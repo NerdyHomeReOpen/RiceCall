@@ -16,6 +16,7 @@ import BadgeViewer from '@/components/viewers/BadgeViewer';
 
 // Providers
 import { useContextMenu } from '@/providers/ContextMenuProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 // Services
 import { ipcService } from '@/services/ipc.service';
@@ -27,15 +28,18 @@ interface FriendGroupProps {
 
 const FriendGroup: React.FC<FriendGroupProps> = React.memo(
   ({ friendGroup, friends }) => {
+    // Language
+    const lang = useLanguage();
+
+    // Context Menu
+    const contextMenu = useContextMenu();
+
     // Variables
     const groupName = friendGroup.name;
     const groupFriends = friends.filter((fd) => fd.groupId == friendGroup.id);
 
     // Expanded Control
     const [expanded, setExpanded] = useState<boolean>(true);
-
-    // Context Menu
-    const contextMenu = useContextMenu();
 
     return (
       <div key={friendGroup.id}>
@@ -50,7 +54,7 @@ const FriendGroup: React.FC<FriendGroupProps> = React.memo(
               {
                 id: 'delete',
                 icon: <Trash size={14} className="w-5 h-5 mr-2" />,
-                label: '刪除',
+                label: lang.tr.delete,
                 onClick: () => {
                   // Open Delete Group Modal
                 },
@@ -86,10 +90,16 @@ interface FriendCardProps {
   friend: Friend;
 }
 const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
+  // Language
+  const lang = useLanguage();
+
+  // Context Menu
+  const contextMenu = useContextMenu();
+
   // Variables
   const friendUser = friend.user || {
     id: '',
-    name: '未知使用者',
+    name: lang.tr.unknownUser,
     avatar: '',
     avatarUrl: '',
     signature: '',
@@ -111,9 +121,6 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
   const friendGrade = Math.min(56, Math.ceil(friendLevel / 5)); // 56 is max level
   const friendBadges = friendUser.badges || [];
 
-  // Context Menu Control
-  const contextMenu = useContextMenu();
-
   // Handlers
   const handleOpenDirectMessagePopup = () => {
     ipcService.popup.open(popupType.DIRECT_MESSAGE);
@@ -132,7 +139,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
             {
               id: 'delete',
               icon: <Trash size={14} className="w-5 h-5 mr-2" />,
-              label: '刪除好友',
+              label: lang.tr.deleteFriend,
               onClick: () => {
                 // Open Delete Friend Modal
               },
@@ -171,6 +178,9 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
   ({ friendGroups, friends }) => {
     // Redux
     const user = useSelector((state: { user: User }) => state.user);
+
+    // Language
+    const lang = useLanguage();
 
     // Search Control
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -223,7 +233,7 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
               <div className={styles['searchIcon']} />
               <input
                 type="text"
-                placeholder="搜尋好友"
+                placeholder={lang.tr.searchFriend}
                 className={styles['searchInput']}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -243,7 +253,7 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
             {/* Bottom Buttons */}
             <div className={styles['bottomButtons']}>
               <div className={styles['button']} datatype="addGroup">
-                {'添加分組'}
+                {lang.tr.friendAddGroup}
               </div>
               <div
                 className={styles['button']}
@@ -252,7 +262,7 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
                   handleOpenApplyFriendPopup();
                 }}
               >
-                {'新增好友'}
+                {lang.tr.addFriend}
               </div>
             </div>
           </div>

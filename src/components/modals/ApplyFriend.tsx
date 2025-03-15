@@ -6,10 +6,11 @@ import popup from '@/styles/common/popup.module.css';
 import applyFriend from '@/styles/popups/applyFriend.module.css';
 
 // Types
-import { FriendApplication, popupType, User } from '@/types';
+import { popupType, User } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/SocketProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 // Services
 import { ipcService } from '@/services/ipc.service';
@@ -21,14 +22,17 @@ interface ApplyFriendModalProps {
 
 const ApplyFriendModal: React.FC<ApplyFriendModalProps> = React.memo(
   (initialData: ApplyFriendModalProps) => {
+    // Language
+    const lang = useLanguage();
+
+    // Socket
+    const socket = useSocket();
+
     // Variables
     const targetUserId = initialData.targetUser?.id || '';
     const targetUserName = initialData.targetUser?.name || '';
     const targetUserAvatarUrl = initialData.targetUser?.avatarUrl || '';
     const friendGroups = initialData.user?.friendGroups || [];
-
-    // Socket
-    const socket = useSocket();
 
     // State
     const [description, setDescription] = useState('');
@@ -38,10 +42,11 @@ const ApplyFriendModal: React.FC<ApplyFriendModalProps> = React.memo(
     //   // socket?.send.createFriendApplication({});
     // };
 
+    // Handlers
     const handleOpenSuccessPopup = () => {
       ipcService.popup.open(popupType.DIALOG_SUCCESS);
       ipcService.initialData.onRequest(popupType.DIALOG_SUCCESS, {
-        title: '好友申請已發送，正等待對方的確認！',
+        title: lang.tr.friendApply,
         submitTo: popupType.DIALOG_SUCCESS,
       });
       ipcService.popup.onSubmit(popupType.DIALOG_SUCCESS, () => {
@@ -57,7 +62,7 @@ const ApplyFriendModal: React.FC<ApplyFriendModalProps> = React.memo(
       <div className={popup['popupContainer']}>
         <div className={`${popup['popupBody']}`}>
           <div className={applyFriend['body']}>
-            <div className={popup['label']}>{'您將添加以下聯絡人'}</div>
+            <div className={popup['label']}>{lang.tr.friendLabel}</div>
             <div className={applyFriend['headerBox']}>
               <div className={applyFriend['avatarWrapper']}>
                 <div className={applyFriend['avatarPicture']} />
@@ -73,7 +78,7 @@ const ApplyFriendModal: React.FC<ApplyFriendModalProps> = React.memo(
             </div>
             <div className={applyFriend['split']} />
             <div className={applyFriend['contentBox']}>
-              <div className={popup['label']}>{'選擇分組：'}</div>
+              <div className={popup['label']}>{lang.tr.friendSelectGroup}</div>
               <div className={popup['inputBox']}>
                 <select
                   className={popup['select']}
@@ -87,9 +92,11 @@ const ApplyFriendModal: React.FC<ApplyFriendModalProps> = React.memo(
                     </option>
                   ))}
                 </select>
-                <div className={applyFriend['linkText']}>{'添加分組'}</div>
+                <div className={applyFriend['linkText']}>
+                  {lang.tr.friendAddGroup}
+                </div>
               </div>
-              <div className={popup['label']}>{'附言：'}</div>
+              <div className={popup['label']}>{lang.tr.friendNote}</div>
               <div className={popup['inputBox']}>
                 <textarea
                   rows={2}
@@ -99,7 +106,7 @@ const ApplyFriendModal: React.FC<ApplyFriendModalProps> = React.memo(
                 />
               </div>
               <div className={applyFriend['noteText']}>
-                {'最多只能輸入120個字元'}
+                {lang.tr.max120content}
               </div>
             </div>
           </div>
@@ -115,7 +122,7 @@ const ApplyFriendModal: React.FC<ApplyFriendModalProps> = React.memo(
               handleOpenSuccessPopup();
             }}
           >
-            {'傳送請求'}
+            {lang.tr.sendRequest}
           </button>
           <button
             className={popup['button']}
@@ -123,7 +130,7 @@ const ApplyFriendModal: React.FC<ApplyFriendModalProps> = React.memo(
               handleClose();
             }}
           >
-            {'取消'}
+            {lang.tr.cancel}
           </button>
         </div>
       </div>

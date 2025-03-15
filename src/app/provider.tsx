@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 // Providers
 import SocketProvider from '@/providers/SocketProvider';
 import ContextMenuProvider from '@/providers/ContextMenuProvider';
+import { LanguageProvider } from '@/providers/LanguageProvider';
 
 // Redux
 import store from '@/redux/store';
@@ -17,9 +18,11 @@ interface ProvidersProps {
 const Providers = ({ children }: ProvidersProps) => {
   return (
     <Provider store={store}>
-      <SocketProvider>
-        <ContextMenuProvider>{children}</ContextMenuProvider>
-      </SocketProvider>
+      <LanguageProvider>
+        <SocketProvider>
+          <ContextMenuProvider>{children}</ContextMenuProvider>
+        </SocketProvider>
+      </LanguageProvider>
     </Provider>
   );
 };

@@ -37,7 +37,7 @@ module.exports = class Logger {
     console.error(
       `${chalk.gray(new Date().toLocaleString())} ${chalk.red(
         `[${this.origin}]`,
-      )}${chalk.magenta(`(${getCallerFile()})`)} ${message}`,
+      )}${chalk.magenta(`(${getCallerFile()}:${getCallerLine()})`)} ${message}`,
     );
   }
 };
@@ -59,4 +59,23 @@ const getCallerFile = () => {
   } catch (e) {}
   Error.prepareStackTrace = originalFunc;
   return callerfile;
+};
+
+const getCallerLine = () => {
+  const originalFunc = Error.prepareStackTrace;
+  let callerline;
+  try {
+    const err = new Error();
+    let currentline;
+    Error.prepareStackTrace = function (err, stack) {
+      return stack;
+    };
+    currentline = err.stack.shift().getLineNumber();
+    while (err.stack.length) {
+      callerline = err.stack.shift().getLineNumber();
+      if (currentline !== callerline) break;
+    }
+  } catch (e) {}
+  Error.prepareStackTrace = originalFunc;
+  return callerline;
 };

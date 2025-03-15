@@ -14,6 +14,7 @@ import { popupType, type Server, type User } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/SocketProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 // Services
 import { ipcService } from '@/services/ipc.service';
@@ -22,14 +23,17 @@ const HomePageComponent: React.FC = React.memo(() => {
   // Redux
   const user = useSelector((state: { user: User }) => state.user);
 
+  // Socket
+  const socket = useSocket();
+
+  // Language
+  const lang = useLanguage();
+
   // Variables
   const userName = user.name;
   const userOwnedServers = user.ownedServers || [];
   const userRecentServers = user.recentServers || [];
   const userFavServers = user.favServers || [];
-
-  // Socket Control
-  const socket = useSocket();
 
   // Search Results Control
   const [searchResults, setSearchResults] = useState<Server[]>([]);
@@ -37,21 +41,21 @@ const HomePageComponent: React.FC = React.memo(() => {
   // Update Discord Presence
   useEffect(() => {
     ipcService.discord.updatePresence({
-      details: `正在瀏覽主頁`,
-      state: `使用者: ${userName}`,
+      details: lang.tr.RPCHomePage,
+      state: `${lang.tr.RPCUser} ${userName}`,
       largeImageKey: 'app_icon',
       largeImageText: 'RC Voice',
       smallImageKey: 'home_icon',
-      smallImageText: '主頁',
+      smallImageText: lang.tr.RPCHome,
       timestamp: Date.now(),
       buttons: [
         {
-          label: '加入我們的Discord伺服器',
+          label: lang.tr.RPCJoinServer,
           url: 'https://discord.gg/adCWzv6wwS',
         },
       ],
     });
-  }, []);
+  }, [userName]);
 
   // Refresh User
   useEffect(() => {
@@ -81,7 +85,7 @@ const HomePageComponent: React.FC = React.memo(() => {
           <div className={homePage['searchBar']}>
             <input
               type="search"
-              placeholder="輸入群ID或群名稱"
+              placeholder={lang.tr.searchPlaceholder}
               data-placeholder="60021"
               className={homePage['searchInput']}
               onKeyDown={(e) => {
@@ -99,15 +103,15 @@ const HomePageComponent: React.FC = React.memo(() => {
             data-key="60060"
           >
             <div></div>
-            主頁
+            {lang.tr.home}
           </button>
           <button className={homePage['navegateItem']} data-key="40007">
             <div></div>
-            遊戲
+            {lang.tr.game}
           </button>
           <button className={homePage['navegateItem']} data-key="30375">
             <div></div>
-            秀場
+            {lang.tr.live}
           </button>
         </div>
         <div className={homePage['right']}>
@@ -117,11 +121,11 @@ const HomePageComponent: React.FC = React.memo(() => {
             onClick={handleOpenCreateServerPopup}
           >
             <div></div>
-            創建語音群
+            {lang.tr.createGroup}
           </button>
           <button className={homePage['navegateItem']} data-key="60004">
             <div></div>
-            個人專屬
+            {lang.tr.personalExclusive}
           </button>
         </div>
       </header>
@@ -132,26 +136,26 @@ const HomePageComponent: React.FC = React.memo(() => {
             {searchResults.length > 0 && (
               <div className={homePage['myGroupsItem']}>
                 <div className={homePage['myGroupsTitle']} data-key="60005">
-                  搜尋結果
+                  {lang.tr.recentVisits}
                 </div>
                 <ServerListViewer servers={searchResults} />
               </div>
             )}
             <div className={homePage['myGroupsItem']}>
               <div className={homePage['myGroupsTitle']} data-key="60005">
-                最近訪問
+                {lang.tr.recentVisits}
               </div>
               <ServerListViewer servers={userRecentServers} />
             </div>
             <div className={homePage['myGroupsItem']}>
               <div className={homePage['myGroupsTitle']} data-key="30283">
-                我的語音群
+                {lang.tr.myGroups}
               </div>
               <ServerListViewer servers={userOwnedServers} />
             </div>
             <div className={homePage['myGroupsItem']}>
               <div className={homePage['myGroupsTitle']} data-key="60005">
-                收藏的語音群
+                {lang.tr.favoriteGroups}
               </div>
               <ServerListViewer servers={userFavServers} />
             </div>

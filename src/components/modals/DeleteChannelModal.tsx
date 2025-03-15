@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { FormEvent, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { Channel } from '@/types';
 import { useSocket } from '@/providers/SocketProvider';
 import Dialog from '@/components/modals/Dialog';
 
 import DeleteChannel from '../../styles/popups/deleteChannel.module.css';
 import Popup from '../../styles/common/popup.module.css';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 interface DeleteChannelModalProps {
   onClose: () => void;
@@ -17,12 +17,16 @@ const DeleteChannelModal: React.FC<DeleteChannelModalProps> = ({
   onClose,
   channel,
 }) => {
+  // Language
+  const lang = useLanguage();
+
   // Socket
   const socket = useSocket();
 
   // Error Control
   const [error, setError] = useState('');
 
+  // Handlers
   const handleSubmit = async (e: FormEvent<Element>) => {
     e.preventDefault();
     socket?.send.deleteChannel({ channelId: channel.id });
@@ -46,10 +50,10 @@ const DeleteChannelModal: React.FC<DeleteChannelModalProps> = ({
 
         <div className={Popup['popupFooter']}>
           <button type="submit" className={Popup['button']}>
-            確定
+            {lang.tr.confirm}
           </button>
           <button type="button" className={Popup['button']} onClick={onClose}>
-            取消
+            {lang.tr.cancel}
           </button>
         </div>
       </div>

@@ -1,6 +1,18 @@
-import { Permission } from '@/types';
+import { LanguageKey, Permission, Translation } from '@/types';
 
-export const formatTimestamp = (timestamp: number): string => {
+export const formatTimestamp = (
+  timestamp: number,
+  key: LanguageKey,
+  tr: Translation,
+): string => {
+  const langMap: Record<LanguageKey, string> = {
+    tw: 'zh-TW',
+    cn: 'zh-CN',
+    en: 'en-US',
+    jp: 'ja-JP',
+    ru: 'ru-RU',
+  };
+  const timezoneLang = langMap[key] || 'zh-TW';
   const now = new Date();
   const messageDate = new Date(timestamp);
   const messageDay = new Date(
@@ -13,34 +25,37 @@ export const formatTimestamp = (timestamp: number): string => {
   yesterday.setDate(yesterday.getDate() - 1);
 
   if (messageDay.getTime() === today.getTime()) {
-    return messageDate.toLocaleTimeString('zh-TW', {
+    return messageDate.toLocaleTimeString(timezoneLang, {
       hour: '2-digit',
       minute: '2-digit',
     });
   } else if (messageDay.getTime() === yesterday.getTime()) {
-    return `昨天 ${messageDate.toLocaleTimeString('zh-TW', {
+    return `${tr.yesterday} ${messageDate.toLocaleTimeString(timezoneLang, {
       hour: '2-digit',
       minute: '2-digit',
     })}`;
   }
   return `${messageDate.toLocaleDateString(
-    'zh-TW',
-  )} ${messageDate.toLocaleTimeString('zh-TW', {
+    timezoneLang,
+  )} ${messageDate.toLocaleTimeString(timezoneLang, {
     hour: '2-digit',
     minute: '2-digit',
   })}`;
 };
 
-export const getPermissionText = (permission: number): string => {
+export const getPermissionText = (
+  permission: number,
+  tr: Translation,
+): string => {
   const permissionMap: Record<number, string> = {
-    [Permission.Guest]: '遊客', // 1
-    [Permission.Member]: '會員', // 2
-    [Permission.ChannelAdmin]: '二級頻道管理員', // 3
-    [Permission.ChannelManager]: '頻道管理員', // 4
-    [Permission.ServerAdmin]: '群管理員', // 5
-    [Permission.ServerOwner]: '群創建者', // 6
-    [Permission.EventStaff]: '官方客服', // 7
-    [Permission.Official]: '超級管理員', // 8
+    [Permission.Guest]: tr.guest, // 1
+    [Permission.Member]: tr.member, // 2
+    [Permission.ChannelAdmin]: tr.channelAdmin, // 3
+    [Permission.ChannelManager]: tr.channelManager, // 4
+    [Permission.ServerAdmin]: tr.serverAdmin, // 5
+    [Permission.ServerOwner]: tr.serverOwner, // 6
+    [Permission.EventStaff]: tr.eventStaff, // 7
+    [Permission.Official]: tr.official, // 8
   };
-  return permissionMap[permission] || '未知';
+  return permissionMap[permission] || tr.unknownUser;
 };

@@ -10,7 +10,7 @@ import { CircleX } from 'lucide-react';
 import header from '@/styles/common/header.module.css';
 
 // Types
-import { Channel, Server, User, SocketServerEvent } from '@/types';
+import { Channel, Server, User, SocketServerEvent, LanguageKey } from '@/types';
 
 // Pages
 import FriendPage from '@/components/pages/FriendPage';
@@ -26,6 +26,7 @@ import { errorHandler, StandardizedError } from '@/utils/errorHandler';
 // Providers
 import WebRTCProvider from '@/providers/WebRTCProvider';
 import { useSocket } from '@/providers/SocketProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 // Services
 import { ipcService } from '@/services/ipc.service';
@@ -56,6 +57,9 @@ const Header: React.FC<HeaderProps> = React.memo(
     // Socket
     const socket = useSocket();
 
+    // Language
+    const lang = useLanguage();
+
     // Fullscreen Control
     const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -70,12 +74,12 @@ const Header: React.FC<HeaderProps> = React.memo(
       const tabs = [
         {
           id: 1,
-          label: '首頁',
+          label: lang.tr.home,
           onClick: () => {},
         },
         {
           id: 2,
-          label: '好友',
+          label: lang.tr.friends,
           onClick: () => {},
         },
       ];
@@ -87,14 +91,14 @@ const Header: React.FC<HeaderProps> = React.memo(
         });
       }
       return tabs;
-    }, [user, server]);
+    }, [user, server, lang]);
 
     // Status Dropdown Control
     const STATUS_OPTIONS = [
-      { status: 'online', label: '上線' },
-      { status: 'dnd', label: '請勿打擾' },
-      { status: 'idle', label: '閒置' },
-      { status: 'gn', label: '離線' },
+      { status: 'online', label: lang.tr.online },
+      { status: 'dnd', label: lang.tr.dnd },
+      { status: 'idle', label: lang.tr.idle },
+      { status: 'gn', label: lang.tr.gn },
     ];
 
     // Handlers
@@ -134,6 +138,10 @@ const Header: React.FC<HeaderProps> = React.memo(
 
     const handleOpenDevtool = () => {
       ipcService.window.openDevtool();
+    };
+
+    const handleLanguageChange = (language: LanguageKey) => {
+      lang.set(language);
     };
 
     return (
@@ -221,7 +229,7 @@ const Header: React.FC<HeaderProps> = React.memo(
                 data-key="30066"
                 onClick={() => handleOpenDevtool()}
               >
-                系統設定
+                {lang.tr.systemSettings}
               </div>
               <div
                 className={`${header['option']} ${header['hasImage']}`}
@@ -239,43 +247,63 @@ const Header: React.FC<HeaderProps> = React.memo(
                   )
                 }
               >
-                訊息紀錄
+                {lang.tr.messageHistory}
               </div>
               <div
                 className={`${header['option']} ${header['hasImage']}`}
                 data-type="change-theme"
                 data-key="60028"
               >
-                更換主題
+                {lang.tr.changeTheme}
               </div>
               <div
                 className={header['option']}
                 data-type="feed-back"
                 data-key="30039"
               >
-                意見反饋
+                {lang.tr.feedback}
               </div>
               <div
                 className={`${header['option']} ${header['hasImage']} ${header['hasSubmenu']}`}
                 data-type="language-select"
               >
-                <span data-key="30374">語言選擇</span>
+                <span data-key="30374">{lang.tr.languageSelect}</span>
                 <div
                   className={`${header['menuDropDown']} ${header['hidden']}`}
                 >
-                  <div className={header['option']} data-lang="tw">
+                  <div
+                    className={header['option']}
+                    data-lang="tw"
+                    onClick={() => handleLanguageChange('tw')}
+                  >
                     繁體中文
                   </div>
-                  <div className={header['option']} data-lang="cn">
+                  <div
+                    className={header['option']}
+                    data-lang="cn"
+                    onClick={() => handleLanguageChange('cn')}
+                  >
                     简体中文
                   </div>
-                  <div className={header['option']} data-lang="en">
+                  <div
+                    className={header['option']}
+                    data-lang="en"
+                    onClick={() => handleLanguageChange('en')}
+                  >
                     English
                   </div>
-                  <div className={header['option']} data-lang="jp">
+                  <div
+                    className={header['option']}
+                    data-lang="jp"
+                    onClick={() => handleLanguageChange('jp')}
+                  >
                     日本語
                   </div>
-                  <div className={header['option']} data-lang="ru">
+                  <div
+                    className={header['option']}
+                    data-lang="ru"
+                    onClick={() => handleLanguageChange('ru')}
+                  >
                     русский язык
                   </div>
                 </div>
@@ -286,7 +314,7 @@ const Header: React.FC<HeaderProps> = React.memo(
                 data-key="30060"
                 onClick={() => handleLogout()}
               >
-                登出
+                {lang.tr.logout}
               </div>
               <div
                 className={`${header['option']} ${header['hasImage']}`}
@@ -294,7 +322,7 @@ const Header: React.FC<HeaderProps> = React.memo(
                 data-key="30061"
                 onClick={() => handleClose()}
               >
-                退出
+                {lang.tr.exit}
               </div>
             </div>
           </div>
@@ -346,6 +374,15 @@ const Home = () => {
       unsubscribe.forEach((unsub) => unsub());
     };
   }, [socket]);
+
+  useEffect(() => {
+    const lang = localStorage.getItem('language');
+    if (lang) {
+      // Apply the language setting to your application
+      // This could involve loading language-specific resources, etc.
+      console.log(`Language set to: ${lang}`);
+    }
+  }, []);
 
   // Tab Control
   const [selectedTabId, setSelectedTabId] = useState<number>(1);

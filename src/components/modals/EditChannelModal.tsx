@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { FormEvent, useState } from 'react';
-import { useSelector } from 'react-redux';
-
-// Components
-import Modal from '@/components/Modal';
 
 // Types
 import { Channel, Visibility } from '@/types';
 
 // Providers
+import { useLanguage } from '@/providers/LanguageProvider';
 import { useSocket } from '@/providers/SocketProvider';
 
 // CSS
@@ -22,6 +19,9 @@ interface EditChannelModalProps {
 
 const EditChannelModal: React.FC<EditChannelModalProps> = React.memo(
   ({ onClose, channel }) => {
+    // Language
+    const lang = useLanguage();
+
     // Socket
     const socket = useSocket();
 
@@ -33,6 +33,7 @@ const EditChannelModal: React.FC<EditChannelModalProps> = React.memo(
       },
     });
 
+    // Handlers
     const handleSubmit = async (e: FormEvent<Element>) => {
       e.preventDefault();
       socket?.send.updateChannel({ channel: editedChannel });
@@ -45,7 +46,8 @@ const EditChannelModal: React.FC<EditChannelModalProps> = React.memo(
           <div className={EditChannel['popupBody']}>
             <div className={Popup['inputBox']}>
               <div className={Popup['title']}>
-                {`${channel?.isCategory ? '類別' : '頻道'}`}名稱
+                {`${channel?.isCategory ? lang.tr.category : lang.tr.channel}`}
+                {lang.tr.name}
               </div>
               <div className={Popup['inputBorder']}>
                 <input
@@ -61,7 +63,7 @@ const EditChannelModal: React.FC<EditChannelModalProps> = React.memo(
               </div>
             </div>
             <div className={Popup['inputBox']}>
-              <div className={Popup['title']}>訪問受限</div>
+              <div className={Popup['title']}>{lang.tr.channelPermission}</div>
               <div className={Popup['inputBorder']}>
                 <select
                   value={editedChannel?.settings?.visibility}
@@ -78,19 +80,19 @@ const EditChannelModal: React.FC<EditChannelModalProps> = React.memo(
                     })
                   }
                 >
-                  <option value="public">任何人可以訪問</option>
-                  <option value="private">禁止遊客訪問</option>
-                  <option value="readonly">唯讀</option>
+                  <option value="public">{lang.tr.channelPublic}</option>
+                  <option value="private">{lang.tr.channelPrivate}</option>
+                  <option value="readonly">{lang.tr.channelReadonly}</option>
                 </select>
               </div>
             </div>
           </div>
           <div className={Popup['popupFooter']}>
             <button type="submit" className={Popup['button']}>
-              確定
+              {lang.tr.confirm}
             </button>
             <button type="button" className={Popup['button']} onClick={onClose}>
-              取消
+              {lang.tr.cancel}
             </button>
           </div>
         </div>

@@ -15,6 +15,7 @@ import permission from '@/styles/common/permission.module.css';
 import { popupType, type Channel, type Server, type User } from '@/types';
 
 // Providers
+import { useLanguage } from '@/providers/LanguageProvider';
 import { useSocket } from '@/providers/SocketProvider';
 import { useContextMenu } from '@/providers/ContextMenuProvider';
 
@@ -31,18 +32,21 @@ interface CategoryTabProps {
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(
   ({ category, canEdit }) => {
-    // Variables
-    const categoryName = category.name;
-    const categoryIsRoot = category.isRoot;
-    const categoryIsLobby = category.isLobby;
-    const categoryVisibility = category.settings.visibility;
-    const categoryChannels = category.subChannels || [];
+    // Language
+    const lang = useLanguage();
 
     // Socket
     const socket = useSocket();
 
     // Context Menu
     const contextMenu = useContextMenu();
+
+    // Variables
+    const categoryName = category.name;
+    const categoryIsRoot = category.isRoot;
+    const categoryIsLobby = category.isLobby;
+    const categoryVisibility = category.settings.visibility;
+    const categoryChannels = category.subChannels || [];
 
     // Expanded Control
     const [expanded, setExpanded] = useState<boolean>(true);
@@ -67,7 +71,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       ipcService.popup.open(popupType.DIALOG_WARNING);
       ipcService.initialData.onRequest(popupType.DIALOG_WARNING, {
         iconType: 'warning',
-        title: '確定要刪除此頻道嗎？',
+        title: lang.tr.warningDeleteChannel,
         submitTo: popupType.DIALOG_WARNING,
       });
       ipcService.popup.onSubmit(popupType.DIALOG_WARNING, () =>
@@ -95,21 +99,21 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               {
                 id: 'edit',
                 icon: <Edit size={14} className="w-5 h-5 mr-2" />,
-                label: '編輯',
+                label: lang.tr.edit,
                 show: canEdit,
                 onClick: handleOpenEditChannelPopup,
               },
               {
                 id: 'add',
                 icon: <Plus size={14} className="w-5 h-5 mr-2" />,
-                label: '新增',
+                label: lang.tr.add,
                 show: canEdit && !categoryIsLobby && categoryIsRoot,
                 onClick: handleOpenCreateChannelPopup,
               },
               {
                 id: 'delete',
                 icon: <Trash size={14} className="w-5 h-5 mr-2" />,
-                label: '刪除',
+                label: lang.tr.delete,
                 show: canEdit && !categoryIsLobby,
                 onClick: handleOpenWarningPopup,
               },
@@ -157,6 +161,15 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const user = useSelector((state: { user: User }) => state.user);
     const server = useSelector((state: { server: Server }) => state.server);
 
+    // Language
+    const lang = useLanguage();
+
+    // Socket
+    const socket = useSocket();
+
+    // Context Menu
+    const contextMenu = useContextMenu();
+
     // Variables
     const serverUsers = server.users || [];
     const channelName = channel.name;
@@ -167,12 +180,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       (u) => u.currentChannelId === channel.id,
     );
     const userInChannel = user.currentChannelId === channel.id;
-
-    // Socket
-    const socket = useSocket();
-
-    // Context Menu
-    const contextMenu = useContextMenu();
 
     // Expanded Control
     const [expanded, setExpanded] = useState<boolean>(true);
@@ -197,7 +204,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       ipcService.popup.open(popupType.DIALOG_WARNING);
       ipcService.initialData.onRequest(popupType.DIALOG_WARNING, {
         iconType: 'warning',
-        title: '確定要刪除此頻道嗎？',
+        title: lang.tr.warningDeleteChannel,
         submitTo: popupType.DIALOG_WARNING,
       });
       ipcService.popup.onSubmit(popupType.DIALOG_WARNING, () =>
@@ -235,21 +242,21 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               {
                 id: 'edit',
                 icon: <Edit size={14} className="w-5 h-5 mr-2" />,
-                label: '編輯',
+                label: lang.tr.edit,
                 show: canEdit,
                 onClick: handleOpenEditChannelPopup,
               },
               {
                 id: 'add',
                 icon: <Plus size={14} className="w-5 h-5 mr-2" />,
-                label: '新增',
+                label: lang.tr.add,
                 show: canEdit && !channelIsLobby && channelIsRoot,
                 onClick: handleOpenCreateChannelPopup,
               },
               {
                 id: 'delete',
                 icon: <Trash size={14} className="w-5 h-5 mr-2" />,
-                label: '刪除',
+                label: lang.tr.delete,
                 show: canEdit && !channelIsLobby,
                 onClick: () => handleOpenWarningPopup,
               },
@@ -290,6 +297,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const user = useSelector((state: { user: User }) => state.user);
     const server = useSelector((state: { server: Server }) => state.server);
 
+    // Language
+    const lang = useLanguage();
+
+    // Context
+    const contextMenu = useContextMenu();
+
     // Variables
     const serverMembers = server.members || {};
     const channelUserMember = serverMembers[channelUser.id] || {
@@ -308,12 +321,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const channelUserGender = channelUser.gender;
     const channelUserBadges = channelUser.badges || [];
     const isCurrentUser = user.id === channelUser.id;
-
-    // Socket
-    const socket = useSocket();
-
-    // Context
-    const contextMenu = useContextMenu();
 
     // Handlers
     const handleOpenApplyFriendPopup = () => {
@@ -342,7 +349,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               {
                 id: 'kick',
                 icon: <Trash size={14} className="w-5 h-5 mr-2" />,
-                label: '踢出',
+                label: lang.tr.kick,
                 show: canEdit && user.id != channelUser.id,
                 onClick: () => {
                   // handleKickUser(user.id);
@@ -351,7 +358,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               {
                 id: 'addFriend',
                 icon: <Plus size={14} className="w-5 h-5 mr-2" />,
-                label: '新增好友',
+                label: lang.tr.addFriend,
                 show: canEdit && user.id != channelUser.id,
                 onClick: () => {
                   handleOpenApplyFriendPopup();
@@ -393,6 +400,12 @@ const ChannelViewer: React.FC<ChannelViewerProps> = ({ channels }) => {
   const user = useSelector((state: { user: User }) => state.user);
   const server = useSelector((state: { server: Server }) => state.server);
 
+  // Language
+  const lang = useLanguage();
+
+  // Context
+  const contextMenu = useContextMenu();
+
   // Variables
   const connectStatus = 3;
   const serverMembers = server.members || {};
@@ -401,7 +414,7 @@ const ChannelViewer: React.FC<ChannelViewerProps> = ({ channels }) => {
     (ch) => ch.id === userCurrentChannelId,
   ) || {
     id: '',
-    name: '未知頻道',
+    name: lang.tr.unknownChannel,
     isRoot: false,
     isCategory: false,
     isLobby: false,
@@ -431,9 +444,6 @@ const ChannelViewer: React.FC<ChannelViewerProps> = ({ channels }) => {
   const userPermission = userMember.permissionLevel;
   const canEdit = userPermission >= 5;
 
-  // Context
-  const contextMenu = useContextMenu();
-
   // Handlers
   const handleOpenCreateChannelPopup = () => {
     ipcService.popup.open(popupType.CREATE_CHANNEL);
@@ -459,7 +469,7 @@ const ChannelViewer: React.FC<ChannelViewerProps> = ({ channels }) => {
       {/* Mic Queue */}
       {userCurrentChannelVoiceMode === 'queue' && (
         <>
-          <div className={styles['sectionTitle']}>麥序</div>
+          <div className={styles['sectionTitle']}>{lang.tr.micOrder}</div>
           <div className={styles['micQueueBox']}>
             <div className={styles['userList']}>
               {/* {micQueueUsers.map((user) => (
@@ -485,14 +495,14 @@ const ChannelViewer: React.FC<ChannelViewerProps> = ({ channels }) => {
             {
               id: 'addChannel',
               icon: <Plus size={14} className="w-5 h-5 mr-2" />,
-              label: '新增',
+              label: lang.tr.add,
               show: canEdit,
               onClick: handleOpenCreateChannelPopup,
             },
           ]);
         }}
       >
-        所有頻道
+        {lang.tr.allChannel}
       </div>
       {/* Channel List */}
       <div className={styles['channelList']}>

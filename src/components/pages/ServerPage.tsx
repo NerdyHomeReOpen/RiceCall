@@ -21,7 +21,8 @@ import {
   type Channel,
 } from '@/types';
 
-// Socket
+// Providers
+import { useLanguage } from '@/providers/LanguageProvider';
 import { useSocket } from '@/providers/SocketProvider';
 
 // Services
@@ -33,6 +34,15 @@ const ServerPageComponent: React.FC = React.memo(() => {
   const user = useSelector((state: { user: User }) => state.user);
   const server = useSelector((state: { server: Server }) => state.server);
   const channel = useSelector((state: { channel: Channel }) => state.channel);
+
+  // Language
+  const lang = useLanguage();
+
+  // Socket
+  const socket = useSocket();
+
+  // WebRTC
+  const webRTC = useWebRTC();
 
   // Variables
   const serverName = server.name;
@@ -57,12 +67,6 @@ const ServerPageComponent: React.FC = React.memo(() => {
     createdAt: 0,
   };
   const userPermissionLevel = userMember.permissionLevel;
-
-  // Socket
-  const socket = useSocket();
-
-  // WebRTC
-  const webRTC = useWebRTC();
 
   // Sidebar Control
   const [sidebarWidth, setSidebarWidth] = useState<number>(256);
@@ -103,16 +107,16 @@ const ServerPageComponent: React.FC = React.memo(() => {
   // Update Discord Presence
   useEffect(() => {
     ipcService.discord.updatePresence({
-      details: `在 ${serverName} 中`,
-      state: `與 ${serverUserCount} 位成員聊天`,
+      details: `${lang.tr.in} ${serverName}`,
+      state: `${lang.tr.with} ${serverUserCount} `,
       largeImageKey: 'app_icon',
       largeImageText: 'RC Voice',
       smallImageKey: 'home_icon',
-      smallImageText: '主頁',
+      smallImageText: lang.tr.RPCServer,
       timestamp: Date.now(),
       buttons: [
         {
-          label: '加入我們的Discord伺服器',
+          label: lang.tr.RPCJoinServer,
           url: 'https://discord.gg/adCWzv6wwS',
         },
       ],
@@ -216,7 +220,9 @@ const ServerPageComponent: React.FC = React.memo(() => {
           </div>
           <div className={styles['buttonArea']}>
             <div className={styles['buttons']}>
-              <div className={styles['voiceModeButton']}>自由發言</div>
+              <div className={styles['voiceModeButton']}>
+                {lang.tr.freeSpeech}
+              </div>
             </div>
             <div
               className={`${styles['micButton']} ${
@@ -226,11 +232,11 @@ const ServerPageComponent: React.FC = React.memo(() => {
             >
               <div className={styles['micIcon']} />
               <div className={styles['micText']}>
-                {webRTC.isMute ? '拿麥發言' : '已拿麥'}
+                {webRTC.isMute ? lang.tr.takeMic : lang.tr.takenMic}
               </div>
             </div>
             <div className={styles['buttons']}>
-              <div className={styles['bkgModeButton']}>混音</div>
+              <div className={styles['bkgModeButton']}>{lang.tr.mixing}</div>
               <div className={styles['saperator']} />
               <div
                 className={`${styles['micModeButton']} ${

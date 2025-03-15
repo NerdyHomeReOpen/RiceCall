@@ -9,6 +9,7 @@ import applyMember from '@/styles/popups/serverApplication.module.css';
 import { popupType, type Server, type ServerApplication } from '@/types';
 
 // Providers
+import { useLanguage } from '@/providers/LanguageProvider';
 import { useSocket } from '@/providers/SocketProvider';
 
 // Services
@@ -20,13 +21,16 @@ interface ServerApplicationModalProps {
 
 const ServerApplicationModal: React.FC<ServerApplicationModalProps> =
   React.memo((initialData: ServerApplicationModalProps) => {
+    // Language
+    const lang = useLanguage();
+
+    // Socket
+    const socket = useSocket();
+
     // Variables
     const serverName = initialData.server?.name || '';
     const serverDisplayId = initialData.server?.displayId || '';
     const serverAvatar = initialData.server?.avatar || null;
-
-    // Socket
-    const socket = useSocket();
 
     // State
     const [description, setDescription] = useState('');
@@ -41,7 +45,7 @@ const ServerApplicationModal: React.FC<ServerApplicationModalProps> =
     const handleOpenSuccessDialog = () => {
       ipcService.popup.open(popupType.DIALOG_SUCCESS);
       ipcService.initialData.onRequest(popupType.DIALOG_SUCCESS, {
-        title: '申請已送出，請等待管理員審核',
+        title: lang.tr.serverApply,
         submitTo: popupType.DIALOG_SUCCESS,
       });
       ipcService.popup.onSubmit(popupType.DIALOG_SUCCESS, () => {
@@ -80,13 +84,17 @@ const ServerApplicationModal: React.FC<ServerApplicationModalProps> =
                     </div>
                   </div>
                 </div>
-                <div className={Popup['label']}>{'申請須知'}</div>
+                <div className={Popup['label']}>
+                  {lang.tr.serverApplyNotice}
+                </div>
                 <div className={applyMember['noteText']}>
                   {'{server.settings.applicationNote}'}
                 </div>
                 <div className={applyMember['split']} />
                 <div className={applyMember['contentBox']}>
-                  <div className={Popup['label']}>{'申請說明'}</div>
+                  <div className={Popup['label']}>
+                    {lang.tr.serverApplyDescription}
+                  </div>
                   <div className={Popup['inputBox']}>
                     <textarea
                       rows={2}
@@ -112,7 +120,7 @@ const ServerApplicationModal: React.FC<ServerApplicationModalProps> =
                   handleOpenSuccessDialog();
                 }}
               >
-                {'送出'}
+                {lang.tr.submit}
               </button>
               <button
                 type="button"
@@ -121,7 +129,7 @@ const ServerApplicationModal: React.FC<ServerApplicationModalProps> =
                   handleClose();
                 }}
               >
-                {'取消'}
+                {lang.tr.cancel}
               </button>
             </div>
           </div>

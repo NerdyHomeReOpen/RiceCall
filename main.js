@@ -34,13 +34,11 @@ let popups = {};
 const WS_URL = 'http://localhost:4500';
 let socketInstance = null;
 
-// Popup initial datas
-let initialDatas = {};
-
 // Disocrd RPC
 const clientId = '1242441392341516288';
 DiscordRPC.register(clientId);
-const rpc = new DiscordRPC.Client({ transport: 'ipc' });
+let rpc = new DiscordRPC.Client({ transport: 'ipc' });
+
 const defaultPrecence = {
   details: '正在使用應用',
   state: '準備中',
@@ -526,4 +524,7 @@ app.on('activate', async () => {
   }
 });
 
-rpc.login({ clientId }).catch(console.error);
+rpc.login({ clientId }).catch(() => {
+  console.log('Discord RPC登錄失敗, 將不會顯示Discord Rich Presence');
+  rpc = null;
+});

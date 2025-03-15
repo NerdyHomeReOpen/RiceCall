@@ -500,13 +500,6 @@ const serverHandler = {
         `New server(${serverId}) created by user(${userId})`,
       );
     } catch (error) {
-      // Clean up uploaded file if error
-      if (uploadedFilePath) {
-        fs.unlink(uploadedFilePath).catch((err) => {
-          new Logger('Server').error(`Error deleting file: ${err.message}`);
-        });
-      }
-
       if (!error instanceof StandardizedError) {
         error = new StandardizedError(
           `創建伺服器時發生無法預期的錯誤: ${error.message}`,
@@ -703,11 +696,6 @@ const serverHandler = {
         `Server(${server.id}) updated by user(${user.id})`,
       );
     } catch (error) {
-      // Delete uploaded file if error occurs
-      if (uploadedFilePath) {
-        fs.unlink(uploadedFilePath).catch(console.error);
-      }
-
       if (!error instanceof StandardizedError) {
         error = new StandardizedError(
           `更新伺服器時發生無法預期的錯誤: ${error.message}`,

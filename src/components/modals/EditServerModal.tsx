@@ -30,6 +30,7 @@ import { validateName, validateDescription } from './CreateServerModal';
 // Providers
 import { useSocket } from '@/providers/SocketProvider';
 import { useContextMenu } from '@/providers/ContextMenuProvider';
+import { useLanguage } from '@/providers/LanguageProvider';
 
 // Services
 import { ipcService } from '@/services/ipc.service';
@@ -60,11 +61,12 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
   (initialData: ServerSettingModalProps) => {
     const { server, mainUserId } = initialData;
 
-    // Socket Control
+    // Socket
     const socket = useSocket();
 
     // Context Menu
     const contextMenu = useContextMenu();
+    const lang = useLanguage();
 
     const [markdownContent, setMarkdownContent] = useState<string>('');
     const setServerIcon = useRef<HTMLInputElement>(null);
@@ -136,7 +138,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
 
       // Validate file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        console.error('檔案大小不能超過 5MB');
+        console.error(lang.tr.fileSizeError);
         return;
       }
 
@@ -146,7 +148,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
           file.type,
         )
       ) {
-        console.error('不支援的檔案格式');
+        console.error(lang.tr.fileTypeError);
         return;
       }
 
@@ -345,7 +347,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
         });
         handleClose();
       } catch (error) {
-        console.error('更新伺服器失敗:', error);
+        console.error(lang.tr.updateServerError, error);
       }
     };
 
@@ -430,19 +432,19 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
           .map((key) => {
             switch (key) {
               case 'name':
-                return '名稱';
+                return lang.tr.name;
               case 'slogan':
-                return '口號';
+                return lang.tr.slogan;
               case 'type':
-                return '類型';
+                return lang.tr.type;
               case 'description':
-                return '介紹';
+                return lang.tr.description;
               case 'settings.visibility':
-                return '訪問許可權';
+                return lang.tr.accessPermission;
               case 'avatar':
-                return '頭像';
+                return lang.tr.avatar;
               case 'announcement':
-                return '公告';
+                return lang.tr.announcement;
               default:
                 return '';
             }
@@ -462,7 +464,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                     <div className={EditServer['serverSettingItem']}>
                       <div className={EditServer['serverSettingItemContain']}>
                         <div className={EditServer['serverSettingText']}>
-                          名稱
+                          {lang.tr.name}
                         </div>
                         <div className={EditServer['serverSettingInputBorder']}>
                           <input
@@ -493,7 +495,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                       </div>
                       <div className={EditServer['serverSettingItemContain']}>
                         <div className={EditServer['serverSettingText']}>
-                          ID
+                          {lang.tr.id}
                         </div>
                         <div className={EditServer['serverSettingInputBorder']}>
                           <input
@@ -509,7 +511,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                         className={`${EditServer['serverSettingItemContain']} ${EditServer['server-setting-slogen']}`}
                       >
                         <div className={EditServer['serverSettingText']}>
-                          口號
+                          {lang.tr.slogan}
                         </div>
                         <div className={EditServer['serverSettingInputBorder']}>
                           <input
@@ -548,7 +550,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                         setServerIcon.current?.click();
                       }}
                     >
-                      更換圖像
+                      {lang.tr.changeImage}
                     </div>
                     <input
                       type="file"
@@ -565,14 +567,14 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                   <div className={EditServer['serverSettingItem']}>
                     <div className={EditServer['serverSettingItemContain']}>
                       <div className={EditServer['serverSettingText']}>
-                        類型
+                        {lang.tr.type}
                       </div>
                       <div className={EditServer['serverSettingSelectBox']}>
                         <div className={EditServer['serverSettingInputBorder']}>
                           <select className={EditServer['serverSettingSelect']}>
-                            <option>其他</option>
-                            <option>遊戲</option>
-                            <option>娛樂</option>
+                            <option>{lang.tr.other}</option>
+                            <option>{lang.tr.game}</option>
+                            <option>{lang.tr.entertainment}</option>
                           </select>
                           <div
                             className={
@@ -593,7 +595,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                   <div className={EditServer['serverSettingItem']}>
                     <div className={EditServer['serverSettingItemContain']}>
                       <div className={EditServer['serverSettingText']}>
-                        等級
+                        {lang.tr.level}
                       </div>
                       <div className={EditServer['serverSettingSelectBox']}>
                         <div className={EditServer['serverSettingInputBorder']}>
@@ -607,7 +609,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                     </div>
                     <div className={EditServer['serverSettingItemContain']}>
                       <div className={EditServer['serverSettingText']}>
-                        創建時間
+                        {lang.tr.creationTime}
                       </div>
                       <div className={EditServer['serverSettingSelectBox']}>
                         <div className={EditServer['serverSettingInputBorder']}>
@@ -622,7 +624,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                     <div className={EditServer['serverSettingItemContain']}>
                       <div className={EditServer['serverSettingRichCoinTitle']}>
                         <div className={EditServer['serverSettingText']}>
-                          財富值
+                          {lang.tr.wealth}
                         </div>
                         <div
                           className={EditServer['serverSettingRichCoin']}
@@ -648,7 +650,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                       className={`${EditServer['serverSettingItemContain']} ${EditServer['server-setting-about']}`}
                     >
                       <div className={EditServer['serverSettingText']}>
-                        介紹
+                        {lang.tr.description}
                       </div>
                       <div className={EditServer['serverSettingInputBorder']}>
                         <input
@@ -692,7 +694,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
               >
                 <div className={EditServer['serverSettingHeaderTitle']}>
                   <div className={EditServer['serverSettingText']}>
-                    輸入公告內容
+                    {lang.tr.inputAnnouncement}
                   </div>
                   <div
                     className={EditServer['serverSettingButton']}
@@ -701,7 +703,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                       setIsPreviewMode(!isPreviewMode);
                     }}
                   >
-                    {isPreviewMode ? '編輯' : '預覽'}
+                    {isPreviewMode ? lang.tr.edit : lang.tr.preview}
                   </div>
                 </div>
                 <div className={EditServer['serverSettingTextareaBox']}>
@@ -724,8 +726,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                 <div
                   className={`${EditServer['serverSettingText']} ${EditServer['markdownTitle']}`}
                 >
-                  支援 Markdown 語法：**粗體**, *斜體*, # 標題, - 列表,
-                  ```程式碼```, [連結](https://)
+                  {lang.tr.markdownSupport}
                 </div>
               </div>
             </div>
@@ -892,13 +893,13 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
               <div className="flex flex-col p-4">
                 <div className="flex flex-row justify-between items-center mb-6  select-none">
                   <span className="text-sm font-medium">
-                    會員: {sortedMembers.length}
+                    {lang.tr.members}: {sortedMembers.length}
                   </span>
                   <div className="flex justify-end items-center border rounded-md overflow-hidden">
                     <Search className="text-gray-400 h-5 w-5 ml-2" />
                     <input
                       type="text"
-                      placeholder="輸入關鍵字搜尋"
+                      placeholder={lang.tr.searchPlaceholder}
                       className="w-60 px-2 py-1.5 text-sm border-none outline-none"
                       value={searchText}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -918,7 +919,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                             onClick={() => handleSort('name')}
                           >
                             <div className="flex items-center relative pr-6">
-                              會員資料
+                              {lang.tr.memberInfo}
                               <span className="absolute right-0">
                                 {sortState.field === 'name' &&
                                   (sortState.direction === 'asc' ? (
@@ -934,7 +935,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                             onClick={() => handleSort('permission')}
                           >
                             <div className="flex items-center relative pr-6">
-                              身分
+                              {lang.tr.identity}
                               <span className="absolute right-0">
                                 {sortState.field === 'permission' &&
                                   (sortState.direction === 'asc' ? (
@@ -950,7 +951,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                             onClick={() => handleSort('contribution')}
                           >
                             <div className="flex items-center relative pr-6">
-                              貢獻值
+                              {lang.tr.contribution}
                               <span className="absolute right-0">
                                 {sortState.field === 'contribution' &&
                                   (sortState.direction === 'asc' ? (
@@ -966,7 +967,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                             onClick={() => handleSort('joinDate')}
                           >
                             <div className="flex items-center relative pr-6">
-                              入會時間
+                              {lang.tr.joinDate}
                               <span className="absolute right-0">
                                 {sortState.field === 'joinDate' &&
                                   (sortState.direction === 'asc' ? (
@@ -1022,7 +1023,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                                   //   onClick: () => {},
                                   // },
                                   {
-                                    label: '移至我的頻道',
+                                    label: lang.tr.moveToMyChannel,
                                     disabled: isCurrentUser,
                                     onClick: () => handleUserMove(member),
                                   },
@@ -1037,22 +1038,22 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                                   //   onClick: () => {},
                                   // },
                                   {
-                                    label: '踢出群',
+                                    label: lang.tr.kickOut,
                                     disabled: isCurrentUser,
                                     onClick: () => handleKickServer(member),
                                   },
                                   {
-                                    label: '封鎖',
+                                    label: lang.tr.block,
                                     disabled: isCurrentUser,
                                     onClick: () => handleBlockUser(member),
                                   },
                                   {
-                                    label: '會員管理',
+                                    label: lang.tr.memberManagement,
                                     disabled: isCurrentUser,
                                     onClick: () => {},
                                   },
                                   {
-                                    label: '邀請成為會員',
+                                    label: lang.tr.inviteToBeMember,
                                     disabled: isCurrentUser,
                                     onClick: () => {},
                                   },
@@ -1072,7 +1073,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                               <td className="px-4 py-3">
                                 <span className="flex flex-col">
                                   <span className="text-gray-500 text-xs">
-                                    {getPermissionText(userPermission || 1)}
+                                    {getPermissionText(userPermission, lang.tr)}
                                   </span>
                                 </span>
                               </td>
@@ -1091,7 +1092,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                 </div>
 
                 <div className="mt-4 text-right text-sm text-gray-500 select-none">
-                  右鍵可以進行處理
+                  {lang.tr.rightClickToProcess}
                 </div>
               </div>
             </>
@@ -1101,7 +1102,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
           return (
             <div className="space-y-4 p-4">
               <div className="text-sm">
-                <span className="font-medium">訪問許可權</span>
+                <span className="font-medium">{lang.tr.accessPermission}</span>
                 <div className="mt-4 ml-8">
                   <div className="flex items-center mb-6">
                     <input
@@ -1125,7 +1126,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                           });
                       }}
                     />
-                    <label htmlFor="public">公開群</label>
+                    <label htmlFor="public">{lang.tr.publicGroup}</label>
                   </div>
 
                   <div className="flex items-start mb-6">
@@ -1151,9 +1152,9 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                       }}
                     />
                     <div>
-                      <label htmlFor="members">半公開群</label>
+                      <label htmlFor="members">{lang.tr.semiPublicGroup}</label>
                       <div className="text-gray-500 text-xs mt-1">
-                        (非會員只允許加入大廳)
+                        {lang.tr.semiPublicGroupDescription}
                       </div>
                     </div>
                   </div>
@@ -1182,9 +1183,9 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                       }}
                     />
                     <div>
-                      <label htmlFor="private">私密群</label>
+                      <label htmlFor="private">{lang.tr.privateGroup}</label>
                       <div className="text-gray-500 text-xs mt-1">
-                        (該群只允許會員進入，不參與排行，只能通過ID搜索到)
+                        {lang.tr.privateGroupDescription}
                       </div>
                     </div>
                   </div>
@@ -1206,7 +1207,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
             <div className="flex flex-col h-full p-4">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-sm font-medium">
-                  申請人數: {sortedApplications.length}
+                  {lang.tr.applicants}: {sortedApplications.length}
                 </span>
                 <button
                   className="text-sm text-blue-400 hover:underline"
@@ -1214,7 +1215,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                     e.preventDefault();
                   }}
                 >
-                  申請設定
+                  {lang.tr.applicationSettings}
                 </button>
               </div>
 
@@ -1224,14 +1225,16 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                     <thead className="sticky top-0 bg-gray-50 text-gray-600 select-none">
                       <tr>
                         <th className="px-4 py-3 text-left font-medium border-b cursor-pointer hover:bg-gray-100 w-32">
-                          <div className="whitespace-nowrap">暱稱</div>
+                          <div className="whitespace-nowrap">
+                            {lang.tr.nickname}
+                          </div>
                         </th>
                         <th
                           className="px-4 py-3 text-left font-medium border-b cursor-pointer hover:bg-gray-100 w-24"
                           onClick={() => handleSort('applyContribution')}
                         >
                           <div className="flex items-center relative pr-6 whitespace-nowrap">
-                            貢獻值
+                            {lang.tr.contribution}
                             <span className="absolute right-0">
                               {sortState.field === 'applyContribution' &&
                                 (sortState.direction === 'asc' ? (
@@ -1243,7 +1246,9 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                           </div>
                         </th>
                         <th className="px-4 py-3 text-left font-medium border-b cursor-pointer hover:bg-gray-100 min-w-[300px]">
-                          <div className="whitespace-nowrap">申請說明</div>
+                          <div className="whitespace-nowrap">
+                            {lang.tr.applicationDescription}
+                          </div>
                         </th>
                       </tr>
                     </thead>
@@ -1283,7 +1288,7 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
               </div>
 
               <div className="mt-4 text-right text-sm text-gray-500 select-none">
-                右鍵可以進行處理
+                {lang.tr.rightClickToProcess}
               </div>
             </div>
           );
@@ -1297,13 +1302,13 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
               {/* head */}
               <div className="flex flex-row justify-between items-center mb-6  select-none">
                 <span className="text-sm font-medium">
-                  黑名單: {Object.keys(blockAccountList).length}
+                  {lang.tr.blacklist}: {Object.keys(blockAccountList).length}
                 </span>
                 <div className="flex justify-end items-center border rounded-md overflow-hidden">
                   <Search className="text-gray-400 h-5 w-5 ml-2" />
                   <input
                     type="text"
-                    placeholder="輸入關鍵字搜尋"
+                    placeholder={lang.tr.searchPlaceholder}
                     className="w-60 px-2 py-1.5 text-sm border-none outline-none"
                   />
                 </div>
@@ -1316,13 +1321,13 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
                     <thead className="sticky top-0 bg-gray-50 text-gray-600 select-none">
                       <tr>
                         <th className="px-4 py-3 text-left font-medium border-b cursor-pointer hover:bg-gray-100">
-                          勾選
+                          {lang.tr.select}
                         </th>
                         <th className="px-4 py-3 text-left font-medium border-b cursor-pointer hover:bg-gray-100">
-                          暱稱
+                          {lang.tr.nickname}
                         </th>
                         <th className="px-4 py-3 text-left font-medium border-b cursor-pointer hover:bg-gray-100">
-                          ID
+                          {lang.tr.id}
                         </th>
                       </tr>
                     </thead>
@@ -1400,12 +1405,36 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
             {/** 左Tab **/}
             <div className={EditServer['serverSettingLeft']}>
               <div className={EditServer['serverSettingTabsBox']}>
-                {TabItem({ index: 0, title: '查看群資料', dataKey: '10158' })}
-                {TabItem({ index: 1, title: '公告', dataKey: '20195' })}
-                {TabItem({ index: 2, title: '會員管理', dataKey: '20107' })}
-                {TabItem({ index: 3, title: '訪問許可權', dataKey: '20073' })}
-                {TabItem({ index: 4, title: '會員申請管理', dataKey: '20108' })}
-                {TabItem({ index: 5, title: '黑名單管理', dataKey: '20144' })}
+                {TabItem({
+                  index: 0,
+                  title: lang.tr.viewGroupInfo,
+                  dataKey: '10158',
+                })}
+                {TabItem({
+                  index: 1,
+                  title: lang.tr.announcement,
+                  dataKey: '20195',
+                })}
+                {TabItem({
+                  index: 2,
+                  title: lang.tr.memberManagement,
+                  dataKey: '20107',
+                })}
+                {TabItem({
+                  index: 3,
+                  title: lang.tr.accessPermission,
+                  dataKey: '20073',
+                })}
+                {TabItem({
+                  index: 4,
+                  title: lang.tr.memberApplicationManagement,
+                  dataKey: '20108',
+                })}
+                {TabItem({
+                  index: 5,
+                  title: lang.tr.blacklistManagement,
+                  dataKey: '20144',
+                })}
               </div>
             </div>
             {/** 右內容 **/}
@@ -1419,14 +1448,14 @@ const EditServerModal: React.FC<ServerSettingModalProps> = React.memo(
           </div>
           <div className={Popup['popupFooter']}>
             <button type="submit" className={Popup['button']}>
-              確定
+              {lang.tr.confirm}
             </button>
             <button
               type="button"
               className={Popup['button']}
               onClick={handleClose}
             >
-              取消
+              {lang.tr.cancel}
             </button>
           </div>
         </form>
