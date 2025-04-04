@@ -1,0 +1,87 @@
+name: 🐞 我找到了一個錯誤
+description: 幫助我們重現並修正你發現的 bug
+title: "🐞 [Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **🐞 我找到了一個錯誤**
+        < - 此模板很有幫助，如果您可以清楚地表達問題，可以幫助我們更快速的解決問題 - >
+
+  - type: textarea
+    id: media
+    attributes:
+      label: 📱螢幕截圖 / 影片
+      description: 如果適用，請添加螢幕截圖或影片錄製以幫助解釋您的問題
+      placeholder: 可以拖進來或貼上圖片、影片連結～
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: ▶ 複現步驟
+      description: 可靠的複現步驟，讓我們可以用來複現該問題
+      placeholder: |
+        1. 運行命令 '...'
+        2. 點擊 '...'
+        3. 將 '...' 放在 '...'
+        4. 請參閱錯誤
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: ✅ 預期行為
+      description: 您期望發生什麼？
+      placeholder: 預期應該發生的畫面或操作結果
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: ❌ 實際行為
+      description: 實際發生的事情
+      placeholder: 錯誤訊息、畫面沒反應、閃退等等
+    validations:
+      required: true
+
+  - type: textarea
+    id: debug
+    attributes:
+      label: 📋 偵錯訊息
+      description: 關於程式的相關資訊，例如終端機錯誤、控制台 log
+      placeholder: |
+        錯誤訊息貼這邊～
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: **版本**：
+      description: |
+        包含作業系統、Node.js、npm/yarn、App 本身等版本資訊
+      placeholder: 例如：Windows 11 / Node 18 / npm 9 / v0.1.3
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 💢 崩潰轉儲、堆棧跟踪、日誌 和 其他文件
+      description: 如果有相關日誌內容請貼上，沒有的話可以跳過
+      placeholder: 例：electron crash log、app 日誌等等
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 💬 我們還應該知道嗎？
+      description: 這是添加任何其他細節的理想場所
+      placeholder: 任何你覺得可能有幫助的細節～
+
+  - type: markdown
+    attributes:
+      value: |
+        **⚠️ 請務必加上適當標籤，方便我們快速進入狀況**
