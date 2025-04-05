@@ -128,6 +128,15 @@ const memberApplicationHandler = {
       const application = await Get.memberApplication(userId, serverId);
       const operatorMember = await Get.member(operator.id, server.id);
 
+      if (!application) {
+        throw new StandardizedError(
+          '申請不存在',
+          'ValidationError',
+          'UPDATEMEMBERAPPLICATION',
+          'APPLICATION_NOT_FOUND',
+          404,
+        );
+      }
       // Validate operator
       if (operator.id === user.id) {
         if (application.applicationStatus !== 'pending') {
@@ -219,6 +228,16 @@ const memberApplicationHandler = {
       const server = await Get.server(serverId);
       const application = await Get.memberApplication(userId, serverId);
       const operatorMember = await Get.member(operator.id, server.id);
+
+      if (!application) {
+        throw new StandardizedError(
+          '申請不存在',
+          'ValidationError',
+          'DELETEMEMBERAPPLICATION',
+          'APPLICATION_NOT_FOUND',
+          404,
+        );
+      }
 
       // Validate operation
       if (operator.id === user.id) {

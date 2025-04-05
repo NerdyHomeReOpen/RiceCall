@@ -42,6 +42,16 @@ const memberHandler = {
       const server = await Get.server(serverId);
       const operatorMember = await Get.member(operator.id, server.id);
 
+      if (!user || !server){
+        throw new StandardizedError(
+          'user 或 server 不存在',
+          'ValidationError',
+          'UPDATEMEMBER',
+          'DATA_INVALID',
+          401,
+        );
+      }
+
       if (operator.id === user.id) {
         if (newMember.permissionLevel !== 1 && server.ownerId != operator.id) {
           throw new StandardizedError(
@@ -160,6 +170,26 @@ const memberHandler = {
       const server = await Get.server(serverId);
       const member = await Get.member(userId, serverId);
       const operatorMember = await Get.member(operator.id, server.id);
+
+      if (!user || !server || !member){
+        throw new StandardizedError(
+          'user 或 server 或 member 不存在',
+          'ValidationError',
+          'UPDATEMEMBER',
+          'DATA_INVALID',
+          401,
+        );
+      }
+
+      if (!operatorMember){
+        throw new StandardizedError(
+          '你不是此伺服器成員',
+          'ValidationError',
+          'UPDATEMEMBER',
+          'DATA_INVALID',
+          401,
+        );
+      }
 
       if (operator.id === user.id) {
         if (editedMember.permissionLevel) {

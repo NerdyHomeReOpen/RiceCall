@@ -9,5 +9,20 @@
       "sharp": "^0.33.5",
       "uuid": "^11.0.5",
       "dotenv": "^16.4.1"
+    },
+    "devDependencies": {
+      "jest": "^29.7.0",
+      "supertest": "^6.3.3",
+      "socket.io-client": "^4.8.1",
+      "jest-mock": "^29.7.0"
+    },
+    "scripts": {
+      "start": "node index.js",
+      "init": "node initial.js",
+      "test": "jest --no-coverage",
+      "test:detail": "jest --coverage",
+      "test:watch": "jest --watch",
+      "test:socket-coverage": "jest --coverage --collectCoverageFrom=\"socket/**/*.js\""
     }
-}
+  }
+  
