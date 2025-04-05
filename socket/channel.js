@@ -128,6 +128,28 @@ const channelHandler = {
             403,
           );
       }
+      // Check channel user limit
+      // manager(>= 5) can join the channel even if it is full
+      if (operatorMember.permissionLevel < 5 && channel.userLimit && channel.userLimit > 0) {
+        // Get all users in the server
+        const serverUsers = await Get.serverUsers(server.id);
+
+        // Filter users who are currently in this channel
+        const usersInChannel = serverUsers.filter(
+          (u) => u.currentChannelId === channel.id,
+        );
+
+        // Check if channel is full
+        if (usersInChannel.length >= channel.userLimit) {
+          throw new StandardizedError(
+            '該頻道已達人數上限',
+            'ValidationError',
+            'CONNECTCHANNEL',
+            'CHANNEL_USER_LIMIT_REACHED',
+            403,
+          );
+        }
+      }
 
       if (user.currentChannelId) {
         // Disconnect the user from the current channel
