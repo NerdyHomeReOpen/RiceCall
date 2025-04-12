@@ -88,7 +88,7 @@ const userHandler = {
       io.to(socket.id).emit('userUpdate', operator);
 
       new Logger('WebSocket').success(
-        `User(${operator.id}) connected with socket(${socket.id})`,
+        `User(${operatorId}) connected with socket(${socket.id})`,
       );
     } catch (error) {
       if (!(error instanceof StandardizedError)) {
@@ -123,11 +123,11 @@ const userHandler = {
       const serverId = operator.currentServerId;
       if (serverId) {
         // Update user
-        const user_update = {
+        const updatedUser = {
           currentServerId: null,
           lastActiveAt: Date.now(),
         };
-        await DB.set.user(operatorId, user_update);
+        await DB.set.user(operatorId, updatedUser);
 
         // Leave the server
         socket.leave(`server_${serverId}`);
@@ -136,11 +136,11 @@ const userHandler = {
       const channelId = operator.currentChannelId;
       if (channelId) {
         // Update user
-        const user_update = {
+        const updatedUser = {
           currentChannelId: null,
           lastActiveAt: Date.now(),
         };
-        await DB.set.user(operatorId, user_update);
+        await DB.set.user(operatorId, updatedUser);
 
         // Clear user contribution interval
         Xp.delete(operatorId);
@@ -167,15 +167,15 @@ const userHandler = {
       Session.deleteUserIdSessionIdMap(operator.id, socket.sessionId);
 
       // Update user
-      const user_update = {
+      const updatedUser = {
         lastActiveAt: Date.now(),
       };
-      await DB.set.user(operator.id, user_update);
+      await DB.set.user(operatorId, updatedUser);
 
       // Emit data (to the operator)
-      io.to(socket.id).emit('userUpdate', user_update);
+      io.to(socket.id).emit('userUpdate', updatedUser);
 
-      new Logger('WebSocket').success(`User(${operator.id}) disconnected`);
+      new Logger('WebSocket').success(`User(${operatorId}) disconnected`);
     } catch (error) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError(
@@ -216,17 +216,15 @@ const userHandler = {
       const operatorId = await Func.validate.socket(socket);
 
       // Get data
-      const operator = await DB.get.user(operatorId);
-      const user = await DB.get.user(userId);
       let userSocket;
       io.sockets.sockets.forEach((_socket) => {
-        if (_socket.userId === user.id) {
+        if (_socket.userId === userId) {
           userSocket = _socket;
         }
       });
 
       // Validate operation
-      if (operator.id !== user.id) {
+      if (operatorId !== userId) {
         throw new StandardizedError(
           '無法更新其他使用者的資料',
           'ValidationError',
@@ -264,13 +262,13 @@ const userHandler = {
       }
 
       // Update user data
-      await DB.set.user(user.id, editedUser);
+      await DB.set.user(userId, editedUser);
 
       // Emit data (to the operator)
       io.to(userSocket.id).emit('userUpdate', editedUser);
 
       new Logger('WebSocket').success(
-        `User(${user.id}) updated by User(${operator.id})`,
+        `User(${userId}) updated by User(${operatorId})`,
       );
     } catch (error) {
       if (!(error instanceof StandardizedError)) {
