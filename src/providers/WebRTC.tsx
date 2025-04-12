@@ -649,16 +649,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   console.log('speakerVolume: ', speakerVolume);
-  // }, [speakerVolume]);
-
-  // useEffect(() => {
-  //   console.log('micVolume: ', micVolume);
-  // }, [micVolume]);
-
   useEffect(() => {
-    // console.log('volumePercent: ', volumePercent);
     for (const dataChannel of Object.values(peerDataChannels.current)) {
       if (dataChannel && dataChannel.readyState === 'open') {
         dataChannel.send(JSON.stringify({ volume: volumePercent }));

@@ -70,8 +70,6 @@ const ChannelMessageTab: React.FC<ChannelMessageTabProps> = React.memo(
     // Hooks
     const lang = useLanguage();
 
-    console.log(messageGroup);
-
     // Variables
     const {
       gender: senderGender,
@@ -83,7 +81,6 @@ const ChannelMessageTab: React.FC<ChannelMessageTabProps> = React.memo(
       timestamp: messageTimestamp,
     } = messageGroup;
     const timestamp = lang.getFormatTimestamp(messageTimestamp);
-    console.log(timestamp, messageTimestamp);
 
     const processContent = (content: string) => {
       return content.replace(

@@ -70,11 +70,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       name: categoryName,
       visibility: categoryVisibility,
     } = category;
-    console.log(serverChannels);
     const categoryChannels = serverChannels
       .filter((ch) => ch.type === 'channel')
       .filter((ch) => ch.categoryId === categoryId);
-    console.log(categoryChannels);
     const userInCategory = categoryChannels.some(
       (ch) => ch.channelId === userCurrentChannelId,
     );
