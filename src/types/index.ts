@@ -1993,6 +1993,7 @@ export type Server = {
 };
 
 export type BaseChannel = {
+  channelId: string;
   name: string;
   order: number;
   bitrate: number;
@@ -2016,12 +2017,10 @@ export type BaseChannel = {
 };
 
 export type Category = BaseChannel & {
-  categoryId: string;
   type: 'category';
 };
 
 export type Channel = BaseChannel & {
-  channelId: string;
   type: 'channel';
 };
 

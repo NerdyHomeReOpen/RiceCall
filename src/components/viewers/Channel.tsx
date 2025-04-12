@@ -66,13 +66,15 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     // Variables
     const {
-      categoryId,
+      channelId: categoryId,
       name: categoryName,
       visibility: categoryVisibility,
     } = category;
+    console.log(serverChannels);
     const categoryChannels = serverChannels
       .filter((ch) => ch.type === 'channel')
       .filter((ch) => ch.categoryId === categoryId);
+    console.log(categoryChannels);
     const userInCategory = categoryChannels.some(
       (ch) => ch.channelId === userCurrentChannelId,
     );
@@ -829,8 +831,7 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
       for (const channel of serverChannels) {
         setExpanded((prev) => ({
           ...prev,
-          [channel.type === 'channel' ? channel.channelId : channel.categoryId]:
-            true,
+          [channel.channelId]: true,
         }));
       }
     }, [serverChannels]);
