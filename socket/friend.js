@@ -73,14 +73,12 @@ const friendHandler = {
       // Create friend
       await DB.set.friend(userId, targetId, {
         ...newFriend,
-        friendGroupId: '',
         createdAt: Date.now(),
       });
 
       // Create reverse friend
       await DB.set.friend(targetId, userId, {
         ...newFriend,
-        friendGroupId: '',
         createdAt: Date.now(),
       });
 
@@ -89,18 +87,22 @@ const friendHandler = {
         'userFriendsUpdate',
         await DB.get.userFriends(userId),
       );
-      io.to(targetSocket.id).emit(
-        'userFriendsUpdate',
-        await DB.get.userFriends(targetId),
-      );
+      if (targetSocket) {
+        io.to(targetSocket.id).emit(
+          'userFriendsUpdate',
+          await DB.get.userFriends(targetId),
+        );
+      }
 
       // Will be removed in the future
       io.to(userSocket.id).emit('userUpdate', {
         friends: await DB.get.userFriends(userId),
       });
-      io.to(targetSocket.id).emit('userUpdate', {
-        friends: await DB.get.userFriends(targetId),
-      });
+      if (targetSocket) {
+        io.to(targetSocket.id).emit('userUpdate', {
+          friends: await DB.get.userFriends(targetId),
+        });
+      }
 
       new Logger('Friend').success(
         `Friend(${userId}-${targetId}) and Friend(${targetId}-${userId}) of User(${userId}) and User(${targetId}) created by User(${operatorId})`,
@@ -185,19 +187,23 @@ const friendHandler = {
         'userFriendsUpdate',
         await DB.get.userFriends(userId),
       );
-      io.to(targetSocket.id).emit('friendUpdate', editedFriend);
-      io.to(targetSocket.id).emit(
-        'userFriendsUpdate',
-        await DB.get.userFriends(targetId),
-      );
+      if (targetSocket) {
+        io.to(targetSocket.id).emit('friendUpdate', editedFriend);
+        io.to(targetSocket.id).emit(
+          'userFriendsUpdate',
+          await DB.get.userFriends(targetId),
+        );
+      }
 
       // Will be removed in the future
       io.to(userSocket.id).emit('userUpdate', {
         friends: await DB.get.userFriends(userId),
       });
-      io.to(targetSocket.id).emit('userUpdate', {
-        friends: await DB.get.userFriends(targetId),
-      });
+      if (targetSocket) {
+        io.to(targetSocket.id).emit('userUpdate', {
+          friends: await DB.get.userFriends(targetId),
+        });
+      }
 
       new Logger('Friend').success(
         `Friend(${userId}-${targetId}) and Friend(${targetId}-${userId}) of User(${userId}) and User(${targetId}) updated by User(${operatorId})`,
@@ -276,18 +282,22 @@ const friendHandler = {
         'userFriendsUpdate',
         await DB.get.userFriends(userId),
       );
-      io.to(targetSocket.id).emit(
-        'userFriendsUpdate',
-        await DB.get.userFriends(targetId),
-      );
+      if (targetSocket) {
+        io.to(targetSocket.id).emit(
+          'userFriendsUpdate',
+          await DB.get.userFriends(targetId),
+        );
+      }
 
       // Will be removed in the future
       io.to(userSocket.id).emit('userUpdate', {
         friends: await DB.get.userFriends(userId),
       });
-      io.to(targetSocket.id).emit('userUpdate', {
-        friends: await DB.get.userFriends(targetId),
-      });
+      if (targetSocket) {
+        io.to(targetSocket.id).emit('userUpdate', {
+          friends: await DB.get.userFriends(targetId),
+        });
+      }
 
       new Logger('Friend').success(
         `Friend(${userId}-${targetId}) and Friend(${targetId}-${userId}) of User(${userId}) and User(${targetId}) deleted by User(${operatorId})`,
