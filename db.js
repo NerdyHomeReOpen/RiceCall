@@ -70,11 +70,13 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['password', 'user_id'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const account = await query(
-          `SELECT * FROM accounts WHERE account = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM accounts 
+          WHERE account = ?`,
           [account],
         );
-        if (account.length) {
+        if (exists.length) {
           // If the account exists, update it
           await query(
             `UPDATE accounts SET ${keys
@@ -131,10 +133,13 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const user = await query(`SELECT * FROM users WHERE user_id = ?`, [
-          userId,
-        ]);
-        if (user.length) {
+        const exists = await query(
+          `SELECT * 
+          FROM users 
+          WHERE user_id = ?`,
+          [userId],
+        );
+        if (exists.length) {
           // If the user exists, update it
           await query(
             `UPDATE users SET ${keys
@@ -170,10 +175,13 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['name', 'description', 'image'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const badge = await query(`SELECT * FROM badges WHERE badge_id = ?`, [
-          badgeId,
-        ]);
-        if (badge.length) {
+        const exists = await query(
+          `SELECT * 
+          FROM badges 
+          WHERE badge_id = ?`,
+          [badgeId],
+        );
+        if (exists.length) {
           // If the badge exists, update it
           await query(
             `UPDATE badges SET ${keys
@@ -209,11 +217,14 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['user_id', 'badge_id', 'order', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const userBadge = await query(
-          `SELECT * FROM user_badges WHERE user_id = ? AND badge_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM user_badges 
+          WHERE user_id = ? 
+          AND badge_id = ?`,
           [userId, badgeId],
         );
-        if (userBadge.length) {
+        if (exists.length) {
           // If the userBadge exists, update it
           await query(
             `UPDATE user_badges SET ${keys
@@ -256,11 +267,14 @@ const Database = {
           'timestamp',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const userServer = await query(
-          `SELECT * FROM user_servers WHERE user_id = ? AND server_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM user_servers 
+          WHERE user_id = ? 
+          AND server_id = ?`,
           [userId, serverId],
         );
-        if (userServer.length) {
+        if (exists.length) {
           // If the userServer exists, update it
           await query(
             `UPDATE user_servers SET ${keys
@@ -314,11 +328,13 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const server = await query(
-          `SELECT * FROM servers WHERE server_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM servers 
+          WHERE server_id = ?`,
           [serverId],
         );
-        if (server.length) {
+        if (exists.length) {
           // If the server exists, update it
           await query(
             `UPDATE servers SET ${keys
@@ -375,11 +391,13 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const channel = await query(
-          `SELECT * FROM channels WHERE channel_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM channels 
+          WHERE channel_id = ?`,
           [channelId],
         );
-        if (channel.length) {
+        if (exists.length) {
           // If the channel exists, update it
           await query(
             `UPDATE channels SET ${keys
@@ -415,11 +433,13 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['name', 'order', 'user_id', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const friendGroup = await query(
-          `SELECT * FROM friend_groups WHERE friend_group_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM friend_groups 
+          WHERE friend_group_id = ?`,
           [friendGroupId],
         );
-        if (friendGroup.length) {
+        if (exists.length) {
           // If the friendGroup exists, update it
           await query(
             `UPDATE friend_groups SET ${keys
@@ -455,11 +475,14 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['isBlocked', 'friend_group_id', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const friend = await query(
-          `SELECT * FROM friends WHERE user_id = ? AND target_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM friends 
+          WHERE user_id = ? 
+          AND target_id = ?`,
           [userId, targetId],
         );
-        if (friend.length) {
+        if (exists.length) {
           // If the friend exists, update it
           await query(
             `UPDATE friends SET ${keys
@@ -493,17 +516,16 @@ const Database = {
 
     friendApplication: async (senderId, receiverId, data) => {
       try {
-        const ALLOWED_FIELDS = [
-          'description',
-          'application_status',
-          'created_at',
-        ];
+        const ALLOWED_FIELDS = ['description', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const friendApplication = await query(
-          `SELECT * FROM friend_applications WHERE sender_id = ? AND receiver_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM friend_applications 
+          WHERE sender_id = ? 
+          AND receiver_id = ?`,
           [senderId, receiverId],
         );
-        if (friendApplication.length) {
+        if (exists.length) {
           // If the friendApplication exists, update it
           await query(
             `UPDATE friend_applications SET ${keys
@@ -547,11 +569,14 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const member = await query(
-          `SELECT * FROM members WHERE user_id = ? AND server_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM members 
+          WHERE user_id = ? 
+          AND server_id = ?`,
           [userId, serverId],
         );
-        if (member.length) {
+        if (exists.length) {
           // If the member exists, update it
           await query(
             `UPDATE members SET ${keys
@@ -585,17 +610,16 @@ const Database = {
 
     memberApplication: async (userId, serverId, data) => {
       try {
-        const ALLOWED_FIELDS = [
-          'description',
-          'application_status',
-          'created_at',
-        ];
+        const ALLOWED_FIELDS = ['description', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const memberApplication = await query(
-          `SELECT * FROM member_applications WHERE user_id = ? AND server_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM member_applications 
+          WHERE user_id = ? 
+          AND server_id = ?`,
           [userId, serverId],
         );
-        if (memberApplication.length) {
+        if (exists.length) {
           // If the memberApplication exists, update it
           await query(
             `UPDATE member_applications SET ${keys
@@ -638,11 +662,13 @@ const Database = {
           'timestamp',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const message = await query(
-          `SELECT * FROM messages WHERE message_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM messages 
+          WHERE message_id = ?`,
           [messageId],
         );
-        if (message.length) {
+        if (exists.length) {
           // If the message exists, update it
           await query(
             `UPDATE messages SET ${keys
@@ -684,11 +710,13 @@ const Database = {
           'timestamp',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        const directMessage = await query(
-          `SELECT * FROM direct_messages WHERE direct_message_id = ?`,
+        const exists = await query(
+          `SELECT * 
+          FROM direct_messages 
+          WHERE direct_message_id = ?`,
           [directMessageId],
         );
-        if (directMessage.length) {
+        if (exists.length) {
           // If the directMessage exists, update it
           await query(
             `UPDATE direct_messages SET ${keys
@@ -964,7 +992,6 @@ const Database = {
           LEFT JOIN users 
           ON friend_applications.sender_id = users.user_id
           WHERE friend_applications.receiver_id = ?
-          AND friend_applications.application_status = 'pending'
           ORDER BY friend_applications.created_at DESC`,
           [userId],
         );
@@ -1122,7 +1149,6 @@ const Database = {
           LEFT JOIN users 
           ON member_applications.user_id = users.user_id
           WHERE member_applications.server_id = ?
-          AND member_applications.application_status = 'pending'
           ORDER BY member_applications.created_at DESC`,
           [serverId],
         );
