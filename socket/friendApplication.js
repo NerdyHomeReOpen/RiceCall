@@ -141,7 +141,6 @@ const friendApplicationHandler = {
       const operatorId = await Func.validate.socket(socket);
 
       // Get data
-      const application = await DB.get.friendApplication(senderId, receiverId);
       let receiverSocket;
       io.sockets.sockets.forEach((_socket) => {
         if (_socket.userId === receiverId) {
@@ -221,7 +220,6 @@ const friendApplicationHandler = {
       const operatorId = await Func.validate.socket(socket);
 
       // Get data
-      const application = await DB.get.friendApplication(senderId, receiverId);
       let receiverSocket;
       io.sockets.sockets.forEach((_socket) => {
         if (_socket.userId === receiverId) {

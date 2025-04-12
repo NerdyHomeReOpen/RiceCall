@@ -132,7 +132,6 @@ const memberApplicationHandler = {
 
       // Get data
       const operatorMember = await DB.get.member(operatorId, serverId);
-      const application = await DB.get.memberApplication(userId, serverId);
 
       // Validate operator
       if (operatorId === userId) {
@@ -209,7 +208,6 @@ const memberApplicationHandler = {
 
       // Get data
       const operatorMember = await DB.get.member(operatorId, serverId);
-      const application = await DB.get.memberApplication(userId, serverId);
 
       // Validate operation
       if (operatorId === userId) {
