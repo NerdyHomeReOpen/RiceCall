@@ -110,8 +110,8 @@ const xpSystem = {
         const elapsedTime = xpSystem.elapsedTime.get(userId) || 0;
         let newElapsedTime = elapsedTime + now - timeFlag;
         while (newElapsedTime >= XP_SYSTEM.INTERVAL_MS) {
-          await xpSystem.obtainXp(userId);
-          newElapsedTime -= XP_SYSTEM.INTERVAL_MS;
+          if (await xpSystem.obtainXp(userId))
+            newElapsedTime -= XP_SYSTEM.INTERVAL_MS;
         }
         xpSystem.elapsedTime.set(userId, newElapsedTime);
         xpSystem.timeFlag.set(userId, now); // Reset timeFlag
@@ -142,21 +142,21 @@ const xpSystem = {
         new Logger('XPSystem').warn(
           `User(${userId}) not found, cannot obtain XP`,
         );
-        return;
+        return false;
       }
       const server = await DB.get.server(user.currentServerId);
       if (!server) {
         new Logger('XPSystem').warn(
           `Server(${user.currentServerId}) not found, cannot obtain XP`,
         );
-        return;
+        return false;
       }
       const member = await DB.get.member(user.userId, server.serverId);
       if (!member) {
         new Logger('XPSystem').warn(
           `User(${user.userId}) not found in server(${server.serverId}), cannot update contribution`,
         );
-        return;
+        return false;
       }
       const vipBoost = user.vip ? 1 + user.vip * 0.2 : 1;
 
@@ -200,6 +200,7 @@ const xpSystem = {
       new Logger('XPSystem').error(
         `Error obtaining user(${userId}) XP: ${error.message}`,
       );
+      return false;
     }
   },
 };

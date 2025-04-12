@@ -159,6 +159,10 @@ const serverHandler = {
       // Join the server
       userSocket.join(`server_${serverId}`);
 
+      // Emit data (only to the user)
+      io.to(userSocket.id).emit('userUpdate', user_update);
+      io.to(userSocket.id).emit('serverUpdate', await Get.server(server.id));
+
       // Connect to the server's lobby channel
       await channelHandler.connectChannel(io, socket, {
         userId: userId,
@@ -258,6 +262,14 @@ const serverHandler = {
         }
       }
 
+      // Leave prev channel
+      if (user.currentChannelId) {
+        await channelHandler.disconnectChannel(io, socket, {
+          channelId: user.currentChannelId,
+          userId: user.id,
+        });
+      }
+
       // Update user presence
       const updatedUser = {
         currentServerId: null,
@@ -267,15 +279,6 @@ const serverHandler = {
 
       // Leave the server
       userSocket.leave(`server_${serverId}`);
-
-      // Leave prev channel
-      if (user.currentChannelId) {
-        await channelHandler.disconnectChannel(io, socket, {
-          userId: userId,
-          serverId: user.currentServerId,
-          channelId: user.currentChannelId,
-        });
-      }
 
       // Emit data (only to the user)
       io.to(userSocket.id).emit('userUpdate', updatedUser);

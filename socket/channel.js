@@ -169,16 +169,16 @@ const channelHandler = {
       await DB.set.member(userId, serverId, updatedMember);
 
       // Setup user interval for accumulate contribution
-      Xp.create(userId);
+      await Xp.create(userId);
 
       // Join RTC channel
       rtcHandler.join(io, userSocket, { channelId: channelId });
 
-      // Play sound
-      io.to(`channel_${channelId}`).emit('playSound', 'join');
-
       // Join channel
       userSocket.join(`channel_${channelId}`);
+
+      // Play sound
+      io.to(`channel_${channel.id}`).emit('playSound', 'join');
 
       // Emit updated data (to the user)
       io.to(userSocket.id).emit('userUpdate', updatedUser);
@@ -293,16 +293,16 @@ const channelHandler = {
       await DB.set.user(userId, updatedUser);
 
       // Clear user contribution interval
-      Xp.delete(userId);
+      await Xp.delete(userId);
 
       // Leave RTC channel
       await rtcHandler.leave(io, userSocket, { channelId: channelId });
 
-      // Leave channel
-      userSocket.leave(`channel_${channelId}`);
-
       // Play sound
       io.to(`channel_${channelId}`).emit('playSound', 'leave');
+
+      // Leave channel
+      userSocket.leave(`channel_${channel.id}`);
 
       // Emit updated data (to the user)
       io.to(userSocket.id).emit('userUpdate', updatedUser);
