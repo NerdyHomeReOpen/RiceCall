@@ -34,12 +34,20 @@ const memberApplicationHandler = {
       const operatorId = await Func.validate.socket(socket);
 
       // Get data
-      const operator = await DB.get.user(operatorId);
-      const user = await DB.get.user(userId);
-      const server = await DB.get.server(serverId);
+      const operatorMember = await DB.get.member(operatorId, serverId);
 
       // Validate operator
-      if (operator.id !== user.id) {
+      if (operatorId === userId) {
+        if (operatorMember.permissionLevel !== 1) {
+          throw new StandardizedError(
+            '非遊客無法創建會員申請',
+            'ValidationError',
+            'CREATEMEMBERAPPLICATION',
+            'PERMISSION_DENIED',
+            403,
+          );
+        }
+      } else {
         throw new StandardizedError(
           '無法創建非自己的會員申請',
           'ValidationError',
@@ -50,25 +58,24 @@ const memberApplicationHandler = {
       }
 
       // Create member application
-      const applicationId = `ma_${user.id}-${server.id}`;
-      await DB.set.memberApplication(applicationId, {
+      await DB.set.memberApplication(userId, serverId, {
         ...memberApplication,
-        userId: user.id,
-        serverId: server.id,
         createdAt: Date.now(),
       });
 
       // Emit updated data to all users in the server
-      io.to(`server_${server.id}`).emit('serverUpdate', {
-        memberApplications: await DB.get.serverMemberApplications(server.id),
-      });
-      io.to(`server_${server.id}`).emit(
+      io.to(`server_${serverId}`).emit(
         'serverMemberApplicationsUpdate',
-        await DB.get.serverMemberApplications(server.id),
+        await DB.get.serverMemberApplications(serverId),
       );
 
+      // Will be removed in the future
+      io.to(`server_${serverId}`).emit('serverUpdate', {
+        memberApplications: await DB.get.serverMemberApplications(serverId),
+      });
+
       new Logger('MemberApplication').success(
-        `Member application(${applicationId}) of User(${user.id}) and server(${server.id}) created by User(${operator.id})`,
+        `Member application(${userId}-${serverId}) of User(${userId}) and server(${serverId}) created by User(${operatorId})`,
       );
     } catch (error) {
       if (!(error instanceof StandardizedError)) {
@@ -119,14 +126,11 @@ const memberApplicationHandler = {
       const operatorId = await Func.validate.socket(socket);
 
       // Get data
-      const operator = await DB.get.user(operatorId);
-      const user = await DB.get.user(userId);
-      const server = await DB.get.server(serverId);
+      const operatorMember = await DB.get.member(operatorId, serverId);
       const application = await DB.get.memberApplication(userId, serverId);
-      const operatorMember = await DB.get.member(operator.id, server.id);
 
       // Validate operator
-      if (operator.id === user.id) {
+      if (operatorId === userId) {
         if (application.applicationStatus !== 'pending') {
           throw new StandardizedError(
             '無法更新已經被處理過的申請',
@@ -158,19 +162,21 @@ const memberApplicationHandler = {
       }
 
       // Update member application
-      await DB.set.memberApplication(application.id, editedApplication);
+      await DB.set.memberApplication(userId, serverId, editedApplication);
 
       // Emit updated data to all users in the server
-      io.to(`server_${server.id}`).emit('serverUpdate', {
-        memberApplications: await DB.get.serverMemberApplications(server.id),
-      });
-      io.to(`server_${server.id}`).emit(
+      io.to(`server_${serverId}`).emit(
         'serverMemberApplicationsUpdate',
-        await DB.get.serverMemberApplications(server.id),
+        await DB.get.serverMemberApplications(serverId),
       );
 
+      // Will be removed in the future
+      io.to(`server_${serverId}`).emit('serverUpdate', {
+        memberApplications: await DB.get.serverMemberApplications(serverId),
+      });
+
       new Logger('MemberApplication').success(
-        `Member application(${application.id}) of User(${user.id}) and server(${server.id}) updated by User(${operator.id})`,
+        `Member application(${userId}-${serverId}) of User(${userId}) and server(${serverId}) updated by User(${operatorId})`,
       );
     } catch (error) {
       if (!(error instanceof StandardizedError)) {
@@ -215,14 +221,11 @@ const memberApplicationHandler = {
       const operatorId = await Func.validate.socket(socket);
 
       // Get data
-      const operator = await DB.get.user(operatorId);
-      const user = await DB.get.user(userId);
-      const server = await DB.get.server(serverId);
+      const operatorMember = await DB.get.member(operatorId, serverId);
       const application = await DB.get.memberApplication(userId, serverId);
-      const operatorMember = await DB.get.member(operator.id, server.id);
 
       // Validate operation
-      if (operator.id === user.id) {
+      if (operatorId === userId) {
         if (application.applicationStatus !== 'pending') {
           throw new StandardizedError(
             '無法刪除已經被處理過的申請',
@@ -254,19 +257,21 @@ const memberApplicationHandler = {
       }
 
       // Delete member application
-      await DB.delete(`memberApplications.${application.id}`);
+      await DB.delete.memberApplication(userId, serverId);
 
       // Emit updated data to all users in the server
-      io.to(`server_${server.id}`).emit('serverUpdate', {
-        memberApplications: await DB.get.serverMemberApplications(server.id),
-      });
-      io.to(`server_${server.id}`).emit(
+      io.to(`server_${serverId}`).emit(
         'serverMemberApplicationsUpdate',
-        await DB.get.serverMemberApplications(server.id),
+        await DB.get.serverMemberApplications(serverId),
       );
 
+      // Will be removed in the future
+      io.to(`server_${serverId}`).emit('serverUpdate', {
+        memberApplications: await DB.get.serverMemberApplications(serverId),
+      });
+
       new Logger('MemberApplication').success(
-        `Member application(${application.id}) of User(${user.id}) and server(${server.id}) deleted by User(${operator.id})`,
+        `Member application(${userId}-${serverId}) of User(${userId}) and server(${serverId}) deleted by User(${operatorId})`,
       );
     } catch (error) {
       if (!(error instanceof StandardizedError)) {
