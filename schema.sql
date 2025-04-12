@@ -132,7 +132,6 @@ CREATE TABLE `friend_applications` (
   `sender_id` char(36) NOT NULL,
   `receiver_id` char(36) NOT NULL,
   `description` varchar(255) NOT NULL DEFAULT '',
-  `application_status` varchar(255) NOT NULL DEFAULT '',
   `created_at` bigint(20) NOT NULL DEFAULT 0
 );
 
@@ -200,7 +199,6 @@ CREATE TABLE `member_applications` (
   `user_id` char(36) NOT NULL,
   `server_id` char(36) NOT NULL,
   `description` varchar(255) NOT NULL DEFAULT '',
-  `application_status` varchar(255) NOT NULL DEFAULT '',
   `created_at` bigint(20) NOT NULL DEFAULT 0
 );
 

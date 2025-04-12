@@ -136,15 +136,6 @@ const memberApplicationHandler = {
 
       // Validate operator
       if (operatorId === userId) {
-        if (application.applicationStatus !== 'pending') {
-          throw new StandardizedError(
-            '無法更新已經被處理過的申請',
-            'ValidationError',
-            'UPDATEMEMBERAPPLICATION',
-            'APPLICATION_ALREADY_PROCESSED',
-            403,
-          );
-        }
       } else {
         if (operatorMember.permissionLevel < 5) {
           throw new StandardizedError(
@@ -152,15 +143,6 @@ const memberApplicationHandler = {
             'ValidationError',
             'UPDATEMEMBERAPPLICATION',
             'PERMISSION_DENIED',
-            403,
-          );
-        }
-        if (application.applicationStatus !== 'pending') {
-          throw new StandardizedError(
-            '無法更新已經被處理過的申請',
-            'ValidationError',
-            'UPDATEMEMBERAPPLICATION',
-            'APPLICATION_ALREADY_PROCESSED',
             403,
           );
         }
@@ -231,15 +213,6 @@ const memberApplicationHandler = {
 
       // Validate operation
       if (operatorId === userId) {
-        if (application.applicationStatus !== 'pending') {
-          throw new StandardizedError(
-            '無法刪除已經被處理過的申請',
-            'ValidationError',
-            'DELETEMEMBERAPPLICATION',
-            'APPLICATION_ALREADY_PROCESSED',
-            403,
-          );
-        }
       } else {
         if (operatorMember.permissionLevel < 5) {
           throw new StandardizedError(
@@ -247,15 +220,6 @@ const memberApplicationHandler = {
             'ValidationError',
             'DELETEMEMBERAPPLICATION',
             'PERMISSION_DENIED',
-            403,
-          );
-        }
-        if (application.applicationStatus !== 'pending') {
-          throw new StandardizedError(
-            '無法刪除已經被處理過的申請',
-            'ValidationError',
-            'DELETEMEMBERAPPLICATION',
-            'APPLICATION_ALREADY_PROCESSED',
             403,
           );
         }
