@@ -1,9 +1,16 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const { v4: uuidv4 } = require('uuid');
+
 // Utils
 const utils = require('../utils');
-const { StandardizedError, Logger, Func, Xp } = utils;
+const { Logger, Func, Xp } = utils;
+
+// Database
 const DB = require('../db');
+
+// StandardizedError
+const StandardizedError = require('../standardizedError');
+
 // Handlers
 const rtcHandler = require('./rtc');
 const messageHandler = require('./message');
@@ -14,12 +21,13 @@ const channelHandler = {
       // data = {
       //   userId: string
       //   channelId: string
+      //   serverId: string
       //   password?: string
       // }
 
       // Validate data
-      const { userId, channelId, password } = data;
-      if (!userId || !channelId) {
+      const { userId, channelId, serverId, password } = data;
+      if (!userId || !channelId || !serverId) {
         throw new StandardizedError(
           '無效的資料',
           'ValidationError',
@@ -33,11 +41,11 @@ const channelHandler = {
       const operatorId = await Func.validate.socket(socket);
 
       // Get data
-      const operatorMember = await DB.get.member(operatorId, channel.serverId);
+      const operatorMember = await DB.get.member(operatorId, serverId);
       const user = await DB.get.user(userId);
       const channel = await DB.get.channel(channelId);
       const channelMembers = await DB.get.channelMembers(channelId);
-      const server = await DB.get.server(channel.serverId);
+      const server = await DB.get.server(serverId);
       let userSocket;
       io.sockets.sockets.forEach((_socket) => {
         if (_socket.userId === userId) {
@@ -141,8 +149,9 @@ const channelHandler = {
       // Disconnect previous channel
       if (user.currentChannelId) {
         await channelHandler.disconnectChannel(io, socket, {
-          channelId: user.currentChannelId,
           userId: userId,
+          channelId: user.currentChannelId,
+          serverId: user.currentServerId,
         });
       }
 
@@ -157,7 +166,7 @@ const channelHandler = {
       const updatedMember = {
         lastJoinChannelTime: Date.now(),
       };
-      await DB.set.member(operatorMember.id, updatedMember);
+      await DB.set.member(userId, serverId, updatedMember);
 
       // Setup user interval for accumulate contribution
       Xp.create(userId);
@@ -217,11 +226,12 @@ const channelHandler = {
       // data = {
       //   userId: string
       //   channelId: string
+      //   serverId: string
       // }
 
       // Validate data
-      const { userId, channelId } = data;
-      if (!userId || !channelId) {
+      const { userId, channelId, serverId } = data;
+      if (!userId || !channelId || !serverId) {
         throw new StandardizedError(
           '無效的資料',
           'ValidationError',
@@ -234,9 +244,9 @@ const channelHandler = {
       const operatorId = await Func.validate.socket(socket);
 
       // Get data
-      const operatorMember = await DB.get.member(operatorId, channel.serverId);
+      const operatorMember = await DB.get.member(operatorId, serverId);
       const user = await DB.get.user(userId);
-      const userMember = await DB.get.member(userId, channel.serverId);
+      const userMember = await DB.get.member(userId, serverId);
       const channel = await DB.get.channel(channelId);
       let userSocket;
       io.sockets.sockets.forEach((_socket) => {
@@ -283,7 +293,7 @@ const channelHandler = {
       await DB.set.user(userId, updatedUser);
 
       // Clear user contribution interval
-      Xp.delete(user.id);
+      Xp.delete(userId);
 
       // Leave RTC channel
       await rtcHandler.leave(io, userSocket, { channelId: channelId });
@@ -378,14 +388,14 @@ const channelHandler = {
       await DB.set.channel(channelId, {
         ...newChannel,
         serverId: serverId,
-        order: await DB.get.serverChannels(serverId).length,
+        order: (await DB.get.serverChannels(serverId)).length,
         createdAt: Date.now().valueOf(),
       });
 
       if (newChannel.categoryId) {
         const parentChannel = await DB.get.channel(newChannel.categoryId);
         if (parentChannel) {
-          await DB.set.channel(parentChannel.id, {
+          await DB.set.channel(parentChannel.channelId, {
             isRoot: true,
             type: 'category',
           });
@@ -435,6 +445,7 @@ const channelHandler = {
       //     ...
       //   },
       // };
+      console.log(data);
 
       // Validate data
       const { channel: _editedChannel, channelId, serverId } = data;
@@ -482,6 +493,8 @@ const channelHandler = {
                 : 'VOICE_CHANGE_TO_QUEUE',
             timestamp: Date.now().valueOf(),
           },
+          userId: operatorId,
+          serverId,
           channelId,
         });
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -499,6 +512,8 @@ const channelHandler = {
               : 'TEXT_CHANGE_TO_FREE_SPEECH',
             timestamp: Date.now().valueOf(),
           },
+          userId: operatorId,
+          serverId,
           channelId,
         });
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -516,6 +531,8 @@ const channelHandler = {
               : 'TEXT_CHANGE_TO_ALLOWED_TEXT',
             timestamp: Date.now().valueOf(),
           },
+          userId: operatorId,
+          serverId,
           channelId,
         });
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -533,6 +550,8 @@ const channelHandler = {
               : 'TEXT_CHANGE_TO_ALLOWED_URL',
             timestamp: Date.now().valueOf(),
           },
+          userId: operatorId,
+          serverId,
           channelId,
         });
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -548,6 +567,8 @@ const channelHandler = {
             content: `TEXT_CHANGE_TO_MAX_LENGTH ${editedChannel.guestTextMaxLength}`,
             timestamp: Date.now().valueOf(),
           },
+          userId: operatorId,
+          serverId,
           channelId,
         });
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -563,6 +584,8 @@ const channelHandler = {
             content: `TEXT_CHANGE_TO_WAIT_TIME ${editedChannel.guestTextWaitTime}`,
             timestamp: Date.now().valueOf(),
           },
+          userId: operatorId,
+          serverId,
           channelId,
         });
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -578,6 +601,8 @@ const channelHandler = {
             content: `TEXT_CHANGE_TO_GAP_TIME ${editedChannel.guestTextGapTime}`,
             timestamp: Date.now().valueOf(),
           },
+          userId: operatorId,
+          serverId,
           channelId,
         });
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -668,11 +693,13 @@ const channelHandler = {
         const serverChannels = await DB.get.serverChannels(serverId);
         const parentChannel = await DB.get.channel(channel.categoryId);
         const parentChannelHasChildren = serverChannels.some(
-          (c) => c.categoryId === parentChannel.id && c.id !== channelId,
+          (c) =>
+            c.categoryId === parentChannel.channelId &&
+            c.channelId !== channelId,
         );
 
         if (!parentChannelHasChildren) {
-          await DB.set.channel(parentChannel.id, {
+          await DB.set.channel(parentChannel.channelId, {
             isRoot: true,
             type: 'channel',
             categoryId: null,

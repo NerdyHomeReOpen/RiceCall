@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 // Constants
 const { XP_SYSTEM } = require('../constant');
+
 // Utils
 const Logger = require('./logger');
+
+// Database
 const DB = require('../db');
+
+// StandardizedError
+const StandardizedError = require('../standardizedError');
 
 const xpSystem = {
   timeFlag: new Map(), // socket -> timeFlag
@@ -145,10 +151,10 @@ const xpSystem = {
         );
         return;
       }
-      const member = await DB.get.member(user.id, server.id);
+      const member = await DB.get.member(user.userId, server.serverId);
       if (!member) {
         new Logger('XPSystem').warn(
-          `User(${user.id}) not found in server(${server.id}), cannot update contribution`,
+          `User(${user.userId}) not found in server(${server.serverId}), cannot update contribution`,
         );
         return;
       }
@@ -172,7 +178,7 @@ const xpSystem = {
         requiredXp: requiredXp,
         progress: user.xp / requiredXp,
       };
-      await DB.set.user(user.id, userUpdate);
+      await DB.set.user(user.userId, userUpdate);
 
       // Update member contribution if in a server
       const memberUpdate = {
@@ -181,7 +187,7 @@ const xpSystem = {
             (member.contribution + XP_SYSTEM.BASE_XP * vipBoost) * 100,
           ) / 100,
       };
-      await DB.set.member(member.id, memberUpdate);
+      await DB.set.member(user.userId, server.serverId, memberUpdate);
 
       // Update server wealth
       const serverUpdate = {
@@ -189,7 +195,7 @@ const xpSystem = {
           Math.round((server.wealth + XP_SYSTEM.BASE_XP * vipBoost) * 100) /
           100,
       };
-      await DB.set.server(server.id, serverUpdate);
+      await DB.set.server(server.serverId, serverUpdate);
     } catch (error) {
       new Logger('XPSystem').error(
         `Error obtaining user(${userId}) XP: ${error.message}`,

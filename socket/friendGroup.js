@@ -1,8 +1,13 @@
 const { v4: uuidv4 } = require('uuid');
 // Utils
 const utils = require('../utils');
-const { StandardizedError, Logger, Func } = utils;
+const { Logger, Func } = utils;
+
+// Database
 const DB = require('../db');
+
+// StandardizedError
+const StandardizedError = require('../standardizedError');
 
 const friendGroupHandler = {
   createFriendGroup: async (io, socket, data) => {

@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const { v4: uuidv4 } = require('uuid');
+
 // Utils
 const utils = require('../utils');
-const { StandardizedError, Session, JWT } = utils;
+const { Session, JWT } = utils;
+
+// StandardizedError
+const StandardizedError = require('../standardizedError');
+
 // Handlers
 const userHandler = require('./user');
 const serverHandler = require('./server');

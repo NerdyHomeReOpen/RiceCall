@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs').promises;
 const path = require('path');
+
 // Constants
 const {
   UPLOADS_DIR,
@@ -9,6 +10,7 @@ const {
   SERVER_AVATAR_DIR,
   USER_AVATAR_DIR,
 } = require('../constant');
+
 // Utils
 const Logger = require('./logger');
 const DB = require('../db');

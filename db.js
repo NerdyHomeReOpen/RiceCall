@@ -1,13 +1,14 @@
 const { query } = require('./database');
-// Utils
-const StandardizedError = require('./utils/standardizedError');
+
+// StandardizedError
+const StandardizedError = require('./standardizedError');
 
 function camelToSnake(str) {
   return str.replace(/([A-Z])/g, '_$1').toLowerCase();
 }
 
 function snakeToCamel(str) {
-  return str.replace(/(_\w)/g, (_, letter) => letter.toUpperCase());
+  return str.replace(/_\w/g, (letter) => letter[1].toUpperCase());
 }
 
 function convertToSnakeCase(obj) {
@@ -70,10 +71,13 @@ const Database = {
         const ALLOWED_FIELDS = ['password', 'user_id'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO accounts (account, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO accounts (account, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [account, ...values],
         );
       } catch (error) {
@@ -116,10 +120,13 @@ const Database = {
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO users (user_id, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO users (user_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [userId, ...values],
         );
       } catch (error) {
@@ -141,10 +148,13 @@ const Database = {
         const ALLOWED_FIELDS = ['name', 'description', 'image'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO badges (badge_id, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO badges (badge_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [badgeId, ...values],
         );
       } catch (error) {
@@ -166,10 +176,13 @@ const Database = {
         const ALLOWED_FIELDS = ['user_id', 'badge_id', 'order', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO user_badges (user_id, badge_id, ${keys.join(', ')}) 
-            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO user_badges (user_id, badge_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [userId, badgeId, ...values],
         );
       } catch (error) {
@@ -198,10 +211,13 @@ const Database = {
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO user_servers (user_id, server_id, ${keys.join(', ')}) 
-            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO user_servers (user_id, server_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [userId, serverId, ...values],
         );
       } catch (error) {
@@ -241,10 +257,13 @@ const Database = {
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO servers (server_id, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO servers (server_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [serverId, ...values],
         );
       } catch (error) {
@@ -287,10 +306,13 @@ const Database = {
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO channels (channel_id, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO channels (channel_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [channelId, ...values],
         );
       } catch (error) {
@@ -312,10 +334,13 @@ const Database = {
         const ALLOWED_FIELDS = ['name', 'order', 'user_id', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO friend_groups (friend_group_id, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO friend_groups (friend_group_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [friendGroupId, ...values],
         );
       } catch (error) {
@@ -337,10 +362,13 @@ const Database = {
         const ALLOWED_FIELDS = ['isBlocked', 'friend_group_id', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO friends (user_id, target_id, ${keys.join(', ')}) 
-            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO friends (user_id, target_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [userId, targetId, ...values],
         );
       } catch (error) {
@@ -366,12 +394,13 @@ const Database = {
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO friend_applications (sender_id, receiver_id, ${keys.join(
-            ', ',
-          )}) 
-            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO friend_applications (sender_id, receiver_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [senderId, receiverId, ...values],
         );
       } catch (error) {
@@ -401,10 +430,13 @@ const Database = {
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO members (user_id, server_id, ${keys.join(', ')}) 
-            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO members (user_id, server_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [userId, serverId, ...values],
         );
       } catch (error) {
@@ -430,12 +462,13 @@ const Database = {
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO member_applications (user_id, server_id, ${keys.join(
-            ', ',
-          )}) 
-            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO member_applications (user_id, server_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [userId, serverId, ...values],
         );
       } catch (error) {
@@ -464,10 +497,13 @@ const Database = {
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO messages (message_id, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO messages (message_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [messageId, ...values],
         );
       } catch (error) {
@@ -495,10 +531,13 @@ const Database = {
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO direct_messages (direct_message_id, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
-            ON DUPLICATE KEY 
-            UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
+          `INSERT INTO direct_messages (direct_message_id, ${keys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) 
+          VALUES (?, ${keys.map(() => '?').join(', ')})
+          ON DUPLICATE KEY UPDATE ${keys
+            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
+            .join(', ')}`,
           [directMessageId, ...values],
         );
       } catch (error) {
@@ -519,10 +558,12 @@ const Database = {
   get: {
     all: async (querys) => {
       try {
-        const res = await query(`SELECT * FROM ${querys}`);
-        const data = res[0];
-        if (!data) return null;
-        return data;
+        const datas = await query(
+          `SELECT * 
+          FROM ${querys}`,
+        );
+        if (!datas) return null;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -622,11 +663,11 @@ const Database = {
           `SELECT * 
           FROM friend_groups
           WHERE user_id = ?
-          ORDER BY order DESC`,
+          ORDER BY friend_groups.\`order\` DESC`,
           [userId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -649,11 +690,11 @@ const Database = {
           LEFT JOIN badges
           ON user_badges.badge_id = badges.badge_id
           WHERE user_id = ?
-          ORDER BY order DESC`,
+          ORDER BY badges.\`order\` DESC`,
           [userId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -680,7 +721,7 @@ const Database = {
           [userId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -703,11 +744,11 @@ const Database = {
           LEFT JOIN servers
           ON members.server_id = servers.server_id
           WHERE user_id = ?
-          ORDER BY created_at DESC`,
+          ORDER BY members.created_at DESC`,
           [userId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -728,13 +769,13 @@ const Database = {
           `SELECT * 
           FROM friends 
           LEFT JOIN users 
-          ON friends.target_id = users.id
+          ON friends.target_id = users.user_id
           WHERE user_id = ?
-          ORDER BY created_at DESC`,
+          ORDER BY friends.created_at DESC`,
           [userId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -755,14 +796,14 @@ const Database = {
           `SELECT * 
           FROM friend_applications 
           LEFT JOIN users 
-          ON friend_applications.sender_id = users.id
+          ON friend_applications.sender_id = users.user_id
           WHERE receiver_id = ?
           AND application_status = 'pending'
-          ORDER BY created_at DESC`,
+          ORDER BY friend_applications.created_at DESC`,
           [userId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -783,12 +824,12 @@ const Database = {
           `SELECT * 
           FROM servers 
           WHERE name LIKE ? OR display_id = ?
-          ORDER BY created_at DESC
+          ORDER BY servers.created_at DESC
           LIMIT 10`,
           [`%${querys}%`, `${querys}`],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -834,13 +875,13 @@ const Database = {
           `SELECT * 
           FROM members 
           LEFT JOIN users 
-          ON members.user_id = users.id
+          ON members.user_id = users.user_id
           WHERE users.current_server_id = ?
-          ORDER BY created_at DESC`,
+          ORDER BY members.created_at DESC`,
           [serverId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -861,11 +902,11 @@ const Database = {
           `SELECT * 
           FROM channels
           WHERE server_id = ?
-          ORDER BY order DESC`,
+          ORDER BY channels.\`order\` DESC`,
           [serverId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -886,13 +927,13 @@ const Database = {
           `SELECT * 
           FROM members 
           LEFT JOIN users 
-          ON members.user_id = users.id
+          ON members.user_id = users.user_id  
           WHERE server_id = ?
-          ORDER BY created_at DESC`,
+          ORDER BY members.created_at DESC`,
           [serverId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -913,14 +954,14 @@ const Database = {
           `SELECT * 
           FROM member_applications 
           LEFT JOIN users 
-          ON member_applications.user_id = users.id
+          ON member_applications.user_id = users.user_id
           WHERE server_id = ?
           AND application_status = 'pending'
           ORDER BY created_at DESC`,
           [serverId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -941,7 +982,7 @@ const Database = {
           `SELECT * 
           FROM categories 
           WHERE category_id = ?
-          ORDER BY order DESC`,
+          ORDER BY categories.\`order\` DESC`,
           [categoryId],
         );
         const data = datas[0];
@@ -967,7 +1008,7 @@ const Database = {
           `SELECT * 
           FROM channels 
           WHERE channel_id = ?
-          ORDER BY order DESC`,
+          ORDER BY channels.\`order\` DESC`,
           [channelId],
         );
         const data = datas[0];
@@ -993,13 +1034,13 @@ const Database = {
           `SELECT * 
           FROM members 
           LEFT JOIN users 
-          ON members.user_id = users.id
+          ON members.user_id = users.user_id
           WHERE users.current_channel_id = ?
-          ORDER BY created_at DESC`,
+          ORDER BY members.created_at DESC`,
           [channelId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1021,11 +1062,11 @@ const Database = {
           FROM messages 
           WHERE channel_id = ?
           AND type = 'general'
-          ORDER BY created_at DESC`,
+          ORDER BY messages.timestamp DESC`,
           [channelId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1047,11 +1088,11 @@ const Database = {
           FROM messages 
           WHERE channel_id = ?
           AND type = 'info'
-          ORDER BY created_at DESC`,
+          ORDER BY messages.timestamp DESC`,
           [channelId],
         );
         if (!datas) return null;
-        return datas;
+        return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1072,7 +1113,7 @@ const Database = {
           `SELECT * 
           FROM friend_groups 
           WHERE friend_group_id = ?
-          ORDER BY order DESC`,
+          ORDER BY friend_groups.\`order\` DESC`,
           [friendGroupId],
         );
         const data = datas[0];
@@ -1206,7 +1247,7 @@ const Database = {
           `SELECT * 
           FROM messages 
           WHERE message_id = ?
-          ORDER BY created_at DESC`,
+          ORDER BY messages.timestamp DESC`,
           [messageId],
         );
         const data = datas[0];
@@ -1234,10 +1275,10 @@ const Database = {
           `SELECT * 
           FROM direct_messages 
           LEFT JOIN users 
-          ON direct_messages.sender_id = users.id
+          ON direct_messages.sender_id = users.user_id
           WHERE user_id_1 = ?
           AND user_id_2 = ?
-          ORDER BY created_at DESC`,
+          ORDER BY direct_messages.timestamp DESC`,
           [userId1, userId2],
         );
         const data = datas[0];

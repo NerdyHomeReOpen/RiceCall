@@ -9,8 +9,13 @@ const formidable = require('formidable');
 
 // Utils
 const utils = require('./utils');
-const { StandardizedError, Logger, Func, JWT, Clean, Xp } = utils;
+const { Logger, Func, JWT, Xp } = utils;
+
+// Database
 const DB = require('./db');
+
+// StandardizedError
+const StandardizedError = require('./standardizedError');
 
 // Constants
 const {

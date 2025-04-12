@@ -2,8 +2,14 @@
 const { v4: uuidv4 } = require('uuid');
 // Utils
 const utils = require('../utils');
-const { StandardizedError, Logger, Func } = utils;
+const { Logger, Func } = utils;
+
+// Database
 const DB = require('../db');
+
+// StandardizedError
+const StandardizedError = require('../standardizedError');
+
 // Handlers
 const channelHandler = require('./channel');
 const memberHandler = require('./member');
@@ -155,8 +161,9 @@ const serverHandler = {
 
       // Connect to the server's lobby channel
       await channelHandler.connectChannel(io, socket, {
-        channelId: server.lobbyId,
         userId: userId,
+        serverId: serverId,
+        channelId: server.lobbyId,
       });
 
       // Emit data (only to the user)
@@ -339,39 +346,41 @@ const serverHandler = {
         );
       }
 
-      // Create Ids
-      const serverId = uuidv4();
-      const channelId = uuidv4();
-
       // Create server
+      const serverId = uuidv4();
       await DB.set.server(serverId, {
         ...newServer,
         name: newServer.name?.trim() || '',
         slogan: newServer.slogan?.trim() || '',
         displayId: await Func.generateUniqueDisplayId(),
-        lobbyId: channelId,
         ownerId: operatorId,
         createdAt: Date.now(),
       });
 
-      // Create channel (lobby)
-      await DB.set.channel(channelId, {
-        name: '大廳',
-        isLobby: true,
-        isRoot: true,
-        serverId: serverId,
-        createdAt: Date.now(),
-      });
-
       // Create member
-      const specialPermissionLevel =
-        specialUsers.getSpecialPermissionLevel(operatorId);
       await memberHandler.createMember(io, socket, {
         userId: operatorId,
         serverId: serverId,
         member: {
-          permissionLevel: specialPermissionLevel || 6,
+          permissionLevel: 6,
         },
+      });
+
+      // Create channel (lobby)
+      await channelHandler.createChannel(io, socket, {
+        serverId: serverId,
+        channel: {
+          name: '大廳',
+          isLobby: true,
+          isRoot: true,
+        },
+      });
+
+      // Update Server (lobby)
+      const serverChannels = await DB.get.serverChannels(serverId);
+      await DB.set.server(serverId, {
+        lobbyId: serverChannels[0].channelId,
+        ownerId: operatorId,
       });
 
       // Create user-server

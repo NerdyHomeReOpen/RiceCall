@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 // Utils
 const utils = require('../utils');
-const { StandardizedError, Logger, Session, Func, Xp } = utils;
+const { Logger, Session, Func, Xp } = utils;
+
+// Database
 const DB = require('../db');
+
+// StandardizedError
+const StandardizedError = require('../standardizedError');
+
 // Handlers
 const rtcHandler = require('./rtc');
 const serverHandler = require('./server');
@@ -74,13 +80,14 @@ const userHandler = {
       if (operator.currentServerId) {
         await serverHandler.connectServer(io, socket, {
           serverId: operator.currentServerId,
-          userId: operator.id,
+          userId: operator.userId,
         });
       }
       if (operator.currentChannelId) {
         await channelHandler.connectChannel(io, socket, {
           channelId: operator.currentChannelId,
-          userId: operator.id,
+          serverId: operator.currentServerId,
+          userId: operator.userId,
         });
       }
 

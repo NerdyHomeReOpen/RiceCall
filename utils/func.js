@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const sharp = require('sharp');
+
 // Utils
-const StandardizedError = require('./standardizedError');
 const Session = require('./session');
 const JWT = require('./jwt');
+
+// Database
 const DB = require('../db');
+
+// StandardizedError
+const StandardizedError = require('../standardizedError');
 
 const func = {
   calculateSimilarity: (str1, str2) => {
@@ -41,6 +46,7 @@ const func = {
   generateUniqueDisplayId: async (baseId = 20000000) => {
     const servers = (await DB.get.all('servers')) || {};
     let displayId = baseId + Object.keys(servers).length;
+    console.log(servers);
     // Ensure displayId is unique
     while (
       Object.values(servers).some((server) => server.displayId === displayId)

@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 // Utils
 const utils = require('../utils');
-const { StandardizedError, Logger, Func } = utils;
+const { Logger, Func } = utils;
+
+// Database
 const DB = require('../db');
+
+// StandardizedError
+const StandardizedError = require('../standardizedError');
 
 const friendHandler = {
   createFriend: async (io, socket, data) => {
