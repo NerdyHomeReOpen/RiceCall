@@ -63,7 +63,7 @@ module.exports = (io) => {
       socket.sessionId = sessionId;
 
       // Save maps
-      Session.createUserIdSessionIdMap(userId, socket.sessionId);
+      Session.createUserIdSessionIdMap(userId, sessionId);
 
       return next();
     } catch (error) {

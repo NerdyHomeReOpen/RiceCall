@@ -247,7 +247,7 @@ const func = {
           401,
         );
       }
-      if (!session.sessionToUser.get(socket.sessionId)) {
+      if (!Session.sessionToUser.get(socket.sessionId)) {
         throw new StandardizedError(
           `無效的 session ID(${socket.sessionId})`,
           'ValidationError',
