@@ -72,8 +72,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     // Handlers
     const handleSendMessage = (
       directMessage: Partial<DirectMessage>,
-      userId: User['id'],
-      targetId: User['id'],
+      userId: User['userId'],
+      targetId: User['userId'],
     ) => {
       if (!socket) return;
       socket.send.directMessage({ directMessage, userId, targetId });

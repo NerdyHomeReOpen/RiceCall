@@ -34,7 +34,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> =
     // Handlers
     const handleAddSubGroups = (
       group: Partial<FriendGroup>,
-      userId: User['id'],
+      userId: User['userId'],
     ) => {
       if (!socket) return;
       socket.send.createFriendGroup({ group, userId });

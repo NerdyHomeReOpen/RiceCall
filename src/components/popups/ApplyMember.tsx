@@ -56,8 +56,8 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
 
     const handleCreatMemberApplication = (
       memberApplication: Partial<MemberApplication>,
-      userId: User['id'],
-      serverId: Server['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.createMemberApplication({

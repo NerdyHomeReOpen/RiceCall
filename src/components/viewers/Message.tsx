@@ -233,9 +233,9 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
 
     return (
       <div className={styles['messageViewerWrapper']}>
-        {messageGroups.map((messageGroup) => {
+        {messageGroups.map((messageGroup, index) => {
           return (
-            <div key={messageGroup.id} className={styles['messageWrapper']}>
+            <div key={index} className={styles['messageWrapper']}>
               {messageGroup.type === 'info' ? (
                 <InfoMessageTab
                   messageGroup={messageGroup}

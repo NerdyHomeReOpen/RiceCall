@@ -42,9 +42,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
 
     // State
     const [section, setSection] = useState<number>(0);
-    const [userFriendGroups, setUserFriendGroups] = useState<FriendGroup[]>(
-      createDefault.user().friendGroups || [],
-    );
+    const [userFriendGroups, setUserFriendGroups] = useState<FriendGroup[]>([]);
     const [targetName, setTargetName] = useState<User['name']>(
       createDefault.user().name,
     );
@@ -52,14 +50,14 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       createDefault.user().avatar,
     );
     const [applicationSenderId, setApplicationSenderId] =
-      useState<User['id']>('');
+      useState<User['userId']>('');
     const [applicationReceiverId, setApplicationReceiverId] =
-      useState<User['id']>('');
+      useState<User['userId']>('');
     const [applicationDescription, setApplicationDescription] = useState<
       FriendApplication['description']
     >(createDefault.friendApplication().description);
     const [selectedFriendGroupId, setSelectedFriendGroupId] =
-      useState<FriendGroup['id']>('');
+      useState<FriendGroup['friendGroupId']>('');
 
     // Variables
     const { userId, targetId } = initialData;
@@ -67,8 +65,8 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
     // Handlers
     const handleCreateFriendApplication = (
       friendApplication: Partial<FriendApplication>,
-      senderId: User['id'],
-      receiverId: User['id'],
+      senderId: User['userId'],
+      receiverId: User['userId'],
     ) => {
       if (!socket) return;
       socket.send.createFriendApplication({
@@ -79,8 +77,8 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
     };
 
     const handleDeleteFriendApplication = (
-      senderId: User['id'],
-      receiverId: User['id'],
+      senderId: User['userId'],
+      receiverId: User['userId'],
     ) => {
       if (!socket) return;
       socket.send.deleteFriendApplication({ senderId, receiverId });
@@ -88,8 +86,8 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
 
     const handleCreateFriend = (
       friend: Partial<Friend>,
-      userId: User['id'],
-      targetId: User['id'],
+      userId: User['userId'],
+      targetId: User['userId'],
     ) => {
       if (!socket) return;
       socket.send.createFriend({ friend, userId, targetId });
@@ -332,7 +330,10 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
                         >
                           <option value={''}>{lang.tr.none}</option>
                           {userFriendGroups.map((group) => (
-                            <option key={group.id} value={group.id}>
+                            <option
+                              key={group.friendGroupId}
+                              value={group.friendGroupId}
+                            >
                               {group.name}
                             </option>
                           ))}

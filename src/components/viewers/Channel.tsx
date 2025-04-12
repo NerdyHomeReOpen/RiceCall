@@ -35,9 +35,9 @@ import ipcService from '@/services/ipc.service';
 import { measureLatency } from '@/utils/measureLatency';
 
 interface CategoryTabProps {
-  userId: User['id'];
-  userCurrentChannelId: Channel['id'];
-  serverId: Server['id'];
+  userId: User['userId'];
+  userCurrentChannelId: Channel['channelId'];
+  serverId: Server['serverId'];
   serverActiveMembers: ServerMember[];
   serverChannels: (Channel | Category)[];
   category: Category;
@@ -66,7 +66,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     // Variables
     const {
-      id: categoryId,
+      categoryId,
       name: categoryName,
       visibility: categoryVisibility,
     } = category;
@@ -74,7 +74,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       .filter((ch) => ch.type === 'channel')
       .filter((ch) => ch.categoryId === categoryId);
     const userInCategory = categoryChannels.some(
-      (ch) => ch.id === userCurrentChannelId,
+      (ch) => ch.channelId === userCurrentChannelId,
     );
     const canCreateChannel = permissionLevel > 4;
     const canDeleteCategory = permissionLevel > 4;
@@ -82,8 +82,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     // Handlers
     const handleOpenChannelSetting = (
-      channelId: Channel['id'],
-      serverId: Server['id'],
+      channelId: Channel['channelId'],
+      serverId: Server['serverId'],
     ) => {
       ipcService.popup.open(PopupType.CHANNEL_SETTING);
       ipcService.initialData.onRequest(PopupType.CHANNEL_SETTING, {
@@ -93,9 +93,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     };
 
     const handleOpenCreateChannel = (
-      serverId: Server['id'],
-      categoryId: Category['id'],
-      userId: User['id'],
+      serverId: Server['serverId'],
+      categoryId: Category['categoryId'],
+      userId: User['userId'],
     ) => {
       ipcService.popup.open(PopupType.CREATE_CHANNEL);
       ipcService.initialData.onRequest(PopupType.CREATE_CHANNEL, {
@@ -118,8 +118,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     };
 
     const handleDeleteChannel = (
-      channelId: Channel['id'],
-      serverId: Server['id'],
+      channelId: Channel['channelId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.deleteChannel({ channelId, serverId });
@@ -191,7 +191,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
               .map((channel) => (
                 <ChannelTab
-                  key={channel.id}
+                  key={channel.channelId}
                   userId={userId}
                   userCurrentChannelId={userCurrentChannelId}
                   serverId={serverId}
@@ -212,9 +212,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 CategoryTab.displayName = 'CategoryTab';
 
 interface ChannelTabProps {
-  userId: User['id'];
-  userCurrentChannelId: Channel['id'];
-  serverId: Server['id'];
+  userId: User['userId'];
+  userCurrentChannelId: Channel['channelId'];
+  serverId: Server['serverId'];
   serverActiveMembers: ServerMember[];
   channel: Channel;
   permissionLevel: number;
@@ -241,7 +241,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     // Variables
     const {
-      id: channelId,
+      channelId,
       name: channelName,
       isRoot: channelIsRoot,
       isLobby: channelIsLobby,
@@ -267,8 +267,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     // Handlers
     const handleOpenChannelSetting = (
-      channelId: Channel['id'],
-      serverId: Server['id'],
+      channelId: Channel['channelId'],
+      serverId: Server['serverId'],
     ) => {
       ipcService.popup.open(PopupType.CHANNEL_SETTING);
       ipcService.initialData.onRequest(PopupType.CHANNEL_SETTING, {
@@ -278,9 +278,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     };
 
     const handleOpenCreateChannel = (
-      serverId: Server['id'],
-      categoryId: Channel['id'],
-      userId: User['id'],
+      serverId: Server['serverId'],
+      categoryId: Category['categoryId'],
+      userId: User['userId'],
     ) => {
       ipcService.popup.open(PopupType.CREATE_CHANNEL);
       ipcService.initialData.onRequest(PopupType.CREATE_CHANNEL, {
@@ -303,16 +303,16 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     };
 
     const handleDeleteChannel = (
-      channelId: Channel['id'],
-      serverId: Server['id'],
+      channelId: Channel['channelId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.deleteChannel({ channelId, serverId });
     };
 
     const handleJoinChannel = (
-      userId: User['id'],
-      channelId: Channel['id'],
+      userId: User['userId'],
+      channelId: Channel['channelId'],
     ) => {
       if (!socket) return;
       socket.send.connectChannel({ userId, channelId });
@@ -411,7 +411,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((channelMember) => (
                 <UserTab
-                  key={channelMember.id}
+                  key={channelMember.userId}
                   userId={userId}
                   channelMember={channelMember}
                   permissionLevel={permissionLevel}
@@ -427,7 +427,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 ChannelTab.displayName = 'ChannelTab';
 
 interface UserTabProps {
-  userId: User['id'];
+  userId: User['userId'];
   channelMember: ServerMember;
   permissionLevel: number;
 }
@@ -442,12 +442,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
 
     // Variables
     const {
-      id: channelMemberId,
-      name: channelMemberName,
+      userId: channelMemberUserId,
       serverId: channelMemberServerId,
+      name: channelMemberName,
       permissionLevel: channelMemberPermission,
       nickname: channelMemberNickname,
-      userId: channelMemberUserId,
       level: channelMemberLevel,
       gender: channelMemberGender,
       badges: channelMemberBadges = [],
@@ -486,8 +485,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
 
     // Handlers
     const handleOpenEditNickname = (
-      serverId: Server['id'],
-      userId: User['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       ipcService.popup.open(PopupType.EDIT_NICKNAME);
       ipcService.initialData.onRequest(PopupType.EDIT_NICKNAME, {
@@ -497,8 +496,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     };
 
     const handleOpenApplyFriend = (
-      userId: User['id'],
-      targetId: User['id'],
+      userId: User['userId'],
+      targetId: User['userId'],
     ) => {
       ipcService.popup.open(PopupType.APPLY_FRIEND);
       ipcService.initialData.onRequest(PopupType.APPLY_FRIEND, {
@@ -508,8 +507,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     };
 
     const handleOpenDirectMessage = (
-      userId: User['id'],
-      targetId: User['id'],
+      userId: User['userId'],
+      targetId: User['userId'],
       targetName: User['name'],
     ) => {
       ipcService.popup.open(PopupType.DIRECT_MESSAGE);
@@ -522,8 +521,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
 
     const handleUpdateMember = (
       member: Partial<Member>,
-      userId: User['id'],
-      serverId: Server['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.updateMember({
@@ -533,14 +532,17 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       });
     };
 
-    const handleKickUser = (userId: User['id'], serverId: Server['id']) => {
+    const handleKickUser = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
       if (!socket) return;
       socket.send.disconnectServer({ userId, serverId });
     };
 
     return (
       <div
-        key={channelMemberId}
+        key={channelMemberUserId}
         className={`${styles['userTab']}`}
         onDoubleClick={(e) => {
           contextMenu.showUserInfoBlock(e.pageX, e.pageY, channelMember);
@@ -581,8 +583,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.editNickname,
               onClick: () =>
                 handleOpenEditNickname(
-                  channelMember.serverId,
                   channelMemberUserId,
+                  channelMemberServerId,
                 ),
               show: canEditNickname,
             },
@@ -742,16 +744,16 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
 
     // Variables
     const connectStatus = 4 - Math.floor(Number(latency) / 50);
-    const { id: userId } = user;
+    const { userId } = user;
     const {
-      id: serverId,
+      serverId,
       name: serverName,
       avatarUrl: serverAvatarUrl,
       displayId: serverDisplayId,
       receiveApply: serverReceiveApply,
     } = server;
     const {
-      id: channelId,
+      channelId,
       name: channelName,
       voiceMode: channelVoiceMode,
     } = channel;
@@ -770,8 +772,8 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
     };
 
     const handleOpenServerSetting = (
-      userId: User['id'],
-      serverId: Server['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       ipcService.popup.open(PopupType.SERVER_SETTING);
       ipcService.initialData.onRequest(PopupType.SERVER_SETTING, {
@@ -781,8 +783,8 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
     };
 
     const handleOpenApplyMember = (
-      userId: User['id'],
-      serverId: Server['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       if (!serverReceiveApply) {
         ipcService.popup.open(PopupType.DIALOG_ALERT2);
@@ -799,8 +801,8 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
     };
 
     const handleOpenEditNickname = (
-      serverId: Server['id'],
-      userId: User['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       ipcService.popup.open(PopupType.EDIT_NICKNAME);
       ipcService.initialData.onRequest(PopupType.EDIT_NICKNAME, {
@@ -820,7 +822,8 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
       for (const channel of serverChannels) {
         setExpanded((prev) => ({
           ...prev,
-          [channel.id]: true,
+          [channel.type === 'channel' ? channel.channelId : channel.categoryId]:
+            true,
         }));
       }
     }, [serverChannels]);
@@ -905,7 +908,7 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
                       label: lang.tr.editNickname,
                       icon: 'editGroupcard',
                       show: canEditNickname,
-                      onClick: () => handleOpenEditNickname(serverId, userId),
+                      onClick: () => handleOpenEditNickname(userId, serverId),
                     },
                     {
                       id: 'locateMe',
@@ -1012,7 +1015,7 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
                 .map((item) =>
                   item.type === 'category' ? (
                     <CategoryTab
-                      key={item.id}
+                      key={item.categoryId}
                       userId={userId}
                       userCurrentChannelId={channelId}
                       serverId={serverId}
@@ -1025,7 +1028,7 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
                     />
                   ) : (
                     <ChannelTab
-                      key={item.id}
+                      key={item.channelId}
                       userId={userId}
                       userCurrentChannelId={channelId}
                       serverId={serverId}

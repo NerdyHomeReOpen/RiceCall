@@ -49,7 +49,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
 
     const handleUpdateServer = (
       server: Partial<Server>,
-      serverId: Server['id'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.updateServer({ server, serverId });

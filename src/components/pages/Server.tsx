@@ -73,14 +73,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     >([]);
 
     // Variables
-    const { id: userId } = user;
+    const { userId } = user;
     const {
-      id: serverId,
+      serverId,
       name: serverName,
       announcement: serverAnnouncement,
     } = server;
     const {
-      id: channelId,
+      channelId,
       bitrate: channelBitrate,
       voiceMode: channelVoiceMode,
       forbidText: channelForbidText,
@@ -118,9 +118,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     // Handlers
     const handleSendMessage = (
       message: Partial<Message>,
-      userId: User['id'],
-      serverId: Server['id'],
-      channelId: Channel['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
+      channelId: Channel['channelId'],
     ): void => {
       if (!socket) return;
       socket.send.message({ message, channelId, serverId, userId });
@@ -128,8 +128,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     const handleUpdateChannel = (
       channel: Partial<Channel>,
-      channelId: Channel['id'],
-      serverId: Server['id'],
+      channelId: Channel['channelId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.updateChannel({ channel, channelId, serverId });
@@ -309,7 +309,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           const currentChannelMessages = channelMessages.filter(
             (msg, index, self) =>
               msg.timestamp >= lastVisitTime &&
-              index === self.findIndex((m) => m.id === msg.id),
+              index === self.findIndex((m) => m.messageId === msg.messageId),
           );
 
           return currentChannelMessages;

@@ -28,7 +28,7 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
     const [placement, setPlacement] = useState<'top' | 'bottom'>('bottom');
 
     // Variables
-    const badgeUrl = `/badge/${badge.id.trim()}.png`;
+    const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
 
     // Refs
     const containerRef = useRef<HTMLDivElement>(null);
@@ -130,7 +130,7 @@ const BadgeViewer: React.FC<BadgeViewerProps> = React.memo(
     return (
       <div className={styles['badgeViewerWrapper']}>
         {sortedBadges.map((badge) => (
-          <BadgeContainer key={badge.id} badge={badge} />
+          <BadgeContainer key={badge.badgeId} badge={badge} />
         ))}
       </div>
     );

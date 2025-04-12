@@ -48,8 +48,8 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
 
     const handleUpdateMember = (
       member: Partial<Member>,
-      userId: User['id'],
-      serverId: Server['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.updateMember({ member, userId, serverId });

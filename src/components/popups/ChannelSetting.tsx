@@ -80,8 +80,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
     // Handlers
     const handleUpdateChannel = (
       channel: Partial<Channel>,
-      channelId: Channel['id'],
-      serverId: Server['id'],
+      channelId: Channel['channelId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.updateChannel({ channel, channelId, serverId });

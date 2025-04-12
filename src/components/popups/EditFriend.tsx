@@ -36,9 +36,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
     const { userId, targetId } = initialData;
 
     // States
-    const [userFriendGroups, setUserFriendGroups] = useState<FriendGroup[]>(
-      createDefault.user().friendGroups || [],
-    );
+    const [userFriendGroups, setUserFriendGroups] = useState<FriendGroup[]>([]);
     const [friendGroup, setFriendGroup] = useState<Friend['friendGroupId']>(
       createDefault.friend().friendGroupId,
     );
@@ -50,8 +48,8 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
 
     const handleUpdateFriend = (
       friend: Partial<Friend>,
-      userId: User['id'],
-      targetId: User['id'],
+      userId: User['userId'],
+      targetId: User['userId'],
     ) => {
       if (!socket) return;
       socket.send.updateFriend({ friend, userId, targetId });
@@ -126,7 +124,10 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
                   >
                     <option value={''}>{lang.tr.none}</option>
                     {userFriendGroups.map((group) => (
-                      <option key={group.id} value={group.id}>
+                      <option
+                        key={group.friendGroupId}
+                        value={group.friendGroupId}
+                      >
                         {group.name}
                       </option>
                     ))}

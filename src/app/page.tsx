@@ -42,10 +42,10 @@ import ipcService from '@/services/ipc.service';
 import authService from '@/services/auth.service';
 
 interface HeaderProps {
-  userId: User['id'];
+  userId: User['userId'];
   userName: User['name'];
   userStatus: User['status'];
-  serverId: Server['id'];
+  serverId: Server['serverId'];
   serverName: Server['name'];
 }
 
@@ -79,12 +79,18 @@ const Header: React.FC<HeaderProps> = React.memo(
     ];
 
     // Handlers
-    const handleLeaveServer = (userId: User['id'], serverId: Server['id']) => {
+    const handleLeaveServer = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
       if (!socket) return;
       socket.send.disconnectServer({ userId, serverId });
     };
 
-    const handleUpdateStatus = (status: User['status'], userId: User['id']) => {
+    const handleUpdateStatus = (
+      status: User['status'],
+      userId: User['userId'],
+    ) => {
       if (!socket) return;
       socket.send.updateUser({ user: { status }, userId });
     };
@@ -112,7 +118,7 @@ const Header: React.FC<HeaderProps> = React.memo(
       localStorage.setItem('language', language);
     };
 
-    const handleOpenUserSetting = (userId: User['id']) => {
+    const handleOpenUserSetting = (userId: User['userId']) => {
       ipcService.popup.open(PopupType.USER_SETTING);
       ipcService.initialData.onRequest(PopupType.USER_SETTING, {
         userId,
@@ -319,8 +325,8 @@ const RootPageComponent = () => {
   const [channel, setChannel] = useState<Channel>(createDefault.channel());
 
   // Variables
-  const { id: userId, name: userName, status: userStatus } = user;
-  const { id: serverId, name: serverName } = server;
+  const { userId, name: userName, status: userStatus } = user;
+  const { serverId, name: serverName } = server;
 
   // Handlers
   const handleUserUpdate = (data: Partial<User> | null) => {
@@ -330,7 +336,7 @@ const RootPageComponent = () => {
 
   const handleServerUpdate = (data: Partial<Server> | null) => {
     if (data != null) {
-      if (data.id) mainTab.setSelectedTabId('server');
+      if (data.serverId) mainTab.setSelectedTabId('server');
     } else {
       mainTab.setSelectedTabId('home');
     }

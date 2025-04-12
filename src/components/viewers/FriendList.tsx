@@ -45,7 +45,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     const socket = useSocket();
 
     // Variables
-    const { id: friendGroupId, name: friendGroupName } = friendGroup;
+    const { friendGroupId, name: friendGroupName } = friendGroup;
     const friendGroupFriends =
       friendGroupId === ''
         ? friends
@@ -55,14 +55,18 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     ).length;
 
     // Handlers
-    const handleOpenEditFriendGroup = (friendGroupId: FriendGroup['id']) => {
+    const handleOpenEditFriendGroup = (
+      friendGroupId: FriendGroup['friendGroupId'],
+    ) => {
       ipcService.popup.open(PopupType.EDIT_FRIENDGROUP);
       ipcService.initialData.onRequest(PopupType.EDIT_FRIENDGROUP, {
         friendGroupId,
       });
     };
 
-    const handleDeleteFriendGroup = (friendGroupId: FriendGroup['id']) => {
+    const handleDeleteFriendGroup = (
+      friendGroupId: FriendGroup['friendGroupId'],
+    ) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT);
       ipcService.initialData.onRequest(PopupType.DIALOG_ALERT, {
         iconType: 'warning',
@@ -112,7 +116,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
         {expanded && friends && (
           <div className={styles['tabContent']}>
             {friendGroupFriends.map((friend) => (
-              <FriendCard key={friend.id} friend={friend} />
+              <FriendCard key={friend.userId} friend={friend} />
             ))}
           </div>
         )}
@@ -145,14 +149,13 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
 
   // Variables
   const {
-    id: friendId,
+    userId: friendUserId,
+    targetId: friendTargetId,
     name: friendName,
     avatarUrl: friendAvatarUrl,
     signature: friendSignature,
     vip: friendVip,
     level: friendLevel,
-    userId: friendUserId,
-    targetId: friendTargetId,
     badges: friendBadges = [],
     currentServerId: friendCurrentServerId,
   } = friend;
@@ -160,8 +163,8 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
 
   // Handlers
   const handleOpenDirectMessage = (
-    userId: User['id'],
-    targetId: User['id'],
+    userId: User['userId'],
+    targetId: User['userId'],
     targetName: User['name'],
   ) => {
     ipcService.popup.open(PopupType.DIRECT_MESSAGE, { targetId });
@@ -178,7 +181,10 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
     setFriendServerName(data.name);
   };
 
-  const handleOpenEditFriend = (userId: User['id'], targetId: User['id']) => {
+  const handleOpenEditFriend = (
+    userId: User['userId'],
+    targetId: User['userId'],
+  ) => {
     ipcService.popup.open(PopupType.EDIT_FRIEND);
     ipcService.initialData.onRequest(PopupType.EDIT_FRIEND, {
       userId,
@@ -186,7 +192,10 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
     });
   };
 
-  const handleDeleteFriend = (userId: User['id'], targetId: User['id']) => {
+  const handleDeleteFriend = (
+    userId: User['userId'],
+    targetId: User['userId'],
+  ) => {
     ipcService.popup.open(PopupType.DIALOG_ALERT);
     ipcService.initialData.onRequest(PopupType.DIALOG_ALERT, {
       iconType: 'warning',
@@ -217,7 +226,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
   }, [friendCurrentServerId]);
 
   return (
-    <div key={friendId}>
+    <div key={friendUserId}>
       {/* User View */}
       <div
         className={styles['friendCard']}
@@ -306,7 +315,7 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
     });
 
     // Handlers
-    const handleOpenSearchUser = (userId: User['id']) => {
+    const handleOpenSearchUser = (userId: User['userId']) => {
       ipcService.popup.open(PopupType.SEARCH_USER);
       ipcService.initialData.onRequest(PopupType.SEARCH_USER, {
         userId,
@@ -364,7 +373,7 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
                 .sort((a, b) => a.order - b.order)
                 .map((friendGroup) => (
                   <FriendGroupTab
-                    key={friendGroup.id}
+                    key={friendGroup.friendGroupId}
                     friendGroup={friendGroup}
                     friends={filteredFriends}
                   />

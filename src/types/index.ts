@@ -1940,7 +1940,7 @@ export const enum Permission {
 }
 
 export type User = {
-  id: string;
+  userId: string;
   name: string;
   avatar: string;
   avatarUrl: string;
@@ -1962,27 +1962,17 @@ export type User = {
   createdAt: number;
   // THESE WERE NOT SAVE IN THE DATABASE
   badges?: Badge[];
-  friends?: UserFriend[];
-  friendGroups?: FriendGroup[];
-  friendApplications?: FriendApplication[];
-  joinedServers?: Server[];
-  recentServers?: Server[];
-  ownedServers?: Server[];
-  favServers?: Server[];
-  // userServers?: UserServer[];
 };
 
 export type UserServer = Server & {
   recent: boolean;
   owned: boolean;
   favorite: boolean;
-  userId: string;
-  serverId: string;
   timestamp: number;
 };
 
 export type Server = {
-  id: string;
+  serverId: string;
   name: string;
   avatar: string;
   avatarUrl: string;
@@ -2000,15 +1990,9 @@ export type Server = {
   lobbyId: string;
   ownerId: string;
   createdAt: number;
-  // THESE WERE NOT SAVE IN THE DATABASE
-  channels?: (Channel | Category)[];
-  members?: ServerMember[];
-  users?: ServerMember[];
-  memberApplications?: MemberApplication[];
 };
 
 export type BaseChannel = {
-  id: string;
   name: string;
   order: number;
   bitrate: number;
@@ -2032,70 +2016,68 @@ export type BaseChannel = {
 };
 
 export type Category = BaseChannel & {
+  categoryId: string;
   type: 'category';
 };
 
 export type Channel = BaseChannel & {
+  channelId: string;
   type: 'channel';
-  // THESE WERE NOT SAVE IN THE DATABASE
-  messages?: ChannelMessage[];
 };
 
 export type Friend = {
-  id: string;
-  isBlocked: boolean;
-  friendGroupId: string;
   userId: string;
   targetId: string;
+  isBlocked: boolean;
+  friendGroupId: string;
   createdAt: number;
 };
 
 export type FriendApplication = User & {
-  description: string;
-  applicationStatus: 'pending' | 'accepted' | 'rejected';
   senderId: string;
   receiverId: string;
+  description: string;
+  applicationStatus: 'pending' | 'accepted' | 'rejected';
   createdAt: number;
 };
 
 export type FriendGroup = {
-  id: string;
+  friendGroupId: string;
+  userId: string;
   name: string;
   order: number;
-  userId: string;
   createdAt: number;
 };
 
 export type Member = {
-  id: string;
+  userId: string;
+  serverId: string;
   nickname: string | null;
   contribution: number;
   lastMessageTime: number;
   lastJoinChannelTime: number;
   isBlocked: boolean;
   permissionLevel: Permission;
-  userId: string;
-  serverId: string;
   createdAt: number;
 };
 
 export type MemberApplication = User & {
-  description: string;
-  applicationStatus: 'pending' | 'accepted' | 'rejected';
   userId: string;
   serverId: string;
+  description: string;
+  applicationStatus: 'pending' | 'accepted' | 'rejected';
   createdAt: number;
 };
 
 export type Badge = {
-  id: string;
+  badgeId: string;
   name: string;
   description: string;
   order: number;
 };
 
 export type Message = {
-  id: string;
+  messageId: string;
   content: string;
   type: 'general' | 'info' | 'dm';
   timestamp: number;
@@ -2103,18 +2085,18 @@ export type Message = {
 
 export type ChannelMessage = Message &
   ServerMember & {
-    type: 'general';
     senderId: string;
     receiverId: string;
     channelId: string;
+    type: 'general';
   };
 
 export type DirectMessage = Message &
   UserFriend & {
-    type: 'dm';
     senderId: string;
     userId1: string;
     userId2: string;
+    type: 'dm';
   };
 
 export type InfoMessage = Message & {

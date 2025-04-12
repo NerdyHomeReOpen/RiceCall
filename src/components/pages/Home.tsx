@@ -115,7 +115,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user }) => {
   const [loadingGroupID, setLoadingGroupID] = useState<string>();
 
   // Variables
-  const { id: userId, name: userName } = user;
+  const { userId, name: userName } = user;
   const hasResults =
     exactMatch || personalResults.length > 0 || relatedResults.length > 0;
   const recentServers = userServers
@@ -146,7 +146,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user }) => {
   };
 
   const handleConnectServer = (
-    serverId: Server['id'],
+    serverId: Server['serverId'],
     serverDisplayId: Server['displayId'],
   ) => {
     if (!socket) return;
@@ -191,9 +191,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user }) => {
 
       const personal = sortedServers.filter(
         (server) =>
-          userServers.some((s) => s.recent && s.id === server.id) ||
-          userServers.some((s) => s.favorite && s.id === server.id) ||
-          userServers.some((s) => s.owned && s.id === server.id),
+          userServers.some((s) => s.recent && s.serverId === server.serverId) ||
+          userServers.some(
+            (s) => s.favorite && s.serverId === server.serverId,
+          ) ||
+          userServers.some((s) => s.owned && s.serverId === server.serverId),
       );
       setPersonalResults(personal);
 
@@ -205,7 +207,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user }) => {
     [userServers, setExactMatch, setPersonalResults, setRelatedResults],
   );
 
-  const handleOpenCreateServer = (userId: User['id']) => {
+  const handleOpenCreateServer = (userId: User['userId']) => {
     ipcService.popup.open(PopupType.CREATE_SERVER);
     ipcService.initialData.onRequest(PopupType.CREATE_SERVER, { userId });
   };
@@ -300,7 +302,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user }) => {
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && exactMatch) {
-                  handleConnectServer(exactMatch.id, exactMatch.displayId);
+                  handleConnectServer(
+                    exactMatch.serverId,
+                    exactMatch.displayId,
+                  );
                 }
               }}
               onFocus={() => setShowDropdown(true)}
@@ -322,10 +327,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user }) => {
                     </div>
                     {personalResults.map((server) => (
                       <SearchResultItem
-                        key={server.id}
+                        key={server.serverId}
                         server={server}
                         onClick={() =>
-                          handleConnectServer(server.id, server.displayId)
+                          handleConnectServer(server.serverId, server.displayId)
                         }
                       />
                     ))}
@@ -339,10 +344,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user }) => {
                     </div>
                     {relatedResults.map((server) => (
                       <SearchResultItem
-                        key={server.id}
+                        key={server.serverId}
                         server={server}
                         onClick={() =>
-                          handleConnectServer(server.id, server.displayId)
+                          handleConnectServer(server.serverId, server.displayId)
                         }
                       />
                     ))}

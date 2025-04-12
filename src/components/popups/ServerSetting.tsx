@@ -123,15 +123,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const [serverVisibility, setServerVisibility] = useState<
       Server['visibility']
     >(createDefault.server().visibility);
-    const [serverMembers, setServerMembers] = useState<ServerMember[]>(
-      createDefault.server().members || [],
-    );
+    const [serverMembers, setServerMembers] = useState<ServerMember[]>([]);
     const [serverApplications, setServerApplications] = useState<
       MemberApplication[]
-    >(createDefault.server().memberApplications || []);
+    >([]);
     const [serverBlockMembers, setServerBlockMembers] = useState<
       ServerMember[]
-    >(createDefault.server().members?.filter((mb) => mb.isBlocked) || []);
+    >([]);
     const [permissionLevel, setPermissionLevel] = useState<number>(0);
 
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
@@ -179,15 +177,15 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const handleUpdateServer = (
       server: Partial<Server>,
-      serverId: Server['id'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.updateServer({ server, serverId });
     };
 
     const handleDeleteMemberApplication = (
-      userId: User['id'],
-      serverId: Server['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.deleteMemberApplication({ userId, serverId });
@@ -195,8 +193,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const handleCreateMember = (
       member: Partial<Member>,
-      userId: User['id'],
-      serverId: Server['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.createMember({ member, userId, serverId });
@@ -204,14 +202,17 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const handleUpdateMember = (
       member: Partial<Member>,
-      userId: User['id'],
-      serverId: Server['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.updateMember({ member, userId, serverId });
     };
 
-    const handleKickUser = (userId: User['id'], serverId: Server['id']) => {
+    const handleKickUser = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
       if (!socket) return;
       socket.send.disconnectServer({ userId, serverId });
     };
@@ -224,8 +225,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     };
 
     const handleOpenApplyFriend = (
-      userId: User['id'],
-      targetId: User['id'],
+      userId: User['userId'],
+      targetId: User['userId'],
     ) => {
       ipcService.popup.open(PopupType.APPLY_FRIEND);
       ipcService.initialData.onRequest(PopupType.APPLY_FRIEND, {
@@ -235,8 +236,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     };
 
     const handleOpenEditNickname = (
-      serverId: Server['id'],
-      userId: User['id'],
+      userId: User['userId'],
+      serverId: Server['serverId'],
     ) => {
       ipcService.popup.open(PopupType.EDIT_NICKNAME);
       ipcService.initialData.onRequest(PopupType.EDIT_NICKNAME, {
@@ -246,8 +247,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     };
 
     const handleOpenDirectMessage = (
-      userId: User['id'],
-      targetId: User['id'],
+      userId: User['userId'],
+      targetId: User['userId'],
       targetName: User['name'],
     ) => {
       ipcService.popup.open(PopupType.DIRECT_MESSAGE);
@@ -596,7 +597,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <tbody className={setting['tableContainer']}>
                       {filteredMembers.map((member) => {
                         const {
-                          id: memberId,
                           name: memberName,
                           nickname: memberNickname,
                           gender: memberGender,
@@ -631,7 +631,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
                         return (
                           <tr
-                            key={memberId}
+                            key={memberUserId}
                             onContextMenu={(e) => {
                               const isCurrentUser = memberUserId === userId;
                               contextMenu.showContextMenu(e.pageX, e.pageY, [
@@ -658,8 +658,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                   label: lang.tr.editNickname,
                                   onClick: () =>
                                     handleOpenEditNickname(
-                                      memberServerId,
                                       memberUserId,
+                                      memberServerId,
                                     ),
                                   show: canEditNickname,
                                 },
@@ -904,16 +904,15 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <tbody className={setting['tableContainer']}>
                       {filteredApplications.map((application) => {
                         const {
-                          id: applicationId,
+                          userId: applicationUserId,
+                          serverId: applicationServerId,
                           name: applicationName,
                           description: applicationDescription,
                           createdAt: applicationCreatedDate,
-                          userId: applicationUserId,
-                          serverId: applicationServerId,
                         } = application;
                         return (
                           <tr
-                            key={applicationId}
+                            key={applicationUserId}
                             onContextMenu={(e) => {
                               contextMenu.showContextMenu(e.pageX, e.pageY, [
                                 {
@@ -1015,8 +1014,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <tbody className={setting['tableContainer']}>
                       {filteredBlockMembers.map((blockMember) => {
                         const {
-                          id: blockMemberId,
-                          // userId: blockMemberUserId,
+                          userId: blockMemberUserId,
                           // serverId: blockMemberServerId,
                           nickname: blockMemberNickname,
                           name: blockMemberName,
@@ -1024,7 +1022,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                         } = blockMember;
                         return (
                           <tr
-                            key={blockMemberId}
+                            key={blockMemberUserId}
                             onContextMenu={(e) => {
                               contextMenu.showContextMenu(e.pageX, e.pageY, []);
                             }}

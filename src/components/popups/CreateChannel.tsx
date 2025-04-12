@@ -48,7 +48,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
     // Handlers
     const handleCreateChannel = (
       channel: Partial<Channel>,
-      serverId: Server['id'],
+      serverId: Server['serverId'],
     ) => {
       if (!socket) return;
       socket.send.createChannel({ channel, serverId });

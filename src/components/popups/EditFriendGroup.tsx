@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Types
-import { FriendGroup } from '@/types';
+import { FriendGroup, User } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
@@ -15,9 +15,10 @@ import setting from '@/styles/popups/editServer.module.css';
 import ipcService from '@/services/ipc.service';
 
 interface EditFriendGroupPopupProps {
-  friendGroupId: string;
-  friendGroupName: string;
-  friendGroupOrder: number;
+  userId: User['userId'];
+  friendGroupId: FriendGroup['friendGroupId'];
+  friendGroupName: FriendGroup['name'];
+  friendGroupOrder: FriendGroup['order'];
 }
 
 const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
@@ -27,7 +28,8 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
     const lang = useLanguage();
 
     // Variables
-    const { friendGroupId, friendGroupName, friendGroupOrder } = initialData;
+    const { userId, friendGroupId, friendGroupName, friendGroupOrder } =
+      initialData;
 
     // States
     const [groupName, setGroupName] = useState<string>(friendGroupName);
@@ -36,15 +38,18 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
     // Handlers
     const handleUpdateFriendGroup = (
       group: Partial<FriendGroup>,
-      friendGroupId: FriendGroup['id'],
+      friendGroupId: FriendGroup['friendGroupId'],
+      userId: User['userId'],
     ) => {
       if (!socket) return;
-      socket.send.updateFriendGroup({ group, friendGroupId });
+      socket.send.updateFriendGroup({ group, friendGroupId, userId });
     };
 
     const handleClose = () => {
       ipcService.window.close();
     };
+
+    // FIXME: Add refresh
 
     return (
       <div className={popup['popupContainer']}>
@@ -111,6 +116,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
               handleUpdateFriendGroup(
                 { name: groupName, order: groupOrder },
                 friendGroupId,
+                userId,
               );
               handleClose();
             }}

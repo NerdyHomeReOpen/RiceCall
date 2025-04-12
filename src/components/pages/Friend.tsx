@@ -49,7 +49,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
 
     // Variables
     const {
-      id: userId,
+      userId,
       name: userName,
       avatarUrl: userAvatarUrl,
       signature: userSignature,
@@ -62,7 +62,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     // Handlers
     const handleChangeSignature = (
       signature: User['signature'],
-      userId: User['id'],
+      userId: User['userId'],
     ) => {
       if (!socket) return;
       socket.send.updateUser({ user: { signature }, userId });

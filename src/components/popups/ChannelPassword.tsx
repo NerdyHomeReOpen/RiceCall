@@ -41,8 +41,8 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(
     };
 
     const handleJoinChannel = (
-      userId: User['id'],
-      channelId: Channel['id'],
+      userId: User['userId'],
+      channelId: Channel['channelId'],
       password: string | null,
     ) => {
       if (!socket) return;

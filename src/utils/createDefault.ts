@@ -15,7 +15,7 @@ import {
 
 export const createDefault = {
   user: (overrides: Partial<User> = {}): User => ({
-    id: '',
+    userId: '',
     name: '',
     avatar: `${Date.now()}`,
     avatarUrl: `${process.env.NEXT_PUBLIC_SERVER_URL}/images/userAvatars/`,
@@ -39,7 +39,7 @@ export const createDefault = {
   }),
 
   channel: (overrides: Partial<Channel> = {}): Channel => ({
-    id: '',
+    channelId: '',
     name: '',
     type: 'channel',
     visibility: 'public',
@@ -64,7 +64,7 @@ export const createDefault = {
   }),
 
   server: (overrides: Partial<Server> = {}): Server => ({
-    id: '',
+    serverId: '',
     name: '',
     avatar: `${Date.now()}`,
     avatarUrl: `${process.env.NEXT_PUBLIC_SERVER_URL}/images/serverAvatars/`,
@@ -86,20 +86,19 @@ export const createDefault = {
   }),
 
   friend: (overrides: Partial<Friend> = {}): Friend => ({
-    id: '',
-    isBlocked: false,
-    friendGroupId: '',
     userId: '',
     targetId: '',
+    isBlocked: false,
+    friendGroupId: '',
     createdAt: 0,
     ...overrides,
   }),
 
   friendGroup: (overrides: Partial<FriendGroup> = {}): FriendGroup => ({
-    id: '',
+    friendGroupId: '',
+    userId: '',
     name: '',
     order: 0,
-    userId: '',
     createdAt: 0,
     ...overrides,
   }),
@@ -111,15 +110,14 @@ export const createDefault = {
   }),
 
   member: (overrides: Partial<Member> = {}): Member => ({
-    id: '',
+    userId: '',
+    serverId: '',
     isBlocked: false,
     nickname: null,
     contribution: 0,
     lastMessageTime: 0,
     lastJoinChannelTime: 0,
     permissionLevel: Permission.Guest,
-    userId: '',
-    serverId: '',
     createdAt: 0,
     ...overrides,
   }),
@@ -150,10 +148,9 @@ export const createDefault = {
   memberApplication: (
     overrides: Partial<MemberApplication> = {},
   ): MemberApplication => ({
+    serverId: '',
     description: '',
     applicationStatus: 'pending',
-    userId: '',
-    serverId: '',
     ...createDefault.user(),
     ...overrides,
   }),
