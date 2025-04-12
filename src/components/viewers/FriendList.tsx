@@ -30,10 +30,11 @@ import refreshService from '@/services/refresh.service';
 interface FriendGroupTabProps {
   friendGroup: FriendGroup;
   friends: UserFriend[];
+  userId: User['userId'];
 }
 
 const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
-  ({ friendGroup, friends }) => {
+  ({ friendGroup, friends, userId }) => {
     // Hooks
     const lang = useLanguage();
     const contextMenu = useContextMenu();
@@ -57,15 +58,18 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     // Handlers
     const handleOpenEditFriendGroup = (
       friendGroupId: FriendGroup['friendGroupId'],
+      userId: User['userId'],
     ) => {
       ipcService.popup.open(PopupType.EDIT_FRIENDGROUP);
       ipcService.initialData.onRequest(PopupType.EDIT_FRIENDGROUP, {
         friendGroupId,
+        userId,
       });
     };
 
     const handleDeleteFriendGroup = (
       friendGroupId: FriendGroup['friendGroupId'],
+      userId: User['userId'],
     ) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT);
       ipcService.initialData.onRequest(PopupType.DIALOG_ALERT, {
@@ -74,7 +78,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
         submitTo: PopupType.DIALOG_ALERT,
       });
       ipcService.popup.onSubmit(PopupType.DIALOG_ALERT, () => {
-        socket.send.deleteFriendGroup({ friendGroupId });
+        socket.send.deleteFriendGroup({ friendGroupId, userId });
       });
     };
 
@@ -90,13 +94,13 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
                 id: 'edit',
                 label: lang.tr.editFriendGroup,
                 show: friendGroupId !== '',
-                onClick: () => handleOpenEditFriendGroup(friendGroupId),
+                onClick: () => handleOpenEditFriendGroup(friendGroupId, userId),
               },
               {
                 id: 'delete',
                 label: lang.tr.delete,
                 show: friendGroupId !== '',
-                onClick: () => handleDeleteFriendGroup(friendGroupId),
+                onClick: () => handleDeleteFriendGroup(friendGroupId, userId),
               },
             ]);
           }}
@@ -376,6 +380,7 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
                     key={friendGroup.friendGroupId}
                     friendGroup={friendGroup}
                     friends={filteredFriends}
+                    userId={userId}
                   />
                 ))}
             </div>

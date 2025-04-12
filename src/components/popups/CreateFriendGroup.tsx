@@ -15,7 +15,7 @@ import setting from '@/styles/popups/editServer.module.css';
 import ipcService from '@/services/ipc.service';
 
 interface CreateFriendGroupPopupProps {
-  userId: string;
+  userId: User['userId'];
 }
 
 const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> =

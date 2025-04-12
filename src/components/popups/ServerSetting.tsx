@@ -32,8 +32,8 @@ import { createDefault } from '@/utils/createDefault';
 import { createSorter } from '@/utils/createSorter';
 
 interface ServerSettingPopupProps {
-  serverId: string;
-  userId: string;
+  serverId: Server['serverId'];
+  userId: User['userId'];
 }
 
 const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(

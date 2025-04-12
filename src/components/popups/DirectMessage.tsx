@@ -25,8 +25,8 @@ import vip from '@/styles/common/vip.module.css';
 import grade from '@/styles/common/grade.module.css';
 
 interface DirectMessagePopupProps {
-  userId: string;
-  targetId: string;
+  userId: User['userId'];
+  targetId: User['userId'];
   windowRef: React.RefObject<HTMLDivElement>;
 }
 

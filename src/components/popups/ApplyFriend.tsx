@@ -27,8 +27,8 @@ import refreshService from '@/services/refresh.service';
 import { createDefault } from '@/utils/createDefault';
 
 interface ApplyFriendPopupProps {
-  userId: string;
-  targetId: string;
+  userId: User['userId'];
+  targetId: User['userId'];
 }
 
 const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(

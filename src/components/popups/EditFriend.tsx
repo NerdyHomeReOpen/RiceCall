@@ -19,8 +19,8 @@ import ipcService from '@/services/ipc.service';
 import { createDefault } from '@/utils/createDefault';
 
 interface EditFriendPopupProps {
-  userId: string;
-  targetId: string;
+  userId: User['userId'];
+  targetId: User['userId'];
 }
 
 const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(

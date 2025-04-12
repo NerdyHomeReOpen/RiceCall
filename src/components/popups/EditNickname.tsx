@@ -19,8 +19,8 @@ import ipcService from '@/services/ipc.service';
 import { createDefault } from '@/utils/createDefault';
 
 interface EditNicknamePopupProps {
-  userId: string;
-  serverId: string;
+  userId: User['userId'];
+  serverId: Server['serverId'];
 }
 
 const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(

@@ -19,8 +19,8 @@ import refreshService from '@/services/refresh.service';
 import { createDefault } from '@/utils/createDefault';
 
 interface ChannelSettingPopupProps {
-  serverId: string;
-  channelId: string;
+  serverId: Server['serverId'];
+  channelId: Channel['channelId'];
 }
 
 const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(

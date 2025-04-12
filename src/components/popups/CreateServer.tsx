@@ -21,7 +21,7 @@ import refreshService from '@/services/refresh.service';
 import { createDefault } from '@/utils/createDefault';
 
 interface CreateServerPopupProps {
-  userId: string;
+  userId: User['userId'];
 }
 
 const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(

@@ -312,10 +312,24 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     const handleJoinChannel = (
       userId: User['userId'],
+      serverId: Server['serverId'],
       channelId: Channel['channelId'],
     ) => {
       if (!socket) return;
-      socket.send.connectChannel({ userId, channelId });
+      socket.send.connectChannel({ userId, channelId, serverId });
+    };
+
+    const handleOpenChannelPassword = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+      channelId: Channel['channelId'],
+    ) => {
+      ipcService.popup.open(PopupType.CHANNEL_PASSWORD);
+      ipcService.initialData.onRequest(PopupType.CHANNEL_PASSWORD, {
+        userId,
+        serverId,
+        channelId,
+      });
     };
 
     // Effect
@@ -335,18 +349,11 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           key={channelId}
           className={`${styles['channelTab']} `}
           onDoubleClick={() => {
-            if (
-              !userInChannel &&
-              channel?.password &&
-              channelVisibility === 'private' &&
-              permissionLevel < 3
-            ) {
-              ipcService.popup.open(PopupType.CHANNEL_PASSWORD);
-              ipcService.initialData.onRequest(PopupType.CHANNEL_PASSWORD, {
-                channelId,
-                userId,
-              });
-            } else if (canJoin) handleJoinChannel(userId, channelId);
+            if (!userInChannel && channel.password && permissionLevel < 3) {
+              handleOpenChannelPassword(userId, serverId, channelId);
+            } else if (canJoin) {
+              handleJoinChannel(userId, serverId, channelId);
+            }
           }}
           onContextMenu={(e) => {
             contextMenu.showContextMenu(e.pageX, e.pageY, [

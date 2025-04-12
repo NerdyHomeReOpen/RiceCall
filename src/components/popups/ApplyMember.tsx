@@ -20,8 +20,8 @@ import { createDefault } from '@/utils/createDefault';
 import refreshService from '@/services/refresh.service';
 
 interface ApplyMemberPopupProps {
-  serverId: string;
-  userId: string;
+  serverId: Server['serverId'];
+  userId: User['userId'];
 }
 
 const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(

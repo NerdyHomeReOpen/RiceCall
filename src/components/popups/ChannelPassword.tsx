@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { User, Channel } from '@/types';
+import { User, Channel, Server } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
@@ -16,8 +16,9 @@ import refreshService from '@/services/refresh.service';
 import ipcService from '@/services/ipc.service';
 
 interface ChannelPasswordPopupProps {
-  userId: string;
-  channelId: string;
+  userId: User['userId'];
+  serverId: Server['serverId'];
+  channelId: Channel['channelId'];
 }
 
 const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(
@@ -27,7 +28,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(
     const lang = useLanguage();
 
     // Variables
-    const { userId, channelId } = initialData;
+    const { userId, serverId, channelId } = initialData;
 
     // Refs
     const refreshRef = useRef(false);
@@ -43,10 +44,11 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(
     const handleJoinChannel = (
       userId: User['userId'],
       channelId: Channel['channelId'],
+      serverId: Server['serverId'],
       password: string | null,
     ) => {
       if (!socket) return;
-      socket.send.connectChannel({ userId, channelId, password });
+      socket.send.connectChannel({ userId, channelId, serverId, password });
     };
 
     // Effects
@@ -93,7 +95,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(
               password && password.length <= 4 ? '' : popup['disabled']
             }`}
             onClick={() => {
-              handleJoinChannel(userId, channelId, password);
+              handleJoinChannel(userId, channelId, serverId, password);
               handleClose();
             }}
           >

@@ -15,7 +15,7 @@ import setting from '@/styles/popups/editServer.module.css';
 import ipcService from '@/services/ipc.service';
 
 interface SearchUserPopupProps {
-  userId: string;
+  userId: User['userId'];
 }
 
 const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(

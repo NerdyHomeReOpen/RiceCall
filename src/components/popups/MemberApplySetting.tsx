@@ -19,7 +19,7 @@ import ipcService from '@/services/ipc.service';
 import { createDefault } from '@/utils/createDefault';
 
 interface MemberApplySettingPopupProps {
-  serverId: string;
+  serverId: Server['serverId'];
 }
 
 const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =

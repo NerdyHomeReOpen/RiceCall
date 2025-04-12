@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { Channel, Server } from '@/types';
+import { Category, Channel, Server, User } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
@@ -19,9 +19,9 @@ import refreshService from '@/services/refresh.service';
 import { createDefault } from '@/utils/createDefault';
 
 interface CreateChannelPopupProps {
-  userId: string;
-  categoryId: string | null;
-  serverId: string;
+  userId: User['userId'];
+  categoryId: Category['categoryId'] | null;
+  serverId: Server['serverId'];
 }
 
 const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
