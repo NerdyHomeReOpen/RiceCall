@@ -28,7 +28,7 @@ import vip from '@/styles/common/vip.module.css';
 import { createDefault } from '@/utils/createDefault';
 
 interface UserSettingPopupProps {
-  userId: string;
+  userId: User['userId'];
 }
 
 const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
