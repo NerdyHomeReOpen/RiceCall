@@ -332,27 +332,21 @@ const Database = {
       }
     },
 
-    friend: async (friendId, data) => {
+    friend: async (userId, targetId, data) => {
       try {
-        const ALLOWED_FIELDS = [
-          'isBlocked',
-          'friend_group_id',
-          'user_id',
-          'target_id',
-          'created_at',
-        ];
+        const ALLOWED_FIELDS = ['isBlocked', 'friend_group_id', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO friends (friend_id, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
+          `INSERT INTO friends (user_id, target_id, ${keys.join(', ')}) 
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
             ON DUPLICATE KEY 
             UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
-          [friendId, ...values],
+          [userId, targetId, ...values],
         );
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
-            `設置 friend.${friendId} 時發生無法預期的錯誤: ${error.message}`,
+            `設置 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
             'AccessDatabaseError',
             'SET',
             'DATABASE_ERROR',
@@ -363,29 +357,27 @@ const Database = {
       }
     },
 
-    friendApplication: async (friendApplicationId, data) => {
+    friendApplication: async (senderId, receiverId, data) => {
       try {
         const ALLOWED_FIELDS = [
           'description',
           'application_status',
-          'sender_id',
-          'receiver_id',
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO friend_applications (friend_application_id, ${keys.join(
+          `INSERT INTO friend_applications (sender_id, receiver_id, ${keys.join(
             ', ',
           )}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
             ON DUPLICATE KEY 
             UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
-          [friendApplicationId, ...values],
+          [senderId, receiverId, ...values],
         );
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
-            `設置 friendApplication.${friendApplicationId} 時發生無法預期的錯誤: ${error.message}`,
+            `設置 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
             'AccessDatabaseError',
             'SET',
             'DATABASE_ERROR',
@@ -396,7 +388,7 @@ const Database = {
       }
     },
 
-    member: async (memberId, data) => {
+    member: async (userId, serverId, data) => {
       try {
         const ALLOWED_FIELDS = [
           'nickname',
@@ -405,22 +397,20 @@ const Database = {
           'last_join_channel_time',
           'is_blocked',
           'permission_level',
-          'user_id',
-          'server_id',
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO members (member_id, ${keys.join(', ')}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
+          `INSERT INTO members (user_id, server_id, ${keys.join(', ')}) 
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
             ON DUPLICATE KEY 
             UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
-          [memberId, ...values],
+          [userId, serverId, ...values],
         );
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
-            `設置 member.${memberId} 時發生無法預期的錯誤: ${error.message}`,
+            `設置 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
             'AccessDatabaseError',
             'SET',
             'DATABASE_ERROR',
@@ -431,29 +421,27 @@ const Database = {
       }
     },
 
-    memberApplication: async (memberApplicationId, data) => {
+    memberApplication: async (userId, serverId, data) => {
       try {
         const ALLOWED_FIELDS = [
           'description',
           'application_status',
-          'user_id',
-          'server_id',
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
         await query(
-          `INSERT INTO member_applications (member_application_id, ${keys.join(
+          `INSERT INTO member_applications (user_id, server_id, ${keys.join(
             ', ',
           )}) 
-            VALUES (?, ${keys.map(() => '?').join(', ')})
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})
             ON DUPLICATE KEY 
             UPDATE ${keys.map((k) => `${k} = VALUES(${k})`).join(', ')}`,
-          [memberApplicationId, ...values],
+          [userId, serverId, ...values],
         );
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
-            `設置 memberApplication.${memberApplicationId} 時發生無法預期的錯誤: ${error.message}`,
+            `設置 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
             'AccessDatabaseError',
             'SET',
             'DATABASE_ERROR',
