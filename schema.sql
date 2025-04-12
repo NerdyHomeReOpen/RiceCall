@@ -19,6 +19,12 @@ CREATE TABLE `accounts` (
   `user_id` char(36) NOT NULL
 );
 
+--
+-- 資料表的關聯 `accounts`:
+--   `user_id`
+--       `users` -> `user_id`
+--
+
 -- --------------------------------------------------------
 
 --
@@ -30,6 +36,10 @@ CREATE TABLE `badges` (
   `name` varchar(255) NOT NULL DEFAULT 'Unknown',
   `description` varchar(255) NOT NULL DEFAULT ''
 );
+
+--
+-- 資料表的關聯 `badges`:
+--
 
 -- --------------------------------------------------------
 
@@ -57,8 +67,12 @@ CREATE TABLE `channels` (
   `voice_mode` varchar(255) NOT NULL DEFAULT 'free',
   `category_id` char(36) NOT NULL,
   `server_id` char(36) NOT NULL,
-  `created_at` BIGINT NOT NULL DEFAULT 0
+  `created_at` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `channels`:
+--
 
 -- --------------------------------------------------------
 
@@ -73,8 +87,16 @@ CREATE TABLE `direct_messages` (
   `sender_id` char(36) NOT NULL,
   `user_id_1` char(36) NOT NULL,
   `user_id_2` char(36) NOT NULL,
-  `timestamp` BIGINT NOT NULL DEFAULT 0
+  `timestamp` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `direct_messages`:
+--   `user_id_1`
+--       `users` -> `user_id`
+--   `user_id_2`
+--       `users` -> `user_id`
+--
 
 -- --------------------------------------------------------
 
@@ -83,13 +105,22 @@ CREATE TABLE `direct_messages` (
 --
 
 CREATE TABLE `friends` (
-  `friend_id` char(36) NOT NULL,
-  `is_blocked` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
-  `friend_group_id` char(36) NOT NULL DEFAULT '',
   `user_id` char(36) NOT NULL,
   `target_id` char(36) NOT NULL,
-  `created_at` BIGINT NOT NULL DEFAULT 0
+  `is_blocked` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `friend_group_id` char(36) NOT NULL DEFAULT '',
+  `created_at` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `friends`:
+--   `friend_group_id`
+--       `friend_groups` -> `friend_group_id`
+--   `user_id`
+--       `users` -> `user_id`
+--   `target_id`
+--       `users` -> `user_id`
+--
 
 -- --------------------------------------------------------
 
@@ -98,13 +129,20 @@ CREATE TABLE `friends` (
 --
 
 CREATE TABLE `friend_applications` (
-  `application_id` char(36) NOT NULL,
-  `description` varchar(255) NOT NULL DEFAULT '',
-  `application_status` varchar(255) NOT NULL DEFAULT '',
   `sender_id` char(36) NOT NULL,
   `reciever_id` char(36) NOT NULL,
-  `created_at` BIGINT NOT NULL DEFAULT 0
+  `description` varchar(255) NOT NULL DEFAULT '',
+  `application_status` varchar(255) NOT NULL DEFAULT '',
+  `created_at` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `friend_applications`:
+--   `sender_id`
+--       `users` -> `user_id`
+--   `reciever_id`
+--       `users` -> `user_id`
+--
 
 -- --------------------------------------------------------
 
@@ -117,8 +155,14 @@ CREATE TABLE `friend_groups` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `order` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `user_id` char(36) NOT NULL,
-  `created_at` BIGINT NOT NULL DEFAULT 0
+  `created_at` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `friend_groups`:
+--   `user_id`
+--       `users` -> `user_id`
+--
 
 -- --------------------------------------------------------
 
@@ -127,17 +171,24 @@ CREATE TABLE `friend_groups` (
 --
 
 CREATE TABLE `members` (
-  `member_id` char(36) NOT NULL,
+  `user_id` char(36) NOT NULL,
+  `server_id` char(36) NOT NULL,
   `nickname` varchar(255) DEFAULT NULL,
   `contribution` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `last_message_time` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `last_join_channel_time` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `permission_level` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `is_blocked` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
-  `user_id` char(36) NOT NULL,
-  `server_id` char(36) NOT NULL,
-  `created_at` BIGINT NOT NULL DEFAULT 0
+  `created_at` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `members`:
+--   `server_id`
+--       `servers` -> `server_id`
+--   `user_id`
+--       `users` -> `user_id`
+--
 
 -- --------------------------------------------------------
 
@@ -146,13 +197,20 @@ CREATE TABLE `members` (
 --
 
 CREATE TABLE `member_applications` (
-  `application_id` char(36) NOT NULL,
-  `description` varchar(255) NOT NULL DEFAULT '',
-  `application_status` varchar(255) NOT NULL DEFAULT '',
   `user_id` char(36) NOT NULL,
   `server_id` char(36) NOT NULL,
-  `created_at` BIGINT NOT NULL DEFAULT 0
+  `description` varchar(255) NOT NULL DEFAULT '',
+  `application_status` varchar(255) NOT NULL DEFAULT '',
+  `created_at` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `member_applications`:
+--   `server_id`
+--       `servers` -> `server_id`
+--   `user_id`
+--       `users` -> `user_id`
+--
 
 -- --------------------------------------------------------
 
@@ -167,8 +225,18 @@ CREATE TABLE `messages` (
   `sender_id` char(36) NOT NULL,
   `server_id` char(36) NOT NULL,
   `channel_id` char(36) NOT NULL,
-  `timestamp` BIGINT NOT NULL DEFAULT 0
+  `timestamp` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `messages`:
+--   `channel_id`
+--       `channels` -> `channel_id`
+--   `sender_id`
+--       `users` -> `user_id`
+--   `server_id`
+--       `servers` -> `server_id`
+--
 
 -- --------------------------------------------------------
 
@@ -194,8 +262,16 @@ CREATE TABLE `servers` (
   `visibility` varchar(255) NOT NULL DEFAULT 'public',
   `lobby_id` char(36) NOT NULL,
   `owner_id` char(36) NOT NULL,
-  `created_at` BIGINT NOT NULL DEFAULT 0
+  `created_at` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `servers`:
+--   `owner_id`
+--       `users` -> `user_id`
+--   `lobby_id`
+--       `channels` -> `channel_id`
+--
 
 -- --------------------------------------------------------
 
@@ -222,9 +298,17 @@ CREATE TABLE `users` (
   `gender` varchar(255) NOT NULL DEFAULT 'Male',
   `current_channel_id` char(36) DEFAULT NULL,
   `current_server_id` char(36) DEFAULT NULL,
-  `last_active_at` BIGINT NOT NULL DEFAULT 0,
-  `created_at` BIGINT NOT NULL DEFAULT 0
+  `last_active_at` bigint(20) NOT NULL DEFAULT 0,
+  `created_at` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `users`:
+--   `current_channel_id`
+--       `channels` -> `channel_id`
+--   `current_server_id`
+--       `servers` -> `server_id`
+--
 
 -- --------------------------------------------------------
 
@@ -236,8 +320,16 @@ CREATE TABLE `user_badges` (
   `user_id` char(36) NOT NULL,
   `badge_id` char(36) NOT NULL,
   `order` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `created_at` BIGINT NOT NULL DEFAULT 0
+  `created_at` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `user_badges`:
+--   `badge_id`
+--       `badges` -> `badge_id`
+--   `user_id`
+--       `users` -> `user_id`
+--
 
 -- --------------------------------------------------------
 
@@ -251,8 +343,16 @@ CREATE TABLE `user_servers` (
   `owned` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `recent` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `favorite` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
-  `timestamp` BIGINT NOT NULL DEFAULT 0
+  `timestamp` bigint(20) NOT NULL DEFAULT 0
 );
+
+--
+-- 資料表的關聯 `user_servers`:
+--   `server_id`
+--       `servers` -> `server_id`
+--   `user_id`
+--       `users` -> `user_id`
+--
 
 --
 -- 已傾印資料表的索引
@@ -289,7 +389,7 @@ ALTER TABLE `direct_messages`
 -- 資料表索引 `friends`
 --
 ALTER TABLE `friends`
-  ADD PRIMARY KEY (`friend_id`),
+  ADD PRIMARY KEY (`user_id`,`target_id`),
   ADD KEY `friend_group_id` (`friend_group_id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `target_id` (`target_id`);
@@ -298,7 +398,7 @@ ALTER TABLE `friends`
 -- 資料表索引 `friend_applications`
 --
 ALTER TABLE `friend_applications`
-  ADD PRIMARY KEY (`application_id`),
+  ADD PRIMARY KEY (`sender_id`,`reciever_id`),
   ADD KEY `sender_id` (`sender_id`),
   ADD KEY `reciever_id` (`reciever_id`);
 
@@ -313,7 +413,7 @@ ALTER TABLE `friend_groups`
 -- 資料表索引 `members`
 --
 ALTER TABLE `members`
-  ADD PRIMARY KEY (`member_id`),
+  ADD PRIMARY KEY (`user_id`,`server_id`),
   ADD KEY `server_id` (`server_id`),
   ADD KEY `user_id` (`user_id`);
 
@@ -321,7 +421,7 @@ ALTER TABLE `members`
 -- 資料表索引 `member_applications`
 --
 ALTER TABLE `member_applications`
-  ADD PRIMARY KEY (`application_id`),
+  ADD PRIMARY KEY (`user_id`,`server_id`),
   ADD KEY `server_id` (`server_id`),
   ADD KEY `user_id` (`user_id`);
 
@@ -346,7 +446,9 @@ ALTER TABLE `servers`
 -- 資料表索引 `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`);
+  ADD PRIMARY KEY (`user_id`),
+  ADD KEY `current_channel_id` (`current_channel_id`),
+  ADD KEY `current_server_id` (`current_server_id`);
 
 --
 -- 資料表索引 `user_badges`
@@ -428,6 +530,13 @@ ALTER TABLE `messages`
 ALTER TABLE `servers`
   ADD CONSTRAINT `servers_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `servers_ibfk_2` FOREIGN KEY (`lobby_id`) REFERENCES `channels` (`channel_id`);
+
+--
+-- 資料表的限制式 `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`current_channel_id`) REFERENCES `channels` (`channel_id`),
+  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`current_server_id`) REFERENCES `servers` (`server_id`);
 
 --
 -- 資料表的限制式 `user_badges`
