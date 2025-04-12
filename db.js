@@ -605,13 +605,13 @@ const Database = {
 
     user: async (userId) => {
       try {
-        const res = await query(
+        const datas = await query(
           `SELECT *
           FROM users
           WHERE user_id = ?`,
           [userId],
         );
-        const data = res[0];
+        const data = datas[0];
         if (!data) return null;
         return convertToCamelCase(data);
       } catch (error) {
@@ -630,15 +630,15 @@ const Database = {
 
     userFriendGroups: async (userId) => {
       try {
-        const friendGroups = await query(
+        const datas = await query(
           `SELECT * 
           FROM friend_groups
           WHERE user_id = ?
           ORDER BY order DESC`,
           [userId],
         );
-        if (!friendGroups) return null;
-        return friendGroups;
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -655,7 +655,7 @@ const Database = {
 
     userBadges: async (userId) => {
       try {
-        const userBadges = await query(
+        const datas = await query(
           `SELECT * 
           FROM user_badges
           LEFT JOIN badges
@@ -664,8 +664,8 @@ const Database = {
           ORDER BY order DESC`,
           [userId],
         );
-        if (!userBadges) return null;
-        return convertToCamelCase(userBadges);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -682,7 +682,7 @@ const Database = {
 
     userServers: async (userId) => {
       try {
-        const userServers = await query(
+        const datas = await query(
           `SELECT *
           FROM user_servers
           LEFT JOIN servers
@@ -691,8 +691,8 @@ const Database = {
           ORDER BY timestamp DESC`,
           [userId],
         );
-        if (!userServers) return null;
-        return convertToCamelCase(userServers);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -709,7 +709,7 @@ const Database = {
 
     userMembers: async (userId) => {
       try {
-        const userMembers = await query(
+        const datas = await query(
           `SELECT * 
           FROM members 
           LEFT JOIN servers
@@ -718,8 +718,8 @@ const Database = {
           ORDER BY created_at DESC`,
           [userId],
         );
-        if (!userMembers) return null;
-        return convertToCamelCase(userMembers);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -736,7 +736,7 @@ const Database = {
 
     userFriends: async (userId) => {
       try {
-        const userFriends = await query(
+        const datas = await query(
           `SELECT * 
           FROM friends 
           LEFT JOIN users 
@@ -745,8 +745,8 @@ const Database = {
           ORDER BY created_at DESC`,
           [userId],
         );
-        if (!userFriends) return null;
-        return convertToCamelCase(userFriends);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -763,7 +763,7 @@ const Database = {
 
     userFriendApplications: async (userId) => {
       try {
-        const userFriendApplications = await query(
+        const datas = await query(
           `SELECT * 
           FROM friend_applications 
           LEFT JOIN users 
@@ -773,8 +773,8 @@ const Database = {
           ORDER BY created_at DESC`,
           [userId],
         );
-        if (!userFriendApplications) return null;
-        return convertToCamelCase(userFriendApplications);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -791,7 +791,7 @@ const Database = {
 
     searchServer: async (querys) => {
       try {
-        const servers = await query(
+        const datas = await query(
           `SELECT * 
           FROM servers 
           WHERE name LIKE ? OR display_id = ?
@@ -799,8 +799,8 @@ const Database = {
           LIMIT 10`,
           [`%${querys}%`, `${querys}`],
         );
-        if (!servers) return null;
-        return servers;
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -817,14 +817,15 @@ const Database = {
 
     server: async (serverId) => {
       try {
-        const server = await query(
+        const datas = await query(
           `SELECT * 
           FROM servers 
           WHERE server_id = ?`,
           [serverId],
         );
-        if (!server) return null;
-        return server;
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -841,17 +842,17 @@ const Database = {
 
     serverUsers: async (serverId) => {
       try {
-        const serverUsers = await query(
+        const datas = await query(
           `SELECT * 
           FROM members 
           LEFT JOIN users 
           ON members.user_id = users.id
-          WHERE server_id = ?
+          WHERE users.current_server_id = ?
           ORDER BY created_at DESC`,
           [serverId],
         );
-        if (!serverUsers) return null;
-        return convertToCamelCase(serverUsers);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -868,15 +869,15 @@ const Database = {
 
     serverChannels: async (serverId) => {
       try {
-        const serverChannels = await query(
+        const datas = await query(
           `SELECT * 
           FROM channels
           WHERE server_id = ?
           ORDER BY order DESC`,
           [serverId],
         );
-        if (!serverChannels) return null;
-        return convertToCamelCase(serverChannels);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -893,7 +894,7 @@ const Database = {
 
     serverMembers: async (serverId) => {
       try {
-        const serverMembers = await query(
+        const datas = await query(
           `SELECT * 
           FROM members 
           LEFT JOIN users 
@@ -902,8 +903,8 @@ const Database = {
           ORDER BY created_at DESC`,
           [serverId],
         );
-        if (!serverMembers) return null;
-        return convertToCamelCase(serverMembers);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -920,7 +921,7 @@ const Database = {
 
     serverMemberApplications: async (serverId) => {
       try {
-        const serverMemberApplications = await query(
+        const datas = await query(
           `SELECT * 
           FROM member_applications 
           LEFT JOIN users 
@@ -930,8 +931,8 @@ const Database = {
           ORDER BY created_at DESC`,
           [serverId],
         );
-        if (!serverMemberApplications) return null;
-        return convertToCamelCase(serverMemberApplications);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -948,15 +949,16 @@ const Database = {
 
     category: async (categoryId) => {
       try {
-        const category = await query(
+        const datas = await query(
           `SELECT * 
           FROM categories 
           WHERE category_id = ?
           ORDER BY order DESC`,
           [categoryId],
         );
-        if (!category) return null;
-        return category;
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -973,15 +975,16 @@ const Database = {
 
     channel: async (channelId) => {
       try {
-        const channel = await query(
+        const datas = await query(
           `SELECT * 
           FROM channels 
           WHERE channel_id = ?
           ORDER BY order DESC`,
           [channelId],
         );
-        if (!channel) return null;
-        return convertToCamelCase(channel);
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -996,9 +999,36 @@ const Database = {
       }
     },
 
+    channelMembers: async (channelId) => {
+      try {
+        const datas = await query(
+          `SELECT * 
+          FROM members 
+          LEFT JOIN users 
+          ON members.user_id = users.id
+          WHERE users.current_channel_id = ?
+          ORDER BY created_at DESC`,
+          [channelId],
+        );
+        if (!datas) return null;
+        return datas;
+      } catch (error) {
+        if (!(error instanceof StandardizedError)) {
+          error = new StandardizedError(
+            `查詢 channelMembers.${channelId} 時發生無法預期的錯誤: ${error.message}`,
+            'AccessDatabaseError',
+            'GET',
+            'DATABASE_ERROR',
+            500,
+          );
+        }
+        throw error;
+      }
+    },
+
     channelMessages: async (channelId) => {
       try {
-        const channelMessages = await query(
+        const datas = await query(
           `SELECT * 
           FROM messages 
           WHERE channel_id = ?
@@ -1006,8 +1036,8 @@ const Database = {
           ORDER BY created_at DESC`,
           [channelId],
         );
-        if (!channelMessages) return null;
-        return convertToCamelCase(channelMessages);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1024,7 +1054,7 @@ const Database = {
 
     channelInfoMessages: async (channelId) => {
       try {
-        const channelInfoMessages = await query(
+        const datas = await query(
           `SELECT * 
           FROM messages 
           WHERE channel_id = ?
@@ -1032,8 +1062,8 @@ const Database = {
           ORDER BY created_at DESC`,
           [channelId],
         );
-        if (!channelInfoMessages) return null;
-        return convertToCamelCase(channelInfoMessages);
+        if (!datas) return null;
+        return datas;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1050,15 +1080,16 @@ const Database = {
 
     friendGroup: async (friendGroupId) => {
       try {
-        const friendGroup = await query(
+        const datas = await query(
           `SELECT * 
           FROM friend_groups 
           WHERE friend_group_id = ?
           ORDER BY order DESC`,
           [friendGroupId],
         );
-        if (!friendGroup) return null;
-        return convertToCamelCase(friendGroup);
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1075,7 +1106,7 @@ const Database = {
 
     member: async (userId, serverId) => {
       try {
-        const member = await query(
+        const datas = await query(
           `SELECT * 
           FROM members 
           WHERE user_id = ?
@@ -1083,8 +1114,9 @@ const Database = {
           ORDER BY created_at DESC`,
           [userId, serverId],
         );
-        if (!member) return null;
-        return convertToCamelCase(member);
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1101,7 +1133,7 @@ const Database = {
 
     memberApplication: async (userId, serverId) => {
       try {
-        const memberApplication = await query(
+        const datas = await query(
           `SELECT * 
           FROM member_applications 
           WHERE user_id = ?
@@ -1109,8 +1141,9 @@ const Database = {
           ORDER BY created_at DESC`,
           [userId, serverId],
         );
-        if (!memberApplication) return null;
-        return convertToCamelCase(memberApplication);
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1127,7 +1160,7 @@ const Database = {
 
     friend: async (userId, targetId) => {
       try {
-        const friend = await query(
+        const datas = await query(
           `SELECT * 
           FROM friends 
           WHERE user_id = ?
@@ -1135,8 +1168,9 @@ const Database = {
           ORDER BY created_at DESC`,
           [userId, targetId],
         );
-        if (!friend) return null;
-        return convertToCamelCase(friend);
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1153,7 +1187,7 @@ const Database = {
 
     friendApplication: async (senderId, receiverId) => {
       try {
-        const friendApplication = await query(
+        const datas = await query(
           `SELECT * 
           FROM friend_applications 
           WHERE sender_id = ?
@@ -1161,8 +1195,9 @@ const Database = {
           ORDER BY created_at DESC`,
           [senderId, receiverId],
         );
-        if (!friendApplication) return null;
-        return convertToCamelCase(friendApplication);
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1179,15 +1214,16 @@ const Database = {
 
     message: async (messageId) => {
       try {
-        const message = await query(
+        const datas = await query(
           `SELECT * 
           FROM messages 
           WHERE message_id = ?
           ORDER BY created_at DESC`,
           [messageId],
         );
-        if (!message) return null;
-        return convertToCamelCase(message);
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -1206,7 +1242,7 @@ const Database = {
       try {
         const userId1 = userId.localeCompare(targetId) < 0 ? userId : targetId;
         const userId2 = userId.localeCompare(targetId) < 0 ? targetId : userId;
-        const directMessages = await query(
+        const datas = await query(
           `SELECT * 
           FROM direct_messages 
           LEFT JOIN users 
@@ -1216,8 +1252,9 @@ const Database = {
           ORDER BY created_at DESC`,
           [userId1, userId2],
         );
-        if (!directMessages) return null;
-        return convertToCamelCase(directMessages);
+        const data = datas[0];
+        if (!data) return null;
+        return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
