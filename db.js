@@ -70,16 +70,28 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['password', 'user_id'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO accounts (account, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [account, ...values],
+        const account = await query(
+          `SELECT * FROM accounts WHERE account = ?`,
+          [account],
         );
+        if (account.length) {
+          // If the account exists, update it
+          await query(
+            `UPDATE accounts SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE account = ?`,
+            [...values, account],
+          );
+        } else {
+          // If the account does not exist, create it
+          await query(
+            `INSERT INTO accounts (account, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ${keys.map(() => '?').join(', ')})`,
+            [account, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -119,16 +131,27 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO users (user_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [userId, ...values],
-        );
+        const user = await query(`SELECT * FROM users WHERE user_id = ?`, [
+          userId,
+        ]);
+        if (user.length) {
+          // If the user exists, update it
+          await query(
+            `UPDATE users SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE user_id = ?`,
+            [...values, userId],
+          );
+        } else {
+          // If the user does not exist, create it
+          await query(
+            `INSERT INTO users (user_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ${keys.map(() => '?').join(', ')})`,
+            [userId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -147,16 +170,27 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['name', 'description', 'image'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO badges (badge_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [badgeId, ...values],
-        );
+        const badge = await query(`SELECT * FROM badges WHERE badge_id = ?`, [
+          badgeId,
+        ]);
+        if (badge.length) {
+          // If the badge exists, update it
+          await query(
+            `UPDATE badges SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE badge_id = ?`,
+            [...values, badgeId],
+          );
+        } else {
+          // If the badge does not exist, create it
+          await query(
+            `INSERT INTO badges (badge_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ${keys.map(() => '?').join(', ')})`,
+            [badgeId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -175,16 +209,28 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['user_id', 'badge_id', 'order', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO user_badges (user_id, badge_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [userId, badgeId, ...values],
+        const userBadge = await query(
+          `SELECT * FROM user_badges WHERE user_id = ? AND badge_id = ?`,
+          [userId, badgeId],
         );
+        if (userBadge.length) {
+          // If the userBadge exists, update it
+          await query(
+            `UPDATE user_badges SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE user_id = ? AND badge_id = ?`,
+            [...values, userId, badgeId],
+          );
+        } else {
+          // If the userBadge does not exist, create it
+          await query(
+            `INSERT INTO user_badges (user_id, badge_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})`,
+            [userId, badgeId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -210,16 +256,28 @@ const Database = {
           'timestamp',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO user_servers (user_id, server_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [userId, serverId, ...values],
+        const userServer = await query(
+          `SELECT * FROM user_servers WHERE user_id = ? AND server_id = ?`,
+          [userId, serverId],
         );
+        if (userServer.length) {
+          // If the userServer exists, update it
+          await query(
+            `UPDATE user_servers SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE user_id = ? AND server_id = ?`,
+            [...values, userId, serverId],
+          );
+        } else {
+          // If the userServer does not exist, create it
+          await query(
+            `INSERT INTO user_servers (user_id, server_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})`,
+            [userId, serverId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -256,16 +314,28 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO servers (server_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [serverId, ...values],
+        const server = await query(
+          `SELECT * FROM servers WHERE server_id = ?`,
+          [serverId],
         );
+        if (server.length) {
+          // If the server exists, update it
+          await query(
+            `UPDATE servers SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE server_id = ?`,
+            [...values, serverId],
+          );
+        } else {
+          // If the server does not exist, create it
+          await query(
+            `INSERT INTO servers (server_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ${keys.map(() => '?').join(', ')})`,
+            [serverId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -305,16 +375,28 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO channels (channel_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [channelId, ...values],
+        const channel = await query(
+          `SELECT * FROM channels WHERE channel_id = ?`,
+          [channelId],
         );
+        if (channel.length) {
+          // If the channel exists, update it
+          await query(
+            `UPDATE channels SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE channel_id = ?`,
+            [...values, channelId],
+          );
+        } else {
+          // If the channel does not exist, create it
+          await query(
+            `INSERT INTO channels (channel_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')})
+            VALUES (?, ${keys.map(() => '?').join(', ')})`,
+            [channelId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -333,16 +415,28 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['name', 'order', 'user_id', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO friend_groups (friend_group_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [friendGroupId, ...values],
+        const friendGroup = await query(
+          `SELECT * FROM friend_groups WHERE friend_group_id = ?`,
+          [friendGroupId],
         );
+        if (friendGroup.length) {
+          // If the friendGroup exists, update it
+          await query(
+            `UPDATE friend_groups SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE friend_group_id = ?`,
+            [...values, friendGroupId],
+          );
+        } else {
+          // If the friendGroup does not exist, create it
+          await query(
+            `INSERT INTO friend_groups (friend_group_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ${keys.map(() => '?').join(', ')})`,
+            [friendGroupId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -361,16 +455,28 @@ const Database = {
       try {
         const ALLOWED_FIELDS = ['isBlocked', 'friend_group_id', 'created_at'];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO friends (user_id, target_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [userId, targetId, ...values],
+        const friend = await query(
+          `SELECT * FROM friends WHERE user_id = ? AND target_id = ?`,
+          [userId, targetId],
         );
+        if (friend.length) {
+          // If the friend exists, update it
+          await query(
+            `UPDATE friends SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE user_id = ? AND target_id = ?`,
+            [...values, userId, targetId],
+          );
+        } else {
+          // If the friend does not exist, create it
+          await query(
+            `INSERT INTO friends (user_id, target_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})`,
+            [userId, targetId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -393,16 +499,28 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO friend_applications (sender_id, receiver_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [senderId, receiverId, ...values],
+        const friendApplication = await query(
+          `SELECT * FROM friend_applications WHERE sender_id = ? AND receiver_id = ?`,
+          [senderId, receiverId],
         );
+        if (friendApplication.length) {
+          // If the friendApplication exists, update it
+          await query(
+            `UPDATE friend_applications SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE sender_id = ? AND receiver_id = ?`,
+            [...values, senderId, receiverId],
+          );
+        } else {
+          // If the friendApplication does not exist, create it
+          await query(
+            `INSERT INTO friend_applications (sender_id, receiver_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})`,
+            [senderId, receiverId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -429,16 +547,28 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO members (user_id, server_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [userId, serverId, ...values],
+        const member = await query(
+          `SELECT * FROM members WHERE user_id = ? AND server_id = ?`,
+          [userId, serverId],
         );
+        if (member.length) {
+          // If the member exists, update it
+          await query(
+            `UPDATE members SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE user_id = ? AND server_id = ?`,
+            [...values, userId, serverId],
+          );
+        } else {
+          // If the member does not exist, create it
+          await query(
+            `INSERT INTO members (user_id, server_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})`,
+            [userId, serverId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -461,16 +591,28 @@ const Database = {
           'created_at',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO member_applications (user_id, server_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [userId, serverId, ...values],
+        const memberApplication = await query(
+          `SELECT * FROM member_applications WHERE user_id = ? AND server_id = ?`,
+          [userId, serverId],
         );
+        if (memberApplication.length) {
+          // If the memberApplication exists, update it
+          await query(
+            `UPDATE member_applications SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE user_id = ? AND server_id = ?`,
+            [...values, userId, serverId],
+          );
+        } else {
+          // If the memberApplication does not exist, create it
+          await query(
+            `INSERT INTO member_applications (user_id, server_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})`,
+            [userId, serverId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -496,16 +638,28 @@ const Database = {
           'timestamp',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO messages (message_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [messageId, ...values],
+        const message = await query(
+          `SELECT * FROM messages WHERE message_id = ?`,
+          [messageId],
         );
+        if (message.length) {
+          // If the message exists, update it
+          await query(
+            `UPDATE messages SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE message_id = ?`,
+            [...values, messageId],
+          );
+        } else {
+          // If the message does not exist, create it
+          await query(
+            `INSERT INTO messages (message_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ${keys.map(() => '?').join(', ')})`,
+            [messageId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -530,16 +684,28 @@ const Database = {
           'timestamp',
         ];
         const { keys, values } = validateData(data, ALLOWED_FIELDS);
-        await query(
-          `INSERT INTO direct_messages (direct_message_id, ${keys
-            .map((k) => `\`${k}\``)
-            .join(', ')}) 
-          VALUES (?, ${keys.map(() => '?').join(', ')})
-          ON DUPLICATE KEY UPDATE ${keys
-            .map((k) => `\`${k}\` = VALUES(\`${k}\`)`)
-            .join(', ')}`,
-          [directMessageId, ...values],
+        const directMessage = await query(
+          `SELECT * FROM direct_messages WHERE direct_message_id = ?`,
+          [directMessageId],
         );
+        if (directMessage.length) {
+          // If the directMessage exists, update it
+          await query(
+            `UPDATE direct_messages SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE direct_message_id = ?`,
+            [...values, directMessageId],
+          );
+        } else {
+          // If the directMessage does not exist, create it
+          await query(
+            `INSERT INTO direct_messages (direct_message_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ${keys.map(() => '?').join(', ')})`,
+            [directMessageId, ...values],
+          );
+        }
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError(
@@ -583,7 +749,7 @@ const Database = {
         const res = await query(
           `SELECT *
           FROM accounts
-          WHERE account = ?`,
+          WHERE accounts.account = ?`,
           [account],
         );
         const data = res[0];
@@ -610,9 +776,9 @@ const Database = {
     searchUser: async (querys) => {
       try {
         const res = await query(
-          `SELECT user_id 
+          `SELECT accounts.user_id 
           FROM accounts
-          WHERE account = ?`,
+          WHERE accounts.account = ?`,
           [querys],
         );
         const data = res[0];
@@ -637,7 +803,7 @@ const Database = {
         const datas = await query(
           `SELECT *
           FROM users
-          WHERE user_id = ?`,
+          WHERE users.user_id = ?`,
           [userId],
         );
         const data = datas[0];
@@ -662,7 +828,7 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM friend_groups
-          WHERE user_id = ?
+          WHERE friend_groups.user_id = ?
           ORDER BY friend_groups.\`order\` DESC`,
           [userId],
         );
@@ -689,7 +855,7 @@ const Database = {
           FROM user_badges
           LEFT JOIN badges
           ON user_badges.badge_id = badges.badge_id
-          WHERE user_id = ?
+          WHERE user_badges.user_id = ?
           ORDER BY badges.\`order\` DESC`,
           [userId],
         );
@@ -716,8 +882,8 @@ const Database = {
           FROM user_servers
           LEFT JOIN servers
           ON user_servers.server_id = servers.server_id
-          WHERE user_id = ?
-          ORDER BY timestamp DESC`,
+          WHERE user_servers.user_id = ?
+          ORDER BY user_servers.timestamp DESC`,
           [userId],
         );
         if (!datas) return null;
@@ -743,7 +909,7 @@ const Database = {
           FROM members 
           LEFT JOIN servers
           ON members.server_id = servers.server_id
-          WHERE user_id = ?
+          WHERE members.user_id = ?
           ORDER BY members.created_at DESC`,
           [userId],
         );
@@ -770,7 +936,7 @@ const Database = {
           FROM friends 
           LEFT JOIN users 
           ON friends.target_id = users.user_id
-          WHERE user_id = ?
+          WHERE friends.user_id = ?
           ORDER BY friends.created_at DESC`,
           [userId],
         );
@@ -797,8 +963,8 @@ const Database = {
           FROM friend_applications 
           LEFT JOIN users 
           ON friend_applications.sender_id = users.user_id
-          WHERE receiver_id = ?
-          AND application_status = 'pending'
+          WHERE friend_applications.receiver_id = ?
+          AND friend_applications.application_status = 'pending'
           ORDER BY friend_applications.created_at DESC`,
           [userId],
         );
@@ -823,7 +989,7 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM servers 
-          WHERE name LIKE ? OR display_id = ?
+          WHERE servers.name LIKE ? OR servers.display_id = ?
           ORDER BY servers.created_at DESC
           LIMIT 10`,
           [`%${querys}%`, `${querys}`],
@@ -849,7 +1015,7 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM servers 
-          WHERE server_id = ?`,
+          WHERE servers.server_id = ?`,
           [serverId],
         );
         const data = datas[0];
@@ -901,7 +1067,7 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM channels
-          WHERE server_id = ?
+          WHERE channels.server_id = ?
           ORDER BY channels.\`order\` DESC`,
           [serverId],
         );
@@ -928,7 +1094,7 @@ const Database = {
           FROM members 
           LEFT JOIN users 
           ON members.user_id = users.user_id  
-          WHERE server_id = ?
+          WHERE members.server_id = ?
           ORDER BY members.created_at DESC`,
           [serverId],
         );
@@ -955,9 +1121,9 @@ const Database = {
           FROM member_applications 
           LEFT JOIN users 
           ON member_applications.user_id = users.user_id
-          WHERE server_id = ?
-          AND application_status = 'pending'
-          ORDER BY created_at DESC`,
+          WHERE member_applications.server_id = ?
+          AND member_applications.application_status = 'pending'
+          ORDER BY member_applications.created_at DESC`,
           [serverId],
         );
         if (!datas) return null;
@@ -981,7 +1147,7 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM categories 
-          WHERE category_id = ?
+          WHERE categories.category_id = ?
           ORDER BY categories.\`order\` DESC`,
           [categoryId],
         );
@@ -1007,7 +1173,7 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM channels 
-          WHERE channel_id = ?
+          WHERE channels.channel_id = ?
           ORDER BY channels.\`order\` DESC`,
           [channelId],
         );
@@ -1060,8 +1226,13 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM messages 
-          WHERE channel_id = ?
-          AND type = 'general'
+          LEFT JOIN users 
+          ON messages.sender_id = users.user_id
+          LEFT JOIN members
+          ON messages.sender_id = members.user_id 
+          AND messages.server_id = members.server_id
+          WHERE messages.channel_id = ?
+          AND messages.type = 'general'
           ORDER BY messages.timestamp DESC`,
           [channelId],
         );
@@ -1086,8 +1257,8 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM messages 
-          WHERE channel_id = ?
-          AND type = 'info'
+          WHERE messages.channel_id = ?
+          AND messages.type = 'info'
           ORDER BY messages.timestamp DESC`,
           [channelId],
         );
@@ -1112,7 +1283,7 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM friend_groups 
-          WHERE friend_group_id = ?
+          WHERE friend_groups.friend_group_id = ?
           ORDER BY friend_groups.\`order\` DESC`,
           [friendGroupId],
         );
@@ -1138,9 +1309,9 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM members 
-          WHERE user_id = ?
-          AND server_id = ?
-          ORDER BY created_at DESC`,
+          WHERE members.user_id = ?
+          AND members.server_id = ?
+          ORDER BY members.created_at DESC`,
           [userId, serverId],
         );
         const data = datas[0];
@@ -1165,9 +1336,9 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM member_applications 
-          WHERE user_id = ?
-          AND server_id = ?
-          ORDER BY created_at DESC`,
+          WHERE member_applications.user_id = ?
+          AND member_applications.server_id = ?
+          ORDER BY member_applications.created_at DESC`,
           [userId, serverId],
         );
         const data = datas[0];
@@ -1192,9 +1363,9 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM friends 
-          WHERE user_id = ?
-          AND target_id = ?
-          ORDER BY created_at DESC`,
+          WHERE friends.user_id = ?
+          AND friends.target_id = ?
+          ORDER BY friends.created_at DESC`,
           [userId, targetId],
         );
         const data = datas[0];
@@ -1219,9 +1390,9 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM friend_applications 
-          WHERE sender_id = ?
-          AND receiver_id = ?
-          ORDER BY created_at DESC`,
+          WHERE friend_applications.sender_id = ?
+          AND friend_applications.receiver_id = ?
+          ORDER BY friend_applications.created_at DESC`,
           [senderId, receiverId],
         );
         const data = datas[0];
@@ -1246,7 +1417,7 @@ const Database = {
         const datas = await query(
           `SELECT * 
           FROM messages 
-          WHERE message_id = ?
+          WHERE messages.message_id = ?
           ORDER BY messages.timestamp DESC`,
           [messageId],
         );
@@ -1276,8 +1447,8 @@ const Database = {
           FROM direct_messages 
           LEFT JOIN users 
           ON direct_messages.sender_id = users.user_id
-          WHERE user_id_1 = ?
-          AND user_id_2 = ?
+          WHERE direct_messages.user_id_1 = ?
+          AND direct_messages.user_id_2 = ?
           ORDER BY direct_messages.timestamp DESC`,
           [userId1, userId2],
         );
@@ -1304,7 +1475,7 @@ const Database = {
       try {
         await query(
           `DELETE FROM users 
-          WHERE user_id = ?`,
+          WHERE users.user_id = ?`,
           [userId],
         );
       } catch (error) {
@@ -1325,7 +1496,7 @@ const Database = {
       try {
         await query(
           `DELETE FROM badges 
-          WHERE badge_id = ?`,
+          WHERE badges.badge_id = ?`,
           [badgeId],
         );
       } catch (error) {
@@ -1346,8 +1517,8 @@ const Database = {
       try {
         await query(
           `DELETE FROM user_badges 
-          WHERE user_id = ?
-          AND badge_id = ?`,
+          WHERE user_badges.user_id = ?
+          AND user_badges.badge_id = ?`,
           [userId, badgeId],
         );
       } catch (error) {
@@ -1368,8 +1539,8 @@ const Database = {
       try {
         await query(
           `DELETE FROM user_servers 
-          WHERE user_id = ?
-          AND server_id = ?`,
+          WHERE user_servers.user_id = ?
+          AND user_servers.server_id = ?`,
           [userId, serverId],
         );
       } catch (error) {
@@ -1390,7 +1561,7 @@ const Database = {
       try {
         await query(
           `DELETE FROM servers 
-          WHERE server_id = ?`,
+          WHERE servers.server_id = ?`,
           [serverId],
         );
       } catch (error) {
@@ -1411,7 +1582,7 @@ const Database = {
       try {
         await query(
           `DELETE FROM channels 
-          WHERE channel_id = ?`,
+          WHERE channels.channel_id = ?`,
           [channelId],
         );
       } catch (error) {
@@ -1432,7 +1603,7 @@ const Database = {
       try {
         await query(
           `DELETE FROM friend_groups 
-          WHERE friend_group_id = ?`,
+          WHERE friend_groups.friend_group_id = ?`,
           [friendGroupId],
         );
       } catch (error) {
@@ -1453,8 +1624,8 @@ const Database = {
       try {
         await query(
           `DELETE FROM members 
-          WHERE user_id = ?
-          AND server_id = ?`,
+          WHERE members.user_id = ?
+          AND members.server_id = ?`,
           [userId, serverId],
         );
       } catch (error) {
@@ -1475,8 +1646,8 @@ const Database = {
       try {
         await query(
           `DELETE FROM member_applications 
-          WHERE user_id = ?
-          AND server_id = ?`,
+          WHERE member_applications.user_id = ?
+          AND member_applications.server_id = ?`,
           [userId, serverId],
         );
       } catch (error) {
@@ -1497,8 +1668,8 @@ const Database = {
       try {
         await query(
           `DELETE FROM friends 
-          WHERE user_id = ?
-          AND target_id = ?`,
+          WHERE friends.user_id = ?
+          AND friends.target_id = ?`,
           [userId, targetId],
         );
       } catch (error) {
@@ -1519,8 +1690,8 @@ const Database = {
       try {
         await query(
           `DELETE FROM friend_applications 
-          WHERE sender_id = ?
-          AND receiver_id = ?`,
+          WHERE friend_applications.sender_id = ?
+          AND friend_applications.receiver_id = ?`,
           [senderId, receiverId],
         );
       } catch (error) {
@@ -1541,7 +1712,7 @@ const Database = {
       try {
         await query(
           `DELETE FROM messages 
-          WHERE message_id = ?`,
+          WHERE messages.message_id = ?`,
           [messageId],
         );
       } catch (error) {
@@ -1564,8 +1735,8 @@ const Database = {
         const userId2 = userId.localeCompare(targetId) < 0 ? targetId : userId;
         await query(
           `DELETE FROM direct_messages 
-          WHERE user_id_1 = ?
-          AND user_id_2 = ?`,
+          WHERE direct_messages.user_id_1 = ?
+          AND direct_messages.user_id_2 = ?`,
           [userId1, userId2],
         );
       } catch (error) {
