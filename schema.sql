@@ -130,7 +130,7 @@ CREATE TABLE `friends` (
 
 CREATE TABLE `friend_applications` (
   `sender_id` char(36) NOT NULL,
-  `reciever_id` char(36) NOT NULL,
+  `receiver_id` char(36) NOT NULL,
   `description` varchar(255) NOT NULL DEFAULT '',
   `application_status` varchar(255) NOT NULL DEFAULT '',
   `created_at` bigint(20) NOT NULL DEFAULT 0
@@ -140,7 +140,7 @@ CREATE TABLE `friend_applications` (
 -- 資料表的關聯 `friend_applications`:
 --   `sender_id`
 --       `users` -> `user_id`
---   `reciever_id`
+--   `receiver_id`
 --       `users` -> `user_id`
 --
 
@@ -398,9 +398,9 @@ ALTER TABLE `friends`
 -- 資料表索引 `friend_applications`
 --
 ALTER TABLE `friend_applications`
-  ADD PRIMARY KEY (`sender_id`,`reciever_id`),
+  ADD PRIMARY KEY (`sender_id`,`receiver_id`),
   ADD KEY `sender_id` (`sender_id`),
-  ADD KEY `reciever_id` (`reciever_id`);
+  ADD KEY `receiver_id` (`receiver_id`);
 
 --
 -- 資料表索引 `friend_groups`
@@ -494,7 +494,7 @@ ALTER TABLE `friends`
 --
 ALTER TABLE `friend_applications`
   ADD CONSTRAINT `friend_applications_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `friend_applications_ibfk_2` FOREIGN KEY (`reciever_id`) REFERENCES `users` (`user_id`);
+  ADD CONSTRAINT `friend_applications_ibfk_2` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`user_id`);
 
 --
 -- 資料表的限制式 `friend_groups`
