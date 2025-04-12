@@ -2094,8 +2094,8 @@ export type ChannelMessage = Message &
 export type DirectMessage = Message &
   UserFriend & {
     senderId: string;
-    userId1: string;
-    userId2: string;
+    user1Id: string;
+    user2Id: string;
     type: 'dm';
   };
 
