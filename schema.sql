@@ -65,7 +65,7 @@ CREATE TABLE `channels` (
   `forbid_guest_url` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `type` varchar(255) NOT NULL DEFAULT 'channel',
   `voice_mode` varchar(255) NOT NULL DEFAULT 'free',
-  `category_id` char(36),
+  `category_id` char(36) DEFAULT NULL,
   `server_id` char(36) NOT NULL,
   `created_at` bigint(20) NOT NULL DEFAULT 0
 );
@@ -108,7 +108,7 @@ CREATE TABLE `friends` (
   `user_id` char(36) NOT NULL,
   `target_id` char(36) NOT NULL,
   `is_blocked` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
-  `friend_group_id` char(36) NOT NULL DEFAULT '',
+  `friend_group_id` char(36) DEFAULT NULL,
   `created_at` bigint(20) NOT NULL DEFAULT 0
 );
 
