@@ -97,13 +97,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       if (!data) data = [];
       if (data.length > 0) {
         // !! THIS IS IMPORTANT !!
-        const userId1 = userId.localeCompare(targetId) < 0 ? userId : targetId;
-        const userId2 = userId.localeCompare(targetId) < 0 ? targetId : userId;
+        const user1Id = userId.localeCompare(targetId) < 0 ? userId : targetId;
+        const user2Id = userId.localeCompare(targetId) < 0 ? targetId : userId;
 
         // check if the message array is between the current users
         const isCurrentMessage =
-          data.find((msg) => msg.userId1 === userId1) &&
-          data.find((msg) => msg.userId2 === userId2);
+          data.find((msg) => msg.user1Id === user1Id) &&
+          data.find((msg) => msg.user2Id === user2Id);
 
         if (isCurrentMessage) setDirectMessages(data);
       }
