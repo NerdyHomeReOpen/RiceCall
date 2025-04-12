@@ -65,7 +65,7 @@ CREATE TABLE `channels` (
   `forbid_guest_url` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `type` varchar(255) NOT NULL DEFAULT 'channel',
   `voice_mode` varchar(255) NOT NULL DEFAULT 'free',
-  `category_id` char(36) NOT NULL,
+  `category_id` char(36),
   `server_id` char(36) NOT NULL,
   `created_at` bigint(20) NOT NULL DEFAULT 0
 );
@@ -175,8 +175,8 @@ CREATE TABLE `members` (
   `server_id` char(36) NOT NULL,
   `nickname` varchar(255) DEFAULT NULL,
   `contribution` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `last_message_time` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `last_join_channel_time` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `last_message_time` bigint(20) NOT NULL DEFAULT 0,
+  `last_join_channel_time` bigint(20) NOT NULL DEFAULT 0,
   `permission_level` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `is_blocked` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `created_at` bigint(20) NOT NULL DEFAULT 0
@@ -260,8 +260,8 @@ CREATE TABLE `servers` (
   `allow_direct_message` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `type` varchar(255) NOT NULL DEFAULT 'game',
   `visibility` varchar(255) NOT NULL DEFAULT 'public',
-  `lobby_id` char(36) NOT NULL,
-  `owner_id` char(36) NOT NULL,
+  `lobby_id` char(36) DEFAULT NULL,
+  `owner_id` char(36) DEFAULT NULL,
   `created_at` bigint(20) NOT NULL DEFAULT 0
 );
 
@@ -285,15 +285,15 @@ CREATE TABLE `users` (
   `avatar` varchar(255) NOT NULL DEFAULT '',
   `avatar_url` varchar(255) NOT NULL DEFAULT '',
   `signature` varchar(255) NOT NULL DEFAULT '',
-  `country` varchar(48) NOT NULL DEFAULT '',
+  `country` varchar(48) NOT NULL DEFAULT 'taiwan',
   `level` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `vip` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `xp` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `required_xp` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `progress` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `birth_year` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
-  `birth_month` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
-  `birth_day` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `birth_year` smallint(5) UNSIGNED NOT NULL DEFAULT 1900,
+  `birth_month` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `birth_day` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
   `status` varchar(255) NOT NULL DEFAULT 'offline',
   `gender` varchar(255) NOT NULL DEFAULT 'Male',
   `current_channel_id` char(36) DEFAULT NULL,
