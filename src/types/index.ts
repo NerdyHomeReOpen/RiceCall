@@ -372,6 +372,7 @@ export interface Translation {
   connectingServer: string;
   mute: string;
   unmute: string;
+  changeChannelOrder: string;
 }
 
 export type LanguageKey = 'tw' | 'cn' | 'en' | 'jp';
@@ -757,6 +758,7 @@ export const translations: Record<LanguageKey, Translation> = {
     connectingServer: '正在連接',
     mute: '拒聽此人語音',
     unmute: '接受此人語音',
+    changeChannelOrder:'修改頻道排序'
   },
   cn: {
     RPCHomePage: '正在浏览主页',
@@ -1137,6 +1139,7 @@ export const translations: Record<LanguageKey, Translation> = {
     connectingServer: '正向连接',
     mute: '拒听此人语音',
     unmute: '接受此人语音',
+    changeChannelOrder:'修改頻道排序'
   },
   en: {
     RPCHomePage: 'Browsing Homepage',
@@ -1541,6 +1544,7 @@ export const translations: Record<LanguageKey, Translation> = {
     connectingServer: 'Connecting',
     mute: 'Mute this user',
     unmute: 'Unmute this user',
+    changeChannelOrder:'change channel order'
   },
   jp: {
     RPCHomePage: 'ホームページを閲覧中',
@@ -1940,6 +1944,7 @@ export const translations: Record<LanguageKey, Translation> = {
     connectingServer: '接続中',
     mute: 'このユーザーの音声を拒聴',
     unmute: 'このユーザーの音声を受聴',
+    changeChannelOrder:'変更チャンネル順序'
   },
 };
 
@@ -2066,7 +2071,7 @@ export type FriendGroup = {
 export type Member = {
   userId: string;
   serverId: string;
-  nickname: string | null;
+  nickname: string;
   contribution: number;
   lastMessageTime: number;
   lastJoinChannelTime: number;
@@ -2277,6 +2282,7 @@ export enum PopupType {
   DIALOG_WARNING = 'dialogWarning',
   DIALOG_ERROR = 'dialogError',
   DIALOG_INFO = 'dialogInfo',
+  CHANGE_CHANNEL_ORDER = 'changeChannelOrder',
 }
 
 export const PopupSize = {
@@ -2302,6 +2308,7 @@ export const PopupSize = {
   [PopupType.DIALOG_WARNING]: { height: 220, width: 400 },
   [PopupType.DIALOG_ERROR]: { height: 220, width: 400 },
   [PopupType.DIALOG_INFO]: { height: 220, width: 400 },
+  [PopupType.CHANGE_CHANNEL_ORDER]: { height: 550, width: 500 },
   Settings: { height: 450, width: 600 },
   Apply: { height: 320, width: 500 },
   Small: { height: 220, width: 400 },

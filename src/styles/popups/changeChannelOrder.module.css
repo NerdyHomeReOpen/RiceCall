@@ -1,0 +1,180 @@
+.body {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.left {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  max-width: 145px;
+  min-height: 0;
+  background: url('../../../public/setting_left_bg.png') no-repeat center center;
+  background-size: cover;
+  border-right: 1px solid #b4dbec;
+}
+
+.tabs {
+  height: 100%;
+  width: 145px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs .item {
+  width: 100%;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  border-top: 1px solid #fff0;
+  border-bottom: 1px solid #fff0;
+  border-right: 1px solid #fff0;
+}
+
+.tabs .item:first-child {
+  margin-top: 15px;
+}
+
+.tabs .item.active {
+  border-top: 1px solid #b4dbec;
+  border-bottom: 1px solid #b4dbec;
+  border-right: 1px solid #fff0;
+  background-color: #f7f7f7;
+  width: 145px;
+}
+
+.right {
+  height: 100%;
+  width: 100%;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.headerBar {
+  justify-content: space-between;
+}
+
+.toolsBar {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 5px;
+  background: url(../../../public/channel/chn_toolbar_bg.png);
+  border-bottom: 2px solid #b4bdc7;
+}
+
+.addChannelBtn,
+.changeChannelNameBtn,
+.deleteChannelBtn,
+.upChannelOrderBtn,
+.downChannelOrderBtn,
+.topChannelOrderBtn,
+.bottomChannelOrderBtn {
+  display: flex;
+  cursor: pointer;
+  padding: 5px 8px 5px 8px;
+  border: 1px solid #ffffff00;
+}
+
+.addChannelBtn:hover,
+.changeChannelNameBtn:hover,
+.deleteChannelBtn:hover,
+.upChannelOrderBtn:hover,
+.downChannelOrderBtn:hover,
+.topChannelOrderBtn:hover,
+.bottomChannelOrderBtn:hover {
+  border: 1px solid #00000023;
+  background: #ffffff4d;
+}
+
+.addChannelBtn:active,
+.changeChannelNameBtn:active,
+.deleteChannelBtn:active,
+.upChannelOrderBtn:active,
+.downChannelOrderBtn:active,
+.topChannelOrderBtn:active,
+.bottomChannelOrderBtn:active {
+  background: #ffffff96;
+}
+
+.addChannelBtn:before,
+.changeChannelNameBtn:before,
+.deleteChannelBtn:before,
+.upChannelOrderBtn:before,
+.downChannelOrderBtn:before,
+.topChannelOrderBtn:before,
+.bottomChannelOrderBtn:before {
+  content: '';
+  background-position: 0 0;
+  background-size: auto;
+  height: 16px;
+  width: 16px;
+  display: block;
+  margin-right: 5px;
+}
+
+.addChannelBtn:before {
+  background: url(../../../public/channel/channel_add.png) no-repeat;
+}
+
+.changeChannelNameBtn:before {
+  background: url(../../../public/channel/channel_rename.png) no-repeat;
+}
+
+.deleteChannelBtn:before {
+  background: url(../../../public/channel/channel_delete.png) no-repeat;
+}
+
+.upChannelOrderBtn:before {
+  background: url(../../../public/channel/channel_up.png) no-repeat;
+}
+
+.downChannelOrderBtn:before {
+  background: url(../../../public/channel/channel_down.png) no-repeat;
+}
+
+.topChannelOrderBtn:before {
+  background: url(../../../public/channel/channel_head.png) no-repeat;
+}
+
+.bottomChannelOrderBtn:before {
+  background: url(../../../public/channel/channel_end.png) no-repeat;
+}
+
+.disabledBtn:before {
+  background-position: -16px 0;
+}
+
+.disabledBtn {
+  pointer-events: none;
+}
+
+.changeOrderChannelList {
+  padding: 5px;
+}
+
+.channelActive {
+  background-color: #d1d5daaf;
+}
+
+.changeOrderTab {
+  padding-left: 5px !important;
+}
+
+.changeOrderSub {
+  padding-left: 25px !important;
+}
+
+.categoryTitle {
+  font-weight: bold;
+  padding: 4px 8px;
+  margin-top: 8px;
+  color: #888;
+}

@@ -123,6 +123,15 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       socket.send.deleteChannel({ channelId, serverId });
     };
 
+    const handleChangeChannelOrder = () => {
+      ipcService.popup.open(PopupType.CHANGE_CHANNEL_ORDER);
+      ipcService.initialData.onRequest(PopupType.CHANGE_CHANNEL_ORDER, {
+        serverId,
+        categoryId: null,
+        userId,
+      });
+    };
+
     // Effect
     useEffect(() => {
       if (setCategoryExpanded && userInCategory)
@@ -159,6 +168,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 label: lang.tr.deleteChannel,
                 show: canDeleteCategory,
                 onClick: () => handleOpenWarning(lang.tr.warningDeleteChannel),
+              },
+              {
+                id: 'changeChannelOrder',
+                label: lang.tr.changeChannelOrder,
+                show: canCreateChannel,
+                onClick: handleChangeChannelOrder,
               },
             ]);
           }}
@@ -317,6 +332,15 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       socket.send.connectChannel({ userId, channelId, serverId });
     };
 
+    const handleChangeChannelOrder = () => {
+      ipcService.popup.open(PopupType.CHANGE_CHANNEL_ORDER);
+      ipcService.initialData.onRequest(PopupType.CHANGE_CHANNEL_ORDER, {
+        serverId,
+        categoryId: null,
+        userId,
+      });
+    };
+
     const handleOpenChannelPassword = (
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -373,6 +397,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 label: lang.tr.deleteChannel,
                 show: canDeleteChannel,
                 onClick: () => handleOpenWarning(lang.tr.warningDeleteChannel),
+              },
+              {
+                id: 'changeChannelOrder',
+                label: lang.tr.changeChannelOrder,
+                show: canCreateChannel,
+                onClick: handleChangeChannelOrder,
               },
             ]);
           }}

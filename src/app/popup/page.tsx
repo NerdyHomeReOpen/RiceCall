@@ -27,6 +27,7 @@ import ApplyMember from '@/components/popups/ApplyMember';
 import DirectMessage from '@/components/popups/DirectMessage';
 import SearchUser from '@/components/popups/SearchUser';
 import Dialog from '@/components/popups/Dialog';
+import ChangeChannelOrder from '@/components/popups/ChangeChannelOrder';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -227,6 +228,11 @@ const Popup = React.memo(() => {
         setHeaderTitle(lang.tr.dialogInfo);
         setHeaderButtons(['close']);
         setContent(<Dialog {...{ ...initialData, iconType: 'INFO' }} />);
+        break;
+      case PopupType.CHANGE_CHANNEL_ORDER:
+        setHeaderTitle(lang.tr.changeChannelOrder);
+        setHeaderButtons(['close']);
+        setContent(<ChangeChannelOrder {...initialData} />);
         break;
       default:
         break;
