@@ -198,8 +198,11 @@ export interface Translation {
   setGuest: string;
   setMember: string;
   setAdmin: string;
+  removeAdmin:string;
   setChannelAdmin: string;
+  removeChannelAdmin:string;
   setCategoryAdmin: string;
+  removeCategoryAdmin:string;
   deleteFriend: string;
   searchFriend: string;
   guest: string;
@@ -577,8 +580,11 @@ export const translations: Record<LanguageKey, Translation> = {
     setGuest: '設為遊客',
     setMember: '設為會員',
     setAdmin: '設為群管理員',
+    removeAdmin:'移除群管理員',
     setChannelAdmin: '設為頻道管理員',
+    removeChannelAdmin:'移除頻道管理員',
     setCategoryAdmin: '設為類別管理員',
+    removeCategoryAdmin:'移除類別管理員',
     deleteFriend: '刪除好友',
     searchFriend: '搜尋好友',
     guest: '遊客',
@@ -955,8 +961,11 @@ export const translations: Record<LanguageKey, Translation> = {
     setGuest: '设为游客',
     setMember: '设为会员',
     setAdmin: '设为管理员',
+    removeAdmin:'移除管理员',
     setChannelAdmin: '设为频道管理员',
+    removeChannelAdmin:'移除频道管理员',
     setCategoryAdmin: '设为类别管理员',
+    removeCategoryAdmin:'移除类别管理员',
     deleteFriend: '删除好友',
     searchFriend: '搜索好友',
     guest: '游客',
@@ -1337,8 +1346,11 @@ export const translations: Record<LanguageKey, Translation> = {
     setGuest: 'Set as guest',
     setMember: 'Set as member',
     setAdmin: 'Set as admin',
+    removeAdmin:'Remove as admin',
     setChannelAdmin: 'Set as channel admin',
+    removeChannelAdmin:'Remove as channel admin',
     setCategoryAdmin: 'Set as category admin',
+    removeCategoryAdmin:'Remove as category admin',
     deleteFriend: 'Delete friend',
     searchFriend: 'Search friend',
     guest: 'Guest',
@@ -1737,8 +1749,11 @@ export const translations: Record<LanguageKey, Translation> = {
     setGuest: 'ゲストに設定',
     setMember: 'メンバーに設定',
     setAdmin: '管理者に設定',
+    removeAdmin:'管理者に削除',
     setChannelAdmin: 'チャンネル管理者に設定',
+    removeChannelAdmin:'チャンネル管理者に削除',
     setCategoryAdmin: 'カテゴリ管理者に設定',
+    removeCategoryAdmin:'カテゴリ管理者に削除',
     deleteFriend: 'フレンドを削除',
     searchFriend: 'フレンドを検索',
     guest: 'ゲスト',
