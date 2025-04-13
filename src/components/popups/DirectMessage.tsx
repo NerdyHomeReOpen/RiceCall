@@ -275,17 +275,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
                   );
                 }}
                 onKeyDown={(e) => {
-                  if (
-                    e.shiftKey ||
-                    e.key !== 'Enter' ||
-                    !messageInput.trim() ||
-                    messageInput.length > 2000 ||
-                    isComposing ||
-                    isDisabled ||
-                    isWarning
-                  )
-                    return;
-                  e.preventDefault();
+                  if (e.shiftKey) return;
+                  if (e.key !== 'Enter') return;
+                  else e.preventDefault();
+                  if (!messageInput.trim()) return;
+                  if (messageInput.length > 2000) return;
+                  if (isComposing) return;
+                  if (isDisabled) return;
+                  if (isWarning) return;
                   handleSendMessage(
                     { content: messageInput },
                     userId,
