@@ -1,10 +1,12 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { marked } from 'marked';
 
 // CSS
 import setting from '@/styles/popups/editServer.module.css';
 import popup from '@/styles/common/popup.module.css';
 import permission from '@/styles/common/permission.module.css';
+import markdown from '@/styles/common/markdown.module.css';
 
 // Types
 import {
@@ -137,6 +139,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const [sortField, setSortField] = useState<string>('');
 
     const [searchText, setSearchText] = useState('');
+
+    const [announcementPreview, setAnnouncementPreview] = useState('');
+    const [showPreview, setShowPreview] = useState(false);
 
     // Variables
     const { serverId, userId } = initialData;
@@ -533,15 +538,45 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               </div>
             ) : activeTabIndex === 1 ? (
               <div className={popup['col']}>
-                <div className={popup['label']}>
-                  {lang.tr.inputAnnouncement}
+                <div className={setting['headerTextBox']}>
+                  <div className={popup['label']}>
+                    {lang.tr.inputAnnouncement}
+                  </div>
+                  <div
+                    className={popup['button']}
+                    onClick={async () => {
+                      if (showPreview) {
+                        setShowPreview(false);
+                      } else {
+                        const html = await marked.parse(serverAnnouncement);
+                        setAnnouncementPreview(html);
+                        setShowPreview(true);
+                      }
+                    }}
+                  >
+                    {showPreview ? '編輯' : '預覽'}
+                  </div>
                 </div>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <textarea
-                    style={{ minHeight: '330px' }}
-                    value={serverAnnouncement}
-                    onChange={(e) => setServerAnnouncement(e.target.value)}
-                  />
+                  {showPreview ? (
+                    <>
+                      <div
+                        style={{ minHeight: '330px' }}
+                        className={`${
+                          showPreview ? setting['previewModeArea'] : ''
+                        } ${markdown['markdownContent']}`}
+                        dangerouslySetInnerHTML={{
+                          __html: announcementPreview,
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <textarea
+                      style={{ minHeight: '330px' }}
+                      value={serverAnnouncement}
+                      onChange={(e) => setServerAnnouncement(e.target.value)}
+                    />
+                  )}
                   <div className={popup['label']}>
                     {lang.tr.markdownSupport}
                   </div>
