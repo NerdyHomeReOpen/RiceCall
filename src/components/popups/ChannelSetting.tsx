@@ -350,24 +350,23 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
                   <div
                     className={`${popup['inputBox']} ${
                       channelIsLobby ? popup['disabled'] : ''
-                    } ${popup['col']}`}
+                    } ${popup['row']}`}
                   >
-                    <div className={popup['row']}>
-                      <input
-                        type="radio"
-                        name="voiceQuality"
-                        checked={channelVisibility === 'private'}
-                        onChange={() => {
-                          setChannelVisibility('private');
-                        }}
-                      />
-                      <div>
-                        <label className={popup['label']}>
-                          {lang.tr.channelPrivate}
-                        </label>
-                      </div>
-                    </div>
-                    {channelVisibility === 'private' && (
+                    <input
+                      type="radio"
+                      name="voiceQuality"
+                      checked={channelVisibility === 'private'}
+                      onChange={() => {
+                        setChannelVisibility('private');
+                      }}
+                    />
+                    <label className={popup['label']}>
+                      {lang.tr.channelPrivate}
+                    </label>
+                  </div>
+
+                  {channelVisibility === 'private' && (
+                    <div className={popup['inputBox']}>
                       <input
                         className={popup['input']}
                         type="text"
@@ -379,8 +378,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
                           else setChannelPassword(value);
                         }}
                       />
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : activeTabIndex === 3 ? (
