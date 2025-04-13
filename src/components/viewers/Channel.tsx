@@ -951,8 +951,11 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
               ${styles['currentChannelIcon']} 
               ${styles[`status${connectStatus}`]}
             `}
-            title={`${latency}ms`}
-          />
+          >
+            <div
+              className={`${styles['currentChannelPing']}`}
+            >{`${latency}ms`}</div>
+          </div>
           <div className={styles['currentChannelText']}>{channelName}</div>
         </div>
 
