@@ -1,10 +1,12 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { marked } from 'marked';
 
 // CSS
 import setting from '@/styles/popups/editServer.module.css';
 import popup from '@/styles/common/popup.module.css';
 import permission from '@/styles/common/permission.module.css';
+import markdown from '@/styles/common/markdown.module.css';
 
 // Types
 import {
@@ -138,16 +140,26 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const [searchText, setSearchText] = useState('');
 
+    const [announcementPreview, setAnnouncementPreview] = useState('');
+    const [showPreview, setShowPreview] = useState(false);
+
     // Variables
     const { serverId, userId } = initialData;
-    const filteredMembers = serverMembers.filter((member) => {
-      const searchLower = searchText.toLowerCase();
-      return (
-        member.permissionLevel > 1 &&
-        (member.nickname?.toLowerCase().includes(searchLower) ||
-          member.name.toLowerCase().includes(searchLower))
-      );
-    });
+    const filteredMembers = serverMembers
+      .filter((member) => {
+        const searchLower = searchText.toLowerCase();
+        return (
+          member.permissionLevel > 1 &&
+          (member.nickname?.toLowerCase().includes(searchLower) ||
+            member.name.toLowerCase().includes(searchLower))
+        );
+      })
+      .sort((a, b) => {
+        if (!sortField) {
+          return b.permissionLevel - a.permissionLevel;
+        }
+        return createSorter(sortField, sortState)(a, b);
+      });
     const filteredApplications = serverApplications.filter((application) => {
       const searchLower = searchText.toLowerCase();
       return (
@@ -533,15 +545,45 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               </div>
             ) : activeTabIndex === 1 ? (
               <div className={popup['col']}>
-                <div className={popup['label']}>
-                  {lang.tr.inputAnnouncement}
+                <div className={setting['headerTextBox']}>
+                  <div className={popup['label']}>
+                    {lang.tr.inputAnnouncement}
+                  </div>
+                  <div
+                    className={popup['button']}
+                    onClick={async () => {
+                      if (showPreview) {
+                        setShowPreview(false);
+                      } else {
+                        const html = await marked.parse(serverAnnouncement);
+                        setAnnouncementPreview(html);
+                        setShowPreview(true);
+                      }
+                    }}
+                  >
+                    {showPreview ? '編輯' : '預覽'}
+                  </div>
                 </div>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <textarea
-                    style={{ minHeight: '330px' }}
-                    value={serverAnnouncement}
-                    onChange={(e) => setServerAnnouncement(e.target.value)}
-                  />
+                  {showPreview ? (
+                    <>
+                      <div
+                        style={{ minHeight: '330px' }}
+                        className={`${
+                          showPreview ? setting['previewModeArea'] : ''
+                        } ${markdown['markdownContent']}`}
+                        dangerouslySetInnerHTML={{
+                          __html: announcementPreview,
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <textarea
+                      style={{ minHeight: '330px' }}
+                      value={serverAnnouncement}
+                      onChange={(e) => setServerAnnouncement(e.target.value)}
+                    />
+                  )}
                   <div className={popup['label']}>
                     {lang.tr.markdownSupport}
                   </div>
@@ -571,7 +613,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   </div>
                 </div>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <table style={{ height: '260px' }}>
+                  <table style={{ height: '330px' }}>
                     <thead>
                       <tr>
                         {MEMBER_FIELDS.map((field) => (
@@ -610,12 +652,16 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                         const canManageMember =
                           !isCurrentUser &&
                           permissionLevel > memberPermissionLevel &&
-                          (memberPermissionLevel > 1 || permissionLevel > 4);
+                          permissionLevel > 3 &&
+                          memberPermissionLevel > 1;
                         const canEditNickname =
                           (isCurrentUser && permissionLevel > 1) ||
                           canManageMember;
                         const canChangeToGuest =
-                          permissionLevel > 5 && memberPermissionLevel !== 1;
+                          !isCurrentUser &&
+                          permissionLevel > memberPermissionLevel &&
+                          permissionLevel > 4 &&
+                          memberPermissionLevel !== 1;
                         const canChangeToMember =
                           permissionLevel > 2 && memberPermissionLevel !== 2;
                         const canChangeToChannelAdmin =
@@ -627,7 +673,24 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                         const canKick =
                           !isCurrentUser &&
                           permissionLevel > 4 &&
-                          memberPermissionLevel < permissionLevel;
+                          permissionLevel > memberPermissionLevel;
+
+                        const removeLevelToMember = (
+                          label: string,
+                          currentLevel: number,
+                        ) => ({
+                          id: 'set-member',
+                          label,
+                          show:
+                            memberPermissionLevel === currentLevel &&
+                            canChangeToMember,
+                          onClick: () =>
+                            handleUpdateMember(
+                              { permissionLevel: 2 },
+                              memberUserId,
+                              memberServerId,
+                            ),
+                        });
 
                         return (
                           <tr
@@ -686,28 +749,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                   hasSubmenu: true,
                                   submenuItems: [
                                     {
-                                      id: 'set-guest',
-                                      label: lang.tr.setGuest,
-                                      show: canChangeToGuest,
-                                      onClick: () =>
-                                        handleUpdateMember(
-                                          { permissionLevel: 1 },
-                                          memberUserId,
-                                          memberServerId,
-                                        ),
-                                    },
-                                    {
-                                      id: 'set-member',
-                                      label: lang.tr.setMember,
-                                      show: canChangeToMember,
-                                      onClick: () =>
-                                        handleUpdateMember(
-                                          { permissionLevel: 2 },
-                                          memberUserId,
-                                          memberServerId,
-                                        ),
-                                    },
-                                    {
                                       id: 'set-channel-admin',
                                       label: lang.tr.setChannelAdmin,
                                       show: canChangeToChannelAdmin,
@@ -718,6 +759,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                           memberServerId,
                                         ),
                                     },
+                                    removeLevelToMember(
+                                      lang.tr.removeChannelAdmin,
+                                      3,
+                                    ),
+
                                     {
                                       id: 'set-category-admin',
                                       label: lang.tr.setCategoryAdmin,
@@ -729,6 +775,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                           memberServerId,
                                         ),
                                     },
+                                    removeLevelToMember(
+                                      lang.tr.removeCategoryAdmin,
+                                      4,
+                                    ),
+
                                     {
                                       id: 'set-admin',
                                       label: lang.tr.setAdmin,
@@ -740,7 +791,19 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                           memberServerId,
                                         ),
                                     },
+                                    removeLevelToMember(lang.tr.removeAdmin, 5),
                                   ],
+                                },
+                                {
+                                  id: 'set-guest',
+                                  label: lang.tr.setGuest,
+                                  show: canChangeToGuest,
+                                  onClick: () =>
+                                    handleUpdateMember(
+                                      { permissionLevel: 1 },
+                                      memberUserId,
+                                      memberServerId,
+                                    ),
                                 },
                               ]);
                             }}
@@ -878,7 +941,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   </div>
                 </div>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <table style={{ height: '260px' }}>
+                  <table style={{ height: '330px' }}>
                     <thead>
                       <tr>
                         {APPLICATION_FIELDS.map((field) => (
@@ -988,7 +1051,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   </div>
                 </div>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <table style={{ height: '260px' }}>
+                  <table style={{ height: '330px' }}>
                     <thead>
                       <tr>
                         {BLOCK_MEMBER_FIELDS.map((field) => (

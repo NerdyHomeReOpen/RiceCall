@@ -16,6 +16,7 @@ import {
   Member,
   Category,
   ContextMenuItem,
+  Permission,
 } from '@/types';
 
 // Providers
@@ -462,11 +463,15 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const canManageMember =
       !isCurrentUser &&
       permissionLevel > channelMemberPermission &&
-      (channelMemberPermission > 1 || permissionLevel > 5);
+      permissionLevel > 3 &&
+      channelMemberPermission > 1;
     const canEditNickname =
       (isCurrentUser && permissionLevel > 1) || canManageMember;
     const canChangeToGuest =
-      permissionLevel > 5 && channelMemberPermission !== 1;
+      !isCurrentUser &&
+      permissionLevel > channelMemberPermission &&
+      permissionLevel > 4 &&
+      channelMemberPermission !== 1;
     const canChangeToMember =
       permissionLevel > 2 && channelMemberPermission !== 2;
     const canChangeToChannelAdmin =
@@ -544,6 +549,18 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       socket.send.disconnectServer({ userId, serverId });
     };
 
+    const removeLevelToMember = (label: string, currentLevel: Permission) => ({
+      id: 'set-member',
+      label,
+      show: channelMemberPermission === currentLevel && canChangeToMember,
+      onClick: () =>
+        handleUpdateMember(
+          { permissionLevel: 2 },
+          channelMemberUserId,
+          channelMemberServerId,
+        ),
+    });
+
     return (
       <div
         key={channelMemberUserId}
@@ -612,28 +629,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               hasSubmenu: true,
               submenuItems: [
                 {
-                  id: 'set-guest',
-                  label: lang.tr.setGuest,
-                  show: canChangeToGuest,
-                  onClick: () =>
-                    handleUpdateMember(
-                      { permissionLevel: 1 },
-                      channelMemberUserId,
-                      channelMemberServerId,
-                    ),
-                },
-                {
-                  id: 'set-member',
-                  label: lang.tr.setMember,
-                  show: canChangeToMember,
-                  onClick: () =>
-                    handleUpdateMember(
-                      { permissionLevel: 2 },
-                      channelMemberUserId,
-                      channelMemberServerId,
-                    ),
-                },
-                {
                   id: 'set-channel-admin',
                   label: lang.tr.setChannelAdmin,
                   show: canChangeToChannelAdmin,
@@ -644,6 +639,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                       channelMemberServerId,
                     ),
                 },
+                removeLevelToMember(lang.tr.removeChannelAdmin, 3),
+
                 {
                   id: 'set-category-admin',
                   label: lang.tr.setCategoryAdmin,
@@ -655,6 +652,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                       channelMemberServerId,
                     ),
                 },
+                removeLevelToMember(lang.tr.removeCategoryAdmin, 4),
+
                 {
                   id: 'set-admin',
                   label: lang.tr.setAdmin,
@@ -666,7 +665,19 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                       channelMemberServerId,
                     ),
                 },
+                removeLevelToMember(lang.tr.removeAdmin, 5),
               ],
+            },
+            {
+              id: 'set-guest',
+              label: lang.tr.setGuest,
+              show: canChangeToGuest,
+              onClick: () =>
+                handleUpdateMember(
+                  { permissionLevel: 1 },
+                  channelMemberUserId,
+                  channelMemberServerId,
+                ),
             },
           ]);
         }}
@@ -960,8 +971,11 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
               ${styles['currentChannelIcon']} 
               ${styles[`status${connectStatus}`]}
             `}
-            title={`${latency}ms`}
-          />
+          >
+            <div
+              className={`${styles['currentChannelPing']}`}
+            >{`${latency}ms`}</div>
+          </div>
           <div className={styles['currentChannelText']}>{channelName}</div>
         </div>
 
