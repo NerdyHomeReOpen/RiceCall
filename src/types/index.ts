@@ -2028,7 +2028,7 @@ export type Friend = {
   userId: string;
   targetId: string;
   isBlocked: boolean;
-  friendGroupId: string;
+  friendGroupId: string | null;
   createdAt: number;
 };
 

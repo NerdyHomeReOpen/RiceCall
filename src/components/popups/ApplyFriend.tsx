@@ -56,8 +56,9 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
     const [applicationDescription, setApplicationDescription] = useState<
       FriendApplication['description']
     >(createDefault.friendApplication().description);
-    const [selectedFriendGroupId, setSelectedFriendGroupId] =
-      useState<FriendGroup['friendGroupId']>('');
+    const [selectedFriendGroupId, setSelectedFriendGroupId] = useState<
+      FriendGroup['friendGroupId'] | null
+    >(null);
 
     // Variables
     const { userId, targetId } = initialData;
@@ -323,7 +324,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
                       <div className={popup['selectBox']}>
                         <select
                           className={popup['select']}
-                          value={selectedFriendGroupId}
+                          value={selectedFriendGroupId || ''}
                           onChange={(e) =>
                             setSelectedFriendGroupId(e.target.value)
                           }
