@@ -151,7 +151,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
         return (
           member.permissionLevel > 1 &&
           (member.nickname?.toLowerCase().includes(searchLower) ||
-            member.name.toLowerCase().includes(searchLower))
+            member.name?.toLowerCase().includes(searchLower))
         );
       })
       .sort((a, b) => {

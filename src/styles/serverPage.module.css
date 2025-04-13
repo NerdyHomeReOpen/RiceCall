@@ -259,7 +259,7 @@
 
 .channelList .channelTab {
   position: relative;
-  padding: 1px 20px 1px 8px;
+  padding: 10px 20px 10px 8px;
   display: flex;
   align-items: center;
   height: 1.8rem;
