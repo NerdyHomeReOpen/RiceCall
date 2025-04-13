@@ -2189,6 +2189,8 @@ export enum SocketClientEvent {
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
   RTC_ICE_CANDIDATE = 'RTCIceCandidate',
+  // Echo
+  PING = 'ping',
 }
 
 export enum SocketServerEvent {
@@ -2233,6 +2235,8 @@ export enum SocketServerEvent {
   RTC_LEAVE = 'RTCLeave',
   // Play
   PLAY_SOUND = 'playSound',
+  // Echo
+  PONG = 'pong',
 }
 
 export enum PopupType {

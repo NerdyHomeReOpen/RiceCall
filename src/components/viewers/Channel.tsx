@@ -31,9 +31,6 @@ import BadgeViewer from '@/components/viewers/Badge';
 // Services
 import ipcService from '@/services/ipc.service';
 
-// Utils
-import { measureLatency } from '@/utils/measureLatency';
-
 interface CategoryTabProps {
   userId: User['userId'];
   userCurrentChannelId: Channel['channelId'];
@@ -740,6 +737,7 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
   }) => {
     // Hooks
     const lang = useLanguage();
+    const socket = useSocket();
     const contextMenu = useContextMenu();
     const { handleSetCategoryExpanded, handleSetChannelExpanded } =
       useExpandedContext();
@@ -835,13 +833,24 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
     }, [serverChannels]);
 
     useEffect(() => {
+      if (!socket) return;
+      let start = Date.now();
+      let end = Date.now();
+      socket.send.ping(null);
       const measure = setInterval(() => {
-        measureLatency().then((latency) => {
-          setLatency(latency);
-        });
+        start = Date.now();
+        socket.send.ping(null);
       }, 10000);
-      return () => clearInterval(measure);
-    }, []);
+      const clearPong = socket.on.pong(() => {
+        end = Date.now();
+        console.log(end - start, 'ms');
+        setLatency((end - start).toFixed(0));
+      });
+      return () => {
+        clearInterval(measure);
+        clearPong();
+      };
+    }, [socket]);
 
     return (
       <>

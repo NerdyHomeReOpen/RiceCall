@@ -63,6 +63,8 @@ const SocketClientEvent = {
   RTC_OFFER: 'RTCOffer',
   RTC_ANSWER: 'RTCAnswer',
   RTC_ICE_CANDIDATE: 'RTCIceCandidate',
+  // Echo
+  PING: 'ping',
 };
 
 const SocketServerEvent = {
@@ -111,6 +113,8 @@ const SocketServerEvent = {
   ERROR: 'error',
   // Play
   PLAY_SOUND: 'playSound',
+  // Echo
+  PONG: 'pong',
 };
 
 let isDev = process.argv.includes('--dev');
