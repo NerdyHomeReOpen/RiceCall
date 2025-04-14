@@ -230,7 +230,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
   }, [friendCurrentServerId]);
 
   return (
-    <div key={friendUserId}>
+    <div key={friendTargetId}>
       {/* User View */}
       <div
         className={styles['friendCard']}
