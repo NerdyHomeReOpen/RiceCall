@@ -132,6 +132,14 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       });
     };
 
+    const handleEditChannelName = () => {
+      ipcService.popup.open(PopupType.EDIT_CHANNEL_NAME);
+      ipcService.initialData.onRequest(
+        PopupType.EDIT_CHANNEL_NAME,
+        selectedChannel,
+      );
+    };
+
     const handleChangeOrder = (currentIndex: number, targetIndex: number) => {
       if (currentIndex === targetIndex) return;
       if (currentIndex < 0 || currentIndex > serverChannels.length - 1) return;
@@ -349,7 +357,8 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
               ${!canRename ? editChannelOrder['disabledBtn'] : ''}
             `}
             onClick={() => {
-              if (!canRename) return;
+              if (!canRename || !selectedChannelId) return;
+              handleEditChannelName();
             }}
           >
             改名

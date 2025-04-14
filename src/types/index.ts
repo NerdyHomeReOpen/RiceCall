@@ -373,6 +373,7 @@ export interface Translation {
   mute: string;
   unmute: string;
   editChannelOrder: string;
+  editChannelName: string;
 }
 
 export type LanguageKey = 'tw' | 'cn' | 'en' | 'jp';
@@ -759,6 +760,7 @@ export const translations: Record<LanguageKey, Translation> = {
     mute: '拒聽此人語音',
     unmute: '接受此人語音',
     editChannelOrder: '修改頻道排序',
+    editChannelName:'修改頻道名'
   },
   cn: {
     RPCHomePage: '正在浏览主页',
@@ -1140,6 +1142,7 @@ export const translations: Record<LanguageKey, Translation> = {
     mute: '拒听此人语音',
     unmute: '接受此人语音',
     editChannelOrder: '修改頻道排序',
+    editChannelName:'修改頻道名'
   },
   en: {
     RPCHomePage: 'Browsing Homepage',
@@ -1544,7 +1547,8 @@ export const translations: Record<LanguageKey, Translation> = {
     connectingServer: 'Connecting',
     mute: 'Mute this user',
     unmute: 'Unmute this user',
-    editChannelOrder: 'change channel order',
+    editChannelOrder: 'Change channel order',
+    editChannelName:'Change channel name'
   },
   jp: {
     RPCHomePage: 'ホームページを閲覧中',
@@ -1945,6 +1949,7 @@ export const translations: Record<LanguageKey, Translation> = {
     mute: 'このユーザーの音声を拒聴',
     unmute: 'このユーザーの音声を受聴',
     editChannelOrder: '変更チャンネル順序',
+    editChannelName:'チャンネル名の変更'
   },
 };
 
@@ -2270,6 +2275,7 @@ export enum PopupType {
   CREATE_CHANNEL = 'createChannel',
   CREATE_FRIENDGROUP = 'createFriendGroup',
   EDIT_CHANNEL_ORDER = 'editChannelOrder',
+  EDIT_CHANNEL_NAME = 'editChannelName',
   EDIT_NICKNAME = 'editNickname',
   EDIT_FRIENDGROUP = 'editFriendGroup',
   EDIT_FRIEND = 'editFriend',
@@ -2296,6 +2302,7 @@ export const PopupSize = {
   [PopupType.CREATE_CHANNEL]: { height: 220, width: 400 },
   [PopupType.CREATE_FRIENDGROUP]: { height: 220, width: 400 },
   [PopupType.EDIT_CHANNEL_ORDER]: { height: 550, width: 500 },
+  [PopupType.EDIT_CHANNEL_NAME]: { height: 220, width: 400 },
   [PopupType.EDIT_NICKNAME]: { height: 220, width: 400 },
   [PopupType.EDIT_FRIENDGROUP]: { height: 220, width: 400 },
   [PopupType.EDIT_FRIEND]: { height: 220, width: 400 },
