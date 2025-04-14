@@ -62,6 +62,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
       avatarUrl: memberAvatarUrl,
       gender: memberGender,
       level: memberLevel,
+      xp: memberXp,
       progress: memberXpProgress,
       requiredXp: memberRequiredXp,
       badges: memberBadges = [],
@@ -129,7 +130,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
                   />
                 </div>
                 <div className={userInfoCard['xpText']}>
-                  <div>0</div>
+                  <div>{memberXp}</div>
                   <div>{memberRequiredXp}</div>
                 </div>
               </div>
