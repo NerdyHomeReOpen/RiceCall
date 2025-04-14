@@ -880,7 +880,10 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
       for (const channel of serverChannels) {
         setExpanded((prev) => ({
           ...prev,
-          [channel.channelId]: true,
+          [channel.channelId]:
+            prev[channel.channelId] != undefined
+              ? prev[channel.channelId]
+              : true,
         }));
       }
     }, [serverChannels]);
