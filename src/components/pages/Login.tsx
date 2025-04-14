@@ -79,7 +79,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
       {/* Main Content */}
       <div className={styles['loginContent']}>
         <div className={styles['appLogo']} />
-        <div className={styles['formWrapper']}>
+        <form className={styles['formWrapper']}>
           {isLoading && (
             <>
               <div className={styles['loadingIndicator']}>
@@ -150,7 +150,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
               </button>
             </>
           )}
-        </div>
+        </form>
       </div>
       {/* Footer */}
       <div className={styles['loginFooter']}>
