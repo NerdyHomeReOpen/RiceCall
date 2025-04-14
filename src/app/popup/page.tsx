@@ -34,6 +34,7 @@ import ipcService from '@/services/ipc.service';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
+import EditChannelName from '@/components/popups/EditChannelName';
 
 interface HeaderProps {
   title: string;
@@ -172,6 +173,11 @@ const Popup = React.memo(() => {
         setHeaderTitle(lang.tr.editChannelOrder);
         setHeaderButtons(['close']);
         setContent(<EditChannelOrder {...initialData} />);
+        break;
+      case PopupType.EDIT_CHANNEL_NAME:
+        setHeaderTitle(lang.tr.editChannelName);
+        setHeaderButtons(['close']);
+        setContent(<EditChannelName {...initialData} />);
         break;
       case PopupType.EDIT_NICKNAME:
         setHeaderTitle(lang.tr.editMemberCard);
