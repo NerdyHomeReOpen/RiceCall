@@ -19,6 +19,7 @@ import MemberApplySetting from '@/components/popups/MemberApplySetting';
 import CreateServer from '@/components/popups/CreateServer';
 import CreateChannel from '@/components/popups/CreateChannel';
 import CreateFriendGroup from '@/components/popups/CreateFriendGroup';
+import EditChannelOrder from '@/components/popups/EditChannelOrder';
 import EditNickname from '@/components/popups/EditNickname';
 import EditFriendGroup from '@/components/popups/EditFriendGroup';
 import EditFriend from '@/components/popups/EditFriend';
@@ -27,7 +28,6 @@ import ApplyMember from '@/components/popups/ApplyMember';
 import DirectMessage from '@/components/popups/DirectMessage';
 import SearchUser from '@/components/popups/SearchUser';
 import Dialog from '@/components/popups/Dialog';
-import ChangeChannelOrder from '@/components/popups/ChangeChannelOrder';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -168,6 +168,11 @@ const Popup = React.memo(() => {
         setHeaderButtons(['close']);
         setContent(<CreateFriendGroup {...initialData} />);
         break;
+      case PopupType.EDIT_CHANNEL_ORDER:
+        setHeaderTitle(lang.tr.editChannelOrder);
+        setHeaderButtons(['close']);
+        setContent(<EditChannelOrder {...initialData} />);
+        break;
       case PopupType.EDIT_NICKNAME:
         setHeaderTitle(lang.tr.editMemberCard);
         setHeaderButtons(['close']);
@@ -228,11 +233,6 @@ const Popup = React.memo(() => {
         setHeaderTitle(lang.tr.dialogInfo);
         setHeaderButtons(['close']);
         setContent(<Dialog {...{ ...initialData, iconType: 'INFO' }} />);
-        break;
-      case PopupType.CHANGE_CHANNEL_ORDER:
-        setHeaderTitle(lang.tr.changeChannelOrder);
-        setHeaderButtons(['close']);
-        setContent(<ChangeChannelOrder {...initialData} />);
         break;
       default:
         break;

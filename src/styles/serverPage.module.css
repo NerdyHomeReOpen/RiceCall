@@ -278,6 +278,7 @@
   background-size: auto;
   min-width: 14px;
   min-height: 14px;
+  cursor: pointer;
 }
 
 .channelList .tabIcon.public {

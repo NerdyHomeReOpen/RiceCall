@@ -123,11 +123,13 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       socket.send.deleteChannel({ channelId, serverId });
     };
 
-    const handleChangeChannelOrder = () => {
-      ipcService.popup.open(PopupType.CHANGE_CHANNEL_ORDER);
-      ipcService.initialData.onRequest(PopupType.CHANGE_CHANNEL_ORDER, {
+    const handleOpenChangeChannelOrder = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
+      ipcService.popup.open(PopupType.EDIT_CHANNEL_ORDER);
+      ipcService.initialData.onRequest(PopupType.EDIT_CHANNEL_ORDER, {
         serverId,
-        categoryId: null,
         userId,
       });
     };
@@ -171,9 +173,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               },
               {
                 id: 'changeChannelOrder',
-                label: lang.tr.changeChannelOrder,
+                label: lang.tr.editChannelOrder,
                 show: canCreateChannel,
-                onClick: handleChangeChannelOrder,
+                onClick: () => handleOpenChangeChannelOrder(userId, serverId),
               },
             ]);
           }}
@@ -332,9 +334,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       socket.send.connectChannel({ userId, channelId, serverId });
     };
 
-    const handleChangeChannelOrder = () => {
-      ipcService.popup.open(PopupType.CHANGE_CHANNEL_ORDER);
-      ipcService.initialData.onRequest(PopupType.CHANGE_CHANNEL_ORDER, {
+    const handleOpenEditChannelOrder = () => {
+      ipcService.popup.open(PopupType.EDIT_CHANNEL_ORDER);
+      ipcService.initialData.onRequest(PopupType.EDIT_CHANNEL_ORDER, {
         serverId,
         categoryId: null,
         userId,
@@ -399,10 +401,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 onClick: () => handleOpenWarning(lang.tr.warningDeleteChannel),
               },
               {
-                id: 'changeChannelOrder',
-                label: lang.tr.changeChannelOrder,
+                id: 'editChannelOrder',
+                label: lang.tr.editChannelOrder,
                 show: canCreateChannel,
-                onClick: handleChangeChannelOrder,
+                onClick: handleOpenEditChannelOrder,
               },
             ]);
           }}
