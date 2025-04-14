@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import dynamic from 'next/dynamic';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 // CSS
 import styles from '@/styles/serverPage.module.css';
@@ -33,7 +33,6 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
@@ -42,36 +41,31 @@ interface ServerPageProps {
   user: User;
   server: Server;
   channel: Channel;
+  display: boolean;
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
-  ({ user, server, channel }) => {
+  ({ user, server, channel, display }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
     const webRTC = useWebRTC();
     const contextMenu = useContextMenu();
 
-    // Refs
-    const refreshed = useRef(false);
-
     // States
     const [serverChannels, setServerChannels] = useState<Channel[]>([]);
     const [serverActiveMembers, setServerActiveMembers] = useState<
       ServerMember[]
     >([]);
-    const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>(
-      [],
-    );
+    const [channelMessages, setChannelMessages] = useState<
+      Record<Channel['channelId'], ChannelMessage[]>
+    >({});
     const [member, setMember] = useState<Member>(createDefault.member());
     const [sidebarWidth, setSidebarWidth] = useState<number>(270);
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [showMicVolume, setShowMicVolume] = useState(false);
     const [showSpeakerVolume, setShowSpeakerVolume] = useState(false);
     const [currentTime, setCurrentTime] = useState<number>(Date.now());
-    const [displayChannelMessages, setDisplayChannelMessages] = useState<
-      ChannelMessage[]
-    >([]);
 
     // Variables
     const { userId } = user;
@@ -153,11 +147,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       setServerActiveMembers(data);
     };
 
-    const handleChannelMessagesUpdate = (
-      data: ChannelMessage[] | null,
-    ): void => {
-      if (!data) data = [];
-      setChannelMessages(data);
+    const handleOnMessagesUpdate = (data: ChannelMessage): void => {
+      console.log('handleOnMessagesUpdate', data);
+      if (!data) return;
+      setChannelMessages((prev) => ({
+        ...prev,
+        [data.channelId]: [...(prev[data.channelId] || []), data],
+      }));
     };
 
     const handleStartResizing = useCallback((e: React.MouseEvent) => {
@@ -214,18 +210,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [handleResize, handleStopResizing]);
 
     useEffect(() => {
-      if (!webRTC || !channelBitrate) return;
-      webRTC.handleUpdateBitrate(channelBitrate);
-    }, [channelBitrate]); // Please ignore this warrning
-
-    useEffect(() => {
-      const timer = setInterval(() => {
-        setCurrentTime(Date.now());
-      }, 1000);
-      return () => clearInterval(timer);
-    }, []);
-
-    useEffect(() => {
       if (!socket) return;
 
       const eventHandlers = {
@@ -233,8 +217,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         [SocketServerEvent.SERVER_CHANNELS_UPDATE]: handleServerChannelsUpdate,
         [SocketServerEvent.SERVER_ACTIVE_MEMBERS_UPDATE]:
           handleServerActiveMembersUpdate,
-        [SocketServerEvent.CHANNEL_MESSAGES_UPDATE]:
-          handleChannelMessagesUpdate,
+        [SocketServerEvent.ON_MESSAGE]: handleOnMessagesUpdate,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -249,34 +232,16 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [socket]);
 
     useEffect(() => {
-      if (!userId || !serverId || !channelId || refreshed.current) return;
-      const refresh = async () => {
-        refreshed.current = true;
-        Promise.all([
-          refreshService.member({
-            userId: userId,
-            serverId: serverId,
-          }),
-          refreshService.serverActiveMembers({
-            serverId: serverId,
-          }),
-          refreshService.serverChannels({
-            serverId: serverId,
-          }),
-          refreshService.channelMessages({
-            channelId: channelId,
-          }),
-        ]).then(
-          ([member, serverActiveMembers, serverChannels, channelMessages]) => {
-            handleMemberUpdate(member);
-            handleServerActiveMembersUpdate(serverActiveMembers);
-            handleServerChannelsUpdate(serverChannels);
-            handleChannelMessagesUpdate(channelMessages);
-          },
-        );
-      };
-      refresh();
-    }, [userId, serverId, channelId]);
+      if (!webRTC || !channelBitrate) return;
+      webRTC.handleUpdateBitrate(channelBitrate);
+    }, [channelBitrate]);
+
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setCurrentTime(Date.now());
+      }, 1000);
+      return () => clearInterval(timer);
+    }, []);
 
     useEffect(() => {
       ipcService.discord.updatePresence({
@@ -299,27 +264,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       });
     }, [lang, serverName, serverActiveMembers]);
 
-    useEffect(() => {
-      if (channelMessages && channelMessages.length > 0) {
-        setDisplayChannelMessages(() => {
-          const lastVisitTime =
-            memberLastJoinChannelTime === 0
-              ? Date.now()
-              : memberLastJoinChannelTime;
-
-          const currentChannelMessages = channelMessages.filter(
-            (msg, index, self) =>
-              msg.timestamp >= lastVisitTime &&
-              index === self.findIndex((m) => m.messageId === msg.messageId),
-          );
-
-          return currentChannelMessages;
-        });
-      }
-    }, [channelMessages, memberLastJoinChannelTime]);
-
     return (
-      <div className={styles['serverWrapper']}>
+      <div
+        className={styles['serverWrapper']}
+        style={{ display: display ? 'flex' : 'none' }}
+      >
         {/* Main Content */}
         <main className={styles['serverContent']}>
           {/* Left Sidebar */}
@@ -350,7 +299,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               <MarkdownViewer markdownText={serverAnnouncement} />
             </div>
             <div className={styles['messageArea']}>
-              <MessageViewer messages={displayChannelMessages} />
+              <MessageViewer messages={channelMessages[channelId] || []} />
             </div>
             <div className={styles['inputArea']}>
               <MessageInputBox

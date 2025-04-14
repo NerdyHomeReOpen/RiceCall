@@ -23,10 +23,11 @@ import refreshService from '@/services/refresh.service';
 
 interface FriendPageProps {
   user: User;
+  display: boolean;
 }
 
 const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
-  ({ user }) => {
+  ({ user, display }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
@@ -108,25 +109,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     }, [handleResize, handleStopResizing]);
 
     useEffect(() => {
-      if (!lang) return;
-      ipcService.discord.updatePresence({
-        details: lang.tr.RPCFriendPage,
-        state: `${lang.tr.RPCUser} ${userName}`,
-        largeImageKey: 'app_icon',
-        largeImageText: 'RC Voice',
-        smallImageKey: 'home_icon',
-        smallImageText: lang.tr.RPCFriend,
-        timestamp: Date.now(),
-        buttons: [
-          {
-            label: lang.tr.RPCJoinServer,
-            url: 'https://discord.gg/adCWzv6wwS',
-          },
-        ],
-      });
-    }, [lang, userName]);
-
-    useEffect(() => {
       if (!socket) return;
 
       const eventHandlers = {
@@ -165,8 +147,30 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
       refresh();
     }, [userId]);
 
+    useEffect(() => {
+      if (!lang) return;
+      ipcService.discord.updatePresence({
+        details: lang.tr.RPCFriendPage,
+        state: `${lang.tr.RPCUser} ${userName}`,
+        largeImageKey: 'app_icon',
+        largeImageText: 'RC Voice',
+        smallImageKey: 'home_icon',
+        smallImageText: lang.tr.RPCFriend,
+        timestamp: Date.now(),
+        buttons: [
+          {
+            label: lang.tr.RPCJoinServer,
+            url: 'https://discord.gg/adCWzv6wwS',
+          },
+        ],
+      });
+    }, [lang, userName]);
+
     return (
-      <div className={friendPage['friendWrapper']}>
+      <div
+        className={friendPage['friendWrapper']}
+        style={{ display: display ? 'flex' : 'none' }}
+      >
         {/* Header */}
         <header className={friendPage['friendHeader']}>
           <div

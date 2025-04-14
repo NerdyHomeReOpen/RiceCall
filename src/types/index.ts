@@ -2237,7 +2237,6 @@ export enum SocketServerEvent {
   SERVER_MEMBER_APPLICATIONS_UPDATE = 'serverMemberApplicationsUpdate',
   // Channel
   CHANNEL_UPDATE = 'channelUpdate',
-  CHANNEL_MESSAGES_UPDATE = 'channelMessagesUpdate',
   // Category
   CATEGORY_UPDATE = 'categoryUpdate',
   // Friend Group
@@ -2250,8 +2249,9 @@ export enum SocketServerEvent {
   FRIEND_UPDATE = 'friendUpdate',
   // Friend Application
   FRIEND_APPLICATION_UPDATE = 'friendApplicationUpdate',
-  // Direct Message
-  DIRECT_MESSAGE_UPDATE = 'directMessageUpdate',
+  // Message
+  ON_MESSAGE = 'onMessage',
+  ON_DIRECT_MESSAGE = 'onDirectMessage',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',

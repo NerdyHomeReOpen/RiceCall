@@ -15,7 +15,6 @@ import {
   FriendGroup,
   ServerMember,
   UserServer,
-  ChannelMessage,
 } from '@/types';
 
 export const refreshService = {
@@ -136,17 +135,6 @@ export const refreshService = {
   }): Promise<Channel | null> => {
     const channel = await apiService.post('/refresh/channel', { channelId });
     return channel;
-  },
-
-  channelMessages: async ({
-    channelId,
-  }: {
-    channelId: Channel['channelId'];
-  }): Promise<ChannelMessage[] | null> => {
-    const channelMessages = await apiService.post('/refresh/channelMessages', {
-      channelId,
-    });
-    return channelMessages;
   },
 
   friendGroup: async ({

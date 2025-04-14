@@ -403,19 +403,22 @@ const RootPageComponent = () => {
   }, [lang]);
 
   const getMainContent = () => {
+    console.log(mainTab.selectedTabId);
     if (!socket.isConnected) return <LoadingSpinner />;
-    switch (mainTab.selectedTabId) {
-      case 'home':
-        return <HomePage user={user} />;
-      case 'friends':
-        return <FriendPage user={user} />;
-      case 'server':
-        return (
-          <ExpandedProvider>
-            <ServerPage user={user} server={server} channel={channel} />
-          </ExpandedProvider>
-        );
-    }
+    return (
+      <>
+        <HomePage user={user} display={mainTab.selectedTabId === 'home'} />
+        <FriendPage user={user} display={mainTab.selectedTabId === 'friends'} />
+        <ExpandedProvider>
+          <ServerPage
+            user={user}
+            server={server}
+            channel={channel}
+            display={mainTab.selectedTabId === 'server'}
+          />
+        </ExpandedProvider>
+      </>
+    );
   };
 
   return (

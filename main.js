@@ -87,7 +87,6 @@ const SocketServerEvent = {
   SERVER_MEMBERS_UPDATE: 'serverMembersUpdate',
   // Channel
   CHANNEL_UPDATE: 'channelUpdate',
-  CHANNEL_MESSAGES_UPDATE: 'channelMessagesUpdate',
   // Category
   CATEGORY_UPDATE: 'categoryUpdate',
   // Friend Group
@@ -101,7 +100,8 @@ const SocketServerEvent = {
   // Friend Application
   FRIEND_APPLICATION_UPDATE: 'friendApplicationUpdate',
   // Direct Message
-  DIRECT_MESSAGE_UPDATE: 'directMessageUpdate',
+  ON_MESSAGE: 'onMessage',
+  ON_DIRECT_MESSAGE: 'onDirectMessage',
   // Popup
   OPEN_POPUP: 'openPopup',
   // RTC
