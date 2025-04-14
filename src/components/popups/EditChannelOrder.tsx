@@ -377,7 +377,15 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
               ${editChannelOrder['deleteChannelBtn']} 
               ${!canDelete ? editChannelOrder['disabledBtn'] : ''}
             `}
-            onClick={() => handleOpenWarning(lang.tr.warningDeleteChannel)}
+            onClick={() => {
+              if (!selectedChannel) return;
+              handleOpenWarning(
+                lang.tr.warningDeleteChannel.replace(
+                  '{0}',
+                  selectedChannel.name,
+                ),
+              );
+            }}
           >
             刪除
           </div>

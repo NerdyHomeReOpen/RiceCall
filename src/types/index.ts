@@ -209,7 +209,6 @@ export interface Translation {
   member: string;
   channelAdmin: string;
   channelManager: string;
-  channelOrder: string;
   serverAdmin: string;
   serverOwner: string;
   eventStaff: string;
@@ -486,7 +485,7 @@ export const translations: Record<LanguageKey, Translation> = {
     deleteChannel: '刪除頻道',
     applyMember: '申請會員',
     applyFriend: '好友請求',
-    directMessage: '私訊',
+    directMessage: '傳送即時訊息',
     dialogAlert: '警告',
     dialogSuccess: '成功',
     dialogWarning: '警告',
@@ -567,12 +566,12 @@ export const translations: Record<LanguageKey, Translation> = {
     mixing: '混音',
     in: '在',
     chatWithMembers: '與 {0} 位成員聊天',
-    warningDeleteChannel: '確定要刪除此頻道嗎？',
+    warningDeleteChannel: '您確定要刪除頻道：{0}嗎？',
     add: '新增',
     delete: '刪除',
     kick: '踢出',
-    addFriend: '新增好友',
-    addChannel: '新增頻道',
+    addFriend: '添加好友',
+    addChannel: '創建頻道',
     unknownChannel: '未知頻道',
     micOrder: '麥序',
     allChannel: '所有頻道',
@@ -593,7 +592,6 @@ export const translations: Record<LanguageKey, Translation> = {
     member: '會員',
     channelAdmin: '二級頻道管理員',
     channelManager: '頻道管理員',
-    channelOrder: '頻道位置',
     serverAdmin: '群管理員',
     serverOwner: '群創建者',
     eventStaff: '官方客服',
@@ -976,7 +974,6 @@ export const translations: Record<LanguageKey, Translation> = {
     member: '会员',
     channelAdmin: '二级频道管理员',
     channelManager: '频道管理员',
-    channelOrder: '频道位置',
     serverAdmin: '群管理员',
     serverOwner: '群创建者',
     eventStaff: '官方客服',
@@ -1363,7 +1360,6 @@ export const translations: Record<LanguageKey, Translation> = {
     member: 'Member',
     channelAdmin: 'Channel admin',
     channelManager: 'Channel manager',
-    channelOrder: 'Channel order',
     serverAdmin: 'Server admin',
     serverOwner: 'Server owner',
     eventStaff: 'Event staff',
@@ -1768,7 +1764,6 @@ export const translations: Record<LanguageKey, Translation> = {
     member: 'メンバー',
     channelAdmin: 'チャンネル管理者',
     channelManager: 'チャンネルマネージャー',
-    channelOrder: 'チャンネル位置',
     serverAdmin: 'サーバー管理者',
     serverOwner: 'グループ作成者',
     eventStaff: '公式カスタマーサービス',

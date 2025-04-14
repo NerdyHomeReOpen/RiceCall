@@ -1,6 +1,15 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  shell,
+  Tray,
+  Menu,
+  nativeImage,
+} from 'electron';
 import serve from 'electron-serve';
 import net from 'net';
 import DiscordRPC from 'discord-rpc';
@@ -9,6 +18,9 @@ import electronUpdater from 'electron-updater';
 import Store from 'electron-store';
 import dotenv from 'dotenv';
 dotenv.config();
+
+let tray = null,
+  isLogin = false;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -589,7 +601,51 @@ const configureUpdateChecker = async () => {
   }
 };
 
+// 托盤圖標設定
+function trayIcon(isGray = true) {
+  if (tray) {
+    tray.destroy();
+  }
+  const iconPath = isGray ? 'tray_gray.ico' : 'tray.ico';
+  tray = new Tray(nativeImage.createFromPath(`./resources/${iconPath}`));
+  tray.on('click', () => {
+    if (mainWindow && authWindow.isVisible()) {
+      authWindow.hide();
+    } else if (mainWindow && mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      (authWindow || mainWindow)?.show();
+    }
+  });
+  const contextMenu = Menu.buildFromTemplate([
+    { label: '打開主視窗', type: 'normal', click: () => app.focus() },
+    { type: 'separator' },
+    {
+      label: '登出',
+      type: 'normal',
+      enabled: isLogin,
+      click: () => {
+        closePopups();
+        ipcMain.emit('logout');
+      },
+    },
+    { label: '退出', type: 'normal', click: () => app.quit() },
+  ]);
+  tray.setToolTip(`RiceCall v${app.getVersion()}`);
+  tray.setContextMenu(contextMenu);
+}
+
+function closePopups() {
+  Object.values(popups).forEach((win) => {
+    if (win && !win.isDestroyed()) {
+      win.close();
+    }
+  });
+  popups = {};
+}
+
 app.on('ready', async () => {
+  trayIcon(true);
   await createAuthWindow();
   await createMainWindow();
 
@@ -620,12 +676,17 @@ app.on('ready', async () => {
     authWindow.hide();
     socketInstance = connectSocket(token);
     socketInstance.connect();
+    isLogin = true;
+    trayIcon(false);
   });
   ipcMain.on('logout', () => {
+    closePopups();
     mainWindow.hide();
     authWindow.show();
     socketInstance.disconnect();
     socketInstance = disconnectSocket(socketInstance);
+    isLogin = false;
+    trayIcon(true);
   });
 
   // Initial data request handlers

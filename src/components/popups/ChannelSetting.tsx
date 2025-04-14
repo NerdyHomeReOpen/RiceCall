@@ -185,27 +185,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
                         }
                       />
                     </div>
-
-                    <div className={`${popup['inputBox']} ${popup['col']}`}>
-                      <div className={popup['label']}>
-                        {lang.tr.channelOrder}
-                      </div>
-                      <input
-                        type="number"
-                        value={channelOrder || 0}
-                        min="-999"
-                        max="999"
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (!value || isNaN(parseInt(value)))
-                            setChannelOrder(0);
-                          else
-                            setChannelOrder(
-                              Math.max(-999, Math.min(999, parseInt(value))),
-                            );
-                        }}
-                      />
-                    </div>
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
                     <div className={popup['label']}>{lang.tr.channelMode}</div>

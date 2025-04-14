@@ -169,7 +169,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 id: 'delete',
                 label: lang.tr.deleteChannel,
                 show: canDeleteCategory,
-                onClick: () => handleOpenWarning(lang.tr.warningDeleteChannel),
+                onClick: () => {
+                  if (!categoryName) return;
+                  handleOpenWarning(
+                    lang.tr.warningDeleteChannel.replace('{0}', categoryName),
+                  );
+                },
               },
               {
                 id: 'changeChannelOrder',
@@ -398,7 +403,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 id: 'delete',
                 label: lang.tr.deleteChannel,
                 show: canDeleteChannel,
-                onClick: () => handleOpenWarning(lang.tr.warningDeleteChannel),
+                onClick: () => {
+                  if (!channelName) return;
+                  handleOpenWarning(
+                    lang.tr.warningDeleteChannel.replace('{0}', channelName),
+                  );
+                },
               },
               {
                 id: 'editChannelOrder',
