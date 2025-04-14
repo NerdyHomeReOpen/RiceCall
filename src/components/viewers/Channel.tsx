@@ -1076,7 +1076,7 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
                 .map((item) =>
                   item.type === 'category' ? (
                     <CategoryTab
-                      key={item.categoryId}
+                      key={item.channelId}
                       userId={userId}
                       userCurrentChannelId={channelId}
                       serverId={serverId}

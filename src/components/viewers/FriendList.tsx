@@ -120,7 +120,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
         {expanded && friends && (
           <div className={styles['tabContent']}>
             {friendGroupFriends.map((friend) => (
-              <FriendCard key={friend.userId} friend={friend} />
+              <FriendCard key={friend.targetId} friend={friend} />
             ))}
           </div>
         )}
