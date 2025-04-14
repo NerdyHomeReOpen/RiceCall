@@ -61,8 +61,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
     const currentIndex = groupChannels.findIndex(
       (ch) => ch.channelId === selectedChannelId,
     );
-    const upperChannel = groupChannels[currentIndex - 1];
-    const lowerChannel = groupChannels[currentIndex + 1];
     const firstChannel = groupChannels[0];
     const lastChannel = groupChannels[groupChannels.length - 1];
     const isFirst =
@@ -70,29 +68,18 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
     const isLast = lastChannel && lastChannel.channelId === selectedChannelId;
     const canRename = isSelected && !isLobby;
     const canDelete = isSelected && !isLobby;
-    const canMoveUp =
-      isSelected &&
-      !isFirst &&
-      !isLobby &&
-      upperChannel &&
-      !upperChannel.isLobby;
+    const canMoveUp = isSelected && !isFirst && !isLobby && currentIndex > 0;
     const canMoveDown =
       isSelected &&
       !isLast &&
       !isLobby &&
-      lowerChannel &&
-      !lowerChannel.isLobby;
-    const canTop =
-      isSelected &&
-      !isFirst &&
-      !isLobby &&
-      firstChannel &&
-      !firstChannel.isLobby;
-    const canBottom =
-      isSelected && !isLast && !isLobby && lastChannel && !lastChannel.isLobby;
+      currentIndex < groupChannels.length - 1;
+    const canTop = isSelected && !isFirst && !isLobby;
+    const canBottom = isSelected && !isLast && !isLobby;
 
     const handleServerChannelsUpdate = (data: Channel[] | null): void => {
       if (!data) data = [];
+      data = data.filter((ch) => !ch.isLobby);
       setServerChannels(data);
       data.forEach((ch) => {
         map.current[ch.channelId] = ch.order;
