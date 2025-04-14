@@ -430,7 +430,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         </main>
 
         {/* Loading */}
-        {isLoading && (
+        {isLoading && !user.currentServerId && (
           <div className={homePage['loadingWrapper']}>
             <div className={homePage['loadingBox']}>
               <div className={homePage['loadingTitleContain']}>
