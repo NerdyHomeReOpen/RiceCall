@@ -760,7 +760,7 @@ export const translations: Record<LanguageKey, Translation> = {
     mute: '拒聽此人語音',
     unmute: '接受此人語音',
     editChannelOrder: '修改頻道排序',
-    editChannelName:'修改頻道名'
+    editChannelName: '修改頻道名',
   },
   cn: {
     RPCHomePage: '正在浏览主页',
@@ -1142,7 +1142,7 @@ export const translations: Record<LanguageKey, Translation> = {
     mute: '拒听此人语音',
     unmute: '接受此人语音',
     editChannelOrder: '修改頻道排序',
-    editChannelName:'修改頻道名'
+    editChannelName: '修改頻道名',
   },
   en: {
     RPCHomePage: 'Browsing Homepage',
@@ -1548,7 +1548,7 @@ export const translations: Record<LanguageKey, Translation> = {
     mute: 'Mute this user',
     unmute: 'Unmute this user',
     editChannelOrder: 'Change channel order',
-    editChannelName:'Change channel name'
+    editChannelName: 'Change channel name',
   },
   jp: {
     RPCHomePage: 'ホームページを閲覧中',
@@ -1949,7 +1949,7 @@ export const translations: Record<LanguageKey, Translation> = {
     mute: 'このユーザーの音声を拒聴',
     unmute: 'このユーザーの音声を受聴',
     editChannelOrder: '変更チャンネル順序',
-    editChannelName:'チャンネル名の変更'
+    editChannelName: 'チャンネル名の変更',
   },
 };
 
@@ -2025,7 +2025,7 @@ export type BaseChannel = {
   guestTextGapTime: number;
   guestTextWaitTime: number;
   guestTextMaxLength: number;
-  isRoot: boolean;
+  // isRoot: boolean;
   isLobby: boolean;
   slowmode: boolean;
   forbidText: boolean;
@@ -2075,7 +2075,7 @@ export type FriendGroup = {
 export type Member = {
   userId: string;
   serverId: string;
-  nickname: string;
+  nickname: string | null;
   contribution: number;
   lastMessageTime: number;
   lastJoinChannelTime: number;
