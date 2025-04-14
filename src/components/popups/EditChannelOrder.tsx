@@ -23,6 +23,9 @@ import popup from '@/styles/common/popup.module.css';
 import ipcService from '@/services/ipc.service';
 import refreshService from '@/services/refresh.service';
 
+// Utils
+import { createDefault } from '@/utils/createDefault';
+
 interface EditChannelOrderPopupProps {
   userId: string;
   serverId: string;
@@ -45,42 +48,48 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
     const [selectedChannel, setSelectedChannel] = useState<
       Channel | Category | null
     >(null);
+    const [groupChannels, setGroupChannels] = useState<(Channel | Category)[]>(
+      [],
+    );
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
     // Variables
     const { userId, serverId } = initialData;
-    const isSelected = !!selectedChannel;
-    const isLobbyChannel = selectedChannel?.isLobby;
-    const selectedCategoryId = selectedChannel?.categoryId;
-    const selectedChannelId = selectedChannel?.channelId;
-    const selectedGroupChannels = serverChannels.filter((ch) =>
-      selectedCategoryId
-        ? ch.categoryId === selectedCategoryId
-        : !ch.categoryId,
-    );
-    const currentIndex = selectedGroupChannels.findIndex(
+    const isSelected = selectedChannel;
+    const { channelId: selectedChannelId, isLobby } =
+      selectedChannel ?? createDefault.channel();
+    const currentIndex = groupChannels.findIndex(
       (ch) => ch.channelId === selectedChannelId,
     );
-    const upperChannel = selectedGroupChannels[currentIndex - 1];
-    const firstChannel = selectedGroupChannels[0];
-    const lastChannel = selectedGroupChannels[selectedGroupChannels.length - 1];
-    const isFirst = firstChannel?.channelId === selectedChannelId;
-    const isLast = lastChannel?.channelId === selectedChannelId;
-    const canRename = isSelected && !isLobbyChannel;
-    const canDelete = isSelected && !isLobbyChannel;
+    const upperChannel = groupChannels[currentIndex - 1];
+    const lowerChannel = groupChannels[currentIndex + 1];
+    const firstChannel = groupChannels[0];
+    const lastChannel = groupChannels[groupChannels.length - 1];
+    const isFirst =
+      firstChannel && firstChannel.channelId === selectedChannelId;
+    const isLast = lastChannel && lastChannel.channelId === selectedChannelId;
+    const canRename = isSelected && !isLobby;
+    const canDelete = isSelected && !isLobby;
     const canMoveUp =
-      isSelected && !isFirst && !isLobbyChannel && !upperChannel?.isLobby;
-    const canMoveDown = isSelected && !isLast && !isLobbyChannel;
-
+      isSelected &&
+      !isFirst &&
+      !isLobby &&
+      upperChannel &&
+      !upperChannel.isLobby;
+    const canMoveDown =
+      isSelected &&
+      !isLast &&
+      !isLobby &&
+      lowerChannel &&
+      !lowerChannel.isLobby;
     const canTop =
       isSelected &&
-      !isLobbyChannel &&
-      currentIndex > 0 &&
-      !firstChannel?.isLobby;
+      !isFirst &&
+      !isLobby &&
+      firstChannel &&
+      !firstChannel.isLobby;
     const canBottom =
-      isSelected &&
-      !isLobbyChannel &&
-      currentIndex < selectedGroupChannels.length - 1;
+      isSelected && !isLast && !isLobby && lastChannel && !lastChannel.isLobby;
 
     const handleServerChannelsUpdate = (data: Channel[] | null): void => {
       if (!data) data = [];
@@ -137,29 +146,33 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       if (currentIndex < 0 || currentIndex > serverChannels.length - 1) return;
       if (targetIndex < 0 || targetIndex > serverChannels.length - 1) return;
 
-      const newChannels = [...serverChannels];
+      const newServerChannels = [...serverChannels];
+      const newGroupChannels = [...groupChannels];
 
       if (currentIndex < targetIndex) {
         for (let i = currentIndex; i < targetIndex; i++) {
-          const temp = newChannels[i].order;
-          const tempChannel = newChannels[i];
-          newChannels[i].order = newChannels[i + 1].order;
-          newChannels[i] = newChannels[i + 1];
-          newChannels[i + 1].order = temp;
-          newChannels[i + 1] = tempChannel;
+          const temp = newGroupChannels[currentIndex].order;
+          newGroupChannels[currentIndex].order = newGroupChannels[i + 1].order;
+          newGroupChannels[i + 1].order = temp;
         }
       } else {
         for (let i = currentIndex; i > targetIndex; i--) {
-          const temp = newChannels[i].order;
-          const tempChannel = newChannels[i];
-          newChannels[i].order = newChannels[i - 1].order;
-          newChannels[i - 1].order = temp;
-          newChannels[i] = newChannels[i - 1];
-          newChannels[i - 1] = tempChannel;
+          const temp = newGroupChannels[currentIndex].order;
+          newGroupChannels[currentIndex].order = newGroupChannels[i - 1].order;
+          newGroupChannels[i - 1].order = temp;
         }
       }
 
-      setServerChannels(newChannels);
+      for (const ch of newGroupChannels) {
+        const index = newServerChannels.findIndex(
+          (sch) => sch.channelId === ch.channelId,
+        );
+        if (index !== -1) {
+          newServerChannels[index].order = ch.order;
+        }
+      }
+      setServerChannels(newServerChannels.sort((a, b) => a.order - b.order));
+      setGroupChannels(newGroupChannels.sort((a, b) => a.order - b.order));
     };
 
     const handleClose = () => {
@@ -242,8 +255,8 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
             `}
             onClick={(e) => {
               e.stopPropagation();
-              setSelectedChannel((prev) =>
-                prev?.channelId === categoryId ? null : category,
+              setSelectedChannel(
+                selectedChannelId === categoryId ? null : category,
               );
             }}
           >
@@ -254,12 +267,13 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
                 ${serverPage[categoryVisibility]}
                 ${categoryIsLobby ? serverPage['lobby'] : ''}
               `}
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 setExpanded((prev) => ({
                   ...prev,
                   [categoryId]: !prev[categoryId],
-                }))
-              }
+                }));
+              }}
             />
             <div
               className={`${serverPage['channelTabLable']} ${editChannelOrder['channelTabBox']}`}
@@ -288,6 +302,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
         visibility: channelVisibility,
         isLobby: channelIsLobby,
         order: channelOrder,
+        categoryId: channelCategoryId,
       } = channel;
       const isSelected = selectedChannelId === channelId;
 
@@ -300,8 +315,13 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
         `}
           onClick={(e) => {
             e.stopPropagation();
-            setSelectedChannel((prev) =>
-              prev?.channelId === channelId ? null : channel,
+            setSelectedChannel(
+              selectedChannelId === channelId ? null : channel,
+            );
+            setGroupChannels(
+              serverChannels
+                .filter((ch) => ch.categoryId === channelCategoryId)
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
             );
           }}
         >
@@ -328,11 +348,12 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       <div className={popup['popupContainer']}>
         <div className={editChannelOrder['header']} onClick={handleUnselect}>
           <div
-            className={`${editChannelOrder['addChannelBtn']} ${
-              isLobbyChannel ? editChannelOrder['disabledBtn'] : ''
-            }`}
+            className={`
+              ${editChannelOrder['addChannelBtn']} 
+              ${isLobby ? editChannelOrder['disabledBtn'] : ''}
+            `}
             onClick={() => {
-              if (isLobbyChannel) return;
+              if (isLobby) return;
               handleOpenCreateChannel(
                 userId,
                 selectedChannelId ?? null,
@@ -372,9 +393,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
             `}
             onClick={() => {
               if (!canMoveUp) return;
-              const currentIndex = serverChannels.findIndex(
-                (ch) => ch.channelId === selectedChannelId,
-              );
+              console.log(currentIndex);
               handleChangeOrder(currentIndex, currentIndex - 1);
             }}
           >
@@ -388,9 +407,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
             `}
             onClick={() => {
               if (!canMoveDown) return;
-              const currentIndex = serverChannels.findIndex(
-                (ch) => ch.channelId === selectedChannelId,
-              );
               handleChangeOrder(currentIndex, currentIndex + 1);
             }}
           >
@@ -404,9 +420,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
             `}
             onClick={() => {
               if (!canTop) return;
-              const currentIndex = serverChannels.findIndex(
-                (ch) => ch.channelId === selectedChannelId,
-              );
               handleChangeOrder(currentIndex, 0);
             }}
           >
@@ -420,10 +433,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
             `}
             onClick={() => {
               if (!canBottom) return;
-              const currentIndex = serverChannels.findIndex(
-                (ch) => ch.channelId === selectedChannelId,
-              );
-              handleChangeOrder(currentIndex, serverChannels.length - 1);
+              handleChangeOrder(currentIndex, groupChannels.length - 1);
             }}
           >
             置底
