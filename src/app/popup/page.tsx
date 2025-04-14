@@ -240,6 +240,12 @@ const Popup = React.memo(() => {
         setHeaderButtons(['close']);
         setContent(<Dialog {...{ ...initialData, iconType: 'INFO' }} />);
         break;
+      case PopupType.ANTHOR_DEVICE_LOGIN:
+        console.log(true);
+        setHeaderTitle(lang.tr.dialogWarning);
+        setHeaderButtons(['close']);
+        setContent(<Dialog {...{ ...initialData, iconType: 'WARNING' }} />);
+        break;
       default:
         break;
     }

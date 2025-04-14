@@ -109,6 +109,7 @@ export interface Translation {
   dialogWarning: string;
   dialogError: string;
   dialogInfo: string;
+  anotherDeviceLogin: string;
   none: string;
   parentChannel: string;
   channelName: string;
@@ -491,6 +492,7 @@ export const translations: Record<LanguageKey, Translation> = {
     dialogWarning: '警告',
     dialogError: '錯誤',
     dialogInfo: '資訊',
+    anotherDeviceLogin: '帳號在別處登入，您被迫下線，您的帳號可能存在異常。',
     none: '無',
     parentChannel: '上級頻道',
     channelName: '頻道名稱',
@@ -873,6 +875,7 @@ export const translations: Record<LanguageKey, Translation> = {
     dialogWarning: '警告',
     dialogError: '错误',
     dialogInfo: '信息',
+    anotherDeviceLogin: '帐号在别处登入，您被迫下线，您的帐号可能存在异常。',
     none: '无',
     parentChannel: '上级频道',
     channelName: '频道名称',
@@ -1255,6 +1258,8 @@ export const translations: Record<LanguageKey, Translation> = {
     dialogWarning: 'Warning',
     dialogError: 'Error',
     dialogInfo: 'Info',
+    anotherDeviceLogin:
+      'Your account is logged in somewhere else and you are forced to go offline, there may be an anomaly with your account',
     none: 'None',
     parentChannel: 'Parent Channel',
     channelName: 'Channel Name',
@@ -1659,6 +1664,8 @@ export const translations: Record<LanguageKey, Translation> = {
     dialogWarning: '警告',
     dialogError: 'エラー',
     dialogInfo: '情報',
+    anotherDeviceLogin:
+      'あなたのアカウントが他の場所にログインしているのに、強制的にオフラインにされた場合、あなたのアカウントに異常が発生している可能性があります。',
     none: 'なし',
     parentChannel: '親チャンネル',
     channelName: 'チャンネル名',
@@ -2284,6 +2291,7 @@ export enum PopupType {
   DIALOG_WARNING = 'dialogWarning',
   DIALOG_ERROR = 'dialogError',
   DIALOG_INFO = 'dialogInfo',
+  ANTHOR_DEVICE_LOGIN = 'anotherDeviceLogin',
 }
 
 export const PopupSize = {
@@ -2311,6 +2319,7 @@ export const PopupSize = {
   [PopupType.DIALOG_WARNING]: { height: 220, width: 400 },
   [PopupType.DIALOG_ERROR]: { height: 220, width: 400 },
   [PopupType.DIALOG_INFO]: { height: 220, width: 400 },
+  [PopupType.ANTHOR_DEVICE_LOGIN]: { height: 220, width: 400 },
   Settings: { height: 450, width: 600 },
   Apply: { height: 320, width: 500 },
   Small: { height: 220, width: 400 },

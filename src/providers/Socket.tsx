@@ -10,6 +10,7 @@ import { SocketServerEvent, SocketClientEvent } from '@/types';
 import ipcService from '@/services/ipc.service';
 import { errorHandler } from '@/utils/errorHandler';
 import { StandardizedError } from '@/utils/errorHandler';
+import { useLanguage } from './Language';
 
 type SocketContextType = {
   send: Record<SocketClientEvent, (data: any) => () => void>;
@@ -31,6 +32,9 @@ interface SocketProviderProps {
 }
 
 const SocketProvider = ({ children }: SocketProviderProps) => {
+  // Language
+  const lang = useLanguage();
+
   // States
   const [on, setOn] = useState<SocketContextType['on']>(
     Object.values(SocketServerEvent).reduce((acc, event) => {
@@ -95,9 +99,13 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
   const handleOpenPopup = (data: any) => {
     console.log('Socket open popup', data);
-    const { popupType, initialData } = data;
+    const { popupType } = data;
     ipcService.popup.open(popupType);
-    ipcService.initialData.onRequest(popupType, initialData);
+    ipcService.initialData.onRequest(popupType, {
+      iconType: 'danger',
+      title: (lang.tr as unknown as Record<string, string>)[popupType],
+      submitTo: popupType,
+    });
   };
 
   // Effects
