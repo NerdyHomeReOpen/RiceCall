@@ -258,10 +258,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const {
       channelId,
       name: channelName,
-      isRoot: channelIsRoot,
       isLobby: channelIsLobby,
       visibility: channelVisibility,
       userLimit: channelUserLimit,
+      categoryId: channelCategoryId,
     } = channel;
     const channelMembers = serverActiveMembers.filter(
       (mb) => mb.currentChannelId === channelId,
@@ -276,7 +276,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         channelUserLimit > channelMembers.length ||
         permissionLevel > 4);
     const canCreateChannel =
-      permissionLevel > 4 && !channelIsLobby && channelIsRoot;
+      permissionLevel > 4 && !channelIsLobby && !channelCategoryId;
     const canDeleteChannel = permissionLevel > 4 && !channelIsLobby;
     const canOpenChannelSettings = permissionLevel > 4;
 
@@ -1071,7 +1071,7 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
               />
             ) : (
               serverChannels
-                .filter((c) => c.isRoot)
+                .filter((c) => !c.categoryId)
                 .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
                 .map((item) =>
                   item.type === 'category' ? (

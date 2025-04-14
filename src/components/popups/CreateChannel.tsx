@@ -43,7 +43,6 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
 
     // Variables
     const { categoryId, serverId } = initialData;
-    const isRoot = !categoryId;
 
     // Handlers
     const handleCreateChannel = (
@@ -112,7 +111,6 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
               handleCreateChannel(
                 {
                   name: channelName,
-                  isRoot: isRoot,
                   categoryId: categoryId,
                 },
                 serverId,
