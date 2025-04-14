@@ -625,12 +625,7 @@ function trayIcon(isGray = true) {
       type: 'normal',
       enabled: isLogin,
       click: () => {
-        Object.values(popups).forEach((win) => {
-          if (win && !win.isDestroyed()) {
-            win.close();
-          }
-        });
-        popups = {};
+        closePopups();
         ipcMain.emit('logout');
       },
     },
@@ -638,6 +633,15 @@ function trayIcon(isGray = true) {
   ]);
   tray.setToolTip(`RiceCall v${app.getVersion()}`);
   tray.setContextMenu(contextMenu);
+}
+
+function closePopups() {
+  Object.values(popups).forEach((win) => {
+    if (win && !win.isDestroyed()) {
+      win.close();
+    }
+  });
+  popups = {};
 }
 
 app.on('ready', async () => {
@@ -676,6 +680,7 @@ app.on('ready', async () => {
     trayIcon(false);
   });
   ipcMain.on('logout', () => {
+    closePopups();
     mainWindow.hide();
     authWindow.show();
     socketInstance.disconnect();
