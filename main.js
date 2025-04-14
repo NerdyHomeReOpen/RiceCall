@@ -35,6 +35,7 @@ const SocketClientEvent = {
   DISCONNECT_CHANNEL: 'disconnectChannel',
   CREATE_CHANNEL: 'createChannel',
   UPDATE_CHANNEL: 'updateChannel',
+  UPDATE_CHANNELS: 'updateChannels',
   DELETE_CHANNEL: 'deleteChannel',
   // Friend Group
   CREATE_FRIEND_GROUP: 'createFriendGroup',
