@@ -78,7 +78,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
     }, [serverId]);
 
     return (
-      <div className={popup['popupContainer']}>
+      <form className={popup['popupContainer']}>
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -124,7 +124,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
             {lang.tr.cancel}
           </button>
         </div>
-      </div>
+      </form>
     );
   });
 

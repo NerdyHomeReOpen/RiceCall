@@ -79,7 +79,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
     }, [categoryId]);
 
     return (
-      <div className={popup['popupContainer']}>
+      <form className={popup['popupContainer']}>
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -124,7 +124,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
             {lang.tr.cancel}
           </button>
         </div>
-      </div>
+      </form>
     );
   },
 );

@@ -72,7 +72,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> =
     }, [socket, handleUserSearch]);
 
     return (
-      <div className={popup['popupContainer']}>
+      <form className={popup['popupContainer']}>
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -145,7 +145,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> =
             {lang.tr.cancel}
           </button>
         </div>
-      </div>
+      </form>
     );
   });
 

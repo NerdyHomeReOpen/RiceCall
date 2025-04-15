@@ -45,7 +45,13 @@ const DialogPopup: React.FC<DialogPopupProps> = (
   };
 
   return (
-    <div className={popup['popupContainer']}>
+    <form
+      className={popup['popupContainer']}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') handleSubmit();
+      }}
+    >
       <div className={popup['popupBody']}>
         <div className={setting['body']}>
           <div className={`${popup['inputGroup']} ${popup['dialogCenter']}`}>
@@ -65,7 +71,7 @@ const DialogPopup: React.FC<DialogPopupProps> = (
           {lang.tr.confirm}
         </button>
       </div>
-    </div>
+    </form>
   );
 };
 

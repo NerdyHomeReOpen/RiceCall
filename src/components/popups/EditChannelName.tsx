@@ -47,7 +47,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
     };
 
     return (
-      <div className={popup['popupContainer']}>
+      <form className={popup['popupContainer']}>
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -68,7 +68,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
         <div className={popup['popupFooter']}>
           <button
             className={`${popup['button']} ${
-              !channelId.trim() ? popup['disabled'] : ''
+              !newChannelName.trim() ? popup['disabled'] : ''
             }`}
             onClick={() => {
               handleUpdateChannel(
@@ -87,7 +87,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
             {lang.tr.cancel}
           </button>
         </div>
-      </div>
+      </form>
     );
   },
 );
