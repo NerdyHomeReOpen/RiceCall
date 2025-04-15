@@ -130,7 +130,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
         submitTo: PopupType.DIALOG_SUCCESS,
       });
       ipcService.popup.onSubmit(PopupType.DIALOG_SUCCESS, () => {
-        setSection(1);
+        handleClose();
       });
     };
 
