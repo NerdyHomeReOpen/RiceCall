@@ -7,6 +7,11 @@
   background-size: cover;
 }
 
+.popupContainer:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .popupTab {
   background: #f0f0f0;
   height: 40px;
