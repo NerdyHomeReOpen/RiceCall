@@ -368,9 +368,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
         ]).then(([server, member, serverMembers, serverMemberApplications]) => {
           handleServerUpdate(server);
           handleMemberUpdate(member);
-          handleMembersUpdate(
-            serverMembers?.filter((mb) => mb.permissionLevel > 1) || [],
-          );
+          handleMembersUpdate(serverMembers);
           handleMemberApplicationsUpdate(serverMemberApplications);
         });
       };
