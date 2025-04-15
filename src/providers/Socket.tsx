@@ -56,12 +56,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
   );
 
   // Refs
-  const cleanupRef = useRef<(() => void)[]>(
-    Object.values(SocketServerEvent).reduce((acc, event) => {
-      acc.push(() => ipcService.removeListener(event));
-      return acc;
-    }, [] as (() => void)[]),
-  );
+  const cleanupRef = useRef<(() => void)[]>([]);
 
   // States
   const [isConnected, setIsConnected] = useState(false);
@@ -112,6 +107,24 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
   useEffect(() => {
     console.log('SocketProvider initialization');
 
+    cleanupRef.current = Object.values(SocketServerEvent).reduce(
+      (acc, event) => {
+        acc.push(() => ipcService.removeListener(event));
+        return acc;
+      },
+      [] as (() => void)[],
+    );
+
+    cleanupRef.current.push(() => {
+      ipcService.onSocketEvent('connect', handleConnect);
+      ipcService.onSocketEvent('connect_error', handleConnectError);
+      ipcService.onSocketEvent('reconnect', handleReconnect);
+      ipcService.onSocketEvent('reconnect_error', handleReconnectError);
+      ipcService.onSocketEvent('disconnect', handleDisconnect);
+      ipcService.onSocketEvent('error', handleError);
+      ipcService.onSocketEvent('openPopup', handleOpenPopup);
+    });
+
     setOn(
       Object.values(SocketServerEvent).reduce((acc, event) => {
         acc[event] = (callback: (data: any) => void) => {
@@ -142,6 +155,13 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
     return () => {
       console.log('SocketProvider cleanup');
+      ipcService.removeListener('connect');
+      ipcService.removeListener('connect_error');
+      ipcService.removeListener('reconnect');
+      ipcService.removeListener('reconnect_error');
+      ipcService.removeListener('disconnect');
+      ipcService.removeListener('error');
+      ipcService.removeListener('openPopup');
       cleanupRef.current.forEach((cleanup) => cleanup());
       cleanupRef.current = [];
     };
