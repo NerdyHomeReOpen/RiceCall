@@ -136,7 +136,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const [sortState, setSortState] = useState<1 | -1>(-1);
-    const [sortField, setSortField] = useState<string>('');
+    const [sortField, setSortField] = useState<string>('name');
 
     const [searchText, setSearchText] = useState('');
 
@@ -145,21 +145,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     // Variables
     const { serverId, userId } = initialData;
-    const filteredMembers = serverMembers
-      .filter((member) => {
-        const searchLower = searchText.toLowerCase();
-        return (
-          member.permissionLevel > 1 &&
-          (member.nickname?.toLowerCase().includes(searchLower) ||
-            member.name?.toLowerCase().includes(searchLower))
-        );
-      })
-      .sort((a, b) => {
-        if (!sortField) {
-          return b.permissionLevel - a.permissionLevel;
-        }
-        return createSorter(sortField, sortState)(a, b);
-      });
+    const filteredMembers = serverMembers.filter((member) => {
+      const searchLower = searchText.toLowerCase();
+      return (
+        member.nickname?.toLowerCase().includes(searchLower) ||
+        member.name.toLowerCase().includes(searchLower)
+      );
+    });
     const filteredApplications = serverApplications.filter((application) => {
       const searchLower = searchText.toLowerCase();
       return (
@@ -297,15 +289,17 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const handleMembersUpdate = (data: ServerMember[] | null) => {
       if (!data) data = [];
-      setServerMembers(data);
-      setServerBlockMembers(data.filter((mb) => mb.isBlocked) || []);
+      const sortedMembers = handleSort('name', [...data]);
+      setServerMembers(sortedMembers.filter((mb) => mb.permissionLevel > 1));
+      setServerBlockMembers(sortedMembers.filter((mb) => mb.isBlocked) || []);
     };
 
     const handleMemberApplicationsUpdate = (
       data: MemberApplication[] | null,
     ) => {
       if (!data) data = [];
-      setServerApplications(data);
+      const sortedApplications = handleSort('name', [...data]);
+      setServerApplications(sortedApplications);
     };
 
     const handleMemberUpdate = (data: Member | null) => {
