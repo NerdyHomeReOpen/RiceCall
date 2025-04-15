@@ -413,7 +413,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               {
                 id: 'editChannelOrder',
                 label: lang.tr.editChannelOrder,
-                show: !channelCategoryId,
+                show: permissionLevel > 4,
                 onClick: handleOpenEditChannelOrder,
               },
             ]);
