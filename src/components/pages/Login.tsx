@@ -95,34 +95,38 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
               )}
               <div className={styles['inputBox']}>
                 <label className={styles['label']}>{lang.tr.account}</label>
-                <input
-                  type="text"
-                  name="account"
-                  value={formData.account}
-                  onChange={handleInputChange}
-                  onBlur={handleBlur}
-                  placeholder={lang.tr.pleaseInputAccount}
-                  className={styles['input']}
-                  style={{
-                    borderColor: errors.account ? '#f87171' : '#d1d5db',
-                  }}
-                />
+                <div className={styles['loginAccountBox']}>
+                  <input
+                    type="text"
+                    name="account"
+                    value={formData.account}
+                    onChange={handleInputChange}
+                    onBlur={handleBlur}
+                    placeholder={lang.tr.pleaseInputAccount}
+                    className={styles['input']}
+                  />
+                  <div className={styles['comboArrow']}></div>
+                </div>
               </div>
               <div className={styles['inputBox']}>
                 <label className={styles['label']}>{lang.tr.password}</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  onBlur={handleBlur}
-                  placeholder={lang.tr.pleaseInputPassword}
-                  className={styles['input']}
-                  style={{
-                    borderColor: errors.password ? '#f87171' : '#d1d5db',
-                  }}
-                />
+                <div className={styles['loginAccountBox']}>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    onBlur={handleBlur}
+                    placeholder={lang.tr.pleaseInputPassword}
+                    className={styles['input']}
+                  />
+                </div>
               </div>
+              {errors && (
+                <div className={styles['warningMessage']}>
+                  {errors.account || errors.password || ''}
+                </div>
+              )}
               <div className={styles['checkWrapper']}>
                 <label className={styles['checkBox']}>
                   <input
@@ -131,6 +135,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     checked={formData.rememberAccount}
                     onChange={handleInputChange}
                     className={styles['check']}
+                    tabIndex={-1}
                   />
                   {lang.tr.rememberAccount}
                 </label>
@@ -141,11 +146,16 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     checked={formData.autoLogin}
                     onChange={handleInputChange}
                     className={styles['check']}
+                    tabIndex={-1}
                   />
                   {lang.tr.autoLogin}
                 </label>
               </div>
-              <button className={styles['button']} onClick={handleSubmit}>
+              <button
+                className={styles['button']}
+                onClick={handleSubmit}
+                tabIndex={-1}
+              >
                 {lang.tr.login}
               </button>
             </>

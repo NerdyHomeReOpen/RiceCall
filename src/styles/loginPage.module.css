@@ -5,6 +5,7 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
+  background: #fbfbfb;
 }
 
 .loginContent {
@@ -46,7 +47,7 @@
   justify-content: center;
   height: 60%;
   width: 100%;
-  gap: 1rem;
+  gap: 0.7rem;
 }
 
 .errorBox {
@@ -65,8 +66,6 @@
   flex: 1;
   height: 29px;
   padding: 8px;
-  border: 1px solid #ccc;
-  box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
   transition: box-shadow 0.3s ease;
   background: #fcfcfc;
 }
@@ -89,16 +88,75 @@
   display: block;
   width: auto;
   text-align: left;
-}
-
-.inputBox label::after {
-  content: '*';
-  color: red;
+  font-size: 12px;
 }
 
 .inputBox .warning {
   color: red;
   font-size: 0.9rem;
+}
+
+.loginAccountBox {
+  display: flex;
+  border: 1px solid #ccc;
+  box-shadow: inset 0.3px 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+
+.loginAccountBox:hover:not(:has(input[type='password'])) {
+  border-color: #929292;
+}
+
+.loginAccountBox:hover input:not([type='password']) {
+  background: #fff;
+}
+
+.comboArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 100%;
+  position: relative;
+}
+
+.loginAccountBox:hover .comboArrow {
+  background: linear-gradient(to bottom, #fff 0%, #f3f3f3 50%, #e0e0e0 100%);
+}
+
+.loginAccountBox .comboArrow:active {
+  background: linear-gradient(to bottom, #e0e0e0 0%, #f3f3f3 50%, #fff 100%);
+}
+
+.comboArrow:before {
+  content: '';
+  width: 2px;
+  height: 20px;
+  background: url(../../public/channel/icon_v_split.png) no-repeat;
+  margin-right: 3px;
+}
+
+.comboArrow:after {
+  content: '';
+  width: 20px;
+  height: 12px;
+  background: url(../../public/login_combobox_triangle.png) no-repeat;
+  background-position: -7px 0;
+}
+
+.loginAccountBox:hover .comboArrow:after {
+  background-position: -33px 0;
+}
+
+.loginAccountBox .comboArrow:active:after {
+  background-position: -59px 0;
+}
+
+.warningMessage {
+  width: 100%;
+  color: #ff0000;
+  text-align: start;
+  font-size: 12px;
+  margin-left: 25px;
 }
 
 .checkWrapper {
