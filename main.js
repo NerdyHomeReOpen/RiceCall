@@ -679,7 +679,14 @@ app.on('ready', async () => {
     isLogin = true;
     trayIcon(false);
   });
-  ipcMain.on('logout', () => {
+  ipcMain.on('logout', async () => {
+    if (rpc) {
+      try {
+        await rpc.clearActivity();
+      } catch (error) {
+        console.error('清除Discord狀態失敗:', error);
+      }
+    }
     closePopups();
     mainWindow.hide();
     authWindow.show();
