@@ -124,7 +124,9 @@ const BadgeViewer: React.FC<BadgeViewerProps> = React.memo(
   ({ badges, maxDisplay = 99 }) => {
     // Variables
     const sortedBadges = [...badges]
-      .sort((a, b) => (b.order ?? 0) - (a.order ?? 0))
+      .sort((a, b) =>
+        a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt,
+      )
       .slice(0, maxDisplay);
 
     return (

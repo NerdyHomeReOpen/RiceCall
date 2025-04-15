@@ -1085,7 +1085,11 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
             ) : (
               serverChannels
                 .filter((c) => !c.categoryId)
-                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                .sort((a, b) =>
+                  a.order !== b.order
+                    ? a.order - b.order
+                    : a.createdAt - b.createdAt,
+                )
                 .map((item) =>
                   item.type === 'category' ? (
                     <CategoryTab

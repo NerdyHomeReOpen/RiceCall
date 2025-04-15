@@ -374,7 +374,11 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
             {/* Friend Groups */}
             <div className={styles['friendList']}>
               {[defaultFriendGroup, ...friendGroups]
-                .sort((a, b) => a.order - b.order)
+                .sort((a, b) =>
+                  a.order !== b.order
+                    ? a.order - b.order
+                    : a.createdAt - b.createdAt,
+                )
                 .map((friendGroup) => (
                   <FriendGroupTab
                     key={friendGroup.friendGroupId}

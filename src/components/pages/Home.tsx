@@ -121,15 +121,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     const { userId, name: userName } = user;
     const hasResults =
       exactMatch || personalResults.length > 0 || relatedResults.length > 0;
-    const recentServers = userServers
-      .filter((s) => s.recent)
-      .sort((a, b) => b.timestamp - a.timestamp);
-    const favoriteServers = userServers
-      .filter((s) => s.favorite)
-      .sort((a, b) => b.timestamp - a.timestamp);
-    const ownedServers = userServers
-      .filter((s) => s.owned)
-      .sort((a, b) => b.timestamp - a.timestamp);
+    const recentServers = userServers.filter((s) => s.recent);
+    const favoriteServers = userServers.filter((s) => s.favorite);
+    const ownedServers = userServers.filter((s) => s.owned);
 
     // Handlers
     const handleUserServersUpdate = (data: UserServer[] | null) => {

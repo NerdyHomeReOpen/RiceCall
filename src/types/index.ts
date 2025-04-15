@@ -2099,6 +2099,7 @@ export type Badge = {
   name: string;
   description: string;
   order: number;
+  createdAt: number;
 };
 
 export type Message = {

@@ -263,7 +263,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
               setGroupChannels(
                 serverChannels
                   .filter((ch) => !ch.categoryId)
-                  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+                  .sort((a, b) =>
+                    a.order !== b.order
+                      ? a.order - b.order
+                      : a.createdAt - b.createdAt,
+                  ),
               );
             }}
           >
@@ -294,7 +298,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
           <div className={serverPage['channelList']}>
             {expanded[categoryId] &&
               subChannels
-                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                .sort((a, b) =>
+                  a.order !== b.order
+                    ? a.order - b.order
+                    : a.createdAt - b.createdAt,
+                )
                 .filter((ch) => ch.type === 'channel')
                 .map((channel) => channelTab(channel))}
           </div>
@@ -328,7 +336,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
             setGroupChannels(
               serverChannels
                 .filter((ch) => ch.categoryId === channelCategoryId)
-                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+                .sort((a, b) =>
+                  a.order !== b.order
+                    ? a.order - b.order
+                    : a.createdAt - b.createdAt,
+                ),
             );
           }}
         >
@@ -465,7 +477,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
               onClick={(e) => e.stopPropagation()}
             >
               {serverChannels
-                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                .sort((a, b) =>
+                  a.order !== b.order
+                    ? a.order - b.order
+                    : a.createdAt - b.createdAt,
+                )
                 .filter((ch) => !ch.categoryId)
                 .map((channel) => {
                   if (channel.type === 'category') {
