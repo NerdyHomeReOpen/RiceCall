@@ -113,6 +113,9 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
     ) => {
       if (!socket) return;
       socket.send.deleteChannel({ channelId, serverId });
+      if (selectedChannel?.channelId === channelId) {
+        setSelectedChannel(null);
+      }
     };
 
     const handleOpenCreateChannel = (
