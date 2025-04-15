@@ -151,6 +151,59 @@
   background-position: -59px 0;
 }
 
+.accountSelectBox {
+  position: absolute;
+  height: 10rem;
+  width: 226px;
+  border: 1px solid #d3d8db;
+  background: #fff;
+  z-index: 1;
+  display: none;
+  margin-top: 4rem;
+  overflow-x: auto;
+}
+
+.showAccountSelectBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.accountSelectOptionBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 3px;
+  height: 2rem;
+  width: 100%;
+}
+
+.accountSelectOptionBox:hover {
+  background: #ececef;
+}
+.accountSelectOptionBox.selected {
+  background: #dfe5ea;
+}
+
+.accountSelectCloseBtn {
+  background: url('../../public/loading_close.png');
+  height: 18px;
+  width: 25px;
+  background-size: auto;
+  background-position: 0 0;
+  height: 18px;
+  width: 18px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.accountSelectCloseBtn:hover {
+  background-position: -18px 0;
+}
+
+.accountSelectCloseBtn:active {
+  background-position: -36px 0;
+}
+
 .warningMessage {
   width: 100%;
   color: #ff0000;
