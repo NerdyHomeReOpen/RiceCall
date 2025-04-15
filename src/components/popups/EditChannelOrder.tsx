@@ -76,7 +76,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       currentIndex < groupChannels.length - 1;
     const canTop = isSelected && !isFirst && !isLobby;
     const canBottom = isSelected && !isLast && !isLobby;
-    const canAdd = isSelected && !isLobby && !selectedChannel.categoryId;
+    const canAdd = !isLobby && !selectedChannel?.categoryId;
 
     const handleServerChannelsUpdate = (data: Channel[] | null): void => {
       if (!data) data = [];
