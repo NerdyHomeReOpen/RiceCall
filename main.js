@@ -309,7 +309,7 @@ async function createAuthWindow() {
   }
 
   authWindow = new BrowserWindow({
-    width: 600,
+    width: 610,
     height: 450,
     resizable: false,
     frame: false,

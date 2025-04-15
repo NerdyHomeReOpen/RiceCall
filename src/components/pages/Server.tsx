@@ -244,24 +244,26 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, []);
 
     useEffect(() => {
-      ipcService.discord.updatePresence({
-        details: `${lang.tr.in} ${serverName}`,
-        state: `${lang.tr.chatWithMembers.replace(
-          '{0}',
-          serverActiveMembers.length.toString(),
-        )}`,
-        largeImageKey: 'app_icon',
-        largeImageText: 'RC Voice',
-        smallImageKey: 'home_icon',
-        smallImageText: lang.tr.RPCServer,
-        timestamp: Date.now(),
-        buttons: [
-          {
-            label: lang.tr.RPCJoinServer,
-            url: 'https://discord.gg/adCWzv6wwS',
-          },
-        ],
-      });
+      if (serverName) {
+        ipcService.discord.updatePresence({
+          details: `${lang.tr.in} ${serverName}`,
+          state: `${lang.tr.chatWithMembers.replace(
+            '{0}',
+            serverActiveMembers.length.toString(),
+          )}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: lang.tr.RPCServer,
+          timestamp: Date.now(),
+          buttons: [
+            {
+              label: lang.tr.RPCJoinServer,
+              url: 'https://discord.gg/adCWzv6wwS',
+            },
+          ],
+        });
+      }
     }, [lang, serverName, serverActiveMembers]);
 
     return (
