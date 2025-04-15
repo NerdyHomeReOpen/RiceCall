@@ -2264,6 +2264,10 @@ export enum SocketServerEvent {
   PLAY_SOUND = 'playSound',
   // Echo
   PONG = 'pong',
+  // Error
+  ERROR = 'error',
+  // Popup
+  OPEN_POPUP = 'openPopup',
 }
 
 export enum PopupType {

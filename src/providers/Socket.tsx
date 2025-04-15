@@ -8,9 +8,6 @@ import { SocketServerEvent, SocketClientEvent } from '@/types';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import { errorHandler } from '@/utils/errorHandler';
-import { StandardizedError } from '@/utils/errorHandler';
-import { useLanguage } from './Language';
 
 type SocketContextType = {
   send: Record<SocketClientEvent, (data: any) => () => void>;
@@ -32,9 +29,6 @@ interface SocketProviderProps {
 }
 
 const SocketProvider = ({ children }: SocketProviderProps) => {
-  // Language
-  const lang = useLanguage();
-
   // States
   const [on, setOn] = useState<SocketContextType['on']>(
     Object.values(SocketServerEvent).reduce((acc, event) => {
@@ -87,22 +81,6 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
     setIsConnected(false);
   };
 
-  const handleError = (error: StandardizedError) => {
-    console.log('Socket error', error);
-    new errorHandler(error).show();
-  };
-
-  const handleOpenPopup = (data: any) => {
-    console.log('Socket open popup', data);
-    const { popupType } = data;
-    ipcService.popup.open(popupType);
-    ipcService.initialData.onRequest(popupType, {
-      iconType: 'danger',
-      title: (lang.tr as unknown as Record<string, string>)[popupType],
-      submitTo: popupType,
-    });
-  };
-
   // Effects
   useEffect(() => {
     console.log('SocketProvider initialization');
@@ -121,8 +99,6 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
       ipcService.removeListener('reconnect');
       ipcService.removeListener('reconnect_error');
       ipcService.removeListener('disconnect');
-      ipcService.removeListener('error');
-      ipcService.removeListener('openPopup');
     });
 
     setOn(
@@ -150,8 +126,6 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
     ipcService.onSocketEvent('reconnect', handleReconnect);
     ipcService.onSocketEvent('reconnect_error', handleReconnectError);
     ipcService.onSocketEvent('disconnect', handleDisconnect);
-    ipcService.onSocketEvent('error', handleError);
-    ipcService.onSocketEvent('openPopup', handleOpenPopup);
 
     return () => {
       console.log('SocketProvider cleanup');

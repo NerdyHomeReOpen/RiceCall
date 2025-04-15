@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -28,6 +28,8 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
+import { StandardizedError } from '@/utils/errorHandler';
+import { errorHandler } from '@/utils/errorHandler';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
@@ -363,6 +365,24 @@ const RootPageComponent = () => {
     }
   };
 
+  const handleError = (error: StandardizedError) => {
+    console.log('Socket error', error);
+    new errorHandler(error).show();
+  };
+
+  const handleOpenPopup = (data: { type: PopupType; initialData: any }) => {
+    console.log('Socket open popup', data);
+    ipcService.popup.open(data.type);
+    ipcService.initialData.onRequest(data.type, data.initialData);
+    ipcService.popup.onSubmit(data.type, () => {
+      switch (data.type) {
+        case PopupType.DIALOG_ALERT:
+          ipcService.auth.logout();
+          break;
+      }
+    });
+  };
+
   // Effects
   useEffect(() => {
     if (!socket) return;
@@ -372,6 +392,8 @@ const RootPageComponent = () => {
       [SocketServerEvent.SERVER_UPDATE]: handleServerUpdate,
       [SocketServerEvent.CHANNEL_UPDATE]: handleCurrentChannelUpdate,
       [SocketServerEvent.PLAY_SOUND]: handlePlaySound,
+      [SocketServerEvent.ERROR]: handleError,
+      [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
     };
     const unsubscribe: (() => void)[] = [];
 
