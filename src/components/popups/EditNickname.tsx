@@ -127,6 +127,13 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
           </button>
           <button
             type="button"
+            className={popup['button']}
+            onClick={() => handleClose()}
+          >
+            {lang.tr.cancel}
+          </button>
+          <button
+            type="button"
             className={`${popup['button']}`}
             onClick={() => {
               handleUpdateMember(
@@ -137,13 +144,6 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
             }}
           >
             {lang.tr.set}
-          </button>
-          <button
-            type="button"
-            className={popup['button']}
-            onClick={() => handleClose()}
-          >
-            {lang.tr.cancel}
           </button>
         </div>
       </form>
