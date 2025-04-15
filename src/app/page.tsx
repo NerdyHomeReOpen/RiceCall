@@ -63,10 +63,6 @@ const Header: React.FC<HeaderProps> = React.memo(
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
-    // Variables
-    // const { id: serverId } = server;
-    // const { id: userId, name: userName, status: userStatus } = user;
-
     // Constants
     const MAIN_TABS = [
       { id: 'home', label: lang.tr.home },
@@ -429,7 +425,11 @@ const RootPageComponent = () => {
     if (!socket.isConnected) return <LoadingSpinner />;
     return (
       <>
-        <HomePage user={user} display={mainTab.selectedTabId === 'home'} />
+        <HomePage
+          user={user}
+          server={server}
+          display={mainTab.selectedTabId === 'home'}
+        />
         <FriendPage user={user} display={mainTab.selectedTabId === 'friends'} />
         <ExpandedProvider>
           <ServerPage

@@ -93,11 +93,12 @@ const SearchResultItem: React.FC<{
 
 interface HomePageProps {
   user: User;
+  server: Server;
   display: boolean;
 }
 
 const HomePageComponent: React.FC<HomePageProps> = React.memo(
-  ({ user, display }) => {
+  ({ user, server, display }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
@@ -267,6 +268,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     }, [userId]);
 
     useEffect(() => {
+      if (!server) return;
+      setIsLoading(false);
+      setLoadingGroupID('');
+    }, [server, isLoading]);
+
+    useEffect(() => {
       if (!lang) return;
       ipcService.discord.updatePresence({
         details: lang.tr.RPCHomePage,
@@ -430,7 +437,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         </main>
 
         {/* Loading */}
-        {isLoading && !user.currentServerId && (
+        {isLoading && (
           <div className={homePage['loadingWrapper']}>
             <div className={homePage['loadingBox']}>
               <div className={homePage['loadingTitleContain']}>
