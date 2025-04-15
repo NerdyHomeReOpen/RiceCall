@@ -2300,10 +2300,10 @@ export enum PopupType {
 
 export const PopupSize = {
   [PopupType.USER_SETTING]: { height: 650, width: 500 },
-  [PopupType.CHANNEL_SETTING]: { height: 450, width: 600 },
+  [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
   [PopupType.CHANNEL_PASSWORD]: { height: 220, width: 400 },
-  [PopupType.SERVER_SETTING]: { height: 500, width: 600 },
-  [PopupType.SYSTEM_SETTING]: { height: 450, width: 600 },
+  [PopupType.SERVER_SETTING]: { height: 520, width: 600 },
+  [PopupType.SYSTEM_SETTING]: { height: 520, width: 600 },
   [PopupType.MEMBERAPPLY_SETTING]: { height: 320, width: 500 },
   [PopupType.CREATE_SERVER]: { height: 460, width: 520 },
   [PopupType.CREATE_CHANNEL]: { height: 220, width: 400 },
@@ -2324,7 +2324,7 @@ export const PopupSize = {
   [PopupType.DIALOG_ERROR]: { height: 220, width: 400 },
   [PopupType.DIALOG_INFO]: { height: 220, width: 400 },
   [PopupType.ANTHOR_DEVICE_LOGIN]: { height: 220, width: 400 },
-  Settings: { height: 450, width: 600 },
+  Settings: { height: 520, width: 600 },
   Apply: { height: 320, width: 500 },
   Small: { height: 220, width: 400 },
 };
