@@ -116,13 +116,13 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
     );
 
     cleanupRef.current.push(() => {
-      ipcService.onSocketEvent('connect', handleConnect);
-      ipcService.onSocketEvent('connect_error', handleConnectError);
-      ipcService.onSocketEvent('reconnect', handleReconnect);
-      ipcService.onSocketEvent('reconnect_error', handleReconnectError);
-      ipcService.onSocketEvent('disconnect', handleDisconnect);
-      ipcService.onSocketEvent('error', handleError);
-      ipcService.onSocketEvent('openPopup', handleOpenPopup);
+      ipcService.removeListener('connect');
+      ipcService.removeListener('connect_error');
+      ipcService.removeListener('reconnect');
+      ipcService.removeListener('reconnect_error');
+      ipcService.removeListener('disconnect');
+      ipcService.removeListener('error');
+      ipcService.removeListener('openPopup');
     });
 
     setOn(
@@ -155,13 +155,6 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
     return () => {
       console.log('SocketProvider cleanup');
-      ipcService.removeListener('connect');
-      ipcService.removeListener('connect_error');
-      ipcService.removeListener('reconnect');
-      ipcService.removeListener('reconnect_error');
-      ipcService.removeListener('disconnect');
-      ipcService.removeListener('error');
-      ipcService.removeListener('openPopup');
       cleanupRef.current.forEach((cleanup) => cleanup());
       cleanupRef.current = [];
     };
