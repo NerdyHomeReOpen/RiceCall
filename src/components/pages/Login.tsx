@@ -69,8 +69,11 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   };
 
   const handleSubmit = async () => {
+    if (!formData.account || !formData.password) return;
     setIsLoading(true);
-    if (await authService.login(formData)) setSection('login');
+    if (await authService.login(formData)) {
+      setSection('login');
+    }
     setIsLoading(false);
   };
 
@@ -79,7 +82,13 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
       {/* Main Content */}
       <div className={styles['loginContent']}>
         <div className={styles['appLogo']} />
-        <form className={styles['formWrapper']}>
+        <form
+          className={styles['formWrapper']}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
           {isLoading && (
             <>
               <div className={styles['loadingIndicator']}>
