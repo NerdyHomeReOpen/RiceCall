@@ -22,7 +22,6 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
   ({ badge }) => {
     // State
     const [expanded, setExpended] = useState<boolean>(false);
-    const [showFallBack, setShowFallBack] = useState(false);
     const [top, setTop] = useState<number>(0);
     const [left, setLeft] = useState<number>(0);
     const [placement, setPlacement] = useState<'top' | 'bottom'>('bottom');
@@ -37,33 +36,41 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
     const HandleCalPosition = (rect: DOMRect) => {
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
+
       const spaceBelow = windowHeight - rect.bottom;
       const spaceAbove = rect.top;
+
       const placement =
         spaceBelow >= INFOVIEWER_HEIGHT + SPACING || spaceBelow >= spaceAbove
           ? 'bottom'
           : 'top';
+
       const top =
         placement === 'bottom'
           ? rect.bottom + SPACING
-          : rect.top - INFOVIEWER_HEIGHT - SPACING;
-      const left = Math.max(
-        SPACING,
-        Math.min(
-          rect.left - INFOVIEWER_WIDTH / 2,
-          windowWidth - INFOVIEWER_WIDTH - SPACING,
-        ),
-      );
+          : rect.top - INFOVIEWER_HEIGHT - SPACING - 60;
+
+      let left = rect.left;
+
+      // 修正超出右邊界
+      if (left + INFOVIEWER_WIDTH + 155 > windowWidth) {
+        left = windowWidth - INFOVIEWER_WIDTH - SPACING - 180;
+      }
+
+      // 修正超出左邊界
+      if (left < SPACING) {
+        left = SPACING;
+      }
 
       setTop(top);
       setLeft(left);
       setPlacement(placement);
     };
 
-    if (failedImageCache.has(badgeUrl) || showFallBack) {
+    if (failedImageCache.has(badgeUrl)) {
       return (
         // Fallback Badge
-        <div className={styles['badgeImage']} />
+        <div className={styles['badgeBigImage']} />
       );
     }
 
@@ -82,10 +89,7 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
         >
           <div
             className={styles['badgeImage']}
-            onError={() => {
-              failedImageCache.add(badgeUrl);
-              setShowFallBack(true);
-            }}
+            style={{ backgroundImage: `url(${badgeUrl})` }}
           />
         </div>
         {expanded && (
@@ -95,16 +99,20 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
           >
             <div className={styles['badgeInfoBox']}>
               <div
-                className={styles['badgeImage']}
-                onError={() => {
-                  failedImageCache.add(badgeUrl);
-                  setShowFallBack(true);
-                }}
+                className={styles['badgeBigImage']}
+                style={{ backgroundImage: `url(${badgeUrl})` }}
               />
-              <div className={styles['name']}>{badge.name}</div>
+              <div className={styles['badgeText']}>{badge.rare}</div>
             </div>
             <div className={styles['badgeDescriptionBox']}>
-              <div className={styles['description']}>{badge.description}</div>
+              <div className={styles['badgeName']}>{badge.name}</div>
+              <div className={styles['badgeDescription']}>
+                {badge.description}
+              </div>
+            </div>
+            <div className={styles['badgeShowTimeBox']}>
+              <div>展示至:</div>
+              <div>1970-01-01</div>
             </div>
           </div>
         )}
@@ -120,24 +128,21 @@ interface BadgeViewerProps {
   maxDisplay?: number;
 }
 
-const BadgeViewer: React.FC<BadgeViewerProps> = React.memo(
-  ({ badges, maxDisplay = 99 }) => {
-    // Variables
-    const sortedBadges = [...badges]
-      .sort((a, b) =>
-        a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt,
-      )
-      .slice(0, maxDisplay);
+const BadgeViewer: React.FC<BadgeViewerProps> = React.memo(({ badges }) => {
+  const sortedBadges = [...badges]
+    .sort((a, b) =>
+      a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt,
+    )
+    .slice(0, 21);
 
-    return (
-      <div className={styles['badgeViewerWrapper']}>
-        {sortedBadges.map((badge) => (
-          <BadgeContainer key={badge.badgeId} badge={badge} />
-        ))}
-      </div>
-    );
-  },
-);
+  return (
+    <div className={styles['badgeViewerWrapper']}>
+      {sortedBadges.map((badge) => (
+        <BadgeContainer key={badge.badgeId} badge={badge} />
+      ))}
+    </div>
+  );
+});
 
 BadgeViewer.displayName = 'BadgeViewer';
 

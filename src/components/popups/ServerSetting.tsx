@@ -263,6 +263,17 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       });
     };
 
+    const handleOpenUserInfo = (
+      userId: User['userId'],
+      targetId: User['userId'],
+    ) => {
+      ipcService.popup.open(PopupType.USER_INFO);
+      ipcService.initialData.onRequest(PopupType.USER_INFO, {
+        userId,
+        targetId,
+      });
+    };
+
     const handleOpenErrorDialog = (message: string) => {
       ipcService.popup.open(PopupType.DIALOG_ERROR);
       ipcService.initialData.onRequest(PopupType.DIALOG_ERROR, {
@@ -691,13 +702,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                               const isCurrentUser = memberUserId === userId;
                               contextMenu.showContextMenu(e.pageX, e.pageY, [
                                 {
-                                  id: 'apply-friend',
-                                  label: lang.tr.addFriend,
-                                  onClick: () =>
-                                    handleOpenApplyFriend(userId, memberUserId),
-                                  show: !isCurrentUser,
-                                },
-                                {
                                   id: 'direct-message',
                                   label: lang.tr.directMessage,
                                   onClick: () =>
@@ -706,6 +710,19 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                       memberUserId,
                                       memberName,
                                     ),
+                                  show: !isCurrentUser,
+                                },
+                                {
+                                  id: 'view-profile',
+                                  label: lang.tr.viewProfile,
+                                  onClick: () =>
+                                    handleOpenUserInfo(userId, memberUserId),
+                                },
+                                {
+                                  id: 'apply-friend',
+                                  label: lang.tr.addFriend,
+                                  onClick: () =>
+                                    handleOpenApplyFriend(userId, memberUserId),
                                   show: !isCurrentUser,
                                 },
                                 {

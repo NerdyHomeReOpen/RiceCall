@@ -1,11 +1,51 @@
 .body {
   height: 100%;
+  max-height: 330px;
   width: 100%;
-  padding: 0 15px;
+  padding: 0 5px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   justify-content: space-between;
+}
+
+.body .userProfileContent {
+  padding: 10px 15px;
+}
+
+.body:has(.joinedServers) {
+  max-height: 450px;
+}
+
+.body .serverItems {
+  max-height: 320px;
+}
+
+.userAboutMeShow {
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e3e3e3;
+  color: #6d6d6d;
+}
+
+.userAboutMeShow:before,
+.userAboutMeShow:after {
+  content: '';
+  height: 19px;
+  width: 23px;
+  display: block;
+  background-size: cover;
+}
+
+.userAboutMeShow:before {
+  background: url('../../../public/card/bg_left_quote.png') no-repeat center
+    center;
+}
+
+.userAboutMeShow:after {
+  background: url('../../../public/card/bg_right_quote.png') no-repeat center
+    center;
 }
 
 .left {
@@ -193,7 +233,7 @@
 }
 
 .confirmedButton,
-.cancelButton {
+.button {
   margin-right: 5px;
   min-width: 82px;
   text-align: center;
@@ -210,16 +250,16 @@
   background: #fff;
 }
 
-.cancelButton:hover {
+.button:hover {
   background: #fafafa;
 }
 
-.cancelButton:active {
+.button:active {
   background: #f5f5f5;
 }
 
-.blueBtn {
-  background: url(../../../public/im/btn-blue.png) no-repeat center center;
+.blueBtn,
+.greenBtn {
   background-size: auto;
   color: #fff;
   border: 0;
@@ -229,11 +269,21 @@
   height: 28px;
 }
 
-.blueBtn:hover {
+.blueBtn {
+  background: url(../../../public/im/btn-blue.png) no-repeat center center;
+}
+
+.greenBtn {
+  background: url(../../../public/im/btn-green.png) no-repeat center center;
+}
+
+.blueBtn:hover,
+.greenBtn:hover {
   background-position: -80px 0;
 }
 
-.blueBtn:active {
+.blueBtn:active,
+.greenBtn:active {
   background-position: -160px 0;
 }
 
@@ -257,12 +307,21 @@
 }
 
 /* User Profile Styles */
+.userProfile {
+  flex: unset;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.userProfile .profileBox {
+  height: 100%;
+  justify-content: space-between;
+}
 
 .userProfile .header {
   position: relative;
-  min-height: 250px;
+  min-height: 270px;
   width: 100%;
-  padding-bottom: 38px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -270,20 +329,68 @@
   color: white;
   background-image: url('../../../public/im/wallpaper.png');
   background-size: cover;
-  gap: 5px;
+  gap: 8px;
+  -webkit-app-region: drag;
+}
+
+.windowActionButtons {
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  -webkit-app-region: no-drag;
+  position: fixed;
+  right: 0;
+  top: 10px;
+}
+
+.minimizeBtn,
+.closeBtn {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-position: 0 0;
+  cursor: pointer;
+  background-size: cover;
+}
+.minimizeBtn {
+  background: url(../../../public/im/btn-min.png) no-repeat center center;
+}
+
+.closeBtn {
+  background: url(../../../public/im/btn-close.png) no-repeat center center;
+}
+
+.minimizeBtn:hover,
+.closeBtn:hover {
+  background-position: -13px 0;
+}
+
+.minimizeBtn:active,
+.closeBtn:active {
+  background-position: -26px 0;
 }
 
 .userProfile .avatar {
   position: relative;
   min-width: 74px;
   min-height: 74px;
-  cursor: pointer;
   object-fit: cover;
   display: inline-block;
   background-image: url('../../../public/im/IMLogo.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+}
+
+.avatar,
+.noDrag,
+.tab div {
+  -webkit-app-region: no-drag;
+}
+
+.userProfile .avatar.editable {
+  cursor: pointer;
 }
 
 .userProfile .avatar::after {
@@ -299,16 +406,49 @@
   background-position: 0 0;
 }
 
+.userProfile .userName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  align-items: 'center';
+}
+
+.userProfile .userAccount {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #fff;
+}
+
+.userProfile .userContent {
+  font-size: 1rem;
+  color: #fff;
+}
+
+.userProfile .userSignature {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #fff;
+  text-align: center;
+  padding-bottom: 1.5rem;
+}
+
 .userProfile .tab {
   height: 38px;
   width: 100%;
   bottom: 0;
   position: absolute;
   display: flex;
+  height: 45px;
+  top: 21rem;
+}
+
+.userProfile .tab:has(.about.selected) {
+  background: linear-gradient(180deg, #ffffff, #d2f0ffa1);
+  border-bottom: 1px solid #dddddd;
 }
 
 .userProfile .tab .item {
-  height: 100%;
+  height: 38px;
   width: 50%;
   display: flex;
   align-items: center;
@@ -318,12 +458,14 @@
   position: relative;
   background-image: url('../../../public/im/userpage_tab.png');
   background-size: auto;
-  background-repeat: no-repeat;
+  background-repeat: repeat;
   background-position: 0 0;
+  bottom: 2.8rem;
+  cursor: pointer;
 }
 
 .userProfile .tab .item.selected {
-  background-position: 0 -38px;
+  background-position: 17px -38px;
 }
 
 .userProfile .tab .item.about::before {
@@ -352,25 +494,51 @@
 }
 
 /* ServerItem */
+.userProfile .joinedServers {
+  padding: 5px;
+}
+
+.joinedServers select {
+  border: unset !important;
+  background: #fff0 !important;
+}
+
+.joinedServers div:has(select):before {
+  background-image: unset !important;
+}
+
+.joinedServers div:has(select):after {
+  left: 50px;
+}
+
 .serverItems {
+  padding: 5px 0;
+  max-height: 270px;
+  overflow-y: auto;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: start;
   align-items: center;
   gap: 5px;
-  padding: 10px 5px;
+  margin-top: 1rem;
 }
 
 .serverItem {
-  background-color: rgb(232, 232, 235);
+  background: #ededed;
+  border: 1px solid #ffffff00;
   display: flex;
   flex-direction: row;
   gap: 5px;
-  width: calc(50% - 5px);
+  width: calc(50% - 2.5px);
   padding: 5px;
   cursor: pointer;
   align-items: center;
+}
+
+.serverItem:hover {
+  background: #e9e9e9;
+  border: 1px solid #bfbfc0;
 }
 
 .serverItem .serverAvatarPicture {
@@ -391,6 +559,8 @@
 
 .serverName {
   font-size: 1rem;
+  line-height: 1rem;
+  color: rgb(95, 95, 95);
 }
 
 .serverInfo {
@@ -413,6 +583,10 @@
   flex-direction: row;
 }
 
+.serverInfo .contributionBox div {
+  color: #888;
+}
+
 .isOwner::before {
   content: '';
   width: 13px;
@@ -428,7 +602,7 @@
   content: '';
   width: 12px;
   height: 12px;
-  background: url('../../../public/channel/ID.png') no-repeat center center;
+  background: url('../../../public/card/icon_id.jpg') no-repeat center center;
   background-size: contain;
   background-position: 0 0;
   display: block;
@@ -468,8 +642,13 @@
 }
 
 .editTabBar {
-  height: 12%;
+  min-height: 45px;
+  height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  z-index: 1;
+  position: fixed;
+  bottom: 29.5rem;
+  right: 0.5rem;
 }

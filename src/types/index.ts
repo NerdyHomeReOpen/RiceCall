@@ -104,6 +104,7 @@ export interface Translation {
   applyMember: string;
   applyFriend: string;
   directMessage: string;
+  viewProfile: string;
   dialogAlert: string;
   dialogSuccess: string;
   dialogWarning: string;
@@ -487,6 +488,7 @@ export const translations: Record<LanguageKey, Translation> = {
     applyMember: '申請會員',
     applyFriend: '好友請求',
     directMessage: '傳送即時訊息',
+    viewProfile: '檢視個人檔案',
     dialogAlert: '警告',
     dialogSuccess: '成功',
     dialogWarning: '警告',
@@ -572,7 +574,7 @@ export const translations: Record<LanguageKey, Translation> = {
     add: '新增',
     delete: '刪除',
     kick: '踢出',
-    addFriend: '添加好友',
+    addFriend: '新增好友',
     addChannel: '創建頻道',
     unknownChannel: '未知頻道',
     micOrder: '麥序',
@@ -870,6 +872,7 @@ export const translations: Record<LanguageKey, Translation> = {
     applyMember: '申请会员',
     applyFriend: '好友请求',
     directMessage: '私信',
+    viewProfile: '檢視個人檔案',
     dialogAlert: '警告',
     dialogSuccess: '成功',
     dialogWarning: '警告',
@@ -1253,6 +1256,7 @@ export const translations: Record<LanguageKey, Translation> = {
     applyMember: 'Apply Member',
     applyFriend: 'Friend Request',
     directMessage: 'Direct Message',
+    viewProfile: '檢視個人檔案',
     dialogAlert: 'Alert',
     dialogSuccess: 'Success',
     dialogWarning: 'Warning',
@@ -1659,6 +1663,7 @@ export const translations: Record<LanguageKey, Translation> = {
     applyMember: 'メンバーを申請',
     applyFriend: '友達リクエスト',
     directMessage: 'ダイレクトメッセージ',
+    viewProfile: '檢視個人檔案',
     dialogAlert: '警告',
     dialogSuccess: '成功',
     dialogWarning: '警告',
@@ -2106,6 +2111,7 @@ export type MemberApplication = User & {
 export type Badge = {
   badgeId: string;
   name: string;
+  rare: string;
   description: string;
   order: number;
   createdAt: number;
@@ -2310,8 +2316,8 @@ export enum PopupType {
 }
 
 export const PopupSize = {
-  [PopupType.USER_INFO]: { height: 650, width: 500 },
-  [PopupType.USER_SETTING]: { height: 650, width: 500 },
+  [PopupType.USER_INFO]: { height: 700, width: 500 },
+  [PopupType.USER_SETTING]: { height: 700, width: 500 },
   [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
   [PopupType.CHANNEL_PASSWORD]: { height: 220, width: 400 },
   [PopupType.SERVER_SETTING]: { height: 520, width: 600 },

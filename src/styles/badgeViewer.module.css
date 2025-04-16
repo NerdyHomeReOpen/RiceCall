@@ -16,6 +16,28 @@
   pointer-events: none;
 }
 
+.userInfoCardBadges .badgeViewerWrapper {
+  display: flex;
+  gap: 0.25rem;
+  height: 25px;
+  align-items: center;
+  border: 1px solid #d7d7d7;
+  padding: 5px;
+  background: #e8e8eb;
+  margin-top: 0.5rem;
+}
+
+.userInfoCardBadges .badgeInfoViewerWrapper {
+  position: fixed;
+  z-index: 50;
+  background: #f4f6fa;
+  display: block !important;
+  z-index: 1000;
+  height: 145px;
+  width: 300px;
+  border: 1px solid #e0e0e4;
+}
+
 .badgeInfoViewerWrapper::before {
   content: '';
   display: block;
@@ -27,55 +49,92 @@
   border-color: transparent;
 }
 
-.badgeInfoViewerWrapper.top::before {
-  top: 100%;
-  border-top-color: #1f2937;
-}
-
 .badgeInfoViewerWrapper.bottom::before {
   bottom: 100%;
   border-bottom-color: #1f2937;
 }
 
 .badgeInfoBox {
+  position: absolute;
+  left: 20px;
+  top: 10px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  height: 95px;
+  width: 95px;
 }
 
-.badgeInfoBox .name {
-  font-weight: 500;
-  text-align: center;
+.badgeInfoBox .badgeAvatar {
+  height: 75px;
+  width: 75px;
+  object-fit: cover;
+}
+
+.badgeInfoBox .badgeText {
+  color: #f3644b;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.badgeInfoBox .badgeText:before {
+  content: '[';
+}
+
+.badgeInfoBox .badgeText:after {
+  content: ']';
 }
 
 .badgeDescriptionBox {
-  flex: 1;
+  height: 98px;
+  width: 145px;
+  position: absolute;
+  left: 120px;
+  top: 11px;
+}
+
+.badgeDescriptionBox .badgeName {
+  margin-bottom: 3px;
+  font-size: 19px;
+  color: #264558;
+  font-weight: bold;
+}
+
+.badgeDescriptionBox .badgeDescription {
+  font-size: 12px;
+  color: #777777;
+  margin-top: 5;
+}
+
+.badgeShowTimeBox {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #777777;
+  margin-left: 10px;
+  height: 30px;
+  width: 100%;
+  position: absolute;
+  bottom: -5px;
   display: flex;
-}
-
-.badgeDescriptionBox .description {
-  font-size: 0.75rem;
-  text-align: center;
-  color: #9ca3af;
-  margin-top: 0.25rem;
-}
-
-.badgeContainer {
-  position: relative;
-  user-select: none;
+  align-items: flex-start;
 }
 
 .badgeImage {
-  min-width: 1rem;
-  min-height: 1rem;
+  min-width: 18px;
+  min-height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.625rem;
   font-weight: 500;
   color: #fff;
-  background: url('../../public/badge/nerdy.png') no-repeat center;
   background-size: contain;
+  cursor: pointer;
+}
+
+.badgeBigImage {
+  height: 75px;
+  width: 75px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }

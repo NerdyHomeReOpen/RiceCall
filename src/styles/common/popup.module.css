@@ -258,6 +258,11 @@
   position: relative;
 }
 
+.selectBoxMax,
+.selectBoxMax select {
+  width: 100% !important;
+  min-width: unset !important;
+}
 .inputBox .selectBox select {
   border: 1px solid #ddd;
   padding: 2px;
@@ -269,6 +274,8 @@
   max-width: 100%;
   height: 2rem;
   appearance: none;
+  text-decoration: none;
+  outline: none;
 }
 
 .inputBox .selectBox::before {
