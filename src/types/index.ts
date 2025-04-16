@@ -1988,6 +1988,15 @@ export type User = {
   createdAt: number;
   // THESE WERE NOT SAVE IN THE DATABASE
   badges?: Badge[];
+  friends?: UserFriend[];
+  friendGroups?: FriendGroup[];
+  friendApplications?: FriendApplication[];
+  // MAYBE NOT FOUND ?
+  joinedServers?: Server[];
+  recentServers?: Server[];
+  ownedServers?: Server[];
+  favServers?: Server[];
+  // userServers?: UserServer[];
 };
 
 export type UserServer = Server & {
@@ -2272,6 +2281,7 @@ export enum SocketServerEvent {
 }
 
 export enum PopupType {
+  USER_INFO = 'userInfo',
   USER_SETTING = 'userSetting',
   CHANNEL_SETTING = 'channelSetting',
   CHANNEL_PASSWORD = 'channelPassword',
@@ -2300,6 +2310,7 @@ export enum PopupType {
 }
 
 export const PopupSize = {
+  [PopupType.USER_INFO]: { height: 650, width: 500 },
   [PopupType.USER_SETTING]: { height: 650, width: 500 },
   [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
   [PopupType.CHANNEL_PASSWORD]: { height: 220, width: 400 },

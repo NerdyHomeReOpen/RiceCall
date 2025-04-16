@@ -185,6 +185,17 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
     setFriendServerName(data.name);
   };
 
+  const handleOpenUserInfo = (
+    userId: User['userId'],
+    targetId: User['userId'],
+  ) => {
+    ipcService.popup.open(PopupType.USER_INFO);
+    ipcService.initialData.onRequest(PopupType.USER_INFO, {
+      userId,
+      targetId,
+    });
+  };
+
   const handleOpenEditFriend = (
     userId: User['userId'],
     targetId: User['userId'],
@@ -236,6 +247,11 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(({ friend }) => {
         className={styles['friendCard']}
         onContextMenu={(e) => {
           contextMenu.showContextMenu(e.pageX, e.pageY, [
+            {
+              id: 'info',
+              label: '檢視個人檔案',
+              onClick: () => handleOpenUserInfo(friendUserId, friendTargetId),
+            },
             {
               id: 'edit',
               label: lang.tr.editFriendGroup,

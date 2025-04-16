@@ -117,9 +117,11 @@ const Header: React.FC<HeaderProps> = React.memo(
     };
 
     const handleOpenUserSetting = (userId: User['userId']) => {
-      ipcService.popup.open(PopupType.USER_SETTING);
-      ipcService.initialData.onRequest(PopupType.USER_SETTING, {
+      const targetId = userId;
+      ipcService.popup.open(PopupType.USER_INFO);
+      ipcService.initialData.onRequest(PopupType.USER_INFO, {
         userId,
+        targetId,
       });
     };
 
@@ -366,7 +368,7 @@ const RootPageComponent = () => {
   };
 
   const handleOpenPopup = (data: { type: PopupType; initialData: any }) => {
-    console.log('Socket open popup', data);
+    ipcService.popup.open(data.type);
     ipcService.initialData.onRequest(data.type, data.initialData);
     ipcService.popup.onSubmit(data.type, () => {
       switch (data.type) {

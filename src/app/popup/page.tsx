@@ -129,6 +129,11 @@ const Popup = React.memo(() => {
         setHeaderButtons(['close']);
         setContent(<ChannelPassword {...initialData} />);
         break;
+      case PopupType.USER_INFO:
+        setHeaderTitle('個人檔案');
+        setHeaderButtons(['close']);
+        setContent(<UserSetting {...initialData} />);
+        break;
       case PopupType.USER_SETTING:
         setHeaderTitle(lang.tr.editUser);
         setHeaderButtons(['close']);
