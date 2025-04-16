@@ -899,7 +899,6 @@ const ChannelViewer: React.FC<ChannelViewerProps> = React.memo(
       }, 10000);
       const clearPong = socket.on.pong(() => {
         end = Date.now();
-        console.log(end - start, 'ms');
         setLatency((end - start).toFixed(0));
       });
       return () => {

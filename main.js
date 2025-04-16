@@ -449,7 +449,7 @@ function connectSocket(token) {
       });
     });
 
-    console.log('Socket 連線成功');
+    console.info('Socket 連線成功');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('connect', null);
     });
@@ -463,14 +463,14 @@ function connectSocket(token) {
   });
 
   socket.on('disconnect', (reason) => {
-    console.log('Socket 斷開連線，原因:', reason);
+    console.info('Socket 斷開連線，原因:', reason);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('disconnect', reason);
     });
   });
 
   socket.on('reconnect', (attemptNumber) => {
-    console.log('Socket 重新連線成功，嘗試次數:', attemptNumber);
+    console.info('Socket 重新連線成功，嘗試次數:', attemptNumber);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect', attemptNumber);
     });
@@ -525,7 +525,7 @@ function configureAutoUpdater() {
 
   autoUpdater.on('error', (error) => {
     if (isDev && error.message.includes('dev-app-update.yml')) {
-      console.log('開發環境中跳過更新檢查');
+      console.info('開發環境中跳過更新檢查');
       return;
     }
     dialog.showMessageBox({
@@ -545,14 +545,14 @@ function configureAutoUpdater() {
   });
 
   autoUpdater.on('update-not-available', () => {
-    console.log('目前是最新版本');
+    console.info('目前是最新版本');
   });
 
   autoUpdater.on('download-progress', (progressObj) => {
     let message = `下載速度: ${progressObj.bytesPerSecond}`;
     message = `${message} - 已下載 ${progressObj.percent}%`;
     message = `${message} (${progressObj.transferred}/${progressObj.total})`;
-    console.log(message);
+    console.info(message);
   });
 
   autoUpdater.on('update-downloaded', (info) => {
@@ -575,7 +575,7 @@ async function configureDiscordRPC() {
   try {
     rpc = new DiscordRPC.Client({ transport: 'ipc' });
     await rpc.login({ clientId }).catch(() => {
-      console.log('Discord RPC登錄失敗, 將不會顯示Discord Rich Presence');
+      console.warn('Discord RPC登錄失敗, 將不會顯示Discord Rich Presence');
       rpc = null;
     });
 

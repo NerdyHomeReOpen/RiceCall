@@ -57,33 +57,33 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
   // Handlers
   const handleConnect = () => {
-    console.log('Socket connected');
+    console.info('Socket connected');
     setIsConnected(true);
   };
 
   const handleDisconnect = () => {
-    console.log('Socket disconnected');
+    console.info('Socket disconnected');
     setIsConnected(false);
   };
 
   const handleConnectError = (error: any) => {
-    console.log('Socket connection error', error);
+    console.error('Socket connection error', error);
     setIsConnected(false);
   };
 
   const handleReconnect = (attemptNumber: number) => {
-    console.log('Socket reconnected', attemptNumber);
+    console.info('Socket reconnected', attemptNumber);
     setIsConnected(true);
   };
 
   const handleReconnectError = (error: any) => {
-    console.log('Socket reconnected error', error);
+    console.error('Socket reconnected error', error);
     setIsConnected(false);
   };
 
   // Effects
   useEffect(() => {
-    console.log('SocketProvider initialization');
+    console.info('SocketProvider initialization');
 
     cleanupRef.current = Object.values(SocketServerEvent).reduce(
       (acc, event) => {
@@ -128,7 +128,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
     ipcService.onSocketEvent('disconnect', handleDisconnect);
 
     return () => {
-      console.log('SocketProvider cleanup');
+      console.info('SocketProvider cleanup');
       cleanupRef.current.forEach((cleanup) => cleanup());
       cleanupRef.current = [];
     };

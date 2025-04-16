@@ -362,13 +362,11 @@ const RootPageComponent = () => {
   };
 
   const handleError = (error: StandardizedError) => {
-    console.log('Socket error', error);
     new errorHandler(error).show();
   };
 
   const handleOpenPopup = (data: { type: PopupType; initialData: any }) => {
     console.log('Socket open popup', data);
-    ipcService.popup.open(data.type);
     ipcService.initialData.onRequest(data.type, data.initialData);
     ipcService.popup.onSubmit(data.type, () => {
       switch (data.type) {
@@ -421,7 +419,6 @@ const RootPageComponent = () => {
   }, [lang]);
 
   const getMainContent = () => {
-    console.log(mainTab.selectedTabId);
     if (!socket.isConnected) return <LoadingSpinner />;
     return (
       <>

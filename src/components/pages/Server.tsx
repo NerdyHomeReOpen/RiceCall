@@ -148,7 +148,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     };
 
     const handleOnMessagesUpdate = (data: ChannelMessage): void => {
-      console.log('handleOnMessagesUpdate', data);
       if (!data) return;
       setChannelMessages((prev) => ({
         ...prev,

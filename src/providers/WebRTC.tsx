@@ -144,7 +144,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     (newBitrate: number) => {
       try {
         if (newBitrate === bitrate) {
-          console.log(`Bitrate already set to ${newBitrate}, skipping...`);
+          console.warn(`Bitrate already set to ${newBitrate}, skipping...`);
           return;
         }
 
@@ -171,23 +171,23 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     (volume: number | null) => {
       try {
         if (!audioContext.current) {
-          console.log('No audio context');
+          console.warn('No audio context');
           return;
         }
         if (!gainNode.current) {
-          console.log('No gain node');
+          console.warn('No gain node');
           return;
         }
         if (!sourceNode.current) {
-          console.log('No source node');
+          console.warn('No source node');
           return;
         }
         if (!destinationNode.current) {
-          console.log('No destination node');
+          console.warn('No destination node');
           return;
         }
         if (destinationNode.current.stream.getAudioTracks().length === 0) {
-          console.log('No audio tracks');
+          console.warn('No audio tracks');
           return;
         }
 
@@ -367,11 +367,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     try {
       // Remove peer connection
       if (!peerConnections.current[userId]) {
-        console.log('Peer connection not found');
+        console.warn('Peer connection not found');
         return;
       }
       if (!peerDataChannels.current[userId]) {
-        console.log('Peer data channel not found');
+        console.warn('Peer data channel not found');
         return;
       }
 
@@ -395,7 +395,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       try {
         // Create peer connection
         if (peerConnections.current[userId]) {
-          console.log('Peer connection already exists');
+          console.warn('Peer connection already exists');
           return;
         }
 
@@ -413,7 +413,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             handleSendRTCIceCandidate(socketId, event.candidate);
         };
         peerConnection.oniceconnectionstatechange = () => {
-          console.log(
+          console.info(
             userId,
             'Connection State:',
             peerConnection.connectionState,
@@ -424,7 +424,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           if (isFailed) removePeerConnection(userId);
         };
         peerConnection.onconnectionstatechange = () => {
-          console.log(
+          console.info(
             userId,
             'Connection State:',
             peerConnection.connectionState,
@@ -435,7 +435,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           if (isFailed) removePeerConnection(userId);
         };
         peerConnection.onsignalingstatechange = () => {
-          console.log(
+          console.info(
             userId,
             'Signaling State:',
             peerConnection.signalingState,
@@ -480,11 +480,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
         // Add audio track to peer connection
         if (!destinationNode.current) {
-          console.log('No destination node');
+          console.warn('No destination node');
           return;
         }
         if (destinationNode.current.stream.getAudioTracks().length === 0) {
-          console.log('No audio tracks');
+          console.warn('No audio tracks');
           return;
         }
 
@@ -617,14 +617,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       // Get device info
       const devices = await navigator.mediaDevices.enumerateDevices();
       const deviceInfo = devices.find((d) => d.deviceId === deviceId);
-      console.log('New input stream device info:', deviceInfo);
+      console.info('New input stream device info:', deviceInfo);
       handleUpdateInputStream(deviceId || '');
     });
     ipcService.audio.get('output', async (deviceId) => {
       // Get device info
       const devices = await navigator.mediaDevices.enumerateDevices();
       const deviceInfo = devices.find((d) => d.deviceId === deviceId);
-      console.log('New output stream device info:', deviceInfo);
+      console.info('New output stream device info:', deviceInfo);
       handleUpdateOutputStream(deviceId || '');
     });
 

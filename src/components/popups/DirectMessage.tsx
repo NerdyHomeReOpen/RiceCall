@@ -94,7 +94,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     };
 
     const handleOnDirectMessage = (data: DirectMessage) => {
-      console.log('handleOnDirectMessage', data);
       if (!data) return;
       // !! THIS IS IMPORTANT !!
       const user1Id = userId.localeCompare(targetId) < 0 ? userId : targetId;
