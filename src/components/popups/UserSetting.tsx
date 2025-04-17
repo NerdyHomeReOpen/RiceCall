@@ -32,7 +32,7 @@ import badge from '@/styles/badgeViewer.module.css';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
-import { Badge } from 'lucide-react';
+// import { Badge } from 'lucide-react';
 
 interface UserSettingPopupProps {
   userId: User['userId'];
