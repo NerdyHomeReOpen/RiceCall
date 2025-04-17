@@ -25,6 +25,12 @@ interface FormDatas {
   autoLogin: boolean;
 }
 
+interface AccountItem {
+  account: string;
+  token: string;
+  auto: boolean;
+}
+
 interface LoginPageProps {
   setSection: (section: 'login' | 'register') => void;
 }
@@ -44,31 +50,80 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [accountSelectBox, setAccountSelectBox] = useState<boolean>(false);
-  const [accountList, setAccountList] = useState<string[]>();
+  const [accountList, setAccountList] = useState<AccountItem[]>([]);
 
   const comboRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const existing = localStorage.getItem('login-accounts');
-    if (existing) {
-      setAccountList(existing.split(','));
+  const getParsedAccounts = () => {
+    try {
+      const raw = localStorage.getItem('login-accounts');
+      return raw ? JSON.parse(raw) : { accounts: [], remembered: [] };
+    } catch {
+      return { accounts: [], remembered: [] };
     }
-    const handleClickOutside = (e: MouseEvent) => {
-      if (comboRef.current && !comboRef.current.contains(e.target as Node)) {
+  };
+
+  useEffect(() => {
+    const { accounts } = getParsedAccounts();
+    setAccountList(accounts);
+    const defaultAcc = accounts.find(
+      (a: { selected: string }) => a.selected,
+    )?.account;
+    const match = accounts.find(
+      (a: { account: string }) => a.account === defaultAcc,
+    );
+    if (match) {
+      setFormData((prev) => ({
+        ...prev,
+        account: defaultAcc,
+        rememberAccount: true,
+        autoLogin: match.auto || false,
+      }));
+    }
+    const listener = (e: MouseEvent) => {
+      if (!comboRef.current?.contains(e.target as Node))
         setAccountSelectBox(false);
-      }
     };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener('click', listener);
+    return () => document.removeEventListener('click', listener);
   }, []);
 
   // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    if (name === 'account') {
+      const { accounts, remembered } = getParsedAccounts();
+      const match = accounts.find(
+        (a: { account: string }) => a.account === value,
+      );
+      setFormData((prev) => ({
+        ...prev,
+        account: value,
+        rememberAccount: remembered.includes(value),
+        autoLogin: match?.auto || false,
+      }));
+    } else if (name === 'autoLogin') {
+      setFormData((prev) => ({
+        ...prev,
+        autoLogin: checked,
+        rememberAccount: checked ? true : prev.rememberAccount,
+      }));
+    } else if (name === 'rememberAccount') {
+      setFormData((prev) => {
+        if (prev.autoLogin && !checked) {
+          return prev;
+        }
+        return {
+          ...prev,
+          rememberAccount: checked,
+        };
+      });
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      }));
+    }
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -90,16 +145,34 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
     if (!formData.account || !formData.password) return;
     setIsLoading(true);
     if (await authService.login(formData)) {
-      const key = 'login-accounts';
-      const existing = localStorage.getItem(key);
-      const list = existing ? existing.split(',') : [];
-      if (!list.includes(formData.account)) {
-        list.push(formData.account);
-      }
+      const parsed = getParsedAccounts();
+      const idx = parsed.accounts.findIndex(
+        (a: { account: string }) => a.account === formData.account,
+      );
+      const token = localStorage.getItem('token') || '';
       if (formData.rememberAccount) {
-        localStorage.setItem(key, list.join(','));
-        setAccountList(list);
+        if (idx >= 0) {
+          parsed.accounts[idx].token = token;
+          parsed.accounts[idx].auto = formData.autoLogin;
+        } else {
+          parsed.accounts.push({
+            account: formData.account,
+            token,
+            auto: formData.autoLogin,
+          });
+        }
+        if (!parsed.remembered.includes(formData.account))
+          parsed.remembered.push(formData.account);
+      } else {
+        parsed.accounts = parsed.accounts.filter(
+          (a: { account: string }) => a.account !== formData.account,
+        );
+        parsed.remembered = parsed.remembered.filter(
+          (a: string) => a !== formData.account,
+        );
       }
+      localStorage.setItem('login-accounts', JSON.stringify(parsed));
+      setAccountList(parsed.accounts);
       setSection('login');
     }
     setIsLoading(false);
@@ -155,32 +228,46 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     accountSelectBox ? styles['showAccountSelectBox'] : ''
                   }`}
                 >
-                  {accountList?.map((account) => (
+                  {accountList.map((account) => (
                     <div
-                      key={account}
+                      key={account.account}
                       className={styles['accountSelectOptionBox']}
                       onClick={() => {
-                        setFormData((prev) => ({ ...prev, account }));
+                        const parsed = getParsedAccounts();
+                        setFormData((prev) => ({
+                          ...prev,
+                          account: account.account,
+                          rememberAccount: parsed.remembered.includes(
+                            account.account,
+                          ),
+                          autoLogin: account.auto,
+                        }));
                         setAccountSelectBox(false);
                       }}
                     >
-                      {account}
+                      {account.account}
                       <div
                         className={styles['accountSelectCloseBtn']}
                         onClick={(e) => {
                           e.stopPropagation();
-                          const updated = accountList.filter(
-                            (a) => a !== account,
+                          const parsed = getParsedAccounts();
+                          parsed.accounts = parsed.accounts.filter(
+                            (a: AccountItem) => a.account !== account.account,
+                          );
+                          parsed.remembered = parsed.remembered.filter(
+                            (a: string) => a !== account.account,
                           );
                           localStorage.setItem(
                             'login-accounts',
-                            updated.join(','),
+                            JSON.stringify(parsed),
                           );
-                          setAccountList(updated);
+                          setAccountList(parsed.accounts);
                           setFormData((prev) => ({
                             ...prev,
                             account:
-                              prev.account === account ? '' : prev.account,
+                              prev.account === account.account
+                                ? ''
+                                : prev.account,
                           }));
                         }}
                       />

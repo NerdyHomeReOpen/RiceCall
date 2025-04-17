@@ -16,53 +16,91 @@ interface RegisterFormData {
   gender: 'Male' | 'Female';
 }
 
-const base64encode = (str: string): string => btoa(str);
+interface AccountItem {
+  account: string;
+  token: string;
+  auto: boolean;
+  selected: boolean;
+}
+
+const base64 = (str: string) => btoa(str);
+const getParsed = (): { accounts: AccountItem[]; remembered: string[] } => {
+  try {
+    return JSON.parse(localStorage.getItem('login-accounts') || '');
+  } catch {
+    return { accounts: [], remembered: [] };
+  }
+};
+const saveParsed = (data: { accounts: AccountItem[]; remembered: string[] }) =>
+  localStorage.setItem('login-accounts', JSON.stringify(data));
 
 export const authService = {
   login: async (formData: LoginFormData): Promise<boolean> => {
-    localStorage.setItem('autoLogin', formData.autoLogin ? 'true' : 'false');
-    localStorage.setItem('account', formData.account || '');
-    const loginData = {
+    const res = await apiService.post('/login', {
       ...formData,
-      password: base64encode(formData.password),
-    };
-    const response = await apiService.post('/login', loginData);
-    if (!response || !response.token) return false;
-    localStorage.setItem('token', response.token);
-    ipcService.auth.login(response.token);
+      password: base64(formData.password),
+    });
+    if (!res?.token) return false;
+    localStorage.setItem('token', res.token);
+    const parsed = getParsed();
+    parsed.accounts = parsed.accounts.map((acc) =>
+      acc.account === formData.account
+        ? {
+            ...acc,
+            token: formData.autoLogin ? res.token : '',
+            auto: formData.autoLogin,
+            selected: true,
+          }
+        : { ...acc, token: acc.auto ? acc.token : '', selected: false },
+    );
+    if (!parsed.accounts.find((a) => a.account === formData.account)) {
+      parsed.accounts.push({
+        account: formData.account,
+        token: formData.autoLogin ? res.token : '',
+        auto: formData.autoLogin,
+        selected: true,
+      });
+    }
+    parsed.remembered = formData.rememberAccount
+      ? Array.from(new Set([...parsed.remembered, formData.account]))
+      : parsed.remembered.filter((a) => a !== formData.account);
+    saveParsed(parsed);
+    ipcService.auth.login(res.token);
     return true;
   },
 
-  register: async (formData: RegisterFormData): Promise<boolean> => {
-    const registerData = {
-      ...formData,
-      password: base64encode(formData.password),
-    };
-    const response = await apiService.post('/register', registerData);
-    if (!response) return false;
-    return true;
+  register: async (data: RegisterFormData) => {
+    const res = await apiService.post('/register', {
+      ...data,
+      password: base64(data.password),
+    });
+    return !!res;
   },
 
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('autoLogin');
     ipcService.auth.logout();
+    const parsed = getParsed();
+    parsed.accounts = parsed.accounts.map((acc) => ({
+      ...acc,
+      token: acc.auto ? acc.token : '',
+    }));
+    saveParsed(parsed);
     return true;
   },
 
-  isAutoLoginEnabled: (): boolean => {
-    return localStorage.getItem('autoLogin') === 'true';
-  },
+  isAutoLoginEnabled: () => localStorage.getItem('autoLogin') === 'true',
+  isRememberAccountEnabled: () => !!localStorage.getItem('account'),
 
-  isRememberAccountEnabled: (): boolean => {
-    return localStorage.getItem('account') !== null;
-  },
-
-  autoLogin: async (): Promise<boolean> => {
-    const autoLogin = localStorage.getItem('autoLogin') === 'true';
-    const token = localStorage.getItem('token');
-    if (!autoLogin || !token) return false;
-    ipcService.auth.login(token);
+  autoLogin: async () => {
+    const parsed = getParsed();
+    const acc =
+      parsed.accounts.find((a) => a.auto && a.selected) ||
+      parsed.accounts.find((a) => a.auto);
+    if (!acc?.token) return false;
+    localStorage.setItem('token', acc.token);
+    ipcService.auth.login(acc.token);
     return true;
   },
 };
