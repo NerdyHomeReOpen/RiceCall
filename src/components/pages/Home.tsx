@@ -23,6 +23,7 @@ import { useLanguage } from '@/providers/Language';
 // Services
 import ipcService from '@/services/ipc.service';
 import refreshService from '@/services/refresh.service';
+import { useMainTab } from '@/providers/MainTab';
 
 export interface ServerListSectionProps {
   title: string;
@@ -102,6 +103,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
+    const mainTab = useMainTab();
 
     // Refs
     const refreshed = useRef(false);
@@ -118,7 +120,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     const [loadingGroupID, setLoadingGroupID] = useState<string>();
 
     // Variables
-    const { userId, name: userName } = user;
+    const { userId, name: userName, currentServerId } = user;
     const hasResults =
       exactMatch || personalResults.length > 0 || relatedResults.length > 0;
     const recentServers = userServers.filter((s) => s.recent);
@@ -262,10 +264,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     }, [userId]);
 
     useEffect(() => {
-      if (!server) return;
-      setIsLoading(false);
-      setLoadingGroupID('');
-    }, [server, isLoading]);
+      if (mainTab.selectedTabId == 'server') {
+        if (!server) return;
+        setIsLoading(false);
+        setLoadingGroupID('');
+      }
+    }, [server, isLoading, mainTab]);
 
     useEffect(() => {
       if (!lang) return;
@@ -406,8 +410,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
             servers={recentServers}
             userId={userId}
             onServerClick={(server) => {
-              setIsLoading(true);
-              setLoadingGroupID(server.displayId);
+              if (currentServerId == server.serverId) {
+                mainTab.setSelectedTabId('server');
+              } else {
+                setIsLoading(true);
+                setLoadingGroupID(server.displayId);
+              }
             }}
           />
           <ServerListSection

@@ -20,7 +20,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 let tray = null,
-  isLogin = false;
+  isLogin = false,
+  userId = null;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -134,13 +135,13 @@ let isDev = process.argv.includes('--dev');
 
 const appServe = app.isPackaged
   ? serve({
-      directory: path.join(__dirname, './out'),
-    })
+    directory: path.join(__dirname, './out'),
+  })
   : !isDev
-  ? serve({
+    ? serve({
       directory: path.join(__dirname, './out'),
     })
-  : null;
+    : null;
 
 let baseUri = '';
 
@@ -443,6 +444,9 @@ function connectSocket(token) {
 
     Object.values(SocketServerEvent).forEach((event) => {
       socket.on(event, (data) => {
+        if (!userId && data.userId) {
+          userId = data.userId;
+        };
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, data);
         });
@@ -607,7 +611,7 @@ function trayIcon(isGray = true) {
     tray.destroy();
   }
   const iconPath = isGray ? 'tray_gray.ico' : 'tray.ico';
-  tray = new Tray(nativeImage.createFromPath(`./resources/${iconPath}`));
+  tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'resources', iconPath)));
   tray.on('click', () => {
     if (mainWindow && authWindow.isVisible()) {
       authWindow.hide();
@@ -674,6 +678,7 @@ app.on('ready', async () => {
   ipcMain.on('login', (_, token) => {
     mainWindow.show();
     authWindow.hide();
+    console.log(token);
     socketInstance = connectSocket(token);
     socketInstance.connect();
     isLogin = true;
@@ -789,3 +794,81 @@ app.on('activate', async () => {
     authWindow.show();
   }
 });
+
+app.whenReady().then(() => {
+  const protocolClient = process.execPath;
+  const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
+  app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
+});
+
+// 防止多開
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, argv) => {
+    const url = argv.find(arg => arg.startsWith('ricecall://'));
+    if (url) {
+      console.log('接收到 deeplink (Windows second-instance):', url);
+      handleDeepLink(url);
+    } else {
+      focusWindow();
+    }
+  });
+}
+
+// macOS 處理 deeplink
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  console.log('接收到 deeplink (macOS open-url):', url);
+  handleDeepLink(url);
+});
+
+// 集中處理 DeepLink
+async function handleDeepLink(url) {
+  if (!url) return;
+  try {
+    const { hostname } = new URL(url);
+    switch (hostname) {
+      // 執行主程式 應該用不到 測試用的
+      // case 'run':
+      //   if (authWindow?.isDestroyed() === false) {
+      //     authWindow.show();
+      //     authWindow.focus();
+      //   } else if (mainWindow?.isDestroyed() === false) {
+      //     mainWindow.show();
+      //     mainWindow.focus();
+      //   } else {
+      //     (await createMainWindow()).show();
+      //   }
+      //   break;
+      case 'join':
+        const serverId = new URL(url).searchParams.get('serverId');
+        // 如果已經登入才能發進群請求
+        if (serverId && userId && socketInstance && socketInstance.connected) {
+          socketInstance.emit(SocketClientEvent.SEARCH_SERVER, { query: serverId });
+          socketInstance.on(SocketServerEvent.SERVER_SEARCH, (serverInfoList) => {
+            // 對照DisplayId 如果找不到就不會進群也不會通知前端
+            const matchedServer = serverInfoList.find((server) => server.displayId === serverId);
+            if (matchedServer) {
+              mainWindow.show();
+              mainWindow.focus();
+              socketInstance.emit(SocketClientEvent.CONNECT_SERVER, { userId, serverId: matchedServer.serverId });
+            }
+          });
+
+        }
+        break;
+    }
+  } catch (error) {
+    console.error('解析deeplink錯誤:', error);
+  }
+}
+
+// 集中處理聚焦視窗
+function focusWindow() {
+  const window = authWindow?.isDestroyed() === false ? authWindow : mainWindow?.isDestroyed() === false ? mainWindow : null;
+  if (window) {
+    if (window.isMinimized()) window.restore();
+    window.focus();
+  }
+}

@@ -136,7 +136,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const [sortState, setSortState] = useState<1 | -1>(-1);
-    const [sortField, setSortField] = useState<string>('name');
+    const [sortField, setSortField] = useState<string>('permissionLevel');
 
     const [searchText, setSearchText] = useState('');
 
@@ -263,6 +263,17 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       });
     };
 
+    const handleOpenUserInfo = (
+      userId: User['userId'],
+      targetId: User['userId'],
+    ) => {
+      ipcService.popup.open(PopupType.USER_INFO);
+      ipcService.initialData.onRequest(PopupType.USER_INFO, {
+        userId,
+        targetId,
+      });
+    };
+
     const handleOpenErrorDialog = (message: string) => {
       ipcService.popup.open(PopupType.DIALOG_ERROR);
       ipcService.initialData.onRequest(PopupType.DIALOG_ERROR, {
@@ -289,7 +300,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const handleMembersUpdate = (data: ServerMember[] | null) => {
       if (!data) data = [];
-      const sortedMembers = handleSort('name', [...data]);
+      const sortedMembers = [...data].sort(
+        (a, b) => b.permissionLevel - a.permissionLevel,
+      );
+      setSortField('permissionLevel');
+      setSortState(-1);
       setServerMembers(sortedMembers.filter((mb) => mb.permissionLevel > 1));
       setServerBlockMembers(sortedMembers.filter((mb) => mb.isBlocked) || []);
     };
@@ -691,13 +706,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                               const isCurrentUser = memberUserId === userId;
                               contextMenu.showContextMenu(e.pageX, e.pageY, [
                                 {
-                                  id: 'apply-friend',
-                                  label: lang.tr.addFriend,
-                                  onClick: () =>
-                                    handleOpenApplyFriend(userId, memberUserId),
-                                  show: !isCurrentUser,
-                                },
-                                {
                                   id: 'direct-message',
                                   label: lang.tr.directMessage,
                                   onClick: () =>
@@ -706,6 +714,19 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                       memberUserId,
                                       memberName,
                                     ),
+                                  show: !isCurrentUser,
+                                },
+                                {
+                                  id: 'view-profile',
+                                  label: lang.tr.viewProfile,
+                                  onClick: () =>
+                                    handleOpenUserInfo(userId, memberUserId),
+                                },
+                                {
+                                  id: 'apply-friend',
+                                  label: lang.tr.addFriend,
+                                  onClick: () =>
+                                    handleOpenApplyFriend(userId, memberUserId),
                                   show: !isCurrentUser,
                                 },
                                 {

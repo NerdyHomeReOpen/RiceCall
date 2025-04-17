@@ -570,6 +570,17 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       });
     };
 
+    const handleOpenUserInfo = (
+      userId: User['userId'],
+      targetId: User['userId'],
+    ) => {
+      ipcService.popup.open(PopupType.USER_INFO);
+      ipcService.initialData.onRequest(PopupType.USER_INFO, {
+        userId,
+        targetId,
+      });
+    };
+
     const handleUpdateMember = (
       member: Partial<Member>,
       userId: User['userId'],
@@ -613,12 +624,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         onContextMenu={(e) => {
           contextMenu.showContextMenu(e.pageX, e.pageY, [
             {
-              id: 'apply-friend',
-              label: lang.tr.addFriend,
-              onClick: () => handleOpenApplyFriend(userId, channelMemberUserId),
-              show: !isCurrentUser,
-            },
-            {
               id: 'direct-message',
               label: lang.tr.directMessage,
               onClick: () =>
@@ -627,6 +632,17 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   channelMemberUserId,
                   channelMemberName,
                 ),
+              show: !isCurrentUser,
+            },
+            {
+              id: 'view-profile',
+              label: lang.tr.viewProfile,
+              onClick: () => handleOpenUserInfo(userId, channelMemberUserId),
+            },
+            {
+              id: 'apply-friend',
+              label: lang.tr.addFriend,
+              onClick: () => handleOpenApplyFriend(userId, channelMemberUserId),
               show: !isCurrentUser,
             },
             {
@@ -708,18 +724,18 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                     ),
                 },
                 removeLevelToMember(lang.tr.removeAdmin, 5),
+                {
+                  id: 'set-guest',
+                  label: lang.tr.setGuest,
+                  show: canChangeToGuest,
+                  onClick: () =>
+                    handleUpdateMember(
+                      { permissionLevel: 1 },
+                      channelMemberUserId,
+                      channelMemberServerId,
+                    ),
+                },
               ],
-            },
-            {
-              id: 'set-guest',
-              label: lang.tr.setGuest,
-              show: canChangeToGuest,
-              onClick: () =>
-                handleUpdateMember(
-                  { permissionLevel: 1 },
-                  channelMemberUserId,
-                  channelMemberServerId,
-                ),
             },
           ]);
         }}

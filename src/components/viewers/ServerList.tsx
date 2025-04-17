@@ -36,15 +36,19 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
       userId: User['userId'],
       serverId: Server['serverId'],
     ) => {
-      if (!socket) return;
-      socket.send.connectServer({ userId, serverId });
+      setTimeout(() => {
+        if (!socket) return;
+        socket.send.connectServer({ userId, serverId });
+      }, 1500);
       onClick?.();
     };
 
     return (
       <div
         className={homePage['serverCard']}
-        onClick={() => handleServerSelect(userId, serverId)}
+        onClick={() => {
+          handleServerSelect(userId, serverId);
+        }}
       >
         <div
           className={homePage['serverAvatarPicture']}
