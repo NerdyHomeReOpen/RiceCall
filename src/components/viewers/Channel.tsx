@@ -299,13 +299,13 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     const handleOpenCreateChannel = (
       serverId: Server['serverId'],
-      categoryId: Category['categoryId'],
+      channelId: Channel['channelId'] | null,
       userId: User['userId'],
     ) => {
       ipcService.popup.open(PopupType.CREATE_CHANNEL);
       ipcService.initialData.onRequest(PopupType.CREATE_CHANNEL, {
         serverId,
-        categoryId,
+        channelId,
         userId,
       });
     };

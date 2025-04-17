@@ -121,14 +121,14 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
 
     const handleOpenCreateChannel = (
       userId: User['userId'],
-      categoryId: Category['categoryId'] | null,
+      channelId: Channel['channelId'] | null,
       serverId: Server['serverId'],
     ) => {
       ipcService.popup.open(PopupType.CREATE_CHANNEL);
       ipcService.initialData.onRequest(PopupType.CREATE_CHANNEL, {
         userId,
         serverId,
-        categoryId,
+        channelId,
       });
     };
 
@@ -378,7 +378,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
               if (!canAdd) return;
               handleOpenCreateChannel(
                 userId,
-                selectedChannelId ?? null,
+                selectedChannelId || null,
                 serverId,
               );
             }}

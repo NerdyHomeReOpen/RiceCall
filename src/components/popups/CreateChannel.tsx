@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { Category, Channel, Server, User } from '@/types';
+import { Channel, Server, User } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
@@ -20,7 +20,7 @@ import { createDefault } from '@/utils/createDefault';
 
 interface CreateChannelPopupProps {
   userId: User['userId'];
-  categoryId: Category['categoryId'] | null;
+  channelId: Channel['channelId'] | null;
   serverId: Server['serverId'];
 }
 
@@ -42,7 +42,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
     );
 
     // Variables
-    const { categoryId, serverId } = initialData;
+    const { channelId, serverId } = initialData;
 
     // Handlers
     const handleCreateChannel = (
@@ -64,19 +64,19 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
 
     // Effects
     useEffect(() => {
-      if (!categoryId || refreshRef.current) return;
+      if (!channelId || refreshRef.current) return;
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
           refreshService.channel({
-            channelId: categoryId,
+            channelId: channelId,
           }),
         ]).then(([channel]) => {
           handleChannelUpdate(channel);
         });
       };
       refresh();
-    }, [categoryId]);
+    }, [channelId]);
 
     return (
       <form className={popup['popupContainer']}>
@@ -109,10 +109,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
             disabled={!channelName.trim()}
             onClick={() => {
               handleCreateChannel(
-                {
-                  name: channelName,
-                  categoryId: categoryId,
-                },
+                { name: channelName, categoryId: channelId },
                 serverId,
               );
               handleClose();

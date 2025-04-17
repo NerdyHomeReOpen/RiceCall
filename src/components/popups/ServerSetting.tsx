@@ -300,11 +300,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const handleMembersUpdate = (data: ServerMember[] | null) => {
       if (!data) data = [];
-      const sortedMembers = [...data].sort(
-        (a, b) => b.permissionLevel - a.permissionLevel,
-      );
-      setSortField('permissionLevel');
-      setSortState(-1);
+      const sortedMembers = handleSort('name', [...data]);
       setServerMembers(sortedMembers.filter((mb) => mb.permissionLevel > 1));
       setServerBlockMembers(sortedMembers.filter((mb) => mb.isBlocked) || []);
     };
