@@ -346,7 +346,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   </div>
                 </div>
               )}
-              {!isSelf && <div className={setting['aboutMe']}></div>}
               <div className={setting['userAboutMeShow']}>{userSignature}</div>
               <div className={setting['userProfileContent']}>
                 <div className={setting['title']}>
@@ -788,7 +787,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
     return (
       <div className={`${popup['popupContainer']} ${setting['userProfile']}`}>
-        <div className={`${popup['col']} ${setting['profileBox']}`}>
+        <div
+          className={`${popup['col']} ${setting['profileBox']} ${
+            !isSelf && setting['hiddenTab']
+          }`}
+        >
           <div className={setting['header']}>
             <div className={setting['windowActionButtons']}>
               <div

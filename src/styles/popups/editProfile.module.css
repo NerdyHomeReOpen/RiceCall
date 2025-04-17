@@ -41,11 +41,13 @@
 .userAboutMeShow:before {
   background: url('../../../public/card/bg_left_quote.png') no-repeat center
     center;
+  margin-bottom: 6rem;
 }
 
 .userAboutMeShow:after {
   background: url('../../../public/card/bg_right_quote.png') no-repeat center
     center;
+  margin-top: 6rem;
 }
 
 .left {
@@ -445,6 +447,18 @@
   display: flex;
   height: 45px;
   top: 21rem;
+}
+
+.userProfile .hiddenTab {
+  gap: 0;
+}
+
+.userProfile .hiddenTab .tab {
+  height: 0;
+}
+
+.userProfile .hiddenTab .body {
+  max-height: 100%;
 }
 
 .userProfile .tab:has(.about.selected) {
