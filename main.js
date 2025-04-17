@@ -611,7 +611,7 @@ function trayIcon(isGray = true) {
     tray.destroy();
   }
   const iconPath = isGray ? 'tray_gray.ico' : 'tray.ico';
-  tray = new Tray(nativeImage.createFromPath(`./resources/${iconPath}`));
+  tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'resources', iconPath)));
   tray.on('click', () => {
     if (mainWindow && authWindow.isVisible()) {
       authWindow.hide();
