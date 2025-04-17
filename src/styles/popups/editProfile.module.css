@@ -429,7 +429,12 @@
   font-weight: 400;
   color: #fff;
   text-align: center;
-  padding-bottom: 1.5rem;
+  max-height: 49.5px;
+  padding: 0 15px 1.5rem 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 498px;
 }
 
 .userProfile .tab {
