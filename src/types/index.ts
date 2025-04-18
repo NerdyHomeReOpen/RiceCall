@@ -1144,8 +1144,8 @@ export const translations: Record<LanguageKey, Translation> = {
     connectingServer: '正向连接',
     mute: '拒听此人语音',
     unmute: '接受此人语音',
-    editChannelOrder: '修改頻道排序',
-    editChannelName: '修改頻道名',
+    editChannelOrder: '修改频道排序',
+    editChannelName: '修改频道名',
   },
   en: {
     RPCHomePage: 'Browsing Homepage',
