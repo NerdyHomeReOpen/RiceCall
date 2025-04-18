@@ -133,7 +133,7 @@ const server = http.createServer((req, res) => {
           );
         }
 
-        var isPasswordVerified = bcrypt.compare(password, accountData.password);
+        const isPasswordVerified = await bcrypt.compare(password, accountData.password);
         if (!isPasswordVerified) {
           throw new StandardizedError(
             '帳號或密碼錯誤',
