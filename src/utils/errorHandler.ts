@@ -11,6 +11,7 @@ export class StandardizedError extends Error {
     public part: string = 'UNKNOWN_PART',
     public tag: string = 'UNKNOWN_ERROR',
     public status_code: number = 500,
+    public timestamp: number = Date.now(),
     title: string = 'Error',
     public handler: () => void = () => {},
   ) {
@@ -26,7 +27,11 @@ export class errorHandler {
   }
 
   show() {
-    const errorMessage = `[錯誤][${this.error.tag}] ${this.error.error_message}，錯誤代碼: ${this.error.status_code} (${this.error.part})`;
+    const errorMessage = `(${new Date(
+      this.error.timestamp,
+    ).toLocaleString()}) [錯誤][${this.error.tag}] ${
+      this.error.error_message
+    }，錯誤代碼: ${this.error.status_code} (${this.error.part})`;
 
     ipcService.popup.open(PopupType.DIALOG_ERROR);
     ipcService.popup.onSubmit('error', () => {
