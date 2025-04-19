@@ -618,7 +618,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       <div
         key={channelMemberUserId}
         className={`${styles['userTab']}`}
-        onDoubleClick={(e) => {
+        onClick={(e) => {
           contextMenu.showUserInfoBlock(e.pageX, e.pageY, channelMember);
         }}
         onContextMenu={(e) => {
