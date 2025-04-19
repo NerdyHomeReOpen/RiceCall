@@ -6,7 +6,48 @@
   width: 275px;
   display: flex;
   flex-direction: column;
-  border: 1px solid #e0e0e4;
+}
+
+.userInfoCard.vip-0 {
+  background-image: url('../../public/channel/ucard_vip0_bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+}
+
+.userInfoCard.vip-1 {
+  background-image: url('../../public/channel/ucard_vip1_bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+}
+
+.userInfoCard.vip-2 {
+  background-image: url('../../public/channel/ucard_vip2_bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+}
+
+.userInfoCard.vip-3 {
+  background-image: url('../../public/channel/ucard_vip3_bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+}
+
+.userInfoCard.vip-4 {
+  background-image: url('../../public/channel/ucard_vip4_bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+}
+
+.userInfoCard.vip-5 {
+  background-image: url('../../public/channel/ucard_vip5_bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
 }
 
 .body {
