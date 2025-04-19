@@ -123,7 +123,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     const { userId, name: userName, currentServerId } = user;
     const hasResults =
       exactMatch || personalResults.length > 0 || relatedResults.length > 0;
-    const recentServers = userServers.filter((s) => s.recent);
+    const recentServers = userServers.filter((s) => s.recent).slice(0, 9);
     const favoriteServers = userServers.filter((s) => s.favorite);
     const ownedServers = userServers.filter((s) => s.owned);
 

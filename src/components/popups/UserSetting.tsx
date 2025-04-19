@@ -110,7 +110,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const isEditing = isSelf && selectedTabId === 'userSetting';
     const userRecentServers = userServers
       .sort((a, b) => b.timestamp - a.timestamp)
-      .filter((server) => server.recent);
+      .filter((server) => server.recent)
+      .slice(0, 4);
     const userFavoriteServers = userServers
       .sort((a, b) => b.timestamp - a.timestamp)
       .filter((server) => server.favorite);
@@ -372,49 +373,55 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               </div>
               <div className={setting['serverItems']}>
                 {serversView === 'joined'
-                  ? userServers.map((server) => {
-                      return (
-                        <div
-                          key={server.serverId}
-                          className={setting['serverItem']}
-                          onClick={() =>
-                            handleServerSelect(userId, server.serverId)
-                          }
-                        >
+                  ? userServers
+                      .filter((server) => server.permissionLevel > 1)
+                      .sort((a, b) => b.permissionLevel - a.permissionLevel)
+                      .map((server) => {
+                        console.log(server);
+                        return (
                           <div
-                            className={setting['serverAvatarPicture']}
-                            style={{
-                              backgroundImage: `url(${server.avatarUrl})`,
-                            }}
-                          />
-                          <div className={setting['serverBox']}>
-                            <div className={setting['serverName']}>
-                              {server.name}
-                            </div>
+                            key={server.serverId}
+                            className={setting['serverItem']}
+                            onClick={() =>
+                              handleServerSelect(userId, server.serverId)
+                            }
+                          >
                             <div
-                              className={`${setting['serverInfo']} ${setting['around']}`}
-                            >
+                              className={setting['serverAvatarPicture']}
+                              style={{
+                                backgroundImage: `url(${server.avatarUrl})`,
+                              }}
+                            />
+                            <div className={setting['serverBox']}>
+                              <div className={setting['serverName']}>
+                                {server.name}
+                              </div>
                               <div
-                                className={`
+                                className={`${setting['serverInfo']} ${setting['around']}`}
+                              >
+                                <div
+                                  className={`
                                 ${setting['permission']}
                                 ${permission[userGender]}
                                 ${
                                   server.ownerId === targetId
                                     ? permission[`lv-6`]
-                                    : permission[`lv-${2}`]
+                                    : permission[`lv-${server.permissionLevel}`]
                                 }`}
-                              />
-                              <div className={`${setting['contributionBox']}`}>
-                                <div>{'貢獻:' /** CONTRIBUTION  **/}</div>
-                                <div className={setting['contributionValue']}>
-                                  {0 /** TODO:Connect Member Contribution **/}
+                                />
+                                <div
+                                  className={`${setting['contributionBox']}`}
+                                >
+                                  <div>{'貢獻:'}</div>
+                                  <div className={setting['contributionValue']}>
+                                    {server.contribution}
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })
+                        );
+                      })
                   : userFavoriteServers.map((server) => {
                       return (
                         <div
