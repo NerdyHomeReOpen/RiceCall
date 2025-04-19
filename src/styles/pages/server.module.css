@@ -491,8 +491,8 @@
   background-position: -308px 2px;
 }
 
-.micIcon {
-  min-width: 26px;
+.micButton .micIcon {
+  min-width: 24px;
   min-height: 30px;
   background-image: url('../../../public/channel/icon_mic_state.png');
   background-repeat: no-repeat;

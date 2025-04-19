@@ -54,9 +54,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     // States
     const [serverChannels, setServerChannels] = useState<Channel[]>([]);
-    const [serverActiveMembers, setServerActiveMembers] = useState<
-      ServerMember[]
-    >([]);
+    const [serverMembers, setServerMembers] = useState<ServerMember[]>([]);
     const [channelMessages, setChannelMessages] = useState<
       Record<Channel['channelId'], ChannelMessage[]>
     >({});
@@ -84,14 +82,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       guestTextWaitTime: channelGuestTextWaitTime,
       guestTextGapTime: channelGuestTextGapTime,
     } = channel;
-
-    member.lastJoinChannelTime =
-      member.lastJoinChannelTime > 0 ? member.lastJoinChannelTime : Date.now();
     const {
       permissionLevel: memberPermissionLevel,
       lastJoinChannelTime: memberLastJoinChannelTime,
       lastMessageTime: memberLastMessageTime,
     } = member;
+    const serverActiveMembers = serverMembers.filter(
+      (mb) => mb.currentServerId === serverId,
+    );
     const leftGapTime =
       channelGuestTextGapTime -
       Math.floor((currentTime - memberLastJoinChannelTime) / 1000);
@@ -142,9 +140,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     const handleServerMembersUpdate = (data: ServerMember[] | null): void => {
       if (!data) data = [];
-      setServerActiveMembers(
-        data.filter((member) => member.currentServerId === serverId),
-      );
+      setServerMembers(data);
     };
 
     const handleOnMessagesUpdate = (data: ChannelMessage): void => {
