@@ -103,11 +103,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
     const [serversView, setServersView] = useState('joined');
 
-    const [userJoinedServers, setUserJoinedServers] = useState<UserServer[]>();
-
-    const [userRecentServers, setUserRecentServers] = useState<UserServer[]>();
-
-    const [editMode, setEditMode] = useState<boolean>(false);
+    const [userServers, setUserServers] = useState<UserServer[]>([]);
 
     const [isFriend, setIsFriend] = useState(false);
 
@@ -115,10 +111,17 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       'about' | 'groups' | 'userSetting'
     >('about');
 
-    // Computed values
+    // Variables
     const { userId, targetId } = initialData;
     const userGrade = Math.min(56, userLevel);
     const isSelf = targetId === userId;
+    const isEditing = isSelf && selectedTabId === 'userSetting';
+    const userRecentServers = userServers
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .filter((server) => server.recent);
+    const userFavoriteServers = userServers
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .filter((server) => server.favorite);
 
     const isFutureDate = useCallback(
       (year: number, month: number, day: number) => {
@@ -202,8 +205,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
     const handleUserServerUpdate = (data: UserServer[] | null) => {
       if (!data) return;
-      setUserRecentServers(data);
-      setUserJoinedServers(data);
+      setUserServers(data);
     };
 
     const handleOpenApplyFriend = (
@@ -215,10 +217,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
         userId,
         targetId,
       });
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setServersView(e.target.value);
     };
 
     const handleMinimize = () => {
@@ -264,16 +262,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       refresh();
     }, [userId, targetId]);
 
-    useEffect(() => {}, [
-      userBirthYear,
-      userBirthMonth,
-      userBirthDay,
-      CURRENT_YEAR,
-      CURRENT_MONTH,
-      CURRENT_DAY,
-      isFutureDate,
-    ]);
-
     useEffect(() => {
       const daysInMonth = new Date(userBirthYear, userBirthMonth, 0).getDate();
 
@@ -296,20 +284,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       isFutureDate,
     ]);
 
-    useEffect(() => {
-      if (selectedTabId === 'userSetting') {
-        setEditMode(true);
-      } else {
-        setEditMode(false);
-      }
-    }, [selectedTabId]);
-
-    const lastRecentServer = userRecentServers?.slice(0, 4);
-    const userFavoriteServers = userJoinedServers?.filter(
-      (Server) => Server.favorite,
-    );
-    const serverNameLengthLimit = 15;
-
     const getMainContent = () => {
       switch (selectedTabId) {
         case 'about':
@@ -331,41 +305,36 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   {'最近訪問' /** LAST JOIN GROUP **/}
                 </div>
                 <div className={setting['serverItems']}>
-                  {lastRecentServer?.map((Server, index) => {
+                  {userRecentServers.map((server) => {
                     return (
                       <div
-                        key={Server.serverId || index}
+                        key={server.serverId}
                         className={setting['serverItem']}
                         onClick={() =>
-                          handleServerSelect(userId, Server.serverId)
+                          handleServerSelect(userId, server.serverId)
                         }
                       >
                         <div
                           className={setting['serverAvatarPicture']}
                           style={{
-                            backgroundImage: `url(${Server.avatarUrl})`,
+                            backgroundImage: `url(${server.avatarUrl})`,
                           }}
                         ></div>
                         <div className={setting['serverBox']}>
                           <div className={setting['serverName']}>
-                            {Server.name.length >= serverNameLengthLimit
-                              ? `${Server.name.slice(
-                                  0,
-                                  serverNameLengthLimit,
-                                )}..`
-                              : Server.name}
+                            {server.name}
                           </div>
                           <div className={setting['serverInfo']}>
                             <div
                               className={`${
-                                isSelf && Server.ownerId === userId
+                                isSelf && server.ownerId === userId
                                   ? setting['isOwner']
                                   : ''
                               }`}
                             ></div>
                             <div className={setting['id']}></div>
                             <div className={setting['displayId']}>
-                              {Server.displayId}
+                              {server.displayId}
                             </div>
                           </div>
                         </div>
@@ -400,41 +369,35 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             <div className={setting['joinedServers']}>
               <div className={`${popup['inputBox']}`}>
                 <div className={`${popup['selectBox']}`}>
-                  <select value={serversView} onChange={handleChange}>
-                    <option value="joined">
-                      {'加入的群' /** JOINED SERVER **/}
-                    </option>
-                    <option value="favorite">
-                      {'收藏的群' /** FAVORITE SERVER **/}
-                    </option>
+                  <select
+                    value={serversView}
+                    onChange={(e) => setServersView(e.target.value)}
+                  >
+                    <option value="joined">{'加入的群'}</option>
+                    <option value="favorite">{'收藏的群'}</option>
                   </select>
                 </div>
               </div>
               <div className={setting['serverItems']}>
                 {serversView === 'joined'
-                  ? userJoinedServers?.map((Server, index) => {
+                  ? userServers.map((server) => {
                       return (
                         <div
-                          key={Server.serverId || index}
+                          key={server.serverId}
                           className={setting['serverItem']}
                           onClick={() =>
-                            handleServerSelect(userId, Server.serverId)
+                            handleServerSelect(userId, server.serverId)
                           }
                         >
                           <div
                             className={setting['serverAvatarPicture']}
                             style={{
-                              backgroundImage: `url(${Server.avatarUrl})`,
+                              backgroundImage: `url(${server.avatarUrl})`,
                             }}
                           />
                           <div className={setting['serverBox']}>
                             <div className={setting['serverName']}>
-                              {Server.name.length >= serverNameLengthLimit
-                                ? `${Server.name.slice(
-                                    0,
-                                    serverNameLengthLimit,
-                                  )}..`
-                                : Server.name}
+                              {server.name}
                             </div>
                             <div
                               className={`${setting['serverInfo']} ${setting['around']}`}
@@ -444,7 +407,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                                 ${setting['permission']}
                                 ${permission[userGender]}
                                 ${
-                                  Server.ownerId === targetId
+                                  server.ownerId === targetId
                                     ? permission[`lv-6`]
                                     : permission[`lv-${2}`]
                                 }`}
@@ -460,24 +423,24 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                         </div>
                       );
                     })
-                  : userFavoriteServers?.map((Server, index) => {
+                  : userFavoriteServers.map((server) => {
                       return (
                         <div
-                          key={Server.serverId || index}
+                          key={server.serverId}
                           className={setting['serverItem']}
                           onClick={() =>
-                            handleServerSelect(userId, Server.serverId)
+                            handleServerSelect(userId, server.serverId)
                           }
                         >
                           <div
                             className={setting['serverAvatarPicture']}
                             style={{
-                              backgroundImage: `url(${Server.avatarUrl})`,
+                              backgroundImage: `url(${server.avatarUrl})`,
                             }}
                           />
                           <div className={setting['serverBox']}>
                             <div className={setting['serverName']}>
-                              {Server.name}
+                              {server.name}
                             </div>
                             <div
                               className={`${setting['serverInfo']} ${setting['around']}`}
@@ -487,7 +450,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                                 ${setting['permission']}
                                 ${permission[userGender]} 
                                 ${
-                                  Server.ownerId === targetId
+                                  server.ownerId === targetId
                                     ? permission[`lv-6`]
                                     : permission[`lv-${2}`]
                                 }`}
@@ -781,39 +744,33 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             </div>
             <div
               className={`${setting['avatar']} ${
-                editMode && isSelf ? setting['editable'] : ''
+                isEditing && isSelf ? setting['editable'] : ''
               }`}
               style={{ backgroundImage: `url(${userAvatarUrl})` }}
-              {...(isSelf && editMode
-                ? {
-                    onClick: () => {
-                      const fileInput = document.createElement('input');
-                      fileInput.type = 'file';
-                      fileInput.accept = 'image/*';
-                      fileInput.onchange = (e) => {
-                        const file = (e.target as HTMLInputElement).files?.[0];
-                        if (!file) return;
-                        const reader = new FileReader();
-                        reader.onloadend = async () => {
-                          const formData = new FormData();
-                          formData.append('_type', 'user');
-                          formData.append('_fileName', userId);
-                          formData.append('_file', reader.result as string);
-                          const data = await apiService.post(
-                            '/upload',
-                            formData,
-                          );
-                          if (data) {
-                            setUserAvatar(data.avatar);
-                            setUserAvatarUrl(data.avatarUrl);
-                          }
-                        };
-                        reader.readAsDataURL(file);
-                      };
-                      fileInput.click();
-                    },
-                  }
-                : {})}
+              onClick={() => {
+                if (!isSelf || !isEditing) return;
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'image/*';
+                fileInput.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onloadend = async () => {
+                    const formData = new FormData();
+                    formData.append('_type', 'user');
+                    formData.append('_fileName', userId);
+                    formData.append('_file', reader.result as string);
+                    const data = await apiService.post('/upload', formData);
+                    if (data) {
+                      setUserAvatar(data.avatar);
+                      setUserAvatarUrl(data.avatarUrl);
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                };
+                fileInput.click();
+              }}
             />
             <div
               className={`${popup['row']} ${setting['noDrag']}`}
