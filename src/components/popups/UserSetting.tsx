@@ -48,11 +48,16 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     // Refs
     const refreshRef = useRef(false);
 
-    // Date related constants
-    const today = useMemo(() => new Date(), []);
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1;
-    const currentDay = today.getDate();
+    // Constants
+    const TODAY = useMemo(() => new Date(), []);
+    const CURRENT_YEAR = TODAY.getFullYear();
+    const CURRENT_MONTH = TODAY.getMonth() + 1;
+    const CURRENT_DAY = TODAY.getDate();
+    const MAIN_TABS = [
+      { id: 'about', label: lang.tr.about },
+      { id: 'groups', label: lang.tr.groups },
+      { id: 'userSetting', label: '' },
+    ];
 
     // User states
     const [userAvatar, setUserAvatar] = useState<User['avatar']>(
@@ -104,82 +109,72 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
     const [editMode, setEditMode] = useState<boolean>(false);
 
-    // Computed values
-    const { userId, targetId } = initialData;
-    const userGrade = Math.min(56, userLevel);
-    const isSelf = targetId === userId;
     const [isFriend, setIsFriend] = useState(false);
-
-    // Tab List
-    const MAIN_TABS = [
-      { id: 'about', label: lang.tr.about },
-      { id: 'groups', label: lang.tr.groups },
-      { id: 'userSetting', label: '' },
-    ];
 
     const [selectedTabId, setSelectedTabId] = useState<
       'about' | 'groups' | 'userSetting'
     >('about');
 
-    const getDaysInMonth = useCallback((year: number, month: number) => {
-      return new Date(year, month, 0).getDate();
-    }, []);
+    // Computed values
+    const { userId, targetId } = initialData;
+    const userGrade = Math.min(56, userLevel);
+    const isSelf = targetId === userId;
 
-    const calculateAge = useCallback(
-      (birthYear: number, birthMonth: number, birthDay: number) => {
-        const birthDate = new Date(birthYear, birthMonth - 1, birthDay);
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
+    const isFutureDate = useCallback(
+      (year: number, month: number, day: number) => {
+        if (year > CURRENT_YEAR) return true;
+        if (year === CURRENT_YEAR && month > CURRENT_MONTH) return true;
         if (
-          monthDiff < 0 ||
-          (monthDiff === 0 && today.getDate() < birthDate.getDate())
-        ) {
-          age--;
-        }
-        return age;
+          year === CURRENT_YEAR &&
+          month === CURRENT_MONTH &&
+          day > CURRENT_DAY
+        )
+          return true;
+        return false;
       },
-      [today],
+      [CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY],
     );
 
-    const userAge = useMemo(
-      () => calculateAge(userBirthYear, userBirthMonth, userBirthDay),
-      [calculateAge, userBirthYear, userBirthMonth, userBirthDay],
-    );
+    const calculateAge = (
+      birthYear: number,
+      birthMonth: number,
+      birthDay: number,
+    ) => {
+      const birthDate = new Date(birthYear, birthMonth - 1, birthDay);
+      let age = CURRENT_YEAR - birthDate.getFullYear();
+      const monthDiff = CURRENT_MONTH - birthDate.getMonth();
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && CURRENT_DAY < birthDate.getDate())
+      ) {
+        age--;
+      }
+      return age;
+    };
 
-    // Date options
-    const years = useMemo(
+    const userAge = calculateAge(userBirthYear, userBirthMonth, userBirthDay);
+
+    const yearOptions = useMemo(
       () =>
         Array.from(
-          { length: currentYear - 1900 + 1 },
-          (_, i) => currentYear - i,
+          { length: CURRENT_YEAR - 1900 + 1 },
+          (_, i) => CURRENT_YEAR - i,
         ),
-      [currentYear],
+      [CURRENT_YEAR],
     );
 
-    const months = useMemo(
+    const monthOptions = useMemo(
       () => Array.from({ length: 12 }, (_, i) => i + 1),
       [],
     );
 
-    const days = useMemo(
+    const dayOptions = useMemo(
       () =>
         Array.from(
-          { length: getDaysInMonth(userBirthYear, userBirthMonth) },
+          { length: new Date(userBirthYear, userBirthMonth, 0).getDate() },
           (_, i) => i + 1,
         ),
-      [userBirthYear, userBirthMonth, getDaysInMonth],
-    );
-
-    // Date validation
-    const isFutureDate = useCallback(
-      (year: number, month: number, day: number) => {
-        if (year > currentYear) return true;
-        if (year === currentYear && month > currentMonth) return true;
-        if (year === currentYear && month === currentMonth && day > currentDay)
-          return true;
-        return false;
-      },
-      [currentYear, currentMonth, currentDay],
+      [userBirthYear, userBirthMonth],
     );
 
     // Handlers
@@ -254,76 +249,50 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
           refreshService.user({
             userId: targetId,
           }),
-        ]).then(([user]) => {
-          handleUserUpdate(user);
-        });
-        Promise.all([
           refreshService.userServers({
             userId: targetId,
           }),
-        ]).then(([userServers]) => {
-          if (!userServers) return;
-          handleUserServerUpdate(userServers);
-        });
-        Promise.all([
           refreshService.userFriends({
             userId: targetId,
           }),
-        ]).then(([userFriends]) => {
-          if (!isSelf) {
-            const isFriendCheck =
-              userFriends &&
-              userFriends.some((friend) => friend.targetId === userId);
-            if (isFriendCheck) {
-              setIsFriend(!isFriend);
-            }
-          }
+        ]).then(([user, userServers, userFriends]) => {
+          handleUserUpdate(user);
+          handleUserServerUpdate(userServers);
+          setIsFriend(!!userFriends?.find((fd) => fd.targetId === userId));
         });
       };
       refresh();
-    }, [userId]);
+    }, [userId, targetId]);
 
-    useEffect(() => {
-      if (isFutureDate(userBirthYear, userBirthMonth, userBirthDay)) {
-        setUserBirthYear(currentYear);
-        setUserBirthMonth(currentMonth);
-        setUserBirthDay(currentDay);
-      }
-    }, [
+    useEffect(() => {}, [
       userBirthYear,
       userBirthMonth,
       userBirthDay,
-      currentYear,
-      currentMonth,
-      currentDay,
+      CURRENT_YEAR,
+      CURRENT_MONTH,
+      CURRENT_DAY,
       isFutureDate,
     ]);
 
     useEffect(() => {
-      const daysInMonth = getDaysInMonth(userBirthYear, userBirthMonth);
-      let newDay = userBirthDay;
+      const daysInMonth = new Date(userBirthYear, userBirthMonth, 0).getDate();
 
-      if (newDay > daysInMonth) {
-        newDay = daysInMonth;
+      if (userBirthDay > daysInMonth) {
+        setUserBirthDay(daysInMonth);
       }
 
-      if (isFutureDate(userBirthYear, userBirthMonth, newDay)) {
-        if (userBirthYear === currentYear && userBirthMonth === currentMonth) {
-          newDay = Math.min(newDay, currentDay);
-        }
-      }
-
-      if (newDay !== userBirthDay) {
-        setUserBirthDay(newDay);
+      if (isFutureDate(userBirthYear, userBirthMonth, userBirthDay)) {
+        setUserBirthYear(CURRENT_YEAR);
+        setUserBirthMonth(CURRENT_MONTH);
+        setUserBirthDay(CURRENT_DAY);
       }
     }, [
       userBirthYear,
       userBirthMonth,
       userBirthDay,
-      currentYear,
-      currentMonth,
-      currentDay,
-      getDaysInMonth,
+      CURRENT_YEAR,
+      CURRENT_MONTH,
+      CURRENT_DAY,
       isFutureDate,
     ]);
 
@@ -699,11 +668,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                               setUserBirthYear(Number(e.target.value))
                             }
                           >
-                            {years.map((year) => (
+                            {yearOptions.map((year) => (
                               <option
                                 key={year}
                                 value={year}
-                                disabled={year > currentYear}
+                                disabled={year > CURRENT_YEAR}
                               >
                                 {year}
                               </option>
@@ -719,13 +688,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                               setUserBirthMonth(Number(e.target.value))
                             }
                           >
-                            {months.map((month) => (
+                            {monthOptions.map((month) => (
                               <option
                                 key={month}
                                 value={month}
                                 disabled={
-                                  userBirthYear === currentYear &&
-                                  month > currentMonth
+                                  userBirthYear === CURRENT_YEAR &&
+                                  month > CURRENT_MONTH
                                 }
                               >
                                 {month.toString().padStart(2, '0')}
@@ -742,14 +711,14 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                               setUserBirthDay(Number(e.target.value))
                             }
                           >
-                            {days.map((day) => (
+                            {dayOptions.map((day) => (
                               <option
                                 key={day}
                                 value={day}
                                 disabled={
-                                  userBirthYear === currentYear &&
-                                  userBirthMonth === currentMonth &&
-                                  day > currentDay
+                                  userBirthYear === CURRENT_YEAR &&
+                                  userBirthMonth === CURRENT_MONTH &&
+                                  day > CURRENT_DAY
                                 }
                               >
                                 {day.toString().padStart(2, '0')}
