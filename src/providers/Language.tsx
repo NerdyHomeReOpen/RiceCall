@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // Types
-import { Translation, LanguageKey, translations, Permission } from '@/types';
+import { Translation, LanguageKey, Permission } from '@/types';
+
+// Translation
+import { translations } from '@/translation';
 
 interface LanguageContextType {
   key: LanguageKey;
