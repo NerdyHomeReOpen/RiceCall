@@ -1993,23 +1993,15 @@ export type User = {
   createdAt: number;
   // THESE WERE NOT SAVE IN THE DATABASE
   badges?: Badge[];
-  friends?: UserFriend[];
-  friendGroups?: FriendGroup[];
-  friendApplications?: FriendApplication[];
-  // MAYBE NOT FOUND ?
-  joinedServers?: Server[];
-  recentServers?: Server[];
-  ownedServers?: Server[];
-  favServers?: Server[];
-  // userServers?: UserServer[];
 };
 
-export type UserServer = Server & {
-  recent: boolean;
-  owned: boolean;
-  favorite: boolean;
-  timestamp: number;
-};
+export type UserServer = Server &
+  Member & {
+    recent: boolean;
+    owned: boolean;
+    favorite: boolean;
+    timestamp: number;
+  };
 
 export type Server = {
   serverId: string;
