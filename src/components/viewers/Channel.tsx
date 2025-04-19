@@ -205,25 +205,28 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         </div>
 
         {/* Expanded Sections */}
-        {expanded[categoryId] && (
-          <div className={styles['channelList']}>
-            {categoryChannels
-              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-              .map((channel) => (
-                <ChannelTab
-                  key={channel.channelId}
-                  userId={userId}
-                  currentChannelId={currentChannelId}
-                  serverId={serverId}
-                  serverActiveMembers={serverActiveMembers}
-                  channel={channel}
-                  permissionLevel={permissionLevel}
-                  expanded={expanded}
-                  setExpanded={setExpanded}
-                />
-              ))}
-          </div>
-        )}
+        <div
+          className={styles['channelList']}
+          style={{
+            display: expanded[categoryId] ? 'block' : 'none',
+          }}
+        >
+          {categoryChannels
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map((channel) => (
+              <ChannelTab
+                key={channel.channelId}
+                userId={userId}
+                currentChannelId={currentChannelId}
+                serverId={serverId}
+                serverActiveMembers={serverActiveMembers}
+                channel={channel}
+                permissionLevel={permissionLevel}
+                expanded={expanded}
+                setExpanded={setExpanded}
+              />
+            ))}
+        </div>
       </>
     );
   },
@@ -452,20 +455,23 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         </div>
 
         {/* Expanded Sections */}
-        {expanded[channelId] && (
-          <div className={styles['userList']}>
-            {channelMembers
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((channelMember) => (
-                <UserTab
-                  key={channelMember.userId}
-                  userId={userId}
-                  channelMember={channelMember}
-                  permissionLevel={permissionLevel}
-                />
-              ))}
-          </div>
-        )}
+        <div
+          className={styles['userList']}
+          style={{
+            display: expanded[channelId] ? 'block' : 'none',
+          }}
+        >
+          {channelMembers
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((channelMember) => (
+              <UserTab
+                key={channelMember.userId}
+                userId={userId}
+                channelMember={channelMember}
+                permissionLevel={permissionLevel}
+              />
+            ))}
+        </div>
       </>
     );
   },

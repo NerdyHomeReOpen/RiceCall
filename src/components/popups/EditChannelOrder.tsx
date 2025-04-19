@@ -295,16 +295,20 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
               </div>
             </div>
           </div>
-          <div className={serverPage['channelList']}>
-            {expanded[categoryId] &&
-              subChannels
-                .sort((a, b) =>
-                  a.order !== b.order
-                    ? a.order - b.order
-                    : a.createdAt - b.createdAt,
-                )
-                .filter((ch) => ch.type === 'channel')
-                .map((channel) => channelTab(channel))}
+          <div
+            className={serverPage['channelList']}
+            style={{
+              display: expanded[categoryId] ? 'block' : 'none',
+            }}
+          >
+            {subChannels
+              .sort((a, b) =>
+                a.order !== b.order
+                  ? a.order - b.order
+                  : a.createdAt - b.createdAt,
+              )
+              .filter((ch) => ch.type === 'channel')
+              .map((channel) => channelTab(channel))}
           </div>
         </div>
       );

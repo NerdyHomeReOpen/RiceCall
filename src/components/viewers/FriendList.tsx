@@ -128,17 +128,16 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
         </div>
 
         {/* Expanded Sections */}
-        {expanded && friends && (
-          <div className={styles['tabContent']}>
-            {friendGroupFriends.map((friend) => (
-              <FriendCard
-                key={friend.targetId}
-                friend={friend}
-                userId={userId}
-              />
-            ))}
-          </div>
-        )}
+        <div
+          className={styles['tabContent']}
+          style={{
+            display: expanded ? 'block' : 'none',
+          }}
+        >
+          {friendGroupFriends.map((friend) => (
+            <FriendCard key={friend.targetId} friend={friend} userId={userId} />
+          ))}
+        </div>
       </div>
     );
   },
@@ -177,7 +176,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
       signature: friendSignature,
       vip: friendVip,
       level: friendLevel,
-      badges: friendBadges = [],
+      badges: friendBadges,
       currentServerId: friendCurrentServerId,
     } = friend;
     const friendGrade = Math.min(56, friendLevel); // 56 is max level
