@@ -102,6 +102,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
     const [userRecentServers, setUserRecentServers] = useState<UserServer[]>();
 
+    const [editMode, setEditMode] = useState<boolean>(false);
+
     // Computed values
     const { userId, targetId } = initialData;
     const userGrade = Math.min(56, userLevel);
@@ -324,6 +326,14 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       getDaysInMonth,
       isFutureDate,
     ]);
+
+    useEffect(() => {
+      if (selectedTabId === 'userSetting') {
+        setEditMode(true);
+      } else {
+        setEditMode(false);
+      }
+    }, [selectedTabId]);
 
     const lastRecentServer = userRecentServers?.slice(0, 4);
     const userFavoriteServers = userJoinedServers?.filter(
@@ -802,34 +812,39 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             </div>
             <div
               className={`${setting['avatar']} ${
-                isSelf ? setting['editable'] : ''
+                editMode && isSelf ? setting['editable'] : ''
               }`}
               style={{ backgroundImage: `url(${userAvatarUrl})` }}
-              onClick={() => {
-                if (isSelf) {
-                  const fileInput = document.createElement('input');
-                  fileInput.type = 'file';
-                  fileInput.accept = 'image/*';
-                  fileInput.onchange = (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onloadend = async () => {
-                      const formData = new FormData();
-                      formData.append('_type', 'user');
-                      formData.append('_fileName', userId); //FIX: Change back to userAvatar
-                      formData.append('_file', reader.result as string);
-                      const data = await apiService.post('/upload', formData);
-                      if (data) {
-                        setUserAvatar(data.avatar);
-                        setUserAvatarUrl(data.avatarUrl);
-                      }
-                    };
-                    reader.readAsDataURL(file);
-                  };
-                  fileInput.click();
-                }
-              }}
+              {...(isSelf && editMode
+                ? {
+                    onClick: () => {
+                      const fileInput = document.createElement('input');
+                      fileInput.type = 'file';
+                      fileInput.accept = 'image/*';
+                      fileInput.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onloadend = async () => {
+                          const formData = new FormData();
+                          formData.append('_type', 'user');
+                          formData.append('_fileName', userId);
+                          formData.append('_file', reader.result as string);
+                          const data = await apiService.post(
+                            '/upload',
+                            formData,
+                          );
+                          if (data) {
+                            setUserAvatar(data.avatar);
+                            setUserAvatarUrl(data.avatarUrl);
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      };
+                      fileInput.click();
+                    },
+                  }
+                : {})}
             />
             <div
               className={`${popup['row']} ${setting['noDrag']}`}
