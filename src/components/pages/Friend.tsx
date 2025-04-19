@@ -191,45 +191,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
                 />
               )}
             </div>
-            <div className={friendPage['container']}>
-              {/* <BadgeViewer badges={userBadges} /> */}
-              <BadgeViewer
-                badges={[
-                  {
-                    badgeId: 'nerdy',
-                    name: '書呆子',
-                    rare: '稀有',
-                    description: '123',
-                    order: 1,
-                    createdAt: 0,
-                  },
-                  {
-                    badgeId: 'nerdy',
-                    name: '書呆子',
-                    rare: '稀有',
-                    description: '123',
-                    order: 1,
-                    createdAt: 0,
-                  },
-                  {
-                    badgeId: 'nerdy',
-                    name: '書呆子',
-                    rare: '稀有',
-                    description: '123',
-                    order: 1,
-                    createdAt: 0,
-                  },
-                  {
-                    badgeId: 'nerdy',
-                    name: '書呆子',
-                    rare: '稀有',
-                    description: '123',
-                    order: 1,
-                    createdAt: 0,
-                  },
-                ]}
-              />
-            </div>
           </div>
           <div className={friendPage['signatureBox']}>
             <textarea

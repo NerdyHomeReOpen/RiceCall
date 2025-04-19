@@ -14,32 +14,30 @@ const failedImageCache = new Set<string>();
 
 interface BadgeContainerProps {
   badge: Badge;
+  preferBelow?: boolean;
 }
 
 const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
-  ({ badge }) => {
+  ({ badge, preferBelow = false }) => {
     // Hooks
     const contextMenu = useContextMenu();
     const badgeRef = React.useRef<HTMLDivElement>(null);
 
-    // Variables
     const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
 
     if (failedImageCache.has(badgeUrl)) {
-      return (
-        // Fallback Badge
-        <div className={styles['badgeBigImage']} />
-      );
+      // Fallback Badge
+      return <div className={styles['badgeBigImage']} />;
     }
 
     return (
       <div
         ref={badgeRef}
         onMouseEnter={() => {
-          contextMenu.showBadgeInfoCard(badgeRef.current!, badge);
+          contextMenu.showBadgeInfoCard(badgeRef.current!, badge, preferBelow);
         }}
         onMouseLeave={() => {
-          contextMenu.closeContextMenu();
+          contextMenu.hideBadgeInfoCard();
         }}
       >
         <div
@@ -56,10 +54,11 @@ BadgeContainer.displayName = 'BadgeContainer';
 interface BadgeViewerProps {
   badges: Badge[];
   maxDisplay?: number;
+  preferBelow?: boolean;
 }
 
 const BadgeViewer: React.FC<BadgeViewerProps> = React.memo(
-  ({ badges, maxDisplay = 21 }) => {
+  ({ badges, preferBelow, maxDisplay = 21 }) => {
     const sortedBadges = [...badges]
       .sort((a, b) =>
         a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt,
@@ -69,7 +68,11 @@ const BadgeViewer: React.FC<BadgeViewerProps> = React.memo(
     return (
       <div className={styles.badgeViewerWrapper}>
         {sortedBadges.map((badge) => (
-          <BadgeContainer key={badge.badgeId} badge={badge} />
+          <BadgeContainer
+            key={badge.badgeId}
+            badge={badge}
+            preferBelow={preferBelow}
+          />
         ))}
       </div>
     );

@@ -214,6 +214,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
                 createdAt: 0,
               },
             ]}
+            preferBelow
           />
         </div>
       </div>

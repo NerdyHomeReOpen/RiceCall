@@ -11,8 +11,14 @@ import BadgeInfoCard from '@/components/BadgeInfoCard';
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, items: ContextMenuItem[]) => void;
   showUserInfoBlock: (x: number, y: number, member: ServerMember) => void;
-  showBadgeInfoCard: (badgeElement: HTMLElement, badge: Badge) => void;
+  showBadgeInfoCard: (
+    badgeElement: HTMLElement,
+    badge: Badge,
+    preferBelow?: boolean,
+  ) => void;
   closeContextMenu: () => void;
+  closeUserInfoBlock: () => void;
+  hideBadgeInfoCard: () => void;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
@@ -32,20 +38,30 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   // States
   const [isVisible, setIsVisible] = React.useState(false);
   const [content, setContent] = React.useState<ReactNode | null>(null);
-  const [hoveredBadge, setHoveredBadge] = React.useState<{
+  const [userInfo, setUserInfo] = React.useState<{
+    x: number;
+    y: number;
+    member: ServerMember;
+  } | null>(null);
+
+  const [badgeInfo, setBadgeInfo] = React.useState<{
     rect: DOMRect;
     badge: Badge;
+    preferBelow: boolean;
   } | null>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if ((e.target as HTMLElement).closest('.context-menu-container')) return;
       if (isVisible) closeContextMenu();
+      if (userInfo) closeUserInfoBlock();
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key != 'Escape') return;
+      if (e.key !== 'Escape') return;
+
       if (isVisible) closeContextMenu();
+      if (userInfo) closeUserInfoBlock();
     };
 
     document.addEventListener('click', handleClick);
@@ -57,7 +73,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('contextmenu', handleClick);
     };
-  }, [isVisible]);
+  }, [isVisible, userInfo]);
 
   const showContextMenu = (x: number, y: number, items: ContextMenuItem[]) => {
     setContent(
@@ -72,14 +88,25 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   };
 
   const showUserInfoBlock = (x: number, y: number, member: ServerMember) => {
-    setContent(<UserInfoCard x={x} y={y} member={member} />);
-    setIsVisible(true);
+    setUserInfo({ x, y, member });
   };
 
-  const showBadgeInfoCard = (badgeElement: HTMLElement, badge: Badge) => {
+  const closeUserInfoBlock = () => {
+    setUserInfo(null);
+    setBadgeInfo(null);
+  };
+
+  const showBadgeInfoCard = (
+    badgeElement: HTMLElement,
+    badge: Badge,
+    preferBelow: boolean = false,
+  ) => {
     const rect = badgeElement.getBoundingClientRect();
-    setContent(<BadgeInfoCard rect={rect} badge={badge} />);
-    setIsVisible(true);
+    setBadgeInfo({ rect, badge, preferBelow });
+  };
+
+  const hideBadgeInfoCard = () => {
+    setBadgeInfo(null);
   };
 
   const closeContextMenu = () => {
@@ -91,11 +118,23 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       value={{
         showContextMenu,
         showUserInfoBlock,
+        closeUserInfoBlock,
         showBadgeInfoCard,
+        hideBadgeInfoCard,
         closeContextMenu,
       }}
     >
       {isVisible && content}
+      {userInfo && (
+        <UserInfoCard x={userInfo.x} y={userInfo.y} member={userInfo.member} />
+      )}
+      {badgeInfo && (
+        <BadgeInfoCard
+          rect={badgeInfo.rect}
+          badge={badgeInfo.badge}
+          preferBelow={badgeInfo.preferBelow}
+        />
+      )}
       {children}
     </ContextMenuContext.Provider>
   );

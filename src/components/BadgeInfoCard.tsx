@@ -12,10 +12,11 @@ import type { Badge } from '@/types';
 interface BadgeInfoCardProps {
   rect: DOMRect;
   badge: Badge;
+  preferBelow: boolean;
 }
 
 const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
-  ({ rect, badge }) => {
+  ({ rect, badge, preferBelow }) => {
     // Refs
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -43,9 +44,24 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
         }
 
         const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
 
         let newCardX = rect.left;
-        let newCardY = rect.top - cardHeight;
+        let newCardY = preferBelow ? rect.bottom : rect.top - cardHeight;
+
+        if (preferBelow) {
+          if (newCardY + cardHeight > windowHeight) {
+            newCardY = rect.top - cardHeight;
+            if (newCardY < 0) newCardY = 20;
+          }
+        } else {
+          if (newCardY < 0) {
+            newCardY = rect.bottom;
+            if (newCardY + cardHeight > windowHeight) {
+              newCardY = windowHeight - cardHeight - 20;
+            }
+          }
+        }
 
         if (newCardX + cardWidth > windowWidth) {
           newCardX = windowWidth - cardWidth - 15;
