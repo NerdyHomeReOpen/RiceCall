@@ -1,0 +1,69 @@
+.badgeInfoCard {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  background: #f4f6fa;
+  z-index: 1000;
+  min-height: 145px;
+  min-width: 300px;
+  border: 1px solid #e0e0e4;
+}
+
+.badgeInfoWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px;
+}
+
+.badgeAvatarBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 75px;
+}
+
+.badgeAvatarBox .badgeImage {
+  display: flex;
+  align-items: center;
+  min-height: 75px;
+  min-width: 75px;
+  justify-content: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.badgeAvatarBox .badgeRarityText {
+  color: #f3644b;
+  margin-top: 8px;
+}
+
+.badgeDescriptionBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100%;
+  width: 100%;
+  padding: 10px;
+}
+
+.badgeDescriptionBox .badgeName {
+  color: #264558;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.badgeDescriptionBox .badgeDescription {
+  color: #777777;
+}
+
+.badgeShowTimeBox {
+  display: flex;
+  width: 100%;
+  color: #777777;
+}

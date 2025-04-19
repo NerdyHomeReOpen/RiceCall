@@ -659,10 +659,12 @@
 .badgeViewer {
   display: flex;
   gap: 0.25rem;
-  min-height: 30px;
-  border: 1px solid #dbdbdb;
+  height: 25px;
+  align-items: center;
+  border: 1px solid #d7d7d7;
+  padding: 5px;
   background: #e8e8eb;
-  margin: 10px 5px;
+  margin-top: 0.5rem;
 }
 
 .editTabBar {

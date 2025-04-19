@@ -1,15 +1,17 @@
 import React, { useEffect, useContext, createContext, ReactNode } from 'react';
 
 // Types
-import { ContextMenuItem, ServerMember } from '@/types';
+import { ContextMenuItem, ServerMember, Badge } from '@/types';
 
 // Components
 import ContextMenu from '@/components/ContextMenu';
 import UserInfoCard from '@/components/UserInfoCard';
+import BadgeInfoCard from '@/components/BadgeInfoCard';
 
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, items: ContextMenuItem[]) => void;
   showUserInfoBlock: (x: number, y: number, member: ServerMember) => void;
+  showBadgeInfoCard: (x: number, y: number, badge: Badge) => void;
   closeContextMenu: () => void;
 }
 
@@ -70,13 +72,23 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsVisible(true);
   };
 
+  const showBadgeInfoCard = (x: number, y: number, badge: Badge) => {
+    setContent(<BadgeInfoCard x={x} y={y} badge={badge} />);
+    setIsVisible(true);
+  };
+
   const closeContextMenu = () => {
     setIsVisible(false);
   };
 
   return (
     <ContextMenuContext.Provider
-      value={{ showContextMenu, showUserInfoBlock, closeContextMenu }}
+      value={{
+        showContextMenu,
+        showUserInfoBlock,
+        showBadgeInfoCard,
+        closeContextMenu,
+      }}
     >
       {isVisible && content}
       {children}

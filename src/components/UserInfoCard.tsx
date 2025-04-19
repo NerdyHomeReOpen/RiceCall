@@ -55,7 +55,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
         setCardX(newCardX);
         setCardY(newCardY);
       }
-    }, [x, y, cardRef]);
+    }, [x, y]);
 
     const {
       name: memberName,

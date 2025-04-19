@@ -23,12 +23,11 @@ import refreshService from '@/services/refresh.service';
 import apiService from '@/services/api.service';
 
 // CSS
+import setting from '@/styles/popups/editProfile.module.css';
 import grade from '@/styles/grade.module.css';
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/editProfile.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
-import badge from '@/styles/viewers/badge.module.css';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
@@ -336,24 +335,24 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   })}
                 </div>
               </div>
-              <div
-                className={`${setting['userProfileContent']}  ${badge['userInfoCardBadges']}`}
-              >
+              <div className={`${setting['userProfileContent']}`}>
                 <div className={setting['title']}>
                   {'最近獲得' /** BADGE TITLE **/}
                 </div>
-                <BadgeViewer
-                  badges={[
-                    {
-                      badgeId: 'nerdy',
-                      name: '書呆子',
-                      rare: '稀有',
-                      description: '123',
-                      order: 1,
-                      createdAt: 0,
-                    },
-                  ]}
-                />
+                <div className={setting['badgeViewer']}>
+                  <BadgeViewer
+                    badges={[
+                      {
+                        badgeId: 'nerdy',
+                        name: '書呆子',
+                        rare: '稀有',
+                        description: '123',
+                        order: 1,
+                        createdAt: 0,
+                      },
+                    ]}
+                  />
+                </div>
               </div>
             </>
           );
