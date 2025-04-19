@@ -373,10 +373,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               <div className={setting['serverItems']}>
                 {serversView === 'joined'
                   ? userServers
-                      .filter((server) => server.permissionLevel > 1)
+                      .filter(
+                        (server) =>
+                          server.permissionLevel > 1 &&
+                          server.permissionLevel < 7,
+                      )
                       .sort((a, b) => b.permissionLevel - a.permissionLevel)
                       .map((server) => {
-                        console.log(server);
                         return (
                           <div
                             key={server.serverId}

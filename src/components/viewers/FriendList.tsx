@@ -102,13 +102,6 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
           onContextMenu={(e) => {
             contextMenu.showContextMenu(e.pageX, e.pageY, [
               {
-                id: 'info',
-                label: lang.tr.viewProfile,
-                onClick: () => {
-                  handleOpenUserInfo(userId, friendGroupId);
-                },
-              },
-              {
                 id: 'edit',
                 label: lang.tr.editFriendGroup,
                 show: friendGroupId !== '',
@@ -275,7 +268,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
                 id: 'info',
                 label: lang.tr.viewProfile,
                 onClick: () => {
-                  handleOpenUserInfo(userId, friendUserId);
+                  handleOpenUserInfo(userId, friendTargetId);
                 },
               },
               {
