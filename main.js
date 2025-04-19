@@ -443,7 +443,7 @@ function connectSocket(token) {
 
     Object.values(SocketServerEvent).forEach((event) => {
       socket.on(event, (data) => {
-        if (!userId && data.userId) {
+        if (!userId && data && data.userId) {
           userId = data.userId;
         }
         BrowserWindow.getAllWindows().forEach((window) => {
