@@ -221,6 +221,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       ipcService.window.close();
     };
 
+    // FIXME: maybe find a better way to handle this
     const handleServerSelect = (userId: User['userId'], server: Server) => {
       if (isSelectingRef.current || isLoading.current || isSelectingRef.current)
         return;

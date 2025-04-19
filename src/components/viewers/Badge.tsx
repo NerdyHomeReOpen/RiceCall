@@ -54,21 +54,23 @@ interface BadgeViewerProps {
   maxDisplay?: number;
 }
 
-const BadgeViewer: React.FC<BadgeViewerProps> = React.memo(({ badges }) => {
-  const sortedBadges = [...badges]
-    .sort((a, b) =>
-      a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt,
-    )
-    .slice(0, 21);
+const BadgeViewer: React.FC<BadgeViewerProps> = React.memo(
+  ({ badges, maxDisplay = 21 }) => {
+    const sortedBadges = [...badges]
+      .sort((a, b) =>
+        a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt,
+      )
+      .slice(0, maxDisplay);
 
-  return (
-    <div className={styles.badgeViewerWrapper}>
-      {sortedBadges.map((badge) => (
-        <BadgeContainer key={badge.badgeId} badge={badge} />
-      ))}
-    </div>
-  );
-});
+    return (
+      <div className={styles.badgeViewerWrapper}>
+        {sortedBadges.map((badge) => (
+          <BadgeContainer key={badge.badgeId} badge={badge} />
+        ))}
+      </div>
+    );
+  },
+);
 
 BadgeViewer.displayName = 'BadgeViewer';
 

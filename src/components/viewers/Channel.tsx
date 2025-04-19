@@ -785,7 +785,40 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         />
         {/* <BadgeViewer badges={channelMemberBadges} maxDisplay={3} /> */}
         <BadgeViewer
+          maxDisplay={3}
           badges={[
+            {
+              badgeId: 'nerdy',
+              name: '書呆子',
+              rare: '稀有',
+              description: '123',
+              order: 1,
+              createdAt: 0,
+            },
+            {
+              badgeId: 'nerdy',
+              name: '書呆子',
+              rare: '稀有',
+              description: '123',
+              order: 1,
+              createdAt: 0,
+            },
+            {
+              badgeId: 'nerdy',
+              name: '書呆子',
+              rare: '稀有',
+              description: '123',
+              order: 1,
+              createdAt: 0,
+            },
+            {
+              badgeId: 'nerdy',
+              name: '書呆子',
+              rare: '稀有',
+              description: '123',
+              order: 1,
+              createdAt: 0,
+            },
             {
               badgeId: 'nerdy',
               name: '書呆子',

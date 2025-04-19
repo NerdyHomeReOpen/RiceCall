@@ -129,14 +129,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const [serverApplications, setServerApplications] = useState<
       MemberApplication[]
     >([]);
-    const [serverBlockMembers, setServerBlockMembers] = useState<
-      ServerMember[]
-    >([]);
     const [permissionLevel, setPermissionLevel] = useState<number>(0);
 
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const [sortState, setSortState] = useState<1 | -1>(-1);
-    const [sortField, setSortField] = useState<string>('permissionLevel');
+    const [sortField, setSortField] = useState<string>('name');
 
     const [searchText, setSearchText] = useState('');
 
@@ -315,11 +312,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const handleMemberUpdate = (data: Member | null) => {
       if (!data) data = createDefault.member();
       setPermissionLevel(data.permissionLevel);
-    };
-
-    const handleBlockMemberSort = (field: keyof ServerMember) => {
-      const sortedMembers = handleSort(field, [...serverBlockMembers]);
-      setServerBlockMembers(sortedMembers);
     };
 
     const handleMemberSort = (field: keyof ServerMember) => {
@@ -597,7 +589,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}
                 >
                   <div className={popup['label']}>
-                    {lang.tr.members}: {serverMembers.length}
+                    {lang.tr.members}: {filteredMembers.length}
                   </div>
                   <div className={setting['searchWrapper']}>
                     <div className={setting['searchBorder']}>
@@ -924,7 +916,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               <div className={popup['col']}>
                 <div className={`${popup['inputBox']} ${popup['row']}`}>
                   <div className={popup['label']}>
-                    {lang.tr.applicants}: {serverApplications.length}
+                    {lang.tr.applicants}: {filteredApplications.length}
                   </div>
                   <button
                     style={{ marginLeft: 'auto' }}
@@ -1041,7 +1033,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}
                 >
                   <div className={popup['label']}>
-                    {lang.tr.blacklist}: {serverBlockMembers.length}
+                    {lang.tr.blacklist}: {filteredBlockMembers.length}
                   </div>
                   <div className={setting['searchWrapper']}>
                     <div className={setting['searchBorder']}>
@@ -1066,7 +1058,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                           <th
                             key={field.field}
                             onClick={() =>
-                              handleBlockMemberSort(
+                              handleMemberSort(
                                 field.field as keyof ServerMember,
                               )
                             }
