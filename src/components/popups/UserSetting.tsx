@@ -381,7 +381,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       )
                       .sort((a, b) => b.permissionLevel - a.permissionLevel)
                       .map((server) => {
-                        console.log(server);
                         return (
                           <div
                             key={server.serverId}
