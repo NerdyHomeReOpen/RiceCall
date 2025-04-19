@@ -268,6 +268,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         if (!server) return;
         setIsLoading(false);
         setLoadingGroupID('');
+        localStorage.removeItem('trigger-handle-server-select');
       }
     }, [server, isLoading, mainTab]);
 
@@ -289,6 +290,18 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         ],
       });
     }, [lang, userName]);
+
+    useEffect(() => {
+      const handler = ({ key, newValue }: StorageEvent) => {
+        if (key !== 'trigger-handle-server-select' || !newValue) return;
+        const { serverDisplayId } = JSON.parse(newValue);
+        mainTab.setSelectedTabId('home');
+        setIsLoading(true);
+        setLoadingGroupID(serverDisplayId);
+      };
+      window.addEventListener('storage', handler);
+      return () => window.removeEventListener('storage', handler);
+    }, [mainTab]);
 
     return (
       <div

@@ -45,6 +45,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
     // Refs
     const refreshRef = useRef(false);
+    const isSelectingRef = useRef(false);
+    const isLoading = useRef(false);
 
     // Constants
     const TODAY = useMemo(() => new Date(), []);
@@ -219,14 +221,22 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       ipcService.window.close();
     };
 
-    const handleServerSelect = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-    ) => {
-      handleMinimize();
+    const handleServerSelect = (userId: User['userId'], server: Server) => {
+      if (isSelectingRef.current || isLoading.current || isSelectingRef.current)
+        return;
+      isSelectingRef.current = true;
       setTimeout(() => {
-        if (!socket) return;
-        socket.send.connectServer({ userId, serverId });
+        isSelectingRef.current = false;
+      }, 3000);
+      window.localStorage.setItem(
+        'trigger-handle-server-select',
+        JSON.stringify({
+          serverDisplayId: server.displayId,
+          timestamp: Date.now(),
+        }),
+      );
+      setTimeout(() => {
+        socket.send.connectServer({ userId, serverId: server.serverId });
       }, 1500);
     };
 
@@ -302,9 +312,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
-                        onClick={() =>
-                          handleServerSelect(userId, server.serverId)
-                        }
+                        onClick={() => handleServerSelect(userId, server)}
                       >
                         <div
                           className={setting['serverAvatarPicture']}
@@ -408,9 +416,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                           <div
                             key={server.serverId}
                             className={setting['serverItem']}
-                            onClick={() =>
-                              handleServerSelect(userId, server.serverId)
-                            }
+                            onClick={() => handleServerSelect(userId, server)}
                           >
                             <div
                               className={setting['serverAvatarPicture']}
@@ -453,9 +459,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                         <div
                           key={server.serverId}
                           className={setting['serverItem']}
-                          onClick={() =>
-                            handleServerSelect(userId, server.serverId)
-                          }
+                          onClick={() => handleServerSelect(userId, server)}
                         >
                           <div
                             className={setting['serverAvatarPicture']}

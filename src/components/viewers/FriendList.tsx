@@ -67,17 +67,6 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
       });
     };
 
-    const handleOpenUserInfo = (
-      userId: User['userId'],
-      targetId: User['userId'],
-    ) => {
-      ipcService.popup.open(PopupType.USER_INFO);
-      ipcService.initialData.onRequest(PopupType.USER_INFO, {
-        userId,
-        targetId,
-      });
-    };
-
     const handleDeleteFriendGroup = (
       friendGroupId: FriendGroup['friendGroupId'],
       userId: User['userId'],
