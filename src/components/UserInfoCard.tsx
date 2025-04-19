@@ -76,10 +76,13 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
     return (
       <div
         ref={cardRef}
-        className={`${userInfoCard['userInfoCard']} ${
+        className={`context-menu-container ${userInfoCard['userInfoCard']} ${
           userInfoCard[`vip-${memberVip}`]
         }`}
         style={{ top: cardY, left: cardX }}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
       >
         <div className={userInfoCard['body']}>
           <div className={userInfoCard['top']}>

@@ -72,7 +72,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   return (
     <div
       ref={menuRef}
-      className={`${contextMenu['contextMenu']}`}
+      className={`context-menu-container ${contextMenu['contextMenu']}`}
       style={{ top: menuY, left: menuX }}
     >
       {items

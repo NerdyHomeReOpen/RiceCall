@@ -35,7 +35,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest('.context-menu')) return;
+      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
       if (isVisible) closeContextMenu();
     };
 
@@ -61,7 +61,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         x={x}
         y={y}
         items={items}
-        onClose={() => closeContextMenu}
+        onClose={() => closeContextMenu()}
       />,
     );
     setIsVisible(true);

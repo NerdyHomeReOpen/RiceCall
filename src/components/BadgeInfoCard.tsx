@@ -53,7 +53,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
     return (
       <div
         ref={cardRef}
-        className={badgeInfoCardStyles.badgeInfoCard}
+        className={`context-menu-container ${badgeInfoCardStyles.badgeInfoCard}`}
         style={{ top: cardY, left: cardX }}
       >
         <div className={badgeInfoCardStyles.badgeInfoWrapper}>
