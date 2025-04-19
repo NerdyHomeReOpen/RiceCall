@@ -410,8 +410,7 @@ export type User = {
   currentServerId: string;
   lastActiveAt: number;
   createdAt: number;
-  // THESE WERE NOT SAVE IN THE DATABASE
-  badges?: Badge[];
+  badges: Badge[];
 };
 
 export type UserServer = Server &

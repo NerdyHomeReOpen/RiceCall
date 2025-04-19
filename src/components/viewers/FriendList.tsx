@@ -308,7 +308,43 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
               <div
                 className={`${grade['grade']} ${grade[`lv-${friendGrade}`]}`}
               />
-              <BadgeViewer badges={friendBadges} />
+              {/* <BadgeViewer badges={friendBadges} /> */}
+              <BadgeViewer
+                badges={[
+                  {
+                    badgeId: 'nerdy',
+                    name: '書呆子',
+                    rare: '稀有',
+                    description: '123',
+                    order: 1,
+                    createdAt: 0,
+                  },
+                  {
+                    badgeId: 'nerdy',
+                    name: '書呆子',
+                    rare: '稀有',
+                    description: '123',
+                    order: 1,
+                    createdAt: 0,
+                  },
+                  {
+                    badgeId: 'nerdy',
+                    name: '書呆子',
+                    rare: '稀有',
+                    description: '123',
+                    order: 1,
+                    createdAt: 0,
+                  },
+                  {
+                    badgeId: 'nerdy',
+                    name: '書呆子',
+                    rare: '稀有',
+                    description: '123',
+                    order: 1,
+                    createdAt: 0,
+                  },
+                ]}
+              />
             </div>
             {friendServerName ? (
               <div className={styles['container']}>

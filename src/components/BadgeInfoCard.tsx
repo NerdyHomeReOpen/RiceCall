@@ -38,12 +38,12 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
       let newCardX = x;
       let newCardY = y - cardHeight;
 
-      if (x + cardWidth > windowWidth) {
+      if (newCardX + cardWidth > windowWidth) {
         newCardX = windowWidth - cardWidth - 20;
       }
 
-      if (y < 0) {
-        newCardY = cardHeight + 20;
+      if (newCardY < 0) {
+        newCardY = 20;
       }
 
       setCardX(newCardX);

@@ -44,11 +44,11 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
         let newCardX = x;
         let newCardY = y;
 
-        if (x + cardWidth > windowWidth - 20) {
+        if (newCardX + cardWidth > windowWidth - 20) {
           newCardX = windowWidth - cardWidth - 20;
         }
 
-        if (y + cardHeight > windowHeight - 20) {
+        if (newCardY + cardHeight > windowHeight - 20) {
           newCardY = windowHeight - cardHeight - 20;
         }
 
@@ -64,7 +64,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
       level: memberLevel,
       xp: memberXp,
       requiredXp: memberRequiredXp,
-      badges: memberBadges = [],
+      badges: memberBadges,
       permissionLevel: memberPermission,
       contribution: memberContributions,
       nickname: memberNickname,
@@ -178,7 +178,43 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
 
         {/* Badges Section */}
         <div className={userInfoCard['footer']}>
-          <BadgeViewer badges={memberBadges} maxDisplay={13} />
+          {/* <BadgeViewer badges={memberBadges} maxDisplay={13} /> */}
+          <BadgeViewer
+            badges={[
+              {
+                badgeId: 'nerdy',
+                name: '書呆子',
+                rare: '稀有',
+                description: '123',
+                order: 1,
+                createdAt: 0,
+              },
+              {
+                badgeId: 'nerdy',
+                name: '書呆子',
+                rare: '稀有',
+                description: '123',
+                order: 1,
+                createdAt: 0,
+              },
+              {
+                badgeId: 'nerdy',
+                name: '書呆子',
+                rare: '稀有',
+                description: '123',
+                order: 1,
+                createdAt: 0,
+              },
+              {
+                badgeId: 'nerdy',
+                name: '書呆子',
+                rare: '稀有',
+                description: '123',
+                order: 1,
+                createdAt: 0,
+              },
+            ]}
+          />
         </div>
       </div>
     );

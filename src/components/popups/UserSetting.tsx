@@ -350,6 +350,30 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                         order: 1,
                         createdAt: 0,
                       },
+                      {
+                        badgeId: 'nerdy',
+                        name: '書呆子',
+                        rare: '稀有',
+                        description: '123',
+                        order: 1,
+                        createdAt: 0,
+                      },
+                      {
+                        badgeId: 'nerdy',
+                        name: '書呆子',
+                        rare: '稀有',
+                        description: '123',
+                        order: 1,
+                        createdAt: 0,
+                      },
+                      {
+                        badgeId: 'nerdy',
+                        name: '書呆子',
+                        rare: '稀有',
+                        description: '123',
+                        order: 1,
+                        createdAt: 0,
+                      },
                     ]}
                   />
                 </div>

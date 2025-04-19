@@ -777,7 +777,43 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             ${grade[`lv-${channelMemberGrade}`]}
           `}
         />
-        <BadgeViewer badges={channelMemberBadges} maxDisplay={3} />
+        {/* <BadgeViewer badges={channelMemberBadges} maxDisplay={3} /> */}
+        <BadgeViewer
+          badges={[
+            {
+              badgeId: 'nerdy',
+              name: '書呆子',
+              rare: '稀有',
+              description: '123',
+              order: 1,
+              createdAt: 0,
+            },
+            {
+              badgeId: 'nerdy',
+              name: '書呆子',
+              rare: '稀有',
+              description: '123',
+              order: 1,
+              createdAt: 0,
+            },
+            {
+              badgeId: 'nerdy',
+              name: '書呆子',
+              rare: '稀有',
+              description: '123',
+              order: 1,
+              createdAt: 0,
+            },
+            {
+              badgeId: 'nerdy',
+              name: '書呆子',
+              rare: '稀有',
+              description: '123',
+              order: 1,
+              createdAt: 0,
+            },
+          ]}
+        />
         {isCurrentUser && <div className={styles['myLocationIcon']} />}
       </div>
     );
