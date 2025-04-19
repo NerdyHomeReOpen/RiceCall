@@ -23,7 +23,6 @@ interface AccountItem {
   selected: boolean;
 }
 
-const base64 = (str: string) => btoa(str);
 const getParsed = (): { accounts: AccountItem[]; remembered: string[] } => {
   try {
     return JSON.parse(localStorage.getItem('login-accounts') || '');
@@ -31,6 +30,7 @@ const getParsed = (): { accounts: AccountItem[]; remembered: string[] } => {
     return { accounts: [], remembered: [] };
   }
 };
+
 const saveParsed = (data: { accounts: AccountItem[]; remembered: string[] }) =>
   localStorage.setItem('login-accounts', JSON.stringify(data));
 
@@ -38,7 +38,7 @@ export const authService = {
   login: async (formData: LoginFormData): Promise<boolean> => {
     const res = await apiService.post('/login', {
       ...formData,
-      password: base64(formData.password),
+      password: formData.password,
     });
     if (!res?.token) return false;
     localStorage.setItem('token', res.token);
@@ -72,7 +72,7 @@ export const authService = {
   register: async (data: RegisterFormData) => {
     const res = await apiService.post('/register', {
       ...data,
-      password: base64(data.password),
+      password: data.password,
     });
     return !!res;
   },
