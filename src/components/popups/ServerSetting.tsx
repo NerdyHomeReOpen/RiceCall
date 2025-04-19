@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { marked } from 'marked';
 
 // CSS
-import setting from '@/styles/popups/editServer.module.css';
+import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 import permission from '@/styles/permission.module.css';
 import markdown from '@/styles/viewers/markdown.module.css';

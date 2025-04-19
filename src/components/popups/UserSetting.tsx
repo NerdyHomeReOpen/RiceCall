@@ -32,7 +32,6 @@ import badge from '@/styles/viewers/badge.module.css';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
-// import { Badge } from 'lucide-react';
 
 interface UserSettingPopupProps {
   userId: User['userId'];
@@ -78,13 +77,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const [userLevel, setUserLevel] = useState<User['level']>(
       createDefault.user().level,
     );
-
     const [userXP, setUserXP] = useState<User['xp']>(createDefault.user().xp);
-
     const [userRequiredXP, setUserRequiredXP] = useState<User['requiredXp']>(
       createDefault.user().requiredXp,
     );
-
     const [userVip, setUserVip] = useState<User['vip']>(
       createDefault.user().vip,
     );
@@ -100,13 +96,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const [userCountry, setUserCountry] = useState<User['country']>(
       createDefault.user().country,
     );
-
     const [serversView, setServersView] = useState('joined');
-
     const [userServers, setUserServers] = useState<UserServer[]>([]);
-
     const [isFriend, setIsFriend] = useState(false);
-
     const [selectedTabId, setSelectedTabId] = useState<
       'about' | 'groups' | 'userSetting'
     >('about');

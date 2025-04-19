@@ -9,7 +9,7 @@ import { useLanguage } from '@/providers/Language';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/editServer.module.css';
+import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';

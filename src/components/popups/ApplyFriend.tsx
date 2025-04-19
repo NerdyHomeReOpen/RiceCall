@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/editServer.module.css';
-import applyFriend from '@/styles/popups/applyFriend.module.css';
+import setting from '@/styles/popups/setting.module.css';
+import applyFriend from '@/styles/popups/apply.module.css';
 
 // Types
 import {
