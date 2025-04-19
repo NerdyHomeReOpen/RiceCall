@@ -27,8 +27,8 @@ const messageHandler = {
       if (!_newMessage || !userId || !serverId || !channelId) {
         throw new StandardizedError(
           '無效的資料',
-          'SENDMESSAGE',
           'ValidationError',
+          'SENDMESSAGE',
           'DATA_INVALID',
           401,
         );
@@ -46,6 +46,7 @@ const messageHandler = {
       if (operatorId !== userId) {
         throw new StandardizedError(
           '無法傳送非自己的訊息',
+          'ValidationError',
           'SENDMESSAGE',
           'PERMISSION_DENIED',
           403,
@@ -122,8 +123,8 @@ const messageHandler = {
       if (!_newDirectMessage || !userId || !targetId) {
         throw new StandardizedError(
           '無效的資料',
-          'SENDDIRECTMESSAGE',
           'ValidationError',
+          'SENDDIRECTMESSAGE',
           'DATA_INVALID',
           401,
         );
@@ -151,6 +152,7 @@ const messageHandler = {
       if (operatorId !== userId) {
         throw new StandardizedError(
           '無法傳送非自己的私訊',
+          'ValidationError',
           'SENDDIRECTMESSAGE',
           'PERMISSION_DENIED',
           403,

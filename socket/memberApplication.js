@@ -127,7 +127,17 @@ const memberApplicationHandler = {
 
       // Get data
       const operatorMember = await DB.get.member(operatorId, serverId);
+      const application = await DB.get.memberApplication(userId, serverId);
 
+      if (!application) {
+        throw new StandardizedError(
+          '申請不存在',
+          'ValidationError',
+          'UPDATEMEMBERAPPLICATION',
+          'APPLICATION_NOT_FOUND',
+          404,
+        );
+      }
       // Validate operator
       if (operatorId === userId) {
       } else {
@@ -198,6 +208,17 @@ const memberApplicationHandler = {
 
       // Get data
       const operatorMember = await DB.get.member(operatorId, serverId);
+      const application = await DB.get.memberApplication(userId, serverId);
+
+      if (!application) {
+        throw new StandardizedError(
+          '申請不存在',
+          'ValidationError',
+          'DELETEMEMBERAPPLICATION',
+          'APPLICATION_NOT_FOUND',
+          404,
+        );
+      }
 
       // Validate operation
       if (operatorId === userId) {
