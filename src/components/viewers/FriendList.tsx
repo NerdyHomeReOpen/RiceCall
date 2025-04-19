@@ -275,7 +275,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
                 id: 'info',
                 label: lang.tr.viewProfile,
                 onClick: () => {
-                  handleOpenUserInfo(userId, friendUserId);
+                  handleOpenUserInfo(userId, friendTargetId);
                 },
               },
               {
