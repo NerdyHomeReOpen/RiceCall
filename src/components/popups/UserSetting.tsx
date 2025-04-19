@@ -23,12 +23,12 @@ import refreshService from '@/services/refresh.service';
 import apiService from '@/services/api.service';
 
 // CSS
-import grade from '@/styles/common/grade.module.css';
-import popup from '@/styles/common/popup.module.css';
+import grade from '@/styles/grade.module.css';
+import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/editProfile.module.css';
-import vip from '@/styles/common/vip.module.css';
-import permission from '@/styles/common/permission.module.css';
-import badge from '@/styles/badgeViewer.module.css';
+import vip from '@/styles/vip.module.css';
+import permission from '@/styles/permission.module.css';
+import badge from '@/styles/viewers/badge.module.css';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';

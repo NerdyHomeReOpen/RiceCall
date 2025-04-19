@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
-import styles from '@/styles/loginPage.module.css';
+import styles from '@/styles/pages/login.module.css';
 
 // Utils
 import { createValidators } from '@/utils/validators';

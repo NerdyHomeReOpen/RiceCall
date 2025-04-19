@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 // CSS
-import styles from '@/styles/serverPage.module.css';
-import grade from '@/styles/common/grade.module.css';
-import vip from '@/styles/common/vip.module.css';
-import permission from '@/styles/common/permission.module.css';
+import styles from '@/styles/pages/server.module.css';
+import grade from '@/styles/grade.module.css';
+import vip from '@/styles/vip.module.css';
+import permission from '@/styles/permission.module.css';
 
 // Types
 import {

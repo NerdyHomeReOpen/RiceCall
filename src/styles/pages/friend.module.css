@@ -27,7 +27,7 @@
   object-fit: cover;
   min-width: 40px;
   min-height: 40px;
-  background-image: url('../../public/im/SecretaryLogo.png');
+  background-image: url('../../../public/im/SecretaryLogo.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -41,7 +41,7 @@
   z-index: 99;
   min-width: 42px;
   min-height: 42px;
-  background: url('../../public/win_border.png') no-repeat center center;
+  background: url('../../../public/win_border.png') no-repeat center center;
   background-size: cover;
 }
 
@@ -63,7 +63,7 @@
 .levelIcon {
   min-width: 16px;
   min-height: 16px;
-  background: url('../../public/im/LV.png') no-repeat center center;
+  background: url('../../../public/im/LV.png') no-repeat center center;
   background-size: auto;
   background-position: 0 0;
 }
@@ -71,7 +71,7 @@
 .wealthIcon {
   min-width: 16px;
   min-height: 16px;
-  background: url('../../public/silver_pea.png') no-repeat center;
+  background: url('../../../public/silver_pea.png') no-repeat center;
   background-size: cover;
   border: none;
   cursor: pointer;
@@ -145,7 +145,7 @@
   flex: 1;
   text-align: center;
   cursor: pointer;
-  background: url('../../public/friend_tab_item_bg.png') no-repeat center;
+  background: url('../../../public/friend_tab_item_bg.png') no-repeat center;
   background-size: 100% 72px;
   background-position: 0 0;
   min-height: 36px;
@@ -156,7 +156,7 @@
 .friendListIcon {
   min-width: 16px;
   min-height: 16px;
-  background: url('../../public/im/friend_list_page.png') no-repeat center
+  background: url('../../../public/im/friend_list_page.png') no-repeat center
     center;
   background-size: auto;
   background-position: 0 0;
@@ -165,7 +165,7 @@
 .recentIcon {
   min-width: 16px;
   min-height: 16px;
-  background: url('../../public/im/recently_list_page.png') no-repeat center
+  background: url('../../../public/im/recently_list_page.png') no-repeat center
     center;
   background-size: auto;
   background-position: 0 0;
@@ -213,7 +213,7 @@
 .searchBar .searchIcon {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../public/channel/channel_search.png') no-repeat center
+  background: url('../../../public/channel/channel_search.png') no-repeat center
     center;
   background-position: 0 0;
 }
@@ -225,7 +225,7 @@
 .prevIcon {
   min-width: 30px;
   min-height: 30px;
-  background: url('../../public/channel/search_pre.png') no-repeat center center;
+  background: url('../../../public/channel/search_pre.png') no-repeat center center;
   background-position: 0 0;
   cursor: pointer;
 }
@@ -233,7 +233,7 @@
 .nextIcon {
   min-width: 30px;
   min-height: 30px;
-  background: url('../../public/channel/search_next.png') no-repeat center
+  background: url('../../../public/channel/search_next.png') no-repeat center
     center;
   background-position: 0 0;
   cursor: pointer;
@@ -281,7 +281,7 @@
 
 .sidebarFooter .button[datatype='addGroup']::before {
   content: '';
-  background: url('../../public/im/add_group.png') no-repeat center center;
+  background: url('../../../public/im/add_group.png') no-repeat center center;
   min-height: 16px;
   min-width: 16px;
   margin-right: 5px;
@@ -289,7 +289,7 @@
 
 .sidebarFooter .button[datatype='addFriend']::before {
   content: '';
-  background: url('../../public/im/add_friend.png') no-repeat center center;
+  background: url('../../../public/im/add_friend.png') no-repeat center center;
   min-height: 16px;
   min-width: 16px;
   margin-right: 5px;
@@ -327,7 +327,7 @@
   display: inline-block;
   min-width: 14px;
   min-height: 14px;
-  background: url('../../public/channel/channelIcon.png') no-repeat center
+  background: url('../../../public/channel/channelIcon.png') no-repeat center
     center;
   background-size: auto;
   background-position: 0 0;
@@ -386,7 +386,7 @@
   content: '';
   min-height: 16px;
   min-width: 16px;
-  background-image: url('../../public/mylocation.png');
+  background-image: url('../../../public/mylocation.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;

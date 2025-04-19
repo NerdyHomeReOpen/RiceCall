@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
-import popup from '@/styles/common/popup.module.css';
+import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/editServer.module.css';
 import applyMember from '@/styles/popups/applyFriend.module.css';
 

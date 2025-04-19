@@ -2,7 +2,7 @@
 import React from 'react';
 
 // CSS
-import loadingSpinner from '@/styles/common/loadingSpinner.module.css';
+import loadingSpinner from '@/styles/loadingSpinner.module.css';
 
 interface LoadingSpinnerProps {
   className?: string;

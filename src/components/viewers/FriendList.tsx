@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 // CSS
-import styles from '@/styles/friendPage.module.css';
-import grade from '@/styles/common/grade.module.css';
-import vip from '@/styles/common/vip.module.css';
+import styles from '@/styles/pages/friend.module.css';
+import grade from '@/styles/grade.module.css';
+import vip from '@/styles/vip.module.css';
 // Types
 import {
   PopupType,

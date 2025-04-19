@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 
 // CSS
-import styles from '@/styles/badgeViewer.module.css';
+import styles from '@/styles/viewers/badge.module.css';
 
 // Types
 import type { Badge } from '@/types';
@@ -78,7 +78,7 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
       <>
         <div
           ref={containerRef}
-          className={styles['badgeContainer']}
+          className={styles.badgeContainer}
           onMouseEnter={() => {
             HandleCalPosition(containerRef.current!.getBoundingClientRect());
             setExpended(true);
@@ -88,29 +88,27 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
           }}
         >
           <div
-            className={styles['badgeImage']}
+            className={styles.badgeImage}
             style={{ backgroundImage: `url(${badgeUrl})` }}
           />
         </div>
         {expanded && (
           <div
-            className={`${styles['badgeInfoViewerWrapper']} ${styles[placement]}`}
+            className={`${styles.badgeInfoViewerWrapper} ${styles[placement]}`}
             style={{ top: top, left: left }}
           >
-            <div className={styles['badgeInfoBox']}>
+            <div className={styles.badgeInfoBox}>
               <div
-                className={styles['badgeBigImage']}
+                className={styles.badgeBigImage}
                 style={{ backgroundImage: `url(${badgeUrl})` }}
               />
-              <div className={styles['badgeText']}>{badge.rare}</div>
+              <div className={styles.badgeText}>{badge.rare}</div>
             </div>
-            <div className={styles['badgeDescriptionBox']}>
-              <div className={styles['badgeName']}>{badge.name}</div>
-              <div className={styles['badgeDescription']}>
-                {badge.description}
-              </div>
+            <div className={styles.badgeDescriptionBox}>
+              <div className={styles.badgeName}>{badge.name}</div>
+              <div className={styles.badgeDescription}>{badge.description}</div>
             </div>
-            <div className={styles['badgeShowTimeBox']}>
+            <div className={styles.badgeShowTimeBox}>
               <div>展示至:</div>
               <div>1970-01-01</div>
             </div>

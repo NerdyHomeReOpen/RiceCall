@@ -22,7 +22,7 @@
   display: block;
   min-width: 226px;
   min-height: 54px;
-  background-image: url('../../public/login_logo.png');
+  background-image: url('../../../public/login_logo.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -34,7 +34,7 @@
   align-items: center;
   width: 256px;
   height: 12px;
-  background-image: url('../../public/icon_loading.gif');
+  background-image: url('../../../public/icon_loading.gif');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center;
@@ -131,7 +131,7 @@
   content: '';
   width: 2px;
   height: 20px;
-  background: url(../../public/channel/icon_v_split.png) no-repeat;
+  background: url(../../../public/channel/icon_v_split.png) no-repeat;
   margin-right: 3px;
 }
 
@@ -139,7 +139,7 @@
   content: '';
   width: 20px;
   height: 12px;
-  background: url(../../public/login_combobox_triangle.png) no-repeat;
+  background: url(../../../public/login_combobox_triangle.png) no-repeat;
   background-position: -7px 0;
 }
 
@@ -185,7 +185,7 @@
 }
 
 .accountSelectCloseBtn {
-  background: url('../../public/loading_close.png');
+  background: url('../../../public/loading_close.png');
   height: 18px;
   width: 25px;
   background-size: auto;
@@ -235,7 +235,7 @@
 
 .checkWrapper .check::before {
   content: '';
-  background: url('../../public/ctrl/checkbox_icon.png') no-repeat center center;
+  background: url('../../../public/ctrl/checkbox_icon.png') no-repeat center center;
   background-size: auto;
   background-position: 0 0;
   height: 18px;
@@ -313,9 +313,9 @@
 }
 
 .createAccount::before {
-  background: url('../../public/icon_createaccount.png') no-repeat center center;
+  background: url('../../../public/icon_createaccount.png') no-repeat center center;
 }
 
 .forgetPassword::before {
-  background: url('../../public/icon_getpass.png') no-repeat center center;
+  background: url('../../../public/icon_getpass.png') no-repeat center center;
 }

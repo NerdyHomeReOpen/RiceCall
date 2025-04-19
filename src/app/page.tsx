@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
-import header from '@/styles/common/header.module.css';
+import header from '@/styles/header.module.css';
 
 // Types
 import {

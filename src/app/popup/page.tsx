@@ -4,7 +4,7 @@
 import React, { useEffect, useState, ReactNode, useRef } from 'react';
 
 // CSS
-import header from '@/styles/common/header.module.css';
+import header from '@/styles/header.module.css';
 
 // Types
 import { PopupType } from '@/types';

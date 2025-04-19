@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: url('../../../public/dialog_body_bg.png') no-repeat center center;
+  background: url('../../public/dialog_body_bg.png') no-repeat center center;
   background-size: cover;
 }
 
@@ -286,7 +286,7 @@
   height: 2rem;
   width: 25px;
   z-index: 1;
-  background-image: url('../../../public/channel/spliter.png');
+  background-image: url('../../public/channel/spliter.png');
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
@@ -299,7 +299,7 @@
   right: 0;
   width: 26px;
   height: 12px;
-  background-image: url('../../../public/login_combobox_triangle.png');
+  background-image: url('../../public/login_combobox_triangle.png');
   background-repeat: no-repeat;
   background-size: cover;
   pointer-events: none;
@@ -331,32 +331,32 @@
   display: inline-block;
   width: 36px;
   height: 36px;
-  background: url('../../../public/pic_alert.png') no-repeat center center;
+  background: url('../../public/pic_alert.png') no-repeat center center;
   vertical-align: middle;
   background-size: contain;
   min-width: 36px;
 }
 
 .dialogIcon.alert {
-  background: url('../../../public/pic_alert.png') no-repeat center center;
+  background: url('../../public/pic_alert.png') no-repeat center center;
 }
 
 .dialogIcon.alert2 {
-  background: url('../../../public/pic_alert2.png') no-repeat center center;
+  background: url('../../public/pic_alert2.png') no-repeat center center;
 }
 
 .dialogIcon.error {
-  background: url('../../../public/pic_error.png') no-repeat center center;
+  background: url('../../public/pic_error.png') no-repeat center center;
 }
 
 .dialogIcon.warning {
-  background: url('../../../public/pic_warning.png') no-repeat center center;
+  background: url('../../public/pic_warning.png') no-repeat center center;
 }
 
 .dialogIcon.info {
-  background: url('../../../public/pic_information.png') no-repeat center center;
+  background: url('../../public/pic_information.png') no-repeat center center;
 }
 
 .dialogIcon.success {
-  background: url('../../../public/pic_ok.png') no-repeat center center;
+  background: url('../../public/pic_ok.png') no-repeat center center;
 }

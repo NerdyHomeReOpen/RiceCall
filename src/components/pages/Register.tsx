@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // CSS
-import styles from '@/styles/registerPage.module.css';
+import styles from '@/styles/pages/register.module.css';
 
 // Utils
 import { createValidators } from '@/utils/validators';

@@ -3,9 +3,9 @@ import packageJson from '../../../package.json';
 const version = packageJson.version;
 
 // CSS
+import systemSetting from '@/styles/popups/systemSetting.module.css';
 import setting from '@/styles/popups/editServer.module.css';
-import popup from '@/styles/common/popup.module.css';
-import styles from '@/styles/popups/systemSetting.module.css';
+import popup from '@/styles/popup.module.css';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -230,7 +230,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                             'https://discord.gg/adCWzv6wwS',
                           )
                         }
-                        className={styles.link}
+                        className={systemSetting.link}
                       >
                         {lang.tr.discord}
                       </div>
@@ -249,7 +249,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                           'https://github.com/NerdyHomeReOpen/RiceCall',
                         )
                       }
-                      className={styles.link}
+                      className={systemSetting.link}
                     >
                       RiceCall
                     </div>
@@ -261,7 +261,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     {lang.tr.developmentTeam}
                   </div>
                   <div className={`${popup['row']}`}>
-                    <div className={styles.developerGrid}>
+                    <div className={systemSetting.developerGrid}>
                       {[
                         {
                           name: '🤓 JoshHuang9508',
@@ -304,16 +304,21 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                           github: 'https://github.com/yayacat',
                         },
                       ].map((dev) => (
-                        <div key={dev.name} className={styles.developerCard}>
+                        <div
+                          key={dev.name}
+                          className={systemSetting.developerCard}
+                        >
                           <div
                             onClick={() =>
                               ipcService.window.openExternal(dev.github)
                             }
-                            className={styles.developerName}
+                            className={systemSetting.developerName}
                           >
                             {dev.name}
                           </div>
-                          <div className={styles.developerRole}>{dev.role}</div>
+                          <div className={systemSetting.developerRole}>
+                            {dev.role}
+                          </div>
                         </div>
                       ))}
                     </div>

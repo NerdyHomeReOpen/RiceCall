@@ -12,7 +12,7 @@
   display: inline-block;
   min-width: 60px;
   min-height: 24px;
-  background: url('../../../public/login_logo_title.png') no-repeat center
+  background: url('../../public/login_logo_title.png') no-repeat center
     center;
   vertical-align: middle;
   background-size: contain;
@@ -33,7 +33,7 @@
   display: inline-block;
   min-width: 18px;
   min-height: 18px;
-  background: url('../../../public/rc_logo_small.png') no-repeat center center;
+  background: url('../../public/rc_logo_small.png') no-repeat center center;
   background-size: auto;
 }
 
@@ -65,7 +65,7 @@
 .gift {
   min-width: 28px;
   min-height: 28px;
-  background: url('../../../public/gift.png') no-repeat center center;
+  background: url('../../public/gift.png') no-repeat center center;
   display: inline-block;
   cursor: pointer;
   background-size: cover;
@@ -75,7 +75,7 @@
 .game {
   min-width: 28px;
   min-height: 28px;
-  background: url('../../../public/game.png') no-repeat center center;
+  background: url('../../public/game.png') no-repeat center center;
   display: inline-block;
   cursor: pointer;
   background-size: cover;
@@ -85,7 +85,7 @@
 .notice {
   min-width: 24px;
   min-height: 24px;
-  background: url('../../../public/icon_notice.png') no-repeat center center;
+  background: url('../../public/icon_notice.png') no-repeat center center;
   display: inline-block;
   cursor: pointer;
   background-size: cover;
@@ -95,7 +95,7 @@
 .overlay {
   min-width: 24px;
   min-height: 24px;
-  background: url('../../../public/icon_notice_overlay.png') no-repeat center
+  background: url('../../public/icon_notice_overlay.png') no-repeat center
     center;
   display: inline-block;
   cursor: pointer;
@@ -106,7 +106,7 @@
 .spliter {
   min-width: 2px;
   min-height: 19px;
-  background: url('../../../public/mf_spliter.png') no-repeat center center;
+  background: url('../../public/mf_spliter.png') no-repeat center center;
   display: inline-block;
   cursor: pointer;
   background-size: cover;
@@ -116,7 +116,7 @@
 .menu {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../../public/BtnMenu.png') no-repeat center center;
+  background: url('../../public/BtnMenu.png') no-repeat center center;
   display: inline-block;
   cursor: pointer;
   background-size: cover;
@@ -126,7 +126,7 @@
 .minimize {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../../public/Button_Minsize.png') no-repeat center center;
+  background: url('../../public/Button_Minsize.png') no-repeat center center;
   display: inline-block;
   cursor: pointer;
   background-size: cover;
@@ -136,7 +136,7 @@
 .restore {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../../public/Button_Restore.png') no-repeat center center !important;
+  background: url('../../public/Button_Restore.png') no-repeat center center !important;
   display: inline-block;
   cursor: pointer;
   background-size: cover;
@@ -146,7 +146,7 @@
 .maxsize {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../../public/Button_Maxsize.png') no-repeat center center;
+  background: url('../../public/Button_Maxsize.png') no-repeat center center;
   display: inline-block;
   cursor: pointer;
   background-size: cover;
@@ -156,7 +156,7 @@
 .close {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../../public/Button_Close.png') no-repeat center center;
+  background: url('../../public/Button_Close.png') no-repeat center center;
   display: inline-block;
   cursor: pointer;
   background-size: cover;
@@ -210,7 +210,7 @@
 .selected::before {
   width: 13px;
   height: 13px;
-  background: url('../../../public/user_state.png') no-repeat center center;
+  background: url('../../public/user_state.png') no-repeat center center;
   background-size: auto;
   background-position: 0 0;
 }
@@ -251,7 +251,7 @@
   left: 0;
   width: 10px;
   height: 31px;
-  background-image: url('../../../public/tab_item_mainframe.png');
+  background-image: url('../../public/tab_item_mainframe.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -264,7 +264,7 @@
   right: 0;
   width: 10px;
   height: 31px;
-  background-image: url('../../../public/tab_item_mainframe.png');
+  background-image: url('../../public/tab_item_mainframe.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -276,7 +276,7 @@
   right: 10px;
   min-width: 15px;
   min-height: 15px;
-  background-image: url('../../../public/ctrl/tabitem_button.png');
+  background-image: url('../../public/ctrl/tabitem_button.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -390,7 +390,7 @@
   display: inline-block;
   min-width: 13px;
   min-height: 13px;
-  background: url('../../../public/user_state.png') no-repeat center center;
+  background: url('../../public/user_state.png') no-repeat center center;
   background-size: auto;
   background-position: 0 0 !important;
 }
@@ -416,7 +416,7 @@
   min-width: 8px;
   min-height: 13px;
   margin-left: 5px;
-  background: url('../../../public/state_triangle.png') no-repeat center center;
+  background: url('../../public/state_triangle.png') no-repeat center center;
   background-size: auto;
   background-position: 0 4px;
 }
@@ -473,7 +473,7 @@
   display: inline-block;
   min-width: 13px;
   min-height: 13px;
-  background: url('../../../public/user_state.png') no-repeat center center;
+  background: url('../../public/user_state.png') no-repeat center center;
   background-size: auto;
 }
 

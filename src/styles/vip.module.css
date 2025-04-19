@@ -1,5 +1,5 @@
 .vipIcon {
-  background-image: url('../../../public/channel/vip_icons.png');
+  background-image: url('../../public/channel/vip_icons.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -35,26 +35,26 @@
 }
 
 .vip-big-1 {
-  background: url('../../../public/channel/icon_vip1.gif') no-repeat center
+  background: url('../../public/channel/icon_vip1.gif') no-repeat center
     center;
 }
 
 .vip-big-2 {
-  background: url('../../../public/channel/icon_vip2.gif') no-repeat center
+  background: url('../../public/channel/icon_vip2.gif') no-repeat center
     center;
 }
 
 .vip-big-3 {
-  background: url('../../../public/channel/icon_vip3.gif') no-repeat center
+  background: url('../../public/channel/icon_vip3.gif') no-repeat center
     center;
 }
 
 .vip-big-4 {
-  background: url('../../../public/channel/icon_vip4.gif') no-repeat center
+  background: url('../../public/channel/icon_vip4.gif') no-repeat center
     center;
 }
 
 .vip-big-5 {
-  background: url('../../../public/channel/icon_vip5.gif') no-repeat center
+  background: url('../../public/channel/icon_vip5.gif') no-repeat center
     center;
 }

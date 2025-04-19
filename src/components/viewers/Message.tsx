@@ -1,9 +1,9 @@
 import React, { useLayoutEffect, useRef } from 'react';
 
 // CSS
-import styles from '@/styles/messageViewer.module.css';
-import permission from '@/styles/common/permission.module.css';
-import vip from '@/styles/common/vip.module.css';
+import styles from '@/styles/viewers/message.module.css';
+import permission from '@/styles/permission.module.css';
+import vip from '@/styles/vip.module.css';
 
 // Components
 import MarkdownViewer from '@/components/viewers/Markdown';

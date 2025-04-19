@@ -16,8 +16,8 @@ import { useLanguage } from '@/providers/Language';
 
 // CSS
 import editChannelOrder from '@/styles/popups/editChannelOrder.module.css';
-import serverPage from '@/styles/serverPage.module.css';
-import popup from '@/styles/common/popup.module.css';
+import serverPage from '@/styles/pages/server.module.css';
+import popup from '@/styles/popup.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';

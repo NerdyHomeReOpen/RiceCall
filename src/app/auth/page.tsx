@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 // CSS
-import header from '@/styles/common/header.module.css';
+import header from '@/styles/header.module.css';
 
 // Pages
 import LoginPage from '@/components/pages/Login';

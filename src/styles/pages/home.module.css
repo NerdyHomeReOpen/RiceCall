@@ -25,7 +25,7 @@
 }
 
 .backBtn {
-  background: url('../../public/icon_left_arrow.png') no-repeat center center;
+  background: url('../../../public/icon_left_arrow.png') no-repeat center center;
   min-height: 15px;
   min-width: 15px;
   border: none;
@@ -35,7 +35,7 @@
 }
 
 .forwardBtn {
-  background: url('../../public/icon_right_arrow.png') no-repeat center center;
+  background: url('../../../public/icon_right_arrow.png') no-repeat center center;
   min-height: 15px;
   min-width: 15px;
   border: none;
@@ -101,7 +101,7 @@
 
 .navegateItem[data-key='60060']::before {
   content: '';
-  background: url('../../public/icon_home_page.png') no-repeat center center;
+  background: url('../../../public/icon_home_page.png') no-repeat center center;
   background-position: 0 0;
   min-width: 20px;
   min-height: 20px;
@@ -110,7 +110,7 @@
 
 .navegateItem[data-key='40007']::before {
   content: '';
-  background: url('../../public/icon_game.png') no-repeat center center;
+  background: url('../../../public/icon_game.png') no-repeat center center;
   background-position: 0 0;
   min-width: 20px;
   min-height: 20px;
@@ -119,7 +119,7 @@
 
 .navegateItem[data-key='30375']::before {
   content: '';
-  background: url('../../public/icon_amusement.png') no-repeat center center;
+  background: url('../../../public/icon_amusement.png') no-repeat center center;
   background-position: 0 0;
   min-width: 20px;
   min-height: 20px;
@@ -128,7 +128,7 @@
 
 .navegateItem[data-key='30014']::before {
   content: '';
-  background: url('../../public/icon_create.png') no-repeat center center;
+  background: url('../../../public/icon_create.png') no-repeat center center;
   background-position: 0 0;
   min-width: 12px;
   min-height: 12px;
@@ -137,7 +137,7 @@
 
 .navegateItem[data-key='60004']::before {
   content: '';
-  background: url('../../public/icon_person.png') no-repeat center center;
+  background: url('../../../public/icon_person.png') no-repeat center center;
   background-position: 0 0;
   min-width: 12px;
   min-height: 12px;
@@ -190,7 +190,7 @@
   object-fit: cover;
   min-height: 50px;
   min-width: 50px;
-  background-image: url('../../public/logo_server_def.png');
+  background-image: url('../../../public/logo_server_def.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -233,7 +233,7 @@
   content: '';
   width: 13px;
   height: 15px;
-  background: url('../../public/icon_creator.png') no-repeat center center;
+  background: url('../../../public/icon_creator.png') no-repeat center center;
   background-size: contain;
   background-position: 0 0;
   display: block;
@@ -276,7 +276,7 @@
   min-width: 16px;
   min-height: 16px;
   transform: rotate(180deg);
-  background-image: url('../../public/btn_fold_person.png');
+  background-image: url('../../../public/btn_fold_person.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -295,7 +295,7 @@
   display: inline-block;
   min-width: 16px;
   min-height: 16px;
-  background-image: url('../../public/btn_fold_person.png');
+  background-image: url('../../../public/btn_fold_person.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -355,7 +355,7 @@
 /* .serverAvatar {
   width: 40px;
   height: 40px;
-  background-image: url('../../public/logo_server_def.png');
+  background-image: url('../../../public/logo_server_def.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -363,7 +363,7 @@
 }
 
 .idIcon {
-  background: url('../../public/channel/ID.png') no-repeat center center;
+  background: url('../../../public/channel/ID.png') no-repeat center center;
   background-size: auto;
   min-height: 12px;
   min-width: 12px;
@@ -432,7 +432,7 @@
 }
 
 .loadingGif {
-  background: url(../../public/icon_loading.gif) no-repeat center center;
+  background: url(../../../public/icon_loading.gif) no-repeat center center;
   background-position: 0 0;
   width: 256px;
   height: 12px;
@@ -446,7 +446,7 @@
   right: 6px;
   width: 18px;
   height: 18px;
-  background: url(../../public/loading_close.png) no-repeat center center;
+  background: url(../../../public/loading_close.png) no-repeat center center;
   background-size: cover;
   border: none;
   cursor: pointer;

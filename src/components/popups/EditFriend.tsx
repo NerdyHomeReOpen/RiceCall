@@ -8,8 +8,8 @@ import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
 
 // CSS
-import popup from '@/styles/common/popup.module.css';
 import setting from '@/styles/popups/editServer.module.css';
+import popup from '@/styles/popup.module.css';
 
 // Services
 import refreshService from '@/services/refresh.service';

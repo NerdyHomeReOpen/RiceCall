@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // CSS
-import homePage from '@/styles/homePage.module.css';
+import homePage from '@/styles/pages/home.module.css';
 
 // Components
 import ServerListViewer from '@/components/viewers/ServerList';

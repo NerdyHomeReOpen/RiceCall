@@ -19,10 +19,10 @@ import refreshService from '@/services/refresh.service';
 import { createDefault } from '@/utils/createDefault';
 
 // CSS
-import popup from '@/styles/common/popup.module.css';
 import directMessage from '@/styles/popups/directMessage.module.css';
-import vip from '@/styles/common/vip.module.css';
-import grade from '@/styles/common/grade.module.css';
+import popup from '@/styles/popup.module.css';
+import vip from '@/styles/vip.module.css';
+import grade from '@/styles/grade.module.css';
 
 interface DirectMessagePopupProps {
   userId: User['userId'];

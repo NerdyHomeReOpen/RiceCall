@@ -1,7 +1,7 @@
 import React from 'react';
 
 // CSS
-import homePage from '@/styles/homePage.module.css';
+import homePage from '@/styles/pages/home.module.css';
 
 // Type
 import { Server, User } from '@/types';

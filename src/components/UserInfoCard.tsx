@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 
 // CSS
 import userInfoCard from '@/styles/userInfoCard.module.css';
-import grade from '@/styles/common/grade.module.css';
-import vip from '@/styles/common/vip.module.css';
-import permission from '@/styles/common/permission.module.css';
+import grade from '@/styles/grade.module.css';
+import vip from '@/styles/vip.module.css';
+import permission from '@/styles/permission.module.css';
 
 // Components
 import BadgeViewer from '@/components/viewers/Badge';

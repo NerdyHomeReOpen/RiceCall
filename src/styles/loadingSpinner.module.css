@@ -2,7 +2,7 @@
   min-width: 35px;
   min-height: 35px;
   border-radius: 50%;
-  background-image: url('../../../public/loading.gif');
+  background-image: url('../../public/loading.gif');
   background-size: auto;
   background-position: center;
   background-repeat: no-repeat;
