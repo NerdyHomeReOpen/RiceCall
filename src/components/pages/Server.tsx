@@ -140,11 +140,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       setServerChannels(data);
     };
 
-    const handleServerActiveMembersUpdate = (
-      data: ServerMember[] | null,
-    ): void => {
+    const handleServerMembersUpdate = (data: ServerMember[] | null): void => {
       if (!data) data = [];
-      setServerActiveMembers(data);
+      setServerActiveMembers(
+        data.filter((member) => member.currentServerId === serverId),
+      );
     };
 
     const handleOnMessagesUpdate = (data: ChannelMessage): void => {
@@ -214,8 +214,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       const eventHandlers = {
         [SocketServerEvent.MEMBER_UPDATE]: handleMemberUpdate,
         [SocketServerEvent.SERVER_CHANNELS_UPDATE]: handleServerChannelsUpdate,
-        [SocketServerEvent.SERVER_ACTIVE_MEMBERS_UPDATE]:
-          handleServerActiveMembersUpdate,
+        [SocketServerEvent.SERVER_MEMBERS_UPDATE]: handleServerMembersUpdate,
         [SocketServerEvent.ON_MESSAGE]: handleOnMessagesUpdate,
       };
       const unsubscribe: (() => void)[] = [];
@@ -280,7 +279,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             <ChannelViewer
               user={user}
               server={server}
-              channel={channel}
+              currentChannel={channel}
               serverActiveMembers={serverActiveMembers}
               serverChannels={serverChannels}
               permissionLevel={memberPermissionLevel}

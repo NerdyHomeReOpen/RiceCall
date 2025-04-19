@@ -2251,7 +2251,6 @@ export enum SocketServerEvent {
   SERVER_UPDATE = 'serverUpdate',
   SERVER_CHANNELS_UPDATE = 'serverChannelsUpdate',
   SERVER_MEMBERS_UPDATE = 'serverMembersUpdate',
-  SERVER_ACTIVE_MEMBERS_UPDATE = 'serverActiveMembersUpdate',
   SERVER_MEMBER_APPLICATIONS_UPDATE = 'serverMemberApplicationsUpdate',
   // Channel
   CHANNEL_UPDATE = 'channelUpdate',

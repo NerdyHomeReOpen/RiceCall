@@ -95,9 +95,8 @@ const SocketServerEvent = {
   SERVER_SEARCH: 'serverSearch',
   SERVER_UPDATE: 'serverUpdate',
   SERVER_CHANNELS_UPDATE: 'serverChannelsUpdate',
-  SERVER_ACTIVE_MEMBERS_UPDATE: 'serverActiveMembersUpdate',
-  SERVER_MEMBER_APPLICATIONS_UPDATE: 'serverMemberApplicationsUpdate',
   SERVER_MEMBERS_UPDATE: 'serverMembersUpdate',
+  SERVER_MEMBER_APPLICATIONS_UPDATE: 'serverMemberApplicationsUpdate',
   // Channel
   CHANNEL_UPDATE: 'channelUpdate',
   // Category
@@ -135,13 +134,13 @@ let isDev = process.argv.includes('--dev');
 
 const appServe = app.isPackaged
   ? serve({
-    directory: path.join(__dirname, './out'),
-  })
-  : !isDev
-    ? serve({
       directory: path.join(__dirname, './out'),
     })
-    : null;
+  : !isDev
+  ? serve({
+      directory: path.join(__dirname, './out'),
+    })
+  : null;
 
 let baseUri = '';
 
@@ -446,7 +445,7 @@ function connectSocket(token) {
       socket.on(event, (data) => {
         if (!userId && data.userId) {
           userId = data.userId;
-        };
+        }
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, data);
         });
@@ -611,7 +610,9 @@ function trayIcon(isGray = true) {
     tray.destroy();
   }
   const iconPath = isGray ? 'tray_gray.ico' : 'tray.ico';
-  tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'resources', iconPath)));
+  tray = new Tray(
+    nativeImage.createFromPath(path.join(__dirname, 'resources', iconPath)),
+  );
   tray.on('click', () => {
     if (mainWindow && authWindow.isVisible()) {
       authWindow.hide();
@@ -797,8 +798,13 @@ app.on('activate', async () => {
 
 app.whenReady().then(() => {
   const protocolClient = process.execPath;
-  const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
-  app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
+  const args =
+    process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
+  app.setAsDefaultProtocolClient(
+    'ricecall',
+    app.isPackaged ? undefined : protocolClient,
+    args,
+  );
 });
 
 // 防止多開
@@ -806,7 +812,7 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   app.on('second-instance', (event, argv) => {
-    const url = argv.find(arg => arg.startsWith('ricecall://'));
+    const url = argv.find((arg) => arg.startsWith('ricecall://'));
     if (url) {
       console.log('接收到 deeplink (Windows second-instance):', url);
       handleDeepLink(url);
@@ -845,17 +851,26 @@ async function handleDeepLink(url) {
         const serverId = new URL(url).searchParams.get('serverId');
         // 如果已經登入才能發進群請求
         if (serverId && userId && socketInstance && socketInstance.connected) {
-          socketInstance.emit(SocketClientEvent.SEARCH_SERVER, { query: serverId });
-          socketInstance.on(SocketServerEvent.SERVER_SEARCH, (serverInfoList) => {
-            // 對照DisplayId 如果找不到就不會進群也不會通知前端
-            const matchedServer = serverInfoList.find((server) => server.displayId === serverId);
-            if (matchedServer) {
-              mainWindow.show();
-              mainWindow.focus();
-              socketInstance.emit(SocketClientEvent.CONNECT_SERVER, { userId, serverId: matchedServer.serverId });
-            }
+          socketInstance.emit(SocketClientEvent.SEARCH_SERVER, {
+            query: serverId,
           });
-
+          socketInstance.on(
+            SocketServerEvent.SERVER_SEARCH,
+            (serverInfoList) => {
+              // 對照DisplayId 如果找不到就不會進群也不會通知前端
+              const matchedServer = serverInfoList.find(
+                (server) => server.displayId === serverId,
+              );
+              if (matchedServer) {
+                mainWindow.show();
+                mainWindow.focus();
+                socketInstance.emit(SocketClientEvent.CONNECT_SERVER, {
+                  userId,
+                  serverId: matchedServer.serverId,
+                });
+              }
+            },
+          );
         }
         break;
     }
@@ -866,7 +881,12 @@ async function handleDeepLink(url) {
 
 // 集中處理聚焦視窗
 function focusWindow() {
-  const window = authWindow?.isDestroyed() === false ? authWindow : mainWindow?.isDestroyed() === false ? mainWindow : null;
+  const window =
+    authWindow?.isDestroyed() === false
+      ? authWindow
+      : mainWindow?.isDestroyed() === false
+      ? mainWindow
+      : null;
   if (window) {
     if (window.isMinimized()) window.restore();
     window.focus();

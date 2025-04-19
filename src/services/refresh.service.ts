@@ -93,18 +93,6 @@ export const refreshService = {
     return serverChannels;
   },
 
-  serverActiveMembers: async ({
-    serverId,
-  }: {
-    serverId: Server['serverId'];
-  }): Promise<ServerMember[] | null> => {
-    const serverActiveMembers = await apiService.post(
-      '/refresh/serverActiveMembers',
-      { serverId },
-    );
-    return serverActiveMembers;
-  },
-
   serverMembers: async ({
     serverId,
   }: {
