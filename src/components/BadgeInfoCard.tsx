@@ -10,51 +10,68 @@ import type { Badge } from '@/types';
 // import { useLanguage } from '@/providers/Language';
 
 interface BadgeInfoCardProps {
-  x: number;
-  y: number;
+  rect: DOMRect;
   badge: Badge;
 }
 
 const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
-  ({ x, y, badge }) => {
+  ({ rect, badge }) => {
     // Refs
     const cardRef = useRef<HTMLDivElement>(null);
 
     // const lang = useLanguage();
 
     // State
-    const [cardX, setCardX] = useState(x);
-    const [cardY, setCardY] = useState(y);
+    const [cardX, setCardX] = useState(0);
+    const [cardY, setCardY] = useState(0);
+    const [ready, setReady] = useState(false);
 
     // Variables
     const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
 
     // Effect
     useEffect(() => {
-      const cardWidth = cardRef.current!.offsetWidth;
-      const cardHeight = cardRef.current!.offsetHeight;
-      const windowWidth = window.innerWidth;
+      const tryPosition = () => {
+        if (!cardRef.current) return;
 
-      let newCardX = x;
-      let newCardY = y - cardHeight;
+        const cardWidth = cardRef.current.offsetWidth;
+        const cardHeight = cardRef.current.offsetHeight;
 
-      if (newCardX + cardWidth > windowWidth) {
-        newCardX = windowWidth - cardWidth - 20;
-      }
+        if (cardHeight === 0 || cardWidth === 0) {
+          requestAnimationFrame(tryPosition);
+          return;
+        }
 
-      if (newCardY < 0) {
-        newCardY = 20;
-      }
+        const windowWidth = window.innerWidth;
 
-      setCardX(newCardX);
-      setCardY(newCardY);
-    }, [x, y]);
+        let newCardX = rect.left;
+        let newCardY = rect.top - cardHeight;
+
+        if (newCardX + cardWidth > windowWidth) {
+          newCardX = windowWidth - cardWidth - 15;
+        }
+
+        if (newCardY < 0) {
+          newCardY = 20;
+        }
+
+        setCardX(newCardX);
+        setCardY(newCardY);
+        setReady(true);
+      };
+
+      requestAnimationFrame(tryPosition);
+    }, [rect]);
 
     return (
       <div
         ref={cardRef}
         className={`context-menu-container ${badgeInfoCardStyles.badgeInfoCard}`}
-        style={{ top: cardY, left: cardX }}
+        style={{
+          top: cardY,
+          left: cardX,
+          visibility: ready ? 'visible' : 'hidden',
+        }}
       >
         <div className={badgeInfoCardStyles.badgeInfoWrapper}>
           <div className={badgeInfoCardStyles.badgeAvatarBox}>

@@ -11,7 +11,7 @@ import BadgeInfoCard from '@/components/BadgeInfoCard';
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, items: ContextMenuItem[]) => void;
   showUserInfoBlock: (x: number, y: number, member: ServerMember) => void;
-  showBadgeInfoCard: (x: number, y: number, badge: Badge) => void;
+  showBadgeInfoCard: (badgeElement: HTMLElement, badge: Badge) => void;
   closeContextMenu: () => void;
 }
 
@@ -32,6 +32,10 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   // States
   const [isVisible, setIsVisible] = React.useState(false);
   const [content, setContent] = React.useState<ReactNode | null>(null);
+  const [hoveredBadge, setHoveredBadge] = React.useState<{
+    rect: DOMRect;
+    badge: Badge;
+  } | null>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -72,8 +76,9 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsVisible(true);
   };
 
-  const showBadgeInfoCard = (x: number, y: number, badge: Badge) => {
-    setContent(<BadgeInfoCard x={x} y={y} badge={badge} />);
+  const showBadgeInfoCard = (badgeElement: HTMLElement, badge: Badge) => {
+    const rect = badgeElement.getBoundingClientRect();
+    setContent(<BadgeInfoCard rect={rect} badge={badge} />);
     setIsVisible(true);
   };
 

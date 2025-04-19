@@ -20,6 +20,7 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
   ({ badge }) => {
     // Hooks
     const contextMenu = useContextMenu();
+    const badgeRef = React.useRef<HTMLDivElement>(null);
 
     // Variables
     const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
@@ -33,9 +34,12 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
 
     return (
       <div
-        onClick={(e) => {
-          e.stopPropagation();
-          contextMenu.showBadgeInfoCard(e.clientX, e.clientY, badge);
+        ref={badgeRef}
+        onMouseEnter={() => {
+          contextMenu.showBadgeInfoCard(badgeRef.current!, badge);
+        }}
+        onMouseLeave={() => {
+          contextMenu.closeContextMenu();
         }}
       >
         <div
