@@ -131,7 +131,9 @@
   content: '';
   width: 2px;
   height: 20px;
-  background: url(../../../public/channel/icon_v_split.png) no-repeat;
+  background-image: url('../../../public/channel/icon_v_split.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
   margin-right: 3px;
 }
 
@@ -139,7 +141,8 @@
   content: '';
   width: 20px;
   height: 12px;
-  background: url(../../../public/login_combobox_triangle.png) no-repeat;
+  background-image: url('../../../public/login_combobox_triangle.png');
+  background-repeat: no-repeat;
   background-position: -7px 0;
 }
 
@@ -185,13 +188,11 @@
 }
 
 .accountSelectCloseBtn {
-  background: url('../../../public/loading_close.png');
-  height: 18px;
-  width: 25px;
-  background-size: auto;
+  min-height: 18px;
+  min-width: 18px;
+  background-image: url('../../../public/loading_close.png');
+  background-size: cover;
   background-position: 0 0;
-  height: 18px;
-  width: 18px;
   margin-right: 5px;
   cursor: pointer;
 }
@@ -234,13 +235,13 @@
 }
 
 .checkWrapper .check::before {
+  display: block;
   content: '';
-  background: url('../../../public/ctrl/checkbox_icon.png') no-repeat center center;
+  min-height: 18px;
+  min-width: 18px;
+  background-image: url('../../../public/ctrl/checkbox_icon.png');
   background-size: auto;
   background-position: 0 0;
-  height: 18px;
-  width: 18px;
-  display: block;
 }
 
 .checkBox:hover > .check::before {
@@ -313,9 +314,13 @@
 }
 
 .createAccount::before {
-  background: url('../../../public/icon_createaccount.png') no-repeat center center;
+  background-image: url('../../../public/icon_createaccount.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
 }
 
 .forgetPassword::before {
-  background: url('../../../public/icon_getpass.png') no-repeat center center;
+  background-image: url('../../../public/icon_getpass.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
 }

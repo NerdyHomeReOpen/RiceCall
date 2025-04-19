@@ -25,22 +25,22 @@
 }
 
 .backBtn {
-  background: url('../../../public/icon_left_arrow.png') no-repeat center center;
   min-height: 15px;
   min-width: 15px;
   border: none;
   cursor: pointer;
   margin-right: 15px;
+  background-image: url('../../../public/icon_left_arrow.png');
   background-position: 0 0;
 }
 
 .forwardBtn {
-  background: url('../../../public/icon_right_arrow.png') no-repeat center center;
   min-height: 15px;
   min-width: 15px;
   border: none;
   cursor: pointer;
   margin-right: 15px;
+  background-image: url('../../../public/icon_right_arrow.png');
   background-position: 0 0;
 }
 
@@ -101,47 +101,47 @@
 
 .navegateItem[data-key='60060']::before {
   content: '';
-  background: url('../../../public/icon_home_page.png') no-repeat center center;
-  background-position: 0 0;
   min-width: 20px;
   min-height: 20px;
   margin-right: 5px;
+  background-image: url('../../../public/icon_home_page.png');
+  background-position: 0 0;
 }
 
 .navegateItem[data-key='40007']::before {
   content: '';
-  background: url('../../../public/icon_game.png') no-repeat center center;
-  background-position: 0 0;
   min-width: 20px;
   min-height: 20px;
   margin-right: 5px;
+  background-image: url('../../../public/icon_game.png');
+  background-position: 0 0;
 }
 
 .navegateItem[data-key='30375']::before {
   content: '';
-  background: url('../../../public/icon_amusement.png') no-repeat center center;
-  background-position: 0 0;
   min-width: 20px;
   min-height: 20px;
   margin-right: 5px;
+  background-image: url('../../../public/icon_amusement.png');
+  background-position: 0 0;
 }
 
 .navegateItem[data-key='30014']::before {
   content: '';
-  background: url('../../../public/icon_create.png') no-repeat center center;
-  background-position: 0 0;
   min-width: 12px;
   min-height: 12px;
   margin-right: 5px;
+  background-image: url('../../../public/icon_create.png');
+  background-position: 0 0;
 }
 
 .navegateItem[data-key='60004']::before {
   content: '';
-  background: url('../../../public/icon_person.png') no-repeat center center;
-  background-position: 0 0;
   min-width: 12px;
   min-height: 12px;
   margin-right: 5px;
+  background-image: url('../../../public/icon_person.png');
+  background-position: 0 0;
 }
 
 /* Content */
@@ -230,14 +230,14 @@
 }
 
 .serverIdText.IsOwner::before {
+  display: block;
   content: '';
   width: 13px;
   height: 15px;
-  background: url('../../../public/icon_creator.png') no-repeat center center;
+  margin-right: 2px;
+  background-image: url('../../../public/icon_creator.png');
   background-size: contain;
   background-position: 0 0;
-  display: block;
-  margin-right: 2px;
 }
 
 @media only screen and (width >= 500px) {
@@ -352,48 +352,6 @@
   background-color: #f5f5f5;
 }
 
-/* .serverAvatar {
-  width: 40px;
-  height: 40px;
-  background-image: url('../../../public/logo_server_def.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  flex-shrink: 0;
-}
-
-.idIcon {
-  background: url('../../../public/channel/ID.png') no-repeat center center;
-  background-size: auto;
-  min-height: 12px;
-  min-width: 12px;
-}
-
-.serverInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1;
-}
-
-.serverName {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 100%;
-}
-
-.serverIdBox {
-  display: flex;
-  flex-direction: row;
-  gap: 2px;
-}
-
-.serverId {
-  color: #666;
-} */
-
 .loadingWrapper {
   height: 100%;
   width: 100%;
@@ -432,12 +390,12 @@
 }
 
 .loadingGif {
-  background: url(../../../public/icon_loading.gif) no-repeat center center;
-  background-position: 0 0;
   width: 256px;
   height: 12px;
-  background-size: contain;
   margin-top: 15px;
+  background-image: url('../../../public/icon_loading.gif');
+  background-position: 0 0;
+  background-size: contain;
 }
 
 .loadingCloseBtn {
@@ -446,10 +404,10 @@
   right: 6px;
   width: 18px;
   height: 18px;
-  background: url(../../../public/loading_close.png) no-repeat center center;
-  background-size: cover;
   border: none;
   cursor: pointer;
+  background-image: url('../../../public/loading_close.png');
+  background-size: cover;
   background-position: 0 0;
 }
 

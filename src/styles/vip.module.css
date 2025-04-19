@@ -1,11 +1,11 @@
 .vipIcon {
+  min-height: 14px;
+  min-width: 14px;
+  margin-right: 2px;
   background-image: url('../../public/channel/vip_icons.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: 0 0;
-  min-height: 14px;
-  min-width: 14px;
-  margin-right: 2px;
 }
 
 .vip-small-1 {
@@ -29,32 +29,29 @@
 }
 
 .vipIconBig {
-  height: 14px;
-  width: 55px;
+  min-height: 14px;
+  min-width: 55px;
   margin-right: 2px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
 }
 
 .vip-big-1 {
-  background: url('../../public/channel/icon_vip1.gif') no-repeat center
-    center;
+  background-image: url('../../public/channel/icon_vip1.gif');
 }
 
 .vip-big-2 {
-  background: url('../../public/channel/icon_vip2.gif') no-repeat center
-    center;
+  background-image: url('../../public/channel/icon_vip2.gif');
 }
 
 .vip-big-3 {
-  background: url('../../public/channel/icon_vip3.gif') no-repeat center
-    center;
+  background-image: url('../../public/channel/icon_vip3.gif');
 }
 
 .vip-big-4 {
-  background: url('../../public/channel/icon_vip4.gif') no-repeat center
-    center;
+  background-image: url('../../public/channel/icon_vip4.gif');
 }
 
 .vip-big-5 {
-  background: url('../../public/channel/icon_vip5.gif') no-repeat center
-    center;
+  background-image: url('../../public/channel/icon_vip5.gif');
 }

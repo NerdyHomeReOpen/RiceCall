@@ -3,7 +3,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: url('../../public/dialog_body_bg.png') no-repeat center center;
+  background-image: url('../../public/dialog_body_bg.png');
+  background-repeat: no-repeat;
   background-size: cover;
 }
 
@@ -331,32 +332,32 @@
   display: inline-block;
   width: 36px;
   height: 36px;
-  background: url('../../public/pic_alert.png') no-repeat center center;
-  vertical-align: middle;
+  background-image: url('../../public/pic_alert.png');
+  background-repeat: no-repeat;
   background-size: contain;
   min-width: 36px;
 }
 
 .dialogIcon.alert {
-  background: url('../../public/pic_alert.png') no-repeat center center;
+  background-image: url('../../public/pic_alert.png');
 }
 
 .dialogIcon.alert2 {
-  background: url('../../public/pic_alert2.png') no-repeat center center;
+  background-image: url('../../public/pic_alert2.png');
 }
 
 .dialogIcon.error {
-  background: url('../../public/pic_error.png') no-repeat center center;
+  background-image: url('../../public/pic_error.png');
 }
 
 .dialogIcon.warning {
-  background: url('../../public/pic_warning.png') no-repeat center center;
+  background-image: url('../../public/pic_warning.png');
 }
 
 .dialogIcon.info {
-  background: url('../../public/pic_information.png') no-repeat center center;
+  background-image: url('../../public/pic_information.png');
 }
 
 .dialogIcon.success {
-  background: url('../../public/pic_ok.png') no-repeat center center;
+  background-image: url('../../public/pic_ok.png');
 }

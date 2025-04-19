@@ -1,8 +1,10 @@
 .badgeIcon {
-  min-width: 16px;
-  min-height: 16px;
-  background: url('../../public/badge/nerdy.png') no-repeat center;
-  background-size: cover;
   border: none;
   cursor: pointer;
+  min-width: 16px;
+  min-height: 16px;
+  background-image: url('../../public/badge/nerdy.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }

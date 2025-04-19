@@ -12,9 +12,10 @@
   display: inline-block;
   min-width: 60px;
   min-height: 24px;
-  background: url('../../public/login_logo_title.png') no-repeat center
-    center;
   vertical-align: middle;
+  background-image: url('../../public/login_logo_title.png');
+  background-repeat: no-repeat;
+  background-position: center center;
   background-size: contain;
   left: 2.5rem;
 }
@@ -33,7 +34,9 @@
   display: inline-block;
   min-width: 18px;
   min-height: 18px;
-  background: url('../../public/rc_logo_small.png') no-repeat center center;
+  background-image: url('../../public/rc_logo_small.png');
+  background-repeat: no-repeat;
+  background-position: center center;
   background-size: auto;
 }
 
@@ -65,102 +68,111 @@
 .gift {
   min-width: 28px;
   min-height: 28px;
-  background: url('../../public/gift.png') no-repeat center center;
+  background-image: url('../../public/gift.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0;
 }
 
 .game {
   min-width: 28px;
   min-height: 28px;
-  background: url('../../public/game.png') no-repeat center center;
+  background-image: url('../../public/game.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0;
 }
 
 .notice {
   min-width: 24px;
   min-height: 24px;
-  background: url('../../public/icon_notice.png') no-repeat center center;
+  background-image: url('../../public/icon_notice.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0;
 }
 
 .overlay {
   min-width: 24px;
   min-height: 24px;
-  background: url('../../public/icon_notice_overlay.png') no-repeat center
-    center;
+  background-image: url('../../public/icon_notice_overlay.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0;
 }
 
 .spliter {
   min-width: 2px;
   min-height: 19px;
-  background: url('../../public/mf_spliter.png') no-repeat center center;
+  background-image: url('../../public/mf_spliter.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0;
 }
 
 .menu {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../public/BtnMenu.png') no-repeat center center;
+  background-image: url('../../public/BtnMenu.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0;
 }
 
 .minimize {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../public/Button_Minsize.png') no-repeat center center;
+  background-image: url('../../public/Button_Minsize.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0;
 }
 
 .restore {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../public/Button_Restore.png') no-repeat center center !important;
+  background-image: url('../../public/Button_Restore.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0 !important;
 }
 
 .maxsize {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../public/Button_Maxsize.png') no-repeat center center;
+  background-image: url('../../public/Button_Maxsize.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0;
 }
 
 .close {
   min-width: 20px;
   min-height: 20px;
-  background: url('../../public/Button_Close.png') no-repeat center center;
+  background-image: url('../../public/Button_Close.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
   display: inline-block;
   cursor: pointer;
-  background-size: cover;
-  background-position: 0 0;
 }
 
 .overlayNew {
@@ -210,8 +222,8 @@
 .selected::before {
   width: 13px;
   height: 13px;
-  background: url('../../public/user_state.png') no-repeat center center;
-  background-size: auto;
+  background-image: url('../../public/user_state.png');
+  background-repeat: no-repeat;
   background-position: 0 0;
 }
 
@@ -390,8 +402,8 @@
   display: inline-block;
   min-width: 13px;
   min-height: 13px;
-  background: url('../../public/user_state.png') no-repeat center center;
-  background-size: auto;
+  background-image: url('../../public/user_state.png');
+  background-repeat: no-repeat;
   background-position: 0 0 !important;
 }
 
@@ -416,8 +428,8 @@
   min-width: 8px;
   min-height: 13px;
   margin-left: 5px;
-  background: url('../../public/state_triangle.png') no-repeat center center;
-  background-size: auto;
+  background-image: url('../../public/state_triangle.png');
+  background-repeat: no-repeat;
   background-position: 0 4px;
 }
 
@@ -473,8 +485,9 @@
   display: inline-block;
   min-width: 13px;
   min-height: 13px;
-  background: url('../../public/user_state.png') no-repeat center center;
-  background-size: auto;
+  background-image: url('../../public/user_state.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
 }
 
 .statusDropdown .option[datatype='online']::before {

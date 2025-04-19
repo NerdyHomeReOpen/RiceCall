@@ -210,19 +210,19 @@
 }
 
 .inputArea .topBar .buttons .button.font {
-  background-image: url(../../../public/FontButton.png);
+  background-image: url('../../../public/FontButton.png');
 }
 
 .inputArea .topBar .buttons .button.emoji {
-  background-image: url(../../../public/FaceButton.png);
+  background-image: url('../../../public/FaceButton.png');
 }
 
 .inputArea .topBar .buttons .button.screenShot {
-  background-image: url(../../../public/ScreenShot.png);
+  background-image: url('../../../public/ScreenShot.png');
 }
 
 .inputArea .topBar .buttons .button.nudge {
-  background: url(../../../public/im/Nudge.png) no-repeat;
+  background-image: url('../../../public/im/Nudge.png');
 }
 
 .inputArea .topBar .historyMessage {
@@ -239,7 +239,7 @@
   min-height: 18px;
   min-width: 18px;
   margin-right: 3px;
-  background-image: url(../../../public/im/history.png);
+  background-image: url('../../../public/im/history.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;

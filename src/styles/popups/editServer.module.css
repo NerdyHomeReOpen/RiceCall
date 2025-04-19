@@ -13,9 +13,10 @@
   width: 100%;
   max-width: 145px;
   min-height: 0;
-  background: url('../../../public/setting_left_bg.png') no-repeat center center;
+  background-image: url('../../../public/setting_left_bg.png');
   background-size: cover;
   border-right: 1px solid #b4dbec;
+  background-repeat: no-repeat;
 }
 
 .tabs {
@@ -111,13 +112,13 @@
 }
 
 .wealthCoinIcon::after {
+  display: block;
   content: '';
   height: 16px;
   width: 16px;
-  display: block;
-  background: url('../../../public/golden_pea.png');
-  background-size: cover;
   margin-left: 3px;
+  background-image: url('../../../public/golden_pea.png');
+  background-size: cover;
 }
 
 .saperator {
@@ -152,12 +153,12 @@
 }
 
 .searchIcon {
-  height: 17px;
-  width: 17px;
-  background: url('../../../public/channel/channel_search.png');
+  min-height: 17px;
+  min-width: 17px;
+  margin-left: 5px;
+  background-image: url('../../../public/channel/channel_search.png');
   background-size: cover;
   background-position: 0 0;
-  margin-left: 5px;
 }
 
 .searchBorder:hover:not(:has(.searchPrev:hover, .searchNext:hover))
@@ -218,14 +219,14 @@
 }
 
 .blueBtn {
-  background: url(../../../public/im/btn-blue.png) no-repeat center center;
-  background-size: auto;
   color: #fff;
   border: 0;
-  background-position: 0 0;
   min-width: 80px;
   max-width: 80px;
   height: 28px;
+  background-image: url('../../../public/im/btn-blue.png');
+  background-size: auto;
+  background-position: 0 0;
 }
 
 .blueBtn:hover {

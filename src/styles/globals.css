@@ -80,11 +80,11 @@ div.resizeHandle {
 }
 
 input[type='radio'] {
-  background: url('../../public/ctrl/radiobox_icon.png');
+  background-image: url('../../public/ctrl/radiobox_icon.png');
 }
 
 input[type='checkbox'] {
-  background: url('../../public/ctrl/checkbox_icon.png');
+  background-image: url('../../public/ctrl/checkbox_icon.png');
 }
 
 input[type='radio'],

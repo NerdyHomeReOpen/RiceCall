@@ -9,36 +9,6 @@
   border: 1px solid #e0e0e4;
 }
 
-.userInfoCard.vip-0 {
-  background: url('../../public/channel/ucard_vip0_bg.png') no-repeat center
-    center;
-}
-
-.userInfoCard.vip-1 {
-  background: url('../../public/channel/ucard_vip1_bg.png') no-repeat center
-    center;
-}
-
-.userInfoCard.vip-2 {
-  background: url('../../public/channel/ucard_vip2_bg.png') no-repeat center
-    center;
-}
-
-.userInfoCard.vip-3 {
-  background: url('../../public/channel/ucard_vip3_bg.png') no-repeat center
-    center;
-}
-
-.userInfoCard.vip-4 {
-  background: url('../../public/channel/ucard_vip4_bg.png') no-repeat center
-    center;
-}
-
-.userInfoCard.vip-5 {
-  background: url('../../public/channel/ucard_vip5_bg.png') no-repeat center
-    center;
-}
-
 .body {
   flex: 1;
   padding: 10px 11px;
@@ -91,7 +61,8 @@
 .nicknameRow:not(:empty)::before {
   content: '';
   display: block;
-  background: url('../../public/channel/groupcard.png') no-repeat center center;
+  background-image: url('../../public/channel/groupcard.png');
+  background-repeat: no-repeat;
   min-width: 16px;
   min-height: 16px;
   object-fit: cover;
@@ -147,10 +118,12 @@
 }
 
 .saperator {
-  background: url('../../public/icon_v_split.png') no-repeat center center;
   margin: 0 5px;
   min-width: 2px;
   min-height: 12px;
+  background-image: url('../../public/icon_v_split.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
   background-size: auto;
 }
 
