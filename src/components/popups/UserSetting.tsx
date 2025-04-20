@@ -287,6 +287,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       isFutureDate,
     ]);
 
+    const ProfilePrivate = false; // TODO: 隱私設定開關，等設定功能完工
+    const PrivateElement = (text: React.ReactNode) => {
+      return <div className={setting['userRecentVisitsPrivate']}>{text}</div>;
+    };
     const getMainContent = () => {
       switch (selectedTabId) {
         case 'about':
@@ -307,9 +311,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                 <div className={setting['title']}>
                   {'最近訪問' /** LAST JOIN GROUP **/}
                 </div>
-                <div className={setting['serverItems']}>
-                  {userRecentServers.map((server) => {
-                    return (
+                {!ProfilePrivate && userRecentServers.length ? (
+                  <div className={setting['serverItems']}>
+                    {userRecentServers.map((server) => (
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
@@ -320,7 +324,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                           style={{
                             backgroundImage: `url(${server.avatarUrl})`,
                           }}
-                        ></div>
+                        />
                         <div className={setting['serverBox']}>
                           <div className={setting['serverName']}>
                             {server.name}
@@ -332,17 +336,27 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                                   ? setting['isOwner']
                                   : ''
                               }`}
-                            ></div>
-                            <div className={setting['id']}></div>
+                            />
+                            <div className={setting['id']} />
                             <div className={setting['displayId']}>
                               {server.displayId}
                             </div>
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                ) : ProfilePrivate ? (
+                  PrivateElement(
+                    <>
+                      對方沒有對外
+                      <br />
+                      公開最近訪問
+                    </>,
+                  )
+                ) : (
+                  PrivateElement('最近沒訪問語音群')
+                )}
               </div>
               <div className={`${setting['userProfileContent']}`}>
                 <div className={setting['title']}>
@@ -405,15 +419,28 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               </div>
               <div className={setting['serverItems']}>
                 {serversView === 'joined'
-                  ? userServers
-                      .filter(
+                  ? ProfilePrivate
+                    ? PrivateElement(
+                        <>
+                          對方沒有對外公開
+                          <br />
+                          加入的語音群
+                        </>,
+                      )
+                    : userServers.filter(
                         (server) =>
                           server.permissionLevel > 1 &&
                           server.permissionLevel < 7,
-                      )
-                      .sort((a, b) => b.permissionLevel - a.permissionLevel)
-                      .map((server) => {
-                        return (
+                      ).length === 0
+                    ? PrivateElement('沒有加入的語音群')
+                    : userServers
+                        .filter(
+                          (server) =>
+                            server.permissionLevel > 1 &&
+                            server.permissionLevel < 7,
+                        )
+                        .sort((a, b) => b.permissionLevel - a.permissionLevel)
+                        .map((server) => (
                           <div
                             key={server.serverId}
                             className={setting['serverItem']}
@@ -435,16 +462,14 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                                 <div
                                   className={`
                                 ${setting['permission']}
-                                ${permission[userGender]}
+                                ${permission[userGender]} 
                                 ${
                                   server.ownerId === targetId
                                     ? permission[`lv-6`]
                                     : permission[`lv-${server.permissionLevel}`]
                                 }`}
                                 />
-                                <div
-                                  className={`${setting['contributionBox']}`}
-                                >
+                                <div className={setting['contributionBox']}>
                                   <div>{'貢獻:'}</div>
                                   <div className={setting['contributionValue']}>
                                     {server.contribution}
@@ -453,49 +478,56 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                               </div>
                             </div>
                           </div>
-                        );
-                      })
-                  : userFavoriteServers.map((server) => {
-                      return (
+                        ))
+                  : ProfilePrivate
+                  ? PrivateElement(
+                      <>
+                        對方沒有對外公開
+                        <br />
+                        收藏的語音群
+                      </>,
+                    )
+                  : userFavoriteServers.length === 0
+                  ? PrivateElement('沒有收藏的語音群')
+                  : userFavoriteServers.map((server) => (
+                      <div
+                        key={server.serverId}
+                        className={setting['serverItem']}
+                        onClick={() => handleServerSelect(userId, server)}
+                      >
                         <div
-                          key={server.serverId}
-                          className={setting['serverItem']}
-                          onClick={() => handleServerSelect(userId, server)}
-                        >
+                          className={setting['serverAvatarPicture']}
+                          style={{
+                            backgroundImage: `url(${server.avatarUrl})`,
+                          }}
+                        />
+                        <div className={setting['serverBox']}>
+                          <div className={setting['serverName']}>
+                            {server.name}
+                          </div>
                           <div
-                            className={setting['serverAvatarPicture']}
-                            style={{
-                              backgroundImage: `url(${server.avatarUrl})`,
-                            }}
-                          />
-                          <div className={setting['serverBox']}>
-                            <div className={setting['serverName']}>
-                              {server.name}
-                            </div>
+                            className={`${setting['serverInfo']} ${setting['around']}`}
+                          >
                             <div
-                              className={`${setting['serverInfo']} ${setting['around']}`}
-                            >
-                              <div
-                                className={`
-                                ${setting['permission']}
-                                ${permission[userGender]} 
-                                ${
-                                  server.ownerId === targetId
-                                    ? permission[`lv-6`]
-                                    : permission[`lv-${2}`]
-                                }`}
-                              />
-                              <div className={`${setting['contributionBox']}`}>
-                                <div>{'貢獻:' /** CONTRIBUTION  **/}</div>
-                                <div className={setting['contributionValue']}>
-                                  {0 /** TODO:Connect Member Contribution **/}
-                                </div>
+                              className={`
+                              ${setting['permission']}
+                              ${permission[userGender]} 
+                              ${
+                                server.ownerId === targetId
+                                  ? permission[`lv-6`]
+                                  : permission[`lv-${server.permissionLevel}`]
+                              }`}
+                            />
+                            <div className={setting['contributionBox']}>
+                              <div>{'貢獻:'}</div>
+                              <div className={setting['contributionValue']}>
+                                {server.contribution}
                               </div>
                             </div>
                           </div>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
               </div>
             </div>
           );
@@ -859,7 +891,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               })}
             </div>
           </div>
-          <div className={setting['body']}>{getMainContent()}</div>
+          <div
+            className={`${setting['body']} ${
+              !userSignature && setting['userAboutEmpty']
+            }`}
+          >
+            {getMainContent()}
+          </div>
         </div>
 
         <div className={popup['popupFooter']}>
