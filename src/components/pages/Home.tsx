@@ -125,7 +125,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
       exactMatch || personalResults.length > 0 || relatedResults.length > 0;
     const recentServers = userServers.filter((s) => s.recent).slice(0, 9);
     const favoriteServers = userServers.filter((s) => s.favorite);
-    const ownedServers = userServers.filter((s) => s.owned);
+    const personalServers = userServers.filter(
+      (s) => s.permissionLevel > 2 && s.permissionLevel < 7,
+    );
 
     // Handlers
     const handleUserServersUpdate = (data: UserServer[] | null) => {
@@ -433,7 +435,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
           />
           <ServerListSection
             title={lang.tr.myGroups}
-            servers={ownedServers}
+            servers={personalServers}
             userId={userId}
             onServerClick={(server) => {
               setIsLoading(true);
