@@ -30,6 +30,8 @@ interface DirectMessagePopupProps {
   windowRef: React.RefObject<HTMLDivElement>;
 }
 
+const SHAKE_COOLDOWN = 3000;
+
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
   (initialData: DirectMessagePopupProps) => {
     // Hooks
@@ -38,6 +40,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
     // Refs
     const refreshRef = useRef(false);
+    const cooldownRef = useRef(0);
 
     // States
     const [userAvatarUrl, setUserAvatarUrl] = useState<User['avatar']>(
@@ -80,8 +83,24 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     };
 
     const handleShakeDirectMessage = () => {
-      if (!socket) return;
+      if (!socket || cooldownRef.current > 0) return;
       socket.send.shakeDirectMessage({ userId, targetId });
+      cooldownRef.current = SHAKE_COOLDOWN;
+
+      // debounce
+      const startTime = Date.now();
+      const timer = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, SHAKE_COOLDOWN - elapsed);
+        
+        if (remaining === 0) {
+          clearInterval(timer);
+        }
+        
+        cooldownRef.current = remaining;
+      }, 100);
+
+      return () => clearInterval(timer);
     };
 
     const handleReceiveShake = (data: any) => {
