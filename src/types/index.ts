@@ -386,8 +386,8 @@ export const enum Permission {
   ChannelManager = 4,
   ServerAdmin = 5,
   ServerOwner = 6,
-  Official = 7,
-  EventStaff = 8,
+  EventStaff = 7,
+  Official = 8,
 }
 
 export type User = {
