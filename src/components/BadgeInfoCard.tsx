@@ -77,7 +77,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
       };
 
       requestAnimationFrame(tryPosition);
-    }, [rect]);
+    }, [rect, preferBelow]);
 
     return (
       <div
