@@ -45,8 +45,8 @@
 .userAboutMeShow:before,
 .userAboutMeShow:after {
   content: '';
-  height: 19px;
-  width: 23px;
+  min-height: 19px;
+  min-width: 23px;
   display: block;
   background-size: cover;
 }
