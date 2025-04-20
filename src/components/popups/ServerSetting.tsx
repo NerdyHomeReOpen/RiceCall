@@ -133,7 +133,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const [sortState, setSortState] = useState<1 | -1>(-1);
-    const [sortField, setSortField] = useState<string>('name');
+    const [sortField, setSortField] = useState<string>('permissionLevel');
 
     const [searchText, setSearchText] = useState('');
 
@@ -299,7 +299,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const handleMembersUpdate = (data: ServerMember[] | null) => {
       if (!data) data = [];
-      setServerMembers(data);
+      const sorted = [...data].sort(
+        (a, b) => b.permissionLevel - a.permissionLevel,
+      );
+      setServerMembers(sorted);
     };
 
     const handleMemberApplicationsUpdate = (
