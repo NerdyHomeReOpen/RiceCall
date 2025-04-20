@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 
 // Types
-import type { Server, User, UserServer } from '@/types';
+import type { Badge, Server, User, UserServer } from '@/types';
 import { PopupType } from '@/types';
 
 // Components
@@ -97,8 +97,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const [userCountry, setUserCountry] = useState<User['country']>(
       createDefault.user().country,
     );
-    const [serversView, setServersView] = useState('joined');
     const [userServers, setUserServers] = useState<UserServer[]>([]);
+    const [userBadges, setUserBadges] = useState<Badge[]>([]);
+    const [serversView, setServersView] = useState('joined');
     const [isFriend, setIsFriend] = useState(false);
     const [selectedTabId, setSelectedTabId] = useState<
       'about' | 'groups' | 'userSetting'
@@ -195,6 +196,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       setUserCountry(data.country);
       setUserRequiredXP(data.requiredXp);
       setUserXP(data.xp);
+      setUserBadges(data.badges);
     };
 
     const handleUserServerUpdate = (data: UserServer[] | null) => {
@@ -363,42 +365,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   {'最近獲得' /** BADGE TITLE **/}
                 </div>
                 <div className={setting['badgeViewer']}>
-                  <BadgeViewer
-                    badges={[
-                      {
-                        badgeId: 'nerdy',
-                        name: '書呆子',
-                        rare: '稀有',
-                        description: '123',
-                        order: 1,
-                        createdAt: 0,
-                      },
-                      {
-                        badgeId: 'nerdy',
-                        name: '書呆子',
-                        rare: '稀有',
-                        description: '123',
-                        order: 1,
-                        createdAt: 0,
-                      },
-                      {
-                        badgeId: 'nerdy',
-                        name: '書呆子',
-                        rare: '稀有',
-                        description: '123',
-                        order: 1,
-                        createdAt: 0,
-                      },
-                      {
-                        badgeId: 'nerdy',
-                        name: '書呆子',
-                        rare: '稀有',
-                        description: '123',
-                        order: 1,
-                        createdAt: 0,
-                      },
-                    ]}
-                  />
+                  <BadgeViewer badges={userBadges} maxDisplay={13} />
                 </div>
               </div>
             </>

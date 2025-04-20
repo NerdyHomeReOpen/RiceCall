@@ -178,44 +178,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
 
         {/* Badges Section */}
         <div className={userInfoCard['footer']}>
-          {/* <BadgeViewer badges={memberBadges} maxDisplay={13} /> */}
-          <BadgeViewer
-            badges={[
-              {
-                badgeId: 'nerdy',
-                name: '書呆子',
-                rare: '稀有',
-                description: '123',
-                order: 1,
-                createdAt: 0,
-              },
-              {
-                badgeId: 'nerdy',
-                name: '書呆子',
-                rare: '稀有',
-                description: '123',
-                order: 1,
-                createdAt: 0,
-              },
-              {
-                badgeId: 'nerdy',
-                name: '書呆子',
-                rare: '稀有',
-                description: '123',
-                order: 1,
-                createdAt: 0,
-              },
-              {
-                badgeId: 'nerdy',
-                name: '書呆子',
-                rare: '稀有',
-                description: '123',
-                order: 1,
-                createdAt: 0,
-              },
-            ]}
-            preferBelow
-          />
+          <BadgeViewer badges={memberBadges} maxDisplay={13} />
         </div>
       </div>
     );
