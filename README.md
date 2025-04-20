@@ -5,24 +5,18 @@
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-v0.1.5-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.1.6-green"/>
   </div>
 </div>
 
-## v0.1.5 更新日誌 (Change Log)
+## v0.1.6 更新日誌 (Change Log)
 
-- **將資料庫從 SQLite 轉為 MySQL，提高穩定性**
-- 新增頻道排序小窗
-- 新增記住帳號功能
-- 修復 Markdown 語法顯示問題
-- 修復語音圖標未正常顯示
-- 修復自動獲取歷史訊息
-- 修復多裝置登入不會登出
-- 優化訊息輸入框輸入邏輯
-- 優化延遲偵測邏輯
-- 優化頁面載入邏輯
-- 使用者群卡面顯示當前經驗
-- 介面改良
+- 新增個人檔案頁面
+- 新增網址進群
+- 新增錯誤彈窗時間戳記
+- 修復無法刪除頻道
+- 修復無法刪除好友
+- 修復無法私訊好友
 
 ## 安裝方法
 
