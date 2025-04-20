@@ -62,6 +62,10 @@
   gap: 5px;
 }
 
+.myBadges {
+  padding: 3;
+}
+
 .levelIcon {
   min-width: 16px;
   min-height: 16px;
