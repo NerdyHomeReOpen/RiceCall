@@ -126,7 +126,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     const recentServers = userServers.filter((s) => s.recent).slice(0, 9);
     const favoriteServers = userServers.filter((s) => s.favorite);
     const personalServers = userServers
-      .filter((s) => s.permissionLevel > 2 && s.permissionLevel < 7)
+      .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
       .sort((a, b) => b.permissionLevel - a.permissionLevel);
 
     // Handlers
