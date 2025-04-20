@@ -111,7 +111,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const isSelf = targetId === userId;
     const isEditing = isSelf && selectedTabId === 'userSetting';
     const userJoinedServers = userServers
-      .filter((server) => server.permissionLevel < 6)
+      .filter(
+        (server) => server.permissionLevel > 1 && server.permissionLevel < 6,
+      )
       .sort((a, b) => b.permissionLevel - a.permissionLevel);
     const userFavoriteServers = userJoinedServers
       .filter((server) => server.favorite)
