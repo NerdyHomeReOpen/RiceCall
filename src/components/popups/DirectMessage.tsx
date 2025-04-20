@@ -79,6 +79,19 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       socket.send.directMessage({ directMessage, userId, targetId });
     };
 
+    const handleShakeDirectMessage = () => {
+      if (!socket) return;
+      socket.send.shakeDirectMessage({ userId, targetId });
+    };
+
+    const handleReceiveShake = (data: any) => {
+      // check if the current conversation
+      const {userId: senderId, targetId: receiverId} = data;
+      if (senderId && receiverId && userId === receiverId) {
+        shakeWindow();
+      }
+    };
+
     const handleTargetUpdate = (data: User | null) => {
       if (!data) data = createDefault.user();
       setTargetAvatarUrl(data.avatarUrl);
@@ -134,6 +147,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
       const eventHandlers = {
         [SocketServerEvent.ON_DIRECT_MESSAGE]: handleOnDirectMessage,
+        [SocketServerEvent.SHAKE_DIRECT_MESSAGE]: handleReceiveShake,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -242,7 +256,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
                   />
                   <div
                     className={`${directMessage['button']} ${directMessage['nudge']}`}
-                    onClick={() => shakeWindow()}
+                    onClick={() => handleShakeDirectMessage()}
                   />
                 </div>
                 <div className={directMessage['buttons']}>

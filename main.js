@@ -79,6 +79,8 @@ const SocketClientEvent = {
   RTC_ICE_CANDIDATE: 'RTCIceCandidate',
   // Echo
   PING: 'ping',
+  // Shake
+  SHAKE_DIRECT_MESSAGE: 'shakeDirectMessage',
 };
 
 const SocketServerEvent = {
@@ -128,6 +130,8 @@ const SocketServerEvent = {
   PLAY_SOUND: 'playSound',
   // Echo
   PONG: 'pong',
+  // Shake
+  SHAKE_DIRECT_MESSAGE: 'shakeDirectMessage',
 };
 
 let isDev = process.argv.includes('--dev');
@@ -446,6 +450,80 @@ function connectSocket(token) {
         if (!userId && data && data.userId) {
           userId = data.userId;
         }
+        // shakeDirectMessage unique handling
+        if (event === SocketServerEvent.SHAKE_DIRECT_MESSAGE) {
+          const {
+            userId: fromUserId,
+            targetId: toUserId,
+            targetName: fromUserName,
+          } = data;
+
+          // check data validity
+          if (fromUserId && toUserId && fromUserName) {
+            // generate window key
+            const windowKey = `directMessage_${fromUserId}`;
+
+            // check if direct message popup window exists
+            if (popups[windowKey] && !popups[windowKey].isDestroyed()) {
+              // is exists, set always on top to set top and cancel to avoid top-locked
+              popups[windowKey].setAlwaysOnTop(true);
+              popups[windowKey].setAlwaysOnTop(false);
+              popups[windowKey].focus();
+            } else {
+              // not exists, create new direct message popup window
+              const popupPromise = createPopup('directMessage', 600, 800);
+              // save initial data for the popup window
+              const initialData = {
+                userId: toUserId, // receiver (current user)
+                targetId: fromUserId, // sender
+                targetName: fromUserName, // sender name
+              };
+
+              const requestHandler = (event, requestType) => {
+                if (requestType === 'directMessage') {
+                  BrowserWindow.getAllWindows().forEach((window) => {
+                    window.webContents.send(
+                      'response-initial-data',
+                      'directMessage',
+                      initialData,
+                    );
+                  });
+                }
+              };
+
+              // register once event listener
+              ipcMain.once('request-initial-data', requestHandler);
+
+              // wait for window creation and set focus
+              popupPromise.then((window) => {
+                // created and set top
+                if (window) {
+                  window.setAlwaysOnTop(true);
+                  window.setAlwaysOnTop(false);
+                  window.focus();
+
+                  // listen did-finish-load event after window creation
+                  window.webContents.once('did-finish-load', () => {
+                    // wait for a short time to ensure the popup is created
+                    setTimeout(() => {
+                      // send a special shake command to this window
+                      window.webContents.send(
+                        SocketServerEvent.SHAKE_DIRECT_MESSAGE,
+                        {
+                          userId: fromUserId, // from who
+                          targetId: toUserId, // current user
+                        },
+                      );
+                    }, 500);
+                  });
+                }
+              });
+            }
+          } else {
+            console.error('無效的抖動消息數據');
+          }
+        }
+
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, data);
         });
