@@ -77,6 +77,9 @@ const DialogPopup: React.FC<DialogPopupProps> = (
         <button className={popup['button']} onClick={() => handleSubmit()}>
           {lang.tr.confirm}
         </button>
+        <button className={popup['button']} onClick={() => handleClose()}>
+          {lang.tr.cancel}
+        </button>
       </div>
     </form>
   );
