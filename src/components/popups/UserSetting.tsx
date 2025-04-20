@@ -110,13 +110,16 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const userGrade = Math.min(56, userLevel);
     const isSelf = targetId === userId;
     const isEditing = isSelf && selectedTabId === 'userSetting';
-    const userRecentServers = userServers
-      .sort((a, b) => b.timestamp - a.timestamp)
+    const userJoinedServers = userServers
+      .filter((server) => server.permissionLevel < 6)
+      .sort((a, b) => b.permissionLevel - a.permissionLevel);
+    const userFavoriteServers = userJoinedServers
+      .filter((server) => server.favorite)
+      .sort((a, b) => b.permissionLevel - a.permissionLevel);
+    const userRecentServers = userJoinedServers
       .filter((server) => server.recent)
-      .slice(0, 4);
-    const userFavoriteServers = userServers
       .sort((a, b) => b.timestamp - a.timestamp)
-      .filter((server) => server.favorite);
+      .slice(0, 4);
 
     const isFutureDate = useCallback(
       (year: number, month: number, day: number) => {
@@ -394,40 +397,29 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                           加入的語音群
                         </>,
                       )
-                    : userServers.filter(
-                        (server) =>
-                          server.permissionLevel > 1 &&
-                          server.permissionLevel < 7,
-                      ).length === 0
+                    : userJoinedServers.length === 0
                     ? PrivateElement('沒有加入的語音群')
-                    : userServers
-                        .filter(
-                          (server) =>
-                            server.permissionLevel > 1 &&
-                            server.permissionLevel < 7,
-                        )
-                        .sort((a, b) => b.permissionLevel - a.permissionLevel)
-                        .map((server) => (
+                    : userJoinedServers.map((server) => (
+                        <div
+                          key={server.serverId}
+                          className={setting['serverItem']}
+                          onClick={() => handleServerSelect(userId, server)}
+                        >
                           <div
-                            key={server.serverId}
-                            className={setting['serverItem']}
-                            onClick={() => handleServerSelect(userId, server)}
-                          >
+                            className={setting['serverAvatarPicture']}
+                            style={{
+                              backgroundImage: `url(${server.avatarUrl})`,
+                            }}
+                          />
+                          <div className={setting['serverBox']}>
+                            <div className={setting['serverName']}>
+                              {server.name}
+                            </div>
                             <div
-                              className={setting['serverAvatarPicture']}
-                              style={{
-                                backgroundImage: `url(${server.avatarUrl})`,
-                              }}
-                            />
-                            <div className={setting['serverBox']}>
-                              <div className={setting['serverName']}>
-                                {server.name}
-                              </div>
+                              className={`${setting['serverInfo']} ${setting['around']}`}
+                            >
                               <div
-                                className={`${setting['serverInfo']} ${setting['around']}`}
-                              >
-                                <div
-                                  className={`
+                                className={`
                                 ${setting['permission']}
                                 ${permission[userGender]} 
                                 ${
@@ -435,17 +427,17 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                                     ? permission[`lv-6`]
                                     : permission[`lv-${server.permissionLevel}`]
                                 }`}
-                                />
-                                <div className={setting['contributionBox']}>
-                                  <div>{'貢獻:'}</div>
-                                  <div className={setting['contributionValue']}>
-                                    {server.contribution}
-                                  </div>
+                              />
+                              <div className={setting['contributionBox']}>
+                                <div>{'貢獻:'}</div>
+                                <div className={setting['contributionValue']}>
+                                  {server.contribution}
                                 </div>
                               </div>
                             </div>
                           </div>
-                        ))
+                        </div>
+                      ))
                   : ProfilePrivate
                   ? PrivateElement(
                       <>
