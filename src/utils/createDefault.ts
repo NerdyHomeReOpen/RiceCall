@@ -35,6 +35,7 @@ export const createDefault = {
     currentServerId: '',
     lastActiveAt: 0,
     createdAt: 0,
+    badges: [],
     ...overrides,
   }),
 

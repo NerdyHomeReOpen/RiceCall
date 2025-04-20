@@ -502,7 +502,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       nickname: channelMemberNickname,
       level: channelMemberLevel,
       gender: channelMemberGender,
-      badges: channelMemberBadges = [],
+      badges: channelMemberBadges,
       vip: channelMemberVip,
     } = channelMember;
     const channelMemberGrade = Math.min(56, channelMemberLevel); // 56 is max leve
