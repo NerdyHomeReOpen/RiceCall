@@ -36,6 +36,7 @@
     "category": "public.app-category.social-networking",
     "target": [
         "dmg",
+        "pkg",
         "zip"
     ]
   },
