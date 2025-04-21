@@ -673,6 +673,8 @@ export enum SocketClientEvent {
   RTC_ICE_CANDIDATE = 'RTCIceCandidate',
   // Echo
   PING = 'ping',
+  // Direct Message Shake
+  SHAKE_DIRECT_MESSAGE = 'shakeDirectMessage',
 }
 
 export enum SocketServerEvent {
@@ -736,6 +738,8 @@ export enum SocketServerEvent {
   RECONNECT_ERROR = 'reconnect_error',
   // Popup
   OPEN_POPUP = 'openPopup',
+  // Direct Message Shake
+  SHAKE_DIRECT_MESSAGE = 'shakeDirectMessage',
 }
 
 export enum PopupType {

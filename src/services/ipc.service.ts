@@ -59,26 +59,26 @@ const ipcService = {
 
   // Initial data methods
   initialData: {
-    request: (to: string, callback: (data: any) => void) => {
+    request: (id: string, callback: (data: any) => void) => {
       if (isElectron) {
-        ipcRenderer.send('request-initial-data', to);
+        ipcRenderer.send('request-initial-data', id);
         ipcRenderer.on(
           'response-initial-data',
-          (_: any, from: string, data: any) => {
-            if (from != to) return;
-            callback(data);
+          (_: any, to: string, data: any) => {
+            if (to != id) return;
             ipcRenderer.removeAllListeners('response-initial-data');
+            callback(data);
           },
         );
       } else {
         console.warn('IPC not available - not in Electron environment');
       }
     },
-    onRequest: (host: string, data: any, callback?: () => void) => {
+    onRequest: (id: string, data: any, callback?: () => void) => {
       if (isElectron) {
-        ipcRenderer.on('request-initial-data', (_: any, to: string) => {
-          if (to != host) return;
-          ipcRenderer.send('response-initial-data', host, data);
+        ipcRenderer.on('request-initial-data', (_: any, from: string) => {
+          if (from != id) return;
+          ipcRenderer.send('response-initial-data', id, data);
           ipcRenderer.removeAllListeners('request-initial-data');
           if (callback) callback();
         });

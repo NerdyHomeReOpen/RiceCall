@@ -75,6 +75,7 @@ enum SocketClientEvent {
   // Message
   SEND_MESSAGE = 'message',
   SEND_DIRECT_MESSAGE = 'directMessage',
+  SEND_SHAKE_WINDOW = 'shakeWindow',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
@@ -128,6 +129,7 @@ enum SocketServerEvent {
   // Message
   ON_MESSAGE = 'onMessage',
   ON_DIRECT_MESSAGE = 'onDirectMessage',
+  ON_SHAKE_WINDOW = 'onShakeWindow',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
@@ -454,6 +456,48 @@ function connectSocket(token: string): Socket | null {
         // if (!userId && args[0] && args[0].userId) {
         //   userId = args[0].userId;
         // }
+
+        // shakeDirectMessage unique handling
+        if (event === SocketServerEvent.ON_SHAKE_WINDOW) {
+          const {
+            userId: fromUserId,
+            targetId: toUserId,
+            targetName: fromUserName,
+          } = args[0];
+
+          // check data validity
+          if (!fromUserId || !toUserId || !fromUserName) {
+            console.error('無效的抖動消息數據');
+            return;
+          }
+
+          // generate window key
+          const windowId = `directMessage_${fromUserId}`;
+
+          // check if direct message popup window exists
+          if (popups[windowId] && !popups[windowId].isDestroyed()) {
+            // is exists, set always on top to set top and cancel to avoid top-locked
+            popups[windowId].setAlwaysOnTop(true);
+            popups[windowId].setAlwaysOnTop(false);
+            popups[windowId].focus();
+          } else {
+            // not exists, create new direct message popup window
+            createPopup('directMessage', windowId, 600, 800).then((window) => {
+              if (!window) return;
+
+              ipcMain.on('request-initial-data', (_, to) => {
+                if (to === windowId) {
+                  window.webContents.send('response-initial-data', windowId, {
+                    userId: toUserId,
+                    targetId: fromUserId,
+                    targetName: fromUserName,
+                  });
+                }
+              });
+            });
+          }
+        }
+
         console.log('socket.on', event, ...args);
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
@@ -712,15 +756,15 @@ app.on('ready', async () => {
   });
 
   // Initial data request handlers
-  ipcMain.on('request-initial-data', (_, to) => {
+  ipcMain.on('request-initial-data', (_, from) => {
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('request-initial-data', to);
+      window.webContents.send('request-initial-data', from);
     });
   });
 
-  ipcMain.on('response-initial-data', (_, from, data) => {
+  ipcMain.on('response-initial-data', (_, to, data) => {
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('response-initial-data', from, data);
+      window.webContents.send('response-initial-data', to, data);
     });
   });
 
