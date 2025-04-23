@@ -3,35 +3,33 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
-
-const fs = require('fs').promises;
 const path = require('path');
 const formidable = require('formidable');
 
 // Utils
-const utils = require('./utils');
-const { Logger, Func, JWT, Xp } = utils;
+const { Logger, Func, JWT } = require('./utils');
+
+// Systems
+const imageSystem = require('./systems/image');
+const xpSystem = require('./systems/xp');
 
 // Database
-const DB = require('./db');
+const DB = require('./database');
 
 // StandardizedError
-const StandardizedError = require('./standardizedError');
+const StandardizedError = require('./error');
 
 // Constants
-const {
-  PORT,
-  SERVER_URL,
-  CONTENT_TYPE_JSON,
-  MIME_TYPES,
-  UPLOADS_PATH,
-  SERVER_AVATAR_PATH,
-  USER_AVATAR_PATH,
-  UPLOADS_DIR,
-  SERVER_AVATAR_DIR,
-  USER_AVATAR_DIR,
-  // BACKUP_DIR,
-} = require('./constant');
+const PORT = process.env.PORT || 4500;
+const SERVER_URL = process.env.SERVER_URL || 'http://localhost:4500';
+const CONTENT_TYPE_JSON = { 'Content-Type': 'application/json' };
+const MIME_TYPES = {
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+};
 
 // Send Error/Success Response
 const sendError = (res, statusCode, message) => {
@@ -760,85 +758,39 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === 'GET' && req.url.startsWith('/images/')) {
-    try {
-      // Get the file path relative to uploads directory
-      const filePath = req.url
-        .replace('/images/', '/')
-        .split('?')[0]
-        .split('/');
-      const fileName = filePath.pop() || '__default.png';
-      const filePrefix = fileName.startsWith('__') ? '' : `upload-`;
-      const relativePath = path.join(...filePath);
-      const fullFilePath = path.join(
-        UPLOADS_DIR,
-        relativePath,
-        `${filePrefix}${fileName}`,
-      );
+    req.on('end', async () => {
+      try {
+        const filePath = req.url
+          .replace('/images/', '/')
+          .split('?')[0]
+          .split('/');
+        const fileName = filePath.pop() || '__default.png';
+        const file = await imageSystem.getImage(filePath, fileName);
 
-      // console.log('req.url: ', req.url);
-      // console.log('filePath: ', filePath);
-      // console.log('fileName: ', fileName);
-      // console.log('relativePath: ', relativePath);
-      // console.log('fullFilePath: ', fullFilePath);
-
-      // Validate file path to prevent directory traversal
-      if (!fullFilePath.startsWith(UPLOADS_DIR)) {
-        throw new StandardizedError(
-          '無權限存取此檔案',
-          'ServerError',
-          'GETFILE',
-          'FILE_ACCESS_DENIED',
-          403,
-        );
-      }
-
-      // Read and serve the file
-      fs.readFile(fullFilePath)
-        .then((data) => {
-          res.writeHead(200, {
-            'Content-Type':
-              MIME_TYPES[path.extname(fileName).toLowerCase()] ||
-              'application/octet-stream',
-            'Cache-Control':
-              'no-store, no-cache, must-revalidate, proxy-revalidate',
-            'Expires': '0',
-            'Pragma': 'no-cache',
-          });
-
-          res.end(data);
-        })
-        .catch((error) => {
-          if (error.code === 'ENOENT') {
-            throw new StandardizedError(
-              '找不到檔案',
-              'ServerError',
-              'GETFILE',
-              'FILE_NOT_FOUND',
-              404,
-            );
-          } else {
-            throw new StandardizedError(
-              `讀取檔案失敗: ${error.message}`,
-              'ServerError',
-              'GETFILE',
-              'READ_FILE_FAILED',
-              500,
-            );
-          }
+        res.writeHead(200, {
+          'Content-Type':
+            MIME_TYPES[path.extname(fileName).toLowerCase()] ||
+            'application/octet-stream',
+          'Cache-Control':
+            'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Expires': '0',
+          'Pragma': 'no-cache',
         });
-    } catch (error) {
-      if (!(error instanceof StandardizedError)) {
-        error = new StandardizedError(
-          `讀取檔案時發生預期外的錯誤: ${error.message}`,
-          'ServerError',
-          'GETFILE',
-          'EXCEPTION_ERROR',
-          500,
-        );
+        res.end(file);
+      } catch (error) {
+        if (!(error instanceof StandardizedError)) {
+          error = new StandardizedError(
+            `讀取檔案時發生預期外的錯誤: ${error.message}`,
+            'ServerError',
+            'GETFILE',
+            'EXCEPTION_ERROR',
+            500,
+          );
+        }
+        sendError(res, error.status_code, error.error_message);
+        new Logger('Server').error(`Get file error: ${error.error_message}`);
       }
-      sendError(res, error.status_code, error.error_message);
-      new Logger('Server').error(`Get file error: ${error.error_message}`);
-    }
+    });
     return;
   }
 
@@ -872,93 +824,7 @@ const server = http.createServer((req, res) => {
             400,
           );
         }
-        const matches = file.match(/^data:image\/(.*?);base64,/);
-        if (!matches) {
-          throw new StandardizedError(
-            '無效的檔案',
-            'ValidationError',
-            'UPLOADAVATAR',
-            'INVALID_FILE_TYPE',
-            400,
-          );
-        }
-        const ext = matches[1];
-        if (!MIME_TYPES[`.${ext}`]) {
-          throw new StandardizedError(
-            '無效的檔案類型',
-            'ValidationError',
-            'UPLOADAVATAR',
-            'INVALID_FILE_TYPE',
-            400,
-          );
-        }
-        const base64Data = file.replace(/^data:image\/\w+;base64,/, '');
-        const dataBuffer = Buffer.from(base64Data, 'base64');
-        if (dataBuffer.size > 5 * 1024 * 1024) {
-          throw new StandardizedError(
-            '檔案過大',
-            'ValidationError',
-            'UPLOADAVATAR',
-            'FILE_TOO_LARGE',
-            400,
-          );
-        }
 
-        const Path = () => {
-          switch (type) {
-            case 'server':
-              return SERVER_AVATAR_PATH;
-            case 'user':
-              return USER_AVATAR_PATH;
-            default:
-              return UPLOADS_PATH;
-          }
-        };
-
-        const Dir = () => {
-          switch (type) {
-            case 'server':
-              return SERVER_AVATAR_DIR;
-            case 'user':
-              return USER_AVATAR_DIR;
-            default:
-              return UPLOADS_DIR;
-          }
-        };
-
-        const filePrefix = 'upload-';
-        const fullFileName = `${fileName}.${ext}`;
-        const filePath = path.join(Dir(), `${filePrefix}${fullFileName}`);
-
-        try {
-          const files = await fs.readdir(Dir());
-          const matchingFiles = files.filter(
-            (file) =>
-              file.startsWith(`${filePrefix}${fileName}`) &&
-              !file.startsWith('__'),
-          );
-          await Promise.all(
-            matchingFiles.map((file) => fs.unlink(path.join(Dir(), file))),
-          );
-        } catch (error) {
-          if (error.code !== 'ENOENT') {
-            throw new StandardizedError(
-              '刪除檔案時發生預期外的錯誤',
-              'ServerError',
-              'UPLOADAVATAR',
-              'DELETE_FILE_FAILED',
-              500,
-            );
-          }
-        }
-
-        // Return Avatar Example:
-        // "test.jpg"
-
-        // Return Avatar URL Example:
-        // 'http://localhost:4500/images/serverAvatars/test.jpg'
-
-        await fs.writeFile(filePath, dataBuffer);
         sendSuccess(res, {
           message: 'success',
           data: {
@@ -1042,6 +908,6 @@ process.on('unhandledRejection', (error) => {
 // Start Server
 server.listen(PORT, () => {
   new Logger('Server').success(`Server is running on port ${PORT}`);
-  // Clean.setup();
-  Xp.setup();
+  xpSystem.setup();
+  imageSystem.setup();
 });

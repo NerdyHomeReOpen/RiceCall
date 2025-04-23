@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-const { v4: uuidv4 } = require('uuid');
+
 // Utils
-const utils = require('../utils');
-const { Logger, Func } = utils;
+const { Logger, Func } = require('../utils');
 
 // Database
-const DB = require('../db');
+const DB = require('../database');
 
 // StandardizedError
-const StandardizedError = require('../standardizedError');
+const StandardizedError = require('../error');
 
 const messageHandler = {
   sendMessage: async (io, socket, data) => {

@@ -1,0 +1,17 @@
+
+{
+  "FILE_PREFIX": "upload-",
+  "CLEANUP_INTERVAL_MS": 1800000,
+  "UPLOADS_DIR": "uploads",
+  "SERVER_AVATAR_DIR": "uploads/serverAvatars",
+  "USER_AVATAR_DIR": "uploads/userAvatars",
+  "BACKUP_DIR": "backups",
+  "MIME_TYPES": {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".gif": "image/gif",
+    ".webp": "image/webp"
+  }
+}
+

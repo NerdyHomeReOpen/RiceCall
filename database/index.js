@@ -1,7 +1,23 @@
-const { query } = require('./database');
+const mysql = require('mysql2/promise');
+const path = require('path');
+const config = require('./config.json');
+const StandardizedError = require('../error');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-// StandardizedError
-const StandardizedError = require('./standardizedError');
+// Create connection pool
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  ...config,
+});
+
+// Helper function to execute queries
+async function query(sql, params) {
+  const [results] = await pool.execute(sql, params);
+  return results;
+}
 
 function camelToSnake(str) {
   return str.replace(/([A-Z])/g, '_$1').toLowerCase();
@@ -54,7 +70,6 @@ function validateData(data, allowedFields) {
   return { keys, values };
 }
 
-// Helper functions to match quick.db API
 const Database = {
   set: {
     account: async (account, data) => {
@@ -1734,4 +1749,4 @@ const Database = {
   },
 };
 
-module.exports = { ...Database };
+module.exports = { ...Database, pool, query };

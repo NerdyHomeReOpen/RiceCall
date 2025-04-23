@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+
 // Utils
-const utils = require('../utils');
-const { Logger, Session, Func, Xp } = utils;
+const { Logger, Session, Func } = require('../utils');
+
+// Systems
+const xpSystem = require('../systems/xp');
 
 // Database
-const DB = require('../db');
+const DB = require('../database');
 
 // StandardizedError
-const StandardizedError = require('../standardizedError');
+const StandardizedError = require('../error');
 
 // Handlers
 const rtcHandler = require('./rtc');
@@ -146,7 +149,7 @@ const userHandler = {
         await DB.set.user(operatorId, updatedUser);
 
         // Clear user contribution interval
-        Xp.delete(operatorId);
+        xpSystem.delete(operatorId);
 
         // Leave RTC channel
         await rtcHandler.leave(io, socket, {

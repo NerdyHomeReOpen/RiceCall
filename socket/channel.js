@@ -2,14 +2,16 @@
 const { v4: uuidv4 } = require('uuid');
 
 // Utils
-const utils = require('../utils');
-const { Logger, Func, Xp } = utils;
+const { Logger, Func } = require('../utils');
 
 // Database
-const DB = require('../db');
+const DB = require('../database');
+
+// Systems
+const xpSystem = require('../systems/xp');
 
 // StandardizedError
-const StandardizedError = require('../standardizedError');
+const StandardizedError = require('../error');
 
 // Handlers
 const rtcHandler = require('./rtc');
@@ -179,7 +181,7 @@ const channelHandler = {
       await DB.set.member(userId, serverId, updatedMember);
 
       // Setup user interval for accumulate contribution
-      await Xp.create(userId);
+      await xpSystem.create(userId);
 
       // Join RTC channel
       await rtcHandler.join(io, userSocket, { channelId: channelId });
@@ -287,7 +289,7 @@ const channelHandler = {
       await DB.set.user(userId, updatedUser);
 
       // Clear user contribution interval
-      await Xp.delete(userId);
+      await xpSystem.delete(userId);
 
       // Leave RTC channel
       await rtcHandler.leave(io, userSocket, { channelId: channelId });

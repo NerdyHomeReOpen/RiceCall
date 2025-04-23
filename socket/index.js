@@ -2,11 +2,10 @@
 const { v4: uuidv4 } = require('uuid');
 
 // Utils
-const utils = require('../utils');
-const { Session, JWT } = utils;
+const { Session, JWT } = require('../utils');
 
 // StandardizedError
-const StandardizedError = require('../standardizedError');
+const StandardizedError = require('../error');
 
 // Handlers
 const userHandler = require('./user');

@@ -6,10 +6,10 @@ const Session = require('./session');
 const JWT = require('./jwt');
 
 // Database
-const DB = require('../db');
+const DB = require('../database');
 
 // StandardizedError
-const StandardizedError = require('../standardizedError');
+const StandardizedError = require('../error');
 
 const func = {
   calculateSimilarity: (str1, str2) => {
@@ -46,7 +46,7 @@ const func = {
   generateUniqueDisplayId: async (baseId = 20000000) => {
     const servers = (await DB.get.all('servers')) || {};
     let displayId = baseId + Object.keys(servers).length;
-    console.log(servers);
+
     // Ensure displayId is unique
     while (
       Object.values(servers).some((server) => server.displayId === displayId)
@@ -172,16 +172,15 @@ const func = {
           400,
         );
       }
-      // FIXME: Password is base64 encoded, use another method to validate
-      // if (!/^[a-zA-Z0-9@$!%*#?&]+$/.test(password)) {
-      //   throw new StandardizedError(
-      //     '密碼只能包含英文字母、數字和特殊字符(@$!%*#?&)',
-      //     'ValidationError',
-      //     'PASSWORD',
-      //     'PASSWORD_INVALID',
-      //     400,
-      //   );
-      // }
+      if (!/^[a-zA-Z0-9@$!%*#?&]+$/.test(password)) {
+        throw new StandardizedError(
+          '密碼只能包含英文字母、數字和特殊字符(@$!%*#?&)',
+          'ValidationError',
+          'PASSWORD',
+          'PASSWORD_INVALID',
+          400,
+        );
+      }
       if (/\./.test(password)) {
         throw new StandardizedError(
           '密碼不能包含點號',

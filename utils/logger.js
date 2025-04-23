@@ -6,6 +6,7 @@ module.exports = class Logger {
   constructor(origin) {
     this.origin = origin;
   }
+
   info(message) {
     console.log(
       `${chalk.gray(new Date().toLocaleString())} ${chalk.cyan(
@@ -13,6 +14,7 @@ module.exports = class Logger {
       )}${chalk.magenta(`(${getCallerFile()})`)} ${message}`,
     );
   }
+
   command(message) {
     console.log(
       `${chalk.gray(new Date().toLocaleString())} ${chalk.hex('#F3CCF3')(
@@ -20,6 +22,7 @@ module.exports = class Logger {
       )}${chalk.magenta(`(${getCallerFile()})`)} ${message}`,
     );
   }
+
   success(message) {
     console.log(
       `${chalk.gray(new Date().toLocaleString())} ${chalk.green(
@@ -27,6 +30,7 @@ module.exports = class Logger {
       )}${chalk.magenta(`(${getCallerFile()})`)} ${message}`,
     );
   }
+
   warn(message) {
     console.warn(
       `${chalk.gray(new Date().toLocaleString())} ${chalk.yellow(
@@ -34,6 +38,7 @@ module.exports = class Logger {
       )}${chalk.magenta(`(${getCallerFile()})`)} ${message}`,
     );
   }
+
   error(message) {
     console.error(
       `${chalk.gray(new Date().toLocaleString())} ${chalk.red(
