@@ -3,10 +3,10 @@
 const { Logger, Func } = require('../utils');
 
 // Database
-const DB = require('../database');
+const DB = require('../../database');
 
 // StandardizedError
-const StandardizedError = require('../error');
+const StandardizedError = require('../../error');
 
 const friendApplicationHandler = {
   createFriendApplication: async (io, socket, data) => {

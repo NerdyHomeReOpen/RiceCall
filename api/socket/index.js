@@ -5,19 +5,19 @@ const { v4: uuidv4 } = require('uuid');
 const { Session, JWT } = require('../utils');
 
 // StandardizedError
-const StandardizedError = require('../error');
+const StandardizedError = require('../../error');
 
 // Handlers
-const userHandler = require('./user');
-const serverHandler = require('./server');
-const memberHandler = require('./member');
+const userHandler = require('./handlers/user');
+const serverHandler = require('./handlers/server');
+const memberHandler = require('./handlers/member');
 const channelHandler = require('./channel');
-const messageHandler = require('./message');
+const messageHandler = require('./handlers/message');
 const friendGroupHandler = require('./friendGroup');
 const friendHandler = require('./friend');
 const friendApplicationHandler = require('./friendApplication');
-const memberApplicationHandler = require('./memberApplication');
-const rtcHandler = require('./rtc');
+const memberApplicationHandler = require('./handlers/memberApplication');
+const rtcHandler = require('./handlers/rtc');
 
 module.exports = (io) => {
   io.use((socket, next) => {

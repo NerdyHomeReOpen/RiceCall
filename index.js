@@ -863,7 +863,7 @@ const io = new Server(server, {
   },
 });
 
-require('./socket/index')(io);
+require('./api/socket/index')(io);
 
 // Error Handling
 server.on('error', (error) => {

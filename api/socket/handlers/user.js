@@ -4,13 +4,13 @@
 const { Logger, Session, Func } = require('../utils');
 
 // Systems
-const xpSystem = require('../systems/xp');
+const xpSystem = require('../../../systems/xp');
 
 // Database
-const DB = require('../database');
+const DB = require('../../../database');
 
 // StandardizedError
-const StandardizedError = require('../error');
+const StandardizedError = require('../../../error');
 
 // Handlers
 const rtcHandler = require('./rtc');

@@ -5,10 +5,10 @@ const { v4: uuidv4 } = require('uuid');
 const { Logger, Func } = require('../utils');
 
 // Database
-const DB = require('../database');
+const DB = require('../../../database');
 
 // StandardizedError
-const StandardizedError = require('../error');
+const StandardizedError = require('../../../error');
 
 // Handlers
 const channelHandler = require('./channel');

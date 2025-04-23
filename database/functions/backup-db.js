@@ -1,4 +1,4 @@
-const { pool } = require('.');
+const { pool } = require('..');
 const fs = require('fs').promises;
 
 async function backupDatabase() {

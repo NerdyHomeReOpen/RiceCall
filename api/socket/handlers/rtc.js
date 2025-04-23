@@ -4,7 +4,7 @@
 const { Logger, Func } = require('../utils');
 
 // StandardizedError
-const StandardizedError = require('../error');
+const StandardizedError = require('../../../error');
 
 const rtcHandler = {
   offer: async (io, socket, data) => {

@@ -1,7 +1,7 @@
 const mysql = require('mysql2/promise');
 const fs = require('fs').promises;
 const path = require('path');
-const config = require('./config.json');
+const config = require('../config.json');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 async function setupDatabase() {

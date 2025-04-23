@@ -1,4 +1,4 @@
-const { pool } = require('../database');
+const { pool } = require('..');
 const fs = require('fs').promises;
 
 async function restoreDatabase(backupFilePath) {
