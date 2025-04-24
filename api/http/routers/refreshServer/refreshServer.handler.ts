@@ -6,18 +6,18 @@ import StandardizedError from '@/error';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Validaters
-import LoginValidator from '@/validators/login.validator';
+// Validators
+import RefreshServerValidator from './refreshServer.validator';
 
 // Services
-import LoginService from '@/services/login.service';
+import RefreshServerService from './refreshServer.service';
 
-export default class LoginHandler {
+export default class RefreshServerHandler {
   constructor(private req: IncomingMessage) {
     this.req = req;
   }
 
-  async handle(): Promise<ResponseType | null> {
+  async refreshServer(): Promise<ResponseType | null> {
     let body = '';
     this.req.on('data', (chunk) => {
       body += chunk.toString();
@@ -25,26 +25,23 @@ export default class LoginHandler {
     this.req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const { account, password } = data;
+        const { serverId } = data;
 
-        const { userId } = await new LoginValidator(
-          account,
-          password,
-        ).validate();
+        await new RefreshServerValidator(serverId).validate();
 
-        const { token } = await new LoginService(userId).use();
+        const result = await new RefreshServerService(serverId).use();
 
         return {
           statusCode: 200,
-          message: '登入成功',
-          data: { token: token },
+          message: 'success',
+          data: result,
         };
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
-            message: `登入時發生預期外的錯誤: ${error.message}`,
-            part: 'LOGIN',
+            message: `刷新群組資料時發生預期外的錯誤: ${error.message}`,
+            part: 'REFRESHSERVER',
             tag: 'SERVER_ERROR',
             statusCode: 500,
           });
@@ -52,7 +49,7 @@ export default class LoginHandler {
 
         return {
           statusCode: error.statusCode,
-          message: '登入失敗',
+          message: 'error',
           data: { error: error.message },
         };
       }

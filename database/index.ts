@@ -1,78 +1,81 @@
-const mysql = require('mysql2/promise');
-const path = require('path');
-const config = require('./config.json');
-const StandardizedError = require('../error');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+import dotenv from 'dotenv';
+import path from 'path';
+import mysql from 'mysql2/promise';
+
+// Config
+import dbConfig from '@/config/db.config';
+
+// Error
+import StandardizedError from '@/error';
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Create connection pool
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  ...config,
-});
+const pool = mysql.createPool(dbConfig);
 
 // Helper function to execute queries
-async function query(sql, params) {
+async function query(sql: string, params?: any[]) {
   const [results] = await pool.execute(sql, params);
   return results;
 }
 
-function camelToSnake(str) {
+function camelToSnake(str: string) {
   return str.replace(/([A-Z])/g, '_$1').toLowerCase();
 }
 
-function snakeToCamel(str) {
+function snakeToCamel(str: string) {
   return str.replace(/_\w/g, (letter) => letter[1].toUpperCase());
 }
 
-function convertToSnakeCase(obj) {
-  const snakeCaseObj = {};
+function convertToSnakeCase(obj: any) {
+  const snakeCaseObj: any = {};
   for (const [key, value] of Object.entries(obj)) {
     snakeCaseObj[camelToSnake(key)] = value;
   }
   return snakeCaseObj;
 }
 
-function convertToCamelCase(obj) {
-  const camelCaseObj = {};
+function convertToCamelCase(obj: any) {
+  const camelCaseObj: any = {};
   for (const [key, value] of Object.entries(obj)) {
     camelCaseObj[snakeToCamel(key)] = value;
   }
   return camelCaseObj;
 }
 
-function validateData(data, allowedFields) {
+function validateData(data: any, allowedFields: string[]) {
   const convertedData = convertToSnakeCase(data);
   const keys = Object.keys(convertedData).filter((k) =>
     allowedFields.includes(k),
   );
   const values = keys.map((k) => convertedData[k]);
+
   if (keys.length === 0 || values.length === 0) {
-    throw new StandardizedError(
-      'No fields to update',
-      'AccessDatabaseError',
-      'SET',
-      'DATA_INVALID',
-      401,
-    );
+    throw new StandardizedError({
+      name: 'ValidationError',
+      message: '無法更新資料',
+      part: 'DATABASE',
+      tag: 'DATA_INVALID',
+      statusCode: 401,
+    });
   }
+
   if (keys.length !== values.length) {
-    throw new StandardizedError(
-      'Keys and values length mismatch',
-      'AccessDatabaseError',
-      'SET',
-      'DATA_INVALID',
-      401,
-    );
+    throw new StandardizedError({
+      name: 'ValidationError',
+      message: '無法更新資料',
+      part: 'DATABASE',
+      tag: 'DATA_INVALID',
+      statusCode: 401,
+    });
   }
+
   return { keys, values };
 }
 
 const Database = {
   set: {
-    account: async (account, data) => {
+    account: async (account: string, data: any) => {
       try {
         if (!account || !data) return false;
         const ALLOWED_FIELDS = ['password', 'user_id'];
@@ -83,8 +86,9 @@ const Database = {
           WHERE account = ?`,
           [account],
         );
-        if (exists.length) {
-          // If the account exists, update it
+        // If the account exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE accounts SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -92,7 +96,6 @@ const Database = {
             [...values, account],
           );
         } else {
-          // If the account does not exist, create it
           await query(
             `INSERT INTO accounts (account, ${keys
               .map((k) => `\`${k}\``)
@@ -102,21 +105,21 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 account.${account} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 account.${account} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    user: async (userId, data) => {
+    user: async (userId: string, data: any) => {
       try {
         if (!userId || !data) return false;
         const ALLOWED_FIELDS = [
@@ -148,8 +151,9 @@ const Database = {
           WHERE user_id = ?`,
           [userId],
         );
-        if (exists.length) {
-          // If the user exists, update it
+        // If the user exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE users SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -157,7 +161,6 @@ const Database = {
             [...values, userId],
           );
         } else {
-          // If the user does not exist, create it
           await query(
             `INSERT INTO users (user_id, ${keys
               .map((k) => `\`${k}\``)
@@ -167,21 +170,21 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 user.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 user.${userId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    badge: async (badgeId, data) => {
+    badge: async (badgeId: string, data: any) => {
       try {
         if (!badgeId || !data) return false;
         const ALLOWED_FIELDS = ['name', 'description', 'image'];
@@ -192,8 +195,9 @@ const Database = {
           WHERE badge_id = ?`,
           [badgeId],
         );
-        if (exists.length) {
-          // If the badge exists, update it
+        // If the badge exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE badges SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -201,7 +205,6 @@ const Database = {
             [...values, badgeId],
           );
         } else {
-          // If the badge does not exist, create it
           await query(
             `INSERT INTO badges (badge_id, ${keys
               .map((k) => `\`${k}\``)
@@ -211,21 +214,21 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 badge.${badgeId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 badge.${badgeId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    userBadge: async (userId, badgeId, data) => {
+    userBadge: async (userId: string, badgeId: string, data: any) => {
       try {
         if (!userId || !badgeId || !data) return false;
         const ALLOWED_FIELDS = ['user_id', 'badge_id', 'order', 'created_at'];
@@ -237,8 +240,9 @@ const Database = {
           AND badge_id = ?`,
           [userId, badgeId],
         );
-        if (exists.length) {
-          // If the userBadge exists, update it
+        // If the userBadge exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE user_badges SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -246,7 +250,6 @@ const Database = {
             [...values, userId, badgeId],
           );
         } else {
-          // If the userBadge does not exist, create it
           await query(
             `INSERT INTO user_badges (user_id, badge_id, ${keys
               .map((k) => `\`${k}\``)
@@ -256,21 +259,21 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 userBadge.${userId}-${badgeId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 userBadge.${userId}-${badgeId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    userServer: async (userId, serverId, data) => {
+    userServer: async (userId: string, serverId: string, data: any) => {
       try {
         if (!userId || !serverId || !data) return false;
         const ALLOWED_FIELDS = [
@@ -289,8 +292,9 @@ const Database = {
           AND server_id = ?`,
           [userId, serverId],
         );
-        if (exists.length) {
-          // If the userServer exists, update it
+        // If the userServer exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE user_servers SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -298,7 +302,6 @@ const Database = {
             [...values, userId, serverId],
           );
         } else {
-          // If the userServer does not exist, create it
           await query(
             `INSERT INTO user_servers (user_id, server_id, ${keys
               .map((k) => `\`${k}\``)
@@ -308,21 +311,21 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 userServer.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 userServer.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    server: async (serverId, data) => {
+    server: async (serverId: string, data: any) => {
       try {
         if (!serverId || !data) return false;
         const ALLOWED_FIELDS = [
@@ -351,8 +354,9 @@ const Database = {
           WHERE server_id = ?`,
           [serverId],
         );
-        if (exists.length) {
-          // If the server exists, update it
+        // If the server exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE servers SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -360,7 +364,6 @@ const Database = {
             [...values, serverId],
           );
         } else {
-          // If the server does not exist, create it
           await query(
             `INSERT INTO servers (server_id, ${keys
               .map((k) => `\`${k}\``)
@@ -370,21 +373,21 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 server.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 server.${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    channel: async (channelId, data) => {
+    channel: async (channelId: string, data: any) => {
       try {
         if (!channelId || !data) return false;
         const ALLOWED_FIELDS = [
@@ -416,8 +419,9 @@ const Database = {
           WHERE channel_id = ?`,
           [channelId],
         );
-        if (exists.length) {
-          // If the channel exists, update it
+        // If the channel exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE channels SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -425,7 +429,6 @@ const Database = {
             [...values, channelId],
           );
         } else {
-          // If the channel does not exist, create it
           await query(
             `INSERT INTO channels (channel_id, ${keys
               .map((k) => `\`${k}\``)
@@ -435,21 +438,21 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 channel.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 channel.${channelId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friendGroup: async (friendGroupId, data) => {
+    friendGroup: async (friendGroupId: string, data: any) => {
       try {
         if (!friendGroupId || !data) return false;
         const ALLOWED_FIELDS = ['name', 'order', 'user_id', 'created_at'];
@@ -460,8 +463,9 @@ const Database = {
           WHERE friend_group_id = ?`,
           [friendGroupId],
         );
-        if (exists.length) {
-          // If the friendGroup exists, update it
+        // If the friendGroup exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE friend_groups SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -469,7 +473,6 @@ const Database = {
             [...values, friendGroupId],
           );
         } else {
-          // If the friendGroup does not exist, create it
           await query(
             `INSERT INTO friend_groups (friend_group_id, ${keys
               .map((k) => `\`${k}\``)
@@ -481,19 +484,19 @@ const Database = {
         return true;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 friendGroup.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 friendGroup.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friend: async (userId, targetId, data) => {
+    friend: async (userId: string, targetId: string, data: any) => {
       try {
         if (!userId || !targetId || !data) return false;
         const ALLOWED_FIELDS = ['is_blocked', 'friend_group_id', 'created_at'];
@@ -505,8 +508,9 @@ const Database = {
           AND target_id = ?`,
           [userId, targetId],
         );
-        if (exists.length) {
-          // If the friend exists, update it
+        // If the friend exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE friends SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -514,7 +518,6 @@ const Database = {
             [...values, userId, targetId],
           );
         } else {
-          // If the friend does not exist, create it
           await query(
             `INSERT INTO friends (user_id, target_id, ${keys
               .map((k) => `\`${k}\``)
@@ -524,21 +527,25 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friendApplication: async (senderId, receiverId, data) => {
+    friendApplication: async (
+      senderId: string,
+      receiverId: string,
+      data: any,
+    ) => {
       try {
         if (!senderId || !receiverId || !data) return false;
         const ALLOWED_FIELDS = ['description', 'created_at'];
@@ -550,8 +557,9 @@ const Database = {
           AND receiver_id = ?`,
           [senderId, receiverId],
         );
-        if (exists.length) {
-          // If the friendApplication exists, update it
+        // If the friendApplication exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE friend_applications SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -559,7 +567,6 @@ const Database = {
             [...values, senderId, receiverId],
           );
         } else {
-          // If the friendApplication does not exist, create it
           await query(
             `INSERT INTO friend_applications (sender_id, receiver_id, ${keys
               .map((k) => `\`${k}\``)
@@ -569,21 +576,21 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    member: async (userId, serverId, data) => {
+    member: async (userId: string, serverId: string, data: any) => {
       try {
         if (!userId || !serverId || !data) return false;
         const ALLOWED_FIELDS = [
@@ -603,8 +610,9 @@ const Database = {
           AND server_id = ?`,
           [userId, serverId],
         );
-        if (exists.length) {
-          // If the member exists, update it
+        // If the member exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE members SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -612,7 +620,6 @@ const Database = {
             [...values, userId, serverId],
           );
         } else {
-          // If the member does not exist, create it
           await query(
             `INSERT INTO members (user_id, server_id, ${keys
               .map((k) => `\`${k}\``)
@@ -622,21 +629,21 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    memberApplication: async (userId, serverId, data) => {
+    memberApplication: async (userId: string, serverId: string, data: any) => {
       try {
         if (!userId || !serverId || !data) return false;
         const ALLOWED_FIELDS = ['description', 'created_at'];
@@ -648,8 +655,9 @@ const Database = {
           AND server_id = ?`,
           [userId, serverId],
         );
-        if (exists.length) {
-          // If the memberApplication exists, update it
+        // If the memberApplication exists, update it
+        // Else, create it
+        if (exists) {
           await query(
             `UPDATE member_applications SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -657,7 +665,6 @@ const Database = {
             [...values, userId, serverId],
           );
         } else {
-          // If the memberApplication does not exist, create it
           await query(
             `INSERT INTO member_applications (user_id, server_id, ${keys
               .map((k) => `\`${k}\``)
@@ -667,15 +674,15 @@ const Database = {
           );
         }
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `設置 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'SET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `設置 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
@@ -683,7 +690,7 @@ const Database = {
   },
 
   get: {
-    all: async (querys) => {
+    all: async (querys: string) => {
       try {
         if (!querys) return null;
         const datas = await query(
@@ -691,76 +698,76 @@ const Database = {
           FROM ${querys}`,
         );
         if (!datas) return null;
-        return datas.map((data) => convertToCamelCase(data));
-      } catch (error) {
+        return datas.constructor === Array
+          ? datas.map((data) => convertToCamelCase(data))
+          : convertToCamelCase(datas);
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 ${querys} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 ${querys} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    account: async (account) => {
+    account: async (account: string) => {
       try {
         if (!account) return null;
-        const res = await query(
+        const data = await query(
           `SELECT 
             accounts.*
           FROM accounts
           WHERE accounts.account = ?`,
           [account],
         );
-        const data = res[0];
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 ${account} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 ${account} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    searchUser: async (querys) => {
+    searchUser: async (querys: string) => {
       try {
         if (!querys) return null;
-        const res = await query(
+        const data = await query(
           `SELECT 
             accounts.user_id 
           FROM accounts
           WHERE accounts.account = ?`,
           [querys],
         );
-        const data = res[0];
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 ${querys} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 ${querys} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    user: async (userId) => {
+    user: async (userId: string) => {
       try {
         if (!userId) return null;
         const datas = await query(
@@ -783,21 +790,21 @@ const Database = {
         if (!data) return null;
         const badges = await Database.get.userBadges(userId);
         return convertToCamelCase({ ...data, badges: [] });
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 users.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 users.${userId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    userBadges: async (userId) => {
+    userBadges: async (userId: string) => {
       try {
         if (!userId) return null;
         const datas = await query(
@@ -813,21 +820,21 @@ const Database = {
         );
         if (!datas) return null;
         return datas.map((data) => convertToCamelCase(data));
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 userBadges.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 userBadges.${userId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    userFriendGroups: async (userId) => {
+    userFriendGroups: async (userId: string) => {
       try {
         if (!userId) return null;
         const datas = await query(
@@ -840,21 +847,21 @@ const Database = {
         );
         if (!datas) return null;
         return datas.map((data) => convertToCamelCase(data));
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 userFriendGroups.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 userFriendGroups.${userId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    userServers: async (userId) => {
+    userServers: async (userId: string) => {
       try {
         if (!userId) return null;
         const datas = await query(
@@ -883,19 +890,19 @@ const Database = {
         });
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 userServers.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 userServers.${userId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    userFriends: async (userId) => {
+    userFriends: async (userId: string) => {
       try {
         if (!userId) return null;
         const datas = await query(
@@ -932,21 +939,21 @@ const Database = {
           delete data.user_user_id;
           return convertToCamelCase({ ...data, badges: [] });
         });
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 userFriends.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 userFriends.${userId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    userFriendApplications: async (userId) => {
+    userFriendApplications: async (userId: string) => {
       try {
         if (!userId) return null;
         const datas = await query(
@@ -969,21 +976,21 @@ const Database = {
           delete data.user_created_at;
           return convertToCamelCase(data);
         });
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 userFriendApplications.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 userFriendApplications.${userId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    searchServer: async (querys) => {
+    searchServer: async (querys: string) => {
       try {
         if (!querys) return null;
         const datas = await query(
@@ -996,21 +1003,21 @@ const Database = {
         );
         if (!datas) return null;
         return datas.map((data) => convertToCamelCase(data));
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 searchServer.${querys} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 searchServer.${querys} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    server: async (serverId) => {
+    server: async (serverId: string) => {
       try {
         if (!serverId) return null;
         const datas = await query(
@@ -1023,21 +1030,21 @@ const Database = {
         const data = datas[0];
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 server.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 server.${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    serverChannels: async (serverId) => {
+    serverChannels: async (serverId: string) => {
       try {
         if (!serverId) return null;
         const datas = await query(
@@ -1050,21 +1057,21 @@ const Database = {
         );
         if (!datas) return null;
         return datas.map((data) => convertToCamelCase(data));
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 serverChannels.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 serverChannels.${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    serverMembers: async (serverId) => {
+    serverMembers: async (serverId: string) => {
       try {
         if (!serverId) return null;
         const datas = await query(
@@ -1095,21 +1102,21 @@ const Database = {
           delete data.user_created_at;
           return convertToCamelCase({ ...data, badges: [] });
         });
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 serverMembers.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 serverMembers.${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    serverMemberApplications: async (serverId) => {
+    serverMemberApplications: async (serverId: string) => {
       try {
         if (!serverId) return null;
         const datas = await query(
@@ -1134,19 +1141,19 @@ const Database = {
         });
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 serverMemberApplications.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 serverMemberApplications.${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    category: async (categoryId) => {
+    category: async (categoryId: string) => {
       try {
         if (!categoryId) return null;
         const datas = await query(
@@ -1160,21 +1167,21 @@ const Database = {
         const data = datas[0];
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 category.${categoryId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 category.${categoryId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    channel: async (channelId) => {
+    channel: async (channelId: string) => {
       try {
         if (!channelId) return null;
         const datas = await query(
@@ -1188,21 +1195,21 @@ const Database = {
         const data = datas[0];
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 channel.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 channel.${channelId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    channelChildren: async (channelId) => {
+    channelChildren: async (channelId: string) => {
       try {
         if (!channelId) return null;
         const datas = await query(
@@ -1217,19 +1224,19 @@ const Database = {
         return datas.map((data) => convertToCamelCase(data));
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 channelChildren.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 channelChildren.${channelId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    channelUsers: async (channelId) => {
+    channelUsers: async (channelId: string) => {
       try {
         if (!channelId) return null;
         const datas = await query(
@@ -1242,21 +1249,21 @@ const Database = {
         );
         if (!datas) return null;
         return datas.map((data) => convertToCamelCase({ ...data, badges: [] }));
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 channelUsers.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 channelUsers.${channelId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friendGroup: async (friendGroupId) => {
+    friendGroup: async (friendGroupId: string) => {
       try {
         if (!friendGroupId) return null;
         const datas = await query(
@@ -1271,19 +1278,19 @@ const Database = {
         return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 friendGroup.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 friendGroup.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friendGroupFriends: async (friendGroupId) => {
+    friendGroupFriends: async (friendGroupId: string) => {
       try {
         if (!friendGroupId) return null;
         const datas = await query(
@@ -1312,21 +1319,21 @@ const Database = {
           delete data.user_user_id;
           return convertToCamelCase({ ...data, badges: [] });
         });
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 friendGroupFriends.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 friendGroupFriends.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    member: async (userId, serverId) => {
+    member: async (userId: string, serverId: string) => {
       try {
         if (!userId || !serverId) return null;
         const datas = await query(
@@ -1342,19 +1349,19 @@ const Database = {
         return convertToCamelCase(data);
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    memberApplication: async (userId, serverId) => {
+    memberApplication: async (userId: string, serverId: string) => {
       try {
         if (!userId || !serverId) return null;
         const datas = await query(
@@ -1368,21 +1375,21 @@ const Database = {
         const data = datas[0];
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friend: async (userId, targetId) => {
+    friend: async (userId: string, targetId: string) => {
       try {
         if (!userId || !targetId) return null;
         const datas = await query(
@@ -1396,21 +1403,21 @@ const Database = {
         const data = datas[0];
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friendApplication: async (senderId, receiverId) => {
+    friendApplication: async (senderId: string, receiverId: string) => {
       try {
         if (!senderId || !receiverId) return null;
         const datas = await query(
@@ -1424,15 +1431,15 @@ const Database = {
         const data = datas[0];
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `查詢 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'GET',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
@@ -1440,7 +1447,7 @@ const Database = {
   },
 
   delete: {
-    user: async (userId) => {
+    user: async (userId: string) => {
       try {
         if (!userId) return false;
         await query(
@@ -1451,19 +1458,19 @@ const Database = {
         return true;
       } catch (error) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 user.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 user.${userId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    badge: async (badgeId) => {
+    badge: async (badgeId: string) => {
       try {
         if (!badgeId) return false;
         await query(
@@ -1472,21 +1479,21 @@ const Database = {
           [badgeId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 badge.${badgeId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 badge.${badgeId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    userBadge: async (userId, badgeId) => {
+    userBadge: async (userId: string, badgeId: string) => {
       try {
         if (!userId || !badgeId) return false;
         await query(
@@ -1496,21 +1503,21 @@ const Database = {
           [userId, badgeId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 userBadge.${userId}-${badgeId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 userBadge.${userId}-${badgeId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    userServer: async (userId, serverId) => {
+    userServer: async (userId: string, serverId: string) => {
       try {
         if (!userId || !serverId) return false;
         await query(
@@ -1520,21 +1527,21 @@ const Database = {
           [userId, serverId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 userServer.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 userServer.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    server: async (serverId) => {
+    server: async (serverId: string) => {
       try {
         if (!serverId) return false;
         await query(
@@ -1543,21 +1550,21 @@ const Database = {
           [serverId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 server.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 server.${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    channel: async (channelId) => {
+    channel: async (channelId: string) => {
       try {
         if (!channelId) return false;
         await query(
@@ -1566,21 +1573,21 @@ const Database = {
           [channelId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 channel.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 channel.${channelId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friendGroup: async (friendGroupId) => {
+    friendGroup: async (friendGroupId: string) => {
       try {
         if (!friendGroupId) return false;
         await query(
@@ -1589,21 +1596,21 @@ const Database = {
           [friendGroupId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 friendGroup.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 friendGroup.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    member: async (userId, serverId) => {
+    member: async (userId: string, serverId: string) => {
       try {
         if (!userId || !serverId) return false;
         await query(
@@ -1613,21 +1620,21 @@ const Database = {
           [userId, serverId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    memberApplication: async (userId, serverId) => {
+    memberApplication: async (userId: string, serverId: string) => {
       try {
         if (!userId || !serverId) return false;
         await query(
@@ -1637,21 +1644,21 @@ const Database = {
           [userId, serverId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friend: async (userId, targetId) => {
+    friend: async (userId: string, targetId: string) => {
       try {
         if (!userId || !targetId) return false;
         await query(
@@ -1661,21 +1668,21 @@ const Database = {
           [userId, targetId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
     },
 
-    friendApplication: async (senderId, receiverId) => {
+    friendApplication: async (senderId: string, receiverId: string) => {
       try {
         if (!senderId || !receiverId) return false;
         await query(
@@ -1685,15 +1692,15 @@ const Database = {
           [senderId, receiverId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError(
-            `刪除 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
-            'AccessDatabaseError',
-            'DELETE',
-            'DATABASE_ERROR',
-            500,
-          );
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `刪除 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'DATABASE_ERROR',
+            statusCode: 500,
+          });
         }
         throw error;
       }
@@ -1749,4 +1756,4 @@ const Database = {
   },
 };
 
-module.exports = { ...Database, pool, query };
+export default { ...Database, pool, query };

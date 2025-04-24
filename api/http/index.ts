@@ -7,9 +7,9 @@ import StandardizedError from '@/error';
 import Logger from '@/utils/logger';
 
 // Handlers
-import LoginHandler from './handlers/login.handler';
-import RegisterHandler from './handlers/register.handler';
-import RefreshHandler from './handlers/refresh.handler';
+import LoginHandler from './routers/login/login.handler';
+import RegisterHandler from './routers/register/register.handler';
+import RefreshUserHandler from './routers/refreshUser/refreshUser.handler';
 
 export type ResponseType = {
   statusCode: number;
@@ -70,7 +70,7 @@ export default class HttpServer {
             });
           }
         } else if (req.url === '/refresh/user') {
-          const response = await new RefreshHandler(req).refreshUser();
+          const response = await new RefreshUserHandler(req).refreshUser();
           if (response) {
             sendResponse(res, response);
           } else {

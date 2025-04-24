@@ -1,28 +1,27 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 import http from 'http';
 import { Server, Socket } from 'socket.io';
-import { v4 as uuidv4 } from 'uuid';
 
 // Error
 import StandardizedError from '@/error';
 
-// Utils
-import { Session, JWT } from '@/utils';
+// Validators
+import AuthValidator from '@/middleware/auth.validator';
 
 // Handlers
-import userHandler from './handlers/user.socket';
-import serverHandler from './handlers/server.handler';
-import memberHandler from './handlers/member.handler';
-import channelHandler from './handlers/channel.handler';
-import messageHandler from './handlers/message.handler';
-import friendGroupHandler from './handlers/friendGroup.handler';
-import friendHandler from './handlers/friend.handler';
-import friendApplicationHandler from './handlers/friendApplication.handler';
-import memberApplicationHandler from './handlers/memberApplication.handler';
-import rtcHandler from './handlers/rtc.handler';
-import UserHandler from './handlers/user.socket';
+import UserHandler from './events/user.socket';
+import ServerHandler from './events/server.socket';
+import ChannelHandler from './events/channel.socket';
+import FriendGroupHandler from './events/friendGroup.socket';
+import FriendHandler from './events/friend.socket';
+import FriendApplicationHandler from './events/friendApplication.socket';
+import MemberHandler from './events/member.socket';
+import MemberApplicationHandler from './events/memberApplication.socket';
+import MessageHandler from './events/message.socket';
+import RTCHandler from './events/rtc.socket';
 
 export default class SocketServer {
+  static userSocketMap: Map<string, string> = new Map(); // userId -> socketId
+
   constructor(private server: http.Server) {
     this.server = server;
   }
@@ -35,54 +34,33 @@ export default class SocketServer {
       },
     });
 
-    io.use((socket: Socket, next: (err?: StandardizedError) => void) => {
+    io.use(async (socket: Socket, next: (err?: StandardizedError) => void) => {
       try {
-        const jwt = socket.handshake.query.jwt;
-        if (!jwt) {
-          return next(
-            new StandardizedError({
-              name: 'ValidationError',
-              message: '無可用的 JWT',
-              part: 'AUTH',
-              tag: 'TOKEN_MISSING',
-              statusCode: 401,
-            }),
-          );
-        }
-        const result = JWT.verifyToken(jwt);
-        if (!result.valid) {
-          return next(
-            new StandardizedError({
-              name: 'ValidationError',
-              message: '無效的 token',
-              part: 'AUTH',
-              tag: 'TOKEN_INVALID',
-              statusCode: 401,
-            }),
-          );
-        }
-        const userId = result.userId;
-        if (!userId) {
-          return next(
-            new StandardizedError({
-              name: 'ValidationError',
-              message: '無效的 token',
-              part: 'AUTH',
-              tag: 'TOKEN_INVALID',
-              statusCode: 401,
-            }),
-          );
-        }
+        const { jwt, sessionId } = socket.handshake.query;
 
-        // Generate a new session ID
-        const sessionId = uuidv4();
+        // Validate
+        const userId = await new AuthValidator(
+          jwt as string,
+          sessionId as string,
+        ).validate();
 
-        socket.jwt = jwt;
-        socket.userId = userId;
-        socket.sessionId = sessionId;
+        socket.data.userId = userId;
 
-        // Save maps
-        Session.createUserIdSessionIdMap(userId, sessionId);
+        if (SocketServer.userSocketMap.has(userId)) {
+          const socketId = SocketServer.userSocketMap.get(userId);
+
+          if (socketId) {
+            io.to(socketId).emit('openPopup', {
+              type: 'dialogAlert',
+              initialData: {
+                title: '另一個設備已登入',
+                content: '請重新登入',
+                submitTo: 'dialogAlert',
+              },
+            });
+            io.to(socketId).disconnectSockets();
+          }
+        }
 
         return next();
       } catch (error: any) {
@@ -101,24 +79,22 @@ export default class SocketServer {
     });
 
     io.on('connection', (socket: Socket) => {
+      SocketServer.userSocketMap.set(socket.data.userId, socket.id);
+
+      io.on('disconnect', () => {
+        SocketServer.userSocketMap.delete(socket.data.userId);
+      });
+
       new UserHandler(io, socket).register();
 
-      // Server
-      socket.on('searchServer', async (data: any) =>
-        serverHandler.searchServer(io, socket, data),
-      );
-      socket.on('connectServer', async (data: any) =>
-        serverHandler.connectServer(io, socket, data),
-      );
-      socket.on('disconnectServer', async (data: any) =>
-        serverHandler.disconnectServer(io, socket, data),
-      );
-      socket.on('createServer', async (data: any) =>
-        serverHandler.createServer(io, socket, data),
-      );
-      socket.on('updateServer', async (data) =>
-        serverHandler.updateServer(io, socket, data),
-      );
+      new ServerHandler(io, socket).register();
+
+      new ChannelHandler(io, socket).register();
+
+      new FriendGroupHandler(io, socket).register();
+
+      new FriendHandler(io, socket).register();
+
       // Channel
       socket.on('connectChannel', async (data) =>
         channelHandler.connectChannel(io, socket, data),

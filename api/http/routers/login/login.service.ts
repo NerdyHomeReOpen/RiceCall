@@ -22,10 +22,9 @@ export default class LoginService {
         userId: this.userId,
       });
 
-      return {
-        userId: this.userId,
-        token,
-      };
+      const sessionId = uuidv4();
+
+      return { token, sessionId };
     } catch (error: any) {
       throw new StandardizedError({
         name: 'ServerError',

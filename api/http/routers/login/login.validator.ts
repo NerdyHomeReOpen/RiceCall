@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import bcrypt from 'bcrypt';
 
 // Error
@@ -14,17 +15,29 @@ export default class LoginValidator {
 
   async validate() {
     try {
-      if (!this.account || !this.password) {
+      const loginSchema = z
+        .object({
+          account: z.string(),
+          password: z.string(),
+        })
+        .strict();
+
+      const result = loginSchema.safeParse({
+        account: this.account,
+        password: this.password,
+      });
+
+      if (!result.success) {
         throw new StandardizedError({
           name: 'ValidationError',
-          message: '無效的帳號或密碼',
+          message: `驗證資料失敗: ${result.error.message}`,
           part: 'LOGIN',
-          tag: 'INVALID_ACCOUNT_OR_PASSWORD',
+          tag: 'INVALID_DATA',
           statusCode: 401,
         });
       }
 
-      const data = await Database.get.account(this.account);
+      const data = await Database.get.account(result.data.account);
       if (!data) {
         throw new StandardizedError({
           name: 'ValidationError',
@@ -36,7 +49,7 @@ export default class LoginValidator {
       }
 
       const isPasswordVerified = await bcrypt.compare(
-        this.password,
+        result.data.password,
         data.password,
       );
       if (!isPasswordVerified) {
@@ -53,16 +66,14 @@ export default class LoginValidator {
       if (!user) {
         throw new StandardizedError({
           name: 'ValidationError',
-          message: '用戶不存在',
+          message: '帳號或密碼錯誤',
           part: 'LOGIN',
-          tag: 'USER_NOT_FOUND',
-          statusCode: 404,
+          tag: 'INVALID_ACCOUNT_OR_PASSWORD',
+          statusCode: 401,
         });
       }
 
-      return {
-        userId: user.userId,
-      };
+      return user.userId;
     } catch (error: any) {
       throw new StandardizedError({
         name: 'ServerError',

@@ -16,4 +16,4 @@ const func = {
   },
 };
 
-module.exports = { ...func };
+export default func;

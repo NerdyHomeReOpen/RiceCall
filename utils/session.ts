@@ -1,12 +1,13 @@
 const session = {
-  userToSession: new Map(), // userId -> sessionId
-  sessionToUser: new Map(), // sessionId -> userId
+  userToSession: new Map<string, string>(), // userId -> sessionId
+  sessionToUser: new Map<string, string>(), // sessionId -> userId
 
-  createUserIdSessionIdMap: (userId, sessionId) => {
+  createUserIdSessionIdMap: (userId: string, sessionId: string) => {
     session.userToSession.set(userId, sessionId);
     session.sessionToUser.set(sessionId, userId);
   },
-  deleteUserIdSessionIdMap: (userId = null, sessionId = null) => {
+
+  deleteUserIdSessionIdMap: (userId?: string, sessionId?: string) => {
     if (userId && session.userToSession.has(userId)) {
       const _sessionId = session.userToSession.get(userId);
       if (sessionId == _sessionId) session.userToSession.delete(userId);
@@ -18,4 +19,4 @@ const session = {
   },
 };
 
-module.exports = { ...session };
+export default session;

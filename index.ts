@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 // Error
 import StandardizedError from './error';
 
@@ -30,11 +28,9 @@ const socketServer = new SocketServer(httpServer).setup();
 //   }
 
 //   if (req.method == 'POST' && req.url == '/login') {
-//     return;
 //   }
 
 //   if (req.method == 'POST' && req.url == '/register') {
-//     return;
 //   }
 
 //   // Refresh
@@ -187,37 +183,6 @@ const socketServer = new SocketServer(httpServer).setup();
 //     }
 
 //     if (req.url == '/refresh/server') {
-//       req.on('end', async () => {
-//         try {
-//           const data = JSON.parse(body);
-//           const { serverId } = data;
-//           if (!serverId) {
-//             throw new StandardizedError(
-//               '無效的資料',
-//               'ValidationError',
-//               'REFRESHSERVER',
-//               'DATA_INVALID',
-//             );
-//           }
-//           sendSuccess(res, {
-//             message: 'success',
-//             data: await DB.get.server(serverId),
-//           });
-//         } catch (error) {
-//           if (!(error instanceof StandardizedError)) {
-//             error = new StandardizedError(
-//               `刷新資料時發生預期外的錯誤: ${error.message}`,
-//               'ServerError',
-//               'REFRESHSERVER',
-//               'EXCEPTION_ERROR',
-//               500,
-//             );
-//           }
-//           sendError(res, error.status_code, error.error_message);
-//           new Logger('Server').error(`Refresh error: ${error.error_message}`);
-//         }
-//       });
-//       return;
 //     }
 
 //     if (req.url == '/refresh/serverChannels') {

@@ -6,15 +6,18 @@ import StandardizedError from '@/error';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Services
-import UserService from '@/services/user.service';
+// Validaters
+import LoginValidator from './login.validator';
 
-export default class RefreshHandler {
+// Services
+import LoginService from './login.service';
+
+export default class LoginHandler {
   constructor(private req: IncomingMessage) {
     this.req = req;
   }
 
-  async refreshUser(): Promise<ResponseType | null> {
+  async handle(): Promise<ResponseType | null> {
     let body = '';
     this.req.on('data', (chunk) => {
       body += chunk.toString();
@@ -22,30 +25,26 @@ export default class RefreshHandler {
     this.req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const { userId } = data;
-        if (!userId) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '無效的資料',
-            part: 'REFRESHUSER',
-            tag: 'DATA_INVALID',
-            statusCode: 401,
-          });
-        }
+        const { account, password } = data;
 
-        const user = await new UserService().getUser(userId);
+        const { userId } = await new LoginValidator(
+          account,
+          password,
+        ).validate();
+
+        const { token } = await new LoginService(userId).use();
 
         return {
           statusCode: 200,
-          message: '刷新使用者資料成功',
-          data: { user },
+          message: 'success',
+          data: { token: token },
         };
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
-            message: `刷新使用者資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHUSER',
+            message: `登入時發生預期外的錯誤: ${error.message}`,
+            part: 'LOGIN',
             tag: 'SERVER_ERROR',
             statusCode: 500,
           });
@@ -53,7 +52,7 @@ export default class RefreshHandler {
 
         return {
           statusCode: error.statusCode,
-          message: '刷新使用者資料失敗',
+          message: 'error',
           data: { error: error.message },
         };
       }

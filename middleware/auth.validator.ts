@@ -33,7 +33,8 @@ export default class AuthValidator {
       });
     }
 
-    if (!Session.sessionToUser.get(this.sessionId)) {
+    const userId = Session.sessionToUser.get(this.sessionId);
+    if (!userId) {
       throw new StandardizedError({
         name: 'ValidationError',
         message: '無效的 session',
@@ -42,5 +43,17 @@ export default class AuthValidator {
         statusCode: 401,
       });
     }
+
+    if (userId !== decoded.userId) {
+      throw new StandardizedError({
+        name: 'ValidationError',
+        message: '無效的 session',
+        part: 'AUTH',
+        tag: 'SESSION_INVALID',
+        statusCode: 401,
+      });
+    }
+
+    return userId;
   }
 }

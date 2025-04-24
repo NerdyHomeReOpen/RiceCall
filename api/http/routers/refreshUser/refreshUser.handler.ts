@@ -6,18 +6,18 @@ import StandardizedError from '@/error';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Validaters
-import RegisterValidator from '@/validators/register.validator';
+// Validators
+import RefreshUserValidator from './refreshUser.validator';
 
 // Services
-import RegisterService from '@/services/register.service';
+import RefreshUserService from './refreshUser.service';
 
-export default class RegisterHandler {
+export default class RefreshUserHandler {
   constructor(private req: IncomingMessage) {
     this.req = req;
   }
 
-  async handle(): Promise<ResponseType | null> {
+  async refreshUser(): Promise<ResponseType | null> {
     let body = '';
     this.req.on('data', (chunk) => {
       body += chunk.toString();
@@ -25,23 +25,23 @@ export default class RegisterHandler {
     this.req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const { account, password, username } = data;
+        const { userId } = data;
 
-        await new RegisterValidator(account, password, username).validate();
+        await new RefreshUserValidator(userId).validate();
 
-        await new RegisterService(account, password, username).use();
+        const result = await new RefreshUserService(userId).use();
 
         return {
           statusCode: 200,
-          message: '註冊成功',
-          data: { account },
+          message: 'success',
+          data: result,
         };
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
-            message: `註冊時發生預期外的錯誤: ${error.message}`,
-            part: 'REGISTER',
+            message: `刷新使用者資料時發生預期外的錯誤: ${error.message}`,
+            part: 'REFRESHUSER',
             tag: 'SERVER_ERROR',
             statusCode: 500,
           });
@@ -49,7 +49,7 @@ export default class RegisterHandler {
 
         return {
           statusCode: error.statusCode,
-          message: '註冊失敗',
+          message: 'error',
           data: { error: error.message },
         };
       }

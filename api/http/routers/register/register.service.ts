@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import { uuidv4 } from 'uuid';
 
 // Error
 import StandardizedError from '@/error';
@@ -36,7 +35,7 @@ export default class RegisterService {
         userId: userId,
       });
 
-      return {};
+      return { account: this.account };
     } catch (error: any) {
       throw new StandardizedError({
         name: 'ServerError',

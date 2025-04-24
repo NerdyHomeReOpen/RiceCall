@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 import { Server, Socket } from 'socket.io';
 
 // Utils
@@ -8,10 +7,13 @@ import Logger from '@/utils/logger';
 import StandardizedError from '@/error';
 
 // Validators
-import AuthValidator from '@/middleware/auth.validator';
+import UserValidator from '@/validators/user.validator';
 
 // Services
-import UserService from '@/services/user.service';
+import UserService from '@/api/socket/events/user.service';
+
+// Socket
+import SocketServer from '@/api/socket';
 
 export default class UserHandler {
   constructor(private io: Server, private socket: Socket) {
@@ -22,27 +24,20 @@ export default class UserHandler {
   register() {
     this.socket.on('searchUser', async (data: { query: string }) => {
       try {
-        // Validate data
         const { query } = data;
-        if (!query) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '無效的資料',
-            part: 'SEARCHUSER',
-            tag: 'DATA_INVALID',
-            statusCode: 401,
-          });
-        }
+        const operatorId = this.socket.data.userId;
 
         // Validate
-        await new AuthValidator(
-          this.socket.jwt,
-          this.socket.sessionId,
-        ).validate();
+        // FIXME: 需要對此操作單獨進行驗證
+
+        const socketId = SocketServer.userSocketMap.get(operatorId) || null;
+        const socket = socketId ? this.io.sockets.sockets.get(socketId) : null;
 
         const user = await new UserService().searchUser(query);
 
-        this.socket.emit('userSearch', user);
+        if (socket) {
+          socket.emit('userSearch', user);
+        }
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -55,35 +50,27 @@ export default class UserHandler {
         }
 
         this.socket.emit('error', error);
-        new Logger('User').error(
-          `Error searching user: ${error.message} (${this.socket.id})`,
-        );
+        new Logger('User').error(error.message);
       }
     });
 
     this.socket.on('updateUser', async (data: any) => {
       try {
-        // Validate data
-        const { user: _editedUser, userId } = data;
-        if (!_editedUser || !userId) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '無效的資料',
-            part: 'UPDATEUSER',
-            tag: 'DATA_INVALID',
-            statusCode: 401,
-          });
-        }
+        const { user: updatedUser, userId } = data;
+        const operatorId = this.socket.data.userId;
 
         // Validate
-        await new AuthValidator(
-          this.socket.jwt,
-          this.socket.sessionId,
-        ).validate();
+        // FIXME: 需要對此操作單獨進行驗證
+        await new UserValidator(updatedUser).validate();
 
-        const user = await new UserService().updateUser(userId, _editedUser);
+        const socketId = SocketServer.userSocketMap.get(userId) || null;
+        const socket = socketId ? this.io.sockets.sockets.get(socketId) : null;
 
-        this.socket.emit('userUpdate', user);
+        const user = await new UserService().updateUser(userId, updatedUser);
+
+        if (socket) {
+          socket.emit('userUpdate', user);
+        }
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -96,9 +83,71 @@ export default class UserHandler {
         }
 
         this.socket.emit('error', error);
-        new Logger('User').error(
-          `Error updating user: ${error.message} (${this.socket.id})`,
-        );
+        new Logger('User').error(error.message);
+      }
+    });
+
+    this.socket.on('connectUser', async (data: any) => {
+      try {
+        const { userId } = data;
+        const operatorId = this.socket.data.userId;
+
+        // Validate
+        // FIXME: 需要對此操作單獨進行驗證
+
+        const socketId = SocketServer.userSocketMap.get(userId) || null;
+        const socket = socketId ? this.io.sockets.sockets.get(socketId) : null;
+
+        const user = await new UserService().connectUser(userId);
+
+        if (socket) {
+          socket.emit('userUpdate', user);
+        }
+      } catch (error: any) {
+        if (!(error instanceof StandardizedError)) {
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `連接使用者時發生無法預期的錯誤: ${error.message}`,
+            part: 'CONNECTUSER',
+            tag: 'EXCEPTION_ERROR',
+            statusCode: 500,
+          });
+        }
+
+        this.socket.emit('error', error);
+        new Logger('User').error(error.message);
+      }
+    });
+
+    this.socket.on('disconnectUser', async (data: any) => {
+      try {
+        const { userId } = data;
+        const operatorId = this.socket.data.userId;
+
+        // Validate
+        // FIXME: 需要對此操作單獨進行驗證
+
+        const socketId = SocketServer.userSocketMap.get(userId) || null;
+        const socket = socketId ? this.io.sockets.sockets.get(socketId) : null;
+
+        await new UserService().disconnectUser(userId);
+
+        if (socket) {
+          socket.emit('userUpdate', null);
+        }
+      } catch (error: any) {
+        if (!(error instanceof StandardizedError)) {
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `斷開使用者時發生無法預期的錯誤: ${error.message}`,
+            part: 'DISCONNECTUSER',
+            tag: 'EXCEPTION_ERROR',
+            statusCode: 500,
+          });
+        }
+
+        this.socket.emit('error', error);
+        new Logger('User').error(error.message);
       }
     });
   }
@@ -129,20 +178,7 @@ export default class UserHandler {
   //       }
   //     });
 
-  //     // Check if user is already connected to a server
-  //     if (operator.currentServerId) {
-  //       await serverHandler.connectServer(io, socket, {
-  //         serverId: operator.currentServerId,
-  //         userId: operator.userId,
-  //       });
-  //     }
-  //     if (operator.currentChannelId) {
-  //       await channelHandler.connectChannel(io, socket, {
-  //         channelId: operator.currentChannelId,
-  //         serverId: operator.currentServerId,
-  //         userId: operator.userId,
-  //       });
-  //     }
+  //
 
   //     // Emit data (to the operator)
   //     io.to(socket.id).emit('userUpdate', operator);
