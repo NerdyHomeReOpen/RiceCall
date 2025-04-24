@@ -14,8 +14,8 @@ const xpSystem = require('../../systems/xp');
 const StandardizedError = require('../../error');
 
 // Handlers
-const rtcHandler = require('./rtc');
-const messageHandler = require('./message');
+const rtcHandler = require('./rtc.socket.ts');
+const messageHandler = require('./message.socket');
 
 const channelHandler = {
   connectChannel: async (io, socket, data) => {
