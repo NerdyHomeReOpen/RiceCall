@@ -8,7 +8,7 @@ import StandardizedError from '@/error';
 import config from '@/config';
 
 // Systems
-import clean from '@/systems/image';
+import imageSystem from '@/systems/image';
 
 export default class UploadService {
   constructor(
@@ -27,11 +27,11 @@ export default class UploadService {
     try {
       const fullFileName = `${this.fileName}.${this.ext}`;
       const filePath = path.join(
-        clean.directory(this.type),
+        imageSystem.directory(this.type),
         `${config.filePrefix}${fullFileName}`,
       );
 
-      const files = await fs.readdir(clean.directory(this.type));
+      const files = await fs.readdir(imageSystem.directory(this.type));
       const matchingFiles = files.filter(
         (file: string) =>
           file.startsWith(`${config.filePrefix}${this.fileName}`) &&
@@ -40,7 +40,7 @@ export default class UploadService {
 
       await Promise.all(
         matchingFiles.map((file) =>
-          fs.unlink(path.join(clean.directory(this.type), file)),
+          fs.unlink(path.join(imageSystem.directory(this.type), file)),
         ),
       );
 

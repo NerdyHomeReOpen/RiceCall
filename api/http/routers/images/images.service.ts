@@ -4,9 +4,6 @@ import fs from 'fs/promises';
 // Error
 import StandardizedError from '@/error';
 
-// Systems
-import clean from '@/systems/image';
-
 // Config
 import config from '@/config';
 
@@ -19,7 +16,8 @@ export default class ImagesService {
   async use() {
     try {
       const filePath = path.join(
-        clean.directory(this.filePath),
+        __dirname,
+        ...this.filePath,
         `${config.filePrefix}${this.fileName}`,
       );
       const file = await fs.readFile(filePath);

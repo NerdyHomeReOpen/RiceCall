@@ -1,53 +1,51 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 // Config
-const config = require('./config.json');
+import config from './config.json';
 
 // Database
-const DB = require('../../database');
+import Database from '@/database';
 
 // Utils
-const Logger = require('../../utils/logger');
+import Logger from '@/utils/logger';
 
 // StandardizedError
-const StandardizedError = require('../../error');
+import StandardizedError from '@/error';
 
 const xpSystem = {
-  timeFlag: new Map(), // socket -> timeFlag
-  elapsedTime: new Map(), // userId -> elapsedTime
+  timeFlag: new Map<string, number>(), // socket -> timeFlag
+  elapsedTime: new Map<string, number>(), // userId -> elapsedTime
 
-  setup: () => {
+  setup: async () => {
     try {
-      // Set up XP interval
-      setInterval(
-        () =>
-          xpSystem.refreshAllUsers().catch((error) => {
-            new Logger('XPSystem').error(
-              `Error refreshing XP interval: ${error.message}`,
-            );
-          }),
-        600000,
-      );
+      setInterval(() => {
+        xpSystem.refreshAllUsers().catch((error) => {
+          new Logger('XPSystem').error(
+            `Error refreshing XP interval: ${error.message}`,
+          );
+        });
+      }, config.INTERVAL_MS);
+
+      // Run initial cleanup
+      await xpSystem.refreshAllUsers();
 
       new Logger('XPSystem').info(`XP system setup complete`);
-    } catch (error) {
+    } catch (error: any) {
       new Logger('XPSystem').error(
         `Error setting up XP system: ${error.message}`,
       );
     }
   },
 
-  create: async (userId) => {
+  create: async (userId: string) => {
     try {
       // Validate data
       if (!userId) {
-        throw new StandardizedError(
-          '無效的資料',
-          'ValidationError',
-          'config',
-          'DATA_INVALID',
-          400,
-        );
+        throw new StandardizedError({
+          name: 'ValidationError',
+          message: '無效的資料',
+          part: 'config',
+          tag: 'DATA_INVALID',
+          statusCode: 400,
+        });
       }
 
       xpSystem.timeFlag.set(userId, Date.now());
@@ -57,24 +55,24 @@ const xpSystem = {
           userId,
         )}ms elapsed time`,
       );
-    } catch (error) {
+    } catch (error: any) {
       new Logger('XPSystem').error(
         `Error creating XP system for user(${userId}): ${error.message}`,
       );
     }
   },
 
-  delete: async (userId) => {
+  delete: async (userId: string) => {
     try {
       // Validate data
       if (!userId) {
-        throw new StandardizedError(
-          '無效的資料',
-          'ValidationError',
-          'config',
-          'DATA_INVALID',
-          400,
-        );
+        throw new StandardizedError({
+          name: 'ValidationError',
+          message: '無效的資料',
+          part: 'config',
+          tag: 'DATA_INVALID',
+          statusCode: 400,
+        });
       }
 
       const timeFlag = xpSystem.timeFlag.get(userId);
@@ -97,7 +95,7 @@ const xpSystem = {
           userId,
         )}ms elapsed time`,
       );
-    } catch (error) {
+    } catch (error: any) {
       new Logger('XPSystem').error(
         `Error deleting XP system for user(${userId}): ${error.message}`,
       );
@@ -121,7 +119,7 @@ const xpSystem = {
           new Logger('XPSystem').info(
             `XP interval refreshed for user(${userId})`,
           );
-        } catch (error) {
+        } catch (error: any) {
           new Logger('XPSystem').error(
             `Error refreshing XP interval for user(${userId}): ${error.message}`,
           );
@@ -134,29 +132,29 @@ const xpSystem = {
     );
   },
 
-  getRequiredXP: (level) => {
+  getRequiredXP: (level: number) => {
     return Math.ceil(
       config.BASE_REQUIRE_XP * Math.pow(config.GROWTH_RATE, level),
     );
   },
 
-  obtainXp: async (userId) => {
+  obtainXp: async (userId: string) => {
     try {
-      const user = await DB.get.user(userId);
+      const user = await Database.get.user(userId);
       if (!user) {
         new Logger('XPSystem').warn(
           `User(${userId}) not found, cannot obtain XP`,
         );
         return false;
       }
-      const server = await DB.get.server(user.currentServerId);
+      const server = await Database.get.server(user.currentServerId);
       if (!server) {
         new Logger('XPSystem').warn(
           `Server(${user.currentServerId}) not found, cannot obtain XP`,
         );
         return false;
       }
-      const member = await DB.get.member(user.userId, server.serverId);
+      const member = await Database.get.member(user.userId, server.serverId);
       if (!member) {
         new Logger('XPSystem').warn(
           `User(${user.userId}) not found in server(${server.serverId}), cannot update contribution`,
@@ -183,7 +181,7 @@ const xpSystem = {
         requiredXp: requiredXp,
         progress: user.xp / requiredXp,
       };
-      await DB.set.user(user.userId, updatedUser);
+      await Database.set.user(user.userId, updatedUser);
 
       // Update member contribution if in a server
       const updatedMember = {
@@ -191,20 +189,20 @@ const xpSystem = {
           Math.round((member.contribution + config.BASE_XP * vipBoost) * 100) /
           100,
       };
-      await DB.set.member(user.userId, server.serverId, updatedMember);
+      await Database.set.member(user.userId, server.serverId, updatedMember);
 
       // Update server wealth
       const updatedServer = {
         wealth:
           Math.round((server.wealth + config.BASE_XP * vipBoost) * 100) / 100,
       };
-      await DB.set.server(server.serverId, updatedServer);
+      await Database.set.server(server.serverId, updatedServer);
 
       new Logger('XPSystem').info(
         `User(${userId}) obtained ${config.BASE_XP * vipBoost} XP`,
       );
       return true;
-    } catch (error) {
+    } catch (error: any) {
       new Logger('XPSystem').error(
         `Error obtaining user(${userId}) XP: ${error.message}`,
       );
@@ -213,4 +211,4 @@ const xpSystem = {
   },
 };
 
-module.exports = { ...xpSystem };
+export default xpSystem;

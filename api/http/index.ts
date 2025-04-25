@@ -1,8 +1,5 @@
 import http, { ServerResponse } from 'http';
 
-// Config
-import config from '@/config';
-
 // Error
 import StandardizedError from '@/error';
 
@@ -46,6 +43,12 @@ const sendOptions = (res: ServerResponse) => {
   res.end();
 };
 
+const ERROR_RESPONSE = {
+  statusCode: 500,
+  message: 'Internal Server Error',
+  data: { error: 'Internal Server Error' },
+};
+
 export default class HttpServer {
   constructor(private port: number) {
     this.port = port;
@@ -71,44 +74,28 @@ export default class HttpServer {
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/register') {
           const response = await new RegisterHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/channel') {
           const response = await new RefreshChannelHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/friend') {
           const response = await new RefreshFriendHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/friendApplication') {
           const response = await new RefreshFriendApplicationHandler(
@@ -117,33 +104,21 @@ export default class HttpServer {
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/friendGroup') {
           const response = await new RefreshFriendGroupHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/member') {
           const response = await new RefreshMemberHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/memberApplication') {
           const response = await new RefreshMemberApplicationHandler(
@@ -152,33 +127,21 @@ export default class HttpServer {
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/server') {
           const response = await new RefreshServerHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/serverChannels') {
           const response = await new RefreshServerChannelsHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/serverMemberApplications') {
           const response = await new RefreshServerMemberApplicationsHandler(
@@ -187,33 +150,21 @@ export default class HttpServer {
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/serverMembers') {
           const response = await new RefreshServerMembersHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/user') {
           const response = await new RefreshUserHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/userFriendApplications') {
           const response = await new RefreshUserFriendApplicationsHandler(
@@ -222,11 +173,7 @@ export default class HttpServer {
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/userFriendGroups') {
           const response = await new RefreshUserFriendGroupsHandler(
@@ -235,33 +182,21 @@ export default class HttpServer {
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/userFriends') {
           const response = await new RefreshUserFriendsHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/refresh/userServers') {
           const response = await new RefreshUserServersHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/images') {
           const response = await new ImagesHandler(req).handle();
@@ -275,29 +210,17 @@ export default class HttpServer {
             });
             res.end(response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else if (req.url === '/upload') {
           const response = await new UploadHandler(req).handle();
           if (response) {
             sendResponse(res, response);
           } else {
-            sendResponse(res, {
-              statusCode: 500,
-              message: 'Internal Server Error',
-              data: { error: 'Internal Server Error' },
-            });
+            sendResponse(res, ERROR_RESPONSE);
           }
         } else {
-          sendResponse(res, {
-            statusCode: 404,
-            message: 'API URL Not Found',
-            data: { error: 'API URL Not Found' },
-          });
+          sendResponse(res, ERROR_RESPONSE);
         }
       }
     });
