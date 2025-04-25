@@ -7,12 +7,13 @@ import StandardizedError from '@/error';
 import { ResponseType } from '@/api/http';
 
 // Validators
-import RefreshUserValidator from './refreshUser.validator';
+import ExampleValidator from './example.validator'; // TODO: change validator file path
 
 // Services
-import RefreshUserService from './refreshUser.service';
+import ExampleService from './example.service'; // TODO: change service file path
 
-export default class RefreshUserHandler {
+export default class ExampleHandler {
+  // TODO: change handler name
   constructor(private req: IncomingMessage) {
     this.req = req;
   }
@@ -28,9 +29,9 @@ export default class RefreshUserHandler {
       try {
         const data = JSON.parse(body);
 
-        const validated = await new RefreshUserValidator(data).validate();
+        const validated = await new ExampleValidator(data).validate(); // TODO: change validator
 
-        const result = await new RefreshUserService(validated.userId).use();
+        const result = await new ExampleService(validated.example).use(); // TODO: change service
 
         return {
           statusCode: 200,
@@ -41,8 +42,8 @@ export default class RefreshUserHandler {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
-            message: `刷新使用者資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHUSER',
+            message: '', // TODO: implement message
+            part: '', // TODO: implement part
             tag: 'SERVER_ERROR',
             statusCode: 500,
           });

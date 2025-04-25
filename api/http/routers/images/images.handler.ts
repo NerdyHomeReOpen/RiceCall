@@ -7,30 +7,24 @@ import StandardizedError from '@/error';
 import { ResponseType } from '@/api/http';
 
 // Validators
-import RefreshUserValidator from './refreshUser.validator';
+// import ImagesValidator from './images.validator';
 
 // Services
-import RefreshUserService from './refreshUser.service';
+import ImagesService from './images.service';
 
-export default class RefreshUserHandler {
+export default class UploadHandler {
   constructor(private req: IncomingMessage) {
     this.req = req;
   }
 
   async handle(): Promise<ResponseType | null> {
-    let body = '';
-
-    this.req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
-
     this.req.on('end', async () => {
       try {
-        const data = JSON.parse(body);
+        const filePath =
+          this.req.url?.replace('/images/', '/').split('?')[0].split('/') || [];
+        const fileName = filePath.pop() || '__default.png';
 
-        const validated = await new RefreshUserValidator(data).validate();
-
-        const result = await new RefreshUserService(validated.userId).use();
+        const result = await new ImagesService(filePath, fileName).use();
 
         return {
           statusCode: 200,
@@ -41,8 +35,8 @@ export default class RefreshUserHandler {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
-            message: `刷新使用者資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHUSER',
+            message: `讀取圖片時發生預期外的錯誤: ${error.message}`,
+            part: 'IMAGES',
             tag: 'SERVER_ERROR',
             statusCode: 500,
           });

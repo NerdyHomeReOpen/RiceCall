@@ -1,4 +1,5 @@
 import { IncomingMessage } from 'http';
+import formidable from 'formidable';
 
 // Error
 import StandardizedError from '@/error';
@@ -7,30 +8,31 @@ import StandardizedError from '@/error';
 import { ResponseType } from '@/api/http';
 
 // Validators
-import RefreshUserValidator from './refreshUser.validator';
+import UploadValidator from './upload.validator';
 
 // Services
-import RefreshUserService from './refreshUser.service';
+import UploadService from './upload.service';
 
-export default class RefreshUserHandler {
+export default class UploadHandler {
   constructor(private req: IncomingMessage) {
     this.req = req;
   }
 
   async handle(): Promise<ResponseType | null> {
-    let body = '';
+    const form = new formidable.IncomingForm();
 
-    this.req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
-
-    this.req.on('end', async () => {
+    form.parse(this.req, async (err, data) => {
       try {
-        const data = JSON.parse(body);
+        if (err) throw new Error(err);
 
-        const validated = await new RefreshUserValidator(data).validate();
+        const validated = await new UploadValidator(data).validate();
 
-        const result = await new RefreshUserService(validated.userId).use();
+        const result = await new UploadService(
+          validated._type,
+          validated._fileName,
+          validated._file,
+          validated.ext,
+        ).use();
 
         return {
           statusCode: 200,
@@ -41,8 +43,8 @@ export default class RefreshUserHandler {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
-            message: `刷新使用者資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHUSER',
+            message: `上傳圖片時發生預期外的錯誤: ${error.message}`,
+            part: 'UPLOAD',
             tag: 'SERVER_ERROR',
             statusCode: 500,
           });

@@ -19,22 +19,27 @@ export default class RegisterHandler {
 
   async handle(): Promise<ResponseType | null> {
     let body = '';
+
     this.req.on('data', (chunk) => {
       body += chunk.toString();
     });
+
     this.req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const { account, password, username } = data;
 
-        await new RegisterValidator(account, password, username).validate();
+        const validated = await new RegisterValidator(data).validate();
 
-        await new RegisterService(account, password, username).use();
+        const result = await new RegisterService(
+          validated.account,
+          validated.password,
+          validated.username,
+        ).use();
 
         return {
           statusCode: 200,
           message: 'success',
-          data: { account },
+          data: result,
         };
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {

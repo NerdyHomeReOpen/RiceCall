@@ -7,12 +7,12 @@ import StandardizedError from '@/error';
 import { ResponseType } from '@/api/http';
 
 // Validators
-import RefreshUserValidator from './refreshUser.validator';
+import RefreshFriendGroupValidator from './refreshFriendGroup.validator';
 
 // Services
-import RefreshUserService from './refreshUser.service';
+import RefreshFriendGroupService from './refreshFriendGroup.service';
 
-export default class RefreshUserHandler {
+export default class RefreshFriendGroupHandler {
   constructor(private req: IncomingMessage) {
     this.req = req;
   }
@@ -28,9 +28,13 @@ export default class RefreshUserHandler {
       try {
         const data = JSON.parse(body);
 
-        const validated = await new RefreshUserValidator(data).validate();
+        const validated = await new RefreshFriendGroupValidator(
+          data,
+        ).validate();
 
-        const result = await new RefreshUserService(validated.userId).use();
+        const result = await new RefreshFriendGroupService(
+          validated.friendGroupId,
+        ).use();
 
         return {
           statusCode: 200,
@@ -41,8 +45,8 @@ export default class RefreshUserHandler {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
-            message: `刷新使用者資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHUSER',
+            message: `刷新好友群組資料時發生預期外的錯誤: ${error.message}`,
+            part: 'REFRESHFRIENDGROUP',
             tag: 'SERVER_ERROR',
             statusCode: 500,
           });

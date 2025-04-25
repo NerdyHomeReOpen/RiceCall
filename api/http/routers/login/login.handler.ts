@@ -19,25 +19,23 @@ export default class LoginHandler {
 
   async handle(): Promise<ResponseType | null> {
     let body = '';
+
     this.req.on('data', (chunk) => {
       body += chunk.toString();
     });
+
     this.req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const { account, password } = data;
 
-        const { userId } = await new LoginValidator(
-          account,
-          password,
-        ).validate();
+        const validated = await new LoginValidator(data).validate();
 
-        const { token } = await new LoginService(userId).use();
+        const result = await new LoginService(validated.account).use();
 
         return {
           statusCode: 200,
           message: 'success',
-          data: { token: token },
+          data: result,
         };
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {

@@ -8,9 +8,8 @@ import StandardizedError from '@/error';
 import Database from '@/database';
 
 export default class LoginValidator {
-  constructor(private account: string, private password: string) {
-    this.account = account;
-    this.password = password;
+  constructor(private data: any) {
+    this.data = data;
   }
 
   async validate() {
@@ -22,10 +21,7 @@ export default class LoginValidator {
         })
         .strict();
 
-      const result = loginSchema.safeParse({
-        account: this.account,
-        password: this.password,
-      });
+      const result = loginSchema.safeParse(this.data);
 
       if (!result.success) {
         throw new StandardizedError({
@@ -73,7 +69,7 @@ export default class LoginValidator {
         });
       }
 
-      return user.userId;
+      return result.data;
     } catch (error: any) {
       throw new StandardizedError({
         name: 'ServerError',

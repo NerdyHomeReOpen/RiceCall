@@ -17,19 +17,20 @@ export default class RefreshServerHandler {
     this.req = req;
   }
 
-  async refreshServer(): Promise<ResponseType | null> {
+  async handle(): Promise<ResponseType | null> {
     let body = '';
+
     this.req.on('data', (chunk) => {
       body += chunk.toString();
     });
+
     this.req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const { serverId } = data;
 
-        await new RefreshServerValidator(serverId).validate();
+        const validated = await new RefreshServerValidator(data).validate();
 
-        const result = await new RefreshServerService(serverId).use();
+        const result = await new RefreshServerService(validated.serverId).use();
 
         return {
           statusCode: 200,

@@ -17,19 +17,24 @@ export default class RefreshUserFriendsHandler {
     this.req = req;
   }
 
-  async refreshUserFriends(): Promise<ResponseType | null> {
+  async handle(): Promise<ResponseType | null> {
     let body = '';
+
     this.req.on('data', (chunk) => {
       body += chunk.toString();
     });
+
     this.req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const { userId } = data;
 
-        await new RefreshUserFriendsValidator(userId).validate();
+        const validated = await new RefreshUserFriendsValidator(
+          data,
+        ).validate();
 
-        const result = await new RefreshUserFriendsService(userId).use();
+        const result = await new RefreshUserFriendsService(
+          validated.userId,
+        ).use();
 
         return {
           statusCode: 200,

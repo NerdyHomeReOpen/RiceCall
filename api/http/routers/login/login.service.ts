@@ -8,19 +8,19 @@ import Database from '@/database';
 import { generateJWT } from '@/utils/jwt';
 
 export default class LoginService {
-  constructor(private userId: string) {
-    this.userId = userId;
+  constructor(private account: string) {
+    this.account = account;
   }
 
   async use() {
     try {
-      await Database.set.user(this.userId, {
+      const { userId } = await Database.get.account(this.account);
+
+      await Database.set.user(userId, {
         lastActiveAt: Date.now(),
       });
 
-      const token = generateJWT({
-        userId: this.userId,
-      });
+      const token = generateJWT({ userId });
 
       const sessionId = uuidv4();
 

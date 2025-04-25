@@ -3,9 +3,9 @@ import { z } from 'zod';
 // Error
 import StandardizedError from '@/error';
 
-export default class RefreshUserValidator {
-  constructor(private serverId: string) {
-    this.serverId = serverId;
+export default class RefreshServerValidator {
+  constructor(private data: any) {
+    this.data = data;
   }
 
   async validate() {
@@ -16,9 +16,7 @@ export default class RefreshUserValidator {
         })
         .strict();
 
-      const result = refreshServerSchema.safeParse({
-        serverId: this.serverId,
-      });
+      const result = refreshServerSchema.safeParse(this.data);
 
       if (!result.success) {
         throw new StandardizedError({
@@ -29,6 +27,8 @@ export default class RefreshUserValidator {
           statusCode: 401,
         });
       }
+
+      return result.data;
     } catch (error: any) {
       throw new StandardizedError({
         name: 'ServerError',

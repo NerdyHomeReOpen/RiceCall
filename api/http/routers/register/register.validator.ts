@@ -7,14 +7,8 @@ import StandardizedError from '@/error';
 import Database from '@/database';
 
 export default class RegisterValidator {
-  constructor(
-    private account: string,
-    private password: string,
-    private username: string,
-  ) {
-    this.account = account;
-    this.password = password;
-    this.username = username;
+  constructor(private data: any) {
+    this.data = data;
   }
 
   async validate() {
@@ -35,11 +29,7 @@ export default class RegisterValidator {
         })
         .strict();
 
-      const result = registerSchema.safeParse({
-        account: this.account,
-        password: this.password,
-        username: this.username,
-      });
+      const result = registerSchema.safeParse(this.data);
 
       if (!result.success) {
         throw new StandardizedError({
@@ -61,6 +51,8 @@ export default class RegisterValidator {
           statusCode: 401,
         });
       }
+
+      return result.data;
     } catch (error: any) {
       throw new StandardizedError({
         name: 'ServerError',

@@ -4,8 +4,8 @@ import { z } from 'zod';
 import StandardizedError from '@/error';
 
 export default class RefreshUserFriendsValidator {
-  constructor(private userId: string) {
-    this.userId = userId;
+  constructor(private data: any) {
+    this.data = data;
   }
 
   async validate() {
@@ -16,9 +16,7 @@ export default class RefreshUserFriendsValidator {
         })
         .strict();
 
-      const result = refreshUserFriendsSchema.safeParse({
-        userId: this.userId,
-      });
+      const result = refreshUserFriendsSchema.safeParse(this.data);
 
       if (!result.success) {
         throw new StandardizedError({
@@ -29,6 +27,8 @@ export default class RefreshUserFriendsValidator {
           statusCode: 401,
         });
       }
+
+      return result.data;
     } catch (error: any) {
       throw new StandardizedError({
         name: 'ServerError',
