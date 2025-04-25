@@ -33,6 +33,16 @@ export type ResponseType = {
   data: any;
 };
 
+const sendImage = (res: ServerResponse, response: ResponseType) => {
+  res.writeHead(200, {
+    'Content-Type': 'image/jpeg',
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Expires': '0',
+    'Pragma': 'no-cache',
+  });
+  res.end(response);
+};
+
 const sendResponse = (res: ServerResponse, response: ResponseType) => {
   res.writeHead(response.statusCode, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(response.data));
@@ -201,14 +211,7 @@ export default class HttpServer {
         } else if (req.url === '/images') {
           const response = await new ImagesHandler(req).handle();
           if (response) {
-            res.writeHead(200, {
-              'Content-Type': 'image/jpeg',
-              'Cache-Control':
-                'no-store, no-cache, must-revalidate, proxy-revalidate',
-              'Expires': '0',
-              'Pragma': 'no-cache',
-            });
-            res.end(response);
+            sendImage(res, response);
           } else {
             sendResponse(res, ERROR_RESPONSE);
           }
