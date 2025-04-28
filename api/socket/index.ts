@@ -8,22 +8,54 @@ import StandardizedError from '@/error';
 import AuthValidator from '@/middleware/auth.validator';
 
 // Handlers
-import UserHandler from './events/user.socket';
-import ServerHandler from './events/server.socket';
-import ChannelHandler from './events/channel.socket';
-import FriendGroupHandler from './events/friendGroup.socket';
-import FriendHandler from './events/friend.socket';
-import FriendApplicationHandler from './events/friendApplication.socket';
-import MemberHandler from './events/member.socket';
-import MemberApplicationHandler from './events/memberApplication.socket';
-import MessageHandler from './events/message.socket';
-import RTCHandler from './events/rtc.socket';
+import {
+  ConnectUserHandler,
+  DisconnectUserHandler,
+  UpdateUserHandler,
+} from './events/user/user.handler';
+import {
+  ConnectServerHandler,
+  CreateServerHandler,
+  DisconnectServerHandler,
+  UpdateServerHandler,
+} from './events/server/server.handler';
+import {
+  RTCOfferHandler,
+  RTCAnswerHandler,
+  RTCCandidateHandler,
+} from './events/rtc/rtc.handler';
+import {
+  ConnectChannelHandler,
+  DeleteChannelHandler,
+  UpdateChannelsHandler,
+  UpdateChannelHandler,
+  CreateChannelHandler,
+  DisconnectChannelHandler,
+} from './events/channel/channel.handler';
+import {
+  SendMessageHandler,
+  SendDirectMessageHandler,
+} from './events/message/message.handler';
 
 export default class SocketServer {
+  static io: Server;
+  static socket: Socket;
   static userSocketMap: Map<string, string> = new Map(); // userId -> socketId
 
   constructor(private server: http.Server) {
     this.server = server;
+  }
+
+  static getSocket(io: Server, userId: string) {
+    const socketId = SocketServer.userSocketMap.get(userId);
+
+    if (!socketId) return null;
+
+    const socket = io.sockets.sockets.get(socketId);
+
+    if (!socket) return null;
+
+    return socket;
   }
 
   setup() {
@@ -36,11 +68,11 @@ export default class SocketServer {
 
     io.use(async (socket: Socket, next: (err?: StandardizedError) => void) => {
       try {
-        const { jwt, sessionId } = socket.handshake.query;
+        const { token, sessionId } = socket.handshake.query;
 
         // Validate
         const userId = await new AuthValidator(
-          jwt as string,
+          token as string,
           sessionId as string,
         ).validate();
 
@@ -80,40 +112,52 @@ export default class SocketServer {
 
     io.on('connection', (socket: Socket) => {
       SocketServer.userSocketMap.set(socket.data.userId, socket.id);
+      new ConnectUserHandler(io, socket).handle();
 
-      io.on('disconnect', () => {
+      socket.on('disconnect', () => {
+        new DisconnectUserHandler(io, socket).handle();
         SocketServer.userSocketMap.delete(socket.data.userId);
       });
 
-      new UserHandler(io, socket).register();
+      // User
+      socket.on('updateUser', async (data) => {
+        new UpdateUserHandler(io, socket).handle(data);
+      });
 
-      new ServerHandler(io, socket).register();
-
-      new ChannelHandler(io, socket).register();
-
-      new FriendGroupHandler(io, socket).register();
-
-      new FriendHandler(io, socket).register();
+      // Server
+      socket.on('connectServer', async (data) => {
+        new ConnectServerHandler(io, socket).handle(data);
+      });
+      socket.on('disconnectServer', async (data) => {
+        new DisconnectServerHandler(io, socket).handle(data);
+      });
+      socket.on('createServer', async (data) => {
+        new CreateServerHandler(io, socket).handle(data);
+      });
+      socket.on('updateServer', async (data) => {
+        new UpdateServerHandler(io, socket).handle(data);
+      });
 
       // Channel
       socket.on('connectChannel', async (data) =>
-        channelHandler.connectChannel(io, socket, data),
+        new ConnectChannelHandler(io, socket).handle(data),
       );
       socket.on('disconnectChannel', async (data) =>
-        channelHandler.disconnectChannel(io, socket, data),
+        new DisconnectChannelHandler(io, socket).handle(data),
       );
       socket.on('createChannel', async (data) =>
-        channelHandler.createChannel(io, socket, data),
+        new CreateChannelHandler(io, socket).handle(data),
       );
       socket.on('updateChannel', async (data) =>
-        channelHandler.updateChannel(io, socket, data),
+        new UpdateChannelHandler(io, socket).handle(data),
       );
       socket.on('updateChannels', async (data) =>
-        channelHandler.updateChannels(io, socket, data),
+        new UpdateChannelsHandler(io, socket).handle(data),
       );
       socket.on('deleteChannel', async (data) =>
-        channelHandler.deleteChannel(io, socket, data),
+        new DeleteChannelHandler(io, socket).handle(data),
       );
+
       // Friend Group
       socket.on('createFriendGroup', async (data) =>
         friendGroupHandler.createFriendGroup(io, socket, data),
@@ -124,6 +168,7 @@ export default class SocketServer {
       socket.on('deleteFriendGroup', async (data) =>
         friendGroupHandler.deleteFriendGroup(io, socket, data),
       );
+
       // Member
       socket.on('createMember', async (data) =>
         memberHandler.createMember(io, socket, data),
@@ -134,6 +179,7 @@ export default class SocketServer {
       socket.on('deleteMember', async (data) =>
         memberHandler.deleteMember(io, socket, data),
       );
+
       // Friend
       socket.on('createFriend', async (data) =>
         friendHandler.createFriend(io, socket, data),
@@ -144,6 +190,7 @@ export default class SocketServer {
       socket.on('deleteFriend', async (data) =>
         friendHandler.deleteFriend(io, socket, data),
       );
+
       // Member Application
       socket.on('createMemberApplication', async (data) =>
         memberApplicationHandler.createMemberApplication(io, socket, data),
@@ -154,6 +201,7 @@ export default class SocketServer {
       socket.on('deleteMemberApplication', async (data) =>
         memberApplicationHandler.deleteMemberApplication(io, socket, data),
       );
+
       // Friend Application
       socket.on('createFriendApplication', async (data) =>
         friendApplicationHandler.createFriendApplication(io, socket, data),
@@ -164,26 +212,33 @@ export default class SocketServer {
       socket.on('deleteFriendApplication', async (data) =>
         friendApplicationHandler.deleteFriendApplication(io, socket, data),
       );
+
       // Message
       socket.on('message', async (data) =>
-        messageHandler.sendMessage(io, socket, data),
+        new SendMessageHandler(io, socket).handle(data),
       );
       socket.on('directMessage', async (data) =>
-        messageHandler.sendDirectMessage(io, socket, data),
+        new SendDirectMessageHandler(io, socket).handle(data),
       );
+
       // RTC
-      socket.on('RTCOffer', async (data) => rtcHandler.offer(io, socket, data));
+      socket.on('RTCOffer', async (data) =>
+        new RTCOfferHandler(io, socket).handle(data),
+      );
       socket.on('RTCAnswer', async (data) =>
-        rtcHandler.answer(io, socket, data),
+        new RTCAnswerHandler(io, socket).handle(data),
       );
       socket.on('RTCIceCandidate', async (data) =>
-        rtcHandler.candidate(io, socket, data),
+        new RTCCandidateHandler(io, socket).handle(data),
       );
+
       // Echo
       socket.on('ping', async () => {
         socket.emit('pong');
       });
     });
+
+    SocketServer.io = io;
 
     return io;
   }
