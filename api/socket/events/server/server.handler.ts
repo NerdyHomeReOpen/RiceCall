@@ -1,5 +1,3 @@
-import { Server, Socket } from 'socket.io';
-
 // Utils
 import Logger from '@/utils/logger';
 
@@ -25,14 +23,9 @@ import {
 } from './server.service';
 
 // Socket
-import SocketServer from '@/api/socket';
+import SocketServer, { SocketHandler } from '@/api/socket';
 
-export class SearchUserHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class SearchServerHandler extends SocketHandler {
   async handle(data: any) {
     try {
       // const operatorId = this.socket.data.userId;
@@ -59,12 +52,7 @@ export class SearchUserHandler {
   }
 }
 
-export class ConnectServerHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class ConnectServerHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -112,12 +100,7 @@ export class ConnectServerHandler {
   }
 }
 
-export class DisconnectServerHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class DisconnectServerHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -164,12 +147,7 @@ export class DisconnectServerHandler {
   }
 }
 
-export class CreateServerHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class CreateServerHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -194,12 +172,7 @@ export class CreateServerHandler {
   }
 }
 
-export class UpdateServerHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class UpdateServerHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;

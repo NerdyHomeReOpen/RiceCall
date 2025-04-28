@@ -1,5 +1,3 @@
-import { Server, Socket } from 'socket.io';
-
 // Utils
 import Logger from '@/utils/logger';
 
@@ -18,12 +16,10 @@ import {
   SendMessageService,
 } from './message.service';
 
-export class SendMessageHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
+// Socket
+import { SocketHandler } from '@/api/socket';
 
+export class SendMessageHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -61,12 +57,7 @@ export class SendMessageHandler {
   }
 }
 
-export class SendDirectMessageHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class SendDirectMessageHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;

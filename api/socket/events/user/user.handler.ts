@@ -1,5 +1,3 @@
-import { Server, Socket } from 'socket.io';
-
 // Utils
 import Logger from '@/utils/logger';
 
@@ -18,14 +16,9 @@ import {
 } from './user.service';
 
 // Socket
-import SocketServer from '@/api/socket';
+import SocketServer, { SocketHandler } from '@/api/socket';
 
-export class SearchUserHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class SearchUserHandler extends SocketHandler {
   async handle(data: any) {
     try {
       // const operatorId = this.socket.data.userId;
@@ -52,12 +45,7 @@ export class SearchUserHandler {
   }
 }
 
-export class ConnectUserHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class ConnectUserHandler extends SocketHandler {
   async handle() {
     try {
       const operatorId = this.socket.data.userId;
@@ -88,12 +76,7 @@ export class ConnectUserHandler {
   }
 }
 
-export class DisconnectUserHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class DisconnectUserHandler extends SocketHandler {
   async handle() {
     try {
       const operatorId = this.socket.data.userId;
@@ -124,12 +107,7 @@ export class DisconnectUserHandler {
   }
 }
 
-export class UpdateUserHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class UpdateUserHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;

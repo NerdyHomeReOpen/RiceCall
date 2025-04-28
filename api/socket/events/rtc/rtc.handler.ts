@@ -1,5 +1,3 @@
-import { Server, Socket } from 'socket.io';
-
 // Utils
 import Logger from '@/utils/logger';
 
@@ -15,12 +13,10 @@ import {
   RTCLeaveValidator,
 } from './rtc.validator';
 
-export class RTCOfferHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
+// Socket
+import { SocketHandler } from '@/api/socket';
 
+export class RTCOfferHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -49,12 +45,7 @@ export class RTCOfferHandler {
   }
 }
 
-export class RTCAnswerHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class RTCAnswerHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -83,12 +74,7 @@ export class RTCAnswerHandler {
   }
 }
 
-export class RTCCandidateHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class RTCCandidateHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -119,12 +105,7 @@ export class RTCCandidateHandler {
   }
 }
 
-export class RTCJoinHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class RTCJoinHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -152,12 +133,7 @@ export class RTCJoinHandler {
   }
 }
 
-export class RTCLeaveHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class RTCLeaveHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;

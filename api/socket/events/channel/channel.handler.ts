@@ -1,5 +1,3 @@
-import { Server, Socket } from 'socket.io';
-
 // Utils
 import Logger from '@/utils/logger';
 
@@ -25,12 +23,10 @@ import {
   DeleteChannelService,
 } from './channel.service';
 
-export class ConnectChannelHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
+// Socket
+import { SocketHandler } from '@/api/socket';
 
+export class ConnectChannelHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -57,7 +53,7 @@ export class ConnectChannelHandler {
 
       if (result.actions) {
         for (const action of result.actions) {
-          await action(this.io, targetSocket);
+          await action(this.io, this.socket);
         }
       }
       this.io
@@ -80,12 +76,7 @@ export class ConnectChannelHandler {
   }
 }
 
-export class DisconnectChannelHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class DisconnectChannelHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -111,7 +102,7 @@ export class DisconnectChannelHandler {
 
       if (result.actions) {
         for (const action of result.actions) {
-          await action(this.io, targetSocket);
+          await action(this.io, this.socket);
         }
       }
       this.io
@@ -134,12 +125,7 @@ export class DisconnectChannelHandler {
   }
 }
 
-export class CreateChannelHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class CreateChannelHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -174,12 +160,7 @@ export class CreateChannelHandler {
   }
 }
 
-export class UpdateChannelHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class UpdateChannelHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
@@ -218,12 +199,7 @@ export class UpdateChannelHandler {
   }
 }
 
-export class UpdateChannelsHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class UpdateChannelsHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const { serverId, channels } = await new UpdateChannelsValidator(
@@ -257,12 +233,7 @@ export class UpdateChannelsHandler {
   }
 }
 
-export class DeleteChannelHandler {
-  constructor(private io: Server, private socket: Socket) {
-    this.io = io;
-    this.socket = socket;
-  }
-
+export class DeleteChannelHandler extends SocketHandler {
   async handle(data: any) {
     try {
       const operatorId = this.socket.data.userId;
