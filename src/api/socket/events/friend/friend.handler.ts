@@ -4,8 +4,8 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
-// Socket
-import { SocketHandler } from '@/api/socket';
+// Handler
+import { SocketHandler } from '@/api/socket/base.handler';
 
 // Schemas
 import {

@@ -3,8 +3,11 @@ import formidable from 'formidable';
 // Error
 import StandardizedError from '@/error';
 
-// Http
-import { HttpHandler, ResponseType } from '@/api/http';
+// Types
+import { ResponseType } from '@/api/http';
+
+// Handler
+import { HttpHandler } from '@/api/http/base.handler';
 
 // Schemas
 import { UploadSchema } from '@/api/http/routers/upload/upload.schema';

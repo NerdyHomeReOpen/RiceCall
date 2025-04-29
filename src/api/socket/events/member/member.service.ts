@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import StandardizedError from '@/error';
 
 // Database
-import Database from '@/src/database';
+import Database from '@/database';
 
 export class CreateMemberService {
   constructor(

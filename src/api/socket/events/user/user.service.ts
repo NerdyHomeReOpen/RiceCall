@@ -4,17 +4,17 @@ import { Server, Socket } from 'socket.io';
 import StandardizedError from '@/error';
 
 // Database
-import Database from '@/src/database';
+import Database from '@/database';
 
 // Handlers
 import {
   ConnectChannelHandler,
   DisconnectChannelHandler,
-} from '@/src/api/socket/events/channel/channel.handler';
+} from '@/api/socket/events/channel/channel.handler';
 import {
   ConnectServerHandler,
   DisconnectServerHandler,
-} from '@/src/api/socket/events/server/server.handler';
+} from '@/api/socket/events/server/server.handler';
 
 export class SearchUserService {
   constructor(private query: string) {

@@ -4,6 +4,9 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
+// Handler
+import { SocketHandler } from '@/api/socket/base.handler';
+
 // Schemas
 import {
   SendDirectMessageSchema,
@@ -18,9 +21,6 @@ import {
   SendDirectMessageService,
   SendMessageService,
 } from '@/api/socket/events/message/message.service';
-
-// Socket
-import { SocketHandler } from '@/api/socket';
 
 export class SendMessageHandler extends SocketHandler {
   async handle(data: any) {

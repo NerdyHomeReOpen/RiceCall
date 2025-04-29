@@ -26,8 +26,8 @@ import {
   DeleteChannelService,
 } from '@/api/socket/events/channel/channel.service';
 
-// Socket
-import { SocketHandler } from '@/api/socket';
+// Handler
+import { SocketHandler } from '@/api/socket/base.handler';
 
 export class ConnectChannelHandler extends SocketHandler {
   async handle(data: any) {

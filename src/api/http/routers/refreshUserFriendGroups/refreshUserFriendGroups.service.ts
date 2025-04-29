@@ -2,7 +2,7 @@
 import StandardizedError from '@/error';
 
 // Database
-import Database from '@/src/database';
+import Database from '@/database';
 
 export default class RefreshUserFriendGroupsService {
   constructor(private userId: string) {

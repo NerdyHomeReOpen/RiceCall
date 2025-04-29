@@ -1,8 +1,11 @@
 // Error
 import StandardizedError from '@/error';
 
-// Http
-import { HttpHandler, ResponseType } from '@/api/http';
+// Types
+import { ResponseType } from '@/api/http';
+
+// Handler
+import { HttpHandler } from '@/api/http/base.handler';
 
 // Schemas
 import { RefreshServerSchema } from '@/api/http/routers/refreshServer/refreshServer.schema';

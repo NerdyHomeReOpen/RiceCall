@@ -5,10 +5,10 @@ import path from 'path';
 import StandardizedError from '@/error';
 
 // Config
-import config from '@/src/config';
+import config from '@/config';
 
 // Systems
-import imageSystem from '@/src/systems/image';
+import imageSystem from '@/systems/image';
 
 export default class UploadService {
   constructor(

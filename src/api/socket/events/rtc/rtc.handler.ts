@@ -4,6 +4,9 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
+// Handler
+import { SocketHandler } from '@/api/socket/base.handler';
+
 // Schemas
 import {
   RTCOfferSchema,
@@ -15,9 +18,6 @@ import {
 
 // Middleware
 import DataValidator from '@/middleware/data.validator';
-
-// Socket
-import { SocketHandler } from '@/api/socket';
 
 export class RTCOfferHandler extends SocketHandler {
   async handle(data: any) {

@@ -1,6 +1,6 @@
 // Utils
-import { verifyJWT } from '@/src/utils/jwt';
-import Session from '@/src/utils/session';
+import { verifyJWT } from '@/utils/jwt';
+import Session from '@/utils/session';
 
 // StandardizedError
 import StandardizedError from '@/error';

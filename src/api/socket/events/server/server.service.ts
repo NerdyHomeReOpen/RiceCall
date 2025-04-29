@@ -5,13 +5,16 @@ import { v4 as uuidv4 } from 'uuid';
 import StandardizedError from '@/error';
 
 // Database
-import Database from '@/src/database';
+import Database from '@/database';
+
+// Utils
+import { generateUniqueDisplayId } from '@/utils';
 
 // Handlers
 import {
   ConnectChannelHandler,
   DisconnectChannelHandler,
-} from '@/src/api/socket/events/channel/channel.handler';
+} from '@/api/socket/events/channel/channel.handler';
 
 export class SearchServerService {
   constructor(private query: string) {
@@ -49,8 +52,9 @@ export class CreateServerService {
       const operatorServers = await Database.get.userServers(this.operatorId);
 
       if (
+        operatorServers &&
         operatorServers.filter((s: any) => s.owned).length >=
-        Math.min(3 + operator.level / 5, 10)
+          Math.min(3 + operator.level / 5, 10)
       ) {
         throw new StandardizedError({
           name: 'PermissionError',
@@ -63,7 +67,7 @@ export class CreateServerService {
 
       // Create server
       const serverId = uuidv4();
-      const displayId = await Func.generateUniqueDisplayId();
+      const displayId = await generateUniqueDisplayId();
       await Database.set.server(serverId, {
         ...this.server,
         displayId,

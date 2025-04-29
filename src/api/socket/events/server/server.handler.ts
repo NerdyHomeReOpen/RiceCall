@@ -4,6 +4,12 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
+// Socket
+import SocketServer from '@/api/socket';
+
+// Handler
+import { SocketHandler } from '@/api/socket/base.handler';
+
 // Schemas
 import {
   SearchServerSchema,
@@ -24,9 +30,6 @@ import {
   ConnectServerService,
   DisconnectServerService,
 } from '@/api/socket/events/server/server.service';
-
-// Socket
-import SocketServer, { SocketHandler } from '@/api/socket';
 
 export class SearchServerHandler extends SocketHandler {
   async handle(data: any) {

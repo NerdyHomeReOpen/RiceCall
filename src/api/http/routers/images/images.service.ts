@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import StandardizedError from '@/error';
 
 // Config
-import config from '@/src/config';
+import config from '@/config';
 
 export default class ImagesService {
   constructor(private filePath: string[], private fileName: string) {

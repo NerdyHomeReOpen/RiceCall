@@ -2,14 +2,14 @@ import fs from 'fs/promises';
 import path from 'path';
 
 // Config
-import globalConfig from '@/src/config';
+import globalConfig from '@/config';
 import config from './config.json';
 
 // Database
-import Database from '@/src/database';
+import Database from '@/database';
 
 // Utils
-import Logger from '@/src/utils/logger';
+import Logger from '@/utils/logger';
 
 const imageSystem = {
   setup: async () => {

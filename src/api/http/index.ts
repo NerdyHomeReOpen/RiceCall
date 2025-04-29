@@ -248,11 +248,3 @@ export default class HttpServer {
     return server;
   }
 }
-
-export abstract class HttpHandler {
-  constructor(protected req: IncomingMessage) {
-    this.req = req;
-  }
-
-  abstract handle(): Promise<ResponseType | null>;
-}

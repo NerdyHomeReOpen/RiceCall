@@ -5,21 +5,21 @@ import { v4 as uuidv4 } from 'uuid';
 import StandardizedError from '@/error';
 
 // Database
-import Database from '@/src/database';
+import Database from '@/database';
 
 // Systems
-import xpSystem from '@/src/systems/xp';
+import xpSystem from '@/systems/xp';
 
 // Handlers
-import { SendMessageHandler } from '@/src/api/socket/events/message/message.handler';
+import { SendMessageHandler } from '@/api/socket/events/message/message.handler';
 import {
   ConnectChannelHandler,
   DisconnectChannelHandler,
-} from '@/src/api/socket/events/channel/channel.handler';
+} from '@/api/socket/events/channel/channel.handler';
 import {
   RTCJoinHandler,
   RTCLeaveHandler,
-} from '@/src/api/socket/events/rtc/rtc.handler';
+} from '@/api/socket/events/rtc/rtc.handler';
 
 export class ConnectChannelService {
   constructor(
@@ -119,6 +119,7 @@ export class ConnectChannelService {
           }
           if (
             channel.userLimit &&
+            channelUsers &&
             channelUsers.length >= channel.userLimit &&
             operatorMember.permissionLevel < 5
           ) {
@@ -307,11 +308,13 @@ export class CreateChannelService {
       await Database.set.channel(channelId, {
         ...this.channel,
         serverId: this.serverId,
-        order: serverChannels.filter((ch: any) =>
-          this.channel.categoryId
-            ? ch.categoryId === this.channel.categoryId
-            : !ch.categoryId,
-        ).length,
+        order: serverChannels
+          ? serverChannels.filter((ch: any) =>
+              this.channel.categoryId
+                ? ch.categoryId === this.channel.categoryId
+                : !ch.categoryId,
+            ).length
+          : 0,
         createdAt: Date.now(),
       });
 
@@ -542,27 +545,27 @@ export class DeleteChannelService {
         const categoryChildren = await Database.get.channelChildren(
           channel.categoryId,
         );
-        if (categoryChildren.length <= 1) {
+        if (categoryChildren && categoryChildren.length <= 1) {
           await Database.set.channel(channel.categoryId, {
             type: 'channel',
           });
         }
       }
 
-      if (channelChildren.length) {
+      if (channelChildren && channelChildren.length) {
         const serverChannels = await Database.get.serverChannels(this.serverId);
         await Promise.all(
           channelChildren.map(
             async (child: any, index: number) =>
               await Database.set.channel(child.channelId, {
                 categoryId: null,
-                order: serverChannels.length + index,
+                order: serverChannels ? serverChannels.length + index : 0,
               }),
           ),
         );
       }
 
-      if (channelUsers.length) {
+      if (channelUsers && channelUsers.length) {
         const server = await Database.get.server(this.serverId);
         actions.push((io: Server, socket: Socket) => {
           channelUsers.map((user: any) =>
