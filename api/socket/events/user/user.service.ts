@@ -151,8 +151,6 @@ export class UpdateUserService {
 
   async use() {
     try {
-      await Database.set.user(this.userId, this.update);
-
       if (this.operatorId !== this.userId) {
         throw new StandardizedError({
           name: 'ServerError',
@@ -162,6 +160,8 @@ export class UpdateUserService {
           statusCode: 403,
         });
       }
+
+      await Database.set.user(this.userId, this.update);
 
       return {
         userUpdate: this.update,

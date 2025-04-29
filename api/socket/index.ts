@@ -20,27 +20,47 @@ import {
   UpdateServerHandler,
 } from './events/server/server.handler';
 import {
-  RTCOfferHandler,
-  RTCAnswerHandler,
-  RTCCandidateHandler,
-} from './events/rtc/rtc.handler';
-import {
   ConnectChannelHandler,
-  DeleteChannelHandler,
+  DisconnectChannelHandler,
+  CreateChannelHandler,
   UpdateChannelsHandler,
   UpdateChannelHandler,
-  CreateChannelHandler,
-  DisconnectChannelHandler,
+  DeleteChannelHandler,
 } from './events/channel/channel.handler';
 import {
-  SendMessageHandler,
-  SendDirectMessageHandler,
-} from './events/message/message.handler';
+  CreateFriendGroupHandler,
+  DeleteFriendGroupHandler,
+  UpdateFriendGroupHandler,
+} from './events/friendGroup/friendGroup.handler';
 import {
   CreateFriendHandler,
   UpdateFriendHandler,
   DeleteFriendHandler,
 } from './events/friend/friend.handler';
+import {
+  CreateMemberApplicationHandler,
+  UpdateMemberApplicationHandler,
+  DeleteMemberApplicationHandler,
+} from './events/memberApplication/memberApplication.handler';
+import {
+  CreateMemberHandler,
+  DeleteMemberHandler,
+  UpdateMemberHandler,
+} from './events/member/member.handler';
+import {
+  CreateFriendApplicationHandler,
+  UpdateFriendApplicationHandler,
+  DeleteFriendApplicationHandler,
+} from './events/friendApplication/friendApplication.handler';
+import {
+  SendMessageHandler,
+  SendDirectMessageHandler,
+} from './events/message/message.handler';
+import {
+  RTCOfferHandler,
+  RTCAnswerHandler,
+  RTCCandidateHandler,
+} from './events/rtc/rtc.handler';
 
 export default class SocketServer {
   static io: Server;
@@ -165,35 +185,35 @@ export default class SocketServer {
 
       // Friend Group
       socket.on('createFriendGroup', async (data) =>
-        friendGroupHandler.createFriendGroup(io, socket, data),
+        new CreateFriendGroupHandler(io, socket).handle(data),
       );
       socket.on('updateFriendGroup', async (data) =>
-        friendGroupHandler.updateFriendGroup(io, socket, data),
+        new UpdateFriendGroupHandler(io, socket).handle(data),
       );
       socket.on('deleteFriendGroup', async (data) =>
-        friendGroupHandler.deleteFriendGroup(io, socket, data),
+        new DeleteFriendGroupHandler(io, socket).handle(data),
       );
 
       // Member
       socket.on('createMember', async (data) =>
-        memberHandler.createMember(io, socket, data),
+        new CreateMemberHandler(io, socket).handle(data),
       );
       socket.on('updateMember', async (data) =>
-        memberHandler.updateMember(io, socket, data),
+        new UpdateMemberHandler(io, socket).handle(data),
       );
       socket.on('deleteMember', async (data) =>
-        memberHandler.deleteMember(io, socket, data),
+        new DeleteMemberHandler(io, socket).handle(data),
       );
 
       // Member Application
       socket.on('createMemberApplication', async (data) =>
-        memberApplicationHandler.createMemberApplication(io, socket, data),
+        new CreateMemberApplicationHandler(io, socket).handle(data),
       );
       socket.on('updateMemberApplication', async (data) =>
-        memberApplicationHandler.updateMemberApplication(io, socket, data),
+        new UpdateMemberApplicationHandler(io, socket).handle(data),
       );
       socket.on('deleteMemberApplication', async (data) =>
-        memberApplicationHandler.deleteMemberApplication(io, socket, data),
+        new DeleteMemberApplicationHandler(io, socket).handle(data),
       );
 
       // Friend
@@ -209,13 +229,13 @@ export default class SocketServer {
 
       // Friend Application
       socket.on('createFriendApplication', async (data) =>
-        friendApplicationHandler.createFriendApplication(io, socket, data),
+        new CreateFriendApplicationHandler(io, socket).handle(data),
       );
       socket.on('updateFriendApplication', async (data) =>
-        friendApplicationHandler.updateFriendApplication(io, socket, data),
+        new UpdateFriendApplicationHandler(io, socket).handle(data),
       );
       socket.on('deleteFriendApplication', async (data) =>
-        friendApplicationHandler.deleteFriendApplication(io, socket, data),
+        new DeleteFriendApplicationHandler(io, socket).handle(data),
       );
 
       // Message

@@ -78,10 +78,7 @@ export class UpdateFriendGroupService {
       }
 
       // Update friend group
-      await Database.set.friendGroup(this.friendGroupId, {
-        ...this.update,
-        updatedAt: Date.now(),
-      });
+      await Database.set.friendGroup(this.friendGroupId, this.update);
 
       return {
         friendGroupsUpdate: await Database.get.userFriendGroups(this.userId),

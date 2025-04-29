@@ -1,6 +1,9 @@
 // Error
 import StandardizedError from '@/error';
 
+// Database
+import Database from '@/database';
+
 export class SendMessageService {
   constructor(
     private operatorId: string,
@@ -18,8 +21,8 @@ export class SendMessageService {
 
   async use() {
     try {
-      const channel = await DB.get.channel(this.channelId);
-      const operatorMember = await DB.get.member(
+      const channel = await Database.get.channel(this.channelId);
+      const operatorMember = await Database.get.member(
         this.operatorId,
         this.serverId,
       );
@@ -44,8 +47,8 @@ export class SendMessageService {
       // Create new message
       const message = {
         ...this.message,
-        ...(await DB.get.member(this.userId, this.serverId)),
-        ...(await DB.get.user(this.userId)),
+        ...(await Database.get.member(this.userId, this.serverId)),
+        ...(await Database.get.user(this.userId)),
         senderId: this.userId,
         serverId: this.serverId,
         channelId: this.channelId,
@@ -56,7 +59,7 @@ export class SendMessageService {
       const updatedMember = {
         lastMessageTime: Date.now().valueOf(),
       };
-      await DB.set.member(this.operatorId, this.serverId, updatedMember);
+      await Database.set.member(this.operatorId, this.serverId, updatedMember);
 
       return {
         onMessage: message,
@@ -102,7 +105,7 @@ export class SendDirectMessageService {
       // Create new message
       const directMessage = {
         ...this.directMessage,
-        ...(await DB.get.user(this.userId)),
+        ...(await Database.get.user(this.userId)),
         senderId: this.userId,
         user1Id:
           this.userId.localeCompare(this.targetId) < 0

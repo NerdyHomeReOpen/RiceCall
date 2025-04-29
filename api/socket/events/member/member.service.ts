@@ -225,10 +225,7 @@ export class UpdateMemberService {
       }
 
       // Update member
-      await Database.set.member(this.userId, this.serverId, {
-        ...this.update,
-        updatedAt: Date.now(),
-      });
+      await Database.set.member(this.userId, this.serverId, this.update);
 
       return {
         memberUpdate: await Database.get.member(this.userId, this.serverId),
