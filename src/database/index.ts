@@ -3,7 +3,7 @@ import path from 'path';
 import mysql from 'mysql2/promise';
 
 // Config
-import dbConfig from '@/src/config/db.config';
+import dbConfig from '@/config/db.config';
 
 // Error
 import StandardizedError from '@/error';
@@ -786,7 +786,7 @@ const Database = {
           WHERE u.user_id = ?`,
           [userId],
         );
-        const data = datas[0];
+        const data = datas.constructor === Array ? datas[0] : datas;
         if (!data) return null;
         const badges = await Database.get.userBadges(userId);
         return convertToCamelCase({ ...data, badges: [] });
@@ -819,7 +819,9 @@ const Database = {
           [userId],
         );
         if (!datas) return null;
-        return datas.map((data) => convertToCamelCase(data));
+        return datas.constructor === Array
+          ? datas.map((data) => convertToCamelCase(data))
+          : null;
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -846,7 +848,9 @@ const Database = {
           [userId],
         );
         if (!datas) return null;
-        return datas.map((data) => convertToCamelCase(data));
+        return datas.constructor === Array
+          ? datas.map((data) => convertToCamelCase(data))
+          : null;
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -882,13 +886,15 @@ const Database = {
           [userId],
         );
         if (!datas) return null;
-        return datas.map((data) => {
-          data.created_at = data.member_created_at;
-          delete data.server_created_at;
-          delete data.member_created_at;
-          return convertToCamelCase(data);
-        });
-      } catch (error) {
+        return datas.constructor === Array
+          ? datas.map((data: any) => {
+              data.created_at = data.member_created_at;
+              delete data.server_created_at;
+              delete data.member_created_at;
+              return convertToCamelCase(data);
+            })
+          : null;
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
@@ -929,16 +935,18 @@ const Database = {
           [userId],
         );
         if (!datas) return null;
-        return datas.map((data) => {
-          data.created_at = data.friend_created_at;
-          delete data.friend_created_at;
-          delete data.user_created_at;
-          data.user_id = data.friend_user_id;
-          delete data.friend_user_id;
-          data.target_id = data.user_user_id;
-          delete data.user_user_id;
-          return convertToCamelCase({ ...data, badges: [] });
-        });
+        return datas.constructor === Array
+          ? datas.map((data: any) => {
+              data.created_at = data.friend_created_at;
+              delete data.friend_created_at;
+              delete data.user_created_at;
+              data.user_id = data.friend_user_id;
+              delete data.friend_user_id;
+              data.target_id = data.user_user_id;
+              delete data.user_user_id;
+              return convertToCamelCase({ ...data, badges: [] });
+            })
+          : null;
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -970,12 +978,14 @@ const Database = {
           [userId],
         );
         if (!datas) return null;
-        return datas.map((data) => {
-          data.created_at = data.friend_application_created_at;
-          delete data.friend_application_created_at;
-          delete data.user_created_at;
-          return convertToCamelCase(data);
-        });
+        return datas.constructor === Array
+          ? datas.map((data: any) => {
+              data.created_at = data.friend_application_created_at;
+              delete data.friend_application_created_at;
+              delete data.user_created_at;
+              return convertToCamelCase(data);
+            })
+          : null;
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -1002,7 +1012,9 @@ const Database = {
           [`%${querys}%`, `${querys}`],
         );
         if (!datas) return null;
-        return datas.map((data) => convertToCamelCase(data));
+        return datas.constructor === Array
+          ? datas.map((data) => convertToCamelCase(data))
+          : null;
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -1027,7 +1039,7 @@ const Database = {
           WHERE servers.server_id = ?`,
           [serverId],
         );
-        const data = datas[0];
+        const data = datas.constructor === Array ? datas[0] : datas;
         if (!data) return null;
         return convertToCamelCase(data);
       } catch (error: any) {
@@ -1056,7 +1068,9 @@ const Database = {
           [serverId],
         );
         if (!datas) return null;
-        return datas.map((data) => convertToCamelCase(data));
+        return datas.constructor === Array
+          ? datas.map((data) => convertToCamelCase(data))
+          : null;
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -1096,12 +1110,14 @@ const Database = {
           [serverId],
         );
         if (!datas) return null;
-        return datas.map((data) => {
-          data.created_at = data.member_created_at;
-          delete data.member_created_at;
-          delete data.user_created_at;
-          return convertToCamelCase({ ...data, badges: [] });
-        });
+        return datas.constructor === Array
+          ? datas.map((data: any) => {
+              data.created_at = data.member_created_at;
+              delete data.member_created_at;
+              delete data.user_created_at;
+              return convertToCamelCase({ ...data, badges: [] });
+            })
+          : null;
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -1133,13 +1149,15 @@ const Database = {
           [serverId],
         );
         if (!datas) return null;
-        return datas.map((data) => {
-          data.created_at = data.member_application_created_at;
-          delete data.member_application_created_at;
-          delete data.user_created_at;
-          return convertToCamelCase(data);
-        });
-      } catch (error) {
+        return datas.constructor === Array
+          ? datas.map((data: any) => {
+              data.created_at = data.member_application_created_at;
+              delete data.member_application_created_at;
+              delete data.user_created_at;
+              return convertToCamelCase(data);
+            })
+          : null;
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
@@ -1164,7 +1182,7 @@ const Database = {
           ORDER BY categories.\`order\`, categories.created_at DESC`,
           [categoryId],
         );
-        const data = datas[0];
+        const data = datas.constructor === Array ? datas[0] : datas;
         if (!data) return null;
         return convertToCamelCase(data);
       } catch (error: any) {
@@ -1192,7 +1210,7 @@ const Database = {
           ORDER BY channels.\`order\`, channels.created_at DESC`,
           [channelId],
         );
-        const data = datas[0];
+        const data = datas.constructor === Array ? datas[0] : datas;
         if (!data) return null;
         return convertToCamelCase(data);
       } catch (error: any) {
@@ -1221,8 +1239,10 @@ const Database = {
           [channelId],
         );
         if (!datas) return null;
-        return datas.map((data) => convertToCamelCase(data));
-      } catch (error) {
+        return datas.constructor === Array
+          ? datas.map((data) => convertToCamelCase(data))
+          : null;
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
@@ -1248,7 +1268,11 @@ const Database = {
           [channelId],
         );
         if (!datas) return null;
-        return datas.map((data) => convertToCamelCase({ ...data, badges: [] }));
+        return datas.constructor === Array
+          ? datas.map((data: any) =>
+              convertToCamelCase({ ...data, badges: [] }),
+            )
+          : null;
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -1273,10 +1297,10 @@ const Database = {
           WHERE friend_groups.friend_group_id = ?`,
           [friendGroupId],
         );
-        const data = datas[0];
+        const data = datas.constructor === Array ? datas[0] : datas;
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
@@ -1309,16 +1333,18 @@ const Database = {
           [friendGroupId],
         );
         if (!datas) return null;
-        return datas.map((data) => {
-          data.created_at = data.friend_created_at;
-          delete data.friend_created_at;
-          delete data.user_created_at;
-          data.user_id = data.friend_user_id;
-          delete data.friend_user_id;
-          data.target_id = data.user_user_id;
-          delete data.user_user_id;
-          return convertToCamelCase({ ...data, badges: [] });
-        });
+        return datas.constructor === Array
+          ? datas.map((data: any) => {
+              data.created_at = data.friend_created_at;
+              delete data.friend_created_at;
+              delete data.user_created_at;
+              data.user_id = data.friend_user_id;
+              delete data.friend_user_id;
+              data.target_id = data.user_user_id;
+              delete data.user_user_id;
+              return convertToCamelCase({ ...data, badges: [] });
+            })
+          : null;
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
@@ -1344,10 +1370,10 @@ const Database = {
           AND members.server_id = ?`,
           [userId, serverId],
         );
-        const data = datas[0];
+        const data = datas.constructor === Array ? datas[0] : datas;
         if (!data) return null;
         return convertToCamelCase(data);
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
@@ -1372,7 +1398,7 @@ const Database = {
           AND member_applications.server_id = ?`,
           [userId, serverId],
         );
-        const data = datas[0];
+        const data = datas.constructor === Array ? datas[0] : datas;
         if (!data) return null;
         return convertToCamelCase(data);
       } catch (error: any) {
@@ -1400,7 +1426,7 @@ const Database = {
           AND friends.target_id = ?`,
           [userId, targetId],
         );
-        const data = datas[0];
+        const data = datas.constructor === Array ? datas[0] : datas;
         if (!data) return null;
         return convertToCamelCase(data);
       } catch (error: any) {
@@ -1428,7 +1454,7 @@ const Database = {
           AND friend_applications.receiver_id = ?`,
           [senderId, receiverId],
         );
-        const data = datas[0];
+        const data = datas.constructor === Array ? datas[0] : datas;
         if (!data) return null;
         return convertToCamelCase(data);
       } catch (error: any) {
@@ -1456,7 +1482,7 @@ const Database = {
           [userId],
         );
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
