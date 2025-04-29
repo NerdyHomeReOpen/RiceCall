@@ -1,4 +1,4 @@
-import http, { ServerResponse } from 'http';
+import http, { IncomingMessage, ServerResponse } from 'http';
 
 // Error
 import StandardizedError from '@/error';
@@ -7,25 +7,25 @@ import StandardizedError from '@/error';
 import Logger from '@/utils/logger';
 
 // Handlers
-import LoginHandler from './routers/login/login.handler';
-import RegisterHandler from './routers/register/register.handler';
-import RefreshChannelHandler from './routers/refreshChannel/refreshChannel.handler';
-import RefreshFriendHandler from './routers/refreshFriend/refreshFriend.handler';
-import RefreshFriendApplicationHandler from './routers/refreshFriendApplication/refreshFriendApplication.handler';
-import RefreshFriendGroupHandler from './routers/refreshFriendGroup/refreshFriendGroup.handler';
-import RefreshMemberHandler from './routers/refreshMember/refreshMember.handler';
-import RefreshMemberApplicationHandler from './routers/refreshMemberApplication/refreshMemberApplication.handler';
-import RefreshServerHandler from './routers/refreshServer/refreshServer.handler';
-import RefreshServerChannelsHandler from './routers/refreshServerChannels/refreshServerChannels.handler';
-import RefreshServerMemberApplicationsHandler from './routers/refreshServerMemberApplications/refreshServerMemberApplications.handler';
-import RefreshServerMembersHandler from './routers/refreshServerMembers/refreshServerMembers.handler';
-import RefreshUserHandler from './routers/refreshUser/refreshUser.handler';
-import RefreshUserFriendApplicationsHandler from './routers/refreshUserFriendApplications/refreshUserFriendApplications.handler';
-import RefreshUserFriendGroupsHandler from './routers/refreshUserFriendGroups/refreshUserFriendGroups.handler';
-import RefreshUserFriendsHandler from './routers/refreshUserFriends/refreshUserFriends.handler';
-import RefreshUserServersHandler from './routers/refreshUserServers/refreshUserServers.handler';
-import ImagesHandler from './routers/images/images.handler';
-import UploadHandler from './routers/upload/upload.handler';
+import { LoginHandler } from './routers/login/login.handler';
+import { RegisterHandler } from './routers/register/register.handler';
+import { RefreshChannelHandler } from './routers/refreshChannel/refreshChannel.handler';
+import { RefreshFriendHandler } from './routers/refreshFriend/refreshFriend.handler';
+import { RefreshFriendApplicationHandler } from './routers/refreshFriendApplication/refreshFriendApplication.handler';
+import { RefreshFriendGroupHandler } from './routers/refreshFriendGroup/refreshFriendGroup.handler';
+import { RefreshMemberHandler } from './routers/refreshMember/refreshMember.handler';
+import { RefreshMemberApplicationHandler } from './routers/refreshMemberApplication/refreshMemberApplication.handler';
+import { RefreshServerHandler } from './routers/refreshServer/refreshServer.handler';
+import { RefreshServerChannelsHandler } from './routers/refreshServerChannels/refreshServerChannels.handler';
+import { RefreshServerMemberApplicationsHandler } from './routers/refreshServerMemberApplications/refreshServerMemberApplications.handler';
+import { RefreshServerMembersHandler } from './routers/refreshServerMembers/refreshServerMembers.handler';
+import { RefreshUserHandler } from './routers/refreshUser/refreshUser.handler';
+import { RefreshUserFriendApplicationsHandler } from './routers/refreshUserFriendApplications/refreshUserFriendApplications.handler';
+import { RefreshUserFriendGroupsHandler } from './routers/refreshUserFriendGroups/refreshUserFriendGroups.handler';
+import { RefreshUserFriendsHandler } from './routers/refreshUserFriends/refreshUserFriends.handler';
+import { RefreshUserServersHandler } from './routers/refreshUserServers/refreshUserServers.handler';
+import { ImagesHandler } from './routers/images/images.handler';
+import { UploadHandler } from './routers/upload/upload.handler';
 
 export type ResponseType = {
   statusCode: number;
@@ -247,4 +247,12 @@ export default class HttpServer {
 
     return server;
   }
+}
+
+export abstract class HttpHandler {
+  constructor(protected req: IncomingMessage) {
+    this.req = req;
+  }
+
+  abstract handle(): Promise<ResponseType | null>;
 }

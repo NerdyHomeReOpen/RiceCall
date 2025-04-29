@@ -1,10 +1,8 @@
-import { IncomingMessage } from 'http';
-
 // Error
 import StandardizedError from '@/error';
 
 // Types
-import { ResponseType } from '@/api/http';
+import { HttpHandler, ResponseType } from '@/api/http';
 
 // Validators
 // import ImagesValidator from './images.validator';
@@ -12,11 +10,7 @@ import { ResponseType } from '@/api/http';
 // Services
 import ImagesService from './images.service';
 
-export default class UploadHandler {
-  constructor(private req: IncomingMessage) {
-    this.req = req;
-  }
-
+export class ImagesHandler extends HttpHandler {
   async handle(): Promise<ResponseType | null> {
     this.req.on('end', async () => {
       try {

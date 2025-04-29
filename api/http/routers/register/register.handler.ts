@@ -1,10 +1,8 @@
-import { IncomingMessage } from 'http';
-
 // Error
 import StandardizedError from '@/error';
 
 // Types
-import { ResponseType } from '@/api/http';
+import { HttpHandler, ResponseType } from '@/api/http';
 
 // Validaters
 import RegisterValidator from './register.validator';
@@ -12,11 +10,7 @@ import RegisterValidator from './register.validator';
 // Services
 import RegisterService from './register.service';
 
-export default class RegisterHandler {
-  constructor(private req: IncomingMessage) {
-    this.req = req;
-  }
-
+export class RegisterHandler extends HttpHandler {
   async handle(): Promise<ResponseType | null> {
     let body = '';
 

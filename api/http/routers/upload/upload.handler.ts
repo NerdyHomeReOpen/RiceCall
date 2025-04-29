@@ -1,11 +1,10 @@
-import { IncomingMessage } from 'http';
 import formidable from 'formidable';
 
 // Error
 import StandardizedError from '@/error';
 
 // Types
-import { ResponseType } from '@/api/http';
+import { HttpHandler, ResponseType } from '@/api/http';
 
 // Validators
 import UploadValidator from './upload.validator';
@@ -13,11 +12,7 @@ import UploadValidator from './upload.validator';
 // Services
 import UploadService from './upload.service';
 
-export default class UploadHandler {
-  constructor(private req: IncomingMessage) {
-    this.req = req;
-  }
-
+export class UploadHandler extends HttpHandler {
   async handle(): Promise<ResponseType | null> {
     const form = new formidable.IncomingForm();
 

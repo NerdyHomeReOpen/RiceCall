@@ -1,10 +1,8 @@
-import { IncomingMessage } from 'http';
-
 // Error
 import StandardizedError from '@/error';
 
 // Types
-import { ResponseType } from '@/api/http';
+import { HttpHandler, ResponseType } from '@/api/http';
 
 // Validators
 import ExampleValidator from './example.validator'; // TODO: change validator file path
@@ -12,12 +10,7 @@ import ExampleValidator from './example.validator'; // TODO: change validator fi
 // Services
 import ExampleService from './example.service'; // TODO: change service file path
 
-export default class ExampleHandler {
-  // TODO: change handler name
-  constructor(private req: IncomingMessage) {
-    this.req = req;
-  }
-
+export class ExampleHandler extends HttpHandler {
   async handle(): Promise<ResponseType | null> {
     let body = '';
 

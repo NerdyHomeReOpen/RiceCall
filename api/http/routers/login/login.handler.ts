@@ -1,10 +1,8 @@
-import { IncomingMessage } from 'http';
-
 // Error
 import StandardizedError from '@/error';
 
 // Types
-import { ResponseType } from '@/api/http';
+import { HttpHandler, ResponseType } from '@/api/http';
 
 // Validaters
 import LoginValidator from './login.validator';
@@ -12,11 +10,7 @@ import LoginValidator from './login.validator';
 // Services
 import LoginService from './login.service';
 
-export default class LoginHandler {
-  constructor(private req: IncomingMessage) {
-    this.req = req;
-  }
-
+export class LoginHandler extends HttpHandler {
   async handle(): Promise<ResponseType | null> {
     let body = '';
 

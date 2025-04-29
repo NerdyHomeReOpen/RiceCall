@@ -1,10 +1,8 @@
-import { IncomingMessage } from 'http';
-
 // Error
 import StandardizedError from '@/error';
 
 // Types
-import { ResponseType } from '@/api/http';
+import { HttpHandler, ResponseType } from '@/api/http';
 
 // Validators
 import RefreshServerChannelsValidator from './refreshServerChannels.validator';
@@ -12,11 +10,7 @@ import RefreshServerChannelsValidator from './refreshServerChannels.validator';
 // Services
 import RefreshServerChannelsService from './refreshServerChannels.service';
 
-export default class RefreshServerChannelsHandler {
-  constructor(private req: IncomingMessage) {
-    this.req = req;
-  }
-
+export class RefreshServerChannelsHandler extends HttpHandler {
   async handle(): Promise<ResponseType | null> {
     let body = '';
 

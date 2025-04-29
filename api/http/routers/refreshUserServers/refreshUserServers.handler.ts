@@ -1,10 +1,8 @@
-import { IncomingMessage } from 'http';
-
 // Error
 import StandardizedError from '@/error';
 
 // Types
-import { ResponseType } from '@/api/http';
+import { HttpHandler, ResponseType } from '@/api/http';
 
 // Validators
 import RefreshUserServersValidator from './refreshUserServers.validator';
@@ -12,11 +10,7 @@ import RefreshUserServersValidator from './refreshUserServers.validator';
 // Services
 import RefreshUserServersService from './refreshUserServers.service';
 
-export default class RefreshUserServersHandler {
-  constructor(private req: IncomingMessage) {
-    this.req = req;
-  }
-
+export class RefreshUserServersHandler extends HttpHandler {
   async handle(): Promise<ResponseType | null> {
     let body = '';
 
