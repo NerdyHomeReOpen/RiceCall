@@ -1,11 +1,14 @@
 // Error
 import StandardizedError from '@/error';
 
-// Types
+// Http
 import { HttpHandler, ResponseType } from '@/api/http';
 
-// Validators
-import RefreshUserFriendApplicationsValidator from './refreshUserFriendApplications.validator';
+// Schemas
+import { RefreshUserFriendApplicationsSchema } from './refreshUserFriendApplications.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import RefreshUserFriendApplicationsService from './refreshUserFriendApplications.service';
@@ -22,9 +25,10 @@ export class RefreshUserFriendApplicationsHandler extends HttpHandler {
       try {
         const data = JSON.parse(body);
 
-        const validated = await new RefreshUserFriendApplicationsValidator(
-          data,
-        ).validate();
+        const validated = await new DataValidator(
+          RefreshUserFriendApplicationsSchema,
+          'REFRESHUSERFRIENDAPPLICATIONS',
+        ).validate(data);
 
         const result = await new RefreshUserFriendApplicationsService(
           validated.userId,

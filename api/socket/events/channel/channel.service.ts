@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io';
+import { v4 as uuidv4 } from 'uuid';
 
 // Error
 import StandardizedError from '@/error';

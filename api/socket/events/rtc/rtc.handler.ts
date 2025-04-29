@@ -4,14 +4,17 @@ import Logger from '@/utils/logger';
 // Error
 import StandardizedError from '@/error';
 
-// Validators
+// Schemas
 import {
-  RTCOfferValidator,
-  RTCAnswerValidator,
-  RTCCandidateValidator,
-  RTCJoinValidator,
-  RTCLeaveValidator,
-} from './rtc.validator';
+  RTCOfferSchema,
+  RTCAnswerSchema,
+  RTCCandidateSchema,
+  RTCJoinSchema,
+  RTCLeaveSchema,
+} from './rtc.schemas';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Socket
 import { SocketHandler } from '@/api/socket';
@@ -21,7 +24,10 @@ export class RTCOfferHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { to, offer } = await new RTCOfferValidator(data).validate();
+      const { to, offer } = await new DataValidator(
+        RTCOfferSchema,
+        'RTCOFFER',
+      ).validate(data);
 
       this.io.to(to).emit('RTCOffer', {
         from: this.socket.id,
@@ -50,7 +56,10 @@ export class RTCAnswerHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { to, answer } = await new RTCAnswerValidator(data).validate();
+      const { to, answer } = await new DataValidator(
+        RTCAnswerSchema,
+        'RTCANSWER',
+      ).validate(data);
 
       this.io.to(to).emit('RTCAnswer', {
         from: this.socket.id,
@@ -79,9 +88,10 @@ export class RTCCandidateHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { to, candidate } = await new RTCCandidateValidator(
-        data,
-      ).validate();
+      const { to, candidate } = await new DataValidator(
+        RTCCandidateSchema,
+        'RTCCANDIDATE',
+      ).validate(data);
 
       this.io.to(to).emit('RTCCandidate', {
         from: this.socket.id,
@@ -110,7 +120,10 @@ export class RTCJoinHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { channelId } = await new RTCJoinValidator(data).validate();
+      const { channelId } = await new DataValidator(
+        RTCJoinSchema,
+        'RTCJOIN',
+      ).validate(data);
 
       this.io.to(`channel_${channelId}`).emit('RTCJoin', {
         from: this.socket.id,
@@ -138,7 +151,10 @@ export class RTCLeaveHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { channelId } = await new RTCLeaveValidator(data).validate();
+      const { channelId } = await new DataValidator(
+        RTCLeaveSchema,
+        'RTCLEAVE',
+      ).validate(data);
 
       this.io.to(`channel_${channelId}`).emit('RTCLeave', {
         from: this.socket.id,

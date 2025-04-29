@@ -4,9 +4,6 @@ import StandardizedError from '@/error';
 // Types
 import { HttpHandler, ResponseType } from '@/api/http';
 
-// Validators
-// import ImagesValidator from './images.validator';
-
 // Services
 import ImagesService from './images.service';
 

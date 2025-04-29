@@ -1,11 +1,14 @@
 // Error
 import StandardizedError from '@/error';
 
-// Types
+// Http
 import { HttpHandler, ResponseType } from '@/api/http';
 
-// Validaters
-import RegisterValidator from './register.validator';
+// Schemas
+import { RegisterSchema } from './register.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import RegisterService from './register.service';
@@ -22,7 +25,10 @@ export class RegisterHandler extends HttpHandler {
       try {
         const data = JSON.parse(body);
 
-        const validated = await new RegisterValidator(data).validate();
+        const validated = await new DataValidator(
+          RegisterSchema,
+          'REGISTER',
+        ).validate(data);
 
         const result = await new RegisterService(
           validated.account,

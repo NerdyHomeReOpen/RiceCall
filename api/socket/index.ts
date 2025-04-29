@@ -36,6 +36,11 @@ import {
   SendMessageHandler,
   SendDirectMessageHandler,
 } from './events/message/message.handler';
+import {
+  CreateFriendHandler,
+  UpdateFriendHandler,
+  DeleteFriendHandler,
+} from './events/friend/friend.handler';
 
 export default class SocketServer {
   static io: Server;
@@ -180,17 +185,6 @@ export default class SocketServer {
         memberHandler.deleteMember(io, socket, data),
       );
 
-      // Friend
-      socket.on('createFriend', async (data) =>
-        friendHandler.createFriend(io, socket, data),
-      );
-      socket.on('updateFriend', async (data) =>
-        friendHandler.updateFriend(io, socket, data),
-      );
-      socket.on('deleteFriend', async (data) =>
-        friendHandler.deleteFriend(io, socket, data),
-      );
-
       // Member Application
       socket.on('createMemberApplication', async (data) =>
         memberApplicationHandler.createMemberApplication(io, socket, data),
@@ -200,6 +194,17 @@ export default class SocketServer {
       );
       socket.on('deleteMemberApplication', async (data) =>
         memberApplicationHandler.deleteMemberApplication(io, socket, data),
+      );
+
+      // Friend
+      socket.on('createFriend', async (data) =>
+        new CreateFriendHandler(io, socket).handle(data),
+      );
+      socket.on('updateFriend', async (data) =>
+        new UpdateFriendHandler(io, socket).handle(data),
+      );
+      socket.on('deleteFriend', async (data) =>
+        new DeleteFriendHandler(io, socket).handle(data),
       );
 
       // Friend Application

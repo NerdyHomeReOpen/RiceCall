@@ -1,11 +1,14 @@
 // Error
 import StandardizedError from '@/error';
 
-// Types
+// Http
 import { HttpHandler, ResponseType } from '@/api/http';
 
-// Validators
-import RefreshChannelValidator from './refreshChannel.validator';
+// Schemas
+import { RefreshChannelSchema } from './refreshChannel.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import RefreshChannelService from './refreshChannel.service';
@@ -22,7 +25,10 @@ export class RefreshChannelHandler extends HttpHandler {
       try {
         const data = JSON.parse(body);
 
-        const validated = await new RefreshChannelValidator(data).validate();
+        const validated = await new DataValidator(
+          RefreshChannelSchema,
+          'REFRESHCHANNEL',
+        ).validate(data);
 
         const result = await new RefreshChannelService(
           validated.channelId,

@@ -4,14 +4,17 @@ import Logger from '@/utils/logger';
 // Error
 import StandardizedError from '@/error';
 
-// Validators
+// Schemas
 import {
-  SearchServerValidator,
-  CreateServerValidator,
-  UpdateServerValidator,
-  ConnectServerValidator,
-  DisconnectServerValidator,
-} from './server.validator';
+  SearchServerSchema,
+  CreateServerSchema,
+  UpdateServerSchema,
+  ConnectServerSchema,
+  DisconnectServerSchema,
+} from './server.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import {
@@ -30,7 +33,10 @@ export class SearchServerHandler extends SocketHandler {
     try {
       // const operatorId = this.socket.data.userId;
 
-      const { query } = await new SearchServerValidator(data).validate();
+      const { query } = await new DataValidator(
+        SearchServerSchema,
+        'SEARCHSERVER',
+      ).validate(data);
 
       const result = await new SearchServerService(query).use();
 
@@ -57,9 +63,10 @@ export class ConnectServerHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { userId, serverId } = await new ConnectServerValidator(
-        data,
-      ).validate();
+      const { userId, serverId } = await new DataValidator(
+        ConnectServerSchema,
+        'CONNECTSERVER',
+      ).validate(data);
 
       const targetSocket = SocketServer.getSocket(this.io, userId);
 
@@ -105,9 +112,10 @@ export class DisconnectServerHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { userId, serverId } = await new DisconnectServerValidator(
-        data,
-      ).validate();
+      const { userId, serverId } = await new DataValidator(
+        DisconnectServerSchema,
+        'DISCONNECTSERVER',
+      ).validate(data);
 
       const targetSocket = SocketServer.getSocket(this.io, userId);
 
@@ -152,7 +160,10 @@ export class CreateServerHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { server } = await new CreateServerValidator(data).validate();
+      const { server } = await new DataValidator(
+        CreateServerSchema,
+        'CREATESERVER',
+      ).validate(data);
 
       await new CreateServerService(operatorId, server).use();
     } catch (error: any) {
@@ -177,9 +188,10 @@ export class UpdateServerHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { serverId, server } = await new UpdateServerValidator(
-        data,
-      ).validate();
+      const { serverId, server } = await new DataValidator(
+        UpdateServerSchema,
+        'UPDATESERVER',
+      ).validate(data);
 
       const result = await new UpdateServerService(
         operatorId,

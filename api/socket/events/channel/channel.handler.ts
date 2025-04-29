@@ -4,15 +4,18 @@ import Logger from '@/utils/logger';
 // Error
 import StandardizedError from '@/error';
 
-// Validators
+// Schemas
 import {
-  ConnectChannelValidator,
-  CreateChannelValidator,
-  DeleteChannelValidator,
-  DisconnectChannelValidator,
-  UpdateChannelsValidator,
-  UpdateChannelValidator,
-} from './channel.validator';
+  ConnectChannelSchema,
+  CreateChannelSchema,
+  DeleteChannelSchema,
+  DisconnectChannelSchema,
+  UpdateChannelsSchema,
+  UpdateChannelSchema,
+} from './channel.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import {
@@ -31,8 +34,10 @@ export class ConnectChannelHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { userId, channelId, serverId, password } =
-        await new ConnectChannelValidator(data).validate();
+      const { userId, channelId, serverId, password } = await new DataValidator(
+        ConnectChannelSchema,
+        'CONNECTCHANNEL',
+      ).validate(data);
 
       const targetSocket = this.io.sockets.sockets.get(userId);
 
@@ -81,8 +86,10 @@ export class DisconnectChannelHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { userId, channelId, serverId } =
-        await new DisconnectChannelValidator(data).validate();
+      const { userId, channelId, serverId } = await new DataValidator(
+        DisconnectChannelSchema,
+        'DISCONNECTCHANNEL',
+      ).validate(data);
 
       const targetSocket = this.io.sockets.sockets.get(userId);
 
@@ -130,9 +137,10 @@ export class CreateChannelHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { serverId, channel } = await new CreateChannelValidator(
-        data,
-      ).validate();
+      const { serverId, channel } = await new DataValidator(
+        CreateChannelSchema,
+        'CREATECHANNEL',
+      ).validate(data);
 
       const result = await new CreateChannelService(
         operatorId,
@@ -165,9 +173,10 @@ export class UpdateChannelHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { channelId, serverId, channel } = await new UpdateChannelValidator(
-        data,
-      ).validate();
+      const { channelId, serverId, channel } = await new DataValidator(
+        UpdateChannelSchema,
+        'UPDATECHANNEL',
+      ).validate(data);
 
       const result = await new UpdateChannelService(
         operatorId,
@@ -202,9 +211,10 @@ export class UpdateChannelHandler extends SocketHandler {
 export class UpdateChannelsHandler extends SocketHandler {
   async handle(data: any) {
     try {
-      const { serverId, channels } = await new UpdateChannelsValidator(
-        data,
-      ).validate();
+      const { serverId, channels } = await new DataValidator(
+        UpdateChannelsSchema,
+        'UPDATECHANNELS',
+      ).validate(data);
 
       await Promise.all(
         channels.map(
@@ -238,9 +248,10 @@ export class DeleteChannelHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { channelId, serverId } = await new DeleteChannelValidator(
-        data,
-      ).validate();
+      const { channelId, serverId } = await new DataValidator(
+        DeleteChannelSchema,
+        'DELETECHANNEL',
+      ).validate(data);
 
       const result = await new DeleteChannelService(
         operatorId,

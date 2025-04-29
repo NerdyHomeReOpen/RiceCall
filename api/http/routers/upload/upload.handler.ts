@@ -3,11 +3,14 @@ import formidable from 'formidable';
 // Error
 import StandardizedError from '@/error';
 
-// Types
+// Http
 import { HttpHandler, ResponseType } from '@/api/http';
 
-// Validators
-import UploadValidator from './upload.validator';
+// Schemas
+import { UploadSchema } from './upload.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import UploadService from './upload.service';
@@ -20,7 +23,10 @@ export class UploadHandler extends HttpHandler {
       try {
         if (err) throw new Error(err);
 
-        const validated = await new UploadValidator(data).validate();
+        const validated = await new DataValidator(
+          UploadSchema,
+          'UPLOAD',
+        ).validate(data);
 
         const result = await new UploadService(
           validated._type,

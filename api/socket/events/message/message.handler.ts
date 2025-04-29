@@ -4,11 +4,11 @@ import Logger from '@/utils/logger';
 // Error
 import StandardizedError from '@/error';
 
-// Validators
-import {
-  SendDirectMessageValidator,
-  SendMessageValidator,
-} from './message.validator';
+// Schemas
+import { SendDirectMessageSchema, SendMessageSchema } from './message.schemas';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import {
@@ -24,8 +24,10 @@ export class SendMessageHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { message, userId, serverId, channelId } =
-        await new SendMessageValidator(data).validate();
+      const { message, userId, serverId, channelId } = await new DataValidator(
+        SendMessageSchema,
+        'SENDMESSAGE',
+      ).validate(data);
 
       const result = await new SendMessageService(
         operatorId,
@@ -62,8 +64,10 @@ export class SendDirectMessageHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { directMessage, userId, targetId } =
-        await new SendDirectMessageValidator(data).validate();
+      const { directMessage, userId, targetId } = await new DataValidator(
+        SendDirectMessageSchema,
+        'SENDDIRECTMESSAGE',
+      ).validate(data);
 
       const targetSocket = this.io.sockets.sockets.get(targetId);
 

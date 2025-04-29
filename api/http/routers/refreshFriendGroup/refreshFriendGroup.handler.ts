@@ -1,11 +1,14 @@
 // Error
 import StandardizedError from '@/error';
 
-// Types
+// Http
 import { HttpHandler, ResponseType } from '@/api/http';
 
-// Validators
-import RefreshFriendGroupValidator from './refreshFriendGroup.validator';
+// Schemas
+import { RefreshFriendGroupSchema } from './refreshFriendGroup.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import RefreshFriendGroupService from './refreshFriendGroup.service';
@@ -22,9 +25,10 @@ export class RefreshFriendGroupHandler extends HttpHandler {
       try {
         const data = JSON.parse(body);
 
-        const validated = await new RefreshFriendGroupValidator(
-          data,
-        ).validate();
+        const validated = await new DataValidator(
+          RefreshFriendGroupSchema,
+          'REFRESHFRIENDGROUP',
+        ).validate(data);
 
         const result = await new RefreshFriendGroupService(
           validated.friendGroupId,

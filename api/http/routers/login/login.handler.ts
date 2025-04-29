@@ -4,8 +4,11 @@ import StandardizedError from '@/error';
 // Types
 import { HttpHandler, ResponseType } from '@/api/http';
 
-// Validaters
-import LoginValidator from './login.validator';
+// Schemas
+import { LoginSchema } from './login.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import LoginService from './login.service';
@@ -22,9 +25,15 @@ export class LoginHandler extends HttpHandler {
       try {
         const data = JSON.parse(body);
 
-        const validated = await new LoginValidator(data).validate();
+        const validated = await new DataValidator(
+          LoginSchema,
+          'LOGIN',
+        ).validate(data);
 
-        const result = await new LoginService(validated.account).use();
+        const result = await new LoginService(
+          validated.account,
+          validated.password,
+        ).use();
 
         return {
           statusCode: 200,

@@ -4,8 +4,11 @@ import Logger from '@/utils/logger';
 // Error
 import StandardizedError from '@/error';
 
-// Validators
-import { SearchUserValidator, UpdateUserValidator } from './user.validator';
+// Schemas
+import { SearchUserSchema, UpdateUserSchema } from './user.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import {
@@ -23,7 +26,10 @@ export class SearchUserHandler extends SocketHandler {
     try {
       // const operatorId = this.socket.data.userId;
 
-      const { query } = await new SearchUserValidator(data).validate();
+      const { query } = await new DataValidator(
+        SearchUserSchema,
+        'SEARCHUSER',
+      ).validate(data);
 
       const result = await new SearchUserService(query).use();
 
@@ -112,7 +118,10 @@ export class UpdateUserHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const { userId, user } = await new UpdateUserValidator(data).validate();
+      const { userId, user } = await new DataValidator(
+        UpdateUserSchema,
+        'UPDATEUSER',
+      ).validate(data);
 
       const targetSocket = SocketServer.getSocket(this.io, userId);
 

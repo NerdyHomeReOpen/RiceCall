@@ -1,11 +1,14 @@
 // Error
 import StandardizedError from '@/error';
 
-// Types
+// Http
 import { HttpHandler, ResponseType } from '@/api/http';
 
-// Validators
-import ExampleValidator from './example.validator'; // TODO: change validator file path
+// Schemas
+import { ExampleSchema } from './example.schema';
+
+// Middleware
+import DataValidator from '@/middleware/data.validator';
 
 // Services
 import ExampleService from './example.service'; // TODO: change service file path
@@ -22,7 +25,10 @@ export class ExampleHandler extends HttpHandler {
       try {
         const data = JSON.parse(body);
 
-        const validated = await new ExampleValidator(data).validate(); // TODO: change validator
+        const validated = await new DataValidator(
+          ExampleSchema,
+          'EXAMPLE',
+        ).validate(data);
 
         const result = await new ExampleService(validated.example).use(); // TODO: change service
 
