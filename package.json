@@ -2,8 +2,7 @@
   "name": "ricecall",
   "version": "0.1.6",
   "private": false,
-  "type": "module",
-  "main": "main.js",
+  "main": "main.ts",
   "description": "Ricecall is a voice chat app that allows you to chat with your friends.",
   "author": "null",
   "scripts": {
@@ -12,17 +11,19 @@
     "export": "next export",
     "start": "next start",
     "lint": "next lint",
-    "electron-dev": "concurrently \"npm run dev\" \"electron . --dev\"",
-    "electron-start": "electron .",
-    "electron-build": "next build && electron-builder",
-    "electron-build-win": "next build && electron-builder --win",
-    "electron-build-mac": "next build && electron-builder --mac",
-    "electron-build-linux": "next build && electron-builder --linux"
+    "build:main": "tsc -p tsconfig.json",
+    "electron-dev": "concurrently \"npm run dev\" \"ts-node -r tsconfig-paths/register .\"",
+    "electron-start": "npm run build:main && electron ./dist/main.js",
+    "electron-build": "npm run build && npm run build:main && electron-builder",
+    "electron-build-win": "npm run build && npm run build:main && electron-builder --win",
+    "electron-build-mac": "npm run build && npm run build:main && electron-builder --mac",
+    "electron-build-linux": "npm run build && npm run build:main && electron-builder --linux"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
     "@radix-ui/themes": "^3.2.0",
     "@reduxjs/toolkit": "^2.5.1",
+    "@types/discord-rpc": "^4.0.9",
     "axios": "^1.8.1",
     "discord-rpc": "^4.0.1",
     "dompurify": "^3.2.4",
@@ -40,7 +41,9 @@
     "react-redux": "^9.2.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "ts-node": "^11.0.0-beta.1",
+    "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
