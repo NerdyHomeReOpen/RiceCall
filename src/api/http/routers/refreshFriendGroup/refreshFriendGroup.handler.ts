@@ -1,6 +1,9 @@
 // Error
 import StandardizedError from '@/error';
 
+// Utils
+import Logger from '@/utils/logger';
+
 // Types
 import { ResponseType } from '@/api/http';
 
@@ -17,49 +20,37 @@ import DataValidator from '@/middleware/data.validator';
 import RefreshFriendGroupService from '@/api/http/routers/refreshFriendGroup/refreshFriendGroup.service';
 
 export class RefreshFriendGroupHandler extends HttpHandler {
-  async handle(): Promise<ResponseType | null> {
-    let body = '';
+  async handle(data: any): Promise<ResponseType> {
+    try {
+      const { friendGroupId } = await new DataValidator(
+        RefreshFriendGroupSchema,
+        'REFRESHFRIENDGROUP',
+      ).validate(data);
 
-    this.req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
+      const result = await new RefreshFriendGroupService(friendGroupId).use();
 
-    this.req.on('end', async () => {
-      try {
-        const data = JSON.parse(body);
-
-        const validated = await new DataValidator(
-          RefreshFriendGroupSchema,
-          'REFRESHFRIENDGROUP',
-        ).validate(data);
-
-        const result = await new RefreshFriendGroupService(
-          validated.friendGroupId,
-        ).use();
-
-        return {
-          statusCode: 200,
-          message: 'success',
-          data: result,
-        };
-      } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刷新好友群組資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHFRIENDGROUP',
-            tag: 'SERVER_ERROR',
-            statusCode: 500,
-          });
-        }
-
-        return {
-          statusCode: error.statusCode,
-          message: 'error',
-          data: { error: error.message },
-        };
+      return {
+        statusCode: 200,
+        message: 'success',
+        data: result,
+      };
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `刷新好友群組資料時發生預期外的錯誤: ${error.message}`,
+          part: 'REFRESHFRIENDGROUP',
+          tag: 'SERVER_ERROR',
+          statusCode: 500,
+        });
       }
-    });
-    return null;
+
+      new Logger('RefreshFriendGroup').error(error);
+      return {
+        statusCode: error.statusCode,
+        message: 'error',
+        data: { error: error.message },
+      };
+    }
   }
 }

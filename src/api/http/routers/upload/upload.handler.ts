@@ -1,7 +1,8 @@
-import formidable from 'formidable';
-
 // Error
 import StandardizedError from '@/error';
+
+// Utils
+import Logger from '@/utils/logger';
 
 // Types
 import { ResponseType } from '@/api/http';
@@ -19,48 +20,44 @@ import DataValidator from '@/middleware/data.validator';
 import UploadService from '@/api/http/routers/upload/upload.service';
 
 export class UploadHandler extends HttpHandler {
-  async handle(): Promise<ResponseType | null> {
-    const form = new formidable.IncomingForm();
+  async handle(data: any): Promise<ResponseType> {
+    try {
+      const { _type, _fileName, _file } = await new DataValidator(
+        UploadSchema,
+        'UPLOAD',
+      ).validate(data);
 
-    form.parse(this.req, async (err, data) => {
-      try {
-        if (err) throw new Error(err);
+      const ext = _file.split('.').pop(); // TODO: 修正
 
-        const validated = await new DataValidator(
-          UploadSchema,
-          'UPLOAD',
-        ).validate(data);
+      const result = await new UploadService(
+        _type,
+        _fileName,
+        _file,
+        ext,
+      ).use();
 
-        const result = await new UploadService(
-          validated._type,
-          validated._fileName,
-          validated._file,
-          validated.ext,
-        ).use();
-
-        return {
-          statusCode: 200,
-          message: 'success',
-          data: result,
-        };
-      } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `上傳圖片時發生預期外的錯誤: ${error.message}`,
-            part: 'UPLOAD',
-            tag: 'SERVER_ERROR',
-            statusCode: 500,
-          });
-        }
-
-        return {
-          statusCode: error.statusCode,
-          message: 'error',
-          data: { error: error.message },
-        };
+      return {
+        statusCode: 200,
+        message: 'success',
+        data: result,
+      };
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `上傳圖片時發生預期外的錯誤: ${error.message}`,
+          part: 'UPLOAD',
+          tag: 'SERVER_ERROR',
+          statusCode: 500,
+        });
       }
-    });
-    return null;
+
+      new Logger('Upload').error(error);
+      return {
+        statusCode: error.statusCode,
+        message: 'error',
+        data: { error: error.message },
+      };
+    }
   }
 }

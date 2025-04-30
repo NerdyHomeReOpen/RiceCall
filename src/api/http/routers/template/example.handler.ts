@@ -1,6 +1,9 @@
 // Error
 import StandardizedError from '@/error';
 
+// Utils
+import Logger from '@/utils/logger';
+
 // Types
 import { ResponseType } from '@/api/http';
 
@@ -17,47 +20,37 @@ import DataValidator from '@/middleware/data.validator';
 import ExampleService from '@/api/http/routers/template/example.service'; // TODO: change service file path
 
 export class ExampleHandler extends HttpHandler {
-  async handle(): Promise<ResponseType | null> {
-    let body = '';
+  async handle(data: any): Promise<ResponseType> {
+    try {
+      const { example } = await new DataValidator(
+        ExampleSchema,
+        'EXAMPLE',
+      ).validate(data);
 
-    this.req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
+      const result = await new ExampleService(example).use(); // TODO: change service
 
-    this.req.on('end', async () => {
-      try {
-        const data = JSON.parse(body);
-
-        const validated = await new DataValidator(
-          ExampleSchema,
-          'EXAMPLE',
-        ).validate(data);
-
-        const result = await new ExampleService(validated.example).use(); // TODO: change service
-
-        return {
-          statusCode: 200,
-          message: 'success',
-          data: result,
-        };
-      } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: '', // TODO: implement message
-            part: '', // TODO: implement part
-            tag: 'SERVER_ERROR',
-            statusCode: 500,
-          });
-        }
-
-        return {
-          statusCode: error.statusCode,
-          message: 'error',
-          data: { error: error.message },
-        };
+      return {
+        statusCode: 200,
+        message: 'success',
+        data: result,
+      };
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: '', // TODO: implement message
+          part: '', // TODO: implement part
+          tag: 'SERVER_ERROR',
+          statusCode: 500,
+        });
       }
-    });
-    return null;
+
+      new Logger('Example').error(error);
+      return {
+        statusCode: error.statusCode,
+        message: 'error',
+        data: { error: error.message },
+      };
+    }
   }
 }

@@ -1,6 +1,9 @@
 // Error
 import StandardizedError from '@/error';
 
+// Utils
+import Logger from '@/utils/logger';
+
 // Types
 import { ResponseType } from '@/api/http';
 
@@ -17,50 +20,40 @@ import DataValidator from '@/middleware/data.validator';
 import RefreshMemberApplicationService from '@/api/http/routers/refreshMemberApplication/refreshMemberApplication.service';
 
 export class RefreshMemberApplicationHandler extends HttpHandler {
-  async handle(): Promise<ResponseType | null> {
-    let body = '';
+  async handle(data: any): Promise<ResponseType> {
+    try {
+      const { userId, serverId } = await new DataValidator(
+        RefreshMemberApplicationSchema,
+        'REFRESHMEMBERAPPLICATION',
+      ).validate(data);
 
-    this.req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
+      const result = await new RefreshMemberApplicationService(
+        userId,
+        serverId,
+      ).use();
 
-    this.req.on('end', async () => {
-      try {
-        const data = JSON.parse(body);
-
-        const validated = await new DataValidator(
-          RefreshMemberApplicationSchema,
-          'REFRESHMEMBERAPPLICATION',
-        ).validate(data);
-
-        const result = await new RefreshMemberApplicationService(
-          validated.userId,
-          validated.serverId,
-        ).use();
-
-        return {
-          statusCode: 200,
-          message: 'success',
-          data: result,
-        };
-      } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刷新成員申請資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHMEMBERAPPLICATION',
-            tag: 'SERVER_ERROR',
-            statusCode: 500,
-          });
-        }
-
-        return {
-          statusCode: error.statusCode,
-          message: 'error',
-          data: { error: error.message },
-        };
+      return {
+        statusCode: 200,
+        message: 'success',
+        data: result,
+      };
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `刷新成員申請資料時發生預期外的錯誤: ${error.message}`,
+          part: 'REFRESHMEMBERAPPLICATION',
+          tag: 'SERVER_ERROR',
+          statusCode: 500,
+        });
       }
-    });
-    return null;
+
+      new Logger('RefreshMemberApplication').error(error);
+      return {
+        statusCode: error.statusCode,
+        message: 'error',
+        data: { error: error.message },
+      };
+    }
   }
 }

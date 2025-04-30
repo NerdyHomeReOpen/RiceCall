@@ -10,28 +10,18 @@ export default class DataValidator {
   }
 
   async validate(data: any) {
-    try {
-      const result = this.schema.safeParse(data);
+    const result = this.schema.safeParse(data);
 
-      if (!result.success) {
-        throw new StandardizedError({
-          name: 'ValidationError',
-          message: `驗證資料失敗: ${result.error.message}`,
-          part: this.part,
-          tag: 'INVALID_DATA',
-          statusCode: 401,
-        });
-      }
-
-      return result.data;
-    } catch (error: any) {
+    if (!result.success) {
       throw new StandardizedError({
-        name: 'ServerError',
-        message: `驗證資料時發生預期外的錯誤: ${error.message}`,
+        name: 'ValidationError',
+        message: `驗證資料失敗: ${result.error.message}`,
         part: this.part,
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
+        tag: 'INVALID_DATA',
+        statusCode: 401,
       });
     }
+
+    return result.data;
   }
 }

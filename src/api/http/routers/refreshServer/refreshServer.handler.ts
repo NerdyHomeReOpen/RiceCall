@@ -1,6 +1,9 @@
 // Error
 import StandardizedError from '@/error';
 
+// Utils
+import Logger from '@/utils/logger';
+
 // Types
 import { ResponseType } from '@/api/http';
 
@@ -17,47 +20,37 @@ import DataValidator from '@/middleware/data.validator';
 import RefreshServerService from '@/api/http/routers/refreshServer/refreshServer.service';
 
 export class RefreshServerHandler extends HttpHandler {
-  async handle(): Promise<ResponseType | null> {
-    let body = '';
+  async handle(data: any): Promise<ResponseType> {
+    try {
+      const { serverId } = await new DataValidator(
+        RefreshServerSchema,
+        'REFRESHSERVER',
+      ).validate(data);
 
-    this.req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
+      const result = await new RefreshServerService(serverId).use();
 
-    this.req.on('end', async () => {
-      try {
-        const data = JSON.parse(body);
-
-        const validated = await new DataValidator(
-          RefreshServerSchema,
-          'REFRESHSERVER',
-        ).validate(data);
-
-        const result = await new RefreshServerService(validated.serverId).use();
-
-        return {
-          statusCode: 200,
-          message: 'success',
-          data: result,
-        };
-      } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刷新群組資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHSERVER',
-            tag: 'SERVER_ERROR',
-            statusCode: 500,
-          });
-        }
-
-        return {
-          statusCode: error.statusCode,
-          message: 'error',
-          data: { error: error.message },
-        };
+      return {
+        statusCode: 200,
+        message: 'success',
+        data: result,
+      };
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `刷新群組資料時發生預期外的錯誤: ${error.message}`,
+          part: 'REFRESHSERVER',
+          tag: 'SERVER_ERROR',
+          statusCode: 500,
+        });
       }
-    });
-    return null;
+
+      new Logger('RefreshServer').error(error);
+      return {
+        statusCode: error.statusCode,
+        message: 'error',
+        data: { error: error.message },
+      };
+    }
   }
 }

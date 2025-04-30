@@ -1,6 +1,9 @@
 // Error
 import StandardizedError from '@/error';
 
+// Utils
+import Logger from '@/utils/logger';
+
 // Types
 import { ResponseType } from '@/api/http';
 
@@ -17,49 +20,37 @@ import DataValidator from '@/middleware/data.validator';
 import RefreshServerMembersService from '@/api/http/routers/refreshServerMembers/refreshServerMembers.service';
 
 export class RefreshServerMembersHandler extends HttpHandler {
-  async handle(): Promise<ResponseType | null> {
-    let body = '';
+  async handle(data: any): Promise<ResponseType> {
+    try {
+      const { serverId } = await new DataValidator(
+        RefreshServerMembersSchema,
+        'REFRESHSERVERMEMBERS',
+      ).validate(data);
 
-    this.req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
+      const result = await new RefreshServerMembersService(serverId).use();
 
-    this.req.on('end', async () => {
-      try {
-        const data = JSON.parse(body);
-
-        const validated = await new DataValidator(
-          RefreshServerMembersSchema,
-          'REFRESHSERVERMEMBERS',
-        ).validate(data);
-
-        const result = await new RefreshServerMembersService(
-          validated.serverId,
-        ).use();
-
-        return {
-          statusCode: 200,
-          message: 'success',
-          data: result,
-        };
-      } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刷新伺服器成員資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHSERVERMEMBERS',
-            tag: 'SERVER_ERROR',
-            statusCode: 500,
-          });
-        }
-
-        return {
-          statusCode: error.statusCode,
-          message: 'error',
-          data: { error: error.message },
-        };
+      return {
+        statusCode: 200,
+        message: 'success',
+        data: result,
+      };
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `刷新伺服器成員資料時發生預期外的錯誤: ${error.message}`,
+          part: 'REFRESHSERVERMEMBERS',
+          tag: 'SERVER_ERROR',
+          statusCode: 500,
+        });
       }
-    });
-    return null;
+
+      new Logger('RefreshServerMembers').error(error);
+      return {
+        statusCode: error.statusCode,
+        message: 'error',
+        data: { error: error.message },
+      };
+    }
   }
 }

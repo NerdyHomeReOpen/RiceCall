@@ -27,7 +27,7 @@ process.on('uncaughtException', (error: any) => {
       statusCode: 500,
     });
   }
-  new Logger('Server').error(`Uncaught Exception: ${error.error_message}`);
+  new Logger('Server').error(error);
 });
 
 process.on('unhandledRejection', (error: any) => {
@@ -40,7 +40,7 @@ process.on('unhandledRejection', (error: any) => {
       statusCode: 500,
     });
   }
-  new Logger('Server').error(`Unhandled Rejection: ${error.error_message}`);
+  new Logger('Server').error(error);
 });
 
 // Start Server

@@ -8,5 +8,5 @@ export abstract class HttpHandler {
     this.req = req;
   }
 
-  abstract handle(): Promise<ResponseType | null>;
+  abstract handle(data: any): Promise<ResponseType>;
 }

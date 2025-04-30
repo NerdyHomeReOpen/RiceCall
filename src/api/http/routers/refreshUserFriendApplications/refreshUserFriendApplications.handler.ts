@@ -1,6 +1,9 @@
 // Error
 import StandardizedError from '@/error';
 
+// Utils
+import Logger from '@/utils/logger';
+
 // Types
 import { ResponseType } from '@/api/http';
 
@@ -17,49 +20,39 @@ import DataValidator from '@/middleware/data.validator';
 import RefreshUserFriendApplicationsService from '@/api/http/routers/refreshUserFriendApplications/refreshUserFriendApplications.service';
 
 export class RefreshUserFriendApplicationsHandler extends HttpHandler {
-  async handle(): Promise<ResponseType | null> {
-    let body = '';
+  async handle(data: any): Promise<ResponseType> {
+    try {
+      const { userId } = await new DataValidator(
+        RefreshUserFriendApplicationsSchema,
+        'REFRESHUSERFRIENDAPPLICATIONS',
+      ).validate(data);
 
-    this.req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
+      const result = await new RefreshUserFriendApplicationsService(
+        userId,
+      ).use();
 
-    this.req.on('end', async () => {
-      try {
-        const data = JSON.parse(body);
-
-        const validated = await new DataValidator(
-          RefreshUserFriendApplicationsSchema,
-          'REFRESHUSERFRIENDAPPLICATIONS',
-        ).validate(data);
-
-        const result = await new RefreshUserFriendApplicationsService(
-          validated.userId,
-        ).use();
-
-        return {
-          statusCode: 200,
-          message: 'success',
-          data: result,
-        };
-      } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刷新用戶好友申請資料時發生預期外的錯誤: ${error.message}`,
-            part: 'REFRESHUSERFRIENDAPPLICATIONS',
-            tag: 'SERVER_ERROR',
-            statusCode: 500,
-          });
-        }
-
-        return {
-          statusCode: error.statusCode,
-          message: 'error',
-          data: { error: error.message },
-        };
+      return {
+        statusCode: 200,
+        message: 'success',
+        data: result,
+      };
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `刷新用戶好友申請資料時發生預期外的錯誤: ${error.message}`,
+          part: 'REFRESHUSERFRIENDAPPLICATIONS',
+          tag: 'SERVER_ERROR',
+          statusCode: 500,
+        });
       }
-    });
-    return null;
+
+      new Logger('RefreshUserFriendApplications').error(error);
+      return {
+        statusCode: error.statusCode,
+        message: 'error',
+        data: { error: error.message },
+      };
+    }
   }
 }
