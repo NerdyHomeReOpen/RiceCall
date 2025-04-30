@@ -1,11 +1,10 @@
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import path from 'path';
 
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+// Config
+import config from '@/config';
 
-const JWT_SECRET = process.env.JWT_SECRET as jwt.Secret;
-const JWT_EXPIRES_IN = parseInt(process.env.JWT_EXPIRES_IN || '0');
+const JWT_SECRET = config.jwtSecret as jwt.Secret;
+const JWT_EXPIRES_IN = parseInt(config.jwtExpiresIn || '0');
 
 export function generateJWT(data: any) {
   const encoded = jwt.sign(data, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });

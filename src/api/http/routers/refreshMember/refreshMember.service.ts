@@ -1,6 +1,3 @@
-// Error
-import StandardizedError from '@/error';
-
 // Database
 import Database from '@/database';
 
@@ -11,18 +8,7 @@ export default class RefreshMemberService {
   }
 
   async use() {
-    try {
-      const member = await Database.get.member(this.userId, this.serverId);
-
-      return member;
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: `刷新成員資料時發生預期外的錯誤: ${error.message}`,
-        part: 'REFRESHMEMBER',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      });
-    }
+    const member = await Database.get.member(this.userId, this.serverId);
+    return member;
   }
 }

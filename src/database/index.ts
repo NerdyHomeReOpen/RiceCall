@@ -1,5 +1,3 @@
-import dotenv from 'dotenv';
-import path from 'path';
 import mysql from 'mysql2/promise';
 
 // Config
@@ -8,9 +6,8 @@ import dbConfig from '@/config/db.config';
 // Error
 import StandardizedError from '@/error';
 
-dotenv.config({ path: path.join(__dirname, '.env') });
-
 // Create connection pool
+console.log(dbConfig);
 const pool = mysql.createPool(dbConfig);
 
 // Helper function to execute queries
@@ -725,8 +722,8 @@ const Database = {
           WHERE accounts.account = ?`,
           [account],
         );
-        if (!data) return null;
-        return convertToCamelCase(data);
+        if (!data || data.constructor !== Array) return null;
+        return convertToCamelCase(data[0]);
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({

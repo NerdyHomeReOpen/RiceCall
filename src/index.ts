@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
 // Error
 import StandardizedError from '@/error';
 
@@ -42,10 +47,3 @@ process.on('unhandledRejection', (error: any) => {
   }
   new Logger('Server').error(error);
 });
-
-// Start Server
-// server.listen(PORT, () => {
-//   new Logger('Server').success(`Server is running on port ${PORT}`);
-//   xpSystem.setup();
-//   imageSystem.setup();
-// });

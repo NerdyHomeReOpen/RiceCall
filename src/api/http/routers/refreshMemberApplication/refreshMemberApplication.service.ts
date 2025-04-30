@@ -1,6 +1,3 @@
-// Error
-import StandardizedError from '@/error';
-
 // Database
 import Database from '@/database';
 
@@ -11,21 +8,10 @@ export default class RefreshMemberApplicationService {
   }
 
   async use() {
-    try {
-      const memberApplication = await Database.get.memberApplication(
-        this.userId,
-        this.serverId,
-      );
-
-      return memberApplication;
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: `刷新成員申請資料時發生預期外的錯誤: ${error.message}`,
-        part: 'REFRESHMEMBERAPPLICATION',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      });
-    }
+    const memberApplication = await Database.get.memberApplication(
+      this.userId,
+      this.serverId,
+    );
+    return memberApplication;
   }
 }

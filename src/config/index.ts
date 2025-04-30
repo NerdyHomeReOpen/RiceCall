@@ -1,11 +1,11 @@
-import dotenv from 'dotenv';
-import path from 'path';
-
-dotenv.config({ path: path.join(__dirname, '.env') });
-
 const config = {
   // All
   serverUrl: process.env.SERVER_URL,
+  serverPort: process.env.SERVER_PORT,
+
+  // JWT
+  jwtSecret: process.env.JWT_SECRET,
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN,
 
   // Upload
   filePrefix: 'upload-',

@@ -1,6 +1,3 @@
-// Error
-import StandardizedError from '@/error';
-
 // Database
 import Database from '@/database';
 
@@ -11,16 +8,6 @@ export default class ExampleService {
   }
 
   async use() {
-    try {
-      // TODO: implement service logic
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: '', // TODO: implement error message
-        part: '', // TODO: implement part
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      });
-    }
+    // TODO: implement service logic
   }
 }

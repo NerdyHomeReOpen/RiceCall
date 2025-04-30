@@ -1,6 +1,3 @@
-// Error
-import StandardizedError from '@/error';
-
 // Database
 import Database from '@/database';
 
@@ -10,18 +7,7 @@ export default class RefreshChannelService {
   }
 
   async use() {
-    try {
-      const channel = await Database.get.channel(this.channelId);
-
-      return channel;
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: `刷新頻道資料時發生預期外的錯誤: ${error.message}`,
-        part: 'REFRESHCHANNEL',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      });
-    }
+    const channel = await Database.get.channel(this.channelId);
+    return channel;
   }
 }
