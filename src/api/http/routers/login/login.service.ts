@@ -28,8 +28,6 @@ export default class LoginService {
       });
     }
 
-    console.log(this.password, data.password);
-
     const isPasswordVerified = await bcrypt.compare(
       this.password,
       data.password,
@@ -61,8 +59,6 @@ export default class LoginService {
 
     const token = generateJWT({ userId: data.userId });
 
-    const sessionId = uuidv4();
-
-    return { token, sessionId };
+    return { token };
   }
 }

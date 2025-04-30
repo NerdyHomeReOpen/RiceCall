@@ -93,13 +93,9 @@ export default class SocketServer {
 
     io.use(async (socket: Socket, next: (err?: StandardizedError) => void) => {
       try {
-        const { token, sessionId } = socket.handshake.query;
+        const { token } = socket.handshake.query;
 
-        // Validate
-        const userId = await new AuthValidator(
-          token as string,
-          sessionId as string,
-        ).validate();
+        const userId = await new AuthValidator(token as string).validate();
 
         socket.data.userId = userId;
 
@@ -140,8 +136,8 @@ export default class SocketServer {
       new ConnectUserHandler(io, socket).handle();
 
       socket.on('disconnect', () => {
-        new DisconnectUserHandler(io, socket).handle();
         SocketServer.userSocketMap.delete(socket.data.userId);
+        new DisconnectUserHandler(io, socket).handle();
       });
 
       // User

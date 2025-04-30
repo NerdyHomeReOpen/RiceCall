@@ -1,14 +1,12 @@
 // Utils
 import { verifyJWT } from '@/utils/jwt';
-import Session from '@/utils/session';
 
 // StandardizedError
 import StandardizedError from '@/error';
 
 export default class AuthValidator {
-  constructor(private token: string, private sessionId: string) {
+  constructor(private token: string) {
     this.token = token;
-    this.sessionId = sessionId;
   }
 
   async validate() {
@@ -33,27 +31,6 @@ export default class AuthValidator {
       });
     }
 
-    const userId = Session.sessionToUser.get(this.sessionId);
-    if (!userId) {
-      throw new StandardizedError({
-        name: 'ValidationError',
-        message: '無效的 session',
-        part: 'AUTH',
-        tag: 'SESSION_INVALID',
-        statusCode: 401,
-      });
-    }
-
-    if (userId !== decoded.userId) {
-      throw new StandardizedError({
-        name: 'ValidationError',
-        message: '無效的 session',
-        part: 'AUTH',
-        tag: 'SESSION_INVALID',
-        statusCode: 401,
-      });
-    }
-
-    return userId;
+    return decoded.userId;
   }
 }
