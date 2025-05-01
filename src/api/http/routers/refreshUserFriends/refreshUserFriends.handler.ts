@@ -45,7 +45,7 @@ export class RefreshUserFriendsHandler extends HttpHandler {
         });
       }
 
-      new Logger('RefreshUserFriends').error(error);
+      new Logger('RefreshUserFriends').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

@@ -45,7 +45,7 @@ export class LoginHandler extends HttpHandler {
         });
       }
 
-      new Logger('Login').error(error);
+      new Logger('Login').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

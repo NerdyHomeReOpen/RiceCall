@@ -62,7 +62,7 @@ export class CreateFriendApplicationHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('FriendApplication').error(error);
+      new Logger('FriendApplication').error(error.message);
     }
   }
 }
@@ -105,7 +105,7 @@ export class UpdateFriendApplicationHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('FriendApplication').error(error);
+      new Logger('FriendApplication').error(error.message);
     }
   }
 }
@@ -146,7 +146,7 @@ export class DeleteFriendApplicationHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('FriendApplication').error(error);
+      new Logger('FriendApplication').error(error.message);
     }
   }
 }

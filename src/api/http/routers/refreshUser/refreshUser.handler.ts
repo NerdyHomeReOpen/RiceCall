@@ -45,7 +45,7 @@ export class RefreshUserHandler extends HttpHandler {
         });
       }
 
-      new Logger('RefreshUser').error(error);
+      new Logger('RefreshUser').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

@@ -52,7 +52,7 @@ export class UploadHandler extends HttpHandler {
         });
       }
 
-      new Logger('Upload').error(error);
+      new Logger('Upload').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

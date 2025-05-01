@@ -46,7 +46,7 @@ export class RTCOfferHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('RTC').error(error);
+      new Logger('RTC').error(error.message);
     }
   }
 }
@@ -78,7 +78,7 @@ export class RTCAnswerHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('RTC').error(error);
+      new Logger('RTC').error(error.message);
     }
   }
 }
@@ -110,7 +110,7 @@ export class RTCCandidateHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('RTC').error(error);
+      new Logger('RTC').error(error.message);
     }
   }
 }
@@ -141,7 +141,7 @@ export class RTCJoinHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('RTC').error(error);
+      new Logger('RTC').error(error.message);
     }
   }
 }
@@ -172,7 +172,7 @@ export class RTCLeaveHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('RTC').error(error);
+      new Logger('RTC').error(error.message);
     }
   }
 }

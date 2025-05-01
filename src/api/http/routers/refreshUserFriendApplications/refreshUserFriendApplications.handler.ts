@@ -47,7 +47,7 @@ export class RefreshUserFriendApplicationsHandler extends HttpHandler {
         });
       }
 
-      new Logger('RefreshUserFriendApplications').error(error);
+      new Logger('RefreshUserFriendApplications').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

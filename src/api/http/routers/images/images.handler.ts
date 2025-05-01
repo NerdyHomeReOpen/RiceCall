@@ -38,7 +38,7 @@ export class ImagesHandler extends HttpHandler {
         });
       }
 
-      new Logger('Images').error(error);
+      new Logger('Images').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

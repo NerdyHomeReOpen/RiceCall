@@ -48,7 +48,7 @@ export class RefreshMemberApplicationHandler extends HttpHandler {
         });
       }
 
-      new Logger('RefreshMemberApplication').error(error);
+      new Logger('RefreshMemberApplication').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

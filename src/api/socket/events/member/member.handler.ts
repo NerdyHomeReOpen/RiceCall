@@ -62,7 +62,7 @@ export class CreateMemberHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('Member').error(error);
+      new Logger('Member').error(error.message);
     }
   }
 }
@@ -105,7 +105,7 @@ export class UpdateMemberHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('Member').error(error);
+      new Logger('Member').error(error.message);
     }
   }
 }
@@ -147,7 +147,7 @@ export class DeleteMemberHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('Member').error(error);
+      new Logger('Member').error(error.message);
     }
   }
 }

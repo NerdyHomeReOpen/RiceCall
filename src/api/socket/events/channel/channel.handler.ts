@@ -76,7 +76,7 @@ export class ConnectChannelHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('Channel').error(error);
+      new Logger('Channel').error(error.message);
     }
   }
 }
@@ -127,7 +127,7 @@ export class DisconnectChannelHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('Channel').error(error);
+      new Logger('Channel').error(error.message);
     }
   }
 }
@@ -163,7 +163,7 @@ export class CreateChannelHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('Channel').error(error);
+      new Logger('Channel').error(error.message);
     }
   }
 }
@@ -203,7 +203,7 @@ export class UpdateChannelHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('Channel').error(error);
+      new Logger('Channel').error(error.message);
     }
   }
 }
@@ -238,7 +238,7 @@ export class UpdateChannelsHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('Channel').error(error);
+      new Logger('Channel').error(error.message);
     }
   }
 }
@@ -280,7 +280,7 @@ export class DeleteChannelHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('Channel').error(error);
+      new Logger('Channel').error(error.message);
     }
   }
 }

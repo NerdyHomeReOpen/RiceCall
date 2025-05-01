@@ -56,7 +56,7 @@ export class SearchServerHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('User').error(error);
+      new Logger('User').error(error.message);
     }
   }
 }
@@ -105,7 +105,7 @@ export class ConnectServerHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('User').error(error);
+      new Logger('User').error(error.message);
     }
   }
 }
@@ -153,7 +153,7 @@ export class DisconnectServerHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('User').error(error);
+      new Logger('User').error(error.message);
     }
   }
 }
@@ -181,7 +181,7 @@ export class CreateServerHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('User').error(error);
+      new Logger('User').error(error.message);
     }
   }
 }
@@ -217,7 +217,7 @@ export class UpdateServerHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('User').error(error);
+      new Logger('User').error(error.message);
     }
   }
 }

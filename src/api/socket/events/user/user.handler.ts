@@ -52,7 +52,7 @@ export class SearchUserHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('User').error(error);
+      new Logger('User').error(error.message);
     }
   }
 }
@@ -83,7 +83,7 @@ export class ConnectUserHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('User').error(error);
+      new Logger('User').error(error.message);
     }
   }
 }
@@ -114,7 +114,7 @@ export class DisconnectUserHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('User').error(error);
+      new Logger('User').error(error.message);
     }
   }
 }
@@ -152,7 +152,7 @@ export class UpdateUserHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('User').error(error);
+      new Logger('User').error(error.message);
     }
   }
 }

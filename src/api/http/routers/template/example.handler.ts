@@ -45,7 +45,7 @@ export class ExampleHandler extends HttpHandler {
         });
       }
 
-      new Logger('Example').error(error);
+      new Logger('Example').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

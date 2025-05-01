@@ -32,7 +32,7 @@ process.on('uncaughtException', (error: any) => {
       statusCode: 500,
     });
   }
-  new Logger('Server').error(error);
+  new Logger('Server').error(error.message);
 });
 
 process.on('unhandledRejection', (error: any) => {
@@ -45,5 +45,5 @@ process.on('unhandledRejection', (error: any) => {
       statusCode: 500,
     });
   }
-  new Logger('Server').error(error);
+  new Logger('Server').error(error.message);
 });

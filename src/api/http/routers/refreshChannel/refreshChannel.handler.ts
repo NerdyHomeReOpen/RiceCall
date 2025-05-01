@@ -45,7 +45,7 @@ export class RefreshChannelHandler extends HttpHandler {
         });
       }
 
-      new Logger('RefreshChannel').error(error);
+      new Logger('RefreshChannel').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

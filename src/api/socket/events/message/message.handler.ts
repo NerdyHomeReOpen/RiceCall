@@ -57,7 +57,7 @@ export class SendMessageHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('SendMessage').error(error);
+      new Logger('SendMessage').error(error.message);
     }
   }
 }
@@ -97,7 +97,7 @@ export class SendDirectMessageHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('SendDirectMessage').error(error);
+      new Logger('SendDirectMessage').error(error.message);
     }
   }
 }

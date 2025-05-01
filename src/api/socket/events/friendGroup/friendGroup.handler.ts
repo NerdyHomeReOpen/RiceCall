@@ -53,7 +53,7 @@ export class CreateFriendGroupHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('FriendGroup').error(error);
+      new Logger('FriendGroup').error(error.message);
     }
   }
 }
@@ -88,7 +88,7 @@ export class UpdateFriendGroupHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('FriendGroup').error(error);
+      new Logger('FriendGroup').error(error.message);
     }
   }
 }
@@ -122,7 +122,7 @@ export class DeleteFriendGroupHandler extends SocketHandler {
       }
 
       this.socket.emit('error', error);
-      new Logger('FriendGroup').error(error);
+      new Logger('FriendGroup').error(error.message);
     }
   }
 }

@@ -49,7 +49,7 @@ export class RegisterHandler extends HttpHandler {
         });
       }
 
-      new Logger('Register').error(error);
+      new Logger('Register').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',
