@@ -37,7 +37,7 @@ export class CreateFriendGroupService {
     });
 
     return {
-      userFriendGroupsUpdate: await Database.get.userFriendGroups(this.userId),
+      friendGroupAdd: await Database.get.friendGroup(friendGroupId),
     };
   }
 }
@@ -69,9 +69,7 @@ export class UpdateFriendGroupService {
     // Update friend group
     await Database.set.friendGroup(this.friendGroupId, this.update);
 
-    return {
-      userFriendGroupsUpdate: await Database.get.userFriendGroups(this.userId),
-    };
+    return {};
   }
 }
 
@@ -100,8 +98,6 @@ export class DeleteFriendGroupService {
     // Delete friend group
     await Database.delete.friendGroup(this.friendGroupId);
 
-    return {
-      userFriendGroupsUpdate: await Database.get.userFriendGroups(this.userId),
-    };
+    return {};
   }
 }

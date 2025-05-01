@@ -50,8 +50,10 @@ export class CreateMemberApplicationService {
     });
 
     return {
-      serverMemberApplicationsUpdate:
-        await Database.get.serverMemberApplications(this.serverId),
+      memberApplicationAdd: await Database.get.memberApplication(
+        this.userId,
+        this.serverId,
+      ),
     };
   }
 }
@@ -94,10 +96,7 @@ export class UpdateMemberApplicationService {
       this.update,
     );
 
-    return {
-      serverMemberApplicationsUpdate:
-        await Database.get.serverMemberApplications(this.serverId),
-    };
+    return {};
   }
 }
 
@@ -133,9 +132,6 @@ export class DeleteMemberApplicationService {
     // Delete member application
     await Database.delete.memberApplication(this.userId, this.serverId);
 
-    return {
-      serverMemberApplicationsUpdate:
-        await Database.get.serverMemberApplications(this.serverId),
-    };
+    return {};
   }
 }

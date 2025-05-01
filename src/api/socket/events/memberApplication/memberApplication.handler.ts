@@ -34,17 +34,16 @@ export class CreateMemberApplicationHandler extends SocketHandler {
         'CREATEMEMBERAPPLICATION',
       ).validate(data);
 
-      const { serverMemberApplicationsUpdate } =
-        await new CreateMemberApplicationService(
-          operatorId,
-          userId,
-          serverId,
-          memberApplication,
-        ).use();
+      const { memberApplicationAdd } = await new CreateMemberApplicationService(
+        operatorId,
+        userId,
+        serverId,
+        memberApplication,
+      ).use();
 
       this.io
         .to(`server_${serverId}`)
-        .emit('serverMemberApplicationsUpdate', serverMemberApplicationsUpdate);
+        .emit('memberApplicationAdd', memberApplicationAdd);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -72,17 +71,16 @@ export class UpdateMemberApplicationHandler extends SocketHandler {
         'UPDATEMEMBERAPPLICATION',
       ).validate(data);
 
-      const { serverMemberApplicationsUpdate } =
-        await new UpdateMemberApplicationService(
-          operatorId,
-          userId,
-          serverId,
-          memberApplication,
-        ).use();
+      await new UpdateMemberApplicationService(
+        operatorId,
+        userId,
+        serverId,
+        memberApplication,
+      ).use();
 
       this.io
         .to(`server_${serverId}`)
-        .emit('serverMemberApplicationsUpdate', serverMemberApplicationsUpdate);
+        .emit('memberApplicationUpdate', userId, serverId, memberApplication);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -110,16 +108,15 @@ export class DeleteMemberApplicationHandler extends SocketHandler {
         'DELETEMEMBERAPPLICATION',
       ).validate(data);
 
-      const { serverMemberApplicationsUpdate } =
-        await new DeleteMemberApplicationService(
-          operatorId,
-          userId,
-          serverId,
-        ).use();
+      await new DeleteMemberApplicationService(
+        operatorId,
+        userId,
+        serverId,
+      ).use();
 
       this.io
         .to(`server_${serverId}`)
-        .emit('serverMemberApplicationsUpdate', serverMemberApplicationsUpdate);
+        .emit('memberApplicationDelete', userId, serverId);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

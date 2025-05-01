@@ -75,11 +75,9 @@ export class ConnectServerHandler extends SocketHandler {
 
       const {
         openPopup,
-        userUpdate,
-        serverUpdate,
-        memberUpdate,
-        userServersUpdate,
-        serverChannelsUpdate,
+        serversUpdate,
+        channelsUpdate,
+        membersUpdate,
         actions,
       } = await new ConnectServerService(operatorId, userId, serverId).use();
 
@@ -90,11 +88,9 @@ export class ConnectServerHandler extends SocketHandler {
 
       if (targetSocket) {
         targetSocket.join(`server_${serverId}`);
-        targetSocket.emit('userUpdate', userUpdate);
-        targetSocket.emit('serverUpdate', serverUpdate);
-        targetSocket.emit('memberUpdate', memberUpdate);
-        targetSocket.emit('userServersUpdate', userServersUpdate);
-        targetSocket.emit('serverChannelsUpdate', serverChannelsUpdate);
+        targetSocket.emit('serversUpdate', serversUpdate);
+        targetSocket.emit('channelsUpdate', channelsUpdate);
+        targetSocket.emit('membersUpdate', membersUpdate);
       }
 
       if (actions.length > 0) {
@@ -131,20 +127,16 @@ export class DisconnectServerHandler extends SocketHandler {
 
       const targetSocket = SocketServer.getSocket(userId);
 
-      const {
-        userUpdate,
-        serverUpdate,
-        memberUpdate,
-        serverChannelsUpdate,
-        actions,
-      } = await new DisconnectServerService(operatorId, userId, serverId).use();
+      const { actions } = await new DisconnectServerService(
+        operatorId,
+        userId,
+        serverId,
+      ).use();
 
       if (targetSocket) {
         targetSocket.leave(`server_${serverId}`);
-        targetSocket.emit('userUpdate', userUpdate);
-        targetSocket.emit('serverUpdate', serverUpdate);
-        targetSocket.emit('memberUpdate', memberUpdate);
-        targetSocket.emit('serverChannelsUpdate', serverChannelsUpdate);
+        targetSocket.emit('channelsUpdate', []);
+        targetSocket.emit('membersUpdate', []);
       }
 
       if (actions.length > 0) {
@@ -179,7 +171,16 @@ export class CreateServerHandler extends SocketHandler {
         'CREATESERVER',
       ).validate(data);
 
-      await new CreateServerService(operatorId, server).use();
+      const { actions } = await new CreateServerService(
+        operatorId,
+        server,
+      ).use();
+
+      if (actions.length > 0) {
+        for (const action of actions) {
+          await action.handler(this.io, this.socket).handle(action.data);
+        }
+      }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -207,13 +208,9 @@ export class UpdateServerHandler extends SocketHandler {
         'UPDATESERVER',
       ).validate(data);
 
-      const { serverUpdate } = await new UpdateServerService(
-        operatorId,
-        serverId,
-        server,
-      ).use();
+      await new UpdateServerService(operatorId, serverId, server).use();
 
-      this.io.to(`server-${serverId}`).emit('serverUpdate', serverUpdate);
+      this.io.to(`server_${serverId}`).emit('serverUpdate', server);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

@@ -88,8 +88,8 @@ export class CreateMemberService {
     });
 
     return {
-      memberUpdate: await Database.get.member(this.userId, this.serverId),
-      serverMembersUpdate: await Database.get.serverMembers(this.serverId),
+      memberAdd: await Database.get.member(this.userId, this.serverId),
+      serverUpdate: await Database.get.serverMembers(this.serverId),
     };
   }
 }
@@ -216,10 +216,7 @@ export class UpdateMemberService {
     // Update member
     await Database.set.member(this.userId, this.serverId, this.update);
 
-    return {
-      memberUpdate: await Database.get.member(this.userId, this.serverId),
-      serverMembersUpdate: await Database.get.serverMembers(this.serverId),
-    };
+    return {};
   }
 }
 
@@ -284,9 +281,6 @@ export class DeleteMemberService {
     // Delete member
     await Database.delete.member(this.userId, this.serverId);
 
-    return {
-      memberUpdate: await Database.get.member(this.userId, this.serverId),
-      serverMembersUpdate: await Database.get.serverMembers(this.serverId),
-    };
+    return {};
   }
 }

@@ -39,21 +39,18 @@ export class CreateMemberHandler extends SocketHandler {
 
       const targetSocket = SocketServer.getSocket(userId);
 
-      const { serverMembersUpdate, memberUpdate } =
-        await new CreateMemberService(
-          operatorId,
-          userId,
-          serverId,
-          member,
-        ).use();
-
-      this.io
-        .to(`server_${serverId}`)
-        .emit('serverMembersUpdate', serverMembersUpdate);
+      const { serverUpdate, memberAdd } = await new CreateMemberService(
+        operatorId,
+        userId,
+        serverId,
+        member,
+      ).use();
 
       if (targetSocket && targetSocket.rooms.has(`server_${serverId}`)) {
-        targetSocket.emit('memberUpdate', memberUpdate);
+        targetSocket.emit('serverUpdate', serverUpdate);
       }
+
+      this.io.to(`server_${serverId}`).emit('memberAdd', memberAdd);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -83,21 +80,15 @@ export class UpdateMemberHandler extends SocketHandler {
 
       const targetSocket = SocketServer.getSocket(userId);
 
-      const { serverMembersUpdate, memberUpdate } =
-        await new UpdateMemberService(
-          operatorId,
-          userId,
-          serverId,
-          member,
-        ).use();
+      await new UpdateMemberService(operatorId, userId, serverId, member).use();
+
+      if (targetSocket && targetSocket.rooms.has(`server_${serverId}`)) {
+        targetSocket.emit('serverUpdate', member);
+      }
 
       this.io
         .to(`server_${serverId}`)
-        .emit('serverMembersUpdate', serverMembersUpdate);
-
-      if (targetSocket && targetSocket.rooms.has(`server_${serverId}`)) {
-        targetSocket.emit('memberUpdate', memberUpdate);
-      }
+        .emit('memberUpdate', userId, serverId, member);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -127,15 +118,12 @@ export class DeleteMemberHandler extends SocketHandler {
 
       const targetSocket = SocketServer.getSocket(userId);
 
-      const { serverMembersUpdate, memberUpdate } =
-        await new DeleteMemberService(operatorId, userId, serverId).use();
+      await new DeleteMemberService(operatorId, userId, serverId).use();
 
-      this.io
-        .to(`server_${serverId}`)
-        .emit('serverMembersUpdate', serverMembersUpdate);
+      this.io.to(`server_${serverId}`).emit('memberDelete', userId, serverId);
 
       if (targetSocket && targetSocket.rooms.has(`server_${serverId}`)) {
-        targetSocket.emit('memberUpdate', memberUpdate);
+        targetSocket.emit('serverUpdate', {}); // TODO: Need to kick user from server
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {

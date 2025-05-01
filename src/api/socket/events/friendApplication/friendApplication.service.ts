@@ -60,8 +60,9 @@ export class CreateFriendApplicationService {
     });
 
     return {
-      userFriendApplicationsUpdate: await Database.get.userFriendApplications(
+      friendApplicationAdd: await Database.get.friendApplication(
         this.senderId,
+        this.receiverId,
       ),
     };
   }
@@ -98,11 +99,7 @@ export class UpdateFriendApplicationService {
       this.update,
     );
 
-    return {
-      userFriendApplicationsUpdate: await Database.get.userFriendApplications(
-        this.senderId,
-      ),
-    };
+    return {};
   }
 }
 
@@ -131,10 +128,6 @@ export class DeleteFriendApplicationService {
     // Delete friend application
     await Database.delete.friendApplication(this.senderId, this.receiverId);
 
-    return {
-      userFriendApplicationsUpdate: await Database.get.userFriendApplications(
-        this.senderId,
-      ),
-    };
+    return {};
   }
 }

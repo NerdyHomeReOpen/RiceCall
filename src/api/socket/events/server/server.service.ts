@@ -15,6 +15,7 @@ import {
   ConnectChannelHandler,
   DisconnectChannelHandler,
 } from '@/api/socket/events/channel/channel.handler';
+import { ConnectServerHandler } from '@/api/socket/events/server/server.handler';
 
 export class SearchServerService {
   constructor(private query: string) {
@@ -37,6 +38,7 @@ export class CreateServerService {
   }
 
   async use() {
+    const actions: any[] = [];
     const operator = await Database.get.user(this.operatorId);
     const operatorServers = await Database.get.userServers(this.operatorId);
 
@@ -88,13 +90,19 @@ export class CreateServerService {
     });
 
     // Join the server
-    await new ConnectServerService(
-      this.operatorId,
-      this.operatorId,
-      serverId,
-    ).use();
 
-    return;
+    actions.push({
+      handler: (io: Server, socket: Socket) =>
+        new ConnectServerHandler(io, socket),
+      data: {
+        userId: this.operatorId,
+        serverId: serverId,
+      },
+    });
+
+    return {
+      actions,
+    };
   }
 }
 
@@ -128,9 +136,7 @@ export class UpdateServerService {
     // Update server
     await Database.set.server(this.serverId, this.update);
 
-    return {
-      serverUpdate: this.update,
-    };
+    return {};
   }
 }
 
@@ -147,7 +153,6 @@ export class ConnectServerService {
 
   async use() {
     const actions: any[] = [];
-    const user = await Database.get.user(this.userId);
     const server = await Database.get.server(this.serverId);
     const operatorMember = await Database.get.member(
       this.operatorId,
@@ -179,15 +184,6 @@ export class ConnectServerService {
       }
     }
 
-    // Leave prev server
-    if (user.currentServerId) {
-      await new DisconnectServerService(
-        this.operatorId,
-        this.userId,
-        user.currentServerId,
-      ).use();
-    }
-
     // Create new membership if there isn't one
     if (!operatorMember) {
       await Database.set.member(this.userId, this.serverId, {
@@ -201,13 +197,6 @@ export class ConnectServerService {
       timestamp: Date.now(),
     });
 
-    // Update user
-    const updatedUser = {
-      currentServerId: this.serverId,
-      lastActiveAt: Date.now(),
-    };
-    await Database.set.user(this.userId, updatedUser);
-
     // Connect to the server's lobby channel
     actions.push({
       handler: (io: Server, socket: Socket) =>
@@ -220,11 +209,9 @@ export class ConnectServerService {
     });
 
     return {
-      userUpdate: updatedUser,
-      serverUpdate: await Database.get.server(this.serverId),
-      memberUpdate: await Database.get.member(this.userId, this.serverId),
-      userServersUpdate: await Database.get.userServers(this.userId),
-      serverChannelsUpdate: await Database.get.serverChannels(this.serverId),
+      serversUpdate: await Database.get.userServers(this.userId),
+      channelsUpdate: await Database.get.serverChannels(this.serverId),
+      membersUpdate: await Database.get.serverMembers(this.serverId),
       actions,
     };
   }
@@ -280,7 +267,7 @@ export class DisconnectServerService {
       }
     }
 
-    // Leave prev channel
+    // Leave current channel
     if (user.currentChannelId) {
       actions.push({
         handler: (io: Server, socket: Socket) =>
@@ -293,18 +280,8 @@ export class DisconnectServerService {
       });
     }
 
-    // Update user
-    const updatedUser = {
-      currentServerId: null,
-      lastActiveAt: Date.now(),
-    };
-    await Database.set.user(this.userId, updatedUser);
-
     return {
-      userUpdate: updatedUser,
       serverUpdate: null,
-      memberUpdate: null,
-      serverChannelsUpdate: [],
       actions,
     };
   }

@@ -132,21 +132,9 @@ export class ConnectChannelService {
       }
     }
 
-    // Disconnect previous channel
-    if (user.currentChannelId) {
-      actions.push({
-        handler: (io: Server, socket: Socket) =>
-          new DisconnectChannelHandler(io, socket),
-        data: {
-          userId: this.userId,
-          channelId: user.currentChannelId,
-          serverId: user.currentServerId,
-        },
-      });
-    }
-
     // Update user
     const updatedUser = {
+      currentServerId: this.serverId,
       currentChannelId: this.channelId,
       lastActiveAt: Date.now(),
     };
@@ -158,8 +146,20 @@ export class ConnectChannelService {
     };
     await Database.set.member(this.userId, this.serverId, updatedMember);
 
-    // Setup user xp interval
-    await xpSystem.create(this.userId);
+    // Disconnect previous channel
+    if (user.currentChannelId) {
+      // Leave RTC channel
+      actions.push({
+        handler: (io: Server, socket: Socket) =>
+          new RTCLeaveHandler(io, socket),
+        data: {
+          channelId: user.currentChannelId,
+        },
+      });
+    } else {
+      // Setup user xp interval
+      await xpSystem.create(this.userId);
+    }
 
     // Join RTC channel
     actions.push({
@@ -171,8 +171,7 @@ export class ConnectChannelService {
 
     return {
       userUpdate: updatedUser,
-      channelUpdate: await Database.get.channel(this.channelId),
-      serverMembersUpdate: await Database.get.serverMembers(this.serverId),
+      memberUpdate: updatedUser,
       actions,
     };
   }
@@ -215,6 +214,7 @@ export class DisconnectChannelService {
 
     // Update user
     const updatedUser = {
+      currentServerId: null,
       currentChannelId: null,
       lastActiveAt: Date.now(),
     };
@@ -233,8 +233,7 @@ export class DisconnectChannelService {
 
     return {
       userUpdate: updatedUser,
-      channelUpdate: null,
-      serverMembersUpdate: await Database.get.serverMembers(this.serverId),
+      memberUpdate: updatedUser,
       actions,
     };
   }
@@ -301,7 +300,7 @@ export class CreateChannelService {
     });
 
     return {
-      serverChannelsUpdate: await Database.get.serverChannels(this.serverId),
+      channelAdd: await Database.get.channel(channelId),
     };
   }
 }
@@ -444,7 +443,6 @@ export class UpdateChannelService {
 
     return {
       channelUpdate: this.update,
-      serverChannelsUpdate: await Database.get.serverChannels(this.serverId),
       onMessage: messages,
     };
   }
@@ -524,7 +522,6 @@ export class DeleteChannelService {
     await Database.delete.channel(this.channelId);
 
     return {
-      serverChannelsUpdate: await Database.get.serverChannels(this.serverId),
       actions,
     };
   }

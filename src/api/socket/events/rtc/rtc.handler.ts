@@ -29,7 +29,7 @@ export class RTCOfferHandler extends SocketHandler {
         'RTCOFFER',
       ).validate(data);
 
-      this.io.to(to).emit('RTCOffer', {
+      this.socket.to(to).emit('RTCOffer', {
         from: this.socket.id,
         userId: operatorId,
         offer: offer,
@@ -61,7 +61,7 @@ export class RTCAnswerHandler extends SocketHandler {
         'RTCANSWER',
       ).validate(data);
 
-      this.io.to(to).emit('RTCAnswer', {
+      this.socket.to(to).emit('RTCAnswer', {
         from: this.socket.id,
         userId: operatorId,
         answer: answer,
@@ -93,7 +93,7 @@ export class RTCCandidateHandler extends SocketHandler {
         'RTCCANDIDATE',
       ).validate(data);
 
-      this.io.to(to).emit('RTCCandidate', {
+      this.socket.to(to).emit('RTCCandidate', {
         from: this.socket.id,
         userId: operatorId,
         candidate: candidate,
@@ -125,7 +125,7 @@ export class RTCJoinHandler extends SocketHandler {
         'RTCJOIN',
       ).validate(data);
 
-      this.io.to(`channel_${channelId}`).emit('RTCJoin', {
+      this.socket.to(`channel_${channelId}`).emit('RTCJoin', {
         from: this.socket.id,
         userId: operatorId,
       });
@@ -156,7 +156,7 @@ export class RTCLeaveHandler extends SocketHandler {
         'RTCLEAVE',
       ).validate(data);
 
-      this.io.to(`channel_${channelId}`).emit('RTCLeave', {
+      this.socket.to(`channel_${channelId}`).emit('RTCLeave', {
         from: this.socket.id,
         userId: operatorId,
       });

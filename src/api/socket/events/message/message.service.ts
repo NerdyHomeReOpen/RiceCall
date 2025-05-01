@@ -62,7 +62,7 @@ export class SendMessageService {
 
     return {
       onMessage: message,
-      memberUpdate: updatedMember,
+      serverUpdate: updatedMember,
     };
   }
 }

@@ -24,6 +24,9 @@ import {
   DeleteFriendApplicationService,
 } from '@/api/socket/events/friendApplication/friendApplication.service';
 
+// Socket
+import SocketServer from '@/api/socket';
+
 export class CreateFriendApplicationHandler extends SocketHandler {
   async handle(data: any) {
     try {
@@ -35,21 +38,17 @@ export class CreateFriendApplicationHandler extends SocketHandler {
           'CREATEFRIENDAPPLICATION',
         ).validate(data);
 
-      const targetSocket = this.io.sockets.sockets.get(receiverId);
+      const targetSocket = SocketServer.getSocket(receiverId);
 
-      const { userFriendApplicationsUpdate } =
-        await new CreateFriendApplicationService(
-          operatorId,
-          senderId,
-          receiverId,
-          friendApplication,
-        ).use();
+      const { friendApplicationAdd } = await new CreateFriendApplicationService(
+        operatorId,
+        senderId,
+        receiverId,
+        friendApplication,
+      ).use();
 
       if (targetSocket) {
-        targetSocket.emit(
-          'userFriendApplicationsUpdate',
-          userFriendApplicationsUpdate,
-        );
+        targetSocket.emit('friendApplicationAdd', friendApplicationAdd);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
@@ -79,20 +78,21 @@ export class UpdateFriendApplicationHandler extends SocketHandler {
           'UPDATEFRIENDAPPLICATION',
         ).validate(data);
 
-      const { userFriendApplicationsUpdate } =
-        await new UpdateFriendApplicationService(
-          operatorId,
-          senderId,
-          receiverId,
-          friendApplication,
-        ).use();
+      await new UpdateFriendApplicationService(
+        operatorId,
+        senderId,
+        receiverId,
+        friendApplication,
+      ).use();
 
-      const targetSocket = this.io.sockets.sockets.get(receiverId);
+      const targetSocket = SocketServer.getSocket(receiverId);
 
       if (targetSocket) {
         targetSocket.emit(
-          'userFriendApplicationsUpdate',
-          userFriendApplicationsUpdate,
+          'friendApplicationUpdate',
+          senderId,
+          receiverId,
+          friendApplication,
         );
       }
     } catch (error: any) {
@@ -122,20 +122,16 @@ export class DeleteFriendApplicationHandler extends SocketHandler {
         'DELETEFRIENDAPPLICATION',
       ).validate(data);
 
-      const { userFriendApplicationsUpdate } =
-        await new DeleteFriendApplicationService(
-          operatorId,
-          senderId,
-          receiverId,
-        ).use();
+      await new DeleteFriendApplicationService(
+        operatorId,
+        senderId,
+        receiverId,
+      ).use();
 
-      const targetSocket = this.io.sockets.sockets.get(receiverId);
+      const targetSocket = SocketServer.getSocket(receiverId);
 
       if (targetSocket) {
-        targetSocket.emit(
-          'userFriendApplicationsUpdate',
-          userFriendApplicationsUpdate,
-        );
+        targetSocket.emit('friendApplicationDelete', senderId, receiverId);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {

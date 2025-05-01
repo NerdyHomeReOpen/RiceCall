@@ -63,8 +63,8 @@ export class CreateFriendService {
     });
 
     return {
-      userFriendsUpdate: await Database.get.userFriends(this.userId),
-      targetFriendsUpdate: await Database.get.userFriends(this.targetId),
+      userFriendAdd: await Database.get.friend(this.userId, this.targetId),
+      targetFriendAdd: await Database.get.friend(this.targetId, this.userId),
     };
   }
 }
@@ -96,10 +96,7 @@ export class UpdateFriendService {
     // Update friend
     await Database.set.friend(this.userId, this.targetId, this.update);
 
-    return {
-      userFriendsUpdate: await Database.get.userFriends(this.userId),
-      targetFriendsUpdate: await Database.get.userFriends(this.targetId),
-    };
+    return {};
   }
 }
 
@@ -131,9 +128,6 @@ export class DeleteFriendService {
     // Delete friend (reverse)
     await Database.delete.friend(this.targetId, this.userId);
 
-    return {
-      userFriendsUpdate: await Database.get.userFriends(this.userId),
-      targetFriendsUpdate: await Database.get.userFriends(this.targetId),
-    };
+    return {};
   }
 }

@@ -32,7 +32,7 @@ export class SendMessageHandler extends SocketHandler {
         'SENDMESSAGE',
       ).validate(data);
 
-      const { onMessage, memberUpdate } = await new SendMessageService(
+      const { onMessage, serverUpdate } = await new SendMessageService(
         operatorId,
         userId,
         serverId,
@@ -41,7 +41,7 @@ export class SendMessageHandler extends SocketHandler {
       ).use();
 
       this.io.to(`channel_${channelId}`).emit('onMessage', onMessage);
-      this.socket.emit('memberUpdate', memberUpdate);
+      this.socket.emit('serverUpdate', serverUpdate);
       this.socket
         .to(`channel_${channelId}`)
         .emit('playSound', 'recieveChannelMessage');

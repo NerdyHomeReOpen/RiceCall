@@ -39,17 +39,16 @@ export class CreateFriendHandler extends SocketHandler {
 
       const targetSocket = SocketServer.getSocket(userId);
 
-      const { userFriendsUpdate, targetFriendsUpdate } =
-        await new CreateFriendService(
-          operatorId,
-          userId,
-          targetId,
-          friend,
-        ).use();
+      const { userFriendAdd, targetFriendAdd } = await new CreateFriendService(
+        operatorId,
+        userId,
+        targetId,
+        friend,
+      ).use();
 
-      this.socket.emit('userFriendsUpdate', userFriendsUpdate);
+      this.socket.emit('friendAdd', userFriendAdd);
       if (targetSocket) {
-        targetSocket.emit('userFriendsUpdate', targetFriendsUpdate);
+        targetSocket.emit('friendAdd', targetFriendAdd);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
@@ -78,14 +77,9 @@ export class UpdateFriendHandler extends SocketHandler {
         'UPDATEFRIEND',
       ).validate(data);
 
-      const { userFriendsUpdate } = await new UpdateFriendService(
-        operatorId,
-        userId,
-        targetId,
-        friend,
-      ).use();
+      await new UpdateFriendService(operatorId, userId, targetId, friend).use();
 
-      this.socket.emit('userFriendsUpdate', userFriendsUpdate);
+      this.socket.emit('friendUpdate', userId, targetId, friend);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -115,12 +109,11 @@ export class DeleteFriendHandler extends SocketHandler {
 
       const targetSocket = SocketServer.getSocket(userId);
 
-      const { userFriendsUpdate, targetFriendsUpdate } =
-        await new DeleteFriendService(operatorId, userId, targetId).use();
+      await new DeleteFriendService(operatorId, userId, targetId).use();
 
-      this.socket.emit('userFriendsUpdate', userFriendsUpdate);
+      this.socket.emit('friendDelete', userId, targetId);
       if (targetSocket) {
-        targetSocket.emit('userFriendsUpdate', targetFriendsUpdate);
+        targetSocket.emit('friendDelete', userId, targetId);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
