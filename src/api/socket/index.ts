@@ -71,12 +71,12 @@ export default class SocketServer {
     this.server = server;
   }
 
-  static getSocket(io: Server, userId: string) {
+  static getSocket(userId: string) {
     const socketId = SocketServer.userSocketMap.get(userId);
 
     if (!socketId) return null;
 
-    const socket = io.sockets.sockets.get(socketId);
+    const socket = SocketServer.io.sockets.sockets.get(socketId);
 
     if (!socket) return null;
 

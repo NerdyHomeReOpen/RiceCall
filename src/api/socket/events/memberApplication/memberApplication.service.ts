@@ -18,51 +18,41 @@ export class CreateMemberApplicationService {
   }
 
   async use() {
-    try {
-      const operatorMember = await Database.get.member(
-        this.operatorId,
-        this.serverId,
-      );
+    const operatorMember = await Database.get.member(
+      this.operatorId,
+      this.serverId,
+    );
 
-      if (this.operatorId !== this.userId) {
+    if (this.operatorId !== this.userId) {
+      throw new StandardizedError({
+        name: 'ValidationError',
+        message: '無法創建非自己的會員申請',
+        part: 'CREATEMEMBERAPPLICATION',
+        tag: 'PERMISSION_DENIED',
+        statusCode: 403,
+      });
+    } else {
+      if (operatorMember.permissionLevel !== 1) {
         throw new StandardizedError({
           name: 'ValidationError',
-          message: '無法創建非自己的會員申請',
+          message: '非遊客無法創建會員申請',
           part: 'CREATEMEMBERAPPLICATION',
           tag: 'PERMISSION_DENIED',
           statusCode: 403,
         });
-      } else {
-        if (operatorMember.permissionLevel !== 1) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '非遊客無法創建會員申請',
-            part: 'CREATEMEMBERAPPLICATION',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
       }
-
-      // Create member application
-      await Database.set.memberApplication(this.userId, this.serverId, {
-        ...this.preset,
-        createdAt: Date.now(),
-      });
-
-      return {
-        serverMemberApplicationsUpdate:
-          await Database.get.serverMemberApplications(this.serverId),
-      };
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: `創建會員申請時發生預期外的錯誤: ${error.message}`,
-        part: 'CREATEMEMBERAPPLICATION',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      });
     }
+
+    // Create member application
+    await Database.set.memberApplication(this.userId, this.serverId, {
+      ...this.preset,
+      createdAt: Date.now(),
+    });
+
+    return {
+      serverMemberApplicationsUpdate:
+        await Database.get.serverMemberApplications(this.serverId),
+    };
   }
 }
 
@@ -80,44 +70,34 @@ export class UpdateMemberApplicationService {
   }
 
   async use() {
-    try {
-      const operatorMember = await Database.get.member(
-        this.operatorId,
-        this.serverId,
-      );
+    const operatorMember = await Database.get.member(
+      this.operatorId,
+      this.serverId,
+    );
 
-      if (this.operatorId !== this.userId) {
-        if (operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '你沒有足夠的權限更新其他成員的會員申請',
-            part: 'UPDATEMEMBERAPPLICATION',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+    if (this.operatorId !== this.userId) {
+      if (operatorMember.permissionLevel < 5) {
+        throw new StandardizedError({
+          name: 'ValidationError',
+          message: '你沒有足夠的權限更新其他成員的會員申請',
+          part: 'UPDATEMEMBERAPPLICATION',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
       }
-
-      // Update member application
-      await Database.set.memberApplication(
-        this.userId,
-        this.serverId,
-        this.update,
-      );
-
-      return {
-        serverMemberApplicationsUpdate:
-          await Database.get.serverMemberApplications(this.serverId),
-      };
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: `更新會員申請時發生預期外的錯誤: ${error.message}`,
-        part: 'UPDATEMEMBERAPPLICATION',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      });
     }
+
+    // Update member application
+    await Database.set.memberApplication(
+      this.userId,
+      this.serverId,
+      this.update,
+    );
+
+    return {
+      serverMemberApplicationsUpdate:
+        await Database.get.serverMemberApplications(this.serverId),
+    };
   }
 }
 
@@ -133,39 +113,29 @@ export class DeleteMemberApplicationService {
   }
 
   async use() {
-    try {
-      const operatorMember = await Database.get.member(
-        this.operatorId,
-        this.serverId,
-      );
+    const operatorMember = await Database.get.member(
+      this.operatorId,
+      this.serverId,
+    );
 
-      if (this.operatorId !== this.userId) {
-        if (operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '你沒有足夠的權限刪除其他成員的會員申請',
-            part: 'DELETEMEMBERAPPLICATION',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+    if (this.operatorId !== this.userId) {
+      if (operatorMember.permissionLevel < 5) {
+        throw new StandardizedError({
+          name: 'ValidationError',
+          message: '你沒有足夠的權限刪除其他成員的會員申請',
+          part: 'DELETEMEMBERAPPLICATION',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
       }
-
-      // Delete member application
-      await Database.delete.memberApplication(this.userId, this.serverId);
-
-      return {
-        serverMemberApplicationsUpdate:
-          await Database.get.serverMemberApplications(this.serverId),
-      };
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: `刪除會員申請時發生預期外的錯誤: ${error.message}`,
-        part: 'DELETEMEMBERAPPLICATION',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      });
     }
+
+    // Delete member application
+    await Database.delete.memberApplication(this.userId, this.serverId);
+
+    return {
+      serverMemberApplicationsUpdate:
+        await Database.get.serverMemberApplications(this.serverId),
+    };
   }
 }

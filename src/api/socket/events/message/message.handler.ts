@@ -32,7 +32,7 @@ export class SendMessageHandler extends SocketHandler {
         'SENDMESSAGE',
       ).validate(data);
 
-      const result = await new SendMessageService(
+      const { onMessage, memberUpdate } = await new SendMessageService(
         operatorId,
         userId,
         serverId,
@@ -40,8 +40,8 @@ export class SendMessageHandler extends SocketHandler {
         message,
       ).use();
 
-      this.io.to(`channel_${channelId}`).emit('onMessage', result.onMessage);
-      this.socket.emit('memberUpdate', result.memberUpdate);
+      this.io.to(`channel_${channelId}`).emit('onMessage', onMessage);
+      this.socket.emit('memberUpdate', memberUpdate);
       this.socket
         .to(`channel_${channelId}`)
         .emit('playSound', 'recieveChannelMessage');
@@ -74,16 +74,16 @@ export class SendDirectMessageHandler extends SocketHandler {
 
       const targetSocket = this.io.sockets.sockets.get(targetId);
 
-      const result = await new SendDirectMessageService(
+      const { onDirectMessage } = await new SendDirectMessageService(
         operatorId,
         userId,
         targetId,
         directMessage,
       ).use();
 
-      this.socket.emit('onDirectMessage', result.onDirectMessage);
+      this.socket.emit('onDirectMessage', onDirectMessage);
       if (targetSocket) {
-        targetSocket.emit('onDirectMessage', result.onDirectMessage);
+        targetSocket.emit('onDirectMessage', onDirectMessage);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {

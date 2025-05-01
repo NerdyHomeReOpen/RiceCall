@@ -20,87 +20,77 @@ export class CreateMemberService {
   }
 
   async use() {
-    try {
-      const server = await Database.get.server(this.serverId);
-      const operatorMember = await Database.get.member(
-        this.operatorId,
-        this.serverId,
-      );
+    const server = await Database.get.server(this.serverId);
+    const operatorMember = await Database.get.member(
+      this.operatorId,
+      this.serverId,
+    );
 
-      if (this.operatorId !== this.userId) {
-        if (operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限新增成員',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-        if (this.preset.permissionLevel >= operatorMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法給予高於自己的權限',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-        if (this.preset.permissionLevel > 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '權限等級過高',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_TOO_HIGH',
-            statusCode: 403,
-          });
-        }
-      } else {
-        if (
-          this.preset.permissionLevel !== 1 &&
-          server.ownerId !== this.operatorId
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '必須是遊客',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-        if (
-          this.preset.permissionLevel !== 6 &&
-          server.ownerId === this.operatorId
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '必須是群組創建者',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+    if (this.operatorId !== this.userId) {
+      if (operatorMember.permissionLevel < 5) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '你沒有足夠的權限新增成員',
+          part: 'CREATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
       }
-
-      // Create member
-      await Database.set.member(this.userId, this.serverId, {
-        ...this.preset,
-        createdAt: Date.now(),
-      });
-
-      return {
-        memberUpdate: await Database.get.member(this.userId, this.serverId),
-        serverMembersUpdate: await Database.get.serverMembers(this.serverId),
-      };
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: `新增成員時發生預期外的錯誤: ${error.message}`,
-        part: 'CREATEMEMBER',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      });
+      if (this.preset.permissionLevel >= operatorMember.permissionLevel) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '無法給予高於自己的權限',
+          part: 'CREATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
+      if (this.preset.permissionLevel > 5) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '權限等級過高',
+          part: 'CREATEMEMBER',
+          tag: 'PERMISSION_TOO_HIGH',
+          statusCode: 403,
+        });
+      }
+    } else {
+      if (
+        this.preset.permissionLevel !== 1 &&
+        server.ownerId !== this.operatorId
+      ) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '必須是遊客',
+          part: 'CREATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
+      if (
+        this.preset.permissionLevel !== 6 &&
+        server.ownerId === this.operatorId
+      ) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '必須是群組創建者',
+          part: 'CREATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
     }
+
+    // Create member
+    await Database.set.member(this.userId, this.serverId, {
+      ...this.preset,
+      createdAt: Date.now(),
+    });
+
+    return {
+      memberUpdate: await Database.get.member(this.userId, this.serverId),
+      serverMembersUpdate: await Database.get.serverMembers(this.serverId),
+    };
   }
 }
 
@@ -118,128 +108,118 @@ export class UpdateMemberService {
   }
 
   async use() {
-    try {
-      const userMember = await Database.get.member(this.userId, this.serverId);
-      const operatorMember = await Database.get.member(
-        this.operatorId,
-        this.serverId,
-      );
+    const userMember = await Database.get.member(this.userId, this.serverId);
+    const operatorMember = await Database.get.member(
+      this.operatorId,
+      this.serverId,
+    );
 
-      if (this.operatorId !== this.userId) {
-        if (operatorMember.permissionLevel < 3) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限更改其他成員',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-
-        if (operatorMember.permissionLevel <= userMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限編輯權限高於自己的成員',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-
-        if (userMember.permissionLevel > 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法更改群組創建者的權限',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-
-        if (
-          userMember.permissionLevel === 1 &&
-          this.update.permissionLevel &&
-          operatorMember.permissionLevel < 5
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限更改遊客的權限',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-
-        if (
-          this.update.permissionLevel === 1 &&
-          operatorMember.permissionLevel < 5
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限更改會員至遊客',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-
-        if (this.update.nickname && operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限更改其他成員的暱稱',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-
-        if (this.update.permissionLevel >= operatorMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法給予高於自己的權限',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-
-        if (this.update.permissionLevel > 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '權限等級過高',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-      } else {
-        if (this.update.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法更改自己的權限',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+    if (this.operatorId !== this.userId) {
+      if (operatorMember.permissionLevel < 3) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '你沒有足夠的權限更改其他成員',
+          part: 'UPDATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
       }
 
-      // Update member
-      await Database.set.member(this.userId, this.serverId, this.update);
+      if (operatorMember.permissionLevel <= userMember.permissionLevel) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '你沒有足夠的權限編輯權限高於自己的成員',
+          part: 'UPDATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
 
-      return {
-        memberUpdate: await Database.get.member(this.userId, this.serverId),
-        serverMembersUpdate: await Database.get.serverMembers(this.serverId),
-      };
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: `更新成員時發生預期外的錯誤: ${error.message}`,
-        part: 'UPDATEMEMBER',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      });
+      if (userMember.permissionLevel > 5) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '無法更改群組創建者的權限',
+          part: 'UPDATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
+
+      if (
+        userMember.permissionLevel === 1 &&
+        this.update.permissionLevel &&
+        operatorMember.permissionLevel < 5
+      ) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '你沒有足夠的權限更改遊客的權限',
+          part: 'UPDATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
+
+      if (
+        this.update.permissionLevel === 1 &&
+        operatorMember.permissionLevel < 5
+      ) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '你沒有足夠的權限更改會員至遊客',
+          part: 'UPDATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
+
+      if (this.update.nickname && operatorMember.permissionLevel < 5) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '你沒有足夠的權限更改其他成員的暱稱',
+          part: 'UPDATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
+
+      if (this.update.permissionLevel >= operatorMember.permissionLevel) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '無法給予高於自己的權限',
+          part: 'UPDATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
+
+      if (this.update.permissionLevel > 5) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '權限等級過高',
+          part: 'UPDATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
+    } else {
+      if (this.update.permissionLevel) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '無法更改自己的權限',
+          part: 'UPDATEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
     }
+
+    // Update member
+    await Database.set.member(this.userId, this.serverId, this.update);
+
+    return {
+      memberUpdate: await Database.get.member(this.userId, this.serverId),
+      serverMembersUpdate: await Database.get.serverMembers(this.serverId),
+    };
   }
 }
 
@@ -255,68 +235,58 @@ export class DeleteMemberService {
   }
 
   async use() {
-    try {
-      const userMember = await Database.get.member(this.userId, this.serverId);
-      const operatorMember = await Database.get.member(
-        this.operatorId,
-        this.serverId,
-      );
+    const userMember = await Database.get.member(this.userId, this.serverId);
+    const operatorMember = await Database.get.member(
+      this.operatorId,
+      this.serverId,
+    );
 
-      if (this.operatorId !== this.userId) {
-        if (operatorMember.permissionLevel < 3) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限刪除其他成員',
-            part: 'DELETEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-
-        if (operatorMember.permissionLevel <= userMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限刪除權限高於自己的成員',
-            part: 'DELETEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-
-        if (userMember.permissionLevel > 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法刪除群組創建者',
-            part: 'DELETEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-      } else {
+    if (this.operatorId !== this.userId) {
+      if (operatorMember.permissionLevel < 3) {
         throw new StandardizedError({
           name: 'PermissionError',
-          message: '無法刪除自己的成員',
+          message: '你沒有足夠的權限刪除其他成員',
           part: 'DELETEMEMBER',
           tag: 'PERMISSION_DENIED',
           statusCode: 403,
         });
       }
 
-      // Delete member
-      await Database.delete.member(this.userId, this.serverId);
+      if (operatorMember.permissionLevel <= userMember.permissionLevel) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '你沒有足夠的權限刪除權限高於自己的成員',
+          part: 'DELETEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
 
-      return {
-        memberUpdate: await Database.get.member(this.userId, this.serverId),
-        serverMembersUpdate: await Database.get.serverMembers(this.serverId),
-      };
-    } catch (error: any) {
+      if (userMember.permissionLevel > 5) {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '無法刪除群組創建者',
+          part: 'DELETEMEMBER',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
+      }
+    } else {
       throw new StandardizedError({
-        name: 'ServerError',
-        message: `刪除成員時發生預期外的錯誤: ${error.message}`,
+        name: 'PermissionError',
+        message: '無法刪除自己的成員',
         part: 'DELETEMEMBER',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
+        tag: 'PERMISSION_DENIED',
+        statusCode: 403,
       });
     }
+
+    // Delete member
+    await Database.delete.member(this.userId, this.serverId);
+
+    return {
+      memberUpdate: await Database.get.member(this.userId, this.serverId),
+      serverMembersUpdate: await Database.get.serverMembers(this.serverId),
+    };
   }
 }

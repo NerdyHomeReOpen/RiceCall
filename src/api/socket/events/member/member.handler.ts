@@ -24,6 +24,9 @@ import {
   DeleteMemberService,
 } from '@/api/socket/events/member/member.service';
 
+// Socket
+import SocketServer from '@/api/socket';
+
 export class CreateMemberHandler extends SocketHandler {
   async handle(data: any) {
     try {
@@ -34,21 +37,22 @@ export class CreateMemberHandler extends SocketHandler {
         'CREATEMEMBER',
       ).validate(data);
 
-      const targetSocket = this.io.sockets.sockets.get(userId);
+      const targetSocket = SocketServer.getSocket(userId);
 
-      const result = await new CreateMemberService(
-        operatorId,
-        userId,
-        serverId,
-        member,
-      ).use();
+      const { serverMembersUpdate, memberUpdate } =
+        await new CreateMemberService(
+          operatorId,
+          userId,
+          serverId,
+          member,
+        ).use();
 
       this.io
         .to(`server_${serverId}`)
-        .emit('serverMembersUpdate', result.serverMembersUpdate);
+        .emit('serverMembersUpdate', serverMembersUpdate);
 
       if (targetSocket && targetSocket.rooms.has(`server_${serverId}`)) {
-        targetSocket.emit('memberUpdate', result.memberUpdate);
+        targetSocket.emit('memberUpdate', memberUpdate);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
@@ -77,21 +81,22 @@ export class UpdateMemberHandler extends SocketHandler {
         'UPDATEMEMBER',
       ).validate(data);
 
-      const targetSocket = this.io.sockets.sockets.get(userId);
+      const targetSocket = SocketServer.getSocket(userId);
 
-      const result = await new UpdateMemberService(
-        operatorId,
-        userId,
-        serverId,
-        member,
-      ).use();
+      const { serverMembersUpdate, memberUpdate } =
+        await new UpdateMemberService(
+          operatorId,
+          userId,
+          serverId,
+          member,
+        ).use();
 
       this.io
         .to(`server_${serverId}`)
-        .emit('serverMembersUpdate', result.serverMembersUpdate);
+        .emit('serverMembersUpdate', serverMembersUpdate);
 
       if (targetSocket && targetSocket.rooms.has(`server_${serverId}`)) {
-        targetSocket.emit('memberUpdate', result.memberUpdate);
+        targetSocket.emit('memberUpdate', memberUpdate);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
@@ -120,20 +125,17 @@ export class DeleteMemberHandler extends SocketHandler {
         'DELETEMEMBER',
       ).validate(data);
 
-      const targetSocket = this.io.sockets.sockets.get(userId);
+      const targetSocket = SocketServer.getSocket(userId);
 
-      const result = await new DeleteMemberService(
-        operatorId,
-        userId,
-        serverId,
-      ).use();
+      const { serverMembersUpdate, memberUpdate } =
+        await new DeleteMemberService(operatorId, userId, serverId).use();
 
       this.io
         .to(`server_${serverId}`)
-        .emit('serverMembersUpdate', result.serverMembersUpdate);
+        .emit('serverMembersUpdate', serverMembersUpdate);
 
       if (targetSocket && targetSocket.rooms.has(`server_${serverId}`)) {
-        targetSocket.emit('memberUpdate', result.memberUpdate);
+        targetSocket.emit('memberUpdate', memberUpdate);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {

@@ -29,6 +29,9 @@ import {
 // Handler
 import { SocketHandler } from '@/api/socket/base.handler';
 
+// Socket
+import SocketServer from '@/api/socket';
+
 export class ConnectChannelHandler extends SocketHandler {
   async handle(data: any) {
     try {
@@ -39,31 +42,33 @@ export class ConnectChannelHandler extends SocketHandler {
         'CONNECTCHANNEL',
       ).validate(data);
 
-      const targetSocket = this.io.sockets.sockets.get(userId);
+      const targetSocket = SocketServer.getSocket(userId);
 
-      const result = await new ConnectChannelService(
-        operatorId,
-        userId,
-        channelId,
-        serverId,
-        password,
-      ).use();
+      const { userUpdate, channelUpdate, serverMembersUpdate, actions } =
+        await new ConnectChannelService(
+          operatorId,
+          userId,
+          channelId,
+          serverId,
+          password,
+        ).use();
 
       if (targetSocket) {
         targetSocket.join(`channel_${channelId}`);
-        targetSocket.emit('userUpdate', result.userUpdate);
-        targetSocket.emit('channelUpdate', result.channelUpdate);
+        targetSocket.emit('userUpdate', userUpdate);
+        targetSocket.emit('channelUpdate', channelUpdate);
         targetSocket.to(`channel_${channelId}`).emit('playSound', 'join');
       }
 
-      if (result.actions) {
-        for (const action of result.actions) {
-          await action(this.io, this.socket);
+      if (actions.length > 0) {
+        for (const action of actions) {
+          await action.handler(this.io, this.socket).handle(action.data);
         }
       }
+
       this.io
         .to(`server_${serverId}`)
-        .emit('serverMembersUpdate', result.serverMembersUpdate);
+        .emit('serverMembersUpdate', serverMembersUpdate);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -91,30 +96,26 @@ export class DisconnectChannelHandler extends SocketHandler {
         'DISCONNECTCHANNEL',
       ).validate(data);
 
-      const targetSocket = this.io.sockets.sockets.get(userId);
+      const targetSocket = SocketServer.getSocket(userId);
 
-      const result = await new DisconnectChannelService(
-        operatorId,
-        userId,
-        channelId,
-        serverId,
-      ).use();
+      const { userUpdate, channelUpdate, serverMembersUpdate } =
+        await new DisconnectChannelService(
+          operatorId,
+          userId,
+          channelId,
+          serverId,
+        ).use();
 
       if (targetSocket) {
         targetSocket.leave(`channel_${channelId}`);
-        targetSocket.emit('userUpdate', result.userUpdate);
-        targetSocket.emit('channelUpdate', result.channelUpdate);
+        targetSocket.emit('userUpdate', userUpdate);
+        targetSocket.emit('channelUpdate', channelUpdate);
         targetSocket.to(`channel_${channelId}`).emit('playSound', 'leave');
       }
 
-      if (result.actions) {
-        for (const action of result.actions) {
-          await action(this.io, this.socket);
-        }
-      }
       this.io
         .to(`server_${serverId}`)
-        .emit('serverMembersUpdate', result.serverMembersUpdate);
+        .emit('serverMembersUpdate', serverMembersUpdate);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -142,7 +143,7 @@ export class CreateChannelHandler extends SocketHandler {
         'CREATECHANNEL',
       ).validate(data);
 
-      const result = await new CreateChannelService(
+      const { serverChannelsUpdate } = await new CreateChannelService(
         operatorId,
         serverId,
         channel,
@@ -150,7 +151,7 @@ export class CreateChannelHandler extends SocketHandler {
 
       this.io
         .to(`server_${serverId}`)
-        .emit('serverChannelsUpdate', result.serverChannelsUpdate);
+        .emit('serverChannelsUpdate', serverChannelsUpdate);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -178,19 +179,19 @@ export class UpdateChannelHandler extends SocketHandler {
         'UPDATECHANNEL',
       ).validate(data);
 
-      const result = await new UpdateChannelService(
-        operatorId,
-        serverId,
-        channelId,
-        channel,
-      ).use();
+      const { onMessage, channelUpdate, serverChannelsUpdate } =
+        await new UpdateChannelService(
+          operatorId,
+          serverId,
+          channelId,
+          channel,
+        ).use();
 
-      this.io
-        .to(`channel_${channelId}`)
-        .emit('channelUpdate', result.channelUpdate);
+      this.io.to(`channel_${channelId}`).emit('onMessage', onMessage);
+      this.io.to(`channel_${channelId}`).emit('channelUpdate', channelUpdate);
       this.io
         .to(`server_${serverId}`)
-        .emit('serverChannelsUpdate', result.serverChannelsUpdate);
+        .emit('serverChannelsUpdate', serverChannelsUpdate);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -253,7 +254,7 @@ export class DeleteChannelHandler extends SocketHandler {
         'DELETECHANNEL',
       ).validate(data);
 
-      const result = await new DeleteChannelService(
+      const { serverChannelsUpdate } = await new DeleteChannelService(
         operatorId,
         serverId,
         channelId,
@@ -261,13 +262,7 @@ export class DeleteChannelHandler extends SocketHandler {
 
       this.io
         .to(`server_${serverId}`)
-        .emit('serverChannelsUpdate', result.serverChannelsUpdate);
-
-      if (result.actions) {
-        for (const action of result.actions) {
-          await action(this.io, this.socket);
-        }
-      }
+        .emit('serverChannelsUpdate', serverChannelsUpdate);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

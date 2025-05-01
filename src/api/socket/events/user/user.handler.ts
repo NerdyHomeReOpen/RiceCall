@@ -4,9 +4,6 @@ import Logger from '@/utils/logger';
 // Error
 import StandardizedError from '@/error';
 
-// Socket
-import SocketServer from '@/api/socket';
-
 // Handler
 import { SocketHandler } from '@/api/socket/base.handler';
 
@@ -27,6 +24,9 @@ import {
   UpdateUserService,
 } from '@/api/socket/events/user/user.service';
 
+// Socket
+import SocketServer from '@/api/socket';
+
 export class SearchUserHandler extends SocketHandler {
   async handle(data: any) {
     try {
@@ -37,9 +37,9 @@ export class SearchUserHandler extends SocketHandler {
         'SEARCHUSER',
       ).validate(data);
 
-      const result = await new SearchUserService(query).use();
+      const { userSearch } = await new SearchUserService(query).use();
 
-      this.socket.emit('userSearch', result.userSearch);
+      this.socket.emit('userSearch', userSearch);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -62,13 +62,15 @@ export class ConnectUserHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const result = await new ConnectUserService(operatorId).use();
+      const { userUpdate, actions } = await new ConnectUserService(
+        operatorId,
+      ).use();
 
-      this.socket.emit('userUpdate', result.userUpdate);
+      this.socket.emit('userUpdate', userUpdate);
 
-      if (result.actions) {
-        for (const action of result.actions) {
-          await action(this.io, this.socket);
+      if (actions.length > 0) {
+        for (const action of actions) {
+          await action.handler(this.io, this.socket).handle(action.data);
         }
       }
     } catch (error: any) {
@@ -93,13 +95,15 @@ export class DisconnectUserHandler extends SocketHandler {
     try {
       const operatorId = this.socket.data.userId;
 
-      const result = await new DisconnectUserService(operatorId).use();
+      const { userUpdate, actions } = await new DisconnectUserService(
+        operatorId,
+      ).use();
 
-      this.socket.emit('userUpdate', result.userUpdate);
+      this.socket.emit('userUpdate', userUpdate);
 
-      if (result.actions) {
-        for (const action of result.actions) {
-          await action(this.io, this.socket);
+      if (actions.length > 0) {
+        for (const action of actions) {
+          await action.handler(this.io, this.socket).handle(action.data);
         }
       }
     } catch (error: any) {
@@ -129,16 +133,16 @@ export class UpdateUserHandler extends SocketHandler {
         'UPDATEUSER',
       ).validate(data);
 
-      const targetSocket = SocketServer.getSocket(this.io, userId);
+      const targetSocket = SocketServer.getSocket(userId);
 
-      const result = await new UpdateUserService(
+      const { userUpdate } = await new UpdateUserService(
         operatorId,
         userId,
         user,
       ).use();
 
       if (targetSocket) {
-        targetSocket.emit('userUpdate', result.userUpdate);
+        targetSocket.emit('userUpdate', userUpdate);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {

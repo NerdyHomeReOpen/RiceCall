@@ -52,20 +52,24 @@ export class ConnectUserService {
 
       // Reconnect user to server and channel
       if (user.currentServerId) {
-        actions.push(async (io: Server, socket: Socket) => {
-          await new ConnectServerHandler(io, socket).handle({
+        actions.push({
+          handler: (io: Server, socket: Socket) =>
+            new ConnectServerHandler(io, socket),
+          data: {
             userId: user.userId,
             serverId: user.currentServerId,
-          });
+          },
         });
       }
       if (user.currentChannelId) {
-        actions.push(async (io: Server, socket: Socket) => {
-          await new ConnectChannelHandler(io, socket).handle({
+        actions.push({
+          handler: (io: Server, socket: Socket) =>
+            new ConnectChannelHandler(io, socket),
+          data: {
             userId: user.userId,
             channelId: user.currentChannelId,
             serverId: user.currentServerId,
-          });
+          },
         });
       }
 
@@ -95,46 +99,40 @@ export class DisconnectUserService {
   }
 
   async use() {
-    try {
-      const actions: any[] = [];
-      const user = await Database.get.user(this.userId);
+    const actions: any[] = [];
+    const user = await Database.get.user(this.userId);
 
-      // Disconnect user from server and channel
-      if (user.currentServerId) {
-        actions.push(async (io: Server, socket: Socket) => {
-          await new DisconnectServerHandler(io, socket).handle({
-            userId: user.userId,
-            serverId: user.currentServerId,
-          });
-        });
-      }
-      if (user.currentChannelId) {
-        actions.push(async (io: Server, socket: Socket) => {
-          await new DisconnectChannelHandler(io, socket).handle({
-            userId: user.userId,
-            channelId: user.currentChannelId,
-            serverId: user.currentServerId,
-          });
-        });
-      }
-
-      await Database.set.user(this.userId, {
-        lastActiveAt: Date.now(),
-      });
-
-      return {
-        userUpdate: null,
-        actions,
-      };
-    } catch (error: any) {
-      throw new StandardizedError({
-        name: 'ServerError',
-        message: `斷開使用者時發生預期外的錯誤: ${error.message}`,
-        part: 'DISCONNECTUSER',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
+    // Disconnect user from server and channel
+    if (user.currentServerId) {
+      actions.push({
+        handler: (io: Server, socket: Socket) =>
+          new DisconnectServerHandler(io, socket),
+        data: {
+          userId: user.userId,
+          serverId: user.currentServerId,
+        },
       });
     }
+    if (user.currentChannelId) {
+      actions.push({
+        handler: (io: Server, socket: Socket) =>
+          new DisconnectChannelHandler(io, socket),
+        data: {
+          userId: user.userId,
+          channelId: user.currentChannelId,
+          serverId: user.currentServerId,
+        },
+      });
+    }
+
+    await Database.set.user(this.userId, {
+      lastActiveAt: Date.now(),
+    });
+
+    return {
+      userUpdate: null,
+      actions,
+    };
   }
 }
 
@@ -150,30 +148,20 @@ export class UpdateUserService {
   }
 
   async use() {
-    try {
-      if (this.operatorId !== this.userId) {
-        throw new StandardizedError({
-          name: 'ServerError',
-          message: '無法更新其他使用者的資料',
-          part: 'UPDATEUSER',
-          tag: 'PERMISSION_ERROR',
-          statusCode: 403,
-        });
-      }
-
-      await Database.set.user(this.userId, this.update);
-
-      return {
-        userUpdate: this.update,
-      };
-    } catch (error: any) {
+    if (this.operatorId !== this.userId) {
       throw new StandardizedError({
         name: 'ServerError',
-        message: `更新使用者時發生預期外的錯誤: ${error.message}`,
+        message: '無法更新其他使用者的資料',
         part: 'UPDATEUSER',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
+        tag: 'PERMISSION_ERROR',
+        statusCode: 403,
       });
     }
+
+    await Database.set.user(this.userId, this.update);
+
+    return {
+      userUpdate: this.update,
+    };
   }
 }

@@ -18,37 +18,27 @@ export class CreateFriendGroupService {
   }
 
   async use() {
-    try {
-      if (this.operatorId !== this.userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法新增非自己的好友群組',
-          part: 'CREATEFRIENDGROUP',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
-      }
-
-      // Create friend group
-      const friendGroupId = uuidv4();
-      await Database.set.friendGroup(friendGroupId, {
-        ...this.preset,
-        userId: this.userId,
-        createdAt: Date.now(),
-      });
-
-      return {
-        friendGroupsUpdate: await Database.get.userFriendGroups(this.userId),
-      };
-    } catch (error: any) {
+    if (this.operatorId !== this.userId) {
       throw new StandardizedError({
-        name: 'ServerError',
-        message: `新增好友群組時發生預期外的錯誤: ${error.message}`,
+        name: 'PermissionError',
+        message: '無法新增非自己的好友群組',
         part: 'CREATEFRIENDGROUP',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
+        tag: 'PERMISSION_DENIED',
+        statusCode: 403,
       });
     }
+
+    // Create friend group
+    const friendGroupId = uuidv4();
+    await Database.set.friendGroup(friendGroupId, {
+      ...this.preset,
+      userId: this.userId,
+      createdAt: Date.now(),
+    });
+
+    return {
+      userFriendGroupsUpdate: await Database.get.userFriendGroups(this.userId),
+    };
   }
 }
 
@@ -66,32 +56,22 @@ export class UpdateFriendGroupService {
   }
 
   async use() {
-    try {
-      if (this.operatorId !== this.userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法更新非自己的好友群組',
-          part: 'UPDATEFRIENDGROUP',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
-      }
-
-      // Update friend group
-      await Database.set.friendGroup(this.friendGroupId, this.update);
-
-      return {
-        friendGroupsUpdate: await Database.get.userFriendGroups(this.userId),
-      };
-    } catch (error: any) {
+    if (this.operatorId !== this.userId) {
       throw new StandardizedError({
-        name: 'ServerError',
-        message: `更新好友群組時發生預期外的錯誤: ${error.message}`,
+        name: 'PermissionError',
+        message: '無法更新非自己的好友群組',
         part: 'UPDATEFRIENDGROUP',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
+        tag: 'PERMISSION_DENIED',
+        statusCode: 403,
       });
     }
+
+    // Update friend group
+    await Database.set.friendGroup(this.friendGroupId, this.update);
+
+    return {
+      userFriendGroupsUpdate: await Database.get.userFriendGroups(this.userId),
+    };
   }
 }
 
@@ -107,31 +87,21 @@ export class DeleteFriendGroupService {
   }
 
   async use() {
-    try {
-      if (this.operatorId !== this.userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法刪除非自己的好友群組',
-          part: 'DELETEFRIENDGROUP',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
-      }
-
-      // Delete friend group
-      await Database.delete.friendGroup(this.friendGroupId);
-
-      return {
-        friendGroupsUpdate: await Database.get.userFriendGroups(this.userId),
-      };
-    } catch (error: any) {
+    if (this.operatorId !== this.userId) {
       throw new StandardizedError({
-        name: 'ServerError',
-        message: `刪除好友群組時發生預期外的錯誤: ${error.message}`,
+        name: 'PermissionError',
+        message: '無法刪除非自己的好友群組',
         part: 'DELETEFRIENDGROUP',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
+        tag: 'PERMISSION_DENIED',
+        statusCode: 403,
       });
     }
+
+    // Delete friend group
+    await Database.delete.friendGroup(this.friendGroupId);
+
+    return {
+      userFriendGroupsUpdate: await Database.get.userFriendGroups(this.userId),
+    };
   }
 }

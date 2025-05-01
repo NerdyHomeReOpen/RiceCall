@@ -37,17 +37,18 @@ export class CreateFriendApplicationHandler extends SocketHandler {
 
       const targetSocket = this.io.sockets.sockets.get(receiverId);
 
-      const result = await new CreateFriendApplicationService(
-        operatorId,
-        senderId,
-        receiverId,
-        friendApplication,
-      ).use();
+      const { userFriendApplicationsUpdate } =
+        await new CreateFriendApplicationService(
+          operatorId,
+          senderId,
+          receiverId,
+          friendApplication,
+        ).use();
 
       if (targetSocket) {
         targetSocket.emit(
-          'friendApplicationsUpdate',
-          result.friendApplicationsUpdate,
+          'userFriendApplicationsUpdate',
+          userFriendApplicationsUpdate,
         );
       }
     } catch (error: any) {
@@ -78,19 +79,20 @@ export class UpdateFriendApplicationHandler extends SocketHandler {
           'UPDATEFRIENDAPPLICATION',
         ).validate(data);
 
-      const result = await new UpdateFriendApplicationService(
-        operatorId,
-        senderId,
-        receiverId,
-        friendApplication,
-      ).use();
+      const { userFriendApplicationsUpdate } =
+        await new UpdateFriendApplicationService(
+          operatorId,
+          senderId,
+          receiverId,
+          friendApplication,
+        ).use();
 
       const targetSocket = this.io.sockets.sockets.get(receiverId);
 
       if (targetSocket) {
         targetSocket.emit(
-          'friendApplicationsUpdate',
-          result.friendApplicationsUpdate,
+          'userFriendApplicationsUpdate',
+          userFriendApplicationsUpdate,
         );
       }
     } catch (error: any) {
@@ -120,18 +122,19 @@ export class DeleteFriendApplicationHandler extends SocketHandler {
         'DELETEFRIENDAPPLICATION',
       ).validate(data);
 
-      const result = await new DeleteFriendApplicationService(
-        operatorId,
-        senderId,
-        receiverId,
-      ).use();
+      const { userFriendApplicationsUpdate } =
+        await new DeleteFriendApplicationService(
+          operatorId,
+          senderId,
+          receiverId,
+        ).use();
 
       const targetSocket = this.io.sockets.sockets.get(receiverId);
 
       if (targetSocket) {
         targetSocket.emit(
-          'friendApplicationsUpdate',
-          result.friendApplicationsUpdate,
+          'userFriendApplicationsUpdate',
+          userFriendApplicationsUpdate,
         );
       }
     } catch (error: any) {

@@ -34,13 +34,13 @@ export class CreateFriendGroupHandler extends SocketHandler {
         'CREATEFRIENDGROUP',
       ).validate(data);
 
-      const result = await new CreateFriendGroupService(
+      const { userFriendGroupsUpdate } = await new CreateFriendGroupService(
         operatorId,
         userId,
         group,
       ).use();
 
-      this.socket.emit('friendGroupsUpdate', result.friendGroupsUpdate);
+      this.socket.emit('userFriendGroupsUpdate', userFriendGroupsUpdate);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -68,14 +68,14 @@ export class UpdateFriendGroupHandler extends SocketHandler {
         'UPDATEFRIENDGROUP',
       ).validate(data);
 
-      const result = await new UpdateFriendGroupService(
+      const { userFriendGroupsUpdate } = await new UpdateFriendGroupService(
         operatorId,
         userId,
         friendGroupId,
         group,
       ).use();
 
-      this.socket.emit('friendGroupsUpdate', result.friendGroupsUpdate);
+      this.socket.emit('userFriendGroupsUpdate', userFriendGroupsUpdate);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -103,13 +103,13 @@ export class DeleteFriendGroupHandler extends SocketHandler {
         'DELETEFRIENDGROUP',
       ).validate(data);
 
-      const result = await new DeleteFriendGroupService(
+      const { userFriendGroupsUpdate } = await new DeleteFriendGroupService(
         operatorId,
         userId,
         friendGroupId,
       ).use();
 
-      this.socket.emit('friendGroupsUpdate', result.friendGroupsUpdate);
+      this.socket.emit('userFriendGroupsUpdate', userFriendGroupsUpdate);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

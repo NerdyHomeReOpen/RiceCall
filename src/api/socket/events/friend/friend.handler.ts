@@ -24,6 +24,9 @@ import {
   UpdateFriendService,
 } from '@/api/socket/events/friend/friend.service';
 
+// Socket
+import SocketServer from '@/api/socket';
+
 export class CreateFriendHandler extends SocketHandler {
   async handle(data: any) {
     try {
@@ -34,18 +37,19 @@ export class CreateFriendHandler extends SocketHandler {
         'CREATEFRIEND',
       ).validate(data);
 
-      const targetSocket = this.io.sockets.sockets.get(userId);
+      const targetSocket = SocketServer.getSocket(userId);
 
-      const result = await new CreateFriendService(
-        operatorId,
-        userId,
-        targetId,
-        friend,
-      ).use();
+      const { userFriendsUpdate, targetFriendsUpdate } =
+        await new CreateFriendService(
+          operatorId,
+          userId,
+          targetId,
+          friend,
+        ).use();
 
-      this.socket.emit('friendsUpdate', result.userFriendsUpdate);
+      this.socket.emit('userFriendsUpdate', userFriendsUpdate);
       if (targetSocket) {
-        targetSocket.emit('friendsUpdate', result.targetFriendsUpdate);
+        targetSocket.emit('userFriendsUpdate', targetFriendsUpdate);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
@@ -74,14 +78,14 @@ export class UpdateFriendHandler extends SocketHandler {
         'UPDATEFRIEND',
       ).validate(data);
 
-      const result = await new UpdateFriendService(
+      const { userFriendsUpdate } = await new UpdateFriendService(
         operatorId,
         userId,
         targetId,
         friend,
       ).use();
 
-      this.socket.emit('friendsUpdate', result.userFriendsUpdate);
+      this.socket.emit('userFriendsUpdate', userFriendsUpdate);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -109,17 +113,14 @@ export class DeleteFriendHandler extends SocketHandler {
         'DELETEFRIEND',
       ).validate(data);
 
-      const targetSocket = this.io.sockets.sockets.get(userId);
+      const targetSocket = SocketServer.getSocket(userId);
 
-      const result = await new DeleteFriendService(
-        operatorId,
-        userId,
-        targetId,
-      ).use();
+      const { userFriendsUpdate, targetFriendsUpdate } =
+        await new DeleteFriendService(operatorId, userId, targetId).use();
 
-      this.socket.emit('friendsUpdate', result.userFriendsUpdate);
+      this.socket.emit('userFriendsUpdate', userFriendsUpdate);
       if (targetSocket) {
-        targetSocket.emit('friendsUpdate', result.targetFriendsUpdate);
+        targetSocket.emit('userFriendsUpdate', targetFriendsUpdate);
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
