@@ -5,11 +5,7 @@
   "directories": {
     "output": "dist"
   },
-  "files": [
-    "main.js",
-    "package.json",
-    "./out/**/*"
-  ],
+  "files": ["dist/**/*", "package.json", "out/**/*"],
   "asar": true,
   "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
   "extraFiles": [
@@ -20,10 +16,7 @@
   ],
   "win": {
     "icon": "./resources/icon.ico",
-    "target": [
-      "nsis",
-      "portable"
-    ]
+    "target": ["nsis", "portable"]
   },
   "nsis": {
     "oneClick": false,
@@ -34,20 +27,12 @@
   "mac": {
     "icon": "./resources/icon.icns",
     "category": "public.app-category.social-networking",
-    "target": [
-        "dmg",
-        "zip"
-    ]
+    "target": ["dmg", "zip"]
   },
   "linux": {
     "icon": "./resources/icon.png",
     "category": "Network",
-    "target": [
-        "AppImage",
-        "deb",
-        "rpm",
-        "zip"
-    ]
+    "target": ["AppImage", "deb", "rpm", "zip"]
   },
   "publish": [
     {

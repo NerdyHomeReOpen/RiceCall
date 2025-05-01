@@ -2,10 +2,7 @@
   "name": "ricecall",
   "version": "0.1.6",
   "private": false,
-  "main": "main.ts",
-  "exports": {
-    ".": "./main.ts"
-  },
+  "main": "dist/main.js",
   "description": "Ricecall is a voice chat app that allows you to chat with your friends.",
   "author": "null",
   "engines": {
@@ -18,13 +15,13 @@
     "export": "next export",
     "start": "next start",
     "lint": "next lint",
-    "build:main": "tsc -p tsconfig.json",
+    "build:main": "tsc -p tsconfig.electron.json",
     "electron-dev": "concurrently \"npm run dev\" \"electron -r tsx . --dev\"",
     "electron-build": "npm run build && npm run build:main && electron-builder",
     "electron-build-win": "npm run build && npm run build:main && electron-builder --win",
     "electron-build-mac": "npm run build && npm run build:main && electron-builder --mac",
     "electron-build-linux": "npm run build && npm run build:main && electron-builder --linux",
-    "electron-start": "npm run build:main && electron ./dist/main.js"
+    "electron-start": "npm run build:main && electron ."
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
