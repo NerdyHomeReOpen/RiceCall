@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { errorHandler, StandardizedError } from '@/utils/errorHandler';
+import StandardizedError, { errorHandler } from '@/utils/errorHandler';
 
 const API_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
@@ -15,26 +15,19 @@ type ApiRequestData = {
 const handleResponse = async (response: Response): Promise<any> => {
   try {
     const data = await response.json();
-    console.log('data', data);
     if (!response.ok) {
-      throw new StandardizedError(
-        'ValidationError',
-        data.error,
-        'RESPONSE',
-        'VALIDATION_ERROR',
-        response.status,
-      );
+      new errorHandler(data.error).show();
     }
-    return data.data;
+    return data;
   } catch (error: Error | any) {
     if (!(error instanceof StandardizedError)) {
-      error = new StandardizedError(
-        'ServerError',
-        `請求失敗: ${error.message}`,
-        'RESPONSE',
-        'EXCEPTION_ERROR',
-        500,
-      );
+      error = new StandardizedError({
+        name: 'ServerError',
+        message: `請求失敗: ${error.message}`,
+        part: 'RESPONSE',
+        tag: 'EXCEPTION_ERROR',
+        statusCode: 500,
+      });
     }
     new errorHandler(error).show();
     return null;
@@ -52,13 +45,13 @@ const apiService = {
       return result;
     } catch (error: Error | any) {
       if (!(error instanceof StandardizedError)) {
-        error = new StandardizedError(
-          'ServerError',
-          `獲取資料時發生預期外的錯誤: ${error.message}`,
-          'GET',
-          'EXCEPTION_ERROR',
-          500,
-        );
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `獲取資料時發生預期外的錯誤: ${error.message}`,
+          part: 'GET',
+          tag: 'EXCEPTION_ERROR',
+          statusCode: 500,
+        });
       }
       new errorHandler(error).show();
       return null;
@@ -90,13 +83,13 @@ const apiService = {
       return result;
     } catch (error: Error | any) {
       if (!(error instanceof StandardizedError)) {
-        error = new StandardizedError(
-          'ServerError',
-          `提交資料時發生預期外的錯誤: ${error.message}`,
-          'POST',
-          'EXCEPTION_ERROR',
-          500,
-        );
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `提交資料時發生預期外的錯誤: ${error.message}`,
+          part: 'POST',
+          tag: 'EXCEPTION_ERROR',
+          statusCode: 500,
+        });
       }
       new errorHandler(error).show();
       return null;
@@ -122,13 +115,13 @@ const apiService = {
       return result;
     } catch (error: Error | any) {
       if (!(error instanceof StandardizedError)) {
-        error = new StandardizedError(
-          'ServerError',
-          `更新資料時發生預期外的錯誤: ${error.message}`,
-          'PATCH',
-          'EXCEPTION_ERROR',
-          500,
-        );
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `更新資料時發生預期外的錯誤: ${error.message}`,
+          part: 'PATCH',
+          tag: 'EXCEPTION_ERROR',
+          statusCode: 500,
+        });
       }
       new errorHandler(error).show();
       return null;

@@ -30,8 +30,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
-import { StandardizedError } from '@/utils/errorHandler';
-import { errorHandler } from '@/utils/errorHandler';
+import StandardizedError, { errorHandler } from '@/utils/errorHandler';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
@@ -362,6 +361,7 @@ const RootPageComponent = () => {
   };
 
   const handleError = (error: StandardizedError) => {
+    console.log('error', error);
     new errorHandler(error).show();
   };
 
