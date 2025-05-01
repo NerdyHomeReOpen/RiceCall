@@ -49,7 +49,7 @@ export class RefreshServerHandler extends HttpHandler {
       return {
         statusCode: error.statusCode,
         message: 'error',
-        data: { error: error.message },
+        data: { error },
       };
     }
   }

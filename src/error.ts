@@ -5,14 +5,15 @@ type StandardizedErrorOptions = Error & {
   statusCode: number;
 };
 
-export default class StandardizedError extends Error {
+export default class StandardizedError {
+  message: string;
   name: string;
   part: string;
   tag: string;
   statusCode: number;
 
   constructor(options: StandardizedErrorOptions) {
-    super(options.message);
+    this.message = options.message;
     this.name = options.name;
     this.part = options.part;
     this.tag = options.tag;
