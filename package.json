@@ -1,16 +1,30 @@
 {
-    "dependencies": {
-        "bcrypt": "^5.1.1",
-        "better-sqlite3": "^11.9.1",
-        "chalk": "^4.1.2",
-        "dotenv": "^16.4.1",
-        "formidable": "^3.5.2",
-        "jsonwebtoken": "^9.0.2",
-        "mysql2": "^3.9.1",
-        "quick.db": "^9.1.7",
-        "sharp": "^0.33.5",
-        "socket.io": "^4.8.1",
-        "uuid": "^11.0.5"
-    },
-    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^11.9.1",
+    "chalk": "^4.1.2",
+    "dotenv": "^16.4.1",
+    "formidable": "^3.5.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.1",
+    "quick.db": "^9.1.7",
+    "sharp": "^0.33.5",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "socket.io-client": "^4.8.1",
+    "jest-mock": "^29.7.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "init": "node initial.js",
+    "test": "jest --no-coverage",
+    "test:detail": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:socket-coverage": "jest --coverage --collectCoverageFrom=\"socket/**/*.js\""
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

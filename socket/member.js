@@ -39,6 +39,17 @@ const memberHandler = {
       // Get data
       const server = await DB.get.server(serverId);
       const operatorMember = await DB.get.member(operatorId, serverId);
+      const user = await DB.get.user(userId);
+
+      if (!user || !server) {
+        throw new StandardizedError(
+          'user 或 server 不存在',
+          'ValidationError',
+          'CREATEMEMBER',
+          'DATA_INVALID',
+          401,
+        );
+      }
 
       if (operatorId === userId) {
         if (newMember.permissionLevel !== 1 && server.ownerId !== operatorId) {
@@ -157,12 +168,34 @@ const memberHandler = {
       // Get data
       const operatorMember = await DB.get.member(operatorId, serverId);
       const userMember = await DB.get.member(userId, serverId);
+      const user = await DB.get.user(userId);
+      const server = await DB.get.server(serverId);
       let userSocket;
       io.sockets.sockets.forEach((_socket) => {
         if (_socket.userId === userId) {
           userSocket = _socket;
         }
       });
+
+      if (!user || !server || !userMember) {
+        throw new StandardizedError(
+          'user 或 server 或 member 不存在',
+          'ValidationError',
+          'UPDATEMEMBER',
+          'DATA_INVALID',
+          401,
+        );
+      }
+
+      if (!operatorMember){
+        throw new StandardizedError(
+          '你不是此伺服器成員',
+          'ValidationError',
+          'UPDATEMEMBER',
+          'DATA_INVALID',
+          401,
+        );
+      }
 
       if (operatorId === userId) {
         if (editedMember.permissionLevel) {
