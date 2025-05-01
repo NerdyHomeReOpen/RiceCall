@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import serve from 'electron-serve';
 import net from 'net';
 import DiscordRPC from 'discord-rpc';
 import dotenv from 'dotenv';
 import path from 'path';
+import serve from 'electron-serve';
 import Store from 'electron-store';
 import { io, Socket } from 'socket.io-client';
-import { fileURLToPath } from 'url';
-import { autoUpdater } from 'electron-updater';
+import ElectronUpdater from 'electron-updater';
 import {
   app,
   BrowserWindow,
@@ -25,8 +24,10 @@ let tray: Tray | null = null;
 let isLogin: boolean = false;
 let userId: string | null = null;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = process.cwd();
+
+// AutoUpdater
+const { autoUpdater } = ElectronUpdater;
 
 // Store
 type StoreSchema = {
@@ -173,6 +174,10 @@ const defaultPrecence = {
   ],
 };
 
+if (app.isPackaged || !DEV) {
+  serve({ directory: path.join(__dirname, './out') });
+}
+
 // Functions
 function waitForPort(port: number) {
   return new Promise((resolve, reject) => {
@@ -273,7 +278,6 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
   });
 
   if (app.isPackaged || !DEV) {
-    serve({ directory: path.join(__dirname, './out') });
     mainWindow.loadURL('app://-');
   } else {
     mainWindow.loadURL(`${BASE_URI}`);
@@ -290,10 +294,6 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
     shell.openExternal(url);
     return { action: 'deny' };
   });
-
-  // mainWindow.webContents.on('close', () => {
-  //   app.quit();
-  // });
 
   return mainWindow;
 }
@@ -333,7 +333,6 @@ async function createAuthWindow() {
   });
 
   if (app.isPackaged || !DEV) {
-    serve({ directory: path.join(__dirname, './out') });
     authWindow.loadURL('app://-/auth.html');
   } else {
     authWindow.loadURL(`${BASE_URI}/auth`);
@@ -345,10 +344,6 @@ async function createAuthWindow() {
       authWindow.isMaximized() ? 'window-maximized' : 'window-unmaximized',
     );
   });
-
-  // authWindow.webContents.on('close', () => {
-  //   app.quit();
-  // });
 
   return authWindow;
 }
@@ -394,20 +389,11 @@ async function createPopup(
   });
 
   if (app.isPackaged || !DEV) {
-    serve({ directory: path.join(__dirname, './out') });
     popups[windowKey].loadURL(`app://-/popup.html?type=${type}`);
   } else {
     popups[windowKey].loadURL(`${BASE_URI}/popup?type=${type}`);
     popups[windowKey].webContents.openDevTools();
   }
-
-  // popups[windowKey].webContents.on('resize', (_, width, height) => {
-  //   popups[windowKey].webContents.setSize(width, height);
-  // });
-
-  // popups[windowKey].webContents.on('closed', () => {
-  //   popups[windowKey] = null;
-  // });
 
   return popups[windowKey];
 }
@@ -438,6 +424,7 @@ function connectSocket(token: string): Socket | null {
     timeout: 20000,
     autoConnect: false,
     query: {
+      jwt: token,
       token: token,
     },
   });
@@ -449,9 +436,11 @@ function connectSocket(token: string): Socket | null {
     }, {} as Record<string, (event: string, data: any) => void>);
 
   socket.on('connect', () => {
-    ipcMain.removeAllListeners();
+    for (const event of Object.values(SocketClientEvent)) {
+      ipcMain.removeAllListeners(event);
 
-    socket.removeAllListeners();
+      socket.removeAllListeners(event);
+    }
 
     Object.entries(ipcHandlers).forEach(([event, handler]) => {
       ipcMain.on(event, (_, data) => handler(event, data));
@@ -475,7 +464,7 @@ function connectSocket(token: string): Socket | null {
   });
 
   socket.on('connect_error', (error) => {
-    console.error('Socket 連線失敗:', error);
+    console.error('Socket 連線失敗:', error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('connect_error', error);
     });
@@ -496,7 +485,7 @@ function connectSocket(token: string): Socket | null {
   });
 
   socket.on('reconnect_error', (error) => {
-    console.error('Socket 重新連線失敗:', error);
+    console.error('Socket 重新連線失敗:', error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect_error', error);
     });
@@ -510,9 +499,11 @@ function connectSocket(token: string): Socket | null {
 function disconnectSocket(): Socket | null {
   if (!socketInstance) return null;
 
-  ipcMain.removeAllListeners();
+  for (const event of Object.values(SocketClientEvent)) {
+    ipcMain.removeAllListeners(event);
 
-  socketInstance.removeAllListeners();
+    socketInstance.removeAllListeners(event);
+  }
 
   socketInstance.disconnect();
 
@@ -530,7 +521,7 @@ function configureAutoUpdater() {
     autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml');
   }
 
-  autoUpdater.on('error', (error) => {
+  autoUpdater.on('error', (error: any) => {
     if (DEV && error.message.includes('dev-app-update.yml')) {
       console.info('開發環境中跳過更新檢查');
       return;
@@ -542,7 +533,7 @@ function configureAutoUpdater() {
     });
   });
 
-  autoUpdater.on('update-available', (info) => {
+  autoUpdater.on('update-available', (info: any) => {
     dialog.showMessageBox({
       type: 'info',
       title: '有新版本可用',
@@ -555,14 +546,14 @@ function configureAutoUpdater() {
     console.info('目前是最新版本');
   });
 
-  autoUpdater.on('download-progress', (progressObj) => {
+  autoUpdater.on('download-progress', (progressObj: any) => {
     let message = `下載速度: ${progressObj.bytesPerSecond}`;
     message = `${message} - 已下載 ${progressObj.percent}%`;
     message = `${message} (${progressObj.transferred}/${progressObj.total})`;
     console.info(message);
   });
 
-  autoUpdater.on('update-downloaded', (info) => {
+  autoUpdater.on('update-downloaded', (info: any) => {
     dialog
       .showMessageBox({
         type: 'info',
@@ -599,7 +590,7 @@ async function setActivity(presence: DiscordRPC.Presence) {
   } catch (error) {
     await rpc.setActivity(defaultPrecence);
 
-    console.error('設置 Activity 時出錯:', error);
+    console.error('設置 Discord RPC 時出錯:', error);
   }
 }
 
@@ -675,11 +666,9 @@ app.on('ready', async () => {
 
   app.on('before-quit', () => {
     if (rpc) {
-      try {
-        rpc.destroy();
-      } catch (error) {
-        console.error('Discord RPC銷毀失敗:', error);
-      }
+      rpc.destroy().catch((error) => {
+        console.error('Discord RPC 銷毀失敗:', error);
+      });
     }
   });
 
@@ -696,13 +685,11 @@ app.on('ready', async () => {
     trayIcon(false);
   });
 
-  ipcMain.on('logout', async () => {
+  ipcMain.on('logout', () => {
     if (rpc) {
-      try {
-        await rpc.clearActivity();
-      } catch (error) {
-        console.error('清除Discord狀態失敗:', error);
-      }
+      rpc.clearActivity().catch((error) => {
+        console.error('清除 Discord 狀態失敗:', error);
+      });
     }
     closePopups();
     mainWindow.hide();
@@ -820,6 +807,7 @@ app.whenReady().then(() => {
   const protocolClient = process.execPath;
   const args =
     process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
+
   app.setAsDefaultProtocolClient(
     'ricecall',
     app.isPackaged ? undefined : protocolClient,

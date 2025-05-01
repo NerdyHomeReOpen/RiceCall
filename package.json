@@ -3,8 +3,15 @@
   "version": "0.1.6",
   "private": false,
   "main": "main.ts",
+  "exports": {
+    ".": "./main.ts"
+  },
   "description": "Ricecall is a voice chat app that allows you to chat with your friends.",
   "author": "null",
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -12,12 +19,12 @@
     "start": "next start",
     "lint": "next lint",
     "build:main": "tsc -p tsconfig.json",
-    "electron-dev": "concurrently \"npm run dev\" \"ts-node -r tsconfig-paths/register .\"",
-    "electron-start": "npm run build:main && electron ./dist/main.js",
+    "electron-dev": "concurrently \"npm run dev\" \"electron -r tsx . --dev\"",
     "electron-build": "npm run build && npm run build:main && electron-builder",
     "electron-build-win": "npm run build && npm run build:main && electron-builder --win",
     "electron-build-mac": "npm run build && npm run build:main && electron-builder --mac",
-    "electron-build-linux": "npm run build && npm run build:main && electron-builder --linux"
+    "electron-build-linux": "npm run build && npm run build:main && electron-builder --linux",
+    "electron-start": "npm run build:main && electron ./dist/main.js"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -43,7 +50,7 @@
     "remark-gfm": "^4.0.0",
     "socket.io-client": "^4.8.1",
     "ts-node": "^11.0.0-beta.1",
-    "tsconfig-paths": "^4.2.0"
+    "tsx": "^4.19.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -51,14 +58,13 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "concurrently": "^8.2.2",
-    "electron": "^29.1.0",
+    "electron": "^36.0.1",
     "electron-builder": "^25.1.8",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
     "stylelint": "^16.17.0",
     "stylelint-config-standard": "^37.0.0",
-    "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
