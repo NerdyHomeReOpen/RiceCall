@@ -2,15 +2,15 @@
 import Database from '@/database';
 
 export default class RefreshFriendApplicationService {
-  constructor(private userId: string, private targetId: string) {
-    this.userId = userId;
-    this.targetId = targetId;
+  constructor(private senderId: string, private receiverId: string) {
+    this.senderId = senderId;
+    this.receiverId = receiverId;
   }
 
   async use() {
     const friendApplication = await Database.get.friendApplication(
-      this.userId,
-      this.targetId,
+      this.senderId,
+      this.receiverId,
     );
     return friendApplication;
   }

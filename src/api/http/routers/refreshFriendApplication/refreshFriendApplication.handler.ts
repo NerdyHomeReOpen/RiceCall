@@ -22,14 +22,14 @@ import RefreshFriendApplicationService from '@/api/http/routers/refreshFriendApp
 export class RefreshFriendApplicationHandler extends HttpHandler {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { userId, targetId } = await new DataValidator(
+      const { senderId, receiverId } = await new DataValidator(
         RefreshFriendApplicationSchema,
         'REFRESHFRIENDAPPLICATION',
       ).validate(data);
 
       const result = await new RefreshFriendApplicationService(
-        userId,
-        targetId,
+        senderId,
+        receiverId,
       ).use();
 
       return {

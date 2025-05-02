@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const RefreshFriendApplicationSchema = z
   .object({
-    userId: z.string(),
-    targetId: z.string(),
+    senderId: z.string(),
+    receiverId: z.string(),
   })
   .strict();
