@@ -8,25 +8,29 @@ import StandardizedError from '@/error';
 import Logger from '@/utils/logger';
 
 // Handlers
-import { LoginHandler } from '@/api/http/routers/login/login.handler';
-import { RegisterHandler } from '@/api/http/routers/register/register.handler';
-import { RefreshChannelHandler } from '@/api/http/routers/refreshChannel/refreshChannel.handler';
-import { RefreshFriendHandler } from '@/api/http/routers/refreshFriend/refreshFriend.handler';
-import { RefreshFriendApplicationHandler } from '@/api/http/routers/refreshFriendApplication/refreshFriendApplication.handler';
-import { RefreshFriendGroupHandler } from '@/api/http/routers/refreshFriendGroup/refreshFriendGroup.handler';
-import { RefreshMemberHandler } from '@/api/http/routers/refreshMember/refreshMember.handler';
-import { RefreshMemberApplicationHandler } from '@/api/http/routers/refreshMemberApplication/refreshMemberApplication.handler';
-import { RefreshServerHandler } from '@/api/http/routers/refreshServer/refreshServer.handler';
-import { RefreshServerChannelsHandler } from '@/api/http/routers/refreshServerChannels/refreshServerChannels.handler';
-import { RefreshServerMemberApplicationsHandler } from '@/api/http/routers/refreshServerMemberApplications/refreshServerMemberApplications.handler';
-import { RefreshServerMembersHandler } from '@/api/http/routers/refreshServerMembers/refreshServerMembers.handler';
-import { RefreshUserHandler } from '@/api/http/routers/refreshUser/refreshUser.handler';
-import { RefreshUserFriendApplicationsHandler } from '@/api/http/routers/refreshUserFriendApplications/refreshUserFriendApplications.handler';
-import { RefreshUserFriendGroupsHandler } from '@/api/http/routers/refreshUserFriendGroups/refreshUserFriendGroups.handler';
-import { RefreshUserFriendsHandler } from '@/api/http/routers/refreshUserFriends/refreshUserFriends.handler';
-import { RefreshUserServersHandler } from '@/api/http/routers/refreshUserServers/refreshUserServers.handler';
-import { ImagesHandler } from '@/api/http/routers/images/images.handler';
-import { UploadHandler } from '@/api/http/routers/upload/upload.handler';
+import { LoginHandler } from './routers/login/login.handler';
+import { RegisterHandler } from './routers/register/register.handler';
+import { RefreshChannelHandler } from './routers/refresh/channel/refreshChannel.handler';
+import { RefreshFriendHandler } from './routers/refresh/friend/refreshFriend.handler';
+import { RefreshFriendApplicationHandler } from './routers/refresh/friendApplication/refreshFriendApplication.handler';
+import { RefreshFriendGroupHandler } from './routers/refresh/friendGroup/refreshFriendGroup.handler';
+import { RefreshMemberHandler } from './routers/refresh/member/refreshMember.handler';
+import { RefreshMemberApplicationHandler } from './routers/refresh/memberApplication/refreshMemberApplication.handler';
+import {
+  RefreshServerHandler,
+  RefreshServerChannelsHandler,
+  RefreshServerMemberApplicationsHandler,
+  RefreshServerMembersHandler,
+} from './routers/refresh/server/refreshServer.handler';
+import {
+  RefreshUserHandler,
+  RefreshUserFriendApplicationsHandler,
+  RefreshUserFriendGroupsHandler,
+  RefreshUserFriendsHandler,
+  RefreshUserServersHandler,
+} from './routers/refresh/user/refreshUser.handler';
+import { ImagesHandler } from './routers/images/images.handler';
+import { UploadHandler } from './routers/upload/upload.handler';
 
 export type ResponseType = {
   statusCode: number;
