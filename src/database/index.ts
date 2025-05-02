@@ -87,7 +87,7 @@ const Database = {
         );
         // If the account exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE accounts SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -152,7 +152,7 @@ const Database = {
         );
         // If the user exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE users SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -196,7 +196,7 @@ const Database = {
         );
         // If the badge exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE badges SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -241,7 +241,7 @@ const Database = {
         );
         // If the userBadge exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE user_badges SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -293,7 +293,7 @@ const Database = {
         );
         // If the userServer exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE user_servers SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -355,7 +355,7 @@ const Database = {
         );
         // If the server exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE servers SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -420,7 +420,7 @@ const Database = {
         );
         // If the channel exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE channels SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -464,7 +464,7 @@ const Database = {
         );
         // If the friendGroup exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE friend_groups SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -509,7 +509,7 @@ const Database = {
         );
         // If the friend exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE friends SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -558,7 +558,7 @@ const Database = {
         );
         // If the friendApplication exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE friend_applications SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -611,7 +611,7 @@ const Database = {
         );
         // If the member exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE members SET ${keys
               .map((k) => `\`${k}\` = ?`)
@@ -656,7 +656,7 @@ const Database = {
         );
         // If the memberApplication exists, update it
         // Else, create it
-        if (exists) {
+        if (exists.length > 0) {
           await query(
             `UPDATE member_applications SET ${keys
               .map((k) => `\`${k}\` = ?`)
