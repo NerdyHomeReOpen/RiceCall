@@ -4,7 +4,7 @@ export const CreateMemberSchema = z
   .object({
     userId: z.string(),
     serverId: z.string(),
-    member: z.object({}),
+    member: z.any(),
   })
   .strict();
 
@@ -12,7 +12,7 @@ export const UpdateMemberSchema = z
   .object({
     userId: z.string(),
     serverId: z.string(),
-    member: z.object({}),
+    member: z.any(),
   })
   .strict();
 
