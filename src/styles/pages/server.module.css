@@ -341,8 +341,11 @@
   color: #555;
 }
 
-.channelList .channelList:not(.lobby) .channelTab,
-.channelList .channelList:not(.lobby) .userTab {
+.channelList .channelList:not(.lobby) .channelTab {
+  padding-left: 25px;
+}
+
+.channelList .userList {
   padding-left: 25px;
 }
 
@@ -366,7 +369,7 @@
   display: flex;
   align-items: center;
   height: 1.8rem;
-  padding: 1px 20px 1px 8px;
+  padding: 1px 20px 1px 0px;
   cursor: pointer;
   gap: 5px;
 }
