@@ -76,6 +76,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const channelMembers = serverMembers.filter(
         (mb) => mb.currentChannelId === channelId,
       );
+    const subChannelIds = categoryChannels.map((ch) => ch.channelId);
+    const categoryMembers = serverMembers.filter(
+        (mb) => subChannelIds.includes(mb.currentChannelId),
+      );
     const userInCategory = categoryChannels.some(
       (ch) => ch.channelId === currentChannelId,
     );
@@ -306,13 +310,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             }
           />
           <div className={styles['channelTabLable']}>{categoryName}</div>
-          {categoryVisibility !== 'readonly' && (
-            <div className={styles['channelTabCount']}>
-              {`(${channelMembers.length}${
-                channelUserLimit > 0 ? `/${channelUserLimit}` : ''
-              })`}
-            </div>
-          )}
+          <div className={styles['channelTabCount']}>
+            {`(${categoryMembers.length + channelMembers.length})`}
+          </div>
           {!expanded[channelId] && userInCategory && (
             <div className={styles['myLocationIcon']} />
           )}
@@ -320,30 +320,68 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
         {/* Expanded Sections */}
         <div
-          className={styles['userList']}
-          style={{
-            display: expanded[channelId] ? 'block' : 'none',
-          }}
-        >
-          {channelMembers
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((member) => (
-              <UserTab
-                key={member.userId}
-                member={member}
-                friends={friends}
-                currentChannel={currentChannel}
-                currentServer={currentServer}
-              />
-            ))}
-        </div>
-
-        <div
           className={styles['channelList']}
           style={{
             display: expanded[channelId] ? 'block' : 'none',
           }}
         >
+          {categoryVisibility !== 'readonly' && (
+          <>
+          <div
+            key={channelId}
+            className={`${styles['channelTab']} `}
+          >
+            <div
+            className={`
+              ${styles['tabIcon']} 
+              ${expanded[channelId] ? styles['expanded'] : ''} 
+              ${styles[categoryVisibility]} 
+            `}
+            onClick={() =>
+              setExpanded((prev) => ({
+                ...prev,
+                [channelId]: !prev[channelId],
+              }))
+            }
+            />
+            <div
+              className={`${
+                styles['channelTabLable']
+              }`}
+            >
+              {'頻道大廳'}
+            </div>
+            
+              <div className={styles['channelTabCount']}>
+                {`(${channelMembers.length}${
+                  channelUserLimit > 0 ? `/${channelUserLimit}` : ''
+                })`}
+              </div>
+            {userInChannel && !expanded[channelId] && (
+              <div className={styles['myLocationIcon']} />
+            )}
+          </div>
+          <div
+            className={styles['userList']}
+            style={{
+              display: expanded[channelId] ? 'block' : 'none',
+            }}
+          >
+            {channelMembers
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((member) => (
+                <UserTab
+                  key={member.userId}
+                  member={member}
+                  friends={friends}
+                  currentChannel={currentChannel}
+                  currentServer={currentServer}
+                />
+              ))}
+          </div>
+          </>
+          )}
+          
           {categoryChannels
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
             .map((channel) => (
@@ -526,7 +564,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         case 'moveUser':
           const targetUserId = e.dataTransfer.getData('userId');
           const currentChannelId = e.dataTransfer.getData('currentChannelId');
-          console.log(targetUserId, currentChannelId);
           if (!targetUserId) return;
           if (currentChannelId === channelId) return;
           socket.send.connectChannel({userId: targetUserId, channelId, serverId });
