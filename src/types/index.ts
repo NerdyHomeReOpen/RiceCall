@@ -667,6 +667,7 @@ export enum SocketClientEvent {
   // Message
   SEND_MESSAGE = 'message',
   SEND_DIRECT_MESSAGE = 'directMessage',
+  SEND_SHAKE_WINDOW = 'shakeWindow',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
@@ -674,7 +675,6 @@ export enum SocketClientEvent {
   // Echo
   PING = 'ping',
   // Direct Message Shake
-  SHAKE_DIRECT_MESSAGE = 'shakeDirectMessage',
 }
 
 export enum SocketServerEvent {
@@ -722,6 +722,7 @@ export enum SocketServerEvent {
   // Message
   ON_MESSAGE = 'onMessage',
   ON_DIRECT_MESSAGE = 'onDirectMessage',
+  ON_SHAKE_WINDOW = 'onShakeWindow',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
@@ -739,7 +740,6 @@ export enum SocketServerEvent {
   // Popup
   OPEN_POPUP = 'openPopup',
   // Direct Message Shake
-  SHAKE_DIRECT_MESSAGE = 'shakeDirectMessage',
 }
 
 export enum PopupType {

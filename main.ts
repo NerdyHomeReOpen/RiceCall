@@ -485,6 +485,15 @@ function connectSocket(token: string): Socket | null {
             createPopup('directMessage', windowId, 600, 800).then((window) => {
               if (!window) return;
 
+              window.setAlwaysOnTop(true);
+              window.setAlwaysOnTop(false);
+              window.focus();
+
+              window.webContents.send(
+                SocketServerEvent.ON_SHAKE_WINDOW,
+                ...args,
+              );
+
               ipcMain.on('request-initial-data', (_, to) => {
                 if (to === windowId) {
                   window.webContents.send('response-initial-data', windowId, {

@@ -80,7 +80,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
     const handleSendShakeWindow = () => {
       if (!socket || cooldownRef.current > 0) return;
-      socket.send.shakeDirectMessage({ userId, targetId });
+      socket.send.shakeWindow({ userId, targetId });
       cooldownRef.current = SHAKE_COOLDOWN;
 
       // debounce
@@ -99,7 +99,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       return () => clearInterval(timer);
     };
 
-    const handleReceiveShake = (data: any) => {
+    const handleReceiveShake = (data: {
+      userId: User['userId'];
+      targetId: User['userId'];
+      targetName: User['name'];
+    }) => {
       // check if the current conversation
       const { userId: senderId, targetId: receiverId } = data;
       if (senderId && receiverId && userId === receiverId) {
@@ -148,7 +152,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
       const eventHandlers = {
         [SocketServerEvent.ON_DIRECT_MESSAGE]: handleOnDirectMessage,
-        [SocketServerEvent.SHAKE_DIRECT_MESSAGE]: handleReceiveShake,
+        [SocketServerEvent.ON_SHAKE_WINDOW]: handleReceiveShake,
       };
       const unsubscribe: (() => void)[] = [];
 
