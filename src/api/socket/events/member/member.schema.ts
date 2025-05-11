@@ -5,7 +5,7 @@ export const MemberSchema = z.object({
   serverId: z.string().length(36),
   nickname: z.string().min(0).max(32).nullable(),
   permissionLevel: z.number().min(1).max(8),
-  isBlocked: z.number().min(0),
+  isBlocked: z.number().min(-1),
 });
 
 export const CreateMemberSchema = z
