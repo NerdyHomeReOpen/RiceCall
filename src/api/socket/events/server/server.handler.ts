@@ -114,9 +114,9 @@ export class ConnectServerHandler extends SocketHandler {
             initialData: {
               title:
                 userMember.isBlocked === -1
-                  ? '你已被加入黑名單，無法加入群組'
-                  : '你已被加入黑名單，無法加入群組，直到：' +
-                    new Date(userMember.isBlocked).toLocaleDateString(),
+                  ? '你已被該語音群封鎖，無法加入群組'
+                  : '你已被該語音群踢出，無法加入群組，直到：' +
+                    new Date(userMember.isBlocked).toLocaleString(),
             },
           });
           return;
