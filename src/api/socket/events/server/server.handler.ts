@@ -323,6 +323,7 @@ export class CreateServerHandler extends SocketHandler {
       // Update Server (lobby)
       await database.set.server(serverId, {
         lobbyId,
+        receptionLobbyId: lobbyId,
       });
 
       // Join the server
