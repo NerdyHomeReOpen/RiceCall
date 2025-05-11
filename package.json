@@ -1,12 +1,10 @@
 {
   "scripts": {
-    "dev": "tsx -r dotenv/config src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "backup": "tsx -r dotenv/config src/database/scripts/backup-db.ts",
-    "restore": "tsx -r dotenv/config src/database/scripts/restore-db.ts",
-    "setup": "tsx -r dotenv/config src/database/scripts/setup-db.ts",
-    "execute": "tsx -r dotenv/config"
+    "dev": "node --inspect --max-old-space-size=4096 -r dotenv/config -r tsx src/index.ts",
+    "backup": "node -r dotenv/config -r tsx src/database/scripts/backup-db.ts",
+    "restore": "node -r dotenv/config -r tsx src/database/scripts/restore-db.ts",
+    "setup": "node -r dotenv/config -r tsx src/database/scripts/setup-db.ts",
+    "execute": "node -r dotenv/config -r tsx"
   },
   "dependencies": {
     "@types/formidable": "^3.4.5",
