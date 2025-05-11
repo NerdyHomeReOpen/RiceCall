@@ -4,7 +4,7 @@ export const FriendSchema = z.object({
   userId: z.string().length(36),
   targetId: z.string().length(36),
   isBlocked: z.boolean(),
-  friendGroupId: z.string().length(36),
+  friendGroupId: z.string().length(36).nullable(),
 });
 
 export const CreateFriendSchema = z
