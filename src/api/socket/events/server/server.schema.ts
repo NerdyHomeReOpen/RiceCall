@@ -12,6 +12,7 @@ export const ServerSchema = z.object({
   receiveApply: z.boolean(),
   type: z.enum(['game', 'entertainment', 'other']),
   visibility: z.enum(['public', 'private', 'invisible']),
+  receptionLobbyId: z.string().length(36),
 });
 
 export const ConnectServerSchema = z

@@ -49,103 +49,97 @@ export class ConnectChannelHandler extends SocketHandler {
       const userMember = await database.get.member(userId, serverId);
       const operatorMember = await database.get.member(operatorId, serverId);
 
-      if (!channel.isLobby) {
-        if (operatorId !== userId) {
-          if (
-            operatorMember.permissionLevel < 5 ||
-            operatorMember.permissionLevel <= userMember.permissionLevel
-          ) {
-            throw new StandardizedError({
-              name: 'PermissionError',
-              message: '你沒有足夠的權限移動其他用戶',
-              part: 'CONNECTCHANNEL',
-              tag: 'PERMISSION_DENIED',
-              statusCode: 403,
-            });
-          }
+      if (operatorId !== userId) {
+        if (
+          operatorMember.permissionLevel < 5 ||
+          operatorMember.permissionLevel <= userMember.permissionLevel
+        ) {
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '你沒有足夠的權限移動其他用戶',
+            part: 'CONNECTCHANNEL',
+            tag: 'PERMISSION_DENIED',
+            statusCode: 403,
+          });
+        }
 
-          if (channel.visibility === 'readonly') {
-            throw new StandardizedError({
-              name: 'PermissionError',
-              message: '該頻道為唯獨頻道',
-              part: 'CONNECTCHANNEL',
-              tag: 'CHANNEL_IS_READONLY',
-              statusCode: 403,
-            });
-          }
+        if (user.currentServerId !== serverId) {
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '用戶不在語音群中',
+            part: 'CONNECTCHANNEL',
+            tag: 'PERMISSION_DENIED',
+            statusCode: 403,
+          });
+        }
 
-          if (user.currentChannelId === channelId) {
-            throw new StandardizedError({
-              name: 'PermissionError',
-              message: '用戶已經在該頻道中',
-              part: 'CONNECTCHANNEL',
-              tag: 'PERMISSION_DENIED',
-              statusCode: 403,
-            });
-          }
+        if (user.currentChannelId === channelId) {
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '用戶已經在該頻道中',
+            part: 'CONNECTCHANNEL',
+            tag: 'PERMISSION_DENIED',
+            statusCode: 403,
+          });
+        }
 
-          if (user.currentServerId !== serverId) {
-            throw new StandardizedError({
-              name: 'PermissionError',
-              message: '用戶不在該語音群中',
-              part: 'CONNECTCHANNEL',
-              tag: 'PERMISSION_DENIED',
-              statusCode: 403,
-            });
-          }
-        } else {
-          if (channel.visibility === 'readonly') {
-            throw new StandardizedError({
-              name: 'PermissionError',
-              message: '該頻道為唯獨頻道',
-              part: 'CONNECTCHANNEL',
-              tag: 'CHANNEL_IS_READONLY',
-              statusCode: 403,
-            });
-          }
+        if (channel.visibility === 'readonly') {
+          await new ConnectChannelHandler(this.io, this.socket).handle({
+            channelId: server.lobbyId,
+            serverId: serverId,
+            userId: userId,
+          });
+          return;
+        }
+      } else {
+        if (
+          channel.password &&
+          password !== channel.password &&
+          operatorMember.permissionLevel < 3
+        ) {
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '密碼錯誤',
+            part: 'CONNECTCHANNEL',
+            tag: 'PASSWORD_INCORRECT',
+            statusCode: 403,
+          });
+        }
 
-          if (
-            (server.visibility === 'private' ||
-              channel.visibility === 'member') &&
-            operatorMember.permissionLevel < 2
-          ) {
-            throw new StandardizedError({
-              name: 'PermissionError',
-              message: '你需要成為該群組的會員才能加入該頻道',
-              part: 'CONNECTCHANNEL',
-              tag: 'PERMISSION_DENIED',
-              statusCode: 403,
-            });
-          }
+        if (channel.visibility === 'readonly') {
+          await new ConnectChannelHandler(this.io, this.socket).handle({
+            channelId: server.lobbyId,
+            serverId: serverId,
+            userId: userId,
+          });
+          return;
+        }
 
-          if (
-            channel.password &&
-            password !== channel.password &&
-            operatorMember.permissionLevel < 3
-          ) {
-            throw new StandardizedError({
-              name: 'PermissionError',
-              message: '你需要輸入正確的密碼才能加入該頻道',
-              part: 'CONNECTCHANNEL',
-              tag: 'PASSWORD_INCORRECT',
-              statusCode: 403,
-            });
-          }
+        if (
+          (server.visibility === 'private' ||
+            channel.visibility === 'member') &&
+          operatorMember.permissionLevel < 2
+        ) {
+          await new ConnectChannelHandler(this.io, this.socket).handle({
+            channelId: server.lobbyId,
+            serverId: serverId,
+            userId: userId,
+          });
+          return;
+        }
 
-          if (
-            channel.userLimit &&
-            channelUsers &&
-            channelUsers.length >= channel.userLimit &&
-            operatorMember.permissionLevel < 5
-          ) {
-            throw new StandardizedError({
-              name: 'PermissionError',
-              message: '該頻道已達人數上限',
-              part: 'CONNECTCHANNEL',
-              tag: 'CHANNEL_USER_LIMIT_REACHED',
-              statusCode: 403,
-            });
-          }
+        if (
+          channel.userLimit &&
+          channelUsers &&
+          channelUsers.length >= channel.userLimit &&
+          operatorMember.permissionLevel < 5
+        ) {
+          await new ConnectChannelHandler(this.io, this.socket).handle({
+            channelId: server.receptionLobbyId || server.lobbyId,
+            serverId: serverId,
+            userId: userId,
+          });
+          return;
         }
       }
 
@@ -239,6 +233,19 @@ export class DisconnectChannelHandler extends SocketHandler {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
+        if (
+          operatorMember.permissionLevel < 5 ||
+          operatorMember.permissionLevel <= userMember.permissionLevel
+        ) {
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '你沒有足夠的權限踢除其他用戶',
+            part: 'DISCONNECTCHANNEL',
+            tag: 'PERMISSION_DENIED',
+            statusCode: 403,
+          });
+        }
+
         if (user.currentChannelId !== channelId) {
           throw new StandardizedError({
             name: 'PermissionError',
@@ -248,22 +255,11 @@ export class DisconnectChannelHandler extends SocketHandler {
             statusCode: 403,
           });
         }
+
         if (user.currentServerId !== serverId) {
           throw new StandardizedError({
             name: 'PermissionError',
-            message: '用戶不在該語音群中',
-            part: 'DISCONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-        if (
-          operatorMember.permissionLevel < 5 ||
-          operatorMember.permissionLevel <= userMember.permissionLevel
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限踢除其他用戶',
+            message: '用戶不在語音群中',
             part: 'DISCONNECTCHANNEL',
             tag: 'PERMISSION_DENIED',
             statusCode: 403,

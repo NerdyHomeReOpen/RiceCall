@@ -131,7 +131,7 @@ export class ConnectServerHandler extends SocketHandler {
 
       // Join lobby
       await new ConnectChannelHandler(this.io, this.socket).handle({
-        channelId: server.lobbyId,
+        channelId: server.receptionLobbyId || server.lobbyId,
         serverId: serverId,
         userId: userId,
       });
