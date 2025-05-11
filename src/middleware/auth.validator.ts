@@ -4,13 +4,9 @@ import { verifyJWT } from '@/utils/jwt';
 // StandardizedError
 import StandardizedError from '@/error';
 
-export default class AuthValidator {
-  constructor(private token: string) {
-    this.token = token;
-  }
-
-  async validate() {
-    const decoded = verifyJWT(this.token);
+export const AuthValidator = {
+  validate: async (token: string) => {
+    const decoded = verifyJWT(token);
     if (!decoded.valid) {
       throw new StandardizedError({
         name: 'ValidationError',
@@ -32,5 +28,5 @@ export default class AuthValidator {
     }
 
     return decoded.userId;
-  }
-}
+  },
+};

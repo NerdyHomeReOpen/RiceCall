@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io';
 import StandardizedError from '@/error';
 
 // Validators
-import AuthValidator from '@/middleware/auth.validator';
+import { AuthValidator } from '@/middleware/auth.validator';
 
 // Handlers
 import {
@@ -98,7 +98,7 @@ export default class SocketServer {
       try {
         const { token } = socket.handshake.query;
 
-        const userId = await new AuthValidator(token as string).validate();
+        const userId = await AuthValidator.validate(token as string);
 
         socket.data.userId = userId;
 
@@ -147,6 +147,11 @@ export default class SocketServer {
     io.on('connection', async (socket: Socket) => {
       SocketServer.userSocketMap.set(socket.data.userId, socket.id);
       await ConnectUserHandler.handle(io, socket);
+
+      socket.on('disconnecting', async () => {
+        SocketServer.userSocketMap.delete(socket.data.userId);
+        await DisconnectUserHandler.handle(io, socket);
+      });
 
       socket.on('disconnect', async () => {
         SocketServer.userSocketMap.delete(socket.data.userId);

@@ -9,7 +9,6 @@ import StandardizedError from '@/error';
 // Handler
 import { ConnectServerHandler } from '@/api/socket/events/server/server.handler';
 import { DisconnectServerHandler } from '@/api/socket/events/server/server.handler';
-import { ConnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
 import { DisconnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
 
 // Schemas
@@ -64,24 +63,8 @@ export const ConnectUserHandler = {
 
       // Reconnect user to server
       if (user.currentServerId) {
-        await DisconnectServerHandler.handle(io, socket, {
-          userId: user.userId,
-          serverId: user.currentServerId,
-        });
         await ConnectServerHandler.handle(io, socket, {
-          userId: user.userId,
-          serverId: user.currentServerId,
-        });
-      }
-      if (user.currentChannelId) {
-        await DisconnectChannelHandler.handle(io, socket, {
-          userId: user.userId,
-          channelId: user.currentChannelId,
-          serverId: user.currentServerId,
-        });
-        await ConnectChannelHandler.handle(io, socket, {
-          userId: user.userId,
-          channelId: user.currentChannelId,
+          userId: operatorId,
           serverId: user.currentServerId,
         });
       }
@@ -119,12 +102,12 @@ export const DisconnectUserHandler = {
       // Disconnect user from server and channel
       if (user.currentServerId) {
         await DisconnectServerHandler.handle(io, socket, {
-          userId: user.userId,
+          userId: operatorId,
           serverId: user.currentServerId,
         });
       } else if (user.currentChannelId) {
         await DisconnectChannelHandler.handle(io, socket, {
-          userId: user.userId,
+          userId: operatorId,
           channelId: user.currentChannelId,
           serverId: user.currentServerId,
         });
