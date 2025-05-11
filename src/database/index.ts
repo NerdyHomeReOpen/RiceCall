@@ -326,6 +326,7 @@ export default class Database {
           'type',
           'visibility',
           'lobby_id',
+          'reception_lobby_id',
           'owner_id',
           'created_at',
         ];

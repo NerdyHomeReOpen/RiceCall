@@ -168,6 +168,7 @@ CREATE TABLE `servers` (
   `type` varchar(255) NOT NULL DEFAULT 'game',
   `visibility` varchar(255) NOT NULL DEFAULT 'public',
   `lobby_id` char(36) DEFAULT NULL,
+  `reception_lobby_id` char(36) DEFAULT NULL,
   `owner_id` char(36) DEFAULT NULL,
   `created_at` bigint(20) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -370,7 +371,8 @@ ALTER TABLE `member_applications`
 --
 ALTER TABLE `servers`
   ADD CONSTRAINT `servers_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `servers_ibfk_2` FOREIGN KEY (`lobby_id`) REFERENCES `channels` (`channel_id`);
+  ADD CONSTRAINT `servers_ibfk_2` FOREIGN KEY (`lobby_id`) REFERENCES `channels` (`channel_id`),
+  ADD CONSTRAINT `servers_ibfk_3` FOREIGN KEY (`reception_lobby_id`) REFERENCES `channels` (`channel_id`) ON DELETE SET NULL;
 
 --
 -- 資料表的限制式 `users`
