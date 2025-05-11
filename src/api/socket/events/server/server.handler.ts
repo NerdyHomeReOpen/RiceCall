@@ -78,6 +78,7 @@ export class ConnectServerHandler extends SocketHandler {
       if (!userMember) {
         await database.set.member(userId, serverId, {
           permissionLevel: 1,
+          createdAt: Date.now(),
         });
       }
 
