@@ -14,17 +14,18 @@ import {
 } from '@/api/socket/events/rtc/rtc.schemas';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 export const RTCOfferHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       const operatorId = socket.data.userId;
 
-      const { to, offer } = await new DataValidator(
+      const { to, offer } = await DataValidator.validate(
         RTCOfferSchema,
+        data,
         'RTCOFFER',
-      ).validate(data);
+      );
 
       socket.to(to).emit('RTCOffer', {
         from: socket.id,
@@ -53,10 +54,11 @@ export const RTCAnswerHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { to, answer } = await new DataValidator(
+      const { to, answer } = await DataValidator.validate(
         RTCAnswerSchema,
+        data,
         'RTCANSWER',
-      ).validate(data);
+      );
 
       socket.to(to).emit('RTCAnswer', {
         from: socket.id,
@@ -85,10 +87,11 @@ export const RTCCandidateHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { to, candidate } = await new DataValidator(
+      const { to, candidate } = await DataValidator.validate(
         RTCCandidateSchema,
+        data,
         'RTCCANDIDATE',
-      ).validate(data);
+      );
 
       socket.to(to).emit('RTCIceCandidate', {
         from: socket.id,

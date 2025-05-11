@@ -14,7 +14,7 @@ import { ResponseType } from '@/api/http';
 import { RegisterSchema } from '@/api/http/routers/register/register.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -25,10 +25,11 @@ import { serverConfig } from '@/config';
 export const RegisterHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { account, password, username } = await new DataValidator(
+      const { account, password, username } = await DataValidator.validate(
         RegisterSchema,
+        data,
         'REGISTER',
-      ).validate(data);
+      );
 
       // Create user data
       const userId = uuidv4();

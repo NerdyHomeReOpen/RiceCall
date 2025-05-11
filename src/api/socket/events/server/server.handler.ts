@@ -25,7 +25,7 @@ import {
 } from '@/api/socket/events/server/server.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -35,10 +35,11 @@ export const SearchServerHandler = {
     try {
       // const operatorId = socket.data.userId;
 
-      const { query } = await new DataValidator(
+      const { query } = await DataValidator.validate(
         SearchServerSchema,
+        data,
         'SEARCHSERVER',
-      ).validate(data);
+      );
 
       const result = await database.get.searchServer(query);
 
@@ -65,10 +66,11 @@ export const ConnectServerHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, serverId } = await new DataValidator(
+      const { userId, serverId } = await DataValidator.validate(
         ConnectServerSchema,
+        data,
         'CONNECTSERVER',
-      ).validate(data);
+      );
 
       const user = await database.get.user(userId);
       const server = await database.get.server(serverId);
@@ -181,10 +183,11 @@ export const DisconnectServerHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, serverId } = await new DataValidator(
+      const { userId, serverId } = await DataValidator.validate(
         DisconnectServerSchema,
+        data,
         'DISCONNECTSERVER',
-      ).validate(data);
+      );
 
       const user = await database.get.user(userId);
       const userMember = await database.get.member(userId, serverId);
@@ -269,10 +272,11 @@ export const CreateServerHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { server: preset } = await new DataValidator(
+      const { server: preset } = await DataValidator.validate(
         CreateServerSchema,
+        data,
         'CREATESERVER',
-      ).validate(data);
+      );
 
       const operator = await database.get.user(operatorId);
       const operatorServers = await database.get.userServers(operatorId);
@@ -354,10 +358,11 @@ export const UpdateServerHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { serverId, server: update } = await new DataValidator(
+      const { serverId, server: update } = await DataValidator.validate(
         UpdateServerSchema,
+        data,
         'UPDATESERVER',
-      ).validate(data);
+      );
 
       const operatorMember = await database.get.member(operatorId, serverId);
 

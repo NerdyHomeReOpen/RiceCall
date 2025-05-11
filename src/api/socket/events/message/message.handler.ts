@@ -17,7 +17,7 @@ import {
 } from '@/api/socket/events/message/message.schemas';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -32,9 +32,7 @@ export const SendMessageHandler = {
         serverId,
         channelId,
         message: preset,
-      } = await new DataValidator(SendMessageSchema, 'SENDMESSAGE').validate(
-        data,
-      );
+      } = await DataValidator.validate(SendMessageSchema, data, 'SENDMESSAGE');
 
       const channel = await database.get.channel(channelId);
       const operatorMember = await database.get.member(operatorId, serverId);
@@ -105,10 +103,11 @@ export const SendDirectMessageHandler = {
         userId,
         targetId,
         directMessage: preset,
-      } = await new DataValidator(
+      } = await DataValidator.validate(
         SendDirectMessageSchema,
+        data,
         'SENDDIRECTMESSAGE',
-      ).validate(data);
+      );
 
       if (operatorId !== userId) {
         throw new StandardizedError({
@@ -158,10 +157,11 @@ export const ShakeWindowHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, targetId } = await new DataValidator(
+      const { userId, targetId } = await DataValidator.validate(
         ShakeWindowSchema,
+        data,
         'SHAKEWINDOW',
-      ).validate(data);
+      );
 
       const friend = await database.get.userFriend(targetId, userId);
 

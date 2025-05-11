@@ -14,7 +14,7 @@ import { ResponseType } from '@/api/http';
 import { LoginSchema } from '@/api/http/routers/login/login.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -22,10 +22,11 @@ import { database } from '@/index';
 export const LoginHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { account, password } = await new DataValidator(
+      const { account, password } = await DataValidator.validate(
         LoginSchema,
+        data,
         'LOGIN',
-      ).validate(data);
+      );
 
       const accountData = await database.get.account(account);
       if (!accountData) {

@@ -17,7 +17,7 @@ import {
 } from '@/api/socket/events/friendApplication/friendApplication.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -31,10 +31,11 @@ export const CreateFriendApplicationHandler = {
         senderId,
         receiverId,
         friendApplication: preset,
-      } = await new DataValidator(
+      } = await DataValidator.validate(
         CreateFriendApplicationSchema,
+        data,
         'CREATEFRIENDAPPLICATION',
-      ).validate(data);
+      );
 
       const friendApplication = await database.get.friendApplication(
         senderId,
@@ -111,10 +112,11 @@ export const UpdateFriendApplicationHandler = {
         senderId,
         receiverId,
         friendApplication: update,
-      } = await new DataValidator(
+      } = await DataValidator.validate(
         UpdateFriendApplicationSchema,
+        data,
         'UPDATEFRIENDAPPLICATION',
-      ).validate(data);
+      );
 
       if (operatorId !== senderId && operatorId !== receiverId) {
         throw new StandardizedError({
@@ -161,10 +163,11 @@ export const DeleteFriendApplicationHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { senderId, receiverId } = await new DataValidator(
+      const { senderId, receiverId } = await DataValidator.validate(
         DeleteFriendApplicationSchema,
+        data,
         'DELETEFRIENDAPPLICATION',
-      ).validate(data);
+      );
 
       if (operatorId !== senderId && operatorId !== receiverId) {
         throw new StandardizedError({

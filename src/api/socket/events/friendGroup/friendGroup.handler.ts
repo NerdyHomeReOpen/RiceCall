@@ -18,7 +18,7 @@ import {
 } from '@/api/socket/events/friendGroup/friendGroup.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -28,10 +28,11 @@ export const CreateFriendGroupHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, group: preset } = await new DataValidator(
+      const { userId, group: preset } = await DataValidator.validate(
         CreateFriendGroupSchema,
+        data,
         'CREATEFRIENDGROUP',
-      ).validate(data);
+      );
 
       if (operatorId !== userId) {
         throw new StandardizedError({
@@ -81,10 +82,11 @@ export const UpdateFriendGroupHandler = {
         userId,
         friendGroupId,
         group: update,
-      } = await new DataValidator(
+      } = await DataValidator.validate(
         UpdateFriendGroupSchema,
+        data,
         'UPDATEFRIENDGROUP',
-      ).validate(data);
+      );
 
       if (operatorId !== userId) {
         throw new StandardizedError({
@@ -122,10 +124,11 @@ export const DeleteFriendGroupHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, friendGroupId } = await new DataValidator(
+      const { userId, friendGroupId } = await DataValidator.validate(
         DeleteFriendGroupSchema,
+        data,
         'DELETEFRIENDGROUP',
-      ).validate(data);
+      );
 
       const friendGroupFriends = await database.get.friendGroupFriends(
         friendGroupId,

@@ -11,7 +11,7 @@ import { ResponseType } from '@/api/http';
 import { RefreshFriendGroupSchema } from './refreshFriendGroup.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -19,10 +19,11 @@ import { database } from '@/index';
 export const RefreshFriendGroupHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { friendGroupId } = await new DataValidator(
+      const { friendGroupId } = await DataValidator.validate(
         RefreshFriendGroupSchema,
+        data,
         'REFRESHFRIENDGROUP',
-      ).validate(data);
+      );
 
       const friendGroup = await database.get.friendGroup(friendGroupId);
 

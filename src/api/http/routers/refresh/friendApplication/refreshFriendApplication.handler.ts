@@ -11,7 +11,7 @@ import { ResponseType } from '@/api/http';
 import { RefreshFriendApplicationSchema } from './refreshFriendApplication.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -19,10 +19,11 @@ import { database } from '@/index';
 export const RefreshFriendApplicationHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { senderId, receiverId } = await new DataValidator(
+      const { senderId, receiverId } = await DataValidator.validate(
         RefreshFriendApplicationSchema,
+        data,
         'REFRESHFRIENDAPPLICATION',
-      ).validate(data);
+      );
 
       const friendApplication = await database.get.friendApplication(
         senderId,

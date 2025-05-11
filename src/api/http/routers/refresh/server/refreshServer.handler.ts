@@ -11,7 +11,7 @@ import { ResponseType } from '@/api/http';
 import { RefreshServerSchema } from './refreshServer.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -19,10 +19,11 @@ import { database } from '@/index';
 export const RefreshServerHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { serverId } = await new DataValidator(
+      const { serverId } = await DataValidator.validate(
         RefreshServerSchema,
+        data,
         'REFRESHSERVER',
-      ).validate(data);
+      );
 
       const server = await database.get.server(serverId);
 
@@ -55,10 +56,11 @@ export const RefreshServerHandler = {
 export const RefreshServerChannelsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { serverId } = await new DataValidator(
+      const { serverId } = await DataValidator.validate(
         RefreshServerSchema,
+        data,
         'REFRESHSERVERCHANNELS',
-      ).validate(data);
+      );
 
       const serverChannels = await database.get.serverChannels(serverId);
 
@@ -91,10 +93,11 @@ export const RefreshServerChannelsHandler = {
 export const RefreshServerMemberApplicationsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { serverId } = await new DataValidator(
+      const { serverId } = await DataValidator.validate(
         RefreshServerSchema,
+        data,
         'REFRESHSERVERMEMBERAPPLICATIONS',
-      ).validate(data);
+      );
 
       const serverMemberApplications =
         await database.get.serverMemberApplications(serverId);
@@ -128,10 +131,11 @@ export const RefreshServerMemberApplicationsHandler = {
 export const RefreshServerMembersHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { serverId } = await new DataValidator(
+      const { serverId } = await DataValidator.validate(
         RefreshServerSchema,
+        data,
         'REFRESHSERVERMEMBERS',
-      ).validate(data);
+      );
 
       const serverMembers = await database.get.serverMembers(serverId);
 

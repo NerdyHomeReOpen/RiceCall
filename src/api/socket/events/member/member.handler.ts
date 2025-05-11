@@ -17,7 +17,7 @@ import {
 } from '@/api/socket/events/member/member.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -31,8 +31,10 @@ export const CreateMemberHandler = {
         userId,
         serverId,
         member: preset,
-      } = await new DataValidator(CreateMemberSchema, 'CREATEMEMBER').validate(
+      } = await DataValidator.validate(
+        CreateMemberSchema,
         data,
+        'CREATEMEMBER',
       );
 
       const server = await database.get.server(serverId);
@@ -123,8 +125,10 @@ export const UpdateMemberHandler = {
         userId,
         serverId,
         member: update,
-      } = await new DataValidator(UpdateMemberSchema, 'UPDATEMEMBER').validate(
+      } = await DataValidator.validate(
+        UpdateMemberSchema,
         data,
+        'UPDATEMEMBER',
       );
 
       const userMember = await database.get.member(userId, serverId);
@@ -267,10 +271,11 @@ export const DeleteMemberHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, serverId } = await new DataValidator(
+      const { userId, serverId } = await DataValidator.validate(
         DeleteMemberSchema,
+        data,
         'DELETEMEMBER',
-      ).validate(data);
+      );
 
       const userMember = await database.get.member(userId, serverId);
       const operatorMember = await database.get.member(operatorId, serverId);

@@ -11,7 +11,7 @@ import { ResponseType } from '@/api/http';
 import { RefreshChannelSchema } from './refreshChannel.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -19,10 +19,11 @@ import { database } from '@/index';
 export const RefreshChannelHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { channelId } = await new DataValidator(
+      const { channelId } = await DataValidator.validate(
         RefreshChannelSchema,
+        data,
         'REFRESHCHANNEL',
-      ).validate(data);
+      );
 
       const channel = await database.get.channel(channelId);
 

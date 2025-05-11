@@ -17,7 +17,7 @@ import {
 } from '@/api/socket/events/friend/friend.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -31,8 +31,10 @@ export const CreateFriendHandler = {
         userId,
         targetId,
         friend: preset,
-      } = await new DataValidator(CreateFriendSchema, 'CREATEFRIEND').validate(
+      } = await DataValidator.validate(
+        CreateFriendSchema,
         data,
+        'CREATEFRIEND',
       );
 
       const friend = await database.get.friend(userId, targetId);
@@ -110,10 +112,11 @@ export const UpdateFriendHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, targetId, friend } = await new DataValidator(
+      const { userId, targetId, friend } = await DataValidator.validate(
         UpdateFriendSchema,
+        data,
         'UPDATEFRIEND',
-      ).validate(data);
+      );
 
       if (operatorId !== userId) {
         throw new StandardizedError({
@@ -151,10 +154,11 @@ export const DeleteFriendHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, targetId } = await new DataValidator(
+      const { userId, targetId } = await DataValidator.validate(
         DeleteFriendSchema,
+        data,
         'DELETEFRIEND',
-      ).validate(data);
+      );
 
       if (operatorId !== userId) {
         throw new StandardizedError({

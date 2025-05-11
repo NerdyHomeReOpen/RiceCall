@@ -11,7 +11,7 @@ import { ResponseType } from '@/api/http';
 import { ExampleSchema } from '@/api/http/routers/template/example.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -19,10 +19,11 @@ import { database } from '@/index';
 export const ExampleHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { example } = await new DataValidator(
+      const { example } = await DataValidator.validate(
         ExampleSchema,
+        data,
         'EXAMPLE',
-      ).validate(data);
+      );
 
       // TODO: implement logic
 

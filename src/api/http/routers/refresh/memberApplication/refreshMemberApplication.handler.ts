@@ -11,7 +11,7 @@ import { ResponseType } from '@/api/http';
 import { RefreshMemberApplicationSchema } from './refreshMemberApplication.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -19,10 +19,11 @@ import { database } from '@/index';
 export const RefreshMemberApplicationHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { userId, serverId } = await new DataValidator(
+      const { userId, serverId } = await DataValidator.validate(
         RefreshMemberApplicationSchema,
+        data,
         'REFRESHMEMBERAPPLICATION',
-      ).validate(data);
+      );
 
       const memberApplication = await database.get.memberApplication(
         userId,

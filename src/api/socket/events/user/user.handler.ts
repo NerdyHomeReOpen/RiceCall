@@ -19,7 +19,7 @@ import {
 } from '@/api/socket/events/user/user.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -29,10 +29,11 @@ export const SearchUserHandler = {
     try {
       // const operatorId = this.socket.data.userId;
 
-      const { query } = await new DataValidator(
+      const { query } = await DataValidator.validate(
         SearchUserSchema,
+        data,
         'SEARCHUSER',
-      ).validate(data);
+      );
 
       const result = await database.get.searchUser(query);
 
@@ -157,10 +158,11 @@ export const UpdateUserHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, user: update } = await new DataValidator(
+      const { userId, user: update } = await DataValidator.validate(
         UpdateUserSchema,
+        data,
         'UPDATEUSER',
-      ).validate(data);
+      );
 
       if (operatorId !== userId) {
         throw new StandardizedError({

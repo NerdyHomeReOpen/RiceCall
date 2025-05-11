@@ -11,7 +11,7 @@ import { ResponseType } from '@/api/http';
 import { RefreshUserSchema } from './refreshUser.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -19,10 +19,11 @@ import { database } from '@/index';
 export const RefreshUserHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { userId } = await new DataValidator(
+      const { userId } = await DataValidator.validate(
         RefreshUserSchema,
+        data,
         'REFRESHUSER',
-      ).validate(data);
+      );
 
       const user = await database.get.user(userId);
 
@@ -55,10 +56,11 @@ export const RefreshUserHandler = {
 export const RefreshUserFriendApplicationsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { userId } = await new DataValidator(
+      const { userId } = await DataValidator.validate(
         RefreshUserSchema,
+        data,
         'REFRESHUSERFRIENDAPPLICATIONS',
-      ).validate(data);
+      );
 
       const userFriendApplications = await database.get.userFriendApplications(
         userId,
@@ -93,10 +95,11 @@ export const RefreshUserFriendApplicationsHandler = {
 export const RefreshUserFriendGroupsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { userId } = await new DataValidator(
+      const { userId } = await DataValidator.validate(
         RefreshUserSchema,
+        data,
         'REFRESHUSERFRIENDGROUPS',
-      ).validate(data);
+      );
 
       const userFriendGroups = await database.get.userFriendGroups(userId);
 
@@ -129,10 +132,11 @@ export const RefreshUserFriendGroupsHandler = {
 export const RefreshUserFriendsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { userId } = await new DataValidator(
+      const { userId } = await DataValidator.validate(
         RefreshUserSchema,
+        data,
         'REFRESHUSERFRIENDS',
-      ).validate(data);
+      );
 
       const userFriends = await database.get.userFriends(userId);
 
@@ -165,10 +169,11 @@ export const RefreshUserFriendsHandler = {
 export const RefreshUserServersHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { userId } = await new DataValidator(
+      const { userId } = await DataValidator.validate(
         RefreshUserSchema,
+        data,
         'REFRESHUSERSERVERS',
-      ).validate(data);
+      );
 
       const userServers = await database.get.userServers(userId);
 

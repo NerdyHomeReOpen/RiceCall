@@ -95,6 +95,13 @@ export default class HttpServer {
         }
 
         if (response) sendImage(res, response);
+        else
+          sendResponse(res, {
+            statusCode: 404,
+            message: 'Not Found',
+            data: null,
+          });
+
         return;
       }
 
@@ -152,8 +159,17 @@ export default class HttpServer {
             }
 
             if (response) sendResponse(res, response);
+            else
+              sendResponse(res, {
+                statusCode: 404,
+                message: 'Not Found',
+                data: null,
+              });
+
             return;
           });
+
+          return;
         } else {
           const form = new IncomingForm();
 
@@ -168,8 +184,17 @@ export default class HttpServer {
             }
 
             if (response) sendResponse(res, response);
+            else
+              sendResponse(res, {
+                statusCode: 404,
+                message: 'Not Found',
+                data: null,
+              });
+
             return;
           });
+
+          return;
         }
       }
     });

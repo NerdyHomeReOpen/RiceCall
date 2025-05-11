@@ -15,7 +15,7 @@ import { ResponseType } from '@/api/http';
 import { UploadSchema } from '@/api/http/routers/upload/upload.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Config
 import { appConfig, serverConfig } from '@/config';
@@ -23,10 +23,11 @@ import { appConfig, serverConfig } from '@/config';
 export const UploadHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
-      const { _type, _fileName, _file } = await new DataValidator(
+      const { _type, _fileName, _file } = await DataValidator.validate(
         UploadSchema,
+        data,
         'UPLOAD',
-      ).validate(data);
+      );
 
       const { type, fileName, file } = {
         type: _type[0],
@@ -92,7 +93,7 @@ export const UploadHandler = {
         ),
       );
 
-      sharp(imageBuffer)
+      await sharp(imageBuffer)
         .webp({ quality: 80 })
         .toFile(path.join(filePath, PrefixFileName))
         .catch((err) => {

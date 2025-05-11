@@ -21,7 +21,7 @@ import {
 } from '@/api/socket/events/channel/channel.schema';
 
 // Middleware
-import DataValidator from '@/middleware/data.validator';
+import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
@@ -34,10 +34,12 @@ export const ConnectChannelHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, channelId, serverId, password } = await new DataValidator(
-        ConnectChannelSchema,
-        'CONNECTCHANNEL',
-      ).validate(data);
+      const { userId, channelId, serverId, password } =
+        await DataValidator.validate(
+          ConnectChannelSchema,
+          data,
+          'CONNECTCHANNEL',
+        );
 
       const user = await database.get.user(userId);
       const server = await database.get.server(serverId);
@@ -222,10 +224,11 @@ export const DisconnectChannelHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, channelId, serverId } = await new DataValidator(
+      const { userId, channelId, serverId } = await DataValidator.validate(
         DisconnectChannelSchema,
+        data,
         'DISCONNECTCHANNEL',
-      ).validate(data);
+      );
 
       const user = await database.get.user(userId);
       const userMember = await database.get.member(userId, serverId);
@@ -318,10 +321,11 @@ export const CreateChannelHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { serverId, channel: preset } = await new DataValidator(
+      const { serverId, channel: preset } = await DataValidator.validate(
         CreateChannelSchema,
+        data,
         'CREATECHANNEL',
-      ).validate(data);
+      );
 
       const category = await database.get.channel(preset.categoryId);
       const serverChannels = await database.get.serverChannels(serverId);
@@ -401,10 +405,11 @@ export const UpdateChannelHandler = {
         channelId,
         serverId,
         channel: update,
-      } = await new DataValidator(
+      } = await DataValidator.validate(
         UpdateChannelSchema,
+        data,
         'UPDATECHANNEL',
-      ).validate(data);
+      );
 
       const messages: any[] = [];
       const channel = await database.get.channel(channelId);
@@ -575,10 +580,11 @@ export const UpdateChannelHandler = {
 export const UpdateChannelsHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
-      const { serverId, channels } = await new DataValidator(
+      const { serverId, channels } = await DataValidator.validate(
         UpdateChannelsSchema,
+        data,
         'UPDATECHANNELS',
-      ).validate(data);
+      );
 
       await Promise.all(
         channels.map(async (channel: any) => {
@@ -611,10 +617,11 @@ export const DeleteChannelHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { channelId, serverId } = await new DataValidator(
+      const { channelId, serverId } = await DataValidator.validate(
         DeleteChannelSchema,
+        data,
         'DELETECHANNEL',
-      ).validate(data);
+      );
 
       const channel = await database.get.channel(channelId);
       const channelUsers = await database.get.channelUsers(channelId);

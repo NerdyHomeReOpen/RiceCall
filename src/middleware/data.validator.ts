@@ -3,14 +3,9 @@ import { z } from 'zod';
 // Error
 import StandardizedError from '@/error';
 
-export default class DataValidator {
-  constructor(private schema: z.ZodSchema, private part: string) {
-    this.schema = schema;
-    this.part = part;
-  }
-
-  async validate(data: any) {
-    const result = this.schema.safeParse(data);
+export const DataValidator = {
+  validate: async (schema: z.ZodSchema, data: any, part: string) => {
+    const result = schema.safeParse(data);
 
     if (!result.success) {
       throw new StandardizedError({
@@ -21,12 +16,12 @@ export default class DataValidator {
               `[${error.code}] ${error.path.join('.')}: ${error.message}`,
           )
           .join(', ')}`,
-        part: this.part,
+        part: part,
         tag: 'INVALID_DATA',
         statusCode: 401,
       });
     }
 
     return result.data;
-  }
-}
+  },
+};
