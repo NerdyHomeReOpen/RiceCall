@@ -133,11 +133,19 @@ export const ConnectServerHandler = {
       });
 
       // Join lobby
-      await ConnectChannelHandler.handle(io, socket, {
-        channelId: server.receptionLobbyId || server.lobbyId,
-        serverId: serverId,
-        userId: userId,
-      });
+      if (server.visibility === 'private' && userMember.permissionLevel < 2) {
+        await ConnectChannelHandler.handle(io, socket, {
+          channelId: server.lobbyId,
+          serverId: serverId,
+          userId: userId,
+        });
+      } else {
+        await ConnectChannelHandler.handle(io, socket, {
+          channelId: server.receptionLobbyId || server.lobbyId,
+          serverId: serverId,
+          userId: userId,
+        });
+      }
 
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
