@@ -9,7 +9,6 @@ import StandardizedError from '@/error';
 // Handler
 import { ConnectServerHandler } from '@/api/socket/events/server/server.handler';
 import { DisconnectServerHandler } from '@/api/socket/events/server/server.handler';
-import { DisconnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
 
 // Schemas
 import {
@@ -63,6 +62,11 @@ export const ConnectUserHandler = {
 
       // Reconnect user to server
       if (user.currentServerId) {
+        await DisconnectServerHandler.handle(io, socket, {
+          userId: operatorId,
+          serverId: user.currentServerId,
+        });
+
         await ConnectServerHandler.handle(io, socket, {
           userId: operatorId,
           serverId: user.currentServerId,
@@ -103,12 +107,6 @@ export const DisconnectUserHandler = {
       if (user.currentServerId) {
         await DisconnectServerHandler.handle(io, socket, {
           userId: operatorId,
-          serverId: user.currentServerId,
-        });
-      } else if (user.currentChannelId) {
-        await DisconnectChannelHandler.handle(io, socket, {
-          userId: operatorId,
-          channelId: user.currentChannelId,
           serverId: user.currentServerId,
         });
       }
