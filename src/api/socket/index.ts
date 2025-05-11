@@ -149,11 +149,13 @@ export default class SocketServer {
       await ConnectUserHandler.handle(io, socket);
 
       socket.on('disconnecting', async () => {
+        socket.removeAllListeners();
         SocketServer.userSocketMap.delete(socket.data.userId);
         await DisconnectUserHandler.handle(io, socket);
       });
 
       socket.on('disconnect', async () => {
+        socket.removeAllListeners();
         SocketServer.userSocketMap.delete(socket.data.userId);
         await DisconnectUserHandler.handle(io, socket);
       });
