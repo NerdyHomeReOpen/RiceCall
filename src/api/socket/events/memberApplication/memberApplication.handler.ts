@@ -1,11 +1,10 @@
+import { Server, Socket } from 'socket.io';
+
 // Error
 import StandardizedError from '@/error';
 
 // Utils
 import Logger from '@/utils/logger';
-
-// Handler
-import { SocketHandler } from '@/api/socket/base.handler';
 
 // Schemas
 import {
@@ -20,10 +19,10 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class CreateMemberApplicationHandler extends SocketHandler {
-  async handle(data: any) {
+export const CreateMemberApplicationHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         userId,
@@ -62,12 +61,10 @@ export class CreateMemberApplicationHandler extends SocketHandler {
         createdAt: Date.now(),
       });
 
-      this.io
-        .to(`server_${serverId}`)
-        .emit(
-          'serverMemberApplicationAdd',
-          await database.get.serverMemberApplication(serverId, userId),
-        );
+      io.to(`server_${serverId}`).emit(
+        'serverMemberApplicationAdd',
+        await database.get.serverMemberApplication(serverId, userId),
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -79,16 +76,16 @@ export class CreateMemberApplicationHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('MemberApplication').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class UpdateMemberApplicationHandler extends SocketHandler {
-  async handle(data: any) {
+export const UpdateMemberApplicationHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         userId,
@@ -116,9 +113,12 @@ export class UpdateMemberApplicationHandler extends SocketHandler {
       // Update member application
       await database.set.memberApplication(userId, serverId, update);
 
-      this.io
-        .to(`server_${serverId}`)
-        .emit('serverMemberApplicationUpdate', userId, serverId, update);
+      io.to(`server_${serverId}`).emit(
+        'serverMemberApplicationUpdate',
+        userId,
+        serverId,
+        update,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -130,16 +130,16 @@ export class UpdateMemberApplicationHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('MemberApplication').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class DeleteMemberApplicationHandler extends SocketHandler {
-  async handle(data: any) {
+export const DeleteMemberApplicationHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, serverId } = await new DataValidator(
         DeleteMemberApplicationSchema,
@@ -163,9 +163,11 @@ export class DeleteMemberApplicationHandler extends SocketHandler {
       // Delete member application
       await database.delete.memberApplication(userId, serverId);
 
-      this.io
-        .to(`server_${serverId}`)
-        .emit('serverMemberApplicationDelete', userId, serverId);
+      io.to(`server_${serverId}`).emit(
+        'serverMemberApplicationDelete',
+        userId,
+        serverId,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -177,8 +179,8 @@ export class DeleteMemberApplicationHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('MemberApplication').error(error.message);
     }
-  }
-}
+  },
+};

@@ -10,9 +10,6 @@ import Logger from '@/utils/logger';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Handler
-import { HttpHandler } from '@/api/http/base.handler';
-
 // Schemas
 import { RegisterSchema } from '@/api/http/routers/register/register.schema';
 
@@ -25,7 +22,7 @@ import { database } from '@/index';
 // Config
 import { serverConfig } from '@/config';
 
-export class RegisterHandler extends HttpHandler {
+export const RegisterHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { account, password, username } = await new DataValidator(
@@ -72,5 +69,5 @@ export class RegisterHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};

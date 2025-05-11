@@ -7,9 +7,6 @@ import Logger from '@/utils/logger';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Handler
-import { HttpHandler } from '@/api/http/base.handler';
-
 // Schemas
 import { RefreshServerSchema } from './refreshServer.schema';
 
@@ -19,7 +16,7 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class RefreshServerHandler extends HttpHandler {
+export const RefreshServerHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await new DataValidator(
@@ -52,10 +49,10 @@ export class RefreshServerHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};
 
-export class RefreshServerChannelsHandler extends HttpHandler {
+export const RefreshServerChannelsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await new DataValidator(
@@ -88,10 +85,10 @@ export class RefreshServerChannelsHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};
 
-export class RefreshServerMemberApplicationsHandler extends HttpHandler {
+export const RefreshServerMemberApplicationsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await new DataValidator(
@@ -125,10 +122,10 @@ export class RefreshServerMemberApplicationsHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};
 
-export class RefreshServerMembersHandler extends HttpHandler {
+export const RefreshServerMembersHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await new DataValidator(
@@ -161,5 +158,5 @@ export class RefreshServerMembersHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};

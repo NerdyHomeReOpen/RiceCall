@@ -10,9 +10,6 @@ import { generateJWT } from '@/utils/jwt';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Handler
-import { HttpHandler } from '@/api/http/base.handler';
-
 // Schemas
 import { LoginSchema } from '@/api/http/routers/login/login.schema';
 
@@ -22,7 +19,7 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class LoginHandler extends HttpHandler {
+export const LoginHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { account, password } = await new DataValidator(
@@ -97,5 +94,5 @@ export class LoginHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};

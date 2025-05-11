@@ -1,3 +1,4 @@
+import { IncomingMessage } from 'http';
 import path from 'path';
 import fs from 'fs/promises';
 
@@ -10,18 +11,14 @@ import Logger from '@/utils/logger';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Handler
-import { HttpHandler } from '@/api/http/base.handler';
-
 // Config
 import { appConfig } from '@/config';
 
-export class ImagesHandler extends HttpHandler {
-  async handle(): Promise<ResponseType> {
+export const ImagesHandler = {
+  async handle(req: IncomingMessage): Promise<ResponseType> {
     try {
       const originalPath =
-        this.req.url?.replace('images', 'uploads').split('?')[0].split('/') ||
-        [];
+        req.url?.replace('images', 'uploads').split('?')[0].split('/') || [];
       const originalName = originalPath.pop() || '';
 
       const fileName = originalName
@@ -73,5 +70,5 @@ export class ImagesHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};

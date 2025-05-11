@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { Server, Socket } from 'socket.io';
 
 // Error
 import StandardizedError from '@/error';
@@ -8,9 +8,6 @@ import Logger from '@/utils/logger';
 
 // Socket
 import SocketServer from '@/api/socket';
-
-// Handler
-import { SocketHandler } from '@/api/socket/base.handler';
 
 // Schemas
 import {
@@ -25,10 +22,10 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class CreateMemberHandler extends SocketHandler {
-  async handle(data: any) {
+export const CreateMemberHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         userId,
@@ -96,12 +93,10 @@ export class CreateMemberHandler extends SocketHandler {
         createdAt: Date.now(),
       });
 
-      this.io
-        .to(`server_${serverId}`)
-        .emit(
-          'serverMemberAdd',
-          await database.get.serverMember(serverId, userId),
-        );
+      io.to(`server_${serverId}`).emit(
+        'serverMemberAdd',
+        await database.get.serverMember(serverId, userId),
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -113,16 +108,16 @@ export class CreateMemberHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Member').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class UpdateMemberHandler extends SocketHandler {
-  async handle(data: any) {
+export const UpdateMemberHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         userId,
@@ -238,15 +233,18 @@ export class UpdateMemberHandler extends SocketHandler {
       await database.set.member(userId, serverId, update);
 
       const targetSocket =
-        operatorId === userId ? this.socket : SocketServer.getSocket(userId);
+        operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
         targetSocket.emit('serverUpdate', serverId, update);
       }
 
-      this.io
-        .to(`server_${serverId}`)
-        .emit('serverMemberUpdate', userId, serverId, update);
+      io.to(`server_${serverId}`).emit(
+        'serverMemberUpdate',
+        userId,
+        serverId,
+        update,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -258,16 +256,16 @@ export class UpdateMemberHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Member').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class DeleteMemberHandler extends SocketHandler {
-  async handle(data: any) {
+export const DeleteMemberHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, serverId } = await new DataValidator(
         DeleteMemberSchema,
@@ -321,11 +319,9 @@ export class DeleteMemberHandler extends SocketHandler {
       await database.delete.member(userId, serverId);
 
       const targetSocket =
-        operatorId === userId ? this.socket : SocketServer.getSocket(userId);
+        operatorId === userId ? socket : SocketServer.getSocket(userId);
 
-      this.io
-        .to(`server_${serverId}`)
-        .emit('serverMemberDelete', userId, serverId);
+      io.to(`server_${serverId}`).emit('serverMemberDelete', userId, serverId);
 
       if (targetSocket) {
         targetSocket.emit('serverDelete', serverId); // TODO: Need to kick user from server
@@ -341,8 +337,8 @@ export class DeleteMemberHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Member').error(error.message);
     }
-  }
-}
+  },
+};

@@ -1,3 +1,5 @@
+import { Server, Socket } from 'socket.io';
+
 // Error
 import StandardizedError from '@/error';
 
@@ -6,9 +8,6 @@ import Logger from '@/utils/logger';
 
 // Socket
 import SocketServer from '@/api/socket';
-
-// Handler
-import { SocketHandler } from '@/api/socket/base.handler';
 
 // Schemas
 import {
@@ -23,10 +22,10 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class CreateFriendApplicationHandler extends SocketHandler {
-  async handle(data: any) {
+export const CreateFriendApplicationHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         senderId,
@@ -97,16 +96,16 @@ export class CreateFriendApplicationHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('FriendApplication').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class UpdateFriendApplicationHandler extends SocketHandler {
-  async handle(data: any) {
+export const UpdateFriendApplicationHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         senderId,
@@ -151,16 +150,16 @@ export class UpdateFriendApplicationHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('FriendApplication').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class DeleteFriendApplicationHandler extends SocketHandler {
-  async handle(data: any) {
+export const DeleteFriendApplicationHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { senderId, receiverId } = await new DataValidator(
         DeleteFriendApplicationSchema,
@@ -196,8 +195,8 @@ export class DeleteFriendApplicationHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('FriendApplication').error(error.message);
     }
-  }
-}
+  },
+};

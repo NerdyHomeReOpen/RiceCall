@@ -1,11 +1,10 @@
+import { Server, Socket } from 'socket.io';
+
 // Error
 import StandardizedError from '@/error';
 
 // Utils
 import Logger from '@/utils/logger';
-
-// Handler
-import { SocketHandler } from '@/api/socket/base.handler';
 
 // Schemas
 import {
@@ -17,18 +16,18 @@ import {
 // Middleware
 import DataValidator from '@/middleware/data.validator';
 
-export class RTCOfferHandler extends SocketHandler {
-  async handle(data: any) {
+export const RTCOfferHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { to, offer } = await new DataValidator(
         RTCOfferSchema,
         'RTCOFFER',
       ).validate(data);
 
-      this.socket.to(to).emit('RTCOffer', {
-        from: this.socket.id,
+      socket.to(to).emit('RTCOffer', {
+        from: socket.id,
         userId: operatorId,
         offer: offer,
       });
@@ -43,24 +42,24 @@ export class RTCOfferHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('RTC').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class RTCAnswerHandler extends SocketHandler {
-  async handle(data: any) {
+export const RTCAnswerHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { to, answer } = await new DataValidator(
         RTCAnswerSchema,
         'RTCANSWER',
       ).validate(data);
 
-      this.socket.to(to).emit('RTCAnswer', {
-        from: this.socket.id,
+      socket.to(to).emit('RTCAnswer', {
+        from: socket.id,
         userId: operatorId,
         answer: answer,
       });
@@ -75,24 +74,24 @@ export class RTCAnswerHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('RTC').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class RTCCandidateHandler extends SocketHandler {
-  async handle(data: any) {
+export const RTCCandidateHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { to, candidate } = await new DataValidator(
         RTCCandidateSchema,
         'RTCCANDIDATE',
       ).validate(data);
 
-      this.socket.to(to).emit('RTCIceCandidate', {
-        from: this.socket.id,
+      socket.to(to).emit('RTCIceCandidate', {
+        from: socket.id,
         userId: operatorId,
         candidate: candidate,
       });
@@ -107,8 +106,8 @@ export class RTCCandidateHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('RTC').error(error.message);
     }
-  }
-}
+  },
+};

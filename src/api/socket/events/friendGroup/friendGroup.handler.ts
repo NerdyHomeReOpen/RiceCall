@@ -1,3 +1,4 @@
+import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 
 // Error
@@ -7,7 +8,6 @@ import StandardizedError from '@/error';
 import Logger from '@/utils/logger';
 
 // Handler
-import { SocketHandler } from '@/api/socket/base.handler';
 import { UpdateFriendHandler } from '@/api/socket/events/friend/friend.handler';
 
 // Schemas
@@ -23,10 +23,10 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class CreateFriendGroupHandler extends SocketHandler {
-  async handle(data: any) {
+export const CreateFriendGroupHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, group: preset } = await new DataValidator(
         CreateFriendGroupSchema,
@@ -51,7 +51,7 @@ export class CreateFriendGroupHandler extends SocketHandler {
         createdAt: Date.now(),
       });
 
-      this.socket.emit(
+      socket.emit(
         'friendGroupAdd',
         await database.get.friendGroup(friendGroupId),
       );
@@ -66,16 +66,16 @@ export class CreateFriendGroupHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('FriendGroup').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class UpdateFriendGroupHandler extends SocketHandler {
-  async handle(data: any) {
+export const UpdateFriendGroupHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         userId,
@@ -99,7 +99,7 @@ export class UpdateFriendGroupHandler extends SocketHandler {
       // Update friend group
       await database.set.friendGroup(friendGroupId, update);
 
-      this.socket.emit('friendGroupUpdate', friendGroupId, update);
+      socket.emit('friendGroupUpdate', friendGroupId, update);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -111,16 +111,16 @@ export class UpdateFriendGroupHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('FriendGroup').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class DeleteFriendGroupHandler extends SocketHandler {
-  async handle(data: any) {
+export const DeleteFriendGroupHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, friendGroupId } = await new DataValidator(
         DeleteFriendGroupSchema,
@@ -144,7 +144,7 @@ export class DeleteFriendGroupHandler extends SocketHandler {
       if (friendGroupFriends && friendGroupFriends.length > 0) {
         await Promise.all(
           friendGroupFriends.map(async (friend) => {
-            await new UpdateFriendHandler(this.io, this.socket).handle({
+            await UpdateFriendHandler.handle(io, socket, {
               userId: friend.userId,
               targetId: friend.targetId,
               friend: {
@@ -158,7 +158,7 @@ export class DeleteFriendGroupHandler extends SocketHandler {
       // Delete friend group
       await database.delete.friendGroup(friendGroupId);
 
-      this.socket.emit('friendGroupDelete', friendGroupId);
+      socket.emit('friendGroupDelete', friendGroupId);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -170,8 +170,8 @@ export class DeleteFriendGroupHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('FriendGroup').error(error.message);
     }
-  }
-}
+  },
+};

@@ -11,9 +11,6 @@ import Logger from '@/utils/logger';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Handler
-import { HttpHandler } from '@/api/http/base.handler';
-
 // Schemas
 import { UploadSchema } from '@/api/http/routers/upload/upload.schema';
 
@@ -23,7 +20,7 @@ import DataValidator from '@/middleware/data.validator';
 // Config
 import { appConfig, serverConfig } from '@/config';
 
-export class UploadHandler extends HttpHandler {
+export const UploadHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { _type, _fileName, _file } = await new DataValidator(
@@ -142,5 +139,5 @@ export class UploadHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};

@@ -1,3 +1,5 @@
+import { Server, Socket } from 'socket.io';
+
 // Utils
 import Logger from '@/utils/logger';
 
@@ -5,7 +7,10 @@ import Logger from '@/utils/logger';
 import StandardizedError from '@/error';
 
 // Handler
-import { SocketHandler } from '@/api/socket/base.handler';
+import { ConnectServerHandler } from '@/api/socket/events/server/server.handler';
+import { DisconnectServerHandler } from '@/api/socket/events/server/server.handler';
+import { ConnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
+import { DisconnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
 
 // Schemas
 import {
@@ -18,13 +23,9 @@ import DataValidator from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
-import { ConnectServerHandler } from '@/api/socket/events/server/server.handler';
-import { DisconnectServerHandler } from '@/api/socket/events/server/server.handler';
-import { ConnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
-import { DisconnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
 
-export class SearchUserHandler extends SocketHandler {
-  async handle(data: any) {
+export const SearchUserHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
       // const operatorId = this.socket.data.userId;
 
@@ -35,7 +36,7 @@ export class SearchUserHandler extends SocketHandler {
 
       const result = await database.get.searchUser(query);
 
-      this.socket.emit('userSearch', result);
+      socket.emit('userSearch', result);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -47,37 +48,37 @@ export class SearchUserHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('User').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class ConnectUserHandler extends SocketHandler {
-  async handle() {
+export const ConnectUserHandler = {
+  async handle(io: Server, socket: Socket) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const user = await database.get.user(operatorId);
 
       // Reconnect user to server
       if (user.currentServerId) {
-        await new DisconnectServerHandler(this.io, this.socket).handle({
+        await DisconnectServerHandler.handle(io, socket, {
           userId: user.userId,
           serverId: user.currentServerId,
         });
-        await new ConnectServerHandler(this.io, this.socket).handle({
+        await ConnectServerHandler.handle(io, socket, {
           userId: user.userId,
           serverId: user.currentServerId,
         });
       }
       if (user.currentChannelId) {
-        await new DisconnectChannelHandler(this.io, this.socket).handle({
+        await DisconnectChannelHandler.handle(io, socket, {
           userId: user.userId,
           channelId: user.currentChannelId,
           serverId: user.currentServerId,
         });
-        await new ConnectChannelHandler(this.io, this.socket).handle({
+        await ConnectChannelHandler.handle(io, socket, {
           userId: user.userId,
           channelId: user.currentChannelId,
           serverId: user.currentServerId,
@@ -89,7 +90,7 @@ export class ConnectUserHandler extends SocketHandler {
         lastActiveAt: Date.now(),
       });
 
-      this.socket.emit('userUpdate', await database.get.user(operatorId));
+      socket.emit('userUpdate', await database.get.user(operatorId));
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -101,27 +102,27 @@ export class ConnectUserHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('User').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class DisconnectUserHandler extends SocketHandler {
-  async handle() {
+export const DisconnectUserHandler = {
+  async handle(io: Server, socket: Socket) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const user = await database.get.user(operatorId);
 
       // Disconnect user from server and channel
       if (user.currentServerId) {
-        await new DisconnectServerHandler(this.io, this.socket).handle({
+        await DisconnectServerHandler.handle(io, socket, {
           userId: user.userId,
           serverId: user.currentServerId,
         });
       } else if (user.currentChannelId) {
-        await new DisconnectChannelHandler(this.io, this.socket).handle({
+        await DisconnectChannelHandler.handle(io, socket, {
           userId: user.userId,
           channelId: user.currentChannelId,
           serverId: user.currentServerId,
@@ -133,7 +134,7 @@ export class DisconnectUserHandler extends SocketHandler {
         lastActiveAt: Date.now(),
       });
 
-      this.socket.emit('userUpdate', null);
+      socket.emit('userUpdate', null);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -145,16 +146,16 @@ export class DisconnectUserHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('User').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class UpdateUserHandler extends SocketHandler {
-  async handle(data: any) {
+export const UpdateUserHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, user: update } = await new DataValidator(
         UpdateUserSchema,
@@ -173,7 +174,7 @@ export class UpdateUserHandler extends SocketHandler {
 
       await database.set.user(userId, update);
 
-      this.socket.emit('userUpdate', update);
+      socket.emit('userUpdate', update);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -185,8 +186,8 @@ export class UpdateUserHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('User').error(error.message);
     }
-  }
-}
+  },
+};

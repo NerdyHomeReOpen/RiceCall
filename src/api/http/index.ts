@@ -91,7 +91,7 @@ export default class HttpServer {
         let response: ResponseType | null = null;
 
         if (req.url?.startsWith('/images')) {
-          response = await new ImagesHandler(req).handle();
+          response = await ImagesHandler.handle(req);
         }
 
         if (response) sendImage(res, response);
@@ -112,53 +112,43 @@ export default class HttpServer {
             data = JSON.parse(data);
 
             if (req.url === '/login') {
-              response = await new LoginHandler(req).handle(data);
+              response = await LoginHandler.handle(data);
             } else if (req.url === '/register') {
-              response = await new RegisterHandler(req).handle(data);
+              response = await RegisterHandler.handle(data);
             } else if (req.url === '/refresh/channel') {
-              response = await new RefreshChannelHandler(req).handle(data);
+              response = await RefreshChannelHandler.handle(data);
             } else if (req.url === '/refresh/friend') {
-              response = await new RefreshFriendHandler(req).handle(data);
+              response = await RefreshFriendHandler.handle(data);
             } else if (req.url === '/refresh/friendApplication') {
-              response = await new RefreshFriendApplicationHandler(req).handle(
-                data,
-              );
+              response = await RefreshFriendApplicationHandler.handle(data);
             } else if (req.url === '/refresh/friendGroup') {
-              response = await new RefreshFriendGroupHandler(req).handle(data);
+              response = await RefreshFriendGroupHandler.handle(data);
             } else if (req.url === '/refresh/member') {
-              response = await new RefreshMemberHandler(req).handle(data);
+              response = await RefreshMemberHandler.handle(data);
             } else if (req.url === '/refresh/memberApplication') {
-              response = await new RefreshMemberApplicationHandler(req).handle(
-                data,
-              );
+              response = await RefreshMemberApplicationHandler.handle(data);
             } else if (req.url === '/refresh/server') {
-              response = await new RefreshServerHandler(req).handle(data);
+              response = await RefreshServerHandler.handle(data);
             } else if (req.url === '/refresh/serverChannels') {
-              response = await new RefreshServerChannelsHandler(req).handle(
-                data,
-              );
+              response = await RefreshServerChannelsHandler.handle(data);
             } else if (req.url === '/refresh/serverMemberApplications') {
-              response = await new RefreshServerMemberApplicationsHandler(
-                req,
-              ).handle(data);
+              response = await RefreshServerMemberApplicationsHandler.handle(
+                data,
+              );
             } else if (req.url === '/refresh/serverMembers') {
-              response = await new RefreshServerMembersHandler(req).handle(
-                data,
-              );
+              response = await RefreshServerMembersHandler.handle(data);
             } else if (req.url === '/refresh/user') {
-              response = await new RefreshUserHandler(req).handle(data);
+              response = await RefreshUserHandler.handle(data);
             } else if (req.url === '/refresh/userFriendApplications') {
-              response = await new RefreshUserFriendApplicationsHandler(
-                req,
-              ).handle(data);
-            } else if (req.url === '/refresh/userFriendGroups') {
-              response = await new RefreshUserFriendGroupsHandler(req).handle(
+              response = await RefreshUserFriendApplicationsHandler.handle(
                 data,
               );
+            } else if (req.url === '/refresh/userFriendGroups') {
+              response = await RefreshUserFriendGroupsHandler.handle(data);
             } else if (req.url === '/refresh/userFriends') {
-              response = await new RefreshUserFriendsHandler(req).handle(data);
+              response = await RefreshUserFriendsHandler.handle(data);
             } else if (req.url === '/refresh/userServers') {
-              response = await new RefreshUserServersHandler(req).handle(data);
+              response = await RefreshUserServersHandler.handle(data);
             }
 
             if (response) sendResponse(res, response);
@@ -174,7 +164,7 @@ export default class HttpServer {
             }
 
             if (req.url === '/upload') {
-              response = await new UploadHandler(req).handle(data);
+              response = await UploadHandler.handle(data);
             }
 
             if (response) sendResponse(res, response);

@@ -1,3 +1,4 @@
+import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 
 // Error
@@ -11,7 +12,6 @@ import { generateUniqueDisplayId } from '@/utils';
 import SocketServer from '@/api/socket';
 
 // Handler
-import { SocketHandler } from '@/api/socket/base.handler';
 import { ConnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
 import { DisconnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
 
@@ -30,10 +30,10 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class SearchServerHandler extends SocketHandler {
-  async handle(data: any) {
+export const SearchServerHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      // const operatorId = this.socket.data.userId;
+      // const operatorId = socket.data.userId;
 
       const { query } = await new DataValidator(
         SearchServerSchema,
@@ -42,7 +42,7 @@ export class SearchServerHandler extends SocketHandler {
 
       const result = await database.get.searchServer(query);
 
-      this.socket.emit('serverSearch', result);
+      socket.emit('serverSearch', result);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -54,16 +54,16 @@ export class SearchServerHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('User').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class ConnectServerHandler extends SocketHandler {
-  async handle(data: any) {
+export const ConnectServerHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, serverId } = await new DataValidator(
         ConnectServerSchema,
@@ -95,7 +95,7 @@ export class ConnectServerHandler extends SocketHandler {
           server.visibility === 'invisible' &&
           (!userMember || userMember.permissionLevel < 2)
         ) {
-          this.socket.emit('openPopup', {
+          socket.emit('openPopup', {
             type: 'applyMember',
             id: 'applyMember',
             initialData: {
@@ -109,7 +109,7 @@ export class ConnectServerHandler extends SocketHandler {
           userMember &&
           (userMember.isBlocked > Date.now() || userMember.isBlocked === -1)
         ) {
-          this.socket.emit('openPopup', {
+          socket.emit('openPopup', {
             type: 'dialogError',
             id: 'errorDialog',
             initialData: {
@@ -131,14 +131,14 @@ export class ConnectServerHandler extends SocketHandler {
       });
 
       // Join lobby
-      await new ConnectChannelHandler(this.io, this.socket).handle({
+      await ConnectChannelHandler.handle(io, socket, {
         channelId: server.receptionLobbyId || server.lobbyId,
         serverId: serverId,
         userId: userId,
       });
 
       const targetSocket =
-        operatorId === userId ? this.socket : SocketServer.getSocket(userId);
+        operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
         if (user.currentServerId) {
@@ -170,16 +170,16 @@ export class ConnectServerHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Server').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class DisconnectServerHandler extends SocketHandler {
-  async handle(data: any) {
+export const DisconnectServerHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, serverId } = await new DataValidator(
         DisconnectServerSchema,
@@ -222,7 +222,7 @@ export class DisconnectServerHandler extends SocketHandler {
 
       // Leave current channel
       if (user.currentChannelId) {
-        await new DisconnectChannelHandler(this.io, this.socket).handle({
+        await DisconnectChannelHandler.handle(io, socket, {
           userId: userId,
           channelId: user.currentChannelId,
           serverId: user.currentServerId,
@@ -230,7 +230,7 @@ export class DisconnectServerHandler extends SocketHandler {
       }
 
       const targetSocket =
-        operatorId === userId ? this.socket : SocketServer.getSocket(userId);
+        operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
         targetSocket.leave(`server_${serverId}`);
@@ -258,16 +258,16 @@ export class DisconnectServerHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Server').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class CreateServerHandler extends SocketHandler {
-  async handle(data: any) {
+export const CreateServerHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { server: preset } = await new DataValidator(
         CreateServerSchema,
@@ -328,7 +328,7 @@ export class CreateServerHandler extends SocketHandler {
       });
 
       // Join the server
-      await new ConnectServerHandler(this.io, this.socket).handle({
+      await ConnectServerHandler.handle(io, socket, {
         userId: operatorId,
         serverId: serverId,
       });
@@ -343,16 +343,16 @@ export class CreateServerHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Server').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class UpdateServerHandler extends SocketHandler {
-  async handle(data: any) {
+export const UpdateServerHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { serverId, server: update } = await new DataValidator(
         UpdateServerSchema,
@@ -374,7 +374,7 @@ export class UpdateServerHandler extends SocketHandler {
       // Update server
       await database.set.server(serverId, update);
 
-      this.io.to(`server_${serverId}`).emit('serverUpdate', serverId, update);
+      io.to(`server_${serverId}`).emit('serverUpdate', serverId, update);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -386,8 +386,8 @@ export class UpdateServerHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Server').error(error.message);
     }
-  }
-}
+  },
+};

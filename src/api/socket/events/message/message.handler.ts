@@ -1,3 +1,5 @@
+import { Server, Socket } from 'socket.io';
+
 // Error
 import StandardizedError from '@/error';
 
@@ -6,9 +8,6 @@ import Logger from '@/utils/logger';
 
 // Socket
 import SocketServer from '@/api/socket';
-
-// Handler
-import { SocketHandler } from '@/api/socket/base.handler';
 
 // Schemas
 import {
@@ -23,10 +22,10 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class SendMessageHandler extends SocketHandler {
-  async handle(data: any) {
+export const SendMessageHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         userId,
@@ -74,12 +73,12 @@ export class SendMessageHandler extends SocketHandler {
       };
       await database.set.member(operatorId, serverId, updatedMember);
 
-      this.socket.emit('serverUpdate', serverId, updatedMember);
-      this.socket
+      socket.emit('serverUpdate', serverId, updatedMember);
+      socket
         .to(`channel_${channelId}`)
         .emit('playSound', 'recieveChannelMessage');
 
-      this.io.to(`channel_${channelId}`).emit('onMessage', message);
+      io.to(`channel_${channelId}`).emit('onMessage', message);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -91,16 +90,16 @@ export class SendMessageHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('SendMessage').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class SendDirectMessageHandler extends SocketHandler {
-  async handle(data: any) {
+export const SendDirectMessageHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         userId,
@@ -133,7 +132,7 @@ export class SendDirectMessageHandler extends SocketHandler {
 
       const targetSocket = SocketServer.getSocket(targetId);
 
-      this.socket.emit('onDirectMessage', directMessage);
+      socket.emit('onDirectMessage', directMessage);
       if (targetSocket) {
         targetSocket.emit('onDirectMessage', directMessage);
       }
@@ -148,16 +147,16 @@ export class SendDirectMessageHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('SendDirectMessage').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class ShakeWindowHandler extends SocketHandler {
-  async handle(data: any) {
+export const ShakeWindowHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, targetId } = await new DataValidator(
         ShakeWindowSchema,
@@ -202,8 +201,8 @@ export class ShakeWindowHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('ShakeWindow').error(error.message);
     }
-  }
-}
+  },
+};

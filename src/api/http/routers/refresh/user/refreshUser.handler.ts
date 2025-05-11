@@ -7,9 +7,6 @@ import Logger from '@/utils/logger';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Handler
-import { HttpHandler } from '@/api/http/base.handler';
-
 // Schemas
 import { RefreshUserSchema } from './refreshUser.schema';
 
@@ -19,7 +16,7 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class RefreshUserHandler extends HttpHandler {
+export const RefreshUserHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await new DataValidator(
@@ -52,10 +49,10 @@ export class RefreshUserHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};
 
-export class RefreshUserFriendApplicationsHandler extends HttpHandler {
+export const RefreshUserFriendApplicationsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await new DataValidator(
@@ -90,10 +87,10 @@ export class RefreshUserFriendApplicationsHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};
 
-export class RefreshUserFriendGroupsHandler extends HttpHandler {
+export const RefreshUserFriendGroupsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await new DataValidator(
@@ -126,10 +123,10 @@ export class RefreshUserFriendGroupsHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};
 
-export class RefreshUserFriendsHandler extends HttpHandler {
+export const RefreshUserFriendsHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await new DataValidator(
@@ -162,10 +159,10 @@ export class RefreshUserFriendsHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};
 
-export class RefreshUserServersHandler extends HttpHandler {
+export const RefreshUserServersHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await new DataValidator(
@@ -198,5 +195,5 @@ export class RefreshUserServersHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};

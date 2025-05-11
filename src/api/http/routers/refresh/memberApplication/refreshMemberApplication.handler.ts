@@ -7,9 +7,6 @@ import Logger from '@/utils/logger';
 // Types
 import { ResponseType } from '@/api/http';
 
-// Handler
-import { HttpHandler } from '@/api/http/base.handler';
-
 // Schemas
 import { RefreshMemberApplicationSchema } from './refreshMemberApplication.schema';
 
@@ -19,7 +16,7 @@ import DataValidator from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 
-export class RefreshMemberApplicationHandler extends HttpHandler {
+export const RefreshMemberApplicationHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId, serverId } = await new DataValidator(
@@ -55,5 +52,5 @@ export class RefreshMemberApplicationHandler extends HttpHandler {
         data: { error },
       };
     }
-  }
-}
+  },
+};

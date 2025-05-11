@@ -10,9 +10,6 @@ import Logger from '@/utils/logger';
 // Socket
 import SocketServer from '@/api/socket';
 
-// Handler
-import { SocketHandler } from '@/api/socket/base.handler';
-
 // Schemas
 import {
   ConnectChannelSchema,
@@ -32,10 +29,10 @@ import { database } from '@/index';
 // Systems
 import xpSystem from '@/systems/xp';
 
-export class ConnectChannelHandler extends SocketHandler {
-  async handle(data: any) {
+export const ConnectChannelHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, channelId, serverId, password } = await new DataValidator(
         ConnectChannelSchema,
@@ -84,7 +81,7 @@ export class ConnectChannelHandler extends SocketHandler {
         }
 
         if (channel.visibility === 'readonly') {
-          await new ConnectChannelHandler(this.io, this.socket).handle({
+          await ConnectChannelHandler.handle(io, socket, {
             channelId: server.lobbyId,
             serverId: serverId,
             userId: userId,
@@ -97,7 +94,7 @@ export class ConnectChannelHandler extends SocketHandler {
           password !== channel.password &&
           operatorMember.permissionLevel < 3
         ) {
-          await new ConnectChannelHandler(this.io, this.socket).handle({
+          await ConnectChannelHandler.handle(io, socket, {
             channelId: server.lobbyId,
             serverId: serverId,
             userId: userId,
@@ -106,7 +103,7 @@ export class ConnectChannelHandler extends SocketHandler {
         }
 
         if (channel.visibility === 'readonly') {
-          await new ConnectChannelHandler(this.io, this.socket).handle({
+          await ConnectChannelHandler.handle(io, socket, {
             channelId: server.lobbyId,
             serverId: serverId,
             userId: userId,
@@ -119,7 +116,7 @@ export class ConnectChannelHandler extends SocketHandler {
             channel.visibility === 'member') &&
           operatorMember.permissionLevel < 2
         ) {
-          await new ConnectChannelHandler(this.io, this.socket).handle({
+          await ConnectChannelHandler.handle(io, socket, {
             channelId: server.lobbyId,
             serverId: serverId,
             userId: userId,
@@ -133,7 +130,7 @@ export class ConnectChannelHandler extends SocketHandler {
           channelUsers.length >= channel.userLimit &&
           operatorMember.permissionLevel < 5
         ) {
-          await new ConnectChannelHandler(this.io, this.socket).handle({
+          await ConnectChannelHandler.handle(io, socket, {
             channelId: server.receptionLobbyId || server.lobbyId,
             serverId: serverId,
             userId: userId,
@@ -162,7 +159,7 @@ export class ConnectChannelHandler extends SocketHandler {
       await database.set.member(userId, serverId, updatedMember);
 
       const targetSocket =
-        operatorId === userId ? this.socket : SocketServer.getSocket(userId);
+        operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket && user.currentChannelId) {
         targetSocket.leave(`channel_${user.currentChannelId}`);
@@ -197,9 +194,12 @@ export class ConnectChannelHandler extends SocketHandler {
         });
       }
 
-      this.io
-        .to(`server_${serverId}`)
-        .emit('serverMemberUpdate', userId, serverId, updatedUser);
+      io.to(`server_${serverId}`).emit(
+        'serverMemberUpdate',
+        userId,
+        serverId,
+        updatedUser,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -211,16 +211,16 @@ export class ConnectChannelHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Channel').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class DisconnectChannelHandler extends SocketHandler {
-  async handle(data: any) {
+export const DisconnectChannelHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { userId, channelId, serverId } = await new DataValidator(
         DisconnectChannelSchema,
@@ -278,7 +278,7 @@ export class DisconnectChannelHandler extends SocketHandler {
       await database.set.user(userId, updatedUser);
 
       const targetSocket =
-        operatorId === userId ? this.socket : SocketServer.getSocket(userId);
+        operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
         targetSocket.emit('userUpdate', updatedUser);
@@ -290,9 +290,12 @@ export class DisconnectChannelHandler extends SocketHandler {
         });
       }
 
-      this.io
-        .to([`server_${serverId}`, `server_${user.currentServerId}`])
-        .emit('serverMemberUpdate', userId, serverId, updatedUser);
+      io.to([`server_${serverId}`, `server_${user.currentServerId}`]).emit(
+        'serverMemberUpdate',
+        userId,
+        serverId,
+        updatedUser,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -304,16 +307,16 @@ export class DisconnectChannelHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Channel').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class CreateChannelHandler extends SocketHandler {
-  async handle(data: any) {
+export const CreateChannelHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { serverId, channel: preset } = await new DataValidator(
         CreateChannelSchema,
@@ -348,7 +351,7 @@ export class CreateChannelHandler extends SocketHandler {
         const channel = {
           type: 'category',
         };
-        await new UpdateChannelHandler(this.io, this.socket).handle({
+        await UpdateChannelHandler.handle(io, socket, {
           channelId: category.channelId,
           serverId: serverId,
           channel,
@@ -368,9 +371,10 @@ export class CreateChannelHandler extends SocketHandler {
         createdAt: Date.now(),
       });
 
-      this.io
-        .to(`server_${serverId}`)
-        .emit('serverChannelAdd', await database.get.channel(channelId));
+      io.to(`server_${serverId}`).emit(
+        'serverChannelAdd',
+        await database.get.channel(channelId),
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -382,16 +386,16 @@ export class CreateChannelHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Channel').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class UpdateChannelHandler extends SocketHandler {
-  async handle(data: any) {
+export const UpdateChannelHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const {
         channelId,
@@ -544,11 +548,13 @@ export class UpdateChannelHandler extends SocketHandler {
       await database.set.channel(channelId, update);
 
       if (messages.length > 0) {
-        this.io.to(`channel_${channelId}`).emit('onMessage', ...messages);
+        io.to(`channel_${channelId}`).emit('onMessage', ...messages);
       }
-      this.io
-        .to(`server_${serverId}`)
-        .emit('serverChannelUpdate', channelId, update);
+      io.to(`server_${serverId}`).emit(
+        'serverChannelUpdate',
+        channelId,
+        update,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -560,14 +566,14 @@ export class UpdateChannelHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Channel').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class UpdateChannelsHandler extends SocketHandler {
-  async handle(data: any) {
+export const UpdateChannelsHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
       const { serverId, channels } = await new DataValidator(
         UpdateChannelsSchema,
@@ -576,7 +582,7 @@ export class UpdateChannelsHandler extends SocketHandler {
 
       await Promise.all(
         channels.map(async (channel: any) => {
-          await new UpdateChannelHandler(this.io, this.socket).handle({
+          await UpdateChannelHandler.handle(io, socket, {
             serverId,
             channelId: channel.channelId,
             channel: channel,
@@ -594,16 +600,16 @@ export class UpdateChannelsHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Channel').error(error.message);
     }
-  }
-}
+  },
+};
 
-export class DeleteChannelHandler extends SocketHandler {
-  async handle(data: any) {
+export const DeleteChannelHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
     try {
-      const operatorId = this.socket.data.userId;
+      const operatorId = socket.data.userId;
 
       const { channelId, serverId } = await new DataValidator(
         DeleteChannelSchema,
@@ -637,7 +643,7 @@ export class DeleteChannelHandler extends SocketHandler {
         const categoryUpdate = {
           type: 'channel',
         };
-        await new UpdateChannelHandler(this.io, this.socket).handle({
+        await UpdateChannelHandler.handle(io, socket, {
           channelId: channel.categoryId,
           serverId: serverId,
           channel: categoryUpdate,
@@ -647,7 +653,7 @@ export class DeleteChannelHandler extends SocketHandler {
       if (channelChildren) {
         await Promise.all(
           channelChildren.map(async (child) => {
-            await new DeleteChannelHandler(this.io, this.socket).handle({
+            await DeleteChannelHandler.handle(io, socket, {
               serverId: serverId,
               channelId: child.channelId,
             });
@@ -658,7 +664,7 @@ export class DeleteChannelHandler extends SocketHandler {
       if (channelUsers) {
         await Promise.all(
           channelUsers.map(async (user) => {
-            await new ConnectChannelHandler(this.io, this.socket).handle({
+            await ConnectChannelHandler.handle(io, socket, {
               channelId: server.lobbyId,
               serverId: serverId,
               userId: user.userId,
@@ -670,7 +676,7 @@ export class DeleteChannelHandler extends SocketHandler {
       // Delete channel
       await database.delete.channel(channelId);
 
-      this.io.to(`server_${serverId}`).emit('serverChannelDelete', channelId);
+      io.to(`server_${serverId}`).emit('serverChannelDelete', channelId);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -682,8 +688,8 @@ export class DeleteChannelHandler extends SocketHandler {
         });
       }
 
-      this.socket.emit('error', error);
+      socket.emit('error', error);
       new Logger('Channel').error(error.message);
     }
-  }
-}
+  },
+};
