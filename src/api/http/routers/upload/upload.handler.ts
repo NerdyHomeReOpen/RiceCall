@@ -117,9 +117,10 @@ export const UploadHandler = {
         message: 'success',
         data: {
           avatar: fileName,
-          avatarUrl: `${serverConfig.url}:${
-            serverConfig.port
-          }/${filePath.replace('uploads', 'images')}/${fullFileName}`,
+          avatarUrl: `${serverConfig.url}/${filePath.replace(
+            'uploads',
+            'images',
+          )}/${fullFileName}`,
         },
       };
     } catch (error: any) {

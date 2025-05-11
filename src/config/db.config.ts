@@ -9,9 +9,9 @@ export const dbConfig = {
   queueLimit: 0,
   charset: 'utf8mb4_unicode_ci',
   schema: {
-    directory: './schemas/schema.sql',
+    directory: 'schemas/schema.sql',
   },
   backups: {
-    directory: './backups',
+    directory: 'backups',
   },
 };
