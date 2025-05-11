@@ -97,13 +97,12 @@ export class ConnectChannelHandler extends SocketHandler {
           password !== channel.password &&
           operatorMember.permissionLevel < 3
         ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '密碼錯誤',
-            part: 'CONNECTCHANNEL',
-            tag: 'PASSWORD_INCORRECT',
-            statusCode: 403,
+          await new ConnectChannelHandler(this.io, this.socket).handle({
+            channelId: server.lobbyId,
+            serverId: serverId,
+            userId: userId,
           });
+          return;
         }
 
         if (channel.visibility === 'readonly') {
