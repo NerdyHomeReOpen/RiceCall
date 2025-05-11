@@ -25,7 +25,7 @@ export const ConnectChannelSchema = z
     userId: z.string().length(36),
     channelId: z.string().length(36),
     serverId: z.string().length(36),
-    password: z.string().length(4).optional(),
+    password: z.string().min(0).max(4).optional(),
   })
   .strict();
 
