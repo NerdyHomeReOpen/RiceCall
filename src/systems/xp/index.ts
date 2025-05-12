@@ -67,9 +67,12 @@ const xpSystem = {
         const elapsedTime = xpSystem.elapsedTime.get(userId) || 0;
 
         let newElapsedTime = elapsedTime + (now - timeFlag);
-        while (newElapsedTime >= config.INTERVAL_MS) {
-          await xpSystem.obtainXp(userId);
-          newElapsedTime -= config.INTERVAL_MS;
+        const times = Math.floor(newElapsedTime / config.INTERVAL_MS);
+
+        for (let i = 0; i < times; i++) {
+          const success = await xpSystem.obtainXp(userId);
+          if (success) newElapsedTime -= config.INTERVAL_MS;
+          else break;
         }
 
         xpSystem.elapsedTime.set(userId, newElapsedTime);
@@ -158,9 +161,8 @@ const xpSystem = {
 
       // Process Level
       let requiredXp = 0;
-      while (true) {
+      while (user.xp < requiredXp) {
         requiredXp = xpSystem.getRequiredXP(user.level - 1);
-        if (user.xp < requiredXp) break;
         user.level += 1;
         user.xp -= requiredXp;
       }
