@@ -1,6 +1,8 @@
 {
   "scripts": {
     "dev": "node --inspect --max-old-space-size=4096 -r dotenv/config -r tsx src/index.ts",
+    "build": "tsc && tsc-alias -p tsconfig.json",
+    "start": "node --inspect --max-old-space-size=4096 -r dotenv/config dist/index.js",
     "backup": "node -r dotenv/config -r tsx src/database/scripts/backup-db.ts",
     "restore": "node -r dotenv/config -r tsx src/database/scripts/restore-db.ts",
     "setup": "node -r dotenv/config -r tsx src/database/scripts/setup-db.ts",
@@ -27,6 +29,8 @@
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
-    "@types/jsonwebtoken": "^9.0.9"
+    "@types/jsonwebtoken": "^9.0.9",
+    "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0"
   }
 }
