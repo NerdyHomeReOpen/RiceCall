@@ -148,7 +148,6 @@ export const ConnectChannelHandler = {
 
       // Update user
       const updatedUser = {
-        currentServerId: serverId,
         currentChannelId: channelId,
         lastActiveAt: Date.now(),
       };
@@ -163,37 +162,36 @@ export const ConnectChannelHandler = {
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
-      if (targetSocket && user.currentChannelId) {
-        targetSocket.leave(`channel_${user.currentChannelId}`);
-        targetSocket
-          .to(`channel_${user.currentChannelId}`)
-          .emit('playSound', 'leave');
-        targetSocket.to(`channel_${user.currentChannelId}`).emit('RTCLeave', {
-          from: targetSocket.id,
-          userId: userId,
-        });
-      }
-
-      if (targetSocket && user.currentServerId) {
-        targetSocket
-          .to(`server_${user.currentServerId}`)
-          .emit(
-            'serverMemberUpdate',
-            userId,
-            user.currentServerId,
-            updatedUser,
-          );
-      }
-
       if (targetSocket) {
+        const currentChannelId = user.currentChannelId;
+
+        if (currentChannelId) {
+          targetSocket.leave(`channel_${currentChannelId}`);
+          targetSocket
+            .to(`channel_${currentChannelId}`)
+            .emit('playSound', 'leave');
+          targetSocket.to(`channel_${currentChannelId}`).emit('RTCLeave', {
+            from: targetSocket.id,
+            userId: userId,
+          });
+        }
+
+        targetSocket.join(`channel_${channelId}`);
         targetSocket.emit('userUpdate', updatedUser);
         targetSocket.emit('serverUpdate', serverId, updatedMember);
-        targetSocket.join(`channel_${channelId}`);
         targetSocket.to(`channel_${channelId}`).emit('playSound', 'join');
         targetSocket.to(`channel_${channelId}`).emit('RTCJoin', {
           from: targetSocket.id,
           userId: userId,
         });
+
+        if (currentChannelId) {
+          targetSocket.emit('playSound', 'leave');
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          targetSocket.emit('playSound', 'join');
+        } else {
+          targetSocket.emit('playSound', 'join');
+        }
       }
 
       io.to(`server_${serverId}`).emit(
@@ -274,7 +272,6 @@ export const DisconnectChannelHandler = {
 
       // Update user
       const updatedUser = {
-        currentServerId: null,
         currentChannelId: null,
         lastActiveAt: Date.now(),
       };

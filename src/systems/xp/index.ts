@@ -6,6 +6,7 @@ import { database } from '@/index';
 
 // Config
 import config from './config.json';
+import { resolve4 } from 'dns';
 
 const xpSystem = {
   timeFlag: new Map<string, number>(), // socket -> timeFlag
@@ -99,7 +100,9 @@ const xpSystem = {
         const elapsedTime = xpSystem.elapsedTime.get(userId) || 0;
 
         let newElapsedTime = elapsedTime + now - timeFlag;
-        while (newElapsedTime >= config.INTERVAL_MS) {
+        const times = Math.floor(newElapsedTime / config.INTERVAL_MS);
+
+        for (let i = 0; i < times; i++) {
           const success = await xpSystem.obtainXp(userId);
           if (success) newElapsedTime -= config.INTERVAL_MS;
           else break;
@@ -111,6 +114,8 @@ const xpSystem = {
         new Logger('XPSystem').info(
           `XP interval refreshed for user(${userId})`,
         );
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       } catch (error: any) {
         new Logger('XPSystem').error(
           `Error refreshing XP interval for user(${userId}): ${error.message}`,

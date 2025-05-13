@@ -60,6 +60,8 @@ export const ConnectUserHandler = {
 
       const user = await database.get.user(operatorId);
 
+      /* Start of Pre Main Logic */
+
       // Reconnect user to server
       if (user.currentServerId) {
         await DisconnectServerHandler.handle(io, socket, {
@@ -73,12 +75,18 @@ export const ConnectUserHandler = {
         });
       }
 
+      /* End of Pre Main Logic */
+
+      /* Start of Main Logic */
+
       // Update user
       await database.set.user(operatorId, {
         lastActiveAt: Date.now(),
       });
 
       socket.emit('userUpdate', await database.get.user(operatorId));
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -103,6 +111,8 @@ export const DisconnectUserHandler = {
 
       const user = await database.get.user(operatorId);
 
+      /* Start of Pre Main Logic */
+
       // Disconnect user from server and channel
       if (user.currentServerId) {
         await DisconnectServerHandler.handle(io, socket, {
@@ -111,12 +121,18 @@ export const DisconnectUserHandler = {
         });
       }
 
+      /* End of Pre Main Logic */
+
+      /* Start of Main Logic */
+
       // Update user
       await database.set.user(operatorId, {
         lastActiveAt: Date.now(),
       });
 
       socket.emit('userUpdate', null);
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
