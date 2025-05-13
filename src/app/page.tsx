@@ -518,6 +518,7 @@ const RootPageComponent = () => {
         part: 'SOCKET',
         tag: 'CONNECT_ERROR',
         statusCode: 500,
+        handler: () => ipcService.auth.logout(),
       }),
     ).show();
   };
@@ -530,6 +531,7 @@ const RootPageComponent = () => {
         part: 'SOCKET',
         tag: 'RECONNECT_ERROR',
         statusCode: 500,
+        handler: () => ipcService.auth.logout(),
       }),
     ).show();
   };
@@ -551,6 +553,14 @@ const RootPageComponent = () => {
   };
 
   // Effects
+  useEffect(() => {
+    if (user.currentServerId) {
+      if (mainTab.selectedTabId === 'home') mainTab.setSelectedTabId('server');
+    } else {
+      if (mainTab.selectedTabId === 'server') mainTab.setSelectedTabId('home');
+    }
+  }, [user.currentServerId]);
+
   useEffect(() => {
     const channel =
       serverChannels.find((item) => item.channelId === user.currentChannelId) ||
