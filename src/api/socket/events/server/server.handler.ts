@@ -178,7 +178,7 @@ export const ConnectServerHandler = {
         const currentServerId = user.currentServerId;
         const servers = await database.get.userServers(userId);
         const serverChannels = await database.get.serverChannels(serverId);
-        const serverMembers = await database.get.serverMembers(serverId);
+        const serverMembers = await database.get.serverOnlineMembers(serverId);
 
         if (currentServerId) {
           targetSocket.leave(`server_${currentServerId}`);
@@ -194,7 +194,10 @@ export const ConnectServerHandler = {
         targetSocket.emit('userUpdate', updatedUser);
         targetSocket
           .to(`server_${serverId}`)
-          .emit('serverMemberUpdate', userId, serverId, updatedUser);
+          .emit(
+            'serverMemberAdd',
+            await database.get.serverMember(serverId, userId),
+          );
       }
 
       /* End of Main Logic */
@@ -278,7 +281,7 @@ export const DisconnectServerHandler = {
         targetSocket.emit('userUpdate', updatedUser);
         targetSocket
           .to(`server_${serverId}`)
-          .emit('serverMemberUpdate', userId, serverId, updatedUser);
+          .emit('serverMemberDelete', userId, serverId);
 
         if (operatorId !== userId) {
           targetSocket.emit('openPopup', {

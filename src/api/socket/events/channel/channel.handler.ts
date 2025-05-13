@@ -185,6 +185,7 @@ export const ConnectChannelHandler = {
         }
 
         targetSocket.join(`channel_${channelId}`);
+        targetSocket.emit('playSound', 'join');
         targetSocket.emit('userUpdate', updatedUser);
         targetSocket.emit('serverUpdate', serverId, updatedMember);
         targetSocket.to(`channel_${channelId}`).emit('playSound', 'join');
@@ -192,14 +193,6 @@ export const ConnectChannelHandler = {
           from: targetSocket.id,
           userId: userId,
         });
-
-        if (currentChannelId) {
-          targetSocket.emit('playSound', 'leave');
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          targetSocket.emit('playSound', 'join');
-        } else {
-          targetSocket.emit('playSound', 'join');
-        }
       }
 
       io.to(`server_${serverId}`).emit(
@@ -289,8 +282,9 @@ export const DisconnectChannelHandler = {
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
-        targetSocket.emit('userUpdate', updatedUser);
         targetSocket.leave(`channel_${channelId}`);
+        targetSocket.emit('userUpdate', updatedUser);
+        targetSocket.emit('playSound', 'leave');
         targetSocket.to(`channel_${channelId}`).emit('playSound', 'leave');
         targetSocket.to(`channel_${channelId}`).emit('RTCLeave', {
           from: targetSocket.id,
@@ -298,7 +292,7 @@ export const DisconnectChannelHandler = {
         });
       }
 
-      io.to([`server_${serverId}`, `server_${user.currentServerId}`]).emit(
+      io.to(`server_${serverId}`).emit(
         'serverMemberUpdate',
         userId,
         serverId,

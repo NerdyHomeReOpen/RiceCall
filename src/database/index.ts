@@ -1223,6 +1223,52 @@ export default class Database {
       }
     },
 
+    serverOnlineMembers: async (serverId: string) => {
+      try {
+        if (!serverId) return null;
+        const datas = await this.query(
+          `SELECT 
+            m.created_at AS member_created_at,
+            m.*, 
+            u.created_at AS user_created_at,
+            u.*,
+            ub.badge_id,
+            ub.created_at AS badge_created_at,
+            b.name AS badge_name,
+            b.description AS badge_description
+          FROM members AS m
+          INNER JOIN users AS u
+            ON m.user_id = u.user_id
+          LEFT JOIN user_badges AS ub
+            ON u.user_id = ub.user_id
+          LEFT JOIN badges AS b
+            ON ub.badge_id = b.badge_id
+          WHERE m.server_id = ?
+          AND u.current_server_id = ?
+          ORDER BY m.created_at DESC`,
+          [serverId, serverId],
+        );
+        if (!datas) return [];
+        return datas.map((data: any) => {
+          data.created_at = data.member_created_at;
+          delete data.member_created_at;
+          delete data.user_created_at;
+          return convertToCamelCase({ ...data, badges: [] });
+        });
+      } catch (error: any) {
+        if (!(error instanceof StandardizedError)) {
+          error = new StandardizedError({
+            name: 'ServerError',
+            message: `查詢 serverMembers.${serverId} 時發生無法預期的錯誤: ${error.message}`,
+            part: 'DATABASE',
+            tag: 'dATABASE.ERROR',
+            statusCode: 500,
+          });
+        }
+        throw error;
+      }
+    },
+
     serverMembers: async (serverId: string) => {
       try {
         if (!serverId) return null;
