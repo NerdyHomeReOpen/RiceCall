@@ -126,11 +126,7 @@ export const ConnectServerHandler = {
         }
       }
 
-      // Update user-server
-      await database.set.userServer(userId, serverId, {
-        recent: true,
-        timestamp: Date.now(),
-      });
+      /* Start of Pre Main Logic */
 
       // Join lobby
       if (server.visibility === 'private' && userMember.permissionLevel < 2) {
@@ -147,28 +143,49 @@ export const ConnectServerHandler = {
         });
       }
 
+      /* End of Pre Main Logic */
+
+      /* Start of Main Logic */
+
+      // Update user-server
+      await database.set.userServer(userId, serverId, {
+        recent: true,
+        timestamp: Date.now(),
+      });
+
+      // Update user
+      const updatedUser = {
+        currentServerId: serverId,
+      };
+      await database.set.user(userId, updatedUser);
+
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
-        if (user.currentServerId) {
-          targetSocket.leave(`server_${user.currentServerId}`);
+        const currentServerId = user.currentServerId;
+        const servers = await database.get.userServers(userId);
+        const serverChannels = await database.get.serverChannels(serverId);
+        const serverMembers = await database.get.serverMembers(serverId);
+
+        if (currentServerId) {
+          targetSocket.leave(`server_${currentServerId}`);
+          targetSocket
+            .to(`server_${currentServerId}`)
+            .emit('serverMemberUpdate', userId, currentServerId, updatedUser);
         }
 
         targetSocket.join(`server_${serverId}`);
-        targetSocket.emit(
-          'serversUpdate',
-          await database.get.userServers(userId),
-        );
-        targetSocket.emit(
-          'serverChannelsUpdate',
-          await database.get.serverChannels(serverId),
-        );
-        targetSocket.emit(
-          'serverMembersUpdate',
-          await database.get.serverMembers(serverId),
-        );
+        targetSocket.emit('serversUpdate', servers);
+        targetSocket.emit('serverChannelsUpdate', serverChannels);
+        targetSocket.emit('serverMembersUpdate', serverMembers);
+        targetSocket.emit('userUpdate', updatedUser);
+        targetSocket
+          .to(`server_${serverId}`)
+          .emit('serverMemberUpdate', userId, serverId, updatedUser);
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -231,14 +248,13 @@ export const DisconnectServerHandler = {
         }
       }
 
-      // Leave current channel
-      if (user.currentChannelId) {
-        await DisconnectChannelHandler.handle(io, socket, {
-          userId: userId,
-          channelId: user.currentChannelId,
-          serverId: user.currentServerId,
-        });
-      }
+      /* Start of Main Logic */
+
+      // Update user
+      const updatedUser = {
+        currentServerId: null,
+      };
+      await database.set.user(userId, updatedUser);
 
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
@@ -247,6 +263,11 @@ export const DisconnectServerHandler = {
         targetSocket.leave(`server_${serverId}`);
         targetSocket.emit('serverChannelsUpdate', []);
         targetSocket.emit('serverMembersUpdate', []);
+        targetSocket.emit('userUpdate', updatedUser);
+        targetSocket
+          .to(`server_${serverId}`)
+          .emit('serverMemberUpdate', userId, serverId, updatedUser);
+
         if (operatorId !== userId) {
           targetSocket.emit('openPopup', {
             type: 'dialogAlert',
@@ -258,6 +279,21 @@ export const DisconnectServerHandler = {
           });
         }
       }
+
+      /* End of Main Logic */
+
+      /* Start of Post Main Logic */
+
+      // Leave current channel
+      if (user.currentChannelId) {
+        await DisconnectChannelHandler.handle(io, socket, {
+          userId: userId,
+          channelId: user.currentChannelId,
+          serverId: user.currentServerId,
+        });
+      }
+
+      /* End of Post Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
