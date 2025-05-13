@@ -52,11 +52,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const CURRENT_YEAR = TODAY.getFullYear();
     const CURRENT_MONTH = TODAY.getMonth() + 1;
     const CURRENT_DAY = TODAY.getDate();
-    const MAIN_TABS = [
-      { id: 'about', label: lang.tr.about },
-      { id: 'groups', label: lang.tr.servers },
-      { id: 'userSetting', label: '' },
-    ];
 
     // User states
     const [user, setUser] = useState<User>(createDefault.user());
@@ -88,6 +83,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const isSelf = targetId === userId;
     const isFriend = !!friend.targetId;
     const isEditing = isSelf && selectedTabId === 'userSetting';
+    const isProfilePrivate = false; // TODO: 隱私設定開關，等設定功能完工
     const joinedServers = servers
       .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
       .sort((a, b) => b.permissionLevel - a.permissionLevel);
@@ -257,33 +253,210 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       isFutureDate,
     ]);
 
-    const ProfilePrivate = false; // TODO: 隱私設定開關，等設定功能完工
     const PrivateElement = (text: React.ReactNode) => {
       return <div className={setting['userRecentVisitsPrivate']}>{text}</div>;
     };
-    const getMainContent = () => {
-      switch (selectedTabId) {
-        case 'about':
-          return (
-            <>
-              {isSelf && (
-                <div className={setting['editTabBar']}>
-                  <div
-                    className={setting['button']}
-                    onClick={() => setSelectedTabId('userSetting')}
-                  >
-                    {lang.tr.editProfile}
-                  </div>
-                </div>
+
+    return (
+      <div className={`${popup['popupContainer']} ${setting['userProfile']}`}>
+        <div className={setting['profileBox']}>
+          {/* Header */}
+          <div className={setting['header']}>
+            <div className={setting['windowActionButtons']}>
+              <div
+                className={setting['minimizeBtn']}
+                onClick={() => handleMinimize()}
+              />
+              <div
+                className={setting['closeBtn']}
+                onClick={() => handleClose()}
+              />
+            </div>
+
+            <div
+              className={`${setting['avatar']} ${
+                isEditing && isSelf ? setting['editable'] : ''
+              }`}
+              style={{ backgroundImage: `url(${userAvatarUrl})` }}
+              onClick={() => {
+                if (!isSelf || !isEditing) return;
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'image/*';
+                fileInput.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onloadend = async () => {
+                    const formData = new FormData();
+                    formData.append('_type', 'user');
+                    formData.append('_fileName', userId);
+                    formData.append('_file', reader.result as string);
+                    const data = await apiService.post('/upload', formData);
+                    if (data) {
+                      setUser((prev) => ({
+                        ...prev,
+                        avatar: data.avatar,
+                        avatarUrl: data.avatarUrl,
+                      }));
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                };
+                fileInput.click();
+              }}
+            />
+
+            <div
+              className={`${popup['row']} ${setting['noDrag']}`}
+              style={{ marginTop: '10px', gap: '2px' }}
+            >
+              <div className={setting['userName']}>{userName}</div>
+              {userVip > 0 && (
+                <div
+                  className={`${vip['vipIcon']} ${vip[`vip-small-${userVip}`]}`}
+                />
               )}
-              <div className={setting['userAboutMeShow']}>{userSignature}</div>
-              <div className={setting['userProfileContent']}>
-                <div className={setting['title']}>
-                  {lang.tr.recentlyJoinServer}
+              <div
+                className={`
+                  ${grade['grade']} 
+                  ${grade[`lv-${Math.min(56, userLevel)}`]}
+                `}
+                title={
+                  `${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${userRequiredXP}` /** LEVEL:{userLevel} EXP:{userXP} LEVEL UP REQUIRED:{userRequiredXP}**/
+                }
+              />
+            </div>
+
+            <div
+              className={setting['userAccount']}
+              onClick={() => {
+                navigator.clipboard.writeText(userId);
+              }}
+            >
+              @{userName}
+            </div>
+
+            <div className={setting['userContent']}>
+              {lang.tr[userGender === 'Male' ? 'male' : 'female']} . {userAge} .
+              {lang.tr[userCountry as keyof typeof lang.tr]}
+            </div>
+
+            <div className={setting['userSignature']}>{userSignature}</div>
+
+            <div
+              className={setting['tab']}
+              style={
+                selectedTabId === 'userSetting'
+                  ? { display: 'none' }
+                  : { display: 'flex' }
+              }
+            >
+              <div
+                className={`${setting['item']} ${setting['about']} ${
+                  selectedTabId === 'about' ? setting['selected'] : ''
+                }`}
+                onClick={() => {
+                  if (selectedTabId !== 'userSetting') {
+                    setSelectedTabId('about');
+                  }
+                }}
+              >
+                {lang.tr.about}
+              </div>
+              <div
+                className={`${setting['item']} ${setting['groups']} ${
+                  selectedTabId === 'groups' ? setting['selected'] : ''
+                }`}
+                onClick={() => {
+                  if (selectedTabId !== 'userSetting') {
+                    setSelectedTabId('groups');
+                  }
+                }}
+              >
+                {lang.tr.servers}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div
+            className={setting['editTabBar']}
+            style={isSelf ? {} : { display: 'none' }}
+          >
+            {selectedTabId === 'userSetting' ? (
+              <>
+                <div
+                  className={`${setting['confirmedButton']} ${
+                    setting['blueBtn']
+                  } ${
+                    !userName ||
+                    !userGender ||
+                    !userCountry ||
+                    !userBirthYear ||
+                    !userBirthMonth ||
+                    !userBirthDay
+                      ? setting['disabled']
+                      : ''
+                  }`}
+                  onClick={() => {
+                    handleUpdateUser({
+                      avatar: userAvatar,
+                      avatarUrl: userAvatarUrl,
+                      name: userName,
+                      gender: userGender,
+                      country: userCountry,
+                      birthYear: userBirthYear,
+                      birthMonth: userBirthMonth,
+                      birthDay: userBirthDay,
+                      signature: userSignature,
+                    });
+                    setSelectedTabId('about');
+                  }}
+                >
+                  {lang.tr.confirm}
                 </div>
-                {!ProfilePrivate && recentServers.length ? (
-                  <div className={setting['serverItems']}>
-                    {recentServers.map((server) => (
+                <div
+                  className={setting['button']}
+                  onClick={() => setSelectedTabId('about')}
+                >
+                  {lang.tr.cancel}
+                </div>
+              </>
+            ) : (
+              <div
+                className={setting['button']}
+                onClick={() => setSelectedTabId('userSetting')}
+              >
+                {lang.tr.editProfile}
+              </div>
+            )}
+          </div>
+
+          {/* Body */}
+          <div
+            className={setting['body']}
+            style={selectedTabId === 'about' ? {} : { display: 'none' }}
+          >
+            {userSignature && !isSelf && (
+              <div className={setting['userAboutMeShow']}>{userSignature}</div>
+            )}
+            <div className={setting['userProfileContent']}>
+              <div className={setting['title']}>
+                {lang.tr.recentlyJoinServer}
+              </div>
+              <div className={setting['serverItems']}>
+                {isProfilePrivate
+                  ? PrivateElement(
+                      <>
+                        {lang.tr.notPublicRecentServersTop}
+                        <br />
+                        {lang.tr.notPublicRecentServersBottom}
+                      </>,
+                    )
+                  : recentServers.length === 0
+                  ? PrivateElement(lang.tr.noRecentServers)
+                  : recentServers.map((server) => (
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
@@ -315,32 +488,23 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                         </div>
                       </div>
                     ))}
-                  </div>
-                ) : ProfilePrivate ? (
-                  PrivateElement(
-                    <>
-                      {lang.tr.notPublicRecentServersTop}
-                      <br />
-                      {lang.tr.notPublicRecentServersBottom}
-                    </>,
-                  )
-                ) : (
-                  PrivateElement(lang.tr.noRecentServers)
-                )}
               </div>
-              <div className={`${setting['userProfileContent']}`}>
-                <div className={setting['title']}>
-                  {lang.tr.recentlyEarnedBadges}
-                </div>
-                <div className={setting['badgeViewer']}>
-                  <BadgeListViewer badges={userBadges} maxDisplay={13} />
-                </div>
+            </div>
+            <div className={`${setting['userProfileContent']}`}>
+              <div className={setting['title']}>
+                {lang.tr.recentlyEarnedBadges}
               </div>
-            </>
-          );
-        case 'groups':
-          return (
-            <div className={setting['joinedServers']}>
+              <div className={setting['badgeViewer']}>
+                <BadgeListViewer badges={userBadges} maxDisplay={13} />
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={setting['body']}
+            style={selectedTabId === 'groups' ? {} : { display: 'none' }}
+          >
+            <div className={setting['userProfileContent']}>
               <div className={`${popup['inputBox']}`}>
                 <div className={`${popup['selectBox']}`}>
                   <select
@@ -352,39 +516,41 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   </select>
                 </div>
               </div>
-              <div className={setting['serverItems']}>
-                {serversView === 'joined'
-                  ? ProfilePrivate
-                    ? PrivateElement(
-                        <>
-                          {lang.tr.notPublicJoinedServersTop}
-                          <br />
-                          {lang.tr.notPublicJoinedServersBottom}
-                        </>,
-                      )
-                    : joinedServers.length === 0
-                    ? PrivateElement(lang.tr.noJoinedServers)
-                    : joinedServers.map((server) => (
+              <div
+                className={setting['serverItems']}
+                style={serversView === 'joined' ? {} : { display: 'none' }}
+              >
+                {isProfilePrivate
+                  ? PrivateElement(
+                      <>
+                        {lang.tr.notPublicJoinedServersTop}
+                        <br />
+                        {lang.tr.notPublicJoinedServersBottom}
+                      </>,
+                    )
+                  : joinedServers.length === 0
+                  ? PrivateElement(lang.tr.noJoinedServers)
+                  : joinedServers.map((server) => (
+                      <div
+                        key={server.serverId}
+                        className={setting['serverItem']}
+                        onClick={() => handleServerSelect(userId, server)}
+                      >
                         <div
-                          key={server.serverId}
-                          className={setting['serverItem']}
-                          onClick={() => handleServerSelect(userId, server)}
-                        >
+                          className={setting['serverAvatarPicture']}
+                          style={{
+                            backgroundImage: `url(${server.avatarUrl})`,
+                          }}
+                        />
+                        <div className={setting['serverBox']}>
+                          <div className={setting['serverName']}>
+                            {server.name}
+                          </div>
                           <div
-                            className={setting['serverAvatarPicture']}
-                            style={{
-                              backgroundImage: `url(${server.avatarUrl})`,
-                            }}
-                          />
-                          <div className={setting['serverBox']}>
-                            <div className={setting['serverName']}>
-                              {server.name}
-                            </div>
+                            className={`${setting['serverInfo']} ${setting['around']}`}
+                          >
                             <div
-                              className={`${setting['serverInfo']} ${setting['around']}`}
-                            >
-                              <div
-                                className={`
+                              className={`
                                 ${setting['permission']}
                                 ${permission[userGender]} 
                                 ${
@@ -392,18 +558,23 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                                     ? permission[`lv-6`]
                                     : permission[`lv-${server.permissionLevel}`]
                                 }`}
-                              />
-                              <div className={setting['contributionBox']}>
-                                <div className={setting['contributionIcon']} />
-                                <div className={setting['contributionValue']}>
-                                  {server.contribution}
-                                </div>
+                            />
+                            <div className={setting['contributionBox']}>
+                              <div className={setting['contributionIcon']} />
+                              <div className={setting['contributionValue']}>
+                                {server.contribution}
                               </div>
                             </div>
                           </div>
                         </div>
-                      ))
-                  : ProfilePrivate
+                      </div>
+                    ))}
+              </div>
+              <div
+                className={setting['serverItems']}
+                style={serversView === 'favorite' ? {} : { display: 'none' }}
+              >
+                {isProfilePrivate
                   ? PrivateElement(
                       <>
                         {lang.tr.notPublicFavoriteServersTop}
@@ -454,402 +625,247 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                     ))}
               </div>
             </div>
-          );
-        case 'userSetting':
-          return (
-            <>
-              <div className={setting['editTabBar']}>
-                <div
-                  className={`${setting['confirmedButton']} ${
-                    setting['blueBtn']
-                  } ${
-                    !userName ||
-                    !userGender ||
-                    !userCountry ||
-                    !userBirthYear ||
-                    !userBirthMonth ||
-                    !userBirthDay
-                      ? setting['disabled']
-                      : ''
-                  }`}
-                  onClick={() => {
-                    handleUpdateUser({
-                      avatar: userAvatar,
-                      avatarUrl: userAvatarUrl,
-                      name: userName,
-                      gender: userGender,
-                      country: userCountry,
-                      birthYear: userBirthYear,
-                      birthMonth: userBirthMonth,
-                      birthDay: userBirthDay,
-                      signature: userSignature,
-                    });
-                    setSelectedTabId('about');
-                  }}
-                >
-                  {lang.tr.confirm}
-                </div>
-                <div
-                  className={setting['button']}
-                  onClick={() => setSelectedTabId('about')}
-                >
-                  {lang.tr.cancel}
-                </div>
-              </div>
-              <div className={setting['userProfileContent']}>
-                <div className={popup['col']}>
-                  <div className={popup['row']}>
-                    <div className={`${popup['inputBox']} ${popup['col']}`}>
-                      <label
-                        className={popup['label']}
-                        htmlFor="profile-form-nickname"
-                      >
-                        {lang.tr.nickname}
-                      </label>
-                      <input
-                        name="name"
-                        type="text"
-                        value={userName}
-                        maxLength={32}
-                        onChange={(e) =>
-                          setUser((prev) => ({ ...prev, name: e.target.value }))
-                        }
-                      />
-                    </div>
+          </div>
 
-                    <div className={`${popup['inputBox']} ${popup['col']}`}>
-                      <label
-                        className={popup['label']}
-                        htmlFor="profile-form-gender"
-                      >
-                        {lang.tr.gender}
-                      </label>
-                      <div
-                        className={`${popup['selectBox']} ${popup['selectBoxMax']}`}
-                      >
-                        <select
-                          value={userGender}
-                          onChange={(e) =>
-                            setUser((prev) => ({
-                              ...prev,
-                              gender: e.target.value as User['gender'],
-                            }))
-                          }
-                        >
-                          <option value="Male">{lang.tr.male}</option>
-                          <option value="Female">{lang.tr.female}</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={popup['row']}>
-                    <div className={`${popup['inputBox']} ${popup['col']}`}>
-                      <label
-                        className={popup['label']}
-                        htmlFor="profile-form-country"
-                      >
-                        {lang.tr.country}
-                      </label>
-                      <div className={popup['selectBox']}>
-                        <select
-                          value={userCountry}
-                          onChange={(e) =>
-                            setUser((prev) => ({
-                              ...prev,
-                              country: e.target.value,
-                            }))
-                          }
-                        >
-                          <option value="taiwan">{lang.tr.taiwan}</option>
-                          <option value="china">{lang.tr.china}</option>
-                          <option value="japan">{lang.tr.japan}</option>
-                          <option value="korea">{lang.tr.korea}</option>
-                          <option value="usa">{lang.tr.usa}</option>
-                          <option value="uk">{lang.tr.uk}</option>
-                          <option value="france">{lang.tr.france}</option>
-                          <option value="germany">{lang.tr.germany}</option>
-                          <option value="italy">{lang.tr.italy}</option>
-                          <option value="spain">{lang.tr.spain}</option>
-                          <option value="portugal">{lang.tr.portugal}</option>
-                          <option value="brazil">{lang.tr.brazil}</option>
-                          <option value="argentina">{lang.tr.argentina}</option>
-                          <option value="mexico">{lang.tr.mexico}</option>
-                          <option value="colombia">{lang.tr.colombia}</option>
-                          <option value="chile">{lang.tr.chile}</option>
-                          <option value="peru">{lang.tr.peru}</option>
-                          <option value="venezuela">{lang.tr.venezuela}</option>
-                          <option value="bolivia">{lang.tr.bolivia}</option>
-                          <option value="ecuador">{lang.tr.ecuador}</option>
-                          <option value="paraguay">{lang.tr.paraguay}</option>
-                          <option value="uruguay">{lang.tr.uruguay}</option>
-                          <option value="nigeria">{lang.tr.nigeria}</option>
-                          <option value="southAfrica">
-                            {lang.tr.southAfrica}
-                          </option>
-                          <option value="india">{lang.tr.india}</option>
-                          <option value="indonesia">{lang.tr.indonesia}</option>
-                          <option value="malaysia">{lang.tr.malaysia}</option>
-                          <option value="philippines">
-                            {lang.tr.philippines}
-                          </option>
-                          <option value="thailand">{lang.tr.thailand}</option>
-                          <option value="vietnam">{lang.tr.vietnam}</option>
-                          <option value="turkey">{lang.tr.turkey}</option>
-                          <option value="saudiArabia">
-                            {lang.tr.saudiArabia}
-                          </option>
-                          <option value="qatar">{lang.tr.qatar}</option>
-                          <option value="kuwait">{lang.tr.kuwait}</option>
-                          <option value="oman">{lang.tr.oman}</option>
-                          <option value="bahrain">{lang.tr.bahrain}</option>
-                          <option value="algeria">{lang.tr.algeria}</option>
-                          <option value="morocco">{lang.tr.morocco}</option>
-                          <option value="tunisia">{lang.tr.tunisia}</option>
-                          <option value="nigeria">{lang.tr.nigeria}</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className={`${popup['inputBox']} ${popup['col']}`}>
-                      <label
-                        className={popup['label']}
-                        htmlFor="profile-form-birthdate"
-                      >
-                        {lang.tr.birthdate}
-                      </label>
-                      <div className={popup['row']}>
-                        <div className={popup['selectBox']}>
-                          <select
-                            id="birthYear"
-                            value={userBirthYear}
-                            onChange={(e) =>
-                              setUser((prev) => ({
-                                ...prev,
-                                birthYear: Number(e.target.value),
-                              }))
-                            }
-                          >
-                            {yearOptions.map((year) => (
-                              <option
-                                key={year}
-                                value={year}
-                                disabled={year > CURRENT_YEAR}
-                              >
-                                {year}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className={popup['selectBox']}>
-                          <select
-                            className={popup['input']}
-                            id="birthMonth"
-                            value={userBirthMonth}
-                            onChange={(e) =>
-                              setUser((prev) => ({
-                                ...prev,
-                                birthMonth: Number(e.target.value),
-                              }))
-                            }
-                          >
-                            {monthOptions.map((month) => (
-                              <option
-                                key={month}
-                                value={month}
-                                disabled={
-                                  userBirthYear === CURRENT_YEAR &&
-                                  month > CURRENT_MONTH
-                                }
-                              >
-                                {month.toString().padStart(2, '0')}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className={popup['selectBox']}>
-                          <select
-                            className={popup['input']}
-                            id="birthDay"
-                            value={userBirthDay}
-                            onChange={(e) =>
-                              setUser((prev) => ({
-                                ...prev,
-                                birthDay: Number(e.target.value),
-                              }))
-                            }
-                          >
-                            {dayOptions.map((day) => (
-                              <option
-                                key={day}
-                                value={day}
-                                disabled={
-                                  userBirthYear === CURRENT_YEAR &&
-                                  userBirthMonth === CURRENT_MONTH &&
-                                  day > CURRENT_DAY
-                                }
-                              >
-                                {day.toString().padStart(2, '0')}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
+          <div
+            className={setting['body']}
+            style={selectedTabId === 'userSetting' ? {} : { display: 'none' }}
+          >
+            <div className={setting['userProfileContent']}>
+              <div className={popup['col']}>
+                <div className={popup['row']}>
+                  <div className={`${popup['inputBox']} ${popup['col']}`}>
+                    <label
+                      className={popup['label']}
+                      htmlFor="profile-form-nickname"
+                    >
+                      {lang.tr.nickname}
+                    </label>
+                    <input
+                      name="name"
+                      type="text"
+                      value={userName}
+                      maxLength={32}
+                      onChange={(e) =>
+                        setUser((prev) => ({ ...prev, name: e.target.value }))
+                      }
+                    />
                   </div>
 
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
                     <label
                       className={popup['label']}
-                      htmlFor="profile-form-signature"
+                      htmlFor="profile-form-gender"
                     >
-                      {lang.tr.signature}
+                      {lang.tr.gender}
                     </label>
-                    <input
-                      name="signature"
-                      type="text"
-                      value={userSignature}
-                      maxLength={100}
-                      onChange={(e) =>
-                        setUser((prev) => ({
-                          ...prev,
-                          signature: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-
-                  <div
-                    className={`${popup['inputBox']} ${popup['col']} ${popup['disabled']}`}
-                  >
-                    <label
-                      className={popup['label']}
-                      htmlFor="profile-form-about"
+                    <div
+                      className={`${popup['selectBox']} ${popup['selectBoxMax']}`}
                     >
-                      {lang.tr.about}
-                    </label>
-                    <textarea name="about" />
+                      <select
+                        value={userGender}
+                        onChange={(e) =>
+                          setUser((prev) => ({
+                            ...prev,
+                            gender: e.target.value as User['gender'],
+                          }))
+                        }
+                      >
+                        <option value="Male">{lang.tr.male}</option>
+                        <option value="Female">{lang.tr.female}</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </>
-          );
-      }
-    };
 
-    return (
-      <div className={`${popup['popupContainer']} ${setting['userProfile']}`}>
-        <div
-          className={`${popup['col']} ${setting['profileBox']} ${
-            !isSelf && setting['hiddenTab']
-          }`}
-        >
-          <div className={setting['header']}>
-            <div className={setting['windowActionButtons']}>
-              <div
-                className={setting['minimizeBtn']}
-                onClick={handleMinimize}
-              ></div>
-              <div className={setting['closeBtn']} onClick={handleClose}></div>
-            </div>
-            <div
-              className={`${setting['avatar']} ${
-                isEditing && isSelf ? setting['editable'] : ''
-              }`}
-              style={{ backgroundImage: `url(${userAvatarUrl})` }}
-              onClick={() => {
-                if (!isSelf || !isEditing) return;
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = 'image/*';
-                fileInput.onchange = (e) => {
-                  const file = (e.target as HTMLInputElement).files?.[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onloadend = async () => {
-                    const formData = new FormData();
-                    formData.append('_type', 'user');
-                    formData.append('_fileName', userId);
-                    formData.append('_file', reader.result as string);
-                    const data = await apiService.post('/upload', formData);
-                    if (data) {
+                <div className={popup['row']}>
+                  <div className={`${popup['inputBox']} ${popup['col']}`}>
+                    <label
+                      className={popup['label']}
+                      htmlFor="profile-form-country"
+                    >
+                      {lang.tr.country}
+                    </label>
+                    <div className={popup['selectBox']}>
+                      <select
+                        value={userCountry}
+                        onChange={(e) =>
+                          setUser((prev) => ({
+                            ...prev,
+                            country: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="taiwan">{lang.tr.taiwan}</option>
+                        <option value="china">{lang.tr.china}</option>
+                        <option value="japan">{lang.tr.japan}</option>
+                        <option value="korea">{lang.tr.korea}</option>
+                        <option value="usa">{lang.tr.usa}</option>
+                        <option value="uk">{lang.tr.uk}</option>
+                        <option value="france">{lang.tr.france}</option>
+                        <option value="germany">{lang.tr.germany}</option>
+                        <option value="italy">{lang.tr.italy}</option>
+                        <option value="spain">{lang.tr.spain}</option>
+                        <option value="portugal">{lang.tr.portugal}</option>
+                        <option value="brazil">{lang.tr.brazil}</option>
+                        <option value="argentina">{lang.tr.argentina}</option>
+                        <option value="mexico">{lang.tr.mexico}</option>
+                        <option value="colombia">{lang.tr.colombia}</option>
+                        <option value="chile">{lang.tr.chile}</option>
+                        <option value="peru">{lang.tr.peru}</option>
+                        <option value="venezuela">{lang.tr.venezuela}</option>
+                        <option value="bolivia">{lang.tr.bolivia}</option>
+                        <option value="ecuador">{lang.tr.ecuador}</option>
+                        <option value="paraguay">{lang.tr.paraguay}</option>
+                        <option value="uruguay">{lang.tr.uruguay}</option>
+                        <option value="nigeria">{lang.tr.nigeria}</option>
+                        <option value="southAfrica">
+                          {lang.tr.southAfrica}
+                        </option>
+                        <option value="india">{lang.tr.india}</option>
+                        <option value="indonesia">{lang.tr.indonesia}</option>
+                        <option value="malaysia">{lang.tr.malaysia}</option>
+                        <option value="philippines">
+                          {lang.tr.philippines}
+                        </option>
+                        <option value="thailand">{lang.tr.thailand}</option>
+                        <option value="vietnam">{lang.tr.vietnam}</option>
+                        <option value="turkey">{lang.tr.turkey}</option>
+                        <option value="saudiArabia">
+                          {lang.tr.saudiArabia}
+                        </option>
+                        <option value="qatar">{lang.tr.qatar}</option>
+                        <option value="kuwait">{lang.tr.kuwait}</option>
+                        <option value="oman">{lang.tr.oman}</option>
+                        <option value="bahrain">{lang.tr.bahrain}</option>
+                        <option value="algeria">{lang.tr.algeria}</option>
+                        <option value="morocco">{lang.tr.morocco}</option>
+                        <option value="tunisia">{lang.tr.tunisia}</option>
+                        <option value="nigeria">{lang.tr.nigeria}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className={`${popup['inputBox']} ${popup['col']}`}>
+                    <label
+                      className={popup['label']}
+                      htmlFor="profile-form-birthdate"
+                    >
+                      {lang.tr.birthdate}
+                    </label>
+                    <div className={popup['row']}>
+                      <div className={popup['selectBox']}>
+                        <select
+                          id="birthYear"
+                          value={userBirthYear}
+                          onChange={(e) =>
+                            setUser((prev) => ({
+                              ...prev,
+                              birthYear: Number(e.target.value),
+                            }))
+                          }
+                        >
+                          {yearOptions.map((year) => (
+                            <option
+                              key={year}
+                              value={year}
+                              disabled={year > CURRENT_YEAR}
+                            >
+                              {year}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className={popup['selectBox']}>
+                        <select
+                          className={popup['input']}
+                          id="birthMonth"
+                          value={userBirthMonth}
+                          onChange={(e) =>
+                            setUser((prev) => ({
+                              ...prev,
+                              birthMonth: Number(e.target.value),
+                            }))
+                          }
+                        >
+                          {monthOptions.map((month) => (
+                            <option
+                              key={month}
+                              value={month}
+                              disabled={
+                                userBirthYear === CURRENT_YEAR &&
+                                month > CURRENT_MONTH
+                              }
+                            >
+                              {month.toString().padStart(2, '0')}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className={popup['selectBox']}>
+                        <select
+                          className={popup['input']}
+                          id="birthDay"
+                          value={userBirthDay}
+                          onChange={(e) =>
+                            setUser((prev) => ({
+                              ...prev,
+                              birthDay: Number(e.target.value),
+                            }))
+                          }
+                        >
+                          {dayOptions.map((day) => (
+                            <option
+                              key={day}
+                              value={day}
+                              disabled={
+                                userBirthYear === CURRENT_YEAR &&
+                                userBirthMonth === CURRENT_MONTH &&
+                                day > CURRENT_DAY
+                              }
+                            >
+                              {day.toString().padStart(2, '0')}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                  <label
+                    className={popup['label']}
+                    htmlFor="profile-form-signature"
+                  >
+                    {lang.tr.signature}
+                  </label>
+                  <input
+                    name="signature"
+                    type="text"
+                    value={userSignature}
+                    maxLength={100}
+                    onChange={(e) =>
                       setUser((prev) => ({
                         ...prev,
-                        avatar: data.avatar,
-                        avatarUrl: data.avatarUrl,
-                      }));
+                        signature: e.target.value,
+                      }))
                     }
-                  };
-                  reader.readAsDataURL(file);
-                };
-                fileInput.click();
-              }}
-            />
-            <div
-              className={`${popup['row']} ${setting['noDrag']}`}
-              style={{ marginTop: '10px', gap: '2px' }}
-            >
-              <div className={setting['userName']}>{userName}</div>
-              {userVip > 0 && (
-                <div
-                  className={`${vip['vipIcon']} ${vip[`vip-small-${userVip}`]}`}
-                />
-              )}
-              <div
-                className={`
-                  ${grade['grade']} 
-                  ${grade[`lv-${Math.min(56, userLevel)}`]}
-                `}
-                title={
-                  `${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${userRequiredXP}` /** LEVEL:{userLevel} EXP:{userXP} LEVEL UP REQUIRED:{userRequiredXP}**/
-                }
-              />
-            </div>
-            <div
-              className={setting['userAccount']}
-              onClick={() => {
-                navigator.clipboard.writeText(userId);
-              }}
-            >
-              @{userName}
-            </div>
-            <div className={setting['userContent']}>
-              {lang.tr[userGender === 'Male' ? 'male' : 'female']} . {userAge} .
-              {lang.tr[userCountry as keyof typeof lang.tr]}
-            </div>
-            <div className={setting['userSignature']}>{userSignature}</div>
+                  />
+                </div>
 
-            <div className={setting['tab']}>
-              {MAIN_TABS.map((Tab) => {
-                const TabId = Tab.id;
-                const TabLabel = Tab.label;
-                if (TabId === 'userSetting') return null;
-                return (
-                  <div
-                    key={`Tabs-${TabId}`}
-                    className={`${setting['item']} ${setting[TabId]} ${
-                      TabId === selectedTabId ||
-                      (selectedTabId === 'userSetting' && TabId !== 'groups')
-                        ? setting['selected']
-                        : ''
-                    }`}
-                    onClick={() => {
-                      if (selectedTabId !== 'userSetting') {
-                        setSelectedTabId(TabId as 'about' | 'groups');
-                      }
-                    }}
+                <div
+                  className={`${popup['inputBox']} ${popup['col']} ${popup['disabled']}`}
+                >
+                  <label
+                    className={popup['label']}
+                    htmlFor="profile-form-about"
                   >
-                    {TabLabel}
-                  </div>
-                );
-              })}
+                    {lang.tr.about}
+                  </label>
+                  <textarea name="about" />
+                </div>
+              </div>
             </div>
-          </div>
-          <div
-            className={`${setting['body']} ${
-              !userSignature && setting['userAboutEmpty']
-            }`}
-          >
-            {getMainContent()}
           </div>
         </div>
 
