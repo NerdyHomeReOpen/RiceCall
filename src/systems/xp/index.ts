@@ -6,12 +6,11 @@ import { database } from '@/index';
 
 // Config
 import config from './config.json';
-import { resolve4 } from 'dns';
+
+const timeFlag = new Map<string, number>(); // socket -> timeFlag
+const elapsedTime = new Map<string, number>(); // userId -> elapsedTime
 
 const xpSystem = {
-  timeFlag: new Map<string, number>(), // socket -> timeFlag
-  elapsedTime: new Map<string, number>(), // userId -> elapsedTime
-
   setup: async () => {
     try {
       setInterval(() => {
@@ -40,10 +39,10 @@ const xpSystem = {
         throw new Error('No userId was provided');
       }
 
-      xpSystem.timeFlag.set(userId, Date.now());
+      timeFlag.set(userId, Date.now());
 
       new Logger('XPSystem').info(
-        `User(${userId}) XP system created with ${xpSystem.elapsedTime.get(
+        `User(${userId}) XP system created with ${elapsedTime.get(
           userId,
         )}ms elapsed time`,
       );
@@ -61,13 +60,13 @@ const xpSystem = {
         throw new Error('No userId was provided');
       }
 
-      const timeFlag = xpSystem.timeFlag.get(userId);
+      const userTimeFlag = timeFlag.get(userId);
 
-      if (timeFlag) {
+      if (userTimeFlag) {
         const now = Date.now();
-        const elapsedTime = xpSystem.elapsedTime.get(userId) || 0;
+        const userElapsedTime = elapsedTime.get(userId) || 0;
 
-        let newElapsedTime = elapsedTime + (now - timeFlag);
+        let newElapsedTime = userElapsedTime + (now - userTimeFlag);
         const times = Math.floor(newElapsedTime / config.INTERVAL_MS);
 
         for (let i = 0; i < times; i++) {
@@ -76,13 +75,13 @@ const xpSystem = {
           else break;
         }
 
-        xpSystem.elapsedTime.set(userId, newElapsedTime);
+        elapsedTime.set(userId, newElapsedTime);
       }
 
-      xpSystem.timeFlag.delete(userId);
+      timeFlag.delete(userId);
 
       new Logger('XPSystem').info(
-        `User(${userId}) XP system deleted with ${xpSystem.elapsedTime.get(
+        `User(${userId}) XP system deleted with ${elapsedTime.get(
           userId,
         )}ms elapsed time`,
       );
@@ -94,12 +93,12 @@ const xpSystem = {
   },
 
   refresh: async () => {
-    for (const [userId, timeFlag] of xpSystem.timeFlag.entries()) {
+    for (const [userId, userTimeFlag] of timeFlag.entries()) {
       try {
         const now = Date.now();
-        const elapsedTime = xpSystem.elapsedTime.get(userId) || 0;
+        const userElapsedTime = elapsedTime.get(userId) || 0;
 
-        let newElapsedTime = elapsedTime + now - timeFlag;
+        let newElapsedTime = userElapsedTime + now - userTimeFlag;
         const times = Math.floor(newElapsedTime / config.INTERVAL_MS);
 
         for (let i = 0; i < times; i++) {
@@ -108,8 +107,8 @@ const xpSystem = {
           else break;
         }
 
-        xpSystem.elapsedTime.set(userId, newElapsedTime);
-        xpSystem.timeFlag.set(userId, now); // Reset timeFlag
+        elapsedTime.set(userId, newElapsedTime);
+        timeFlag.set(userId, now); // Reset timeFlag
 
         new Logger('XPSystem').info(
           `XP interval refreshed for user(${userId})`,
@@ -123,7 +122,7 @@ const xpSystem = {
       }
     }
     new Logger('XPSystem').info(
-      `XP interval refreshed complete, ${xpSystem.timeFlag.size} users updated`,
+      `XP interval refreshed complete, ${timeFlag.size} users updated`,
     );
   },
 
