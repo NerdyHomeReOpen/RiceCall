@@ -31,7 +31,7 @@ export const database = new Database();
 
 // Setup Systems
 // xpSystem.setup();
-imageSystem.setup();
+// imageSystem.setup();
 
 // Error Handling
 process.on('uncaughtException', (error: any) => {
