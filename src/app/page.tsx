@@ -3,7 +3,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -47,6 +47,9 @@ import { useMainTab } from '@/providers/MainTab';
 import ipcService from '@/services/ipc.service';
 import authService from '@/services/auth.service';
 import refreshService from '@/services/refresh.service';
+
+// Components
+import { SoundEffectPlayer } from '@/components/SoundEffectPlayer';
 
 interface HeaderProps {
   user: User;
@@ -323,17 +326,6 @@ const RootPageComponent = () => {
   const lang = useLanguage();
   const mainTab = useMainTab();
 
-  // Refs
-  const joinAudioRef = useRef<HTMLAudioElement>(null);
-  joinAudioRef.current = new Audio('./sounds/Yconnect.wav');
-  joinAudioRef.current.volume = 0.5;
-  const leaveAudioRef = useRef<HTMLAudioElement>(null);
-  leaveAudioRef.current = new Audio('./sounds/Ydisconnect.wav');
-  leaveAudioRef.current.volume = 0.5;
-  const recieveAudioRef = useRef<HTMLAudioElement>(null);
-  recieveAudioRef.current = new Audio('./sounds/ReceiveChannelMsg.wav');
-  recieveAudioRef.current.volume = 0.5;
-
   // States
   const [user, setUser] = useState<User>(createDefault.user());
   const [servers, setServers] = useState<UserServer[]>([]);
@@ -492,20 +484,6 @@ const RootPageComponent = () => {
     setChannelMessages((prev) => [...prev, ...channelMessages]);
   };
 
-  const handlePlaySound = (sound: string) => {
-    switch (sound) {
-      case 'leave':
-        leaveAudioRef.current?.play();
-        break;
-      case 'join':
-        joinAudioRef.current?.play();
-        break;
-      case 'recieveChannelMessage':
-        recieveAudioRef.current?.play();
-        break;
-    }
-  };
-
   const handleError = (error: StandardizedError) => {
     new errorHandler(error).show();
   };
@@ -601,7 +579,6 @@ const RootPageComponent = () => {
       [SocketServerEvent.SERVER_CHANNEL_DELETE]: handleServerChannelDelete,
       [SocketServerEvent.SERVER_CHANNELS_UPDATE]: handleServerChannelsUpdate,
       [SocketServerEvent.ON_MESSAGE]: handleOnMessages,
-      [SocketServerEvent.PLAY_SOUND]: handlePlaySound,
       [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
       [SocketServerEvent.ERROR]: handleError,
       [SocketServerEvent.CONNECT_ERROR]: handleConnectError,
@@ -669,6 +646,7 @@ const RootPageComponent = () => {
     if (!socket.isConnected) return <LoadingSpinner />;
     return (
       <>
+        <SoundEffectPlayer />
         <HomePage
           user={user}
           servers={servers}
