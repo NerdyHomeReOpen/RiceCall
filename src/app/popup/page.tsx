@@ -137,6 +137,18 @@ const Popup = React.memo(() => {
   }, [id]);
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        ipcService.window.close();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!initialData || !type) return;
 
     switch (type) {
