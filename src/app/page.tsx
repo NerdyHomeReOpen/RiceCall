@@ -559,11 +559,6 @@ const RootPageComponent = () => {
   }, [user.currentChannelId, serverChannels]);
 
   useEffect(() => {
-    if (user.currentServerId) {
-      if (mainTab.selectedTabId === 'home') mainTab.setSelectedTabId('server');
-    } else {
-      if (mainTab.selectedTabId === 'server') mainTab.setSelectedTabId('home');
-    }
     const server =
       servers.find((item) => item.serverId === user.currentServerId) ||
       createDefault.userServer();
