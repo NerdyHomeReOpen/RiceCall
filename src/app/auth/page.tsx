@@ -47,7 +47,7 @@ const Auth: React.FC = () => {
   // Effects
   useEffect(() => {
     const autoLogin = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       await authService.autoLogin();
     };
     autoLogin();
