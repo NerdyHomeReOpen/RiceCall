@@ -100,7 +100,9 @@ const xpSystem = {
         const elapsedTime = xpSystem.elapsedTime.get(userId) || 0;
 
         let newElapsedTime = elapsedTime + now - timeFlag;
-        while (newElapsedTime >= config.INTERVAL_MS) {
+        const times = Math.floor(newElapsedTime / config.INTERVAL_MS);
+
+        for (let i = 0; i < times; i++) {
           const success = await xpSystem.obtainXp(userId);
           if (success) newElapsedTime -= config.INTERVAL_MS;
           else break;
