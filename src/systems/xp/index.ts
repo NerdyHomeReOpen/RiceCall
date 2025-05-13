@@ -6,6 +6,7 @@ import { database } from '@/index';
 
 // Config
 import config from './config.json';
+import { resolve4 } from 'dns';
 
 const xpSystem = {
   timeFlag: new Map<string, number>(), // socket -> timeFlag
@@ -111,6 +112,8 @@ const xpSystem = {
         new Logger('XPSystem').info(
           `XP interval refreshed for user(${userId})`,
         );
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       } catch (error: any) {
         new Logger('XPSystem').error(
           `Error refreshing XP interval for user(${userId}): ${error.message}`,
