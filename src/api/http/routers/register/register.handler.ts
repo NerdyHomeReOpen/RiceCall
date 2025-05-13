@@ -31,6 +31,18 @@ export const RegisterHandler = {
         'REGISTER',
       );
 
+      // Check if account already exists
+      const accountExists = await database.get.account(account);
+      if (accountExists) {
+        throw new StandardizedError({
+          name: 'ServerError',
+          message: '帳號已存在',
+          part: 'REGISTER',
+          tag: 'ACCOUNT_EXISTS',
+          statusCode: 400,
+        });
+      }
+
       // Create user data
       const userId = uuidv4();
       await database.set.user(userId, {
