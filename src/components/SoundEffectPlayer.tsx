@@ -16,7 +16,9 @@ export const SoundEffectPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const handlePlaySound = (sound: string) => {
-    audioRef.current?.pause();
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
 
     switch (sound) {
       case 'leave':
