@@ -145,17 +145,17 @@ export const DeleteFriendGroupHandler = {
       }
 
       if (friendGroupFriends && friendGroupFriends.length > 0) {
-        await Promise.all(
-          friendGroupFriends.map(async (friend) => {
-            await UpdateFriendHandler.handle(io, socket, {
-              userId: friend.userId,
-              targetId: friend.targetId,
-              friend: {
-                friendGroupId: null,
-              },
-            });
-          }),
-        );
+        for (const friend of friendGroupFriends) {
+          await UpdateFriendHandler.handle(io, socket, {
+            userId: friend.userId,
+            targetId: friend.targetId,
+            friend: {
+              friendGroupId: null,
+            },
+          });
+
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
       }
 
       // Delete friend group

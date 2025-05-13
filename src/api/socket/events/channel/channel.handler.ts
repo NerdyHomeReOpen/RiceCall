@@ -34,7 +34,7 @@ export const ConnectChannelHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { userId, channelId, serverId, password } =
+      let { userId, channelId, serverId, password } =
         await DataValidator.validate(
           ConnectChannelSchema,
           data,
@@ -81,49 +81,46 @@ export const ConnectChannelHandler = {
             statusCode: 403,
           });
         }
-
-        if (channel.visibility === 'readonly') {
-          await ConnectChannelHandler.handle(io, socket, {
-            channelId: server.lobbyId,
-            serverId: serverId,
-            userId: userId,
-          });
-          return;
-        }
       } else {
         if (
           channel.password &&
           password !== channel.password &&
           operatorMember.permissionLevel < 3
         ) {
-          await ConnectChannelHandler.handle(io, socket, {
-            channelId: server.lobbyId,
-            serverId: serverId,
-            userId: userId,
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '密碼錯誤',
+            part: 'CONNECTCHANNEL',
+            tag: 'PERMISSION_DENIED',
+            statusCode: 403,
           });
-          return;
-        }
-
-        if (channel.visibility === 'readonly') {
-          await ConnectChannelHandler.handle(io, socket, {
-            channelId: server.lobbyId,
-            serverId: serverId,
-            userId: userId,
-          });
-          return;
         }
 
         if (
-          (server.visibility === 'private' ||
-            channel.visibility === 'member') &&
+          server.visibility === 'private' &&
+          !channel.isLobby &&
           operatorMember.permissionLevel < 2
         ) {
-          await ConnectChannelHandler.handle(io, socket, {
-            channelId: server.lobbyId,
-            serverId: serverId,
-            userId: userId,
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '你需要成為會員才能加入該頻道',
+            part: 'CONNECTCHANNEL',
+            tag: 'PERMISSION_DENIED',
+            statusCode: 403,
           });
-          return;
+        }
+
+        if (
+          channel.visibility === 'member' &&
+          operatorMember.permissionLevel < 2
+        ) {
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '你需要成為會員才能加入該頻道',
+            part: 'CONNECTCHANNEL',
+            tag: 'PERMISSION_DENIED',
+            statusCode: 403,
+          });
         }
 
         if (
@@ -132,13 +129,24 @@ export const ConnectChannelHandler = {
           channelUsers.length >= channel.userLimit &&
           operatorMember.permissionLevel < 5
         ) {
-          await ConnectChannelHandler.handle(io, socket, {
-            channelId: server.receptionLobbyId || server.lobbyId,
-            serverId: serverId,
-            userId: userId,
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '該頻道已達到人數限制',
+            part: 'CONNECTCHANNEL',
+            tag: 'PERMISSION_DENIED',
+            statusCode: 403,
           });
-          return;
         }
+      }
+
+      if (channel.visibility === 'readonly') {
+        throw new StandardizedError({
+          name: 'PermissionError',
+          message: '該頻道為訊息展示頻道',
+          part: 'CONNECTCHANNEL',
+          tag: 'PERMISSION_DENIED',
+          statusCode: 403,
+        });
       }
 
       // Setup user xp interval
@@ -583,15 +591,15 @@ export const UpdateChannelsHandler = {
         'UPDATECHANNELS',
       );
 
-      await Promise.all(
-        channels.map(async (channel: any) => {
-          await UpdateChannelHandler.handle(io, socket, {
-            serverId,
-            channelId: channel.channelId,
-            channel: channel,
-          });
-        }),
-      );
+      for (const channel of channels) {
+        await UpdateChannelHandler.handle(io, socket, {
+          serverId,
+          channelId: channel.channelId,
+          channel: channel,
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -655,26 +663,26 @@ export const DeleteChannelHandler = {
       }
 
       if (channelChildren) {
-        await Promise.all(
-          channelChildren.map(async (child) => {
-            await DeleteChannelHandler.handle(io, socket, {
-              serverId: serverId,
-              channelId: child.channelId,
-            });
-          }),
-        );
+        for (const child of channelChildren) {
+          await DeleteChannelHandler.handle(io, socket, {
+            serverId: serverId,
+            channelId: child.channelId,
+          });
+
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
       }
 
       if (channelUsers) {
-        await Promise.all(
-          channelUsers.map(async (user) => {
-            await ConnectChannelHandler.handle(io, socket, {
-              channelId: server.lobbyId,
-              serverId: serverId,
-              userId: user.userId,
-            });
-          }),
-        );
+        for (const user of channelUsers) {
+          await ConnectChannelHandler.handle(io, socket, {
+            channelId: server.lobbyId,
+            serverId: serverId,
+            userId: user.userId,
+          });
+
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
       }
 
       // Delete channel

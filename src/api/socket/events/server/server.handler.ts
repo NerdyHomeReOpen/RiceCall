@@ -129,19 +129,27 @@ export const ConnectServerHandler = {
       /* Start of Pre Main Logic */
 
       // Join lobby
-      if (
-        server.visibility === 'private' &&
-        userMember &&
-        userMember.permissionLevel < 2
-      ) {
+      if (server.receptionLobbyId) {
+        if (
+          server.visibility === 'private' &&
+          userMember &&
+          userMember.permissionLevel < 2
+        ) {
+          await ConnectChannelHandler.handle(io, socket, {
+            channelId: server.lobbyId,
+            serverId: serverId,
+            userId: userId,
+          });
+        }
+
         await ConnectChannelHandler.handle(io, socket, {
-          channelId: server.lobbyId,
+          channelId: server.receptionLobbyId,
           serverId: serverId,
           userId: userId,
         });
       } else {
         await ConnectChannelHandler.handle(io, socket, {
-          channelId: server.receptionLobbyId || server.lobbyId,
+          channelId: server.lobbyId,
           serverId: serverId,
           userId: userId,
         });
