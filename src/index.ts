@@ -30,7 +30,7 @@ export const socketServer = new SocketServer(httpServer).setup();
 export const database = new Database();
 
 // Setup Systems
-xpSystem.setup();
+// xpSystem.setup();
 imageSystem.setup();
 
 // Error Handling
