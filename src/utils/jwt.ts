@@ -4,13 +4,19 @@ import jwt from 'jsonwebtoken';
 import { jwtConfig } from '@/config';
 
 export function generateJWT(data: any) {
-  const encoded = jwt.sign(data, jwtConfig.secret, {
+  return jwt.sign(data, jwtConfig.secret, {
     expiresIn: jwtConfig.expiresIn,
+    algorithm: 'HS256',
   });
-  return encoded;
 }
 
 export function verifyJWT(token: string) {
-  const decoded = jwt.verify(token, jwtConfig.secret) as any;
-  return { valid: true, ...decoded };
+  try {
+    const data = jwt.verify(token, jwtConfig.secret, {
+      algorithms: ['HS256'],
+    }) as { userId: string };
+    return { valid: true, data };
+  } catch (error) {
+    return { valid: false, error };
+  }
 }

@@ -17,7 +17,7 @@ export const AuthValidator = {
       });
     }
 
-    if (!decoded.userId) {
+    if (!decoded.data) {
       throw new StandardizedError({
         name: 'ValidationError',
         message: '無效的 token',
@@ -27,6 +27,6 @@ export const AuthValidator = {
       });
     }
 
-    return decoded.userId;
+    return decoded.data.userId;
   },
 };
