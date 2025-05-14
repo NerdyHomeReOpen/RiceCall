@@ -30,8 +30,8 @@ export const socketServer = new SocketServer(httpServer).setup();
 export const database = new Database();
 
 // Setup Systems
-// xpSystem.setup();
-// imageSystem.setup();
+xpSystem.setup();
+imageSystem.setup();
 
 // Error Handling
 process.on('uncaughtException', (error: any) => {
