@@ -263,6 +263,19 @@ export const DisconnectServerHandler = {
         }
       }
 
+      /* Start of Pre Main Logic */
+
+      // Leave current channel
+      if (user.currentChannelId) {
+        await DisconnectChannelHandler.handle(io, socket, {
+          userId: userId,
+          channelId: user.currentChannelId,
+          serverId: user.currentServerId,
+        });
+      }
+
+      /* End of Pre Main Logic */
+
       /* Start of Main Logic */
 
       // Update user
@@ -296,19 +309,6 @@ export const DisconnectServerHandler = {
       }
 
       /* End of Main Logic */
-
-      /* Start of Post Main Logic */
-
-      // Leave current channel
-      if (user.currentChannelId) {
-        await DisconnectChannelHandler.handle(io, socket, {
-          userId: userId,
-          channelId: user.currentChannelId,
-          serverId: user.currentServerId,
-        });
-      }
-
-      /* End of Post Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
