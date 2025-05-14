@@ -128,7 +128,7 @@ const xpSystem = {
 
   getRequiredXP: (level: number) => {
     return Math.ceil(
-      config.BASE_REQUIRE_XP * Math.pow(config.GROWTH_RATE, level),
+      config.BASE_REQUIRE_XP * Math.pow(config.GROWTH_RATE, level - 1),
     );
   },
 
@@ -162,8 +162,8 @@ const xpSystem = {
 
       // Process Level
       let requiredXp = 0;
-      while (user.xp < requiredXp) {
-        requiredXp = xpSystem.getRequiredXP(user.level - 1);
+      while (user.xp >= requiredXp) {
+        requiredXp = xpSystem.getRequiredXP(user.level);
         user.level += 1;
         user.xp -= requiredXp;
       }
