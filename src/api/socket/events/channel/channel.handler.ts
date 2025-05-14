@@ -49,13 +49,20 @@ export const ConnectChannelHandler = {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
-        if (
-          operatorMember.permissionLevel < 5 ||
-          operatorMember.permissionLevel <= userMember.permissionLevel
-        ) {
+        if (operatorMember.permissionLevel < 5) {
           throw new StandardizedError({
             name: 'PermissionError',
             message: '你沒有足夠的權限移動其他用戶',
+            part: 'CONNECTCHANNEL',
+            tag: 'PERMISSION_DENIED',
+            statusCode: 403,
+          });
+        }
+
+        if (operatorMember.permissionLevel <= userMember.permissionLevel) {
+          throw new StandardizedError({
+            name: 'PermissionError',
+            message: '你沒有足夠的權限移動該用戶',
             part: 'CONNECTCHANNEL',
             tag: 'PERMISSION_DENIED',
             statusCode: 403,
