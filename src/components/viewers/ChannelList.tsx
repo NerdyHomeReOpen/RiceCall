@@ -629,7 +629,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               },
               {
                 id: 'createSubChannel',
-                label: lang.tr.addChannel,
+                label: lang.tr.addSubChannel,
                 show: canCreateSub,
                 onClick: () =>
                   handleOpenCreateChannel(serverId, channelId, userId),

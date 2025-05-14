@@ -198,6 +198,7 @@ export interface Translation {
   kick: string;
   addFriend: string;
   addChannel: string;
+  addSubChannel: string;
   unknownChannel: string;
   micOrder: string;
   allChannel: string;
