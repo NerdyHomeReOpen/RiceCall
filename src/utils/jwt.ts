@@ -7,7 +7,7 @@ export function generateJWT(data: any) {
   return jwt.sign(data, jwtConfig.secret, {
     expiresIn: jwtConfig.expiresIn,
     algorithm: 'HS256',
-  });
+  } as any);
 }
 
 export function verifyJWT(token: string) {
@@ -16,7 +16,7 @@ export function verifyJWT(token: string) {
       algorithms: ['HS256'],
     }) as { userId: string };
     return { valid: true, data };
-  } catch (error) {
+  } catch (error: any) {
     return { valid: false, error };
   }
 }
