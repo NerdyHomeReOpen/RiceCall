@@ -148,10 +148,13 @@ enum SocketServerEvent {
 
 // Constants
 const DEV = process.argv.includes('--dev');
+const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const WS_URL_SECONDARY = process.env.NEXT_PUBLIC_SERVER_URL_SECONDARY;
 const BASE_URI = DEV ? 'http://localhost:3000' : 'app://-';
 const FILE_PATH = fileURLToPath(import.meta.url);
 const DIR_PATH = path.dirname(FILE_PATH);
 const ROOT_PATH = DEV ? DIR_PATH : path.join(DIR_PATH, '../');
+const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
 const APP_ICON =
   process.platform === 'win32'
     ? path.join(ROOT_PATH, 'resources', 'icon.ico')
@@ -173,12 +176,10 @@ let authWindow: BrowserWindow;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
-const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+let websocketUrl = WS_URL;
 let socketInstance: Socket | null = null;
 
 // Discord RPC
-const CLIENT_ID = '1242441392341516288';
-DiscordRPC.register(CLIENT_ID);
 let rpc: DiscordRPC.Client | null = null;
 
 const defaultPrecence = {
@@ -201,6 +202,13 @@ const defaultPrecence = {
 const appServe = serve({ directory: path.join(ROOT_PATH, 'out') });
 
 // Functions
+async function checkIsHinet() {
+  const ipData = await fetch('https://ipinfo.io/json').then((res) =>
+    res.json(),
+  );
+  return ipData.org.startsWith('AS3462');
+}
+
 function waitForPort(port: number) {
   return new Promise((resolve, reject) => {
     let timeout = 30000; // 30 seconds timeout
@@ -430,7 +438,7 @@ function connectSocket(token: string): Socket | null {
     socketInstance = disconnectSocket();
   }
 
-  const socket = io(WS_URL, {
+  const socket = io(websocketUrl, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 10000,
@@ -633,9 +641,10 @@ async function setActivity(presence: DiscordRPC.Presence) {
 }
 
 async function configureDiscordRPC() {
+  DiscordRPC.register(DISCORD_RPC_CLIENT_ID);
   rpc = new DiscordRPC.Client({ transport: 'ipc' });
 
-  rpc = await rpc.login({ clientId: CLIENT_ID }).catch(() => {
+  rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID }).catch(() => {
     console.warn('Cannot login to Discord RPC, will not show Discord status');
     return null;
   });
@@ -711,6 +720,8 @@ app.on('ready', async () => {
   configureAutoUpdater();
   configureDiscordRPC();
   configureTray();
+
+  if (await checkIsHinet()) websocketUrl = WS_URL_SECONDARY;
 
   await createAuthWindow();
   await createMainWindow();
