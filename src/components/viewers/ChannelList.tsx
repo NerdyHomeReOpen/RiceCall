@@ -209,17 +209,19 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       if (!socket) return;
       const moveType = e.dataTransfer.getData('type');
       const currentChannelId = e.dataTransfer.getData('currentChannelId');
+      if (!moveType || !currentChannelId || currentChannelId === channelId)
+        return;
 
       switch (moveType) {
         case 'moveUser':
           const targetUserId = e.dataTransfer.getData('userId');
-          if (!targetUserId || currentChannelId === channelId) return;
+          if (!targetUserId) return;
           handleJoinChannel(targetUserId, serverId, channelId);
           break;
         case 'moveChannelUser':
           const targetUserIds = e.dataTransfer.getData('userIds').split(',');
           for (const targetUserId of targetUserIds) {
-            if (!targetUserId || currentChannelId === channelId) return;
+            if (!targetUserId) return;
             handleJoinChannel(targetUserId, serverId, channelId);
           }
           break;
@@ -550,17 +552,19 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       if (!socket) return;
       const moveType = e.dataTransfer.getData('type');
       const currentChannelId = e.dataTransfer.getData('currentChannelId');
+      if (!moveType || !currentChannelId || currentChannelId === channelId)
+        return;
 
       switch (moveType) {
         case 'moveUser':
           const targetUserId = e.dataTransfer.getData('userId');
-          if (!targetUserId || currentChannelId === channelId) return;
+          if (!targetUserId) return;
           handleJoinChannel(targetUserId, serverId, channelId);
           break;
         case 'moveChannelUser':
           const targetUserIds = e.dataTransfer.getData('userIds').split(',');
           for (const targetUserId of targetUserIds) {
-            if (!targetUserId || currentChannelId === channelId) return;
+            if (!targetUserId) return;
             handleJoinChannel(targetUserId, serverId, channelId);
           }
           break;
