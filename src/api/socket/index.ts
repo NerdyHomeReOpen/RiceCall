@@ -130,7 +130,7 @@ export default class SocketServer {
           });
         }
 
-        io.to(socket.id).emit('openPopup', {
+        socket.emit('openPopup', {
           type: 'dialogAlert',
           id: 'logout',
           initialData: {
@@ -138,7 +138,6 @@ export default class SocketServer {
             submitTo: 'logout',
           },
         });
-        io.to(socket.id).disconnectSockets();
 
         return next(error);
       }
