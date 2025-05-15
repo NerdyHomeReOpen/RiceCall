@@ -34,17 +34,19 @@ const ipcService = {
     ipcRenderer.removeAllListeners(event);
   },
 
-  // Socket event methods
-  sendSocketEvent: (event: SocketClientEvent, ...args: any[]) => {
-    if (!isElectron) return;
-    ipcRenderer.send(event, ...args);
-  },
-  onSocketEvent: (
-    event: SocketServerEvent | 'connect' | 'reconnect' | 'disconnect',
-    callback: (...args: any[]) => void,
-  ) => {
-    if (!isElectron) return;
-    ipcRenderer.on(event, (_: any, ...args: any[]) => callback(...args));
+  socket: {
+    send: (event: SocketClientEvent, ...args: any[]) => {
+      if (!isElectron) return;
+      ipcRenderer.send(event, ...args);
+    },
+    on: (
+      event: SocketServerEvent | 'connect' | 'reconnect' | 'disconnect',
+      callback: (...args: any[]) => void,
+    ) => {
+      if (!isElectron) return () => {};
+      ipcRenderer.on(event, (_: any, ...args: any[]) => callback(...args));
+      return () => ipcRenderer.removeAllListeners(event);
+    },
   },
 
   // DeepLink methods

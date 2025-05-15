@@ -10,7 +10,7 @@ import { SocketServerEvent, SocketClientEvent } from '@/types';
 import ipcService from '@/services/ipc.service';
 
 type SocketContextType = {
-  send: Record<SocketClientEvent, (...args: any[]) => () => void>;
+  send: Record<SocketClientEvent, (...args: any[]) => void>;
   on: Record<
     SocketServerEvent,
     (callback: (...args: any[]) => void) => () => void
@@ -34,22 +34,10 @@ interface SocketProviderProps {
 const SocketProvider = ({ children }: SocketProviderProps) => {
   // States
   const [on, setOn] = useState<SocketContextType['on']>(
-    Object.values(SocketServerEvent).reduce((acc, event) => {
-      acc[event] = (callback: (...args: any[]) => void) => {
-        ipcService.onSocketEvent(event, (...args) => callback(...args));
-        return () => ipcService.removeListener(event);
-      };
-      return acc;
-    }, {} as SocketContextType['on']),
+    {} as SocketContextType['on'],
   );
   const [send, setSend] = useState<SocketContextType['send']>(
-    Object.values(SocketClientEvent).reduce((acc, event) => {
-      acc[event] = (...args: any[]) => {
-        ipcService.sendSocketEvent(event, ...args);
-        return () => {};
-      };
-      return acc;
-    }, {} as SocketContextType['send']),
+    {} as SocketContextType['send'],
   );
 
   // Refs
@@ -77,46 +65,28 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
   useEffect(() => {
     console.info('SocketProvider initialization');
 
-    cleanupRef.current = Object.values(SocketServerEvent).reduce(
-      (acc, event) => {
-        acc.push(() => ipcService.removeListener(event));
-        return acc;
-      },
-      [] as (() => void)[],
-    );
-
-    cleanupRef.current.push(() => {
-      ipcService.removeListener('connect');
-      ipcService.removeListener('reconnect');
-      ipcService.removeListener('disconnect');
-    });
-
     setOn(
       Object.values(SocketServerEvent).reduce((acc, event) => {
-        acc[event] = (callback: (...args: any[]) => void) => {
-          ipcService.onSocketEvent(event, (...args) => callback(...args));
-          return () => ipcService.removeListener(event);
-        };
+        acc[event] = (callback: (...args: any[]) => void) =>
+          ipcService.socket.on(event, callback);
         return acc;
       }, {} as SocketContextType['on']),
     );
 
     setSend(
       Object.values(SocketClientEvent).reduce((acc, event) => {
-        acc[event] = (...args: any[]) => {
-          ipcService.sendSocketEvent(event, ...args);
-          return () => {};
-        };
+        acc[event] = (...args: any[]) => ipcService.socket.send(event, ...args);
         return acc;
       }, {} as SocketContextType['send']),
     );
 
-    ipcService.onSocketEvent('connect', handleConnect);
-    ipcService.onSocketEvent('reconnect', handleReconnect);
-    ipcService.onSocketEvent('disconnect', handleDisconnect);
+    cleanupRef.current.push(
+      ipcService.socket.on('connect', handleConnect),
+      ipcService.socket.on('reconnect', handleReconnect),
+      ipcService.socket.on('disconnect', handleDisconnect),
+    );
 
     return () => {
-      console.info('SocketProvider cleanup');
       cleanupRef.current.forEach((cleanup) => cleanup());
       cleanupRef.current = [];
     };
