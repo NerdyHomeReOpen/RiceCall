@@ -117,18 +117,21 @@ const ipcService = {
     },
 
     onMaximize: (callback: () => void) => {
-      if (!isElectron) return;
+      if (!isElectron) return () => {};
       ipcRenderer.on('maximize', callback);
+      return () => ipcRenderer.removeAllListeners('maximize');
     },
 
     onUnmaximize: (callback: () => void) => {
-      if (!isElectron) return;
+      if (!isElectron) return () => {};
       ipcRenderer.on('unmaximize', callback);
+      return () => ipcRenderer.removeAllListeners('unmaximize');
     },
 
     onShakeWindow: (callback: () => void) => {
-      if (!isElectron) return;
+      if (!isElectron) return () => {};
       ipcRenderer.on('shakeWindow', callback);
+      return () => ipcRenderer.removeAllListeners('shakeWindow');
     },
   },
 

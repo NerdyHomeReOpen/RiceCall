@@ -136,7 +136,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
     // Effects
     useEffect(() => {
-      ipcService.window.onShakeWindow(() => handleShakeWindow());
+      const offShakeWindow = ipcService.window.onShakeWindow(() =>
+        handleShakeWindow(),
+      );
+
+      return () => offShakeWindow();
     }, []);
 
     useEffect(() => {

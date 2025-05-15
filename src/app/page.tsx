@@ -142,13 +142,18 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
 
   // Effects
   useEffect(() => {
-    ipcService.window.onMaximize(() => {
+    const offMaximize = ipcService.window.onMaximize(() => {
       setIsFullscreen(true);
     });
 
-    ipcService.window.onUnmaximize(() => {
+    const offUnmaximize = ipcService.window.onUnmaximize(() => {
       setIsFullscreen(false);
     });
+
+    return () => {
+      offMaximize();
+      offUnmaximize();
+    };
   }, []);
 
   return (
