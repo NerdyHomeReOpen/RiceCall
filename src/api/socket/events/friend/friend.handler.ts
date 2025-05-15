@@ -69,6 +69,8 @@ export const CreateFriendHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Create friend
       await database.set.friend(userId, targetId, {
         ...preset,
@@ -83,6 +85,7 @@ export const CreateFriendHandler = {
 
       const targetSocket = SocketServer.getSocket(targetId);
 
+      // Send socket event
       socket.emit('friendAdd', await database.get.userFriend(userId, targetId));
       if (targetSocket) {
         targetSocket.emit(
@@ -90,6 +93,8 @@ export const CreateFriendHandler = {
           await database.get.userFriend(targetId, userId),
         );
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -128,10 +133,15 @@ export const UpdateFriendHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Update friend
       await database.set.friend(userId, targetId, friend);
 
+      // Send socket event
       socket.emit('friendUpdate', userId, targetId, friend);
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -170,18 +180,23 @@ export const DeleteFriendHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Delete friend
       await database.delete.friend(userId, targetId);
 
       // Delete friend (reverse)
       await database.delete.friend(targetId, userId);
 
+      // Send socket event
       const targetSocket = SocketServer.getSocket(targetId);
 
       socket.emit('friendDelete', userId, targetId);
       if (targetSocket) {
         targetSocket.emit('friendDelete', targetId, userId);
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

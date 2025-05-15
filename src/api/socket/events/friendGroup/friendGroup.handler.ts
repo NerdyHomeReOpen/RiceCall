@@ -44,6 +44,8 @@ export const CreateFriendGroupHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Create friend group
       const friendGroupId = uuidv4();
       await database.set.friendGroup(friendGroupId, {
@@ -52,10 +54,13 @@ export const CreateFriendGroupHandler = {
         createdAt: Date.now(),
       });
 
+      // Send socket event
       socket.emit(
         'friendGroupAdd',
         await database.get.friendGroup(friendGroupId),
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -98,10 +103,15 @@ export const UpdateFriendGroupHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Update friend group
       await database.set.friendGroup(friendGroupId, update);
 
+      // Send socket event
       socket.emit('friendGroupUpdate', friendGroupId, update);
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -144,6 +154,8 @@ export const DeleteFriendGroupHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       if (friendGroupFriends && friendGroupFriends.length > 0) {
         for (const friend of friendGroupFriends) {
           await UpdateFriendHandler.handle(io, socket, {
@@ -161,7 +173,10 @@ export const DeleteFriendGroupHandler = {
       // Delete friend group
       await database.delete.friendGroup(friendGroupId);
 
+      // Send socket event
       socket.emit('friendGroupDelete', friendGroupId);
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

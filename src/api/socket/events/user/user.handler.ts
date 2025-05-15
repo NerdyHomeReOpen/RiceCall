@@ -171,9 +171,14 @@ export const UpdateUserHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       await database.set.user(userId, update);
 
+      // Send socket event
       socket.emit('userUpdate', update);
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

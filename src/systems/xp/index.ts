@@ -176,24 +176,24 @@ const xpSystem = {
       server.wealth += config.BASE_CONTRIBUTION;
 
       // Update user
-      const updatedUser = {
+      const userUpdate = {
         level: user.level,
         xp: user.xp,
         requiredXp: xpSystem.getRequiredXP(user.level),
       };
-      await database.set.user(user.userId, updatedUser);
+      await database.set.user(user.userId, userUpdate);
 
       // Update member contribution if in a server
-      const updatedMember = {
+      const memberUpdate = {
         contribution: member.contribution,
       };
-      await database.set.member(user.userId, server.serverId, updatedMember);
+      await database.set.member(user.userId, server.serverId, memberUpdate);
 
       // Update server wealth
-      const updatedServer = {
+      const serverUpdate = {
         wealth: server.wealth,
       };
-      await database.set.server(server.serverId, updatedServer);
+      await database.set.server(server.serverId, serverUpdate);
 
       new Logger('XPSystem').info(
         `User(${userId}) obtained ${config.BASE_XP * vipBoost} XP and ${

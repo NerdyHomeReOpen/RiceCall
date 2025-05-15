@@ -47,6 +47,8 @@ export const SendMessageHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       if (channel.forbidGuestUrl && operatorMember.permissionLevel === 1) {
         preset.content = preset.content.replace(
           /https?:\/\/[^\s]+/g,
@@ -66,17 +68,20 @@ export const SendMessageHandler = {
       };
 
       // Update member
-      const updatedMember = {
+      const memberUpdate = {
         lastMessageTime: Date.now().valueOf(),
       };
-      await database.set.member(operatorId, serverId, updatedMember);
+      await database.set.member(operatorId, serverId, memberUpdate);
 
-      socket.emit('serverUpdate', serverId, updatedMember);
+      // Send socket event
+      socket.emit('serverUpdate', serverId, memberUpdate);
       socket
         .to(`channel_${channelId}`)
         .emit('playSound', 'recieveChannelMessage');
 
       io.to(`channel_${channelId}`).emit('onMessage', message);
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -119,6 +124,8 @@ export const SendDirectMessageHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Create new message
       const directMessage = {
         ...preset,
@@ -129,12 +136,15 @@ export const SendDirectMessageHandler = {
         timestamp: Date.now().valueOf(),
       };
 
+      // Send socket event
       const targetSocket = SocketServer.getSocket(targetId);
 
       socket.emit('onDirectMessage', directMessage);
       if (targetSocket) {
         targetSocket.emit('onDirectMessage', directMessage);
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -185,11 +195,15 @@ export const ShakeWindowHandler = {
         });
       }
 
+      /* Start of Main Logic */
       const targetSocket = SocketServer.getSocket(targetId);
 
+      // Send socket event
       if (targetSocket) {
         targetSocket.emit('onShakeWindow', friend);
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

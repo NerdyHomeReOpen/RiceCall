@@ -363,6 +363,8 @@ export const CreateServerHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Create server
       const serverId = uuidv4();
       const displayId = await generateUniqueDisplayId();
@@ -404,6 +406,8 @@ export const CreateServerHandler = {
         userId: operatorId,
         serverId: serverId,
       });
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -444,10 +448,15 @@ export const UpdateServerHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Update server
       await database.set.server(serverId, update);
 
+      // Send socket event
       io.to(`server_${serverId}`).emit('serverUpdate', serverId, update);
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

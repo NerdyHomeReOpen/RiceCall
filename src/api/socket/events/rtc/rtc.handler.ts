@@ -27,11 +27,16 @@ export const RTCOfferHandler = {
         'RTCOFFER',
       );
 
+      /* Start of Main Logic */
+
+      // Send socket event
       socket.to(to).emit('RTCOffer', {
         from: socket.id,
         userId: operatorId,
         offer: offer,
       });
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -60,11 +65,16 @@ export const RTCAnswerHandler = {
         'RTCANSWER',
       );
 
+      /* Start of Main Logic */
+
+      // Send socket event
       socket.to(to).emit('RTCAnswer', {
         from: socket.id,
         userId: operatorId,
         answer: answer,
       });
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -93,11 +103,16 @@ export const RTCCandidateHandler = {
         'RTCCANDIDATE',
       );
 
+      /* Start of Main Logic */
+
+      // Send socket event
       socket.to(to).emit('RTCIceCandidate', {
         from: socket.id,
         userId: operatorId,
         candidate: candidate,
       });
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

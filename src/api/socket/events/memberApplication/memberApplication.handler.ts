@@ -56,16 +56,21 @@ export const CreateMemberApplicationHandler = {
         }
       }
 
+      /* Start of Main Logic */
+
       // Create member application
       await database.set.memberApplication(userId, serverId, {
         ...preset,
         createdAt: Date.now(),
       });
 
+      // Send socket event
       io.to(`server_${serverId}`).emit(
         'serverMemberApplicationAdd',
         await database.get.serverMemberApplication(serverId, userId),
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -112,15 +117,20 @@ export const UpdateMemberApplicationHandler = {
         }
       }
 
+      /* Start of Main Logic */
+
       // Update member application
       await database.set.memberApplication(userId, serverId, update);
 
+      // Send socket event
       io.to(`server_${serverId}`).emit(
         'serverMemberApplicationUpdate',
         userId,
         serverId,
         update,
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -163,14 +173,19 @@ export const DeleteMemberApplicationHandler = {
         }
       }
 
+      /* Start of Main Logic */
+
       // Delete member application
       await database.delete.memberApplication(userId, serverId);
 
+      // Send socket event
       io.to(`server_${serverId}`).emit(
         'serverMemberApplicationDelete',
         userId,
         serverId,
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

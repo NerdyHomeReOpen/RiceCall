@@ -89,12 +89,15 @@ export const CreateMemberHandler = {
         }
       }
 
+      /* Start of Main Logic */
+
       // Create member
       await database.set.member(userId, serverId, {
         ...preset,
         createdAt: Date.now(),
       });
 
+      // Send socket event
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
@@ -109,6 +112,8 @@ export const CreateMemberHandler = {
         'serverMemberAdd',
         await database.get.serverMember(serverId, userId),
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -243,9 +248,12 @@ export const UpdateMemberHandler = {
         }
       }
 
+      /* Start of Main Logic */
+
       // Update member
       await database.set.member(userId, serverId, update);
 
+      // Send socket event
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
@@ -259,6 +267,8 @@ export const UpdateMemberHandler = {
         serverId,
         update,
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -330,9 +340,12 @@ export const DeleteMemberHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Delete member
       await database.delete.member(userId, serverId);
 
+      // Send socket event
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
@@ -341,6 +354,8 @@ export const DeleteMemberHandler = {
       if (targetSocket) {
         targetSocket.emit('serverDelete', serverId); // TODO: Need to kick user from server
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

@@ -156,24 +156,27 @@ export const ConnectChannelHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Setup user xp interval
       if (!user.currentChannelId) {
         await xpSystem.create(userId);
       }
 
       // Update user
-      const updatedUser = {
+      const userUpdate = {
         currentChannelId: channelId,
         lastActiveAt: Date.now(),
       };
-      await database.set.user(userId, updatedUser);
+      await database.set.user(userId, userUpdate);
 
-      // Update Member
-      const updatedMember = {
+      // Update member
+      const memberUpdate = {
         lastJoinChannelTime: Date.now(),
       };
-      await database.set.member(userId, serverId, updatedMember);
+      await database.set.member(userId, serverId, memberUpdate);
 
+      // Send socket event
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
@@ -193,8 +196,8 @@ export const ConnectChannelHandler = {
 
         targetSocket.join(`channel_${channelId}`);
         targetSocket.emit('playSound', 'join');
-        targetSocket.emit('userUpdate', updatedUser);
-        targetSocket.emit('serverUpdate', serverId, updatedMember);
+        targetSocket.emit('userUpdate', userUpdate);
+        targetSocket.emit('serverUpdate', serverId, memberUpdate);
         targetSocket.to(`channel_${channelId}`).emit('playSound', 'join');
         targetSocket.to(`channel_${channelId}`).emit('RTCJoin', {
           from: targetSocket.id,
@@ -206,8 +209,10 @@ export const ConnectChannelHandler = {
         'serverMemberUpdate',
         userId,
         serverId,
-        updatedUser,
+        userUpdate,
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -275,22 +280,25 @@ export const DisconnectChannelHandler = {
         }
       }
 
+      /* Start of Main Logic */
+
       // Clear user xp interval
       await xpSystem.delete(userId);
 
       // Update user
-      const updatedUser = {
+      const userUpdate = {
         currentChannelId: null,
         lastActiveAt: Date.now(),
       };
-      await database.set.user(userId, updatedUser);
+      await database.set.user(userId, userUpdate);
 
+      // Send socket event
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
         targetSocket.leave(`channel_${channelId}`);
-        targetSocket.emit('userUpdate', updatedUser);
+        targetSocket.emit('userUpdate', userUpdate);
         targetSocket.emit('playSound', 'leave');
         targetSocket.to(`channel_${channelId}`).emit('playSound', 'leave');
         targetSocket.to(`channel_${channelId}`).emit('RTCLeave', {
@@ -303,8 +311,10 @@ export const DisconnectChannelHandler = {
         'serverMemberUpdate',
         userId,
         serverId,
-        updatedUser,
+        userUpdate,
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -368,6 +378,8 @@ export const CreateChannelHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       const categoryChannels = serverChannels?.filter(
         (ch) => ch.categoryId === preset.categoryId,
       );
@@ -381,10 +393,13 @@ export const CreateChannelHandler = {
         createdAt: Date.now(),
       });
 
+      // Send socket event
       io.to(`server_${serverId}`).emit(
         'serverChannelAdd',
         await database.get.channel(channelId),
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -417,7 +432,6 @@ export const UpdateChannelHandler = {
         'UPDATECHANNEL',
       );
 
-      const messages: any[] = [];
       const channel = await database.get.channel(channelId);
       const operatorMember = await database.get.member(operatorId, serverId);
 
@@ -452,6 +466,10 @@ export const UpdateChannelHandler = {
           });
         }
       }
+
+      /* Start of Main Logic */
+
+      const messages: any[] = [];
 
       if (
         update.voiceMode !== undefined &&
@@ -558,6 +576,7 @@ export const UpdateChannelHandler = {
       // Update channel
       await database.set.channel(channelId, update);
 
+      // Send socket event
       if (messages.length > 0) {
         io.to(`channel_${channelId}`).emit('onMessage', ...messages);
       }
@@ -566,6 +585,8 @@ export const UpdateChannelHandler = {
         channelId,
         update,
       );
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -592,6 +613,8 @@ export const UpdateChannelsHandler = {
         'UPDATECHANNELS',
       );
 
+      /* Start of Main Logic */
+
       for (const channel of channels) {
         await UpdateChannelHandler.handle(io, socket, {
           serverId,
@@ -601,6 +624,8 @@ export const UpdateChannelsHandler = {
 
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -645,6 +670,8 @@ export const DeleteChannelHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       const channelChildren = serverChannels?.filter(
         (ch) => ch.categoryId === channelId,
       );
@@ -652,6 +679,7 @@ export const DeleteChannelHandler = {
         (ch) => ch.categoryId === channel.categoryId,
       );
 
+      // Update category
       if (categoryChildren && categoryChildren.length <= 1) {
         const categoryUpdate = {
           type: 'channel',
@@ -663,6 +691,7 @@ export const DeleteChannelHandler = {
         });
       }
 
+      // Delete channel children
       if (channelChildren) {
         for (const child of channelChildren) {
           await DeleteChannelHandler.handle(io, socket, {
@@ -674,6 +703,7 @@ export const DeleteChannelHandler = {
         }
       }
 
+      // Connect users to lobby
       if (channelUsers) {
         for (const user of channelUsers) {
           await ConnectChannelHandler.handle(io, socket, {
@@ -689,7 +719,10 @@ export const DeleteChannelHandler = {
       // Delete channel
       await database.delete.channel(channelId);
 
+      // Send socket event
       io.to(`server_${serverId}`).emit('serverChannelDelete', channelId);
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({

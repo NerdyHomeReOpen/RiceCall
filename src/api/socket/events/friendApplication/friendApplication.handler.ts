@@ -72,12 +72,15 @@ export const CreateFriendApplicationHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Create friend application
       await database.set.friendApplication(senderId, receiverId, {
         ...preset,
         createdAt: Date.now(),
       });
 
+      // Send socket event
       const targetSocket = SocketServer.getSocket(receiverId);
 
       if (targetSocket) {
@@ -86,6 +89,8 @@ export const CreateFriendApplicationHandler = {
           await database.get.userFriendApplication(receiverId, senderId),
         );
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -128,9 +133,12 @@ export const UpdateFriendApplicationHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Update friend application
       await database.set.friendApplication(senderId, receiverId, update);
 
+      // Send socket event
       const targetSocket = SocketServer.getSocket(receiverId);
 
       if (targetSocket) {
@@ -141,6 +149,8 @@ export const UpdateFriendApplicationHandler = {
           update,
         );
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -179,14 +189,19 @@ export const DeleteFriendApplicationHandler = {
         });
       }
 
+      /* Start of Main Logic */
+
       // Delete friend application
       await database.delete.friendApplication(senderId, receiverId);
 
+      // Send socket event
       const targetSocket = SocketServer.getSocket(receiverId);
 
       if (targetSocket) {
         targetSocket.emit('friendApplicationDelete', senderId, receiverId);
       }
+
+      /* End of Main Logic */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
