@@ -429,12 +429,12 @@ const RootPageComponent = () => {
     setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== id));
   };
 
-  const handleServerMemberAdd = (member: ServerMember): void => {
-    setServerMembers((prev) => [...prev, member]);
-  };
-
   const handleServerMembersSet = (members: ServerMember[]) => {
     setServerMembers(members);
+  };
+
+  const handleServerMemberAdd = (member: ServerMember): void => {
+    setServerMembers((prev) => [...prev, member]);
   };
 
   const handleServerMemberUpdate = (
@@ -577,7 +577,7 @@ const RootPageComponent = () => {
       [SocketServerEvent.FRIEND_GROUP_ADD]: handleFriendGroupAdd,
       [SocketServerEvent.FRIEND_GROUP_UPDATE]: handleFriendGroupUpdate,
       [SocketServerEvent.FRIEND_GROUP_DELETE]: handleFriendGroupDelete,
-      [SocketServerEvent.SERVER_MEMBERS_SET]: handleServerMembersSet,
+      [SocketServerEvent.SERVER_ONLINE_MEMBERS_SET]: handleServerMembersSet,
       [SocketServerEvent.SERVER_ONLINE_MEMBER_ADD]: handleServerMemberAdd,
       [SocketServerEvent.SERVER_MEMBER_UPDATE]: handleServerMemberUpdate,
       [SocketServerEvent.SERVER_ONLINE_MEMBER_DELETE]: handleServerMemberDelete,
