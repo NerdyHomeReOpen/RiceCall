@@ -18,8 +18,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
+import { SocketRequestHandler } from '@/handler';
 
-export const CreateMemberApplicationHandler = {
+export const CreateMemberApplicationHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -92,7 +93,7 @@ export const CreateMemberApplicationHandler = {
   },
 };
 
-export const UpdateMemberApplicationHandler = {
+export const UpdateMemberApplicationHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -162,7 +163,7 @@ export const UpdateMemberApplicationHandler = {
   },
 };
 
-export const DeleteMemberApplicationHandler = {
+export const DeleteMemberApplicationHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

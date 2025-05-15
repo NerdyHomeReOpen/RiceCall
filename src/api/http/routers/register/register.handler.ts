@@ -21,9 +21,9 @@ import { database } from '@/index';
 
 // Config
 import { serverConfig } from '@/config';
-import { Handler } from '@/handler';
+import { RequestHandler } from '@/handler';
 
-export const RegisterHandler: Handler = {
+export const RegisterHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { account, password, username } = await DataValidator.validate(

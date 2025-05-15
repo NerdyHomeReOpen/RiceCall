@@ -14,60 +14,12 @@ import {
   SearchUserHandler,
   UpdateUserHandler,
 } from '@/api/socket/events/user/user.handler';
-import {
-  ConnectServerHandler,
-  CreateServerHandler,
-  DisconnectServerHandler,
-  FavoriteServerHandler,
-  SearchServerHandler,
-  UpdateServerHandler,
-} from '@/api/socket/events/server/server.handler';
-import {
-  ConnectChannelHandler,
-  DisconnectChannelHandler,
-  CreateChannelHandler,
-  UpdateChannelsHandler,
-  UpdateChannelHandler,
-  DeleteChannelHandler,
-} from '@/api/socket/events/channel/channel.handler';
-import {
-  CreateFriendGroupHandler,
-  DeleteFriendGroupHandler,
-  UpdateFriendGroupHandler,
-} from '@/api/socket/events/friendGroup/friendGroup.handler';
-import {
-  CreateFriendHandler,
-  UpdateFriendHandler,
-  DeleteFriendHandler,
-} from '@/api/socket/events/friend/friend.handler';
-import {
-  CreateMemberApplicationHandler,
-  UpdateMemberApplicationHandler,
-  DeleteMemberApplicationHandler,
-} from '@/api/socket/events/memberApplication/memberApplication.handler';
-import {
-  CreateMemberHandler,
-  DeleteMemberHandler,
-  UpdateMemberHandler,
-} from '@/api/socket/events/member/member.handler';
-import {
-  CreateFriendApplicationHandler,
-  UpdateFriendApplicationHandler,
-  DeleteFriendApplicationHandler,
-} from '@/api/socket/events/friendApplication/friendApplication.handler';
-import {
-  SendMessageHandler,
-  SendDirectMessageHandler,
-  ShakeWindowHandler,
-} from '@/api/socket/events/message/message.handler';
-import {
-  RTCOfferHandler,
-  RTCAnswerHandler,
-  RTCCandidateHandler,
-} from '@/api/socket/events/rtc/rtc.handler';
-
 // Logger
 import Logger from '@/utils/logger';
+import { EventRouters } from './EventRoutes';
+
+import EventRouteInitializer from './events/routes';
+
 
 export default class SocketServer {
   static io: Server;
@@ -165,131 +117,9 @@ export default class SocketServer {
         await DisconnectUserHandler.handle(io, socket);
       });
 
-      // User
-      socket.on(
-        'searchUser',
-        async (data) => await SearchUserHandler.handle(io, socket, data),
-      );
-      socket.on('updateUser', async (data) => {
-        await UpdateUserHandler.handle(io, socket, data);
-      });
-
-      // Server
-      socket.on('searchServer', async (data) => {
-        await SearchServerHandler.handle(io, socket, data);
-      });
-      socket.on('connectServer', async (data) => {
-        await ConnectServerHandler.handle(io, socket, data);
-      });
-      socket.on('disconnectServer', async (data) => {
-        await DisconnectServerHandler.handle(io, socket, data);
-      });
-      socket.on('createServer', async (data) => {
-        await CreateServerHandler.handle(io, socket, data);
-      });
-      socket.on('updateServer', async (data) => {
-        await UpdateServerHandler.handle(io, socket, data);
-      });
-      socket.on('favoriteServer', async (data) => {
-        await FavoriteServerHandler.handle(io, socket, data);
-      });
-
-      // Channel
-      socket.on('connectChannel', async (data) => {
-        await ConnectChannelHandler.handle(io, socket, data);
-      });
-      socket.on('disconnectChannel', async (data) => {
-        await DisconnectChannelHandler.handle(io, socket, data);
-      });
-      socket.on('createChannel', async (data) => {
-        await CreateChannelHandler.handle(io, socket, data);
-      });
-      socket.on('updateChannel', async (data) => {
-        await UpdateChannelHandler.handle(io, socket, data);
-      });
-      socket.on('updateChannels', async (data) => {
-        await UpdateChannelsHandler.handle(io, socket, data);
-      });
-      socket.on('deleteChannel', async (data) => {
-        await DeleteChannelHandler.handle(io, socket, data);
-      });
-
-      // Friend Group
-      socket.on('createFriendGroup', async (data) => {
-        await CreateFriendGroupHandler.handle(io, socket, data);
-      });
-      socket.on('updateFriendGroup', async (data) => {
-        await UpdateFriendGroupHandler.handle(io, socket, data);
-      });
-      socket.on('deleteFriendGroup', async (data) => {
-        await DeleteFriendGroupHandler.handle(io, socket, data);
-      });
-
-      // Member
-      socket.on('createMember', async (data) => {
-        await CreateMemberHandler.handle(io, socket, data);
-      });
-      socket.on('updateMember', async (data) => {
-        await UpdateMemberHandler.handle(io, socket, data);
-      });
-      socket.on('deleteMember', async (data) => {
-        await DeleteMemberHandler.handle(io, socket, data);
-      });
-
-      // Member Application
-      socket.on('createMemberApplication', async (data) => {
-        await CreateMemberApplicationHandler.handle(io, socket, data);
-      });
-      socket.on('updateMemberApplication', async (data) => {
-        await UpdateMemberApplicationHandler.handle(io, socket, data);
-      });
-      socket.on('deleteMemberApplication', async (data) => {
-        await DeleteMemberApplicationHandler.handle(io, socket, data);
-      });
-
-      // Friend
-      socket.on('createFriend', async (data) => {
-        await CreateFriendHandler.handle(io, socket, data);
-      });
-      socket.on('updateFriend', async (data) => {
-        await UpdateFriendHandler.handle(io, socket, data);
-      });
-      socket.on('deleteFriend', async (data) => {
-        await DeleteFriendHandler.handle(io, socket, data);
-      });
-
-      // Friend Application
-      socket.on('createFriendApplication', async (data) => {
-        await CreateFriendApplicationHandler.handle(io, socket, data);
-      });
-      socket.on('updateFriendApplication', async (data) => {
-        await UpdateFriendApplicationHandler.handle(io, socket, data);
-      });
-      socket.on('deleteFriendApplication', async (data) => {
-        await DeleteFriendApplicationHandler.handle(io, socket, data);
-      });
-
-      // Message
-      socket.on('message', async (data) => {
-        await SendMessageHandler.handle(io, socket, data);
-      });
-      socket.on('directMessage', async (data) => {
-        await SendDirectMessageHandler.handle(io, socket, data);
-      });
-      socket.on('shakeWindow', async (data) => {
-        await ShakeWindowHandler.handle(io, socket, data);
-      });
-
-      // RTC
-      socket.on('RTCOffer', async (data) => {
-        await RTCOfferHandler.handle(io, socket, data);
-      });
-      socket.on('RTCAnswer', async (data) => {
-        await RTCAnswerHandler.handle(io, socket, data);
-      });
-      socket.on('RTCIceCandidate', async (data) => {
-        await RTCCandidateHandler.handle(io, socket, data);
-      });
+      // 路由定義已改到 ./events/routes.ts
+      EventRouteInitializer(new EventRouters(io, socket));
+      
 
       // Echo
       socket.on('ping', async () => {

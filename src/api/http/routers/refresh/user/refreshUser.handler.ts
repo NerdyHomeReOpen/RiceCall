@@ -15,9 +15,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
-import { Handler } from '@/handler';
+import { RequestHandler } from '@/handler';
 
-export const RefreshUserHandler: Handler = {
+export const RefreshUserHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(
@@ -55,7 +55,7 @@ export const RefreshUserHandler: Handler = {
   },
 };
 
-export const RefreshUserFriendApplicationsHandler: Handler = {
+export const RefreshUserFriendApplicationsHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(
@@ -95,7 +95,7 @@ export const RefreshUserFriendApplicationsHandler: Handler = {
   },
 };
 
-export const RefreshUserFriendGroupsHandler: Handler = {
+export const RefreshUserFriendGroupsHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(
@@ -133,7 +133,7 @@ export const RefreshUserFriendGroupsHandler: Handler = {
   },
 };
 
-export const RefreshUserFriendsHandler: Handler = {
+export const RefreshUserFriendsHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(
@@ -171,7 +171,7 @@ export const RefreshUserFriendsHandler: Handler = {
   },
 };
 
-export const RefreshUserServersHandler: Handler = {
+export const RefreshUserServersHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(

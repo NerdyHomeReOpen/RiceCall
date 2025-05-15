@@ -15,9 +15,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
-import { Handler } from '@/handler';
+import { RequestHandler } from '@/handler';
 
-export const RefreshServerHandler: Handler = {
+export const RefreshServerHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await DataValidator.validate(
@@ -55,7 +55,7 @@ export const RefreshServerHandler: Handler = {
   },
 };
 
-export const RefreshServerChannelsHandler: Handler = {
+export const RefreshServerChannelsHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await DataValidator.validate(
@@ -93,7 +93,7 @@ export const RefreshServerChannelsHandler: Handler = {
   },
 };
 
-export const RefreshServerMemberApplicationsHandler: Handler = {
+export const RefreshServerMemberApplicationsHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await DataValidator.validate(
@@ -132,7 +132,7 @@ export const RefreshServerMemberApplicationsHandler: Handler = {
   },
 };
 
-export const RefreshServerMembersHandler: Handler = {
+export const RefreshServerMembersHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await DataValidator.validate(

@@ -21,8 +21,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
+import { SocketRequestHandler } from '@/handler';
 
-export const CreateMemberHandler = {
+export const CreateMemberHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -118,7 +119,7 @@ export const CreateMemberHandler = {
   },
 };
 
-export const UpdateMemberHandler = {
+export const UpdateMemberHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -224,7 +225,7 @@ export const UpdateMemberHandler = {
   },
 };
 
-export const DeleteMemberHandler = {
+export const DeleteMemberHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

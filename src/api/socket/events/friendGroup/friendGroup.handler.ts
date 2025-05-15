@@ -22,8 +22,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
+import { SocketRequestHandler } from '@/handler';
 
-export const CreateFriendGroupHandler = {
+export const CreateFriendGroupHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -88,7 +89,7 @@ export const CreateFriendGroupHandler = {
   },
 };
 
-export const UpdateFriendGroupHandler = {
+export const UpdateFriendGroupHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -149,7 +150,7 @@ export const UpdateFriendGroupHandler = {
   },
 };
 
-export const DeleteFriendGroupHandler = {
+export const DeleteFriendGroupHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

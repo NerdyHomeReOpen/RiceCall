@@ -21,8 +21,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
+import { SocketRequestHandler } from '@/handler';
 
-export const SendMessageHandler = {
+export const SendMessageHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -109,7 +110,7 @@ export const SendMessageHandler = {
   },
 };
 
-export const SendDirectMessageHandler = {
+export const SendDirectMessageHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -182,7 +183,7 @@ export const SendDirectMessageHandler = {
   },
 };
 
-export const ShakeWindowHandler = {
+export const ShakeWindowHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
