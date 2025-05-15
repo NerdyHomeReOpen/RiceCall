@@ -9,6 +9,8 @@
   </div>
 </div>
 
+This project is tested with BrowserStack
+
 ## v0.1.8 更新日誌 (Change Log)
 
 - 新增切換音效選項
