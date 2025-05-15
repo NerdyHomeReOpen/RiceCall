@@ -95,6 +95,16 @@ export const CreateMemberHandler = {
         createdAt: Date.now(),
       });
 
+      const targetSocket =
+        operatorId === userId ? socket : SocketServer.getSocket(userId);
+
+      if (targetSocket) {
+        targetSocket.emit(
+          'serverAdd',
+          await database.get.userServer(userId, serverId),
+        );
+      }
+
       io.to(`server_${serverId}`).emit(
         'serverMemberAdd',
         await database.get.serverMember(serverId, userId),

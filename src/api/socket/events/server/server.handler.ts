@@ -14,6 +14,7 @@ import SocketServer from '@/api/socket';
 // Handler
 import { ConnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
 import { DisconnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
+import { CreateMemberHandler } from '@/api/socket/events/member/member.handler';
 
 // Schemas
 import {
@@ -78,9 +79,13 @@ export const ConnectServerHandler = {
 
       // Create new membership if there isn't one
       if (!userMember) {
-        await database.set.member(userId, serverId, {
-          permissionLevel: 1,
-          createdAt: Date.now(),
+        await CreateMemberHandler.handle(io, socket, {
+          userId,
+          serverId,
+          member: {
+            permissionLevel: 1,
+            createdAt: Date.now(),
+          },
         });
       }
 
@@ -160,42 +165,46 @@ export const ConnectServerHandler = {
       /* Start of Main Logic */
 
       // Update user-server
-      await database.set.userServer(userId, serverId, {
+      const serverUpdate = {
         recent: true,
         timestamp: Date.now(),
-      });
+      };
+      await database.set.userServer(userId, serverId, serverUpdate);
 
       // Update user
-      const updatedUser = {
+      const userUpdate = {
         currentServerId: serverId,
       };
-      await database.set.user(userId, updatedUser);
+      await database.set.user(userId, userUpdate);
 
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
         const currentServerId = user.currentServerId;
-        const servers = await database.get.userServers(userId);
-        const serverChannels = await database.get.serverChannels(serverId);
-        const serverMembers = await database.get.serverOnlineMembers(serverId);
 
         if (currentServerId) {
           targetSocket.leave(`server_${currentServerId}`);
           targetSocket
             .to(`server_${currentServerId}`)
-            .emit('serverMemberUpdate', userId, currentServerId, updatedUser);
+            .emit('serverOnlineMemberDelete', userId, currentServerId);
         }
 
         targetSocket.join(`server_${serverId}`);
-        targetSocket.emit('serversUpdate', servers);
-        targetSocket.emit('serverChannelsUpdate', serverChannels);
-        targetSocket.emit('serverMembersUpdate', serverMembers);
-        targetSocket.emit('userUpdate', updatedUser);
+        targetSocket.emit('serverUpdate', serverId, serverUpdate);
+        targetSocket.emit(
+          'serverChannelsSet',
+          await database.get.serverChannels(serverId),
+        );
+        targetSocket.emit(
+          'serverOnlineMembersSet',
+          await database.get.serverOnlineMembers(serverId),
+        );
+        targetSocket.emit('userUpdate', userUpdate);
         targetSocket
           .to(`server_${serverId}`)
           .emit(
-            'serverMemberAdd',
+            'serverOnlineMemberAdd',
             await database.get.serverMember(serverId, userId),
           );
       }
@@ -279,22 +288,22 @@ export const DisconnectServerHandler = {
       /* Start of Main Logic */
 
       // Update user
-      const updatedUser = {
+      const userUpdate = {
         currentServerId: null,
       };
-      await database.set.user(userId, updatedUser);
+      await database.set.user(userId, userUpdate);
 
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
         targetSocket.leave(`server_${serverId}`);
-        targetSocket.emit('serverChannelsUpdate', []);
-        targetSocket.emit('serverMembersUpdate', []);
-        targetSocket.emit('userUpdate', updatedUser);
+        targetSocket.emit('serverChannelsSet', []);
+        targetSocket.emit('serverOnlineMembersSet', []);
+        targetSocket.emit('userUpdate', userUpdate);
         targetSocket
           .to(`server_${serverId}`)
-          .emit('serverMemberDelete', userId, serverId);
+          .emit('serverOnlineMemberDelete', userId, serverId);
 
         if (operatorId !== userId) {
           targetSocket.emit('openPopup', {
