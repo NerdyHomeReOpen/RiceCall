@@ -9,6 +9,8 @@
   </div>
 </div>
 
+This project is tested with BrowserStack
+
 ## v0.1.7 更新日誌 (Change Log)
 
 - 新增「主頁」，用以展示官網公告，並將原有的語音群列表轉移至「個人專屬」
