@@ -334,7 +334,7 @@ export const CreateChannelHandler = {
       await database.set.channel(channelId, {
         ...preset,
         serverId: serverId,
-        order: (categoryChannels?.length || 0) - 1, // (-1 ~ serverChannels.length - 1)
+        order: categoryChannels?.length || 0, // (-1 ~ serverChannels.length - 1)
         createdAt: Date.now(),
       });
 
