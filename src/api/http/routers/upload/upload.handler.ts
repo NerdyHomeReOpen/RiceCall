@@ -82,13 +82,7 @@ export const UploadHandler = {
       await Promise.all(
         matchingFiles.map((fileName) =>
           fs.unlink(path.join(filePath, fileName)).catch((err) => {
-            throw new StandardizedError({
-              name: 'ServerError',
-              message: `刪除圖片失敗: ${err.message}`,
-              part: 'UPLOAD',
-              tag: 'SERVER_ERROR',
-              statusCode: 500,
-            });
+            throw new Error(`Delete file failed: ${err.message}`);
           }),
         ),
       );
@@ -97,13 +91,7 @@ export const UploadHandler = {
         .webp({ quality: 80 })
         .toFile(path.join(filePath, PrefixFileName))
         .catch((err) => {
-          throw new StandardizedError({
-            name: 'ServerError',
-            message: `轉換圖片失敗: ${err.message}`,
-            part: 'UPLOAD',
-            tag: 'SERVER_ERROR',
-            statusCode: 500,
-          });
+          throw new Error(`Convert image failed: ${err.message}`);
         });
 
       // Return Image Name Example:
@@ -127,7 +115,7 @@ export const UploadHandler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `上傳圖片時發生預期外的錯誤: ${error.message}`,
+          message: `上傳圖片時發生預期外的錯誤，請稍後再試`,
           part: 'UPLOAD',
           tag: 'SERVER_ERROR',
           statusCode: 500,

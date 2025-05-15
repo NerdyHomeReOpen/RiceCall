@@ -38,21 +38,9 @@ export const ImagesHandler = {
       } else {
         const file = await fs.readFile(filePath).catch((error) => {
           if (error.code === 'ENOENT') {
-            throw new StandardizedError({
-              name: 'ServerError',
-              message: '找不到檔案',
-              part: 'GETFILE',
-              tag: 'FILE_NOT_FOUND',
-              statusCode: 404,
-            });
+            throw new Error(`Can't find file: ${error.message}`);
           } else {
-            throw new StandardizedError({
-              name: 'ServerError',
-              message: `讀取檔案失敗: ${error.message}`,
-              part: 'GETFILE',
-              tag: 'READ_FILE_FAILED',
-              statusCode: 500,
-            });
+            throw new Error(`Read file failed: ${error.message}`);
           }
         });
 
@@ -72,7 +60,7 @@ export const ImagesHandler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `讀取圖片時發生預期外的錯誤: ${error.message}`,
+          message: `讀取圖片時發生預期外的錯誤，請稍後再試`,
           part: 'IMAGES',
           tag: 'SERVER_ERROR',
           statusCode: 500,

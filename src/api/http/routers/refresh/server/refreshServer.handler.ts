@@ -17,7 +17,7 @@ import { DataValidator } from '@/middleware/data.validator';
 import { database } from '@/index';
 import { Handler } from '@/handler';
 
-export const RefreshServerHandler : Handler = {
+export const RefreshServerHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await DataValidator.validate(
@@ -37,7 +37,7 @@ export const RefreshServerHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新群組資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新群組資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -54,7 +54,7 @@ export const RefreshServerHandler : Handler = {
   },
 };
 
-export const RefreshServerChannelsHandler : Handler = {
+export const RefreshServerChannelsHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await DataValidator.validate(
@@ -74,7 +74,7 @@ export const RefreshServerChannelsHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新伺服器頻道資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新伺服器頻道資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHSERVERCHANNELS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -91,7 +91,7 @@ export const RefreshServerChannelsHandler : Handler = {
   },
 };
 
-export const RefreshServerMemberApplicationsHandler : Handler = {
+export const RefreshServerMemberApplicationsHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await DataValidator.validate(
@@ -112,7 +112,7 @@ export const RefreshServerMemberApplicationsHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新伺服器成員申請資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新伺服器成員申請資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHSERVERMEMBERAPPLICATIONS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -129,7 +129,7 @@ export const RefreshServerMemberApplicationsHandler : Handler = {
   },
 };
 
-export const RefreshServerMembersHandler : Handler = {
+export const RefreshServerMembersHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { serverId } = await DataValidator.validate(
@@ -149,7 +149,7 @@ export const RefreshServerMembersHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新伺服器成員資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新伺服器成員資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHSERVERMEMBERS',
           tag: 'SERVER_ERROR',
           statusCode: 500,

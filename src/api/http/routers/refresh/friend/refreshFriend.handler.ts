@@ -17,7 +17,7 @@ import { DataValidator } from '@/middleware/data.validator';
 import { database } from '@/index';
 import { Handler } from '@/handler';
 
-export const RefreshFriendHandler : Handler = {
+export const RefreshFriendHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId, targetId } = await DataValidator.validate(
@@ -37,7 +37,7 @@ export const RefreshFriendHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新好友資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新好友資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHFRIEND',
           tag: 'SERVER_ERROR',
           statusCode: 500,

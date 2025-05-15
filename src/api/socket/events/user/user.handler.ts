@@ -44,7 +44,7 @@ export const SearchUserHandler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `搜尋使用者時發生無法預期的錯誤: ${error.message}`,
+          message: `搜尋使用者時發生無法預期的錯誤，請稍後再試`,
           part: 'SEARCHUSER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,

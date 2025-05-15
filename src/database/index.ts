@@ -5,6 +5,7 @@ import { dbConfig } from '@/config';
 
 // Error
 import StandardizedError from '@/error';
+import Logger from '@/utils/logger';
 
 function camelToSnake(str: string) {
   return str.replace(/([A-Z])/g, '_$1').toLowerCase();
@@ -90,16 +91,7 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 account.${account} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error setting account.${account}: ${error.message}`);
       }
     },
 
@@ -154,16 +146,7 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 user.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error setting user.${userId}: ${error.message}`);
       }
     },
 
@@ -198,16 +181,7 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 badge.${badgeId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error setting badge.${badgeId}: ${error.message}`);
       }
     },
 
@@ -243,16 +217,9 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 userBadge.${userId}-${badgeId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error setting userBadge.${userId}-${badgeId}: ${error.message}`,
+        );
       }
     },
 
@@ -295,16 +262,9 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 userServer.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error setting userServer.${userId}-${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -357,16 +317,7 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 server.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error setting server.${serverId}: ${error.message}`);
       }
     },
 
@@ -421,16 +372,7 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 channel.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error setting channel.${channelId}: ${error.message}`);
       }
     },
 
@@ -465,16 +407,9 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 friendGroup.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error setting friendGroup.${friendGroupId}: ${error.message}`,
+        );
       }
     },
 
@@ -510,16 +445,9 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error setting friend.${userId}-${targetId}: ${error.message}`,
+        );
       }
     },
 
@@ -559,16 +487,9 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error setting friendApplication.${senderId}-${receiverId}: ${error.message}`,
+        );
       }
     },
 
@@ -612,16 +533,9 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error setting member.${userId}-${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -657,16 +571,9 @@ export default class Database {
         }
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `設置 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error setting memberApplication.${userId}-${serverId}: ${error.message}`,
+        );
       }
     },
   };
@@ -682,16 +589,7 @@ export default class Database {
         if (!datas || datas.length === 0) return null;
         return datas.map((data) => convertToCamelCase(data));
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 ${querys} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error getting ${querys}: ${error.message}`);
       }
     },
 
@@ -708,16 +606,7 @@ export default class Database {
         if (!data || data.length === 0) return null;
         return convertToCamelCase(data[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 ${account} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error getting account.${account}: ${error.message}`);
       }
     },
 
@@ -734,16 +623,7 @@ export default class Database {
         if (!data || data.length === 0) return null;
         return convertToCamelCase(data[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 ${querys} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error getting ${querys}: ${error.message}`);
       }
     },
 
@@ -770,16 +650,7 @@ export default class Database {
         const data = datas[0];
         return convertToCamelCase({ ...data, badges: [] });
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 users.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error getting user.${userId}: ${error.message}`);
       }
     },
 
@@ -800,16 +671,7 @@ export default class Database {
         if (!datas) return [];
         return datas.map((data) => convertToCamelCase(data));
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 userBadges.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error getting userBadges.${userId}: ${error.message}`);
       }
     },
 
@@ -827,16 +689,9 @@ export default class Database {
         if (!datas) return [];
         return datas.map((data) => convertToCamelCase(data));
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 userFriendGroups.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting userFriendGroups.${userId}: ${error.message}`,
+        );
       }
     },
 
@@ -868,16 +723,9 @@ export default class Database {
         delete data.member_created_at;
         return convertToCamelCase(data);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 userServer.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting userServer.${userId}-${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -909,16 +757,9 @@ export default class Database {
           return convertToCamelCase(data);
         });
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 userServers.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting userServers.${userId}: ${error.message}`,
+        );
       }
     },
 
@@ -960,16 +801,9 @@ export default class Database {
         delete data.user_user_id;
         return convertToCamelCase({ ...data, badges: [] });
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 userFriend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting userFriend.${userId}-${targetId}: ${error.message}`,
+        );
       }
     },
 
@@ -1011,16 +845,9 @@ export default class Database {
           return convertToCamelCase({ ...data, badges: [] });
         });
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 userFriends.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting userFriends.${userId}: ${error.message}`,
+        );
       }
     },
 
@@ -1048,16 +875,9 @@ export default class Database {
         delete data.user_created_at;
         return convertToCamelCase(data);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 userFriendApplication.${userId}-${senderId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting userFriendApplication.${userId}-${senderId}: ${error.message}`,
+        );
       }
     },
 
@@ -1085,16 +905,9 @@ export default class Database {
           return convertToCamelCase(data);
         });
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 userFriendApplications.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting userFriendApplications.${userId}: ${error.message}`,
+        );
       }
     },
 
@@ -1112,16 +925,9 @@ export default class Database {
         if (!datas) return [];
         return datas.map((data) => convertToCamelCase(data));
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 searchServer.${querys} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting searchServer.${querys}: ${error.message}`,
+        );
       }
     },
 
@@ -1138,16 +944,7 @@ export default class Database {
         if (!datas || datas.length === 0) return null;
         return convertToCamelCase(datas[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 server.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error getting server.${serverId}: ${error.message}`);
       }
     },
 
@@ -1165,16 +962,9 @@ export default class Database {
         if (!datas) return [];
         return datas.map((data) => convertToCamelCase(data));
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 serverChannels.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting serverChannels.${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -1210,16 +1000,9 @@ export default class Database {
         delete data.user_created_at;
         return convertToCamelCase({ ...data, badges: [] });
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 serverMember.${serverId}-${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting serverMember.${serverId}-${userId}: ${error.message}`,
+        );
       }
     },
 
@@ -1256,16 +1039,9 @@ export default class Database {
           return convertToCamelCase({ ...data, badges: [] });
         });
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 serverMembers.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting serverOnlineMembers.${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -1301,16 +1077,9 @@ export default class Database {
           return convertToCamelCase({ ...data, badges: [] });
         });
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 serverMembers.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting serverMembers.${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -1338,16 +1107,9 @@ export default class Database {
         delete data.user_created_at;
         return convertToCamelCase(data);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 serverMemberApplication.${serverId}-${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting serverMemberApplication.${serverId}-${userId}: ${error.message}`,
+        );
       }
     },
 
@@ -1375,16 +1137,9 @@ export default class Database {
           return convertToCamelCase(data);
         });
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 serverMemberApplications.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting serverMemberApplications.${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -1402,16 +1157,9 @@ export default class Database {
         if (!datas || datas.length === 0) return null;
         return convertToCamelCase(datas[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 category.${categoryId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting category.${categoryId}: ${error.message}`,
+        );
       }
     },
 
@@ -1429,16 +1177,7 @@ export default class Database {
         if (!datas || datas.length === 0) return null;
         return convertToCamelCase(datas[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 channel.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error getting channel.${channelId}: ${error.message}`);
       }
     },
 
@@ -1456,16 +1195,9 @@ export default class Database {
         if (!datas) return [];
         return datas.map((data) => convertToCamelCase(data));
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 channelChildren.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting channelChildren.${channelId}: ${error.message}`,
+        );
       }
     },
 
@@ -1485,16 +1217,9 @@ export default class Database {
           convertToCamelCase({ ...data, badges: [] }),
         );
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 channelUsers.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting channelUsers.${channelId}: ${error.message}`,
+        );
       }
     },
 
@@ -1511,16 +1236,9 @@ export default class Database {
         if (!datas || datas.length === 0) return null;
         return convertToCamelCase(datas[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 friendGroup.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting friendGroup.${friendGroupId}: ${error.message}`,
+        );
       }
     },
 
@@ -1540,16 +1258,9 @@ export default class Database {
         if (!datas) return [];
         return datas.map((data) => convertToCamelCase(data));
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 friendGroupFriends.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting friendGroupFriends.${friendGroupId}: ${error.message}`,
+        );
       }
     },
 
@@ -1567,16 +1278,9 @@ export default class Database {
         if (!datas || datas.length === 0) return null;
         return convertToCamelCase(datas[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting member.${userId}-${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -1594,16 +1298,9 @@ export default class Database {
         if (!datas || datas.length === 0) return null;
         return convertToCamelCase(datas[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting memberApplication.${userId}-${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -1621,16 +1318,9 @@ export default class Database {
         if (!datas || datas.length === 0) return null;
         return convertToCamelCase(datas[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting friend.${userId}-${targetId}: ${error.message}`,
+        );
       }
     },
 
@@ -1648,16 +1338,9 @@ export default class Database {
         if (!datas || datas.length === 0) return null;
         return convertToCamelCase(datas[0]);
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `查詢 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error getting friendApplication.${senderId}-${receiverId}: ${error.message}`,
+        );
       }
     },
   };
@@ -1673,16 +1356,7 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 user.${userId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error deleting user.${userId}: ${error.message}`);
       }
     },
 
@@ -1696,16 +1370,7 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 badge.${badgeId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error deleting badge.${badgeId}: ${error.message}`);
       }
     },
 
@@ -1720,16 +1385,9 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 userBadge.${userId}-${badgeId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error deleting userBadge.${userId}-${badgeId}: ${error.message}`,
+        );
       }
     },
 
@@ -1744,16 +1402,9 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 userServer.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error deleting userServer.${userId}-${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -1767,16 +1418,7 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 server.${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(`Error deleting server.${serverId}: ${error.message}`);
       }
     },
 
@@ -1790,16 +1432,9 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 channel.${channelId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error deleting channel.${channelId}: ${error.message}`,
+        );
       }
     },
 
@@ -1813,16 +1448,9 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 friendGroup.${friendGroupId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error deleting friendGroup.${friendGroupId}: ${error.message}`,
+        );
       }
     },
 
@@ -1837,16 +1465,9 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 member.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error deleting member.${userId}-${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -1861,16 +1482,9 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 memberApplication.${userId}-${serverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error deleting memberApplication.${userId}-${serverId}: ${error.message}`,
+        );
       }
     },
 
@@ -1885,16 +1499,9 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 friend.${userId}-${targetId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error deleting friend.${userId}-${targetId}: ${error.message}`,
+        );
       }
     },
 
@@ -1909,65 +1516,10 @@ export default class Database {
         );
         return true;
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `刪除 friendApplication.${senderId}-${receiverId} 時發生無法預期的錯誤: ${error.message}`,
-            part: 'DATABASE',
-            tag: 'dATABASE.ERROR',
-            statusCode: 500,
-          });
-        }
-        throw error;
+        throw new Error(
+          `Error deleting friendApplication.${senderId}-${receiverId}: ${error.message}`,
+        );
       }
     },
   };
-
-  async initialize() {
-    const tables = [
-      'accounts',
-      'users',
-      'badges',
-      'user_badges',
-      'user_servers',
-      'servers',
-      'channels',
-      'friend_groups',
-      'members',
-      'member_applications',
-      'friends',
-      'friend_applications',
-      'messages',
-      'direct_messages',
-    ];
-
-    for (const table of tables) {
-      await this.query(`CREATE TABLE IF NOT EXISTS ${table} (
-        ${table.slice(0, -1)} VARCHAR(255) PRIMARY KEY,
-      )`);
-    }
-  }
-
-  async deleteAll() {
-    const tables = [
-      'accounts',
-      'users',
-      'badges',
-      'user_badges',
-      'user_servers',
-      'servers',
-      'channels',
-      'friend_groups',
-      'members',
-      'member_applications',
-      'friends',
-      'friend_applications',
-      'messages',
-      'direct_messages',
-    ];
-
-    for (const table of tables) {
-      await this.query(`TRUNCATE TABLE ${table}`);
-    }
-  }
 }

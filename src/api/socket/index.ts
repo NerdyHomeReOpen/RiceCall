@@ -123,7 +123,7 @@ export default class SocketServer {
         if (!(error instanceof StandardizedError)) {
           error = new StandardizedError({
             name: 'ServerError',
-            message: `驗證時發生無法預期的錯誤: ${error.message}`,
+            message: `驗證時發生無法預期的錯誤，請稍後再試`,
             part: 'AUTH',
             tag: 'EXCEPTION_ERROR',
             statusCode: 500,

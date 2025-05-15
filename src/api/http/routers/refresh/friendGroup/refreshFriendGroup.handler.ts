@@ -36,7 +36,7 @@ export const RefreshFriendGroupHandler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新好友群組資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新好友群組資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHFRIENDGROUP',
           tag: 'SERVER_ERROR',
           statusCode: 500,

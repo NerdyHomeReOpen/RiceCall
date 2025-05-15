@@ -12,7 +12,7 @@ import Logger from '@/utils/logger';
 import { ImagesHandler } from './routers/images/images.handler';
 import { UploadHandler } from './routers/upload/upload.handler';
 import { PostRouters } from './routers/PostRouters';
-import routesInitializer from './routers/routes' 
+import routesInitializer from './routers/routes';
 import RouteNotFoundError from '@/errors/RouteNotFoundError';
 
 export type ResponseType = {
@@ -20,7 +20,6 @@ export type ResponseType = {
   message: string;
   data: any;
 };
-
 
 const sendImage = (res: ServerResponse, response: ResponseType) => {
   res.writeHead(200, {
@@ -53,8 +52,6 @@ const sendOptions = (res: ServerResponse) => {
 };
 
 routesInitializer();
-
-
 
 export default class HttpServer {
   constructor(private port: number) {
@@ -105,15 +102,14 @@ export default class HttpServer {
 
           req.on('end', async () => {
             data = JSON.parse(data);
-            
+
             // 路由定義已改到 ./routers/routes.ts
-            let handleRoute = async ()=>{
+            let handleRoute = async () => {
               if (!req.url) req.url = '/';
               try {
                 return await PostRouters.handle(req.url, data);
-              }
-              catch (error) {
-                if (!(error instanceof RouteNotFoundError)) return null; 
+              } catch (error) {
+                if (!(error instanceof RouteNotFoundError)) return null;
                 sendResponse(res, {
                   statusCode: 404,
                   message: 'Not Found',
@@ -121,10 +117,10 @@ export default class HttpServer {
                 });
                 return null;
               }
-            }
+            };
 
-            response = await handleRoute()
-          
+            response = await handleRoute();
+
             if (response) {
               sendResponse(res, response);
               return;
@@ -136,13 +132,15 @@ export default class HttpServer {
               data: null,
             });
 
-            console.error(new StandardizedError({
-              message: `Request not handled: ${req.url}`,
-              name: `ServerError`,
-              part: `SERVER`,
-              tag: `SERVER_ERROR`,
-              statusCode: 500
-            }))
+            console.error(
+              new StandardizedError({
+                message: `Request not handled: ${req.url}`,
+                name: `ServerError`,
+                part: `SERVER`,
+                tag: `SERVER_ERROR`,
+                statusCode: 500,
+              }),
+            );
 
             return;
           });
@@ -182,15 +180,6 @@ export default class HttpServer {
     });
 
     server.on('error', (error: any) => {
-      if (!(error instanceof StandardizedError)) {
-        error = new StandardizedError({
-          name: 'ServerError',
-          message: `伺服器發生預期外的錯誤: ${error.message}`,
-          part: 'SERVER',
-          tag: 'SERVER_ERROR',
-          statusCode: 500,
-        });
-      }
       new Logger('Server').error(`Server error: ${error.error_message}`);
     });
 

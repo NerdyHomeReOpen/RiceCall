@@ -17,7 +17,7 @@ import { DataValidator } from '@/middleware/data.validator';
 import { database } from '@/index';
 import { Handler } from '@/handler';
 
-export const RefreshUserHandler : Handler = {
+export const RefreshUserHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(
@@ -37,7 +37,7 @@ export const RefreshUserHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新使用者資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新使用者資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHUSER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -54,7 +54,7 @@ export const RefreshUserHandler : Handler = {
   },
 };
 
-export const RefreshUserFriendApplicationsHandler : Handler = {
+export const RefreshUserFriendApplicationsHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(
@@ -76,7 +76,7 @@ export const RefreshUserFriendApplicationsHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新用戶好友申請資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新用戶好友申請資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHUSERFRIENDAPPLICATIONS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -93,7 +93,7 @@ export const RefreshUserFriendApplicationsHandler : Handler = {
   },
 };
 
-export const RefreshUserFriendGroupsHandler : Handler = {
+export const RefreshUserFriendGroupsHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(
@@ -113,7 +113,7 @@ export const RefreshUserFriendGroupsHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新用戶好友群組資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新用戶好友群組資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHUSERFRIENDGROUPS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -130,7 +130,7 @@ export const RefreshUserFriendGroupsHandler : Handler = {
   },
 };
 
-export const RefreshUserFriendsHandler : Handler = {
+export const RefreshUserFriendsHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(
@@ -150,7 +150,7 @@ export const RefreshUserFriendsHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新使用者好友資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新使用者好友資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHUSERFRIENDS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -167,7 +167,7 @@ export const RefreshUserFriendsHandler : Handler = {
   },
 };
 
-export const RefreshUserServersHandler : Handler = {
+export const RefreshUserServersHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId } = await DataValidator.validate(
@@ -187,7 +187,7 @@ export const RefreshUserServersHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新用戶伺服器資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新用戶伺服器資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHUSERSERVERS',
           tag: 'SERVER_ERROR',
           statusCode: 500,

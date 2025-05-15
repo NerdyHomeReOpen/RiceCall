@@ -20,7 +20,7 @@ import { DataValidator } from '@/middleware/data.validator';
 import { database } from '@/index';
 import { Handler } from '@/handler';
 
-export const LoginHandler : Handler = {
+export const LoginHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { account, password } = await DataValidator.validate(
@@ -82,7 +82,7 @@ export const LoginHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `登入時發生預期外的錯誤: ${error.message}`,
+          message: `登入時發生預期外的錯誤，請稍後再試`,
           part: 'LOGIN',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -96,5 +96,5 @@ export const LoginHandler : Handler = {
         data: { error },
       };
     }
-  }
+  },
 };

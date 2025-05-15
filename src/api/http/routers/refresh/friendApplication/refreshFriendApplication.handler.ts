@@ -39,7 +39,7 @@ export const RefreshFriendApplicationHandler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新好友申請資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新好友申請資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHFRIENDAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,

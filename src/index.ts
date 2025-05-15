@@ -35,27 +35,9 @@ imageSystem.setup();
 
 // Error Handling
 process.on('uncaughtException', (error: any) => {
-  if (!(error instanceof StandardizedError)) {
-    error = new StandardizedError({
-      name: 'ServerError',
-      message: `未處理的例外: ${error.message}`,
-      part: 'SERVER',
-      tag: 'UNCAUGHT_EXCEPTION',
-      statusCode: 500,
-    });
-  }
-  new Logger('Server').error(error.message);
+  new Logger('Server').error(`Uncaught exception: ${error.message}`);
 });
 
 process.on('unhandledRejection', (error: any) => {
-  if (!(error instanceof StandardizedError)) {
-    error = new StandardizedError({
-      message: `未處理的拒絕: ${error.message}`,
-      name: 'ServerError',
-      part: 'SERVER',
-      tag: 'UNHANDLED_REJECTION',
-      statusCode: 500,
-    });
-  }
-  new Logger('Server').error(error.message);
+  new Logger('Server').error(`Unhandled rejection: ${error.message}`);
 });

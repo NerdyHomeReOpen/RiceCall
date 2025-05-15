@@ -17,7 +17,7 @@ import { DataValidator } from '@/middleware/data.validator';
 import { database } from '@/index';
 import { Handler } from '@/handler';
 
-export const RefreshMemberApplicationHandler : Handler = {
+export const RefreshMemberApplicationHandler: Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId, serverId } = await DataValidator.validate(
@@ -40,7 +40,7 @@ export const RefreshMemberApplicationHandler : Handler = {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新成員申請資料時發生預期外的錯誤: ${error.message}`,
+          message: `刷新成員申請資料時發生預期外的錯誤，請稍後再試`,
           part: 'REFRESHMEMBERAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
