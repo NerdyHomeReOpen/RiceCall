@@ -106,6 +106,10 @@
   background-position: center;
 }
 
+.avatarPicture.non-friend {
+  filter: grayscale(100%);
+}
+
 .avatarPicture::before {
   z-index: 2;
   content: '';
