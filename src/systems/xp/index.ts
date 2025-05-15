@@ -162,8 +162,9 @@ const xpSystem = {
 
       // Process Level
       let requiredXp = 0;
-      while (user.xp >= requiredXp) {
+      while (true) {
         requiredXp = xpSystem.getRequiredXP(user.level);
+        if (user.xp < requiredXp) break;
         user.level += 1;
         user.xp -= requiredXp;
       }
