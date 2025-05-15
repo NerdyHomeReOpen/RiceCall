@@ -25,6 +25,10 @@ import { database } from '@/index';
 export const SendMessageHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -38,16 +42,17 @@ export const SendMessageHandler = {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法傳送非自己的訊息',
-          part: 'SENDMESSAGE',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot send non-self message';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('SendMessage').warn(
+          `User(${operatorId}) failed to send message(${userId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       if (channel.forbidGuestUrl && operatorMember.permissionLevel === 1) {
         preset.content = preset.content.replace(
@@ -81,12 +86,16 @@ export const SendMessageHandler = {
 
       io.to(`channel_${channelId}`).emit('onMessage', message);
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('SendMessage').info(
+        `User(${operatorId}) sent message(${userId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `傳送訊息時發生無法預期的錯誤: ${error.message}`,
+          message: `傳送訊息時發生無法預期的錯誤，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -94,6 +103,7 @@ export const SendMessageHandler = {
       }
 
       socket.emit('error', error);
+
       new Logger('SendMessage').error(error.message);
     }
   },
@@ -102,6 +112,10 @@ export const SendMessageHandler = {
 export const SendDirectMessageHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -115,16 +129,17 @@ export const SendDirectMessageHandler = {
       );
 
       if (operatorId !== userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法傳送非自己的私訊',
-          part: 'SENDDIRECTMESSAGE',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot send non-self direct message';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('SendDirectMessage').warn(
+          `User(${operatorId}) failed to send direct message(${userId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Create new message
       const directMessage = {
@@ -144,12 +159,16 @@ export const SendDirectMessageHandler = {
         targetSocket.emit('onDirectMessage', directMessage);
       }
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('SendDirectMessage').info(
+        `User(${operatorId}) sent direct message(${userId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `傳送私訊時發生無法預期的錯誤: ${error.message}`,
+          message: `傳送私訊時發生無法預期的錯誤，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -157,6 +176,7 @@ export const SendDirectMessageHandler = {
       }
 
       socket.emit('error', error);
+
       new Logger('SendDirectMessage').error(error.message);
     }
   },
@@ -165,6 +185,10 @@ export const SendDirectMessageHandler = {
 export const ShakeWindowHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { userId, targetId } = await DataValidator.validate(
@@ -176,26 +200,22 @@ export const ShakeWindowHandler = {
       const friend = await database.get.userFriend(targetId, userId);
 
       if (operatorId !== userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法搖動非自己的視窗',
-          part: 'SHAKEWINDOW',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot shake non-self window';
       }
 
       if (!friend) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法搖動非好友的視窗',
-          part: 'SHAKEWINDOW',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot shake non-friend window';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('ShakeWindow').warn(
+          `User(${operatorId}) failed to shake window(${userId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
+
       const targetSocket = SocketServer.getSocket(targetId);
 
       // Send socket event
@@ -203,12 +223,16 @@ export const ShakeWindowHandler = {
         targetSocket.emit('onShakeWindow', friend);
       }
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('ShakeWindow').info(
+        `User(${operatorId}) shook window(${userId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `搖動視窗時發生無法預期的錯誤: ${error.message}`,
+          message: `搖動視窗時發生無法預期的錯誤，請稍後再試`,
           part: 'SHAKEWINDOW',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -216,6 +240,7 @@ export const ShakeWindowHandler = {
       }
 
       socket.emit('error', error);
+
       new Logger('ShakeWindow').error(error.message);
     }
   },

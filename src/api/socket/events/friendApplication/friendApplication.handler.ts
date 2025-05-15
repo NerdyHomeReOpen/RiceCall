@@ -25,6 +25,10 @@ import { database } from '@/index';
 export const CreateFriendApplicationHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -43,36 +47,23 @@ export const CreateFriendApplicationHandler = {
       );
 
       if (friendApplication) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '你已經發送過好友申請',
-          part: 'CREATEFRIENDAPPLICATION',
-          tag: 'FRIENDAPPLICATION_EXISTS',
-          statusCode: 400,
-        });
+        reason = 'Already sent friend application';
       }
 
-      if (operatorId !== senderId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法新增非自己的好友',
-          part: 'CREATEFRIEND',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+      if (operatorId !== senderId)
+        reason = 'Cannot send non-self friend applications';
+
+      if (senderId === receiverId)
+        reason = 'Cannot send friend application to self';
+
+      if (reason) {
+        new Logger('CreateFriendApplication').warn(
+          `User(${senderId}) failed to send friend application(${receiverId}): ${reason}`,
+        );
+        return;
       }
 
-      if (senderId === receiverId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法將自己加入好友',
-          part: 'CREATEFRIEND',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
-      }
-
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ==========   */
 
       // Create friend application
       await database.set.friendApplication(senderId, receiverId, {
@@ -90,12 +81,16 @@ export const CreateFriendApplicationHandler = {
         );
       }
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('CreateFriendApplication').info(
+        `User(${senderId}) sent friend application(${receiverId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `創建好友申請時發生預期外的錯誤: ${error.message}`,
+          message: `發送好友申請時發生預期外的錯誤，請稍後再試`,
           part: 'CREATEFRIENDAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -103,7 +98,8 @@ export const CreateFriendApplicationHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('FriendApplication').error(error.message);
+
+      new Logger('CreateFriendApplication').error(error.message);
     }
   },
 };
@@ -111,6 +107,10 @@ export const CreateFriendApplicationHandler = {
 export const UpdateFriendApplicationHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -124,16 +124,17 @@ export const UpdateFriendApplicationHandler = {
       );
 
       if (operatorId !== senderId && operatorId !== receiverId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法修改非自己的好友申請',
-          part: 'UPDATEFRIENDAPPLICATION',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot modify non-self friend applications';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('UpdateFriendApplication').warn(
+          `User(${senderId}) failed to update friend application(${receiverId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Update friend application
       await database.set.friendApplication(senderId, receiverId, update);
@@ -150,12 +151,16 @@ export const UpdateFriendApplicationHandler = {
         );
       }
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('UpdateFriendApplication').info(
+        `User(${senderId}) updated friend application(${receiverId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新好友申請時發生預期外的錯誤: ${error.message}`,
+          message: `更新好友申請時發生預期外的錯誤，請稍後再試`,
           part: 'UPDATEFRIENDAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -163,7 +168,8 @@ export const UpdateFriendApplicationHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('FriendApplication').error(error.message);
+
+      new Logger('UpdateFriendApplication').error(error.message);
     }
   },
 };
@@ -171,6 +177,10 @@ export const UpdateFriendApplicationHandler = {
 export const DeleteFriendApplicationHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { senderId, receiverId } = await DataValidator.validate(
@@ -180,16 +190,17 @@ export const DeleteFriendApplicationHandler = {
       );
 
       if (operatorId !== senderId && operatorId !== receiverId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法刪除非自己的好友申請',
-          part: 'DELETEFRIENDAPPLICATION',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot delete non-self friend applications';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('DeleteFriendApplication').warn(
+          `User(${senderId}) failed to delete friend application(${receiverId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Delete friend application
       await database.delete.friendApplication(senderId, receiverId);
@@ -201,12 +212,16 @@ export const DeleteFriendApplicationHandler = {
         targetSocket.emit('friendApplicationDelete', senderId, receiverId);
       }
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('DeleteFriendApplication').info(
+        `User(${senderId}) deleted friend application(${receiverId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除好友申請時發生預期外的錯誤: ${error.message}`,
+          message: `刪除好友申請時發生預期外的錯誤，請稍後再試`,
           part: 'DELETEFRIENDAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -214,7 +229,8 @@ export const DeleteFriendApplicationHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('FriendApplication').error(error.message);
+
+      new Logger('DeleteFriendApplication').error(error.message);
     }
   },
 };

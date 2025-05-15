@@ -25,6 +25,10 @@ import { database } from '@/index';
 export const CreateMemberHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -41,55 +45,29 @@ export const CreateMemberHandler = {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
-        if (operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限新增成員',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-        if (preset.permissionLevel >= operatorMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法給予高於自己的權限',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-        if (preset.permissionLevel > 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '權限等級過高',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_TOO_HIGH',
-            statusCode: 403,
-          });
-        }
+        if (operatorMember.permissionLevel < 5)
+          reason = 'Not enough permission';
+
+        if (preset.permissionLevel >= operatorMember.permissionLevel)
+          reason = 'Cannot give permission higher than self';
+
+        if (preset.permissionLevel > 5) reason = 'Permission level too high';
       } else {
-        if (preset.permissionLevel !== 1 && server.ownerId !== operatorId) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '必須是遊客',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
-        if (preset.permissionLevel !== 6 && server.ownerId === operatorId) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '必須是群組創建者',
-            part: 'CREATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (preset.permissionLevel !== 1 && server.ownerId !== operatorId)
+          reason = 'Permission level must be 1';
+
+        if (preset.permissionLevel !== 6 && server.ownerId === operatorId)
+          reason = 'Permission level must be 6';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('CreateMember').warn(
+          `User(${userId}) failed to create member(${serverId}) (Operator: ${operatorId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Create member
       await database.set.member(userId, serverId, {
@@ -113,12 +91,16 @@ export const CreateMemberHandler = {
         await database.get.serverMember(serverId, userId),
       );
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('CreateMember').info(
+        `User(${userId}) created member(${serverId}) (Operator: ${operatorId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `建立成員時發生預期外的錯誤: ${error.message}`,
+          message: `建立成員時發生預期外的錯誤，請稍後再試`,
           part: 'CREATEMEMBER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -126,7 +108,8 @@ export const CreateMemberHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Member').error(error.message);
+
+      new Logger('CreateMember').error(error.message);
     }
   },
 };
@@ -134,6 +117,10 @@ export const CreateMemberHandler = {
 export const UpdateMemberHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -150,105 +137,47 @@ export const UpdateMemberHandler = {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
-        if (operatorMember.permissionLevel < 3) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限更改其他成員',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (operatorMember.permissionLevel < 3)
+          reason = 'Not enough permission';
 
-        if (operatorMember.permissionLevel <= userMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限編輯權限高於自己的成員',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (operatorMember.permissionLevel <= userMember.permissionLevel)
+          reason = 'Permission lower than the target';
 
-        if (userMember.permissionLevel > 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法更改群組創建者的權限',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (userMember.permissionLevel > 5)
+          reason = "Cannot edit group creator's permission";
 
         if (
           userMember.permissionLevel === 1 &&
           update.permissionLevel &&
           operatorMember.permissionLevel < 5
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限更改遊客的權限',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        )
+          reason =
+            'Cannot edit guest permission as while permission is lower than 5';
 
-        if (
-          update.permissionLevel === 1 &&
-          operatorMember.permissionLevel < 5
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限更改會員至遊客',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (update.permissionLevel === 1 && operatorMember.permissionLevel < 5)
+          reason =
+            'Cannot set target to guest as while permission is lower than 5';
 
-        if (update.nickname && operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限更改其他成員的暱稱',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (update.nickname && operatorMember.permissionLevel < 5)
+          reason =
+            'Cannot edit target nickname while permission is lower than 5';
 
-        if (update.permissionLevel >= operatorMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法給予高於自己的權限',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (update.permissionLevel >= operatorMember.permissionLevel)
+          reason = 'Cannot give permission higher than self';
 
-        if (update.permissionLevel > 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '權限等級過高',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (update.permissionLevel > 5) reason = 'Permission level too high';
       } else {
-        if (update.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法更改自己的權限',
-            part: 'UPDATEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (update.permissionLevel) reason = 'Cannot edit self permission';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('UpdateMember').warn(
+          `User(${userId}) failed to update member(${serverId}) (Operator: ${operatorId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Update member
       await database.set.member(userId, serverId, update);
@@ -268,12 +197,16 @@ export const UpdateMemberHandler = {
         update,
       );
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('UpdateMember').info(
+        `User(${userId}) updated member(${serverId}) (Operator: ${operatorId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新成員時發生預期外的錯誤: ${error.message}`,
+          message: `更新成員時發生預期外的錯誤，請稍後再試`,
           part: 'UPDATEMEMBER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -281,7 +214,8 @@ export const UpdateMemberHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Member').error(error.message);
+
+      new Logger('UpdateMember').error(error.message);
     }
   },
 };
@@ -289,6 +223,10 @@ export const UpdateMemberHandler = {
 export const DeleteMemberHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { userId, serverId } = await DataValidator.validate(
@@ -302,45 +240,28 @@ export const DeleteMemberHandler = {
 
       if (operatorId !== userId) {
         if (operatorMember.permissionLevel < 3) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限刪除其他成員',
-            part: 'DELETEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
+          reason = 'Not enough permission';
         }
 
         if (operatorMember.permissionLevel <= userMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限刪除權限高於自己的成員',
-            part: 'DELETEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
+          reason = 'Permission lower than the target';
         }
 
         if (userMember.permissionLevel > 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法刪除群組創建者',
-            part: 'DELETEMEMBER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
+          reason = "Cannot delete group creator's member";
         }
       } else {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法刪除自己的成員',
-          part: 'DELETEMEMBER',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot delete self member';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('DeleteMember').warn(
+          `User(${userId}) failed to delete member(${serverId}) (Operator: ${operatorId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Delete member
       await database.delete.member(userId, serverId);
@@ -355,12 +276,16 @@ export const DeleteMemberHandler = {
         targetSocket.emit('serverDelete', serverId); // TODO: Need to kick user from server
       }
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('DeleteMember').info(
+        `User(${userId}) deleted member(${serverId}) (Operator: ${operatorId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除成員時發生預期外的錯誤: ${error.message}`,
+          message: `刪除成員時發生預期外的錯誤，請稍後再試`,
           part: 'DELETEMEMBER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -368,7 +293,8 @@ export const DeleteMemberHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Member').error(error.message);
+
+      new Logger('DeleteMember').error(error.message);
     }
   },
 };

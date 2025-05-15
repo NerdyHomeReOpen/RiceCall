@@ -22,6 +22,10 @@ import { database } from '@/index';
 export const CreateMemberApplicationHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -37,26 +41,21 @@ export const CreateMemberApplicationHandler = {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
-        throw new StandardizedError({
-          name: 'ValidationError',
-          message: '無法創建非自己的會員申請',
-          part: 'CREATEMEMBERAPPLICATION',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot create non-self member application';
       } else {
         if (operatorMember && operatorMember.permissionLevel !== 1) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '非遊客無法創建會員申請',
-            part: 'CREATEMEMBERAPPLICATION',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
+          reason = 'Cannot create member application as non-guest';
         }
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('CreateMemberApplication').warn(
+          `User(${operatorId}) failed to create member application(${userId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Create member application
       await database.set.memberApplication(userId, serverId, {
@@ -70,12 +69,16 @@ export const CreateMemberApplicationHandler = {
         await database.get.serverMemberApplication(serverId, userId),
       );
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('CreateMemberApplication').info(
+        `User(${operatorId}) created member application(${userId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `創建成員申請時發生無法預期的錯誤: ${error.message}`,
+          message: `創建成員申請時發生無法預期的錯誤，請稍後再試`,
           part: 'CREATEMEMBERAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -83,7 +86,8 @@ export const CreateMemberApplicationHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('MemberApplication').error(error.message);
+
+      new Logger('CreateMemberApplication').error(error.message);
     }
   },
 };
@@ -91,6 +95,10 @@ export const CreateMemberApplicationHandler = {
 export const UpdateMemberApplicationHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -107,17 +115,18 @@ export const UpdateMemberApplicationHandler = {
 
       if (operatorId !== userId) {
         if (operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '你沒有足夠的權限更新其他成員的會員申請',
-            part: 'UPDATEMEMBERAPPLICATION',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
+          reason = 'Not enough permission';
         }
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('UpdateMemberApplication').warn(
+          `User(${operatorId}) failed to update member application(${userId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Update member application
       await database.set.memberApplication(userId, serverId, update);
@@ -130,12 +139,16 @@ export const UpdateMemberApplicationHandler = {
         update,
       );
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('UpdateMemberApplication').info(
+        `User(${operatorId}) updated member application(${userId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新成員申請時發生無法預期的錯誤: ${error.message}`,
+          message: `更新成員申請時發生無法預期的錯誤，請稍後再試`,
           part: 'UPDATEMEMBERAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -143,7 +156,8 @@ export const UpdateMemberApplicationHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('MemberApplication').error(error.message);
+
+      new Logger('UpdateMemberApplication').error(error.message);
     }
   },
 };
@@ -151,6 +165,10 @@ export const UpdateMemberApplicationHandler = {
 export const DeleteMemberApplicationHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { userId, serverId } = await DataValidator.validate(
@@ -163,17 +181,18 @@ export const DeleteMemberApplicationHandler = {
 
       if (operatorId !== userId) {
         if (operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '你沒有足夠的權限刪除其他成員的會員申請',
-            part: 'DELETEMEMBERAPPLICATION',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
+          reason = 'Not enough permission';
         }
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('DeleteMemberApplication').warn(
+          `User(${operatorId}) failed to delete member application(${userId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Delete member application
       await database.delete.memberApplication(userId, serverId);
@@ -185,12 +204,16 @@ export const DeleteMemberApplicationHandler = {
         serverId,
       );
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('DeleteMemberApplication').info(
+        `User(${operatorId}) deleted member application(${userId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除成員申請時發生無法預期的錯誤: ${error.message}`,
+          message: `刪除成員申請時發生無法預期的錯誤，請稍後再試`,
           part: 'DELETEMEMBERAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -198,7 +221,8 @@ export const DeleteMemberApplicationHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('MemberApplication').error(error.message);
+
+      new Logger('DeleteMemberApplication').error(error.message);
     }
   },
 };

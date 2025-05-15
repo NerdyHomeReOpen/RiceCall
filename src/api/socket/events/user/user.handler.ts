@@ -25,7 +25,7 @@ import { database } from '@/index';
 export const SearchUserHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
-      // const operatorId = this.socket.data.userId;
+      /* ========== Start of Handling ========== */
 
       const { query } = await DataValidator.validate(
         SearchUserSchema,
@@ -33,9 +33,13 @@ export const SearchUserHandler = {
         'SEARCHUSER',
       );
 
+      /* ========== Start of Main Logic ========== */
+
       const result = await database.get.searchUser(query);
 
       socket.emit('userSearch', result);
+
+      /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
@@ -48,7 +52,8 @@ export const SearchUserHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('User').error(error.message);
+
+      new Logger('SearchUser').error(error.message);
     }
   },
 };
@@ -56,11 +61,13 @@ export const SearchUserHandler = {
 export const ConnectUserHandler = {
   async handle(io: Server, socket: Socket) {
     try {
+      /* ========== Start of Handling ========== */
+
       const operatorId = socket.data.userId;
 
       const user = await database.get.user(operatorId);
 
-      /* Start of Pre Main Logic */
+      /* ========== Start of Pre Main Logic ========== */
 
       // Reconnect user to server
       if (user.currentServerId) {
@@ -75,9 +82,7 @@ export const ConnectUserHandler = {
         });
       }
 
-      /* End of Pre Main Logic */
-
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       // Update user
       await database.set.user(operatorId, {
@@ -86,12 +91,14 @@ export const ConnectUserHandler = {
 
       socket.emit('userUpdate', await database.get.user(operatorId));
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('ConnectUser').info(`User(${operatorId}) connected`);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `連接使用者時發生無法預期的錯誤: ${error.message}`,
+          message: `連接使用者時發生無法預期的錯誤，請稍後再試`,
           part: 'CONNECTUSER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -99,7 +106,8 @@ export const ConnectUserHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('User').error(error.message);
+
+      new Logger('ConnectUser').error(error.message);
     }
   },
 };
@@ -107,11 +115,13 @@ export const ConnectUserHandler = {
 export const DisconnectUserHandler = {
   async handle(io: Server, socket: Socket) {
     try {
+      /* ========== Start of Handling ========== */
+
       const operatorId = socket.data.userId;
 
       const user = await database.get.user(operatorId);
 
-      /* Start of Pre Main Logic */
+      /* ========== Start of Pre Main Logic ========== */
 
       // Disconnect user from server and channel
       if (user.currentServerId) {
@@ -121,9 +131,7 @@ export const DisconnectUserHandler = {
         });
       }
 
-      /* End of Pre Main Logic */
-
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       // Update user
       await database.set.user(operatorId, {
@@ -132,12 +140,14 @@ export const DisconnectUserHandler = {
 
       socket.emit('userUpdate', null);
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('DisconnectUser').info(`User(${operatorId}) disconnected`);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `斷開使用者時發生無法預期的錯誤: ${error.message}`,
+          message: `斷開使用者時發生無法預期的錯誤，請稍後再試`,
           part: 'DISCONNECTUSER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -145,7 +155,8 @@ export const DisconnectUserHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('User').error(error.message);
+
+      new Logger('DisconnectUser').error(error.message);
     }
   },
 };
@@ -153,6 +164,10 @@ export const DisconnectUserHandler = {
 export const UpdateUserHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { userId, user: update } = await DataValidator.validate(
@@ -162,28 +177,32 @@ export const UpdateUserHandler = {
       );
 
       if (operatorId !== userId) {
-        throw new StandardizedError({
-          name: 'ServerError',
-          message: '無法更新其他使用者的資料',
-          part: 'UPDATEUSER',
-          tag: 'PERMISSION_ERROR',
-          statusCode: 403,
-        });
+        reason = 'Cannot update other user data';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('UpdateUser').warn(
+          `User(${operatorId}) failed to update user(${userId}): ${reason}`,
+        );
+        return;
+      }
 
+      /* ========== Start of Main Logic ========== */
+
+      // Update user
       await database.set.user(userId, update);
 
       // Send socket event
       socket.emit('userUpdate', update);
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('UpdateUser').info(`User(${operatorId}) updated`);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新使用者時發生無法預期的錯誤: ${error.message}`,
+          message: `更新使用者時發生無法預期的錯誤，請稍後再試`,
           part: 'UPDATEUSER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -191,7 +210,8 @@ export const UpdateUserHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('User').error(error.message);
+
+      new Logger('UpdateUser').error(error.message);
     }
   },
 };

@@ -32,9 +32,13 @@ import xpSystem from '@/systems/xp';
 export const ConnectChannelHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
-      let { userId, channelId, serverId, password } =
+      const { userId, channelId, serverId, password } =
         await DataValidator.validate(
           ConnectChannelSchema,
           data,
@@ -49,114 +53,57 @@ export const ConnectChannelHandler = {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
-        if (operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限移動其他用戶',
-            part: 'CONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (operatorMember.permissionLevel < 5)
+          reason = 'Not enough permission';
 
-        if (operatorMember.permissionLevel <= userMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限移動該用戶',
-            part: 'CONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (operatorMember.permissionLevel <= userMember.permissionLevel)
+          reason = 'Permission lower than the target';
 
-        if (user.currentServerId !== serverId) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '用戶不在語音群中',
-            part: 'CONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (user.currentServerId !== serverId)
+          reason = 'Target is not in the server';
 
-        if (user.currentChannelId === channelId) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '用戶已經在該頻道中',
-            part: 'CONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (user.currentChannelId === channelId)
+          reason = 'Target is already in the channel';
       } else {
         if (
           channel.password &&
           password !== channel.password &&
           operatorMember.permissionLevel < 3
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '密碼錯誤',
-            part: 'CONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        )
+          reason = 'Wrong password';
 
         if (
-          server.visibility === 'private' &&
           !channel.isLobby &&
+          server.visibility === 'private' &&
           operatorMember.permissionLevel < 2
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你需要成為會員才能加入該頻道',
-            part: 'CONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        )
+          reason = 'Blocked by server visibility';
 
         if (
           channel.visibility === 'member' &&
           operatorMember.permissionLevel < 2
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你需要成為會員才能加入該頻道',
-            part: 'CONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        )
+          reason = 'Blocked by channel visibility';
 
         if (
           channel.userLimit &&
           channelUsers &&
           channelUsers.length >= channel.userLimit &&
           operatorMember.permissionLevel < 5
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '該頻道已達到人數限制',
-            part: 'CONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        )
+          reason = 'Channel is full';
+
+        if (channel.visibility === 'readonly') reason = 'Read-only channel';
       }
 
-      if (channel.visibility === 'readonly') {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '該頻道為訊息展示頻道',
-          part: 'CONNECTCHANNEL',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+      if (reason) {
+        new Logger('ConnectChannel').warn(
+          `User(${userId}) failed to connect to channel(${channelId}) (Operator: ${operatorId}): ${reason}`,
+        );
+        return;
       }
 
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       // Setup user xp interval
       if (!user.currentChannelId) {
@@ -212,12 +159,16 @@ export const ConnectChannelHandler = {
         userUpdate,
       );
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('ConnectChannel').info(
+        `User(${userId}) connected to channel(${channelId}) (Operator: ${operatorId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `連接頻道時發生無法預期的錯誤: ${error.message}`,
+          message: `連接頻道時發生無法預期的錯誤，請稍後再試`,
           part: 'CONNECTCHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -225,7 +176,8 @@ export const ConnectChannelHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Channel').error(error.message);
+
+      new Logger('ConnectChannel').error(error.message);
     }
   },
 };
@@ -233,6 +185,10 @@ export const ConnectChannelHandler = {
 export const DisconnectChannelHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { userId, channelId, serverId } = await DataValidator.validate(
@@ -246,41 +202,27 @@ export const DisconnectChannelHandler = {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
-        if (
-          operatorMember.permissionLevel < 5 ||
-          operatorMember.permissionLevel <= userMember.permissionLevel
-        ) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限踢除其他用戶',
-            part: 'DISCONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (operatorMember.permissionLevel < 5)
+          reason = 'Not enough permission';
 
-        if (user.currentChannelId !== channelId) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '用戶不在該頻道中',
-            part: 'DISCONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (operatorMember.permissionLevel <= userMember.permissionLevel)
+          reason = 'Permission lower than the target';
 
-        if (user.currentServerId !== serverId) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '用戶不在語音群中',
-            part: 'DISCONNECTCHANNEL',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
+        if (user.currentChannelId !== channelId)
+          reason = 'Target is not in the channel';
+
+        if (user.currentServerId !== serverId)
+          reason = 'Target is not in the server';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('DisconnectChannel').warn(
+          `User(${userId}) failed to disconnect from channel(${channelId}) (Operator: ${operatorId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Clear user xp interval
       await xpSystem.delete(userId);
@@ -314,12 +256,16 @@ export const DisconnectChannelHandler = {
         userUpdate,
       );
 
-      /* End of Main Logic */
+      new Logger('DisconnectChannel').info(
+        `User(${userId}) disconnected from channel(${channelId}) (Operator: ${operatorId})`,
+      );
+
+      /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `離開頻道時發生無法預期的錯誤: ${error.message}`,
+          message: `離開頻道時發生無法預期的錯誤，請稍後再試`,
           part: 'DISCONNECTCHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -327,7 +273,8 @@ export const DisconnectChannelHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Channel').error(error.message);
+
+      new Logger('DisconnectChannel').error(error.message);
     }
   },
 };
@@ -335,6 +282,10 @@ export const DisconnectChannelHandler = {
 export const CreateChannelHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { serverId, channel: preset } = await DataValidator.validate(
@@ -347,42 +298,34 @@ export const CreateChannelHandler = {
       const serverChannels = await database.get.serverChannels(serverId);
       const operatorMember = await database.get.member(operatorId, serverId);
 
-      if (operatorMember.permissionLevel < 5) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '你沒有足夠的權限創建頻道',
-          part: 'CREATECHANNEL',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+      if (operatorMember.permissionLevel < 5) reason = 'Not enough permission';
+
+      if (category && category.categoryId)
+        reason = 'Cannot create channel under sub-channel';
+
+      if (reason) {
+        new Logger('CreateChannel').warn(
+          `User(${operatorId}) failed to create channel: ${reason}`,
+        );
+        return;
       }
 
-      if (category && category.categoryId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法在二級頻道下創建頻道',
-          part: 'CREATECHANNEL',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
-      }
-
-      if (category && !category.categoryId) {
-        const channel = {
-          type: 'category',
-        };
-        await UpdateChannelHandler.handle(io, socket, {
-          channelId: category.channelId,
-          serverId: serverId,
-          channel,
-        });
-      }
-
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       const categoryChannels = serverChannels?.filter(
         (ch) => ch.categoryId === preset.categoryId,
       );
+
+      // Update category
+      if (category && !category.categoryId) {
+        await UpdateChannelHandler.handle(io, socket, {
+          channelId: category.channelId,
+          serverId: serverId,
+          channel: {
+            type: 'category',
+          },
+        });
+      }
 
       // Create new channel
       const channelId = uuidv4();
@@ -399,12 +342,16 @@ export const CreateChannelHandler = {
         await database.get.channel(channelId),
       );
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('CreateChannel').info(
+        `User(${operatorId}) created channel(${channelId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `建立頻道時發生無法預期的錯誤: ${error.message}`,
+          message: `建立頻道時發生無法預期的錯誤，請稍後再試`,
           part: 'CREATECHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -412,7 +359,8 @@ export const CreateChannelHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Channel').error(error.message);
+
+      new Logger('CreateChannel').error(error.message);
     }
   },
 };
@@ -420,6 +368,10 @@ export const CreateChannelHandler = {
 export const UpdateChannelHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -435,39 +387,24 @@ export const UpdateChannelHandler = {
       const channel = await database.get.channel(channelId);
       const operatorMember = await database.get.member(operatorId, serverId);
 
-      if (operatorMember.permissionLevel < 5) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '你沒有足夠的權限編輯頻道',
-          part: 'UPDATECHANNEL',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
-      }
+      if (operatorMember.permissionLevel < 5) reason = 'Not enough permission';
 
       if (channel.isLobby) {
-        if (update.userLimit && update.userLimit !== 0) {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '大廳頻道不能設置人數限制',
-            part: 'CHANNEL',
-            tag: 'USER_LIMIT_INVALID',
-            statusCode: 401,
-          });
-        }
+        if (update.userLimit && update.userLimit !== 0)
+          reason = 'Lobby channel cannot set user limit';
 
-        if (update.visibility && update.visibility !== 'public') {
-          throw new StandardizedError({
-            name: 'ValidationError',
-            message: '大廳頻道只能設置為公開',
-            part: 'CHANNEL',
-            tag: 'VISIBILITY_INVALID',
-            statusCode: 401,
-          });
-        }
+        if (update.visibility && update.visibility !== 'public')
+          reason = 'Lobby channel cannot set visibility';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('UpdateChannel').warn(
+          `User(${operatorId}) failed to update channel(${channelId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       const messages: any[] = [];
 
@@ -586,12 +523,16 @@ export const UpdateChannelHandler = {
         update,
       );
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('UpdateChannel').info(
+        `User(${operatorId}) updated channel(${channelId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新頻道時發生無法預期的錯誤: ${error.message}`,
+          message: `更新頻道時發生無法預期的錯誤，請稍後再試`,
           part: 'UPDATECHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -599,7 +540,8 @@ export const UpdateChannelHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Channel').error(error.message);
+
+      new Logger('UpdateChannel').error(error.message);
     }
   },
 };
@@ -607,13 +549,15 @@ export const UpdateChannelHandler = {
 export const UpdateChannelsHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
       const { serverId, channels } = await DataValidator.validate(
         UpdateChannelsSchema,
         data,
         'UPDATECHANNELS',
       );
 
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       for (const channel of channels) {
         await UpdateChannelHandler.handle(io, socket, {
@@ -625,12 +569,12 @@ export const UpdateChannelsHandler = {
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新頻道時發生無法預期的錯誤: ${error.message}`,
+          message: `更新頻道時發生無法預期的錯誤，請稍後再試`,
           part: 'UPDATECHANNELS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -638,7 +582,8 @@ export const UpdateChannelsHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Channel').error(error.message);
+
+      new Logger('UpdateChannels').error(error.message);
     }
   },
 };
@@ -646,6 +591,10 @@ export const UpdateChannelsHandler = {
 export const DeleteChannelHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { channelId, serverId } = await DataValidator.validate(
@@ -660,17 +609,18 @@ export const DeleteChannelHandler = {
       const server = await database.get.server(serverId);
       const operatorMember = await database.get.member(operatorId, serverId);
 
-      if (operatorMember.permissionLevel < 5) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '你沒有足夠的權限刪除頻道',
-          part: 'DELETECHANNEL',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+      if (operatorMember.permissionLevel < 5) reason = 'Not enough permission';
+
+      if (channel.isLobby) reason = 'Cannot delete lobby channel';
+
+      if (reason) {
+        new Logger('DeleteChannel').warn(
+          `User(${operatorId}) failed to delete channel(${channelId}): ${reason}`,
+        );
+        return;
       }
 
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       const channelChildren = serverChannels?.filter(
         (ch) => ch.categoryId === channelId,
@@ -722,12 +672,16 @@ export const DeleteChannelHandler = {
       // Send socket event
       io.to(`server_${serverId}`).emit('serverChannelDelete', channelId);
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('DeleteChannel').info(
+        `User(${operatorId}) deleted channel(${channelId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除頻道時發生無法預期的錯誤: ${error.message}`,
+          message: `刪除頻道時發生無法預期的錯誤，請稍後再試`,
           part: 'DELETECHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -735,7 +689,8 @@ export const DeleteChannelHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Channel').error(error.message);
+
+      new Logger('DeleteChannel').error(error.message);
     }
   },
 };

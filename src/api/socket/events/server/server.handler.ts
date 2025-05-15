@@ -34,7 +34,7 @@ import { database } from '@/index';
 export const SearchServerHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
-      // const operatorId = socket.data.userId;
+      /* ========== Start of Handling ========== */
 
       const { query } = await DataValidator.validate(
         SearchServerSchema,
@@ -42,14 +42,18 @@ export const SearchServerHandler = {
         'SEARCHSERVER',
       );
 
+      /* ========== Start of Main Logic ========== */
+
       const result = await database.get.searchServer(query);
 
       socket.emit('serverSearch', result);
+
+      /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `搜尋群組時發生無法預期的錯誤: ${error.message}`,
+          message: `搜尋群組時發生無法預期的錯誤，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -57,7 +61,8 @@ export const SearchServerHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('User').error(error.message);
+
+      new Logger('SearchServer').error(error.message);
     }
   },
 };
@@ -65,6 +70,10 @@ export const SearchServerHandler = {
 export const ConnectServerHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { userId, serverId } = await DataValidator.validate(
@@ -90,13 +99,7 @@ export const ConnectServerHandler = {
       }
 
       if (operatorId !== userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法移動其他用戶的群組',
-          part: 'CONNECTSERVER',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = "Cannot move other user's server";
       } else {
         if (
           server.visibility === 'invisible' &&
@@ -131,7 +134,14 @@ export const ConnectServerHandler = {
         }
       }
 
-      /* Start of Pre Main Logic */
+      if (reason) {
+        new Logger('ConnectServer').warn(
+          `User(${operatorId}) failed to connect to server(${serverId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Pre Main Logic ========== */
 
       // Join lobby
       if (server.receptionLobbyId) {
@@ -160,9 +170,7 @@ export const ConnectServerHandler = {
         });
       }
 
-      /* End of Pre Main Logic */
-
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       // Update user-server
       const serverUpdate = {
@@ -209,12 +217,16 @@ export const ConnectServerHandler = {
           );
       }
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('ConnectServer').info(
+        `User(${operatorId}) connected to server(${serverId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `連接群組時發生無法預期的錯誤: ${error.message}`,
+          message: `連接群組時發生無法預期的錯誤，請稍後再試`,
           part: 'CONNECTSERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -222,7 +234,8 @@ export const ConnectServerHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Server').error(error.message);
+
+      new Logger('ConnectServer').error(error.message);
     }
   },
 };
@@ -230,6 +243,10 @@ export const ConnectServerHandler = {
 export const DisconnectServerHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { userId, serverId } = await DataValidator.validate(
@@ -243,36 +260,27 @@ export const DisconnectServerHandler = {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
-        if (serverId !== user.currentServerId) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '無法踢出不在該群組的用戶',
-            part: 'DISCONNECTSERVER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
-        }
         if (operatorMember.permissionLevel < 5) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限踢出其他用戶',
-            part: 'DISCONNECTSERVER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
+          reason = 'Not enough permission';
         }
+
         if (operatorMember.permissionLevel <= userMember.permissionLevel) {
-          throw new StandardizedError({
-            name: 'PermissionError',
-            message: '你沒有足夠的權限踢出該用戶',
-            part: 'DISCONNECTSERVER',
-            tag: 'PERMISSION_DENIED',
-            statusCode: 403,
-          });
+          reason = 'Target has higher or equal permission';
+        }
+
+        if (serverId !== user.currentServerId) {
+          reason = 'Target not in the server';
         }
       }
 
-      /* Start of Pre Main Logic */
+      if (reason) {
+        new Logger('DisconnectServer').warn(
+          `User(${operatorId}) failed to disconnect from server(${serverId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Pre Main Logic ========== */
 
       // Leave current channel
       if (user.currentChannelId) {
@@ -283,9 +291,7 @@ export const DisconnectServerHandler = {
         });
       }
 
-      /* End of Pre Main Logic */
-
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       // Update user
       const userUpdate = {
@@ -317,12 +323,16 @@ export const DisconnectServerHandler = {
         }
       }
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('DisconnectServer').info(
+        `User(${operatorId}) disconnected from server(${serverId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `斷開群組時發生無法預期的錯誤: ${error.message}`,
+          message: `斷開群組時發生無法預期的錯誤，請稍後再試`,
           part: 'DISCONNECTSERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -330,7 +340,8 @@ export const DisconnectServerHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Server').error(error.message);
+
+      new Logger('DisconnectServer').error(error.message);
     }
   },
 };
@@ -338,6 +349,10 @@ export const DisconnectServerHandler = {
 export const CreateServerHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { server: preset } = await DataValidator.validate(
@@ -353,17 +368,17 @@ export const CreateServerHandler = {
         operatorServers &&
         operatorServers.filter((s: any) => s.owned).length >=
           Math.min(3 + operator.level / 5, 10)
-      ) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '可擁有群組數量已達上限',
-          part: 'CREATESERVER',
-          tag: 'LIMIT_REACHED',
-          statusCode: 403,
-        });
+      )
+        reason = 'Server limit reached';
+
+      if (reason) {
+        new Logger('CreateServer').warn(
+          `User(${operatorId}) failed to create server: ${reason}`,
+        );
+        return;
       }
 
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       // Create server
       const serverId = uuidv4();
@@ -407,12 +422,16 @@ export const CreateServerHandler = {
         serverId: serverId,
       });
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('CreateServer').info(
+        `User(${operatorId}) created server(${serverId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `建立群組時發生無法預期的錯誤: ${error.message}`,
+          message: `建立群組時發生無法預期的錯誤，請稍後再試`,
           part: 'CREATESERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -420,7 +439,8 @@ export const CreateServerHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Server').error(error.message);
+
+      new Logger('CreateServer').error(error.message);
     }
   },
 };
@@ -428,6 +448,10 @@ export const CreateServerHandler = {
 export const UpdateServerHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { serverId, server: update } = await DataValidator.validate(
@@ -439,16 +463,17 @@ export const UpdateServerHandler = {
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorMember.permissionLevel < 5) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '你沒有足夠的權限更新該群組',
-          part: 'UPDATESERVER',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Not enough permission';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('UpdateServer').warn(
+          `User(${operatorId}) failed to update server(${serverId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Update server
       await database.set.server(serverId, update);
@@ -456,12 +481,16 @@ export const UpdateServerHandler = {
       // Send socket event
       io.to(`server_${serverId}`).emit('serverUpdate', serverId, update);
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('UpdateServer').info(
+        `User(${operatorId}) updated server(${serverId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新群組時發生無法預期的錯誤: ${error.message}`,
+          message: `更新群組時發生無法預期的錯誤，請稍後再試`,
           part: 'UPDATESERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -469,7 +498,8 @@ export const UpdateServerHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('Server').error(error.message);
+
+      new Logger('UpdateServer').error(error.message);
     }
   },
 };

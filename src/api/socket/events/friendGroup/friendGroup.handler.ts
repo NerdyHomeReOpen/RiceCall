@@ -26,6 +26,10 @@ import { database } from '@/index';
 export const CreateFriendGroupHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { userId, group: preset } = await DataValidator.validate(
@@ -35,16 +39,17 @@ export const CreateFriendGroupHandler = {
       );
 
       if (operatorId !== userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法新增非自己的好友群組',
-          part: 'CREATEFRIENDGROUP',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot create non-self friend groups';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('CreateFriendGroup').warn(
+          `User(${userId}) failed to create friend group: ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Create friend group
       const friendGroupId = uuidv4();
@@ -60,12 +65,16 @@ export const CreateFriendGroupHandler = {
         await database.get.friendGroup(friendGroupId),
       );
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('CreateFriendGroup').info(
+        `User(${userId}) created friend group(${friendGroupId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `新增好友群組時發生無法預期的錯誤: ${error.message}`,
+          message: `建立好友群組時發生無法預期的錯誤，請稍後再試`,
           part: 'CREATEFRIENDGROUP',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -73,7 +82,8 @@ export const CreateFriendGroupHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('FriendGroup').error(error.message);
+
+      new Logger('CreateFriendGroup').error(error.message);
     }
   },
 };
@@ -81,6 +91,10 @@ export const CreateFriendGroupHandler = {
 export const UpdateFriendGroupHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const {
@@ -94,16 +108,17 @@ export const UpdateFriendGroupHandler = {
       );
 
       if (operatorId !== userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法更新非自己的好友群組',
-          part: 'UPDATEFRIENDGROUP',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot update non-self friend groups';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('UpdateFriendGroup').warn(
+          `User(${userId}) failed to update friend group(${friendGroupId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       // Update friend group
       await database.set.friendGroup(friendGroupId, update);
@@ -111,12 +126,16 @@ export const UpdateFriendGroupHandler = {
       // Send socket event
       socket.emit('friendGroupUpdate', friendGroupId, update);
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('UpdateFriendGroup').info(
+        `User(${userId}) updated friend group(${friendGroupId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新好友群組時發生無法預期的錯誤: ${error.message}`,
+          message: `更新好友群組時發生無法預期的錯誤，請稍後再試`,
           part: 'UPDATEFRIENDGROUP',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -124,7 +143,8 @@ export const UpdateFriendGroupHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('FriendGroup').error(error.message);
+
+      new Logger('UpdateFriendGroup').error(error.message);
     }
   },
 };
@@ -132,6 +152,10 @@ export const UpdateFriendGroupHandler = {
 export const DeleteFriendGroupHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
+      let reason: string | null = null;
+
       const operatorId = socket.data.userId;
 
       const { userId, friendGroupId } = await DataValidator.validate(
@@ -145,16 +169,17 @@ export const DeleteFriendGroupHandler = {
       );
 
       if (operatorId !== userId) {
-        throw new StandardizedError({
-          name: 'PermissionError',
-          message: '無法刪除非自己的好友群組',
-          part: 'DELETEFRIENDGROUP',
-          tag: 'PERMISSION_DENIED',
-          statusCode: 403,
-        });
+        reason = 'Cannot delete non-self friend groups';
       }
 
-      /* Start of Main Logic */
+      if (reason) {
+        new Logger('DeleteFriendGroup').warn(
+          `User(${userId}) failed to delete friend group(${friendGroupId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
 
       if (friendGroupFriends && friendGroupFriends.length > 0) {
         for (const friend of friendGroupFriends) {
@@ -176,12 +201,16 @@ export const DeleteFriendGroupHandler = {
       // Send socket event
       socket.emit('friendGroupDelete', friendGroupId);
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
+
+      new Logger('DeleteFriendGroup').info(
+        `User(${userId}) deleted friend group(${friendGroupId})`,
+      );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除好友群組時發生無法預期的錯誤: ${error.message}`,
+          message: `刪除好友群組時發生無法預期的錯誤，請稍後再試`,
           part: 'DELETEFRIENDGROUP',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -189,7 +218,8 @@ export const DeleteFriendGroupHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('FriendGroup').error(error.message);
+
+      new Logger('DeleteFriendGroup').error(error.message);
     }
   },
 };

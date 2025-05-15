@@ -19,6 +19,8 @@ import { DataValidator } from '@/middleware/data.validator';
 export const RTCOfferHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
       const operatorId = socket.data.userId;
 
       const { to, offer } = await DataValidator.validate(
@@ -27,7 +29,7 @@ export const RTCOfferHandler = {
         'RTCOFFER',
       );
 
-      /* Start of Main Logic */
+      /* ========== Start of Handling ========== */
 
       // Send socket event
       socket.to(to).emit('RTCOffer', {
@@ -36,12 +38,12 @@ export const RTCOfferHandler = {
         offer: offer,
       });
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `傳送 RTC offer 時發生無法預期的錯誤: ${error.message}`,
+          message: `連接 RTC 時發生無法預期的錯誤，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -49,7 +51,8 @@ export const RTCOfferHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('RTC').error(error.message);
+
+      new Logger('RTCOffer').error(error.message);
     }
   },
 };
@@ -57,6 +60,8 @@ export const RTCOfferHandler = {
 export const RTCAnswerHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
       const operatorId = socket.data.userId;
 
       const { to, answer } = await DataValidator.validate(
@@ -65,7 +70,7 @@ export const RTCAnswerHandler = {
         'RTCANSWER',
       );
 
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       // Send socket event
       socket.to(to).emit('RTCAnswer', {
@@ -74,12 +79,12 @@ export const RTCAnswerHandler = {
         answer: answer,
       });
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `傳送 RTC answer 時發生無法預期的錯誤: ${error.message}`,
+          message: `連接 RTC 時發生無法預期的錯誤，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -87,7 +92,8 @@ export const RTCAnswerHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('RTC').error(error.message);
+
+      new Logger('RTCAnswer').error(error.message);
     }
   },
 };
@@ -95,6 +101,8 @@ export const RTCAnswerHandler = {
 export const RTCCandidateHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
+      /* ========== Start of Handling ========== */
+
       const operatorId = socket.data.userId;
 
       const { to, candidate } = await DataValidator.validate(
@@ -103,7 +111,7 @@ export const RTCCandidateHandler = {
         'RTCCANDIDATE',
       );
 
-      /* Start of Main Logic */
+      /* ========== Start of Main Logic ========== */
 
       // Send socket event
       socket.to(to).emit('RTCIceCandidate', {
@@ -112,12 +120,12 @@ export const RTCCandidateHandler = {
         candidate: candidate,
       });
 
-      /* End of Main Logic */
+      /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
-          message: `傳送 RTC candidate 時發生無法預期的錯誤: ${error.message}`,
+          message: `連接 RTC 時發生無法預期的錯誤，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -125,7 +133,8 @@ export const RTCCandidateHandler = {
       }
 
       socket.emit('error', error);
-      new Logger('RTC').error(error.message);
+
+      new Logger('RTCCandidate').error(error.message);
     }
   },
 };
