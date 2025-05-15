@@ -69,7 +69,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [autoLaunch, setAutoLaunch] = useState<boolean>(false);
   const [minimizeToTray, setMinimizeToTray] = useState<boolean>(false);
   const [startMinimized, setStartMinimized] = useState<boolean>(false);
-  const [notificationSound, setNotificationSound] = useState<boolean>(true);
+  const [soundEffect, setSoundEffect] = useState<boolean>(true);
 
   // Handlers
   const handleClose = () => {
@@ -78,8 +78,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
   // Effects
   useEffect(() => {
-    ipcService.systemSettings.get.all((data) => {
+    ipcService.systemSettings.get((data) => {
       setAutoLaunch(data.autoLaunch);
+      setSoundEffect(data.soundEffect);
       setSelectedInput(data.inputAudioDevice);
       setSelectedOutput(data.outputAudioDevice);
     });
@@ -176,18 +177,16 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 </div>
               </div>
 
-              <div
-                className={`${popup['inputBox']} ${popup['row']} ${popup['disabled']}`}
-              >
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
                 <input
-                  name="notificationSound"
+                  name="soundEffect"
                   type="checkbox"
-                  checked={notificationSound}
-                  onChange={(e) => setNotificationSound(e.target.checked)}
+                  checked={soundEffect}
+                  onChange={(e) => setSoundEffect(e.target.checked)}
                 />
                 <div>
                   <div className={popup['label']}>
-                    {lang.tr.notificationSound + lang.tr.soon}
+                    {lang.tr.notificationSound}
                   </div>
                   <div className={popup['hint']}>
                     {lang.tr.notificationSoundDescription}
@@ -343,9 +342,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         <button
           className={popup['button']}
           onClick={() => {
-            ipcService.systemSettings.set.autoLaunch(autoLaunch);
-            ipcService.systemSettings.set.inputAudioDevice(selectedInput);
-            ipcService.systemSettings.set.outputAudioDevice(selectedOutput);
+            ipcService.systemSettings.autoLaunch.set(autoLaunch);
+            ipcService.systemSettings.soundEffect.set(soundEffect);
+            ipcService.systemSettings.inputAudioDevice.set(selectedInput);
+            ipcService.systemSettings.outputAudioDevice.set(selectedOutput);
             handleClose();
           }}
         >

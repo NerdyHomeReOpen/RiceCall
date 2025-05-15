@@ -3,7 +3,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -47,6 +47,9 @@ import { useMainTab } from '@/providers/MainTab';
 import ipcService from '@/services/ipc.service';
 import authService from '@/services/auth.service';
 import refreshService from '@/services/refresh.service';
+
+// Components
+import { SoundEffectPlayer } from '@/components/SoundEffectPlayer';
 
 interface HeaderProps {
   user: User;
@@ -139,13 +142,18 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
 
   // Effects
   useEffect(() => {
-    ipcService.window.onMaximize(() => {
+    const offMaximize = ipcService.window.onMaximize(() => {
       setIsFullscreen(true);
     });
 
-    ipcService.window.onUnmaximize(() => {
+    const offUnmaximize = ipcService.window.onUnmaximize(() => {
       setIsFullscreen(false);
     });
+
+    return () => {
+      offMaximize();
+      offUnmaximize();
+    };
   }, []);
 
   return (
@@ -323,17 +331,6 @@ const RootPageComponent = () => {
   const lang = useLanguage();
   const mainTab = useMainTab();
 
-  // Refs
-  const joinAudioRef = useRef<HTMLAudioElement>(null);
-  joinAudioRef.current = new Audio('./sounds/Yconnect.wav');
-  joinAudioRef.current.volume = 0.5;
-  const leaveAudioRef = useRef<HTMLAudioElement>(null);
-  leaveAudioRef.current = new Audio('./sounds/Ydisconnect.wav');
-  leaveAudioRef.current.volume = 0.5;
-  const recieveAudioRef = useRef<HTMLAudioElement>(null);
-  recieveAudioRef.current = new Audio('./sounds/ReceiveChannelMsg.wav');
-  recieveAudioRef.current.volume = 0.5;
-
   // States
   const [user, setUser] = useState<User>(createDefault.user());
   const [servers, setServers] = useState<UserServer[]>([]);
@@ -351,6 +348,10 @@ const RootPageComponent = () => {
   // Handlers
   const handleUserUpdate = (user: Partial<User>) => {
     setUser((prev) => ({ ...prev, ...user }));
+  };
+
+  const handleServersSet = (servers: UserServer[]) => {
+    setServers(servers);
   };
 
   const handleServerAdd = (server: UserServer) => {
@@ -372,8 +373,8 @@ const RootPageComponent = () => {
     setServers((prev) => prev.filter((item) => item.serverId !== id));
   };
 
-  const handleServersUpdate = (servers: UserServer[]) => {
-    setServers(servers);
+  const handleFriendsSet = (friends: UserFriend[]) => {
+    setFriends(friends);
   };
 
   const handleFriendAdd = (friend: UserFriend) => {
@@ -405,8 +406,8 @@ const RootPageComponent = () => {
     );
   };
 
-  const handleFriendsUpdate = (friends: UserFriend[]) => {
-    setFriends(friends);
+  const handleFriendGroupsSet = (friendGroups: FriendGroup[]) => {
+    setFriendGroups(friendGroups);
   };
 
   const handleFriendGroupAdd = (friendGroup: FriendGroup) => {
@@ -428,8 +429,8 @@ const RootPageComponent = () => {
     setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== id));
   };
 
-  const handleFriendGroupsUpdate = (friendGroups: FriendGroup[]) => {
-    setFriendGroups(friendGroups);
+  const handleServerMembersSet = (members: ServerMember[]) => {
+    setServerMembers(members);
   };
 
   const handleServerMemberAdd = (member: ServerMember): void => {
@@ -461,8 +462,8 @@ const RootPageComponent = () => {
     );
   };
 
-  const handleServerMembersUpdate = (members: ServerMember[]) => {
-    setServerMembers(members);
+  const handleServerChannelsSet = (channels: Channel[]) => {
+    setServerChannels(channels);
   };
 
   const handleServerChannelAdd = (channel: Channel): void => {
@@ -484,26 +485,8 @@ const RootPageComponent = () => {
     setServerChannels((prev) => prev.filter((item) => item.channelId !== id));
   };
 
-  const handleServerChannelsUpdate = (channels: Channel[]) => {
-    setServerChannels(channels);
-  };
-
   const handleOnMessages = (...channelMessages: ChannelMessage[]): void => {
     setChannelMessages((prev) => [...prev, ...channelMessages]);
-  };
-
-  const handlePlaySound = (sound: string) => {
-    switch (sound) {
-      case 'leave':
-        leaveAudioRef.current?.play();
-        break;
-      case 'join':
-        joinAudioRef.current?.play();
-        break;
-      case 'recieveChannelMessage':
-        recieveAudioRef.current?.play();
-        break;
-    }
   };
 
   const handleError = (error: StandardizedError) => {
@@ -518,6 +501,7 @@ const RootPageComponent = () => {
         part: 'SOCKET',
         tag: 'CONNECT_ERROR',
         statusCode: 500,
+        handler: () => ipcService.auth.logout(),
       }),
     ).show();
   };
@@ -530,6 +514,7 @@ const RootPageComponent = () => {
         part: 'SOCKET',
         tag: 'RECONNECT_ERROR',
         statusCode: 500,
+        handler: () => ipcService.auth.logout(),
       }),
     ).show();
   };
@@ -552,6 +537,16 @@ const RootPageComponent = () => {
 
   // Effects
   useEffect(() => {
+    if (user.currentServerId) {
+      if (mainTab.selectedTabId === 'home') mainTab.setSelectedTabId('server');
+    } else {
+      if (mainTab.selectedTabId === 'server') mainTab.setSelectedTabId('home');
+    }
+
+    setChannelMessages([]);
+  }, [user.currentServerId]);
+
+  useEffect(() => {
     const channel =
       serverChannels.find((item) => item.channelId === user.currentChannelId) ||
       createDefault.channel();
@@ -559,11 +554,6 @@ const RootPageComponent = () => {
   }, [user.currentChannelId, serverChannels]);
 
   useEffect(() => {
-    if (user.currentServerId) {
-      if (mainTab.selectedTabId === 'home') mainTab.setSelectedTabId('server');
-    } else {
-      if (mainTab.selectedTabId === 'server') mainTab.setSelectedTabId('home');
-    }
     const server =
       servers.find((item) => item.serverId === user.currentServerId) ||
       createDefault.userServer();
@@ -575,28 +565,27 @@ const RootPageComponent = () => {
 
     const eventHandlers = {
       [SocketServerEvent.USER_UPDATE]: handleUserUpdate,
+      [SocketServerEvent.SERVERS_SET]: handleServersSet,
       [SocketServerEvent.SERVER_ADD]: handleServerAdd,
       [SocketServerEvent.SERVER_UPDATE]: handleServerUpdate,
       [SocketServerEvent.SERVER_DELETE]: handleServerDelete,
-      [SocketServerEvent.SERVERS_UPDATE]: handleServersUpdate,
+      [SocketServerEvent.FRIENDS_SET]: handleFriendsSet,
       [SocketServerEvent.FRIEND_ADD]: handleFriendAdd,
       [SocketServerEvent.FRIEND_UPDATE]: handleFriendUpdate,
       [SocketServerEvent.FRIEND_DELETE]: handleFriendDelete,
-      [SocketServerEvent.FRIENDS_UPDATE]: handleFriendsUpdate,
+      [SocketServerEvent.FRIEND_GROUPS_SET]: handleFriendGroupsSet,
       [SocketServerEvent.FRIEND_GROUP_ADD]: handleFriendGroupAdd,
       [SocketServerEvent.FRIEND_GROUP_UPDATE]: handleFriendGroupUpdate,
       [SocketServerEvent.FRIEND_GROUP_DELETE]: handleFriendGroupDelete,
-      [SocketServerEvent.FRIEND_GROUPS_UPDATE]: handleFriendGroupsUpdate,
-      [SocketServerEvent.SERVER_MEMBER_ADD]: handleServerMemberAdd,
+      [SocketServerEvent.SERVER_ONLINE_MEMBERS_SET]: handleServerMembersSet,
+      [SocketServerEvent.SERVER_ONLINE_MEMBER_ADD]: handleServerMemberAdd,
       [SocketServerEvent.SERVER_MEMBER_UPDATE]: handleServerMemberUpdate,
-      [SocketServerEvent.SERVER_MEMBER_DELETE]: handleServerMemberDelete,
-      [SocketServerEvent.SERVER_MEMBERS_UPDATE]: handleServerMembersUpdate,
+      [SocketServerEvent.SERVER_ONLINE_MEMBER_DELETE]: handleServerMemberDelete,
+      [SocketServerEvent.SERVER_CHANNELS_SET]: handleServerChannelsSet,
       [SocketServerEvent.SERVER_CHANNEL_ADD]: handleServerChannelAdd,
       [SocketServerEvent.SERVER_CHANNEL_UPDATE]: handleServerChannelUpdate,
       [SocketServerEvent.SERVER_CHANNEL_DELETE]: handleServerChannelDelete,
-      [SocketServerEvent.SERVER_CHANNELS_UPDATE]: handleServerChannelsUpdate,
       [SocketServerEvent.ON_MESSAGE]: handleOnMessages,
-      [SocketServerEvent.PLAY_SOUND]: handlePlaySound,
       [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
       [SocketServerEvent.ERROR]: handleError,
       [SocketServerEvent.CONNECT_ERROR]: handleConnectError,
@@ -664,6 +653,7 @@ const RootPageComponent = () => {
     if (!socket.isConnected) return <LoadingSpinner />;
     return (
       <>
+        <SoundEffectPlayer />
         <HomePage
           user={user}
           servers={servers}

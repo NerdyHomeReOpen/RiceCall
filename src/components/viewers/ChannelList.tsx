@@ -209,17 +209,19 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       if (!socket) return;
       const moveType = e.dataTransfer.getData('type');
       const currentChannelId = e.dataTransfer.getData('currentChannelId');
+      if (!moveType || !currentChannelId || currentChannelId === channelId)
+        return;
 
       switch (moveType) {
         case 'moveUser':
           const targetUserId = e.dataTransfer.getData('userId');
-          if (!targetUserId || currentChannelId === channelId) return;
+          if (!targetUserId) return;
           handleJoinChannel(targetUserId, serverId, channelId);
           break;
         case 'moveChannelUser':
           const targetUserIds = e.dataTransfer.getData('userIds').split(',');
           for (const targetUserId of targetUserIds) {
-            if (!targetUserId || currentChannelId === channelId) return;
+            if (!targetUserId) return;
             handleJoinChannel(targetUserId, serverId, channelId);
           }
           break;
@@ -550,17 +552,19 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       if (!socket) return;
       const moveType = e.dataTransfer.getData('type');
       const currentChannelId = e.dataTransfer.getData('currentChannelId');
+      if (!moveType || !currentChannelId || currentChannelId === channelId)
+        return;
 
       switch (moveType) {
         case 'moveUser':
           const targetUserId = e.dataTransfer.getData('userId');
-          if (!targetUserId || currentChannelId === channelId) return;
+          if (!targetUserId) return;
           handleJoinChannel(targetUserId, serverId, channelId);
           break;
         case 'moveChannelUser':
           const targetUserIds = e.dataTransfer.getData('userIds').split(',');
           for (const targetUserId of targetUserIds) {
-            if (!targetUserId || currentChannelId === channelId) return;
+            if (!targetUserId) return;
             handleJoinChannel(targetUserId, serverId, channelId);
           }
           break;
@@ -629,7 +633,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               },
               {
                 id: 'createSubChannel',
-                label: lang.tr.addChannel,
+                label: lang.tr.addSubChannel,
                 show: canCreateSub,
                 onClick: () =>
                   handleOpenCreateChannel(serverId, channelId, userId),
@@ -1211,6 +1215,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       displayId: serverDisplayId,
       receiveApply: serverReceiveApply,
       permissionLevel: userPermission,
+      favorite: isFavorite,
     } = currentServer;
     const {
       channelId: currentChannelId,
@@ -1222,6 +1227,13 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
     const canOpenSettings = userPermission > 4;
 
     // Handlers
+    const handleFavoriteServer = (serverId: Server['serverId']) => {
+      if (!socket) return;
+      socket.send.favoriteServer({
+        serverId,
+      });
+    };
+
     const handleOpenAlert = (message: string) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
       ipcService.initialData.onRequest('alertDialog', {
@@ -1390,12 +1402,12 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                     //   label: '舉報',
                     //   onClick: () => {},
                     // },
-                    // {
-                    //   id: 'favorite',
-                    //   label: isFavorite ? lang.tr.unfavorite : lang.tr.favorite,
-                    //   icon: isFavorite ? 'collect' : 'uncollect',
-                    //   onClick: () => handleAddFavoriteServer(serverId),
-                    // },
+                    {
+                      id: 'favorite',
+                      label: isFavorite ? lang.tr.unfavorite : lang.tr.favorite,
+                      icon: isFavorite ? 'collect' : 'uncollect',
+                      onClick: () => handleFavoriteServer(serverId),
+                    },
                   ],
                   e.currentTarget as HTMLElement,
                 );

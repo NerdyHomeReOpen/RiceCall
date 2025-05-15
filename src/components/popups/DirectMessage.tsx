@@ -52,6 +52,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     const [directMessages, setDirectMessages] = useState<DirectMessage[]>([]);
     const [messageInput, setMessageInput] = useState<string>('');
     const [isComposing, setIsComposing] = useState<boolean>(false);
+    const [isFriend, setIsFriend] = useState<boolean>(false);
     // const [isDisabled, setIsDisabled] = useState<boolean>(false);
     // const [isWarning, setIsWarning] = useState<boolean>(false);
 
@@ -136,7 +137,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
     // Effects
     useEffect(() => {
-      ipcService.window.onShakeWindow(() => handleShakeWindow());
+      const offShakeWindow = ipcService.window.onShakeWindow(() =>
+        handleShakeWindow(),
+      );
+
+      return () => offShakeWindow();
     }, []);
 
     useEffect(() => {
@@ -168,12 +173,19 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
           refreshService.user({
             userId: userId,
           }),
-        ]).then(([target, user]) => {
+          refreshService.friend({
+            userId: userId,
+            targetId: targetId,
+          }),
+        ]).then(([target, user, friend]) => {
           if (target) {
             setTarget(target);
           }
           if (user) {
             setUser(user);
+          }
+          if (friend) {
+            setIsFriend(true);
           }
         });
       };
@@ -209,7 +221,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
           <div className={directMessage['sidebar']}>
             <div className={directMessage['targetBox']}>
               <div
-                className={directMessage['avatarPicture']}
+                className={`${directMessage['avatarPicture']} ${
+                  isFriend ? '' : directMessage['non-friend']
+                }`}
                 style={{ backgroundImage: `url(${targetAvatarUrl})` }}
               />
               {targetVip > 0 && (

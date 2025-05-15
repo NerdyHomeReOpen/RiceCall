@@ -40,6 +40,7 @@ enum SocketClientEvent {
   SEARCH_USER = 'searchUser',
   UPDATE_USER = 'updateUser',
   // Server
+  FAVORITE_SERVER = 'favoriteServer',
   SEARCH_SERVER = 'searchServer',
   CONNECT_SERVER = 'connectServer',
   DISCONNECT_SERVER = 'disconnectServer',
@@ -92,41 +93,44 @@ enum SocketServerEvent {
   USER_SEARCH = 'userSearch',
   USER_UPDATE = 'userUpdate',
   // Friend Group
+  FRIEND_GROUPS_SET = 'friendGroupsSet',
   FRIEND_GROUP_ADD = 'friendGroupAdd',
   FRIEND_GROUP_UPDATE = 'friendGroupUpdate',
   FRIEND_GROUP_DELETE = 'friendGroupDelete',
-  FRIEND_GROUPS_UPDATE = 'friendGroupsUpdate',
   // Friend
+  FRIENDS_SET = 'friendsSet',
   FRIEND_ADD = 'friendAdd',
   FRIEND_UPDATE = 'friendUpdate',
   FRIEND_DELETE = 'friendDelete',
-  FRIENDS_UPDATE = 'friendsUpdate',
   // Friend Application
+  FRIEND_APPLICATIONS_SET = 'friendApplicationsSet',
   FRIEND_APPLICATION_ADD = 'friendApplicationAdd',
   FRIEND_APPLICATION_UPDATE = 'friendApplicationUpdate',
   FRIEND_APPLICATION_DELETE = 'friendApplicationDelete',
-  FRIEND_APPLICATIONS_UPDATE = 'friendApplicationsUpdate',
   // Server
   SERVER_SEARCH = 'serverSearch',
+  SERVERS_SET = 'serversSet',
   SERVER_ADD = 'serverAdd',
   SERVER_UPDATE = 'serverUpdate',
   SERVER_DELETE = 'serverDelete',
-  SERVERS_UPDATE = 'serversUpdate',
   // Channel
+  SERVER_CHANNELS_SET = 'serverChannelsSet',
   SERVER_CHANNEL_ADD = 'serverChannelAdd',
   SERVER_CHANNEL_UPDATE = 'serverChannelUpdate',
   SERVER_CHANNEL_DELETE = 'serverChannelDelete',
-  SERVER_CHANNELS_UPDATE = 'serverChannelsUpdate',
   // Member
+  SERVER_MEMBERS_SET = 'serverMembersSet',
   SERVER_MEMBER_ADD = 'serverMemberAdd',
   SERVER_MEMBER_UPDATE = 'serverMemberUpdate',
   SERVER_MEMBER_DELETE = 'serverMemberDelete',
-  SERVER_MEMBERS_UPDATE = 'serverMembersUpdate',
+  SERVER_ONLINE_MEMBERS_SET = 'serverOnlineMembersSet',
+  SERVER_ONLINE_MEMBER_ADD = 'serverOnlineMemberAdd',
+  SERVER_ONLINE_MEMBER_DELETE = 'serverOnlineMemberDelete',
   // Member Application
+  SERVER_MEMBER_APPLICATIONS_SET = 'serverMemberApplicationsSet',
   SERVER_MEMBER_APPLICATION_ADD = 'serverMemberApplicationAdd',
   SERVER_MEMBER_APPLICATION_UPDATE = 'serverMemberApplicationUpdate',
   SERVER_MEMBER_APPLICATION_DELETE = 'serverMemberApplicationDelete',
-  SERVER_MEMBER_APPLICATIONS_UPDATE = 'serverMemberApplicationsUpdate',
   // Message
   ON_MESSAGE = 'onMessage',
   ON_DIRECT_MESSAGE = 'onDirectMessage',
@@ -148,10 +152,13 @@ enum SocketServerEvent {
 
 // Constants
 const DEV = process.argv.includes('--dev');
+const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const WS_URL_SECONDARY = process.env.NEXT_PUBLIC_SERVER_URL_SECONDARY;
 const BASE_URI = DEV ? 'http://localhost:3000' : 'app://-';
 const FILE_PATH = fileURLToPath(import.meta.url);
 const DIR_PATH = path.dirname(FILE_PATH);
 const ROOT_PATH = DEV ? DIR_PATH : path.join(DIR_PATH, '../');
+const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
 const APP_ICON =
   process.platform === 'win32'
     ? path.join(ROOT_PATH, 'resources', 'icon.ico')
@@ -173,12 +180,10 @@ let authWindow: BrowserWindow;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
-const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+let websocketUrl = WS_URL;
 let socketInstance: Socket | null = null;
 
 // Discord RPC
-const CLIENT_ID = '1242441392341516288';
-DiscordRPC.register(CLIENT_ID);
 let rpc: DiscordRPC.Client | null = null;
 
 const defaultPrecence = {
@@ -201,6 +206,13 @@ const defaultPrecence = {
 const appServe = serve({ directory: path.join(ROOT_PATH, 'out') });
 
 // Functions
+async function checkIsHinet() {
+  const ipData = await fetch('https://ipinfo.io/json').then((res) =>
+    res.json(),
+  );
+  return ipData.org.startsWith('AS3462');
+}
+
 function waitForPort(port: number) {
   return new Promise((resolve, reject) => {
     let timeout = 30000; // 30 seconds timeout
@@ -430,11 +442,11 @@ function connectSocket(token: string): Socket | null {
     socketInstance = disconnectSocket();
   }
 
-  const socket = io(WS_URL, {
+  const socket = io(websocketUrl, {
     transports: ['websocket'],
     reconnection: true,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
+    reconnectionDelay: 10000,
+    reconnectionDelayMax: 20000,
     timeout: 20000,
     autoConnect: false,
     query: {
@@ -633,9 +645,10 @@ async function setActivity(presence: DiscordRPC.Presence) {
 }
 
 async function configureDiscordRPC() {
+  DiscordRPC.register(DISCORD_RPC_CLIENT_ID);
   rpc = new DiscordRPC.Client({ transport: 'ipc' });
 
-  rpc = await rpc.login({ clientId: CLIENT_ID }).catch(() => {
+  rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID }).catch(() => {
     console.warn('Cannot login to Discord RPC, will not show Discord status');
     return null;
   });
@@ -711,6 +724,8 @@ app.on('ready', async () => {
   configureAutoUpdater();
   configureDiscordRPC();
   configureTray();
+
+  if (await checkIsHinet()) websocketUrl = WS_URL_SECONDARY;
 
   await createAuthWindow();
   await createMainWindow();
@@ -821,6 +836,7 @@ app.on('ready', async () => {
   ipcMain.on('get-system-settings', (event) => {
     const settings = {
       autoLaunch: isAutoLaunchEnabled(),
+      soundEffect: store.get('soundEffect'),
       inputAudioDevice: store.get('audioInputDevice'),
       outputAudioDevice: store.get('audioOutputDevice'),
     };
@@ -829,6 +845,10 @@ app.on('ready', async () => {
 
   ipcMain.on('get-auto-launch', (event) => {
     event.reply('auto-launch-status', isAutoLaunchEnabled());
+  });
+
+  ipcMain.on('get-sound-effect', (event) => {
+    event.reply('sound-effect-status', store.get('soundEffect'));
   });
 
   ipcMain.on('get-input-audio-device', (event) => {
@@ -841,6 +861,13 @@ app.on('ready', async () => {
 
   ipcMain.on('set-auto-launch', (_, enable) => {
     setAutoLaunch(enable);
+  });
+
+  ipcMain.on('set-sound-effect', (_, enable) => {
+    store.set('soundEffect', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('sound-effect-status', enable);
+    });
   });
 
   ipcMain.on('set-input-audio-device', (_, deviceId) => {

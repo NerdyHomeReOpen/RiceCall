@@ -5,31 +5,21 @@
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-v0.1.7-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.1.8-green"/>
   </div>
 </div>
 
 This project is tested with BrowserStack
 
-## v0.1.7 更新日誌 (Change Log)
+## v0.1.8 更新日誌 (Change Log)
 
-- 新增「主頁」，用以展示官網公告，並將原有的語音群列表轉移至「個人專屬」
-- 新增「踢出頻道」、「踢出群」、「封鎖」功能，封鎖功能暫時不能指定時間，固定為一個月
-- 新增「拖曳使用者」、「拖曳頻道」以切換頻道功能
-- 新增「批量移動至我的頻道」功能
-- 新增「頻道大廳」
-- 新增「接待大廳」
-- 新增切換音質選項
-- 新增公告區域調整功能
-- 新增搖動視窗功能
-- 修復無法開啟同時多個個人檔案問題
-- 修復無法多開問題
-- 修復自動調整麥克風音量問題
-- 修改訊息顯示邏輯，現在同語音群內訊息會延續
-- 修改 Markdown 樣式
-- 修改一些介面樣式
-- 修改一些輸入限制
-- 精簡 Error Dialog 內容
+- 新增切換音效選項
+- 新增 Esc 關閉彈出視窗功能
+- 改善中華電信連線問題
+- 改善音效播放邏輯
+- 修復切換語音群時未清空訊息列
+- 修復個人檔案頁面版面問題
+- 修復私聊介面非好友頭像顏色不正確問題
 
 ## 安裝方法
 

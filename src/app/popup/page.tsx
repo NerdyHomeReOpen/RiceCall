@@ -64,13 +64,18 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons }) => {
 
   // Effects
   useEffect(() => {
-    ipcService.window.onMaximize(() => {
+    const offMaximize = ipcService.window.onMaximize(() => {
       setIsFullscreen(true);
     });
 
-    ipcService.window.onUnmaximize(() => {
+    const offUnmaximize = ipcService.window.onUnmaximize(() => {
       setIsFullscreen(false);
     });
+
+    return () => {
+      offMaximize();
+      offUnmaximize();
+    };
   }, []);
 
   return (
@@ -135,6 +140,18 @@ const Popup = React.memo(() => {
       setInitialData(data);
     });
   }, [id]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        ipcService.window.close();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   useEffect(() => {
     if (!initialData || !type) return;

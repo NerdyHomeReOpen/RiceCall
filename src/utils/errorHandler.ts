@@ -9,6 +9,7 @@ type StandardizedErrorOptions = Error & {
   part: string;
   tag: string;
   statusCode: number;
+  handler?: () => void;
 };
 
 export default class StandardizedError {
@@ -25,6 +26,7 @@ export default class StandardizedError {
     this.part = options.part;
     this.tag = options.tag;
     this.statusCode = options.statusCode;
+    this.handler = options.handler;
   }
 
   handle() {

@@ -1,11 +1,10 @@
 .body {
-  height: 100%;
-  max-height: 330px;
-  width: 100%;
-  padding: 5 5;
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  width: 100%;
+  padding: 5px;
 }
 
 .body .userProfileContent {
@@ -332,7 +331,7 @@
   overflow-y: scroll;
 }
 
-/* User Profile Styles */
+/* User Profile */
 .userProfile {
   flex: unset;
   height: 100%;
@@ -342,12 +341,13 @@
 
 .userProfile .profileBox {
   height: 100%;
-  justify-content: space-between;
+  display: flex;
+  flex-direction: column;
 }
 
 .userProfile .header {
   position: relative;
-  min-height: 270px;
+  min-height: 250px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -485,46 +485,24 @@
 }
 
 .userProfile .tab {
-  height: 38px;
-  width: 100%;
-  bottom: 0;
   position: absolute;
   display: flex;
-  height: 45px;
-  top: 21rem;
-}
-
-.userProfile .hiddenTab {
-  gap: 0;
-}
-
-.userProfile .hiddenTab .tab {
-  height: 0;
-}
-
-.userProfile .hiddenTab .body {
-  max-height: 100%;
-}
-
-.userProfile .tab:has(.about.selected) {
-  background: linear-gradient(180deg, #ffffff, #d2f0ffa1);
-  border-bottom: 1px solid #dddddd;
+  width: 100%;
+  bottom: 0;
 }
 
 .userProfile .tab .item {
-  height: 38px;
-  width: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 38px;
+  width: 50%;
   padding-bottom: 6px;
   gap: 5px;
-  position: relative;
   background-image: url('../../../public/im/userpage_tab.png');
   background-size: auto;
   background-repeat: repeat;
   background-position: 0 0;
-  bottom: 2.8rem;
   cursor: pointer;
 }
 
@@ -552,29 +530,7 @@
   background-position: 0 0;
 }
 
-.userProfile .aboutMe {
-  display: block;
-  height: 100px;
-}
-
 /* ServerItem */
-.userProfile .joinedServers {
-  padding: 5px;
-}
-
-.joinedServers select {
-  border: unset !important;
-  background: #fff0 !important;
-}
-
-.joinedServers div:has(select):before {
-  background-image: unset !important;
-}
-
-.joinedServers div:has(select):after {
-  left: 50px;
-}
-
 .serverItems {
   padding: 5px 0;
   max-height: 270px;
@@ -670,6 +626,11 @@
   min-width: 2.5rem;
 }
 
+.displayId {
+  color: #6d6d6d;
+  font-weight: 500;
+}
+
 .isOwner::before {
   display: block;
   content: '';
@@ -692,29 +653,18 @@
   background-position: 0 0;
 }
 
-.displayId {
-  color: #6d6d6d;
-  font-weight: 500;
-}
-
-.userBadges {
-  background-color: #e8e8eb;
-}
-
-.dialogCenter {
+/* Edit Tab Bar */
+.editTabBar {
+  z-index: 1;
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 100%;
+  justify-content: flex-end;
+  min-height: 45px;
+  background: linear-gradient(180deg, #ffffff, #d2f0ffa1);
+  border-bottom: 1px solid #dddddd;
 }
 
-.dialogContent {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  text-align: left;
-}
-
+/* User Badges */
 .badgeViewer {
   display: flex;
   gap: 0.25rem;
@@ -724,16 +674,4 @@
   padding: 5px;
   background: #e8e8eb;
   margin-top: 0.5rem;
-}
-
-.editTabBar {
-  min-height: 45px;
-  height: 3.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  z-index: 1;
-  position: fixed;
-  bottom: 29.5rem;
-  right: 0.5rem;
 }

@@ -24,259 +24,286 @@ const isElectron = !!ipcRenderer;
 
 const ipcService = {
   exit: () => {
-    if (isElectron) {
-      ipcRenderer.send('exit');
-    }
+    if (!isElectron) return;
+    ipcRenderer.send('exit');
   },
 
-  // Socket event methods
-  sendSocketEvent: (event: SocketClientEvent, ...args: any[]) => {
-    if (isElectron) {
-      ipcRenderer.send(event, ...args);
-    } else {
-      console.warn('IPC not available - not in Electron environment');
-    }
+  // Remove specific listener
+  removeListener: (event: string) => {
+    if (!isElectron) return;
+    ipcRenderer.removeAllListeners(event);
   },
-  onSocketEvent: (
-    event: SocketServerEvent | 'connect' | 'reconnect' | 'disconnect',
-    callback: (...args: any[]) => void,
-  ) => {
-    if (isElectron) {
+
+  socket: {
+    send: (event: SocketClientEvent, ...args: any[]) => {
+      if (!isElectron) return;
+      ipcRenderer.send(event, ...args);
+    },
+    on: (
+      event: SocketServerEvent | 'connect' | 'reconnect' | 'disconnect',
+      callback: (...args: any[]) => void,
+    ) => {
+      if (!isElectron) return () => {};
       ipcRenderer.on(event, (_: any, ...args: any[]) => callback(...args));
-    } else {
-      console.warn('IPC not available - not in Electron environment');
-    }
+      return () => ipcRenderer.removeAllListeners(event);
+    },
   },
 
   // DeepLink methods
   deepLink: {
     onDeepLink: (callback: (serverId: string) => void) => {
-      if (isElectron) {
-        ipcRenderer.on('deepLink', (_: any, serverId: string) =>
-          callback(serverId),
-        );
-      }
+      if (!isElectron) return () => {};
+      ipcRenderer.on('deepLink', (_: any, serverId: string) =>
+        callback(serverId),
+      );
+      return () => ipcRenderer.removeAllListeners('deepLink');
     },
-
-    offDeepLink: () => {
-      if (isElectron) {
-        ipcRenderer.removeAllListeners('deepLink');
-      }
-    },
-  },
-
-  // Remove specific listener
-  removeListener: (event: string) => {
-    if (isElectron) {
-      ipcRenderer.removeAllListeners(event);
-    } else {
-      console.warn('IPC not available - not in Electron environment');
-    }
   },
 
   // Initial data methods
   initialData: {
     request: (id: string, callback: (data: any) => void) => {
-      if (isElectron) {
-        ipcRenderer.send('request-initial-data', id);
-        ipcRenderer.on(
-          'response-initial-data',
-          (_: any, to: string, data: any) => {
-            if (to != id) return;
-            ipcRenderer.removeAllListeners('response-initial-data');
-            callback(data);
-          },
-        );
-      } else {
-        console.warn('IPC not available - not in Electron environment');
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('request-initial-data', id);
+      ipcRenderer.on(
+        'response-initial-data',
+        (_: any, to: string, data: any) => {
+          if (to != id) return;
+          ipcRenderer.removeAllListeners('response-initial-data');
+          callback(data);
+        },
+      );
     },
+
     onRequest: (id: string, data: any, callback?: () => void) => {
-      if (isElectron) {
-        ipcRenderer.on('request-initial-data', (_: any, from: string) => {
-          if (from != id) return;
-          ipcRenderer.send('response-initial-data', id, data);
-          ipcRenderer.removeAllListeners('request-initial-data');
-          if (callback) callback();
-        });
-      } else {
-        console.warn('IPC not available - not in Electron environment');
-      }
+      if (!isElectron) return;
+      ipcRenderer.on('request-initial-data', (_: any, from: string) => {
+        if (from != id) return;
+        ipcRenderer.send('response-initial-data', id, data);
+        ipcRenderer.removeAllListeners('request-initial-data');
+        if (callback) callback();
+      });
     },
   },
 
   // Window control methods
   window: {
     resize: (width: number, height: number) => {
-      if (isElectron) {
-        ipcRenderer.send('resize', width, height);
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('resize', width, height);
     },
+
     minimize: () => {
-      if (isElectron) {
-        ipcRenderer.send('window-control', 'minimize');
-      } else {
-        window.close();
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('window-control', 'minimize');
     },
+
     maximize: () => {
-      if (isElectron) {
-        ipcRenderer.send('window-control', 'maximize');
-      } else {
-        document.documentElement.requestFullscreen();
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('window-control', 'maximize');
     },
+
     unmaximize: () => {
-      if (isElectron) {
-        ipcRenderer.send('window-control', 'unmaximize');
-      } else {
-        document.exitFullscreen();
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('window-control', 'unmaximize');
     },
-    close: () => {
-      if (isElectron) {
-        ipcRenderer.send('window-control', 'close');
-      } else {
-        window.close();
-      }
-    },
-    onMaximize: (callback: () => void) => {
-      if (isElectron) {
-        ipcRenderer.on('maximize', callback);
-      }
-    },
-    onUnmaximize: (callback: () => void) => {
-      if (isElectron) {
-        ipcRenderer.on('unmaximize', callback);
-      }
-    },
+
     openExternal: (url: string) => {
-      if (isElectron) {
-        ipcRenderer.send('open-external', url);
-      } else {
-        window.open(url, '_blank');
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('open-external', url);
     },
+
+    close: () => {
+      if (!isElectron) return;
+      ipcRenderer.send('window-control', 'close');
+    },
+
+    onMaximize: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      ipcRenderer.on('maximize', callback);
+      return () => ipcRenderer.removeAllListeners('maximize');
+    },
+
+    onUnmaximize: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      ipcRenderer.on('unmaximize', callback);
+      return () => ipcRenderer.removeAllListeners('unmaximize');
+    },
+
     onShakeWindow: (callback: () => void) => {
-      if (isElectron) {
-        ipcRenderer.on('shakeWindow', callback);
-      }
+      if (!isElectron) return () => {};
+      ipcRenderer.on('shakeWindow', callback);
+      return () => ipcRenderer.removeAllListeners('shakeWindow');
     },
   },
 
   popup: {
     open: (type: PopupType, id: string) => {
-      if (isElectron) {
-        ipcRenderer.send(
-          'open-popup',
-          type,
-          id,
-          PopupSize[type].height,
-          PopupSize[type].width,
-        );
-      }
+      if (!isElectron) return;
+      ipcRenderer.send(
+        'open-popup',
+        type,
+        id,
+        PopupSize[type].height,
+        PopupSize[type].width,
+      );
     },
+
     submit: (to: string, data?: any) => {
-      if (isElectron) {
-        ipcRenderer.send('popup-submit', to, data);
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('popup-submit', to, data);
     },
+
     onSubmit: (host: string, callback: (data: any) => void) => {
-      if (isElectron) {
-        ipcRenderer.on('popup-submit', (_: any, to: string, data?: any) => {
-          if (to != host) return;
-          callback(data);
-          ipcRenderer.removeAllListeners('popup-submit');
-        });
-      }
+      if (!isElectron) return;
+      ipcRenderer.on('popup-submit', (_: any, to: string, data?: any) => {
+        if (to != host) return;
+        callback(data);
+        ipcRenderer.removeAllListeners('popup-submit');
+      });
     },
   },
 
   // Auth related methods
   auth: {
     login: (token: string) => {
-      if (isElectron) {
-        ipcRenderer.send('login', token);
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('login', token);
     },
+
     logout: () => {
-      if (isElectron) {
-        ipcRenderer.send('logout');
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('logout');
     },
   },
 
   discord: {
     updatePresence: (presence: DiscordPresence) => {
-      if (isElectron) {
-        ipcRenderer.send('update-discord-presence', presence);
-      }
+      if (!isElectron) return;
+      ipcRenderer.send('update-discord-presence', presence);
     },
   },
 
   systemSettings: {
-    get: {
-      all: (
-        callback: (data: {
-          autoLaunch: boolean;
-          inputAudioDevice: string;
-          outputAudioDevice: string;
-        }) => void,
-      ) => {
-        if (isElectron) {
-          ipcRenderer.send('get-system-settings');
-          ipcRenderer.once('system-settings-status', (_: any, data: any) => {
-            callback(data);
-          });
-        }
+    autoLaunch: {
+      get: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-auto-launch');
+        ipcRenderer.once('auto-launch-status', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
       },
-      autoLaunch: (callback: (enabled: boolean) => void) => {
-        if (isElectron) {
-          ipcRenderer.send('get-auto-launch');
-          ipcRenderer.once('auto-launch-status', (_: any, enabled: boolean) => {
-            callback(enabled);
-          });
-        }
+
+      set: (enable: boolean) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-auto-launch', enable);
       },
-      inputAudioDevice: (callback: (deviceId: string) => void) => {
-        if (isElectron) {
-          ipcRenderer.send('get-input-audio-device');
-          ipcRenderer.once(
-            'input-audio-device-status',
-            (_: any, deviceId: string) => {
-              callback(deviceId);
-            },
-          );
-        }
-      },
-      outputAudioDevice: (callback: (deviceId: string) => void) => {
-        if (isElectron) {
-          ipcRenderer.send('get-output-audio-device');
-          ipcRenderer.once(
-            'output-audio-device-status',
-            (_: any, deviceId: string) => {
-              callback(deviceId);
-            },
-          );
-        }
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('auto-launch-status', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+        return () => ipcRenderer.removeAllListeners('auto-launch-status');
       },
     },
-    set: {
-      autoLaunch: (enable: boolean) => {
-        if (isElectron) {
-          ipcRenderer.send('set-auto-launch', enable);
-        }
+
+    soundEffect: {
+      get: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-sound-effect');
+        ipcRenderer.once('sound-effect-status', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
       },
-      inputAudioDevice: (deviceId: string) => {
-        if (isElectron) {
-          ipcRenderer.send('set-input-audio-device', deviceId);
-        }
+
+      set: (enable: boolean) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-sound-effect', enable);
       },
-      outputAudioDevice: (deviceId: string) => {
-        if (isElectron) {
-          ipcRenderer.send('set-output-audio-device', deviceId);
-        }
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('sound-effect-status', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+        return () => ipcRenderer.removeAllListeners('sound-effect-status');
       },
+    },
+
+    inputAudioDevice: {
+      get: (callback: (deviceId: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-input-audio-device');
+        ipcRenderer.once(
+          'input-audio-device-status',
+          (_: any, deviceId: string) => {
+            callback(deviceId);
+          },
+        );
+      },
+
+      set: (deviceId: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-input-audio-device', deviceId);
+      },
+
+      onUpdate: (callback: (deviceId: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on(
+          'input-audio-device-status',
+          (_: any, deviceId: string) => {
+            callback(deviceId);
+          },
+        );
+        return () =>
+          ipcRenderer.removeAllListeners('input-audio-device-status');
+      },
+    },
+
+    outputAudioDevice: {
+      get: (callback: (deviceId: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-output-audio-device');
+        ipcRenderer.once(
+          'output-audio-device-status',
+          (_: any, deviceId: string) => {
+            callback(deviceId);
+          },
+        );
+      },
+
+      set: (deviceId: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-output-audio-device', deviceId);
+      },
+
+      onUpdate: (callback: (deviceId: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on(
+          'output-audio-device-status',
+          (_: any, deviceId: string) => {
+            callback(deviceId);
+          },
+        );
+        return () =>
+          ipcRenderer.removeAllListeners('output-audio-device-status');
+      },
+    },
+
+    get: (
+      callback: (data: {
+        autoLaunch: boolean;
+        soundEffect: boolean;
+        inputAudioDevice: string;
+        outputAudioDevice: string;
+      }) => void,
+    ) => {
+      if (!isElectron) return;
+      ipcRenderer.send('get-system-settings');
+      ipcRenderer.once('system-settings-status', (_: any, data: any) => {
+        callback(data);
+      });
     },
   },
 };

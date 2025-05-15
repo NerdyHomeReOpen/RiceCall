@@ -198,6 +198,7 @@ export interface Translation {
   kick: string;
   addFriend: string;
   addChannel: string;
+  addSubChannel: string;
   unknownChannel: string;
   micOrder: string;
   allChannel: string;
@@ -656,6 +657,7 @@ export enum SocketClientEvent {
   UPDATE_FRIEND_APPLICATION = 'updateFriendApplication',
   DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
   // Server
+  FAVORITE_SERVER = 'favoriteServer',
   SEARCH_SERVER = 'searchServer',
   CONNECT_SERVER = 'connectServer',
   DISCONNECT_SERVER = 'disconnectServer',
@@ -687,7 +689,6 @@ export enum SocketClientEvent {
   RTC_ICE_CANDIDATE = 'RTCIceCandidate',
   // Echo
   PING = 'ping',
-  // Direct Message Shake
 }
 
 export enum SocketServerEvent {
@@ -697,41 +698,44 @@ export enum SocketServerEvent {
   USER_SEARCH = 'userSearch',
   USER_UPDATE = 'userUpdate',
   // Friend Group
+  FRIEND_GROUPS_SET = 'friendGroupsSet',
   FRIEND_GROUP_ADD = 'friendGroupAdd',
   FRIEND_GROUP_UPDATE = 'friendGroupUpdate',
   FRIEND_GROUP_DELETE = 'friendGroupDelete',
-  FRIEND_GROUPS_UPDATE = 'friendGroupsUpdate',
   // Friend
+  FRIENDS_SET = 'friendsSet',
   FRIEND_ADD = 'friendAdd',
   FRIEND_UPDATE = 'friendUpdate',
   FRIEND_DELETE = 'friendDelete',
-  FRIENDS_UPDATE = 'friendsUpdate',
   // Friend Application
+  FRIEND_APPLICATIONS_SET = 'friendApplicationsSet',
   FRIEND_APPLICATION_ADD = 'friendApplicationAdd',
   FRIEND_APPLICATION_UPDATE = 'friendApplicationUpdate',
   FRIEND_APPLICATION_DELETE = 'friendApplicationDelete',
-  FRIEND_APPLICATIONS_UPDATE = 'friendApplicationsUpdate',
   // Server
   SERVER_SEARCH = 'serverSearch',
+  SERVERS_SET = 'serversSet',
   SERVER_ADD = 'serverAdd',
   SERVER_UPDATE = 'serverUpdate',
   SERVER_DELETE = 'serverDelete',
-  SERVERS_UPDATE = 'serversUpdate',
   // Channel
+  SERVER_CHANNELS_SET = 'serverChannelsSet',
   SERVER_CHANNEL_ADD = 'serverChannelAdd',
   SERVER_CHANNEL_UPDATE = 'serverChannelUpdate',
   SERVER_CHANNEL_DELETE = 'serverChannelDelete',
-  SERVER_CHANNELS_UPDATE = 'serverChannelsUpdate',
   // Member
+  SERVER_MEMBERS_SET = 'serverMembersSet',
   SERVER_MEMBER_ADD = 'serverMemberAdd',
   SERVER_MEMBER_UPDATE = 'serverMemberUpdate',
   SERVER_MEMBER_DELETE = 'serverMemberDelete',
-  SERVER_MEMBERS_UPDATE = 'serverMembersUpdate',
+  SERVER_ONLINE_MEMBERS_SET = 'serverOnlineMembersSet',
+  SERVER_ONLINE_MEMBER_ADD = 'serverOnlineMemberAdd',
+  SERVER_ONLINE_MEMBER_DELETE = 'serverOnlineMemberDelete',
   // Member Application
+  SERVER_MEMBER_APPLICATIONS_SET = 'serverMemberApplicationsSet',
   SERVER_MEMBER_APPLICATION_ADD = 'serverMemberApplicationAdd',
   SERVER_MEMBER_APPLICATION_UPDATE = 'serverMemberApplicationUpdate',
   SERVER_MEMBER_APPLICATION_DELETE = 'serverMemberApplicationDelete',
-  SERVER_MEMBER_APPLICATIONS_UPDATE = 'serverMemberApplicationsUpdate',
   // Message
   ON_MESSAGE = 'onMessage',
   ON_DIRECT_MESSAGE = 'onDirectMessage',
@@ -752,7 +756,6 @@ export enum SocketServerEvent {
   RECONNECT_ERROR = 'reconnect_error',
   // Popup
   OPEN_POPUP = 'openPopup',
-  // Direct Message Shake
 }
 
 export enum PopupType {
