@@ -34,6 +34,8 @@ export const ExampleHandler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('Example').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
           message: '', // TODO: implement message
@@ -43,7 +45,6 @@ export const ExampleHandler = {
         });
       }
 
-      new Logger('Example').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

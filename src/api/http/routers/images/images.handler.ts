@@ -58,16 +58,17 @@ export const ImagesHandler = {
       }
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('Images').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `讀取圖片時發生預期外的錯誤，請稍後再試`,
+          message: `讀取圖片失敗，請稍後再試`,
           part: 'IMAGES',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('Images').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

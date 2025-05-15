@@ -35,16 +35,17 @@ export const RefreshFriendHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshFriend').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新好友資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新好友資料失敗，請稍後再試`,
           part: 'REFRESHFRIEND',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshFriend').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

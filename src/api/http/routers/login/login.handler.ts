@@ -80,16 +80,17 @@ export const LoginHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('Login').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `登入時發生預期外的錯誤，請稍後再試`,
+          message: `登入失敗，請稍後再試`,
           part: 'LOGIN',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('Login').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

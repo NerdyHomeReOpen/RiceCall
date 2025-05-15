@@ -42,9 +42,11 @@ export const SearchUserHandler = {
       /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('SearchUser').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `搜尋使用者時發生無法預期的錯誤，請稍後再試`,
+          message: `搜尋使用者失敗，請稍後再試`,
           part: 'SEARCHUSER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -52,8 +54,6 @@ export const SearchUserHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('SearchUser').error(error.message);
     }
   },
 };
@@ -96,9 +96,11 @@ export const ConnectUserHandler = {
       new Logger('ConnectUser').info(`User(${operatorId}) connected`);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('ConnectUser').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `連接使用者時發生無法預期的錯誤，請稍後再試`,
+          message: `連接使用者失敗，請稍後再試`,
           part: 'CONNECTUSER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -106,8 +108,6 @@ export const ConnectUserHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('ConnectUser').error(error.message);
     }
   },
 };
@@ -145,9 +145,11 @@ export const DisconnectUserHandler = {
       new Logger('DisconnectUser').info(`User(${operatorId}) disconnected`);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('DisconnectUser').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `斷開使用者時發生無法預期的錯誤，請稍後再試`,
+          message: `斷開使用者失敗，請稍後再試`,
           part: 'DISCONNECTUSER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -155,8 +157,6 @@ export const DisconnectUserHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('DisconnectUser').error(error.message);
     }
   },
 };
@@ -200,9 +200,11 @@ export const UpdateUserHandler = {
       new Logger('UpdateUser').info(`User(${operatorId}) updated`);
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('UpdateUser').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新使用者時發生無法預期的錯誤，請稍後再試`,
+          message: `更新使用者失敗，請稍後再試`,
           part: 'UPDATEUSER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -210,8 +212,6 @@ export const UpdateUserHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('UpdateUser').error(error.message);
     }
   },
 };

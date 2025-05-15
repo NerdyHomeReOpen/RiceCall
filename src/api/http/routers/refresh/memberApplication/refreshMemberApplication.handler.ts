@@ -38,16 +38,17 @@ export const RefreshMemberApplicationHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshMemberApplication').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新成員申請資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新成員申請資料失敗，請稍後再試`,
           part: 'REFRESHMEMBERAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshMemberApplication').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

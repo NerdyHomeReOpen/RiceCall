@@ -41,9 +41,11 @@ export const RTCOfferHandler = {
       /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RTCOffer').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `連接 RTC 時發生無法預期的錯誤，請稍後再試`,
+          message: `連接 RTC 失敗，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -51,8 +53,6 @@ export const RTCOfferHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('RTCOffer').error(error.message);
     }
   },
 };
@@ -82,9 +82,11 @@ export const RTCAnswerHandler = {
       /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RTCAnswer').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `連接 RTC 時發生無法預期的錯誤，請稍後再試`,
+          message: `連接 RTC 失敗，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -92,8 +94,6 @@ export const RTCAnswerHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('RTCAnswer').error(error.message);
     }
   },
 };
@@ -123,9 +123,11 @@ export const RTCCandidateHandler = {
       /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RTCCandidate').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `連接 RTC 時發生無法預期的錯誤，請稍後再試`,
+          message: `連接 RTC 失敗，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -133,8 +135,6 @@ export const RTCCandidateHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('RTCCandidate').error(error.message);
     }
   },
 };

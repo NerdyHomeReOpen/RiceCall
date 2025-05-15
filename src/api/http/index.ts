@@ -132,15 +132,7 @@ export default class HttpServer {
               data: null,
             });
 
-            console.error(
-              new StandardizedError({
-                message: `Request not handled: ${req.url}`,
-                name: `ServerError`,
-                part: `SERVER`,
-                tag: `SERVER_ERROR`,
-                statusCode: 500,
-              }),
-            );
+            console.error(`Request not handled: ${req.url}`);
 
             return;
           });

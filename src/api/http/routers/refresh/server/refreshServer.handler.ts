@@ -35,16 +35,17 @@ export const RefreshServerHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshServer').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新群組資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新群組資料失敗，請稍後再試`,
           part: 'REFRESHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshServer').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',
@@ -72,16 +73,17 @@ export const RefreshServerChannelsHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshServerChannels').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新伺服器頻道資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新伺服器頻道資料失敗，請稍後再試`,
           part: 'REFRESHSERVERCHANNELS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshServerChannels').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',
@@ -110,16 +112,17 @@ export const RefreshServerMemberApplicationsHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshServerMemberApplications').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新伺服器成員申請資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新伺服器成員申請資料失敗，請稍後再試`,
           part: 'REFRESHSERVERMEMBERAPPLICATIONS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshServerMemberApplications').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',
@@ -147,16 +150,17 @@ export const RefreshServerMembersHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshServerMembers').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新伺服器成員資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新伺服器成員資料失敗，請稍後再試`,
           part: 'REFRESHSERVERMEMBERS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshServerMembers').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

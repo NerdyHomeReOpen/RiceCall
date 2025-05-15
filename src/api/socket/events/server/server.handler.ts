@@ -51,9 +51,11 @@ export const SearchServerHandler = {
       /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('SearchServer').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `搜尋群組時發生無法預期的錯誤，請稍後再試`,
+          message: `搜尋群組失敗，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -61,8 +63,6 @@ export const SearchServerHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('SearchServer').error(error.message);
     }
   },
 };
@@ -217,9 +217,11 @@ export const ConnectServerHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('ConnectServer').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `連接群組時發生無法預期的錯誤，請稍後再試`,
+          message: `連接群組失敗，請稍後再試`,
           part: 'CONNECTSERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -227,8 +229,6 @@ export const ConnectServerHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('ConnectServer').error(error.message);
     }
   },
 };
@@ -317,9 +317,11 @@ export const DisconnectServerHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('DisconnectServer').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `斷開群組時發生無法預期的錯誤，請稍後再試`,
+          message: `斷開群組失敗，請稍後再試`,
           part: 'DISCONNECTSERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -327,8 +329,6 @@ export const DisconnectServerHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('DisconnectServer').error(error.message);
     }
   },
 };
@@ -416,9 +416,11 @@ export const CreateServerHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('CreateServer').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `建立群組時發生無法預期的錯誤，請稍後再試`,
+          message: `建立群組失敗，請稍後再試`,
           part: 'CREATESERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -426,8 +428,6 @@ export const CreateServerHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('CreateServer').error(error.message);
     }
   },
 };
@@ -475,9 +475,11 @@ export const UpdateServerHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('UpdateServer').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新群組時發生無法預期的錯誤，請稍後再試`,
+          message: `更新群組失敗，請稍後再試`,
           part: 'UPDATESERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -485,8 +487,6 @@ export const UpdateServerHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('UpdateServer').error(error.message);
     }
   },
 };

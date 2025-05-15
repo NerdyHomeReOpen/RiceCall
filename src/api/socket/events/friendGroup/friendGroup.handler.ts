@@ -72,9 +72,11 @@ export const CreateFriendGroupHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('CreateFriendGroup').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `建立好友群組時發生無法預期的錯誤，請稍後再試`,
+          message: `建立好友群組失敗，請稍後再試`,
           part: 'CREATEFRIENDGROUP',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -82,8 +84,6 @@ export const CreateFriendGroupHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('CreateFriendGroup').error(error.message);
     }
   },
 };
@@ -133,9 +133,11 @@ export const UpdateFriendGroupHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('UpdateFriendGroup').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新好友群組時發生無法預期的錯誤，請稍後再試`,
+          message: `更新好友群組失敗，請稍後再試`,
           part: 'UPDATEFRIENDGROUP',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -143,8 +145,6 @@ export const UpdateFriendGroupHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('UpdateFriendGroup').error(error.message);
     }
   },
 };
@@ -208,9 +208,11 @@ export const DeleteFriendGroupHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('DeleteFriendGroup').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除好友群組時發生無法預期的錯誤，請稍後再試`,
+          message: `刪除好友群組失敗，請稍後再試`,
           part: 'DELETEFRIENDGROUP',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
@@ -218,8 +220,6 @@ export const DeleteFriendGroupHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('DeleteFriendGroup').error(error.message);
     }
   },
 };

@@ -67,16 +67,17 @@ export const RegisterHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('Register').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `註冊時發生預期外的錯誤，請稍後再試`,
+          message: `註冊失敗，請稍後再試`,
           part: 'REGISTER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('Register').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

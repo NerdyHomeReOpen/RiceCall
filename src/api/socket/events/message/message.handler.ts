@@ -93,9 +93,11 @@ export const SendMessageHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('SendMessage').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `傳送訊息時發生無法預期的錯誤，請稍後再試`,
+          message: `傳送訊息失敗，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -103,8 +105,6 @@ export const SendMessageHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('SendMessage').error(error.message);
     }
   },
 };
@@ -166,9 +166,11 @@ export const SendDirectMessageHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('SendDirectMessage').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `傳送私訊時發生無法預期的錯誤，請稍後再試`,
+          message: `傳送私訊失敗，請稍後再試`,
           part: 'SEARCHSERVER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -176,8 +178,6 @@ export const SendDirectMessageHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('SendDirectMessage').error(error.message);
     }
   },
 };
@@ -230,9 +230,11 @@ export const ShakeWindowHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('ShakeWindow').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `搖動視窗時發生無法預期的錯誤，請稍後再試`,
+          message: `搖動視窗失敗，請稍後再試`,
           part: 'SHAKEWINDOW',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -240,8 +242,6 @@ export const ShakeWindowHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('ShakeWindow').error(error.message);
     }
   },
 };

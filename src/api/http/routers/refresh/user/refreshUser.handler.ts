@@ -35,16 +35,17 @@ export const RefreshUserHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshUser').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新使用者資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新使用者資料失敗，請稍後再試`,
           part: 'REFRESHUSER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshUser').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',
@@ -74,16 +75,17 @@ export const RefreshUserFriendApplicationsHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshUserFriendApplications').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新用戶好友申請資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新用戶好友申請資料失敗，請稍後再試`,
           part: 'REFRESHUSERFRIENDAPPLICATIONS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshUserFriendApplications').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',
@@ -111,16 +113,17 @@ export const RefreshUserFriendGroupsHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshUserFriendGroups').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新用戶好友群組資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新用戶好友群組資料失敗，請稍後再試`,
           part: 'REFRESHUSERFRIENDGROUPS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshUserFriendGroups').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',
@@ -148,16 +151,17 @@ export const RefreshUserFriendsHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshUserFriends').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新使用者好友資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新使用者好友資料失敗，請稍後再試`,
           part: 'REFRESHUSERFRIENDS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshUserFriends').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',
@@ -185,16 +189,17 @@ export const RefreshUserServersHandler: Handler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshUserServers').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新用戶伺服器資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新用戶伺服器資料失敗，請稍後再試`,
           part: 'REFRESHUSERSERVERS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshUserServers').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

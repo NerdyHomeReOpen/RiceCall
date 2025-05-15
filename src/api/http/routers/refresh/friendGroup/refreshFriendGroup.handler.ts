@@ -34,16 +34,17 @@ export const RefreshFriendGroupHandler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('RefreshFriendGroup').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刷新好友群組資料時發生預期外的錯誤，請稍後再試`,
+          message: `刷新好友群組資料失敗，請稍後再試`,
           part: 'REFRESHFRIENDGROUP',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('RefreshFriendGroup').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',

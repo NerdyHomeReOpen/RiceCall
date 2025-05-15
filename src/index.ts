@@ -1,9 +1,6 @@
 // Config
 import { serverConfig } from '@/config';
 
-// Error
-import StandardizedError from '@/error';
-
 // Utils
 import Logger from '@/utils/logger';
 

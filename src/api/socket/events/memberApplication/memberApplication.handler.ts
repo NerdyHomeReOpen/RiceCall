@@ -76,9 +76,11 @@ export const CreateMemberApplicationHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('CreateMemberApplication').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `創建成員申請時發生無法預期的錯誤，請稍後再試`,
+          message: `創建成員申請失敗，請稍後再試`,
           part: 'CREATEMEMBERAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -86,8 +88,6 @@ export const CreateMemberApplicationHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('CreateMemberApplication').error(error.message);
     }
   },
 };
@@ -146,9 +146,11 @@ export const UpdateMemberApplicationHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('UpdateMemberApplication').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新成員申請時發生無法預期的錯誤，請稍後再試`,
+          message: `更新成員申請失敗，請稍後再試`,
           part: 'UPDATEMEMBERAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -156,8 +158,6 @@ export const UpdateMemberApplicationHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('UpdateMemberApplication').error(error.message);
     }
   },
 };
@@ -211,9 +211,11 @@ export const DeleteMemberApplicationHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('DeleteMemberApplication').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除成員申請時發生無法預期的錯誤，請稍後再試`,
+          message: `刪除成員申請失敗，請稍後再試`,
           part: 'DELETEMEMBERAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -221,8 +223,6 @@ export const DeleteMemberApplicationHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('DeleteMemberApplication').error(error.message);
     }
   },
 };

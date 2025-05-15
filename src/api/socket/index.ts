@@ -65,6 +65,9 @@ import {
   RTCCandidateHandler,
 } from '@/api/socket/events/rtc/rtc.handler';
 
+// Logger
+import Logger from '@/utils/logger';
+
 export default class SocketServer {
   static io: Server;
   static socket: Socket;
@@ -121,9 +124,11 @@ export default class SocketServer {
         return next();
       } catch (error: any) {
         if (!(error instanceof StandardizedError)) {
+          new Logger('SocketServer').error(error.message);
+
           error = new StandardizedError({
             name: 'ServerError',
-            message: `驗證時發生無法預期的錯誤，請稍後再試`,
+            message: `驗證失敗，請稍後再試`,
             part: 'AUTH',
             tag: 'EXCEPTION_ERROR',
             statusCode: 500,

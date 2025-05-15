@@ -167,9 +167,11 @@ export const ConnectChannelHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('ConnectChannel').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `連接頻道時發生無法預期的錯誤，請稍後再試`,
+          message: `連接頻道失敗，請稍後再試`,
           part: 'CONNECTCHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -177,8 +179,6 @@ export const ConnectChannelHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('ConnectChannel').error(error.message);
     }
   },
 };
@@ -265,9 +265,11 @@ export const DisconnectChannelHandler = {
       /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('DisconnectChannel').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `離開頻道時發生無法預期的錯誤，請稍後再試`,
+          message: `離開頻道失敗，請稍後再試`,
           part: 'DISCONNECTCHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -275,8 +277,6 @@ export const DisconnectChannelHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('DisconnectChannel').error(error.message);
     }
   },
 };
@@ -351,9 +351,11 @@ export const CreateChannelHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('CreateChannel').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `建立頻道時發生無法預期的錯誤，請稍後再試`,
+          message: `建立頻道失敗，請稍後再試`,
           part: 'CREATECHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -361,8 +363,6 @@ export const CreateChannelHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('CreateChannel').error(error.message);
     }
   },
 };
@@ -532,9 +532,11 @@ export const UpdateChannelHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('UpdateChannel').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新頻道時發生無法預期的錯誤，請稍後再試`,
+          message: `更新頻道失敗，請稍後再試`,
           part: 'UPDATECHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -542,8 +544,6 @@ export const UpdateChannelHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('UpdateChannel').error(error.message);
     }
   },
 };
@@ -574,9 +574,11 @@ export const UpdateChannelsHandler = {
       /* ========== End of Handling ========== */
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('UpdateChannels').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新頻道時發生無法預期的錯誤，請稍後再試`,
+          message: `更新頻道失敗，請稍後再試`,
           part: 'UPDATECHANNELS',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -584,8 +586,6 @@ export const UpdateChannelsHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('UpdateChannels').error(error.message);
     }
   },
 };
@@ -681,9 +681,11 @@ export const DeleteChannelHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('DeleteChannel').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除頻道時發生無法預期的錯誤，請稍後再試`,
+          message: `刪除頻道失敗，請稍後再試`,
           part: 'DELETECHANNEL',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -691,8 +693,6 @@ export const DeleteChannelHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('DeleteChannel').error(error.message);
     }
   },
 };

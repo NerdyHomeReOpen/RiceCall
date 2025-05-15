@@ -98,9 +98,11 @@ export const CreateMemberHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('CreateMember').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `建立成員時發生預期外的錯誤，請稍後再試`,
+          message: `建立成員失敗，請稍後再試`,
           part: 'CREATEMEMBER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -108,8 +110,6 @@ export const CreateMemberHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('CreateMember').error(error.message);
     }
   },
 };
@@ -204,9 +204,11 @@ export const UpdateMemberHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('UpdateMember').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新成員時發生預期外的錯誤，請稍後再試`,
+          message: `更新成員失敗，請稍後再試`,
           part: 'UPDATEMEMBER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -214,8 +216,6 @@ export const UpdateMemberHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('UpdateMember').error(error.message);
     }
   },
 };
@@ -283,9 +283,11 @@ export const DeleteMemberHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('DeleteMember').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除成員時發生預期外的錯誤，請稍後再試`,
+          message: `刪除成員失敗，請稍後再試`,
           part: 'DELETEMEMBER',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -293,8 +295,6 @@ export const DeleteMemberHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('DeleteMember').error(error.message);
     }
   },
 };

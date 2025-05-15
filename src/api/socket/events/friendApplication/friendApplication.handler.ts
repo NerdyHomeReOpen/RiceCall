@@ -88,9 +88,11 @@ export const CreateFriendApplicationHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('CreateFriendApplication').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `發送好友申請時發生預期外的錯誤，請稍後再試`,
+          message: `發送好友申請失敗，請稍後再試`,
           part: 'CREATEFRIENDAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -98,8 +100,6 @@ export const CreateFriendApplicationHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('CreateFriendApplication').error(error.message);
     }
   },
 };
@@ -158,9 +158,11 @@ export const UpdateFriendApplicationHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('UpdateFriendApplication').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `更新好友申請時發生預期外的錯誤，請稍後再試`,
+          message: `更新好友申請失敗，請稍後再試`,
           part: 'UPDATEFRIENDAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -168,8 +170,6 @@ export const UpdateFriendApplicationHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('UpdateFriendApplication').error(error.message);
     }
   },
 };
@@ -219,9 +219,11 @@ export const DeleteFriendApplicationHandler = {
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('DeleteFriendApplication').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `刪除好友申請時發生預期外的錯誤，請稍後再試`,
+          message: `刪除好友申請失敗，請稍後再試`,
           part: 'DELETEFRIENDAPPLICATION',
           tag: 'SERVER_ERROR',
           statusCode: 500,
@@ -229,8 +231,6 @@ export const DeleteFriendApplicationHandler = {
       }
 
       socket.emit('error', error);
-
-      new Logger('DeleteFriendApplication').error(error.message);
     }
   },
 };

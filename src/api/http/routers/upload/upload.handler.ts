@@ -113,16 +113,17 @@ export const UploadHandler = {
       };
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
+        new Logger('Upload').error(error.message);
+
         error = new StandardizedError({
           name: 'ServerError',
-          message: `上傳圖片時發生預期外的錯誤，請稍後再試`,
+          message: `上傳圖片失敗，請稍後再試`,
           part: 'UPLOAD',
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
       }
 
-      new Logger('Upload').error(error.message);
       return {
         statusCode: error.statusCode,
         message: 'error',
