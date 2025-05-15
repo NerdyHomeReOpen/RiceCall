@@ -23,6 +23,18 @@ import { DataValidator } from '@/middleware/data.validator';
 import { database } from '@/index';
 import { SocketRequestHandler } from '@/handler';
 
+async function createFriendBiRecord(userId1: string, userId2: string, preset: any) {
+  let dbExec = async (a: string, b: string) => {
+    await database.set.friend(a, b, {
+      ...preset,
+      createdAt: Date.now(),
+    });
+  }
+  
+  await dbExec(userId1, userId2);
+  await dbExec(userId2, userId1);
+}
+
 export const CreateFriendHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
@@ -59,17 +71,7 @@ export const CreateFriendHandler : SocketRequestHandler = {
 
       /* ========== Start of Main Logic ========== */
 
-      // Create friend
-      await database.set.friend(userId, targetId, {
-        ...preset,
-        createdAt: Date.now(),
-      });
-
-      // Create friend (reverse)
-      await database.set.friend(targetId, userId, {
-        ...preset,
-        createdAt: Date.now(),
-      });
+      await createFriendBiRecord(userId, targetId, preset);
 
       const targetSocket = SocketServer.getSocket(targetId);
 
