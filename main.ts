@@ -40,6 +40,7 @@ enum SocketClientEvent {
   SEARCH_USER = 'searchUser',
   UPDATE_USER = 'updateUser',
   // Server
+  FAVORITE_SERVER = 'favoriteServer',
   SEARCH_SERVER = 'searchServer',
   CONNECT_SERVER = 'connectServer',
   DISCONNECT_SERVER = 'disconnectServer',

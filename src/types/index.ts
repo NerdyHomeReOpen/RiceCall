@@ -657,6 +657,7 @@ export enum SocketClientEvent {
   UPDATE_FRIEND_APPLICATION = 'updateFriendApplication',
   DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
   // Server
+  FAVORITE_SERVER = 'favoriteServer',
   SEARCH_SERVER = 'searchServer',
   CONNECT_SERVER = 'connectServer',
   DISCONNECT_SERVER = 'disconnectServer',
@@ -688,7 +689,6 @@ export enum SocketClientEvent {
   RTC_ICE_CANDIDATE = 'RTCIceCandidate',
   // Echo
   PING = 'ping',
-  // Direct Message Shake
 }
 
 export enum SocketServerEvent {
@@ -756,7 +756,6 @@ export enum SocketServerEvent {
   RECONNECT_ERROR = 'reconnect_error',
   // Popup
   OPEN_POPUP = 'openPopup',
-  // Direct Message Shake
 }
 
 export enum PopupType {
