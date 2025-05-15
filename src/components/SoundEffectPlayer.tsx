@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // Types
 import { SocketServerEvent } from '@/types';
@@ -6,16 +6,37 @@ import { SocketServerEvent } from '@/types';
 // Providers
 import { useSocket } from '@/providers/Socket';
 
+// Services
+import ipcService from '@/services/ipc.service';
+
 export const SoundEffectPlayer = () => {
   // Hooks
   const socket = useSocket();
 
   // Refs
-
-  // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // Statas
+  const [soundEffect, setSoundEffect] = useState(false);
+
+  // Effects
+  useEffect(() => {
+    ipcService.systemSettings.soundEffect.get((enabled) => {
+      setSoundEffect(enabled);
+    });
+
+    const offUpdate = ipcService.systemSettings.soundEffect.onUpdate(
+      (enabled) => {
+        setSoundEffect(enabled);
+      },
+    );
+
+    return () => offUpdate();
+  }, []);
+
   const handlePlaySound = (sound: string) => {
+    if (!soundEffect) return;
+
     if (audioRef.current) {
       audioRef.current.pause();
     }

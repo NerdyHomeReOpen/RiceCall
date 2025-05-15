@@ -617,22 +617,48 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     handleUpdateInputStream('');
     handleUpdateOutputStream('');
 
-    ipcService.systemSettings.get.inputAudioDevice(async (deviceId) => {
-      // Get device info
+    // Get input device info
+    const getInputDeviceInfo = async (deviceId: string) => {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const deviceInfo = devices.find((d) => d.deviceId === deviceId);
       console.info('New input stream device info:', deviceInfo);
       handleUpdateInputStream(deviceId || '');
-    });
-    ipcService.systemSettings.get.outputAudioDevice(async (deviceId) => {
-      // Get device info
+    };
+
+    const getOutputDeviceInfo = async (deviceId: string) => {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const deviceInfo = devices.find((d) => d.deviceId === deviceId);
       console.info('New output stream device info:', deviceInfo);
       handleUpdateOutputStream(deviceId || '');
+    };
+
+    ipcService.systemSettings.inputAudioDevice.get((deviceId) => {
+      getInputDeviceInfo(deviceId);
+      handleUpdateInputStream(deviceId || '');
     });
 
+    const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate(
+      (deviceId) => {
+        getInputDeviceInfo(deviceId);
+        handleUpdateInputStream(deviceId || '');
+      },
+    );
+
+    ipcService.systemSettings.outputAudioDevice.get((deviceId) => {
+      getOutputDeviceInfo(deviceId);
+      handleUpdateOutputStream(deviceId || '');
+    });
+
+    const offUpdateOutput =
+      ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
+        getOutputDeviceInfo(deviceId);
+        handleUpdateOutputStream(deviceId || '');
+      });
+
     return () => {
+      offUpdateInput();
+      offUpdateOutput();
+
       if (localStream.current) {
         localStream.current.getTracks().forEach((track) => track.stop());
         localStream.current = null;

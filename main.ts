@@ -832,6 +832,7 @@ app.on('ready', async () => {
   ipcMain.on('get-system-settings', (event) => {
     const settings = {
       autoLaunch: isAutoLaunchEnabled(),
+      soundEffect: store.get('soundEffect'),
       inputAudioDevice: store.get('audioInputDevice'),
       outputAudioDevice: store.get('audioOutputDevice'),
     };
@@ -840,6 +841,10 @@ app.on('ready', async () => {
 
   ipcMain.on('get-auto-launch', (event) => {
     event.reply('auto-launch-status', isAutoLaunchEnabled());
+  });
+
+  ipcMain.on('get-sound-effect', (event) => {
+    event.reply('sound-effect-status', store.get('soundEffect'));
   });
 
   ipcMain.on('get-input-audio-device', (event) => {
@@ -852,6 +857,13 @@ app.on('ready', async () => {
 
   ipcMain.on('set-auto-launch', (_, enable) => {
     setAutoLaunch(enable);
+  });
+
+  ipcMain.on('set-sound-effect', (_, enable) => {
+    store.set('soundEffect', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('sound-effect-status', enable);
+    });
   });
 
   ipcMain.on('set-input-audio-device', (_, deviceId) => {

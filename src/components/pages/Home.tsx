@@ -244,10 +244,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     }, [currentServer, isLoading, mainTab]);
 
     useEffect(() => {
-      ipcService.deepLink.onDeepLink(handleDeepLink);
-      return () => {
-        ipcService.deepLink.offDeepLink();
-      };
+      const offDeepLink = ipcService.deepLink.onDeepLink(handleDeepLink);
+      return () => offDeepLink();
     }, [handleDeepLink]);
 
     useEffect(() => {
