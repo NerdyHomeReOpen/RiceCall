@@ -637,27 +637,27 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       handleUpdateInputStream(deviceId || '');
     });
 
-    const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate(
-      (deviceId) => {
-        getInputDeviceInfo(deviceId);
-        handleUpdateInputStream(deviceId || '');
-      },
-    );
+    // const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate(
+    //   (deviceId) => {
+    //     getInputDeviceInfo(deviceId);
+    //     handleUpdateInputStream(deviceId || '');
+    //   },
+    // );
 
     ipcService.systemSettings.outputAudioDevice.get((deviceId) => {
       getOutputDeviceInfo(deviceId);
       handleUpdateOutputStream(deviceId || '');
     });
 
-    const offUpdateOutput =
-      ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
-        getOutputDeviceInfo(deviceId);
-        handleUpdateOutputStream(deviceId || '');
-      });
+    // const offUpdateOutput =
+    //   ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
+    //     getOutputDeviceInfo(deviceId);
+    //     handleUpdateOutputStream(deviceId || '');
+    //   });
 
     return () => {
-      offUpdateInput();
-      offUpdateOutput();
+      // offUpdateInput();
+      // offUpdateOutput();
 
       if (localStream.current) {
         localStream.current.getTracks().forEach((track) => track.stop());
