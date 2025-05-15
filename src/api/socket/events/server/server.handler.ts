@@ -179,12 +179,6 @@ export const ConnectServerHandler = {
       };
       await database.set.userServer(userId, serverId, serverUpdate);
 
-      // Update user
-      const userUpdate = {
-        currentServerId: serverId,
-      };
-      await database.set.user(userId, userUpdate);
-
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
@@ -208,7 +202,6 @@ export const ConnectServerHandler = {
           'serverOnlineMembersSet',
           await database.get.serverOnlineMembers(serverId),
         );
-        targetSocket.emit('userUpdate', userUpdate);
         targetSocket
           .to(`server_${serverId}`)
           .emit(
@@ -293,12 +286,7 @@ export const DisconnectServerHandler = {
 
       /* ========== Start of Main Logic ========== */
 
-      // Update user
-      const userUpdate = {
-        currentServerId: null,
-      };
-      await database.set.user(userId, userUpdate);
-
+      // Send socket event
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
@@ -306,7 +294,6 @@ export const DisconnectServerHandler = {
         targetSocket.leave(`server_${serverId}`);
         targetSocket.emit('serverChannelsSet', []);
         targetSocket.emit('serverOnlineMembersSet', []);
-        targetSocket.emit('userUpdate', userUpdate);
         targetSocket
           .to(`server_${serverId}`)
           .emit('serverOnlineMemberDelete', userId, serverId);
