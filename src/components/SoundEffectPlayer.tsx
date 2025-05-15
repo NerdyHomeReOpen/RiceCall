@@ -76,7 +76,7 @@ export const SoundEffectPlayer = () => {
     return () => {
       unsubscribe.forEach((unsub) => unsub());
     };
-  }, [socket]);
+  }, [socket, handlePlaySound]);
 
   return null;
 };
