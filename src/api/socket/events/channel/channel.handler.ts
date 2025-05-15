@@ -113,6 +113,7 @@ export const ConnectChannelHandler = {
       // Update user
       const userUpdate = {
         currentChannelId: channelId,
+        currentServerId: serverId,
         lastActiveAt: Date.now(),
       };
       await database.set.user(userId, userUpdate);
@@ -230,6 +231,7 @@ export const DisconnectChannelHandler = {
       // Update user
       const userUpdate = {
         currentChannelId: null,
+        currentServerId: null,
         lastActiveAt: Date.now(),
       };
       await database.set.user(userId, userUpdate);
@@ -332,7 +334,7 @@ export const CreateChannelHandler = {
       await database.set.channel(channelId, {
         ...preset,
         serverId: serverId,
-        order: (categoryChannels?.length || 0) + 1, // 1 is for lobby (-1 ~ serverChannels.length - 1)
+        order: (categoryChannels?.length || 0) - 1, // (-1 ~ serverChannels.length - 1)
         createdAt: Date.now(),
       });
 
