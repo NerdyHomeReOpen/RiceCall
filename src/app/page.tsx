@@ -350,6 +350,10 @@ const RootPageComponent = () => {
     setUser((prev) => ({ ...prev, ...user }));
   };
 
+  const handleServersSet = (servers: UserServer[]) => {
+    setServers(servers);
+  };
+
   const handleServerAdd = (server: UserServer) => {
     setServers((prev) => [...prev, server]);
   };
@@ -369,8 +373,8 @@ const RootPageComponent = () => {
     setServers((prev) => prev.filter((item) => item.serverId !== id));
   };
 
-  const handleServersUpdate = (servers: UserServer[]) => {
-    setServers(servers);
+  const handleFriendsSet = (friends: UserFriend[]) => {
+    setFriends(friends);
   };
 
   const handleFriendAdd = (friend: UserFriend) => {
@@ -402,8 +406,8 @@ const RootPageComponent = () => {
     );
   };
 
-  const handleFriendsUpdate = (friends: UserFriend[]) => {
-    setFriends(friends);
+  const handleFriendGroupsSet = (friendGroups: FriendGroup[]) => {
+    setFriendGroups(friendGroups);
   };
 
   const handleFriendGroupAdd = (friendGroup: FriendGroup) => {
@@ -425,12 +429,12 @@ const RootPageComponent = () => {
     setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== id));
   };
 
-  const handleFriendGroupsUpdate = (friendGroups: FriendGroup[]) => {
-    setFriendGroups(friendGroups);
-  };
-
   const handleServerMemberAdd = (member: ServerMember): void => {
     setServerMembers((prev) => [...prev, member]);
+  };
+
+  const handleServerMembersSet = (members: ServerMember[]) => {
+    setServerMembers(members);
   };
 
   const handleServerMemberUpdate = (
@@ -458,8 +462,8 @@ const RootPageComponent = () => {
     );
   };
 
-  const handleServerMembersUpdate = (members: ServerMember[]) => {
-    setServerMembers(members);
+  const handleServerChannelsSet = (channels: Channel[]) => {
+    setServerChannels(channels);
   };
 
   const handleServerChannelAdd = (channel: Channel): void => {
@@ -479,10 +483,6 @@ const RootPageComponent = () => {
 
   const handleServerChannelDelete = (id: Channel['channelId']): void => {
     setServerChannels((prev) => prev.filter((item) => item.channelId !== id));
-  };
-
-  const handleServerChannelsUpdate = (channels: Channel[]) => {
-    setServerChannels(channels);
   };
 
   const handleOnMessages = (...channelMessages: ChannelMessage[]): void => {
@@ -565,26 +565,26 @@ const RootPageComponent = () => {
 
     const eventHandlers = {
       [SocketServerEvent.USER_UPDATE]: handleUserUpdate,
+      [SocketServerEvent.SERVERS_SET]: handleServersSet,
       [SocketServerEvent.SERVER_ADD]: handleServerAdd,
       [SocketServerEvent.SERVER_UPDATE]: handleServerUpdate,
       [SocketServerEvent.SERVER_DELETE]: handleServerDelete,
-      [SocketServerEvent.SERVERS_UPDATE]: handleServersUpdate,
+      [SocketServerEvent.FRIENDS_SET]: handleFriendsSet,
       [SocketServerEvent.FRIEND_ADD]: handleFriendAdd,
       [SocketServerEvent.FRIEND_UPDATE]: handleFriendUpdate,
       [SocketServerEvent.FRIEND_DELETE]: handleFriendDelete,
-      [SocketServerEvent.FRIENDS_UPDATE]: handleFriendsUpdate,
+      [SocketServerEvent.FRIEND_GROUPS_SET]: handleFriendGroupsSet,
       [SocketServerEvent.FRIEND_GROUP_ADD]: handleFriendGroupAdd,
       [SocketServerEvent.FRIEND_GROUP_UPDATE]: handleFriendGroupUpdate,
       [SocketServerEvent.FRIEND_GROUP_DELETE]: handleFriendGroupDelete,
-      [SocketServerEvent.FRIEND_GROUPS_UPDATE]: handleFriendGroupsUpdate,
-      [SocketServerEvent.SERVER_MEMBER_ADD]: handleServerMemberAdd,
+      [SocketServerEvent.SERVER_MEMBERS_SET]: handleServerMembersSet,
+      [SocketServerEvent.SERVER_ONLINE_MEMBER_ADD]: handleServerMemberAdd,
       [SocketServerEvent.SERVER_MEMBER_UPDATE]: handleServerMemberUpdate,
-      [SocketServerEvent.SERVER_MEMBER_DELETE]: handleServerMemberDelete,
-      [SocketServerEvent.SERVER_MEMBERS_UPDATE]: handleServerMembersUpdate,
+      [SocketServerEvent.SERVER_ONLINE_MEMBER_DELETE]: handleServerMemberDelete,
+      [SocketServerEvent.SERVER_CHANNELS_SET]: handleServerChannelsSet,
       [SocketServerEvent.SERVER_CHANNEL_ADD]: handleServerChannelAdd,
       [SocketServerEvent.SERVER_CHANNEL_UPDATE]: handleServerChannelUpdate,
       [SocketServerEvent.SERVER_CHANNEL_DELETE]: handleServerChannelDelete,
-      [SocketServerEvent.SERVER_CHANNELS_UPDATE]: handleServerChannelsUpdate,
       [SocketServerEvent.ON_MESSAGE]: handleOnMessages,
       [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
       [SocketServerEvent.ERROR]: handleError,
