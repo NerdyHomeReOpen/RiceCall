@@ -75,6 +75,10 @@ export const CreateMemberHandler = {
         createdAt: Date.now(),
       });
 
+      await database.set.userServer(userId, serverId, {
+        timestamp: Date.now(),
+      });
+
       // Send socket event
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
