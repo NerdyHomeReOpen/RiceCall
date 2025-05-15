@@ -15,8 +15,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
+import { Handler } from '@/handler';
 
-export const RefreshFriendHandler = {
+export const RefreshFriendHandler : Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { userId, targetId } = await DataValidator.validate(

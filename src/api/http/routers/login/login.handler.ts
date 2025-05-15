@@ -18,8 +18,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
+import { Handler } from '@/handler';
 
-export const LoginHandler = {
+export const LoginHandler : Handler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { account, password } = await DataValidator.validate(
@@ -95,5 +96,5 @@ export const LoginHandler = {
         data: { error },
       };
     }
-  },
+  }
 };

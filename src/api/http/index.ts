@@ -8,35 +8,19 @@ import StandardizedError from '@/error';
 import Logger from '@/utils/logger';
 
 // Handlers
-import { LoginHandler } from './routers/login/login.handler';
-import { RegisterHandler } from './routers/register/register.handler';
-import { RefreshChannelHandler } from './routers/refresh/channel/refreshChannel.handler';
-import { RefreshFriendHandler } from './routers/refresh/friend/refreshFriend.handler';
-import { RefreshFriendApplicationHandler } from './routers/refresh/friendApplication/refreshFriendApplication.handler';
-import { RefreshFriendGroupHandler } from './routers/refresh/friendGroup/refreshFriendGroup.handler';
-import { RefreshMemberHandler } from './routers/refresh/member/refreshMember.handler';
-import { RefreshMemberApplicationHandler } from './routers/refresh/memberApplication/refreshMemberApplication.handler';
-import {
-  RefreshServerHandler,
-  RefreshServerChannelsHandler,
-  RefreshServerMemberApplicationsHandler,
-  RefreshServerMembersHandler,
-} from './routers/refresh/server/refreshServer.handler';
-import {
-  RefreshUserHandler,
-  RefreshUserFriendApplicationsHandler,
-  RefreshUserFriendGroupsHandler,
-  RefreshUserFriendsHandler,
-  RefreshUserServersHandler,
-} from './routers/refresh/user/refreshUser.handler';
+
 import { ImagesHandler } from './routers/images/images.handler';
 import { UploadHandler } from './routers/upload/upload.handler';
+import { PostRouters } from './routers/PostRouters';
+import routesInitializer from './routers/routes' 
+import RouteNotFoundError from '@/errors/RouteNotFoundError';
 
 export type ResponseType = {
   statusCode: number;
   message: string;
   data: any;
 };
+
 
 const sendImage = (res: ServerResponse, response: ResponseType) => {
   res.writeHead(200, {
@@ -67,6 +51,10 @@ const sendOptions = (res: ServerResponse) => {
   res.writeHead(200);
   res.end();
 };
+
+routesInitializer();
+
+
 
 export default class HttpServer {
   constructor(private port: number) {
@@ -117,54 +105,44 @@ export default class HttpServer {
 
           req.on('end', async () => {
             data = JSON.parse(data);
-
-            if (req.url === '/login') {
-              response = await LoginHandler.handle(data);
-            } else if (req.url === '/register') {
-              response = await RegisterHandler.handle(data);
-            } else if (req.url === '/refresh/channel') {
-              response = await RefreshChannelHandler.handle(data);
-            } else if (req.url === '/refresh/friend') {
-              response = await RefreshFriendHandler.handle(data);
-            } else if (req.url === '/refresh/friendApplication') {
-              response = await RefreshFriendApplicationHandler.handle(data);
-            } else if (req.url === '/refresh/friendGroup') {
-              response = await RefreshFriendGroupHandler.handle(data);
-            } else if (req.url === '/refresh/member') {
-              response = await RefreshMemberHandler.handle(data);
-            } else if (req.url === '/refresh/memberApplication') {
-              response = await RefreshMemberApplicationHandler.handle(data);
-            } else if (req.url === '/refresh/server') {
-              response = await RefreshServerHandler.handle(data);
-            } else if (req.url === '/refresh/serverChannels') {
-              response = await RefreshServerChannelsHandler.handle(data);
-            } else if (req.url === '/refresh/serverMemberApplications') {
-              response = await RefreshServerMemberApplicationsHandler.handle(
-                data,
-              );
-            } else if (req.url === '/refresh/serverMembers') {
-              response = await RefreshServerMembersHandler.handle(data);
-            } else if (req.url === '/refresh/user') {
-              response = await RefreshUserHandler.handle(data);
-            } else if (req.url === '/refresh/userFriendApplications') {
-              response = await RefreshUserFriendApplicationsHandler.handle(
-                data,
-              );
-            } else if (req.url === '/refresh/userFriendGroups') {
-              response = await RefreshUserFriendGroupsHandler.handle(data);
-            } else if (req.url === '/refresh/userFriends') {
-              response = await RefreshUserFriendsHandler.handle(data);
-            } else if (req.url === '/refresh/userServers') {
-              response = await RefreshUserServersHandler.handle(data);
+            
+            // 路由定義已改到 ./routers/routes.ts
+            let handleRoute = async ()=>{
+              if (!req.url) req.url = '/';
+              try {
+                return await PostRouters.handle(req.url, data);
+              }
+              catch (error) {
+                if (!(error instanceof RouteNotFoundError)) return null; 
+                sendResponse(res, {
+                  statusCode: 404,
+                  message: 'Not Found',
+                  data: null,
+                });
+                return null;
+              }
             }
 
-            if (response) sendResponse(res, response);
-            else
-              sendResponse(res, {
-                statusCode: 404,
-                message: 'Not Found',
-                data: null,
-              });
+            response = await handleRoute()
+          
+            if (response) {
+              sendResponse(res, response);
+              return;
+            }
+
+            sendResponse(res, {
+              statusCode: 500,
+              message: 'Request not handled',
+              data: null,
+            });
+
+            console.error(new StandardizedError({
+              message: `Request not handled: ${req.url}`,
+              name: `ServerError`,
+              part: `SERVER`,
+              tag: `SERVER_ERROR`,
+              statusCode: 500
+            }))
 
             return;
           });
