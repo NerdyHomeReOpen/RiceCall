@@ -3,10 +3,6 @@ import mysql from 'mysql2/promise';
 // Config
 import { dbConfig } from '@/config';
 
-// Error
-import StandardizedError from '@/error';
-import Logger from '@/utils/logger';
-
 function camelToSnake(str: string) {
   return str.replace(/([A-Z])/g, '_$1').toLowerCase();
 }
