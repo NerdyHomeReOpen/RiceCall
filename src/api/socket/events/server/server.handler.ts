@@ -23,6 +23,7 @@ import {
   UpdateServerSchema,
   ConnectServerSchema,
   DisconnectServerSchema,
+  FavoriteServerSchema,
 } from '@/api/socket/events/server/server.schema';
 
 // Middleware
@@ -481,6 +482,57 @@ export const UpdateServerHandler = {
           name: 'ServerError',
           message: `更新群組失敗，請稍後再試`,
           part: 'UPDATESERVER',
+          tag: 'EXCEPTION_ERROR',
+          statusCode: 500,
+        });
+      }
+
+      socket.emit('error', error);
+    }
+  },
+};
+
+export const FavoriteServerHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
+    try {
+      /* ========== Start of Handling ========== */
+
+      const operatorId = socket.data.userId;
+
+      const { serverId } = await DataValidator.validate(
+        FavoriteServerSchema,
+        data,
+        'FAVORITESERVER',
+      );
+
+      const userServer = await database.get.userServer(operatorId, serverId);
+
+      /* ========== Start of Main Logic ========== */
+
+      // Update server
+      const serverUpdate = {
+        favorite: !userServer.favorite,
+      };
+      await database.set.userServer(operatorId, serverId, serverUpdate);
+
+      // Send socket event
+      io.to(`server_${serverId}`).emit('serverUpdate', serverId, serverUpdate);
+
+      /* ========== End of Handling ========== */
+
+      new Logger('FavoriteServer').info(
+        `User(${operatorId}) ${
+          userServer.favorite ? 'unfavorited' : 'favorited'
+        } server(${serverId})`,
+      );
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        new Logger('FavoriteServer').error(error.message);
+
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `收藏群組失敗，請稍後再試`,
+          part: 'FAVORITESERVER',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });

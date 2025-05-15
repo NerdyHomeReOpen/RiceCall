@@ -18,6 +18,7 @@ import {
   ConnectServerHandler,
   CreateServerHandler,
   DisconnectServerHandler,
+  FavoriteServerHandler,
   SearchServerHandler,
   UpdateServerHandler,
 } from '@/api/socket/events/server/server.handler';
@@ -188,6 +189,9 @@ export default class SocketServer {
       });
       socket.on('updateServer', async (data) => {
         await UpdateServerHandler.handle(io, socket, data);
+      });
+      socket.on('favoriteServer', async (data) => {
+        await FavoriteServerHandler.handle(io, socket, data);
       });
 
       // Channel

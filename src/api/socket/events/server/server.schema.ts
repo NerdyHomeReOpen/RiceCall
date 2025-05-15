@@ -47,3 +47,9 @@ export const UpdateServerSchema = z
     server: ServerSchema.partial(),
   })
   .strict();
+
+export const FavoriteServerSchema = z
+  .object({
+    serverId: z.string(),
+  })
+  .strict();
