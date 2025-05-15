@@ -537,6 +537,8 @@ const RootPageComponent = () => {
     } else {
       if (mainTab.selectedTabId === 'server') mainTab.setSelectedTabId('home');
     }
+
+    setChannelMessages([]);
   }, [user.currentServerId]);
 
   useEffect(() => {
