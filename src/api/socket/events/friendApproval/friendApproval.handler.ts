@@ -7,6 +7,7 @@ import FriendApplicationNotFoundError from '@/errors/FriendApplicationNotFoundEr
 import { FriendHandlerServerSide } from '../friend/friend.handler';
 import StandardizedError from '@/error';
 import Logger from '@/utils/logger';
+import AlreadyFriendError from '@/errors/AlreadyFriendError';
 
 export const FriendApprovalHandler: SocketRequestHandler = {
     async handle(io: Server, socket: Socket, data: any) {
@@ -28,9 +29,12 @@ export const FriendApprovalHandler: SocketRequestHandler = {
             );
             if (!friendApplication) throw new FriendApplicationNotFoundError(targetId, operatorId);
 
+            const friend = await database.get.friend(operatorId, targetId);
+            if (friend) throw new AlreadyFriendError(targetId, operatorId);
+
             await FriendHandlerServerSide.createFriend(operatorId, targetId);
             await database.delete.friendApplication(targetId, operatorId);
-            
+
             if (friendGroupId) await FriendHandlerServerSide.updateFriendGroup(operatorId, targetId, friendGroupId);
 
             socket.emit('friendApproval', {
