@@ -196,7 +196,7 @@
   position: absolute;
   width: 99%;
   display: flex;
-  background: linear-gradient(#fff, #d2f0ffa1);
+  background: linear-gradient(to bottom, #ffffff, #f2f7f9);
   border-bottom: 1px solid #ddd;
   left: 2px;
   justify-content: right;
@@ -230,22 +230,16 @@
 }
 
 .blueBtn {
-  color: #fff;
-  border: 0;
-  min-width: 80px;
-  max-width: 80px;
-  height: 28px;
-  background-image: url('../../../public/im/btn-blue.png');
-  background-size: auto;
-  background-position: 0 0;
+  background: #4aabf0;
+  border: 1px solid #50a1db;
 }
 
 .blueBtn:hover {
-  background-position: -80px 0;
+  background: #53b6f3;
 }
 
 .blueBtn:active {
-  background-position: -160px 0;
+  background: #49aaef;
 }
 
 .headerTextBox {

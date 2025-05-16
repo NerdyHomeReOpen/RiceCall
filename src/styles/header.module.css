@@ -24,9 +24,10 @@
   left: 2.5rem;
 }
 
-.buttons,
+.nameBox,
+.statusBox,
 .mainTabs,
-.titleBox {
+.buttons {
   -webkit-app-region: no-drag;
 }
 

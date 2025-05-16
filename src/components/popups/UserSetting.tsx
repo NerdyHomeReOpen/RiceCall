@@ -82,7 +82,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     } = user;
     const isSelf = targetId === userId;
     const isFriend = !!friend.targetId;
-    const isEditing = isSelf && selectedTabId === 'userSetting';
     const isProfilePrivate = false; // TODO: 隱私設定開關，等設定功能完工
     const joinedServers = servers
       .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
@@ -275,11 +274,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
             <div
               className={`${setting['avatar']} ${
-                isEditing && isSelf ? setting['editable'] : ''
+                isSelf ? setting['editable'] : ''
               }`}
               style={{ backgroundImage: `url(${userAvatarUrl})` }}
               onClick={() => {
-                if (!isSelf || !isEditing) return;
+                if (!isSelf) return;
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
                 fileInput.accept = 'image/*';
@@ -309,7 +308,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
             <div
               className={`${popup['row']} ${setting['noDrag']}`}
-              style={{ marginTop: '10px', gap: '2px' }}
+              style={{ gap: '2px' }}
             >
               <div className={setting['userName']}>{userName}</div>
               {userVip > 0 && (

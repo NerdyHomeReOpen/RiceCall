@@ -96,7 +96,6 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  cursor: pointer;
   border-top: 1px solid #fff0;
   border-bottom: 1px solid #fff0;
   border-right: 1px solid #fff0;
@@ -248,7 +247,7 @@
   position: absolute;
   width: 99%;
   display: flex;
-  background: linear-gradient(#fff, #d2f0ffa1);
+  background: linear-gradient(to bottom, #ffffff, #f2f7f9);
   border-bottom: 1px solid #ddd;
   left: 2px;
   justify-content: right;
@@ -257,11 +256,11 @@
 
 .confirmedButton,
 .button {
-  margin-right: 5px;
-  min-width: 82px;
+  margin-right: 10px;
+  min-width: 78px;
   text-align: center;
-  font-size: 13px;
-  height: 26px;
+  font-size: 12px;
+  height: 25px;
   align-items: center;
   display: flex;
   justify-content: center;
@@ -270,7 +269,8 @@
   border: 1px solid #cbcccd;
   width: auto;
   border-radius: 5px;
-  background: #fff;
+  background: linear-gradient(#fafafb, #e9e9ed);
+  color: #333333;
 }
 
 .button:hover {
@@ -287,29 +287,35 @@
   color: #fff;
   border: 0;
   background-position: 0 0;
-  min-width: 80px;
-  max-width: 80px;
-  height: 28px;
+  min-width: 78px;
+  max-width: 78px;
+  height: 25px;
 }
 
 .blueBtn {
-  background-image: url('../../../public/im/btn-blue.png');
-  background-repeat: no-repeat;
+  background: #4aabf0;
+  border: 1px solid #50a1db;
+}
+
+.blueBtn:hover {
+  background: #53b6f3;
+}
+
+.blueBtn:active {
+  background: #49aaef;
 }
 
 .greenBtn {
-  background-image: url('../../../public/im/btn-green.png');
-  background-repeat: no-repeat;
+  background: #0fb11f;
+  border: 1px solid #0d9e1b;
 }
 
-.blueBtn:hover,
 .greenBtn:hover {
-  background-position: -80px 0;
+  background: #12bc23;
 }
 
-.blueBtn:active,
 .greenBtn:active {
-  background-position: -160px 0;
+  background: #0fac1e;
 }
 
 .headerTextBox {
@@ -412,6 +418,15 @@
   background-position: center center;
 }
 
+.userProfile .avatar:hover {
+  box-shadow: 0 0 3px 6px rgba(255, 255, 255, 1);
+  border-radius: 3px;
+}
+
+.userProfile .avatar:hover:after {
+  display: none;
+}
+
 .avatar,
 .noDrag,
 .tab div {
@@ -503,7 +518,6 @@
   background-size: auto;
   background-repeat: repeat;
   background-position: 0 0;
-  cursor: pointer;
 }
 
 .userProfile .tab .item.selected {
@@ -660,8 +674,8 @@
   align-items: center;
   justify-content: flex-end;
   min-height: 45px;
-  background: linear-gradient(180deg, #ffffff, #d2f0ffa1);
-  border-bottom: 1px solid #dddddd;
+  background: linear-gradient(to bottom, #ffffff, #f2f7f9);
+  border-bottom: 1px solid #f1f1f1;
 }
 
 /* User Badges */

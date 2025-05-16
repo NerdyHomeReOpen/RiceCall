@@ -283,6 +283,11 @@ const Popup = React.memo(() => {
         setHeaderButtons(['close']);
         setContent(<Dialog {...{ ...initialData, iconType: 'WARNING' }} />);
         break;
+      case PopupType.CHANGE_THEME:
+        setHeaderTitle(lang.tr.changeTheme);
+        setHeaderButtons(['close']);
+        setContent(<ChangeTheme {...initialData} />);
+        break;
       default:
         break;
     }
