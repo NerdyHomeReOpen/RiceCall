@@ -4,6 +4,7 @@
   background-color: #f6e6d7;
   background-position: 0 0px;
   background-size: auto;
+  color: #f6e6d7;
 }
 
 .theme-2 {
@@ -12,6 +13,7 @@
   background-color: #1b71ac;
   background-position: 0 0px;
   background-size: auto;
+  color: #1b71ac;
 }
 
 .theme-3 {
@@ -20,6 +22,7 @@
   background-color: #efd1ab;
   background-position: 0 0px;
   background-size: auto;
+  color: #efd1ab;
 }
 
 .theme-4 {
@@ -27,6 +30,7 @@
   background-color: #d4be99;
   background-position: 0 0px;
   background-size: auto;
+  color: #d4be99;
 }
 
 .theme-5 {
@@ -35,6 +39,7 @@
   background-color: #89c68b;
   background-position: 0 0px;
   background-size: auto;
+  color: #89c68b;
 }
 
 .theme-6 {
@@ -43,6 +48,7 @@
   background-color: #edd569;
   background-position: 0 0px;
   background-size: auto;
+  color: #edd569;
 }
 
 .theme-7 {
@@ -50,6 +56,7 @@
   background-color: #7464ad;
   background-position: 0 0px;
   background-size: auto;
+  color: #7464ad;
 }
 
 .theme-8 {
@@ -58,6 +65,7 @@
   background-color: #e3908f;
   background-position: 0 0px;
   background-size: auto;
+  color: #e3908f;
 }
 
 .theme-9 {
@@ -65,6 +73,7 @@
   background-color: #a4cfd5;
   background-position: 0 0px;
   background-size: auto;
+  color: #a4cfd5;
 }
 
 .theme-10 {
@@ -72,6 +81,7 @@
   background-color: #aa7a52;
   background-position: 0 0px;
   background-size: cover;
+  color: #aa7a52;
 }
 
 .theme-11 {
@@ -80,6 +90,7 @@
   background-color: #591234;
   background-position: 0 0px;
   background-size: auto;
+  color: #591234;
 }
 
 .theme-12 {
@@ -88,7 +99,7 @@
   background-color: #313131;
   background-position: 0 0px;
   background-size: cover;
-  color: #fff;
+  color: #313131;
 }
 
 .theme-1 div,

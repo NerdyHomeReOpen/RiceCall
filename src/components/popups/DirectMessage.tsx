@@ -33,19 +33,6 @@ interface DirectMessagePopupProps {
 
 const SHAKE_COOLDOWN = 3000;
 
-export const directMessageHeader = (targetSignature: string) => (
-  <div className={directMessage['header']}>
-    <div className={directMessage['userSignature']}>{targetSignature}</div>
-    <div className={directMessage['directOptionButtons']}>
-      <div className={directMessage['fileShare']} />
-      <div className={directMessage['blockUser']} />
-      <div className={directMessage['unBlockUser']} />
-      <div className={directMessage['inviteTempGroup']} />
-      <div className={directMessage['report']} />
-    </div>
-  </div>
-);
-
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
   (initialData: DirectMessagePopupProps) => {
     // Hooks
@@ -76,7 +63,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       avatarUrl: targetAvatarUrl,
       level: targetLevel,
       vip: targetVip,
-      signature: targetSignature,
       currentServerId: targetCurrentServerId,
       badges: targetBadges,
     } = target;
@@ -218,7 +204,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
     return (
       <div className={popup['popupContainer']}>
-        {directMessageHeader(targetSignature)}
         <div className={popup['popupBody']}>
           <div className={directMessage['sidebar']}>
             <div className={directMessage['targetBox']}>

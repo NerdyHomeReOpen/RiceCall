@@ -19,6 +19,7 @@ interface ChangeThemePopupProps {
 const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   const lang = useLanguage();
   const containerRef = useRef<HTMLFormElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
     ipcService.popup.submit(submitTo);
@@ -33,6 +34,38 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     setThemeValue('selectedTheme', `theme-${index}`);
     removeThemeValue('selectedThemeColor');
     removeThemeValue('customThemeImage');
+  };
+
+  const handleColorBoxClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const clickedElement = event.currentTarget;
+    const color = window.getComputedStyle(clickedElement).backgroundColor;
+
+    if (color) {
+      setThemeValue('selectedThemeColor', color);
+      removeThemeValue('selectedTheme');
+      removeThemeValue('customThemeImage');
+    }
+  };
+
+  const handleAddCustomImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setThemeValue('customThemeImage', base64String);
+        removeThemeValue('selectedTheme');
+        removeThemeValue('selectedThemeColor');
+      };
+      reader.readAsDataURL(file);
+    }
+    if (event.target) {
+      event.target.value = '';
+    }
   };
 
   useEffect(() => {
@@ -78,9 +111,23 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
 
                 <div className={changeTheme['themeColors']}>
                   {Array.from({ length: 10 }).map((_, i) => (
-                    <div key={i} className={changeTheme['colorBox']} />
+                    <div
+                      key={`color-${i}`}
+                      className={changeTheme['colorBox']}
+                      onClick={handleColorBoxClick}
+                    />
                   ))}
-                  <div className={changeTheme['addColorBtn']} />
+                  <div
+                    className={changeTheme['addColorBtn']}
+                    onClick={handleAddCustomImageClick}
+                  />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
                 </div>
               </div>
             </div>

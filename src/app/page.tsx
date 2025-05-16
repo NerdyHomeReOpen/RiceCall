@@ -259,7 +259,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
               <div className={header['tabBg']} />
               {TabClose && (
                 <div
-                  className={header['tabClose']}
+                  className={`${header['tabClose']} themeTabClose`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleLeaveServer(userId, serverId);

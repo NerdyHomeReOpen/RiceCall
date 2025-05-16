@@ -2,12 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  color: #fff;
   width: 100%;
   padding: 0 10px 5px 10px;
-  background-color: #0073c6;
-  border-left: 1px solid #858585;
-  border-right: 1px solid #858585;
 }
 
 .userSignature {
@@ -20,6 +16,7 @@
   justify-content: left;
   margin-left: 18px;
   gap: 5px;
+  -webkit-app-region: no-drag;
 }
 
 .directOptionButtons .fileShare,

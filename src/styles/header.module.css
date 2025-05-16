@@ -7,6 +7,17 @@
   min-height: 30px;
 }
 
+.popupHeader {
+  flex-direction: column;
+  justify-content: center;
+}
+
+.titleWrapper {
+  display: flex;
+  justify-content: space-between;
+  min-height: 30px;
+}
+
 .header .big {
   min-height: 40px;
 }
@@ -307,11 +318,11 @@
 }
 
 .mainTabs .tab.selected .tabLable {
-  color: rgb(0 115 198);
+  color: currentColor;
 }
 
 .mainTabs .tab.selected .tabClose {
-  color: #0073c6;
+  color: currentColor;
 }
 
 /* Title */
