@@ -5,6 +5,7 @@ import React, { useEffect, useState, ReactNode, useRef } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
+import '@/styles/viewers/theme.css';
 
 // Types
 import { PopupType } from '@/types';
@@ -31,6 +32,12 @@ import SearchUser from '@/components/popups/SearchUser';
 import Dialog from '@/components/popups/Dialog';
 import ChangeTheme from '@/components/popups/ChangeTheme';
 
+// Utils
+import {
+  THEME_CHANGE_EVENT,
+  applyThemeToReactState,
+} from '@/utils/themeStorage';
+
 // Services
 import ipcService from '@/services/ipc.service';
 
@@ -45,6 +52,9 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = React.memo(({ title, buttons }) => {
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [themeClass, setThemeClass] = useState<string | null>(null);
+  const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
 
   // Handlers
   const handleFullscreen = () => {
@@ -65,43 +75,71 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons }) => {
 
   // Effects
   useEffect(() => {
-    const offMaximize = ipcService.window.onMaximize(() => {
-      setIsFullscreen(true);
-    });
-
-    const offUnmaximize = ipcService.window.onUnmaximize(() => {
-      setIsFullscreen(false);
-    });
+    const offMaximize = ipcService.window.onMaximize(() =>
+      setIsFullscreen(true),
+    );
+    const offUnmaximize = ipcService.window.onUnmaximize(() =>
+      setIsFullscreen(false),
+    );
 
     return () => {
       offMaximize();
       offUnmaximize();
     };
   }, []);
+  useEffect(() => {
+    applyThemeToReactState({
+      setThemeClass,
+      setBackgroundColor,
+      setBackgroundImage,
+    });
+    const onThemeChange = () => {
+      applyThemeToReactState({
+        setThemeClass,
+        setBackgroundColor,
+        setBackgroundImage,
+      });
+    };
+    window.addEventListener(THEME_CHANGE_EVENT, onThemeChange);
+    window.addEventListener('storage', onThemeChange);
+    return () => {
+      window.removeEventListener(THEME_CHANGE_EVENT, onThemeChange);
+      window.removeEventListener('storage', onThemeChange);
+    };
+  }, []);
+
+  const headerClassName = [header['header'], themeClass]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <div className={header['header']}>
+    <header
+      className={headerClassName}
+      style={{
+        backgroundColor: backgroundColor || undefined,
+        backgroundImage: backgroundImage
+          ? `url(${backgroundImage})`
+          : undefined,
+      }}
+    >
       <div className={header['titleBox']}>
         <div className={header['title']}>{title}</div>
       </div>
       <div className={header['buttons']}>
         {buttons.includes('minimize') && (
-          <div
-            className={header['minimize']}
-            onClick={() => handleMinimize()}
-          />
+          <div className={header['minimize']} onClick={handleMinimize} />
         )}
         {buttons.includes('maxsize') && (
           <div
             className={isFullscreen ? header['restore'] : header['maxsize']}
-            onClick={() => handleFullscreen()}
+            onClick={handleFullscreen}
           />
         )}
         {buttons.includes('close') && (
-          <div className={header['close']} onClick={() => handleClose()} />
+          <div className={header['close']} onClick={handleClose} />
         )}
       </div>
-    </div>
+    </header>
   );
 });
 

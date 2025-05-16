@@ -9,6 +9,7 @@ import ipcService from '@/services/ipc.service';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
+import { setThemeValue, removeThemeValue } from '@/utils/themeStorage';
 
 interface ChangeThemePopupProps {
   title: React.ReactNode;
@@ -26,6 +27,12 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
 
   const handleClose = () => {
     ipcService.window.close();
+  };
+
+  const changeThemes = (index: number) => {
+    setThemeValue('selectedTheme', `theme-${index}`);
+    removeThemeValue('selectedThemeColor');
+    removeThemeValue('customThemeImage');
   };
 
   useEffect(() => {
@@ -50,7 +57,11 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                   className={`${changeTheme['themeImages']} ${changeTheme['big']}`}
                 >
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className={changeTheme[`themePreview-${i}`]} />
+                    <div
+                      key={i}
+                      className={changeTheme[`themePreview-${i}`]}
+                      onClick={() => changeThemes(i)}
+                    />
                   ))}
                 </div>
                 <div
@@ -60,9 +71,11 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                     <div
                       key={i + 5}
                       className={changeTheme[`themePreview-${i + 5}`]}
+                      onClick={() => changeThemes(i + 5)}
                     />
                   ))}
                 </div>
+
                 <div className={changeTheme['themeColors']}>
                   {Array.from({ length: 10 }).map((_, i) => (
                     <div key={i} className={changeTheme['colorBox']} />
@@ -74,6 +87,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
           </div>
         </div>
       </div>
+
       <div className={popup['popupFooter']}>
         <button className={popup['button']} onClick={handleSubmit}>
           {lang.tr.confirm}
