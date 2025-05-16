@@ -8,7 +8,6 @@ import changeTheme from '@/styles/popups/changeTheme.module.css';
 import ipcService from '@/services/ipc.service';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
 import { setThemeValue, removeThemeValue } from '@/utils/themeStorage';
 
 interface ChangeThemePopupProps {
@@ -17,7 +16,6 @@ interface ChangeThemePopupProps {
 }
 
 const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
-  const lang = useLanguage();
   const containerRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -133,12 +131,6 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className={popup['popupFooter']}>
-        <button className={popup['button']} onClick={handleSubmit}>
-          {lang.tr.confirm}
-        </button>
       </div>
     </form>
   );
