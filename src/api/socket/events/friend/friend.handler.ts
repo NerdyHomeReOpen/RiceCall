@@ -24,6 +24,8 @@ import { database } from '@/index';
 import { SocketRequestHandler } from '@/handler';
 import { biDirectionalAsyncOperation } from '@/utils';
 import AlreadyFriendError from '@/errors/AlreadyFriendError';
+import FriendNotFoundError from '@/errors/FriendNotFoundError';
+import FriendGroupNotFoundError from '@/errors/FriendGroupNotFoundError';
 
 enum FriendDatabaseOperator {
   SET = 'set',
@@ -43,7 +45,7 @@ async function operateFriendBiDirection(usersId: string[], operator: FriendDatab
 }
 
 
-export const CreateFriendHandlerServerSide = {
+export const FriendHandlerServerSide = {
   // 本函式觸發條件:
   // 1. 應呼叫於雙向 FriendApplication 偵測到時(在處理新的 FriendApplication 時，發現已經有來自對方的 FriendApplication) (好友分組設為 null)
   // 2. 應呼叫於處理 FriendApplicationApproval 時 
@@ -81,8 +83,22 @@ export const CreateFriendHandlerServerSide = {
     new Logger('CreateFriend').info(
       `Friend peer (${userId1}, ${userId2}) created`,
     );
+  },
+
+  updateFriendGroup: async (userId: string, targetId: string, friendGroupId: string) => {
+    const friend = await database.get.friend(userId, targetId);
+    if (!friend) throw new FriendNotFoundError(userId, targetId);
+
+    const friendGroup = await database.get.friendGroup(friendGroupId);
+    if (!friendGroup) throw new FriendGroupNotFoundError(friendGroupId);
     
+    await database.set.friend(userId, targetId, {
+      ...friend,
+      friendGroup: friendGroupId,
+    });
   }
+
+
 }
 
 export const CreateFriendHandler : SocketRequestHandler = {

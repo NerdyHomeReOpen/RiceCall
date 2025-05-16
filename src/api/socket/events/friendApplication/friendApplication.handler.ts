@@ -22,7 +22,7 @@ import { DataValidator } from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 import { SocketRequestHandler } from '@/handler';
-import { CreateFriendHandlerServerSide } from '../friend/friend.handler';
+import { FriendHandlerServerSide } from '../friend/friend.handler';
 
 export const CreateFriendApplicationHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
@@ -51,7 +51,7 @@ export const CreateFriendApplicationHandler : SocketRequestHandler = {
         new Logger('CreateFriendApplication').info(
           `User(${senderId}) and User(${receiverId}) are already friends, creating friend application...`
         );
-        await CreateFriendHandlerServerSide.createFriend(senderId, receiverId);
+        await FriendHandlerServerSide.createFriend(senderId, receiverId);
         return;
       }
 
