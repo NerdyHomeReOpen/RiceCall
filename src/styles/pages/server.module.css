@@ -26,7 +26,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  min-width: 0;
+  min-width: 280px;
   background-color: #f1f2f5;
   font-size: 0.875rem;
 }
@@ -429,20 +429,19 @@
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  min-width: 0;
+  min-width: 500px;
 }
 
 .announcementArea {
   overflow-y: auto;
   padding: 0.75rem;
-  margin-bottom: 0.25rem;
-  height: 150px;
-  max-height: 500px;
+  min-height: 80px;
 }
 
 .messageArea {
   display: flex;
   flex: 5;
+  min-height: 80px;
   padding: 0.75rem;
   overflow-y: auto;
 }
@@ -451,7 +450,7 @@
 
 .inputArea {
   display: flex;
-  flex: 1;
+  min-height: 80px;
   padding: 0.75rem;
 }
 
