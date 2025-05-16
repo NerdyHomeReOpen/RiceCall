@@ -251,8 +251,11 @@
 
 .currentChannelText {
   margin-left: 3px;
-  color: #555;
+  color: #999;
   font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .micQueueBox {
@@ -341,7 +344,7 @@
 }
 
 .channelTab .channelTabCount {
-  color: #555;
+  color: #999999;
 }
 
 .channelTab .channelTabLable.isReceptionLobby {
