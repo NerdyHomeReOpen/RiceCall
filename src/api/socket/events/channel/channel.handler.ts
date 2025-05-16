@@ -314,7 +314,7 @@ export const CreateChannelHandler = {
 
       /* ========== Start of Main Logic ========== */
 
-      const categoryChannels = serverChannels?.filter(
+      const categoryChannels = serverChannels.filter(
         (ch) => ch.categoryId === preset.categoryId,
       );
 
@@ -334,7 +334,7 @@ export const CreateChannelHandler = {
       await database.set.channel(channelId, {
         ...preset,
         serverId: serverId,
-        order: categoryChannels?.length || 0, // (-1 ~ serverChannels.length - 1)
+        order: Math.max(categoryChannels.length - 1, 0), // (-1 is for lobby)
         createdAt: Date.now(),
       });
 
