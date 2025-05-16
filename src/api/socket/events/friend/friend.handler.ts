@@ -31,10 +31,11 @@ enum FriendDatabaseOperator {
 
 async function operateFriendBiDirection(usersId: string[], operator: FriendDatabaseOperator, preset: any) {
   let dbExec = async (a: string, b: string) => {
-    await database[operator].friend(a, b, {
+    if (operator === FriendDatabaseOperator.SET) await database[operator].friend(a, b, {
       ...preset,
       createdAt: Date.now(),
     });
+    if (operator === FriendDatabaseOperator.DELETE) await database[operator].friend(a, b);
   }
   
   await biDirectionalAsyncOperation(dbExec, usersId);
