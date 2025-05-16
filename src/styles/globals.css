@@ -47,7 +47,6 @@ body,
   width: 100%;
   height: 100%;
   border-radius: 5px;
-  display: flex;
   flex-direction: column;
   overflow: hidden;
   border-top-left-radius: 0;
@@ -141,7 +140,8 @@ input,
 select,
 table,
 button,
-a {
+a,
+form {
   outline: none;
 }
 

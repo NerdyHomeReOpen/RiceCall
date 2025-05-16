@@ -815,7 +815,7 @@ export const PopupSize = {
   [PopupType.DIALOG_ERROR]: { height: 200, width: 370 },
   [PopupType.DIALOG_INFO]: { height: 200, width: 370 },
   [PopupType.ANTHOR_DEVICE_LOGIN]: { height: 200, width: 370 },
-  [PopupType.CHANGE_THEME]: { height: 520, width: 600 },
+  [PopupType.CHANGE_THEME]: { height: 370, width: 480 },
   Settings: { height: 520, width: 600 },
   Apply: { height: 320, width: 500 },
   Small: { height: 200, width: 370 },

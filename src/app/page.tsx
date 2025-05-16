@@ -111,6 +111,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
     ipcService.initialData.onRequest('systemSetting', {});
   };
 
+  const handleOpenChangeTheme = () => {
+    ipcService.popup.open(PopupType.CHANGE_THEME, 'changeTheme');
+    ipcService.initialData.onRequest('changeTheme', {});
+  };
+
   const handleLogout = () => {
     authService.logout();
   };
@@ -254,7 +259,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
                 //   id: 'change-theme',
                 //   label: lang.tr.changeTheme,
                 //   icon: 'skin',
-                //   onClick: () => {},
+                //   onClick: () => handleOpenChangeTheme(),
                 // },
                 {
                   id: 'feedback',

@@ -29,6 +29,7 @@ import ApplyMember from '@/components/popups/ApplyMember';
 import DirectMessage from '@/components/popups/DirectMessage';
 import SearchUser from '@/components/popups/SearchUser';
 import Dialog from '@/components/popups/Dialog';
+import ChangeTheme from '@/components/popups/ChangeTheme';
 
 // Services
 import ipcService from '@/services/ipc.service';
