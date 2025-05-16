@@ -80,7 +80,7 @@
   flex-direction: column;
   justify-content: space-around;
   position: relative;
-  color: #515151;
+  color: #777777;
 }
 
 .baseInfoBox .container {
@@ -102,10 +102,9 @@
 
 .name {
   display: -webkit-box;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  color: #666666;
 }
 
 .idText,
@@ -379,7 +378,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #777;
+  color: #878787;
 }
 
 .userTab .userTabName.member {
