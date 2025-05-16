@@ -5,21 +5,16 @@
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-v0.1.8-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.1.9-green"/>
   </div>
 </div>
 
 This project is tested with BrowserStack
 
-## v0.1.8 更新日誌 (Change Log)
+## v0.1.9 更新日誌 (Change Log)
 
-- 新增切換音效選項
-- 新增 Esc 關閉彈出視窗功能
-- 改善中華電信連線問題
-- 改善音效播放邏輯
-- 修復切換語音群時未清空訊息列
-- 修復個人檔案頁面版面問題
-- 修復私聊介面非好友頭像顏色不正確問題
+- 修復系統設定點擊確認會導致軟體錯誤
+- 修復創群時的不正常行為
 
 ## 安裝方法
 
