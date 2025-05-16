@@ -387,21 +387,22 @@ export const CreateServerHandler = {
         createdAt: Date.now(),
       });
 
-      // Create member
-      await database.set.member(operatorId, serverId, {
-        permissionLevel: 6,
-        createdAt: Date.now(),
-      });
-
-      // Create user-server
+      // Update user-server
       await database.set.userServer(operatorId, serverId, {
         owned: true,
       });
 
-      // Update Server (lobby)
+      // Update server (lobby)
       await database.set.server(serverId, {
         lobbyId,
         receptionLobbyId: lobbyId,
+      });
+
+      // Create member
+      await CreateMemberHandler.handle(io, socket, {
+        userId: operatorId,
+        serverId,
+        member: { permissionLevel: 6 },
       });
 
       // Join the server
