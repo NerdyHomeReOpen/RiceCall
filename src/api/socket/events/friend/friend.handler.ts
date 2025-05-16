@@ -23,6 +23,7 @@ import { DataValidator } from '@/middleware/data.validator';
 import { database } from '@/index';
 import { SocketRequestHandler } from '@/handler';
 import { biDirectionalAsyncOperation } from '@/utils';
+import AlreadyFriendError from '@/errors/AlreadyFriendError';
 
 enum FriendDatabaseOperator {
   SET = 'set',
@@ -39,6 +40,44 @@ async function operateFriendBiDirection(usersId: string[], operator: FriendDatab
   }
   
   await biDirectionalAsyncOperation(dbExec, usersId);
+}
+
+
+export const ServerSideOperate = {
+  // 本函式應呼叫於雙向 FriendApplication 偵測到時(在處理新的 FriendApplication 時，發現已經有來自對方的 FriendApplication)
+  // 所以 userId1 和 userId2 此時一定存在並且[還不是好友] ([]內之條件只存在新版狀況下，在舊版 client 主導的操作邏輯上仍然需要判斷兩者是否為好友)
+  // 由於 FriendApplication 已經避免自我加好友，所以這邊保證 userId1 !== userId2
+  createFriend: async (userId1: string, userId2: string) => {
+
+    // == the logic is for old version friend application support, should remove in future ==
+    const friend = await database.get.friend(userId1, userId2);
+    if (friend) throw new AlreadyFriendError(userId1, userId2);
+    // == end of the old version compatibility logic ==
+
+
+    await operateFriendBiDirection([userId1, userId2], FriendDatabaseOperator.SET, {
+      createdAt: Date.now(),
+      friend: {
+        firendGroup: null
+      }
+    });
+    
+    const emitEvent = async (userId: string, targetId: string) => {
+      const targetSocket = SocketServer.getSocket(targetId);
+      if (targetSocket) {
+        targetSocket.emit(
+          'friendAdd',
+          await database.get.userFriend(targetId, userId),
+        );
+      }
+    }
+    await biDirectionalAsyncOperation(emitEvent, [userId1, userId2]);
+    
+    new Logger('CreateFriend').info(
+      `Friend peer (${userId1}, ${userId2}) created`,
+    );
+    
+  }
 }
 
 export const CreateFriendHandler : SocketRequestHandler = {
