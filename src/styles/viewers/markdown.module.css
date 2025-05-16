@@ -64,9 +64,9 @@
   margin-inline: 0;
   padding: 0.25rem;
   color: #4f545c;
-  border-left: 4px solid #c7ccd1;
+  border-left: 4px solid #00000020;
   border-radius: 0 4px 4px 0;
-  background: rgba(79, 84, 92, 0.05);
+  background: #00000005;
 }
 
 /* inline code */
@@ -77,8 +77,7 @@
   margin-inline: 0;
   padding: 0.125rem 0.25rem;
   border-radius: 4px;
-  color: #f1f5f9;
-  background: #222;
+  background: #00000015;
 }
 
 /* block code */
@@ -167,8 +166,7 @@
 .markdownContent .codeWrapper {
   padding: 0.5rem;
   border-radius: 4px;
-  color: #f1f5f9;
-  background: #222;
+  background: #00000015;
   font-family: monospace !important;
 }
 
@@ -191,10 +189,9 @@
   top: 0.3rem;
   right: 0.3rem;
   padding: 0.15rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #00000005;
+  border: 1px solid #00000020;
   border-radius: 4px;
-  color: #fff;
   cursor: pointer;
   transition: all 0.2s;
   font-family: monospace;
@@ -203,7 +200,7 @@
 }
 
 .copyButton:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #00000010;
 }
 
 .markdownContent pre:hover .copyButton {

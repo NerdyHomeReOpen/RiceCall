@@ -13,7 +13,7 @@ import hljs from 'highlight.js';
 import emojis from '@/components/emojis';
 
 // CSS
-import 'highlight.js/styles/github-dark.css';
+import 'highlight.js/styles/github.css';
 import markdown from '@/styles/viewers/markdown.module.css';
 
 // Providers
