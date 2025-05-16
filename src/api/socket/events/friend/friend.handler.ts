@@ -22,17 +22,22 @@ import { DataValidator } from '@/middleware/data.validator';
 // Database
 import { database } from '@/index';
 import { SocketRequestHandler } from '@/handler';
+import { biDirectionalAsyncOperation } from '@/utils';
 
-async function createFriendBiRecord(userId1: string, userId2: string, preset: any) {
+enum FriendDatabaseOperator {
+  SET = 'set',
+  DELETE = 'delete',
+}
+
+async function operateFriendBiDirection(usersId: string[], operator: FriendDatabaseOperator, preset: any) {
   let dbExec = async (a: string, b: string) => {
-    await database.set.friend(a, b, {
+    await database[operator].friend(a, b, {
       ...preset,
       createdAt: Date.now(),
     });
   }
   
-  await dbExec(userId1, userId2);
-  await dbExec(userId2, userId1);
+  await biDirectionalAsyncOperation(dbExec, usersId);
 }
 
 export const CreateFriendHandler : SocketRequestHandler = {
@@ -71,7 +76,7 @@ export const CreateFriendHandler : SocketRequestHandler = {
 
       /* ========== Start of Main Logic ========== */
 
-      await createFriendBiRecord(userId, targetId, preset);
+      await operateFriendBiDirection([userId, targetId], FriendDatabaseOperator.SET, preset);
 
       const targetSocket = SocketServer.getSocket(targetId);
 
@@ -187,12 +192,7 @@ export const DeleteFriendHandler : SocketRequestHandler = {
       }
 
       /* ========== Start of Main Logic ========== */
-
-      // Delete friend
-      await database.delete.friend(userId, targetId);
-
-      // Delete friend (reverse)
-      await database.delete.friend(targetId, userId);
+      await operateFriendBiDirection([userId, targetId], FriendDatabaseOperator.DELETE, {});
 
       // Send socket event
       const targetSocket = SocketServer.getSocket(targetId);

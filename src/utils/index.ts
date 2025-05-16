@@ -14,3 +14,8 @@ export const generateUniqueDisplayId = async (baseId = 20000000) => {
 
   return displayId;
 };
+
+export async function biDirectionalAsyncOperation(func: (arg0: any, arg1: any) => Promise<void>, args: any[]) {
+  await func(args[0], args[1]);
+  await func(args[1], args[0]);
+}
