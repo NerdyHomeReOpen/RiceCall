@@ -31,8 +31,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
+import { SocketRequestHandler } from '@/handler';
 
-export const SearchServerHandler = {
+export const SearchServerHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -68,7 +69,7 @@ export const SearchServerHandler = {
   },
 };
 
-export const ConnectServerHandler = {
+export const ConnectServerHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -234,7 +235,7 @@ export const ConnectServerHandler = {
   },
 };
 
-export const DisconnectServerHandler = {
+export const DisconnectServerHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -334,7 +335,7 @@ export const DisconnectServerHandler = {
   },
 };
 
-export const CreateServerHandler = {
+export const CreateServerHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -434,7 +435,7 @@ export const CreateServerHandler = {
   },
 };
 
-export const UpdateServerHandler = {
+export const UpdateServerHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -493,7 +494,7 @@ export const UpdateServerHandler = {
   },
 };
 
-export const FavoriteServerHandler = {
+export const FavoriteServerHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

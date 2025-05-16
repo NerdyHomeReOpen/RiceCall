@@ -21,8 +21,21 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
+import { SocketRequestHandler } from '@/handler';
 
-export const CreateFriendHandler = {
+async function createFriendBiRecord(userId1: string, userId2: string, preset: any) {
+  let dbExec = async (a: string, b: string) => {
+    await database.set.friend(a, b, {
+      ...preset,
+      createdAt: Date.now(),
+    });
+  }
+  
+  await dbExec(userId1, userId2);
+  await dbExec(userId2, userId1);
+}
+
+export const CreateFriendHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -58,17 +71,7 @@ export const CreateFriendHandler = {
 
       /* ========== Start of Main Logic ========== */
 
-      // Create friend
-      await database.set.friend(userId, targetId, {
-        ...preset,
-        createdAt: Date.now(),
-      });
-
-      // Create friend (reverse)
-      await database.set.friend(targetId, userId, {
-        ...preset,
-        createdAt: Date.now(),
-      });
+      await createFriendBiRecord(userId, targetId, preset);
 
       const targetSocket = SocketServer.getSocket(targetId);
 
@@ -104,7 +107,7 @@ export const CreateFriendHandler = {
   },
 };
 
-export const UpdateFriendHandler = {
+export const UpdateFriendHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -159,7 +162,7 @@ export const UpdateFriendHandler = {
   },
 };
 
-export const DeleteFriendHandler = {
+export const DeleteFriendHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

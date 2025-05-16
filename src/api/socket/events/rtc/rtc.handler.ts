@@ -15,8 +15,9 @@ import {
 
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
+import { SocketRequestHandler } from '@/handler';
 
-export const RTCOfferHandler = {
+export const RTCOfferHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -57,7 +58,7 @@ export const RTCOfferHandler = {
   },
 };
 
-export const RTCAnswerHandler = {
+export const RTCAnswerHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -98,7 +99,7 @@ export const RTCAnswerHandler = {
   },
 };
 
-export const RTCCandidateHandler = {
+export const RTCCandidateHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

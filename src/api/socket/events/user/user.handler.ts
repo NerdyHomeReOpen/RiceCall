@@ -21,8 +21,9 @@ import { DataValidator } from '@/middleware/data.validator';
 
 // Database
 import { database } from '@/index';
+import { SocketRequestHandler } from '@/handler';
 
-export const SearchUserHandler = {
+export const SearchUserHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -58,7 +59,7 @@ export const SearchUserHandler = {
   },
 };
 
-export const ConnectUserHandler = {
+export const ConnectUserHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket) {
     try {
       /* ========== Start of Handling ========== */
@@ -112,7 +113,7 @@ export const ConnectUserHandler = {
   },
 };
 
-export const DisconnectUserHandler = {
+export const DisconnectUserHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket) {
     try {
       /* ========== Start of Handling ========== */
@@ -161,7 +162,7 @@ export const DisconnectUserHandler = {
   },
 };
 
-export const UpdateUserHandler = {
+export const UpdateUserHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

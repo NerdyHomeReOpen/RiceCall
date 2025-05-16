@@ -28,8 +28,9 @@ import { database } from '@/index';
 
 // Systems
 import xpSystem from '@/systems/xp';
+import { SocketRequestHandler } from '@/handler';
 
-export const ConnectChannelHandler = {
+export const ConnectChannelHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -183,7 +184,7 @@ export const ConnectChannelHandler = {
   },
 };
 
-export const DisconnectChannelHandler = {
+export const DisconnectChannelHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -281,7 +282,7 @@ export const DisconnectChannelHandler = {
   },
 };
 
-export const CreateChannelHandler = {
+export const CreateChannelHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -367,7 +368,7 @@ export const CreateChannelHandler = {
   },
 };
 
-export const UpdateChannelHandler = {
+export const UpdateChannelHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -548,7 +549,7 @@ export const UpdateChannelHandler = {
   },
 };
 
-export const UpdateChannelsHandler = {
+export const UpdateChannelsHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -590,7 +591,7 @@ export const UpdateChannelsHandler = {
   },
 };
 
-export const DeleteChannelHandler = {
+export const DeleteChannelHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

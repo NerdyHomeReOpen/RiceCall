@@ -1,14 +1,14 @@
-import { Handler } from '@/handler';
+import { RequestHandler } from '@/handler';
 import { ResponseType } from '..';
 import RouteNotFoundError from '@/errors/RouteNotFoundError';
 
 interface PostRoutes {
-  [key: string]: Handler;
+  [key: string]: RequestHandler;
 }
 
 export class PostRouters {
   static routes: PostRoutes = {};
-  static addRoute(path: string, handler: Handler): void {
+  static addRoute(path: string, handler: RequestHandler): void {
     if (PostRouters.routes[path]) {
       throw new Error(`Route already exists: ${path}`);
     }
