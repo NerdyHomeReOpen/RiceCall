@@ -577,12 +577,12 @@ export default class Database {
   get = {
     all: async (querys: string) => {
       try {
-        if (!querys) return null;
+        if (!querys) return [];
         const datas = await this.query(
           `SELECT * 
           FROM ${querys}`,
         );
-        if (!datas || datas.length === 0) return null;
+        if (!datas || datas.length === 0) return [];
         return datas.map((data) => convertToCamelCase(data));
       } catch (error: any) {
         throw new Error(`Error getting ${querys}: ${error.message}`);
@@ -652,7 +652,7 @@ export default class Database {
 
     userBadges: async (userId: string) => {
       try {
-        if (!userId) return null;
+        if (!userId) return [];
         const datas = await this.query(
           `SELECT 
             user_badges.*,
@@ -673,7 +673,7 @@ export default class Database {
 
     userFriendGroups: async (userId: string) => {
       try {
-        if (!userId) return null;
+        if (!userId) return [];
         const datas = await this.query(
           `SELECT 
             friend_groups.*
@@ -693,7 +693,7 @@ export default class Database {
 
     userServer: async (userId: string, serverId: string) => {
       try {
-        if (!userId || !serverId) return null;
+        if (!userId || !serverId) return [];
         const datas = await this.query(
           `SELECT 
             user_servers.*,
@@ -727,7 +727,7 @@ export default class Database {
 
     userServers: async (userId: string) => {
       try {
-        if (!userId) return null;
+        if (!userId) return [];
         const datas = await this.query(
           `SELECT 
             user_servers.*,
@@ -805,7 +805,7 @@ export default class Database {
 
     userFriends: async (userId: string) => {
       try {
-        if (!userId) return null;
+        if (!userId) return [];
         const datas = await this.query(
           `SELECT 
             f.user_id AS friend_user_id,
@@ -879,7 +879,7 @@ export default class Database {
 
     userFriendApplications: async (userId: string) => {
       try {
-        if (!userId) return null;
+        if (!userId) return [];
         const datas = await this.query(
           `SELECT 
             friend_applications.created_at AS friend_application_created_at,
@@ -946,7 +946,7 @@ export default class Database {
 
     serverChannels: async (serverId: string) => {
       try {
-        if (!serverId) return null;
+        if (!serverId) return [];
         const datas = await this.query(
           `SELECT 
             channels.*
@@ -1004,7 +1004,7 @@ export default class Database {
 
     serverOnlineMembers: async (serverId: string) => {
       try {
-        if (!serverId) return null;
+        if (!serverId) return [];
         const datas = await this.query(
           `SELECT 
             m.created_at AS member_created_at,
@@ -1043,7 +1043,7 @@ export default class Database {
 
     serverMembers: async (serverId: string) => {
       try {
-        if (!serverId) return null;
+        if (!serverId) return [];
         const datas = await this.query(
           `SELECT 
             m.created_at AS member_created_at,
@@ -1111,7 +1111,7 @@ export default class Database {
 
     serverMemberApplications: async (serverId: string) => {
       try {
-        if (!serverId) return null;
+        if (!serverId) return [];
         const datas = await this.query(
           `SELECT 
             member_applications.created_at AS member_application_created_at,
@@ -1139,26 +1139,6 @@ export default class Database {
       }
     },
 
-    category: async (categoryId: string) => {
-      try {
-        if (!categoryId) return null;
-        const datas = await this.query(
-          `SELECT 
-            categories.*
-          FROM categories 
-          WHERE categories.category_id = ?
-          ORDER BY categories.\`order\`, categories.created_at DESC`,
-          [categoryId],
-        );
-        if (!datas || datas.length === 0) return null;
-        return convertToCamelCase(datas[0]);
-      } catch (error: any) {
-        throw new Error(
-          `Error getting category.${categoryId}: ${error.message}`,
-        );
-      }
-    },
-
     channel: async (channelId: string) => {
       try {
         if (!channelId) return null;
@@ -1179,7 +1159,7 @@ export default class Database {
 
     channelChildren: async (channelId: string) => {
       try {
-        if (!channelId) return null;
+        if (!channelId) return [];
         const datas = await this.query(
           `SELECT 
             channels.*
@@ -1199,7 +1179,7 @@ export default class Database {
 
     channelUsers: async (channelId: string) => {
       try {
-        if (!channelId) return null;
+        if (!channelId) return [];
         const datas = await this.query(
           `SELECT 
             users.*
@@ -1240,7 +1220,7 @@ export default class Database {
 
     friendGroupFriends: async (friendGroupId: string) => {
       try {
-        if (!friendGroupId) return null;
+        if (!friendGroupId) return [];
         const datas = await this.query(
           `SELECT 
             friends.*
