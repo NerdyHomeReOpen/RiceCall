@@ -836,9 +836,9 @@ app.on('ready', async () => {
   ipcMain.on('get-system-settings', (event) => {
     const settings = {
       autoLaunch: isAutoLaunchEnabled(),
-      soundEffect: store.get('soundEffect'),
-      inputAudioDevice: store.get('audioInputDevice'),
-      outputAudioDevice: store.get('audioOutputDevice'),
+      soundEffect: store.get('soundEffect') || true,
+      inputAudioDevice: store.get('audioInputDevice') || '',
+      outputAudioDevice: store.get('audioOutputDevice') || '',
     };
     event.reply('system-settings-status', settings);
   });
@@ -848,15 +848,21 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-sound-effect', (event) => {
-    event.reply('sound-effect-status', store.get('soundEffect'));
+    event.reply('sound-effect-status', store.get('soundEffect') || true);
   });
 
   ipcMain.on('get-input-audio-device', (event) => {
-    event.reply('input-audio-device-status', store.get('audioInputDevice'));
+    event.reply(
+      'input-audio-device-status',
+      store.get('audioInputDevice') || '',
+    );
   });
 
   ipcMain.on('get-output-audio-device', (event) => {
-    event.reply('output-audio-device-status', store.get('audioOutputDevice'));
+    event.reply(
+      'output-audio-device-status',
+      store.get('audioOutputDevice') || '',
+    );
   });
 
   ipcMain.on('set-auto-launch', (_, enable) => {
@@ -864,21 +870,21 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-sound-effect', (_, enable) => {
-    store.set('soundEffect', enable);
+    store.set('soundEffect', enable || true);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('sound-effect-status', enable);
     });
   });
 
   ipcMain.on('set-input-audio-device', (_, deviceId) => {
-    store.set('audioInputDevice', deviceId);
+    store.set('audioInputDevice', deviceId || '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('input-audio-device-status', deviceId);
     });
   });
 
   ipcMain.on('set-output-audio-device', (_, deviceId) => {
-    store.set('audioOutputDevice', deviceId);
+    store.set('audioOutputDevice', deviceId || '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('output-audio-device-status', deviceId);
     });
