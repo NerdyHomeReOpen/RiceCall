@@ -43,10 +43,15 @@ async function operateFriendBiDirection(usersId: string[], operator: FriendDatab
 }
 
 
-export const ServerSideOperate = {
-  // 本函式應呼叫於雙向 FriendApplication 偵測到時(在處理新的 FriendApplication 時，發現已經有來自對方的 FriendApplication)
-  // 所以 userId1 和 userId2 此時一定存在並且[還不是好友] ([]內之條件只存在新版狀況下，在舊版 client 主導的操作邏輯上仍然需要判斷兩者是否為好友)
-  // 由於 FriendApplication 已經避免自我加好友，所以這邊保證 userId1 !== userId2
+export const CreateFriendHandlerServerSide = {
+  // 本函式觸發條件:
+  // 1. 應呼叫於雙向 FriendApplication 偵測到時(在處理新的 FriendApplication 時，發現已經有來自對方的 FriendApplication) (好友分組設為 null)
+  // 2. 應呼叫於處理 FriendApplicationApproval 時 
+
+  // 觸發條件1保證 userId1 和 userId2 此時一定存在並且[還不是好友] (舊版 client 主導的操作邏輯上仍然需要判斷兩者是否為好友)
+  // 觸發條件1保證 userId1 !== userId2
+  // 觸發條件2(尚未實做)保證 userId1 和 userId2 皆存在並且還不是好友
+  // 觸發條件2(尚未實做)userId1 !== userId2
   createFriend: async (userId1: string, userId2: string) => {
 
     // == the logic is for old version friend application support, should remove in future ==
