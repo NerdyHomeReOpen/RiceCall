@@ -2,12 +2,20 @@ import { Server, Socket } from 'socket.io';
 
 // Error
 import StandardizedError from '@/error';
+import AlreadyFriendError from '@/errors/AlreadyFriendError';
+import FriendNotFoundError from '@/errors/FriendNotFoundError';
+import FriendGroupNotFoundError from '@/errors/FriendGroupNotFoundError';
 
 // Utils
 import Logger from '@/utils/logger';
+import { biDirectionalAsyncOperation } from '@/utils';
 
 // Socket
 import SocketServer from '@/api/socket';
+import { SocketRequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
 
 // Schemas
 import {
@@ -19,56 +27,55 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-import { SocketRequestHandler } from '@/handler';
-import { biDirectionalAsyncOperation } from '@/utils';
-import AlreadyFriendError from '@/errors/AlreadyFriendError';
-import FriendNotFoundError from '@/errors/FriendNotFoundError';
-import FriendGroupNotFoundError from '@/errors/FriendGroupNotFoundError';
-
 enum FriendDatabaseOperator {
   SET = 'set',
   DELETE = 'delete',
 }
 
-async function operateFriendBiDirection(usersId: string[], operator: FriendDatabaseOperator, preset: any) {
+async function operateFriendBiDirection(
+  usersId: string[],
+  operator: FriendDatabaseOperator,
+  preset: any,
+) {
   let dbExec = async (a: string, b: string) => {
-    if (operator === FriendDatabaseOperator.SET) await database[operator].friend(a, b, {
-      ...preset,
-      createdAt: Date.now(),
-    });
-    if (operator === FriendDatabaseOperator.DELETE) await database[operator].friend(a, b);
-  }
-  
+    if (operator === FriendDatabaseOperator.SET)
+      await database[operator].friend(a, b, {
+        ...preset,
+        createdAt: Date.now(),
+      });
+    if (operator === FriendDatabaseOperator.DELETE)
+      await database[operator].friend(a, b);
+  };
+
   await biDirectionalAsyncOperation(dbExec, usersId);
 }
-
 
 export const FriendHandlerServerSide = {
   // 本函式觸發條件:
   // 1. 應呼叫於雙向 FriendApplication 偵測到時(在處理新的 FriendApplication 時，發現已經有來自對方的 FriendApplication) (好友分組設為 null)
-  // 2. 應呼叫於處理 FriendApproval 時 
+  // 2. 應呼叫於處理 FriendApproval 時
 
   // 觸發條件1保證 userId1 和 userId2 此時一定存在並且[還不是好友] (舊版 client 主導的操作邏輯上仍然需要判斷兩者是否為好友)
   // 觸發條件1保證 userId1 !== userId2
   // 觸發條件2保證 userId1 和 userId2 皆存在並且還不是好友
   // 觸發條件2保證 userId1 !== userId2
   createFriend: async (userId1: string, userId2: string) => {
-
     // == the logic is for old version friend application support, should remove in future ==
     const friend = await database.get.friend(userId1, userId2);
     if (friend) throw new AlreadyFriendError(userId1, userId2);
     // == end of the old version compatibility logic ==
 
+    await operateFriendBiDirection(
+      [userId1, userId2],
+      FriendDatabaseOperator.SET,
+      {
+        createdAt: Date.now(),
+        friend: {
+          firendGroup: null,
+        },
+      },
+    );
 
-    await operateFriendBiDirection([userId1, userId2], FriendDatabaseOperator.SET, {
-      createdAt: Date.now(),
-      friend: {
-        firendGroup: null
-      }
-    });
-    
     const emitEvent = async (userId: string, targetId: string) => {
       const targetSocket = SocketServer.getSocket(targetId);
       if (targetSocket) {
@@ -77,31 +84,33 @@ export const FriendHandlerServerSide = {
           await database.get.userFriend(targetId, userId),
         );
       }
-    }
+    };
     await biDirectionalAsyncOperation(emitEvent, [userId1, userId2]);
-    
+
     new Logger('CreateFriend').info(
       `Friend peer (${userId1}, ${userId2}) created`,
     );
   },
 
-  updateFriendGroup: async (userId: string, targetId: string, friendGroupId: string) => {
+  updateFriendGroup: async (
+    userId: string,
+    targetId: string,
+    friendGroupId: string,
+  ) => {
     const friend = await database.get.friend(userId, targetId);
     if (!friend) throw new FriendNotFoundError(userId, targetId);
 
     const friendGroup = await database.get.friendGroup(friendGroupId);
     if (!friendGroup) throw new FriendGroupNotFoundError(friendGroupId);
-    
+
     await database.set.friend(userId, targetId, {
       ...friend,
       friendGroupId,
     });
-  }
+  },
+};
 
-
-}
-
-export const CreateFriendHandler : SocketRequestHandler = {
+export const CreateFriendHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -137,7 +146,11 @@ export const CreateFriendHandler : SocketRequestHandler = {
 
       /* ========== Start of Main Logic ========== */
 
-      await operateFriendBiDirection([userId, targetId], FriendDatabaseOperator.SET, preset);
+      await operateFriendBiDirection(
+        [userId, targetId],
+        FriendDatabaseOperator.SET,
+        preset,
+      );
 
       const targetSocket = SocketServer.getSocket(targetId);
 
@@ -173,7 +186,7 @@ export const CreateFriendHandler : SocketRequestHandler = {
   },
 };
 
-export const UpdateFriendHandler : SocketRequestHandler = {
+export const UpdateFriendHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -228,7 +241,7 @@ export const UpdateFriendHandler : SocketRequestHandler = {
   },
 };
 
-export const DeleteFriendHandler : SocketRequestHandler = {
+export const DeleteFriendHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -253,7 +266,11 @@ export const DeleteFriendHandler : SocketRequestHandler = {
       }
 
       /* ========== Start of Main Logic ========== */
-      await operateFriendBiDirection([userId, targetId], FriendDatabaseOperator.DELETE, {});
+      await operateFriendBiDirection(
+        [userId, targetId],
+        FriendDatabaseOperator.DELETE,
+        {},
+      );
 
       // Send socket event
       const targetSocket = SocketServer.getSocket(targetId);

@@ -4,18 +4,18 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
-// Types
+// Http
+import { RequestHandler } from '@/handler';
 import { ResponseType } from '@/api/http';
+
+// Database
+import { database } from '@/index';
 
 // Schemas
 import { RefreshServerSchema } from './refreshServer.schema';
 
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
-
-// Database
-import { database } from '@/index';
-import { RequestHandler } from '@/handler';
 
 export const RefreshServerHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {

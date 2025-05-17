@@ -8,6 +8,10 @@ import Logger from '@/utils/logger';
 
 // Socket
 import SocketServer from '@/api/socket';
+import { SocketRequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
 
 // Schemas
 import {
@@ -19,11 +23,7 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-import { SocketRequestHandler } from '@/handler';
-
-export const SendMessageHandler : SocketRequestHandler = {
+export const SendMessageHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -110,7 +110,7 @@ export const SendMessageHandler : SocketRequestHandler = {
   },
 };
 
-export const SendDirectMessageHandler : SocketRequestHandler = {
+export const SendDirectMessageHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -183,7 +183,7 @@ export const SendDirectMessageHandler : SocketRequestHandler = {
   },
 };
 
-export const ShakeWindowHandler : SocketRequestHandler = {
+export const ShakeWindowHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

@@ -3,17 +3,18 @@ import { IncomingForm } from 'formidable';
 
 // Error
 import StandardizedError from '@/error';
+import RouteNotFoundError from '@/errors/RouteNotFoundError';
 
 // Utils
 import Logger from '@/utils/logger';
 
 // Handlers
-
 import { ImagesHandler } from './routers/images/images.handler';
 import { UploadHandler } from './routers/upload/upload.handler';
-import { PostRouters } from './routers/PostRouters';
+
+// Routers
+import { PostRouters } from './PostRouters';
 import routesInitializer from './routers/routes';
-import RouteNotFoundError from '@/errors/RouteNotFoundError';
 
 export type ResponseType = {
   statusCode: number;

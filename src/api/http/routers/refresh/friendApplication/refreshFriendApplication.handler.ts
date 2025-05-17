@@ -4,8 +4,12 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
-// Types
+// Http
 import { ResponseType } from '@/api/http';
+import { RequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
 
 // Schemas
 import { RefreshFriendApplicationSchema } from './refreshFriendApplication.schema';
@@ -13,10 +17,7 @@ import { RefreshFriendApplicationSchema } from './refreshFriendApplication.schem
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-
-export const RefreshFriendApplicationHandler = {
+export const RefreshFriendApplicationHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { senderId, receiverId } = await DataValidator.validate(

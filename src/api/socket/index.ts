@@ -11,15 +11,14 @@ import { AuthValidator } from '@/middleware/auth.validator';
 import {
   ConnectUserHandler,
   DisconnectUserHandler,
-  SearchUserHandler,
-  UpdateUserHandler,
 } from '@/api/socket/events/user/user.handler';
+
 // Logger
 import Logger from '@/utils/logger';
+
+// Routes
 import { EventRouters } from './EventRoutes';
-
 import EventRouteInitializer from './events/routes';
-
 
 export default class SocketServer {
   static io: Server;
@@ -76,17 +75,7 @@ export default class SocketServer {
 
         return next();
       } catch (error: any) {
-        if (!(error instanceof StandardizedError)) {
-          new Logger('SocketServer').error(error.message);
-
-          error = new StandardizedError({
-            name: 'ServerError',
-            message: `驗證失敗，請稍後再試`,
-            part: 'AUTH',
-            tag: 'EXCEPTION_ERROR',
-            statusCode: 500,
-          });
-        }
+        new Logger('SocketServer').error(error.message);
 
         socket.emit('openPopup', {
           type: 'dialogAlert',
@@ -119,7 +108,6 @@ export default class SocketServer {
 
       // 路由定義已改到 ./events/routes.ts
       EventRouteInitializer(new EventRouters(io, socket));
-      
 
       // Echo
       socket.on('ping', async () => {

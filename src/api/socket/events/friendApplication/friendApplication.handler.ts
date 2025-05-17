@@ -2,12 +2,18 @@ import { Server, Socket } from 'socket.io';
 
 // Error
 import StandardizedError from '@/error';
+import AlreadyFriendError from '@/errors/AlreadyFriendError';
+import FriendApplicationNotFoundError from '@/errors/FriendApplicationNotFoundError';
 
 // Utils
 import Logger from '@/utils/logger';
 
 // Socket
 import SocketServer from '@/api/socket';
+import { SocketRequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
 
 // Schemas
 import {
@@ -20,14 +26,9 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-import { SocketRequestHandler } from '@/handler';
 import { FriendHandlerServerSide } from '../friend/friend.handler';
-import AlreadyFriendError from '@/errors/AlreadyFriendError';
-import FriendApplicationNotFoundError from '@/errors/FriendApplicationNotFoundError';
 
-export const CreateFriendApplicationHandler : SocketRequestHandler = {
+export const CreateFriendApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -52,7 +53,7 @@ export const CreateFriendApplicationHandler : SocketRequestHandler = {
       );
       if (reverseFriendApplication) {
         new Logger('CreateFriendApplication').info(
-          `User(${senderId}) and User(${receiverId}) are already friends, creating friend application...`
+          `User(${senderId}) and User(${receiverId}) are already friends, creating friend application...`,
         );
         await FriendHandlerServerSide.createFriend(senderId, receiverId);
         return;
@@ -121,7 +122,7 @@ export const CreateFriendApplicationHandler : SocketRequestHandler = {
   },
 };
 
-export const UpdateFriendApplicationHandler : SocketRequestHandler = {
+export const UpdateFriendApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -191,7 +192,7 @@ export const UpdateFriendApplicationHandler : SocketRequestHandler = {
   },
 };
 
-export const DeleteFriendApplicationHandler : SocketRequestHandler = {
+export const DeleteFriendApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -253,56 +254,57 @@ export const DeleteFriendApplicationHandler : SocketRequestHandler = {
 };
 
 export const ApproveFriendApplicationHandler: SocketRequestHandler = {
-    async handle(io: Server, socket: Socket, data: any) {
-        try {
-            const operatorId = socket.data.userId;
+  async handle(io: Server, socket: Socket, data: any) {
+    try {
+      const operatorId = socket.data.userId;
 
-            const {
-                targetId,
-                friendGroupId,
-            } = await DataValidator.validate(
-                ApproveFriendApplicationSchema,
-                data,
-                'APPROVEFRIENDAPPLICATION',
-            );
+      const { targetId, friendGroupId } = await DataValidator.validate(
+        ApproveFriendApplicationSchema,
+        data,
+        'APPROVEFRIENDAPPLICATION',
+      );
 
-            new Logger('ApproveFriendApplication').info(
-                `User(${operatorId}) approve friend application(${targetId})`,
-            );
+      new Logger('ApproveFriendApplication').info(
+        `User(${operatorId}) approve friend application(${targetId})`,
+      );
 
-            const friendApplication = await database.get.friendApplication(
-                targetId,
-                operatorId,
-            );
-            if (!friendApplication) throw new FriendApplicationNotFoundError(targetId, operatorId);
+      const friendApplication = await database.get.friendApplication(
+        targetId,
+        operatorId,
+      );
+      if (!friendApplication)
+        throw new FriendApplicationNotFoundError(targetId, operatorId);
 
-            const friend = await database.get.friend(operatorId, targetId);
-            if (friend) throw new AlreadyFriendError(targetId, operatorId);
+      const friend = await database.get.friend(operatorId, targetId);
+      if (friend) throw new AlreadyFriendError(targetId, operatorId);
 
-            await FriendHandlerServerSide.createFriend(operatorId, targetId);
-            await database.delete.friendApplication(targetId, operatorId);
+      await FriendHandlerServerSide.createFriend(operatorId, targetId);
+      await database.delete.friendApplication(targetId, operatorId);
 
-            if (friendGroupId) await FriendHandlerServerSide.updateFriendGroup(operatorId, targetId, friendGroupId);
+      if (friendGroupId)
+        await FriendHandlerServerSide.updateFriendGroup(
+          operatorId,
+          targetId,
+          friendGroupId,
+        );
 
-            socket.emit('friendApproval', {
-                targetId
-            });
-        }
-        catch (error: any) {
-            if (!(error instanceof StandardizedError)) {
-                new Logger('FriendApproval').error(error.message);
+      socket.emit('friendApproval', {
+        targetId,
+      });
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        new Logger('FriendApproval').error(error.message);
 
-                error = new StandardizedError({
-                    name: 'ServerError',
-                    message: `處理好友申請失敗，請稍後再試`,
-                    part: 'FRIENDAPPROVAL',
-                    tag: 'EXCEPTION_ERROR',
-                    statusCode: 500,
-                });
-            }
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `處理好友申請失敗，請稍後再試`,
+          part: 'FRIENDAPPROVAL',
+          tag: 'EXCEPTION_ERROR',
+          statusCode: 500,
+        });
+      }
 
-            socket.emit('error', error);
-        }
-        
+      socket.emit('error', error);
     }
-}
+  },
+};

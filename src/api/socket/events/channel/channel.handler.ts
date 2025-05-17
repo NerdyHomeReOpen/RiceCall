@@ -9,6 +9,13 @@ import Logger from '@/utils/logger';
 
 // Socket
 import SocketServer from '@/api/socket';
+import { SocketRequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
+
+// Systems
+import xpSystem from '@/systems/xp';
 
 // Schemas
 import {
@@ -23,14 +30,7 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-
-// Systems
-import xpSystem from '@/systems/xp';
-import { SocketRequestHandler } from '@/handler';
-
-export const ConnectChannelHandler : SocketRequestHandler = {
+export const ConnectChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -184,7 +184,7 @@ export const ConnectChannelHandler : SocketRequestHandler = {
   },
 };
 
-export const DisconnectChannelHandler : SocketRequestHandler = {
+export const DisconnectChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -282,7 +282,7 @@ export const DisconnectChannelHandler : SocketRequestHandler = {
   },
 };
 
-export const CreateChannelHandler : SocketRequestHandler = {
+export const CreateChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -368,7 +368,7 @@ export const CreateChannelHandler : SocketRequestHandler = {
   },
 };
 
-export const UpdateChannelHandler : SocketRequestHandler = {
+export const UpdateChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -549,7 +549,7 @@ export const UpdateChannelHandler : SocketRequestHandler = {
   },
 };
 
-export const UpdateChannelsHandler : SocketRequestHandler = {
+export const UpdateChannelsHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -591,7 +591,7 @@ export const UpdateChannelsHandler : SocketRequestHandler = {
   },
 };
 
-export const DeleteChannelHandler : SocketRequestHandler = {
+export const DeleteChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

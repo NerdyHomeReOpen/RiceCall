@@ -8,6 +8,10 @@ import Logger from '@/utils/logger';
 
 // Socket
 import SocketServer from '@/api/socket';
+import { SocketRequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
 
 // Schemas
 import {
@@ -19,11 +23,7 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-import { SocketRequestHandler } from '@/handler';
-
-export const CreateMemberHandler : SocketRequestHandler = {
+export const CreateMemberHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -119,7 +119,7 @@ export const CreateMemberHandler : SocketRequestHandler = {
   },
 };
 
-export const UpdateMemberHandler : SocketRequestHandler = {
+export const UpdateMemberHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -225,7 +225,7 @@ export const UpdateMemberHandler : SocketRequestHandler = {
   },
 };
 
-export const DeleteMemberHandler : SocketRequestHandler = {
+export const DeleteMemberHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

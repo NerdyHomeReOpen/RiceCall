@@ -6,6 +6,12 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
+// Socket
+import { SocketRequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
+
 // Schemas
 import {
   CreateMemberApplicationSchema,
@@ -16,11 +22,7 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-import { SocketRequestHandler } from '@/handler';
-
-export const CreateMemberApplicationHandler : SocketRequestHandler = {
+export const CreateMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -93,7 +95,7 @@ export const CreateMemberApplicationHandler : SocketRequestHandler = {
   },
 };
 
-export const UpdateMemberApplicationHandler : SocketRequestHandler = {
+export const UpdateMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -163,7 +165,7 @@ export const UpdateMemberApplicationHandler : SocketRequestHandler = {
   },
 };
 
-export const DeleteMemberApplicationHandler : SocketRequestHandler = {
+export const DeleteMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

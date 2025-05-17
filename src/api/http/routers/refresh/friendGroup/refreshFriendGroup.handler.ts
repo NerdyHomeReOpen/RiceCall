@@ -4,8 +4,12 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
-// Types
+// Http
 import { ResponseType } from '@/api/http';
+import { RequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
 
 // Schemas
 import { RefreshFriendGroupSchema } from './refreshFriendGroup.schema';
@@ -13,10 +17,7 @@ import { RefreshFriendGroupSchema } from './refreshFriendGroup.schema';
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-
-export const RefreshFriendGroupHandler = {
+export const RefreshFriendGroupHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
     try {
       const { friendGroupId } = await DataValidator.validate(

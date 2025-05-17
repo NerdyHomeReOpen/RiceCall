@@ -10,6 +10,10 @@ import { generateUniqueDisplayId } from '@/utils';
 
 // Socket
 import SocketServer from '@/api/socket';
+import { SocketRequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
 
 // Handler
 import { ConnectChannelHandler } from '@/api/socket/events/channel/channel.handler';
@@ -29,11 +33,7 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-import { SocketRequestHandler } from '@/handler';
-
-export const SearchServerHandler : SocketRequestHandler = {
+export const SearchServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -69,7 +69,7 @@ export const SearchServerHandler : SocketRequestHandler = {
   },
 };
 
-export const ConnectServerHandler : SocketRequestHandler = {
+export const ConnectServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -235,7 +235,7 @@ export const ConnectServerHandler : SocketRequestHandler = {
   },
 };
 
-export const DisconnectServerHandler : SocketRequestHandler = {
+export const DisconnectServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -335,7 +335,7 @@ export const DisconnectServerHandler : SocketRequestHandler = {
   },
 };
 
-export const CreateServerHandler : SocketRequestHandler = {
+export const CreateServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -435,7 +435,7 @@ export const CreateServerHandler : SocketRequestHandler = {
   },
 };
 
-export const UpdateServerHandler : SocketRequestHandler = {
+export const UpdateServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -494,7 +494,7 @@ export const UpdateServerHandler : SocketRequestHandler = {
   },
 };
 
-export const FavoriteServerHandler : SocketRequestHandler = {
+export const FavoriteServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

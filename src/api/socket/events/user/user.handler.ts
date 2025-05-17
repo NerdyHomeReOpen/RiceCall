@@ -6,6 +6,12 @@ import Logger from '@/utils/logger';
 // Error
 import StandardizedError from '@/error';
 
+// Socket
+import { SocketRequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
+
 // Handler
 import { ConnectServerHandler } from '@/api/socket/events/server/server.handler';
 import { DisconnectServerHandler } from '@/api/socket/events/server/server.handler';
@@ -19,11 +25,7 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-import { SocketRequestHandler } from '@/handler';
-
-export const SearchUserHandler : SocketRequestHandler = {
+export const SearchUserHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -59,7 +61,7 @@ export const SearchUserHandler : SocketRequestHandler = {
   },
 };
 
-export const ConnectUserHandler : SocketRequestHandler = {
+export const ConnectUserHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket) {
     try {
       /* ========== Start of Handling ========== */
@@ -113,7 +115,7 @@ export const ConnectUserHandler : SocketRequestHandler = {
   },
 };
 
-export const DisconnectUserHandler : SocketRequestHandler = {
+export const DisconnectUserHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket) {
     try {
       /* ========== Start of Handling ========== */
@@ -162,7 +164,7 @@ export const DisconnectUserHandler : SocketRequestHandler = {
   },
 };
 
-export const UpdateUserHandler : SocketRequestHandler = {
+export const UpdateUserHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

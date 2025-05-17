@@ -7,8 +7,12 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
-// Types
+// Http
 import { ResponseType } from '@/api/http';
+import { RequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
 
 // Schemas
 import { RegisterSchema } from '@/api/http/routers/register/register.schema';
@@ -16,12 +20,8 @@ import { RegisterSchema } from '@/api/http/routers/register/register.schema';
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-
 // Config
 import { serverConfig } from '@/config';
-import { RequestHandler } from '@/handler';
 
 export const RegisterHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {

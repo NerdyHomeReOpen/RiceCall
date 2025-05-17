@@ -6,6 +6,9 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
+// Socket
+import { SocketRequestHandler } from '@/handler';
+
 // Schemas
 import {
   RTCOfferSchema,
@@ -15,9 +18,8 @@ import {
 
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
-import { SocketRequestHandler } from '@/handler';
 
-export const RTCOfferHandler : SocketRequestHandler = {
+export const RTCOfferHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -58,7 +60,7 @@ export const RTCOfferHandler : SocketRequestHandler = {
   },
 };
 
-export const RTCAnswerHandler : SocketRequestHandler = {
+export const RTCAnswerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -99,7 +101,7 @@ export const RTCAnswerHandler : SocketRequestHandler = {
   },
 };
 
-export const RTCCandidateHandler : SocketRequestHandler = {
+export const RTCCandidateHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

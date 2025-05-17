@@ -7,6 +7,12 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
+// Socket
+import { SocketRequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
+
 // Handler
 import { UpdateFriendHandler } from '@/api/socket/events/friend/friend.handler';
 
@@ -20,11 +26,7 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
-// Database
-import { database } from '@/index';
-import { SocketRequestHandler } from '@/handler';
-
-export const CreateFriendGroupHandler : SocketRequestHandler = {
+export const CreateFriendGroupHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -89,7 +91,7 @@ export const CreateFriendGroupHandler : SocketRequestHandler = {
   },
 };
 
-export const UpdateFriendGroupHandler : SocketRequestHandler = {
+export const UpdateFriendGroupHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */
@@ -150,7 +152,7 @@ export const UpdateFriendGroupHandler : SocketRequestHandler = {
   },
 };
 
-export const DeleteFriendGroupHandler : SocketRequestHandler = {
+export const DeleteFriendGroupHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     try {
       /* ========== Start of Handling ========== */

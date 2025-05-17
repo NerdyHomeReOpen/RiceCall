@@ -8,7 +8,7 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
-// Types
+// Http
 import { ResponseType } from '@/api/http';
 
 // Config

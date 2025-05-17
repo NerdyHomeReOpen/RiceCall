@@ -7,18 +7,18 @@ import StandardizedError from '@/error';
 import Logger from '@/utils/logger';
 import { generateJWT } from '@/utils/jwt';
 
-// Types
+// Http
 import { ResponseType } from '@/api/http';
+import { RequestHandler } from '@/handler';
+
+// Database
+import { database } from '@/index';
 
 // Schemas
 import { LoginSchema } from '@/api/http/routers/login/login.schema';
 
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
-
-// Database
-import { database } from '@/index';
-import { RequestHandler } from '@/handler';
 
 export const LoginHandler: RequestHandler = {
   async handle(data: any): Promise<ResponseType> {
