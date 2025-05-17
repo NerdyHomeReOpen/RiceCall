@@ -1,8 +1,10 @@
 .message {
-  padding: 5px;
+  padding: 8px;
   margin-bottom: 15px;
   background: #fff8dc;
   border: 1px solid #ffd700;
+  color: #666666;
+  font-size: 12px;
 }
 
 .typeLabel {
@@ -21,22 +23,25 @@
 .buttonGroup .button {
   width: 50%;
   padding: 10px;
-  border: 1px solid #ccc;
-  background: white;
+  border: 1px solid #e1e1e1;
+  background-image: linear-gradient(to bottom, #fffffa, #f4f4f4);
   cursor: pointer;
   border-radius: 4px;
   text-align: center;
 }
 
-.buttonGroup .button.selected {
-  background: #a7c0e9;
+.buttonGroup .button:hover {
+  border: 1px solid #cccccc;
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 15px;
+}
+
+.inputBox {
+  flex-direction: column;
 }
 
 .avatarWrapper {
@@ -58,4 +63,20 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inputDescription {
+  margin-top: 3px;
+  color: #666666;
+  font-size: 12px;
+}
+
+.labelText:after {
+  content: '：';
 }

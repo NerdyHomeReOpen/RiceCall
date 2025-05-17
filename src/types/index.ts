@@ -98,6 +98,7 @@ export interface Translation {
   save: string;
   modify: string;
   cancel: string;
+  created: string;
   next: string;
   previous: string;
   signaturePlaceholder: string;
@@ -806,7 +807,7 @@ export const PopupSize = {
   [PopupType.SERVER_SETTING]: { height: 520, width: 600 },
   [PopupType.SYSTEM_SETTING]: { height: 520, width: 600 },
   [PopupType.MEMBERAPPLY_SETTING]: { height: 200, width: 370 },
-  [PopupType.CREATE_SERVER]: { height: 460, width: 520 },
+  [PopupType.CREATE_SERVER]: { height: 436, width: 478 },
   [PopupType.CREATE_CHANNEL]: { height: 200, width: 370 },
   [PopupType.CREATE_FRIENDGROUP]: { height: 200, width: 370 },
   [PopupType.EDIT_CHANNEL_ORDER]: { height: 550, width: 500 },
