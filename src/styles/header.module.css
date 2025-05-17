@@ -333,6 +333,7 @@
   align-items: center;
   padding: 0 10px;
   gap: 5px;
+  color: #fff;
 }
 
 .titleBox::before {
@@ -357,7 +358,7 @@
   padding: 0px 2px;
   font-size: 12px;
   font-weight: bold;
-  color: inherit;
+  color: #000;
 }
 
 .nameBox:hover {
