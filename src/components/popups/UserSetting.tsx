@@ -347,8 +347,12 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               className={setting['tab']}
             >
               <div
-                className={`${setting['item']} ${setting['about']} ${
-                  selectedTabId === 'about' || selectedTabId === 'userSetting' ? setting['selected'] : ''
+                className={`${setting['item']} ${setting['about']}
+                ${
+                  selectedTabId === 'userSetting' ? `${setting['selected']} ${setting['editable']}` : ''
+                }
+                ${
+                  selectedTabId === 'about' ? setting['selected'] : ''
                 }`}
                 onClick={() => {
                   if (selectedTabId !== 'userSetting') {
@@ -359,7 +363,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                 {lang.tr.about}
               </div>
               <div
-                className={`${setting['item']} ${setting['groups']} ${
+                className={`${setting['item']} ${setting['groups']}
+                ${
+                  selectedTabId === 'userSetting' ? setting['editable'] : ''
+                }
+                ${
                   selectedTabId === 'groups' ? setting['selected'] : ''
                 }`}
                 onClick={() => {

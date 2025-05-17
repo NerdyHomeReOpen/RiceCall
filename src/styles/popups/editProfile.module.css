@@ -511,6 +511,10 @@
   cursor: pointer;
 }
 
+.userProfile .tab .item.editable {
+  cursor: not-allowed;
+}
+
 .userProfile .tab .item.about::before {
   content: '';
   min-height: 14px;
