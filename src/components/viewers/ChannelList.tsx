@@ -42,6 +42,8 @@ interface CategoryTabProps {
   serverChannels: (Channel | Category)[];
   expanded: Record<string, boolean>;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  selectedChannelId: string | null;
+  setSelectedChannelId: (id: string | null) => void;
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(
@@ -54,6 +56,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     serverChannels,
     expanded,
     setExpanded,
+    selectedChannelId,
+    setSelectedChannelId,
   }) => {
     // Hooks
     const lang = useLanguage();
@@ -243,7 +247,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         {/* Category View */}
         <div
           key={categoryId}
-          className={`${styles['channelTab']} `}
+          className={`${styles['channelTab']} ${
+            selectedChannelId === categoryId ? styles['selected'] : ''
+          }`}
+          onClick={() => setSelectedChannelId(categoryId)}
           onDoubleClick={() => {
             if (!canJoin) return;
             if (needPassword) {
@@ -367,6 +374,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 serverMembers={serverMembers}
                 expanded={expanded}
                 setExpanded={setExpanded}
+                selectedChannelId={selectedChannelId}
+                setSelectedChannelId={setSelectedChannelId}
               />
             ))}
         </div>
@@ -385,6 +394,8 @@ interface ChannelTabProps {
   serverMembers: ServerMember[];
   expanded: Record<string, boolean>;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  selectedChannelId: string | null;
+  setSelectedChannelId: (id: string | null) => void;
 }
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(
@@ -396,6 +407,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     serverMembers,
     expanded,
     setExpanded,
+    selectedChannelId,
+    setSelectedChannelId,
   }) => {
     // Hooks
     const lang = useLanguage();
@@ -581,12 +594,21 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           }));
     }, [channelId, setChannelExpanded, setExpanded, userInChannel]);
 
+    useEffect(() => {
+      if (currentChannel) {
+        setSelectedChannelId(currentChannel.channelId);
+      }
+    }, [currentChannel?.channelId]);
+
     return (
       <>
         {/* Channel View */}
         <div
           key={channelId}
-          className={`${styles['channelTab']} `}
+          className={`${styles['channelTab']} ${
+            selectedChannelId === channelId ? styles['selected'] : ''
+          }`}
+          onClick={() => setSelectedChannelId(channelId)}
           onDoubleClick={() => {
             if (!canJoin) return;
             if (needPassword) {
@@ -1204,6 +1226,9 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const [view, setView] = useState<'all' | 'current'>('all');
     const [latency, setLatency] = useState<string>('0');
+    const [selectedChannelId, setSelectedChannelId] = useState<string | null>(
+      currentChannel.channelId,
+    );
 
     // Variables
     const connectStatus = 4 - Math.floor(Number(latency) / 50);
@@ -1315,6 +1340,12 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
         clearPong();
       };
     }, [socket]);
+
+    useEffect(() => {
+      if (currentChannel) {
+        setSelectedChannelId(currentChannel.channelId);
+      }
+    }, [currentChannel?.channelId]);
 
     return (
       <>
@@ -1471,6 +1502,8 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                 serverMembers={serverMembers}
                 expanded={{ [currentChannelId]: true }}
                 setExpanded={() => {}}
+                selectedChannelId={selectedChannelId}
+                setSelectedChannelId={setSelectedChannelId}
               />
             ) : (
               serverChannels
@@ -1484,7 +1517,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                   item.type === 'category' ? (
                     <CategoryTab
                       key={item.channelId}
-                      category={item}
+                      category={item as Category}
                       friends={friends}
                       currentChannel={currentChannel}
                       currentServer={currentServer}
@@ -1492,17 +1525,21 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                       serverChannels={serverChannels}
                       expanded={expanded}
                       setExpanded={setExpanded}
+                      selectedChannelId={selectedChannelId}
+                      setSelectedChannelId={setSelectedChannelId}
                     />
                   ) : (
                     <ChannelTab
                       key={item.channelId}
-                      channel={item}
+                      channel={item as Channel}
                       friends={friends}
                       currentChannel={currentChannel}
                       currentServer={currentServer}
                       serverMembers={serverMembers}
                       expanded={expanded}
                       setExpanded={setExpanded}
+                      selectedChannelId={selectedChannelId}
+                      setSelectedChannelId={setSelectedChannelId}
                     />
                   ),
                 )

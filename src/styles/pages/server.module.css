@@ -274,12 +274,15 @@
   align-items: center;
   height: 1.8rem;
   padding: 1px 20px 1px 8px;
-  cursor: pointer;
   gap: 5px;
 }
 
 .channelTab:hover {
   background-color: #d1d5da5c;
+}
+
+.channelTab.selected {
+  background-color: #d8dadc;
 }
 
 .channelList .channelList .channelTab {
@@ -362,7 +365,6 @@
   align-items: center;
   height: 1.8rem;
   padding: 1px 20px 1px 8px;
-  cursor: pointer;
   gap: 5px;
 }
 
