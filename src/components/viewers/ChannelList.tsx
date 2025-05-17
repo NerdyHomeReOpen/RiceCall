@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -42,8 +42,9 @@ interface CategoryTabProps {
   serverChannels: (Channel | Category)[];
   expanded: Record<string, boolean>;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  selectedChannelId: string | null;
-  setSelectedChannelId: (id: string | null) => void;
+  selectedItemId: string | null;
+  selectedItemType: string | null;
+  setSelectedChannelId: (id: string | null, type: string | null) => void;
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(
@@ -56,7 +57,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     serverChannels,
     expanded,
     setExpanded,
-    selectedChannelId,
+    selectedItemId,
+    selectedItemType,
     setSelectedChannelId,
   }) => {
     // Hooks
@@ -248,9 +250,11 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         <div
           key={categoryId}
           className={`${styles['channelTab']} ${
-            selectedChannelId === categoryId ? styles['selected'] : ''
+            selectedItemId === categoryId && selectedItemType === 'category'
+              ? styles['selected']
+              : ''
           }`}
-          onClick={() => setSelectedChannelId(categoryId)}
+          onClick={() => setSelectedChannelId(categoryId, 'category')}
           onDoubleClick={() => {
             if (!canJoin) return;
             if (needPassword) {
@@ -369,12 +373,13 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 key={channel.channelId}
                 channel={channel}
                 friends={friends}
-                currentServer={currentServer}
                 currentChannel={currentChannel}
+                currentServer={currentServer}
                 serverMembers={serverMembers}
                 expanded={expanded}
                 setExpanded={setExpanded}
-                selectedChannelId={selectedChannelId}
+                selectedItemId={selectedItemId}
+                selectedItemType={selectedItemType}
                 setSelectedChannelId={setSelectedChannelId}
               />
             ))}
@@ -394,8 +399,9 @@ interface ChannelTabProps {
   serverMembers: ServerMember[];
   expanded: Record<string, boolean>;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  selectedChannelId: string | null;
-  setSelectedChannelId: (id: string | null) => void;
+  selectedItemId: string | null;
+  selectedItemType: string | null;
+  setSelectedChannelId: (id: string | null, type: string | null) => void;
 }
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(
@@ -407,7 +413,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     serverMembers,
     expanded,
     setExpanded,
-    selectedChannelId,
+    selectedItemId,
+    selectedItemType,
     setSelectedChannelId,
   }) => {
     // Hooks
@@ -596,7 +603,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     useEffect(() => {
       if (currentChannel) {
-        setSelectedChannelId(currentChannel.channelId);
+        setSelectedChannelId(currentChannel.channelId, 'channel');
       }
     }, [currentChannel?.channelId]);
 
@@ -606,9 +613,11 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         <div
           key={channelId}
           className={`${styles['channelTab']} ${
-            selectedChannelId === channelId ? styles['selected'] : ''
+            selectedItemId === channelId && selectedItemType === 'channel'
+              ? styles['selected']
+              : ''
           }`}
-          onClick={() => setSelectedChannelId(channelId)}
+          onClick={() => setSelectedChannelId(channelId, 'channel')}
           onDoubleClick={() => {
             if (!canJoin) return;
             if (needPassword) {
@@ -749,6 +758,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 friends={friends}
                 currentChannel={currentChannel}
                 currentServer={currentServer}
+                selectedItemId={selectedItemId}
+                selectedItemType={selectedItemType}
+                setSelectedChannelId={setSelectedChannelId}
               />
             ))}
         </div>
@@ -764,15 +776,39 @@ interface UserTabProps {
   currentChannel: Channel;
   currentServer: UserServer;
   friends: UserFriend[];
+  selectedItemId: string | null;
+  selectedItemType: string | null;
+  setSelectedChannelId: (id: string | null, type: string | null) => void;
 }
 
 const UserTab: React.FC<UserTabProps> = React.memo(
-  ({ member, friends, currentChannel, currentServer }) => {
+  ({
+    member,
+    friends,
+    currentChannel,
+    currentServer,
+    selectedItemId,
+    selectedItemType,
+    setSelectedChannelId,
+  }) => {
     // Hooks
     const lang = useLanguage();
     const contextMenu = useContextMenu();
     const socket = useSocket();
     const webRTC = useWebRTC();
+
+    // Refs
+    const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const qualifyingEventRef = useRef<React.MouseEvent<HTMLDivElement> | null>(
+      null,
+    );
+    const initialPosForThresholdRef = useRef<{ x: number; y: number } | null>(
+      null,
+    );
+    const hasMovedTooMuchInitiallyRef = useRef<boolean>(false);
+
+    const HOVER_DELAY = 600,
+      MOVEMENT_THRESHOLD = 5;
 
     // Variables
     const {
@@ -846,12 +882,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (!webRTC) return;
       webRTC.handleMute(userId);
     };
-
     const handleUnmuteUser = (userId: User['userId']) => {
       if (!webRTC) return;
       webRTC.handleUnmute(userId);
     };
-
     const handleKickServer = (
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -859,7 +893,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (!socket) return;
       socket.send.disconnectServer({ userId, serverId });
     };
-
     const handleKickChannel = (
       userId: User['userId'],
       lobbyId: Channel['channelId'],
@@ -868,7 +901,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (!socket) return;
       socket.send.connectChannel({ userId, channelId: lobbyId, serverId });
     };
-
     const handleUpdateMember = (
       member: Partial<Member>,
       userId: User['userId'],
@@ -881,7 +913,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         serverId,
       });
     };
-
     const handleMoveToChannel = (
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -890,7 +921,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (!socket) return;
       socket.send.connectChannel({ userId, serverId, channelId });
     };
-
     const handleOpenEditNickname = (
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -901,7 +931,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         userId,
       });
     };
-
     const handleOpenApplyFriend = (
       userId: User['userId'],
       targetId: User['userId'],
@@ -912,7 +941,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         targetId,
       });
     };
-
     const handleOpenDirectMessage = (
       userId: User['userId'],
       targetId: User['userId'],
@@ -928,7 +956,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         targetName,
       });
     };
-
     const handleOpenUserInfo = (
       userId: User['userId'],
       targetId: User['userId'],
@@ -939,7 +966,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         targetId,
       });
     };
-
     const handleDragStart = (
       e: React.DragEvent,
       userId: User['userId'],
@@ -949,13 +975,76 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       e.dataTransfer.setData('userId', userId);
       e.dataTransfer.setData('currentChannelId', channelId);
     };
+    const handleShowUserInfoCard = () => {
+      if (qualifyingEventRef.current) {
+        contextMenu.showUserInfoBlock(
+          qualifyingEventRef.current.clientX + 5,
+          qualifyingEventRef.current.clientY + 5,
+          member,
+        );
+      }
+    };
+    const handleClearTimeout = () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = null;
+      }
+    };
+    const handleStartTimeout = (event: React.MouseEvent<HTMLDivElement>) => {
+      handleClearTimeout();
+      qualifyingEventRef.current = event;
+      hoverTimeoutRef.current = setTimeout(handleShowUserInfoCard, HOVER_DELAY);
+    };
 
     return (
       <div
         key={memberUserId}
-        className={`${styles['userTab']}`}
-        onClick={(e) => {
-          contextMenu.showUserInfoBlock(e.clientX, e.clientY, member);
+        className={`${styles['userTab']} ${
+          selectedItemId === memberUserId && selectedItemType === 'user'
+            ? styles['selected']
+            : ''
+        }`}
+        onMouseEnter={(e) => {
+          handleClearTimeout();
+          initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
+          hasMovedTooMuchInitiallyRef.current = false;
+          qualifyingEventRef.current = e;
+          hoverTimeoutRef.current = setTimeout(
+            handleShowUserInfoCard,
+            HOVER_DELAY,
+          );
+        }}
+        onMouseMove={(e) => {
+          if (!initialPosForThresholdRef.current) {
+            initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
+            hasMovedTooMuchInitiallyRef.current = false;
+            handleStartTimeout(e);
+            return;
+          }
+          if (!hasMovedTooMuchInitiallyRef.current) {
+            const deltaX = Math.abs(
+              e.clientX - initialPosForThresholdRef.current.x,
+            );
+            const deltaY = Math.abs(
+              e.clientY - initialPosForThresholdRef.current.y,
+            );
+            if (deltaX > MOVEMENT_THRESHOLD || deltaY > MOVEMENT_THRESHOLD) {
+              hasMovedTooMuchInitiallyRef.current = true;
+              handleStartTimeout(e);
+            }
+          } else {
+            handleStartTimeout(e);
+          }
+        }}
+        onMouseLeave={() => {
+          handleClearTimeout();
+          contextMenu.closeUserInfoBlock();
+          initialPosForThresholdRef.current = null;
+          hasMovedTooMuchInitiallyRef.current = false;
+          qualifyingEventRef.current = null;
+        }}
+        onClick={() => {
+          setSelectedChannelId(memberUserId, 'user');
         }}
         draggable={userPermission >= 5 && memberUserId !== userId}
         onDragStart={(e) =>
@@ -1226,9 +1315,17 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const [view, setView] = useState<'all' | 'current'>('all');
     const [latency, setLatency] = useState<string>('0');
-    const [selectedChannelId, setSelectedChannelId] = useState<string | null>(
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(
       currentChannel.channelId,
     );
+    const [selectedItemType, setSelectedItemType] = useState<string | null>(
+      'channel',
+    );
+
+    const setSelectedChannelId = (id: string | null, type: string | null) => {
+      setSelectedItemId(id);
+      setSelectedItemType(type);
+    };
 
     // Variables
     const connectStatus = 4 - Math.floor(Number(latency) / 50);
@@ -1343,7 +1440,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
 
     useEffect(() => {
       if (currentChannel) {
-        setSelectedChannelId(currentChannel.channelId);
+        setSelectedItemId(currentChannel.channelId);
       }
     }, [currentChannel?.channelId]);
 
@@ -1502,7 +1599,8 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                 serverMembers={serverMembers}
                 expanded={{ [currentChannelId]: true }}
                 setExpanded={() => {}}
-                selectedChannelId={selectedChannelId}
+                selectedItemId={selectedItemId}
+                selectedItemType={selectedItemType}
                 setSelectedChannelId={setSelectedChannelId}
               />
             ) : (
@@ -1525,7 +1623,8 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                       serverChannels={serverChannels}
                       expanded={expanded}
                       setExpanded={setExpanded}
-                      selectedChannelId={selectedChannelId}
+                      selectedItemId={selectedItemId}
+                      selectedItemType={selectedItemType}
                       setSelectedChannelId={setSelectedChannelId}
                     />
                   ) : (
@@ -1538,7 +1637,8 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                       serverMembers={serverMembers}
                       expanded={expanded}
                       setExpanded={setExpanded}
-                      selectedChannelId={selectedChannelId}
+                      selectedItemId={selectedItemId}
+                      selectedItemType={selectedItemType}
                       setSelectedChannelId={setSelectedChannelId}
                     />
                   ),

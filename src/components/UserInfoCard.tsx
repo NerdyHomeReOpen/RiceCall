@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
 
 // CSS
 import userInfoCard from '@/styles/userInfoCard.module.css';
@@ -34,26 +34,34 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
     const [cardY, setCardY] = useState(y);
 
     // Effect
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (cardRef.current) {
         const cardWidth = cardRef.current.offsetWidth;
         const cardHeight = cardRef.current.offsetHeight;
+        if (cardWidth === 0 || cardHeight === 0) {
+          return;
+        }
+
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
-
-        let newCardX = x;
-        let newCardY = y;
-
-        if (newCardX + cardWidth > windowWidth - 20) {
-          newCardX = windowWidth - cardWidth - 20;
+        const MARGIN = 10;
+        let newPosX = x,
+          newPosY = y;
+        if (newPosX + cardWidth > windowWidth - MARGIN) {
+          newPosX = windowWidth - cardWidth - MARGIN;
+        }
+        if (newPosX < MARGIN) {
+          newPosX = MARGIN;
+        }
+        if (newPosY + cardHeight > windowHeight - MARGIN) {
+          newPosY = windowHeight - cardHeight - MARGIN;
+        }
+        if (newPosY < MARGIN) {
+          newPosY = MARGIN;
         }
 
-        if (newCardY + cardHeight > windowHeight - 20) {
-          newCardY = windowHeight - cardHeight - 20;
-        }
-
-        setCardX(newCardX);
-        setCardY(newCardY);
+        setCardX(newPosX);
+        setCardY(newPosY);
       }
     }, [x, y]);
 

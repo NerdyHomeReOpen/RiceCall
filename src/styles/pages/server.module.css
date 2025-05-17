@@ -281,6 +281,7 @@
   background-color: #d1d5da5c;
 }
 
+.userTab.selected,
 .channelTab.selected {
   background-color: #d8dadc;
 }
@@ -372,7 +373,7 @@
   padding-left: 25px;
 }
 
-.userTab:hover {
+.userTab:not(.selected):hover {
   background-color: #d1d5da5c;
 }
 
