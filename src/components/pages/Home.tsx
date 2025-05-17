@@ -393,7 +393,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
               className={`${homePage['navegateItem']} ${
                 section === 1 ? homePage['active'] : ''
               }`}
-              data-key="30014"
+              data-key="40007"
               onClick={() => setSection(1)}
             >
               {lang.tr.game}
