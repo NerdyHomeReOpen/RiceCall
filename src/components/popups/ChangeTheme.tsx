@@ -10,6 +10,12 @@ import ipcService from '@/services/ipc.service';
 // Providers
 import { setThemeValue, removeThemeValue } from '@/utils/themeStorage';
 
+// Components
+import ContextMenu from '@/components/ContextMenu';
+
+// Types
+import { ContextMenuItem } from '@/types';
+
 interface ChangeThemePopupProps {
   title: React.ReactNode;
   submitTo: string;
@@ -24,6 +30,43 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   const [hoveredThemeIndex, setHoveredThemeIndex] = useState<number | null>(
     null,
   );
+  const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
+  const [pickedColor, setPickedColor] = useState<string>('#000000');
+  const [customAppliedColors, setCustomAppliedColors] = useState<
+    (string | null)[]
+  >(() => {
+    const storedColors = localStorage.getItem('customAppliedColors');
+    if (storedColors) {
+      try {
+        const parsedColors = JSON.parse(storedColors);
+        if (Array.isArray(parsedColors) && parsedColors.length === 7) {
+          return parsedColors;
+        }
+      } catch (e) {
+        console.error('解析 localStorage customAppliedColors 出錯', e);
+      }
+    }
+    return Array(7).fill(null);
+  });
+  const [nextCustomColorSlotIndex, setNextCustomColorSlotIndex] =
+    useState<number>(() => {
+      const storedIndex = localStorage.getItem('nextCustomColorSlotIndex');
+      if (storedIndex) {
+        const parsedIndex = parseInt(storedIndex, 10);
+        if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex <= 7) {
+          return parsedIndex;
+        }
+      }
+      return 0;
+    });
+  const [contextMenuVisible, setContextMenuVisible] = useState<boolean>(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{
+    x: number;
+    y: number;
+  }>({ x: 0, y: 0 });
+  const [contextMenuTargetIndex, setContextMenuTargetIndex] = useState<
+    number | null
+  >(null);
 
   // Handlers
   const handleSubmit = () => {
@@ -67,11 +110,122 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       event.target.value = '';
     }
   };
+  const handleColorCustomClick = () => {
+    setShowColorPicker(!showColorPicker);
+  };
+  const handleColorSelectorImageClick = (
+    event: React.MouseEvent<HTMLDivElement>,
+  ) => {
+    const imageElement = event.currentTarget;
+    const rect = imageElement.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const offsetY = event.clientY - rect.top;
+    const imgSrc = '/skin_palette.png';
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.src = imgSrc;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+        const safeOffsetX = Math.max(
+          0,
+          Math.min(offsetX, img.naturalWidth - 1),
+        );
+        const safeOffsetY = Math.max(
+          0,
+          Math.min(offsetY, img.naturalHeight - 1),
+        );
+        const pixelData = ctx.getImageData(safeOffsetX, safeOffsetY, 1, 1).data;
+        const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
+        setPickedColor(color);
+      }
+    };
+    img.onerror = () => {
+      console.error('載入顏色選擇器圖片時發生錯誤。');
+    };
+  };
+  const handleSavePickedColor = () => {
+    if (pickedColor) {
+      setThemeValue('selectedThemeColor', pickedColor);
+      removeThemeValue('selectedTheme');
+      removeThemeValue('customThemeImage');
+      let newAppliedColors;
+      let newSlotIndex = nextCustomColorSlotIndex;
+      if (nextCustomColorSlotIndex < 7) {
+        newAppliedColors = [...customAppliedColors];
+        newAppliedColors[nextCustomColorSlotIndex] = pickedColor;
+        newSlotIndex = nextCustomColorSlotIndex + 1;
+      } else {
+        newAppliedColors = [...customAppliedColors];
+        newAppliedColors[0] = pickedColor;
+      }
+      setCustomAppliedColors(newAppliedColors);
+      setNextCustomColorSlotIndex(newSlotIndex);
+      localStorage.setItem(
+        'customAppliedColors',
+        JSON.stringify(newAppliedColors),
+      );
+      localStorage.setItem('nextCustomColorSlotIndex', newSlotIndex.toString());
+    }
+    setShowColorPicker(false);
+  };
+  const handleCancelPickColor = () => {
+    setShowColorPicker(false);
+  };
+  const handleCustomColorRightClick = (
+    event: React.MouseEvent<HTMLDivElement>,
+    indexInCustomArray: number,
+  ) => {
+    event.preventDefault();
+    setContextMenuPosition({ x: event.clientX, y: event.clientY });
+    setContextMenuTargetIndex(indexInCustomArray);
+    setContextMenuVisible(true);
+  };
+  const handleRemoveCustomColor = () => {
+    if (contextMenuTargetIndex !== null) {
+      const newAppliedColors = [...customAppliedColors];
+      newAppliedColors[contextMenuTargetIndex] = null;
+      setCustomAppliedColors(newAppliedColors);
+      const firstNullIndex = newAppliedColors.findIndex(
+        (color) => color === null,
+      );
+      const newSlotIndex = firstNullIndex === -1 ? 7 : firstNullIndex;
+      setNextCustomColorSlotIndex(newSlotIndex);
+      localStorage.setItem(
+        'customAppliedColors',
+        JSON.stringify(newAppliedColors),
+      );
+      localStorage.setItem('nextCustomColorSlotIndex', newSlotIndex.toString());
+    }
+    setContextMenuVisible(false);
+    setContextMenuTargetIndex(null);
+  };
+
+  const closeContextMenu = () => {
+    setContextMenuVisible(false);
+    setContextMenuTargetIndex(null);
+  };
 
   // Effects
   useEffect(() => {
     containerRef.current?.focus();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (contextMenuVisible) {
+        closeContextMenu();
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [contextMenuVisible]);
 
   return (
     <form
@@ -120,15 +274,53 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                     />
                   ))}
                 </div>
-
                 <div className={changeTheme['themeColors']}>
-                  {Array.from({ length: 10 }).map((_, i) => (
-                    <div
-                      key={`color-${i}`}
-                      className={changeTheme['colorBox']}
-                      onClick={handleColorBoxClick}
-                    />
-                  ))}
+                  {Array.from({ length: 15 }).map((_, i) => {
+                    if (i === 7) {
+                      return (
+                        <div
+                          key={`color-custom-${i}`}
+                          className={`${changeTheme['colorBox']} ${changeTheme['colorCustom']}`}
+                          onClick={handleColorCustomClick}
+                        ></div>
+                      );
+                    } else {
+                      const isEmptyPlaceholder = i >= 8;
+                      if (isEmptyPlaceholder) {
+                        const customSlotIndex = i - 8;
+                        const customColor =
+                          customAppliedColors[customSlotIndex];
+                        if (customColor) {
+                          return (
+                            <div
+                              key={`color-box-custom-filled-${i}`}
+                              className={changeTheme['colorBox']}
+                              style={{ backgroundColor: customColor }}
+                              onClick={handleColorBoxClick}
+                              onContextMenu={(e) =>
+                                handleCustomColorRightClick(e, customSlotIndex)
+                              }
+                            />
+                          );
+                        } else {
+                          return (
+                            <div
+                              key={`color-box-empty-${i}`}
+                              className={`${changeTheme['colorBox']} ${changeTheme['emptyColorBox']}`}
+                            />
+                          );
+                        }
+                      } else {
+                        return (
+                          <div
+                            key={`color-box-predefined-${i}`}
+                            className={changeTheme['colorBox']}
+                            onClick={handleColorBoxClick}
+                          />
+                        );
+                      }
+                    }
+                  })}
                   <div
                     className={changeTheme['addColorBtn']}
                     onClick={handleAddCustomImageClick}
@@ -141,6 +333,46 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                     onChange={handleFileChange}
                   />
                 </div>
+                {showColorPicker && (
+                  <div className={changeTheme['colorSelectorBox']}>
+                    <div
+                      className={changeTheme['colorSelectorImage']}
+                      onClick={handleColorSelectorImageClick}
+                    ></div>
+                    <div className={changeTheme['colorSelectorFooter']}>
+                      <div
+                        className={changeTheme['colorSelectedColor']}
+                        style={{ backgroundColor: pickedColor }}
+                      ></div>
+                      <div className={changeTheme['colorSelectedBtn']}>
+                        <div
+                          className={changeTheme['colorSelectedSave']}
+                          onClick={handleSavePickedColor}
+                        ></div>
+                        <div
+                          className={changeTheme['colorSelectedCancel']}
+                          onClick={handleCancelPickColor}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {contextMenuVisible && contextMenuTargetIndex !== null && (
+                  <ContextMenu
+                    x={contextMenuPosition.x}
+                    y={contextMenuPosition.y}
+                    items={
+                      [
+                        {
+                          id: 'remove-color',
+                          label: '移除顏色',
+                          onClick: handleRemoveCustomColor,
+                        },
+                      ] as ContextMenuItem[]
+                    }
+                    onClose={closeContextMenu}
+                  />
+                )}
               </div>
             </div>
           </div>

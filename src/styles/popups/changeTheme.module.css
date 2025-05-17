@@ -92,8 +92,9 @@
   width: 100%;
 }
 
-.themeColors div,
-.themeImages div {
+.themeSelector div[class*='themePreview-'],
+.colorBox,
+.addColorBtn {
   cursor: pointer;
 }
 
@@ -130,16 +131,71 @@
   background: linear-gradient(to bottom, #ae6b73, #ab6a72);
 }
 
-.colorBox:nth-child(8) {
-  background: #31996a;
+.colorCustom {
+  background: url(../../../public/palette.png) no-repeat center center;
+  background-position: 0 0px;
+  background-size: auto;
+  height: 58px;
 }
 
-.colorBox:nth-child(9) {
-  background: #e67b1d;
+.colorSelectorBox {
+  position: absolute;
+  width: 280px;
+  height: 145px;
+  border: 1px solid #000;
+  left: 8rem;
+  top: 7rem;
+  background-color: #fff;
+  padding: 5px;
 }
 
-.colorBox:nth-child(10) {
-  background: #6d95da;
+.colorSelectorImage {
+  background: url(../../../public/skin_palette.png) no-repeat center center;
+  background-position: 0 0px;
+  background-size: auto;
+  height: 105px;
+  width: 270px;
+}
+
+.colorSelectorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 3px;
+}
+
+.colorSelectedColor {
+  background: #000;
+  height: 2rem;
+  width: 6rem;
+}
+
+.colorSelectedBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.colorSelectedSave,
+.colorSelectedCancel {
+  height: 25px;
+  width: 56px;
+  border: 1px solid #000;
+  cursor: pointer;
+}
+
+.colorSelectedSave:hover,
+.colorSelectedCancel:hover {
+  background-color: #c7c7c7;
+}
+
+.colorSelectedSave {
+  background: url(../../../public/palette_ok.png) no-repeat center center;
+  margin-right: 3px;
+}
+
+.colorSelectedCancel {
+  background: url(../../../public/palette_cancel.png) no-repeat center center;
 }
 
 .themeImages.big {
@@ -267,7 +323,7 @@
 }
 
 .themeImages.small div[class*='themePreview-']:hover,
-.themeColors .colorBox:hover {
+.themeColors .colorBox:not(.emptyColorBox):hover {
   border: 1px solid #20a5d8;
 }
 
