@@ -48,17 +48,6 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     }
     return Array(7).fill(null);
   });
-  const [nextCustomColorSlotIndex, setNextCustomColorSlotIndex] =
-    useState<number>(() => {
-      const storedIndex = localStorage.getItem('nextCustomColorSlotIndex');
-      if (storedIndex) {
-        const parsedIndex = parseInt(storedIndex, 10);
-        if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex <= 7) {
-          return parsedIndex;
-        }
-      }
-      return 0;
-    });
   const [contextMenuVisible, setContextMenuVisible] = useState<boolean>(false);
   const [contextMenuPosition, setContextMenuPosition] = useState<{
     x: number;
@@ -153,23 +142,20 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       setThemeValue('selectedThemeColor', pickedColor);
       removeThemeValue('selectedTheme');
       removeThemeValue('customThemeImage');
-      let newAppliedColors;
-      let newSlotIndex = nextCustomColorSlotIndex;
-      if (nextCustomColorSlotIndex < 7) {
-        newAppliedColors = [...customAppliedColors];
-        newAppliedColors[nextCustomColorSlotIndex] = pickedColor;
-        newSlotIndex = nextCustomColorSlotIndex + 1;
+      const updatedColors = [...customAppliedColors];
+      const targetSlotIndex = updatedColors.findIndex(
+        (color) => color === null,
+      );
+      if (targetSlotIndex !== -1) {
+        updatedColors[targetSlotIndex] = pickedColor;
       } else {
-        newAppliedColors = [...customAppliedColors];
-        newAppliedColors[0] = pickedColor;
+        updatedColors[0] = pickedColor;
       }
-      setCustomAppliedColors(newAppliedColors);
-      setNextCustomColorSlotIndex(newSlotIndex);
+      setCustomAppliedColors(updatedColors);
       localStorage.setItem(
         'customAppliedColors',
-        JSON.stringify(newAppliedColors),
+        JSON.stringify(updatedColors),
       );
-      localStorage.setItem('nextCustomColorSlotIndex', newSlotIndex.toString());
     }
     setShowColorPicker(false);
   };
@@ -190,22 +176,15 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       const newAppliedColors = [...customAppliedColors];
       newAppliedColors[contextMenuTargetIndex] = null;
       setCustomAppliedColors(newAppliedColors);
-      const firstNullIndex = newAppliedColors.findIndex(
-        (color) => color === null,
-      );
-      const newSlotIndex = firstNullIndex === -1 ? 7 : firstNullIndex;
-      setNextCustomColorSlotIndex(newSlotIndex);
       localStorage.setItem(
         'customAppliedColors',
         JSON.stringify(newAppliedColors),
       );
-      localStorage.setItem('nextCustomColorSlotIndex', newSlotIndex.toString());
     }
     setContextMenuVisible(false);
     setContextMenuTargetIndex(null);
   };
-
-  const closeContextMenu = () => {
+  const handleCloseContextMenu = () => {
     setContextMenuVisible(false);
     setContextMenuTargetIndex(null);
   };
@@ -218,7 +197,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   useEffect(() => {
     const handleClickOutside = () => {
       if (contextMenuVisible) {
-        closeContextMenu();
+        handleCloseContextMenu();
       }
     };
     document.addEventListener('click', handleClickOutside);
@@ -370,7 +349,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                         },
                       ] as ContextMenuItem[]
                     }
-                    onClose={closeContextMenu}
+                    onClose={handleCloseContextMenu}
                   />
                 )}
               </div>
