@@ -290,7 +290,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               },
               {
                 id: 'createSubChannel',
-                label: lang.tr.addChannel,
+                label: lang.tr.addSubChannel,
                 show: canManageChannel,
                 onClick: () =>
                   handleOpenCreateChannel(serverId, categoryId, userId),
