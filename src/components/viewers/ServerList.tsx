@@ -24,7 +24,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
 
     // Variables
     const {
-      serverId: serverId,
+      serverId,
       name: serverName,
       avatarUrl: serverAvatarUrl,
       displayId: serverDisplayId,
