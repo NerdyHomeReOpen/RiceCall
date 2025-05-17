@@ -197,8 +197,12 @@
   flex-direction: row;
 }
 
-.inputBox table tr:hover {
+.inputBox table tr:not(.selected):hover {
   background: #f4f4f5;
+}
+
+.inputBox table tr.selected {
+  background-color: rgb(216, 218, 220);
 }
 
 .inputBox table tr th {
