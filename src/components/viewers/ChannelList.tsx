@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -1310,6 +1310,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
     const contextMenu = useContextMenu();
     const { handleSetCategoryExpanded, handleSetChannelExpanded } =
       useExpandedContext();
+    const viewerRef = useRef<HTMLDivElement>(null);
 
     // States
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -1322,10 +1323,13 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       'channel',
     );
 
-    const setSelectedChannelId = (id: string | null, type: string | null) => {
-      setSelectedItemId(id);
-      setSelectedItemType(type);
-    };
+    const setSelectedChannelId = useCallback(
+      (id: string | null, type: string | null) => {
+        setSelectedItemId(id);
+        setSelectedItemType(type);
+      },
+      [setSelectedItemId, setSelectedItemType],
+    );
 
     // Variables
     const connectStatus = 4 - Math.floor(Number(latency) / 50);
@@ -1441,13 +1445,38 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
     useEffect(() => {
       if (currentChannel) {
         setSelectedItemId(currentChannel.channelId);
+        setSelectedItemType('channel');
       }
-    }, [currentChannel?.channelId]);
+    }, [currentChannel, currentChannel.channelId]);
+
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          viewerRef.current &&
+          !viewerRef.current.contains(event.target as Node)
+        ) {
+          setSelectedChannelId(null, null);
+        } else if (event.target instanceof HTMLElement) {
+          const targetElement = event.target as HTMLElement;
+          const isUserTab = targetElement.closest(`.${styles['userTab']}`);
+          const isChannelTab = targetElement.closest(
+            `.${styles['channelTab']}`,
+          );
+          if (!isUserTab && !isChannelTab) {
+            setSelectedChannelId(null, null);
+          }
+        }
+      };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [setSelectedChannelId]);
 
     return (
       <>
         {/* Header */}
-        <div className={styles['sidebarHeader']}>
+        <div className={styles['sidebarHeader']} ref={viewerRef}>
           <div
             className={styles['avatarBox']}
             onClick={() => {
