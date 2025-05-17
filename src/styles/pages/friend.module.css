@@ -318,7 +318,11 @@
   font-size: 13px;
 }
 
-.friendList .tab:hover {
+.friendList .tab.selected {
+  background-color: #d8dadc;
+}
+
+.friendList .tab:not(.selected):hover {
   background-color: #d1d5da5c;
 }
 
@@ -358,7 +362,11 @@
   gap: 5px;
 }
 
-.friendCard:hover {
+.friendCard.selected {
+  background-color: #d8dadc;
+}
+
+.friendCard:not(.selected):hover {
   background-color: #d1d5da5c;
 }
 
