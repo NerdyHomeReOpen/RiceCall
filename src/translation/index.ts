@@ -854,6 +854,7 @@ export const translations: Record<LanguageKey, Translation> = {
     userInfo: '个人档案',
     registering: '注册中',
     micMuted: '麦已静音',
+    create: '新建',
     changeName: '改名',
     moveUp: '上移',
     moveDown: '下移',
