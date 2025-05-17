@@ -39,9 +39,7 @@
 }
 
 .popupFooter {
-  min-height: 39px;
-  max-height: 39px;
-  padding: 10px 15px;
+  padding: 10px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -82,8 +80,7 @@
 
 .label {
   min-width: 3rem;
-  margin-right: 5px;
-  margin-bottom: 3px;
+  margin-top: 5px;
 }
 
 .label.required::after {
@@ -140,14 +137,14 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  gap: 5px;
 }
 
 .row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 
 /* Input Styles */
