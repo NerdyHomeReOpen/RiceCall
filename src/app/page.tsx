@@ -198,6 +198,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
       className={headerClassName}
       style={{
         backgroundColor: backgroundColor || undefined,
+        color: backgroundColor || undefined,
         backgroundImage: backgroundImage
           ? `url(${backgroundImage})`
           : undefined,
@@ -258,13 +259,26 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
               <div className={header['tabLable']}>{TabLable}</div>
               <div className={header['tabBg']} />
               {TabClose && (
-                <div
+                <svg
                   className={`${header['tabClose']} themeTabClose`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleLeaveServer(userId, serverId);
                   }}
-                />
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="12" cy="12" r="12" fill="currentColor" />
+                  <path
+                    d="M17 7L7 17M7 7l10 10"
+                    stroke="#fff"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               )}
             </div>
           );

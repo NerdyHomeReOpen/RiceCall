@@ -271,9 +271,9 @@
   min-width: 15px;
   min-height: 15px;
   align-self: flex-start;
-  background-image: url('../../public/ctrl/tabitem_button.png');
-  background-repeat: no-repeat;
-  background-position: 0 0;
+  left: 3px;
+  bottom: 3px;
+  position: relative;
 }
 
 .mainTabs .tabClose:hover {
