@@ -31,6 +31,7 @@ import DirectMessage from '@/components/popups/DirectMessage';
 import SearchUser from '@/components/popups/SearchUser';
 import Dialog from '@/components/popups/Dialog';
 import ChangeTheme from '@/components/popups/ChangeTheme';
+import About from '@/components/popups/AboutUs';
 
 // Utils
 import {
@@ -387,6 +388,11 @@ const Popup = React.memo(() => {
         setHeaderTitle(lang.tr.changeTheme);
         setHeaderButtons(['close']);
         setContent(<ChangeTheme {...popupInitialData} />);
+        break;
+      case PopupType.ABOUTUS:
+        setHeaderTitle(lang.tr.aboutUs);
+        setHeaderButtons(['close']);
+        setContent(<About {...popupInitialData} />);
         break;
       default:
         break;

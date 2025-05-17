@@ -19,6 +19,12 @@ export interface Translation {
   changeTheme: string;
   feedback: string;
   languageSelect: string;
+  helpCenter: string;
+  agreement: string;
+  specification: string;
+  contactUs: string;
+  aboutRiceCall: string;
+  faq: string;
   logout: string;
   exit: string;
   searchPlaceholder: string;
@@ -277,14 +283,14 @@ export interface Translation {
   unknownDevice: string;
   microphone: string;
   speaker: string;
-  version: string;
   projectRepo: string;
-  projectRepoDescription: string;
-  developmentTeam: string;
+  officialWebsite: string;
   mainDeveloper: string;
   serverMaintainer: string;
   frontendDeveloper: string;
   backendDeveloper: string;
+  technicalSupport: string;
+  teamMembers: string;
   copyright: string;
   isReceiveApply: string;
   setApplyNotice: string;
@@ -788,6 +794,7 @@ export enum PopupType {
   DIALOG_INFO = 'dialogInfo',
   ANTHOR_DEVICE_LOGIN = 'anotherDeviceLogin',
   CHANGE_THEME = 'changeTheme',
+  ABOUTUS = 'aboutus',
 }
 
 export const PopupSize = {
@@ -818,6 +825,7 @@ export const PopupSize = {
   [PopupType.DIALOG_INFO]: { height: 200, width: 370 },
   [PopupType.ANTHOR_DEVICE_LOGIN]: { height: 200, width: 370 },
   [PopupType.CHANGE_THEME]: { height: 331, width: 480 },
+  [PopupType.ABOUTUS]: { height: 440, width: 480 },
   Settings: { height: 520, width: 600 },
   Apply: { height: 320, width: 500 },
   Small: { height: 200, width: 370 },

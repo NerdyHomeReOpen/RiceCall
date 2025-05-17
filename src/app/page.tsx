@@ -120,6 +120,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
     ipcService.initialData.onRequest('systemSetting', {});
   };
 
+  const handleOpenAboutUs = () => {
+    ipcService.popup.open(PopupType.ABOUTUS, 'aboutUs');
+    ipcService.initialData.onRequest('aboutUs', {});
+  };
+
   const handleOpenChangeTheme = () => {
     ipcService.popup.open(PopupType.CHANGE_THEME, 'changeTheme');
     ipcService.initialData.onRequest('changeTheme', {});
@@ -359,6 +364,56 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
                       id: 'language-select-jp',
                       label: '日本語',
                       onClick: () => handleLanguageChange('jp'),
+                    },
+                  ],
+                },
+                {
+                  id: 'help-center',
+                  label: lang.tr.helpCenter,
+                  icon: 'submenu',
+                  hasSubmenu: true,
+                  submenuItems: [
+                    {
+                      id: 'faq',
+                      label: lang.tr.faq,
+                      onClick: () => {
+                        window.open('https://ricecall.com.tw/faq', '_blank');
+                      },
+                    },
+                    {
+                      id: 'agreement',
+                      label: lang.tr.agreement,
+                      onClick: () => {
+                        window.open(
+                          'https://ricecall.com.tw/agreement',
+                          '_blank',
+                        );
+                      },
+                    },
+                    {
+                      id: 'specification',
+                      label: lang.tr.specification,
+                      onClick: () => {
+                        window.open(
+                          'https://ricecall.com.tw/specification',
+                          '_blank',
+                        );
+                      },
+                    },
+                    {
+                      id: 'contact-us',
+                      label: lang.tr.contactUs,
+                      onClick: () => {
+                        window.open(
+                          'https://ricecall.com.tw/contactus',
+                          '_blank',
+                        );
+                      },
+                    },
+                    {
+                      id: 'about-us',
+                      label: lang.tr.aboutUs,
+                      onClick: () => handleOpenAboutUs(),
                     },
                   ],
                 },
