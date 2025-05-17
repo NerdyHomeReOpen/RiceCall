@@ -198,9 +198,12 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
     <header
       className={headerClassName}
       style={{
-        background: backgroundImage
-          ? `url(${backgroundImage})`
-          : backgroundColor ?? undefined,
+        background:
+          headerClassName === header['header']
+            ? backgroundImage
+              ? `url(${backgroundImage})`
+              : backgroundColor ?? undefined
+            : undefined,
         color: extractFirstColor(backgroundColor),
       }}
     >

@@ -131,9 +131,11 @@ const Header: React.FC<HeaderProps> = React.memo(
       <header
         className={`${header['header']} ${header['popupHeader']} ${themeClass}`}
         style={{
-          background: backgroundImage
-            ? `url(${backgroundImage})`
-            : backgroundColor ?? undefined,
+          background: !themeClass
+            ? backgroundImage
+              ? `url(${backgroundImage})`
+              : backgroundColor ?? undefined
+            : undefined,
         }}
       >
         <div className={header['titleWrapper']}>
