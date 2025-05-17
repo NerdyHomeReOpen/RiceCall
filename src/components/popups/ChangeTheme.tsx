@@ -40,7 +40,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   };
   const handleColorBoxClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const clickedElement = event.currentTarget;
-    const color = window.getComputedStyle(clickedElement).backgroundColor;
+    const color = window.getComputedStyle(clickedElement).background;
 
     if (color) {
       setThemeValue('selectedThemeColor', color);

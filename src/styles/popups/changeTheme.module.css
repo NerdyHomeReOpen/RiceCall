@@ -103,7 +103,7 @@
 }
 
 .colorBox:nth-child(1) {
-  background: #46b7e1;
+  background: #0073c6;
 }
 
 .colorBox:nth-child(2) {
@@ -111,23 +111,23 @@
 }
 
 .colorBox:nth-child(3) {
-  background: #2f9b6a;
+  background: linear-gradient(to bottom, #91b719, #729714);
 }
 
 .colorBox:nth-child(4) {
-  background: #ffb902;
+  background: linear-gradient(to bottom, #d7aa35, #c79c2d);
 }
 
 .colorBox:nth-child(5) {
-  background: #e67b1d;
+  background: linear-gradient(to bottom, #f3c89a, #edc193);
 }
 
 .colorBox:nth-child(6) {
-  background: #d54f8a;
+  background: linear-gradient(to bottom, #d74a33, #c8412b);
 }
 
 .colorBox:nth-child(7) {
-  background: #f19ebc;
+  background: linear-gradient(to bottom, #ae6b73, #ab6a72);
 }
 
 .colorBox:nth-child(8) {

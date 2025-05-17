@@ -38,6 +38,7 @@ import StandardizedError, { errorHandler } from '@/utils/errorHandler';
 import {
   THEME_CHANGE_EVENT,
   applyThemeToReactState,
+  extractFirstColor,
 } from '@/utils/themeStorage';
 
 // Providers
@@ -197,8 +198,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
     <header
       className={headerClassName}
       style={{
-        backgroundColor: backgroundColor || undefined,
-        color: backgroundColor || undefined,
+        background: backgroundColor || undefined,
+        color: extractFirstColor(backgroundColor),
         backgroundImage: backgroundImage
           ? `url(${backgroundImage})`
           : undefined,
