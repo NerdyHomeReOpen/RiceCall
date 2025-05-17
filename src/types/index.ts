@@ -241,6 +241,7 @@ export interface Translation {
   recentlyJoinServer: string;
   recentlyEarnedBadges: string;
   joinedServers: string;
+  favoritedServers: string;
   notPublicJoinedServersTop: string;
   notPublicJoinedServersBottom: string;
   noJoinedServers: string;
