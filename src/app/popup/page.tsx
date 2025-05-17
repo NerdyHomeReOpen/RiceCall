@@ -66,12 +66,12 @@ const directMessageHeader = (targetSignature: string) => (
 interface HeaderProps {
   title: string;
   buttons: ('minimize' | 'maxsize' | 'close')[];
+  titleBoxIcon?: string;
   titleBoxContent?: ReactNode;
 }
 
 const Header: React.FC<HeaderProps> = React.memo(
-  ({ title, buttons, titleBoxContent }) => {
-    console.log('title', title);
+  ({ title, buttons, titleBoxIcon, titleBoxContent }) => {
     // States
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [themeClass, setThemeClass] = useState<string | null>(null);
@@ -138,7 +138,7 @@ const Header: React.FC<HeaderProps> = React.memo(
         }}
       >
         <div className={header['titleWrapper']}>
-          <div className={header['titleBox']}>
+          <div className={`${header['titleBox']} ${titleBoxIcon}`}>
             <div className={header['title']}>{title}</div>
           </div>
           <div className={header['buttons']}>
@@ -400,6 +400,13 @@ const Popup = React.memo(() => {
           <Header
             title={headerTitle}
             buttons={headerButtons}
+            titleBoxIcon={
+              type === PopupType.CHANGE_THEME
+                ? header['titleBoxSkinIcon']
+                : type === PopupType.DIRECT_MESSAGE
+                ? header['titleBoxDirectMessageIcon']
+                : undefined
+            }
             titleBoxContent={
               type === PopupType.DIRECT_MESSAGE &&
               directMessageTargetSignature !== null
