@@ -28,3 +28,8 @@ export const DeleteFriendApplicationSchema = z
     receiverId: z.string().length(36),
   })
   .strict();
+
+export const ApproveFriendApplicationSchema = z.object({
+  targetId: z.string().length(36),
+  friendGroupId: z.string().length(36).nullable()
+}).strict();
