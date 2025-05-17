@@ -275,7 +275,7 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
       if (!friendApplication)
         throw new FriendApplicationNotFoundError(targetId, operatorId);
 
-      const friend = await database.get.friend(operatorId, targetId);
+      let friend = await database.get.friend(operatorId, targetId);
       if (friend) throw new AlreadyFriendError(targetId, operatorId);
 
       await FriendHandlerServerSide.createFriend(operatorId, targetId);
@@ -285,12 +285,16 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
         `User(${operatorId}) updated friend(${targetId}) to friend group(${friendGroupId})`,
       );
 
-      if (friendGroupId) 
+      if (friendGroupId) {
+        friend = await database.get.friend(operatorId, targetId);
+        
         await FriendHandlerServerSide.updateFriendGroup(
           operatorId,
           targetId,
           friendGroupId,
         );  
+        socket.emit('friendUpdate', operatorId, targetId, friend);
+      }
         
 
       socket.emit('friendApproval', {
