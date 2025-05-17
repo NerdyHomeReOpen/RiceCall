@@ -108,7 +108,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       targetId: User['userId'],
     ) => {
       if (!socket) return;
-      socket.send.createFriend({ friend, userId, targetId });
+      let friendGroupId = friend.friendGroupId || null;
+      socket.send.approveFriendApplication({ 
+        userId,
+        targetId,
+        friendGroupId
+      });
     };
 
     const handleOpenSuccessDialog = (message: string) => {
@@ -355,15 +360,15 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
               <button
                 className={popup['button']}
                 onClick={() => {
-                  handleDeleteFriendApplication(
-                    applicationSenderId,
-                    applicationReceiverId,
-                  );
                   handleCreateFriend(
                     { friendGroupId: selectedFriendGroupId },
                     userId,
                     targetId,
                   );
+                  // handleDeleteFriendApplication(
+                  //   applicationSenderId,
+                  //   applicationReceiverId,
+                  // );
                   handleClose();
                 }}
               >

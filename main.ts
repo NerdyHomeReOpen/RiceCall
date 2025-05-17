@@ -74,6 +74,7 @@ enum SocketClientEvent {
   CREATE_FRIEND_APPLICATION = 'createFriendApplication',
   UPDATE_FRIEND_APPLICATION = 'updateFriendApplication',
   DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
+  APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
   // Message
   SEND_MESSAGE = 'message',
   SEND_DIRECT_MESSAGE = 'directMessage',

@@ -656,6 +656,7 @@ export enum SocketClientEvent {
   CREATE_FRIEND_APPLICATION = 'createFriendApplication',
   UPDATE_FRIEND_APPLICATION = 'updateFriendApplication',
   DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
+  APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
   // Server
   FAVORITE_SERVER = 'favoriteServer',
   SEARCH_SERVER = 'searchServer',
