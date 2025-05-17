@@ -31,6 +31,7 @@ export const DeleteFriendApplicationSchema = z
 
 export const ApproveFriendApplicationSchema = z
   .object({
+    userId: z.string().length(36),
     targetId: z.string().length(36),
     friendGroupId: z.string().length(36).nullable(),
   })
