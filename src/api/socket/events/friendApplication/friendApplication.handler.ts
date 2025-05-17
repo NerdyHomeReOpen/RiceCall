@@ -266,6 +266,10 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
                 'APPROVEFRIENDAPPLICATION',
             );
 
+            new Logger('ApproveFriendApplication').info(
+                `User(${operatorId}) approve friend application(${targetId})`,
+            );
+
             const friendApplication = await database.get.friendApplication(
                 targetId,
                 operatorId,
