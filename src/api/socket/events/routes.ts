@@ -1,7 +1,7 @@
 import { EventRouters } from "../EventRoutes"
 import { ConnectChannelHandler, CreateChannelHandler, DeleteChannelHandler, DisconnectChannelHandler, UpdateChannelHandler, UpdateChannelsHandler } from "./channel/channel.handler";
 import { CreateFriendHandler, DeleteFriendHandler, UpdateFriendHandler } from "./friend/friend.handler";
-import { CreateFriendApplicationHandler, DeleteFriendApplicationHandler, UpdateFriendApplicationHandler } from "./friendApplication/friendApplication.handler";
+import { ApproveFriendApplicationHandler, CreateFriendApplicationHandler, DeleteFriendApplicationHandler, UpdateFriendApplicationHandler } from "./friendApplication/friendApplication.handler";
 import { CreateFriendGroupHandler, DeleteFriendGroupHandler, UpdateFriendGroupHandler } from "./friendGroup/friendGroup.handler";
 import { CreateMemberHandler, DeleteMemberHandler, UpdateMemberHandler } from "./member/member.handler";
 import { CreateMemberApplicationHandler, DeleteMemberApplicationHandler, UpdateMemberApplicationHandler } from "./memberApplication/memberApplication.handler";
@@ -54,6 +54,7 @@ export default function(eventRouter: EventRouters) {
     eventRouter.addRoute('createFriendApplication',CreateFriendApplicationHandler);
     eventRouter.addRoute('updateFriendApplication',UpdateFriendApplicationHandler);
     eventRouter.addRoute('deleteFriendApplication',DeleteFriendApplicationHandler);
+    eventRouter.addRoute('approveFriendApplication',ApproveFriendApplicationHandler);
 
     // Message
     eventRouter.addRoute('message',SendMessageHandler);

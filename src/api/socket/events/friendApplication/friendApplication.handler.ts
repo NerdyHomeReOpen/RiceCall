@@ -14,6 +14,7 @@ import {
   CreateFriendApplicationSchema,
   UpdateFriendApplicationSchema,
   DeleteFriendApplicationSchema,
+  ApproveFriendApplicationSchema,
 } from '@/api/socket/events/friendApplication/friendApplication.schema';
 
 // Middleware
@@ -23,6 +24,8 @@ import { DataValidator } from '@/middleware/data.validator';
 import { database } from '@/index';
 import { SocketRequestHandler } from '@/handler';
 import { FriendHandlerServerSide } from '../friend/friend.handler';
+import AlreadyFriendError from '@/errors/AlreadyFriendError';
+import FriendApplicationNotFoundError from '@/errors/FriendApplicationNotFoundError';
 
 export const CreateFriendApplicationHandler : SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
@@ -248,3 +251,54 @@ export const DeleteFriendApplicationHandler : SocketRequestHandler = {
     }
   },
 };
+
+export const ApproveFriendApplicationHandler: SocketRequestHandler = {
+    async handle(io: Server, socket: Socket, data: any) {
+        try {
+            const operatorId = socket.data.userId;
+
+            const {
+                targetId,
+                friendGroupId,
+            } = await DataValidator.validate(
+                ApproveFriendApplicationSchema,
+                data,
+                'APPROVEFRIENDAPPLICATION',
+            );
+
+            const friendApplication = await database.get.friendApplication(
+                targetId,
+                operatorId,
+            );
+            if (!friendApplication) throw new FriendApplicationNotFoundError(targetId, operatorId);
+
+            const friend = await database.get.friend(operatorId, targetId);
+            if (friend) throw new AlreadyFriendError(targetId, operatorId);
+
+            await FriendHandlerServerSide.createFriend(operatorId, targetId);
+            await database.delete.friendApplication(targetId, operatorId);
+
+            if (friendGroupId) await FriendHandlerServerSide.updateFriendGroup(operatorId, targetId, friendGroupId);
+
+            socket.emit('friendApproval', {
+                targetId
+            });
+        }
+        catch (error: any) {
+            if (!(error instanceof StandardizedError)) {
+                new Logger('FriendApproval').error(error.message);
+
+                error = new StandardizedError({
+                    name: 'ServerError',
+                    message: `處理好友申請失敗，請稍後再試`,
+                    part: 'FRIENDAPPROVAL',
+                    tag: 'EXCEPTION_ERROR',
+                    statusCode: 500,
+                });
+            }
+
+            socket.emit('error', error);
+        }
+        
+    }
+}

@@ -94,7 +94,7 @@ export const FriendHandlerServerSide = {
     
     await database.set.friend(userId, targetId, {
       ...friend,
-      friendGroup: friendGroupId,
+      friendGroupId,
     });
   }
 
