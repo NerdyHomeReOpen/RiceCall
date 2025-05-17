@@ -127,6 +127,7 @@ export interface Translation {
   friendAddGroup: string;
   friendDeleteGroup: string;
   editFriendGroup: string;
+  renameFriendGroup: string;
   friendNote: string;
   max120content: string;
   sendRequest: string;

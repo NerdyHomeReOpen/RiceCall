@@ -95,7 +95,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
             contextMenu.showContextMenu(e.clientX, e.clientY, [
               {
                 id: 'edit',
-                label: lang.tr.editFriendGroup,
+                label: lang.tr.renameFriendGroup,
                 show: canManageFriendGroup,
                 onClick: () => handleOpenEditFriendGroup(friendGroupId, userId),
               },
