@@ -345,15 +345,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
             <div
               className={setting['tab']}
-              style={
-                selectedTabId === 'userSetting'
-                  ? { display: 'none' }
-                  : { display: 'flex' }
-              }
             >
               <div
                 className={`${setting['item']} ${setting['about']} ${
-                  selectedTabId === 'about' ? setting['selected'] : ''
+                  selectedTabId === 'about' || selectedTabId === 'userSetting' ? setting['selected'] : ''
                 }`}
                 onClick={() => {
                   if (selectedTabId !== 'userSetting') {
@@ -381,7 +376,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
           {/* Action Buttons */}
           <div
             className={setting['editTabBar']}
-            style={isSelf ? {} : { display: 'none' }}
+            style={isSelf && selectedTabId !== 'groups' ? {} : { display: 'none' }}
           >
             {selectedTabId === 'userSetting' ? (
               <>

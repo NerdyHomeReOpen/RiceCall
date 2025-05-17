@@ -452,24 +452,6 @@
   z-index: 1;
 }
 
-.userProfile .avatar.editable::before {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  right: -8px;
-  width: 15px;
-  height: 15px;
-  background-color: white;
-  background-image: url('../../../public/im/btn-edit.png');
-  background-size: 70% 70%;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 4px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 2;
-}
-
 .userProfile .userName {
   font-size: 1.5rem;
   font-weight: 600;
@@ -522,7 +504,11 @@
 }
 
 .userProfile .tab .item.selected {
-  background-position: 17px -38px;
+  background-position: 0 -38px;
+}
+
+.userProfile .tab .item:not(.selected) {
+  cursor: pointer;
 }
 
 .userProfile .tab .item.about::before {
