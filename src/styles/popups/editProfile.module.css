@@ -419,12 +419,16 @@
   background-position: center center;
 }
 
-.userProfile .avatar:hover {
+.userProfile .avatar.editable {
+  cursor: pointer;
+}
+
+.userProfile .avatar.editable:hover {
   box-shadow: 0 0 3px 6px rgba(255, 255, 255, 1);
   border-radius: 3px;
 }
 
-.userProfile .avatar:hover:after {
+.userProfile .avatar.editable:hover:after {
   display: none;
 }
 
@@ -432,10 +436,6 @@
 .noDrag,
 .tab div {
   -webkit-app-region: no-drag;
-}
-
-.userProfile .avatar.editable {
-  cursor: pointer;
 }
 
 .userProfile .avatar::after {
