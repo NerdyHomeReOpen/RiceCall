@@ -1,103 +1,79 @@
-.theme-1 {
-  background: url(../../../public/skin/57KJ57SF5Zue5oa2.jpg) no-repeat center
-    center;
-  background-color: #f6e6d7;
+header[class*='theme-'] {
+  background-color: var(--main-color);
+  color: var(--secondary-color);
+  background-repeat: no-repeat;
   background-position: 0 0px;
-  background-size: auto;
-  color: #f6e6d7;
+  background-size: cover;
+}
+
+.theme-1 {
+  --main-color: #f6e6d7;
+  --secondary-color: #000;
+  background-image: url(../../../public/skin/57KJ57SF5Zue5oa2.jpg);
 }
 
 .theme-2 {
-  background: url(../../../public/skin/57SU55yf56ul5bm0.jpg) no-repeat center
-    center;
-  background-color: #1b71ac;
-  background-position: 0 0px;
-  background-size: auto;
-  color: #1b71ac;
+  --main-color: #1b71ac;
+  --secondary-color: #fff;
+  background-image: url(../../../public/skin/57SU55yf56ul5bm0.jpg);
 }
 
 .theme-3 {
-  background: url(../../../public/skin/5Y+v5oSb6LKT5ZKq.jpg) no-repeat center
-    center;
-  background-color: #efd1ab;
-  background-position: 0 0px;
-  background-size: auto;
-  color: #efd1ab;
+  --main-color: #efd1ab;
+  --secondary-color: #000;
+  background-image: url(../../../public/skin/5Y+v5oSb6LKT5ZKq.jpg);
 }
 
 .theme-4 {
-  background: url(../../../public/skin/6YKj5LiA5bm0.jpg) no-repeat center center;
-  background-color: #d4be99;
-  background-position: 0 0px;
-  background-size: auto;
-  color: #d4be99;
+  --main-color: #d4be99;
+  --secondary-color: #000;
+  background-image: url(../../../public/skin/6YKj5LiA5bm0.jpg);
 }
 
 .theme-5 {
-  background: url(../../../public/skin/img_greenmood.jpg) no-repeat center
-    center;
-  background-color: #89c68b;
-  background-position: 0 0px;
-  background-size: auto;
-  color: #89c68b;
+  --main-color: #89c68b;
+  --secondary-color: #000;
+  background-image: url(../../../public/skin/img_greenmood.jpg);
 }
 
 .theme-6 {
-  background: url(../../../public/skin/img_sunflower.jpg) no-repeat center
-    center;
-  background-color: #edd569;
-  background-position: 0 0px;
-  background-size: auto;
-  color: #edd569;
+  --main-color: #edd569;
+  --secondary-color: #000;
+  background-image: url(../../../public/skin/img_sunflower.jpg);
 }
 
 .theme-7 {
-  background: url(../../../public/skin/img_sunset.jpg) no-repeat center center;
-  background-color: #7464ad;
-  background-position: 0 0px;
-  background-size: auto;
-  color: #7464ad;
+  --main-color: #7464ad;
+  --secondary-color: #000;
+  background-image: url(../../../public/skin/img_sunset.jpg);
 }
 
 .theme-8 {
-  background: url(../../../public/skin/img_colddrink.jpg) no-repeat center
-    center;
-  background-color: #e3908f;
-  background-position: 0 0px;
-  background-size: auto;
-  color: #e3908f;
+  --main-color: #e3908f;
+  --secondary-color: #000;
+  background-image: url(../../../public/skin/img_colddrink.jpg);
 }
 
 .theme-9 {
-  background: url(../../../public/skin/img_pebble.jpg) no-repeat center center;
-  background-color: #a4cfd5;
-  background-position: 0 0px;
-  background-size: auto;
-  color: #a4cfd5;
+  --main-color: #a4cfd5;
+  --secondary-color: #000;
+  background-image: url(../../../public/skin/img_pebble.jpg);
 }
 
 .theme-10 {
-  background: url(../../../public/skin/img_love.jpg) no-repeat center center;
-  background-color: #aa7a52;
-  background-position: 0 0px;
-  background-size: cover;
-  color: #aa7a52;
+  --main-color: #aa7a52;
+  --secondary-color: #000;
+  background-image: url(../../../public/skin/img_love.jpg);
 }
 
 .theme-11 {
-  background: url(../../../public/skin/img_hamburger.jpg) no-repeat center
-    center;
-  background-color: #591234;
-  background-position: 0 0px;
-  background-size: auto;
-  color: #591234;
+  --main-color: #591234;
+  --secondary-color: #fff;
+  background-image: url(../../../public/skin/img_hamburger.jpg);
 }
 
 .theme-12 {
-  background: url(../../../public/skin/img_coastline.jpg) no-repeat center
-    center;
-  background-color: #313131;
-  background-position: 0 0px;
-  background-size: cover;
-  color: #313131;
+  --main-color: #313131;
+  --secondary-color: #fff;
+  background-image: url(../../../public/skin/img_coastline.jpg);
 }

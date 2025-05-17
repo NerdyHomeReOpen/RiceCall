@@ -317,11 +317,11 @@
 }
 
 .mainTabs .tab.selected .tabLable {
-  color: currentColor;
+  color: var(--main-color);
 }
 
 .mainTabs .tab.selected .tabClose {
-  color: currentColor;
+  color: var(--main-color);
 }
 
 /* Title */

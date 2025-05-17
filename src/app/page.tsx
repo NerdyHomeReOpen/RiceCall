@@ -270,7 +270,12 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
                   height="15"
                   viewBox="0 0 24 24"
                 >
-                  <circle cx="12" cy="12" r="12" fill="currentColor" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="12"
+                    fill="var(--main-color, currentColor)"
+                  />
                   <path
                     d="M17 7L7 17M7 7l10 10"
                     stroke="#fff"
