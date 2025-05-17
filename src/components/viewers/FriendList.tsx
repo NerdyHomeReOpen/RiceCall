@@ -439,6 +439,17 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
+        if (event.button === 2) {
+          const targetElement = event.target as HTMLElement;
+          const friendGroupTab = targetElement.closest(`.${styles['tab']}`);
+          const friendCard = targetElement.closest(`.${styles['friendCard']}`);
+          if (
+            friendGroupTab?.classList.contains(styles['selected']) ||
+            friendCard?.classList.contains(styles['selected'])
+          ) {
+            return;
+          }
+        }
         if (
           viewerRef.current &&
           !viewerRef.current.contains(event.target as Node)
@@ -464,7 +475,7 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
-    }, [setSelectedFriendItemIdAndType, styles]);
+    }, [setSelectedFriendItemIdAndType]);
 
     return (
       <>

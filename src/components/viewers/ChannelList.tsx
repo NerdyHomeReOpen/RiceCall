@@ -1451,6 +1451,18 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
+        if (event.button === 2) {
+          const targetElement = event.target as HTMLElement;
+          const userTab = targetElement.closest(`.${styles['userTab']}`);
+          const channelTab = targetElement.closest(`.${styles['channelTab']}`);
+          if (
+            userTab?.classList.contains(styles['selected']) ||
+            channelTab?.classList.contains(styles['selected'])
+          ) {
+            return;
+          }
+        }
+
         if (
           viewerRef.current &&
           !viewerRef.current.contains(event.target as Node)
