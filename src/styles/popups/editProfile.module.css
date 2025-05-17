@@ -4,8 +4,12 @@
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  max-height: 340px;
+  overflow-y: scroll;
+}
+
+.body.canEditeable {
+  max-height: 290px;
 }
 
 .body .userProfileContent {
