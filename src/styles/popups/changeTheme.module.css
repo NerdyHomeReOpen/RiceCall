@@ -251,6 +251,16 @@
   height: 120px;
 }
 
+.themeDescription {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0000007d;
+  color: #fff;
+}
+
 .themeImages.small div[class*='themePreview-'],
 .themeColors .colorBox {
   border: 1px solid #fff;

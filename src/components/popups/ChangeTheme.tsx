@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -16,24 +16,28 @@ interface ChangeThemePopupProps {
 }
 
 const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
+  // Refs
   const containerRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // States
+  const [hoveredThemeIndex, setHoveredThemeIndex] = useState<number | null>(
+    null,
+  );
+
+  // Handlers
   const handleSubmit = () => {
     ipcService.popup.submit(submitTo);
     handleClose();
   };
-
   const handleClose = () => {
     ipcService.window.close();
   };
-
-  const changeThemes = (index: number) => {
+  const handleChangeTheme = (index: number) => {
     setThemeValue('selectedTheme', `theme-${index}`);
     removeThemeValue('selectedThemeColor');
     removeThemeValue('customThemeImage');
   };
-
   const handleColorBoxClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const clickedElement = event.currentTarget;
     const color = window.getComputedStyle(clickedElement).backgroundColor;
@@ -44,11 +48,9 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       removeThemeValue('customThemeImage');
     }
   };
-
   const handleAddCustomImageClick = () => {
     fileInputRef.current?.click();
   };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -66,6 +68,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     }
   };
 
+  // Effects
   useEffect(() => {
     containerRef.current?.focus();
   }, []);
@@ -91,8 +94,19 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                     <div
                       key={i}
                       className={changeTheme[`themePreview-${i}`]}
-                      onClick={() => changeThemes(i)}
-                    />
+                      onClick={() => handleChangeTheme(i)}
+                      onMouseEnter={() => setHoveredThemeIndex(i)}
+                      onMouseLeave={() => setHoveredThemeIndex(null)}
+                    >
+                      {hoveredThemeIndex === i && (
+                        <div className={changeTheme['themeDescription']}>
+                          {i === 1 && '粉紅回憶'}
+                          {i === 2 && '純真童年'}
+                          {i === 3 && '可愛貓咪'}
+                          {i === 4 && '那一年'}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
                 <div
@@ -102,7 +116,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                     <div
                       key={i + 5}
                       className={changeTheme[`themePreview-${i + 5}`]}
-                      onClick={() => changeThemes(i + 5)}
+                      onClick={() => handleChangeTheme(i + 5)}
                     />
                   ))}
                 </div>
