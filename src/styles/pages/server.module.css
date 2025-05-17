@@ -414,6 +414,10 @@
   background-position: 0 0;
 }
 
+.gradeIcon {
+  cursor: default;
+}
+
 .myLocationIcon {
   position: absolute;
   min-height: 15px;

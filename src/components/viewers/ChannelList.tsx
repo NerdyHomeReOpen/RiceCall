@@ -1251,7 +1251,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           `}
         />
         <div
-          className={`
+          className={`${styles['gradeIcon']} 
             ${permission[memberGender]} 
             ${permission[`lv-${memberPermission}`]}
           `}
@@ -1278,6 +1278,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             ${grade['grade']} 
             ${grade[`lv-${Math.min(56, memberLevel)}`]}
           `}
+          style={{ cursor: 'default' }}
         />
         <BadgeListViewer badges={memberBadges} maxDisplay={5} />
         {isCurrentUser && <div className={styles['myLocationIcon']} />}
