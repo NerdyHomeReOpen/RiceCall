@@ -14,7 +14,7 @@ import { UploadHandler } from './routers/upload/upload.handler';
 
 // Routers
 import { PostRouters } from './PostRouters';
-import routesInitializer from './routers/routes';
+import PostRoutesInitializer from './routers/routes';
 
 export type ResponseType = {
   statusCode: number;
@@ -52,14 +52,14 @@ const sendOptions = (res: ServerResponse) => {
   res.end();
 };
 
-routesInitializer();
-
 export default class HttpServer {
   constructor(private port: number) {
     this.port = port;
   }
 
   setup() {
+    PostRoutesInitializer();
+
     const server = http.createServer(async (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, PATCH');
