@@ -161,7 +161,6 @@
 .inputBox {
   width: 100%;
   display: flex;
-  gap: 5px;
 }
 
 .inputBox input[type='text'],
@@ -274,11 +273,12 @@
   background: #fff;
   position: relative;
   display: inline-block;
-  min-width: 100px;
+  min-width: 6.5rem;
   max-width: 100%;
   height: 2rem;
   appearance: none;
   text-decoration: none;
+  box-shadow: inset 0 1px 2px #00000026;
 }
 
 .inputBox .selectBox::before {
