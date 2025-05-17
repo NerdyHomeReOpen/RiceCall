@@ -286,13 +286,14 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
       );
 
       if (friendGroupId) {
-        friend = await database.get.friend(operatorId, targetId);
-        
         await FriendHandlerServerSide.updateFriendGroup(
           operatorId,
           targetId,
           friendGroupId,
         );  
+
+        friend = await database.get.friend(operatorId, targetId);
+
         socket.emit('friendUpdate', operatorId, targetId, friend);
       }
         
