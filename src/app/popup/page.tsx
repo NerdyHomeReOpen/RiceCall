@@ -136,12 +136,10 @@ const Header: React.FC<HeaderProps> = React.memo(
             !themeClass && backgroundImage
               ? `url(${backgroundImage})`
               : undefined,
-          backgroundColor:
+          background:
             !themeClass && !backgroundImage && backgroundColor !== null
               ? backgroundColor
               : undefined,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
         }}
       >
         <div className={header['titleWrapper']}>
