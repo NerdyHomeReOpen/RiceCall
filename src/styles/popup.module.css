@@ -323,10 +323,14 @@
   display: none;
 }
 
-.popupContainer :disabled,
-.popupContainer .disabled {
+.popupContainer :disabled {
   background-image: linear-gradient(to bottom, #fdfdfd, #fafafa);
   color: #c5c5c5;
+  pointer-events: none;
+}
+
+.disabled {
+  opacity: 0.5;
   pointer-events: none;
 }
 
