@@ -435,8 +435,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         channelUserLimit > channelMembers.length ||
         permissionLevel > 4);
     const canManageChannel = permissionLevel > 4;
-    const canCreate = canManageChannel;
-    const canCreateSub = canManageChannel && !isLobby && !channelCategoryId;
+    const canCreate = canManageChannel && !channelCategoryId;
+    const canCreateSub = canManageChannel && !isLobby;
     const canEdit = canManageChannel;
     const canDelete = canManageChannel && !isLobby;
     const canMoveAllUserToChannel =
