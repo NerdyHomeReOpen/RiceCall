@@ -445,7 +445,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                         name="displayId"
                         type="text"
                         value={serverDisplayId}
-                        disabled
+                        readOnly
                       />
                     </div>
                   </div>
@@ -545,7 +545,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       name="level"
                       type="text"
                       value={serverLevel}
-                      disabled
+                      readOnly
                     />
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
@@ -554,7 +554,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       name="createdAt"
                       type="text"
                       value={new Date(serverCreatedAt).toLocaleString()}
-                      disabled
+                      readOnly
                     />
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
@@ -567,7 +567,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       name="wealth"
                       type="text"
                       value={serverWealth}
-                      disabled
+                      readOnly
                     />
                   </div>
                 </div>
@@ -577,7 +577,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     name="link"
                     type="text"
                     value={`https://ricecall.com.tw/join?sid=${serverDisplayId}`}
-                    disabled
+                    readOnly
                   />
                 </div>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>

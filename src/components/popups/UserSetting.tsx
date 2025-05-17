@@ -437,10 +437,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
           {/* Body */}
           <div
-            className={setting['body']}
+            className={`${setting['body']} ${isSelf ? setting['canEditeable']: ''}`}
             style={selectedTabId === 'about' ? {} : { display: 'none' }}
           >
-            {userSignature && !isSelf && (
+            {userSignature && (
               <div className={setting['userAboutMeShow']}>{userSignature}</div>
             )}
             <div className={setting['userProfileContent']}>
