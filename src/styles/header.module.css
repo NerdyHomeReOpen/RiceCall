@@ -309,7 +309,7 @@
   z-index: 1;
   text-overflow: ellipsis;
   overflow: hidden;
-  color: rgb(255, 255, 255);
+  color: var(--secondary-color, var(--main-color, #fff));
   width: 100%;
   height: 100%;
   text-align: center;
