@@ -368,12 +368,16 @@
   -webkit-app-region: drag;
 }
 
+.userProfile .header div:not(.tab, .tab div),
+.userAboutMeShow {
+  user-select: text;
+}
+
 .windowActionButtons {
   width: 50px;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  -webkit-app-region: no-drag;
   position: fixed;
   right: 0;
   top: 10px;
@@ -433,6 +437,11 @@
   display: none;
 }
 
+.windowActionButtons,
+.vipIcon,
+.userAccount,
+.userContent,
+.userSignature,
 .avatar,
 .noDrag,
 .tab div {
@@ -506,10 +515,6 @@
 
 .userProfile .tab .item.selected {
   background-position: 0 -38px;
-}
-
-.userProfile .tab .item:not(.selected) {
-  cursor: pointer;
 }
 
 .userProfile .tab .item.editable {
