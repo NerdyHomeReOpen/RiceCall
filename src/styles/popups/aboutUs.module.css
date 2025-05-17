@@ -160,10 +160,14 @@
   background-color: rgba(136, 63, 216, 0.8);
 }
 
-.serverMaintainer {
+.machineNetwork {
   background-color: rgb(77 173 147 / 80%);
 }
 
 .technicalSupport {
   background-color: rgba(216, 166, 63, 0.8);
+}
+
+.customerService {
+  background-color: rgba(63, 166, 216, 0.8);
 }

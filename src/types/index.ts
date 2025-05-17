@@ -286,10 +286,11 @@ export interface Translation {
   projectRepo: string;
   officialWebsite: string;
   mainDeveloper: string;
-  serverMaintainer: string;
   frontendDeveloper: string;
   backendDeveloper: string;
   technicalSupport: string;
+  customerService: string;
+  machineNetwork: string;
   teamMembers: string;
   copyright: string;
   isReceiveApply: string;

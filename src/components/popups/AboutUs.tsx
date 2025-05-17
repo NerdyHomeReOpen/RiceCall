@@ -27,15 +27,17 @@ const AboutPopup: React.FC = () => {
     | typeof lang.tr.mainDeveloper
     | typeof lang.tr.backendDeveloper
     | typeof lang.tr.frontendDeveloper
-    | typeof lang.tr.serverMaintainer
-    | typeof lang.tr.technicalSupport;
+    | typeof lang.tr.machineNetwork
+    | typeof lang.tr.technicalSupport
+    | typeof lang.tr.customerService;
 
   const titleColorClasses: Record<JobTitle, string> = {
     [lang.tr.mainDeveloper]: aboutUs.mainDeveloper,
     [lang.tr.backendDeveloper]: aboutUs.backendDeveloper,
     [lang.tr.frontendDeveloper]: aboutUs.frontendDeveloper,
-    [lang.tr.serverMaintainer]: aboutUs.serverMaintainer,
+    [lang.tr.machineNetwork]: aboutUs.machineNetwork,
     [lang.tr.technicalSupport]: aboutUs.technicalSupport,
+    [lang.tr.customerService]: aboutUs.customerService,
   };
   const currentYear = new Date().getFullYear();
   const teamMembers = [
@@ -57,10 +59,10 @@ const AboutPopup: React.FC = () => {
     },
     {
       title: lang.tr.backendDeveloper,
-      contact: 'lekoOwO',
+      contact: 'yuusukealmal',
       info: [
-        { label: 'Github', value: 'lekoOwO' },
-        { label: 'Discord', value: '108153734541942784' },
+        { label: 'Github', value: 'yuusukealmal' },
+        { label: 'Discord', value: '878830839822176287' },
       ],
     },
     {
@@ -80,7 +82,7 @@ const AboutPopup: React.FC = () => {
       ],
     },
     {
-      title: lang.tr.serverMaintainer,
+      title: lang.tr.machineNetwork,
       contact: 'Cooookie16',
       info: [
         { label: 'Github', value: 'Cooookie16' },
@@ -88,11 +90,19 @@ const AboutPopup: React.FC = () => {
       ],
     },
     {
-      title: lang.tr.serverMaintainer,
+      title: lang.tr.machineNetwork,
       contact: 'yayacat',
       info: [
         { label: 'Github', value: 'yayacat' },
         { label: 'Discord', value: '107918754251325440' },
+      ],
+    },
+    {
+      title: lang.tr.machineNetwork,
+      contact: 'codingbear',
+      info: [
+        { label: 'Github', value: 'mcg25035' },
+        { label: 'Discord', value: '492908862647697409' },
       ],
     },
     {
@@ -110,6 +120,16 @@ const AboutPopup: React.FC = () => {
         { label: 'Github', value: 'SN-Koarashi' },
         { label: 'Discord', value: '198418020329062400' },
       ],
+    },
+    {
+      title: lang.tr.customerService,
+      contact: 'lingyu1121',
+      info: [{ label: 'Discord', value: '371580417096155137' }],
+    },
+    {
+      title: lang.tr.customerService,
+      contact: 'goujuanji_',
+      info: [{ label: 'Discord', value: '415152218690420736' }],
     },
   ];
 
