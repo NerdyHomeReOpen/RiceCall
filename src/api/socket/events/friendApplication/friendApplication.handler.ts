@@ -281,19 +281,24 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
       await FriendHandlerServerSide.createFriend(operatorId, targetId);
       await database.delete.friendApplication(targetId, operatorId);
 
-      if (friendGroupId)
+      new Logger('ApproveFriendApplication').info(
+        `User(${operatorId}) updated friend(${targetId}) to friend group(${friendGroupId})`,
+      );
+
+      if (friendGroupId) 
         await FriendHandlerServerSide.updateFriendGroup(
           operatorId,
           targetId,
           friendGroupId,
-        );
+        );  
+        
 
       socket.emit('friendApproval', {
         targetId,
       });
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
-        new Logger('FriendApproval').error(error.message);
+        new Logger('ApproveFriendApplication').error(error.message);
 
         error = new StandardizedError({
           name: 'ServerError',
