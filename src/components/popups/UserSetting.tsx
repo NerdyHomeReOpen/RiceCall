@@ -1244,53 +1244,54 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             >
               <div className={setting['emojiIconsContent']}>
                 {emojiList.map((emoji) => (
-                  <div key={emoji.id} className={setting['emojiIconBox']}>
+                  <div
+                    key={emoji.id}
+                    className={setting['emojiIconBox']}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                    }}
+                    onClick={() => {
+                      if (signatureDivRef.current) {
+                        signatureDivRef.current.focus();
+                        const emojiImgTag = `<img src="/vipemotions/${emoji.src}.png" alt="${emoji.name}" data-emoji-name="${emoji.name}" data-emoji-src="${emoji.src}" style="width: 17px; height: 17px; vertical-align: middle; margin: 0 1px;" contenteditable="false" draggable="false" />`;
+                        const selection = window.getSelection();
+                        if (!selection) return;
+                        let range: Range;
+                        if (
+                          selection.rangeCount > 0 &&
+                          signatureDivRef.current.contains(selection.anchorNode)
+                        ) {
+                          range = selection.getRangeAt(0);
+                          range.deleteContents();
+                        } else {
+                          range = document.createRange();
+                          range.selectNodeContents(signatureDivRef.current);
+                          range.collapse(false);
+                        }
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = emojiImgTag;
+                        const imgNodeToInsert = tempDiv.firstChild;
+                        if (imgNodeToInsert) {
+                          range.insertNode(imgNodeToInsert);
+                          range.setStartAfter(imgNodeToInsert);
+                          range.collapse(true);
+                          selection.removeAllRanges();
+                          selection.addRange(range);
+                        }
+                        setUser((prev) => ({
+                          ...prev,
+                          signature: signatureDivRef.current!.innerHTML,
+                        }));
+                        lastCursorPosition.current = null;
+                      }
+                    }}
+                  >
                     <div
                       className={setting['emojiIcon']}
                       style={{
                         backgroundImage: `url('/vipemotions/${emoji.src}.png')`,
                       }}
                       title={emoji.name}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                      }}
-                      onClick={() => {
-                        if (signatureDivRef.current) {
-                          signatureDivRef.current.focus();
-                          const emojiImgTag = `<img src="/vipemotions/${emoji.src}.png" alt="${emoji.name}" data-emoji-name="${emoji.name}" data-emoji-src="${emoji.src}" style="width: 17px; height: 17px; vertical-align: middle; margin: 0 1px;" contenteditable="false" draggable="false" />`;
-                          const selection = window.getSelection();
-                          if (!selection) return;
-                          let range: Range;
-                          if (
-                            selection.rangeCount > 0 &&
-                            signatureDivRef.current.contains(
-                              selection.anchorNode,
-                            )
-                          ) {
-                            range = selection.getRangeAt(0);
-                            range.deleteContents();
-                          } else {
-                            range = document.createRange();
-                            range.selectNodeContents(signatureDivRef.current);
-                            range.collapse(false);
-                          }
-                          const tempDiv = document.createElement('div');
-                          tempDiv.innerHTML = emojiImgTag;
-                          const imgNodeToInsert = tempDiv.firstChild;
-                          if (imgNodeToInsert) {
-                            range.insertNode(imgNodeToInsert);
-                            range.setStartAfter(imgNodeToInsert);
-                            range.collapse(true);
-                            selection.removeAllRanges();
-                            selection.addRange(range);
-                          }
-                          setUser((prev) => ({
-                            ...prev,
-                            signature: signatureDivRef.current!.innerHTML,
-                          }));
-                          lastCursorPosition.current = null;
-                        }
-                      }}
                     ></div>
                   </div>
                 ))}
