@@ -38,6 +38,7 @@ import {
   THEME_CHANGE_EVENT,
   applyThemeToReactState,
 } from '@/utils/themeStorage';
+import { emojiList, convertEmojiPlaceholderToHtml } from '@/utils/emoji';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -51,9 +52,12 @@ import directMessageStyles from '@/styles/popups/directMessage.module.css';
 
 const directMessageHeader = (targetSignature: string) => (
   <div className={directMessageStyles['header']}>
-    <div className={directMessageStyles['userSignature']}>
-      {targetSignature}
-    </div>
+    <div
+      className={directMessageStyles['userSignature']}
+      dangerouslySetInnerHTML={{
+        __html: convertEmojiPlaceholderToHtml(targetSignature || '', emojiList),
+      }}
+    />
     <div className={directMessageStyles['directOptionButtons']}>
       <div className={directMessageStyles['fileShare']} />
       <div className={directMessageStyles['blockUser']} />
