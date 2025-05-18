@@ -518,7 +518,7 @@ export const FavoriteServerHandler: SocketRequestHandler = {
       await database.set.userServer(operatorId, serverId, serverUpdate);
 
       // Send socket event
-      io.to(`server_${serverId}`).emit('serverUpdate', serverId, serverUpdate);
+      socket.emit('serverUpdate', serverId, serverUpdate);
 
       /* ========== End of Handling ========== */
 
