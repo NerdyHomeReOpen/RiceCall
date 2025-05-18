@@ -359,7 +359,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
             />
             <div
               ref={emojiButtonRef}
-              className={emoji['emojiButtonIcon']}
+              className={`${emoji['emojiButtonIcon']} ${friendPage['emojiBtn']}`}
               onMouseDown={(e) => {
                 e.preventDefault();
               }}

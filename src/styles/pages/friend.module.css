@@ -126,13 +126,22 @@
   border-radius: 3px;
 }
 
+.emojiBtn {
+  display: none;
+}
+
+.signatureBox:focus-within .enterButtonIconBox,
+.signatureBox:focus-within .emojiBtn {
+  display: flex;
+}
+
 .enterButtonIconBox {
   border: 1px solid #d1d1d1;
   background-color: #fbfbfb;
   border-radius: 5px;
   height: 18px;
   width: 30px;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   cursor: pointer;
