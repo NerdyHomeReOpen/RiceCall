@@ -589,11 +589,13 @@
 }
 
 .serverBox {
-  flex: 1;
-  display: flex;
   flex-direction: column;
-  overflow: hidden;
+  flex: 1;
   gap: 5px;
+  display: flex;
+  overflow: hidden;
+  min-height: 33px;
+  justify-content: space-between;
 }
 
 .serverName {
