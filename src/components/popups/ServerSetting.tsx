@@ -108,7 +108,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       MemberApplication[]
     >([]);
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-    const [sortState, setSortState] = useState<1 | -1>(-1);
+    const [sortDirection, setSortDirection] = useState<1 | -1>(-1);
     const [sortField, setSortField] = useState<string>('permissionLevel');
     const [searchText, setSearchText] = useState('');
     const [showPreview, setShowPreview] = useState(false);
@@ -220,11 +220,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const handleSort = <T extends ServerMember | MemberApplication>(
       field: keyof T,
       array: T[],
+      direction: 1 | -1,
     ) => {
-      const newDirection =
-        sortField === String(field) ? (sortState === 1 ? -1 : 1) : -1;
+      const newDirection = direction === 1 ? -1 : 1;
       setSortField(String(field));
-      setSortState(newDirection);
+      setSortDirection(newDirection);
       return [...array].sort(createSorter(field, newDirection));
     };
 
@@ -321,12 +321,16 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     };
 
     const handleMemberSort = (field: keyof ServerMember) => {
-      const sortedMembers = handleSort(field, [...serverMembers]);
+      const sortedMembers = handleSort(field, serverMembers, sortDirection);
       setServerMembers(sortedMembers);
     };
 
     const handleApplicationSort = (field: keyof MemberApplication) => {
-      const sortedApplications = handleSort(field, [...serverApplications]);
+      const sortedApplications = handleSort(
+        field,
+        serverApplications,
+        sortDirection,
+      );
       setServerApplications(sortedApplications);
     };
 
@@ -395,13 +399,12 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
             setMember(member);
           }
           if (members) {
-            const sortedMembers = members.sort(
-              (a, b) => b.permissionLevel - a.permissionLevel,
-            );
+            const sortedMembers = handleSort('permissionLevel', members, 1);
             setServerMembers(sortedMembers);
           }
           if (applications) {
-            setServerApplications(applications);
+            const sortedApplications = handleSort('createdAt', applications, 1);
+            setServerApplications(sortedApplications);
           }
         });
       };
