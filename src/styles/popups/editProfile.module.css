@@ -368,12 +368,17 @@
   -webkit-app-region: drag;
 }
 
+.userProfile .header div:not(.tab, .tab div),
+.userAboutMeShow,
+.userRecentVisitsPrivate {
+  user-select: text;
+}
+
 .windowActionButtons {
   width: 50px;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  -webkit-app-region: no-drag;
   position: fixed;
   right: 0;
   top: 10px;
@@ -433,9 +438,15 @@
   display: none;
 }
 
+.windowActionButtons,
+.vipIcon,
+.userAccount,
+.userContent,
+.userSignature,
 .avatar,
 .noDrag,
-.tab div {
+.tab div,
+.userRecentVisitsPrivate {
   -webkit-app-region: no-drag;
 }
 
@@ -471,16 +482,20 @@
 }
 
 .userProfile .userSignature {
+  color: #fff;
+  width: 30rem;
+  max-height: 2.4rem;
   font-size: 0.95rem;
   font-weight: 400;
-  color: #fff;
-  text-align: center;
-  max-height: 49.5px;
-  padding: 0 15px 1.5rem 15px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 498px;
+  overflow-y: scroll;
+  margin-bottom: 1.5rem;
+  text-align: start;
+}
+
+.userProfile .userSignature:hover::-webkit-scrollbar-thumb {
+  background: rgb(255, 255, 255);
+  border-radius: 4px;
+  border: 1px solid #ffffff;
 }
 
 .userProfile .tab {
@@ -506,10 +521,6 @@
 
 .userProfile .tab .item.selected {
   background-position: 0 -38px;
-}
-
-.userProfile .tab .item:not(.selected) {
-  cursor: pointer;
 }
 
 .userProfile .tab .item.editable {

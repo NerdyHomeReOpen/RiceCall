@@ -88,9 +88,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       .sort((a, b) => b.permissionLevel - a.permissionLevel);
     const favoriteServers = servers
       .filter((s) => s.favorite)
+      .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
       .sort((a, b) => b.permissionLevel - a.permissionLevel);
     const recentServers = servers
       .filter((s) => s.recent)
+      .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 4);
 
@@ -343,17 +345,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
             <div className={setting['userSignature']}>{userSignature}</div>
 
-            <div
-              className={setting['tab']}
-            >
+            <div className={setting['tab']}>
               <div
                 className={`${setting['item']} ${setting['about']}
                 ${
-                  selectedTabId === 'userSetting' ? `${setting['selected']} ${setting['editable']}` : ''
+                  selectedTabId === 'userSetting'
+                    ? `${setting['selected']} ${setting['editable']}`
+                    : ''
                 }
-                ${
-                  selectedTabId === 'about' ? setting['selected'] : ''
-                }`}
+                ${selectedTabId === 'about' ? setting['selected'] : ''}`}
                 onClick={() => {
                   if (selectedTabId !== 'userSetting') {
                     setSelectedTabId('about');
@@ -364,12 +364,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               </div>
               <div
                 className={`${setting['item']} ${setting['groups']}
-                ${
-                  selectedTabId === 'userSetting' ? setting['editable'] : ''
-                }
-                ${
-                  selectedTabId === 'groups' ? setting['selected'] : ''
-                }`}
+                ${selectedTabId === 'userSetting' ? setting['editable'] : ''}
+                ${selectedTabId === 'groups' ? setting['selected'] : ''}`}
                 onClick={() => {
                   if (selectedTabId !== 'userSetting') {
                     setSelectedTabId('groups');
@@ -384,7 +380,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
           {/* Action Buttons */}
           <div
             className={setting['editTabBar']}
-            style={isSelf && selectedTabId !== 'groups' ? {} : { display: 'none' }}
+            style={
+              isSelf && selectedTabId !== 'groups' ? {} : { display: 'none' }
+            }
           >
             {selectedTabId === 'userSetting' ? (
               <>
@@ -437,7 +435,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
           {/* Body */}
           <div
-            className={`${setting['body']} ${isSelf ? setting['canEditeable']: ''}`}
+            className={`${setting['body']} ${
+              isSelf ? setting['canEditeable'] : ''
+            }`}
             style={selectedTabId === 'about' ? {} : { display: 'none' }}
           >
             {userSignature && (
@@ -514,7 +514,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                     onChange={(e) => setServersView(e.target.value)}
                   >
                     <option value="joined">{lang.tr.joinedServers}</option>
-                    <option value="favorite">{lang.tr.favoriteServers}</option>
+                    <option value="favorite">{lang.tr.favoritedServers}</option>
                   </select>
                 </div>
               </div>

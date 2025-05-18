@@ -62,6 +62,10 @@
   gap: 5px;
 }
 
+.gradeIcon {
+  cursor: default;
+}
+
 .myBadges {
   padding: 3;
 }
@@ -355,7 +359,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  cursor: pointer;
   position: relative;
   padding: 5px;
   border-radius: 3px;
