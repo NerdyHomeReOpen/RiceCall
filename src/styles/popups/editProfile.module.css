@@ -482,16 +482,20 @@
 }
 
 .userProfile .userSignature {
+  color: #fff;
+  width: 30rem;
+  max-height: 2.4rem;
   font-size: 0.95rem;
   font-weight: 400;
-  color: #fff;
-  text-align: center;
-  max-height: 49.5px;
-  padding: 0 15px 1.5rem 15px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 498px;
+  overflow-y: scroll;
+  margin-bottom: 1.5rem;
+  text-align: start;
+}
+
+.userProfile .userSignature:hover::-webkit-scrollbar-thumb {
+  background: rgb(255, 255, 255);
+  border-radius: 4px;
+  border: 1px solid #ffffff;
 }
 
 .userProfile .tab {
