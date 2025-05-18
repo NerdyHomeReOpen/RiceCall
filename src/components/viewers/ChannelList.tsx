@@ -1087,7 +1087,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               {
                 id: 'view-profile',
                 label: lang.tr.viewProfile,
-                show: !isCurrentUser,
                 onClick: () => handleOpenUserInfo(userId, memberUserId),
               },
               {
