@@ -121,6 +121,13 @@
   margin-right: 0.5rem;
 }
 
+.signatureInput:empty::before {
+  content: attr(data-placeholder-text);
+  color: #000000;
+  pointer-events: none;
+  display: block;
+}
+
 .signatureBox:focus-within {
   border: 1px solid #dfe2e5;
   border-radius: 3px;
