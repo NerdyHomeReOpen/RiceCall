@@ -634,13 +634,10 @@ export const DeleteChannelHandler: SocketRequestHandler = {
 
       // Update category
       if (categoryChildren && categoryChildren.length <= 1) {
-        const categoryUpdate = {
-          type: 'channel',
-        };
         await UpdateChannelHandler.handle(io, socket, {
-          channelId: channel.categoryId,
           serverId: serverId,
-          channel: categoryUpdate,
+          channelId: channel.categoryId,
+          channel: { type: 'channel' },
         });
       }
 
@@ -660,9 +657,9 @@ export const DeleteChannelHandler: SocketRequestHandler = {
       if (channelUsers) {
         for (const user of channelUsers) {
           await ConnectChannelHandler.handle(io, socket, {
-            channelId: server.lobbyId,
-            serverId: serverId,
             userId: user.userId,
+            serverId: serverId,
+            channelId: server.lobbyId,
           });
 
           await new Promise((resolve) => setTimeout(resolve, 200));
