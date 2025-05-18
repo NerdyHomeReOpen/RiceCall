@@ -32,6 +32,7 @@ import SearchUser from '@/components/popups/SearchUser';
 import Dialog from '@/components/popups/Dialog';
 import ChangeTheme from '@/components/popups/ChangeTheme';
 import About from '@/components/popups/AboutUs';
+import FriendVerification from '@/components/popups/FriendVerification';
 
 // Utils
 import {
@@ -399,6 +400,11 @@ const Popup = React.memo(() => {
         setHeaderTitle(lang.tr.aboutUs);
         setHeaderButtons(['close']);
         setContent(<About {...popupInitialData} />);
+        break;
+      case PopupType.FRIEND_VERIFICATION:
+        setHeaderTitle(lang.tr.friendVerification);
+        setHeaderButtons(['close']);
+        setContent(<FriendVerification {...popupInitialData} />);
         break;
       default:
         break;

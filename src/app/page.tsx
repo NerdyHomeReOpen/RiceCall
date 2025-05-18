@@ -159,6 +159,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
     localStorage.setItem('language', language);
   };
 
+  const handleOpenFriendVerification = () => {
+    ipcService.popup.open(PopupType.FRIEND_VERIFICATION, 'friendVerification');
+    ipcService.initialData.onRequest('friendVerification', {});
+  };
+
   // Effects
   useEffect(() => {
     const offMaximize = ipcService.window.onMaximize(() => {
@@ -299,7 +304,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
       <div className={header['buttons']}>
         <div className={header['gift']} />
         <div className={header['game']} />
-        <div className={header['notice']} />
+        <div
+          className={header['notice']}
+          onClick={() => handleOpenFriendVerification()}
+        />
         <div className={header['spliter']} />
         <div
           className={header['menu']}

@@ -270,6 +270,7 @@ export interface Translation {
   basicSettings: string;
   voiceSettings: string;
   aboutUs: string;
+  friendVerification: string;
   generalSettings: string;
   autoStartup: string;
   autoStartupDescription: string;
@@ -799,6 +800,7 @@ export enum PopupType {
   ANTHOR_DEVICE_LOGIN = 'anotherDeviceLogin',
   CHANGE_THEME = 'changeTheme',
   ABOUTUS = 'aboutus',
+  FRIEND_VERIFICATION = 'friendVerification',
 }
 
 export const PopupSize = {
@@ -830,6 +832,7 @@ export const PopupSize = {
   [PopupType.ANTHOR_DEVICE_LOGIN]: { height: 200, width: 370 },
   [PopupType.CHANGE_THEME]: { height: 331, width: 480 },
   [PopupType.ABOUTUS]: { height: 440, width: 480 },
+  [PopupType.FRIEND_VERIFICATION]: { height: 320, width: 500 },
   Settings: { height: 520, width: 600 },
   Apply: { height: 320, width: 500 },
   Small: { height: 200, width: 370 },
