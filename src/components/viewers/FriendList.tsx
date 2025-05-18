@@ -355,6 +355,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
               <div className={styles['name']}>{friendName}</div>
               <div
                 className={`
+                  ${styles['gradeIcon']} 
                   ${grade['grade']} 
                   ${grade[`lv-${Math.min(56, friendLevel)}`]}
                 `}

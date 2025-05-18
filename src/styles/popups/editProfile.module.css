@@ -369,7 +369,8 @@
 }
 
 .userProfile .header div:not(.tab, .tab div),
-.userAboutMeShow {
+.userAboutMeShow,
+.userRecentVisitsPrivate {
   user-select: text;
 }
 
@@ -444,7 +445,8 @@
 .userSignature,
 .avatar,
 .noDrag,
-.tab div {
+.tab div,
+.userRecentVisitsPrivate {
   -webkit-app-region: no-drag;
 }
 
