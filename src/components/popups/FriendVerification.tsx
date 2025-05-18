@@ -20,7 +20,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = (
   initialData: FriendVerificationPopupProps,
 ) => {
   // Hooks
-  const lang = useLanguage();
+  // const lang = useLanguage();
 
   // Variables
   const { submitTo } = initialData;
@@ -68,6 +68,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = (
               <div className={friendVerification['userApplyContentBox']}>
                 <div className={friendVerification['userInfo']}>
                   <div className={friendVerification['userName']}>userName</div>
+                  <div className={friendVerification['time']}>1秒前</div>
                 </div>
                 <div className={friendVerification['userApplyContent']}>
                   <div className={friendVerification['userApplyContentText']}>

@@ -35,6 +35,16 @@
   display: flex;
 }
 
+.userInfo {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.time {
+  color: #666;
+}
+
 .avatarBox {
   background-image: url('../../../public/im/SecretaryLogo.png');
   background-size: cover;
@@ -47,10 +57,6 @@
 
 .userApplyContentBox {
   width: 31rem;
-}
-
-.userInfo {
-  margin-bottom: 1rem;
 }
 
 .userApplyContent {
