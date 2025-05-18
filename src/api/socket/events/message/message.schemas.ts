@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const MessageSchema = z.object({
   content: z.string().min(1),
-  type: z.enum(['general', 'info', 'dm']),
+  type: z.enum(['general', 'info', 'warn', 'event', 'dm']),
 });
 
 export const ChannelMessageSchema = MessageSchema.extend({
