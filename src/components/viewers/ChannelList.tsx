@@ -989,6 +989,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     };
 
     const handleShowUserInfoCard = () => {
+      if (contextMenu.isContextMenuVisible) {
+        return;
+      }
       if (qualifyingEventRef.current && userTabRef.current) {
         const rect = userTabRef.current.getBoundingClientRect();
         const cardX = rect.right - 100;

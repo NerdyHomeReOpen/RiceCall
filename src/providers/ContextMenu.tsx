@@ -24,6 +24,7 @@ interface ContextMenuContextType {
   closeContextMenu: () => void;
   closeUserInfoBlock: () => void;
   hideBadgeInfoCard: () => void;
+  isContextMenuVisible: boolean;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
@@ -102,7 +103,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   };
 
   const showUserInfoBlock = (x: number, y: number, member: ServerMember) => {
-    if (isVisible) closeContextMenu();
     setUserInfo({ x, y, member });
   };
 
@@ -137,6 +137,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         showBadgeInfoCard,
         hideBadgeInfoCard,
         closeContextMenu,
+        isContextMenuVisible: isVisible,
       }}
     >
       {isVisible && content}
