@@ -53,7 +53,7 @@
   justify-content: flex-start;
   overflow: hidden;
   height: 100%;
-  gap: 5px;
+  gap: 10px;
 }
 
 .baseInfoBox .container {
@@ -411,6 +411,10 @@
 
 .friendList .tab .toggleIcon.expanded {
   background-position: -14px 0;
+}
+
+.friendList .tabContent {
+  margin-left: 1.6rem;
 }
 
 .friendCard {
