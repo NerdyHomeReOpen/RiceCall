@@ -22,10 +22,10 @@ export function applyThemeToReactState(setters: {
   setBackgroundImage: (val: string | null) => void;
 }) {
   const theme = localStorage.getItem('selectedTheme');
-  const color = localStorage.getItem('selectedThemeColor') || 'rgb(0, 115, 198) none repeat scroll 0% 0% / auto padding-box border-box';
+  const selectedColor = localStorage.getItem('selectedThemeColor');
   const customImage = localStorage.getItem('customThemeImage');
 
   setters.setThemeClass(theme);
-  setters.setBackgroundColor(color);
+  setters.setBackgroundColor(selectedColor);
   setters.setBackgroundImage(customImage);
 }
