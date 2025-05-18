@@ -129,18 +129,14 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
                     </div>
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <div className={popup['label']}>
-                      {lang.tr.serverApplyNotice}
-                    </div>
+                    <div>{lang.tr.serverApplyNotice}</div>
                     <div className={popup['hint']}>
                       {serverApplyNotice || lang.tr.none}
                     </div>
                   </div>
                   <div className={applyMember['split']} />
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <div className={popup['label']}>
-                      {lang.tr.serverApplyDescription}
-                    </div>
+                    <div>{lang.tr.serverApplyDescription}</div>
                     <textarea
                       rows={2}
                       onChange={(e) =>
@@ -206,15 +202,13 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
                     </div>
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <div className={popup['label']}>
-                      {lang.tr.serverApplyNotice}
-                    </div>
+                    <div>{lang.tr.serverApplyNotice}</div>
                     <div className={popup['hint']}>
                       {serverApplyNotice || lang.tr.none}
                     </div>
                   </div>
                   <div className={applyMember['split']} />
-                  <div className={popup['hint']}>{lang.tr.applySuccess}</div>
+                  <p className={popup['hint']}>{lang.tr.applySuccess}</p>
                 </div>
               </div>
             </div>

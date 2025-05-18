@@ -78,28 +78,30 @@
 
 /* Text Styles */
 
-.label {
-  min-width: 3rem;
-  margin-top: 5px;
-}
-
-.label.required::after {
-  content: '*';
-  color: red;
-}
-
 .pageHeaderText {
   display: flex;
   align-items: center;
   flex-direction: row;
   width: 100%;
-  margin-top: 5px;
 }
 
-.textLineSplit {
+.pageHeaderText::after {
+  content: '';
   width: 100%;
   height: 1px;
   background: #0073c6;
+}
+
+.label {
+  display: flex;
+  height: 2rem;
+  min-width: fit-content;
+  padding: 5px 5px 5px 0;
+}
+
+.required::after {
+  content: '*';
+  color: red;
 }
 
 .hint {
@@ -153,7 +155,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 16px;
+  gap: 10px;
   padding: 5px;
 }
 
@@ -171,7 +173,6 @@
   display: inline-block;
   width: 100%;
   height: 2rem;
-
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
@@ -270,13 +271,14 @@
   width: 100% !important;
   min-width: unset !important;
 }
+
 .inputBox .selectBox select {
   border: 1px solid #ddd;
   padding: 2px;
   padding-right: 25px;
   background: #fff;
   position: relative;
-  display: inline-block;
+  display: flex;
   min-width: 6.5rem;
   max-width: 100%;
   height: 2rem;

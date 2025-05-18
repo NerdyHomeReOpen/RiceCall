@@ -7,9 +7,22 @@
   font-size: 12px;
 }
 
-.typeLabel {
+.type {
   font-weight: bold;
   color: #646464;
+}
+
+.label {
+  min-width: 80px;
+}
+
+.label:after {
+  content: '：';
+}
+
+.hint {
+  margin-left: 80px;
+  color: #666666;
 }
 
 .buttonGroup {
@@ -69,14 +82,5 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-}
-
-.inputDescription {
-  margin-top: 3px;
-  color: #666666;
-  font-size: 12px;
-}
-
-.labelText:after {
-  content: '：';
+  gap: 0.5rem;
 }

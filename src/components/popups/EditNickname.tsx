@@ -86,8 +86,8 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
               <div className={popup['inputBox']}>
-                <label>{lang.tr.nickname}</label>
-                <label className={popup['value']}>{userName}</label>
+                <div className={popup['label']}>{lang.tr.nickname}</div>
+                <div className={popup['label']}>{userName}</div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
                 <div className={popup['label']}>

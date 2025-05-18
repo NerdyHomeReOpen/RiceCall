@@ -637,12 +637,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               <div className={popup['col']}>
                 <div className={popup['row']}>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <label
-                      className={popup['label']}
-                      htmlFor="profile-form-nickname"
-                    >
-                      {lang.tr.nickname}
-                    </label>
+                    <div className={popup['label']}>{lang.tr.nickname}</div>
                     <input
                       name="name"
                       type="text"
@@ -655,12 +650,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   </div>
 
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <label
-                      className={popup['label']}
-                      htmlFor="profile-form-gender"
-                    >
-                      {lang.tr.gender}
-                    </label>
+                    <div className={popup['label']}>{lang.tr.gender}</div>
                     <div
                       className={`${popup['selectBox']} ${popup['selectBoxMax']}`}
                     >
@@ -682,12 +672,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
                 <div className={popup['row']}>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <label
-                      className={popup['label']}
-                      htmlFor="profile-form-country"
-                    >
-                      {lang.tr.country}
-                    </label>
+                    <div className={popup['label']}>{lang.tr.country}</div>
                     <div className={popup['selectBox']}>
                       <select
                         value={userCountry}
@@ -748,12 +733,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                     </div>
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <label
-                      className={popup['label']}
-                      htmlFor="profile-form-birthdate"
-                    >
-                      {lang.tr.birthdate}
-                    </label>
+                    <div className={popup['label']}>{lang.tr.birthdate}</div>
                     <div className={popup['row']}>
                       <div className={popup['selectBox']}>
                         <select
@@ -835,12 +815,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                 </div>
 
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <label
-                    className={popup['label']}
-                    htmlFor="profile-form-signature"
-                  >
-                    {lang.tr.signature}
-                  </label>
+                  <div className={popup['label']}>{lang.tr.signature}</div>
                   <input
                     name="signature"
                     type="text"
@@ -858,12 +833,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                 <div
                   className={`${popup['inputBox']} ${popup['col']} ${popup['disabled']}`}
                 >
-                  <label
-                    className={popup['label']}
-                    htmlFor="profile-form-about"
-                  >
-                    {lang.tr.about}
-                  </label>
+                  <div className={popup['label']}>{lang.tr.about}</div>
                   <textarea name="about" />
                 </div>
               </div>

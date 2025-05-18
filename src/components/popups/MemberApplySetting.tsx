@@ -76,9 +76,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
               <div className={`${popup['inputBox']} ${popup['row']}`}>
-                <label className={popup['label']}>
-                  {lang.tr.isReceiveApply}
-                </label>
+                <div className={popup['label']}>{lang.tr.isReceiveApply}</div>
                 <input
                   name="receiveApply"
                   type="checkbox"

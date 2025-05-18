@@ -48,8 +48,10 @@ function validatePassword(value: string, lang: { tr: Translation }): string {
 function validateUsername(value: string, lang: { tr: Translation }): string {
   value = value.trim();
   if (!value) return lang.tr.usernameRequired;
-  if (value.length < 1) return lang.tr.usernameMinLength;
+  if (value.length < 2) return lang.tr.usernameMinLength;
   if (value.length > 32) return lang.tr.usernameMaxLength;
+  if (!/^[A-Za-z0-9\u4e00-\u9fa5]+$/.test(value))
+    return lang.tr.usernameInvalidFormat;
   return '';
 }
 
@@ -196,11 +198,8 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(
             {!isLoading && (
               <>
                 <div className={styles['inputWrapper']}>
-                  {errors.general && (
-                    <div className={styles['errorBox']}>{errors.general}</div>
-                  )}
                   <div className={styles['inputBox']}>
-                    <label className={styles['label']}>{lang.tr.account}</label>
+                    <div className={styles['label']}>{lang.tr.account}</div>
                     <input
                       type="text"
                       name="account"
@@ -224,9 +223,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(
                 </div>
                 <div className={styles['inputWrapper']}>
                   <div className={styles['inputBox']}>
-                    <label className={styles['label']}>
-                      {lang.tr.password}
-                    </label>
+                    <div className={styles['label']}>{lang.tr.password}</div>
                     <input
                       type="password"
                       name="password"
@@ -248,9 +245,9 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(
                 </div>
                 <div className={styles['inputWrapper']}>
                   <div className={styles['inputBox']}>
-                    <label className={styles['label']}>
+                    <div className={styles['label']}>
                       {lang.tr.confirmPassword}
-                    </label>
+                    </div>
                     <input
                       type="password"
                       name="confirmPassword"
@@ -278,9 +275,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(
                 </div>
                 <div className={styles['inputWrapper']}>
                   <div className={styles['inputBox']}>
-                    <label className={styles['label']}>
-                      {lang.tr.nickname}
-                    </label>
+                    <div className={styles['label']}>{lang.tr.nickname}</div>
                     <input
                       name="username"
                       value={formData.username}

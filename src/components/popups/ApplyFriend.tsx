@@ -7,7 +7,7 @@ import applyFriend from '@/styles/popups/apply.module.css';
 
 // Types
 import {
-  Friend,
+  // Friend,
   FriendApplication,
   FriendGroup,
   PopupType,
@@ -54,8 +54,8 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
     const { userId, targetId } = initialData;
     const { name: targetName, avatarUrl: targetAvatarUrl } = target;
     const {
-      senderId: applicationSenderId,
-      receiverId: applicationReceiverId,
+      // senderId: applicationSenderId,
+      // receiverId: applicationReceiverId,
       description: applicationDescription,
     } = friendApplication;
 
@@ -94,27 +94,27 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       });
     };
 
-    const handleDeleteFriendApplication = (
-      senderId: User['userId'],
-      receiverId: User['userId'],
-    ) => {
-      if (!socket) return;
-      socket.send.deleteFriendApplication({ senderId, receiverId });
-    };
+    // const handleDeleteFriendApplication = (
+    //   senderId: User['userId'],
+    //   receiverId: User['userId'],
+    // ) => {
+    //   if (!socket) return;
+    //   socket.send.deleteFriendApplication({ senderId, receiverId });
+    // };
 
-    const handleCreateFriend = (
-      friend: Partial<Friend>,
-      userId: User['userId'],
-      targetId: User['userId'],
-    ) => {
-      if (!socket) return;
-      let friendGroupId = friend.friendGroupId || null;
-      socket.send.approveFriendApplication({ 
-        userId,
-        targetId,
-        friendGroupId
-      });
-    };
+    // const handleCreateFriend = (
+    //   friend: Partial<Friend>,
+    //   userId: User['userId'],
+    //   targetId: User['userId'],
+    // ) => {
+    //   if (!socket) return;
+    //   let friendGroupId = friend.friendGroupId || null;
+    //   socket.send.approveFriendApplication({
+    //     userId,
+    //     targetId,
+    //     friendGroupId
+    //   });
+    // };
 
     const handleOpenSuccessDialog = (message: string) => {
       ipcService.popup.open(PopupType.DIALOG_SUCCESS, 'successDialog');

@@ -455,8 +455,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         channelUserLimit > channelMembers.length ||
         permissionLevel > 4);
     const canManageChannel = permissionLevel > 4;
-    const canCreate = canManageChannel && !channelCategoryId;
-    const canCreateSub = canManageChannel && !isLobby;
+    const canCreate = canManageChannel;
+    const canCreateSub = canManageChannel && !channelCategoryId && !isLobby;
     const canEdit = canManageChannel;
     const canDelete = canManageChannel && !isLobby;
     const canMoveAllUserToChannel =
@@ -807,8 +807,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     );
     const hasMovedTooMuchInitiallyRef = useRef<boolean>(false);
 
-    const HOVER_DELAY = 600,
-      MOVEMENT_THRESHOLD = 5;
+    // Constants
+    const HOVER_DELAY = 600;
+    const MOVEMENT_THRESHOLD = 5;
 
     // Variables
     const {
@@ -882,10 +883,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (!webRTC) return;
       webRTC.handleMute(userId);
     };
+
     const handleUnmuteUser = (userId: User['userId']) => {
       if (!webRTC) return;
       webRTC.handleUnmute(userId);
     };
+
     const handleKickServer = (
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -893,6 +896,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (!socket) return;
       socket.send.disconnectServer({ userId, serverId });
     };
+
     const handleKickChannel = (
       userId: User['userId'],
       lobbyId: Channel['channelId'],
@@ -901,6 +905,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (!socket) return;
       socket.send.connectChannel({ userId, channelId: lobbyId, serverId });
     };
+
     const handleUpdateMember = (
       member: Partial<Member>,
       userId: User['userId'],
@@ -913,6 +918,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         serverId,
       });
     };
+
     const handleMoveToChannel = (
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -921,6 +927,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (!socket) return;
       socket.send.connectChannel({ userId, serverId, channelId });
     };
+
     const handleOpenEditNickname = (
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -931,6 +938,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         userId,
       });
     };
+
     const handleOpenApplyFriend = (
       userId: User['userId'],
       targetId: User['userId'],
@@ -941,6 +949,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         targetId,
       });
     };
+
     const handleOpenDirectMessage = (
       userId: User['userId'],
       targetId: User['userId'],
@@ -956,6 +965,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         targetName,
       });
     };
+
     const handleOpenUserInfo = (
       userId: User['userId'],
       targetId: User['userId'],
@@ -966,6 +976,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         targetId,
       });
     };
+
     const handleDragStart = (
       e: React.DragEvent,
       userId: User['userId'],
@@ -975,6 +986,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       e.dataTransfer.setData('userId', userId);
       e.dataTransfer.setData('currentChannelId', channelId);
     };
+
     const handleShowUserInfoCard = () => {
       if (qualifyingEventRef.current) {
         contextMenu.showUserInfoBlock(
@@ -984,12 +996,14 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         );
       }
     };
+
     const handleClearTimeout = () => {
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
         hoverTimeoutRef.current = null;
       }
     };
+
     const handleStartTimeout = (event: React.MouseEvent<HTMLDivElement>) => {
       handleClearTimeout();
       qualifyingEventRef.current = event;

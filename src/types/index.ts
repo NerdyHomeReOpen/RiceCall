@@ -264,6 +264,7 @@ export interface Translation {
   usernameRequired: string;
   usernameMinLength: string;
   usernameMaxLength: string;
+  usernameInvalidFormat: string;
   accountCannotChange: string;
   passwordsDoNotMatch: string;
   basicSettings: string;

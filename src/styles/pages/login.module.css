@@ -50,6 +50,20 @@
   gap: 0.7rem;
 }
 
+.label {
+  color: #333;
+  margin-bottom: 5px;
+  display: block;
+  width: auto;
+  text-align: left;
+  font-size: 12px;
+}
+
+.warning {
+  color: red;
+  font-size: 0.9rem;
+}
+
 .errorBox {
   display: flex;
   justify-content: center;
@@ -81,21 +95,8 @@
   max-width: 400px;
 }
 
-.inputBox label {
-  color: #333;
-  margin-bottom: 5px;
-  display: block;
-  width: auto;
-  text-align: left;
-  font-size: 12px;
-}
-
-.inputBox .warning {
-  color: red;
-  font-size: 0.9rem;
-}
-
 .loginAccountBox {
+  position: relative;
   display: flex;
   border: 1px solid #ccc;
   box-shadow: inset 0.3px 0.5px 1px rgba(0, 0, 0, 0.1);
@@ -155,19 +156,15 @@
 
 .accountSelectBox {
   position: absolute;
-  height: 10rem;
-  width: 226px;
+  display: flex;
+  flex-direction: column;
+  height: 200px;
+  width: 100%;
   border: 1px solid #d3d8db;
   background: #fff;
   z-index: 1;
-  display: none;
-  margin-top: 4rem;
-  overflow-x: auto;
-}
-
-.showAccountSelectBox {
-  display: flex;
-  flex-direction: column;
+  top: 30px;
+  overflow-y: auto;
 }
 
 .accountSelectOptionBox {
@@ -202,14 +199,6 @@
 
 .accountSelectCloseBtn:active {
   background-position: -36px 0;
-}
-
-.warningMessage {
-  width: 100%;
-  color: #ff0000;
-  text-align: start;
-  font-size: 12px;
-  margin-left: 25px;
 }
 
 .checkWrapper {

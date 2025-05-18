@@ -122,7 +122,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
                 }`}
               />
               <div className={friendPage['wealthIcon']} />
-              <label className={friendPage['wealthValue']}>0</label>
+              <div className={friendPage['wealthValue']}>0</div>
               {userVip > 0 && (
                 <div
                   className={`${vip['vipIcon']} ${vip[`vip-small-${userVip}`]}`}
