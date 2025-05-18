@@ -806,9 +806,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       null,
     );
     const hasMovedTooMuchInitiallyRef = useRef<boolean>(false);
+    const userTabRef = useRef<HTMLDivElement>(null);
 
     // Constants
-    const HOVER_DELAY = 600;
+    const HOVER_DELAY = 500;
     const MOVEMENT_THRESHOLD = 5;
 
     // Variables
@@ -988,12 +989,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     };
 
     const handleShowUserInfoCard = () => {
-      if (qualifyingEventRef.current) {
-        contextMenu.showUserInfoBlock(
-          qualifyingEventRef.current.clientX + 5,
-          qualifyingEventRef.current.clientY + 5,
-          member,
-        );
+      if (qualifyingEventRef.current && userTabRef.current) {
+        const rect = userTabRef.current.getBoundingClientRect();
+        const cardX = rect.right - 50;
+        const cardY = rect.top;
+        contextMenu.showUserInfoBlock(cardX, cardY, member);
       }
     };
 
@@ -1012,6 +1012,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
 
     return (
       <div
+        ref={userTabRef}
         key={memberUserId}
         className={`${styles['userTab']} ${
           selectedItemId === memberUserId && selectedItemType === 'user'
@@ -1032,6 +1033,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           if (!initialPosForThresholdRef.current) {
             initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
             hasMovedTooMuchInitiallyRef.current = false;
+            qualifyingEventRef.current = e;
             handleStartTimeout(e);
             return;
           }
@@ -1044,9 +1046,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             );
             if (deltaX > MOVEMENT_THRESHOLD || deltaY > MOVEMENT_THRESHOLD) {
               hasMovedTooMuchInitiallyRef.current = true;
+              qualifyingEventRef.current = e;
               handleStartTimeout(e);
             }
           } else {
+            qualifyingEventRef.current = e;
             handleStartTimeout(e);
           }
         }}
@@ -1061,6 +1065,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           setSelectedChannelId(memberUserId, 'user');
         }}
         onDoubleClick={() => {
+          if (isCurrentUser) return;
           handleOpenDirectMessage(userId, memberUserId, memberName);
         }}
         draggable={userPermission >= 5 && memberUserId !== userId}
