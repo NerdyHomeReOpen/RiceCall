@@ -172,7 +172,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
 
         if (update.permissionLevel > 5) reason = 'Permission level too high';
       } else {
-        if (operatorMember.permissionLevel < 1 && operatorMember.permissionLevel > 6) {
+        if (operatorMember.permissionLevel < 2 && operatorMember.permissionLevel > 5) {
           reason = 'Cannot remove self membership';
         }
         if (update.permissionLevel !== 1) reason = 'Cannot edit self permission';
