@@ -329,7 +329,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       const selectionChangeHandler = () => {
         handleEmojiSelectionChange(
           signatureDivRef.current,
-          setting['selectedEmojiImage'],
+          emoji['selectedEmojiImage'],
         );
       };
       document.addEventListener('selectionchange', selectionChangeHandler);
@@ -342,7 +342,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               'img[data-emoji-src]',
             );
           allEmojiImages.forEach((img) => {
-            img.classList.remove(setting['selectedEmojiImage']);
+            img.classList.remove(emoji['selectedEmojiImage']);
           });
         }
       };

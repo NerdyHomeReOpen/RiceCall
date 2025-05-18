@@ -213,7 +213,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
       const selectionChangeHandler = () => {
         handleEmojiSelectionChange(
           signatureDivRef.current,
-          friendPage['selectedEmojiImage'],
+          emoji['selectedEmojiImage'],
         );
       };
 
@@ -228,7 +228,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
               'img[data-emoji-src]',
             );
           allEmojiImages.forEach((img) => {
-            img.classList.remove(friendPage['selectedEmojiImage']);
+            img.classList.remove(emoji['selectedEmojiImage']);
           });
         }
       };

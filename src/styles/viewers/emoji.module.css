@@ -103,7 +103,7 @@
   user-select: all;
 }
 
-.inputArea img[data-emoji-src].selectedEmojiImage {
+.selectedEmojiImage {
   outline: 1px solid black;
   user-select: none;
 }
