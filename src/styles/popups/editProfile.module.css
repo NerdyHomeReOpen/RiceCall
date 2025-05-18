@@ -484,13 +484,13 @@
 .userProfile .userSignature {
   color: #fff;
   width: 30rem;
-  max-height: 2.4rem;
   font-size: 0.95rem;
   font-weight: 400;
   overflow-y: scroll;
   margin-bottom: 1.5rem;
   text-align: center;
   min-height: 17.52px;
+  max-height: 17.52px;
 }
 
 .userProfile .userSignature:hover::-webkit-scrollbar-thumb {
