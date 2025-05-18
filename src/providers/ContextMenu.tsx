@@ -1,4 +1,10 @@
-import React, { useEffect, useContext, createContext, ReactNode } from 'react';
+import React, {
+  useEffect,
+  useContext,
+  createContext,
+  ReactNode,
+  useRef,
+} from 'react';
 
 // Types
 import { ContextMenuItem, ServerMember, Badge } from '@/types';
@@ -25,6 +31,8 @@ interface ContextMenuContextType {
   closeUserInfoBlock: () => void;
   hideBadgeInfoCard: () => void;
   isContextMenuVisible: boolean;
+  requestDelayedCloseUserInfoBlock: () => void;
+  cancelDelayedCloseUserInfoBlock: () => void;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
@@ -56,9 +64,23 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     preferBelow: boolean;
   } | null>(null);
 
+  const hideUserInfoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const HIDE_USER_INFO_DELAY = 100;
+
+  const clearHideUserInfoTimeout = () => {
+    if (hideUserInfoTimeoutRef.current) {
+      clearTimeout(hideUserInfoTimeoutRef.current);
+      hideUserInfoTimeoutRef.current = null;
+    }
+  };
+
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
+      if (
+        (e.target as HTMLElement).closest('.context-menu-container') ||
+        (e.target as HTMLElement).closest('.user-info-card-hover-wrapper')
+      )
+        return;
       if (isVisible) closeContextMenu();
       if (userInfo) closeUserInfoBlock();
     };
@@ -72,12 +94,23 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
     document.addEventListener('click', handleClick);
     document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('contextmenu', handleClick);
+
+    const handleOuterContextMenu = (e: MouseEvent) => {
+      if (
+        !(e.target as HTMLElement).closest('.context-menu-container') &&
+        !(e.target as HTMLElement).closest('.user-info-card-hover-wrapper')
+      ) {
+        if (isVisible) closeContextMenu();
+        if (userInfo) closeUserInfoBlock();
+      }
+    };
+    document.addEventListener('contextmenu', handleOuterContextMenu);
 
     return () => {
       document.removeEventListener('click', handleClick);
       document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('contextmenu', handleClick);
+      document.removeEventListener('contextmenu', handleOuterContextMenu);
+      clearHideUserInfoTimeout();
     };
   }, [isVisible, userInfo]);
 
@@ -103,10 +136,12 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   };
 
   const showUserInfoBlock = (x: number, y: number, member: ServerMember) => {
+    clearHideUserInfoTimeout();
     setUserInfo({ x, y, member });
   };
 
   const closeUserInfoBlock = () => {
+    clearHideUserInfoTimeout();
     setUserInfo(null);
     setBadgeInfo(null);
   };
@@ -128,6 +163,17 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsVisible(false);
   };
 
+  const requestDelayedCloseUserInfoBlock = () => {
+    clearHideUserInfoTimeout();
+    hideUserInfoTimeoutRef.current = setTimeout(() => {
+      closeUserInfoBlock();
+    }, HIDE_USER_INFO_DELAY);
+  };
+
+  const cancelDelayedCloseUserInfoBlock = () => {
+    clearHideUserInfoTimeout();
+  };
+
   return (
     <ContextMenuContext.Provider
       value={{
@@ -138,11 +184,23 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         hideBadgeInfoCard,
         closeContextMenu,
         isContextMenuVisible: isVisible,
+        requestDelayedCloseUserInfoBlock,
+        cancelDelayedCloseUserInfoBlock,
       }}
     >
       {isVisible && content}
       {userInfo && (
-        <UserInfoCard x={userInfo.x} y={userInfo.y} member={userInfo.member} />
+        <div
+          className="user-info-card-hover-wrapper"
+          onMouseEnter={cancelDelayedCloseUserInfoBlock}
+          onMouseLeave={requestDelayedCloseUserInfoBlock}
+        >
+          <UserInfoCard
+            x={userInfo.x}
+            y={userInfo.y}
+            member={userInfo.member}
+          />
+        </div>
       )}
       {badgeInfo && (
         <BadgeInfoCard

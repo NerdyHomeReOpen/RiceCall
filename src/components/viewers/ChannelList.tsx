@@ -605,7 +605,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       if (currentChannel) {
         setSelectedChannelId(currentChannel.channelId, 'channel');
       }
-    }, [currentChannel?.channelId]);
+    }, [currentChannel, currentChannel.channelId, setSelectedChannelId]);
 
     return (
       <>
@@ -992,6 +992,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (contextMenu.isContextMenuVisible) {
         return;
       }
+      contextMenu.cancelDelayedCloseUserInfoBlock();
+
       if (qualifyingEventRef.current && userTabRef.current) {
         const rect = userTabRef.current.getBoundingClientRect();
         const cardX = rect.right - 100;
@@ -1023,6 +1025,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             : ''
         }`}
         onMouseEnter={(e) => {
+          contextMenu.cancelDelayedCloseUserInfoBlock();
           handleClearTimeout();
           initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
           hasMovedTooMuchInitiallyRef.current = false;
@@ -1059,7 +1062,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         }}
         onMouseLeave={() => {
           handleClearTimeout();
-          contextMenu.closeUserInfoBlock();
+          contextMenu.requestDelayedCloseUserInfoBlock();
           initialPosForThresholdRef.current = null;
           hasMovedTooMuchInitiallyRef.current = false;
           qualifyingEventRef.current = null;
@@ -1076,6 +1079,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           handleDragStart(e, memberUserId, memberCurrentChannelId)
         }
         onContextMenu={(e) => {
+          handleClearTimeout();
+          contextMenu.closeUserInfoBlock();
           contextMenu.showContextMenu(
             e.clientX,
             e.clientY,
