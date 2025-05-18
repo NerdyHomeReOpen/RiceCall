@@ -275,25 +275,35 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
       if (!friendApplication)
         throw new FriendApplicationNotFoundError(targetId, operatorId);
 
-      const friend = await database.get.friend(operatorId, targetId);
+      let friend = await database.get.friend(operatorId, targetId);
       if (friend) throw new AlreadyFriendError(targetId, operatorId);
 
       await FriendHandlerServerSide.createFriend(operatorId, targetId);
       await database.delete.friendApplication(targetId, operatorId);
 
-      if (friendGroupId)
+      new Logger('ApproveFriendApplication').info(
+        `User(${operatorId}) updated friend(${targetId}) to friend group(${friendGroupId})`,
+      );
+
+      if (friendGroupId) {
         await FriendHandlerServerSide.updateFriendGroup(
           operatorId,
           targetId,
           friendGroupId,
-        );
+        );  
+
+        friend = await database.get.friend(operatorId, targetId);
+
+        socket.emit('friendUpdate', operatorId, targetId, friend);
+      }
+        
 
       socket.emit('friendApproval', {
         targetId,
       });
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
-        new Logger('FriendApproval').error(error.message);
+        new Logger('ApproveFriendApplication').error(error.message);
 
         error = new StandardizedError({
           name: 'ServerError',
