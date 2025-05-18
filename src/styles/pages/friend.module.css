@@ -97,9 +97,14 @@
 
 .signatureBox {
   display: flex;
-  min-width: 30%;
+  width: 619px;
+  height: 30px;
   margin-left: 7rem;
   align-items: center;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 .signatureInput {
@@ -107,16 +112,49 @@
   border-color: unset;
   border-width: unset;
   border-style: unset;
-  padding: 5px;
-  width: 100%;
   resize: none;
-  overflow: hidden;
   outline: unset;
+  width: 90%;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin-right: 0.5rem;
 }
 
-.signatureInput:focus {
-  border: 1px solid #b4b4b4;
+.signatureBox:focus-within {
+  border: 1px solid #dfe2e5;
   border-radius: 3px;
+}
+
+.enterButtonIconBox {
+  border: 1px solid #d1d1d1;
+  background-color: #fbfbfb;
+  border-radius: 5px;
+  height: 18px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.enterButtonIconBox:hover {
+  background-image: linear-gradient(to bottom, #fffffa, #f4f4f4);
+  border: 1px solid #cccccc;
+}
+
+.enterButtonIconBox:active {
+  background-image: linear-gradient(to bottom, #f4f4f4, #fffffa);
+  border: 1px solid #cccccc;
+}
+
+.enterButtonIcon {
+  background-image: url('../../../public/im/btn_publish.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 9px;
+  width: 22px;
 }
 
 .badgeBox {
