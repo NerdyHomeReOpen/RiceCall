@@ -134,11 +134,14 @@ const Header: React.FC<HeaderProps> = React.memo(
 
     return (
       <header
-        className={`${header['header']} ${header['popupHeader']} ${themeClass}`}
+        className={`${header['header']} ${header['popupHeader']} ${
+          localStorage.getItem('token') && themeClass
+        }`}
         style={{
           background:
-            (backgroundImage && `url(${backgroundImage})`) ||
-            backgroundColor ||
+            (localStorage.getItem('token') &&
+              ((backgroundImage && `url(${backgroundImage})`) ||
+                backgroundColor)) ||
             undefined,
         }}
       >
