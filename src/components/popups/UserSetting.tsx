@@ -539,7 +539,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
           >
             {userSignature && (
               <div className={setting['userAboutMeShow']}>
-                <div dangerouslySetInnerHTML={{ __html: userSignature }} />
+                <div
+                  className={setting['userAboutMeShowText']}
+                  dangerouslySetInnerHTML={{ __html: userSignature }}
+                />
               </div>
             )}
             <div className={setting['userProfileContent']}>

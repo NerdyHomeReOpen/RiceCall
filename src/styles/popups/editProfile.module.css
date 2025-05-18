@@ -71,6 +71,13 @@
   margin-top: 6rem;
 }
 
+.userAboutMeShowText {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .left {
   display: flex;
   height: 100%;
