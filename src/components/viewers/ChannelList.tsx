@@ -1060,6 +1060,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         onClick={() => {
           setSelectedChannelId(memberUserId, 'user');
         }}
+        onDoubleClick={() => {
+          handleOpenDirectMessage(userId, memberUserId, memberName);
+        }}
         draggable={userPermission >= 5 && memberUserId !== userId}
         onDragStart={(e) =>
           handleDragStart(e, memberUserId, memberCurrentChannelId)
