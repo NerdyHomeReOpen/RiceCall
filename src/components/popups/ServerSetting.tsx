@@ -395,7 +395,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
             setMember(member);
           }
           if (members) {
-            setServerMembers(members);
+            const sortedMembers = members.sort(
+              (a, b) => b.permissionLevel - a.permissionLevel,
+            );
+            setServerMembers(sortedMembers);
           }
           if (applications) {
             setServerApplications(applications);
