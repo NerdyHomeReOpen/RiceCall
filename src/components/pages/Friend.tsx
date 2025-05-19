@@ -47,6 +47,8 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     const lastCursorPosition = useRef<number | null>(null);
     const emojiIconsWrapperRef = useRef<HTMLDivElement>(null);
     const emojiButtonRef = useRef<HTMLDivElement>(null);
+    const justSavedRef = useRef<boolean>(false);
+    const forceBlurRef = useRef<boolean>(false);
 
     // Constants
     const MAXLENGTH = 300;
@@ -79,11 +81,22 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
 
     const handleSaveSignature = useCallback(() => {
       if (!signatureDivRef.current) return;
-      const currentHtml = signatureDivRef.current.innerHTML;
-      const signatureWithPlaceholders =
-        convertHtmlToEmojiPlaceholder(currentHtml);
+      const currentLiveHtmlFromDiv = signatureDivRef.current.innerHTML;
+      const signatureWithPlaceholders = convertHtmlToEmojiPlaceholder(
+        currentLiveHtmlFromDiv,
+      );
 
-      if (signatureWithPlaceholders === (user.signature || '')) {
+      const currentSignatureFromProp = user.signature || '';
+
+      if (signatureWithPlaceholders === currentSignatureFromProp) {
+        const expectedStandardHtml = convertEmojiPlaceholderToHtml(
+          currentSignatureFromProp,
+          emojiList,
+        );
+        if (signatureDivRef.current.innerHTML !== expectedStandardHtml) {
+          setSignatureInputHtml(expectedStandardHtml);
+        }
+        forceBlurRef.current = true;
         signatureDivRef.current?.blur();
         return;
       }
@@ -94,22 +107,30 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
           `Signature too long. Max ${MAXLENGTH} chars. Reverting.`;
         alert(signatureTooLongMessage);
         const originalHtml = convertEmojiPlaceholderToHtml(
-          user.signature || '',
+          currentSignatureFromProp,
           emojiList,
         );
         setSignatureInputHtml(originalHtml);
         return;
       }
+
+      justSavedRef.current = true;
+      forceBlurRef.current = true;
+
+      const htmlToDisplayAfterSave = convertEmojiPlaceholderToHtml(
+        signatureWithPlaceholders,
+        emojiList,
+      );
+      setSignatureInputHtml(htmlToDisplayAfterSave);
+
       handleChangeSignature(signatureWithPlaceholders, userId);
       signatureDivRef.current?.blur();
-    }, [
-      user.signature,
-      lang,
-      MAXLENGTH,
-      userId,
-      setSignatureInputHtml,
-      handleChangeSignature,
-    ]);
+
+      setTimeout(() => {
+        justSavedRef.current = false;
+        forceBlurRef.current = false;
+      }, 0);
+    }, [user.signature, lang, MAXLENGTH, userId, handleChangeSignature]);
 
     const handleSignatureKeyDownForDiv = (
       e: React.KeyboardEvent<HTMLDivElement>,
@@ -122,6 +143,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
       if (handledByEmojiUtil) {
         return;
       }
+
       if (e.key === 'Enter') {
         if (isComposing) return;
         if (e.shiftKey) {
@@ -171,45 +193,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     }, [lang, userName]);
 
     useEffect(() => {
-      const initialHtml = convertEmojiPlaceholderToHtml(
-        user.signature || '',
-        emojiList,
-      );
-      setSignatureInputHtml(initialHtml);
-    }, [user.signature]);
-
-    useEffect(() => {
-      if (
-        signatureDivRef.current &&
-        signatureDivRef.current.innerHTML !== signatureInputHtml
-      ) {
-        let selection: Selection | null = null;
-        let range: Range | null = null;
-        selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-          range = selection.getRangeAt(0).cloneRange();
-        }
-        signatureDivRef.current.innerHTML = signatureInputHtml;
-        if (
-          range &&
-          selection &&
-          signatureDivRef.current.contains(range.startContainer)
-        ) {
-          try {
-            selection.removeAllRanges();
-            selection.addRange(range);
-          } catch {
-            const newRange = document.createRange();
-            newRange.selectNodeContents(signatureDivRef.current);
-            newRange.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(newRange);
-          }
-        }
-      }
-    }, [signatureInputHtml]);
-
-    useEffect(() => {
       const selectionChangeHandler = () => {
         handleEmojiSelectionChange(
           signatureDivRef.current,
@@ -253,18 +236,38 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     }, [isEmojiPickerVisible]);
 
     useEffect(() => {
+      const initialHtml = convertEmojiPlaceholderToHtml(
+        user.signature || '',
+        emojiList,
+      );
+      if (initialHtml !== signatureInputHtml) {
+        setSignatureInputHtml(initialHtml);
+      }
+    }, [user.signature]);
+
+    useEffect(() => {
       if (
         signatureDivRef.current &&
         signatureDivRef.current.innerHTML !== signatureInputHtml
       ) {
         let selection: Selection | null = null;
         let range: Range | null = null;
-        selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-          range = selection.getRangeAt(0).cloneRange();
+
+        const currentFocus = document.activeElement;
+        const isFocusedOnDiv = signatureDivRef.current === currentFocus;
+
+        if (isFocusedOnDiv && !forceBlurRef.current) {
+          selection = window.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            range = selection.getRangeAt(0).cloneRange();
+          }
         }
+
         signatureDivRef.current.innerHTML = signatureInputHtml;
+
         if (
+          isFocusedOnDiv &&
+          !forceBlurRef.current &&
           range &&
           selection &&
           signatureDivRef.current.contains(range.startContainer)
@@ -282,6 +285,41 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
         }
       }
     }, [signatureInputHtml]);
+
+    const handleSignatureInput = (e: React.FormEvent<HTMLDivElement>) => {
+      const currentHtml = e.currentTarget.innerHTML;
+      if (currentHtml !== signatureInputHtml) {
+        setSignatureInputHtml(currentHtml);
+      }
+    };
+
+    const handleSignatureBlur = () => {
+      setTimeout(() => {
+        if (justSavedRef.current || forceBlurRef.current) {
+          return;
+        }
+        if (
+          (emojiIconsWrapperRef.current &&
+            emojiIconsWrapperRef.current.contains(
+              document.activeElement as Node,
+            )) ||
+          (emojiButtonRef.current &&
+            emojiButtonRef.current.contains(document.activeElement as Node))
+        ) {
+          return;
+        }
+        if (signatureDivRef.current) {
+          const currentLiveHtml = signatureDivRef.current.innerHTML;
+          const originalSignatureHtml = convertEmojiPlaceholderToHtml(
+            user.signature || '',
+            emojiList,
+          );
+          if (currentLiveHtml !== originalSignatureHtml) {
+            setSignatureInputHtml(originalSignatureHtml);
+          }
+        }
+      }, 0);
+    };
 
     return (
       <div
@@ -323,35 +361,8 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
               contentEditable
               suppressContentEditableWarning
               data-placeholder-text={lang.tr.signaturePlaceholder}
-              onInput={(e) => {
-                setSignatureInputHtml(e.currentTarget.innerHTML);
-              }}
-              onBlur={() => {
-                setTimeout(() => {
-                  if (
-                    (emojiIconsWrapperRef.current &&
-                      emojiIconsWrapperRef.current.contains(
-                        document.activeElement as Node,
-                      )) ||
-                    (emojiButtonRef.current &&
-                      emojiButtonRef.current.contains(
-                        document.activeElement as Node,
-                      ))
-                  ) {
-                    return;
-                  }
-                  if (signatureDivRef.current) {
-                    const currentLiveHtml = signatureDivRef.current.innerHTML;
-                    const savedSignatureAsHtml = convertEmojiPlaceholderToHtml(
-                      user.signature || '',
-                      emojiList,
-                    );
-                    if (currentLiveHtml !== savedSignatureAsHtml) {
-                      setSignatureInputHtml(savedSignatureAsHtml);
-                    }
-                  }
-                }, 0);
-              }}
+              onInput={handleSignatureInput}
+              onBlur={handleSignatureBlur}
               onKeyDown={handleSignatureKeyDownForDiv}
               onCompositionStart={() => setIsComposing(true)}
               onCompositionEnd={() => setIsComposing(false)}
