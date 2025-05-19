@@ -201,6 +201,8 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     }, [lang, userName]);
 
     useEffect(() => {
+      const capturedSignatureDiv = signatureDivRef.current;
+
       const selectionChangeHandler = () => {
         handleEmojiSelectionChange(
           signatureDivRef.current,
@@ -208,14 +210,18 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
         );
       };
 
-      document.addEventListener('selectionchange', selectionChangeHandler);
-      const currentSignatureDiv = signatureDivRef.current;
+      if (capturedSignatureDiv) {
+        document.addEventListener('selectionchange', selectionChangeHandler);
+      }
 
       return () => {
-        document.removeEventListener('selectionchange', selectionChangeHandler);
-        if (currentSignatureDiv) {
+        if (capturedSignatureDiv) {
+          document.removeEventListener(
+            'selectionchange',
+            selectionChangeHandler,
+          );
           const allEmojiImages =
-            currentSignatureDiv.querySelectorAll<HTMLImageElement>(
+            capturedSignatureDiv.querySelectorAll<HTMLImageElement>(
               'img[data-emoji-src]',
             );
           allEmojiImages.forEach((img) => {
@@ -244,60 +250,81 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     }, [isEmojiPickerVisible]);
 
     useEffect(() => {
-      const initialHtml = convertEmojiPlaceholderToHtml(
-        user.signature || '',
+      const propSignatureValue = user.signature || '';
+      const propSignatureHtml = convertEmojiPlaceholderToHtml(
+        propSignatureValue,
         emojiList,
       );
-      if (initialHtml !== signatureInputHtml) {
-        setSignatureInputHtml(initialHtml);
-      }
+      const cleanedPropSignatureHtml = cleanHtmlEndingBr(propSignatureHtml);
+
+      setSignatureInputHtml((currentLocalHtml) => {
+        if (cleanedPropSignatureHtml !== currentLocalHtml) {
+          return cleanedPropSignatureHtml;
+        }
+        return currentLocalHtml;
+      });
     }, [user.signature]);
 
     useEffect(() => {
-      if (
-        signatureDivRef.current &&
-        signatureDivRef.current.innerHTML !== signatureInputHtml
-      ) {
-        let selection: Selection | null = null;
-        let range: Range | null = null;
+      if (signatureDivRef.current) {
+        const domHtmlCleaned = cleanHtmlEndingBr(
+          signatureDivRef.current.innerHTML,
+        );
 
-        const currentFocus = document.activeElement;
-        const isFocusedOnDiv = signatureDivRef.current === currentFocus;
+        if (domHtmlCleaned !== signatureInputHtml) {
+          const selectionState: { range: Range | null } = { range: null };
+          const currentFocus = document.activeElement;
+          const isFocusedOnDiv = signatureDivRef.current === currentFocus;
 
-        if (isFocusedOnDiv && !forceBlurRef.current) {
-          selection = window.getSelection();
-          if (selection && selection.rangeCount > 0) {
-            range = selection.getRangeAt(0).cloneRange();
+          if (isFocusedOnDiv && !forceBlurRef.current) {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+              const currentRange = selection.getRangeAt(0);
+              if (
+                signatureDivRef.current.contains(
+                  currentRange.commonAncestorContainer,
+                )
+              ) {
+                selectionState.range = currentRange.cloneRange();
+              }
+            }
           }
-        }
 
-        signatureDivRef.current.innerHTML = signatureInputHtml;
+          signatureDivRef.current.innerHTML = signatureInputHtml;
 
-        if (
-          isFocusedOnDiv &&
-          !forceBlurRef.current &&
-          range &&
-          selection &&
-          signatureDivRef.current.contains(range.startContainer)
-        ) {
-          try {
-            selection.removeAllRanges();
-            selection.addRange(range);
-          } catch {
-            const newRange = document.createRange();
-            newRange.selectNodeContents(signatureDivRef.current);
-            newRange.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(newRange);
+          if (isFocusedOnDiv && !forceBlurRef.current && selectionState.range) {
+            const selection = window.getSelection();
+            if (selection) {
+              try {
+                selection.removeAllRanges();
+                selection.addRange(selectionState.range);
+              } catch (e) {
+                console.error('Error restoring selection:', e);
+                const newRange = document.createRange();
+                newRange.selectNodeContents(signatureDivRef.current);
+                newRange.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+              }
+            }
+          } else if (isFocusedOnDiv && !forceBlurRef.current) {
+            const selection = window.getSelection();
+            if (selection) {
+              const newRange = document.createRange();
+              newRange.selectNodeContents(signatureDivRef.current);
+              newRange.collapse(false);
+              selection.removeAllRanges();
+              selection.addRange(newRange);
+            }
           }
         }
       }
-    }, [signatureInputHtml]);
+    }, [signatureInputHtml, forceBlurRef]);
 
     const handleSignatureInput = (e: React.FormEvent<HTMLDivElement>) => {
-      const currentHtml = cleanHtmlEndingBr(e.currentTarget.innerHTML);
-      if (currentHtml !== signatureInputHtml) {
-        setSignatureInputHtml(currentHtml);
+      const currentHtmlFromInput = cleanHtmlEndingBr(e.currentTarget.innerHTML);
+      if (currentHtmlFromInput !== signatureInputHtml) {
+        setSignatureInputHtml(currentHtmlFromInput);
       }
     };
 
@@ -445,10 +472,19 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
                     e.preventDefault();
                   }}
                   onClick={() => {
+                    if (!signatureDivRef.current) return;
                     insertEmojiIntoDiv(
                       eItem,
                       signatureDivRef.current,
-                      (newHtml) => setSignatureInputHtml(newHtml),
+                      (rawNewHtmlFromUtil) => {
+                        const cleanedNewHtml =
+                          cleanHtmlEndingBr(rawNewHtmlFromUtil);
+                        setSignatureInputHtml((prevHtml) =>
+                          prevHtml !== cleanedNewHtml
+                            ? cleanedNewHtml
+                            : prevHtml,
+                        );
+                      },
                       (pos) => (lastCursorPosition.current = pos),
                     );
                   }}

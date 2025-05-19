@@ -269,9 +269,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               userData.signature || '',
               emojiList,
             );
+            const cleanedInitialHtml = cleanHtmlEndingBr(signatureAsHtml);
             setUser({
               ...userData,
-              signature: signatureAsHtml,
+              signature: cleanedInitialHtml,
             });
           }
           if (serversData) {
@@ -327,12 +328,22 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     }, [isEmojiPickerVisible]);
 
     useEffect(() => {
-      if (
-        signatureDivRef.current &&
-        signatureDivRef.current.innerHTML !== userSignature
-      ) {
-        signatureDivRef.current.innerHTML = userSignature;
-        if (document.activeElement === signatureDivRef.current) {
+      if (signatureDivRef.current) {
+        const currentDomCleanedHtml = cleanHtmlEndingBr(
+          signatureDivRef.current.innerHTML,
+        );
+        if (currentDomCleanedHtml !== userSignature) {
+          signatureDivRef.current.innerHTML = userSignature;
+          if (document.activeElement === signatureDivRef.current) {
+            const selection = window.getSelection();
+            if (selection) {
+              const newRange = document.createRange();
+              newRange.selectNodeContents(signatureDivRef.current);
+              newRange.collapse(false);
+              selection.removeAllRanges();
+              selection.addRange(newRange);
+            }
+          }
         }
       }
     }, [userSignature]);
@@ -979,12 +990,12 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                           target.innerHTML,
                         );
 
-                        if (user.signature !== currentInputHtml) {
-                          setUser((prev) => ({
-                            ...prev,
-                            signature: currentInputHtml,
-                          }));
-                        }
+                        setUser((prev) => {
+                          if (prev.signature !== currentInputHtml) {
+                            return { ...prev, signature: currentInputHtml };
+                          }
+                          return prev;
+                        });
                         lastCursorPosition.current = null;
                       }}
                       onKeyDown={handleSignatureKeyDown}
@@ -1058,17 +1069,20 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       e.preventDefault();
                     }}
                     onClick={() => {
-                      const cleanedNewHtml = cleanHtmlEndingBr(
-                        signatureDivRef.current?.innerHTML || '',
-                      );
+                      if (!signatureDivRef.current) return;
                       insertEmojiIntoDiv(
                         e,
                         signatureDivRef.current,
-                        () =>
-                          setUser((prev) => ({
-                            ...prev,
-                            signature: cleanedNewHtml,
-                          })),
+                        (rawNewHtmlFromUtil) => {
+                          const cleanedNewHtml =
+                            cleanHtmlEndingBr(rawNewHtmlFromUtil);
+                          setUser((prev) => {
+                            if (prev.signature !== cleanedNewHtml) {
+                              return { ...prev, signature: cleanedNewHtml };
+                            }
+                            return prev;
+                          });
+                        },
                         (pos) => (lastCursorPosition.current = pos),
                       );
                     }}
