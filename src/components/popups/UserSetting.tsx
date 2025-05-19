@@ -234,14 +234,29 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     };
 
     const handleSignatureKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const handled = handleEmojiKeyDown(
+      const handledByEmojiUtil = handleEmojiKeyDown(
         e,
         signatureDivRef.current,
-        (newHtml) => setUser((prev) => ({ ...prev, signature: newHtml })),
+        (newHtml) => {
+          const cleanedHtml = cleanHtmlEndingBr(newHtml);
+          setUser((prev) => {
+            if (prev.signature !== cleanedHtml) {
+              return { ...prev, signature: cleanedHtml };
+            }
+            return prev;
+          });
+        },
       );
-      if (handled) {
+      if (handledByEmojiUtil) {
         lastCursorPosition.current = null;
+        return;
       }
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        return;
+      }
+
       if (e.type === 'dragstart') {
         e.preventDefault();
       }

@@ -153,11 +153,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
       }
 
       if (e.key === 'Enter') {
+        e.preventDefault();
         if (isComposing) return;
         if (e.shiftKey) {
           return;
         }
-        e.preventDefault();
         handleSaveSignature();
       }
     };
