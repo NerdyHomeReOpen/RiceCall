@@ -572,6 +572,44 @@ export default class Database {
         );
       }
     },
+
+    memberInvitation: async (receiverId: string, serverId: string, data: any) => {
+      try {
+        if (!receiverId || !serverId || !data) return false;
+        const ALLOWED_FIELDS = ['description', 'created_at', 'opreator_id'];
+        const { keys, values } = validateData(data, ALLOWED_FIELDS);
+        const exists = await this.query(
+          `SELECT * 
+          FROM member_invitations 
+          WHERE receiver_id = ? 
+          AND server_id = ?`,
+          [receiverId, serverId],
+        );
+        // If the memberInvitation exists, update it
+        // Else, create it
+        if (exists.length > 0) {
+          await this.query(
+            `UPDATE member_invitations SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE receiver_id = ? AND server_id = ?`,
+            [...values, receiverId, serverId],
+          );
+        } else {
+          await this.query(
+            `INSERT INTO member_invitations (receiver_id, server_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ?, ${keys.map(() => '?').join(', ')})`,
+            [receiverId, serverId, ...values],
+          );
+        }
+      }
+      catch (error: any) {
+        throw new Error(
+          `Error setting memberInvitation.${receiverId}-${serverId}: ${error.message}`,
+        );
+      }
+    }
   };
 
   get = {
@@ -1109,6 +1147,36 @@ export default class Database {
       }
     },
 
+    serverMemberInvitation: async (serverId: string, receiverId: string) => {
+      try {
+        if (!serverId || !receiverId) return null;
+        const datas = await this.query(
+          `SELECT 
+            member_invitations.created_at AS member_invitation_created_at,
+            member_invitations.*,
+            users.created_at AS user_created_at,
+            users.*
+          FROM member_invitations 
+          INNER JOIN users 
+            ON member_invitations.receiver_id = users.user_id
+          WHERE member_invitations.server_id = ?
+          AND member_invitations.receiver_id = ?
+          ORDER BY member_invitations.created_at DESC`,
+          [serverId, receiverId],
+        );
+        if (!datas || datas.length === 0) return null;
+        const data = datas[0];
+        data.created_at = data.member_invitation_created_at;
+        delete data.member_invitation_created_at;
+        delete data.user_created_at;
+        return convertToCamelCase(data);
+      } catch (error: any) {
+        throw new Error(
+          `Error getting serverMemberInvitation.${serverId}-${receiverId}: ${error.message}`,
+        );
+      }
+    },
+
     serverMemberApplications: async (serverId: string) => {
       try {
         if (!serverId) return [];
@@ -1135,6 +1203,36 @@ export default class Database {
       } catch (error: any) {
         throw new Error(
           `Error getting serverMemberApplications.${serverId}: ${error.message}`,
+        );
+      }
+    },
+
+    serverMemberInvitations: async (serverId: string) => {
+      try {
+        if (!serverId) return [];
+        const datas = await this.query(
+          `SELECT 
+            member_invitations.created_at AS member_invitation_created_at,
+            member_invitations.*,
+            users.created_at AS user_created_at,
+            users.*
+          FROM member_invitations 
+          INNER JOIN users 
+            ON member_invitations.receiver_id = users.user_id
+          WHERE member_invitations.server_id = ?
+          ORDER BY member_invitations.created_at DESC`,
+          [serverId],
+        );
+        if (!datas) return [];
+        return datas.map((data: any) => {
+          data.created_at = data.member_invitation_created_at;
+          delete data.member_invitation_created_at;
+          delete data.user_created_at;
+          return convertToCamelCase(data);
+        });
+      } catch (error: any) {
+        throw new Error(
+          `Error getting serverMemberInvitations.${serverId}: ${error.message}`,
         );
       }
     },
@@ -1276,6 +1374,57 @@ export default class Database {
       } catch (error: any) {
         throw new Error(
           `Error getting memberApplication.${userId}-${serverId}: ${error.message}`,
+        );
+      }
+    },
+
+    memberInvitation: async (receiverId: string, serverId: string) => {
+      try {
+        if (!receiverId || !serverId) return null;
+        const datas = await this.query(
+          `SELECT 
+            member_invitations.*
+          FROM member_invitations 
+          WHERE member_invitations.receiver_id = ?
+          AND member_invitations.server_id = ?`,
+          [receiverId, serverId],
+        );
+        if (!datas || datas.length === 0) return null;
+        return convertToCamelCase(datas[0]);
+      } catch (error: any) {
+        throw new Error(
+          `Error getting memberInvitation.${receiverId}-${serverId}: ${error.message}`,
+        );
+      }
+    },
+
+
+    userMemberInvitations: async (userId: string) => {
+      try {
+        if (!userId) return [];
+        const datas = await this.query(
+          `SELECT 
+            member_invitations.created_at AS member_invitation_created_at,
+            member_invitations.*,
+            servers.created_at AS server_created_at,
+            servers.*
+          FROM member_invitations 
+          INNER JOIN servers 
+            ON member_invitations.server_id = servers.server_id
+          WHERE member_invitations.receiver_id = ?
+          ORDER BY member_invitations.created_at DESC`,
+          [userId],
+        );
+        if (!datas) return [];
+        return datas.map((data: any) => {
+          data.created_at = data.member_invitation_created_at;
+          delete data.member_invitation_created_at;
+          delete data.server_created_at;
+          return convertToCamelCase(data);
+        });
+      } catch (error: any) {
+        throw new Error(
+          `Error getting userMemberInvitations.${userId}: ${error.message}`,
         );
       }
     },
@@ -1460,6 +1609,23 @@ export default class Database {
       } catch (error: any) {
         throw new Error(
           `Error deleting memberApplication.${userId}-${serverId}: ${error.message}`,
+        );
+      }
+    },
+
+    memberInvitation: async (receiverId: string, serverId: string) => {
+      try {
+        if (!receiverId || !serverId) return false;
+        await this.query(
+          `DELETE FROM member_invitations 
+          WHERE member_invitations.receiver_id = ?
+          AND member_invitations.server_id = ?`,
+          [receiverId, serverId],
+        );
+        return true;
+      } catch (error: any) {
+        throw new Error(
+          `Error deleting memberInvitation.${receiverId}-${serverId}: ${error.message}`,
         );
       }
     },
