@@ -81,7 +81,17 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
 
     const handleSaveSignature = useCallback(() => {
       if (!signatureDivRef.current) return;
-      const currentLiveHtmlFromDiv = signatureDivRef.current.innerHTML;
+      let currentLiveHtmlFromDiv = signatureDivRef.current.innerHTML;
+      if (
+        currentLiveHtmlFromDiv.endsWith('<br>') ||
+        currentLiveHtmlFromDiv.endsWith('<br/>')
+      ) {
+        currentLiveHtmlFromDiv = currentLiveHtmlFromDiv.substring(
+          0,
+          currentLiveHtmlFromDiv.lastIndexOf('<br'),
+        );
+      }
+
       const signatureWithPlaceholders = convertHtmlToEmojiPlaceholder(
         currentLiveHtmlFromDiv,
       );
@@ -98,6 +108,9 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
         }
         forceBlurRef.current = true;
         signatureDivRef.current?.blur();
+        setTimeout(() => {
+          forceBlurRef.current = false;
+        }, 0);
         return;
       }
 
@@ -288,7 +301,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
 
     const handleSignatureInput = (e: React.FormEvent<HTMLDivElement>) => {
       const currentHtml = e.currentTarget.innerHTML;
-      if (currentHtml !== signatureInputHtml) {
+      if (currentHtml === '<br>' || currentHtml === '<br/>') {
+        if (signatureInputHtml !== '') {
+          setSignatureInputHtml('');
+        }
+      } else if (currentHtml !== signatureInputHtml) {
         setSignatureInputHtml(currentHtml);
       }
     };
