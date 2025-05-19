@@ -13,11 +13,11 @@ import ipcService from '@/services/ipc.service';
 // Providers
 import { useLanguage } from '@/providers/Language';
 
-const AboutPopup: React.FC = () => {
+const AboutPopup: React.FC = React.memo(() => {
   // Language
   const lang = useLanguage();
 
-  // Handle
+  // Handlers
   const handleClose = () => {
     ipcService.window.close();
   };
@@ -31,6 +31,7 @@ const AboutPopup: React.FC = () => {
     | typeof lang.tr.technicalSupport
     | typeof lang.tr.customerService;
 
+  // Variables
   const titleColorClasses: Record<JobTitle, string> = {
     [lang.tr.mainDeveloper]: aboutUs.mainDeveloper,
     [lang.tr.backendDeveloper]: aboutUs.backendDeveloper,
@@ -135,6 +136,7 @@ const AboutPopup: React.FC = () => {
 
   return (
     <div className={`${popup['popupContainer']}`}>
+      {/* Body */}
       <div className={`${popup['popupBody']} ${aboutUs['aboutContainer']}`}>
         <div className={`${aboutUs['logoArea']}`}>
           <div className={`${aboutUs['logoPlaceholder']}`}></div>
@@ -247,6 +249,7 @@ const AboutPopup: React.FC = () => {
         </div>
       </div>
 
+      {/* Footer */}
       <div className={`${popup['popupFooter']} aboutFooter`}>
         <button className={popup['button']} onClick={handleClose}>
           {lang.tr.close}
@@ -254,7 +257,7 @@ const AboutPopup: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 AboutPopup.displayName = 'AboutPopup';
 

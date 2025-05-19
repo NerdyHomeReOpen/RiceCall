@@ -24,7 +24,7 @@ interface EditFriendPopupProps {
 }
 
 const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
-  (initialData: EditFriendPopupProps) => {
+  ({ userId, targetId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -37,7 +37,6 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
     const [friend, setFriend] = useState<Friend>(createDefault.friend());
 
     // Variables
-    const { userId, targetId } = initialData;
     const { friendGroupId } = friend;
 
     // Handlers
@@ -122,6 +121,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
 
     return (
       <div className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -156,6 +156,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={`${popup['button']}`}

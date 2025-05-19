@@ -21,16 +21,13 @@ interface ChannelPasswordPopupProps {
 }
 
 const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(
-  (initialData: ChannelPasswordPopupProps) => {
+  ({ userId, serverId, channelId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
 
     // States
     const [password, setPassword] = useState<string | null>(null);
-
-    // Variables
-    const { userId, serverId, channelId } = initialData;
 
     // Handlers
     const handleJoinChannel = (
@@ -49,28 +46,28 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(
 
     return (
       <div className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
-            <div className={popup['inputGroup']}>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>
-                  {lang.tr.pleaseEnterTheChannelPassword}
-                </div>
-                <input
-                  className={popup['input']}
-                  type="text"
-                  value={password || ''}
-                  maxLength={4}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === '') setPassword(null);
-                    else setPassword(value);
-                  }}
-                />
+            <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={popup['label']}>
+                {lang.tr.pleaseEnterTheChannelPassword}
               </div>
+              <input
+                type="text"
+                value={password || ''}
+                maxLength={4}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') setPassword(null);
+                  else setPassword(value);
+                }}
+              />
             </div>
           </div>
         </div>
+
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={`${popup['button']} ${

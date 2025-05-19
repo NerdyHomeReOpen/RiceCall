@@ -17,7 +17,6 @@ import ContextMenu from '@/components/ContextMenu';
 import { ContextMenuItem } from '@/types';
 
 interface ChangeThemePopupProps {
-  title: React.ReactNode;
   submitTo: string;
 }
 
@@ -62,14 +61,17 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     ipcService.popup.submit(submitTo);
     handleClose();
   };
+
   const handleClose = () => {
     ipcService.window.close();
   };
+
   const handleChangeTheme = (index: number) => {
     setThemeValue('selectedTheme', `theme-${index}`);
     removeThemeValue('selectedThemeColor');
     removeThemeValue('customThemeImage');
   };
+
   const handleColorBoxClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const clickedElement = event.currentTarget;
     const color = window.getComputedStyle(clickedElement).background;
@@ -80,9 +82,11 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       removeThemeValue('customThemeImage');
     }
   };
+
   const handleAddCustomImageClick = () => {
     fileInputRef.current?.click();
   };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -99,9 +103,11 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       event.target.value = '';
     }
   };
+
   const handleColorCustomClick = () => {
     setShowColorPicker(!showColorPicker);
   };
+
   const handleColorSelectorImageClick = (
     event: React.MouseEvent<HTMLDivElement>,
   ) => {
@@ -137,6 +143,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       console.error('載入顏色選擇器圖片時發生錯誤。');
     };
   };
+
   const handleSavePickedColor = () => {
     if (pickedColor) {
       setThemeValue('selectedThemeColor', pickedColor);
@@ -159,9 +166,11 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     }
     setShowColorPicker(false);
   };
+
   const handleCancelPickColor = () => {
     setShowColorPicker(false);
   };
+
   const handleCustomColorRightClick = (
     event: React.MouseEvent<HTMLDivElement>,
     indexInCustomArray: number,
@@ -171,6 +180,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     setContextMenuTargetIndex(indexInCustomArray);
     setContextMenuVisible(true);
   };
+
   const handleRemoveCustomColor = () => {
     if (contextMenuTargetIndex !== null) {
       const newAppliedColors = [...customAppliedColors];
@@ -184,6 +194,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     setContextMenuVisible(false);
     setContextMenuTargetIndex(null);
   };
+
   const handleCloseContextMenu = () => {
     setContextMenuVisible(false);
     setContextMenuTargetIndex(null);
@@ -215,6 +226,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
         if (e.key === 'Enter') handleSubmit();
       }}
     >
+      {/* Body */}
       <div className={popup['popupBody']}>
         <div className={changeTheme['ctWrapper']}>
           <div className={changeTheme['ctContain']}>

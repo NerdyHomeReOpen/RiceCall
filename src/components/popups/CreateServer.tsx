@@ -25,7 +25,7 @@ interface CreateServerPopupProps {
 }
 
 const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
-  (initialData: CreateServerPopupProps) => {
+  ({ userId }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
@@ -56,7 +56,6 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
     const [section, setSection] = useState<number>(0);
 
     // Variables
-    const { userId } = initialData;
     const { level: userLevel } = user;
     const {
       name: serverName,
@@ -68,13 +67,20 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
     const MAX_GROUPS =
       userLevel >= 16 ? 5 : userLevel >= 6 && userLevel < 16 ? 4 : 3;
     const remainingServers = MAX_GROUPS - servers.filter((s) => s.owned).length;
-    const canCreate = remainingServers > 0;
+    const canCreate = remainingServers > 0 && serverName.trim() !== '';
 
     // Handlers
-
-    const handleCreateServer = (server: Partial<Server>) => {
+    const handleCreateServer = () => {
       if (!socket) return;
-      socket.send.createServer({ server });
+      socket.send.createServer({
+        server: {
+          name: serverName,
+          avatar: serverAvatar,
+          avatarUrl: serverAvatarUrl,
+          slogan: serverSlogan,
+          type: serverType,
+        },
+      });
     };
 
     const handleOpenErrorDialog = (message: string) => {
@@ -113,71 +119,75 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
       refresh();
     }, [userId]);
 
-    switch (section) {
-      // Server Type Selection Section
-      case 0:
-        return (
-          <div className={popup['popupContainer']}>
-            <div className={popup['popupTab']}>
-              <div className={`${popup['item']} ${popup['active']}`}>
-                {lang.tr.selectServerType}
-              </div>
-              <div className={popup['item']}>{lang.tr.fillInfo}</div>
+    return (
+      <>
+        <div
+          className={popup['popupContainer']}
+          style={section === 0 ? {} : { display: 'none' }}
+        >
+          {/* Tab */}
+          <div className={popup['popupTab']}>
+            <div className={`${popup['item']} ${popup['active']}`}>
+              {lang.tr.selectServerType}
             </div>
+            <div className={popup['item']}>{lang.tr.fillInfo}</div>
+          </div>
 
-            <div className={popup['popupBody']}>
-              <div className={setting['body']}>
-                <div className={`${createServer['message']}`}>
-                  {`${lang.tr.remainingServer1} ${remainingServers} ${lang.tr.remainingServer2}`}
-                </div>
-                <div className={createServer['type']}>
-                  {lang.tr.selectServerTypeDescription}
-                </div>
-                <div className={createServer['buttonGroup']}>
-                  {SERVER_TYPES.map((type) => (
-                    <div
-                      key={type.value}
-                      className={`${createServer['button']} ${
-                        serverType === type.value
-                          ? createServer['selected']
-                          : ''
-                      }`}
-                      onClick={() => {
-                        setServer((prev) => ({
-                          ...prev,
-                          type: type.value as Server['type'],
-                        }));
-                        if (canCreate) {
-                          setSection(1);
-                        }
-                      }}
-                    >
-                      {type.name}
-                    </div>
-                  ))}
-                </div>
+          {/* Body */}
+          <div className={popup['popupBody']}>
+            <div className={setting['body']}>
+              <div className={`${createServer['message']}`}>
+                {`${lang.tr.remainingServer1} ${remainingServers} ${lang.tr.remainingServer2}`}
               </div>
-            </div>
-            <div className={popup['popupFooter']}>
-              <button className={popup['button']} onClick={() => handleClose()}>
-                {lang.tr.cancel}
-              </button>
+              <div className={createServer['type']}>
+                {lang.tr.selectServerTypeDescription}
+              </div>
+              <div className={createServer['buttonGroup']}>
+                {SERVER_TYPES.map((type) => (
+                  <div
+                    key={type.value}
+                    className={`${createServer['button']} ${
+                      serverType === type.value ? createServer['selected'] : ''
+                    }`}
+                    onClick={() => {
+                      setServer((prev) => ({
+                        ...prev,
+                        type: type.value as Server['type'],
+                      }));
+                      setSection(1);
+                    }}
+                  >
+                    {type.name}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        );
 
-      // Server Data Input Section
-      case 1:
-        return (
-          <div className={popup['popupContainer']}>
-            <div className={popup['popupTab']}>
-              <div className={popup['item']}>{lang.tr.selectServerType}</div>
-              <div className={`${popup['item']}  ${popup['active']}`}>
-                {lang.tr.fillInfo}
-              </div>
+          {/* Footer */}
+          <div className={popup['popupFooter']}>
+            <button className={popup['button']} onClick={() => handleClose()}>
+              {lang.tr.cancel}
+            </button>
+          </div>
+        </div>
+
+        <div
+          className={popup['popupContainer']}
+          style={section === 1 ? {} : { display: 'none' }}
+        >
+          {/* Tab */}
+          <div className={popup['popupTab']}>
+            <div className={popup['item']}>{lang.tr.selectServerType}</div>
+            <div className={`${popup['item']}  ${popup['active']}`}>
+              {lang.tr.fillInfo}
             </div>
-            <div className={popup['popupBody']}>
-              <div className={setting['body']}>
+          </div>
+
+          {/* Body */}
+          <div className={popup['popupBody']}>
+            <div className={setting['body']}>
+              <div className={popup['inputGroup']}>
                 <div className={createServer['avatarWrapper']}>
                   <div
                     className={createServer['avatarPicture']}
@@ -191,10 +201,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
                     accept="image/*"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (!file) {
-                        handleOpenErrorDialog(lang.tr.canNotReadImage);
-                        return;
-                      }
+                      if (!file) return;
                       if (file.size > 5 * 1024 * 1024) {
                         handleOpenErrorDialog(lang.tr.imageTooLarge);
                         return;
@@ -249,6 +256,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
                         name="name"
                         type="text"
                         value={serverName}
+                        placeholder={lang.tr.serverNamePlaceholder}
                         maxLength={32}
                         onChange={(e) =>
                           setServer((prev) => ({
@@ -257,9 +265,6 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
                           }))
                         }
                       />
-                    </div>
-                    <div className={createServer['hint']}>
-                      {lang.tr.serverNamePlaceholder}
                     </div>
                   </div>
                   <div className={createServer['inputWrapper']}>
@@ -271,6 +276,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
                         name="slogan"
                         type="text"
                         value={serverSlogan}
+                        placeholder={lang.tr.serverSloganPlaceholder}
                         maxLength={32}
                         onChange={(e) =>
                           setServer((prev) => ({
@@ -280,41 +286,34 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
                         }
                       />
                     </div>
-                    <div className={createServer['hint']}>
-                      {lang.tr.serverSloganPlaceholder}
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className={popup['popupFooter']}>
-              <button className={popup['button']} onClick={() => setSection(0)}>
-                {lang.tr.previous}
-              </button>
-              <button
-                className={popup['button']}
-                disabled={!serverName.trim() || !canCreate}
-                onClick={() => {
-                  handleCreateServer({
-                    name: serverName,
-                    avatar: serverAvatar,
-                    avatarUrl: serverAvatarUrl,
-                    slogan: serverSlogan,
-                    type: serverType,
-                    ownerId: userId,
-                  });
-                  handleClose();
-                }}
-              >
-                {lang.tr.created}
-              </button>
-              <button className={popup['button']} onClick={() => handleClose()}>
-                {lang.tr.cancel}
-              </button>
-            </div>
           </div>
-        );
-    }
+
+          {/* Footer */}
+          <div className={popup['popupFooter']}>
+            <button className={popup['button']} onClick={() => setSection(0)}>
+              {lang.tr.previous}
+            </button>
+            <button
+              className={popup['button']}
+              disabled={!canCreate}
+              onClick={() => {
+                handleCreateServer();
+                handleClose();
+              }}
+            >
+              {lang.tr.created}
+            </button>
+            <button className={popup['button']} onClick={() => handleClose()}>
+              {lang.tr.cancel}
+            </button>
+          </div>
+        </div>
+      </>
+    );
   },
 );
 

@@ -23,7 +23,7 @@ interface MemberApplySettingPopupProps {
 }
 
 const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
-  React.memo((initialData: MemberApplySettingPopupProps) => {
+  React.memo(({ serverId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -35,7 +35,6 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
     const [server, setServer] = useState<Server>(createDefault.server());
 
     // Variables
-    const { serverId } = initialData;
     const { receiveApply: serverReceiveApply, applyNotice: serverApplyNotice } =
       server;
 
@@ -72,6 +71,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
 
     return (
       <form className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -106,6 +106,8 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
             </div>
           </div>
         </div>
+
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}

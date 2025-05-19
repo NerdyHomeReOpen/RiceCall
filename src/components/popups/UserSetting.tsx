@@ -42,11 +42,11 @@ import {
 
 interface UserSettingPopupProps {
   userId: User['userId'];
-  targetId: string;
+  targetId: User['userId'];
 }
 
 const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
-  (initialData: UserSettingPopupProps) => {
+  ({ userId, targetId }) => {
     // Props
     const socket = useSocket();
     const lang = useLanguage();
@@ -78,7 +78,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
 
     // Variables
-    const { userId, targetId } = initialData;
     const {
       name: userName,
       avatar: userAvatar,
@@ -98,6 +97,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const isSelf = targetId === userId;
     const isFriend = !!friend.targetId;
     const isProfilePrivate = false; // TODO: 隱私設定開關，等設定功能完工
+    const canSubmit =
+      userName.trim() &&
+      userGender.trim() &&
+      userCountry.trim() &&
+      userBirthYear &&
+      userBirthMonth &&
+      userBirthDay;
     const joinedServers = servers
       .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
       .sort((a, b) => b.permissionLevel - a.permissionLevel);
@@ -483,20 +489,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
           >
             {selectedTabId === 'userSetting' ? (
               <>
-                <div
-                  className={`${setting['confirmedButton']} ${
-                    setting['blueBtn']
-                  } ${
-                    !userName ||
-                    !userGender ||
-                    !userCountry ||
-                    !userBirthYear ||
-                    !userBirthMonth ||
-                    !userBirthDay
-                      ? setting['disabled']
-                      : ''
-                  }`}
+                <button
+                  className={`${setting['confirmedButton']} ${setting['blueBtn']}`}
+                  disabled={!canSubmit}
                   onClick={() => {
+                    if (!canSubmit) return;
                     handleUpdateUser({
                       avatar: userAvatar,
                       avatarUrl: userAvatarUrl,
@@ -512,29 +509,27 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   }}
                 >
                   {lang.tr.confirm}
-                </div>
-                <div
+                </button>
+                <button
                   className={setting['button']}
                   onClick={() => setSelectedTabId('about')}
                 >
                   {lang.tr.cancel}
-                </div>
+                </button>
               </>
             ) : (
-              <div
+              <button
                 className={setting['button']}
                 onClick={() => setSelectedTabId('userSetting')}
               >
                 {lang.tr.editProfile}
-              </div>
+              </button>
             )}
           </div>
 
-          {/* Body */}
+          {/* About */}
           <div
-            className={`${setting['body']} ${
-              isSelf ? setting['canEditeable'] : ''
-            }`}
+            className={setting['body']}
             style={selectedTabId === 'about' ? {} : { display: 'none' }}
           >
             {userSignature && (
@@ -604,6 +599,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             </div>
           </div>
 
+          {/* Groups */}
           <div
             className={setting['body']}
             style={selectedTabId === 'groups' ? {} : { display: 'none' }}
@@ -731,6 +727,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             </div>
           </div>
 
+          {/* User Setting */}
           <div
             className={setting['body']}
             style={selectedTabId === 'userSetting' ? {} : { display: 'none' }}
@@ -977,7 +974,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       }}
                       onKeyDown={handleSignatureKeyDown}
                       onDragStart={(e) => e.preventDefault()}
-                    ></div>
+                    />
                     <div
                       className={`${setting['emojiBox']} ${
                         isEmojiBoxVisible ? setting['emojiBoxVisible'] : ''
@@ -1019,7 +1016,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                             setIsEmojiBoxVisible(true);
                           }
                         }}
-                      ></div>
+                      />
                     </div>
                   </div>
                 </div>
@@ -1077,6 +1074,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
           )}
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           {!isFriend && !isSelf && (
             <div
@@ -1087,7 +1085,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             </div>
           )}
           <div className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.close /** CLOSE **/}
+            {lang.tr.close}
           </div>
         </div>
       </div>

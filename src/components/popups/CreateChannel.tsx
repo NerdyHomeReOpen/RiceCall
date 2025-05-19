@@ -25,7 +25,7 @@ interface CreateChannelPopupProps {
 }
 
 const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
-  (initialData: CreateChannelPopupProps) => {
+  ({ userId, channelId, serverId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -38,9 +38,9 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
     const [channel, setChannel] = useState<Channel>(createDefault.channel());
 
     // Variables
-    const { channelId, serverId } = initialData;
     const { name: parentName } = parent;
     const { name: channelName } = channel;
+    const canCreate = channelName.trim();
 
     const handleCreateChannel = (
       channel: Partial<Channel>,
@@ -74,6 +74,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
 
     return (
       <div className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -103,10 +104,11 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}
-            disabled={!channelName.trim()}
+            disabled={!canCreate}
             onClick={() => {
               handleCreateChannel(
                 { name: channelName, categoryId: channelId },

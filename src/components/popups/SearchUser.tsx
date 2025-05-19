@@ -19,16 +19,13 @@ interface SearchUserPopupProps {
 }
 
 const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(
-  (initialData: SearchUserPopupProps) => {
+  ({ userId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
 
     // States
     const [searchQuery, setSearchQuery] = useState<string>('');
-
-    // Variables
-    const { userId } = initialData;
 
     // Handlers
     const handleSearchUser = (searchQuery: string) => {
@@ -75,6 +72,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(
 
     return (
       <div className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -94,6 +92,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             type="submit"

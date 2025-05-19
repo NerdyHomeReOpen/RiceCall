@@ -32,7 +32,7 @@ interface EditChannelOrderPopupProps {
 }
 
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
-  (initialData: EditChannelOrderPopupProps) => {
+  ({ userId, serverId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -54,7 +54,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
     // Variables
-    const { userId, serverId } = initialData;
     const isSelected = selectedChannel;
     const { channelId: selectedChannelId, isLobby } =
       selectedChannel ?? createDefault.channel();

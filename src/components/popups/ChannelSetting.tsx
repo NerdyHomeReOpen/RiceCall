@@ -28,7 +28,7 @@ interface ChannelSettingPopupProps {
 }
 
 const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
-  (initialData: ChannelSettingPopupProps) => {
+  ({ serverId, channelId }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
@@ -43,7 +43,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
     const [server, setServer] = useState<Server>(createDefault.server());
 
     // Variables
-    const { channelId, serverId } = initialData;
     const { lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } =
       server;
     const {
@@ -64,6 +63,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
     } = channel;
     const isLobby = serverLobbyId === channelId;
     const isReceptionLobby = serverReceptionLobbyId === channelId;
+    const canSubmit = channelName.trim();
 
     // Handlers
     const handleUpdateChannel = (
@@ -105,6 +105,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
 
     return (
       <div className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           {/* Sidebar */}
           <div className={setting['left']}>
@@ -600,10 +601,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}
+            disabled={!canSubmit}
             onClick={() => {
+              if (!canSubmit) return;
               handleUpdateChannel(
                 {
                   name: channelName,

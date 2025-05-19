@@ -46,7 +46,7 @@ interface ServerSettingPopupProps {
 }
 
 const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
-  (initialData: ServerSettingPopupProps) => {
+  ({ serverId, userId }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
@@ -116,7 +116,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const [selectedRowType, setSelectedRowType] = useState<string | null>(null);
 
     // Variables
-    const { serverId, userId } = initialData;
     const {
       name: serverName,
       avatar: serverAvatar,
@@ -132,6 +131,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       visibility: serverVisibility,
     } = server;
     const { permissionLevel: userPermission } = member;
+    const canSubmit = serverName.trim();
     const filteredMembers = serverMembers.filter((member) => {
       const searchLower = searchText.toLowerCase();
       return (
@@ -447,6 +447,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     return (
       <div className={popup['popupContainer']} ref={popupRef}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           {/* Sidebar */}
           <div className={setting['left']}>
@@ -1000,7 +1001,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <div className={popup['label']}>
                       {lang.tr.semiPublicServer}
                     </div>
-                    <div className={setting['hintText']}>
+                    <div className={popup['hint']}>
                       {lang.tr.semiPublicServerDescription}
                     </div>
                   </div>
@@ -1024,7 +1025,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <div className={popup['label']}>
                       {lang.tr.privateServer}
                     </div>
-                    <div className={setting['hintText']}>
+                    <div className={popup['hint']}>
                       {lang.tr.privateServerDescription}
                     </div>
                   </div>
@@ -1287,10 +1288,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}
+            disabled={!canSubmit}
             onClick={() => {
+              if (!canSubmit) return;
               handleUpdateServer(
                 {
                   name: serverName,

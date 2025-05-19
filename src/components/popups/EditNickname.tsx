@@ -24,7 +24,7 @@ interface EditNicknamePopupProps {
 }
 
 const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
-  (initialData: EditNicknamePopupProps) => {
+  ({ userId, serverId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -37,7 +37,6 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
     const [user, setUser] = useState<User>(createDefault.user());
 
     // Variables
-    const { userId, serverId } = initialData;
     const { nickname: memberNickname } = member;
     const { name: userName } = user;
 
@@ -82,6 +81,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
 
     return (
       <form className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -109,6 +109,8 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
             </div>
           </div>
         </div>
+
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}

@@ -25,15 +25,15 @@ interface DialogPopupProps {
   submitTo: string;
 }
 
-const DialogPopup: React.FC<DialogPopupProps> = (
-  initialData: DialogPopupProps,
-) => {
+const DialogPopup: React.FC<DialogPopupProps> = ({
+  iconType,
+  title,
+  submitTo,
+}) => {
   // Hooks
   const lang = useLanguage();
 
-  // Variables
-  const { iconType, title, submitTo } = initialData;
-
+  // Refs
   const containerRef = useRef<HTMLFormElement>(null);
 
   // Handlers
@@ -60,6 +60,7 @@ const DialogPopup: React.FC<DialogPopupProps> = (
         if (e.key === 'Enter') handleSubmit();
       }}
     >
+      {/* Body */}
       <div className={popup['popupBody']}>
         <div className={setting['body']}>
           <div className={popup['dialogContent']}>
@@ -72,6 +73,8 @@ const DialogPopup: React.FC<DialogPopupProps> = (
           </div>
         </div>
       </div>
+
+      {/* Footer */}
       <div className={popup['popupFooter']}>
         <button className={popup['button']} onClick={() => handleSubmit()}>
           {lang.tr.confirm}

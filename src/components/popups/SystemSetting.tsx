@@ -49,6 +49,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
   return (
     <div className={popup['popupContainer']}>
+      {/* Body */}
       <div className={popup['popupBody']}>
         {/* Sidebar */}
         <div className={setting['left']}>
@@ -212,6 +213,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         </div>
       </div>
 
+      {/* Footer */}
       <div className={popup['popupFooter']}>
         <button
           className={popup['button']}
