@@ -81,9 +81,15 @@ export const cleanHtmlEndingBr = (html: string): string => {
 
 export const convertHtmlToEmojiPlaceholder = (html: string): string => {
     if (!html) return '';
-    const cleanedHtml = cleanHtmlEndingBr(html);
+
+    let cleanedHtml = cleanHtmlEndingBr(html);
+
+    cleanedHtml = cleanedHtml.replace(/<div>\s*(<br\s*\/?>)?\s*<\/div>/gi, '');
+    cleanedHtml = cleanedHtml.replace(/<p>\s*(<br\s*\/?>)?\s*<\/p>/gi, '');
+
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = cleanedHtml;
+
     const images = tempDiv.querySelectorAll('img[data-emoji-src]');
     images.forEach((img) => {
         const emojiSrc = img.getAttribute('data-emoji-src');
@@ -92,7 +98,14 @@ export const convertHtmlToEmojiPlaceholder = (html: string): string => {
             img.parentNode?.replaceChild(textNode, img);
         }
     });
-    return tempDiv.innerHTML;
+
+    let finalHtml = tempDiv.innerHTML;
+    finalHtml = finalHtml.replace(/(<br\s*\/?>|\s)*$/gi, '');
+    if (finalHtml === '<br>' || finalHtml === '<br/>') {
+        finalHtml = '';
+    }
+
+    return finalHtml;
 };
 
 export const convertEmojiPlaceholderToHtml = (
@@ -171,8 +184,7 @@ export const handleEmojiKeyDown = (
         if (imageToDelete) {
             e.preventDefault();
             imageToDelete.parentNode?.removeChild(imageToDelete);
-            const newHtml = signatureDivRefCurrent.innerHTML;
-            updateSignatureCallback(newHtml);
+            updateSignatureCallback(signatureDivRefCurrent.innerHTML);
             signatureDivRefCurrent.focus();
             return true;
         }
@@ -217,8 +229,7 @@ export const insertEmojiIntoDiv = (
             selection.removeAllRanges();
             selection.addRange(range);
         }
-        const rawHtml = signatureDivRefCurrent.innerHTML;
-        updateSignatureCallback(cleanHtmlEndingBr(rawHtml));
+        updateSignatureCallback(signatureDivRefCurrent.innerHTML);
         if (setLastCursorPosCallback) {
             setLastCursorPosCallback(null);
         }
