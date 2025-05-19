@@ -67,10 +67,23 @@ export const emojiList: Emoji[] = [
     { id: 60, name: '心碎', src: 'broken_heart' },
 ];
 
+export const cleanHtmlEndingBr = (html: string): string => {
+    let cleanedHtml = html;
+    if (cleanedHtml === '<br>' || cleanedHtml === '<br/>') {
+        return '';
+    }
+    if (cleanedHtml.endsWith('<br>') || cleanedHtml.endsWith('<br/>')) {
+        cleanedHtml = cleanedHtml.substring(0, cleanedHtml.lastIndexOf('<br'));
+    }
+    cleanedHtml = cleanedHtml.replace(/(<br\s*\/?>|\s)*$/gi, '');
+    return cleanedHtml;
+};
+
 export const convertHtmlToEmojiPlaceholder = (html: string): string => {
     if (!html) return '';
+    const cleanedHtml = cleanHtmlEndingBr(html);
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
+    tempDiv.innerHTML = cleanedHtml;
     const images = tempDiv.querySelectorAll('img[data-emoji-src]');
     images.forEach((img) => {
         const emojiSrc = img.getAttribute('data-emoji-src');
@@ -204,7 +217,8 @@ export const insertEmojiIntoDiv = (
             selection.removeAllRanges();
             selection.addRange(range);
         }
-        updateSignatureCallback(signatureDivRefCurrent.innerHTML);
+        const rawHtml = signatureDivRefCurrent.innerHTML;
+        updateSignatureCallback(cleanHtmlEndingBr(rawHtml));
         if (setLastCursorPosCallback) {
             setLastCursorPosCallback(null);
         }

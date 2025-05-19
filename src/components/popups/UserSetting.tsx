@@ -38,6 +38,7 @@ import {
   handleEmojiKeyDown,
   insertEmojiIntoDiv,
   handleEmojiSelectionChange,
+  cleanHtmlEndingBr,
 } from '@/utils/emoji';
 
 interface UserSettingPopupProps {
@@ -177,8 +178,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     // Handlers
     const handleUpdateUser = (userData: Partial<User>) => {
       if (!socket) return;
-      const signatureWithPlaceholders = convertHtmlToEmojiPlaceholder(
+
+      const signatureHtmlToConvert = cleanHtmlEndingBr(
         userData.signature || '',
+      );
+
+      const signatureWithPlaceholders = convertHtmlToEmojiPlaceholder(
+        signatureHtmlToConvert,
       );
       socket.send.updateUser({
         user: {
@@ -953,23 +959,32 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                           ) {
                             setIsEmojiBoxVisible(false);
                           }
-                          if (
-                            signatureDivRef.current &&
-                            user.signature !== signatureDivRef.current.innerHTML
-                          ) {
-                            setUser((prev) => ({
-                              ...prev,
-                              signature: signatureDivRef.current!.innerHTML,
-                            }));
+                          if (signatureDivRef.current) {
+                            const currentDivHtml = cleanHtmlEndingBr(
+                              signatureDivRef.current.innerHTML,
+                            );
+
+                            if (user.signature !== currentDivHtml) {
+                              setUser((prev) => ({
+                                ...prev,
+                                signature: currentDivHtml,
+                              }));
+                            }
                           }
                         }, 0);
                       }}
                       onInput={(e) => {
                         const target = e.target as HTMLDivElement;
-                        setUser((prev) => ({
-                          ...prev,
-                          signature: target.innerHTML,
-                        }));
+                        const currentInputHtml = cleanHtmlEndingBr(
+                          target.innerHTML,
+                        );
+
+                        if (user.signature !== currentInputHtml) {
+                          setUser((prev) => ({
+                            ...prev,
+                            signature: currentInputHtml,
+                          }));
+                        }
                         lastCursorPosition.current = null;
                       }}
                       onKeyDown={handleSignatureKeyDown}
@@ -1043,13 +1058,16 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       e.preventDefault();
                     }}
                     onClick={() => {
+                      const cleanedNewHtml = cleanHtmlEndingBr(
+                        signatureDivRef.current?.innerHTML || '',
+                      );
                       insertEmojiIntoDiv(
                         e,
                         signatureDivRef.current,
-                        (newHtml) =>
+                        () =>
                           setUser((prev) => ({
                             ...prev,
-                            signature: newHtml,
+                            signature: cleanedNewHtml,
                           })),
                         (pos) => (lastCursorPosition.current = pos),
                       );

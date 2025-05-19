@@ -27,6 +27,7 @@ import {
   handleEmojiKeyDown,
   insertEmojiIntoDiv,
   handleEmojiSelectionChange,
+  cleanHtmlEndingBr,
 } from '@/utils/emoji';
 
 interface FriendPageProps {
@@ -81,16 +82,10 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
 
     const handleSaveSignature = useCallback(() => {
       if (!signatureDivRef.current) return;
-      let currentLiveHtmlFromDiv = signatureDivRef.current.innerHTML;
-      if (
-        currentLiveHtmlFromDiv.endsWith('<br>') ||
-        currentLiveHtmlFromDiv.endsWith('<br/>')
-      ) {
-        currentLiveHtmlFromDiv = currentLiveHtmlFromDiv.substring(
-          0,
-          currentLiveHtmlFromDiv.lastIndexOf('<br'),
-        );
-      }
+
+      const currentLiveHtmlFromDiv = cleanHtmlEndingBr(
+        signatureDivRef.current.innerHTML,
+      );
 
       const signatureWithPlaceholders = convertHtmlToEmojiPlaceholder(
         currentLiveHtmlFromDiv,
@@ -300,12 +295,8 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     }, [signatureInputHtml]);
 
     const handleSignatureInput = (e: React.FormEvent<HTMLDivElement>) => {
-      const currentHtml = e.currentTarget.innerHTML;
-      if (currentHtml === '<br>' || currentHtml === '<br/>') {
-        if (signatureInputHtml !== '') {
-          setSignatureInputHtml('');
-        }
-      } else if (currentHtml !== signatureInputHtml) {
+      const currentHtml = cleanHtmlEndingBr(e.currentTarget.innerHTML);
+      if (currentHtml !== signatureInputHtml) {
         setSignatureInputHtml(currentHtml);
       }
     };
@@ -326,7 +317,9 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
           return;
         }
         if (signatureDivRef.current) {
-          const currentLiveHtml = signatureDivRef.current.innerHTML;
+          const currentLiveHtml = cleanHtmlEndingBr(
+            signatureDivRef.current.innerHTML,
+          );
           const originalSignatureHtml = convertEmojiPlaceholderToHtml(
             user.signature || '',
             emojiList,
