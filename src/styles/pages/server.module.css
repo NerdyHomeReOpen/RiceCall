@@ -381,7 +381,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #878787;
+  color: #777777;
 }
 
 .userTab .userTabName.member {
@@ -549,14 +549,15 @@
 }
 
 .micText {
-  display: flex;
+  color: #2594ca;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   margin-left: 5px;
+  font-family: Noto Sans TC;
   font-size: 1.25rem;
-  color: #28a0da;
-  font-family: 'Noto Sans TC';
+  display: flex;
+  font-weight: bold;
 }
 
 .micSubText {
@@ -818,7 +819,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
   z-index: 1;
   transition: transform 0.2s ease;
 }
@@ -836,7 +836,7 @@
 }
 
 .navItem.active {
-  color: #8b8b8b;
+  color: #58595b;
   transform: translateY(-1px);
 }
 
