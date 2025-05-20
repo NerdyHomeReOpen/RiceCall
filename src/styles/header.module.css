@@ -241,7 +241,7 @@
   height: 30px;
   overflow: hidden;
   white-space: nowrap;
-  padding: 5px 13px 0 13px;
+  padding: 0 13px;
 }
 
 .mainTabs .tab:before {
@@ -279,8 +279,6 @@
   z-index: 2;
   min-width: 12px;
   min-height: 12px;
-  align-self: flex-start;
-  left: 3px;
   position: relative;
   border-radius: 50%;
   box-shadow: 0 0 2px rgb(255 255 255 / 35%);
@@ -326,10 +324,8 @@
   overflow: hidden;
   color: var(--secondary-color, var(--main-color, #fff));
   width: 100%;
-  height: 100%;
   text-align: center;
   white-space: nowrap;
-  font-size: 14px;
 }
 
 .mainTabs .tab.selected .tabLable {
