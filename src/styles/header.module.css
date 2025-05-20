@@ -324,6 +324,7 @@
   height: 100%;
   text-align: center;
   white-space: nowrap;
+  font-size: 14px;
 }
 
 .mainTabs .tab.selected .tabLable {

@@ -1723,6 +1723,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
           <div
             className={`
               ${styles['navItem']} 
+              ${styles['navItemLeft']} 
               ${view === 'current' ? styles['active'] : ''}
             `}
             onClick={() => setView('current')}
@@ -1732,6 +1733,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
           <div
             className={`
               ${styles['navItem']} 
+              ${styles['navItemRight']} 
               ${view === 'all' ? styles['active'] : ''}
             `}
             onClick={() => setView('all')}
