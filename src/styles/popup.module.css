@@ -39,7 +39,7 @@
 }
 
 .popupFooter {
-  padding: 10px;
+  padding: 8px 3px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
