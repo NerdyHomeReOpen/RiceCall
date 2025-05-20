@@ -241,7 +241,7 @@
   height: 30px;
   overflow: hidden;
   white-space: nowrap;
-  padding: 8px 13px 0 13px;
+  padding: 5px 13px 0 13px;
 }
 
 .mainTabs .tab:before {

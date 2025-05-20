@@ -616,7 +616,7 @@
   padding: 0.5rem;
   border-radius: 4px;
   background: none;
-  color: #777;
+  color: #888888;
   text-align: center;
   position: relative;
 }
@@ -659,7 +659,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: #777;
+  color: #888888;
 }
 
 .bkgModeButton::before {
