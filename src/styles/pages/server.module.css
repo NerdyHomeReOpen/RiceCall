@@ -116,7 +116,8 @@
   position: relative;
   display: flex;
   font-size: 13px;
-  justify-content: center;
+  min-width: 75px;
+  justify-content: start;
   align-items: center;
 }
 
@@ -132,7 +133,6 @@
 }
 
 .memberText:before {
-  margin-left: 20px;
   content: '';
   min-height: 12px;
   min-width: 12px;
@@ -141,6 +141,7 @@
   background-repeat: no-repeat;
   background-position: 0 0;
   margin-right: 5px;
+  margin-left: 5px;
 }
 
 .optionBox {
