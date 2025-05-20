@@ -125,7 +125,16 @@ const Markdown: React.FC<MarkdownProps> = React.memo(
         if (isGuest && forbidGuestUrl) return <span {...props} />;
         // TODO: Need a better way to handle this
         if (alt.startsWith('[emoji_')) {
-          return <img src={src} alt={alt} width="19" height="19" {...props} />;
+          return (
+            <img
+              src={src}
+              alt={alt}
+              width="19"
+              height="19"
+              draggable={false}
+              {...props}
+            />
+          );
         }
         return <img src={src} alt={alt} {...props} />;
       },
