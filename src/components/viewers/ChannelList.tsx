@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -44,7 +44,8 @@ interface CategoryTabProps {
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   selectedItemId: string | null;
   selectedItemType: string | null;
-  setSelectedChannelId: (id: string | null, type: string | null) => void;
+  setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedItemType: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(
@@ -59,7 +60,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     setExpanded,
     selectedItemId,
     selectedItemType,
-    setSelectedChannelId,
+    setSelectedItemId,
+    setSelectedItemType,
   }) => {
     // Hooks
     const lang = useLanguage();
@@ -254,7 +256,18 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               ? styles['selected']
               : ''
           }`}
-          onClick={() => setSelectedChannelId(categoryId, 'category')}
+          onClick={() => {
+            if (
+              selectedItemId === categoryId &&
+              selectedItemType === 'category'
+            ) {
+              setSelectedItemId(null);
+              setSelectedItemType(null);
+              return;
+            }
+            setSelectedItemId(categoryId);
+            setSelectedItemType('category');
+          }}
           onDoubleClick={() => {
             if (!canJoin) return;
             if (needPassword) {
@@ -382,7 +395,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 setExpanded={setExpanded}
                 selectedItemId={selectedItemId}
                 selectedItemType={selectedItemType}
-                setSelectedChannelId={setSelectedChannelId}
+                setSelectedItemId={setSelectedItemId}
+                setSelectedItemType={setSelectedItemType}
               />
             ))}
         </div>
@@ -400,10 +414,11 @@ interface ChannelTabProps {
   friends: UserFriend[];
   serverMembers: ServerMember[];
   expanded: Record<string, boolean>;
-  setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   selectedItemId: string | null;
   selectedItemType: string | null;
-  setSelectedChannelId: (id: string | null, type: string | null) => void;
+  setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedItemType: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(
@@ -414,10 +429,11 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     currentServer,
     serverMembers,
     expanded,
-    setExpanded,
     selectedItemId,
     selectedItemType,
-    setSelectedChannelId,
+    setExpanded,
+    setSelectedItemId,
+    setSelectedItemType,
   }) => {
     // Hooks
     const lang = useLanguage();
@@ -603,12 +619,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           }));
     }, [channelId, setChannelExpanded, setExpanded, userInChannel]);
 
-    useEffect(() => {
-      if (currentChannel) {
-        setSelectedChannelId(currentChannel.channelId, 'channel');
-      }
-    }, [currentChannel, currentChannel.channelId, setSelectedChannelId]);
-
     return (
       <>
         {/* Channel View */}
@@ -619,7 +629,18 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               ? styles['selected']
               : ''
           }`}
-          onClick={() => setSelectedChannelId(channelId, 'channel')}
+          onClick={() => {
+            if (
+              selectedItemId === channelId &&
+              selectedItemType === 'channel'
+            ) {
+              setSelectedItemId(null);
+              setSelectedItemType(null);
+              return;
+            }
+            setSelectedItemId(channelId);
+            setSelectedItemType('channel');
+          }}
           onDoubleClick={() => {
             if (!canJoin) return;
             if (needPassword) {
@@ -763,7 +784,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 currentServer={currentServer}
                 selectedItemId={selectedItemId}
                 selectedItemType={selectedItemType}
-                setSelectedChannelId={setSelectedChannelId}
+                setSelectedItemId={setSelectedItemId}
+                setSelectedItemType={setSelectedItemType}
               />
             ))}
         </div>
@@ -781,7 +803,8 @@ interface UserTabProps {
   friends: UserFriend[];
   selectedItemId: string | null;
   selectedItemType: string | null;
-  setSelectedChannelId: (id: string | null, type: string | null) => void;
+  setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedItemType: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const UserTab: React.FC<UserTabProps> = React.memo(
@@ -792,7 +815,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     currentServer,
     selectedItemId,
     selectedItemType,
-    setSelectedChannelId,
+    setSelectedItemId,
+    setSelectedItemType,
   }) => {
     // Hooks
     const lang = useLanguage();
@@ -1022,7 +1046,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       <div
         ref={userTabRef}
         key={memberUserId}
-        className={`${styles['userTab']} ${
+        className={`context-menu-container ${styles['userTab']} ${
           selectedItemId === memberUserId && selectedItemType === 'user'
             ? styles['selected']
             : ''
@@ -1031,54 +1055,19 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           if (!userTabRef.current) return;
           const x =
             userTabRef.current.getBoundingClientRect().left +
-            userTabRef.current.getBoundingClientRect().width;
+            userTabRef.current.getBoundingClientRect().width -
+            10;
           const y = userTabRef.current.getBoundingClientRect().top;
-          // contextMenu.cancelDelayedCloseUserInfoBlock();
-          // handleClearTimeout();
-          // initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
-          // hasMovedTooMuchInitiallyRef.current = false;
-          // qualifyingEventRef.current = e;
-          // hoverTimeoutRef.current = setTimeout(
-          //   handleShowUserInfoCard,
-          //   HOVER_DELAY,
-          // );
           contextMenu.showUserInfoBlock(x, y, false, member);
         }}
-        // onMouseMove={(e) => {
-        //   if (!initialPosForThresholdRef.current) {
-        //     initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
-        //     hasMovedTooMuchInitiallyRef.current = false;
-        //     qualifyingEventRef.current = e;
-        //     handleStartTimeout(e);
-        //     return;
-        //   }
-        //   if (!hasMovedTooMuchInitiallyRef.current) {
-        //     const deltaX = Math.abs(
-        //       e.clientX - initialPosForThresholdRef.current.x,
-        //     );
-        //     const deltaY = Math.abs(
-        //       e.clientY - initialPosForThresholdRef.current.y,
-        //     );
-        //     if (deltaX > MOVEMENT_THRESHOLD || deltaY > MOVEMENT_THRESHOLD) {
-        //       hasMovedTooMuchInitiallyRef.current = true;
-        //       qualifyingEventRef.current = e;
-        //       handleStartTimeout(e);
-        //     }
-        //   } else {
-        //     qualifyingEventRef.current = e;
-        //     handleStartTimeout(e);
-        //   }
-        // }}
-        onMouseLeave={() => {
-          // handleClearTimeout();
-          // contextMenu.requestDelayedCloseUserInfoBlock();
-          // initialPosForThresholdRef.current = null;
-          // hasMovedTooMuchInitiallyRef.current = false;
-          // qualifyingEventRef.current = null;
-          contextMenu.closeUserInfoBlock();
-        }}
         onClick={() => {
-          setSelectedChannelId(memberUserId, 'user');
+          if (selectedItemId === memberUserId && selectedItemType === 'user') {
+            setSelectedItemId(null);
+            setSelectedItemType(null);
+            return;
+          }
+          setSelectedItemId(memberUserId);
+          setSelectedItemType('user');
         }}
         onDoubleClick={() => {
           if (isCurrentUser) return;
@@ -1361,14 +1350,6 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       'channel',
     );
 
-    const setSelectedChannelId = useCallback(
-      (id: string | null, type: string | null) => {
-        setSelectedItemId(id);
-        setSelectedItemType(type);
-      },
-      [setSelectedItemId, setSelectedItemType],
-    );
-
     // Variables
     const connectStatus = 4 - Math.floor(Number(latency) / 50);
     const {
@@ -1480,48 +1461,48 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       };
     }, [socket]);
 
-    useEffect(() => {
-      if (currentChannel) {
-        setSelectedItemId(currentChannel.channelId);
-        setSelectedItemType('channel');
-      }
-    }, [currentChannel, currentChannel.channelId]);
+    // useEffect(() => {
+    //   if (currentChannel) {
+    //     setSelectedItemId(currentChannel.channelId);
+    //     setSelectedItemType('channel');
+    //   }
+    // }, [currentChannel, currentChannel.channelId]);
 
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (event.button === 2) {
-          const targetElement = event.target as HTMLElement;
-          const userTab = targetElement.closest(`.${styles['userTab']}`);
-          const channelTab = targetElement.closest(`.${styles['channelTab']}`);
-          if (
-            userTab?.classList.contains(styles['selected']) ||
-            channelTab?.classList.contains(styles['selected'])
-          ) {
-            return;
-          }
-        }
+    // useEffect(() => {
+    //   const handleClickOutside = (event: MouseEvent) => {
+    //     if (event.button === 2) {
+    //       const targetElement = event.target as HTMLElement;
+    //       const userTab = targetElement.closest(`.${styles['userTab']}`);
+    //       const channelTab = targetElement.closest(`.${styles['channelTab']}`);
+    //       if (
+    //         userTab?.classList.contains(styles['selected']) ||
+    //         channelTab?.classList.contains(styles['selected'])
+    //       ) {
+    //         return;
+    //       }
+    //     }
 
-        if (
-          viewerRef.current &&
-          !viewerRef.current.contains(event.target as Node)
-        ) {
-          setSelectedChannelId(null, null);
-        } else if (event.target instanceof HTMLElement) {
-          const targetElement = event.target as HTMLElement;
-          const isUserTab = targetElement.closest(`.${styles['userTab']}`);
-          const isChannelTab = targetElement.closest(
-            `.${styles['channelTab']}`,
-          );
-          if (!isUserTab && !isChannelTab) {
-            setSelectedChannelId(null, null);
-          }
-        }
-      };
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }, [setSelectedChannelId]);
+    //     if (
+    //       viewerRef.current &&
+    //       !viewerRef.current.contains(event.target as Node)
+    //     ) {
+    //       setSelectedChannelId(null, null);
+    //     } else if (event.target instanceof HTMLElement) {
+    //       const targetElement = event.target as HTMLElement;
+    //       const isUserTab = targetElement.closest(`.${styles['userTab']}`);
+    //       const isChannelTab = targetElement.closest(
+    //         `.${styles['channelTab']}`,
+    //       );
+    //       if (!isUserTab && !isChannelTab) {
+    //         setSelectedChannelId(null, null);
+    //       }
+    //     }
+    //   };
+    //   document.addEventListener('mousedown', handleClickOutside);
+    //   return () => {
+    //     document.removeEventListener('mousedown', handleClickOutside);
+    //   };
+    // }, [setSelectedChannelId]);
 
     return (
       <>
@@ -1678,10 +1659,11 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                 currentServer={currentServer}
                 serverMembers={serverMembers}
                 expanded={{ [currentChannelId]: true }}
-                setExpanded={() => {}}
                 selectedItemId={selectedItemId}
                 selectedItemType={selectedItemType}
-                setSelectedChannelId={setSelectedChannelId}
+                setExpanded={() => {}}
+                setSelectedItemId={setSelectedItemId}
+                setSelectedItemType={setSelectedItemType}
               />
             ) : (
               serverChannels
@@ -1702,10 +1684,11 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                       serverMembers={serverMembers}
                       serverChannels={serverChannels}
                       expanded={expanded}
-                      setExpanded={setExpanded}
                       selectedItemId={selectedItemId}
                       selectedItemType={selectedItemType}
-                      setSelectedChannelId={setSelectedChannelId}
+                      setExpanded={setExpanded}
+                      setSelectedItemId={setSelectedItemId}
+                      setSelectedItemType={setSelectedItemType}
                     />
                   ) : (
                     <ChannelTab
@@ -1716,10 +1699,11 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                       currentServer={currentServer}
                       serverMembers={serverMembers}
                       expanded={expanded}
-                      setExpanded={setExpanded}
                       selectedItemId={selectedItemId}
                       selectedItemType={selectedItemType}
-                      setSelectedChannelId={setSelectedChannelId}
+                      setExpanded={setExpanded}
+                      setSelectedItemId={setSelectedItemId}
+                      setSelectedItemType={setSelectedItemType}
                     />
                   ),
                 )

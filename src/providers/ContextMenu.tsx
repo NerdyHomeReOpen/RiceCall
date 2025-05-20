@@ -82,44 +82,42 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     (e: MouseEvent) => {
       if ((e.target as HTMLElement).closest('.context-menu-container')) return;
       if (isContextMenuVisible) closeContextMenu();
-      if (isUserInfoVisible) closeUserInfoBlock();
       if (isBadgeInfoVisible) closeBadgeInfoCard();
       if (isEmojiPickerVisible) closeEmojiPicker();
     },
-    [
-      isContextMenuVisible,
-      isUserInfoVisible,
-      isBadgeInfoVisible,
-      isEmojiPickerVisible,
-    ],
+    [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible],
+  );
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
+      if (isUserInfoVisible) closeUserInfoBlock();
+    },
+    [isUserInfoVisible],
   );
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       if (isContextMenuVisible) closeContextMenu();
-      if (isUserInfoVisible) closeUserInfoBlock();
       if (isBadgeInfoVisible) closeBadgeInfoCard();
       if (isEmojiPickerVisible) closeEmojiPicker();
     },
-    [
-      isContextMenuVisible,
-      isUserInfoVisible,
-      isBadgeInfoVisible,
-      isEmojiPickerVisible,
-    ],
+    [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible],
   );
 
   // Effects
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousemove', handleMouseMove);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [handleKeyDown, handleClickOutside]);
+  }, [handleKeyDown, handleClickOutside, handleMouseMove]);
 
   const showContextMenu = (
     x: number,
@@ -128,7 +126,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     preferLeft: boolean,
     items: ContextMenuItem[],
   ) => {
-    if (isUserInfoVisible) closeUserInfoBlock();
     setContextMenu(
       <ContextMenu
         items={items}
@@ -153,8 +150,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     preferTop: boolean,
     member: ServerMember,
   ) => {
-    if (isContextMenuVisible) return;
-    if (isBadgeInfoVisible) closeBadgeInfoCard();
     setUserInfo(
       <UserInfoCard member={member} x={x} y={y} preferTop={preferTop} />,
     );
