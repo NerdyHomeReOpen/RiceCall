@@ -270,10 +270,15 @@
   background-position: 0 0;
 }
 
+.mainTabs .tab[data-tab-id='server'] {
+  min-width: 192px !important;
+  max-width: 192px !important;
+}
+
 .mainTabs .tabClose {
   z-index: 2;
-  min-width: 15px;
-  min-height: 15px;
+  min-width: 12px;
+  min-height: 12px;
   align-self: flex-start;
   left: 3px;
   position: relative;

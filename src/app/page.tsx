@@ -260,6 +260,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
           return (
             <div
               key={`Tabs-${TabId}`}
+              data-tab-id={TabId}
               className={`${header['tab']} ${
                 TabId === mainTab.selectedTabId ? header['selected'] : ''
               }`}
@@ -277,8 +278,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
                     handleLeaveServer(userId, serverId);
                   }}
                   xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="15"
+                  width="12"
+                  height="12"
                   viewBox="0 0 24 24"
                 >
                   <circle
@@ -290,7 +291,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
                   <path
                     d="M17 7L7 17M7 7l10 10"
                     stroke="#fff"
-                    strokeWidth="3"
+                    strokeWidth="4"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
