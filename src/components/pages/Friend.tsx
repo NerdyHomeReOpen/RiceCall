@@ -420,13 +420,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
                   return openingPicker;
                 });
               }}
-            ></div>
-            <div
-              className={friendPage['enterButtonIconBox']}
-              onClick={handleSaveSignature}
-            >
-              <div className={friendPage['enterButtonIcon']}></div>
-            </div>
+            />
           </div>
         </header>
         {/* Main Content */}

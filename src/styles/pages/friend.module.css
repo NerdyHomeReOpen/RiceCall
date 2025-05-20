@@ -97,14 +97,11 @@
 
 .signatureBox {
   display: flex;
-  width: 619px;
+  width: 60%;
   height: 30px;
-  margin-left: 7rem;
   align-items: center;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  margin-left: 100px;
+  padding: 2px 5px;
 }
 
 .signatureInput {
@@ -114,11 +111,10 @@
   border-style: unset;
   resize: none;
   outline: unset;
-  width: 90%;
+  width: 100%;
   height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-  margin-right: 0.5rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -141,11 +137,11 @@
   display: none;
 }
 
-.signatureBox:focus-within .enterButtonIconBox,
+/* .signatureBox:focus-within .enterButtonIconBox, */
 .signatureBox:focus-within .emojiBtn {
   display: flex;
 }
-
+/* 
 .enterButtonIconBox {
   border: 1px solid #d1d1d1;
   background-color: #fbfbfb;
@@ -175,7 +171,7 @@
   background-size: contain;
   height: 9px;
   width: 22px;
-}
+} */
 
 .badgeBox {
   display: flex;
