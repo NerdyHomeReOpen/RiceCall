@@ -83,7 +83,7 @@ const Markdown: React.FC<MarkdownProps> = React.memo(
       '$1\n\n$3',
     );
     const withEmojis = processedText.replace(
-      /(\[emoji_\w+\])/g,
+      /(\[emoji_[\w-]+\])/g,
       (match: string) => {
         const emoji = [...emojis, ...unicodeEmojis].find(
           (emoji) => emoji.char === match,
