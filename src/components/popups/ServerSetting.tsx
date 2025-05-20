@@ -109,7 +109,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     >([]);
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const [sortDirection, setSortDirection] = useState<1 | -1>(-1);
-    const [sortField, setSortField] = useState<string>('permissionLevel');
+    // const [sortField, setSortField] = useState<string>('permissionLevel'); temp: not used
     const [searchText, setSearchText] = useState('');
     const [showPreview, setShowPreview] = useState(false);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -223,7 +223,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       direction: 1 | -1,
     ) => {
       const newDirection = direction === 1 ? -1 : 1;
-      setSortField(String(field));
+      // setSortField(String(field)); temp: not used
       setSortDirection(newDirection);
       return [...array].sort(createSorter(field, newDirection));
     };
@@ -812,7 +812,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                           }
                           onContextMenu={(e) => {
                             const isCurrentUser = memberUserId === userId;
-                            contextMenu.showContextMenu(e.clientX, e.clientY, [
+                            const x = e.clientX;
+                            const y = e.clientY;
+                            contextMenu.showContextMenu(x, y, false, false, [
                               {
                                 id: 'direct-message',
                                 label: lang.tr.directMessage,
@@ -1118,7 +1120,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             )
                           }
                           onContextMenu={(e) => {
-                            contextMenu.showContextMenu(e.clientX, e.clientY, [
+                            const x = e.clientX;
+                            const y = e.clientY;
+                            contextMenu.showContextMenu(x, y, false, false, [
                               {
                                 id: 'view-profile',
                                 label: lang.tr.viewProfile,
@@ -1251,7 +1255,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             )
                           }
                           onContextMenu={(e) => {
-                            contextMenu.showContextMenu(e.clientX, e.clientY, [
+                            const x = e.clientX;
+                            const y = e.clientY;
+                            contextMenu.showContextMenu(x, y, false, false, [
                               {
                                 id: 'unblock',
                                 label: lang.tr.unblock,

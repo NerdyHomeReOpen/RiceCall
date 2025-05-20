@@ -3,7 +3,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -68,6 +68,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
   const lang = useLanguage();
   const contextMenu = useContextMenu();
   const mainTab = useMainTab();
+
+  // Refs
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -311,135 +314,133 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
         />
         <div className={header['spliter']} />
         <div
+          ref={menuRef}
           className={header['menu']}
-          onClick={(e) =>
-            contextMenu.showContextMenu(
-              e.clientX,
-              e.clientY,
-              [
-                {
-                  id: 'system-setting',
-                  label: lang.tr.systemSettings,
-                  icon: 'setting',
-                  onClick: () => handleOpenSystemSetting(),
+          onClick={() => {
+            if (!menuRef.current) return;
+            const x = menuRef.current.getBoundingClientRect().left;
+            const y =
+              menuRef.current.getBoundingClientRect().top +
+              menuRef.current.getBoundingClientRect().height;
+            contextMenu.showContextMenu(x, y, false, false, [
+              {
+                id: 'system-setting',
+                label: lang.tr.systemSettings,
+                icon: 'setting',
+                onClick: () => handleOpenSystemSetting(),
+              },
+              // {
+              //   id: 'message-history',
+              //   label: lang.tr.messageHistory,
+              //   icon: 'message',
+              //   onClick: () => {},
+              // },
+              {
+                id: 'change-theme',
+                label: lang.tr.changeTheme,
+                icon: 'skin',
+                onClick: () => handleOpenChangeTheme(),
+              },
+              {
+                id: 'feedback',
+                label: lang.tr.feedback,
+                icon: 'feedback',
+                onClick: () => {
+                  window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank');
                 },
-                // {
-                //   id: 'message-history',
-                //   label: lang.tr.messageHistory,
-                //   icon: 'message',
-                //   onClick: () => {},
-                // },
-                {
-                  id: 'change-theme',
-                  label: lang.tr.changeTheme,
-                  icon: 'skin',
-                  onClick: () => handleOpenChangeTheme(),
-                },
-                {
-                  id: 'feedback',
-                  label: lang.tr.feedback,
-                  icon: 'feedback',
-                  onClick: () => {
-                    window.open(
-                      'https://forms.gle/AkBTqsZm9NGr5aH46',
-                      '_blank',
-                    );
+              },
+              {
+                id: 'language-select',
+                label: lang.tr.languageSelect,
+                icon: 'submenu',
+                hasSubmenu: true,
+                submenuItems: [
+                  {
+                    id: 'language-select-tw',
+                    label: '繁體中文',
+                    onClick: () => handleLanguageChange('tw'),
                   },
-                },
-                {
-                  id: 'language-select',
-                  label: lang.tr.languageSelect,
-                  icon: 'submenu',
-                  hasSubmenu: true,
-                  submenuItems: [
-                    {
-                      id: 'language-select-tw',
-                      label: '繁體中文',
-                      onClick: () => handleLanguageChange('tw'),
+                  {
+                    id: 'language-select-cn',
+                    label: '简体中文',
+                    onClick: () => handleLanguageChange('cn'),
+                  },
+                  {
+                    id: 'language-select-en',
+                    label: 'English',
+                    onClick: () => handleLanguageChange('en'),
+                  },
+                  {
+                    id: 'language-select-jp',
+                    label: '日本語',
+                    onClick: () => handleLanguageChange('jp'),
+                  },
+                ],
+              },
+              {
+                id: 'help-center',
+                label: lang.tr.helpCenter,
+                icon: 'submenu',
+                hasSubmenu: true,
+                submenuItems: [
+                  {
+                    id: 'faq',
+                    label: lang.tr.faq,
+                    onClick: () => {
+                      window.open('https://ricecall.com.tw/faq', '_blank');
                     },
-                    {
-                      id: 'language-select-cn',
-                      label: '简体中文',
-                      onClick: () => handleLanguageChange('cn'),
+                  },
+                  {
+                    id: 'agreement',
+                    label: lang.tr.agreement,
+                    onClick: () => {
+                      window.open(
+                        'https://ricecall.com.tw/agreement',
+                        '_blank',
+                      );
                     },
-                    {
-                      id: 'language-select-en',
-                      label: 'English',
-                      onClick: () => handleLanguageChange('en'),
+                  },
+                  {
+                    id: 'specification',
+                    label: lang.tr.specification,
+                    onClick: () => {
+                      window.open(
+                        'https://ricecall.com.tw/specification',
+                        '_blank',
+                      );
                     },
-                    {
-                      id: 'language-select-jp',
-                      label: '日本語',
-                      onClick: () => handleLanguageChange('jp'),
+                  },
+                  {
+                    id: 'contact-us',
+                    label: lang.tr.contactUs,
+                    onClick: () => {
+                      window.open(
+                        'https://ricecall.com.tw/contactus',
+                        '_blank',
+                      );
                     },
-                  ],
-                },
-                {
-                  id: 'help-center',
-                  label: lang.tr.helpCenter,
-                  icon: 'submenu',
-                  hasSubmenu: true,
-                  submenuItems: [
-                    {
-                      id: 'faq',
-                      label: lang.tr.faq,
-                      onClick: () => {
-                        window.open('https://ricecall.com.tw/faq', '_blank');
-                      },
-                    },
-                    {
-                      id: 'agreement',
-                      label: lang.tr.agreement,
-                      onClick: () => {
-                        window.open(
-                          'https://ricecall.com.tw/agreement',
-                          '_blank',
-                        );
-                      },
-                    },
-                    {
-                      id: 'specification',
-                      label: lang.tr.specification,
-                      onClick: () => {
-                        window.open(
-                          'https://ricecall.com.tw/specification',
-                          '_blank',
-                        );
-                      },
-                    },
-                    {
-                      id: 'contact-us',
-                      label: lang.tr.contactUs,
-                      onClick: () => {
-                        window.open(
-                          'https://ricecall.com.tw/contactus',
-                          '_blank',
-                        );
-                      },
-                    },
-                    {
-                      id: 'about-us',
-                      label: lang.tr.aboutUs,
-                      onClick: () => handleOpenAboutUs(),
-                    },
-                  ],
-                },
-                {
-                  id: 'logout',
-                  label: lang.tr.logout,
-                  icon: 'logout',
-                  onClick: () => handleLogout(),
-                },
-                {
-                  id: 'exit',
-                  label: lang.tr.exit,
-                  icon: 'exit',
-                  onClick: () => handleExit(),
-                },
-              ],
-              e.currentTarget as HTMLElement,
-            )
-          }
+                  },
+                  {
+                    id: 'about-us',
+                    label: lang.tr.aboutUs,
+                    onClick: () => handleOpenAboutUs(),
+                  },
+                ],
+              },
+              {
+                id: 'logout',
+                label: lang.tr.logout,
+                icon: 'logout',
+                onClick: () => handleLogout(),
+              },
+              {
+                id: 'exit',
+                label: lang.tr.exit,
+                icon: 'exit',
+                onClick: () => handleExit(),
+              },
+            ]);
+          }}
         />
         <div className={header['minimize']} onClick={() => handleMinimize()} />
         <div

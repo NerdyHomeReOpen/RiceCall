@@ -114,7 +114,9 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
             setSelectedFriendItemIdAndType(friendGroupId, 'friendGroup');
           }}
           onContextMenu={(e) => {
-            contextMenu.showContextMenu(e.clientX, e.clientY, [
+            const x = e.clientX;
+            const y = e.clientY;
+            contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'edit',
                 label: lang.tr.renameFriendGroup,
@@ -311,7 +313,9 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
             )
           }
           onContextMenu={(e) => {
-            contextMenu.showContextMenu(e.clientX, e.clientY, [
+            const x = e.clientX;
+            const y = e.clientY;
+            contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'info',
                 label: lang.tr.viewProfile,

@@ -7,21 +7,21 @@ import contextMenu from '@/styles/contextMenu.module.css';
 import { ContextMenuItem } from '@/types';
 
 interface ContextMenuProps {
-  x: number;
-  y: number;
   items: ContextMenuItem[];
-  target?: HTMLElement;
   onClose: () => void;
-  side?: 'left' | 'right';
+  x?: number;
+  y?: number;
+  preferTop?: boolean;
+  preferLeft?: boolean;
 }
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
-  x,
-  y,
   items,
-  side = 'right',
-  target,
   onClose,
+  x = 0,
+  y = 0,
+  preferTop = false,
+  preferLeft = false,
 }) => {
   // Ref
   const menuRef = useRef<HTMLDivElement>(null);
@@ -30,43 +30,50 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
-  const isSetting = items[0]?.icon;
 
   // Effect
   useEffect(() => {
     if (!menuRef.current) return;
-    const menuWidth = menuRef.current.offsetWidth,
-      menuHeight = menuRef.current.offsetHeight,
-      windowWidth = window.innerWidth,
-      windowHeight = window.innerHeight;
-    let newMenuX = x,
-      newMenuY = y;
-    if (
-      target &&
-      (target.classList[0].includes('setting') ||
-        target.classList[0].includes('menu'))
-    ) {
-      const rect = target.getBoundingClientRect();
-      newMenuX = rect.left;
-      newMenuY = rect.bottom;
-      if (newMenuY + menuHeight > windowHeight) {
-        newMenuY = rect.top - menuHeight;
-      }
-    } else if (side === 'left') {
-      newMenuX = x - menuWidth;
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const marginEdge = 10;
+
+    let newPosX = x;
+    let newPosY = y;
+
+    const menuWidth = menuRef.current.offsetWidth;
+    const menuHeight = menuRef.current.offsetHeight;
+
+    if (preferTop) {
+      newPosY -= menuHeight;
     }
-    newMenuX = Math.max(8, Math.min(newMenuX, windowWidth - menuWidth - 8));
-    newMenuY = Math.max(8, Math.min(newMenuY, windowHeight - menuHeight - 8));
-    setMenuX(newMenuX);
-    setMenuY(newMenuY);
-  }, [x, y, target, side]);
+
+    if (preferLeft) {
+      newPosX -= menuWidth;
+    }
+
+    if (newPosX + menuWidth + marginEdge > windowWidth) {
+      newPosX = windowWidth - menuWidth - marginEdge;
+    }
+    if (newPosX < marginEdge) {
+      newPosX = marginEdge;
+    }
+    if (newPosY + menuHeight + marginEdge > windowHeight) {
+      newPosY = windowHeight - menuHeight - marginEdge;
+    }
+    if (newPosY < marginEdge) {
+      newPosY = marginEdge;
+    }
+
+    setMenuX(newPosX);
+    setMenuY(newPosY);
+  }, [x, y, preferLeft, preferTop]);
 
   return (
     <div
       ref={menuRef}
-      className={`context-menu-container ${
-        isSetting ? contextMenu[isSetting] : ''
-      } ${contextMenu['contextMenu']}`}
+      className={`context-menu-container ${contextMenu['contextMenu']}`}
       style={{ top: menuY, left: menuX }}
     >
       {items
@@ -77,7 +84,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           }
           return (
             <div
-              key={item.id || index}
+              key={index}
               className={`
                 ${contextMenu['option']} 
                 ${item.hasSubmenu ? contextMenu['hasSubmenu'] : ''}
@@ -90,15 +97,16 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
                 onClose();
               }}
               onMouseEnter={(e) => {
-                if (!item.hasSubmenu) return;
+                if (!item.hasSubmenu || !item.submenuItems) return;
                 const rect = e.currentTarget.getBoundingClientRect();
                 setSubMenu(
                   <ContextMenu
+                    items={item.submenuItems}
+                    onClose={onClose}
                     x={rect.left}
                     y={rect.top}
-                    items={item.submenuItems || []}
-                    onClose={onClose}
-                    side={'left'}
+                    preferTop={false}
+                    preferLeft={true}
                   />,
                 );
               }}

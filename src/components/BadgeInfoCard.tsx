@@ -10,13 +10,15 @@ import type { Badge } from '@/types';
 import { useLanguage } from '@/providers/Language';
 
 interface BadgeInfoCardProps {
-  rect: DOMRect;
   badge: Badge;
-  preferBelow: boolean;
+  x?: number;
+  y?: number;
+  preferTop?: boolean;
+  preferLeft?: boolean;
 }
 
 const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
-  ({ rect, badge, preferBelow }) => {
+  ({ x = 0, y = 0, preferTop = false, preferLeft = false, badge }) => {
     // Refs
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -25,7 +27,6 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
     // State
     const [cardX, setCardX] = useState(0);
     const [cardY, setCardY] = useState(0);
-    const [ready, setReady] = useState(false);
 
     // Variables
     const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
@@ -34,41 +35,46 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
     useEffect(() => {
       const positionCard = () => {
         if (!cardRef.current) return;
-        const cardWidth = cardRef.current.offsetWidth;
-        const cardHeight = cardRef.current.offsetHeight;
-        if (!cardWidth || !cardHeight) {
-          requestAnimationFrame(positionCard);
-          return;
-        }
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
-        let x = rect.left;
-        let y: number;
-        if (!preferBelow) {
-          y = rect.bottom;
-          if (y + cardHeight > windowHeight) {
-            y = rect.top - cardHeight;
-          }
-        } else {
-          y = rect.top - cardHeight;
-          if (y < 0) {
-            y = rect.bottom;
-          }
+
+        let newPosX = x;
+        let newPosY = y;
+
+        const cardWidth = cardRef.current.offsetWidth;
+        const cardHeight = cardRef.current.offsetHeight;
+        const marginEdge = 10;
+
+        if (cardWidth === 0 || cardHeight === 0) {
+          return;
         }
-        if (x + cardWidth > windowWidth) {
-          x = windowWidth - cardWidth - 8;
+
+        if (preferTop) {
+          newPosY -= cardHeight;
         }
-        if (x < 8) x = 8;
-        if (y + cardHeight > windowHeight) {
-          y = windowHeight - cardHeight - 8;
+
+        if (preferLeft) {
+          newPosX -= cardWidth;
         }
-        if (y < 8) y = 8;
+
+        if (newPosX + cardWidth + marginEdge > windowWidth) {
+          newPosX = windowWidth - cardWidth - marginEdge;
+        }
+        if (newPosX < marginEdge) {
+          newPosX = marginEdge;
+        }
+        if (newPosY + cardHeight + marginEdge > windowHeight) {
+          newPosY = windowHeight - cardHeight - marginEdge;
+        }
+        if (newPosY < marginEdge) {
+          newPosY = marginEdge;
+        }
+
         setCardX(x);
         setCardY(y);
-        setReady(true);
       };
       requestAnimationFrame(positionCard);
-    }, [rect, preferBelow]);
+    }, [x, y, preferTop, preferLeft]);
 
     return (
       <div
@@ -77,7 +83,6 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
         style={{
           top: cardY,
           left: cardX,
-          visibility: ready ? 'visible' : 'hidden',
         }}
       >
         <div className={badgeInfoCardStyles.badgeInfoWrapper}>

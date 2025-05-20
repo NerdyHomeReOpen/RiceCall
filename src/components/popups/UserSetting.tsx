@@ -832,14 +832,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       }}
                     />
                     <EmojiPicker
+                      type="signature"
                       onEmojiSelect={(emoji) => {
                         setUser((prev) => ({
                           ...prev,
                           signature: prev.signature + emoji,
                         }));
                       }}
-                      type="signature"
-                      preferBelow={false}
                     />
                   </div>
                 </div>

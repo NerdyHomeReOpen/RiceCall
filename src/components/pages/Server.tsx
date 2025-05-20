@@ -62,6 +62,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     // Refs
     const announcementAreaRef = useRef<HTMLDivElement>(null);
+    const voiceModeRef = useRef<HTMLDivElement>(null);
 
     // States
     const [sidebarWidth, setSidebarWidth] = useState<number>(270);
@@ -319,79 +320,82 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             </div>
             <div className={styles['buttonArea']}>
               <div className={styles['buttons']}>
-                {userPermission >= 3 && (
-                  <div
-                    className={styles['voiceModeDropdown']}
-                    onClick={(e) =>
-                      contextMenu.showContextMenu(e.clientX, e.clientY, [
-                        {
-                          id: 'freeSpeech',
-                          label: lang.tr.freeSpeech,
-                          show: canChangeToFreeSpeech,
-                          onClick: () => {
-                            handleUpdateChannel(
-                              { voiceMode: 'free' },
-                              channelId,
-                              serverId,
-                            );
-                          },
+                <div
+                  ref={voiceModeRef}
+                  className={styles['voiceModeDropdown']}
+                  style={userPermission >= 3 ? {} : { display: 'none' }}
+                  onClick={() => {
+                    if (!voiceModeRef.current) return;
+                    const x = voiceModeRef.current.getBoundingClientRect().left;
+                    const y = voiceModeRef.current.getBoundingClientRect().top;
+                    contextMenu.showContextMenu(x, y, true, false, [
+                      {
+                        id: 'freeSpeech',
+                        label: lang.tr.freeSpeech,
+                        show: canChangeToFreeSpeech,
+                        onClick: () => {
+                          handleUpdateChannel(
+                            { voiceMode: 'free' },
+                            channelId,
+                            serverId,
+                          );
                         },
-                        {
-                          id: 'forbiddenSpeech',
-                          label: lang.tr.forbiddenSpeech,
-                          show: canChangeToForbiddenSpeech,
-                          onClick: () => {
-                            handleUpdateChannel(
-                              { voiceMode: 'forbidden' },
-                              channelId,
-                              serverId,
-                            );
-                          },
+                      },
+                      {
+                        id: 'forbiddenSpeech',
+                        label: lang.tr.forbiddenSpeech,
+                        show: canChangeToForbiddenSpeech,
+                        onClick: () => {
+                          handleUpdateChannel(
+                            { voiceMode: 'forbidden' },
+                            channelId,
+                            serverId,
+                          );
                         },
-                        {
-                          id: 'queue',
-                          label: lang.tr.queue,
-                          icon: 'submenu',
-                          show: false, // canChangeToQueue
-                          hasSubmenu: true,
-                          onClick: () => {
-                            handleUpdateChannel(
-                              { voiceMode: 'queue' },
-                              channelId,
-                              serverId,
-                            );
-                          },
-                          submenuItems: [
-                            {
-                              id: 'forbiddenQueue',
-                              label: lang.tr.forbiddenQueue,
-                              // show: canChangeToForbiddenQueue,
-                              onClick: () => {
-                                // handleUpdateChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
-                              },
+                      },
+                      {
+                        id: 'queue',
+                        label: lang.tr.queue,
+                        icon: 'submenu',
+                        show: false, // canChangeToQueue
+                        hasSubmenu: true,
+                        onClick: () => {
+                          handleUpdateChannel(
+                            { voiceMode: 'queue' },
+                            channelId,
+                            serverId,
+                          );
+                        },
+                        submenuItems: [
+                          {
+                            id: 'forbiddenQueue',
+                            label: lang.tr.forbiddenQueue,
+                            // show: canChangeToForbiddenQueue,
+                            onClick: () => {
+                              // handleUpdateChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
                             },
-                            {
-                              id: 'controlQueue',
-                              label: lang.tr.controlQueue,
-                              // show: canChangeToControlQueue,
-                              onClick: () => {
-                                // handleUpdateChannel({ queueMode: 'control' }, currentChannelId, serverId);
-                              },
+                          },
+                          {
+                            id: 'controlQueue',
+                            label: lang.tr.controlQueue,
+                            // show: canChangeToControlQueue,
+                            onClick: () => {
+                              // handleUpdateChannel({ queueMode: 'control' }, currentChannelId, serverId);
                             },
-                          ],
-                        },
-                      ])
-                    }
-                  >
-                    {channelVoiceMode === 'queue'
-                      ? lang.tr.queue
-                      : channelVoiceMode === 'free'
-                      ? lang.tr.freeSpeech
-                      : channelVoiceMode === 'forbidden'
-                      ? lang.tr.forbiddenSpeech
-                      : ''}
-                  </div>
-                )}
+                          },
+                        ],
+                      },
+                    ]);
+                  }}
+                >
+                  {channelVoiceMode === 'queue'
+                    ? lang.tr.queue
+                    : channelVoiceMode === 'free'
+                    ? lang.tr.freeSpeech
+                    : channelVoiceMode === 'forbidden'
+                    ? lang.tr.forbiddenSpeech
+                    : ''}
+                </div>
               </div>
               <div
                 className={`

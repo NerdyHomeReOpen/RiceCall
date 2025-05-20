@@ -44,10 +44,10 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
       >
         <EmojiPicker
           type="message"
-          preferBelow={false}
           onEmojiSelect={(emoji) => {
             setMessageInput((prev) => prev + emoji);
           }}
+          preferTop={true}
         />
 
         <textarea

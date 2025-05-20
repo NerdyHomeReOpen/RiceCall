@@ -10,13 +10,13 @@ import emojis, { Emoji } from './emojis';
 interface EmojiPickerProps {
   onEmojiSelect: (emoji: string) => void;
   type: 'message' | 'signature';
-  preferBelow: boolean;
+  preferTop?: boolean;
 }
 
 const EmojiPicker: React.FC<EmojiPickerProps> = ({
   onEmojiSelect,
   type,
-  preferBelow,
+  preferTop = false,
 }) => {
   // Refs
   const emojiIconRef = useRef<HTMLDivElement>(null);
@@ -47,6 +47,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
   // Effects
   useEffect(() => {
     if (!emojiIconRef.current) return;
+    if (!emojiPickerRef.current) return;
 
     const iconHeight = emojiIconRef.current.offsetHeight;
 
@@ -57,8 +58,6 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
     let newPosX = emojiIconRef.current.getBoundingClientRect().left;
     let newPosY = emojiIconRef.current.getBoundingClientRect().top;
 
-    if (!emojiPickerRef.current) return;
-
     const pickerWidth = emojiPickerRef.current.offsetWidth;
     const pickerHeight = emojiPickerRef.current.offsetHeight;
 
@@ -66,10 +65,10 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
       return;
     }
 
-    if (preferBelow) {
-      newPosY += iconHeight;
-    } else {
+    if (preferTop) {
       newPosY -= pickerHeight;
+    } else {
+      newPosY += iconHeight;
     }
 
     if (newPosX + pickerWidth + marginEdge > windowWidth) {
@@ -87,7 +86,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
 
     setPickerX(newPosX);
     setPickerY(newPosY);
-  }, [emojiIconRef.current, emojiPickerRef.current]);
+  }, [emojiIconRef.current, emojiPickerRef.current, preferTop]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleEnterEscape);

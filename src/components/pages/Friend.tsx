@@ -160,7 +160,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
             <div ref={emojiIconRef} className={friendPage['emojiBtn']}>
               <EmojiPicker
                 type="signature"
-                preferBelow={true}
                 onEmojiSelect={(emoji) => {
                   setSignatureInput(signatureInput + emoji);
                 }}

@@ -268,7 +268,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleDrop(e, serverId, categoryId)}
           onContextMenu={(e) => {
-            contextMenu.showContextMenu(e.clientX, e.clientY, [
+            const x = e.clientX;
+            const y = e.clientY;
+            contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'joinChannel',
                 label: '進入此頻道',
@@ -631,13 +633,14 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleDrop(e, serverId, channelId)}
           onContextMenu={(e) => {
-            contextMenu.showContextMenu(e.clientX, e.clientY, [
+            const x = e.clientX;
+            const y = e.clientY;
+            contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'joinChannel',
                 label: '進入此頻道',
                 show: canJoin,
                 onClick: () => {
-                  if (!canJoin) return;
                   if (needPassword) {
                     handleOpenChannelPassword(userId, serverId, channelId);
                   } else {
@@ -798,19 +801,19 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const webRTC = useWebRTC();
 
     // Refs
-    const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const qualifyingEventRef = useRef<React.MouseEvent<HTMLDivElement> | null>(
-      null,
-    );
-    const initialPosForThresholdRef = useRef<{ x: number; y: number } | null>(
-      null,
-    );
-    const hasMovedTooMuchInitiallyRef = useRef<boolean>(false);
+    // const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    // const qualifyingEventRef = useRef<React.MouseEvent<HTMLDivElement> | null>(
+    //   null,
+    // );
+    // const initialPosForThresholdRef = useRef<{ x: number; y: number } | null>(
+    //   null,
+    // );
+    // const hasMovedTooMuchInitiallyRef = useRef<boolean>(false);
     const userTabRef = useRef<HTMLDivElement>(null);
 
-    // Constants
-    const HOVER_DELAY = 500;
-    const MOVEMENT_THRESHOLD = 5;
+    // // Constants
+    // const HOVER_DELAY = 500;
+    // const MOVEMENT_THRESHOLD = 5;
 
     // Variables
     const {
@@ -988,32 +991,32 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       e.dataTransfer.setData('currentChannelId', channelId);
     };
 
-    const handleShowUserInfoCard = () => {
-      if (contextMenu.isContextMenuVisible) {
-        return;
-      }
-      contextMenu.cancelDelayedCloseUserInfoBlock();
+    // const handleShowUserInfoCard = () => {
+    //   if (contextMenu.isContextMenuVisible) {
+    //     return;
+    //   }
+    //   contextMenu.cancelDelayedCloseUserInfoBlock();
 
-      if (qualifyingEventRef.current && userTabRef.current) {
-        const rect = userTabRef.current.getBoundingClientRect();
-        const cardX = rect.right - 100;
-        const cardY = rect.top;
-        contextMenu.showUserInfoBlock(cardX, cardY, member);
-      }
-    };
+    //   if (qualifyingEventRef.current && userTabRef.current) {
+    //     const rect = userTabRef.current.getBoundingClientRect();
+    //     const cardX = rect.right - 100;
+    //     const cardY = rect.top;
 
-    const handleClearTimeout = () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-        hoverTimeoutRef.current = null;
-      }
-    };
+    //   }
+    // };
 
-    const handleStartTimeout = (event: React.MouseEvent<HTMLDivElement>) => {
-      handleClearTimeout();
-      qualifyingEventRef.current = event;
-      hoverTimeoutRef.current = setTimeout(handleShowUserInfoCard, HOVER_DELAY);
-    };
+    // const handleClearTimeout = () => {
+    //   if (hoverTimeoutRef.current) {
+    //     clearTimeout(hoverTimeoutRef.current);
+    //     hoverTimeoutRef.current = null;
+    //   }
+    // };
+
+    // const handleStartTimeout = (event: React.MouseEvent<HTMLDivElement>) => {
+    //   handleClearTimeout();
+    //   qualifyingEventRef.current = event;
+    //   hoverTimeoutRef.current = setTimeout(handleShowUserInfoCard, HOVER_DELAY);
+    // };
 
     return (
       <div
@@ -1024,48 +1027,55 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             ? styles['selected']
             : ''
         }`}
-        onMouseEnter={(e) => {
-          contextMenu.cancelDelayedCloseUserInfoBlock();
-          handleClearTimeout();
-          initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
-          hasMovedTooMuchInitiallyRef.current = false;
-          qualifyingEventRef.current = e;
-          hoverTimeoutRef.current = setTimeout(
-            handleShowUserInfoCard,
-            HOVER_DELAY,
-          );
+        onMouseEnter={() => {
+          if (!userTabRef.current) return;
+          const x =
+            userTabRef.current.getBoundingClientRect().left +
+            userTabRef.current.getBoundingClientRect().width;
+          const y = userTabRef.current.getBoundingClientRect().top;
+          // contextMenu.cancelDelayedCloseUserInfoBlock();
+          // handleClearTimeout();
+          // initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
+          // hasMovedTooMuchInitiallyRef.current = false;
+          // qualifyingEventRef.current = e;
+          // hoverTimeoutRef.current = setTimeout(
+          //   handleShowUserInfoCard,
+          //   HOVER_DELAY,
+          // );
+          contextMenu.showUserInfoBlock(x, y, false, member);
         }}
-        onMouseMove={(e) => {
-          if (!initialPosForThresholdRef.current) {
-            initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
-            hasMovedTooMuchInitiallyRef.current = false;
-            qualifyingEventRef.current = e;
-            handleStartTimeout(e);
-            return;
-          }
-          if (!hasMovedTooMuchInitiallyRef.current) {
-            const deltaX = Math.abs(
-              e.clientX - initialPosForThresholdRef.current.x,
-            );
-            const deltaY = Math.abs(
-              e.clientY - initialPosForThresholdRef.current.y,
-            );
-            if (deltaX > MOVEMENT_THRESHOLD || deltaY > MOVEMENT_THRESHOLD) {
-              hasMovedTooMuchInitiallyRef.current = true;
-              qualifyingEventRef.current = e;
-              handleStartTimeout(e);
-            }
-          } else {
-            qualifyingEventRef.current = e;
-            handleStartTimeout(e);
-          }
-        }}
+        // onMouseMove={(e) => {
+        //   if (!initialPosForThresholdRef.current) {
+        //     initialPosForThresholdRef.current = { x: e.clientX, y: e.clientY };
+        //     hasMovedTooMuchInitiallyRef.current = false;
+        //     qualifyingEventRef.current = e;
+        //     handleStartTimeout(e);
+        //     return;
+        //   }
+        //   if (!hasMovedTooMuchInitiallyRef.current) {
+        //     const deltaX = Math.abs(
+        //       e.clientX - initialPosForThresholdRef.current.x,
+        //     );
+        //     const deltaY = Math.abs(
+        //       e.clientY - initialPosForThresholdRef.current.y,
+        //     );
+        //     if (deltaX > MOVEMENT_THRESHOLD || deltaY > MOVEMENT_THRESHOLD) {
+        //       hasMovedTooMuchInitiallyRef.current = true;
+        //       qualifyingEventRef.current = e;
+        //       handleStartTimeout(e);
+        //     }
+        //   } else {
+        //     qualifyingEventRef.current = e;
+        //     handleStartTimeout(e);
+        //   }
+        // }}
         onMouseLeave={() => {
-          handleClearTimeout();
-          contextMenu.requestDelayedCloseUserInfoBlock();
-          initialPosForThresholdRef.current = null;
-          hasMovedTooMuchInitiallyRef.current = false;
-          qualifyingEventRef.current = null;
+          // handleClearTimeout();
+          // contextMenu.requestDelayedCloseUserInfoBlock();
+          // initialPosForThresholdRef.current = null;
+          // hasMovedTooMuchInitiallyRef.current = false;
+          // qualifyingEventRef.current = null;
+          contextMenu.closeUserInfoBlock();
         }}
         onClick={() => {
           setSelectedChannelId(memberUserId, 'user');
@@ -1079,196 +1089,191 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           handleDragStart(e, memberUserId, memberCurrentChannelId)
         }
         onContextMenu={(e) => {
-          handleClearTimeout();
-          contextMenu.closeUserInfoBlock();
-          contextMenu.showContextMenu(
-            e.clientX,
-            e.clientY,
-            [
-              {
-                id: 'direct-message',
-                label: lang.tr.directMessage,
-                show: !isCurrentUser,
-                onClick: () =>
-                  handleOpenDirectMessage(userId, memberUserId, memberName),
+          const x = e.clientX;
+          const y = e.clientY;
+          contextMenu.showContextMenu(x, y, false, false, [
+            {
+              id: 'direct-message',
+              label: lang.tr.directMessage,
+              show: !isCurrentUser,
+              onClick: () =>
+                handleOpenDirectMessage(userId, memberUserId, memberName),
+            },
+            {
+              id: 'view-profile',
+              label: lang.tr.viewProfile,
+              onClick: () => handleOpenUserInfo(userId, memberUserId),
+            },
+            {
+              id: 'apply-friend',
+              label: lang.tr.addFriend,
+              show: canApplyFriend,
+              onClick: () => handleOpenApplyFriend(userId, memberUserId),
+            },
+            {
+              id: 'mute',
+              label: lang.tr.mute,
+              show: canMute,
+              onClick: () => handleMuteUser(memberUserId),
+            },
+            {
+              id: 'unmute',
+              label: lang.tr.unmute,
+              show: canUnmute,
+              onClick: () => handleUnmuteUser(memberUserId),
+            },
+            {
+              id: 'edit-nickname',
+              label: lang.tr.editNickname,
+              show: canEditNickname,
+              onClick: () => handleOpenEditNickname(memberUserId, serverId),
+            },
+            {
+              id: 'separator',
+              label: '',
+              show: canMoveToChannel,
+            },
+            {
+              id: 'move-to-channel',
+              label: lang.tr.moveToChannel,
+              show: canMoveToChannel,
+              onClick: () =>
+                handleMoveToChannel(memberUserId, serverId, currentChannelId),
+            },
+            {
+              id: 'separator',
+              label: '',
+              show: canManageMember,
+            },
+            {
+              id: 'forbid-voice',
+              label: lang.tr.forbidVoice,
+              show: canManageMember,
+              disabled: true,
+              onClick: () => {},
+            },
+            {
+              id: 'forbid-text',
+              label: lang.tr.forbidText,
+              show: canManageMember,
+              disabled: true,
+              onClick: () => {},
+            },
+            {
+              id: 'kick-channel',
+              label: lang.tr.kickChannel,
+              show: canKickChannel,
+              onClick: () => {
+                handleKickChannel(memberUserId, serverLobbyId, serverId);
               },
-              {
-                id: 'view-profile',
-                label: lang.tr.viewProfile,
-                onClick: () => handleOpenUserInfo(userId, memberUserId),
+            },
+            {
+              id: 'kick-server',
+              label: lang.tr.kickServer,
+              show: canKickServer,
+              onClick: () => {
+                handleUpdateMember(
+                  {
+                    isBlocked: Date.now() + 1000 * 60 * 60 * 24 * 30, // 30 days TODO: user can set the time
+                  },
+                  memberUserId,
+                  serverId,
+                );
+                handleKickServer(memberUserId, serverId);
               },
-              {
-                id: 'apply-friend',
-                label: lang.tr.addFriend,
-                show: canApplyFriend,
-                onClick: () => handleOpenApplyFriend(userId, memberUserId),
+            },
+            {
+              id: 'ban',
+              label: lang.tr.ban,
+              show: canBan,
+              onClick: () => {
+                handleUpdateMember(
+                  { permissionLevel: 1, isBlocked: -1 },
+                  memberUserId,
+                  serverId,
+                );
+                handleKickServer(memberUserId, serverId);
               },
-              {
-                id: 'mute',
-                label: lang.tr.mute,
-                show: canMute,
-                onClick: () => handleMuteUser(memberUserId),
+            },
+            {
+              id: 'separator',
+              label: '',
+              show: canManageMember,
+            },
+            {
+              id: 'send-member-application',
+              label: lang.tr.sendMemberApplication,
+              show: canManageMember && memberPermission === 1,
+              disabled: true,
+              onClick: () => {
+                /* sendMemberApplication() */
               },
-              {
-                id: 'unmute',
-                label: lang.tr.unmute,
-                show: canUnmute,
-                onClick: () => handleUnmuteUser(memberUserId),
-              },
-              {
-                id: 'edit-nickname',
-                label: lang.tr.editNickname,
-                show: canEditNickname,
-                onClick: () => handleOpenEditNickname(memberUserId, serverId),
-              },
-              {
-                id: 'separator',
-                label: '',
-                show: canMoveToChannel,
-              },
-              {
-                id: 'move-to-channel',
-                label: lang.tr.moveToChannel,
-                show: canMoveToChannel,
-                onClick: () =>
-                  handleMoveToChannel(memberUserId, serverId, currentChannelId),
-              },
-              {
-                id: 'separator',
-                label: '',
-                show: canManageMember,
-              },
-              {
-                id: 'forbid-voice',
-                label: lang.tr.forbidVoice,
-                show: canManageMember,
-                disabled: true,
-                onClick: () => {},
-              },
-              {
-                id: 'forbid-text',
-                label: lang.tr.forbidText,
-                show: canManageMember,
-                disabled: true,
-                onClick: () => {},
-              },
-              {
-                id: 'kick-channel',
-                label: lang.tr.kickChannel,
-                show: canKickChannel,
-                onClick: () => {
-                  handleKickChannel(memberUserId, serverLobbyId, serverId);
+            },
+            {
+              id: 'member-management',
+              label: lang.tr.memberManagement,
+              show: canManageMember && memberPermission > 1,
+              icon: 'submenu',
+              hasSubmenu: true,
+              submenuItems: [
+                {
+                  id: 'set-guest',
+                  label: lang.tr.setGuest,
+                  show: canChangeToGuest,
+                  onClick: () =>
+                    handleUpdateMember(
+                      { permissionLevel: 1 },
+                      memberUserId,
+                      serverId,
+                    ),
                 },
-              },
-              {
-                id: 'kick-server',
-                label: lang.tr.kickServer,
-                show: canKickServer,
-                onClick: () => {
-                  handleUpdateMember(
-                    {
-                      isBlocked: Date.now() + 1000 * 60 * 60 * 24 * 30, // 30 days TODO: user can set the time
-                    },
-                    memberUserId,
-                    serverId,
-                  );
-                  handleKickServer(memberUserId, serverId);
+                {
+                  id: 'set-member',
+                  label: lang.tr.setMember,
+                  show: canChangeToMember,
+                  onClick: () =>
+                    handleUpdateMember(
+                      { permissionLevel: 2 },
+                      memberUserId,
+                      serverId,
+                    ),
                 },
-              },
-              {
-                id: 'ban',
-                label: lang.tr.ban,
-                show: canBan,
-                onClick: () => {
-                  handleUpdateMember(
-                    { permissionLevel: 1, isBlocked: -1 },
-                    memberUserId,
-                    serverId,
-                  );
-                  handleKickServer(memberUserId, serverId);
+                {
+                  id: 'set-channel-admin',
+                  label: lang.tr.setChannelAdmin,
+                  show: canChangeToChannelAdmin,
+                  onClick: () =>
+                    handleUpdateMember(
+                      { permissionLevel: 3 },
+                      memberUserId,
+                      serverId,
+                    ),
                 },
-              },
-              {
-                id: 'separator',
-                label: '',
-                show: canManageMember,
-              },
-              {
-                id: 'send-member-application',
-                label: lang.tr.sendMemberApplication,
-                show: canManageMember && memberPermission === 1,
-                disabled: true,
-                onClick: () => {
-                  /* sendMemberApplication() */
+                {
+                  id: 'set-category-admin',
+                  label: lang.tr.setCategoryAdmin,
+                  show: canChangeToCategoryAdmin,
+                  onClick: () =>
+                    handleUpdateMember(
+                      { permissionLevel: 4 },
+                      memberUserId,
+                      serverId,
+                    ),
                 },
-              },
-              {
-                id: 'member-management',
-                label: lang.tr.memberManagement,
-                show: canManageMember && memberPermission > 1,
-                icon: 'submenu',
-                hasSubmenu: true,
-                submenuItems: [
-                  {
-                    id: 'set-guest',
-                    label: lang.tr.setGuest,
-                    show: canChangeToGuest,
-                    onClick: () =>
-                      handleUpdateMember(
-                        { permissionLevel: 1 },
-                        memberUserId,
-                        serverId,
-                      ),
-                  },
-                  {
-                    id: 'set-member',
-                    label: lang.tr.setMember,
-                    show: canChangeToMember,
-                    onClick: () =>
-                      handleUpdateMember(
-                        { permissionLevel: 2 },
-                        memberUserId,
-                        serverId,
-                      ),
-                  },
-                  {
-                    id: 'set-channel-admin',
-                    label: lang.tr.setChannelAdmin,
-                    show: canChangeToChannelAdmin,
-                    onClick: () =>
-                      handleUpdateMember(
-                        { permissionLevel: 3 },
-                        memberUserId,
-                        serverId,
-                      ),
-                  },
-                  {
-                    id: 'set-category-admin',
-                    label: lang.tr.setCategoryAdmin,
-                    show: canChangeToCategoryAdmin,
-                    onClick: () =>
-                      handleUpdateMember(
-                        { permissionLevel: 4 },
-                        memberUserId,
-                        serverId,
-                      ),
-                  },
-                  {
-                    id: 'set-admin',
-                    label: lang.tr.setAdmin,
-                    show: canChangeToAdmin,
-                    onClick: () =>
-                      handleUpdateMember(
-                        { permissionLevel: 5 },
-                        memberUserId,
-                        serverId,
-                      ),
-                  },
-                ],
-              },
-            ],
-            e.currentTarget as HTMLElement,
-          );
+                {
+                  id: 'set-admin',
+                  label: lang.tr.setAdmin,
+                  show: canChangeToAdmin,
+                  onClick: () =>
+                    handleUpdateMember(
+                      { permissionLevel: 5 },
+                      memberUserId,
+                      serverId,
+                    ),
+                },
+              ],
+            },
+          ]);
         }}
       >
         <div
@@ -1340,7 +1345,10 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
     const contextMenu = useContextMenu();
     const { handleSetCategoryExpanded, handleSetChannelExpanded } =
       useExpandedContext();
+
+    // Refs
     const viewerRef = useRef<HTMLDivElement>(null);
+    const settingButtonRef = useRef<HTMLDivElement>(null);
 
     // States
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -1550,66 +1558,67 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
             />
             <div className={styles['saperator']} />
             <div
+              ref={settingButtonRef}
               className={styles['setting']}
-              onClick={(e) => {
-                contextMenu.showContextMenu(
-                  e.clientX,
-                  e.clientY,
-                  [
-                    {
-                      id: 'invitation',
-                      label: lang.tr.invitation,
-                      show: canApplyMember,
-                      icon: 'memberapply',
-                      onClick: () => handleOpenApplyMember(userId, serverId),
-                    },
-                    // {
-                    //   id: 'memberChat',
-                    //   label: '會員群聊',
-                    //   show: memberPermission > 2,
-                    //   onClick: () => {},
-                    // },
-                    // {
-                    //   id: 'admin',
-                    //   label: '查看管理員',
-                    //   onClick: () => {},
-                    // },
-                    // {
-                    //   id: 'separator',
-                    //   label: '',
-                    //   show: canEditNickname,
-                    // },
-                    {
-                      id: 'editNickname',
-                      label: lang.tr.editNickname,
-                      icon: 'editGroupcard',
-                      show: canEditNickname,
-                      onClick: () => handleOpenEditNickname(userId, serverId),
-                    },
-                    {
-                      id: 'locateMe',
-                      label: lang.tr.locateMe,
-                      icon: 'locateme',
-                      onClick: () => handleLocateUser(),
-                    },
-                    // {
-                    //   id: 'separator',
-                    //   label: '',
-                    // },
-                    // {
-                    //   id: 'report',
-                    //   label: '舉報',
-                    //   onClick: () => {},
-                    // },
-                    {
-                      id: 'favorite',
-                      label: isFavorite ? lang.tr.unfavorite : lang.tr.favorite,
-                      icon: isFavorite ? 'collect' : 'uncollect',
-                      onClick: () => handleFavoriteServer(serverId),
-                    },
-                  ],
-                  e.currentTarget as HTMLElement,
-                );
+              onClick={() => {
+                if (!settingButtonRef.current) return;
+                const x = settingButtonRef.current.getBoundingClientRect().left;
+                const y =
+                  settingButtonRef.current.getBoundingClientRect().top +
+                  settingButtonRef.current.getBoundingClientRect().height;
+                contextMenu.showContextMenu(x, y, false, false, [
+                  {
+                    id: 'invitation',
+                    label: lang.tr.invitation,
+                    show: canApplyMember,
+                    icon: 'memberapply',
+                    onClick: () => handleOpenApplyMember(userId, serverId),
+                  },
+                  // {
+                  //   id: 'memberChat',
+                  //   label: '會員群聊',
+                  //   show: memberPermission > 2,
+                  //   onClick: () => {},
+                  // },
+                  // {
+                  //   id: 'admin',
+                  //   label: '查看管理員',
+                  //   onClick: () => {},
+                  // },
+                  // {
+                  //   id: 'separator',
+                  //   label: '',
+                  //   show: canEditNickname,
+                  // },
+                  {
+                    id: 'editNickname',
+                    label: lang.tr.editNickname,
+                    icon: 'editGroupcard',
+                    show: canEditNickname,
+                    onClick: () => handleOpenEditNickname(userId, serverId),
+                  },
+                  {
+                    id: 'locateMe',
+                    label: lang.tr.locateMe,
+                    icon: 'locateme',
+                    onClick: () => handleLocateUser(),
+                  },
+                  // {
+                  //   id: 'separator',
+                  //   label: '',
+                  // },
+                  // {
+                  //   id: 'report',
+                  //   label: '舉報',
+                  //   onClick: () => {},
+                  // },
+                  {
+                    id: 'favorite',
+                    label: isFavorite ? lang.tr.unfavorite : lang.tr.favorite,
+                    icon: isFavorite ? 'collect' : 'uncollect',
+                    onClick: () => handleFavoriteServer(serverId),
+                  },
+                ]);
               }}
             />
           </div>

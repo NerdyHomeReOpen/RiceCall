@@ -16,13 +16,14 @@ import type { ServerMember } from '@/types';
 import { useLanguage } from '@/providers/Language';
 
 interface UserInfoCardProps {
-  x: number;
-  y: number;
   member: ServerMember;
+  x?: number;
+  y?: number;
+  preferTop?: boolean;
 }
 
 const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
-  ({ x, y, member }) => {
+  ({ member, x = 0, y = 0, preferTop = false }) => {
     // Refs
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -35,35 +36,41 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
 
     // Effect
     useLayoutEffect(() => {
-      if (cardRef.current) {
-        const cardWidth = cardRef.current.offsetWidth;
-        const cardHeight = cardRef.current.offsetHeight;
-        if (cardWidth === 0 || cardHeight === 0) {
-          return;
-        }
+      if (!cardRef.current) return;
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      const marginEdge = 10;
 
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        const MARGIN = 10;
-        let newPosX = x,
-          newPosY = y;
-        if (newPosX + cardWidth > windowWidth - MARGIN) {
-          newPosX = windowWidth - cardWidth - MARGIN;
-        }
-        if (newPosX < MARGIN) {
-          newPosX = MARGIN;
-        }
-        if (newPosY + cardHeight > windowHeight - MARGIN) {
-          newPosY = windowHeight - cardHeight - MARGIN;
-        }
-        if (newPosY < MARGIN) {
-          newPosY = MARGIN;
-        }
+      let newPosX = x;
+      let newPosY = y;
 
-        setCardX(newPosX);
-        setCardY(newPosY);
+      const cardWidth = cardRef.current.offsetWidth;
+      const cardHeight = cardRef.current.offsetHeight;
+
+      if (cardWidth === 0 || cardHeight === 0) {
+        return;
       }
-    }, [x, y]);
+
+      if (preferTop) {
+        newPosY -= cardHeight;
+      }
+
+      if (newPosX + cardWidth + marginEdge > windowWidth) {
+        newPosX = windowWidth - cardWidth - marginEdge;
+      }
+      if (newPosX < marginEdge) {
+        newPosX = marginEdge;
+      }
+      if (newPosY + cardHeight + marginEdge > windowHeight) {
+        newPosY = windowHeight - cardHeight - marginEdge;
+      }
+      if (newPosY < marginEdge) {
+        newPosY = marginEdge;
+      }
+
+      setCardX(newPosX);
+      setCardY(newPosY);
+    }, [x, y, preferTop]);
 
     const {
       name: memberName,
@@ -93,12 +100,14 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
         }}
       >
         <div className={userInfoCard['body']}>
+          {/* Top Section */}
           <div className={userInfoCard['top']}>
             {/* Left Avatar */}
             <div
               className={userInfoCard['avatarPicture']}
               style={{ backgroundImage: `url(${memberAvatarUrl})` }}
             />
+
             {/* Right Info */}
             <div className={userInfoCard['userInfoWrapper']}>
               <div
@@ -123,6 +132,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
                   ${vip[`vip-big-${memberVip}`]}
                 `}
               />
+
               {/* VIP Info Text */}
               {memberVip > 0 && (
                 <div className={userInfoCard['vipText']}>
@@ -132,7 +142,8 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
                   )}
                 </div>
               )}
-              {/* Xp Section */}
+
+              {/* Xp Info */}
               <div className={userInfoCard['xpWrapper']}>
                 <div className={userInfoCard['levelText']}>
                   {`${lang.tr.level} ${memberLevel} `}
@@ -159,6 +170,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
                 <div className={userInfoCard['nickname']}>{memberNickname}</div>
               )}
             </div>
+
             {/* Info Row */}
             <div className={userInfoCard['infoRow']}>
               {/* Permission */}

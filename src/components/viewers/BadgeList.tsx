@@ -14,11 +14,11 @@ const failedImageCache = new Set<string>();
 
 interface BadgeContainerProps {
   badge: Badge;
-  preferBelow?: boolean;
+  preferTop?: boolean;
 }
 
 const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
-  ({ badge, preferBelow = false }) => {
+  ({ badge, preferTop = false }) => {
     // Hooks
     const contextMenu = useContextMenu();
     const badgeRef = React.useRef<HTMLDivElement>(null);
@@ -33,11 +33,13 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
     return (
       <div
         ref={badgeRef}
-        onMouseEnter={() => {
-          contextMenu.showBadgeInfoCard(badgeRef.current!, badge, preferBelow);
+        onMouseEnter={(e) => {
+          const x = e.clientX;
+          const y = e.clientY;
+          contextMenu.showBadgeInfoCard(x, y, preferTop, false, badge);
         }}
         onMouseLeave={() => {
-          contextMenu.hideBadgeInfoCard();
+          contextMenu.closeBadgeInfoCard();
         }}
       >
         <div
@@ -54,11 +56,11 @@ BadgeContainer.displayName = 'BadgeContainer';
 interface BadgeListViewerProps {
   badges: Badge[];
   maxDisplay?: number;
-  preferBelow?: boolean;
+  preferTop?: boolean;
 }
 
 const BadgeListViewer: React.FC<BadgeListViewerProps> = React.memo(
-  ({ badges, preferBelow, maxDisplay = 21 }) => {
+  ({ badges, preferTop, maxDisplay = 21 }) => {
     const sortedBadges = [...badges]
       .sort((a, b) =>
         a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt,
@@ -71,7 +73,7 @@ const BadgeListViewer: React.FC<BadgeListViewerProps> = React.memo(
           <BadgeContainer
             key={badge.badgeId}
             badge={badge}
-            preferBelow={preferBelow}
+            preferTop={preferTop}
           />
         ))}
       </div>

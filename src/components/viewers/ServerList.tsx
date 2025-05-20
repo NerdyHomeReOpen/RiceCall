@@ -33,15 +33,16 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
       favorite: serverFavorite,
       permissionLevel: serverPermissionLevel,
     } = server;
-    const canRemoveMemberShip = serverPermissionLevel > 1 && serverPermissionLevel < 6;
+    const canRemoveMemberShip =
+      serverPermissionLevel > 1 && serverPermissionLevel < 6;
     const { userId } = user;
     const isOwner = serverOwnerId === userId;
 
     const handleFavoriteServer = (serverId: Server['serverId']) => {
       if (!socket) return;
-        socket.send.favoriteServer({
-          serverId,
-        });
+      socket.send.favoriteServer({
+        serverId,
+      });
     };
 
     return (
@@ -49,31 +50,37 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
         className={homePage['serverCard']}
         onClick={onClick}
         onContextMenu={(e) => {
-          contextMenu.showContextMenu(e.clientX, e.clientY, [
+          const x = e.clientX;
+          const y = e.clientY;
+          contextMenu.showContextMenu(x, y, false, false, [
             {
-                id: 'joinServer',
-                label: '進入',
-                onClick: onClick,
+              id: 'joinServer',
+              label: '進入',
+              onClick: onClick,
             },
             {
-                id: 'viewServerInfo',
-                label: '查看群資料',
-                disabled: true,
-                onClick: () => {/* handleOpenServerSetting(userId, serverId); */},
+              id: 'viewServerInfo',
+              label: '查看群資料',
+              disabled: true,
+              onClick: () => {
+                /* handleOpenServerSetting(userId, serverId); */
+              },
             },
             {
-                id: 'setFavorite',
-                label: (!serverFavorite ? '加入收藏' : '取消收藏'),
-                onClick: () => {
-                  handleFavoriteServer(serverId);
-                },
+              id: 'setFavorite',
+              label: !serverFavorite ? '加入收藏' : '取消收藏',
+              onClick: () => {
+                handleFavoriteServer(serverId);
+              },
             },
             {
-                id: 'removeMemberShip',
-                label: '解除會員關係',
-                disabled: true,
-                show: canRemoveMemberShip,
-                onClick: () => {/* handleUpdateMember() */},
+              id: 'removeMemberShip',
+              label: '解除會員關係',
+              disabled: true,
+              show: canRemoveMemberShip,
+              onClick: () => {
+                /* handleUpdateMember() */
+              },
             },
           ]);
         }}

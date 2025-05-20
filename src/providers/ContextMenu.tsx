@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useContext,
-  createContext,
-  ReactNode,
-  useRef,
-} from 'react';
+import React, { useEffect, useContext, createContext, ReactNode } from 'react';
 
 // Types
 import { ContextMenuItem, ServerMember, Badge } from '@/types';
@@ -18,21 +12,29 @@ interface ContextMenuContextType {
   showContextMenu: (
     x: number,
     y: number,
+    preferTop: boolean,
+    preferLeft: boolean,
     items: ContextMenuItem[],
-    target?: HTMLElement,
   ) => void;
-  showUserInfoBlock: (x: number, y: number, member: ServerMember) => void;
+  showUserInfoBlock: (
+    x: number,
+    y: number,
+    preferTop: boolean,
+    member: ServerMember,
+  ) => void;
   showBadgeInfoCard: (
-    badgeElement: HTMLElement,
+    x: number,
+    y: number,
+    preferTop: boolean,
+    preferLeft: boolean,
     badge: Badge,
-    preferBelow?: boolean,
   ) => void;
   closeContextMenu: () => void;
   closeUserInfoBlock: () => void;
-  hideBadgeInfoCard: () => void;
+  closeBadgeInfoCard: () => void;
   isContextMenuVisible: boolean;
-  requestDelayedCloseUserInfoBlock: () => void;
-  cancelDelayedCloseUserInfoBlock: () => void;
+  isUserInfoVisible: boolean;
+  isBadgeInfoVisible: boolean;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
@@ -50,29 +52,12 @@ interface ContextMenuProviderProps {
 
 const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   // States
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [content, setContent] = React.useState<ReactNode | null>(null);
-  const [userInfo, setUserInfo] = React.useState<{
-    x: number;
-    y: number;
-    member: ServerMember;
-  } | null>(null);
-
-  const [badgeInfo, setBadgeInfo] = React.useState<{
-    rect: DOMRect;
-    badge: Badge;
-    preferBelow: boolean;
-  } | null>(null);
-
-  const hideUserInfoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const HIDE_USER_INFO_DELAY = 100;
-
-  const clearHideUserInfoTimeout = () => {
-    if (hideUserInfoTimeoutRef.current) {
-      clearTimeout(hideUserInfoTimeoutRef.current);
-      hideUserInfoTimeoutRef.current = null;
-    }
-  };
+  const [isContextMenuVisible, setIsContextMenuVisible] = React.useState(false);
+  const [isUserInfoVisible, setIsUserInfoVisible] = React.useState(false);
+  const [isBadgeInfoVisible, setIsBadgeInfoVisible] = React.useState(false);
+  const [contextMenu, setContextMenu] = React.useState<ReactNode | null>(null);
+  const [userInfo, setUserInfo] = React.useState<ReactNode | null>(null);
+  const [badgeInfo, setBadgeInfo] = React.useState<ReactNode | null>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -81,15 +66,15 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         (e.target as HTMLElement).closest('.user-info-card-hover-wrapper')
       )
         return;
-      if (isVisible) closeContextMenu();
-      if (userInfo) closeUserInfoBlock();
+      if (isContextMenuVisible) closeContextMenu();
+      if (isUserInfoVisible) closeUserInfoBlock();
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
 
-      if (isVisible) closeContextMenu();
-      if (userInfo) closeUserInfoBlock();
+      if (isContextMenuVisible) closeContextMenu();
+      if (isUserInfoVisible) closeUserInfoBlock();
     };
 
     document.addEventListener('click', handleClick);
@@ -100,8 +85,8 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         !(e.target as HTMLElement).closest('.context-menu-container') &&
         !(e.target as HTMLElement).closest('.user-info-card-hover-wrapper')
       ) {
-        if (isVisible) closeContextMenu();
-        if (userInfo) closeUserInfoBlock();
+        if (isContextMenuVisible) closeContextMenu();
+        if (isUserInfoVisible) closeUserInfoBlock();
       }
     };
     document.addEventListener('contextmenu', handleOuterContextMenu);
@@ -110,68 +95,76 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       document.removeEventListener('click', handleClick);
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('contextmenu', handleOuterContextMenu);
-      clearHideUserInfoTimeout();
     };
-  }, [isVisible, userInfo]);
+  }, [isContextMenuVisible, isUserInfoVisible]);
 
   const showContextMenu = (
     x: number,
     y: number,
+    preferTop: boolean,
+    preferLeft: boolean,
     items: ContextMenuItem[],
-    target?: HTMLElement,
   ) => {
-    if (userInfo) closeUserInfoBlock();
-
-    setContent(
+    if (isUserInfoVisible) closeUserInfoBlock();
+    setContextMenu(
       <ContextMenu
+        items={items}
+        onClose={closeContextMenu}
         x={x}
         y={y}
-        items={items}
-        target={target}
-        onClose={closeContextMenu}
+        preferTop={preferTop}
+        preferLeft={preferLeft}
       />,
     );
-
-    setIsVisible(true);
-  };
-
-  const showUserInfoBlock = (x: number, y: number, member: ServerMember) => {
-    clearHideUserInfoTimeout();
-    setUserInfo({ x, y, member });
-  };
-
-  const closeUserInfoBlock = () => {
-    clearHideUserInfoTimeout();
-    setUserInfo(null);
-    setBadgeInfo(null);
-  };
-
-  const showBadgeInfoCard = (
-    badgeElement: HTMLElement,
-    badge: Badge,
-    preferBelow: boolean = false,
-  ) => {
-    const rect = badgeElement.getBoundingClientRect();
-    setBadgeInfo({ rect, badge, preferBelow });
-  };
-
-  const hideBadgeInfoCard = () => {
-    setBadgeInfo(null);
+    setIsContextMenuVisible(true);
   };
 
   const closeContextMenu = () => {
-    setIsVisible(false);
+    setContextMenu(null);
+    setIsContextMenuVisible(false);
   };
 
-  const requestDelayedCloseUserInfoBlock = () => {
-    clearHideUserInfoTimeout();
-    hideUserInfoTimeoutRef.current = setTimeout(() => {
-      closeUserInfoBlock();
-    }, HIDE_USER_INFO_DELAY);
+  const showUserInfoBlock = (
+    x: number,
+    y: number,
+    preferTop: boolean,
+    member: ServerMember,
+  ) => {
+    if (isContextMenuVisible) return;
+    if (isBadgeInfoVisible) closeBadgeInfoCard();
+    setUserInfo(
+      <UserInfoCard member={member} x={x} y={y} preferTop={preferTop} />,
+    );
+    setIsUserInfoVisible(true);
   };
 
-  const cancelDelayedCloseUserInfoBlock = () => {
-    clearHideUserInfoTimeout();
+  const closeUserInfoBlock = () => {
+    setUserInfo(null);
+    setIsUserInfoVisible(false);
+  };
+
+  const showBadgeInfoCard = (
+    x: number,
+    y: number,
+    preferTop: boolean,
+    preferLeft: boolean,
+    badge: Badge,
+  ) => {
+    setBadgeInfo(
+      <BadgeInfoCard
+        badge={badge}
+        x={x}
+        y={y}
+        preferTop={preferTop}
+        preferLeft={preferLeft}
+      />,
+    );
+    setIsBadgeInfoVisible(true);
+  };
+
+  const closeBadgeInfoCard = () => {
+    setBadgeInfo(null);
+    setIsBadgeInfoVisible(false);
   };
 
   return (
@@ -179,36 +172,18 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       value={{
         showContextMenu,
         showUserInfoBlock,
-        closeUserInfoBlock,
         showBadgeInfoCard,
-        hideBadgeInfoCard,
+        closeUserInfoBlock,
+        closeBadgeInfoCard,
         closeContextMenu,
-        isContextMenuVisible: isVisible,
-        requestDelayedCloseUserInfoBlock,
-        cancelDelayedCloseUserInfoBlock,
+        isContextMenuVisible,
+        isUserInfoVisible,
+        isBadgeInfoVisible,
       }}
     >
-      {isVisible && content}
-      {userInfo && (
-        <div
-          className="user-info-card-hover-wrapper"
-          onMouseEnter={cancelDelayedCloseUserInfoBlock}
-          onMouseLeave={requestDelayedCloseUserInfoBlock}
-        >
-          <UserInfoCard
-            x={userInfo.x}
-            y={userInfo.y}
-            member={userInfo.member}
-          />
-        </div>
-      )}
-      {badgeInfo && (
-        <BadgeInfoCard
-          rect={badgeInfo.rect}
-          badge={badgeInfo.badge}
-          preferBelow={badgeInfo.preferBelow}
-        />
-      )}
+      {isContextMenuVisible && contextMenu}
+      {isUserInfoVisible && userInfo}
+      {badgeInfo && badgeInfo}
       {children}
     </ContextMenuContext.Provider>
   );
