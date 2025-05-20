@@ -236,8 +236,7 @@
   align-items: center;
   justify-content: center;
   width: max-content;
-  min-width: 100px;
-  max-width: 150px;
+  max-width: 200px;
   height: 30px;
   overflow: hidden;
   white-space: nowrap;
@@ -268,11 +267,6 @@
   background-image: url('../../public/tab_item_mainframe.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-}
-
-.mainTabs .tab[data-tab-id='server'] {
-  min-width: 192px !important;
-  max-width: 192px !important;
 }
 
 .mainTabs .tabClose {
@@ -324,6 +318,7 @@
   overflow: hidden;
   color: var(--secondary-color, var(--main-color, #fff));
   width: 100%;
+  margin: 0 20px;
   text-align: center;
   white-space: nowrap;
 }
