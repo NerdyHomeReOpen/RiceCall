@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 // CSS
 import styles from '@/styles/pages/friend.module.css';
@@ -29,22 +29,11 @@ interface FriendGroupTabProps {
   friendGroup: FriendGroup;
   friends: UserFriend[];
   selectedItemId: string | null;
-  selectedItemType: string | null;
-  setSelectedFriendItemIdAndType: (
-    id: string | null,
-    type: string | null,
-  ) => void;
+  setSelectedItemId: (id: string | null) => void;
 }
 
 const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
-  ({
-    user,
-    friendGroup,
-    friends,
-    selectedItemId,
-    selectedItemType,
-    setSelectedFriendItemIdAndType,
-  }) => {
+  ({ user, friendGroup, friends, selectedItemId, setSelectedItemId }) => {
     // Hooks
     const lang = useLanguage();
     const contextMenu = useContextMenu();
@@ -104,14 +93,11 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
         {/* Tab View */}
         <div
           className={`${styles['tab']} ${
-            selectedItemId === friendGroupId &&
-            selectedItemType === 'friendGroup'
-              ? styles['selected']
-              : ''
+            selectedItemId === friendGroupId ? styles['selected'] : ''
           }`}
           onClick={() => {
             setExpanded(!expanded);
-            setSelectedFriendItemIdAndType(friendGroupId, 'friendGroup');
+            setSelectedItemId(friendGroupId);
           }}
           onContextMenu={(e) => {
             const x = e.clientX;
@@ -155,9 +141,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
               key={friend.targetId}
               friend={friend}
               selectedItemId={selectedItemId}
-              selectedItemType={selectedItemType}
-              setSelectedFriendItemIdAndType={setSelectedFriendItemIdAndType}
-              friendGroupId={friendGroupId}
+              setSelectedItemId={setSelectedItemId}
             />
           ))}
         </div>
@@ -171,22 +155,11 @@ FriendGroupTab.displayName = 'FriendGroupTab';
 interface FriendCardProps {
   friend: UserFriend;
   selectedItemId: string | null;
-  selectedItemType: string | null;
-  setSelectedFriendItemIdAndType: (
-    id: string | null,
-    type: string | null,
-  ) => void;
-  friendGroupId: string;
+  setSelectedItemId: (id: string | null) => void;
 }
 
 const FriendCard: React.FC<FriendCardProps> = React.memo(
-  ({
-    friend,
-    selectedItemId,
-    selectedItemType,
-    setSelectedFriendItemIdAndType,
-    friendGroupId,
-  }) => {
+  ({ friend, selectedItemId, setSelectedItemId }) => {
     // Hooks
     const lang = useLanguage();
     const contextMenu = useContextMenu();
@@ -212,6 +185,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
       vip: friendVip,
       level: friendLevel,
       badges: friendBadges,
+      status: friendStatus,
       currentServerId: friendCurrentServerId,
     } = friend;
     const isCurrentUser = friendTargetId === friendUserId;
@@ -301,17 +275,9 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
         {/* User View */}
         <div
           className={`${styles['friendCard']} ${
-            selectedItemId === `${friendGroupId}_${friendTargetId}` &&
-            selectedItemType === 'friend_instance'
-              ? styles['selected']
-              : ''
+            selectedItemId === `${friendTargetId}` ? styles['selected'] : ''
           }`}
-          onClick={() =>
-            setSelectedFriendItemIdAndType(
-              `${friendGroupId}_${friendTargetId}`,
-              'friend_instance',
-            )
-          }
+          onClick={() => setSelectedItemId(friendTargetId)}
           onContextMenu={(e) => {
             const x = e.clientX;
             const y = e.clientY;
@@ -347,6 +313,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
               backgroundImage: `url(${friendAvatarUrl})`,
               filter: !friendServerName ? 'grayscale(100%)' : '',
             }}
+            datatype={friendServerName ? friendStatus : ''}
           />
           <div className={styles['baseInfoBox']}>
             <div className={styles['container']}>
@@ -408,9 +375,6 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [selectedTabId, setSelectedTabId] = useState<number>(0);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-    const [selectedItemType, setSelectedItemType] = useState<string | null>(
-      null,
-    );
 
     // Variables
     const { userId } = user;
@@ -428,14 +392,6 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
       userId,
     });
 
-    const setSelectedFriendItemIdAndType = useCallback(
-      (id: string | null, type: string | null) => {
-        setSelectedItemId(id);
-        setSelectedItemType(type);
-      },
-      [setSelectedItemId, setSelectedItemType],
-    );
-
     // Handlers
     const handleOpenSearchUser = (userId: User['userId']) => {
       ipcService.popup.open(PopupType.SEARCH_USER, 'searchUser');
@@ -450,46 +406,6 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
         userId,
       });
     };
-
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (event.button === 2) {
-          const targetElement = event.target as HTMLElement;
-          const friendGroupTab = targetElement.closest(`.${styles['tab']}`);
-          const friendCard = targetElement.closest(`.${styles['friendCard']}`);
-          if (
-            friendGroupTab?.classList.contains(styles['selected']) ||
-            friendCard?.classList.contains(styles['selected'])
-          ) {
-            return;
-          }
-        }
-        if (
-          viewerRef.current &&
-          !viewerRef.current.contains(event.target as Node)
-        ) {
-          setSelectedFriendItemIdAndType(null, null);
-        } else if (event.target instanceof HTMLElement) {
-          const targetElement = event.target as HTMLElement;
-          const isFriendGroupTab = targetElement.closest(`.${styles['tab']}`);
-          const isFriendCard = targetElement.closest(
-            `.${styles['friendCard']}`,
-          );
-          const isNavTab = targetElement.closest(
-            `.${styles['navigateTabs']} .${styles['tab']}`,
-          );
-
-          if (!isFriendGroupTab && !isFriendCard && !isNavTab) {
-            setSelectedFriendItemIdAndType(null, null);
-          }
-        }
-      };
-
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }, [setSelectedFriendItemIdAndType]);
 
     return (
       <>
@@ -546,10 +462,7 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
                     friends={filteredFriends}
                     user={user}
                     selectedItemId={selectedItemId}
-                    selectedItemType={selectedItemType}
-                    setSelectedFriendItemIdAndType={
-                      setSelectedFriendItemIdAndType
-                    }
+                    setSelectedItemId={setSelectedItemId}
                   />
                 ))}
             </div>

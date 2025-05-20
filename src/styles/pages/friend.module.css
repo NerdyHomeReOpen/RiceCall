@@ -47,6 +47,39 @@
   background-position: 0 0;
 }
 
+.avatarPicture::after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  bottom: 0;
+  right: 0;
+  min-width: 13px;
+  min-height: 13px;
+  background-image: url('../../../public/user_state.png');
+  background-repeat: no-repeat;
+  background-position: 0 0 !important;
+}
+
+.avatarPicture[datatype='']::after {
+  background-image: none;
+}
+
+.avatarPicture[datatype='online']::after {
+  background-position: 0 0 !important;
+}
+
+.avatarPicture[datatype='dnd']::after {
+  background-position: -13px 0 !important;
+}
+
+.avatarPicture[datatype='idle']::after {
+  background-position: -26px 0 !important;
+}
+
+.avatarPicture[datatype='gn']::after {
+  background-position: -39px 0 !important;
+}
+
 .baseInfoBox {
   display: flex;
   flex-direction: column;
@@ -380,7 +413,6 @@
 }
 
 .friendList .tab .tabLable {
-  margin-right: 1;
   font-weight: 100;
 }
 
@@ -405,7 +437,7 @@
 }
 
 .friendList .tabContent {
-  margin-left: 1.6rem;
+  margin: 0px 10px;
 }
 
 .friendCard {

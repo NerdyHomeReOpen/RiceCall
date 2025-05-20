@@ -55,6 +55,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
       level: userLevel,
       vip: userVip,
       badges: userBadges,
+      status: userStatus,
     } = user;
 
     // Handlers
@@ -119,6 +120,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
           <div
             className={friendPage['avatarPicture']}
             style={{ backgroundImage: `url(${userAvatarUrl})` }}
+            datatype={userStatus}
           />
           <div className={friendPage['baseInfoBox']}>
             <div className={friendPage['container']}>
