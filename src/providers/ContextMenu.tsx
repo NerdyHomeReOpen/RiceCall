@@ -1,4 +1,10 @@
-import React, { useEffect, useContext, createContext, ReactNode } from 'react';
+import React, {
+  useEffect,
+  useContext,
+  createContext,
+  ReactNode,
+  useCallback,
+} from 'react';
 
 // Types
 import { ContextMenuItem, ServerMember, Badge } from '@/types';
@@ -59,44 +65,35 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [userInfo, setUserInfo] = React.useState<ReactNode | null>(null);
   const [badgeInfo, setBadgeInfo] = React.useState<ReactNode | null>(null);
 
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (
-        (e.target as HTMLElement).closest('.context-menu-container') ||
-        (e.target as HTMLElement).closest('.user-info-card-hover-wrapper')
-      )
-        return;
+  // Handlers
+  const handleClickOutside = useCallback(
+    (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
       if (isContextMenuVisible) closeContextMenu();
       if (isUserInfoVisible) closeUserInfoBlock();
-    };
+    },
+    [isContextMenuVisible, isUserInfoVisible],
+  );
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-
       if (isContextMenuVisible) closeContextMenu();
       if (isUserInfoVisible) closeUserInfoBlock();
-    };
+    },
+    [isContextMenuVisible, isUserInfoVisible],
+  );
 
-    document.addEventListener('click', handleClick);
+  // Effects
+  useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
-
-    const handleOuterContextMenu = (e: MouseEvent) => {
-      if (
-        !(e.target as HTMLElement).closest('.context-menu-container') &&
-        !(e.target as HTMLElement).closest('.user-info-card-hover-wrapper')
-      ) {
-        if (isContextMenuVisible) closeContextMenu();
-        if (isUserInfoVisible) closeUserInfoBlock();
-      }
-    };
-    document.addEventListener('contextmenu', handleOuterContextMenu);
+    document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
-      document.removeEventListener('click', handleClick);
       document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('contextmenu', handleOuterContextMenu);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isContextMenuVisible, isUserInfoVisible]);
+  }, [handleKeyDown, handleClickOutside]);
 
   const showContextMenu = (
     x: number,
