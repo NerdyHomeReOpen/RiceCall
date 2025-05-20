@@ -7,30 +7,7 @@ import messageInputBox from '@/styles/messageInputBox.module.css';
 import { useLanguage } from '@/providers/Language';
 
 // Components
-import emojis, { Emoji } from './emojis';
-
-interface EmojiGridProps {
-  onEmojiSelect?: (emoji: string) => void;
-}
-
-const EmojiGrid: React.FC<EmojiGridProps> = ({ onEmojiSelect }) => {
-  return (
-    <div className={messageInputBox['emojiGrid']}>
-      {emojis.map((emoji: Emoji) => (
-        <div
-          key={emoji.id}
-          className={messageInputBox['emoji']}
-          data-id={emoji.id + 1}
-          onClick={() => {
-            onEmojiSelect?.(`[emoji_${emoji.id}]`);
-          }}
-        />
-      ))}
-    </div>
-  );
-};
-
-EmojiGrid.displayName = 'EmojiGrid';
+import EmojiPicker from '@/components/EmojiPicker';
 
 interface MessageInputBoxProps {
   onSendMessage?: (message: string) => void;
@@ -53,7 +30,6 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
 
     // States
     const [messageInput, setMessageInput] = useState<string>('');
-    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
     const [isComposing, setIsComposing] = useState<boolean>(false);
 
     // Variables
@@ -66,18 +42,13 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
         ${isWarning ? messageInputBox['warning'] : ''} 
         ${isDisabled ? messageInputBox['disabled'] : ''}`}
       >
-        <div
-          className={messageInputBox['emojiIcon']}
-          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-        >
-          {showEmojiPicker && (
-            <EmojiGrid
-              onEmojiSelect={(emojiTag) =>
-                setMessageInput((prev) => prev + emojiTag)
-              }
-            />
-          )}
-        </div>
+        <EmojiPicker
+          type="message"
+          preferBelow={false}
+          onEmojiSelect={(emoji) => {
+            setMessageInput((prev) => prev + emoji);
+          }}
+        />
 
         <textarea
           rows={2}

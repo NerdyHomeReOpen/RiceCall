@@ -11,6 +11,7 @@ import { Server, User, UserServer, PopupType, Friend } from '@/types';
 
 // Components
 import BadgeListViewer from '@/components/viewers/BadgeList';
+import EmojiPicker from '@/components/EmojiPicker';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
@@ -27,19 +28,9 @@ import grade from '@/styles/grade.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
-import emoji from '@/styles/viewers/emoji.module.css';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
-import {
-  emojiList,
-  convertHtmlToEmojiPlaceholder,
-  convertEmojiPlaceholderToHtml,
-  handleEmojiKeyDown,
-  insertEmojiIntoDiv,
-  handleEmojiSelectionChange,
-  cleanHtmlEndingBr,
-} from '@/utils/emoji';
 
 interface UserSettingPopupProps {
   userId: User['userId'];
@@ -56,11 +47,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const refreshRef = useRef(false);
     const isSelectingRef = useRef(false);
     const isLoading = useRef(false);
-    const signatureDivRef = useRef<HTMLDivElement>(null);
-    const emojiBoxContainerRef = useRef<HTMLDivElement>(null);
-    const lastCursorPosition = useRef<number | null>(null);
-    const emojiIconsWrapperRef = useRef<HTMLDivElement>(null);
-
     // Constants
     const TODAY = useMemo(() => new Date(), []);
     const CURRENT_YEAR = TODAY.getFullYear();
@@ -75,8 +61,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const [selectedTabId, setSelectedTabId] = useState<
       'about' | 'groups' | 'userSetting'
     >('about');
-    const [isEmojiBoxVisible, setIsEmojiBoxVisible] = useState(false);
-    const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
 
     // Variables
     const {
@@ -176,23 +160,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     );
 
     // Handlers
-    const handleUpdateUser = (userData: Partial<User>) => {
+    const handleUpdateUser = (user: Partial<User>) => {
       if (!socket) return;
 
-      const signatureHtmlToConvert = cleanHtmlEndingBr(
-        userData.signature || '',
-      );
-
-      const signatureWithPlaceholders = convertHtmlToEmojiPlaceholder(
-        signatureHtmlToConvert,
-      );
-      socket.send.updateUser({
-        user: {
-          ...userData,
-          signature: signatureWithPlaceholders,
-        },
-        userId,
-      });
+      socket.send.updateUser({ user, userId });
     };
 
     const handleOpenApplyFriend = (
@@ -233,35 +204,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       }, 1500);
     };
 
-    const handleSignatureKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const handledByEmojiUtil = handleEmojiKeyDown(
-        e,
-        signatureDivRef.current,
-        (newHtml) => {
-          const cleanedHtml = cleanHtmlEndingBr(newHtml);
-          setUser((prev) => {
-            if (prev.signature !== cleanedHtml) {
-              return { ...prev, signature: cleanedHtml };
-            }
-            return prev;
-          });
-        },
-      );
-      if (handledByEmojiUtil) {
-        lastCursorPosition.current = null;
-        return;
-      }
-
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        return;
-      }
-
-      if (e.type === 'dragstart') {
-        e.preventDefault();
-      }
-    };
-
     // Effects
     useEffect(() => {
       if (!targetId || refreshRef.current) return;
@@ -278,23 +220,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             userId: userId,
             targetId: targetId,
           }),
-        ]).then(([userData, serversData, friendData]) => {
-          if (userData) {
-            const signatureAsHtml = convertEmojiPlaceholderToHtml(
-              userData.signature || '',
-              emojiList,
-            );
-            const cleanedInitialHtml = cleanHtmlEndingBr(signatureAsHtml);
-            setUser({
-              ...userData,
-              signature: cleanedInitialHtml,
-            });
+        ]).then(([user, servers, friend]) => {
+          if (user) {
+            setUser(user);
           }
-          if (serversData) {
-            setServers(serversData);
+          if (servers) {
+            setServers(servers);
           }
-          if (friendData) {
-            setFriend(friendData);
+          if (friend) {
+            setFriend(friend);
           }
         });
       };
@@ -323,68 +257,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       CURRENT_DAY,
       isFutureDate,
     ]);
-
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          isEmojiPickerVisible &&
-          emojiIconsWrapperRef.current &&
-          !emojiIconsWrapperRef.current.contains(event.target as Node) &&
-          emojiBoxContainerRef.current &&
-          !emojiBoxContainerRef.current.contains(event.target as Node)
-        ) {
-          setIsEmojiPickerVisible(false);
-        }
-      };
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }, [isEmojiPickerVisible]);
-
-    useEffect(() => {
-      if (signatureDivRef.current) {
-        const currentDomCleanedHtml = cleanHtmlEndingBr(
-          signatureDivRef.current.innerHTML,
-        );
-        if (currentDomCleanedHtml !== userSignature) {
-          signatureDivRef.current.innerHTML = userSignature;
-          if (document.activeElement === signatureDivRef.current) {
-            const selection = window.getSelection();
-            if (selection) {
-              const newRange = document.createRange();
-              newRange.selectNodeContents(signatureDivRef.current);
-              newRange.collapse(false);
-              selection.removeAllRanges();
-              selection.addRange(newRange);
-            }
-          }
-        }
-      }
-    }, [userSignature]);
-
-    useEffect(() => {
-      const selectionChangeHandler = () => {
-        handleEmojiSelectionChange(
-          signatureDivRef.current,
-          emoji['selectedEmojiImage'],
-        );
-      };
-      document.addEventListener('selectionchange', selectionChangeHandler);
-      const currentSignatureDiv = signatureDivRef.current;
-      return () => {
-        document.removeEventListener('selectionchange', selectionChangeHandler);
-        if (currentSignatureDiv) {
-          const allEmojiImages =
-            currentSignatureDiv.querySelectorAll<HTMLImageElement>(
-              'img[data-emoji-src]',
-            );
-          allEmojiImages.forEach((img) => {
-            img.classList.remove(emoji['selectedEmojiImage']);
-          });
-        }
-      };
-    }, []);
 
     const PrivateElement = (text: React.ReactNode) => {
       return <div className={setting['userRecentVisitsPrivate']}>{text}</div>;
@@ -947,118 +819,28 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
                   <div className={popup['label']}>{lang.tr.signature}</div>
-                  <div className={`${popup['input']} ${setting['inputBox']}`}>
-                    <div
-                      className={setting['inputArea']}
-                      id="profile-form-signature"
-                      contentEditable
-                      suppressContentEditableWarning
-                      ref={signatureDivRef}
-                      onFocus={() => {
-                        setIsEmojiBoxVisible(true);
+                  <div className={popup['row']}>
+                    <input
+                      name="signature"
+                      type="text"
+                      value={userSignature}
+                      onChange={(e) => {
+                        setUser((prev) => ({
+                          ...prev,
+                          signature: e.target.value,
+                        }));
                       }}
-                      onBlur={(e: React.FocusEvent<HTMLDivElement>) => {
-                        setTimeout(() => {
-                          const targetElement = (e.relatedTarget ||
-                            document.activeElement) as HTMLElement | null;
-                          if (
-                            (emojiBoxContainerRef.current &&
-                              targetElement &&
-                              emojiBoxContainerRef.current.contains(
-                                targetElement,
-                              )) ||
-                            (emojiIconsWrapperRef.current &&
-                              targetElement &&
-                              emojiIconsWrapperRef.current.contains(
-                                targetElement,
-                              ))
-                          ) {
-                            if (!isEmojiBoxVisible) setIsEmojiBoxVisible(true);
-                            return;
-                          }
-                          if (
-                            targetElement &&
-                            (targetElement.tagName === 'INPUT' ||
-                              targetElement.tagName === 'SELECT' ||
-                              targetElement.tagName === 'TEXTAREA') &&
-                            targetElement !== signatureDivRef.current
-                          ) {
-                            setIsEmojiBoxVisible(false);
-                          }
-                          if (signatureDivRef.current) {
-                            const currentDivHtml = cleanHtmlEndingBr(
-                              signatureDivRef.current.innerHTML,
-                            );
-
-                            if (user.signature !== currentDivHtml) {
-                              setUser((prev) => ({
-                                ...prev,
-                                signature: currentDivHtml,
-                              }));
-                            }
-                          }
-                        }, 0);
-                      }}
-                      onInput={(e) => {
-                        const target = e.target as HTMLDivElement;
-                        const currentInputHtml = cleanHtmlEndingBr(
-                          target.innerHTML,
-                        );
-
-                        setUser((prev) => {
-                          if (prev.signature !== currentInputHtml) {
-                            return { ...prev, signature: currentInputHtml };
-                          }
-                          return prev;
-                        });
-                        lastCursorPosition.current = null;
-                      }}
-                      onKeyDown={handleSignatureKeyDown}
-                      onDragStart={(e) => e.preventDefault()}
                     />
-                    <div
-                      className={`${setting['emojiBox']} ${
-                        isEmojiBoxVisible ? setting['emojiBoxVisible'] : ''
-                      }`}
-                      ref={emojiBoxContainerRef}
-                    >
-                      <div
-                        className={emoji['emojiButtonIcon']}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                        }}
-                        onClick={() => {
-                          setIsEmojiPickerVisible((prevVisible) => {
-                            const openingPicker = !prevVisible;
-                            if (openingPicker) {
-                              if (
-                                document.activeElement ===
-                                signatureDivRef.current
-                              ) {
-                                const selection = window.getSelection();
-                                if (selection && selection.rangeCount > 0) {
-                                  const range = selection.getRangeAt(0);
-                                  if (
-                                    signatureDivRef.current &&
-                                    signatureDivRef.current.contains(
-                                      range.startContainer,
-                                    )
-                                  ) {
-                                    lastCursorPosition.current =
-                                      range.startOffset;
-                                  }
-                                }
-                              }
-                              signatureDivRef.current?.focus();
-                            }
-                            return openingPicker;
-                          });
-                          if (!isEmojiBoxVisible) {
-                            setIsEmojiBoxVisible(true);
-                          }
-                        }}
-                      />
-                    </div>
+                    <EmojiPicker
+                      onEmojiSelect={(emoji) => {
+                        setUser((prev) => ({
+                          ...prev,
+                          signature: prev.signature + emoji,
+                        }));
+                      }}
+                      type="signature"
+                      preferBelow={false}
+                    />
                   </div>
                 </div>
                 <div
@@ -1070,55 +852,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               </div>
             </div>
           </div>
-          {isEmojiPickerVisible && (
-            <div
-              className={emoji['emojiIconsWrapper']}
-              ref={emojiIconsWrapperRef}
-            >
-              <div className={emoji['emojiIconsContent']}>
-                {emojiList.map((e) => (
-                  <div
-                    key={e.id}
-                    className={emoji['emojiIconBox']}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                    }}
-                    onClick={() => {
-                      if (!signatureDivRef.current) return;
-                      insertEmojiIntoDiv(
-                        e,
-                        signatureDivRef.current,
-                        (rawNewHtmlFromUtil) => {
-                          const cleanedNewHtml =
-                            cleanHtmlEndingBr(rawNewHtmlFromUtil);
-                          setUser((prev) => {
-                            if (prev.signature !== cleanedNewHtml) {
-                              return { ...prev, signature: cleanedNewHtml };
-                            }
-                            return prev;
-                          });
-                        },
-                        (pos) => (lastCursorPosition.current = pos),
-                      );
-                    }}
-                  >
-                    <div
-                      className={emoji['emojiIcon']}
-                      style={{
-                        backgroundImage: `url('/vipemotions/${e.src}.png')`,
-                      }}
-                      title={e.name}
-                    ></div>
-                  </div>
-                ))}
-              </div>
-              <div className={emoji['emojiIconsFooter']}>
-                <div
-                  className={`${emoji['emojiIconsFooterButtonIcon']} ${emoji['emojiHumanIcon']} ${emoji['selected']}`}
-                ></div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer */}

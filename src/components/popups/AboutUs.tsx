@@ -1,7 +1,9 @@
 import React from 'react';
+import { FaGithub, FaDiscord } from 'react-icons/fa';
+
+// Package
 import packageJson from '../../../package.json';
 const version = packageJson.version;
-import { FaGithub, FaDiscord } from 'react-icons/fa';
 
 // CSS
 import popup from '@/styles/popup.module.css';
