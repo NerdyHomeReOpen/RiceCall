@@ -11,11 +11,11 @@ import { Server, User, UserServer, PopupType, Friend } from '@/types';
 
 // Components
 import BadgeListViewer from '@/components/viewers/BadgeList';
-import EmojiPicker from '@/components/EmojiPicker';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
+import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -28,6 +28,7 @@ import grade from '@/styles/grade.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
+import emoji from '@/styles/emoji.module.css';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
@@ -42,11 +43,14 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     // Props
     const socket = useSocket();
     const lang = useLanguage();
+    const contextMenu = useContextMenu();
 
     // Refs
     const refreshRef = useRef(false);
     const isSelectingRef = useRef(false);
     const isLoading = useRef(false);
+    const emojiIconRef = useRef<HTMLDivElement>(null);
+
     // Constants
     const TODAY = useMemo(() => new Date(), []);
     const CURRENT_YEAR = TODAY.getFullYear();
@@ -831,13 +835,27 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                         }));
                       }}
                     />
-                    <EmojiPicker
-                      type="signature"
-                      onEmojiSelect={(emoji) => {
-                        setUser((prev) => ({
-                          ...prev,
-                          signature: prev.signature + emoji,
-                        }));
+                    <div
+                      ref={emojiIconRef}
+                      className={emoji['emojiIcon']}
+                      onClick={() => {
+                        if (!emojiIconRef.current) return;
+                        const x =
+                          emojiIconRef.current.getBoundingClientRect().x;
+                        const y =
+                          emojiIconRef.current.getBoundingClientRect().y;
+                        contextMenu.showEmojiPicker(
+                          x,
+                          y,
+                          true,
+                          'unicode',
+                          (emoji) => {
+                            setUser((prev) => ({
+                              ...prev,
+                              signature: prev.signature + emoji,
+                            }));
+                          },
+                        );
                       }}
                     />
                   </div>

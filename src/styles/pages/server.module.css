@@ -627,6 +627,7 @@
   min-height: 8px;
   min-width: 8px;
   cursor: pointer;
+  transform: rotate(180deg);
   background-image: url('../../../public/channel/triangle.png');
   background-repeat: no-repeat;
   background-position: 0 0;

@@ -33,6 +33,7 @@
     "electron-store": "^10.0.1",
     "electron-updater": "^6.6.2",
     "emoji-picker-react": "^4.12.2",
+    "emoji.json": "^15.1.0",
     "highlight.js": "^11.11.1",
     "net": "^1.0.2",
     "next": "^15.3.2",
@@ -44,7 +45,8 @@
     "react-syntax-highlighter": "^15.6.1",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "twemoji": "^14.0.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

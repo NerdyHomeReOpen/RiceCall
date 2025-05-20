@@ -1,164 +1,128 @@
 import React, { useEffect, useRef, useState } from 'react';
-import * as Picker from 'emoji-picker-react';
 
 // CSS
-import emoji from '@/styles/viewers/emoji.module.css';
+import emoji from '@/styles/emoji.module.css';
 
 // Components
-import emojis, { Emoji } from './emojis';
+import { emojis, unicodeEmojis, Emoji } from './emojis';
 
 interface EmojiPickerProps {
   onEmojiSelect: (emoji: string) => void;
-  type: 'message' | 'signature';
+  type: 'custom' | 'unicode';
+  x?: number;
+  y?: number;
   preferTop?: boolean;
 }
 
-const EmojiPicker: React.FC<EmojiPickerProps> = ({
-  onEmojiSelect,
-  type,
-  preferTop = false,
-}) => {
-  // Refs
-  const emojiIconRef = useRef<HTMLDivElement>(null);
-  const emojiPickerRef = useRef<HTMLDivElement>(null);
+const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
+  ({ onEmojiSelect, type, x = 0, y = 0, preferTop = false }) => {
+    // Refs
+    const emojiPickerRef = useRef<HTMLDivElement>(null);
 
-  // States
-  const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
-  const [pickerX, setPickerX] = useState<number>(0);
-  const [pickerY, setPickerY] = useState<number>(0);
+    // States
+    const [pickerX, setPickerX] = useState<number>(x);
+    const [pickerY, setPickerY] = useState<number>(y);
 
-  // Handlers
-  const handleEnterEscape = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      setShowEmojiPicker(false);
-    }
-  };
+    // Effects
+    useEffect(() => {
+      if (!emojiPickerRef.current) return;
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      emojiPickerRef.current &&
-      !emojiPickerRef.current.contains(event.target as Node) &&
-      !emojiIconRef.current?.contains(event.target as Node)
-    ) {
-      setShowEmojiPicker(false);
-    }
-  };
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      const marginEdge = 10;
 
-  // Effects
-  useEffect(() => {
-    if (!emojiIconRef.current) return;
-    if (!emojiPickerRef.current) return;
+      let newPosX = x;
+      let newPosY = y;
 
-    const iconHeight = emojiIconRef.current.offsetHeight;
+      const pickerWidth = emojiPickerRef.current.offsetWidth;
+      const pickerHeight = emojiPickerRef.current.offsetHeight;
 
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    const marginEdge = 10;
+      if (pickerWidth === 0 || pickerHeight === 0) {
+        return;
+      }
 
-    let newPosX = emojiIconRef.current.getBoundingClientRect().left;
-    let newPosY = emojiIconRef.current.getBoundingClientRect().top;
+      if (preferTop) {
+        newPosY -= pickerHeight;
+      }
 
-    const pickerWidth = emojiPickerRef.current.offsetWidth;
-    const pickerHeight = emojiPickerRef.current.offsetHeight;
+      if (newPosX + pickerWidth + marginEdge > windowWidth) {
+        newPosX = windowWidth - pickerWidth - marginEdge;
+      }
+      if (newPosX < marginEdge) {
+        newPosX = marginEdge;
+      }
+      if (newPosY + pickerHeight + marginEdge > windowHeight) {
+        newPosY = windowHeight - pickerHeight - marginEdge;
+      }
+      if (newPosY < marginEdge) {
+        newPosY = marginEdge;
+      }
 
-    if (pickerWidth === 0 || pickerHeight === 0) {
-      return;
-    }
+      setPickerX(newPosX);
+      setPickerY(newPosY);
+    }, [x, y, preferTop]);
 
-    if (preferTop) {
-      newPosY -= pickerHeight;
-    } else {
-      newPosY += iconHeight;
-    }
-
-    if (newPosX + pickerWidth + marginEdge > windowWidth) {
-      newPosX = windowWidth - pickerWidth - marginEdge;
-    }
-    if (newPosX < marginEdge) {
-      newPosX = marginEdge;
-    }
-    if (newPosY + pickerHeight + marginEdge > windowHeight) {
-      newPosY = windowHeight - pickerHeight - marginEdge;
-    }
-    if (newPosY < marginEdge) {
-      newPosY = marginEdge;
-    }
-
-    setPickerX(newPosX);
-    setPickerY(newPosY);
-  }, [emojiIconRef.current, emojiPickerRef.current, preferTop]);
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleEnterEscape);
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('keydown', handleEnterEscape);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  return (
-    <div
-      ref={emojiIconRef}
-      className={emoji['emojiIcon']}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        setShowEmojiPicker(!showEmojiPicker);
-      }}
-    >
-      {type === 'message' && showEmojiPicker && (
-        <div
-          ref={emojiPickerRef}
-          className={emoji['emojiGrid']}
-          style={{
-            left: pickerX,
-            top: pickerY,
-          }}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          {emojis.map((e: Emoji) => (
-            <div
-              key={e.id}
-              className={emoji['emoji']}
-              data-id={e.id + 1}
-              onClick={() => {
-                onEmojiSelect?.(`[emoji_${e.id}]`);
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {type === 'signature' && showEmojiPicker && (
-        <div
-          ref={emojiPickerRef}
-          className={emoji['emojiPicker']}
-          style={{
-            left: pickerX,
-            top: pickerY,
-          }}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <Picker.default
+    switch (type) {
+      case 'custom':
+        return (
+          <div
+            ref={emojiPickerRef}
+            className={`context-menu-container ${emoji['emojiGrid']}`}
             style={{
-              width: '100%',
-              height: '100%',
+              left: pickerX,
+              top: pickerY,
             }}
-            onEmojiClick={(e) => {
-              onEmojiSelect?.(e.emoji);
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
             }}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
+          >
+            {emojis.map((e: Emoji) => (
+              <div
+                key={e.id}
+                className={emoji['emoji']}
+                style={{
+                  backgroundImage: `url(${e.path})`,
+                }}
+                onClick={() => {
+                  onEmojiSelect?.(e.char);
+                }}
+              />
+            ))}
+          </div>
+        );
+
+      case 'unicode':
+        return (
+          <div
+            ref={emojiPickerRef}
+            className={`context-menu-container ${emoji['emojiGrid']}`}
+            style={{
+              left: pickerX,
+              top: pickerY,
+            }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            {unicodeEmojis.map((e: Emoji) => (
+              <div
+                key={e.id}
+                className={emoji['emoji']}
+                style={{
+                  backgroundImage: `url(${e.path})`,
+                }}
+                onClick={() => {
+                  onEmojiSelect?.(e.char);
+                }}
+              />
+            ))}
+          </div>
+        );
+    }
+  },
+);
 
 EmojiPicker.displayName = 'EmojiPicker';
 

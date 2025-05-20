@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 // CSS
 import messageInputBox from '@/styles/messageInputBox.module.css';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
+import { useContextMenu } from '@/providers/ContextMenu';
 
-// Components
-import EmojiPicker from '@/components/EmojiPicker';
+// Styles
+import emoji from '@/styles/emoji.module.css';
 
 interface MessageInputBoxProps {
   onSendMessage?: (message: string) => void;
@@ -25,8 +26,12 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
     placeholder = '',
     maxLength = 2000,
   }) => {
-    // Language
+    // Hooks
     const lang = useLanguage();
+    const contextMenu = useContextMenu();
+
+    // Refs
+    const emojiIconRef = useRef<HTMLDivElement>(null);
 
     // States
     const [messageInput, setMessageInput] = useState<string>('');
@@ -42,27 +47,27 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
         ${isWarning ? messageInputBox['warning'] : ''} 
         ${isDisabled ? messageInputBox['disabled'] : ''}`}
       >
-        <EmojiPicker
-          type="message"
-          onEmojiSelect={(emoji) => {
-            setMessageInput((prev) => prev + emoji);
+        <div
+          ref={emojiIconRef}
+          className={emoji['emojiIcon']}
+          onClick={() => {
+            if (!emojiIconRef.current) return;
+            const x = emojiIconRef.current.getBoundingClientRect().x;
+            const y = emojiIconRef.current.getBoundingClientRect().y;
+            contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
+              setMessageInput((prev) => prev + emoji);
+            });
           }}
-          preferTop={true}
         />
 
         <textarea
           rows={2}
           placeholder={placeholder}
           value={messageInput}
+          maxLength={maxLength}
           onChange={(e) => {
             if (isDisabled) return;
-            e.preventDefault();
             setMessageInput(e.target.value);
-          }}
-          onPaste={(e) => {
-            if (isDisabled) return;
-            e.preventDefault();
-            setMessageInput((prev) => prev + e.clipboardData.getData('text'));
           }}
           onKeyDown={(e) => {
             if (e.shiftKey) return;
@@ -78,7 +83,6 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
           }}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
-          maxLength={maxLength}
           aria-label={lang.tr.messageInputBox}
         />
         <div className={messageInputBox['messageInputLength']}>

@@ -100,25 +100,20 @@
   width: 60%;
   height: 30px;
   align-items: center;
+  border: 1px solid #ffffffff;
   margin-left: 100px;
   padding: 2px 5px;
 }
 
 .signatureInput {
   z-index: 1;
-  border-color: unset;
-  border-width: unset;
-  border-style: unset;
-  resize: none;
-  outline: unset;
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-  overflow-x: hidden;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  resize: none;
 }
 
 .signatureInput:empty::before {

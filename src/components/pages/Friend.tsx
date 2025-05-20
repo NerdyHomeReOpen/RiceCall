@@ -5,11 +5,11 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import friendPage from '@/styles/pages/friend.module.css';
 import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
+import emoji from '@/styles/emoji.module.css';
 
 // Components
 import FriendListViewer from '@/components/viewers/FriendList';
 import BadgeListViewer from '@/components/viewers/BadgeList';
-import EmojiPicker from '@/components/EmojiPicker';
 
 // Types
 import { User, UserFriend, FriendGroup } from '@/types';
@@ -17,6 +17,7 @@ import { User, UserFriend, FriendGroup } from '@/types';
 // Providers
 import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
+import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -33,6 +34,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
+    const contextMenu = useContextMenu();
 
     // Refs
     const signatureInputRef = useRef<HTMLTextAreaElement>(null);
@@ -56,13 +58,14 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     } = user;
 
     // Handlers
-    const handleChangeSignature = useCallback(
-      (signature: User['signature'], userId: User['userId']) => {
-        if (!socket) return;
-        socket.send.updateUser({ user: { signature }, userId });
-      },
-      [socket],
-    );
+    const handleChangeSignature = (
+      signature: User['signature'],
+      userId: User['userId'],
+    ) => {
+      if (!socket) return;
+      if (signature === userSignature) return;
+      socket.send.updateUser({ user: { signature }, userId });
+    };
 
     const handleResize = useCallback(
       (e: MouseEvent) => {
@@ -157,14 +160,22 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
               onCompositionStart={() => setIsComposing(true)}
               onCompositionEnd={() => setIsComposing(false)}
             />
-            <div ref={emojiIconRef} className={friendPage['emojiBtn']}>
-              <EmojiPicker
-                type="signature"
-                onEmojiSelect={(emoji) => {
-                  setSignatureInput(signatureInput + emoji);
-                }}
-              />
-            </div>
+            <div
+              ref={emojiIconRef}
+              className={emoji['emojiIcon']}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                if (!emojiIconRef.current) return;
+                const x = emojiIconRef.current.getBoundingClientRect().x;
+                const y =
+                  emojiIconRef.current.getBoundingClientRect().y +
+                  emojiIconRef.current.getBoundingClientRect().height;
+                contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
+                  signatureInputRef.current?.focus();
+                  setSignatureInput((prev) => prev + emoji);
+                });
+              }}
+            />
           </div>
         </header>
 
