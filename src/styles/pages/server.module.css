@@ -797,20 +797,6 @@
   border-top: 2px solid #e2e8f0;
 }
 
-.bottomNav::before {
-  content: '';
-  position: absolute;
-  min-height: 20px;
-  min-width: 70px;
-  top: -15px;
-  left: calc(25% - 10px);
-  transition: left 0.2s ease;
-  background-image: url('../../../public/channel/switch_arrow.png');
-  background-repeat: no-repeat;
-  background-size: auto;
-  background-position: 0 0;
-}
-
 .bottomNav:has(.navItem:last-child.active)::before {
   left: calc(75% - 60px);
 }
@@ -821,6 +807,28 @@
 
 .navItemRight {
   justify-content: flex-start !important;
+}
+
+.navItemLeft.active:after,
+.navItemRight.active:after {
+  content: '';
+  position: absolute;
+  min-height: 20px;
+  min-width: 70px;
+  top: -15px;
+  transition: left 0.2s ease;
+  background-image: url('../../../public/channel/switch_arrow.png');
+  background-repeat: no-repeat;
+  background-size: auto;
+  background-position: 0 0;
+}
+
+.navItemLeft:after {
+  right: 10px;
+}
+
+.navItemRight:after {
+  left: 10px;
 }
 
 .navItem {
