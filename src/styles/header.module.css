@@ -275,6 +275,7 @@
   min-height: 12px;
   position: relative;
   border-radius: 50%;
+  background-color: rgb(55 144 206);
   box-shadow: 0 0 2px rgb(255 255 255 / 35%);
   display: flex;
   align-items: center;
@@ -324,11 +325,11 @@
 }
 
 .mainTabs .tab.selected .tabLable {
-  color: var(--main-color);
+  color: var(--main-color, rgb(0, 115, 198));
 }
 
 .mainTabs .tab.selected .tabClose {
-  color: var(--main-color);
+  color: var(--main-color, rgb(0, 115, 198));
 }
 
 /* Title */

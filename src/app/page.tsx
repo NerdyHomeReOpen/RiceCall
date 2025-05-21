@@ -289,7 +289,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
                     cx="12"
                     cy="12"
                     r="12"
-                    fill="var(--main-color, currentColor)"
+                    fill="var(--main-color, rgb(55 144 206))"
                   />
                   <path
                     d="M17 7L7 17M7 7l10 10"
