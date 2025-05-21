@@ -47,6 +47,10 @@
   justify-content: center;
 }
 
+.contextMenu .option.hasIcon {
+  justify-content: flex-start;
+}
+
 .contextMenu .option:not([data-type=''])::before {
   content: '';
   min-width: 16px;
