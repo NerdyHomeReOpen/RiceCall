@@ -396,12 +396,16 @@
 }
 
 .friendList .tab {
+  position: sticky;
+  top: 0;
   font-weight: bold;
   display: flex;
   align-items: center;
   padding: 5px;
   border-radius: 3px;
   font-size: 13px;
+  z-index: 999;
+  background-color: #f1f2f5;
 }
 
 .friendList .tab.selected {
@@ -409,7 +413,7 @@
 }
 
 .friendList .tab:not(.selected):hover {
-  background-color: #d1d5da5c;
+  background-color: #d1d5da;
 }
 
 .friendList .tab .tabLable {
@@ -437,7 +441,7 @@
 }
 
 .friendList .tabContent {
-  margin: 0px 10px;
+  margin-left: 20px;
 }
 
 .friendCard {
