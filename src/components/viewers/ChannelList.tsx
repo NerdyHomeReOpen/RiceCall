@@ -76,7 +76,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       visibility: categoryVisibility,
       userLimit: channelUserLimit,
     } = category;
-    const { permissionLevel, userId, serverId } = currentServer;
+    const {
+      userId,
+      serverId,
+      permissionLevel,
+      receptionLobbyId: serverReceptionLobbyId,
+    } = currentServer;
     const { channelId: currentChannelId } = currentChannel;
     const categoryChannels = serverChannels
       .filter((ch) => ch.type === 'channel')
@@ -106,6 +111,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const channelMembers = serverMembers.filter(
       (mb) => mb.currentChannelId === categoryId,
     );
+    const isReceptionLobby = serverReceptionLobbyId === categoryId;
     const userInChannel = currentChannelId === categoryId;
     const needPassword =
       categoryVisibility === 'private' && permissionLevel < 3;
@@ -119,8 +125,21 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const canManageChannel = permissionLevel > 4;
     const canMoveToChannel =
       canManageChannel && !userInChannel && categoryUserIds.length !== 0;
+    const canSetReceptionLobby =
+      canManageChannel &&
+      !isReceptionLobby &&
+      categoryVisibility !== 'private' &&
+      categoryVisibility !== 'readonly';
 
     // Handlers
+    const handleUpdateServer = (
+      server: Partial<Server>,
+      serverId: Server['serverId'],
+    ) => {
+      if (!socket) return;
+      socket.send.updateServer({ serverId, server });
+    };
+
     const handleJoinChannel = (
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -350,6 +369,18 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 show: canManageChannel,
                 onClick: () => handleOpenChangeChannelOrder(userId, serverId),
               },
+              {
+                id: 'separator',
+                label: '',
+                show: canSetReceptionLobby,
+              },
+              {
+                id: 'setReceptionLobby',
+                label: lang.tr.setDefaultChannel,
+                show: canSetReceptionLobby,
+                onClick: () =>
+                  handleUpdateServer({ receptionLobbyId: categoryId }, serverId),
+              },
             ]);
           }}
         >
@@ -366,7 +397,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               }))
             }
           />
-          <div className={styles['channelTabLable']}>{categoryName}</div>
+          <div className={`
+            ${styles['channelTabLable']}
+            ${isReceptionLobby ? styles['isReceptionLobby'] : ''}
+          `}>
+            {categoryName}
+          </div>
           <div className={styles['channelTabCount']}>
             {`(${categoryMembers.length})`}
           </div>
@@ -473,8 +509,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         channelUserLimit > channelMembers.length ||
         permissionLevel > 4);
     const canManageChannel = permissionLevel > 4;
-    const canCreate = canManageChannel;
-    const canCreateSub = canManageChannel && !channelCategoryId && !isLobby;
+    const canCreate = canManageChannel && !channelCategoryId;
+    const canCreateSub = canManageChannel && !isLobby;
     const canEdit = canManageChannel;
     const canDelete = canManageChannel && !isLobby;
     const canMoveAllUserToChannel =
@@ -691,7 +727,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 label: lang.tr.addSubChannel,
                 show: canCreateSub,
                 onClick: () =>
-                  handleOpenCreateChannel(serverId, channelId, userId),
+                  handleOpenCreateChannel(serverId, (channelCategoryId ? channelCategoryId : channelId), userId),
               },
               {
                 id: 'deleteChannel',
