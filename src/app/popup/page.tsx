@@ -60,11 +60,11 @@ const directMessageHeader = (targetSignature: string) => (
       }}
     />
     <div className={directMessageStyles['directOptionButtons']}>
-      <div className={directMessageStyles['fileShare']} />
-      <div className={directMessageStyles['blockUser']} />
-      <div className={directMessageStyles['unBlockUser']} />
-      <div className={directMessageStyles['inviteTempGroup']} />
-      <div className={directMessageStyles['report']} />
+      <div className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`} />
+      <div className={`${directMessageStyles['blockUser']} ${directMessageStyles['disabled']}`} />
+      <div className={`${directMessageStyles['unBlockUser']} ${directMessageStyles['disabled']}`} />
+      <div className={`${directMessageStyles['inviteTempGroup']} ${directMessageStyles['disabled']}`} />
+      <div className={`${directMessageStyles['report']} ${directMessageStyles['disabled']}`} />
     </div>
   </div>
 );

@@ -33,6 +33,10 @@
   cursor: pointer;
 }
 
+.directOptionButtons .disabled {
+  cursor: not-allowed;
+}
+
 .directOptionButtons .fileShare {
   background-image: url(../../../public/im/Fileshare.png);
   background-size: contain;
@@ -103,7 +107,7 @@
   background-position: center;
 }
 
-.avatarPicture.non-friend {
+.avatarPicture.offline {
   filter: grayscale(100%);
 }
 
@@ -181,6 +185,11 @@
 .serverInName {
   margin-left: 5px;
   width: 100%;
+}
+
+.notifyArea {
+  display: flex;
+  padding: 5px;
 }
 
 .messageArea {

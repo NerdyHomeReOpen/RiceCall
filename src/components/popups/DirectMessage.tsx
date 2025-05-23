@@ -63,6 +63,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       currentServerId: targetCurrentServerId,
       badges: targetBadges,
     } = target;
+    const isOnline = targetCurrentServerId !== null;
     const { name: targetCurrentServerName } = targetCurrentServer;
 
     // Handlers
@@ -128,6 +129,12 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
         requestAnimationFrame(shake);
       };
       requestAnimationFrame(shake);
+    };
+
+    const handleServerSelect = (userId: User['userId'], server: Server) => {
+      setTimeout(() => {
+        socket.send.connectServer({ userId, serverId: server.serverId });
+      }, 1500);
     };
 
     // Effects
@@ -207,7 +214,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
             <div className={directMessage['targetBox']}>
               <div
                 className={`${directMessage['avatarPicture']} ${
-                  isFriend ? '' : directMessage['non-friend']
+                  isFriend && isOnline ? '' : directMessage['offline']
                 }`}
                 style={{ backgroundImage: `url(${targetAvatarUrl})` }}
               />
@@ -244,11 +251,21 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
           {/* Main Content */}
           <div className={directMessage['mainContent']}>
-            <div className={directMessage['serverInArea']}>
+            {isFriend && targetCurrentServerId && (
+            <div
+              className={directMessage['serverInArea']}
+              onClick={() => {
+                handleServerSelect(userId, targetCurrentServer)
+              }}
+            >
               <div className={directMessage['serverInIcon']} />
               <div className={directMessage['serverInName']}>
                 {targetCurrentServerName}
               </div>
+            </div>
+            )}
+            <div className={directMessage['notifyArea']}>
+              {isFriend ? '' : '對方不在你的好友列表，一些功能將無法使用!'}
             </div>
             <div className={directMessage['messageArea']}>
               <MessageViewer messages={directMessages} />
