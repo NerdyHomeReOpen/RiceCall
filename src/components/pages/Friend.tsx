@@ -120,7 +120,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
           <div
             className={friendPage['avatarPicture']}
             style={{ backgroundImage: `url(${userAvatarUrl})` }}
-            datatype={userStatus}
+            datatype={''}
           />
           <div className={friendPage['baseInfoBox']}>
             <div className={friendPage['container']}>

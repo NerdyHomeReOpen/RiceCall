@@ -313,7 +313,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
               backgroundImage: `url(${friendAvatarUrl})`,
               filter: !friendServerName ? 'grayscale(100%)' : '',
             }}
-            datatype={friendServerName ? friendStatus : ''}
+            datatype={friendServerName && friendStatus !== 'online' ? friendStatus : ''}
           />
           <div className={styles['baseInfoBox']}>
             <div className={styles['container']}>
