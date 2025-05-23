@@ -2,6 +2,8 @@ import { Server, Socket } from 'socket.io';
 
 // Error
 import StandardizedError from '@/error';
+import MemberApplicationNotFoundError from '@/errors/MemberApplicationNotFoundError';
+import AlreadyMemberError from '@/errors/AlreadyMemberError';
 
 // Utils
 import Logger from '@/utils/logger';
@@ -17,10 +19,13 @@ import {
   CreateMemberApplicationSchema,
   UpdateMemberApplicationSchema,
   DeleteMemberApplicationSchema,
+  ApproveMemberApplicationSchema,
 } from '@/api/socket/events/memberApplication/memberApplication.schema';
 
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
+
+import { MemberHandlerServerSide } from '../member/memberHandlerServerSide';
 
 export const CreateMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
@@ -221,6 +226,55 @@ export const DeleteMemberApplicationHandler: SocketRequestHandler = {
           message: `刪除成員申請失敗，請稍後再試`,
           part: 'DELETEMEMBERAPPLICATION',
           tag: 'SERVER_ERROR',
+          statusCode: 500,
+        });
+      }
+
+      socket.emit('error', error);
+    }
+  },
+};
+
+export const ApproveMemberApplicationHandler: SocketRequestHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
+    try {
+      const operatorId = socket.data.userId;
+
+      const { userId, serverId, member: preset } = await DataValidator.validate(
+        ApproveMemberApplicationSchema,
+        data,
+        'APPROVEMEMBERAPPLICATION',
+      );
+
+      new Logger('ApproveMemberApplication').info(
+        `User(${operatorId}) approve member application for User(${userId}) to Server(${serverId})`,
+      );
+
+      const memberApplication = await database.get.memberApplication(
+        userId,
+        serverId,
+      );
+      if (!memberApplication) throw new MemberApplicationNotFoundError(userId, serverId);
+
+      const member = await database.get.member(userId, serverId);
+      if (member) throw new AlreadyMemberError(userId, serverId);
+
+      await MemberHandlerServerSide.createMember(userId, serverId, preset);
+      await database.delete.memberApplication(userId, serverId);
+
+      socket.emit('memberApproval', {
+        userId,
+        serverId,
+      });
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        new Logger('ApproveMemberApplication').error(error.message);
+
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `處理成員申請失敗，請稍後再試`,
+          part: 'APPROVEMEMBERAPPLICATION',
+          tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
       }

@@ -34,6 +34,7 @@ import {
   CreateMemberApplicationHandler,
   DeleteMemberApplicationHandler,
   UpdateMemberApplicationHandler,
+  ApproveMemberApplicationHandler,
 } from './memberApplication/memberApplication.handler';
 import {
   SendDirectMessageHandler,
@@ -96,6 +97,10 @@ export default function (eventRouter: EventRouters) {
   eventRouter.addRoute(
     'deleteMemberApplication',
     DeleteMemberApplicationHandler,
+  );
+  eventRouter.addRoute(
+    'approveMemberApplication',
+    ApproveMemberApplicationHandler,
   );
 
   // Friend
