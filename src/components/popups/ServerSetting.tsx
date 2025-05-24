@@ -217,6 +217,35 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       );
     };
 
+    const handleMemberApproval = (userId: User['userId'], serverId: Server['serverId']) => {
+      setServerApplications((prev) =>
+        prev.filter(
+          (item) => !(item.userId === userId && item.serverId === serverId),
+        ),
+      );
+    };
+
+    const handleSocketError = (error: { message: string }) => {
+      handleOpenErrorDialog(error.message);
+    };
+
+    const handleApproveMemberApplication = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+      member?: Partial<Member>,
+    ) => {
+      if (!socket) return;
+      socket.send.approveMemberApplication({ userId, serverId, member });
+    };
+
+    const handleDeleteMemberApplication = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
+      if (!socket) return;
+      socket.send.deleteMemberApplication({ userId, serverId });
+    };
+
     const handleSort = <T extends ServerMember | MemberApplication>(
       field: keyof T,
       array: T[],
@@ -234,14 +263,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     ) => {
       if (!socket) return;
       socket.send.updateServer({ server, serverId });
-    };
-
-    const handleDeleteMemberApplication = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-    ) => {
-      if (!socket) return;
-      socket.send.deleteMemberApplication({ userId, serverId });
     };
 
     const handleUpdateMember = (
@@ -360,6 +381,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           handleServerMemberApplicationUpdate,
         [SocketServerEvent.SERVER_MEMBER_APPLICATION_DELETE]:
           handleServerMemberApplicationDelete,
+        [SocketServerEvent.MEMBER_APPROVAL]: handleMemberApproval,
+        [SocketServerEvent.ERROR]: handleSocketError,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -1135,14 +1158,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                 label: lang.tr.acceptApplication,
                                 show: canAccept,
                                 onClick: () => {
-                                  handleDeleteMemberApplication(
+                                  handleApproveMemberApplication(
                                     applicationUserId,
                                     serverId,
-                                  );
-                                  handleUpdateMember(
                                     { permissionLevel: 2 },
-                                    applicationUserId,
-                                    serverId,
                                   );
                                 },
                               },

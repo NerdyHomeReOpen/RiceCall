@@ -558,6 +558,12 @@ export type Channel = BaseChannel & {
   type: 'channel';
 };
 
+export type ApproveMemberApplicationPayload = {
+  userId: string;
+  serverId: string;
+  member?: Partial<Member>;
+};
+
 export type Member = {
   userId: string;
   serverId: string;
@@ -692,6 +698,7 @@ export enum SocketClientEvent {
   CREATE_MEMBER_APPLICATION = 'createMemberApplication',
   UPDATE_MEMBER_APPLICATION = 'updateMemberApplication',
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
+  APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
   // Message
   SEND_MESSAGE = 'message',
   SEND_DIRECT_MESSAGE = 'directMessage',
@@ -749,6 +756,7 @@ export enum SocketServerEvent {
   SERVER_MEMBER_APPLICATION_ADD = 'serverMemberApplicationAdd',
   SERVER_MEMBER_APPLICATION_UPDATE = 'serverMemberApplicationUpdate',
   SERVER_MEMBER_APPLICATION_DELETE = 'serverMemberApplicationDelete',
+  MEMBER_APPROVAL = 'memberApproval',
   // Message
   ON_MESSAGE = 'onMessage',
   ON_DIRECT_MESSAGE = 'onDirectMessage',

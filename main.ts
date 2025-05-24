@@ -70,6 +70,7 @@ enum SocketClientEvent {
   CREATE_MEMBER_APPLICATION = 'createMemberApplication',
   UPDATE_MEMBER_APPLICATION = 'updateMemberApplication',
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
+  APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
   // Friend Application
   CREATE_FRIEND_APPLICATION = 'createFriendApplication',
   UPDATE_FRIEND_APPLICATION = 'updateFriendApplication',
