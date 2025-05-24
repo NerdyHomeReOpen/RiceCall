@@ -256,11 +256,9 @@ export const ApproveMemberApplicationHandler: SocketRequestHandler = {
       );
       if (!memberApplication) throw new MemberApplicationNotFoundError(userId, serverId);
 
-      const member = await database.get.member(userId, serverId);
-      if (member) throw new AlreadyMemberError(userId, serverId);
-
-      await MemberHandlerServerSide.createMember(userId, serverId, preset);
+      // Member should already exist when joining the server
       await database.delete.memberApplication(userId, serverId);
+      await MemberHandlerServerSide.updateMember(userId, serverId, { permissionLevel: 2 });
 
       socket.emit('memberApproval', {
         userId,
