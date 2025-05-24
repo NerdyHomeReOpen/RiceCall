@@ -111,7 +111,7 @@ export default class SocketServer {
 
       // Echo
       socket.on('ping', async () => {
-        socket.emit('pong');
+        socket.emit('pong', 'pong');
       });
     });
 
