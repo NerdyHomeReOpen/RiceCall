@@ -588,7 +588,7 @@ export type Message = {
   // Change name to BaseMessage
   messageId: string;
   content: string;
-  type: 'general' | 'info' | 'dm';
+  type: 'general' | 'info' | 'warn' | 'dm';
   timestamp: number;
 };
 
@@ -611,6 +611,10 @@ export type DirectMessage = Message &
 export type InfoMessage = Message & {
   type: 'info';
 };
+
+export type WarnMessage = Message & {
+  type: 'warn';
+}
 
 export type UserServerStatus = {
   recent: boolean;
