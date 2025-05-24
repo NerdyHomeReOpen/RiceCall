@@ -131,10 +131,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const handleToggleMute = () => {
     try {
+      setIsMute(!isMute);
       localStream.current?.getAudioTracks().forEach((track) => {
         track.enabled = isMute;
       });
-      setIsMute(!isMute);
     } catch (error) {
       console.error('Error toggling mute:', error);
     }
@@ -242,14 +242,20 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const handleUpdateInputStream = useCallback(
     (deviceId: string) => {
+      if (localStream.current) {
+        localStream.current.getTracks().forEach(track => track.stop());
+      }
+      if (audioContext.current) {
+        audioContext.current.close().catch((err) => console.error('Error closing audio context:', err));
+      }
       navigator.mediaDevices
         .getUserMedia({
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: false,
+            ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
           },
-          ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
         })
         .then((stream) => {
           localStream.current = stream;
@@ -286,7 +292,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             }
             const volume = Math.sqrt(sum / dataArray.length);
             const volumePercent = Math.floor(Math.min(1, volume / 0.5) * 100);
-
             if (volumePercent > volumeThreshold.current) {
               if (volumePercentRef.current !== -1) {
                 volumePercentRef.current = volumePercent;
@@ -304,6 +309,20 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             requestAnimationFrame(detectSpeaking);
           };
           detectSpeaking();
+
+          queueMicrotask(() => {
+            Object.entries(peerConnections.current).forEach(([userId, pc]) => {
+              const sender = pc.getSenders().find((s) => s.track?.kind === 'audio');
+              const newTrack = destination.stream.getAudioTracks()[0];
+              if (sender) {
+                if (sender.track?.id !== newTrack.id) {
+                  sender.replaceTrack(newTrack);
+                } else {
+                  console.warn(`[${userId}] Track unchanged, skipping replaceTrack`);
+                }
+              }
+            });
+          });
         })
         .catch((err) => console.error('Error accessing microphone', err));
       handleUpdateMicVolume(null);
@@ -313,12 +332,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const handleUpdateOutputStream = useCallback(
     async (deviceId: string) => {
-      Object.values(peerAudioRefs.current).forEach((audio) =>
+      Object.values(peerAudioRefs.current).forEach((audio) => {
         audio
           .setSinkId(deviceId)
-          .catch((err) => console.error('Error accessing speaker:', err)),
-      );
-      handleUpdateSpeakerVolume(null);
+          .catch((err) => console.error('Error accessing speaker:', err));
+      });
+      setTimeout(() => {
+        handleUpdateSpeakerVolume(null);
+      }, 100);
     },
     [handleUpdateSpeakerVolume],
   );
@@ -621,43 +642,43 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     const getInputDeviceInfo = async (deviceId: string) => {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const deviceInfo = devices.find((d) => d.deviceId === deviceId);
-      console.info('New input stream device info:', deviceInfo);
+      // console.info('New input stream device info:', deviceInfo);
       handleUpdateInputStream(deviceId || '');
     };
 
     const getOutputDeviceInfo = async (deviceId: string) => {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const deviceInfo = devices.find((d) => d.deviceId === deviceId);
-      console.info('New output stream device info:', deviceInfo);
+      // console.info('New output stream device info:', deviceInfo);
       handleUpdateOutputStream(deviceId || '');
     };
 
     ipcService.systemSettings.inputAudioDevice.get((deviceId) => {
       getInputDeviceInfo(deviceId);
-      handleUpdateInputStream(deviceId || '');
+      // handleUpdateInputStream(deviceId || '');
     });
 
-    // const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate(
-    //   (deviceId) => {
-    //     getInputDeviceInfo(deviceId);
-    //     handleUpdateInputStream(deviceId || '');
-    //   },
-    // );
+    const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate(
+      (deviceId) => {
+        getInputDeviceInfo(deviceId);
+        // handleUpdateInputStream(deviceId || '');
+      },
+    );
 
     ipcService.systemSettings.outputAudioDevice.get((deviceId) => {
       getOutputDeviceInfo(deviceId);
-      handleUpdateOutputStream(deviceId || '');
+      // handleUpdateOutputStream(deviceId || '');
     });
 
-    // const offUpdateOutput =
-    //   ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
-    //     getOutputDeviceInfo(deviceId);
-    //     handleUpdateOutputStream(deviceId || '');
-    //   });
+    const offUpdateOutput =
+      ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
+        getOutputDeviceInfo(deviceId);
+        // handleUpdateOutputStream(deviceId || '');
+      });
 
     return () => {
-      // offUpdateInput();
-      // offUpdateOutput();
+      offUpdateInput();
+      offUpdateOutput();
 
       if (localStream.current) {
         localStream.current.getTracks().forEach((track) => track.stop());
