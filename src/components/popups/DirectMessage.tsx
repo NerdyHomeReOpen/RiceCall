@@ -132,6 +132,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     };
 
     const handleServerSelect = (userId: User['userId'], server: Server) => {
+      window.localStorage.setItem(
+        'trigger-handle-server-select',
+        JSON.stringify({
+          serverDisplayId: server.displayId,
+          timestamp: Date.now(),
+        }),
+      );
       setTimeout(() => {
         socket.send.connectServer({ userId, serverId: server.serverId });
       }, 1500);
