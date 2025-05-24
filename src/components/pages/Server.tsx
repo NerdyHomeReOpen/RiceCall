@@ -443,14 +443,25 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                           ? styles['muted']
                           : styles['active']
                       }`}
+                    onMouseEnter={(e) => {
+                      e.stopPropagation();
+                      setShowMicVolume(true);
+                      setShowSpeakerVolume(false);
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setShowMicVolume(!showMicVolume);
+                      // setShowMicVolume(!showMicVolume);
                       setShowSpeakerVolume(false);
                     }}
                   />
                   {showMicVolume && (
-                    <div className={styles['volumeSlider']}>
+                    <div
+                      className={styles['volumeSlider']}
+                      onMouseLeave={(e) => {
+                        e.stopPropagation();
+                        setShowMicVolume(false);
+                      }}
+                    >
                       <input
                         type="range"
                         min="0"
@@ -471,14 +482,25 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     className={`${styles['speakerButton']} ${
                       webRTC.speakerVolume === 0 ? styles['muted'] : ''
                     }`}
+                    onMouseEnter={(e) => {
+                      e.stopPropagation();
+                      setShowSpeakerVolume(true);
+                      setShowMicVolume(false);
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setShowSpeakerVolume(!showSpeakerVolume);
+                      // setShowSpeakerVolume(!showSpeakerVolume);
                       setShowMicVolume(false);
                     }}
                   />
                   {showSpeakerVolume && (
-                    <div className={styles['volumeSlider']}>
+                    <div
+                      className={styles['volumeSlider']}
+                      onMouseLeave={(e) => {
+                        e.stopPropagation();
+                        setShowSpeakerVolume(false);
+                      }}
+                    >
                       <input
                         type="range"
                         min="0"
