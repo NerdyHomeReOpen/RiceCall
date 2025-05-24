@@ -95,6 +95,10 @@
   gap: 5px;
 }
 
+.baseInfoBox .container.hasServer {
+  cursor: pointer
+}
+
 .gradeIcon {
   cursor: default;
 }

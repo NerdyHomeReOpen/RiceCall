@@ -138,6 +138,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
         >
           {friendGroupFriends.map((friend) => (
             <FriendCard
+              user={user}
               key={friend.targetId}
               friend={friend}
               selectedItemId={selectedItemId}
@@ -153,13 +154,14 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
 FriendGroupTab.displayName = 'FriendGroupTab';
 
 interface FriendCardProps {
+  user: User;
   friend: UserFriend;
   selectedItemId: string | null;
   setSelectedItemId: (id: string | null) => void;
 }
 
 const FriendCard: React.FC<FriendCardProps> = React.memo(
-  ({ friend, selectedItemId, setSelectedItemId }) => {
+  ({ user, friend, selectedItemId, setSelectedItemId }) => {
     // Hooks
     const lang = useLanguage();
     const contextMenu = useContextMenu();
@@ -171,11 +173,12 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
     const refreshed = useRef(false);
 
     // States
-    const [friendServerName, setFriendServerName] = useState<Server['name']>(
-      createDefault.server().name,
+    const [friendServer, setFriendServer] = useState<Server>(
+      createDefault.server(),
     );
 
     // Variables
+    const { userId } = user;
     const {
       userId: friendUserId,
       targetId: friendTargetId,
@@ -188,10 +191,27 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
       status: friendStatus,
       currentServerId: friendCurrentServerId,
     } = friend;
+    const {
+      serverId,
+      displayId: friendServerDisplayId,
+      name: friendServerName,
+    } = friendServer;
     const isCurrentUser = friendTargetId === friendUserId;
     const canManageFriend = !isCurrentUser;
 
     // Handlers
+    const handleServerSelect = (userId: User['userId'], server: Server) => {
+      window.localStorage.setItem(
+        'trigger-handle-server-select',
+        JSON.stringify({
+          serverDisplayId: server.displayId,
+          timestamp: Date.now(),
+        }),
+      );
+      setTimeout(() => {
+        socket.send.connectServer({ userId, serverId: server.serverId });
+      }, 1500);
+    };
 
     const handleDeleteFriend = (
       userId: User['userId'],
@@ -205,7 +225,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
     };
 
     const handleServerUpdate = (data: Server) => {
-      setFriendServerName(data.name);
+      setFriendServer(data);
     };
 
     const handleOpenWarning = (message: string, callback: () => void) => {
@@ -335,7 +355,15 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
               <BadgeListViewer badges={friendBadges} maxDisplay={5} />
             </div>
             {friendServerName ? (
-              <div className={styles['container']}>
+              <div
+                className={`
+                  ${styles['container']}
+                  ${friendServerName ? styles['hasServer'] : ''}
+                `}
+                onClick={() => {
+                  handleServerSelect(userId, friendServer)
+                }}
+              >
                 <div className={styles['location']} />
                 <div className={styles['serverName']}>{friendServerName}</div>
               </div>
