@@ -82,20 +82,19 @@
   display: flex;
   align-items: center;
   flex-direction: row;
-  width: 100%;
 }
 
 .pageHeaderText::after {
   content: '';
-  width: 100%;
+  flex: 1;
   height: 1px;
   background: #0073c6;
 }
 
 .label {
   display: flex;
-  height: 2rem;
-  min-width: fit-content;
+  min-height: 2rem;
+  width: fit-content;
   padding: 5px 5px 5px 0;
 }
 
