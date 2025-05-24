@@ -191,11 +191,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
       status: friendStatus,
       currentServerId: friendCurrentServerId,
     } = friend;
-    const {
-      serverId,
-      displayId: friendServerDisplayId,
-      name: friendServerName,
-    } = friendServer;
+    const { name: friendServerName } = friendServer;
     const isCurrentUser = friendTargetId === friendUserId;
     const canManageFriend = !isCurrentUser;
 
@@ -333,7 +329,9 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
               backgroundImage: `url(${friendAvatarUrl})`,
               filter: !friendServerName ? 'grayscale(100%)' : '',
             }}
-            datatype={friendServerName && friendStatus !== 'online' ? friendStatus : ''}
+            datatype={
+              friendServerName && friendStatus !== 'online' ? friendStatus : ''
+            }
           />
           <div className={styles['baseInfoBox']}>
             <div className={styles['container']}>
@@ -361,7 +359,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
                   ${friendServerName ? styles['hasServer'] : ''}
                 `}
                 onClick={() => {
-                  handleServerSelect(userId, friendServer)
+                  handleServerSelect(userId, friendServer);
                 }}
               >
                 <div className={styles['location']} />
