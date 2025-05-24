@@ -1482,10 +1482,10 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       if (!socket) return;
       let start = Date.now();
       let end = Date.now();
-      socket.send.ping(null);
+      socket.send.ping('ping');
       const measure = setInterval(() => {
         start = Date.now();
-        socket.send.ping(null);
+        socket.send.ping('ping');
       }, 10000);
       const clearPong = socket.on.pong(() => {
         end = Date.now();
