@@ -57,9 +57,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     serverMembers,
     serverChannels,
     expanded,
-    setExpanded,
     selectedItemId,
     selectedItemType,
+    setExpanded,
     setSelectedItemId,
     setSelectedItemType,
   }) => {
@@ -379,7 +379,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 label: lang.tr.setDefaultChannel,
                 show: canSetReceptionLobby,
                 onClick: () =>
-                  handleUpdateServer({ receptionLobbyId: categoryId }, serverId),
+                  handleUpdateServer(
+                    { receptionLobbyId: categoryId },
+                    serverId,
+                  ),
               },
             ]);
           }}
@@ -397,10 +400,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               }))
             }
           />
-          <div className={`
+          <div
+            className={`
             ${styles['channelTabLable']}
             ${isReceptionLobby ? styles['isReceptionLobby'] : ''}
-          `}>
+          `}
+          >
             {categoryName}
           </div>
           <div className={styles['channelTabCount']}>
@@ -727,7 +732,11 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 label: lang.tr.addSubChannel,
                 show: canCreateSub,
                 onClick: () =>
-                  handleOpenCreateChannel(serverId, (channelCategoryId ? channelCategoryId : channelId), userId),
+                  handleOpenCreateChannel(
+                    serverId,
+                    channelCategoryId ? channelCategoryId : channelId,
+                    userId,
+                  ),
               },
               {
                 id: 'deleteChannel',
@@ -1050,33 +1059,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       e.dataTransfer.setData('userId', userId);
       e.dataTransfer.setData('currentChannelId', channelId);
     };
-
-    // const handleShowUserInfoCard = () => {
-    //   if (contextMenu.isContextMenuVisible) {
-    //     return;
-    //   }
-    //   contextMenu.cancelDelayedCloseUserInfoBlock();
-
-    //   if (qualifyingEventRef.current && userTabRef.current) {
-    //     const rect = userTabRef.current.getBoundingClientRect();
-    //     const cardX = rect.right - 100;
-    //     const cardY = rect.top;
-
-    //   }
-    // };
-
-    // const handleClearTimeout = () => {
-    //   if (hoverTimeoutRef.current) {
-    //     clearTimeout(hoverTimeoutRef.current);
-    //     hoverTimeoutRef.current = null;
-    //   }
-    // };
-
-    // const handleStartTimeout = (event: React.MouseEvent<HTMLDivElement>) => {
-    //   handleClearTimeout();
-    //   qualifyingEventRef.current = event;
-    //   hoverTimeoutRef.current = setTimeout(handleShowUserInfoCard, HOVER_DELAY);
-    // };
 
     return (
       <div
@@ -1497,49 +1479,6 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       };
     }, [socket]);
 
-    // useEffect(() => {
-    //   if (currentChannel) {
-    //     setSelectedItemId(currentChannel.channelId);
-    //     setSelectedItemType('channel');
-    //   }
-    // }, [currentChannel, currentChannel.channelId]);
-
-    // useEffect(() => {
-    //   const handleClickOutside = (event: MouseEvent) => {
-    //     if (event.button === 2) {
-    //       const targetElement = event.target as HTMLElement;
-    //       const userTab = targetElement.closest(`.${styles['userTab']}`);
-    //       const channelTab = targetElement.closest(`.${styles['channelTab']}`);
-    //       if (
-    //         userTab?.classList.contains(styles['selected']) ||
-    //         channelTab?.classList.contains(styles['selected'])
-    //       ) {
-    //         return;
-    //       }
-    //     }
-
-    //     if (
-    //       viewerRef.current &&
-    //       !viewerRef.current.contains(event.target as Node)
-    //     ) {
-    //       setSelectedChannelId(null, null);
-    //     } else if (event.target instanceof HTMLElement) {
-    //       const targetElement = event.target as HTMLElement;
-    //       const isUserTab = targetElement.closest(`.${styles['userTab']}`);
-    //       const isChannelTab = targetElement.closest(
-    //         `.${styles['channelTab']}`,
-    //       );
-    //       if (!isUserTab && !isChannelTab) {
-    //         setSelectedChannelId(null, null);
-    //       }
-    //     }
-    //   };
-    //   document.addEventListener('mousedown', handleClickOutside);
-    //   return () => {
-    //     document.removeEventListener('mousedown', handleClickOutside);
-    //   };
-    // }, [setSelectedChannelId]);
-
     return (
       <>
         {/* Header */}
@@ -1591,22 +1530,6 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                     icon: 'memberapply',
                     onClick: () => handleOpenApplyMember(userId, serverId),
                   },
-                  // {
-                  //   id: 'memberChat',
-                  //   label: '會員群聊',
-                  //   show: memberPermission > 2,
-                  //   onClick: () => {},
-                  // },
-                  // {
-                  //   id: 'admin',
-                  //   label: '查看管理員',
-                  //   onClick: () => {},
-                  // },
-                  // {
-                  //   id: 'separator',
-                  //   label: '',
-                  //   show: canEditNickname,
-                  // },
                   {
                     id: 'editNickname',
                     label: lang.tr.editNickname,
@@ -1620,15 +1543,16 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                     icon: 'locateme',
                     onClick: () => handleLocateUser(),
                   },
-                  // {
-                  //   id: 'separator',
-                  //   label: '',
-                  // },
-                  // {
-                  //   id: 'report',
-                  //   label: '舉報',
-                  //   onClick: () => {},
-                  // },
+                  {
+                    id: 'separator',
+                    label: '',
+                  },
+                  {
+                    id: 'report',
+                    label: '舉報',
+                    disabled: true,
+                    onClick: () => {},
+                  },
                   {
                     id: 'favorite',
                     label: isFavorite ? lang.tr.unfavorite : lang.tr.favorite,

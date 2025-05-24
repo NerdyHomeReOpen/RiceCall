@@ -55,7 +55,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
       level: userLevel,
       vip: userVip,
       badges: userBadges,
-      status: userStatus,
     } = user;
 
     // Handlers
