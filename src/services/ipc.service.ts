@@ -40,7 +40,14 @@ const ipcService = {
       ipcRenderer.send(event, ...args);
     },
     on: (
-      event: SocketServerEvent | 'connect' | 'reconnect' | 'disconnect',
+      event:
+        | SocketServerEvent
+        | 'connect'
+        | 'reconnect'
+        | 'disconnect'
+        | 'connect_error'
+        | 'reconnect_error'
+        | 'error',
       callback: (...args: any[]) => void,
     ) => {
       if (!isElectron) return () => {};

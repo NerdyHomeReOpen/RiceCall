@@ -34,7 +34,6 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
-import StandardizedError, { errorHandler } from '@/utils/errorHandler';
 import {
   THEME_CHANGE_EVENT,
   applyThemeToReactState,
@@ -619,36 +618,6 @@ const RootPageComponent = () => {
     setChannelMessages((prev) => [...prev, ...channelMessages]);
   };
 
-  const handleError = (error: StandardizedError) => {
-    new errorHandler(error).show();
-  };
-
-  const handleConnectError = () => {
-    new errorHandler(
-      new StandardizedError({
-        name: 'ConnectError',
-        message: '連線失敗',
-        part: 'SOCKET',
-        tag: 'CONNECT_ERROR',
-        statusCode: 500,
-        handler: () => ipcService.auth.logout(),
-      }),
-    ).show();
-  };
-
-  const handleReconnectError = () => {
-    new errorHandler(
-      new StandardizedError({
-        name: 'ReconnectError',
-        message: '重新連線失敗',
-        part: 'SOCKET',
-        tag: 'RECONNECT_ERROR',
-        statusCode: 500,
-        handler: () => ipcService.auth.logout(),
-      }),
-    ).show();
-  };
-
   const handleOpenPopup = (popup: {
     type: PopupType;
     id: string; // FIXME: Server didn't return this
@@ -717,9 +686,6 @@ const RootPageComponent = () => {
       [SocketServerEvent.SERVER_CHANNEL_DELETE]: handleServerChannelDelete,
       [SocketServerEvent.ON_MESSAGE]: handleOnMessages,
       [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
-      [SocketServerEvent.ERROR]: handleError,
-      [SocketServerEvent.CONNECT_ERROR]: handleConnectError,
-      [SocketServerEvent.RECONNECT_ERROR]: handleReconnectError,
     };
     const unsubscribe: (() => void)[] = [];
 
