@@ -84,10 +84,20 @@ interface WebRTCProviderProps {
 
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // States
-  const [isMute, setIsMute] = useState<boolean>(false);
+  const [isMute, setIsMute] = useState<boolean>(() => {
+    const localMute = window.localStorage.getItem('isMute');
+    return localMute !== null ? localMute === 'true' : false;
+  });
   const [bitrate, setBitrate] = useState<number>(128000);
-  const [micVolume, setMicVolume] = useState<number>(100);
-  const [speakerVolume, setSpeakerVolume] = useState<number>(100);
+  const [micVolume, setMicVolume] = useState<number>(() => {
+    const localMicVolume = window.localStorage.getItem('inputVolume');
+    return localMicVolume !== null ? parseInt(localMicVolume) : 100;
+  });
+  const [speakerVolume, setSpeakerVolume] = useState<number>(() => {
+    const localSpeakerVolume = window.localStorage.getItem('outputVolume');
+    return localSpeakerVolume !== null ? parseInt(localSpeakerVolume) : 100;
+  });
+  const [muteVolumeCheck, setMuteVolumeCheck] = useState<boolean>(false);
   const [speakStatus, setSpeakStatus] = useState<{ [id: string]: number }>({});
   const [volumePercent, setVolumePercent] = useState<number>(0);
   const [muteList, setMuteList] = useState<string[]>([]);
@@ -129,12 +139,16 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     });
   };
 
-  const handleToggleMute = () => {
+  const handleToggleMute = (hasNewDevice = false) => {
     try {
-      setIsMute(!isMute);
+      const muted = hasNewDevice ? window.localStorage.getItem('isMute') !== 'true': isMute;
+      const localVolume = window.localStorage.getItem('inputVolume');
+      
       localStream.current?.getAudioTracks().forEach((track) => {
-        track.enabled = isMute;
+        track.enabled = (muted && (localVolume != null ? parseInt(localVolume) : micVolume) > 0 );
       });
+      setMuteVolumeCheck(muted);
+      setIsMute(!muted);
     } catch (error) {
       console.error('Error toggling mute:', error);
     }
@@ -168,7 +182,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   );
 
   const handleUpdateMicVolume = useCallback(
-    (volume: number | null) => {
+    (volume: number | null, hasNewDevice = false) => {
       try {
         if (!audioContext.current) {
           console.warn('No audio context');
@@ -216,7 +230,16 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
               );
           }
         });
-        setMicVolume(newVolume);
+        if (muteVolumeCheck && newVolume > 0) {
+          localStream.current?.getAudioTracks().forEach((track) => {
+            track.enabled = true;
+          });
+          setMuteVolumeCheck(false);
+        }
+
+        if (!hasNewDevice) {
+          setMicVolume(newVolume);
+        }
       } catch (error) {
         console.error('Error updating microphone volume:', error);
       }
@@ -225,14 +248,17 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   );
 
   const handleUpdateSpeakerVolume = useCallback(
-    (volume: number | null) => {
+    (volume: number | null, hasNewDevice = false) => {
       try {
         // Set volume
-        const newVolume = volume !== null ? volume : speakerVolume;
+        const localVolume = window.localStorage.getItem('outputVolume');
+        const newVolume = volume !== null ? volume : (hasNewDevice && localVolume ? parseInt(localVolume) : speakerVolume);
         Object.entries(peerAudioRefs.current).forEach(([userId, audio]) => {
           if (!muteList.includes(userId)) audio.volume = newVolume / 100;
         });
-        setSpeakerVolume(newVolume);
+        if (!hasNewDevice) {
+          setSpeakerVolume(newVolume);
+        }
       } catch (error) {
         console.error('Error updating speaker volume:', error);
       }
@@ -244,9 +270,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     (deviceId: string) => {
       if (localStream.current) {
         localStream.current.getTracks().forEach(track => track.stop());
-      }
-      if (audioContext.current) {
-        audioContext.current.close().catch((err) => console.error('Error closing audio context:', err));
       }
       navigator.mediaDevices
         .getUserMedia({
@@ -310,6 +333,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           };
           detectSpeaking();
 
+          // Update track
           queueMicrotask(() => {
             Object.entries(peerConnections.current).forEach(([userId, pc]) => {
               const sender = pc.getSenders().find((s) => s.track?.kind === 'audio');
@@ -323,9 +347,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
               }
             });
           });
+          handleToggleMute(true); // (hasNewDevice = false)
         })
         .catch((err) => console.error('Error accessing microphone', err));
-      handleUpdateMicVolume(null);
+      handleUpdateMicVolume(null, true); // (null, hasNewDevice = false)
     },
     [handleUpdateMicVolume],
   );
@@ -337,9 +362,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           .setSinkId(deviceId)
           .catch((err) => console.error('Error accessing speaker:', err));
       });
-      setTimeout(() => {
-        handleUpdateSpeakerVolume(null);
-      }, 100);
+      handleUpdateSpeakerVolume(null, true);
     },
     [handleUpdateSpeakerVolume],
   );
@@ -640,15 +663,15 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
     // Get input device info
     const getInputDeviceInfo = async (deviceId: string) => {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const deviceInfo = devices.find((d) => d.deviceId === deviceId);
-      // console.info('New input stream device info:', deviceInfo);
+      // const devices = await navigator.mediaDevices.enumerateDevices();
+      // const deviceInfo = devices.find((d) => d.deviceId === deviceId);
+      // // console.info('New input stream device info:', deviceInfo);
       handleUpdateInputStream(deviceId || '');
     };
 
     const getOutputDeviceInfo = async (deviceId: string) => {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const deviceInfo = devices.find((d) => d.deviceId === deviceId);
+      // const devices = await navigator.mediaDevices.enumerateDevices();
+      // const deviceInfo = devices.find((d) => d.deviceId === deviceId);
       // console.info('New output stream device info:', deviceInfo);
       handleUpdateOutputStream(deviceId || '');
     };
@@ -699,6 +722,16 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    /* 延遲避免過快寫入，但使用者如果拉太快會導致判斷錯誤 */
+    // if (volumeSaveTimeout.current) clearTimeout(volumeSaveTimeout.current);
+    // volumeSaveTimeout.current = setTimeout(() => {
+      window.localStorage.setItem('inputVolume', micVolume.toString());
+      window.localStorage.setItem('outputVolume', speakerVolume.toString());
+      window.localStorage.setItem('isMute', (isMute).toString());
+    // }, 100);
+  }, [micVolume, speakerVolume, isMute, muteVolumeCheck]);
 
   useEffect(() => {
     for (const dataChannel of Object.values(peerDataChannels.current)) {
