@@ -242,7 +242,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
       }
 
       // Blocked member
-      if (update.isBlocked != null) {
+      if (update.isBlocked !== 0) {
         if (update.isBlocked === -1) { // Ban member
           io.to(`server_${serverId}`).emit('onMessage', {
             serverId: serverId,
