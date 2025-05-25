@@ -138,8 +138,13 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         'UPDATEMEMBER',
       );
 
+      // Target User
       const userMember = await database.get.member(userId, serverId);
+      const user = await database.get.user(userId);
+
+      // Operator
       const operatorMember = await database.get.member(operatorId, serverId);
+      const operator = await database.get.user(operatorId);
 
       if (operatorId !== userId) {
         if (operatorMember.permissionLevel < 3)
@@ -209,8 +214,14 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         io.to(`server_${serverId}`).emit('onMessage', {
           serverId: serverId,
           channelId: null,
-          sender: operatorMember,
-          receiver: updatedUserMember,
+          sender: {
+            ...operatorMember,
+            ...operator
+          },
+          receiver: {
+            ...updatedUserMember,
+            ...user
+          },
           type: 'event',
           content: 'updateMemberMessage',
           timestamp: Date.now().valueOf(),
@@ -221,8 +232,14 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         io.to(`server_${serverId}`).emit('onMessage', {
           serverId: serverId,
           channelId: null,
-          sender: operatorMember,
-          receiver: updatedUserMember,
+          sender: {
+            ...operatorMember,
+            ...operator
+          },
+          receiver: {
+            ...updatedUserMember,
+            ...user
+          },
           type: 'event',
           content: 'updateChannelManagerMessage',
           timestamp: Date.now().valueOf(),
@@ -233,8 +250,14 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         io.to(`server_${serverId}`).emit('onMessage', {
           serverId: serverId,
           channelId: null,
-          sender: operatorMember,
-          receiver: updatedUserMember,
+          sender: {
+            ...operatorMember,
+            ...operator
+          },
+          receiver: {
+            ...updatedUserMember,
+            ...user
+          },
           type: 'event',
           content: 'updateServerManagerMessage',
           timestamp: Date.now().valueOf(),
@@ -247,8 +270,14 @@ export const UpdateMemberHandler: SocketRequestHandler = {
           io.to(`server_${serverId}`).emit('onMessage', {
             serverId: serverId,
             channelId: null,
-            sender: operatorMember,
-            receiver: updatedUserMember,
+            sender: {
+              ...operatorMember,
+              ...operator
+            },
+            receiver: {
+              ...updatedUserMember,
+              ...user
+            },
             type: 'warn',
             content: 'blockedMemberMessage',
             timestamp: Date.now().valueOf(),
@@ -258,8 +287,14 @@ export const UpdateMemberHandler: SocketRequestHandler = {
           io.to(`server_${serverId}`).emit('onMessage', {
             serverId: serverId,
             channelId: null,
-            sender: operatorMember,
-            receiver: updatedUserMember,
+            sender: {
+              ...operatorMember, 
+              ...operator
+            },
+            receiver: {
+              ...updatedUserMember,
+              ...user
+            },
             type: 'warn',
             content: 'timeoutMemberMessage',
             timestamp: Date.now().valueOf(),

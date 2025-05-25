@@ -250,8 +250,12 @@ export const DisconnectServerHandler: SocketRequestHandler = {
         'DISCONNECTSERVER',
       );
 
+      // Target User
       const user = await database.get.user(userId);
       const userMember = await database.get.member(userId, serverId);
+
+      // Operator
+      const operator = await database.get.user(operatorId);
       const operatorMember = await database.get.member(operatorId, serverId);
 
       if (operatorId !== userId) {
@@ -301,15 +305,21 @@ export const DisconnectServerHandler: SocketRequestHandler = {
           .emit('serverOnlineMemberDelete', userId, serverId);
 
         if (operatorId !== userId) {
-          io.to(`server_${serverId}`).emit('onMessage', {
-            serverId: serverId,
-            channelId: null,
-            sender: operatorMember,
-            receiver: userMember, // target user member
-            type: 'warn',
-            content: 'userKickedServerMessage',
-            timestamp: Date.now().valueOf(),
-          });
+          // io.to(`server_${serverId}`).emit('onMessage', {
+          //   serverId: serverId,
+          //   channelId: null,
+          //   sender: {
+          //     ...operatorMember,
+          //     ...operator
+          //   },
+          //   receiver: {
+          //     ...userMember,
+          //     ...user
+          //   }, 
+          //   type: 'warn',
+          //   content: 'userKickedServerMessage',
+          //   timestamp: Date.now().valueOf(),
+          // });
           
           targetSocket.emit('openPopup', {
             type: 'dialogAlert',

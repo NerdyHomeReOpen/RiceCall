@@ -40,6 +40,8 @@ export const SendMessageHandler: SocketRequestHandler = {
       } = await DataValidator.validate(SendMessageSchema, data, 'SENDMESSAGE');
 
       const channel = await database.get.channel(channelId);
+
+      const operator = await database.get.user(operatorId);
       const operatorMember = await database.get.member(operatorId, serverId);
 
       // if (operatorId !== userId) {
@@ -67,7 +69,7 @@ export const SendMessageHandler: SocketRequestHandler = {
         ...preset,
         sender: {
           ...operatorMember,
-          ...(await database.get.user(operatorId)),
+          ...operator,
         },
         receiver: null, // Channel message does not have a receiver
         senderId: userId, // 前端改完格式後刪除
