@@ -77,12 +77,13 @@
 }
 
 .baseInfoBox {
-  width: 120px;
+  width: 16rem;
   height: 52px;
   display: flex;
   right: 5px;
+  gap: 10px;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: flex-end;
   position: relative;
   color: #777777;
 }
@@ -109,6 +110,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   color: #666666;
+  line-height: 1rem;
 }
 
 .idText,
@@ -148,13 +150,11 @@
   gap: 5px;
   height: auto;
   min-width: 40px;
+  padding: 0 5px;
   display: flex;
   align-items: center;
-  position: absolute;
   justify-content: flex-end;
-  margin-left: auto;
-  bottom: 5px;
-  right: 5px;
+  margin: auto;
 }
 
 .navItem:first-child:hover::before,
