@@ -138,7 +138,7 @@ export const ConnectServerHandler: SocketRequestHandler = {
 
       if (reason) {
         new Logger('ConnectServer').warn(
-          `User(${operatorId}) failed to connect to server(${serverId}): ${reason}`,
+          `User(${userId}) failed to connect to server(${serverId}) (Operator: ${operatorId}): ${reason}`,
         );
         return;
       }
@@ -215,7 +215,7 @@ export const ConnectServerHandler: SocketRequestHandler = {
       /* ========== End of Handling ========== */
 
       new Logger('ConnectServer').info(
-        `User(${operatorId}) connected to server(${serverId})`,
+        `User(${operatorId}) connected to server(${serverId}) (Operator: ${operatorId})`,
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
@@ -270,7 +270,7 @@ export const DisconnectServerHandler: SocketRequestHandler = {
 
       if (reason) {
         new Logger('DisconnectServer').warn(
-          `User(${operatorId}) failed to disconnect from server(${serverId}): ${reason}`,
+          `User(${userId}) failed to disconnect from server(${serverId}) (Operator: ${operatorId}): ${reason}`,
         );
         return;
       }
@@ -301,6 +301,16 @@ export const DisconnectServerHandler: SocketRequestHandler = {
           .emit('serverOnlineMemberDelete', userId, serverId);
 
         if (operatorId !== userId) {
+          io.to(`server_${serverId}`).emit('onMessage', {
+            serverId: serverId,
+            channelId: null,
+            sender: operatorMember,
+            receiver: userMember, // target user member
+            type: 'warn',
+            content: 'userKickedServerMessage',
+            timestamp: Date.now().valueOf(),
+          });
+          
           targetSocket.emit('openPopup', {
             type: 'dialogAlert',
             id: 'kick',
@@ -315,7 +325,7 @@ export const DisconnectServerHandler: SocketRequestHandler = {
       /* ========== End of Handling ========== */
 
       new Logger('DisconnectServer').info(
-        `User(${operatorId}) disconnected from server(${serverId})`,
+        `User(${userId}) disconnected from server(${serverId}) (Operator: ${operatorId})`,
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {

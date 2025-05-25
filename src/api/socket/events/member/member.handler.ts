@@ -190,12 +190,81 @@ export const UpdateMemberHandler: SocketRequestHandler = {
       // Update member
       await database.set.member(userId, serverId, update);
 
+      // Updated member Data
+      const updatedUserMember = {
+        ...userMember,
+        ...update,
+      };
+
       // Send socket event
       const targetSocket =
         operatorId === userId ? socket : SocketServer.getSocket(userId);
 
       if (targetSocket) {
         targetSocket.emit('serverUpdate', serverId, update);
+      }
+
+      if (update.permissionLevel === 2) {
+        // update user to member;
+        io.to(`server_${serverId}`).emit('onMessage', {
+          serverId: serverId,
+          channelId: null,
+          sender: operatorMember,
+          receiver: updatedUserMember,
+          type: 'event',
+          content: 'updateMemberMessage',
+          timestamp: Date.now().valueOf(),
+        });
+
+      } else if (update.permissionLevel === 3 || update.permissionLevel === 4) {
+        // update member to channelManager or CategoryManager
+        io.to(`server_${serverId}`).emit('onMessage', {
+          serverId: serverId,
+          channelId: null,
+          sender: operatorMember,
+          receiver: updatedUserMember,
+          type: 'event',
+          content: 'updateChannelManagerMessage',
+          timestamp: Date.now().valueOf(),
+        });
+
+      } else if (update.permissionLevel === 5) {
+        // update member to serverManager
+        io.to(`server_${serverId}`).emit('onMessage', {
+          serverId: serverId,
+          channelId: null,
+          sender: operatorMember,
+          receiver: updatedUserMember,
+          type: 'event',
+          content: 'updateServerManagerMessage',
+          timestamp: Date.now().valueOf(),
+        });
+      }
+
+      // Blocked member
+      if (update.isBlocked != null) {
+        if (update.isBlocked === -1) { // Ban member
+          io.to(`server_${serverId}`).emit('onMessage', {
+            serverId: serverId,
+            channelId: null,
+            sender: operatorMember,
+            receiver: updatedUserMember,
+            type: 'warn',
+            content: 'blockedMemberMessage',
+            timestamp: Date.now().valueOf(),
+          });
+
+        } else { // Timeout member
+          io.to(`server_${serverId}`).emit('onMessage', {
+            serverId: serverId,
+            channelId: null,
+            sender: operatorMember,
+            receiver: updatedUserMember,
+            type: 'warn',
+            content: 'timeoutMemberMessage',
+            timestamp: Date.now().valueOf(),
+          });
+        }
       }
 
       io.to(`server_${serverId}`).emit(

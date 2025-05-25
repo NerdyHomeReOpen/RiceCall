@@ -42,13 +42,13 @@ export const SendMessageHandler: SocketRequestHandler = {
       const channel = await database.get.channel(channelId);
       const operatorMember = await database.get.member(operatorId, serverId);
 
-      if (operatorId !== userId) {
-        reason = 'Cannot send non-self message';
-      }
+      // if (operatorId !== userId) {
+      //   reason = 'Cannot send non-self message';
+      // }
 
       if (reason) {
         new Logger('SendMessage').warn(
-          `User(${operatorId}) failed to send message(${userId}): ${reason}`,
+          `User(${operatorId}) failed to send message to channel(${channelId}): ${reason}`,
         );
         return;
       }
@@ -65,9 +65,12 @@ export const SendMessageHandler: SocketRequestHandler = {
       // Create new message
       const message = {
         ...preset,
-        ...(await database.get.member(userId, serverId)),
-        ...(await database.get.user(userId)),
-        senderId: userId,
+        sender: {
+          ...operatorMember,
+          ...(await database.get.user(operatorId)),
+        },
+        receiver: null, // Channel message does not have a receiver
+        senderId: userId, // 前端改完格式後刪除
         serverId: serverId,
         channelId: channelId,
         timestamp: Date.now().valueOf(),
@@ -90,7 +93,7 @@ export const SendMessageHandler: SocketRequestHandler = {
       /* ========== End of Handling ========== */
 
       new Logger('SendMessage').info(
-        `User(${operatorId}) sent message(${userId})`,
+        `User(${operatorId}) sent message to channel(${channelId})`,
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
@@ -135,7 +138,7 @@ export const SendDirectMessageHandler: SocketRequestHandler = {
 
       if (reason) {
         new Logger('SendDirectMessage').warn(
-          `User(${operatorId}) failed to send direct message(${userId}): ${reason}`,
+          `User(${operatorId}) failed to send direct message to User(${userId}): ${reason}`,
         );
         return;
       }
@@ -163,7 +166,7 @@ export const SendDirectMessageHandler: SocketRequestHandler = {
       /* ========== End of Handling ========== */
 
       new Logger('SendDirectMessage').info(
-        `User(${operatorId}) sent direct message(${userId})`,
+        `User(${operatorId}) sent direct message to User(${userId})`,
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
@@ -210,7 +213,7 @@ export const ShakeWindowHandler: SocketRequestHandler = {
 
       if (reason) {
         new Logger('ShakeWindow').warn(
-          `User(${operatorId}) failed to shake window(${userId}): ${reason}`,
+          `User(${operatorId}) failed to shake window to User(${userId}): ${reason}`,
         );
         return;
       }
@@ -227,7 +230,7 @@ export const ShakeWindowHandler: SocketRequestHandler = {
       /* ========== End of Handling ========== */
 
       new Logger('ShakeWindow').info(
-        `User(${operatorId}) shook window(${userId})`,
+        `User(${operatorId}) shook window to User(${userId})`,
       );
     } catch (error: any) {
       if (!(error instanceof StandardizedError)) {

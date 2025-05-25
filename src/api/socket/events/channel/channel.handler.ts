@@ -152,10 +152,12 @@ export const ConnectChannelHandler: SocketRequestHandler = {
           from: targetSocket.id,
           userId: userId,
         });
-        
+
         targetSocket.emit('onMessage', {
           serverId: serverId,
           channelId: channelId,
+          sender: null,
+          receiver: null,
           type: 'info',
           content:
             channel.voiceMode === 'free'
@@ -264,6 +266,18 @@ export const DisconnectChannelHandler: SocketRequestHandler = {
           userId: userId,
         });
       }
+      
+      // if (operatorId !== userId) {
+      //   io.to(`channel_${channelId}`).emit('onMessage', {
+      //     serverId: serverId,
+      //     channelId: channelId,
+      //     sender: operatorMember,
+      //     receiver: userMember,
+      //     type: 'info',
+      //     content: 'userKickedChannelMessage',
+      //     timestamp: Date.now().valueOf(),
+      //   });
+      // }
 
       io.to(`server_${serverId}`).emit(
         'serverMemberUpdate',
@@ -431,6 +445,8 @@ export const UpdateChannelHandler: SocketRequestHandler = {
         messages.push({
           serverId: serverId,
           channelId: channelId,
+          sender: operatorMember,
+          receiver: null,
           type: 'info',
           content:
             update.voiceMode === 'free'
@@ -449,6 +465,8 @@ export const UpdateChannelHandler: SocketRequestHandler = {
         messages.push({
           serverId: serverId,
           channelId: channelId,
+          sender: operatorMember,
+          receiver: null,
           type: 'info',
           content: update.forbidText
             ? 'TEXT_CHANGE_TO_FORBIDDEN_SPEECH'
@@ -464,6 +482,8 @@ export const UpdateChannelHandler: SocketRequestHandler = {
         messages.push({
           serverId: serverId,
           channelId: channelId,
+          sender: operatorMember,
+          receiver: null,
           type: 'info',
           content: update.forbidGuestText
             ? 'TEXT_CHANGE_TO_FORBIDDEN_TEXT'
@@ -479,6 +499,8 @@ export const UpdateChannelHandler: SocketRequestHandler = {
         messages.push({
           serverId: serverId,
           channelId: channelId,
+          sender: operatorMember,
+          receiver: null,
           type: 'info',
           content: update.forbidGuestUrl
             ? 'TEXT_CHANGE_TO_FORBIDDEN_URL'
@@ -494,6 +516,8 @@ export const UpdateChannelHandler: SocketRequestHandler = {
         messages.push({
           serverId: serverId,
           channelId: channelId,
+          sender: operatorMember,
+          receiver: null,
           type: 'info',
           content: `TEXT_CHANGE_TO_MAX_LENGTH ${update.guestTextMaxLength}`,
           timestamp: Date.now().valueOf(),
@@ -507,6 +531,8 @@ export const UpdateChannelHandler: SocketRequestHandler = {
         messages.push({
           serverId: serverId,
           channelId: channelId,
+          sender: operatorMember,
+          receiver: null,
           type: 'info',
           content: `TEXT_CHANGE_TO_WAIT_TIME ${update.guestTextWaitTime}`,
           timestamp: Date.now().valueOf(),
@@ -520,6 +546,8 @@ export const UpdateChannelHandler: SocketRequestHandler = {
         messages.push({
           serverId: serverId,
           channelId: channelId,
+          sender: operatorMember,
+          receiver: null,
           type: 'info',
           content: `TEXT_CHANGE_TO_GAP_TIME ${update.guestTextGapTime}`,
           timestamp: Date.now().valueOf(),
