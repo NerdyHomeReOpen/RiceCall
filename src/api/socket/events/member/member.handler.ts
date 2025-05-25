@@ -204,7 +204,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         targetSocket.emit('serverUpdate', serverId, update);
       }
 
-      if (update.permissionLevel === 2) {
+      if (updatedUserMember.permissionLevel === 2) {
         // update user to member;
         io.to(`server_${serverId}`).emit('onMessage', {
           serverId: serverId,
@@ -216,7 +216,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
           timestamp: Date.now().valueOf(),
         });
 
-      } else if (update.permissionLevel === 3 || update.permissionLevel === 4) {
+      } else if (updatedUserMember.permissionLevel === 3 || updatedUserMember.permissionLevel === 4) {
         // update member to channelManager or CategoryManager
         io.to(`server_${serverId}`).emit('onMessage', {
           serverId: serverId,
@@ -228,7 +228,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
           timestamp: Date.now().valueOf(),
         });
 
-      } else if (update.permissionLevel === 5) {
+      } else if (updatedUserMember.permissionLevel === 5) {
         // update member to serverManager
         io.to(`server_${serverId}`).emit('onMessage', {
           serverId: serverId,
@@ -242,8 +242,8 @@ export const UpdateMemberHandler: SocketRequestHandler = {
       }
 
       // Blocked member
-      if (update.isBlocked !== 0) {
-        if (update.isBlocked === -1) { // Ban member
+      if (updatedUserMember.isBlocked !== 0) {
+        if (updatedUserMember.isBlocked === -1) { // Ban member
           io.to(`server_${serverId}`).emit('onMessage', {
             serverId: serverId,
             channelId: null,
