@@ -61,7 +61,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
         'height': '100%',
         '--main-color': backgroundColor,
         '--secondary-color': backgroundColor,
-        '--background-image': backgroundImage,
+        '--header-image': backgroundImage,
       }}
     >
       <ThemeContext.Provider value={{ backgroundColor, backgroundImage }}>

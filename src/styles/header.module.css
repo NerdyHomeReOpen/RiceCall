@@ -5,7 +5,7 @@
   border: none;
   min-height: 30px;
   background-color: var(--main-color);
-  background-image: var(--background-image);
+  background-image: var(--header-image);
   background-repeat: no-repeat;
   background-position: 0 20%;
   background-size: cover;
