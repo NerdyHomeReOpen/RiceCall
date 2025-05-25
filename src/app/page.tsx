@@ -7,7 +7,6 @@ import React, { useEffect, useState, useRef } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
-import '@/styles/viewers/theme.css';
 
 // Types
 import {
@@ -34,11 +33,6 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
-import {
-  THEME_CHANGE_EVENT,
-  applyThemeToReactState,
-  extractFirstColor,
-} from '@/utils/themeStorage';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
@@ -74,9 +68,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-  const [themeClass, setThemeClass] = useState<string | null>(null);
-  const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
-  const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
 
   const { userId, name: userName, status: userStatus } = user;
   const { serverId, name: serverName } = userServer;
@@ -181,42 +172,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
       offUnmaximize();
     };
   }, []);
-  useEffect(() => {
-    applyThemeToReactState({
-      setThemeClass,
-      setBackgroundColor,
-      setBackgroundImage,
-    });
-    const onThemeChange = () => {
-      applyThemeToReactState({
-        setThemeClass,
-        setBackgroundColor,
-        setBackgroundImage,
-      });
-    };
-    window.addEventListener(THEME_CHANGE_EVENT, onThemeChange);
-    window.addEventListener('storage', onThemeChange);
-    return () => {
-      window.removeEventListener(THEME_CHANGE_EVENT, onThemeChange);
-      window.removeEventListener('storage', onThemeChange);
-    };
-  }, []);
-
-  const headerClassName = [header['header'], themeClass]
-    .filter(Boolean)
-    .join(' ');
 
   return (
-    <header
-      className={headerClassName}
-      style={{
-        background:
-          (backgroundImage && `url(${backgroundImage})`) ||
-          backgroundColor ||
-          undefined,
-        color: extractFirstColor(backgroundColor),
-      }}
-    >
+    <header className={header['header']}>
       {/* Title */}
       <div className={`${header['titleBox']} ${header['big']}`}>
         <div

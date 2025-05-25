@@ -8,22 +8,26 @@ import changeTheme from '@/styles/popups/changeTheme.module.css';
 import ipcService from '@/services/ipc.service';
 
 // Providers
-import { setThemeValue, removeThemeValue } from '@/utils/themeStorage';
-
-// Components
-import ContextMenu from '@/components/ContextMenu';
-
-// Types
-import { ContextMenuItem } from '@/types';
+import { setThemeValue } from '@/utils/themeStorage';
+import { useContextMenu } from '@/providers/ContextMenu';
 
 interface ChangeThemePopupProps {
   submitTo: string;
 }
 
+interface Theme {
+  backgroundColor: string;
+  backgroundImage: string;
+}
+
 const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
+  // Hooks
+  const contextMenu = useContextMenu();
+
   // Refs
   const containerRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const colorSelectorRef = useRef<HTMLDivElement>(null);
 
   // States
   const [hoveredThemeIndex, setHoveredThemeIndex] = useState<number | null>(
@@ -31,30 +35,10 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   );
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
   const [pickedColor, setPickedColor] = useState<string>('#000000');
-  const [customAppliedColors, setCustomAppliedColors] = useState<
-    (string | null)[]
-  >(() => {
-    const storedColors = localStorage.getItem('customAppliedColors');
-    if (storedColors) {
-      try {
-        const parsedColors = JSON.parse(storedColors);
-        if (Array.isArray(parsedColors) && parsedColors.length === 7) {
-          return parsedColors;
-        }
-      } catch (e) {
-        console.error('解析 localStorage customAppliedColors 出錯', e);
-      }
-    }
-    return Array(7).fill(null);
-  });
-  const [contextMenuVisible, setContextMenuVisible] = useState<boolean>(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState<{
-    x: number;
-    y: number;
-  }>({ x: 0, y: 0 });
-  const [contextMenuTargetIndex, setContextMenuTargetIndex] = useState<
-    number | null
-  >(null);
+  const [customThemes, setCustomThemes] = useState<Theme[]>(
+    Array.from({ length: 7 }),
+  );
+  const [isSelectingColor, setIsSelectingColor] = useState<boolean>(false);
 
   // Handlers
   const handleSubmit = () => {
@@ -66,53 +50,67 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     ipcService.window.close();
   };
 
-  const handleChangeTheme = (index: number) => {
-    setThemeValue('selectedTheme', `theme-${index}`);
-    removeThemeValue('selectedThemeColor');
-    removeThemeValue('customThemeImage');
-  };
-
-  const handleColorBoxClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleSelectTheme = (event: React.MouseEvent<HTMLDivElement>) => {
     const clickedElement = event.currentTarget;
-    const color = window.getComputedStyle(clickedElement).background;
+    const image = window.getComputedStyle(clickedElement).backgroundImage;
+    const color = window.getComputedStyle(clickedElement).backgroundColor;
 
-    if (color) {
-      setThemeValue('selectedThemeColor', color);
-      removeThemeValue('selectedTheme');
-      removeThemeValue('customThemeImage');
-    }
+    setThemeValue('themeColor', color);
+    setThemeValue('themeImage', image);
   };
 
-  const handleAddCustomImageClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setThemeValue('customThemeImage', base64String);
-        removeThemeValue('selectedTheme');
-        removeThemeValue('selectedThemeColor');
-      };
-      reader.readAsDataURL(file);
-    }
-    if (event.target) {
-      event.target.value = '';
-    }
-  };
-
-  const handleColorCustomClick = () => {
-    setShowColorPicker(!showColorPicker);
-  };
-
-  const handleColorSelectorImageClick = (
-    event: React.MouseEvent<HTMLDivElement>,
+  const handleSaveSelectedImage = (
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const imageElement = event.currentTarget;
-    const rect = imageElement.getBoundingClientRect();
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      const newTheme: Theme = {
+        backgroundColor: '#000000',
+        backgroundImage: `url(${base64String})`,
+      };
+
+      if (customThemes.unshift(newTheme) >= 7) customThemes.length = 7;
+
+      setThemeValue('themeColor', newTheme.backgroundColor);
+      setThemeValue('themeImage', newTheme.backgroundImage);
+      setCustomThemes(customThemes);
+      localStorage.setItem('customThemes', JSON.stringify(customThemes));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveSelectedColor = () => {
+    if (!pickedColor) return;
+
+    const newTheme: Theme = {
+      backgroundColor: pickedColor,
+      backgroundImage: '',
+    };
+
+    if (customThemes.unshift(newTheme) >= 7) customThemes.length = 7;
+
+    setThemeValue('themeColor', newTheme.backgroundColor);
+    setThemeValue('themeImage', newTheme.backgroundImage);
+    setCustomThemes(customThemes);
+    setShowColorPicker(false);
+    localStorage.setItem('customThemes', JSON.stringify(customThemes));
+  };
+
+  const handleRemoveCustom = (index: number) => {
+    if (index !== null) {
+      const newThemes = customThemes.filter((_, i) => i !== index);
+      setCustomThemes(newThemes);
+      localStorage.setItem('customThemes', JSON.stringify(newThemes));
+    }
+  };
+
+  const handleColorSelect = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!colorSelectorRef.current) return;
+    const rect = colorSelectorRef.current.getBoundingClientRect();
     const offsetX = event.clientX - rect.left;
     const offsetY = event.clientY - rect.top;
     const imgSrc = '/skin_palette.png';
@@ -144,78 +142,17 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     };
   };
 
-  const handleSavePickedColor = () => {
-    if (pickedColor) {
-      setThemeValue('selectedThemeColor', pickedColor);
-      removeThemeValue('selectedTheme');
-      removeThemeValue('customThemeImage');
-      const updatedColors = [...customAppliedColors];
-      const targetSlotIndex = updatedColors.findIndex(
-        (color) => color === null,
-      );
-      if (targetSlotIndex !== -1) {
-        updatedColors[targetSlotIndex] = pickedColor;
-      } else {
-        updatedColors[0] = pickedColor;
-      }
-      setCustomAppliedColors(updatedColors);
-      localStorage.setItem(
-        'customAppliedColors',
-        JSON.stringify(updatedColors),
-      );
-    }
-    setShowColorPicker(false);
-  };
-
-  const handleCancelPickColor = () => {
-    setShowColorPicker(false);
-  };
-
-  const handleCustomColorRightClick = (
-    event: React.MouseEvent<HTMLDivElement>,
-    indexInCustomArray: number,
-  ) => {
-    event.preventDefault();
-    setContextMenuPosition({ x: event.clientX, y: event.clientY });
-    setContextMenuTargetIndex(indexInCustomArray);
-    setContextMenuVisible(true);
-  };
-
-  const handleRemoveCustomColor = () => {
-    if (contextMenuTargetIndex !== null) {
-      const newAppliedColors = [...customAppliedColors];
-      newAppliedColors[contextMenuTargetIndex] = null;
-      setCustomAppliedColors(newAppliedColors);
-      localStorage.setItem(
-        'customAppliedColors',
-        JSON.stringify(newAppliedColors),
-      );
-    }
-    setContextMenuVisible(false);
-    setContextMenuTargetIndex(null);
-  };
-
-  const handleCloseContextMenu = () => {
-    setContextMenuVisible(false);
-    setContextMenuTargetIndex(null);
-  };
-
   // Effects
   useEffect(() => {
     containerRef.current?.focus();
-  }, []);
 
-  useEffect(() => {
-    const handleClickOutside = () => {
-      if (contextMenuVisible) {
-        handleCloseContextMenu();
-      }
-    };
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [contextMenuVisible]);
+    const localTheme = localStorage.getItem('customThemes');
+
+    if (localTheme) {
+      const themes = JSON.parse(localTheme);
+      setCustomThemes(themes);
+    }
+  }, []);
 
   return (
     <form
@@ -232,137 +169,125 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
           <div className={changeTheme['ctContain']}>
             <div className={changeTheme['themeSelector']}>
               <div className={changeTheme['themeOptions']}>
-                <div
-                  className={`${changeTheme['themeImages']} ${changeTheme['big']}`}
-                >
-                  {[1, 2, 3, 4].map((i) => (
+                <div className={changeTheme['themeSlotsBig']}>
+                  {/* Default Themes (Big) */}
+                  {Array.from({ length: 4 }).map((_, i) => (
                     <div
                       key={i}
-                      className={changeTheme[`themePreview-${i}`]}
-                      onClick={() => handleChangeTheme(i)}
+                      className={changeTheme['theme']}
+                      data-theme-index={i}
+                      onClick={(e) => handleSelectTheme(e)}
                       onMouseEnter={() => setHoveredThemeIndex(i)}
                       onMouseLeave={() => setHoveredThemeIndex(null)}
                     >
                       {hoveredThemeIndex === i && (
                         <div className={changeTheme['themeDescription']}>
-                          {i === 1 && '粉紅回憶'}
-                          {i === 2 && '純真童年'}
-                          {i === 3 && '可愛貓咪'}
-                          {i === 4 && '那一年'}
+                          {i === 0 && '粉紅回憶'}
+                          {i === 1 && '純真童年'}
+                          {i === 2 && '可愛貓咪'}
+                          {i === 3 && '那一年'}
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
-                <div
-                  className={`${changeTheme['themeImages']} ${changeTheme['small']}`}
-                >
-                  {Array.from({ length: 8 }, (_, i) => (
+
+                <div className={changeTheme['themeSlotsSmall']}>
+                  {/* Default Themes (Small) */}
+                  {Array.from({ length: 15 }, (_, i) => (
                     <div
-                      key={i + 5}
-                      className={changeTheme[`themePreview-${i + 5}`]}
-                      onClick={() => handleChangeTheme(i + 5)}
+                      key={i + 4}
+                      className={changeTheme['theme']}
+                      data-theme-index={i + 4}
+                      onClick={(e) => handleSelectTheme(e)}
                     />
                   ))}
-                </div>
-                <div className={changeTheme['themeColors']}>
-                  {Array.from({ length: 15 }).map((_, i) => {
-                    if (i === 7) {
+
+                  {/* Color Selector */}
+                  <div
+                    className={changeTheme['colorSelector']}
+                    onClick={() => setShowColorPicker(!showColorPicker)}
+                  />
+
+                  {/* Custom Colors */}
+                  {customThemes.slice(0, 7).map((_, i) => {
+                    const customTheme = customThemes[i];
+                    if (customTheme) {
                       return (
                         <div
-                          key={`color-custom-${i}`}
-                          className={`${changeTheme['colorBox']} ${changeTheme['colorCustom']}`}
-                          onClick={handleColorCustomClick}
-                        ></div>
+                          key={`custom-${i}`}
+                          style={{
+                            backgroundColor: customTheme.backgroundColor,
+                            backgroundImage: customTheme.backgroundImage,
+                          }}
+                          onClick={(e) => handleSelectTheme(e)}
+                          onContextMenu={(e) => {
+                            contextMenu.showContextMenu(
+                              e.clientX,
+                              e.clientY,
+                              false,
+                              false,
+                              [
+                                {
+                                  id: 'remove-custom-color',
+                                  label: '刪除',
+                                  onClick: () => handleRemoveCustom(i),
+                                },
+                              ],
+                            );
+                          }}
+                        />
                       );
                     } else {
-                      const isEmptyPlaceholder = i >= 8;
-                      if (isEmptyPlaceholder) {
-                        const customSlotIndex = i - 8;
-                        const customColor =
-                          customAppliedColors[customSlotIndex];
-                        if (customColor) {
-                          return (
-                            <div
-                              key={`color-box-custom-filled-${i}`}
-                              className={changeTheme['colorBox']}
-                              style={{ backgroundColor: customColor }}
-                              onClick={handleColorBoxClick}
-                              onContextMenu={(e) =>
-                                handleCustomColorRightClick(e, customSlotIndex)
-                              }
-                            />
-                          );
-                        } else {
-                          return (
-                            <div
-                              key={`color-box-empty-${i}`}
-                              className={`${changeTheme['colorBox']} ${changeTheme['emptyColorBox']}`}
-                            />
-                          );
-                        }
-                      } else {
-                        return (
-                          <div
-                            key={`color-box-predefined-${i}`}
-                            className={changeTheme['colorBox']}
-                            onClick={handleColorBoxClick}
-                          />
-                        );
-                      }
+                      return <div key={`color-box-empty-${i}`} />;
                     }
                   })}
+
+                  {/* Image Selector */}
                   <div
-                    className={changeTheme['addColorBtn']}
-                    onClick={handleAddCustomImageClick}
+                    className={changeTheme['imageSelector']}
+                    onClick={() => fileInputRef.current?.click()}
                   />
                   <input
                     type="file"
                     ref={fileInputRef}
                     style={{ display: 'none' }}
                     accept="image/*"
-                    onChange={handleFileChange}
+                    onChange={handleSaveSelectedImage}
                   />
                 </div>
+
                 {showColorPicker && (
                   <div className={changeTheme['colorSelectorBox']}>
                     <div
+                      ref={colorSelectorRef}
                       className={changeTheme['colorSelectorImage']}
-                      onClick={handleColorSelectorImageClick}
-                    ></div>
+                      onMouseDown={(e) => {
+                        handleColorSelect(e);
+                        setIsSelectingColor(true);
+                      }}
+                      onMouseUp={() => setIsSelectingColor(false)}
+                      onMouseMove={(e) => {
+                        if (isSelectingColor) handleColorSelect(e);
+                      }}
+                    />
                     <div className={changeTheme['colorSelectorFooter']}>
                       <div
                         className={changeTheme['colorSelectedColor']}
                         style={{ backgroundColor: pickedColor }}
-                      ></div>
+                      />
                       <div className={changeTheme['colorSelectedBtn']}>
                         <div
                           className={changeTheme['colorSelectedSave']}
-                          onClick={handleSavePickedColor}
-                        ></div>
+                          onClick={() => handleSaveSelectedColor()}
+                        />
                         <div
                           className={changeTheme['colorSelectedCancel']}
-                          onClick={handleCancelPickColor}
-                        ></div>
+                          onClick={() => setShowColorPicker(false)}
+                        />
                       </div>
                     </div>
                   </div>
-                )}
-                {contextMenuVisible && contextMenuTargetIndex !== null && (
-                  <ContextMenu
-                    x={contextMenuPosition.x}
-                    y={contextMenuPosition.y}
-                    items={
-                      [
-                        {
-                          id: 'remove-color',
-                          label: '移除顏色',
-                          onClick: handleRemoveCustomColor,
-                        },
-                      ] as ContextMenuItem[]
-                    }
-                    onClose={handleCloseContextMenu}
-                  />
                 )}
               </div>
             </div>

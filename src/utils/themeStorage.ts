@@ -17,15 +17,12 @@ export function extractFirstColor(input: string | null): string | undefined {
 }
 
 export function applyThemeToReactState(setters: {
-  setThemeClass: (val: string | null) => void;
-  setBackgroundColor: (val: string | null) => void;
-  setBackgroundImage: (val: string | null) => void;
+  setBackgroundColor?: (val: string | null) => void;
+  setBackgroundImage?: (val: string | null) => void;
 }) {
-  const theme = localStorage.getItem('selectedTheme');
-  const selectedColor = localStorage.getItem('selectedThemeColor');
-  const customImage = localStorage.getItem('customThemeImage');
+  const selectedColor = localStorage.getItem('themeColor');
+  const customImage = localStorage.getItem('themeImage');
 
-  setters.setThemeClass(theme);
-  setters.setBackgroundColor(selectedColor);
-  setters.setBackgroundImage(customImage);
+  if (setters.setBackgroundColor) setters.setBackgroundColor(selectedColor);
+  if (setters.setBackgroundImage) setters.setBackgroundImage(customImage);
 }

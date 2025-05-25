@@ -5,7 +5,6 @@ import React, { useEffect, useState, ReactNode, useRef } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
-import '@/styles/viewers/theme.css';
 
 // Types
 import { PopupType } from '@/types';
@@ -35,10 +34,6 @@ import About from '@/components/popups/AboutUs';
 import FriendVerification from '@/components/popups/FriendVerification';
 
 // Utils
-import {
-  THEME_CHANGE_EVENT,
-  applyThemeToReactState,
-} from '@/utils/themeStorage';
 import { emojiList, convertEmojiPlaceholderToHtml } from '@/utils/emoji';
 
 // Services
@@ -60,11 +55,21 @@ const directMessageHeader = (targetSignature: string) => (
       }}
     />
     <div className={directMessageStyles['directOptionButtons']}>
-      <div className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['blockUser']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['unBlockUser']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['inviteTempGroup']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['report']} ${directMessageStyles['disabled']}`} />
+      <div
+        className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`}
+      />
+      <div
+        className={`${directMessageStyles['blockUser']} ${directMessageStyles['disabled']}`}
+      />
+      <div
+        className={`${directMessageStyles['unBlockUser']} ${directMessageStyles['disabled']}`}
+      />
+      <div
+        className={`${directMessageStyles['inviteTempGroup']} ${directMessageStyles['disabled']}`}
+      />
+      <div
+        className={`${directMessageStyles['report']} ${directMessageStyles['disabled']}`}
+      />
     </div>
   </div>
 );
@@ -80,9 +85,6 @@ const Header: React.FC<HeaderProps> = React.memo(
   ({ title, buttons, titleBoxIcon, titleBoxContent }) => {
     // States
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [themeClass, setThemeClass] = useState<string | null>(null);
-    const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
-    const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
 
     // Handlers
     const handleFullscreen = () => {
@@ -112,40 +114,9 @@ const Header: React.FC<HeaderProps> = React.memo(
         offUnmaximize();
       };
     }, []);
-    useEffect(() => {
-      applyThemeToReactState({
-        setThemeClass,
-        setBackgroundColor,
-        setBackgroundImage,
-      });
-      const onThemeChange = () => {
-        applyThemeToReactState({
-          setThemeClass,
-          setBackgroundColor,
-          setBackgroundImage,
-        });
-      };
-      window.addEventListener(THEME_CHANGE_EVENT, onThemeChange);
-      window.addEventListener('storage', onThemeChange);
-      return () => {
-        window.removeEventListener(THEME_CHANGE_EVENT, onThemeChange);
-        window.removeEventListener('storage', onThemeChange);
-      };
-    }, []);
 
     return (
-      <header
-        className={`${header['header']} ${header['popupHeader']} ${
-          localStorage.getItem('token') && themeClass
-        }`}
-        style={{
-          background:
-            (localStorage.getItem('token') &&
-              ((backgroundImage && `url(${backgroundImage})`) ||
-                backgroundColor)) ||
-            undefined,
-        }}
-      >
+      <header className={`${header['header']} ${header['popupHeader']}`}>
         <div className={header['titleWrapper']}>
           <div className={`${header['titleBox']} ${titleBoxIcon}`}>
             <div className={header['title']}>{title}</div>

@@ -1,14 +1,14 @@
 .header {
   display: flex;
-  background: none 0% 0% / auto repeat scroll padding-box border-box
-    rgb(0, 115, 198);
-  color: var(--main-color);
   -webkit-app-region: drag;
   justify-content: space-between;
   border: none;
   min-height: 30px;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
+  background-color: var(--main-color);
+  background-image: var(--background-image);
+  background-repeat: no-repeat;
+  background-position: 0 20%;
+  background-size: cover;
 }
 
 .popupHeader {
