@@ -755,31 +755,42 @@
 
 .micVolumeContainer .volumeSlider,
 .speakerVolumeContainer .volumeSlider {
+  z-index: 1000;
   position: absolute;
-  bottom: 25px;
-  left: 35%;
-  transform: translateX(-50%);
-  background: rgb(255 255 255 / 90%);
-  padding: 10px;
+  bottom: -3px;
+  left: -3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 3px;
+  width: 24px;
+  height: fit-content;
   border-radius: 6px;
   box-shadow: 0 4px 10px rgb(0 0 0 / 20%);
-  z-index: 1000;
-  width: 30px;
-  height: 120px;
+  background: rgb(255 255 255 / 90%);
+}
+
+.sliderContainer {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  height: 120px;
+  width: 4px;
+  margin: 10px;
+  background: #bbb;
+  border-radius: 2px;
 }
 
 .slider {
   appearance: none;
-  width: 100px;
+  position: absolute;
+  top: calc(50% - 4px);
+  left: -60px;
+  width: 120px;
   height: 4px;
   background: #bbb;
   border-radius: 2px;
-
   transform: rotate(-90deg);
-  position: absolute;
 }
 
 .slider::-webkit-slider-thumb {

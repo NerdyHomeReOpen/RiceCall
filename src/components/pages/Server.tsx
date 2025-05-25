@@ -436,22 +436,18 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 <div className={styles['saperator']} />
                 <div className={styles['micVolumeContainer']}>
                   <div
-                    className={`
-                      ${styles['micModeButton']} 
-                      ${
-                        webRTC.isMute || webRTC.micVolume === 0
-                          ? styles['muted']
-                          : styles['active']
-                      }`}
+                    className={`${styles['micModeButton']} ${
+                      webRTC.isMute || webRTC.micVolume === 0
+                        ? styles['muted']
+                        : styles['active']
+                    }`}
                     onMouseEnter={(e) => {
                       e.stopPropagation();
                       setShowMicVolume(true);
-                      setShowSpeakerVolume(false);
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      // setShowMicVolume(!showMicVolume);
-                      setShowSpeakerVolume(false);
+                      setShowMicVolume(!showMicVolume);
                     }}
                   />
                   {showMicVolume && (
@@ -462,17 +458,26 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         setShowMicVolume(false);
                       }}
                     >
-                      <input
-                        type="range"
-                        min="0"
-                        max="200"
-                        value={webRTC.micVolume}
-                        onChange={(e) => {
-                          webRTC.handleUpdateMicVolume?.(
-                            parseInt(e.target.value),
-                          );
-                        }}
-                        className={styles['slider']}
+                      <div className={styles['sliderContainer']}>
+                        <input
+                          className={styles['slider']}
+                          type="range"
+                          min="0"
+                          max="200"
+                          value={webRTC.micVolume}
+                          onChange={(e) => {
+                            webRTC.handleUpdateMicVolume?.(
+                              parseInt(e.target.value),
+                            );
+                          }}
+                        />
+                      </div>
+                      <div
+                        className={`${styles['micModeButton']} ${
+                          webRTC.isMute || webRTC.micVolume === 0
+                            ? styles['muted']
+                            : styles['active']
+                        }`}
                       />
                     </div>
                   )}
@@ -485,12 +490,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     onMouseEnter={(e) => {
                       e.stopPropagation();
                       setShowSpeakerVolume(true);
-                      setShowMicVolume(false);
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      // setShowSpeakerVolume(!showSpeakerVolume);
-                      setShowMicVolume(false);
+                      setShowSpeakerVolume(!showSpeakerVolume);
                     }}
                   />
                   {showSpeakerVolume && (
@@ -501,17 +504,25 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         setShowSpeakerVolume(false);
                       }}
                     >
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={webRTC.speakerVolume}
-                        onChange={(e) => {
-                          webRTC.handleUpdateSpeakerVolume(
-                            parseInt(e.target.value),
-                          );
-                        }}
-                        className={styles['slider']}
+                      <div className={styles['sliderContainer']}>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={webRTC.speakerVolume}
+                          onChange={(e) => {
+                            webRTC.handleUpdateSpeakerVolume(
+                              parseInt(e.target.value),
+                            );
+                          }}
+                          className={styles['slider']}
+                        />
+                      </div>
+
+                      <div
+                        className={`${styles['speakerButton']} ${
+                          webRTC.speakerVolume === 0 ? styles['muted'] : ''
+                        }`}
                       />
                     </div>
                   )}
