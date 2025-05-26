@@ -258,7 +258,7 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
     try {
       const operatorId = socket.data.userId;
 
-      const { targetId, friendGroupId } = await DataValidator.validate(
+      const { targetId, friend } = await DataValidator.validate(
         ApproveFriendApplicationSchema,
         data,
         'APPROVEFRIENDAPPLICATION',
@@ -275,11 +275,13 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
       if (!friendApplication)
         throw new FriendApplicationNotFoundError(targetId, operatorId);
 
-      let friend = await database.get.friend(operatorId, targetId);
-      if (friend) throw new AlreadyFriendError(targetId, operatorId);
+      let friend_ = await database.get.friend(operatorId, targetId);
+      if (friend_) throw new AlreadyFriendError(targetId, operatorId);
 
       await FriendHandlerServerSide.createFriend(operatorId, targetId);
       await database.delete.friendApplication(targetId, operatorId);
+
+      let friendGroupId = friend.friendGroupId;
 
       new Logger('ApproveFriendApplication').info(
         `User(${operatorId}) updated friend(${targetId}) to friend group(${friendGroupId})`,
@@ -292,9 +294,9 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
           friendGroupId,
         );  
 
-        friend = await database.get.friend(operatorId, targetId);
+        friend_ = await database.get.friend(operatorId, targetId);
 
-        socket.emit('friendUpdate', operatorId, targetId, friend);
+        socket.emit('friendUpdate', operatorId, targetId, friend_);
       }
         
 
