@@ -60,4 +60,36 @@ export const MemberHandlerServerSide = {
       `User(${userId}) updated member(${serverId})`,
     );
   },
+
+  deleteMemberApplication: async (userId: string, serverId: string) => {
+    // Delete member application
+    await database.delete.memberApplication(userId, serverId);
+
+    // Send socket event
+    SocketServer.io
+      .to(`server_${serverId}`)
+      .emit('serverMemberApplicationDelete', userId, serverId);
+
+    new Logger('DeleteMemberApplicationServerSide').info(
+      `User(${userId}) deleted member application(${serverId})`,
+    );
+  },
+
+  deleteMember: async (userId: string, serverId: string) => {
+    // Delete member
+    await database.delete.member(userId, serverId);
+
+    // Send socket event
+    const targetSocket = SocketServer.getSocket(userId);
+
+    SocketServer.io.to(`server_${serverId}`).emit('serverMemberDelete', userId, serverId);
+
+    if (targetSocket) {
+      targetSocket.emit('serverDelete', serverId); // TODO: Need to kick user from server
+    }
+
+    new Logger('DeleteMemberServerSide').info(
+      `User(${userId}) deleted member(${serverId})`,
+    );
+  },
 };

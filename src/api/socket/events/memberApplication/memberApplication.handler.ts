@@ -26,6 +26,7 @@ import {
 import { DataValidator } from '@/middleware/data.validator';
 
 import { MemberHandlerServerSide } from '../member/memberHandlerServerSide';
+import { MemberApplicationHandlerServerSide } from './memberApplicationHandlerServerSide';
 
 export const CreateMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
@@ -202,15 +203,7 @@ export const DeleteMemberApplicationHandler: SocketRequestHandler = {
 
       /* ========== Start of Main Logic ========== */
 
-      // Delete member application
-      await database.delete.memberApplication(userId, serverId);
-
-      // Send socket event
-      io.to(`server_${serverId}`).emit(
-        'serverMemberApplicationDelete',
-        userId,
-        serverId,
-      );
+      await MemberApplicationHandlerServerSide.deleteMemberApplication(userId, serverId);
 
       /* ========== End of Handling ========== */
 
@@ -257,7 +250,7 @@ export const ApproveMemberApplicationHandler: SocketRequestHandler = {
       if (!memberApplication) throw new MemberApplicationNotFoundError(userId, serverId);
 
       // Member should already exist when joining the server
-      await database.delete.memberApplication(userId, serverId);
+      await MemberApplicationHandlerServerSide.deleteMemberApplication(userId, serverId);
       await MemberHandlerServerSide.updateMember(userId, serverId, { permissionLevel: 2 });
 
       socket.emit('memberApproval', {
