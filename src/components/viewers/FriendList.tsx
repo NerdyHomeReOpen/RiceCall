@@ -193,6 +193,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
     const { name: friendServerName } = friendServer;
     const isCurrentUser = friendTargetId === friendUserId;
     const canManageFriend = !isCurrentUser;
+    const isFriendOnline = friendCurrentServerId !== null;
 
     // Handlers
     const handleServerSelect = (userId: User['userId'], server: Server) => {
@@ -326,10 +327,10 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
             className={styles['avatarPicture']}
             style={{
               backgroundImage: `url(${friendAvatarUrl})`,
-              filter: !friendServerName ? 'grayscale(100%)' : '',
+              filter: !isFriendOnline ? 'grayscale(100%)' : '',
             }}
             datatype={
-              friendServerName && friendStatus !== 'online' ? friendStatus : ''
+              isFriendOnline && friendStatus !== 'online' ? friendStatus : ''
             }
           />
           <div className={styles['baseInfoBox']}>
@@ -351,11 +352,11 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
               />
               <BadgeListViewer badges={friendBadges} maxDisplay={5} />
             </div>
-            {friendServerName ? (
+            {friendCurrentServerId ? (
               <div
                 className={`
                   ${styles['container']}
-                  ${friendServerName ? styles['hasServer'] : ''}
+                  ${friendCurrentServerId ? styles['hasServer'] : ''}
                 `}
                 onClick={() => {
                   handleServerSelect(userId, friendServer);
