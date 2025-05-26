@@ -9,6 +9,7 @@
   background-repeat: no-repeat;
   background-position: 0 20%;
   background-size: cover;
+  color: var(--secondary-color);
 }
 
 .popupHeader {
