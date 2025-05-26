@@ -200,6 +200,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         ...userMember,
         ...update,
       };
+      const userCurrentChannelId = updatedUserMember.currentChannelId;
 
       // Send socket event
       const targetSocket =
@@ -209,41 +210,25 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         targetSocket.emit('serverUpdate', serverId, update);
       }
 
-      if (updatedUserMember.permissionLevel === 2) {
-        // update user to member;
-        io.to(`server_${serverId}`).emit('onMessage', {
-          serverId: serverId,
-          channelId: null,
-          sender: {
-            ...operatorMember,
-            ...operator
-          },
-          receiver: {
-            ...updatedUserMember,
-            ...user
-          },
-          type: 'event',
-          content: 'updateMemberMessage',
-          timestamp: Date.now().valueOf(),
-        });
-
-      } else if (updatedUserMember.permissionLevel === 3 || updatedUserMember.permissionLevel === 4) {
+      if (updatedUserMember.permissionLevel === 3 || updatedUserMember.permissionLevel === 4) {
         // update member to channelManager or CategoryManager
-        io.to(`server_${serverId}`).emit('onMessage', {
-          serverId: serverId,
-          channelId: null,
-          sender: {
-            ...operatorMember,
-            ...operator
-          },
-          receiver: {
-            ...updatedUserMember,
-            ...user
-          },
-          type: 'event',
-          content: 'updateChannelManagerMessage',
-          timestamp: Date.now().valueOf(),
-        });
+        if (userCurrentChannelId) { // If user is in a channel
+          io.to(`channel_${userCurrentChannelId}`).emit('onMessage', {
+            serverId: serverId,
+            channelId: userCurrentChannelId,
+            sender: {
+              ...operatorMember,
+              ...operator
+            },
+            receiver: {
+              ...updatedUserMember,
+              ...user
+            },
+            type: 'event',
+            content: 'updateChannelManagerMessage',
+            timestamp: Date.now().valueOf(),
+          });
+        }
 
       } else if (updatedUserMember.permissionLevel === 5) {
         // update member to serverManager
