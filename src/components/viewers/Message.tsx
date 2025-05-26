@@ -396,7 +396,7 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
           !isEvent &&
           ((isGeneral &&
             lastGroup.type === 'general' &&
-            message.sender === lastGroup.sender) ||
+            message.sender.userId === lastGroup.sender.userId) ||
             (isDm &&
               lastGroup.type === 'dm' &&
               message.senderId === lastGroup.senderId));
