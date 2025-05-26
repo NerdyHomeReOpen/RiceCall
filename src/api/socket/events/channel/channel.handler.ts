@@ -156,20 +156,22 @@ export const ConnectChannelHandler: SocketRequestHandler = {
           userId: userId,
         });
 
-        targetSocket.emit('onMessage', {
-          serverId: serverId,
-          channelId: channelId,
-          sender: null,
-          receiver: null,
-          type: 'info',
-          content:
-            channel.voiceMode === 'free'
-              ? 'voiceChangeToFreeSpeech'
-              : channel.voiceMode === 'forbidden'
-              ? 'voiceChangeToForbiddenSpeech'
-              : 'voiceChangeToQueue',
-          timestamp: Date.now().valueOf(),
-        });
+        setTimeout(() => {
+          targetSocket.emit('onMessage', {
+            serverId: serverId,
+            channelId: channelId,
+            sender: null,
+            receiver: null,
+            type: 'info',
+            content:
+              channel.voiceMode === 'free'
+                ? 'voiceChangeToFreeSpeech'
+                : channel.voiceMode === 'forbidden'
+                ? 'voiceChangeToForbiddenSpeech'
+                : 'voiceChangeToQueue',
+            timestamp: Date.now().valueOf(),
+          });
+        }, 500);
       }
 
       io.to(`server_${serverId}`).emit(
