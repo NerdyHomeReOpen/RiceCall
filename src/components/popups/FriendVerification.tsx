@@ -9,7 +9,7 @@ import friendVerification from '@/styles/popups/friendVerification.module.css';
 import ipcService from '@/services/ipc.service';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+// import { useLanguage } from '@/providers/Language';
 
 interface FriendVerificationPopupProps {
   submitTo: string;
@@ -18,7 +18,7 @@ interface FriendVerificationPopupProps {
 const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
   React.memo(({ submitTo }) => {
     // Hooks
-    const lang = useLanguage();
+    // const lang = useLanguage();
 
     // Refs
     const containerRef = useRef<HTMLFormElement>(null);

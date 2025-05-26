@@ -285,13 +285,15 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                       return (
                         <div
                           key={`custom-${i}`}
-                          style={{
-                            'backgroundColor': customTheme.mainColor,
-                            'backgroundImage': customTheme.headerImage,
-                            '--main-color': customTheme.mainColor,
-                            '--secondary-color': customTheme.secondaryColor,
-                            '--header-image': customTheme.headerImage,
-                          }}
+                          style={
+                            {
+                              'backgroundColor': customTheme.mainColor,
+                              'backgroundImage': customTheme.headerImage,
+                              '--main-color': customTheme.mainColor,
+                              '--secondary-color': customTheme.secondaryColor,
+                              '--header-image': customTheme.headerImage,
+                            } as React.CSSProperties
+                          }
                           onClick={(e) => handleSelectTheme(e)}
                           onContextMenu={(e) => {
                             contextMenu.showContextMenu(

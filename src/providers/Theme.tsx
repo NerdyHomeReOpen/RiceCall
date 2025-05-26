@@ -58,13 +58,15 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   return (
     <div
-      style={{
-        'width': '100%',
-        'height': '100%',
-        '--main-color': mainColor,
-        '--secondary-color': secondaryColor,
-        '--header-image': headerImage,
-      }}
+      style={
+        {
+          'width': '100%',
+          'height': '100%',
+          '--main-color': mainColor,
+          '--secondary-color': secondaryColor,
+          '--header-image': headerImage,
+        } as React.CSSProperties
+      }
     >
       <ThemeContext.Provider value={{ headerImage, mainColor, secondaryColor }}>
         {children}

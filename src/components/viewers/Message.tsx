@@ -9,11 +9,16 @@ import vip from '@/styles/vip.module.css';
 import MarkdownViewer from '@/components/viewers/Markdown';
 
 // Types
-import type { ChannelMessage, DirectMessage, InfoMessage, WarnMessage, EventMessage } from '@/types';
+import type {
+  ChannelMessage,
+  DirectMessage,
+  InfoMessage,
+  WarnMessage,
+  EventMessage,
+} from '@/types';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
-import test from 'node:test';
 
 interface DirectMessageTabProps {
   messageGroup: DirectMessage & {
@@ -147,10 +152,7 @@ const InfoMessageTab: React.FC<InfoMessageTabProps> = React.memo(
     const lang = useLanguage();
 
     // Variables
-    const {
-      contents: messageContents,
-      timestamp: messageTimestamp, // Event Time
-    } = messageGroup;
+    const { contents: messageContents } = messageGroup;
 
     const getTranslatedContent = (content: string) => {
       if (content.includes(' ')) {
@@ -202,26 +204,23 @@ const WarnMessageTab: React.FC<WarnMessageTabProps> = React.memo(
       sender: messageSender,
       receiver: messageReceiver,
       contents: messageContents,
-      timestamp: messageTimestamp, // Event Time
     } = messageGroup;
 
-    const {
-      nickname: senderNickname = null,
-      name: senderName,
-    } = messageSender ?? {};
+    const { nickname: senderNickname = null, name: senderName } =
+      messageSender ?? {};
 
-    const {
-      nickname: targetNickname = null,
-      name: targetName,
-    } = messageReceiver ?? {};
+    const { nickname: targetNickname = null, name: targetName } =
+      messageReceiver ?? {};
 
     const formatKey = {
-      "user": targetNickname || targetName,
-      "operator": senderNickname || senderName,
+      user: targetNickname || targetName,
+      operator: senderNickname || senderName,
     };
-    
 
-    const format = (template: string, values: Record<string, string>): string => {
+    const format = (
+      template: string,
+      values: Record<string, string>,
+    ): string => {
       let result = template;
       for (const key in values) {
         result = result.replace(`{${key}}`, values[key]);
@@ -240,8 +239,14 @@ const WarnMessageTab: React.FC<WarnMessageTabProps> = React.memo(
           return translatedText;
         }
       }
-      content = content.replace('timeoutMemberMessage', '【{user}】被管理員【{operator}】踢出群');
-      content = content.replace('blockedMemberMessage', '【{user}】被管理員【{operator}】封鎖');
+      content = content.replace(
+        'timeoutMemberMessage',
+        '【{user}】被管理員【{operator}】踢出群',
+      );
+      content = content.replace(
+        'blockedMemberMessage',
+        '【{user}】被管理員【{operator}】封鎖',
+      );
       return Object.prototype.hasOwnProperty.call(lang.tr, content)
         ? lang.tr[content as keyof typeof lang.tr]
         : content;
@@ -253,7 +258,9 @@ const WarnMessageTab: React.FC<WarnMessageTabProps> = React.memo(
         <div className={styles['messageBox']}>
           {messageContents.map((content, index) => (
             <div key={index}>
-              <MarkdownViewer markdownText={format(getTranslatedContent(content), formatKey)} />
+              <MarkdownViewer
+                markdownText={format(getTranslatedContent(content), formatKey)}
+              />
             </div>
           ))}
         </div>
@@ -277,11 +284,8 @@ const EventMessageTab: React.FC<EventMessageTabProps> = React.memo(
     const lang = useLanguage();
 
     // Variables
-    const {
-      receiver: messageReceiver,
-      contents: messageContents,
-      timestamp: messageTimestamp, // Event Time
-    } = messageGroup;
+    const { receiver: messageReceiver, contents: messageContents } =
+      messageGroup;
 
     const {
       nickname: targetNickname = null,
@@ -301,9 +305,18 @@ const EventMessageTab: React.FC<EventMessageTabProps> = React.memo(
           return translatedText;
         }
       }
-      content = content.replace('updateMemberMessage', '加入了群，成為本群會員。');
-      content = content.replace('updateChannelManagerMessage', '被提升為本頻道的頻道管理員。');
-      content = content.replace('updateServerManagerMessage', '被提升為本群的管理員。');
+      content = content.replace(
+        'updateMemberMessage',
+        '加入了群，成為本群會員。',
+      );
+      content = content.replace(
+        'updateChannelManagerMessage',
+        '被提升為本頻道的頻道管理員。',
+      );
+      content = content.replace(
+        'updateServerManagerMessage',
+        '被提升為本群的管理員。',
+      );
       return Object.prototype.hasOwnProperty.call(lang.tr, content)
         ? lang.tr[content as keyof typeof lang.tr]
         : content;
@@ -311,26 +324,26 @@ const EventMessageTab: React.FC<EventMessageTabProps> = React.memo(
 
     return (
       <>
-      <div className={styles['messageEvent']}>
-        <div className={styles['infoIcon']} />
-        <div
-          className={`
+        <div className={styles['messageEvent']}>
+          <div className={styles['infoIcon']} />
+          <div
+            className={`
             ${styles['senderIcon']}
             ${permission[targetGender]}
             ${permission[`lv-${targetPermissionLevel}`]}
           `}
-        />
-        <div className={styles['username']}>
-          {targetNickname || targetName}
+          />
+          <div className={styles['username']}>
+            {targetNickname || targetName}
+          </div>
+          <div className={styles['messageBox']}>
+            {messageContents.map((content, index) => (
+              <div key={index}>
+                <MarkdownViewer markdownText={getTranslatedContent(content)} />
+              </div>
+            ))}
+          </div>
         </div>
-        <div className={styles['messageBox']}>
-          {messageContents.map((content, index) => (
-            <div key={index}>
-              <MarkdownViewer markdownText={getTranslatedContent(content)} />
-            </div>
-          ))}
-        </div>
-      </div>
       </>
     );
   },
@@ -338,13 +351,24 @@ const EventMessageTab: React.FC<EventMessageTabProps> = React.memo(
 
 EventMessageTab.displayName = 'EventMessageTab';
 
-type MessageGroup = (DirectMessage | ChannelMessage | InfoMessage | WarnMessage | EventMessage) & {
+type MessageGroup = (
+  | DirectMessage
+  | ChannelMessage
+  | InfoMessage
+  | WarnMessage
+  | EventMessage
+) & {
   type: 'general' | 'info' | 'warn' | 'event' | 'dm';
   contents: string[];
 };
 
 interface MessageViewerProps {
-  messages: DirectMessage[] | ChannelMessage[] | InfoMessage[] | WarnMessage[] | EventMessage[];
+  messages:
+    | DirectMessage[]
+    | ChannelMessage[]
+    | InfoMessage[]
+    | WarnMessage[]
+    | EventMessage[];
   forbidGuestUrl?: boolean;
 }
 
@@ -367,7 +391,9 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
         const isDm = message.type === 'dm';
         const sameSender =
           lastGroup &&
-          !isInfo && !isWarn && !isEvent &&
+          !isInfo &&
+          !isWarn &&
+          !isEvent &&
           ((isGeneral &&
             lastGroup.type === 'general' &&
             message.sender === lastGroup.sender) ||
