@@ -77,23 +77,22 @@
 }
 
 .baseInfoBox {
-  width: 16rem;
-  height: 52px;
+  flex: 1;
   display: flex;
-  right: 5px;
-  gap: 10px;
   flex-direction: column;
-  justify-content: flex-end;
-  position: relative;
+  justify-content: space-around;
+  height: 52px;
   color: #777777;
+  overflow: hidden;
 }
 
 .baseInfoBox .container {
+  flex: 1;
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  left: 7px;
-  position: relative;
+  height: 1rem;
+  gap: 5px;
 }
 
 .verifyIcon {
@@ -102,7 +101,6 @@
   background-image: url('../../../public/icon_verify.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-  margin-right: 2px;
 }
 
 .name {
@@ -115,11 +113,9 @@
 
 .idText,
 .memberText {
-  position: relative;
   display: flex;
-  font-size: 13px;
   min-width: 75px;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -143,18 +139,14 @@
   background-repeat: no-repeat;
   background-position: 0 0;
   margin-right: 5px;
-  margin-left: 5px;
 }
 
 .optionBox {
-  gap: 5px;
-  height: auto;
-  min-width: 40px;
-  padding: 0 5px;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin: auto;
+  gap: 5px;
 }
 
 .navItem:first-child:hover::before,
@@ -163,7 +155,7 @@
 }
 
 .invitation {
-  min-height: 20px;
+  min-height: 16px;
   min-width: 20px;
   cursor: pointer;
   background-image: url('../../../public/channel/icon_invite_friend.png');
@@ -180,7 +172,7 @@
 }
 
 .setting {
-  min-height: 18px;
+  min-height: 16px;
   min-width: 24px;
   cursor: pointer;
   background-image: url('../../../public/channel/icon_group_option.png');
@@ -197,7 +189,7 @@
 }
 
 .saperator {
-  min-height: 20px;
+  min-height: 16px;
   min-width: 2px;
   background-size: auto;
   background-image: url('../../../public/icon_v_split.png');
