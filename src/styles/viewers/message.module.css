@@ -35,6 +35,13 @@
   background-position: center;
 }
 
+.messageEvent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 0;
+}
+
 .messageBox {
   flex: 1;
   display: flex;

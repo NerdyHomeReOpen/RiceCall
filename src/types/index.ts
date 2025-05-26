@@ -588,15 +588,15 @@ export type Message = {
   // Change name to BaseMessage
   messageId: string;
   content: string;
-  type: 'general' | 'info' | 'warn' | 'dm';
+  type: 'general' | 'info' | 'warn' | 'event' | 'dm';
   timestamp: number;
 };
 
-export type ChannelMessage = Message &
-  ServerMember & {
-    senderId: string;
+export type ChannelMessage = Message & {
+    sender: ServerMember;
+    receiver: ServerMember;
     serverId: string;
-    channelId: string;
+    channelId: string | null;
     type: 'general';
   };
 
@@ -609,12 +609,28 @@ export type DirectMessage = Message &
   };
 
 export type InfoMessage = Message & {
+  sender: ServerMember;
+  receiver: ServerMember;
+  serverId: string;
+  channelId: string | null;
   type: 'info';
 };
 
 export type WarnMessage = Message & {
+  sender: ServerMember;
+  receiver: ServerMember;
+  serverId: string;
+  channelId: string | null;
   type: 'warn';
 };
+
+export type EventMessage = Message & {
+  sender: ServerMember;
+  receiver: ServerMember;
+  serverId: string;
+  channelId: string | null;
+  type: 'event';
+}
 
 export type UserServerStatus = {
   recent: boolean;

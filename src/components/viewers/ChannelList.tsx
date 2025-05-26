@@ -1503,65 +1503,65 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
             <div className={styles['container']}>
               <div className={styles['idText']}>{serverDisplayId}</div>
               <div className={styles['memberText']}>{serverMembers.length}</div>
+              <div className={styles['optionBox']}>
+                <div
+                  className={styles['invitation']}
+                  onClick={() => {
+                    // Handle invite friends
+                  }}
+                />
+                <div className={styles['saperator']} />
+                <div
+                  ref={settingButtonRef}
+                  className={styles['setting']}
+                  onClick={() => {
+                    if (!settingButtonRef.current) return;
+                    const x = settingButtonRef.current.getBoundingClientRect().left;
+                    const y =
+                      settingButtonRef.current.getBoundingClientRect().top +
+                      settingButtonRef.current.getBoundingClientRect().height;
+                    contextMenu.showContextMenu(x, y, false, false, [
+                      {
+                        id: 'invitation',
+                        label: lang.tr.invitation,
+                        show: canApplyMember,
+                        icon: 'memberapply',
+                        onClick: () => handleOpenApplyMember(userId, serverId),
+                      },
+                      {
+                        id: 'editNickname',
+                        label: lang.tr.editNickname,
+                        icon: 'editGroupcard',
+                        show: canEditNickname,
+                        onClick: () => handleOpenEditNickname(userId, serverId),
+                      },
+                      {
+                        id: 'locateMe',
+                        label: lang.tr.locateMe,
+                        icon: 'locateme',
+                        onClick: () => handleLocateUser(),
+                      },
+                      {
+                        id: 'separator',
+                        label: '',
+                      },
+                      {
+                        id: 'report',
+                        label: '舉報',
+                        disabled: true,
+                        onClick: () => {},
+                      },
+                      {
+                        id: 'favorite',
+                        label: isFavorite ? lang.tr.unfavorite : lang.tr.favorite,
+                        icon: isFavorite ? 'collect' : 'uncollect',
+                        onClick: () => handleFavoriteServer(serverId),
+                      },
+                    ]);
+                  }}
+                />
+              </div>
             </div>
-          </div>
-          <div className={styles['optionBox']}>
-            <div
-              className={styles['invitation']}
-              onClick={() => {
-                // Handle invite friends
-              }}
-            />
-            <div className={styles['saperator']} />
-            <div
-              ref={settingButtonRef}
-              className={styles['setting']}
-              onClick={() => {
-                if (!settingButtonRef.current) return;
-                const x = settingButtonRef.current.getBoundingClientRect().left;
-                const y =
-                  settingButtonRef.current.getBoundingClientRect().top +
-                  settingButtonRef.current.getBoundingClientRect().height;
-                contextMenu.showContextMenu(x, y, false, false, [
-                  {
-                    id: 'invitation',
-                    label: lang.tr.invitation,
-                    show: canApplyMember,
-                    icon: 'memberapply',
-                    onClick: () => handleOpenApplyMember(userId, serverId),
-                  },
-                  {
-                    id: 'editNickname',
-                    label: lang.tr.editNickname,
-                    icon: 'editGroupcard',
-                    show: canEditNickname,
-                    onClick: () => handleOpenEditNickname(userId, serverId),
-                  },
-                  {
-                    id: 'locateMe',
-                    label: lang.tr.locateMe,
-                    icon: 'locateme',
-                    onClick: () => handleLocateUser(),
-                  },
-                  {
-                    id: 'separator',
-                    label: '',
-                  },
-                  {
-                    id: 'report',
-                    label: '舉報',
-                    disabled: true,
-                    onClick: () => {},
-                  },
-                  {
-                    id: 'favorite',
-                    label: isFavorite ? lang.tr.unfavorite : lang.tr.favorite,
-                    icon: isFavorite ? 'collect' : 'uncollect',
-                    onClick: () => handleFavoriteServer(serverId),
-                  },
-                ]);
-              }}
-            />
           </div>
         </div>
 
