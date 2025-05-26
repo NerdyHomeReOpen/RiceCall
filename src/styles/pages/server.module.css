@@ -119,6 +119,10 @@
   align-items: center;
 }
 
+.memberText {
+  min-width: 55px;
+}
+
 .idText:before {
   content: '';
   min-height: 12px;
