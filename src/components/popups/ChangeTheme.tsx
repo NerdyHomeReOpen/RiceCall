@@ -16,8 +16,57 @@ interface ChangeThemePopupProps {
 }
 
 interface Theme {
-  backgroundColor: string;
-  backgroundImage: string;
+  headerImage: string;
+  mainColor: string;
+  secondaryColor: string;
+}
+
+function getDominantColor(url: string): Promise<[number, number, number]> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = url;
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject('No canvas context');
+
+      ctx.drawImage(img, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      const colorCount: Record<string, number> = {};
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const key = `${r},${g},${b}`;
+        colorCount[key] = (colorCount[key] || 0) + 1;
+      }
+
+      const dominant = Object.entries(colorCount).sort(
+        (a, b) => b[1] - a[1],
+      )[0][0];
+      const [r, g, b] = dominant.split(',').map(Number);
+      resolve([r, g, b]);
+    };
+
+    img.onerror = reject;
+  });
+}
+
+function getSimilarColor([r, g, b]: [number, number, number]): string {
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function getContrastColor([r, g, b]: [number, number, number]): string {
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 128 ? 'black' : 'white';
 }
 
 const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
@@ -34,7 +83,9 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     null,
   );
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
-  const [pickedColor, setPickedColor] = useState<string>('#000000');
+  const [pickedColor, setPickedColor] = useState<[number, number, number]>([
+    0, 0, 0,
+  ]);
   const [customThemes, setCustomThemes] = useState<Theme[]>(
     Array.from({ length: 7 }),
   );
@@ -52,11 +103,14 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
 
   const handleSelectTheme = (event: React.MouseEvent<HTMLDivElement>) => {
     const clickedElement = event.currentTarget;
-    const image = window.getComputedStyle(clickedElement).backgroundImage;
-    const color = window.getComputedStyle(clickedElement).backgroundColor;
+    const computedStyle = window.getComputedStyle(clickedElement as Element);
+    const headerImage = computedStyle.getPropertyValue('--header-image');
+    const mainColor = computedStyle.getPropertyValue('--main-color');
+    const secondaryColor = computedStyle.getPropertyValue('--secondary-color');
 
-    setThemeValue('themeColor', color);
-    setThemeValue('themeImage', image);
+    setThemeValue('theme-main-color', mainColor);
+    setThemeValue('theme-secondary-color', secondaryColor);
+    setThemeValue('theme-header-image', headerImage);
   };
 
   const handleSaveSelectedImage = (
@@ -66,17 +120,22 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       const base64String = reader.result as string;
+      const dominantColor = await getDominantColor(base64String);
+      const similarColor = getSimilarColor(dominantColor);
+      const contrastColor = getContrastColor(dominantColor);
       const newTheme: Theme = {
-        backgroundColor: '#000000',
-        backgroundImage: `url(${base64String})`,
+        headerImage: `url(${base64String})`,
+        mainColor: similarColor,
+        secondaryColor: contrastColor,
       };
 
       if (customThemes.unshift(newTheme) >= 7) customThemes.length = 7;
 
-      setThemeValue('themeColor', newTheme.backgroundColor);
-      setThemeValue('themeImage', newTheme.backgroundImage);
+      setThemeValue('theme-header-image', newTheme.headerImage);
+      setThemeValue('theme-main-color', newTheme.mainColor);
+      setThemeValue('theme-secondary-color', newTheme.secondaryColor);
       setCustomThemes(customThemes);
       localStorage.setItem('customThemes', JSON.stringify(customThemes));
     };
@@ -86,15 +145,20 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   const handleSaveSelectedColor = () => {
     if (!pickedColor) return;
 
+    const contrastColor = getContrastColor(pickedColor);
+    const similarColor = getSimilarColor(pickedColor);
+
     const newTheme: Theme = {
-      backgroundColor: pickedColor,
-      backgroundImage: '',
+      headerImage: '',
+      mainColor: similarColor,
+      secondaryColor: contrastColor,
     };
 
     if (customThemes.unshift(newTheme) >= 7) customThemes.length = 7;
 
-    setThemeValue('themeColor', newTheme.backgroundColor);
-    setThemeValue('themeImage', newTheme.backgroundImage);
+    setThemeValue('theme-header-image', '');
+    setThemeValue('theme-main-color', newTheme.mainColor);
+    setThemeValue('theme-secondary-color', newTheme.secondaryColor);
     setCustomThemes(customThemes);
     setShowColorPicker(false);
     localStorage.setItem('customThemes', JSON.stringify(customThemes));
@@ -102,7 +166,8 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
 
   const handleRemoveCustom = (index: number) => {
     if (index !== null) {
-      const newThemes = customThemes.filter((_, i) => i !== index);
+      const newThemes = customThemes;
+      newThemes[index] = undefined as unknown as Theme;
       setCustomThemes(newThemes);
       localStorage.setItem('customThemes', JSON.stringify(newThemes));
     }
@@ -133,7 +198,11 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
           Math.min(offsetY, img.naturalHeight - 1),
         );
         const pixelData = ctx.getImageData(safeOffsetX, safeOffsetY, 1, 1).data;
-        const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
+        const color: [number, number, number] = [
+          pixelData[0],
+          pixelData[1],
+          pixelData[2],
+        ];
         setPickedColor(color);
       }
     };
@@ -217,8 +286,11 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                         <div
                           key={`custom-${i}`}
                           style={{
-                            backgroundColor: customTheme.backgroundColor,
-                            backgroundImage: customTheme.backgroundImage,
+                            'backgroundColor': customTheme.mainColor,
+                            'backgroundImage': customTheme.headerImage,
+                            '--main-color': customTheme.mainColor,
+                            '--secondary-color': customTheme.secondaryColor,
+                            '--header-image': customTheme.headerImage,
                           }}
                           onClick={(e) => handleSelectTheme(e)}
                           onContextMenu={(e) => {
@@ -270,11 +342,14 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                       onMouseMove={(e) => {
                         if (isSelectingColor) handleColorSelect(e);
                       }}
+                      onMouseLeave={() => setIsSelectingColor(false)}
                     />
                     <div className={changeTheme['colorSelectorFooter']}>
                       <div
                         className={changeTheme['colorSelectedColor']}
-                        style={{ backgroundColor: pickedColor }}
+                        style={{
+                          backgroundColor: `rgb(${pickedColor[0]}, ${pickedColor[1]}, ${pickedColor[2]})`,
+                        }}
                       />
                       <div className={changeTheme['colorSelectedBtn']}>
                         <div

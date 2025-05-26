@@ -187,146 +187,155 @@
 }
 
 .theme[data-theme-index='0'] {
-  background-image: url(../../../public/skin/57KJ57SF5Zue5oa2.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='0']::before {
   background-image: url(../../../public/skin/57KJ57SF5Zue5oa2_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/57KJ57SF5Zue5oa2.jpg);
+  --main-color: #f6e6d7;
+  --secondary-color: #000;
 }
 
 .theme[data-theme-index='1'] {
-  background-image: url(../../../public/skin/57SU55yf56ul5bm0.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='1']::before {
   background-image: url(../../../public/skin/57SU55yf56ul5bm0_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/57SU55yf56ul5bm0.jpg);
+  --main-color: #1b71ac;
+  --secondary-color: #fff;
 }
 
 .theme[data-theme-index='2'] {
-  background-image: url(../../../public/skin/5Y+v5oSb6LKT5ZKq.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='2']::before {
   background-image: url(../../../public/skin/5Y+v5oSb6LKT5ZKq_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/5Y+v5oSb6LKT5ZKq.jpg);
+  --main-color: #efd1ab;
+  --secondary-color: #000;
 }
 
 .theme[data-theme-index='3'] {
-  background-image: url(../../../public/skin/6YKj5LiA5bm0.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='3']::before {
   background-image: url(../../../public/skin/6YKj5LiA5bm0_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/6YKj5LiA5bm0.jpg);
+  --main-color: #d4be99;
+  --secondary-color: #000;
 }
 
 .theme[data-theme-index='4'] {
-  background-image: url(../../../public/skin/img_greenmood.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='4']::before {
   background-image: url(../../../public/skin/img_greenmood_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_greenmood.jpg);
+  --main-color: #89c68b;
+  --secondary-color: #000;
 }
 
 .theme[data-theme-index='5'] {
-  background-image: url(../../../public/skin/img_sunflower.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='5']::before {
   background-image: url(../../../public/skin/img_sunflower_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_sunflower.jpg);
+  --main-color: #edd569;
+  --secondary-color: #000;
 }
 
 .theme[data-theme-index='6'] {
-  background-image: url(../../../public/skin/img_sunset.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='6']::before {
   background-image: url(../../../public/skin/img_sunset_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_sunset.jpg);
+  --main-color: #7464ad;
+  --secondary-color: #000;
 }
 
 .theme[data-theme-index='7'] {
-  background-image: url(../../../public/skin/img_colddrink.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='7']::before {
   background-image: url(../../../public/skin/img_colddrink_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_colddrink.jpg);
+  --main-color: #e3908f;
+  --secondary-color: #000;
 }
 
 .theme[data-theme-index='8'] {
-  background-image: url(../../../public/skin/img_pebble.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='8']::before {
   background-image: url(../../../public/skin/img_pebble_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_pebble.jpg);
+  --main-color: #a4cfd5;
+  --secondary-color: #000;
 }
 
 .theme[data-theme-index='9'] {
-  background-image: url(../../../public/skin/img_love.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='9']::before {
   background-image: url(../../../public/skin/img_love_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_love.jpg);
+  --main-color: #aa7a52;
+  --secondary-color: #000;
 }
 
 .theme[data-theme-index='10'] {
-  background-image: url(../../../public/skin/img_hamburger.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='10']::before {
   background-image: url(../../../public/skin/img_hamburger_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_hamburger.jpg);
+  --main-color: #591234;
+  --secondary-color: #fff;
 }
 
 .theme[data-theme-index='11'] {
-  background-image: url(../../../public/skin/img_coastline.jpg);
-  background-color: #000;
-}
-
-.theme[data-theme-index='11']::before {
   background-image: url(../../../public/skin/img_coastline_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_coastline.jpg);
+  --main-color: #313131;
+  --secondary-color: #fff;
 }
 
 .theme[data-theme-index='12'] {
   background-image: linear-gradient(to bottom, #0073c6, #0073c6);
   background-color: #000;
+  --header-image: linear-gradient(to bottom, #0073c6, #0073c6);
+  --main-color: #0073c6;
+  --secondary-color: #ffffff;
 }
 
 .theme[data-theme-index='13'] {
   background-image: linear-gradient(to bottom, #6d95da, #6d95da);
   background-color: #000;
+  --header-image: linear-gradient(to bottom, #6d95da, #6d95da);
+  --main-color: #6d95da;
+  --secondary-color: #ffffff;
 }
 
 .theme[data-theme-index='14'] {
   background-image: linear-gradient(to bottom, #91b719, #729714);
   background-color: #000;
+  --header-image: linear-gradient(to bottom, #91b719, #729714);
+  --main-color: #91b719;
+  --secondary-color: #ffffff;
 }
 
 .theme[data-theme-index='15'] {
   background-image: linear-gradient(to bottom, #d7aa35, #c79c2d);
   background-color: #000;
+  --header-image: linear-gradient(to bottom, #d7aa35, #c79c2d);
+  --main-color: #d7aa35;
+  --secondary-color: #ffffff;
 }
 
 .theme[data-theme-index='16'] {
   background-image: linear-gradient(to bottom, #f3c89a, #edc193);
   background-color: #000;
+  --header-image: linear-gradient(to bottom, #f3c89a, #edc193);
+  --main-color: #f3c89a;
+  --secondary-color: #ffffff;
 }
 
 .theme[data-theme-index='17'] {
   background-image: linear-gradient(to bottom, #d74a33, #c8412b);
   background-color: #000;
+  --header-image: linear-gradient(to bottom, #d74a33, #c8412b);
+  --main-color: #d74a33;
+  --secondary-color: #ffffff;
 }
 
 .theme[data-theme-index='18'] {
   background-image: linear-gradient(to bottom, #ae6b73, #ab6a72);
   background-color: #000;
+  --header-image: linear-gradient(to bottom, #ae6b73, #ab6a72);
+  --main-color: #ae6b73;
+  --secondary-color: #ffffff;
 }
 
 .themeDescription {

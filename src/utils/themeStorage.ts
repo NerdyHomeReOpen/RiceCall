@@ -1,11 +1,16 @@
 export const THEME_CHANGE_EVENT = 'themeChange';
 
-export function setThemeValue(key: string, value: string) {
+export function setThemeValue(
+  key: 'theme-header-image' | 'theme-main-color' | 'theme-secondary-color',
+  value: string,
+) {
   localStorage.setItem(key, value);
   window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT));
 }
 
-export function removeThemeValue(key: string) {
+export function removeThemeValue(
+  key: 'theme-header-image' | 'theme-main-color' | 'theme-secondary-color',
+) {
   localStorage.removeItem(key);
   window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT));
 }
@@ -17,12 +22,15 @@ export function extractFirstColor(input: string | null): string | undefined {
 }
 
 export function applyThemeToReactState(setters: {
-  setBackgroundColor?: (val: string | null) => void;
-  setBackgroundImage?: (val: string | null) => void;
+  setHeaderImage?: (val: string | null) => void;
+  setMainColor?: (val: string | null) => void;
+  setSecondaryColor?: (val: string | null) => void;
 }) {
-  const selectedColor = localStorage.getItem('themeColor');
-  const customImage = localStorage.getItem('themeImage');
+  const headerImage = localStorage.getItem('theme-header-image');
+  const mainColor = localStorage.getItem('theme-main-color');
+  const secondaryColor = localStorage.getItem('theme-secondary-color');
 
-  if (setters.setBackgroundColor) setters.setBackgroundColor(selectedColor);
-  if (setters.setBackgroundImage) setters.setBackgroundImage(customImage);
+  if (setters.setHeaderImage) setters.setHeaderImage(headerImage);
+  if (setters.setMainColor) setters.setMainColor(mainColor);
+  if (setters.setSecondaryColor) setters.setSecondaryColor(secondaryColor);
 }

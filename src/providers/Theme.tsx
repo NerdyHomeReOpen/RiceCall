@@ -7,8 +7,9 @@ import {
 } from '@/utils/themeStorage';
 
 interface ThemeContextType {
-  backgroundColor: string | null;
-  backgroundImage: string | null;
+  headerImage: string | null;
+  mainColor: string | null;
+  secondaryColor: string | null;
 }
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
@@ -25,24 +26,25 @@ interface ThemeProviderProps {
 
 const ThemeProvider = ({ children }: ThemeProviderProps) => {
   // States
-  const [backgroundColor, setBackgroundColor] = React.useState<string | null>(
-    null,
-  );
-  const [backgroundImage, setBackgroundImage] = React.useState<string | null>(
+  const [headerImage, setHeaderImage] = React.useState<string | null>(null);
+  const [mainColor, setMainColor] = React.useState<string | null>(null);
+  const [secondaryColor, setSecondaryColor] = React.useState<string | null>(
     null,
   );
 
   // Effects
   useEffect(() => {
     applyThemeToReactState({
-      setBackgroundColor,
-      setBackgroundImage,
+      setHeaderImage,
+      setMainColor,
+      setSecondaryColor,
     });
 
     const onThemeChange = () => {
       applyThemeToReactState({
-        setBackgroundColor,
-        setBackgroundImage,
+        setHeaderImage,
+        setMainColor,
+        setSecondaryColor,
       });
     };
 
@@ -59,12 +61,12 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
       style={{
         'width': '100%',
         'height': '100%',
-        '--main-color': backgroundColor,
-        '--secondary-color': backgroundColor,
-        '--header-image': backgroundImage,
+        '--main-color': mainColor,
+        '--secondary-color': secondaryColor,
+        '--header-image': headerImage,
       }}
     >
-      <ThemeContext.Provider value={{ backgroundColor, backgroundImage }}>
+      <ThemeContext.Provider value={{ headerImage, mainColor, secondaryColor }}>
         {children}
       </ThemeContext.Provider>
     </div>

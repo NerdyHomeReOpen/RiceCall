@@ -614,7 +614,7 @@ export type InfoMessage = Message & {
 
 export type WarnMessage = Message & {
   type: 'warn';
-}
+};
 
 export type UserServerStatus = {
   recent: boolean;
@@ -805,7 +805,6 @@ export enum PopupType {
   DIALOG_WARNING = 'dialogWarning',
   DIALOG_ERROR = 'dialogError',
   DIALOG_INFO = 'dialogInfo',
-  ANTHOR_DEVICE_LOGIN = 'anotherDeviceLogin',
   CHANGE_THEME = 'changeTheme',
   ABOUTUS = 'aboutus',
   FRIEND_VERIFICATION = 'friendVerification',
@@ -837,8 +836,7 @@ export const PopupSize = {
   [PopupType.DIALOG_WARNING]: { height: 200, width: 370 },
   [PopupType.DIALOG_ERROR]: { height: 200, width: 370 },
   [PopupType.DIALOG_INFO]: { height: 200, width: 370 },
-  [PopupType.ANTHOR_DEVICE_LOGIN]: { height: 200, width: 370 },
-  [PopupType.CHANGE_THEME]: { height: 331, width: 480 },
+  [PopupType.CHANGE_THEME]: { height: 340, width: 480 },
   [PopupType.ABOUTUS]: { height: 440, width: 480 },
   [PopupType.FRIEND_VERIFICATION]: { height: 320, width: 500 },
   Settings: { height: 520, width: 600 },
