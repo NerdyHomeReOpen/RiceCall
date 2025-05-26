@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import emoji from '@/styles/emoji.module.css';
 
 // Components
-import { emojis, unicodeEmojis, Emoji } from './emojis';
+import { emojis, Emoji } from './emojis';
 
 interface EmojiPickerProps {
   onEmojiSelect: (emoji: string) => void;
@@ -106,7 +106,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
               e.stopPropagation();
             }}
           >
-            {unicodeEmojis.map((e: Emoji) => (
+            {emojis.map((e: Emoji) => (
               <div
                 key={e.id}
                 className={emoji['emoji']}

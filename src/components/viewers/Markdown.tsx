@@ -10,7 +10,7 @@ import DOMPurify from 'dompurify';
 import hljs from 'highlight.js';
 
 // Components
-import { emojis, unicodeEmojis } from '@/components/emojis';
+import { emojis } from '@/components/emojis';
 
 // CSS
 import 'highlight.js/styles/github.css';
@@ -85,9 +85,7 @@ const Markdown: React.FC<MarkdownProps> = React.memo(
     const withEmojis = processedText.replace(
       /(\[emoji_[\w-]+\])/g,
       (match: string) => {
-        const emoji = [...emojis, ...unicodeEmojis].find(
-          (emoji) => emoji.char === match,
-        );
+        const emoji = emojis.find((emoji) => emoji.char === match);
         if (!emoji) return match;
         return `<img src="${emoji.path}" alt="${emoji.char}" />`;
       },

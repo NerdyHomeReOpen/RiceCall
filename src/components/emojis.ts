@@ -8,7 +8,7 @@ export interface Emoji {
   path: string;
 }
 
-const emojis: Emoji[] = [
+const customEmojis: Emoji[] = [
   { id: 0, char: '[emoji_1]', alt: '微笑', path: '/smiles/1.gif' },
   { id: 1, char: '[emoji_2]', alt: '開懷笑', path: '/smiles/2.gif' },
   { id: 2, char: '[emoji_3]', alt: '眨眼', path: '/smiles/3.gif' },
@@ -81,4 +81,4 @@ const unicodeEmojis: Emoji[] = emojiData.map((emoji, index) => {
   };
 });
 
-export { emojis, unicodeEmojis };
+export const emojis = [...customEmojis, ...unicodeEmojis];

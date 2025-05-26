@@ -33,9 +33,6 @@ import ChangeTheme from '@/components/popups/ChangeTheme';
 import About from '@/components/popups/AboutUs';
 import FriendVerification from '@/components/popups/FriendVerification';
 
-// Utils
-import { emojiList, convertEmojiPlaceholderToHtml } from '@/utils/emoji';
-
 // Services
 import ipcService from '@/services/ipc.service';
 import refreshService from '@/services/refresh.service';
@@ -48,12 +45,9 @@ import directMessageStyles from '@/styles/popups/directMessage.module.css';
 
 const directMessageHeader = (targetSignature: string) => (
   <div className={directMessageStyles['header']}>
-    <div
-      className={directMessageStyles['userSignature']}
-      dangerouslySetInnerHTML={{
-        __html: convertEmojiPlaceholderToHtml(targetSignature || '', emojiList),
-      }}
-    />
+    <div className={directMessageStyles['userSignature']}>
+      {targetSignature}
+    </div>
     <div className={directMessageStyles['directOptionButtons']}>
       <div
         className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`}

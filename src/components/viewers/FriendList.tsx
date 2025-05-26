@@ -22,7 +22,6 @@ import refreshService from '@/services/refresh.service';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
-import { emojiList, convertEmojiPlaceholderToHtml } from '@/utils/emoji';
 
 interface FriendGroupTabProps {
   user: User;
@@ -366,15 +365,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
                 <div className={styles['serverName']}>{friendServerName}</div>
               </div>
             ) : (
-              <div
-                className={styles['signature']}
-                dangerouslySetInnerHTML={{
-                  __html: convertEmojiPlaceholderToHtml(
-                    friendSignature || '',
-                    emojiList,
-                  ),
-                }}
-              />
+              <div className={styles['signature']}>{friendSignature}</div>
             )}
           </div>
         </div>
