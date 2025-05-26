@@ -29,11 +29,13 @@ export const authService = {
     const res = await apiService.post('/login', data);
     if (!res?.token) return false;
     const accounts = localStorage.getItem('accounts')?.split(',') || [];
-    if (!accounts.includes(data.account)) {
+    if (data.rememberAccount && !accounts.includes(data.account)) {
       accounts.push(data.account);
+      localStorage.setItem('accounts', accounts.join(','));
     }
-    localStorage.setItem('token', res.token);
-    localStorage.setItem('accounts', accounts.join(','));
+    if (data.autoLogin) {
+      localStorage.setItem('token', res.token);
+    }
     ipcService.auth.login(res.token);
     return true;
   },
