@@ -238,6 +238,14 @@ export const ApproveMemberApplicationHandler: SocketRequestHandler = {
         data,
         'APPROVEMEMBERAPPLICATION',
       );
+      // Target User
+      const user = await database.get.user(userId);
+      const userMember = await database.get.member(userId, serverId);
+
+      // Operator
+      const operator = await database.get.user(operatorId);
+      const operatorMember = await database.get.member(operatorId, serverId);
+      
 
       new Logger('ApproveMemberApplication').info(
         `User(${operatorId}) approve member application for User(${userId}) to Server(${serverId})`,
@@ -252,6 +260,27 @@ export const ApproveMemberApplicationHandler: SocketRequestHandler = {
       // Member should already exist when joining the server
       await MemberApplicationHandlerServerSide.deleteMemberApplication(userId, serverId);
       await MemberHandlerServerSide.updateMember(userId, serverId, { permissionLevel: 2 });
+
+      const updatedUserMember = {
+        ...userMember,
+        ...{ permissionLevel: 2 },
+      };
+
+      io.to(`server_${serverId}`).emit('onMessage', {
+        serverId: serverId,
+        channelId: null,
+        sender: {
+          ...operatorMember,
+          ...operator
+        },
+        receiver: {
+          ...updatedUserMember,
+          ...user
+        },
+        type: 'event',
+        content: 'updateMemberMessage',
+        timestamp: Date.now().valueOf(),
+      });
 
       socket.emit('memberApproval', {
         userId,
