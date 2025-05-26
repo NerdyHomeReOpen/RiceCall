@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FriendSchema } from '../friend/friend.schema';
 
 export const FriendApplicationSchema = z.object({
   senderId: z.string().length(36),
@@ -33,6 +34,6 @@ export const ApproveFriendApplicationSchema = z
   .object({
     userId: z.string().length(36),
     targetId: z.string().length(36),
-    friend: z.string().length(36).nullable(),
+    friend: FriendSchema.partial(),
   })
   .strict();
