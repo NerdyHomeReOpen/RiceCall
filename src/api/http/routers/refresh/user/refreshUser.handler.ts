@@ -146,7 +146,7 @@ export const RefreshUserFriendsHandler: RequestHandler = {
       );
 
       const userFriends = (await database.get.userFriends(userId)).map((friend) => {
-        const isFriendOnline = SocketServer.hasSocket(friend.userId);
+        const isFriendOnline = SocketServer.hasSocket(friend.targetId);
         return {
           ...friend,
           online: isFriendOnline,
