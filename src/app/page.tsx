@@ -152,10 +152,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
     localStorage.setItem('language', language);
   };
 
-  const handleOpenFriendVerification = () => {
-    ipcService.popup.open(PopupType.FRIEND_VERIFICATION, 'friendVerification');
-    ipcService.initialData.onRequest('friendVerification', {});
-  };
+  // const handleOpenFriendVerification = () => {
+  //   ipcService.popup.open(PopupType.FRIEND_VERIFICATION, 'friendVerification');
+  //   ipcService.initialData.onRequest('friendVerification', {});
+  // };
 
   // Effects
   useEffect(() => {
@@ -265,10 +265,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
       <div className={header['buttons']}>
         <div className={header['gift']} />
         <div className={header['game']} />
-        <div
-          className={header['notice']}
-          onClick={() => handleOpenFriendVerification()}
-        />
+        <div className={header['notice']} />
         <div className={header['spliter']} />
         <div
           ref={menuRef}
@@ -578,7 +575,7 @@ const RootPageComponent = () => {
 
   const handleOpenPopup = (popup: {
     type: PopupType;
-    id: string; // FIXME: Server didn't return this
+    id: string;
     initialData: any;
   }) => {
     ipcService.popup.open(popup.type, popup.id);
