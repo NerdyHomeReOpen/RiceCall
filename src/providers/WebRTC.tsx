@@ -651,9 +651,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   };
 
   useEffect(() => {
-    const localMicVolume = window.localStorage.getItem('inputVolume');
-    const localSpeakerVolume = window.localStorage.getItem('outputVolume');
-    const localMute = window.localStorage.getItem('isMute');
+    const localMicVolume = window.localStorage.getItem('mic-volume');
+    const localSpeakerVolume = window.localStorage.getItem('speaker-volume');
+    const localMute = window.localStorage.getItem('is-mute');
 
     setMicVolume(localMicVolume !== null ? parseInt(localMicVolume) : 100);
     setSpeakerVolume(
@@ -758,10 +758,16 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [handleUpdateInputStream, handleUpdateOutputStream]);
 
   useEffect(() => {
-    window.localStorage.setItem('inputVolume', micVolume.toString());
-    window.localStorage.setItem('outputVolume', speakerVolume.toString());
-    window.localStorage.setItem('isMute', isMute.toString());
-  }, [micVolume, speakerVolume, isMute]);
+    window.localStorage.setItem('mic-volume', micVolume.toString());
+  }, [micVolume]);
+
+  useEffect(() => {
+    window.localStorage.setItem('speaker-volume', speakerVolume.toString());
+  }, [speakerVolume]);
+
+  useEffect(() => {
+    window.localStorage.setItem('is-mute', isMute.toString());
+  }, [isMute]);
 
   useEffect(() => {
     for (const dataChannel of Object.values(peerDataChannels.current)) {

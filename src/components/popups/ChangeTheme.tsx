@@ -137,7 +137,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       setThemeValue('theme-main-color', newTheme.mainColor);
       setThemeValue('theme-secondary-color', newTheme.secondaryColor);
       setCustomThemes(customThemes);
-      localStorage.setItem('customThemes', JSON.stringify(customThemes));
+      localStorage.setItem('custom-themes', JSON.stringify(customThemes));
     };
     reader.readAsDataURL(file);
   };
@@ -161,7 +161,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     setThemeValue('theme-secondary-color', newTheme.secondaryColor);
     setCustomThemes(customThemes);
     setShowColorPicker(false);
-    localStorage.setItem('customThemes', JSON.stringify(customThemes));
+    localStorage.setItem('custom-themes', JSON.stringify(customThemes));
   };
 
   const handleRemoveCustom = (index: number) => {
@@ -169,7 +169,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       const newThemes = customThemes;
       newThemes[index] = undefined as unknown as Theme;
       setCustomThemes(newThemes);
-      localStorage.setItem('customThemes', JSON.stringify(newThemes));
+      localStorage.setItem('custom-themes', JSON.stringify(newThemes));
     }
   };
 
@@ -215,7 +215,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   useEffect(() => {
     containerRef.current?.focus();
 
-    const localTheme = localStorage.getItem('customThemes');
+    const localTheme = localStorage.getItem('custom-themes');
 
     if (localTheme) {
       const themes = JSON.parse(localTheme);
