@@ -53,6 +53,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     const [messageInput, setMessageInput] = useState<string>('');
     const [isComposing, setIsComposing] = useState<boolean>(false);
     const [isFriend, setIsFriend] = useState<boolean>(false);
+    const [isOnline, setIsOnline] = useState<boolean>(false);
 
     // Variables
     const { avatarUrl: userAvatarUrl } = user;
@@ -63,7 +64,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       currentServerId: targetCurrentServerId,
       badges: targetBadges,
     } = target;
-    const isOnline = targetCurrentServerId !== null;
     const { name: targetCurrentServerName } = targetCurrentServer;
 
     // Handlers
@@ -194,6 +194,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
             setUser(user);
           }
           if (friend) {
+            if (friend.online) {
+              setIsOnline(friend.online);
+            }
             setIsFriend(true);
           }
         });
@@ -202,6 +205,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     }, [userId, targetId]);
 
     useEffect(() => {
+      setIsOnline(targetCurrentServerId ? true : false); // 後端更新後移除
       if (!targetCurrentServerId) return;
       Promise.all([
         refreshService.server({
@@ -258,7 +262,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
           {/* Main Content */}
           <div className={directMessage['mainContent']}>
-            {isFriend && targetCurrentServerId && (
+            {isFriend && isOnline && targetCurrentServerId && (
             <div
               className={directMessage['serverInArea']}
               onClick={() => {
