@@ -355,6 +355,24 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 show: canManageChannel,
               },
               {
+                id: 'broadcastChannel',
+                label: '頻道廣播',
+                disabled: true,
+                show: canManageChannel,
+                onClick: () => {
+                  // TODO: channelBroadcast
+                } 
+              },
+              {
+                id: 'broadcastServer',
+                label: '廣播',
+                disabled: true,
+                show: canManageChannel,
+                onClick: () => {
+                  // TODO: serverBroadcast
+                } 
+              },
+              {
                 id: 'moveAllUserToChannel',
                 label: '批量移動到我的房間',
                 show: canMoveToChannel,
@@ -748,6 +766,24 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 id: 'separator',
                 label: '',
                 show: canManageChannel,
+              },
+              {
+                id: 'broadcastChannel',
+                label: '頻道廣播',
+                disabled: true,
+                show: canManageChannel,
+                onClick: () => {
+                  // TODO: channelBroadcast
+                } 
+              },
+              {
+                id: 'broadcastServer',
+                label: '廣播',
+                disabled: true,
+                show: canManageChannel,
+                onClick: () => {
+                  // TODO: serverBroadcast
+                } 
               },
               {
                 id: 'moveAllUserToChannel',

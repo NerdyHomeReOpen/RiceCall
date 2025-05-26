@@ -455,9 +455,44 @@
   overflow-y: auto;
 }
 
+.broadcastArea {
+  position: absolute;
+  right: 0;
+  left: 0;
+  bottom: 6rem;
+  display: flex;
+  min-height: 25px;
+  align-items: center;
+  background-color: #fefee4;
+  justify-content: flex-start;
+  border: solid 2px #f9c55d;
+  border-radius: 5px;
+  margin: 0 0.75rem;
+  padding: 1px 5px;
+}
+
+.broadcastArea .broadcastContent {
+  flex: 5;
+}
+
+.broadcastArea .broadcastClose {
+  z-index: 2;
+  min-width: 12px;
+  min-height: 12px;
+  position: relative;
+  border-radius: 50%;
+  background-color: #f9c55d;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
 /* Input Area */
 
 .inputArea {
+  position: relative;
   display: flex;
   min-height: 80px;
   padding: 0.75rem;
