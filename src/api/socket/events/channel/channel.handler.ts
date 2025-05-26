@@ -57,7 +57,10 @@ export const ConnectChannelHandler: SocketRequestHandler = {
         if (operatorMember.permissionLevel < 5)
           reason = 'Not enough permission';
 
-        if (operatorMember.permissionLevel <= userMember.permissionLevel)
+        if (userMember.permissionLevel !== 6 && operatorMember.permissionLevel < userMember.permissionLevel)
+          reason = 'Permission lower than the target';
+
+        if (userMember.permissionLevel === 6 && operatorMember.permissionLevel < 5)
           reason = 'Permission lower than the target';
 
         if (user.currentServerId !== serverId)
@@ -93,9 +96,9 @@ export const ConnectChannelHandler: SocketRequestHandler = {
           operatorMember.permissionLevel < 5
         )
           reason = 'Channel is full';
-
-        if (channel.visibility === 'readonly') reason = 'Read-only channel';
       }
+
+      if (channel.visibility === 'readonly') reason = 'Read-only channel';
 
       if (reason) {
         new Logger('ConnectChannel').warn(
