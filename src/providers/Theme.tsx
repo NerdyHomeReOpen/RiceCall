@@ -65,7 +65,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
           '--main-color': mainColor,
           '--secondary-color': secondaryColor,
           '--header-image': headerImage,
-          'color': 'var(--secondary-color)',
+          'color': secondaryColor,
         } as React.CSSProperties
       }
     >
