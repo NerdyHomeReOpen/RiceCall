@@ -476,6 +476,7 @@
 .friendCard .signature {
   color: #888;
   overflow: hidden;
+  min-height: 15px;
   white-space: nowrap;
   text-overflow: ellipsis;
   display: flex;

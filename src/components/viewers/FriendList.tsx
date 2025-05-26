@@ -48,10 +48,14 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     const { friendGroupId, name: friendGroupName } = friendGroup;
     const friendGroupFriends =
       friendGroupId === ''
-        ? friends
-        : friends.filter((fd) => fd.friendGroupId === friendGroupId);
-    const friendsInServer = friendGroupFriends.filter(
-      (fd) => fd.currentServerId,
+        ? friends.sort((a, b) => {
+          return (b.online ? 1 : 0) - (a.online ? 1 : 0);
+        })
+        : friends.filter((fd) => fd.friendGroupId === friendGroupId).sort((a, b) => {
+          return (b.online ? 1 : 0) - (a.online ? 1 : 0);
+        });
+    const friendsOnlineCount = friendGroupFriends.filter(
+      (fd) => fd.online ?? fd.currentServerId,
     ).length;
     const canManageFriendGroup = friendGroupId !== '';
 
@@ -124,7 +128,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
           />
           <div className={styles['tabLable']}>{friendGroupName}</div>
           <div className={styles['tabCount']}>
-            {`(${friendsInServer}/${friendGroupFriends.length})`}
+            {`(${friendsOnlineCount}/${friendGroupFriends.length})`}
           </div>
         </div>
 
@@ -353,7 +357,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
               />
               <BadgeListViewer badges={friendBadges} maxDisplay={5} />
             </div>
-            {friendCurrentServerId ? (
+            {isFriendOnline && friendCurrentServerId ? (
               <div
                 className={`
                   ${styles['container']}

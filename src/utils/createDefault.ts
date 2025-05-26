@@ -91,6 +91,7 @@ export const createDefault = {
     isBlocked: false,
     friendGroupId: '',
     createdAt: 0,
+    online: false,
     ...overrides,
   }),
 
