@@ -4,6 +4,9 @@ import StandardizedError from '@/error';
 // Utils
 import Logger from '@/utils/logger';
 
+// Socket
+import SocketServer from '@/api/socket';
+
 // Http
 import { RequestHandler } from '@/handler';
 import { ResponseType } from '@/api/http';
@@ -142,7 +145,13 @@ export const RefreshUserFriendsHandler: RequestHandler = {
         'REFRESHUSERFRIENDS',
       );
 
-      const userFriends = await database.get.userFriends(userId);
+      const userFriends = (await database.get.userFriends(userId)).map((friend) => {
+        const isFriendOnline = SocketServer.hasSocket(friend.userId);
+        return {
+          ...friend,
+          online: isFriendOnline,
+        }
+      });
 
       return {
         statusCode: 200,

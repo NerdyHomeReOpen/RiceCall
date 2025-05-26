@@ -29,6 +29,10 @@ export default class SocketServer {
     this.server = server;
   }
 
+  static hasSocket(userId: string) {
+    return SocketServer.userSocketMap.has(userId);
+  }
+
   static getSocket(userId: string) {
     const socketId = SocketServer.userSocketMap.get(userId);
 
