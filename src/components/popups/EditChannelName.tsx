@@ -21,11 +21,10 @@ import { createDefault } from '@/utils/createDefault';
 interface editChannelNamePopupProps {
   channelId: Channel['channelId'];
   serverId: Server['serverId'];
-  name: Channel['name'];
 }
 
 const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
-  (initialData: editChannelNamePopupProps) => {
+  ({ channelId, serverId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -37,8 +36,8 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
     const [channel, setChannel] = useState<Channel>(createDefault.channel());
 
     // Variables
-    const { channelId, serverId } = initialData;
     const { name: channelName } = channel;
+    const canSubmit = channelName.trim();
 
     // Handlers
     const handleUpdateChannel = (
@@ -73,7 +72,8 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
     }, [channelId]);
 
     return (
-      <form className={popup['popupContainer']}>
+      <div className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -96,11 +96,13 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}
-            disabled={!channelName.trim()}
+            disabled={!canSubmit}
             onClick={() => {
+              if (!canSubmit) return;
               handleUpdateChannel({ name: channelName }, channelId, serverId);
               handleClose();
             }}
@@ -111,7 +113,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
             {lang.tr.cancel}
           </button>
         </div>
-      </form>
+      </div>
     );
   },
 );

@@ -3,8 +3,12 @@ import React from 'react';
 // CSS
 import homePage from '@/styles/pages/home.module.css';
 
+// Providers
+import { useContextMenu } from '@/providers/ContextMenu';
+import { useSocket } from '@/providers/Socket';
+
 // Type
-import { UserServer, User } from '@/types';
+import { UserServer, User, Server } from '@/types';
 
 interface ServerCardProps {
   user: User;
@@ -14,19 +18,73 @@ interface ServerCardProps {
 
 const ServerCard: React.FC<ServerCardProps> = React.memo(
   ({ user, server, onClick }) => {
+    // Hooks
+    const contextMenu = useContextMenu();
+    const socket = useSocket();
+
     // Variables
     const {
+      serverId,
       name: serverName,
       avatarUrl: serverAvatarUrl,
       displayId: serverDisplayId,
       slogan: serverSlogan,
       ownerId: serverOwnerId,
+      favorite: serverFavorite,
+      permissionLevel: serverPermissionLevel,
     } = server;
+    const canRemoveMemberShip =
+      serverPermissionLevel > 1 && serverPermissionLevel < 6;
     const { userId } = user;
     const isOwner = serverOwnerId === userId;
 
+    const handleFavoriteServer = (serverId: Server['serverId']) => {
+      if (!socket) return;
+      socket.send.favoriteServer({
+        serverId,
+      });
+    };
+
     return (
-      <div className={homePage['serverCard']} onClick={onClick}>
+      <div
+        className={homePage['serverCard']}
+        onClick={onClick}
+        onContextMenu={(e) => {
+          const x = e.clientX;
+          const y = e.clientY;
+          contextMenu.showContextMenu(x, y, false, false, [
+            {
+              id: 'joinServer',
+              label: '進入',
+              onClick: onClick,
+            },
+            {
+              id: 'viewServerInfo',
+              label: '查看群資料',
+              disabled: true,
+              onClick: () => {
+                /* handleOpenServerSetting(userId, serverId); */
+              },
+            },
+            {
+              id: 'setFavorite',
+              label: !serverFavorite ? '加入收藏' : '取消收藏',
+              onClick: () => {
+                handleFavoriteServer(serverId);
+              },
+            },
+            {
+              id: 'removeMemberShip',
+              label: '解除會員關係',
+              disabled: true,
+              show: canRemoveMemberShip,
+              onClick: () => {
+                /* handleUpdateMember() */
+              },
+            },
+          ]);
+        }}
+      >
         <div
           className={homePage['serverAvatarPicture']}
           style={{ backgroundImage: `url(${serverAvatarUrl})` }}

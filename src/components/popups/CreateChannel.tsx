@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { Channel, Server, User } from '@/types';
+import { Channel, Server } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
@@ -19,13 +19,12 @@ import refreshService from '@/services/refresh.service';
 import { createDefault } from '@/utils/createDefault';
 
 interface CreateChannelPopupProps {
-  userId: User['userId'];
   channelId: Channel['channelId'] | null;
   serverId: Server['serverId'];
 }
 
 const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
-  (initialData: CreateChannelPopupProps) => {
+  ({ channelId, serverId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -38,9 +37,9 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
     const [channel, setChannel] = useState<Channel>(createDefault.channel());
 
     // Variables
-    const { channelId, serverId } = initialData;
     const { name: parentName } = parent;
     const { name: channelName } = channel;
+    const canCreate = channelName.trim();
 
     const handleCreateChannel = (
       channel: Partial<Channel>,
@@ -74,12 +73,15 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
 
     return (
       <div className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
               <div className={popup['inputBox']}>
                 <div className={popup['label']}>{lang.tr.parentChannel}</div>
-                <label>{parentName || lang.tr.none}</label>
+                <div className={popup['label']}>
+                  {parentName || lang.tr.none}
+                </div>
               </div>
               <div className={popup['inputBox']}>
                 <div className={popup['label']}>{lang.tr.channelName}</div>
@@ -101,10 +103,11 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}
-            disabled={!channelName.trim()}
+            disabled={!canCreate}
             onClick={() => {
               handleCreateChannel(
                 { name: channelName, categoryId: channelId },

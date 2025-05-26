@@ -10,10 +10,10 @@ import DOMPurify from 'dompurify';
 import hljs from 'highlight.js';
 
 // Components
-import emojis from '@/components/emojis';
+import { emojis, unicodeEmojis } from '@/components/emojis';
 
 // CSS
-import 'highlight.js/styles/github-dark.css';
+import 'highlight.js/styles/github.css';
 import markdown from '@/styles/viewers/markdown.module.css';
 
 // Providers
@@ -83,11 +83,13 @@ const Markdown: React.FC<MarkdownProps> = React.memo(
       '$1\n\n$3',
     );
     const withEmojis = processedText.replace(
-      /\[emoji_(\d+)\]/g,
-      (match: string, id: string) => {
-        const emojiId = parseInt(id);
-        if (!emojis.find((emoji) => emoji.id === emojiId)) return match;
-        return `<img src="/smiles/${emojiId + 1}.gif" alt="[emoji_${id}]" />`;
+      /(\[emoji_[\w-]+\])/g,
+      (match: string) => {
+        const emoji = [...emojis, ...unicodeEmojis].find(
+          (emoji) => emoji.char === match,
+        );
+        if (!emoji) return match;
+        return `<img src="${emoji.path}" alt="${emoji.char}" />`;
       },
     );
     const sanitized = DOMPurify.sanitize(withEmojis, PURIFY_CONFIG);
@@ -121,6 +123,19 @@ const Markdown: React.FC<MarkdownProps> = React.memo(
       hr: ({ node, ...props }: any) => <hr {...props} />,
       img: ({ node, src, alt, ...props }: any) => {
         if (isGuest && forbidGuestUrl) return <span {...props} />;
+        // TODO: Need a better way to handle this
+        if (alt.startsWith('[emoji_')) {
+          return (
+            <img
+              src={src}
+              alt={alt}
+              width="19"
+              height="19"
+              draggable={false}
+              {...props}
+            />
+          );
+        }
         return <img src={src} alt={alt} {...props} />;
       },
       code: ({ node, className, children, ...props }: any) => {

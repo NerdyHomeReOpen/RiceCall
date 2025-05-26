@@ -3,7 +3,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -33,7 +33,6 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
-import StandardizedError, { errorHandler } from '@/utils/errorHandler';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
@@ -62,6 +61,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
   const lang = useLanguage();
   const contextMenu = useContextMenu();
   const mainTab = useMainTab();
+
+  // Refs
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -111,6 +113,16 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
     ipcService.initialData.onRequest('systemSetting', {});
   };
 
+  const handleOpenAboutUs = () => {
+    ipcService.popup.open(PopupType.ABOUTUS, 'aboutUs');
+    ipcService.initialData.onRequest('aboutUs', {});
+  };
+
+  const handleOpenChangeTheme = () => {
+    ipcService.popup.open(PopupType.CHANGE_THEME, 'changeTheme');
+    ipcService.initialData.onRequest('changeTheme', {});
+  };
+
   const handleLogout = () => {
     authService.logout();
   };
@@ -140,6 +152,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
     localStorage.setItem('language', language);
   };
 
+  // const handleOpenFriendVerification = () => {
+  //   ipcService.popup.open(PopupType.FRIEND_VERIFICATION, 'friendVerification');
+  //   ipcService.initialData.onRequest('friendVerification', {});
+  // };
+
   // Effects
   useEffect(() => {
     const offMaximize = ipcService.window.onMaximize(() => {
@@ -157,7 +174,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
   }, []);
 
   return (
-    <div className={header['header']}>
+    <header className={header['header']}>
       {/* Title */}
       <div className={`${header['titleBox']} ${header['big']}`}>
         <div
@@ -203,6 +220,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
           return (
             <div
               key={`Tabs-${TabId}`}
+              data-tab-id={TabId}
               className={`${header['tab']} ${
                 TabId === mainTab.selectedTabId ? header['selected'] : ''
               }`}
@@ -213,13 +231,31 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
               <div className={header['tabLable']}>{TabLable}</div>
               <div className={header['tabBg']} />
               {TabClose && (
-                <div
-                  className={header['tabClose']}
+                <svg
+                  className={`${header['tabClose']} themeTabClose`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleLeaveServer(userId, serverId);
                   }}
-                />
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="12"
+                    fill="var(--main-color, rgb(55 144 206))"
+                  />
+                  <path
+                    d="M17 7L7 17M7 7l10 10"
+                    stroke="#fff"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               )}
             </div>
           );
@@ -232,85 +268,133 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
         <div className={header['notice']} />
         <div className={header['spliter']} />
         <div
+          ref={menuRef}
           className={header['menu']}
-          onClick={(e) =>
-            contextMenu.showContextMenu(
-              e.clientX,
-              e.clientY,
-              [
-                {
-                  id: 'system-setting',
-                  label: lang.tr.systemSettings,
-                  icon: 'setting',
-                  onClick: () => handleOpenSystemSetting(),
+          onClick={() => {
+            if (!menuRef.current) return;
+            const x = menuRef.current.getBoundingClientRect().left;
+            const y =
+              menuRef.current.getBoundingClientRect().top +
+              menuRef.current.getBoundingClientRect().height;
+            contextMenu.showContextMenu(x, y, false, false, [
+              {
+                id: 'system-setting',
+                label: lang.tr.systemSettings,
+                icon: 'setting',
+                onClick: () => handleOpenSystemSetting(),
+              },
+              // {
+              //   id: 'message-history',
+              //   label: lang.tr.messageHistory,
+              //   icon: 'message',
+              //   onClick: () => {},
+              // },
+              {
+                id: 'change-theme',
+                label: lang.tr.changeTheme,
+                icon: 'skin',
+                onClick: () => handleOpenChangeTheme(),
+              },
+              {
+                id: 'feedback',
+                label: lang.tr.feedback,
+                icon: 'feedback',
+                onClick: () => {
+                  window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank');
                 },
-                // {
-                //   id: 'message-history',
-                //   label: lang.tr.messageHistory,
-                //   icon: 'message',
-                //   onClick: () => {},
-                // },
-                // {
-                //   id: 'change-theme',
-                //   label: lang.tr.changeTheme,
-                //   icon: 'skin',
-                //   onClick: () => {},
-                // },
-                {
-                  id: 'feedback',
-                  label: lang.tr.feedback,
-                  icon: 'feedback',
-                  onClick: () => {
-                    window.open(
-                      'https://forms.gle/AkBTqsZm9NGr5aH46',
-                      '_blank',
-                    );
+              },
+              {
+                id: 'language-select',
+                label: lang.tr.languageSelect,
+                icon: 'submenu',
+                hasSubmenu: true,
+                submenuItems: [
+                  {
+                    id: 'language-select-tw',
+                    label: '繁體中文',
+                    onClick: () => handleLanguageChange('tw'),
                   },
-                },
-                {
-                  id: 'language-select',
-                  label: lang.tr.languageSelect,
-                  icon: 'submenu',
-                  hasSubmenu: true,
-                  submenuItems: [
-                    {
-                      id: 'language-select-tw',
-                      label: '繁體中文',
-                      onClick: () => handleLanguageChange('tw'),
+                  {
+                    id: 'language-select-cn',
+                    label: '简体中文',
+                    onClick: () => handleLanguageChange('cn'),
+                  },
+                  {
+                    id: 'language-select-en',
+                    label: 'English',
+                    onClick: () => handleLanguageChange('en'),
+                  },
+                  {
+                    id: 'language-select-jp',
+                    label: '日本語',
+                    onClick: () => handleLanguageChange('jp'),
+                  },
+                ],
+              },
+              {
+                id: 'help-center',
+                label: lang.tr.helpCenter,
+                icon: 'submenu',
+                hasSubmenu: true,
+                submenuItems: [
+                  {
+                    id: 'faq',
+                    label: lang.tr.faq,
+                    onClick: () => {
+                      window.open('https://ricecall.com.tw/faq', '_blank');
                     },
-                    {
-                      id: 'language-select-cn',
-                      label: '简体中文',
-                      onClick: () => handleLanguageChange('cn'),
+                  },
+                  {
+                    id: 'agreement',
+                    label: lang.tr.agreement,
+                    onClick: () => {
+                      window.open(
+                        'https://ricecall.com.tw/agreement',
+                        '_blank',
+                      );
                     },
-                    {
-                      id: 'language-select-en',
-                      label: 'English',
-                      onClick: () => handleLanguageChange('en'),
+                  },
+                  {
+                    id: 'specification',
+                    label: lang.tr.specification,
+                    onClick: () => {
+                      window.open(
+                        'https://ricecall.com.tw/specification',
+                        '_blank',
+                      );
                     },
-                    {
-                      id: 'language-select-jp',
-                      label: '日本語',
-                      onClick: () => handleLanguageChange('jp'),
+                  },
+                  {
+                    id: 'contact-us',
+                    label: lang.tr.contactUs,
+                    onClick: () => {
+                      window.open(
+                        'https://ricecall.com.tw/contactus',
+                        '_blank',
+                      );
                     },
-                  ],
-                },
-                {
-                  id: 'logout',
-                  label: lang.tr.logout,
-                  icon: 'logout',
-                  onClick: () => handleLogout(),
-                },
-                {
-                  id: 'exit',
-                  label: lang.tr.exit,
-                  icon: 'exit',
-                  onClick: () => handleExit(),
-                },
-              ],
-              e.currentTarget as HTMLElement,
-            )
-          }
+                  },
+                  {
+                    id: 'about-us',
+                    label: lang.tr.aboutUs,
+                    onClick: () => handleOpenAboutUs(),
+                  },
+                ],
+              },
+              {
+                id: 'logout',
+                label: lang.tr.logout,
+                icon: 'logout',
+                onClick: () => handleLogout(),
+              },
+              {
+                id: 'exit',
+                label: lang.tr.exit,
+                icon: 'exit',
+                onClick: () => handleExit(),
+              },
+            ]);
+          }}
         />
         <div className={header['minimize']} onClick={() => handleMinimize()} />
         <div
@@ -319,7 +403,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
         />
         <div className={header['close']} onClick={() => handleClose()} />
       </div>
-    </div>
+    </header>
   );
 });
 
@@ -489,39 +573,9 @@ const RootPageComponent = () => {
     setChannelMessages((prev) => [...prev, ...channelMessages]);
   };
 
-  const handleError = (error: StandardizedError) => {
-    new errorHandler(error).show();
-  };
-
-  const handleConnectError = () => {
-    new errorHandler(
-      new StandardizedError({
-        name: 'ConnectError',
-        message: '連線失敗',
-        part: 'SOCKET',
-        tag: 'CONNECT_ERROR',
-        statusCode: 500,
-        handler: () => ipcService.auth.logout(),
-      }),
-    ).show();
-  };
-
-  const handleReconnectError = () => {
-    new errorHandler(
-      new StandardizedError({
-        name: 'ReconnectError',
-        message: '重新連線失敗',
-        part: 'SOCKET',
-        tag: 'RECONNECT_ERROR',
-        statusCode: 500,
-        handler: () => ipcService.auth.logout(),
-      }),
-    ).show();
-  };
-
   const handleOpenPopup = (popup: {
     type: PopupType;
-    id: string; // FIXME: Server didn't return this
+    id: string;
     initialData: any;
   }) => {
     ipcService.popup.open(popup.type, popup.id);
@@ -587,9 +641,6 @@ const RootPageComponent = () => {
       [SocketServerEvent.SERVER_CHANNEL_DELETE]: handleServerChannelDelete,
       [SocketServerEvent.ON_MESSAGE]: handleOnMessages,
       [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
-      [SocketServerEvent.ERROR]: handleError,
-      [SocketServerEvent.CONNECT_ERROR]: handleConnectError,
-      [SocketServerEvent.RECONNECT_ERROR]: handleReconnectError,
     };
     const unsubscribe: (() => void)[] = [];
 
@@ -646,7 +697,6 @@ const RootPageComponent = () => {
     if (!lang) return;
     const language = localStorage.getItem('language');
     if (language) lang.set(language as LanguageKey);
-    localStorage.setItem('pageReloadFlag', 'true');
   }, [lang]);
 
   const getMainContent = () => {

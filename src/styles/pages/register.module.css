@@ -42,6 +42,28 @@
   gap: 1rem;
 }
 
+.label {
+  font-size: 0.9rem;
+  color: #333;
+  display: inline-block;
+  width: 80px;
+  text-align: right;
+}
+
+.label::after {
+  content: '：';
+}
+
+.warning {
+  margin-left: 80px;
+  color: red;
+}
+
+.hint {
+  margin-left: 80px;
+  color: #777;
+}
+
 .errorBox {
   display: flex;
   justify-content: center;
@@ -83,28 +105,6 @@
   display: flex;
   align-items: center;
   width: 100%;
-}
-
-.inputBox label {
-  font-size: 0.9rem;
-  color: #333;
-  display: inline-block;
-  width: 80px;
-  text-align: right;
-}
-
-.inputBox label::after {
-  content: '：';
-}
-
-.warning {
-  margin-left: 80px;
-  color: red;
-}
-
-.hint {
-  margin-left: 80px;
-  color: #777;
 }
 
 .button {

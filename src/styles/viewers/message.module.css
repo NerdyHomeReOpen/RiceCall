@@ -26,6 +26,22 @@
   background-position: center;
 }
 
+.warnIcon {
+  display: flex;
+  min-width: 12px;
+  min-height: 12px;
+  background-image: url('/channel/NT_WARNING.png');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.messageEvent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 0;
+}
+
 .messageBox {
   flex: 1;
   display: flex;

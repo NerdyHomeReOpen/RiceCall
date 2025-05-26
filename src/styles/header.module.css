@@ -1,9 +1,24 @@
 .header {
   display: flex;
-  background-color: #0073c6;
   -webkit-app-region: drag;
   justify-content: space-between;
   border: none;
+  min-height: 30px;
+  background-color: var(--main-color);
+  background-image: var(--header-image);
+  background-repeat: no-repeat;
+  background-position: 0 20%;
+  background-size: cover;
+}
+
+.popupHeader {
+  flex-direction: column;
+  justify-content: center;
+}
+
+.titleWrapper {
+  display: flex;
+  justify-content: space-between;
   min-height: 30px;
 }
 
@@ -24,9 +39,10 @@
   left: 2.5rem;
 }
 
-.buttons,
+.nameBox,
+.statusBox,
 .mainTabs,
-.titleBox {
+.buttons {
   -webkit-app-region: no-drag;
 }
 
@@ -220,12 +236,11 @@
   align-items: center;
   justify-content: center;
   width: max-content;
-  min-width: 100px;
-  max-width: 150px;
+  max-width: 200px;
   height: 30px;
   overflow: hidden;
   white-space: nowrap;
-  padding: 8px 13px 0 13px;
+  padding: 0 13px;
 }
 
 .mainTabs .tab:before {
@@ -256,12 +271,16 @@
 
 .mainTabs .tabClose {
   z-index: 2;
-  min-width: 15px;
-  min-height: 15px;
-  align-self: flex-start;
-  background-image: url('../../public/ctrl/tabitem_button.png');
-  background-repeat: no-repeat;
-  background-position: 0 0;
+  min-width: 12px;
+  min-height: 12px;
+  position: relative;
+  border-radius: 50%;
+  background-color: rgb(55 144 206);
+  box-shadow: 0 0 2px rgb(255 255 255 / 35%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .mainTabs .tabClose:hover {
@@ -298,24 +317,25 @@
   z-index: 1;
   text-overflow: ellipsis;
   overflow: hidden;
-  color: rgb(255, 255, 255);
+  color: var(--secondary-color, var(--main-color, #fff));
   width: 100%;
-  height: 100%;
+  margin: 0 20px;
   text-align: center;
   white-space: nowrap;
 }
 
 .mainTabs .tab.selected .tabLable {
-  color: rgb(0 115 198);
+  color: var(--main-color, rgb(0, 115, 198));
 }
 
 .mainTabs .tab.selected .tabClose {
-  color: #0073c6;
+  color: var(--main-color, rgb(0, 115, 198));
 }
 
 /* Title */
 
-.titleBox {
+.titleBox,
+.titleBoxSkinIcon {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -324,15 +344,23 @@
   gap: 5px;
 }
 
-.titleBox::before {
+.titleBox:before {
   content: '';
   display: inline-block;
   min-width: 18px;
   min-height: 18px;
-  background-image: url('../../public/rc_logo_small.png');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;
+  background-image: url('../../public/rc_logo_small.png');
+}
+
+.titleBoxSkinIcon::before {
+  background-image: url('../../public/icon_skin.png');
+}
+
+.titleBoxDirectMessageIcon::before {
+  background-image: url('../../public/im/chat.png');
 }
 
 .nameBox {
@@ -346,7 +374,7 @@
   padding: 0px 2px;
   font-size: 12px;
   font-weight: bold;
-  color: inherit;
+  color: #000;
 }
 
 .nameBox:hover {
@@ -446,7 +474,6 @@
 
 .statusDropdown .option {
   color: #333;
-  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;

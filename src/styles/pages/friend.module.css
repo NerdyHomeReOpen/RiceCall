@@ -47,19 +47,60 @@
   background-position: 0 0;
 }
 
+.avatarPicture::after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  bottom: 0;
+  right: 0;
+  min-width: 13px;
+  min-height: 13px;
+  background-image: url('../../../public/user_state.png');
+  background-repeat: no-repeat;
+  background-position: 0 0 !important;
+}
+
+.avatarPicture[datatype='']::after {
+  background-image: none;
+}
+
+.avatarPicture[datatype='online']::after {
+  background-position: 0 0 !important;
+}
+
+.avatarPicture[datatype='dnd']::after {
+  background-position: -13px 0 !important;
+}
+
+.avatarPicture[datatype='idle']::after {
+  background-position: -26px 0 !important;
+}
+
+.avatarPicture[datatype='gn']::after {
+  background-position: -39px 0 !important;
+}
+
 .baseInfoBox {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   overflow: hidden;
   height: 100%;
-  gap: 5px;
+  gap: 10px;
 }
 
 .baseInfoBox .container {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.baseInfoBox .container.hasServer {
+  cursor: pointer
+}
+
+.gradeIcon {
+  cursor: default;
 }
 
 .myBadges {
@@ -93,27 +134,76 @@
 
 .signatureBox {
   display: flex;
-  min-width: 30%;
-  margin-left: 7rem;
+  width: 60%;
+  height: 30px;
   align-items: center;
+  border: 1px solid #ffffffff;
+  margin-left: 100px;
+  padding: 2px 5px;
 }
 
 .signatureInput {
   z-index: 1;
-  border-color: unset;
-  border-width: unset;
-  border-style: unset;
-  padding: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
   width: 100%;
+  height: 100%;
   resize: none;
-  overflow: hidden;
-  outline: unset;
 }
 
-.signatureInput:focus {
-  border: 1px solid #b4b4b4;
+.signatureInput:empty::before {
+  content: attr(data-placeholder-text);
+  color: #000000;
+  pointer-events: none;
+  display: block;
+}
+
+.signatureBox:focus-within {
+  border: 1px solid #dfe2e5;
   border-radius: 3px;
 }
+
+.emojiBtn {
+  display: none;
+}
+
+/* .signatureBox:focus-within .enterButtonIconBox, */
+.signatureBox:focus-within .emojiBtn {
+  display: flex;
+}
+/* 
+.enterButtonIconBox {
+  border: 1px solid #d1d1d1;
+  background-color: #fbfbfb;
+  border-radius: 5px;
+  height: 18px;
+  width: 30px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.enterButtonIconBox:hover {
+  background-image: linear-gradient(to bottom, #fffffa, #f4f4f4);
+  border: 1px solid #cccccc;
+}
+
+.enterButtonIconBox:active {
+  background-image: linear-gradient(to bottom, #f4f4f4, #fffffa);
+  border: 1px solid #cccccc;
+}
+
+.enterButtonIcon {
+  background-image: url('../../../public/im/btn_publish.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 9px;
+  width: 22px;
+} */
 
 .badgeBox {
   display: flex;
@@ -134,7 +224,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  min-width: 0;
+  min-width: 280px;
   background-color: #f1f2f5;
 }
 
@@ -310,20 +400,27 @@
 }
 
 .friendList .tab {
+  position: sticky;
+  top: 0;
   font-weight: bold;
   display: flex;
   align-items: center;
   padding: 5px;
   border-radius: 3px;
   font-size: 13px;
+  z-index: 999;
+  background-color: #f1f2f5;
 }
 
-.friendList .tab:hover {
-  background-color: #d1d5da5c;
+.friendList .tab.selected {
+  background-color: #d8dadc;
+}
+
+.friendList .tab:not(.selected):hover {
+  background-color: #d1d5da;
 }
 
 .friendList .tab .tabLable {
-  margin-right: 1;
   font-weight: 100;
 }
 
@@ -347,18 +444,25 @@
   background-position: -14px 0;
 }
 
+.friendList .tabContent {
+  margin-left: 20px;
+}
+
 .friendCard {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  cursor: pointer;
   position: relative;
   padding: 5px;
   border-radius: 3px;
   gap: 5px;
 }
 
-.friendCard:hover {
+.friendCard.selected {
+  background-color: #d8dadc;
+}
+
+.friendCard:not(.selected):hover {
   background-color: #d1d5da5c;
 }
 
@@ -374,6 +478,8 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
 }
 
 .friendCard .serverName {
@@ -399,8 +505,11 @@
   flex: 1;
 }
 
+/* Main Content */
+
 .mainContent {
   flex: 1;
+  min-width: 500px;
   height: auto;
   border-top: 2px solid #e0e0e4;
 }

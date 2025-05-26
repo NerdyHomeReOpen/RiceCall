@@ -12,6 +12,7 @@
   font-weight: bold;
   margin-block: 0.75rem;
   margin-inline: 0;
+  cursor: text;
 }
 
 .markdownContent h2 {
@@ -19,6 +20,7 @@
   font-weight: bold;
   margin-block: 0.625rem;
   margin-inline: 0;
+  cursor: text;
 }
 
 .markdownContent h3 {
@@ -26,6 +28,7 @@
   font-weight: bold;
   margin-block: 0.5rem;
   margin-inline: 0;
+  cursor: text;
 }
 
 .markdownContent p {
@@ -33,6 +36,7 @@
   margin-inline: 0;
   display: inline-block;
   align-self: baseline;
+  cursor: text;
 }
 
 .markdownContent a {
@@ -41,6 +45,7 @@
   text-decoration: underline;
   text-underline-offset: 0.125rem;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .markdownContent a:hover {
@@ -53,10 +58,12 @@
   margin-inline: 0;
   padding-inline-start: 20px;
   list-style-position: outside;
+  cursor: pointer;
 }
 
 .markdownContent li {
   margin-block: 0.5em;
+  cursor: text;
 }
 
 .markdownContent blockquote {
@@ -64,9 +71,10 @@
   margin-inline: 0;
   padding: 0.25rem;
   color: #4f545c;
-  border-left: 4px solid #c7ccd1;
+  border-left: 4px solid #00000020;
   border-radius: 0 4px 4px 0;
-  background: rgba(79, 84, 92, 0.05);
+  background: #00000005;
+  cursor: text;
 }
 
 /* inline code */
@@ -77,8 +85,8 @@
   margin-inline: 0;
   padding: 0.125rem 0.25rem;
   border-radius: 4px;
-  color: #f1f5f9;
-  background: #222;
+  background: #00000015;
+  cursor: text;
 }
 
 /* block code */
@@ -86,6 +94,7 @@
   position: relative;
   margin-block: 0.125rem;
   margin-inline: 0;
+  cursor: text;
 }
 
 .markdownContent hr {
@@ -103,6 +112,7 @@
   background-color: #00000005;
   border-radius: 8px;
   text-align: left;
+  cursor: default;
 }
 
 .markdownContent thead {
@@ -117,12 +127,14 @@
   padding: 12px 16px;
   border: 1px solid #00000010;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .markdownContent td {
   padding: 12px 16px;
   border: 1px solid #00000010;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .markdownContent td:hover {
@@ -134,6 +146,7 @@
   margin-block: 0;
   margin-inline: 0;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .container {
@@ -167,8 +180,7 @@
 .markdownContent .codeWrapper {
   padding: 0.5rem;
   border-radius: 4px;
-  color: #f1f5f9;
-  background: #222;
+  background: #00000015;
   font-family: monospace !important;
 }
 
@@ -191,10 +203,9 @@
   top: 0.3rem;
   right: 0.3rem;
   padding: 0.15rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #00000005;
+  border: 1px solid #00000020;
   border-radius: 4px;
-  color: #fff;
   cursor: pointer;
   transition: all 0.2s;
   font-family: monospace;
@@ -203,7 +214,7 @@
 }
 
 .copyButton:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #00000010;
 }
 
 .markdownContent pre:hover .copyButton {

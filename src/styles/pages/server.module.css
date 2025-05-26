@@ -19,6 +19,10 @@
   flex: 1;
   min-height: 0;
   min-width: 0;
+  overflow-y: hidden;
+}
+
+.scrollView:hover {
   overflow-y: auto;
 }
 
@@ -26,7 +30,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  min-width: 0;
+  min-width: 280px;
   background-color: #f1f2f5;
   font-size: 0.875rem;
 }
@@ -73,22 +77,22 @@
 }
 
 .baseInfoBox {
-  width: 120px;
-  height: 52px;
+  flex: 1;
   display: flex;
-  right: 5px;
   flex-direction: column;
   justify-content: space-around;
-  position: relative;
-  color: #515151;
+  height: 52px;
+  color: #777777;
+  overflow: hidden;
 }
 
 .baseInfoBox .container {
+  flex: 1;
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  left: 7px;
-  position: relative;
+  height: 1rem;
+  gap: 5px;
 }
 
 .verifyIcon {
@@ -97,23 +101,21 @@
   background-image: url('../../../public/icon_verify.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-  margin-right: 2px;
 }
 
 .name {
   display: -webkit-box;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  color: #666666;
+  line-height: 1rem;
 }
 
 .idText,
 .memberText {
-  position: relative;
   display: flex;
-  font-size: 13px;
-  justify-content: center;
+  min-width: 75px;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -129,7 +131,6 @@
 }
 
 .memberText:before {
-  margin-left: 20px;
   content: '';
   min-height: 12px;
   min-width: 12px;
@@ -141,16 +142,11 @@
 }
 
 .optionBox {
-  gap: 5px;
-  height: auto;
-  min-width: 40px;
+  flex: 1;
   display: flex;
   align-items: center;
-  position: absolute;
   justify-content: flex-end;
-  margin-left: auto;
-  bottom: 5px;
-  right: 5px;
+  gap: 5px;
 }
 
 .navItem:first-child:hover::before,
@@ -159,7 +155,7 @@
 }
 
 .invitation {
-  min-height: 20px;
+  min-height: 16px;
   min-width: 20px;
   cursor: pointer;
   background-image: url('../../../public/channel/icon_invite_friend.png');
@@ -176,7 +172,7 @@
 }
 
 .setting {
-  min-height: 18px;
+  min-height: 16px;
   min-width: 24px;
   cursor: pointer;
   background-image: url('../../../public/channel/icon_group_option.png');
@@ -193,7 +189,7 @@
 }
 
 .saperator {
-  min-height: 20px;
+  min-height: 16px;
   min-width: 2px;
   background-size: auto;
   background-image: url('../../../public/icon_v_split.png');
@@ -251,8 +247,11 @@
 
 .currentChannelText {
   margin-left: 3px;
-  color: #555;
+  color: #999;
   font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .micQueueBox {
@@ -272,12 +271,16 @@
   align-items: center;
   height: 1.8rem;
   padding: 1px 20px 1px 8px;
-  cursor: pointer;
   gap: 5px;
 }
 
 .channelTab:hover {
   background-color: #d1d5da5c;
+}
+
+.userTab.selected,
+.channelTab.selected {
+  background-color: #d8dadc;
 }
 
 .channelList .channelList .channelTab {
@@ -338,10 +341,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #333333;
 }
 
 .channelTab .channelTabCount {
-  color: #555;
+  color: #808080;
 }
 
 .channelTab .channelTabLable.isReceptionLobby {
@@ -360,7 +364,6 @@
   align-items: center;
   height: 1.8rem;
   padding: 1px 20px 1px 8px;
-  cursor: pointer;
   gap: 5px;
 }
 
@@ -368,7 +371,7 @@
   padding-left: 25px;
 }
 
-.userTab:hover {
+.userTab:not(.selected):hover {
   background-color: #d1d5da5c;
 }
 
@@ -376,7 +379,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #777;
+  color: #777777;
 }
 
 .userTab .userTabName.member {
@@ -384,7 +387,7 @@
 }
 
 .userTab .userTabName.isVIP {
-  color: #dd1313 !important;
+  color: #d16059 !important;
 }
 
 .userState {
@@ -409,6 +412,10 @@
   background-position: 0 0;
 }
 
+.gradeIcon {
+  cursor: default;
+}
+
 .myLocationIcon {
   position: absolute;
   min-height: 15px;
@@ -427,20 +434,19 @@
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  min-width: 0;
+  min-width: 500px;
 }
 
 .announcementArea {
   overflow-y: auto;
   padding: 0.75rem;
-  margin-bottom: 0.25rem;
-  height: 150px;
-  max-height: 500px;
+  min-height: 80px;
 }
 
 .messageArea {
   display: flex;
   flex: 5;
+  min-height: 80px;
   padding: 0.75rem;
   overflow-y: auto;
 }
@@ -449,7 +455,7 @@
 
 .inputArea {
   display: flex;
-  flex: 1;
+  min-height: 80px;
   padding: 0.75rem;
 }
 
@@ -541,14 +547,15 @@
 }
 
 .micText {
-  display: flex;
+  color: #2594ca;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   margin-left: 5px;
+  font-family: Noto Sans TC;
   font-size: 1.25rem;
-  color: #28a0da;
-  font-family: 'Noto Sans TC';
+  display: flex;
+  font-weight: bold;
 }
 
 .micSubText {
@@ -602,7 +609,7 @@
   padding: 0.5rem;
   border-radius: 4px;
   background: none;
-  color: #777;
+  color: #888888;
   text-align: center;
   position: relative;
 }
@@ -613,6 +620,7 @@
   min-height: 8px;
   min-width: 8px;
   cursor: pointer;
+  transform: rotate(180deg);
   background-image: url('../../../public/channel/triangle.png');
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -645,7 +653,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: #777;
+  color: #888888;
 }
 
 .bkgModeButton::before {
@@ -739,31 +747,42 @@
 
 .micVolumeContainer .volumeSlider,
 .speakerVolumeContainer .volumeSlider {
+  z-index: 1000;
   position: absolute;
-  bottom: 25px;
-  left: 35%;
-  transform: translateX(-50%);
-  background: rgb(255 255 255 / 90%);
-  padding: 10px;
+  bottom: -3px;
+  left: -3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 3px;
+  width: 24px;
+  height: fit-content;
   border-radius: 6px;
   box-shadow: 0 4px 10px rgb(0 0 0 / 20%);
-  z-index: 1000;
-  width: 30px;
-  height: 120px;
+  background: rgb(255 255 255 / 90%);
+}
+
+.sliderContainer {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  height: 120px;
+  width: 4px;
+  margin: 10px;
+  background: #bbb;
+  border-radius: 2px;
 }
 
 .slider {
   appearance: none;
-  width: 100px;
+  position: absolute;
+  top: calc(50% - 4px);
+  left: -60px;
+  width: 120px;
   height: 4px;
   background: #bbb;
   border-radius: 2px;
-
   transform: rotate(-90deg);
-  position: absolute;
 }
 
 .slider::-webkit-slider-thumb {
@@ -783,13 +802,25 @@
   border-top: 2px solid #e2e8f0;
 }
 
-.bottomNav::before {
+.bottomNav:has(.navItem:last-child.active)::before {
+  left: calc(75% - 60px);
+}
+
+.navItemLeft {
+  justify-content: flex-end !important;
+}
+
+.navItemRight {
+  justify-content: flex-start !important;
+}
+
+.navItemLeft.active:after,
+.navItemRight.active:after {
   content: '';
   position: absolute;
   min-height: 20px;
   min-width: 70px;
   top: -15px;
-  left: calc(25% - 35px);
   transition: left 0.2s ease;
   background-image: url('../../../public/channel/switch_arrow.png');
   background-repeat: no-repeat;
@@ -797,8 +828,12 @@
   background-position: 0 0;
 }
 
-.bottomNav:has(.navItem:last-child.active)::before {
-  left: calc(75% - 35px);
+.navItemLeft:after {
+  right: 10px;
+}
+
+.navItemRight:after {
+  left: 10px;
 }
 
 .navItem {
@@ -810,7 +845,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
   z-index: 1;
   transition: transform 0.2s ease;
 }
@@ -828,7 +862,7 @@
 }
 
 .navItem.active {
-  color: #8b8b8b;
+  color: #58595b;
   transform: translateY(-1px);
 }
 

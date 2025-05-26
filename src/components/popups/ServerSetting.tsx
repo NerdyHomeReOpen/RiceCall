@@ -1,4 +1,10 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 
 // CSS
 import setting from '@/styles/popups/setting.module.css';
@@ -40,7 +46,7 @@ interface ServerSettingPopupProps {
 }
 
 const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
-  (initialData: ServerSettingPopupProps) => {
+  ({ serverId, userId }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
@@ -92,6 +98,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     // Refs
     const refreshRef = useRef(false);
+    const popupRef = useRef<HTMLDivElement>(null);
 
     // States
     const [server, setServer] = useState<Server>(createDefault.server());
@@ -101,13 +108,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       MemberApplication[]
     >([]);
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-    const [sortState, setSortState] = useState<1 | -1>(-1);
-    const [sortField, setSortField] = useState<string>('permissionLevel');
+    const [sortDirection, setSortDirection] = useState<1 | -1>(-1);
+    // const [sortField, setSortField] = useState<string>('permissionLevel'); temp: not used
     const [searchText, setSearchText] = useState('');
     const [showPreview, setShowPreview] = useState(false);
+    const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+    const [selectedRowType, setSelectedRowType] = useState<string | null>(null);
 
     // Variables
-    const { serverId, userId } = initialData;
     const {
       name: serverName,
       avatar: serverAvatar,
@@ -123,6 +131,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       visibility: serverVisibility,
     } = server;
     const { permissionLevel: userPermission } = member;
+    const canSubmit = serverName.trim();
     const filteredMembers = serverMembers.filter((member) => {
       const searchLower = searchText.toLowerCase();
       return (
@@ -208,14 +217,42 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       );
     };
 
+    const handleMemberApproval = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
+      setServerApplications((prev) =>
+        prev.filter(
+          (item) => !(item.userId === userId && item.serverId === serverId),
+        ),
+      );
+    };
+
+    const handleApproveMemberApplication = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+      member?: Partial<Member>,
+    ) => {
+      if (!socket) return;
+      socket.send.approveMemberApplication({ userId, serverId, member });
+    };
+
+    const handleDeleteMemberApplication = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
+      if (!socket) return;
+      socket.send.deleteMemberApplication({ userId, serverId });
+    };
+
     const handleSort = <T extends ServerMember | MemberApplication>(
       field: keyof T,
       array: T[],
+      direction: 1 | -1,
     ) => {
-      const newDirection =
-        sortField === String(field) ? (sortState === 1 ? -1 : 1) : -1;
-      setSortField(String(field));
-      setSortState(newDirection);
+      const newDirection = direction === 1 ? -1 : 1;
+      // setSortField(String(field)); temp: not used
+      setSortDirection(newDirection);
       return [...array].sort(createSorter(field, newDirection));
     };
 
@@ -225,14 +262,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     ) => {
       if (!socket) return;
       socket.send.updateServer({ server, serverId });
-    };
-
-    const handleDeleteMemberApplication = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-    ) => {
-      if (!socket) return;
-      socket.send.deleteMemberApplication({ userId, serverId });
     };
 
     const handleUpdateMember = (
@@ -312,18 +341,30 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     };
 
     const handleMemberSort = (field: keyof ServerMember) => {
-      const sortedMembers = handleSort(field, [...serverMembers]);
+      const sortedMembers = handleSort(field, serverMembers, sortDirection);
       setServerMembers(sortedMembers);
     };
 
     const handleApplicationSort = (field: keyof MemberApplication) => {
-      const sortedApplications = handleSort(field, [...serverApplications]);
+      const sortedApplications = handleSort(
+        field,
+        serverApplications,
+        sortDirection,
+      );
       setServerApplications(sortedApplications);
     };
 
     const handleClose = () => {
       ipcService.window.close();
     };
+
+    const setSelectedRowIdAndType = useCallback(
+      (id: string | null, type: string | null) => {
+        setSelectedRowId(id);
+        setSelectedRowType(type);
+      },
+      [setSelectedRowId, setSelectedRowType],
+    );
 
     // Effects
     useEffect(() => {
@@ -339,6 +380,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           handleServerMemberApplicationUpdate,
         [SocketServerEvent.SERVER_MEMBER_APPLICATION_DELETE]:
           handleServerMemberApplicationDelete,
+        [SocketServerEvent.MEMBER_APPROVAL]: handleMemberApproval,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -378,18 +420,55 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
             setMember(member);
           }
           if (members) {
-            setServerMembers(members);
+            const sortedMembers = handleSort('permissionLevel', members, 1);
+            setServerMembers(sortedMembers);
           }
           if (applications) {
-            setServerApplications(applications);
+            const sortedApplications = handleSort('createdAt', applications, 1);
+            setServerApplications(sortedApplications);
           }
         });
       };
       refresh();
     }, [serverId, userId]);
 
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (event.button === 2) {
+          const targetElement = event.target as HTMLElement;
+          const trElement = targetElement.closest('tr');
+          if (trElement?.classList.contains(popup['selected'])) {
+            return;
+          }
+        }
+        if (
+          popupRef.current &&
+          !popupRef.current.contains(event.target as Node)
+        ) {
+          setSelectedRowIdAndType(null, null);
+        } else if (event.target instanceof HTMLElement) {
+          const targetElement = event.target as HTMLElement;
+          const isTableRow = targetElement.closest('tr');
+          const isTableContainer =
+            targetElement.closest('table') ||
+            targetElement.closest(`.${setting['tableContainer']}`);
+
+          if (isTableContainer && !isTableRow) {
+            setSelectedRowIdAndType(null, null);
+          } else if (!isTableContainer) {
+            setSelectedRowIdAndType(null, null);
+          }
+        }
+      };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [setSelectedRowIdAndType]);
+
     return (
-      <div className={popup['popupContainer']}>
+      <div className={popup['popupContainer']} ref={popupRef}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           {/* Sidebar */}
           <div className={setting['left']}>
@@ -445,7 +524,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                         name="displayId"
                         type="text"
                         value={serverDisplayId}
-                        disabled
+                        readOnly
                       />
                     </div>
                   </div>
@@ -545,7 +624,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       name="level"
                       type="text"
                       value={serverLevel}
-                      disabled
+                      readOnly
                     />
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
@@ -554,7 +633,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       name="createdAt"
                       type="text"
                       value={new Date(serverCreatedAt).toLocaleString()}
-                      disabled
+                      readOnly
                     />
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
@@ -567,7 +646,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       name="wealth"
                       type="text"
                       value={serverWealth}
-                      disabled
+                      readOnly
                     />
                   </div>
                 </div>
@@ -577,7 +656,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     name="link"
                     type="text"
                     value={`https://ricecall.com.tw/join?sid=${serverDisplayId}`}
-                    disabled
+                    readOnly
                   />
                 </div>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
@@ -743,9 +822,20 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       return (
                         <tr
                           key={memberUserId}
+                          className={`${
+                            selectedRowId === memberUserId &&
+                            selectedRowType === 'member'
+                              ? popup['selected']
+                              : ''
+                          }`}
+                          onClick={() =>
+                            setSelectedRowIdAndType(memberUserId, 'member')
+                          }
                           onContextMenu={(e) => {
                             const isCurrentUser = memberUserId === userId;
-                            contextMenu.showContextMenu(e.clientX, e.clientY, [
+                            const x = e.clientX;
+                            const y = e.clientY;
+                            contextMenu.showContextMenu(x, y, false, false, [
                               {
                                 id: 'direct-message',
                                 label: lang.tr.directMessage,
@@ -934,7 +1024,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <div className={popup['label']}>
                       {lang.tr.semiPublicServer}
                     </div>
-                    <div className={setting['hintText']}>
+                    <div className={popup['hint']}>
                       {lang.tr.semiPublicServerDescription}
                     </div>
                   </div>
@@ -958,7 +1048,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <div className={popup['label']}>
                       {lang.tr.privateServer}
                     </div>
-                    <div className={setting['hintText']}>
+                    <div className={popup['hint']}>
                       {lang.tr.privateServerDescription}
                     </div>
                   </div>
@@ -1038,8 +1128,22 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       return (
                         <tr
                           key={applicationUserId}
+                          className={`${
+                            selectedRowId === applicationUserId &&
+                            selectedRowType === 'application'
+                              ? popup['selected']
+                              : ''
+                          }`}
+                          onClick={() =>
+                            setSelectedRowIdAndType(
+                              applicationUserId,
+                              'application',
+                            )
+                          }
                           onContextMenu={(e) => {
-                            contextMenu.showContextMenu(e.clientX, e.clientY, [
+                            const x = e.clientX;
+                            const y = e.clientY;
+                            contextMenu.showContextMenu(x, y, false, false, [
                               {
                                 id: 'view-profile',
                                 label: lang.tr.viewProfile,
@@ -1052,14 +1156,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                 label: lang.tr.acceptApplication,
                                 show: canAccept,
                                 onClick: () => {
-                                  handleDeleteMemberApplication(
+                                  handleApproveMemberApplication(
                                     applicationUserId,
                                     serverId,
-                                  );
-                                  handleUpdateMember(
                                     { permissionLevel: 2 },
-                                    applicationUserId,
-                                    serverId,
                                   );
                                 },
                               },
@@ -1159,8 +1259,22 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       return (
                         <tr
                           key={memberUserId}
+                          className={`${
+                            selectedRowId === memberUserId &&
+                            selectedRowType === 'blockedMember'
+                              ? popup['selected']
+                              : ''
+                          }`}
+                          onClick={() =>
+                            setSelectedRowIdAndType(
+                              memberUserId,
+                              'blockedMember',
+                            )
+                          }
                           onContextMenu={(e) => {
-                            contextMenu.showContextMenu(e.clientX, e.clientY, [
+                            const x = e.clientX;
+                            const y = e.clientY;
+                            contextMenu.showContextMenu(x, y, false, false, [
                               {
                                 id: 'unblock',
                                 label: lang.tr.unblock,
@@ -1197,10 +1311,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}
+            disabled={!canSubmit}
             onClick={() => {
+              if (!canSubmit) return;
               handleUpdateServer(
                 {
                   name: serverName,

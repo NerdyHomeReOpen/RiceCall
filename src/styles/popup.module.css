@@ -39,9 +39,7 @@
 }
 
 .popupFooter {
-  min-height: 50px;
-  max-height: 50px;
-  padding: 10px 15px;
+  padding: 8px 3px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -55,15 +53,19 @@
 .button {
   margin-right: 5px;
   min-width: 78px;
-  min-height: 24px;
   text-align: center;
-  display: flex;
+  font-size: 12px;
+  height: 25px;
   align-items: center;
+  display: flex;
   justify-content: center;
   cursor: pointer;
+  max-width: 79px;
   border: 1px solid #cbcccd;
+  width: auto;
   border-radius: 5px;
-  background: #fff;
+  background: linear-gradient(#fafafb, #e9e9ed);
+  color: #333333;
 }
 
 .button:hover {
@@ -76,28 +78,29 @@
 
 /* Text Styles */
 
-.label {
-  min-width: 5rem;
-  margin-right: 5px;
-}
-
-.label.required::after {
-  content: '*';
-  color: red;
-}
-
 .pageHeaderText {
   display: flex;
   align-items: center;
   flex-direction: row;
-  width: 100%;
-  margin-top: 5px;
 }
 
-.textLineSplit {
-  width: 100%;
+.pageHeaderText::after {
+  content: '';
+  flex: 1;
   height: 1px;
   background: #0073c6;
+}
+
+.label {
+  display: flex;
+  min-height: 2rem;
+  width: fit-content;
+  padding: 5px 5px 5px 0;
+}
+
+.required::after {
+  content: '*';
+  color: red;
 }
 
 .hint {
@@ -106,6 +109,7 @@
 }
 
 .value {
+  margin-left: 0.3rem;
   color: #777;
 }
 
@@ -134,14 +138,14 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  gap: 5px;
 }
 
 .row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 
 /* Input Styles */
@@ -150,27 +154,25 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 16px;
-  padding: 16px;
+  gap: 10px;
+  padding: 5px;
 }
 
 .inputBox {
   width: 100%;
   display: flex;
-  gap: 5px;
 }
 
 .inputBox input[type='text'],
 .inputBox input[type='number'] {
-  border: 1px solid #ddd;
+  border: 1px solid #cccccc;
   padding: 2px;
   background: #fff;
   position: relative;
   display: inline-block;
   width: 100%;
   height: 2rem;
-
-  box-shadow: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .inputBox table {
@@ -195,8 +197,12 @@
   flex-direction: row;
 }
 
-.inputBox table tr:hover {
+.inputBox table tr:not(.selected):hover {
   background: #f4f4f5;
+}
+
+.inputBox table tr.selected {
+  background-color: rgb(216, 218, 220);
 }
 
 .inputBox table tr th {
@@ -250,6 +256,7 @@
   width: 100%;
   height: 4rem;
   resize: none;
+  box-shadow: inset 0 1px 2px #00000026;
 }
 
 .inputBox .selectBox {
@@ -263,18 +270,20 @@
   width: 100% !important;
   min-width: unset !important;
 }
+
 .inputBox .selectBox select {
   border: 1px solid #ddd;
   padding: 2px;
   padding-right: 25px;
   background: #fff;
   position: relative;
-  display: inline-block;
-  min-width: 100px;
+  display: flex;
+  min-width: 6.5rem;
   max-width: 100%;
   height: 2rem;
   appearance: none;
   text-decoration: none;
+  box-shadow: inset 0 1px 2px #00000026;
 }
 
 .inputBox .selectBox::before {
@@ -312,13 +321,29 @@
   background-position: -52px 0;
 }
 
+.input {
+  background: #fff;
+  border: 1px solid #ccc;
+  width: 100%;
+  height: 2.3rem;
+  padding: 5px;
+  display: inline-block;
+  position: relative;
+  box-shadow: inset 0 1px 2px #00000026;
+}
+
 .hidden {
   display: none;
 }
 
-.popupContainer :disabled,
-.popupContainer .disabled {
-  color: #8f8f8f;
+.popupContainer :disabled {
+  background-image: linear-gradient(to bottom, #fdfdfd, #fafafa);
+  color: #c5c5c5;
+  pointer-events: none;
+}
+
+.disabled {
+  opacity: 0.5;
   pointer-events: none;
 }
 

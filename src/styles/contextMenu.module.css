@@ -40,12 +40,15 @@
   align-items: center;
   width: 100%;
   padding: 6px 10px;
-  cursor: pointer;
   color: #333;
 }
 
 .language-select .option {
   justify-content: center;
+}
+
+.contextMenu .option.hasIcon {
+  justify-content: flex-start;
 }
 
 .contextMenu .option:not([data-type=''])::before {

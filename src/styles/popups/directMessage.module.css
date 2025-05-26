@@ -2,12 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  color: #fff;
   width: 100%;
   padding: 0 10px 5px 10px;
-  background-color: #0073c6;
-  border-left: 1px solid #858585;
-  border-right: 1px solid #858585;
 }
 
 .userSignature {
@@ -20,6 +16,7 @@
   justify-content: left;
   margin-left: 18px;
   gap: 5px;
+  -webkit-app-region: no-drag;
 }
 
 .directOptionButtons .fileShare,
@@ -34,6 +31,10 @@
   vertical-align: middle;
   background-size: contain;
   cursor: pointer;
+}
+
+.directOptionButtons .disabled {
+  cursor: not-allowed;
 }
 
 .directOptionButtons .fileShare {
@@ -106,7 +107,7 @@
   background-position: center;
 }
 
-.avatarPicture.non-friend {
+.avatarPicture.offline {
   filter: grayscale(100%);
 }
 
@@ -184,6 +185,11 @@
 .serverInName {
   margin-left: 5px;
   width: 100%;
+}
+
+.notifyArea {
+  display: flex;
+  padding: 5px;
 }
 
 .messageArea {

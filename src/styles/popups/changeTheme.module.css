@@ -1,0 +1,349 @@
+.small div {
+  height: 58px;
+  background-size: cover;
+}
+
+.ctWrapper {
+  height: 100%;
+  display: flex;
+  font-family: 'SimSun', sans-serif;
+  flex-direction: column;
+  background: url(../../../public/dialog_body_bg.png) no-repeat center center;
+  background-size: cover;
+}
+
+.ctContain {
+  display: flex;
+  margin-right: 30px;
+  width: 100%;
+}
+
+.dialog-icon {
+  margin-right: 1rem;
+  content: '';
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  background: url(../../../public/pic_alert.png) no-repeat center center;
+  vertical-align: middle;
+  background-size: contain;
+}
+
+.themeSelector {
+  border-radius: 8px;
+  width: 100%;
+  margin: 1px;
+}
+
+.themeSlotsBig {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.themeSlotsBig div {
+  position: relative;
+  height: 120px;
+  border: 1px solid #fff;
+  cursor: pointer;
+  background-size: cover;
+  background-position: 0px 0px;
+  background-repeat: no-repeat;
+}
+
+.themeSlotsBig div::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: 0px 0px;
+  background-repeat: no-repeat;
+}
+
+.themeSlotsBig div:hover {
+  border: 1px solid #20a5d8;
+}
+
+.themeSlotsSmall {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 1px;
+  margin-top: 1px;
+  width: 100%;
+}
+
+.themeSlotsSmall div {
+  position: relative;
+  height: 60px;
+  border: 1px solid #fff;
+  cursor: pointer;
+  background-size: cover;
+  background-position: 0px 0px;
+  background-repeat: no-repeat;
+}
+
+.themeSlotsSmall div::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: 0px 0px;
+  background-repeat: no-repeat;
+}
+
+.themeSlotsSmall div:hover {
+  border: 1px solid #20a5d8;
+}
+
+.imageSelector {
+  min-width: 60px;
+  min-height: 60px;
+  background-image: url(../../../public/user_defined.png);
+}
+
+.imageSelector:hover {
+  background-position: -58px 0px !important;
+}
+
+.imageSelector:active {
+  background-position: -116px 0px !important;
+}
+
+.colorSelector {
+  background-image: url(../../../public/palette.png);
+}
+
+.colorSelectorBox {
+  position: absolute;
+  width: 280px;
+  height: 145px;
+  border: 1px solid #000;
+  left: 8rem;
+  top: 7rem;
+  background-color: #fff;
+  padding: 5px;
+}
+
+.colorSelectorImage {
+  background-image: url(../../../public/skin_palette.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  height: 105px;
+  width: 270px;
+  cursor: crosshair;
+}
+
+.colorSelectorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 3px;
+}
+
+.colorSelectedColor {
+  background: #000;
+  height: 2rem;
+  width: 6rem;
+}
+
+.colorSelectedBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.colorSelectedSave,
+.colorSelectedCancel {
+  height: 25px;
+  width: 56px;
+  border: 1px solid #000;
+  cursor: pointer;
+}
+
+.colorSelectedSave:hover,
+.colorSelectedCancel:hover {
+  background-color: #c7c7c7;
+}
+
+.colorSelectedSave {
+  background-image: url(../../../public/palette_ok.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  margin-right: 3px;
+}
+
+.colorSelectedCancel {
+  background-image: url(../../../public/palette_cancel.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.theme[data-theme-index='0'] {
+  background-image: url(../../../public/skin/57KJ57SF5Zue5oa2_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/57KJ57SF5Zue5oa2.jpg);
+  --main-color: #f6e6d7;
+  --secondary-color: #000;
+}
+
+.theme[data-theme-index='1'] {
+  background-image: url(../../../public/skin/57SU55yf56ul5bm0_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/57SU55yf56ul5bm0.jpg);
+  --main-color: #1b71ac;
+  --secondary-color: #fff;
+}
+
+.theme[data-theme-index='2'] {
+  background-image: url(../../../public/skin/5Y+v5oSb6LKT5ZKq_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/5Y+v5oSb6LKT5ZKq.jpg);
+  --main-color: #efd1ab;
+  --secondary-color: #000;
+}
+
+.theme[data-theme-index='3'] {
+  background-image: url(../../../public/skin/6YKj5LiA5bm0_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/6YKj5LiA5bm0.jpg);
+  --main-color: #d4be99;
+  --secondary-color: #000;
+}
+
+.theme[data-theme-index='4'] {
+  background-image: url(../../../public/skin/img_greenmood_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_greenmood.jpg);
+  --main-color: #89c68b;
+  --secondary-color: #000;
+}
+
+.theme[data-theme-index='5'] {
+  background-image: url(../../../public/skin/img_sunflower_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_sunflower.jpg);
+  --main-color: #edd569;
+  --secondary-color: #000;
+}
+
+.theme[data-theme-index='6'] {
+  background-image: url(../../../public/skin/img_sunset_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_sunset.jpg);
+  --main-color: #7464ad;
+  --secondary-color: #000;
+}
+
+.theme[data-theme-index='7'] {
+  background-image: url(../../../public/skin/img_colddrink_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_colddrink.jpg);
+  --main-color: #e3908f;
+  --secondary-color: #000;
+}
+
+.theme[data-theme-index='8'] {
+  background-image: url(../../../public/skin/img_pebble_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_pebble.jpg);
+  --main-color: #a4cfd5;
+  --secondary-color: #000;
+}
+
+.theme[data-theme-index='9'] {
+  background-image: url(../../../public/skin/img_love_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_love.jpg);
+  --main-color: #aa7a52;
+  --secondary-color: #000;
+}
+
+.theme[data-theme-index='10'] {
+  background-image: url(../../../public/skin/img_hamburger_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_hamburger.jpg);
+  --main-color: #591234;
+  --secondary-color: #fff;
+}
+
+.theme[data-theme-index='11'] {
+  background-image: url(../../../public/skin/img_coastline_preview.jpg);
+  background-color: #000;
+  --header-image: url(../../../public/skin/img_coastline.jpg);
+  --main-color: #313131;
+  --secondary-color: #fff;
+}
+
+.theme[data-theme-index='12'] {
+  background-image: linear-gradient(to bottom, #0073c6, #0073c6);
+  background-color: #000;
+  --header-image: linear-gradient(to bottom, #0073c6, #0073c6);
+  --main-color: #0073c6;
+  --secondary-color: #ffffff;
+}
+
+.theme[data-theme-index='13'] {
+  background-image: linear-gradient(to bottom, #6d95da, #6d95da);
+  background-color: #000;
+  --header-image: linear-gradient(to bottom, #6d95da, #6d95da);
+  --main-color: #6d95da;
+  --secondary-color: #ffffff;
+}
+
+.theme[data-theme-index='14'] {
+  background-image: linear-gradient(to bottom, #91b719, #729714);
+  background-color: #000;
+  --header-image: linear-gradient(to bottom, #91b719, #729714);
+  --main-color: #91b719;
+  --secondary-color: #ffffff;
+}
+
+.theme[data-theme-index='15'] {
+  background-image: linear-gradient(to bottom, #d7aa35, #c79c2d);
+  background-color: #000;
+  --header-image: linear-gradient(to bottom, #d7aa35, #c79c2d);
+  --main-color: #d7aa35;
+  --secondary-color: #ffffff;
+}
+
+.theme[data-theme-index='16'] {
+  background-image: linear-gradient(to bottom, #f3c89a, #edc193);
+  background-color: #000;
+  --header-image: linear-gradient(to bottom, #f3c89a, #edc193);
+  --main-color: #f3c89a;
+  --secondary-color: #ffffff;
+}
+
+.theme[data-theme-index='17'] {
+  background-image: linear-gradient(to bottom, #d74a33, #c8412b);
+  background-color: #000;
+  --header-image: linear-gradient(to bottom, #d74a33, #c8412b);
+  --main-color: #d74a33;
+  --secondary-color: #ffffff;
+}
+
+.theme[data-theme-index='18'] {
+  background-image: linear-gradient(to bottom, #ae6b73, #ab6a72);
+  background-color: #000;
+  --header-image: linear-gradient(to bottom, #ae6b73, #ab6a72);
+  --main-color: #ae6b73;
+  --secondary-color: #ffffff;
+}
+
+.themeDescription {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0000007d;
+  color: #fff;
+}

@@ -19,6 +19,12 @@ export interface Translation {
   changeTheme: string;
   feedback: string;
   languageSelect: string;
+  helpCenter: string;
+  agreement: string;
+  specification: string;
+  contactUs: string;
+  aboutRiceCall: string;
+  faq: string;
   logout: string;
   exit: string;
   searchPlaceholder: string;
@@ -92,6 +98,7 @@ export interface Translation {
   save: string;
   modify: string;
   cancel: string;
+  created: string;
   next: string;
   previous: string;
   signaturePlaceholder: string;
@@ -127,6 +134,7 @@ export interface Translation {
   friendAddGroup: string;
   friendDeleteGroup: string;
   editFriendGroup: string;
+  renameFriendGroup: string;
   friendNote: string;
   max120content: string;
   sendRequest: string;
@@ -233,6 +241,7 @@ export interface Translation {
   recentlyJoinServer: string;
   recentlyEarnedBadges: string;
   joinedServers: string;
+  favoritedServers: string;
   notPublicJoinedServersTop: string;
   notPublicJoinedServersBottom: string;
   noJoinedServers: string;
@@ -255,11 +264,13 @@ export interface Translation {
   usernameRequired: string;
   usernameMinLength: string;
   usernameMaxLength: string;
+  usernameInvalidFormat: string;
   accountCannotChange: string;
   passwordsDoNotMatch: string;
   basicSettings: string;
   voiceSettings: string;
   aboutUs: string;
+  friendVerification: string;
   generalSettings: string;
   autoStartup: string;
   autoStartupDescription: string;
@@ -276,14 +287,15 @@ export interface Translation {
   unknownDevice: string;
   microphone: string;
   speaker: string;
-  version: string;
   projectRepo: string;
-  projectRepoDescription: string;
-  developmentTeam: string;
+  officialWebsite: string;
   mainDeveloper: string;
-  serverMaintainer: string;
   frontendDeveloper: string;
   backendDeveloper: string;
+  technicalSupport: string;
+  customerService: string;
+  machineNetwork: string;
+  teamMembers: string;
   copyright: string;
   isReceiveApply: string;
   setApplyNotice: string;
@@ -546,6 +558,12 @@ export type Channel = BaseChannel & {
   type: 'channel';
 };
 
+export type ApproveMemberApplicationPayload = {
+  userId: string;
+  serverId: string;
+  member?: Partial<Member>;
+};
+
 export type Member = {
   userId: string;
   serverId: string;
@@ -570,15 +588,15 @@ export type Message = {
   // Change name to BaseMessage
   messageId: string;
   content: string;
-  type: 'general' | 'info' | 'dm';
+  type: 'general' | 'info' | 'warn' | 'event' | 'dm';
   timestamp: number;
 };
 
-export type ChannelMessage = Message &
-  ServerMember & {
-    senderId: string;
+export type ChannelMessage = Message & {
+    sender: ServerMember;
+    receiver: ServerMember;
     serverId: string;
-    channelId: string;
+    channelId: string | null;
     type: 'general';
   };
 
@@ -591,8 +609,28 @@ export type DirectMessage = Message &
   };
 
 export type InfoMessage = Message & {
+  sender: ServerMember;
+  receiver: ServerMember;
+  serverId: string;
+  channelId: string | null;
   type: 'info';
 };
+
+export type WarnMessage = Message & {
+  sender: ServerMember;
+  receiver: ServerMember;
+  serverId: string;
+  channelId: string | null;
+  type: 'warn';
+};
+
+export type EventMessage = Message & {
+  sender: ServerMember;
+  receiver: ServerMember;
+  serverId: string;
+  channelId: string | null;
+  type: 'event';
+}
 
 export type UserServerStatus = {
   recent: boolean;
@@ -656,6 +694,7 @@ export enum SocketClientEvent {
   CREATE_FRIEND_APPLICATION = 'createFriendApplication',
   UPDATE_FRIEND_APPLICATION = 'updateFriendApplication',
   DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
+  APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
   // Server
   FAVORITE_SERVER = 'favoriteServer',
   SEARCH_SERVER = 'searchServer',
@@ -679,6 +718,7 @@ export enum SocketClientEvent {
   CREATE_MEMBER_APPLICATION = 'createMemberApplication',
   UPDATE_MEMBER_APPLICATION = 'updateMemberApplication',
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
+  APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
   // Message
   SEND_MESSAGE = 'message',
   SEND_DIRECT_MESSAGE = 'directMessage',
@@ -736,6 +776,7 @@ export enum SocketServerEvent {
   SERVER_MEMBER_APPLICATION_ADD = 'serverMemberApplicationAdd',
   SERVER_MEMBER_APPLICATION_UPDATE = 'serverMemberApplicationUpdate',
   SERVER_MEMBER_APPLICATION_DELETE = 'serverMemberApplicationDelete',
+  MEMBER_APPROVAL = 'memberApproval',
   // Message
   ON_MESSAGE = 'onMessage',
   ON_DIRECT_MESSAGE = 'onDirectMessage',
@@ -750,10 +791,6 @@ export enum SocketServerEvent {
   PLAY_SOUND = 'playSound',
   // Echo
   PONG = 'pong',
-  // Error
-  ERROR = 'error',
-  CONNECT_ERROR = 'connect_error',
-  RECONNECT_ERROR = 'reconnect_error',
   // Popup
   OPEN_POPUP = 'openPopup',
 }
@@ -784,37 +821,41 @@ export enum PopupType {
   DIALOG_WARNING = 'dialogWarning',
   DIALOG_ERROR = 'dialogError',
   DIALOG_INFO = 'dialogInfo',
-  ANTHOR_DEVICE_LOGIN = 'anotherDeviceLogin',
+  CHANGE_THEME = 'changeTheme',
+  ABOUTUS = 'aboutus',
+  FRIEND_VERIFICATION = 'friendVerification',
 }
 
 export const PopupSize = {
-  [PopupType.USER_INFO]: { height: 700, width: 500 },
+  [PopupType.USER_INFO]: { height: 630, width: 440 },
   [PopupType.USER_SETTING]: { height: 700, width: 500 },
   [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
-  [PopupType.CHANNEL_PASSWORD]: { height: 220, width: 400 },
+  [PopupType.CHANNEL_PASSWORD]: { height: 200, width: 370 },
   [PopupType.SERVER_SETTING]: { height: 520, width: 600 },
   [PopupType.SYSTEM_SETTING]: { height: 520, width: 600 },
-  [PopupType.MEMBERAPPLY_SETTING]: { height: 220, width: 400 },
-  [PopupType.CREATE_SERVER]: { height: 460, width: 520 },
-  [PopupType.CREATE_CHANNEL]: { height: 220, width: 400 },
-  [PopupType.CREATE_FRIENDGROUP]: { height: 220, width: 400 },
+  [PopupType.MEMBERAPPLY_SETTING]: { height: 200, width: 370 },
+  [PopupType.CREATE_SERVER]: { height: 436, width: 478 },
+  [PopupType.CREATE_CHANNEL]: { height: 200, width: 370 },
+  [PopupType.CREATE_FRIENDGROUP]: { height: 200, width: 370 },
   [PopupType.EDIT_CHANNEL_ORDER]: { height: 550, width: 500 },
-  [PopupType.EDIT_CHANNEL_NAME]: { height: 220, width: 400 },
-  [PopupType.EDIT_NICKNAME]: { height: 220, width: 400 },
-  [PopupType.EDIT_FRIENDGROUP]: { height: 220, width: 400 },
-  [PopupType.EDIT_FRIEND]: { height: 220, width: 400 },
+  [PopupType.EDIT_CHANNEL_NAME]: { height: 200, width: 370 },
+  [PopupType.EDIT_NICKNAME]: { height: 200, width: 370 },
+  [PopupType.EDIT_FRIENDGROUP]: { height: 200, width: 370 },
+  [PopupType.EDIT_FRIEND]: { height: 200, width: 370 },
   [PopupType.APPLY_FRIEND]: { height: 320, width: 500 },
   [PopupType.APPLY_MEMBER]: { height: 320, width: 500 },
-  [PopupType.SEARCH_USER]: { height: 220, width: 400 },
+  [PopupType.SEARCH_USER]: { height: 200, width: 370 },
   [PopupType.DIRECT_MESSAGE]: { height: 550, width: 650 },
-  [PopupType.DIALOG_ALERT]: { height: 220, width: 400 },
-  [PopupType.DIALOG_ALERT2]: { height: 220, width: 400 },
-  [PopupType.DIALOG_SUCCESS]: { height: 220, width: 400 },
-  [PopupType.DIALOG_WARNING]: { height: 220, width: 400 },
-  [PopupType.DIALOG_ERROR]: { height: 220, width: 400 },
-  [PopupType.DIALOG_INFO]: { height: 220, width: 400 },
-  [PopupType.ANTHOR_DEVICE_LOGIN]: { height: 220, width: 400 },
+  [PopupType.DIALOG_ALERT]: { height: 200, width: 370 },
+  [PopupType.DIALOG_ALERT2]: { height: 200, width: 370 },
+  [PopupType.DIALOG_SUCCESS]: { height: 200, width: 370 },
+  [PopupType.DIALOG_WARNING]: { height: 200, width: 370 },
+  [PopupType.DIALOG_ERROR]: { height: 200, width: 370 },
+  [PopupType.DIALOG_INFO]: { height: 200, width: 370 },
+  [PopupType.CHANGE_THEME]: { height: 340, width: 480 },
+  [PopupType.ABOUTUS]: { height: 440, width: 480 },
+  [PopupType.FRIEND_VERIFICATION]: { height: 320, width: 500 },
   Settings: { height: 520, width: 600 },
   Apply: { height: 320, width: 500 },
-  Small: { height: 220, width: 400 },
+  Small: { height: 200, width: 370 },
 };

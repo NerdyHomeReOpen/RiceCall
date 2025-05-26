@@ -15,6 +15,7 @@ import BadgeListViewer from '@/components/viewers/BadgeList';
 // Providers
 import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
+import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -27,25 +28,28 @@ import grade from '@/styles/grade.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
+import emoji from '@/styles/emoji.module.css';
 
 // Utils
 import { createDefault } from '@/utils/createDefault';
 
 interface UserSettingPopupProps {
   userId: User['userId'];
-  targetId: string;
+  targetId: User['userId'];
 }
 
 const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
-  (initialData: UserSettingPopupProps) => {
+  ({ userId, targetId }) => {
     // Props
     const socket = useSocket();
     const lang = useLanguage();
+    const contextMenu = useContextMenu();
 
     // Refs
     const refreshRef = useRef(false);
     const isSelectingRef = useRef(false);
     const isLoading = useRef(false);
+    const emojiIconRef = useRef<HTMLDivElement>(null);
 
     // Constants
     const TODAY = useMemo(() => new Date(), []);
@@ -53,7 +57,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const CURRENT_MONTH = TODAY.getMonth() + 1;
     const CURRENT_DAY = TODAY.getDate();
 
-    // User states
+    // States
     const [user, setUser] = useState<User>(createDefault.user());
     const [friend, setFriend] = useState<Friend>(createDefault.friend());
     const [servers, setServers] = useState<UserServer[]>([]);
@@ -63,7 +67,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     >('about');
 
     // Variables
-    const { userId, targetId } = initialData;
     const {
       name: userName,
       avatar: userAvatar,
@@ -82,16 +85,24 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     } = user;
     const isSelf = targetId === userId;
     const isFriend = !!friend.targetId;
-    const isEditing = isSelf && selectedTabId === 'userSetting';
     const isProfilePrivate = false; // TODO: 隱私設定開關，等設定功能完工
+    const canSubmit =
+      userName.trim() &&
+      userGender.trim() &&
+      userCountry.trim() &&
+      userBirthYear &&
+      userBirthMonth &&
+      userBirthDay;
     const joinedServers = servers
       .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
       .sort((a, b) => b.permissionLevel - a.permissionLevel);
     const favoriteServers = servers
       .filter((s) => s.favorite)
+      .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
       .sort((a, b) => b.permissionLevel - a.permissionLevel);
     const recentServers = servers
       .filter((s) => s.recent)
+      .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 4);
 
@@ -155,6 +166,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     // Handlers
     const handleUpdateUser = (user: Partial<User>) => {
       if (!socket) return;
+
       socket.send.updateUser({ user, userId });
     };
 
@@ -177,7 +189,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       ipcService.window.close();
     };
 
-    // FIXME: maybe find a better way to handle this
     const handleServerSelect = (userId: User['userId'], server: Server) => {
       if (isSelectingRef.current || isLoading.current || isSelectingRef.current)
         return;
@@ -230,11 +241,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
     useEffect(() => {
       const daysInMonth = new Date(userBirthYear, userBirthMonth, 0).getDate();
-
       if (userBirthDay > daysInMonth) {
         setUser((prev) => ({ ...prev, birthDay: daysInMonth }));
       }
-
       if (isFutureDate(userBirthYear, userBirthMonth, userBirthDay)) {
         setUser((prev) => ({
           ...prev,
@@ -275,11 +284,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
             <div
               className={`${setting['avatar']} ${
-                isEditing && isSelf ? setting['editable'] : ''
+                isSelf ? setting['editable'] : ''
               }`}
               style={{ backgroundImage: `url(${userAvatarUrl})` }}
               onClick={() => {
-                if (!isSelf || !isEditing) return;
+                if (!isSelf) return;
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
                 fileInput.accept = 'image/*';
@@ -309,7 +318,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
             <div
               className={`${popup['row']} ${setting['noDrag']}`}
-              style={{ marginTop: '10px', gap: '2px' }}
+              style={{ gap: '2px' }}
             >
               <div className={setting['userName']}>{userName}</div>
               {userVip > 0 && (
@@ -342,20 +351,20 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               {lang.tr[userCountry as keyof typeof lang.tr]}
             </div>
 
-            <div className={setting['userSignature']}>{userSignature}</div>
-
             <div
-              className={setting['tab']}
-              style={
-                selectedTabId === 'userSetting'
-                  ? { display: 'none' }
-                  : { display: 'flex' }
-              }
-            >
+              className={setting['userSignature']}
+              dangerouslySetInnerHTML={{ __html: userSignature }}
+            />
+
+            <div className={setting['tab']}>
               <div
-                className={`${setting['item']} ${setting['about']} ${
-                  selectedTabId === 'about' ? setting['selected'] : ''
-                }`}
+                className={`${setting['item']} ${setting['about']}
+                ${
+                  selectedTabId === 'userSetting'
+                    ? `${setting['selected']} ${setting['editable']}`
+                    : ''
+                }
+                ${selectedTabId === 'about' ? setting['selected'] : ''}`}
                 onClick={() => {
                   if (selectedTabId !== 'userSetting') {
                     setSelectedTabId('about');
@@ -365,9 +374,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                 {lang.tr.about}
               </div>
               <div
-                className={`${setting['item']} ${setting['groups']} ${
-                  selectedTabId === 'groups' ? setting['selected'] : ''
-                }`}
+                className={`${setting['item']} ${setting['groups']}
+                ${selectedTabId === 'userSetting' ? setting['editable'] : ''}
+                ${selectedTabId === 'groups' ? setting['selected'] : ''}`}
                 onClick={() => {
                   if (selectedTabId !== 'userSetting') {
                     setSelectedTabId('groups');
@@ -382,24 +391,17 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
           {/* Action Buttons */}
           <div
             className={setting['editTabBar']}
-            style={isSelf ? {} : { display: 'none' }}
+            style={
+              isSelf && selectedTabId !== 'groups' ? {} : { display: 'none' }
+            }
           >
             {selectedTabId === 'userSetting' ? (
               <>
-                <div
-                  className={`${setting['confirmedButton']} ${
-                    setting['blueBtn']
-                  } ${
-                    !userName ||
-                    !userGender ||
-                    !userCountry ||
-                    !userBirthYear ||
-                    !userBirthMonth ||
-                    !userBirthDay
-                      ? setting['disabled']
-                      : ''
-                  }`}
+                <button
+                  className={`${setting['confirmedButton']} ${setting['blueBtn']}`}
+                  disabled={!canSubmit}
                   onClick={() => {
+                    if (!canSubmit) return;
                     handleUpdateUser({
                       avatar: userAvatar,
                       avatarUrl: userAvatarUrl,
@@ -415,31 +417,36 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   }}
                 >
                   {lang.tr.confirm}
-                </div>
-                <div
+                </button>
+                <button
                   className={setting['button']}
                   onClick={() => setSelectedTabId('about')}
                 >
                   {lang.tr.cancel}
-                </div>
+                </button>
               </>
             ) : (
-              <div
+              <button
                 className={setting['button']}
                 onClick={() => setSelectedTabId('userSetting')}
               >
                 {lang.tr.editProfile}
-              </div>
+              </button>
             )}
           </div>
 
-          {/* Body */}
+          {/* About */}
           <div
             className={setting['body']}
             style={selectedTabId === 'about' ? {} : { display: 'none' }}
           >
-            {userSignature && !isSelf && (
-              <div className={setting['userAboutMeShow']}>{userSignature}</div>
+            {userSignature && (
+              <div className={setting['userAboutMeShow']}>
+                <div
+                  className={setting['userAboutMeShowText']}
+                  dangerouslySetInnerHTML={{ __html: userSignature }}
+                />
+              </div>
             )}
             <div className={setting['userProfileContent']}>
               <div className={setting['title']}>
@@ -500,6 +507,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             </div>
           </div>
 
+          {/* Groups */}
           <div
             className={setting['body']}
             style={selectedTabId === 'groups' ? {} : { display: 'none' }}
@@ -512,7 +520,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                     onChange={(e) => setServersView(e.target.value)}
                   >
                     <option value="joined">{lang.tr.joinedServers}</option>
-                    <option value="favorite">{lang.tr.favoriteServers}</option>
+                    <option value="favorite">{lang.tr.favoritedServers}</option>
                   </select>
                 </div>
               </div>
@@ -627,6 +635,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             </div>
           </div>
 
+          {/* User Setting */}
           <div
             className={setting['body']}
             style={selectedTabId === 'userSetting' ? {} : { display: 'none' }}
@@ -635,12 +644,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               <div className={popup['col']}>
                 <div className={popup['row']}>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <label
-                      className={popup['label']}
-                      htmlFor="profile-form-nickname"
-                    >
-                      {lang.tr.nickname}
-                    </label>
+                    <div className={popup['label']}>{lang.tr.nickname}</div>
                     <input
                       name="name"
                       type="text"
@@ -653,12 +657,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   </div>
 
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <label
-                      className={popup['label']}
-                      htmlFor="profile-form-gender"
-                    >
-                      {lang.tr.gender}
-                    </label>
+                    <div className={popup['label']}>{lang.tr.gender}</div>
                     <div
                       className={`${popup['selectBox']} ${popup['selectBoxMax']}`}
                     >
@@ -680,12 +679,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
                 <div className={popup['row']}>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <label
-                      className={popup['label']}
-                      htmlFor="profile-form-country"
-                    >
-                      {lang.tr.country}
-                    </label>
+                    <div className={popup['label']}>{lang.tr.country}</div>
                     <div className={popup['selectBox']}>
                       <select
                         value={userCountry}
@@ -746,12 +740,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                     </div>
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <label
-                      className={popup['label']}
-                      htmlFor="profile-form-birthdate"
-                    >
-                      {lang.tr.birthdate}
-                    </label>
+                    <div className={popup['label']}>{lang.tr.birthdate}</div>
                     <div className={popup['row']}>
                       <div className={popup['selectBox']}>
                         <select
@@ -833,35 +822,48 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                 </div>
 
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <label
-                    className={popup['label']}
-                    htmlFor="profile-form-signature"
-                  >
-                    {lang.tr.signature}
-                  </label>
-                  <input
-                    name="signature"
-                    type="text"
-                    value={userSignature}
-                    maxLength={100}
-                    onChange={(e) =>
-                      setUser((prev) => ({
-                        ...prev,
-                        signature: e.target.value,
-                      }))
-                    }
-                  />
+                  <div className={popup['label']}>{lang.tr.signature}</div>
+                  <div className={popup['row']}>
+                    <input
+                      name="signature"
+                      type="text"
+                      value={userSignature}
+                      onChange={(e) => {
+                        setUser((prev) => ({
+                          ...prev,
+                          signature: e.target.value,
+                        }));
+                      }}
+                    />
+                    <div
+                      ref={emojiIconRef}
+                      className={emoji['emojiIcon']}
+                      onClick={() => {
+                        if (!emojiIconRef.current) return;
+                        const x =
+                          emojiIconRef.current.getBoundingClientRect().x;
+                        const y =
+                          emojiIconRef.current.getBoundingClientRect().y;
+                        contextMenu.showEmojiPicker(
+                          x,
+                          y,
+                          true,
+                          'unicode',
+                          (emoji) => {
+                            setUser((prev) => ({
+                              ...prev,
+                              signature: prev.signature + emoji,
+                            }));
+                          },
+                        );
+                      }}
+                    />
+                  </div>
                 </div>
-
                 <div
                   className={`${popup['inputBox']} ${popup['col']} ${popup['disabled']}`}
                 >
-                  <label
-                    className={popup['label']}
-                    htmlFor="profile-form-about"
-                  >
-                    {lang.tr.about}
-                  </label>
+                  <div className={popup['label']}>{lang.tr.about}</div>
                   <textarea name="about" />
                 </div>
               </div>
@@ -869,6 +871,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           {!isFriend && !isSelf && (
             <div
@@ -879,7 +882,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             </div>
           )}
           <div className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.close /** CLOSE **/}
+            {lang.tr.close}
           </div>
         </div>
       </div>

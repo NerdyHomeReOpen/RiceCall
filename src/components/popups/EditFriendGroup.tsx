@@ -24,7 +24,7 @@ interface EditFriendGroupPopupProps {
 }
 
 const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
-  (initialData: EditFriendGroupPopupProps) => {
+  ({ userId, friendGroupId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -38,8 +38,8 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
     );
 
     // Variables
-    const { userId, friendGroupId } = initialData;
     const { name: groupName, order: groupOrder } = friendGroup;
+    const canSubmit = groupName.trim();
 
     // Handlers
     const handleUpdateFriendGroup = (
@@ -75,6 +75,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
 
     return (
       <form className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -99,11 +100,13 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}
-            disabled={!groupName.trim()}
+            disabled={!canSubmit}
             onClick={() => {
+              if (!canSubmit) return;
               handleUpdateFriendGroup(
                 { name: groupName, order: groupOrder },
                 friendGroupId,

@@ -34,7 +34,7 @@ interface DirectMessagePopupProps {
 const SHAKE_COOLDOWN = 3000;
 
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
-  (initialData: DirectMessagePopupProps) => {
+  ({ userId, targetId, windowRef }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
@@ -53,20 +53,17 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     const [messageInput, setMessageInput] = useState<string>('');
     const [isComposing, setIsComposing] = useState<boolean>(false);
     const [isFriend, setIsFriend] = useState<boolean>(false);
-    // const [isDisabled, setIsDisabled] = useState<boolean>(false);
-    // const [isWarning, setIsWarning] = useState<boolean>(false);
 
     // Variables
-    const { targetId, userId } = initialData;
     const { avatarUrl: userAvatarUrl } = user;
     const {
       avatarUrl: targetAvatarUrl,
       level: targetLevel,
       vip: targetVip,
-      signature: targetSignature,
       currentServerId: targetCurrentServerId,
       badges: targetBadges,
     } = target;
+    const isOnline = targetCurrentServerId !== null;
     const { name: targetCurrentServerName } = targetCurrentServer;
 
     // Handlers
@@ -114,25 +111,37 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     };
 
     const handleShakeWindow = (duration = 500) => {
-      const windowRef = initialData.windowRef.current;
-      if (!windowRef) return;
+      if (!windowRef.current) return;
 
       const start = performance.now();
 
       const shake = (time: number) => {
         const elapsed = time - start;
         if (elapsed > duration) {
-          windowRef.style.transform = 'translate(0, 0)';
+          windowRef.current.style.transform = 'translate(0, 0)';
           return;
         }
 
         const x = Math.round((Math.random() - 0.5) * 10);
         const y = Math.round((Math.random() - 0.5) * 10);
-        windowRef.style.transform = `translate(${x}px, ${y}px)`;
+        windowRef.current.style.transform = `translate(${x}px, ${y}px)`;
 
         requestAnimationFrame(shake);
       };
       requestAnimationFrame(shake);
+    };
+
+    const handleServerSelect = (userId: User['userId'], server: Server) => {
+      window.localStorage.setItem(
+        'trigger-handle-server-select',
+        JSON.stringify({
+          serverDisplayId: server.displayId,
+          timestamp: Date.now(),
+        }),
+      );
+      setTimeout(() => {
+        socket.send.connectServer({ userId, serverId: server.serverId });
+      }, 1500);
     };
 
     // Effects
@@ -205,24 +214,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
     return (
       <div className={popup['popupContainer']}>
-        <div className={directMessage['header']}>
-          <div className={directMessage['userSignature']}>
-            {targetSignature}
-          </div>
-          <div className={directMessage['directOptionButtons']}>
-            <div className={directMessage['fileShare']} />
-            <div className={directMessage['blockUser']} />
-            <div className={directMessage['unBlockUser']} />
-            <div className={directMessage['inviteTempGroup']} />
-            <div className={directMessage['report']} />
-          </div>
-        </div>
+        {/* Body */}
         <div className={popup['popupBody']}>
+          {/* Sidebar */}
           <div className={directMessage['sidebar']}>
             <div className={directMessage['targetBox']}>
               <div
                 className={`${directMessage['avatarPicture']} ${
-                  isFriend ? '' : directMessage['non-friend']
+                  isFriend && isOnline ? '' : directMessage['offline']
                 }`}
                 style={{ backgroundImage: `url(${targetAvatarUrl})` }}
               />
@@ -256,12 +255,24 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
               />
             </div>
           </div>
+
+          {/* Main Content */}
           <div className={directMessage['mainContent']}>
-            <div className={directMessage['serverInArea']}>
+            {isFriend && targetCurrentServerId && (
+            <div
+              className={directMessage['serverInArea']}
+              onClick={() => {
+                handleServerSelect(userId, targetCurrentServer)
+              }}
+            >
               <div className={directMessage['serverInIcon']} />
               <div className={directMessage['serverInName']}>
                 {targetCurrentServerName}
               </div>
+            </div>
+            )}
+            <div className={directMessage['notifyArea']}>
+              {isFriend ? '' : '對方不在你的好友列表，一些功能將無法使用!'}
             </div>
             <div className={directMessage['messageArea']}>
               <MessageViewer messages={directMessages} />
@@ -293,12 +304,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
                 className={directMessage['input']}
                 value={messageInput}
                 onChange={(e) => {
-                  // if (isDisabled) return;
                   e.preventDefault();
                   setMessageInput(e.target.value);
                 }}
                 onPaste={(e) => {
-                  // if (isDisabled) return;
                   e.preventDefault();
                   setMessageInput(
                     (prev) => prev + e.clipboardData.getData('text'),
@@ -311,8 +320,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
                   if (!messageInput.trim()) return;
                   if (messageInput.length > 2000) return;
                   if (isComposing) return;
-                  // if (isDisabled) return;
-                  // if (isWarning) return;
                   handleSendMessage(
                     { type: 'dm', content: messageInput },
                     userId,

@@ -32,7 +32,7 @@ interface EditChannelOrderPopupProps {
 }
 
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
-  (initialData: EditChannelOrderPopupProps) => {
+  ({ userId, serverId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -54,7 +54,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
     // Variables
-    const { userId, serverId } = initialData;
     const isSelected = selectedChannel;
     const { channelId: selectedChannelId, isLobby } =
       selectedChannel ?? createDefault.channel();
@@ -130,6 +129,17 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       });
     };
 
+    const handleOpenEditChannelName = (
+      serverId: Server['serverId'],
+      channelId: Channel['channelId'],
+    ) => {
+      ipcService.popup.open(PopupType.EDIT_CHANNEL_NAME, 'editChannelName');
+      ipcService.initialData.onRequest('editChannelName', {
+        serverId,
+        channelId,
+      });
+    };
+
     const handleOpenWarning = (message: string) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'deleteChannel');
       ipcService.initialData.onRequest('deleteChannel', {
@@ -139,13 +149,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       ipcService.popup.onSubmit('deleteChannel', () => {
         if (!selectedChannel) return;
         handleDeleteChannel(selectedChannel.channelId, serverId);
-      });
-    };
-
-    const handleEditChannelName = () => {
-      ipcService.popup.open(PopupType.EDIT_CHANNEL_NAME, 'editChannelName');
-      ipcService.initialData.onRequest('editChannelName', {
-        selectedChannel,
       });
     };
 
@@ -414,7 +417,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
             `}
             onClick={() => {
               if (!canRename) return;
-              handleEditChannelName();
+              handleOpenEditChannelName(serverId, selectedChannelId);
             }}
           >
             {lang.tr.changeName}

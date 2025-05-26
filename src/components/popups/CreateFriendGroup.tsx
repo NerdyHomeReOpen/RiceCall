@@ -22,7 +22,7 @@ interface CreateFriendGroupPopupProps {
 }
 
 const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> =
-  React.memo((initialData: CreateFriendGroupPopupProps) => {
+  React.memo(({ userId }) => {
     // Hooks
     const socket = useSocket();
     const lang = useLanguage();
@@ -33,8 +33,8 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> =
     );
 
     // Variables
-    const { userId } = initialData;
     const { name: groupName, order: groupOrder } = friendGroup;
+    const canCreate = groupName.trim();
 
     // Handlers
     const handleCreateFriendGroup = (
@@ -51,6 +51,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> =
 
     return (
       <div className={popup['popupContainer']}>
+        {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
@@ -75,10 +76,11 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> =
           </div>
         </div>
 
+        {/* Footer */}
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}
-            disabled={!groupName.trim()}
+            disabled={!canCreate}
             onClick={() => {
               handleCreateFriendGroup(
                 { name: groupName, order: groupOrder },

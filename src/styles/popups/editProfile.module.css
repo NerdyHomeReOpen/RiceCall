@@ -4,11 +4,11 @@
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  padding: 5px;
+  overflow-y: auto;
 }
 
 .body .userProfileContent {
-  padding: 10px 15px;
+  padding: 5px 15px;
 }
 
 .body .userRecentVisitsPrivate {
@@ -39,6 +39,7 @@
   align-items: center;
   border-bottom: 1px solid #e3e3e3;
   color: #6d6d6d;
+  padding: 10px 15px;
 }
 
 .userAboutMeShow:before,
@@ -70,6 +71,13 @@
   margin-top: 6rem;
 }
 
+.userAboutMeShowText {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .left {
   display: flex;
   height: 100%;
@@ -96,7 +104,6 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  cursor: pointer;
   border-top: 1px solid #fff0;
   border-bottom: 1px solid #fff0;
   border-right: 1px solid #fff0;
@@ -248,7 +255,7 @@
   position: absolute;
   width: 99%;
   display: flex;
-  background: linear-gradient(#fff, #d2f0ffa1);
+  background: linear-gradient(to bottom, #ffffff, #f2f7f9);
   border-bottom: 1px solid #ddd;
   left: 2px;
   justify-content: right;
@@ -257,11 +264,11 @@
 
 .confirmedButton,
 .button {
-  margin-right: 5px;
-  min-width: 82px;
+  margin-right: 10px;
+  min-width: 78px;
   text-align: center;
-  font-size: 13px;
-  height: 26px;
+  font-size: 12px;
+  height: 25px;
   align-items: center;
   display: flex;
   justify-content: center;
@@ -270,7 +277,8 @@
   border: 1px solid #cbcccd;
   width: auto;
   border-radius: 5px;
-  background: #fff;
+  background: linear-gradient(#fafafb, #e9e9ed);
+  color: #333333;
 }
 
 .button:hover {
@@ -287,29 +295,35 @@
   color: #fff;
   border: 0;
   background-position: 0 0;
-  min-width: 80px;
-  max-width: 80px;
-  height: 28px;
+  min-width: 78px;
+  max-width: 78px;
+  height: 25px;
 }
 
 .blueBtn {
-  background-image: url('../../../public/im/btn-blue.png');
-  background-repeat: no-repeat;
+  background: #4aabf0;
+  border: 1px solid #50a1db;
+}
+
+.blueBtn:hover {
+  background: #53b6f3;
+}
+
+.blueBtn:active {
+  background: #49aaef;
 }
 
 .greenBtn {
-  background-image: url('../../../public/im/btn-green.png');
-  background-repeat: no-repeat;
+  background: #0fb11f;
+  border: 1px solid #0d9e1b;
 }
 
-.blueBtn:hover,
 .greenBtn:hover {
-  background-position: -80px 0;
+  background: #12bc23;
 }
 
-.blueBtn:active,
 .greenBtn:active {
-  background-position: -160px 0;
+  background: #0fac1e;
 }
 
 .headerTextBox {
@@ -341,6 +355,7 @@
 
 .userProfile .profileBox {
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -360,12 +375,17 @@
   -webkit-app-region: drag;
 }
 
+.userProfile .header div:not(.tab, .tab div),
+.userAboutMeShow,
+.userRecentVisitsPrivate {
+  user-select: text;
+}
+
 .windowActionButtons {
   width: 50px;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  -webkit-app-region: no-drag;
   position: fixed;
   right: 0;
   top: 10px;
@@ -412,14 +432,29 @@
   background-position: center center;
 }
 
-.avatar,
-.noDrag,
-.tab div {
-  -webkit-app-region: no-drag;
-}
-
 .userProfile .avatar.editable {
   cursor: pointer;
+}
+
+.userProfile .avatar.editable:hover {
+  box-shadow: 0 0 3px 6px rgba(255, 255, 255, 1);
+  border-radius: 3px;
+}
+
+.userProfile .avatar.editable:hover:after {
+  display: none;
+}
+
+.windowActionButtons,
+.vipIcon,
+.userAccount,
+.userContent,
+.userSignature,
+.avatar,
+.noDrag,
+.tab div,
+.userRecentVisitsPrivate {
+  -webkit-app-region: no-drag;
 }
 
 .userProfile .avatar::after {
@@ -434,24 +469,6 @@
   background-repeat: no-repeat;
   background-position: 0 0;
   z-index: 1;
-}
-
-.userProfile .avatar.editable::before {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  right: -8px;
-  width: 15px;
-  height: 15px;
-  background-color: white;
-  background-image: url('../../../public/im/btn-edit.png');
-  background-size: 70% 70%;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 4px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 2;
 }
 
 .userProfile .userName {
@@ -472,16 +489,25 @@
 }
 
 .userProfile .userSignature {
+  color: #fff;
+  width: 30rem;
   font-size: 0.95rem;
   font-weight: 400;
-  color: #fff;
+  overflow-y: scroll;
+  margin-bottom: 1.5rem;
   text-align: center;
-  max-height: 49.5px;
-  padding: 0 15px 1.5rem 15px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 498px;
+  min-height: 17.52px;
+  max-height: 17.52px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.userProfile .userSignature:hover::-webkit-scrollbar-thumb {
+  background: rgb(255, 255, 255);
+  border-radius: 4px;
+  border: 1px solid #ffffff;
 }
 
 .userProfile .tab {
@@ -503,11 +529,14 @@
   background-size: auto;
   background-repeat: repeat;
   background-position: 0 0;
-  cursor: pointer;
 }
 
 .userProfile .tab .item.selected {
-  background-position: 17px -38px;
+  background-position: 0 -38px;
+}
+
+.userProfile .tab .item.editable {
+  cursor: not-allowed;
 }
 
 .userProfile .tab .item.about::before {
@@ -571,11 +600,13 @@
 }
 
 .serverBox {
-  flex: 1;
-  display: flex;
   flex-direction: column;
-  overflow: hidden;
+  flex: 1;
   gap: 5px;
+  display: flex;
+  overflow: hidden;
+  min-height: 33px;
+  justify-content: space-between;
 }
 
 .serverName {
@@ -660,8 +691,8 @@
   align-items: center;
   justify-content: flex-end;
   min-height: 45px;
-  background: linear-gradient(180deg, #ffffff, #d2f0ffa1);
-  border-bottom: 1px solid #dddddd;
+  background: linear-gradient(to bottom, #ffffff, #f2f7f9);
+  border-bottom: 1px solid #f1f1f1;
 }
 
 /* User Badges */
@@ -674,4 +705,41 @@
   padding: 5px;
   background: #e8e8eb;
   margin-top: 0.5rem;
+}
+
+.inputBox {
+  display: flex !important;
+  align-items: center;
+}
+
+.emojiBox {
+  height: 40px;
+  width: 40px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.emojiBoxVisible {
+  display: flex;
+}
+
+.emojiBox:before {
+  content: '';
+  background-image: url('../../../public/channel/spliter.png');
+  height: 14px;
+  width: 1px;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.inputArea {
+  width: 100%;
+  height: 1.5rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
 }

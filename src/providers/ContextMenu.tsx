@@ -1,4 +1,10 @@
-import React, { useEffect, useContext, createContext, ReactNode } from 'react';
+import React, {
+  useEffect,
+  useContext,
+  createContext,
+  ReactNode,
+  useCallback,
+} from 'react';
 
 // Types
 import { ContextMenuItem, ServerMember, Badge } from '@/types';
@@ -7,23 +13,44 @@ import { ContextMenuItem, ServerMember, Badge } from '@/types';
 import ContextMenu from '@/components/ContextMenu';
 import UserInfoCard from '@/components/UserInfoCard';
 import BadgeInfoCard from '@/components/BadgeInfoCard';
+import EmojiPicker from '@/components/EmojiPicker';
 
 interface ContextMenuContextType {
   showContextMenu: (
     x: number,
     y: number,
+    preferTop: boolean,
+    preferLeft: boolean,
     items: ContextMenuItem[],
-    target?: HTMLElement,
   ) => void;
-  showUserInfoBlock: (x: number, y: number, member: ServerMember) => void;
+  showUserInfoBlock: (
+    x: number,
+    y: number,
+    preferTop: boolean,
+    member: ServerMember,
+  ) => void;
   showBadgeInfoCard: (
-    badgeElement: HTMLElement,
+    x: number,
+    y: number,
+    preferTop: boolean,
+    preferLeft: boolean,
     badge: Badge,
-    preferBelow?: boolean,
+  ) => void;
+  showEmojiPicker: (
+    x: number,
+    y: number,
+    preferTop: boolean,
+    type: 'custom' | 'unicode',
+    onEmojiSelect: (emoji: string) => void,
   ) => void;
   closeContextMenu: () => void;
   closeUserInfoBlock: () => void;
-  hideBadgeInfoCard: () => void;
+  closeBadgeInfoCard: () => void;
+  closeEmojiPicker: () => void;
+  isContextMenuVisible: boolean;
+  isUserInfoVisible: boolean;
+  isBadgeInfoVisible: boolean;
+  isEmojiPickerVisible: boolean;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
@@ -41,91 +68,145 @@ interface ContextMenuProviderProps {
 
 const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   // States
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [content, setContent] = React.useState<ReactNode | null>(null);
-  const [userInfo, setUserInfo] = React.useState<{
-    x: number;
-    y: number;
-    member: ServerMember;
-  } | null>(null);
+  const [isContextMenuVisible, setIsContextMenuVisible] = React.useState(false);
+  const [isUserInfoVisible, setIsUserInfoVisible] = React.useState(false);
+  const [isBadgeInfoVisible, setIsBadgeInfoVisible] = React.useState(false);
+  const [isEmojiPickerVisible, setIsEmojiPickerVisible] = React.useState(false);
+  const [contextMenu, setContextMenu] = React.useState<ReactNode | null>(null);
+  const [userInfo, setUserInfo] = React.useState<ReactNode | null>(null);
+  const [badgeInfo, setBadgeInfo] = React.useState<ReactNode | null>(null);
+  const [emojiPicker, setEmojiPicker] = React.useState<ReactNode | null>(null);
 
-  const [badgeInfo, setBadgeInfo] = React.useState<{
-    rect: DOMRect;
-    badge: Badge;
-    preferBelow: boolean;
-  } | null>(null);
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+  // Handlers
+  const handleClickOutside = useCallback(
+    (e: MouseEvent) => {
       if ((e.target as HTMLElement).closest('.context-menu-container')) return;
-      if (isVisible) closeContextMenu();
-      if (userInfo) closeUserInfoBlock();
-    };
+      if (isContextMenuVisible) closeContextMenu();
+      if (isBadgeInfoVisible) closeBadgeInfoCard();
+      if (isEmojiPickerVisible) closeEmojiPicker();
+    },
+    [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible],
+  );
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
+      if (isUserInfoVisible) closeUserInfoBlock();
+    },
+    [isUserInfoVisible],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
+      if (isContextMenuVisible) closeContextMenu();
+      if (isBadgeInfoVisible) closeBadgeInfoCard();
+      if (isEmojiPickerVisible) closeEmojiPicker();
+    },
+    [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible],
+  );
 
-      if (isVisible) closeContextMenu();
-      if (userInfo) closeUserInfoBlock();
-    };
-
-    document.addEventListener('click', handleClick);
+  // Effects
+  useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('contextmenu', handleClick);
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousemove', handleMouseMove);
 
     return () => {
-      document.removeEventListener('click', handleClick);
       document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('contextmenu', handleClick);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isVisible, userInfo]);
+  }, [handleKeyDown, handleClickOutside, handleMouseMove]);
 
   const showContextMenu = (
     x: number,
     y: number,
+    preferTop: boolean,
+    preferLeft: boolean,
     items: ContextMenuItem[],
-    target?: HTMLElement,
   ) => {
-    if (userInfo) closeUserInfoBlock();
-
-    setContent(
+    setContextMenu(
       <ContextMenu
+        items={items}
+        onClose={closeContextMenu}
         x={x}
         y={y}
-        items={items}
-        target={target}
-        onClose={closeContextMenu}
+        preferTop={preferTop}
+        preferLeft={preferLeft}
       />,
     );
-
-    setIsVisible(true);
+    setIsContextMenuVisible(true);
   };
 
-  const showUserInfoBlock = (x: number, y: number, member: ServerMember) => {
-    if (isVisible) closeContextMenu();
-    setUserInfo({ x, y, member });
+  const closeContextMenu = () => {
+    setContextMenu(null);
+    setIsContextMenuVisible(false);
+  };
+
+  const showUserInfoBlock = (
+    x: number,
+    y: number,
+    preferTop: boolean,
+    member: ServerMember,
+  ) => {
+    setUserInfo(
+      <UserInfoCard member={member} x={x} y={y} preferTop={preferTop} />,
+    );
+    setIsUserInfoVisible(true);
   };
 
   const closeUserInfoBlock = () => {
     setUserInfo(null);
-    setBadgeInfo(null);
+    setIsUserInfoVisible(false);
   };
 
   const showBadgeInfoCard = (
-    badgeElement: HTMLElement,
+    x: number,
+    y: number,
+    preferTop: boolean,
+    preferLeft: boolean,
     badge: Badge,
-    preferBelow: boolean = false,
   ) => {
-    const rect = badgeElement.getBoundingClientRect();
-    setBadgeInfo({ rect, badge, preferBelow });
+    setBadgeInfo(
+      <BadgeInfoCard
+        badge={badge}
+        x={x}
+        y={y}
+        preferTop={preferTop}
+        preferLeft={preferLeft}
+      />,
+    );
+    setIsBadgeInfoVisible(true);
   };
 
-  const hideBadgeInfoCard = () => {
+  const closeBadgeInfoCard = () => {
     setBadgeInfo(null);
+    setIsBadgeInfoVisible(false);
   };
 
-  const closeContextMenu = () => {
-    setIsVisible(false);
+  const showEmojiPicker = (
+    x: number,
+    y: number,
+    preferTop: boolean,
+    type: 'custom' | 'unicode',
+    onEmojiSelect: (emoji: string) => void,
+  ) => {
+    setEmojiPicker(
+      <EmojiPicker
+        type={type}
+        onEmojiSelect={onEmojiSelect}
+        x={x}
+        y={y}
+        preferTop={preferTop}
+      />,
+    );
+    setIsEmojiPickerVisible(true);
+  };
+
+  const closeEmojiPicker = () => {
+    setEmojiPicker(null);
+    setIsEmojiPickerVisible(false);
   };
 
   return (
@@ -133,23 +214,22 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       value={{
         showContextMenu,
         showUserInfoBlock,
-        closeUserInfoBlock,
         showBadgeInfoCard,
-        hideBadgeInfoCard,
+        showEmojiPicker,
         closeContextMenu,
+        closeUserInfoBlock,
+        closeBadgeInfoCard,
+        closeEmojiPicker,
+        isContextMenuVisible,
+        isUserInfoVisible,
+        isBadgeInfoVisible,
+        isEmojiPickerVisible,
       }}
     >
-      {isVisible && content}
-      {userInfo && (
-        <UserInfoCard x={userInfo.x} y={userInfo.y} member={userInfo.member} />
-      )}
-      {badgeInfo && (
-        <BadgeInfoCard
-          rect={badgeInfo.rect}
-          badge={badgeInfo.badge}
-          preferBelow={badgeInfo.preferBelow}
-        />
-      )}
+      {isContextMenuVisible && contextMenu}
+      {isUserInfoVisible && userInfo}
+      {badgeInfo && badgeInfo}
+      {isEmojiPickerVisible && emojiPicker}
       {children}
     </ContextMenuContext.Provider>
   );

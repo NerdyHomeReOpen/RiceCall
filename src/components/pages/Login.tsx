@@ -16,12 +16,6 @@ interface FormDatas {
   autoLogin: boolean;
 }
 
-interface AccountItem {
-  account: string;
-  token: string;
-  auto: boolean;
-}
-
 interface LoginPageProps {
   setSection: (section: 'login' | 'register') => void;
 }
@@ -40,32 +34,21 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
     rememberAccount: false,
     autoLogin: false,
   });
+  const [accounts, setAccounts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [accountSelectBox, setAccountSelectBox] = useState<boolean>(false);
-  const [accountList, setAccountList] = useState<AccountItem[]>([]);
-
-  const getParsedAccounts = () => {
-    try {
-      const raw = localStorage.getItem('login-accounts');
-      return raw ? JSON.parse(raw) : { accounts: [], remembered: [] };
-    } catch {
-      return { accounts: [], remembered: [] };
-    }
-  };
+  const [showAccountSelectBox, setShowAccountSelectBox] =
+    useState<boolean>(false);
 
   // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     if (name === 'account') {
-      const { accounts, remembered } = getParsedAccounts();
-      const match = accounts.find(
-        (a: { account: string }) => a.account === value,
-      );
+      const match = accounts.find((acc: string) => acc === value);
       setFormData((prev) => ({
         ...prev,
         account: value,
-        rememberAccount: remembered.includes(value),
-        autoLogin: match?.auto || false,
+        rememberAccount: !!match,
+        autoLogin: !!match,
       }));
     } else if (name === 'autoLogin') {
       setFormData((prev) => ({
@@ -95,34 +78,10 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
     if (!formData.account || !formData.password) return;
     setIsLoading(true);
     if (await authService.login(formData)) {
-      const parsed = getParsedAccounts();
-      const idx = parsed.accounts.findIndex(
-        (a: { account: string }) => a.account === formData.account,
-      );
-      const token = localStorage.getItem('token') || '';
-      if (formData.rememberAccount) {
-        if (idx >= 0) {
-          parsed.accounts[idx].token = token;
-          parsed.accounts[idx].auto = formData.autoLogin;
-        } else {
-          parsed.accounts.push({
-            account: formData.account,
-            token,
-            auto: formData.autoLogin,
-          });
-        }
-        if (!parsed.remembered.includes(formData.account))
-          parsed.remembered.push(formData.account);
-      } else {
-        parsed.accounts = parsed.accounts.filter(
-          (a: { account: string }) => a.account !== formData.account,
-        );
-        parsed.remembered = parsed.remembered.filter(
-          (a: string) => a !== formData.account,
-        );
+      if (formData.rememberAccount && !accounts.includes(formData.account)) {
+        setAccounts([...accounts, formData.account]);
+        localStorage.setItem('login-account', formData.account);
       }
-      localStorage.setItem('login-accounts', JSON.stringify(parsed));
-      setAccountList(parsed.accounts);
       setSection('login');
     }
     setIsLoading(false);
@@ -130,28 +89,34 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
 
   // Effects
   useEffect(() => {
-    const { accounts } = getParsedAccounts();
-    setAccountList(accounts);
-    const defaultAcc = accounts.find(
-      (a: { selected: string }) => a.selected,
-    )?.account;
-    const match = accounts.find(
-      (a: { account: string }) => a.account === defaultAcc,
-    );
-    if (match) {
-      setFormData((prev) => ({
-        ...prev,
-        account: defaultAcc,
-        rememberAccount: true,
-        autoLogin: match.auto || false,
-      }));
-    }
-    const listener = (e: MouseEvent) => {
+    const loginAccount = localStorage.getItem('login-account');
+    setFormData((prev) => ({
+      ...prev,
+      account: loginAccount || '',
+      rememberAccount: !!loginAccount,
+      autoLogin: !!loginAccount,
+    }));
+  }, []);
+
+  useEffect(() => {
+    const accounts = localStorage.getItem('accounts')?.split(',') || [];
+    setAccounts(accounts);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('accounts', accounts.join(','));
+  }, [accounts]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (!comboRef.current?.contains(e.target as Node))
-        setAccountSelectBox(false);
+        setShowAccountSelectBox(false);
     };
-    document.addEventListener('click', listener);
-    return () => document.removeEventListener('click', listener);
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
   }, []);
 
   return (
@@ -177,7 +142,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
           {!isLoading && (
             <>
               <div className={styles['inputBox']}>
-                <label className={styles['label']}>{lang.tr.account}</label>
+                <div className={styles['label']}>{lang.tr.account}</div>
                 <div className={styles['loginAccountBox']} ref={comboRef}>
                   <input
                     type="text"
@@ -192,64 +157,42 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     className={styles['comboArrow']}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setAccountSelectBox((prev) => !prev);
+                      setShowAccountSelectBox((prev) => !prev);
                     }}
-                  ></div>
-                </div>
-                <div
-                  className={`${styles['accountSelectBox']} ${
-                    accountSelectBox ? styles['showAccountSelectBox'] : ''
-                  }`}
-                >
-                  {accountList.map((account) => (
-                    <div
-                      key={account.account}
-                      className={styles['accountSelectOptionBox']}
-                      onClick={() => {
-                        const parsed = getParsedAccounts();
-                        setFormData((prev) => ({
-                          ...prev,
-                          account: account.account,
-                          rememberAccount: parsed.remembered.includes(
-                            account.account,
-                          ),
-                          autoLogin: account.auto,
-                        }));
-                        setAccountSelectBox(false);
-                      }}
-                    >
-                      {account.account}
+                  />
+                  <div
+                    className={styles['accountSelectBox']}
+                    style={showAccountSelectBox ? {} : { display: 'none' }}
+                  >
+                    {accounts.map((account) => (
                       <div
-                        className={styles['accountSelectCloseBtn']}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const parsed = getParsedAccounts();
-                          parsed.accounts = parsed.accounts.filter(
-                            (a: AccountItem) => a.account !== account.account,
-                          );
-                          parsed.remembered = parsed.remembered.filter(
-                            (a: string) => a !== account.account,
-                          );
-                          localStorage.setItem(
-                            'login-accounts',
-                            JSON.stringify(parsed),
-                          );
-                          setAccountList(parsed.accounts);
+                        key={account}
+                        className={styles['accountSelectOptionBox']}
+                        onClick={() => {
                           setFormData((prev) => ({
                             ...prev,
-                            account:
-                              prev.account === account.account
-                                ? ''
-                                : prev.account,
+                            account: account,
+                            rememberAccount: true,
+                            autoLogin: true,
                           }));
+                          setShowAccountSelectBox(false);
                         }}
-                      />
-                    </div>
-                  ))}
+                      >
+                        {account}
+                        <div
+                          className={styles['accountSelectCloseBtn']}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAccounts(accounts.filter((a) => a !== account));
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className={styles['inputBox']}>
-                <label className={styles['label']}>{lang.tr.password}</label>
+                <div className={styles['label']}>{lang.tr.password}</div>
                 <div className={styles['loginAccountBox']}>
                   <input
                     type="password"
@@ -263,7 +206,15 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                 </div>
               </div>
               <div className={styles['checkWrapper']}>
-                <label className={styles['checkBox']}>
+                <div
+                  className={styles['checkBox']}
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      rememberAccount: !prev.rememberAccount,
+                    }));
+                  }}
+                >
                   <input
                     type="checkbox"
                     name="rememberAccount"
@@ -273,8 +224,16 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     tabIndex={-1}
                   />
                   {lang.tr.rememberAccount}
-                </label>
-                <label className={styles['checkBox']}>
+                </div>
+                <div
+                  className={styles['checkBox']}
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      autoLogin: !prev.autoLogin,
+                    }));
+                  }}
+                >
                   <input
                     type="checkbox"
                     name="autoLogin"
@@ -284,7 +243,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     tabIndex={-1}
                   />
                   {lang.tr.autoLogin}
-                </label>
+                </div>
               </div>
               <button
                 className={styles['button']}

@@ -29,80 +29,118 @@ import ApplyMember from '@/components/popups/ApplyMember';
 import DirectMessage from '@/components/popups/DirectMessage';
 import SearchUser from '@/components/popups/SearchUser';
 import Dialog from '@/components/popups/Dialog';
+import ChangeTheme from '@/components/popups/ChangeTheme';
+import About from '@/components/popups/AboutUs';
+import FriendVerification from '@/components/popups/FriendVerification';
+
+// Utils
+import { emojiList, convertEmojiPlaceholderToHtml } from '@/utils/emoji';
 
 // Services
 import ipcService from '@/services/ipc.service';
+import refreshService from '@/services/refresh.service';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
 
+// CSS
+import directMessageStyles from '@/styles/popups/directMessage.module.css';
+
+const directMessageHeader = (targetSignature: string) => (
+  <div className={directMessageStyles['header']}>
+    <div
+      className={directMessageStyles['userSignature']}
+      dangerouslySetInnerHTML={{
+        __html: convertEmojiPlaceholderToHtml(targetSignature || '', emojiList),
+      }}
+    />
+    <div className={directMessageStyles['directOptionButtons']}>
+      <div
+        className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`}
+      />
+      <div
+        className={`${directMessageStyles['blockUser']} ${directMessageStyles['disabled']}`}
+      />
+      <div
+        className={`${directMessageStyles['unBlockUser']} ${directMessageStyles['disabled']}`}
+      />
+      <div
+        className={`${directMessageStyles['inviteTempGroup']} ${directMessageStyles['disabled']}`}
+      />
+      <div
+        className={`${directMessageStyles['report']} ${directMessageStyles['disabled']}`}
+      />
+    </div>
+  </div>
+);
+
 interface HeaderProps {
   title: string;
   buttons: ('minimize' | 'maxsize' | 'close')[];
+  titleBoxIcon?: string;
+  titleBoxContent?: ReactNode;
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ title, buttons }) => {
-  // States
-  const [isFullscreen, setIsFullscreen] = useState(false);
+const Header: React.FC<HeaderProps> = React.memo(
+  ({ title, buttons, titleBoxIcon, titleBoxContent }) => {
+    // States
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Handlers
-  const handleFullscreen = () => {
-    if (isFullscreen) {
-      ipcService.window.unmaximize();
-    } else {
-      ipcService.window.maximize();
-    }
-  };
-
-  const handleMinimize = () => {
-    ipcService.window.minimize();
-  };
-
-  const handleClose = () => {
-    ipcService.window.close();
-  };
-
-  // Effects
-  useEffect(() => {
-    const offMaximize = ipcService.window.onMaximize(() => {
-      setIsFullscreen(true);
-    });
-
-    const offUnmaximize = ipcService.window.onUnmaximize(() => {
-      setIsFullscreen(false);
-    });
-
-    return () => {
-      offMaximize();
-      offUnmaximize();
+    // Handlers
+    const handleFullscreen = () => {
+      if (isFullscreen) {
+        ipcService.window.unmaximize();
+      } else {
+        ipcService.window.maximize();
+      }
     };
-  }, []);
+    const handleMinimize = () => {
+      ipcService.window.minimize();
+    };
+    const handleClose = () => {
+      ipcService.window.close();
+    };
 
-  return (
-    <div className={header['header']}>
-      <div className={header['titleBox']}>
-        <div className={header['title']}>{title}</div>
-      </div>
-      <div className={header['buttons']}>
-        {buttons.includes('minimize') && (
-          <div
-            className={header['minimize']}
-            onClick={() => handleMinimize()}
-          />
-        )}
-        {buttons.includes('maxsize') && (
-          <div
-            className={isFullscreen ? header['restore'] : header['maxsize']}
-            onClick={() => handleFullscreen()}
-          />
-        )}
-        {buttons.includes('close') && (
-          <div className={header['close']} onClick={() => handleClose()} />
-        )}
-      </div>
-    </div>
-  );
-});
+    // Effects
+    useEffect(() => {
+      const offMaximize = ipcService.window.onMaximize(() =>
+        setIsFullscreen(true),
+      );
+      const offUnmaximize = ipcService.window.onUnmaximize(() =>
+        setIsFullscreen(false),
+      );
+      return () => {
+        offMaximize();
+        offUnmaximize();
+      };
+    }, []);
+
+    return (
+      <header className={`${header['header']} ${header['popupHeader']}`}>
+        <div className={header['titleWrapper']}>
+          <div className={`${header['titleBox']} ${titleBoxIcon}`}>
+            <div className={header['title']}>{title}</div>
+          </div>
+          <div className={header['buttons']}>
+            {buttons.includes('minimize') && (
+              <div className={header['minimize']} onClick={handleMinimize} />
+            )}
+            {buttons.includes('maxsize') && (
+              <div
+                className={isFullscreen ? header['restore'] : header['maxsize']}
+                onClick={handleFullscreen}
+              />
+            )}
+            {buttons.includes('close') && (
+              <div className={header['close']} onClick={handleClose} />
+            )}
+          </div>
+        </div>
+        {titleBoxContent}
+      </header>
+    );
+  },
+);
 
 Header.displayName = 'Header';
 
@@ -122,6 +160,8 @@ const Popup = React.memo(() => {
   >([]);
   const [content, setContent] = useState<ReactNode | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
+  const [directMessageTargetSignature, setDirectMessageTargetSignature] =
+    useState<string | null>(null);
 
   // Effects
   useEffect(() => {
@@ -154,146 +194,210 @@ const Popup = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    if (!initialData || !type) return;
+    const currentTargetId = initialData?.targetId;
+    if (type === PopupType.DIRECT_MESSAGE && currentTargetId) {
+      let isActive = true;
+      setDirectMessageTargetSignature(null);
 
+      refreshService
+        .user({ userId: currentTargetId })
+        .then((targetUser) => {
+          if (isActive) {
+            setDirectMessageTargetSignature(targetUser?.signature || '');
+          }
+        })
+        .catch((error) => {
+          if (isActive) {
+            console.error('Failed to fetch target user for DM header:', error);
+            setDirectMessageTargetSignature('');
+          }
+        });
+      return () => {
+        isActive = false;
+      };
+    } else if (type !== PopupType.DIRECT_MESSAGE) {
+      if (directMessageTargetSignature !== null) {
+        setDirectMessageTargetSignature(null);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type, initialData?.targetId]);
+
+  useEffect(() => {
+    const popupInitialData = initialData;
+    if (type === PopupType.SYSTEM_SETTING || type === PopupType.CHANGE_THEME) {
+    } else if (!popupInitialData || !type) {
+      return;
+    }
     switch (type) {
       case PopupType.CHANNEL_PASSWORD:
         setHeaderTitle(lang.tr.pleaseEnterTheChannelPassword);
         setHeaderButtons(['close']);
-        setContent(<ChannelPassword {...initialData} />);
+        setContent(<ChannelPassword {...popupInitialData} />);
         break;
       case PopupType.USER_INFO:
         setHeaderTitle(lang.tr.userInfo);
         setHeaderButtons(['close']);
-        setContent(<UserSetting {...initialData} />);
+        setContent(<UserSetting {...popupInitialData} />);
         break;
       case PopupType.USER_SETTING:
         setHeaderTitle(lang.tr.editUser);
         setHeaderButtons(['close']);
-        setContent(<UserSetting {...initialData} />);
+        setContent(<UserSetting {...popupInitialData} />);
         break;
       case PopupType.SERVER_SETTING:
         setHeaderTitle(lang.tr.editServer);
         setHeaderButtons(['close']);
-        setContent(<ServerSetting {...initialData} />);
+        setContent(<ServerSetting {...popupInitialData} />);
         break;
       case PopupType.CHANNEL_SETTING:
         setHeaderTitle(lang.tr.editChannel);
         setHeaderButtons(['close']);
-        setContent(<ChannelSetting {...initialData} />);
+        setContent(<ChannelSetting {...popupInitialData} />);
         break;
       case PopupType.MEMBERAPPLY_SETTING:
         setHeaderTitle(lang.tr.editApplySettings);
         setHeaderButtons(['close']);
-        setContent(<MemberApplySetting {...initialData} />);
+        setContent(<MemberApplySetting {...popupInitialData} />);
         break;
       case PopupType.SYSTEM_SETTING:
         setHeaderTitle(lang.tr.systemSetting);
         setHeaderButtons(['close']);
-        setContent(<SystemSetting {...initialData} />);
+        setContent(<SystemSetting {...popupInitialData} />);
         break;
       case PopupType.CREATE_SERVER:
         setHeaderTitle(lang.tr.createServer);
         setHeaderButtons(['close']);
-        setContent(<CreateServer {...initialData} />);
+        setContent(<CreateServer {...popupInitialData} />);
         break;
       case PopupType.CREATE_CHANNEL:
         setHeaderTitle(lang.tr.createChannel);
         setHeaderButtons(['close']);
-        setContent(<CreateChannel {...initialData} />);
+        setContent(<CreateChannel {...popupInitialData} />);
         break;
       case PopupType.CREATE_FRIENDGROUP:
         setHeaderTitle(lang.tr.addFriendGroup);
         setHeaderButtons(['close']);
-        setContent(<CreateFriendGroup {...initialData} />);
+        setContent(<CreateFriendGroup {...popupInitialData} />);
         break;
       case PopupType.EDIT_CHANNEL_ORDER:
         setHeaderTitle(lang.tr.editChannelOrder);
         setHeaderButtons(['close']);
-        setContent(<EditChannelOrder {...initialData} />);
+        setContent(<EditChannelOrder {...popupInitialData} />);
         break;
       case PopupType.EDIT_CHANNEL_NAME:
         setHeaderTitle(lang.tr.editChannelName);
         setHeaderButtons(['close']);
-        setContent(<EditChannelName {...initialData} />);
+        setContent(<EditChannelName {...popupInitialData} />);
         break;
       case PopupType.EDIT_NICKNAME:
         setHeaderTitle(lang.tr.editMemberCard);
         setHeaderButtons(['close']);
-        setContent(<EditNickname {...initialData} />);
+        setContent(<EditNickname {...popupInitialData} />);
         break;
       case PopupType.EDIT_FRIENDGROUP:
         setHeaderTitle(lang.tr.editFriendGroup);
         setHeaderButtons(['close']);
-        setContent(<EditFriendGroup {...initialData} />);
+        setContent(<EditFriendGroup {...popupInitialData} />);
         break;
       case PopupType.EDIT_FRIEND:
         setHeaderTitle(lang.tr.editFriend);
         setHeaderButtons(['close']);
-        setContent(<EditFriend {...initialData} />);
+        setContent(<EditFriend {...popupInitialData} />);
         break;
       case PopupType.APPLY_MEMBER:
         setHeaderTitle(lang.tr.applyMember);
         setHeaderButtons(['close']);
-        setContent(<ApplyMember {...initialData} />);
+        setContent(<ApplyMember {...popupInitialData} />);
         break;
       case PopupType.APPLY_FRIEND:
         setHeaderTitle(lang.tr.applyFriend);
         setHeaderButtons(['close']);
-        setContent(<ApplyFriend {...initialData} />);
+        setContent(<ApplyFriend {...popupInitialData} />);
         break;
       case PopupType.SEARCH_USER:
         setHeaderTitle(lang.tr.addFriend);
         setHeaderButtons(['close']);
-        setContent(<SearchUser {...initialData} />);
+        setContent(<SearchUser {...popupInitialData} />);
         break;
       case PopupType.DIRECT_MESSAGE:
-        setHeaderTitle(initialData.targetName || lang.tr.directMessage);
+        setHeaderTitle(popupInitialData?.targetName || lang.tr.directMessage);
         setHeaderButtons(['close', 'minimize', 'maxsize']);
-        setContent(<DirectMessage {...{ ...initialData, windowRef }} />);
+        setContent(<DirectMessage {...{ ...popupInitialData, windowRef }} />);
         break;
       case PopupType.DIALOG_ALERT:
       case PopupType.DIALOG_ALERT2:
         setHeaderTitle(lang.tr.dialogAlert);
         setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...initialData, iconType: 'ALERT' }} />);
+        setContent(<Dialog {...{ ...popupInitialData, iconType: 'ALERT' }} />);
         break;
       case PopupType.DIALOG_SUCCESS:
         setHeaderTitle(lang.tr.dialogSuccess);
         setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...initialData, iconType: 'SUCCESS' }} />);
+        setContent(
+          <Dialog {...{ ...popupInitialData, iconType: 'SUCCESS' }} />,
+        );
         break;
       case PopupType.DIALOG_WARNING:
         setHeaderTitle(lang.tr.dialogWarning);
         setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...initialData, iconType: 'WARNING' }} />);
+        setContent(
+          <Dialog {...{ ...popupInitialData, iconType: 'WARNING' }} />,
+        );
         break;
       case PopupType.DIALOG_ERROR:
         setHeaderTitle(lang.tr.dialogError);
         setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...initialData, iconType: 'ERROR' }} />);
+        setContent(<Dialog {...{ ...popupInitialData, iconType: 'ERROR' }} />);
         break;
       case PopupType.DIALOG_INFO:
         setHeaderTitle(lang.tr.dialogInfo);
         setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...initialData, iconType: 'INFO' }} />);
+        setContent(<Dialog {...{ ...popupInitialData, iconType: 'INFO' }} />);
         break;
-      case PopupType.ANTHOR_DEVICE_LOGIN:
-        setHeaderTitle(lang.tr.dialogWarning);
+      case PopupType.CHANGE_THEME:
+        setHeaderTitle(lang.tr.changeTheme);
         setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...initialData, iconType: 'WARNING' }} />);
+        setContent(<ChangeTheme {...popupInitialData} />);
+        break;
+      case PopupType.ABOUTUS:
+        setHeaderTitle(lang.tr.aboutUs);
+        setHeaderButtons(['close']);
+        setContent(<About {...popupInitialData} />);
+        break;
+      case PopupType.FRIEND_VERIFICATION:
+        setHeaderTitle(lang.tr.friendVerification);
+        setHeaderButtons(['close']);
+        setContent(<FriendVerification {...popupInitialData} />);
         break;
       default:
         break;
     }
-  }, [lang, initialData, type]);
+  }, [lang, initialData, type, windowRef]);
 
   return (
     <div className="wrapper" ref={windowRef}>
       {/* Top Nevigation */}
-      {headerTitle !== lang.tr.userInfo && (
-        <Header title={headerTitle} buttons={headerButtons} />
-      )}
+      {(type !== PopupType.USER_INFO || headerTitle !== lang.tr.userInfo) &&
+        headerButtons.length > 0 && (
+          <Header
+            title={headerTitle}
+            buttons={headerButtons}
+            titleBoxIcon={
+              type === PopupType.CHANGE_THEME
+                ? header['titleBoxSkinIcon']
+                : type === PopupType.DIRECT_MESSAGE
+                ? header['titleBoxDirectMessageIcon']
+                : undefined
+            }
+            titleBoxContent={
+              type === PopupType.DIRECT_MESSAGE &&
+              directMessageTargetSignature !== null
+                ? directMessageHeader(directMessageTargetSignature)
+                : undefined
+            }
+          />
+        )}
       {/* Main Content */}
       <div className="content">{content}</div>
     </div>

@@ -25,7 +25,7 @@ interface ApplyMemberPopupProps {
 }
 
 const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
-  (initialData: ApplyMemberPopupProps) => {
+  ({ userId, serverId }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
@@ -40,14 +40,13 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
       useState<MemberApplication>(createDefault.memberApplication());
 
     // Variables
-    const { userId, serverId } = initialData;
     const {
       name: serverName,
       avatarUrl: serverAvatarUrl,
       displayId: serverDisplayId,
       applyNotice: serverApplyNotice,
     } = server;
-    const { description: applicationDescription } = memberApplication;
+    const { description: applicationDes } = memberApplication;
 
     // Handlers
     const handleCreatMemberApplication = (
@@ -104,89 +103,89 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
       refresh();
     }, [serverId, userId]);
 
-    switch (section) {
-      // Member Application Form
-      case 0:
-        return (
-          <div className={popup['popupContainer']}>
-            <div className={popup['popupBody']}>
-              <div className={setting['body']}>
-                <div className={popup['col']}>
-                  <div className={popup['row']}>
-                    <div className={applyMember['avatarWrapper']}>
-                      <div
-                        className={applyMember['avatarPicture']}
-                        style={{ backgroundImage: `url(${serverAvatarUrl})` }}
-                      />
-                    </div>
-                    <div className={applyMember['infoWrapper']}>
-                      <div className={applyMember['mainText']}>
-                        {serverName}
-                      </div>
-                      <div className={applyMember['subText']}>
-                        {`ID: ${serverDisplayId}`}
-                      </div>
-                    </div>
-                  </div>
-                  <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <div className={popup['label']}>
-                      {lang.tr.serverApplyNotice}
-                    </div>
-                    <div className={popup['hint']}>
-                      {serverApplyNotice || lang.tr.none}
-                    </div>
-                  </div>
-                  <div className={applyMember['split']} />
-                  <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <div className={popup['label']}>
-                      {lang.tr.serverApplyDescription}
-                    </div>
-                    <textarea
-                      rows={2}
-                      onChange={(e) =>
-                        setMemberApplication((prev) => ({
-                          ...prev,
-                          description: e.target.value,
-                        }))
-                      }
-                      value={applicationDescription}
+    return (
+      <>
+        {/* Member Application Form */}
+        <div
+          className={popup['popupContainer']}
+          style={section === 0 ? {} : { display: 'none' }}
+        >
+          {/* Body */}
+          <div className={popup['popupBody']}>
+            <div className={setting['body']}>
+              <div className={popup['col']}>
+                <div className={popup['row']}>
+                  <div className={applyMember['avatarWrapper']}>
+                    <div
+                      className={applyMember['avatarPicture']}
+                      style={{ backgroundImage: `url(${serverAvatarUrl})` }}
                     />
                   </div>
+                  <div className={applyMember['infoWrapper']}>
+                    <div className={applyMember['mainText']}>{serverName}</div>
+                    <div className={applyMember['subText']}>
+                      {`ID: ${serverDisplayId}`}
+                    </div>
+                  </div>
+                </div>
+                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                  <div>{lang.tr.serverApplyNotice}</div>
+                  <div className={popup['hint']}>
+                    {serverApplyNotice || lang.tr.none}
+                  </div>
+                </div>
+                <div className={applyMember['split']} />
+                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                  <div>{lang.tr.serverApplyDescription}</div>
+                  <textarea
+                    rows={2}
+                    value={applicationDes}
+                    onChange={(e) =>
+                      setMemberApplication((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                  />
                 </div>
               </div>
             </div>
-
-            <div className={popup['popupFooter']}>
-              <button
-                type="submit"
-                className={popup['button']}
-                onClick={() => {
-                  handleCreatMemberApplication(
-                    { description: applicationDescription },
-                    userId,
-                    serverId,
-                  );
-                  handleOpenSuccessDialog(lang.tr.serverApply);
-                }}
-              >
-                {lang.tr.submit}
-              </button>
-              <button
-                type="button"
-                className={popup['button']}
-                onClick={() => handleClose()}
-              >
-                {lang.tr.cancel}
-              </button>
-            </div>
           </div>
-        );
 
-      // Show Notification
-      case 1:
-        return (
-          <div className={popup['popupContainer']}>
-            <div className={popup['popupBody']}>
+          {/* Footer */}
+          <div className={popup['popupFooter']}>
+            <button
+              type="submit"
+              className={popup['button']}
+              onClick={() => {
+                handleCreatMemberApplication(
+                  { description: applicationDes },
+                  userId,
+                  serverId,
+                );
+                handleOpenSuccessDialog(lang.tr.serverApply);
+              }}
+            >
+              {lang.tr.submit}
+            </button>
+            <button
+              type="button"
+              className={popup['button']}
+              onClick={() => handleClose()}
+            >
+              {lang.tr.cancel}
+            </button>
+          </div>
+        </div>
+
+        {/* Show Notification */}
+        <div
+          className={popup['popupContainer']}
+          style={section === 1 ? {} : { display: 'none' }}
+        >
+          {/* Body */}
+          <div className={popup['popupBody']}>
+            <div className={setting['body']}>
               <div className={setting['body']}>
                 <div className={popup['col']}>
                   <div className={popup['row']}>
@@ -206,19 +205,18 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
                     </div>
                   </div>
                   <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <div className={popup['label']}>
-                      {lang.tr.serverApplyNotice}
-                    </div>
+                    <div>{lang.tr.serverApplyNotice}</div>
                     <div className={popup['hint']}>
                       {serverApplyNotice || lang.tr.none}
                     </div>
                   </div>
                   <div className={applyMember['split']} />
-                  <div className={popup['hint']}>{lang.tr.applySuccess}</div>
+                  <p className={popup['hint']}>{lang.tr.applySuccess}</p>
                 </div>
               </div>
             </div>
 
+            {/* Footer */}
             <div className={popup['popupFooter']}>
               <button className={popup['button']} onClick={() => setSection(0)}>
                 {lang.tr.modify}
@@ -228,8 +226,9 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
               </button>
             </div>
           </div>
-        );
-    }
+        </div>
+      </>
+    );
   },
 );
 

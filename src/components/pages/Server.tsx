@@ -62,6 +62,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     // Refs
     const announcementAreaRef = useRef<HTMLDivElement>(null);
+    const voiceModeRef = useRef<HTMLDivElement>(null);
 
     // States
     const [sidebarWidth, setSidebarWidth] = useState<number>(270);
@@ -117,8 +118,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       userPermission > 4 && channelVoiceMode !== 'free';
     const canChangeToForbiddenSpeech =
       userPermission > 4 && channelVoiceMode !== 'forbidden';
-    // const canChangeToQueue =
-    //   userPermission > 4 && channelVoiceMode !== 'queue';
+    const canChangeToForbiddenQueue =
+      userPermission > 4 && channelVoiceMode !== 'queue';
+    const canChangeToControlQueue =
+      userPermission > 4 && channelVoiceMode !== 'forbidden';
 
     // Handlers
     const handleSendMessage = (
@@ -143,10 +146,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const handleResizeSidebar = useCallback(
       (e: MouseEvent) => {
         if (!isResizingSidebar) return;
-        // const maxWidth = window.innerWidth * 0.3;
-        const maxWidth = 400;
-        const minWidth = 250;
-        const newWidth = Math.max(minWidth, Math.min(e.clientX, maxWidth));
+        const newWidth = e.clientX;
         setSidebarWidth(newWidth);
       },
       [isResizingSidebar],
@@ -156,12 +156,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       (e: MouseEvent) => {
         if (!isResizingAnnouncementArea) return;
         if (!announcementAreaRef.current) return;
-        // const maxHeight = window.innerHeight * 0.6;
-        const maxHeight = 500;
-        const minHeight = 100;
-        const newHeight =
-          Math.max(minHeight, Math.min(e.clientY, maxHeight)) -
-          announcementAreaRef.current.offsetTop;
+        const newHeight = e.clientY - announcementAreaRef.current.offsetTop;
         setAnnouncementAreaHeight(newHeight);
       },
       [isResizingAnnouncementArea],
@@ -327,79 +322,87 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             </div>
             <div className={styles['buttonArea']}>
               <div className={styles['buttons']}>
-                {userPermission >= 3 && (
-                  <div
-                    className={styles['voiceModeDropdown']}
-                    onClick={(e) =>
-                      contextMenu.showContextMenu(e.clientX, e.clientY, [
-                        {
-                          id: 'freeSpeech',
-                          label: lang.tr.freeSpeech,
-                          show: canChangeToFreeSpeech,
-                          onClick: () => {
-                            handleUpdateChannel(
-                              { voiceMode: 'free' },
-                              channelId,
-                              serverId,
-                            );
-                          },
+                <div
+                  ref={voiceModeRef}
+                  className={styles['voiceModeDropdown']}
+                  style={userPermission >= 3 ? {} : { display: 'none' }}
+                  onClick={() => {
+                    if (!voiceModeRef.current) return;
+                    const x = voiceModeRef.current.getBoundingClientRect().left;
+                    const y = voiceModeRef.current.getBoundingClientRect().top;
+                    contextMenu.showContextMenu(x, y, true, false, [
+                      {
+                        id: 'freeSpeech',
+                        label: lang.tr.freeSpeech,
+                        show: canChangeToFreeSpeech,
+                        onClick: () => {
+                          handleUpdateChannel(
+                            { voiceMode: 'free' },
+                            channelId,
+                            serverId,
+                          );
                         },
-                        {
-                          id: 'forbiddenSpeech',
-                          label: lang.tr.forbiddenSpeech,
-                          show: canChangeToForbiddenSpeech,
-                          onClick: () => {
-                            handleUpdateChannel(
-                              { voiceMode: 'forbidden' },
-                              channelId,
-                              serverId,
-                            );
-                          },
+                      },
+                      {
+                        id: 'forbiddenSpeech',
+                        label: lang.tr.forbiddenSpeech,
+                        show: canChangeToForbiddenSpeech,
+                        disabled: true,
+                        onClick: () => {
+                          handleUpdateChannel(
+                            { voiceMode: 'forbidden' },
+                            channelId,
+                            serverId,
+                          );
                         },
-                        {
-                          id: 'queue',
-                          label: lang.tr.queue,
-                          icon: 'submenu',
-                          show: false, // canChangeToQueue
-                          hasSubmenu: true,
-                          onClick: () => {
-                            handleUpdateChannel(
-                              { voiceMode: 'queue' },
-                              channelId,
-                              serverId,
-                            );
-                          },
-                          submenuItems: [
-                            {
-                              id: 'forbiddenQueue',
-                              label: lang.tr.forbiddenQueue,
-                              // show: canChangeToForbiddenQueue,
-                              onClick: () => {
-                                // handleUpdateChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
-                              },
+                      },
+                      {
+                        id: 'queue',
+                        label: lang.tr.queue,
+                        icon: 'submenu',
+                        show:
+                          canChangeToForbiddenQueue || canChangeToControlQueue,
+                        hasSubmenu: true,
+                        disabled: true,
+                        onClick: () => {
+                          handleUpdateChannel(
+                            { voiceMode: 'queue' },
+                            channelId,
+                            serverId,
+                          );
+                        },
+                        submenuItems: [
+                          {
+                            id: 'forbiddenQueue',
+                            label: lang.tr.forbiddenQueue,
+                            show: canChangeToForbiddenQueue,
+                            disabled: true,
+                            onClick: () => {
+                              // handleUpdateChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
                             },
-                            {
-                              id: 'controlQueue',
-                              label: lang.tr.controlQueue,
-                              // show: canChangeToControlQueue,
-                              onClick: () => {
-                                // handleUpdateChannel({ queueMode: 'control' }, currentChannelId, serverId);
-                              },
+                          },
+                          {
+                            id: 'controlQueue',
+                            label: lang.tr.controlQueue,
+                            show: canChangeToControlQueue,
+                            disabled: true,
+                            onClick: () => {
+                              // handleUpdateChannel({ queueMode: 'control' }, currentChannelId, serverId);
                             },
-                          ],
-                        },
-                      ])
-                    }
-                  >
-                    {channelVoiceMode === 'queue'
-                      ? lang.tr.queue
-                      : channelVoiceMode === 'free'
-                      ? lang.tr.freeSpeech
-                      : channelVoiceMode === 'forbidden'
-                      ? lang.tr.forbiddenSpeech
-                      : ''}
-                  </div>
-                )}
+                          },
+                        ],
+                      },
+                    ]);
+                  }}
+                >
+                  {channelVoiceMode === 'queue'
+                    ? lang.tr.queue
+                    : channelVoiceMode === 'free'
+                    ? lang.tr.freeSpeech
+                    : channelVoiceMode === 'forbidden'
+                    ? lang.tr.forbiddenSpeech
+                    : ''}
+                </div>
               </div>
               <div
                 className={`
@@ -433,32 +436,48 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 <div className={styles['saperator']} />
                 <div className={styles['micVolumeContainer']}>
                   <div
-                    className={`
-                      ${styles['micModeButton']} 
-                      ${
-                        webRTC.isMute || webRTC.micVolume === 0
-                          ? styles['muted']
-                          : styles['active']
-                      }`}
+                    className={`${styles['micModeButton']} ${
+                      webRTC.isMute || webRTC.micVolume === 0
+                        ? styles['muted']
+                        : styles['active']
+                    }`}
+                    onMouseEnter={(e) => {
+                      e.stopPropagation();
+                      setShowMicVolume(true);
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowMicVolume(!showMicVolume);
-                      setShowSpeakerVolume(false);
                     }}
                   />
                   {showMicVolume && (
-                    <div className={styles['volumeSlider']}>
-                      <input
-                        type="range"
-                        min="0"
-                        max="200"
-                        value={webRTC.micVolume}
-                        onChange={(e) => {
-                          webRTC.handleUpdateMicVolume?.(
-                            parseInt(e.target.value),
-                          );
-                        }}
-                        className={styles['slider']}
+                    <div
+                      className={styles['volumeSlider']}
+                      onMouseLeave={(e) => {
+                        e.stopPropagation();
+                        setShowMicVolume(false);
+                      }}
+                    >
+                      <div className={styles['sliderContainer']}>
+                        <input
+                          className={styles['slider']}
+                          type="range"
+                          min="0"
+                          max="200"
+                          value={webRTC.micVolume}
+                          onChange={(e) => {
+                            webRTC.handleUpdateMicVolume?.(
+                              parseInt(e.target.value),
+                            );
+                          }}
+                        />
+                      </div>
+                      <div
+                        className={`${styles['micModeButton']} ${
+                          webRTC.isMute || webRTC.micVolume === 0
+                            ? styles['muted']
+                            : styles['active']
+                        }`}
                       />
                     </div>
                   )}
@@ -468,25 +487,42 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     className={`${styles['speakerButton']} ${
                       webRTC.speakerVolume === 0 ? styles['muted'] : ''
                     }`}
+                    onMouseEnter={(e) => {
+                      e.stopPropagation();
+                      setShowSpeakerVolume(true);
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowSpeakerVolume(!showSpeakerVolume);
-                      setShowMicVolume(false);
                     }}
                   />
                   {showSpeakerVolume && (
-                    <div className={styles['volumeSlider']}>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={webRTC.speakerVolume}
-                        onChange={(e) => {
-                          webRTC.handleUpdateSpeakerVolume(
-                            parseInt(e.target.value),
-                          );
-                        }}
-                        className={styles['slider']}
+                    <div
+                      className={styles['volumeSlider']}
+                      onMouseLeave={(e) => {
+                        e.stopPropagation();
+                        setShowSpeakerVolume(false);
+                      }}
+                    >
+                      <div className={styles['sliderContainer']}>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={webRTC.speakerVolume}
+                          onChange={(e) => {
+                            webRTC.handleUpdateSpeakerVolume(
+                              parseInt(e.target.value),
+                            );
+                          }}
+                          className={styles['slider']}
+                        />
+                      </div>
+
+                      <div
+                        className={`${styles['speakerButton']} ${
+                          webRTC.speakerVolume === 0 ? styles['muted'] : ''
+                        }`}
                       />
                     </div>
                   )}

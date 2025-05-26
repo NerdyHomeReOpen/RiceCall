@@ -24,7 +24,7 @@ const Header: React.FC = React.memo(() => {
   };
 
   return (
-    <div className={header['header']}>
+    <header className={header['header']}>
       {/* Title */}
       <div className={`${header['titleBox']} ${header['big']}`}>
         <div className={header['appIcon']} />
@@ -34,7 +34,7 @@ const Header: React.FC = React.memo(() => {
         <div className={header['minimize']} onClick={() => handleMinimize()} />
         <div className={header['close']} onClick={() => handleClose()} />
       </div>
-    </div>
+    </header>
   );
 });
 

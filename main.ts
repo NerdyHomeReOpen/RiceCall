@@ -70,10 +70,12 @@ enum SocketClientEvent {
   CREATE_MEMBER_APPLICATION = 'createMemberApplication',
   UPDATE_MEMBER_APPLICATION = 'updateMemberApplication',
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
+  APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
   // Friend Application
   CREATE_FRIEND_APPLICATION = 'createFriendApplication',
   UPDATE_FRIEND_APPLICATION = 'updateFriendApplication',
   DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
+  APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
   // Message
   SEND_MESSAGE = 'message',
   SEND_DIRECT_MESSAGE = 'directMessage',
@@ -144,8 +146,6 @@ enum SocketServerEvent {
   PLAY_SOUND = 'playSound',
   // Echo
   PONG = 'pong',
-  // Error
-  ERROR = 'error',
   // Popup
   OPEN_POPUP = 'openPopup',
 }
@@ -445,12 +445,11 @@ function connectSocket(token: string): Socket | null {
   const socket = io(websocketUrl, {
     transports: ['websocket'],
     reconnection: true,
-    reconnectionDelay: 10000,
+    reconnectionDelay: 1000,
     reconnectionDelayMax: 20000,
-    timeout: 20000,
+    timeout: 10000,
     autoConnect: false,
     query: {
-      jwt: token,
       token: token,
     },
   });
@@ -466,49 +465,58 @@ function connectSocket(token: string): Socket | null {
 
     Object.values(SocketClientEvent).forEach((event) => {
       ipcMain.on(event, (_, ...args) => {
-        console.log('socket.emit', event, ...args);
+        // console.log('socket.emit', event, ...args);
+        console.log('socket.emit', event);
         socket.emit(event, ...args);
       });
     });
 
     Object.values(SocketServerEvent).forEach((event) => {
       socket.on(event, (...args) => {
-        console.log('socket.on', event, ...args);
+        // console.log('socket.on', event, ...args);
+        console.log('socket.on', event);
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
       });
     });
 
-    console.info('Socket 連線成功');
+    console.info('Socket connected');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('connect', null);
     });
   });
 
-  socket.on('connect_error', (error) => {
-    console.error('Socket 連線失敗:', error.message);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('connect_error', error);
-    });
-  });
-
   socket.on('disconnect', (reason) => {
-    console.info('Socket 斷開連線，原因:', reason);
+    console.info('Socket disconnected, reason:', reason);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('disconnect', reason);
     });
   });
 
   socket.on('reconnect', (attemptNumber) => {
-    console.info('Socket 重新連線成功，嘗試次數:', attemptNumber);
+    console.info('Socket reconnected, attempt number:', attemptNumber);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect', attemptNumber);
     });
   });
 
+  socket.on('error', (error) => {
+    console.error('Socket error:', error.message);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('error', error);
+    });
+  });
+
+  socket.on('connect_error', (error) => {
+    console.error('Socket connect error:', error.message);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('connect_error', error);
+    });
+  });
+
   socket.on('reconnect_error', (error) => {
-    console.error('Socket 重新連線失敗:', error.message);
+    console.error('Socket reconnect error:', error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect_error', error);
     });

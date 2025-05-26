@@ -5,16 +5,20 @@
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-v0.1.9-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.1.10-green"/>
   </div>
 </div>
 
 This project is tested with BrowserStack
 
-## v0.1.9 更新日誌 (Change Log)
+## v0.1.10 更新日誌 (Change Log)
 
-- 修復系統設定點擊確認會導致軟體錯誤
-- 修復創群時的不正常行為
+- 新增主題系統
+- 新增表情符號
+- 修正無法切換輸入輸出裝置問題
+- 修正錯誤文本內容
+- 調整主頁伺服器卡片大小
+- 調整各種介面樣式及行為
 
 ## 安裝方法
 
