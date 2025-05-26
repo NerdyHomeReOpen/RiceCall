@@ -613,7 +613,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         );
         peerAudioRefs.current[userId].autoplay = true;
         peerAudioRefs.current[userId].oncanplay = () =>
-          handleUpdateSpeakerVolume(speakerVolume);
+          handleUpdateSpeakerVolume();
       }
       peerAudioRefs.current[userId].srcObject = event.streams[0];
       peerStreams.current[userId] = event.streams[0];
