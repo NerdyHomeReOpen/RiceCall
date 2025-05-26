@@ -172,8 +172,9 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
                   emojiIconRef.current.getBoundingClientRect().y +
                   emojiIconRef.current.getBoundingClientRect().height;
                 contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
-                  signatureInputRef.current?.focus();
                   setSignatureInput((prev) => prev + emoji);
+                  if (signatureInputRef.current)
+                    signatureInputRef.current.focus();
                 });
               }}
             />
