@@ -491,6 +491,7 @@ export type Friend = {
   userId: string;
   targetId: string;
   isBlocked: boolean;
+  online: boolean;
   friendGroupId: string | null;
   createdAt: number;
 };

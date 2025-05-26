@@ -189,11 +189,12 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
       badges: friendBadges,
       status: friendStatus,
       currentServerId: friendCurrentServerId,
+      online: friendOnlineStatus = null,
     } = friend;
     const { name: friendServerName } = friendServer;
     const isCurrentUser = friendTargetId === friendUserId;
     const canManageFriend = !isCurrentUser;
-    const isFriendOnline = friendCurrentServerId !== null;
+    const isFriendOnline = friendOnlineStatus ?? friendCurrentServerId !== null;
 
     // Handlers
     const handleServerSelect = (userId: User['userId'], server: Server) => {
