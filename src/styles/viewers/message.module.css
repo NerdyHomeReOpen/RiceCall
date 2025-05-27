@@ -42,12 +42,17 @@
   padding: 5px 0;
 }
 
+.messageEvent .username {
+  max-width: 35vw;
+  overflow-x: hidden;
+}
+
+
 .messageBox {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  max-width: 100%;
   gap: 0.25rem;
 }
 
