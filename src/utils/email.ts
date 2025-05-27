@@ -156,7 +156,7 @@ export const getEmailHtml = (resetLink: string, account: string): string => {
 														<tr>
 															<td class="pad" style="padding-bottom:15px;padding-top:15px;width:100%;">
 																<div class="alignment" align="center">
-																	<div style="max-width: 226px;"><img src="https://raw.githubusercontent.com/NerdyHomeReOpen/RiceCall/refs/heads/main/public/login_logo_title.png" style="display: block; height: auto; border: 0; width: 100%;" width="226" alt title height="auto"></div>
+																	<div style="max-width: 226px;"><img src="https://raw.githubusercontent.com/NerdyHomeReOpen/RiceCall/refs/heads/main/public/login_logo.png" style="display: block; height: auto; border: 0; width: 100%;" width="226" alt title height="auto"></div>
 																</div>
 															</td>
 														</tr>
