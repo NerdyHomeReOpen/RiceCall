@@ -38,7 +38,7 @@ export const RequestAccountRecoverHandler: RequestHandler = {
       const userEmail = 'user@example.com'; // Placeholder for user's email, in a real app, fetch from userAccount
       const resetLink = `${serverConfig.frontendUrl}/reset-password?userId=${userAccount.userId}&token=${resetToken}`; // Changed
       const emailSubject = 'RiceCall 密碼重設請求';
-      const emailHtml = getEmailHtml(resetLink);
+      const emailHtml = getEmailHtml(resetLink, account);
 
       await sendEmail(userEmail, emailSubject, emailHtml);
       new Logger('AccountRecover').info(`Password reset email sent to ${userEmail}`);

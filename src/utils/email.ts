@@ -19,7 +19,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
   }
 };
 
-export const getEmailHtml = (resetLink: string): string => {
+export const getEmailHtml = (resetLink: string, account: string): string => {
   return `
 <!DOCTYPE html>
 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
@@ -194,7 +194,7 @@ export const getEmailHtml = (resetLink: string): string => {
 														<tr>
 															<td class="pad">
 																<div style="color:#000;direction:ltr;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;font-size:15px;font-weight:400;letter-spacing:0px;line-height:0.7;text-align:left;mso-line-height-alt:11px;">
-																	<p style="margin: 0; margin-bottom: 12px;"><br>您好 user_id，</p>
+																	<p style="margin: 0; margin-bottom: 12px;"><br>您好 ${account}，</p>
 																	<p style="margin: 0; margin-bottom: 12px;">&nbsp;</p>
 																	<p style="margin: 0; margin-bottom: 12px;">&nbsp;</p>
 																	<p style="margin: 0; margin-bottom: 12px;">您已請求重設您的 RiceCall 帳號密碼。</p>
