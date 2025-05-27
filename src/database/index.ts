@@ -679,6 +679,24 @@ export default class Database {
       }
     },
 
+    accountByUserId: async (userId: string) => {
+      try {
+        if (!userId) return null;
+        const data = await this.query(
+          `SELECT 
+            accounts.*
+          FROM accounts
+          WHERE accounts.user_id = ?`,
+          [userId],
+        );
+        if (!data || data.length === 0) return null;
+        return convertToCamelCase(data[0]);
+      }
+      catch (error: any) {
+        throw new Error(`Error getting accountByUserId.${userId}: ${error.message}`);
+      }
+    },
+
     searchUser: async (querys: string) => {
       try {
         if (!querys) return null;

@@ -85,7 +85,9 @@ export const ResetPasswordHandler: RequestHandler = {
       }
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await database.set.account(accountRecoverData.userId, { password: hashedPassword });
+      let userAccount = await database.get.accountByUserId(userId);
+      if (!userAccount) throw new AccountNotFoundError('RESET_PASSWORD');
+      await database.set.account(userAccount.account, { password: hashedPassword });
       await database.set.accountRecover(userId, { tried: accountRecoverData.tried + 1 });
 
       // Clear the reset token after successful password reset
