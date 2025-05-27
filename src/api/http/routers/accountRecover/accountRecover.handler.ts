@@ -13,7 +13,7 @@ import AccountNotFoundError from '@/errors/AccountNotFoundError';
 import InvalidOrExpiredResetTokenError from '@/errors/InvalidOrExpiredResetTokenError';
 import TooManyFailedAttemptsError from '@/errors/TooManyFailedAttemptsError';
 import ServerError from '@/errors/ServerError';
-import { sendEmail } from '@/utils/email';
+import { getEmailHtml, sendEmail } from '@/utils/email';
 import { serverConfig } from '@/config/server.config'; // Changed from appConfig
 
 export const RequestAccountRecoverHandler: RequestHandler = {
@@ -38,18 +38,7 @@ export const RequestAccountRecoverHandler: RequestHandler = {
       const userEmail = 'user@example.com'; // Placeholder for user's email, in a real app, fetch from userAccount
       const resetLink = `${serverConfig.frontendUrl}/reset-password?userId=${userAccount.userId}&token=${resetToken}`; // Changed
       const emailSubject = 'RiceCall 密碼重設請求';
-      const emailHtml = `
-        您好，
-
-        您已請求重設您的 RiceCall 帳號密碼。
-        請點擊以下連結重設您的密碼：
-        <a href="${resetLink}">${resetLink}</a>
-
-        如果您沒有發出此請求，請忽略此電子郵件。
-
-        此致，
-        RiceCall 團隊
-      `;
+      const emailHtml = getEmailHtml(resetLink);
 
       await sendEmail(userEmail, emailSubject, emailHtml);
       new Logger('AccountRecover').info(`Password reset email sent to ${userEmail}`);
