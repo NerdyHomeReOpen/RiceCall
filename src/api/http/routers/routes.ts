@@ -22,6 +22,7 @@ import {
   RefreshUserFriendsHandler,
   RefreshUserServersHandler,
 } from './refresh/user/refreshUser.handler';
+import { RequestAccountRecoverHandler, ResetPasswordHandler } from './accountRecover/accountRecover.handler'; // Changed
 
 export default function () {
   PostRouters.addRoute('/login', LoginHandler);
@@ -56,4 +57,6 @@ export default function () {
   );
   PostRouters.addRoute('/refresh/userFriends', RefreshUserFriendsHandler);
   PostRouters.addRoute('/refresh/userServers', RefreshUserServersHandler);
+  PostRouters.addRoute('/accountRecover/request', RequestAccountRecoverHandler); // Changed
+  PostRouters.addRoute('/accountRecover/reset', ResetPasswordHandler); // Changed
 }

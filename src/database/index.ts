@@ -609,7 +609,42 @@ export default class Database {
           `Error setting memberInvitation.${receiverId}-${serverId}: ${error.message}`,
         );
       }
-    }
+    },
+
+    accountRecover: async (userId: string, data: any) => {
+      try {
+        if (!userId || !data) return false;
+        const ALLOWED_FIELDS = ['user_id', 'reset_token', 'tried'];
+        const { keys, values } = validateData(data, ALLOWED_FIELDS);
+        const exists = await this.query(
+          `SELECT * 
+          FROM account_recover 
+          WHERE user_id = ?`,
+          [userId],
+        );
+        // If the accountRecover exists, update it
+        // Else, create it
+        if (exists.length > 0) {
+          await this.query(
+            `UPDATE account_recover SET ${keys
+              .map((k) => `\`${k}\` = ?`)
+              .join(', ')} WHERE user_id = ?`,
+            [...values, userId],
+          );
+        } else {
+          await this.query(
+            `INSERT INTO account_recover (user_id, ${keys
+              .map((k) => `\`${k}\``)
+              .join(', ')}) 
+            VALUES (?, ${keys.map(() => '?').join(', ')})`,
+            [userId, ...values],
+          );
+        }
+        return true;
+      } catch (error: any) {
+        throw new Error(`Error setting accountRecover.${userId}: ${error.message}`);
+      }
+    },
   };
 
   get = {
@@ -1468,6 +1503,23 @@ export default class Database {
         );
       }
     },
+
+    accountRecover: async (userId: string) => {
+      try {
+        if (!userId) return null;
+        const datas = await this.query(
+          `SELECT 
+            account_recover.*
+          FROM account_recover 
+          WHERE account_recover.user_id = ?`,
+          [userId],
+        );
+        if (!datas || datas.length === 0) return null;
+        return convertToCamelCase(datas[0]);
+      } catch (error: any) {
+        throw new Error(`Error getting accountRecover.${userId}: ${error.message}`);
+      }
+    },
   };
 
   delete = {
@@ -1661,6 +1713,20 @@ export default class Database {
         throw new Error(
           `Error deleting friendApplication.${senderId}-${receiverId}: ${error.message}`,
         );
+      }
+    },
+
+    accountRecover: async (userId: string) => {
+      try {
+        if (!userId) return false;
+        await this.query(
+          `DELETE FROM account_recover 
+          WHERE account_recover.user_id = ?`,
+          [userId],
+        );
+        return true;
+      } catch (error: any) {
+        throw new Error(`Error deleting accountRecover.${userId}: ${error.message}`);
       }
     },
   };

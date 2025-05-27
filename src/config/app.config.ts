@@ -12,4 +12,5 @@ export const appConfig = {
     '.gif': 'image/gif',
     '.webp': 'image/webp',
   },
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
 };

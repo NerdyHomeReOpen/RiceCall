@@ -19,3 +19,13 @@ export async function biDirectionalAsyncOperation(func: (arg0: any, arg1: any) =
   await func(args[0], args[1]);
   await func(args[1], args[0]);
 }
+
+export function generateRandomString(length: number) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0987654321';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
