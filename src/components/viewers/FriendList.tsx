@@ -47,11 +47,13 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     const { userId } = user;
     const { friendGroupId, name: friendGroupName } = friendGroup;
     const friendGroupFriends =
-      friendGroupId === ''
-        ? friends.sort((a, b) => {
+      friendGroupId === '' ? friends.sort((a, b) => {
           return (b.online ? 1 : 0) - (a.online ? 1 : 0);
         })
-        : friends.filter((fd) => fd.friendGroupId === friendGroupId).sort((a, b) => {
+      : friendGroupId === 'blocked' ? friends.filter((friend) => {
+          return friend.isBlocked;
+        })
+      : friends.filter((fd) => fd.friendGroupId === friendGroupId).sort((a, b) => {
           return (b.online ? 1 : 0) - (a.online ? 1 : 0);
         });
     const friendsOnlineCount = friendGroupFriends.filter(
@@ -304,17 +306,70 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
             const y = e.clientY;
             contextMenu.showContextMenu(x, y, false, false, [
               {
+                id: 'driectMessage',
+                label: '傳送即時訊息', // TODO: lang.tr
+                show: !isCurrentUser,
+                onClick: () => handleOpenDirectMessage(friendUserId, friendTargetId, friendName),
+              },
+              {
+                id: 'separator',
+                label: '',
+                show: canManageFriend,
+              },
+              {
                 id: 'info',
                 label: lang.tr.viewProfile,
-                show: !isCurrentUser,
+                show: canManageFriend,
                 onClick: () => handleOpenUserInfo(friendUserId, friendTargetId),
               },
               {
-                id: 'edit',
+                id: 'editNote',
+                label: '修改備註', // TODO: lang.tr
+                show: canManageFriend,
+                disabled: true,
+                onClick: () => { /* handleFriendNote() */ }
+              },
+              {
+                id: 'separator',
+                label: '',
+                show: canManageFriend,
+              },
+              {
+                id: 'permission-setting',
+                label: '權限設定',
+                show: canManageFriend,
+                icon: 'submenu',
+                hasSubmenu: true,
+                submenuItems: [
+                  {
+                    id: 'set-private',
+                    label: '對好友隱藏上線', // TODO: lang.tr
+                    show: canManageFriend,
+                    disabled: true,
+                    onClick: () => { /* TODO: handlePrivateFriend() */ }
+                  },
+                  {
+                    id: 'set-notify',
+                    label: '好友上線提醒我', // TODO: lang.tr
+                    show: canManageFriend,
+                    disabled: true,
+                    onClick: () => { /* TODO: handleNotifyFriendOnline() */ }
+                  },
+                ],
+              },
+              {
+                id: 'editGroup',
                 label: lang.tr.editFriendGroup,
                 show: canManageFriend,
                 onClick: () =>
                   handleOpenEditFriend(friendUserId, friendTargetId),
+              },
+              {
+                id: 'setBlock',
+                label: '封鎖', // TODO: lang.tr
+                show: canManageFriend,
+                disabled: true,
+                onClick: () => { /* TODO: handleBlocdFriend */ },
               },
               {
                 id: 'delete',
@@ -414,6 +469,18 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
       order: 0,
       userId,
     });
+    const outlanderFriendGroup: FriendGroup = createDefault.friendGroup({
+      friendGroupId: 'outlander',
+      name: `陌生人`, // TODO: lang.tr
+      order: 998,
+      userId,
+    });
+    const blockedFriendGroup: FriendGroup = createDefault.friendGroup({
+      friendGroupId: 'blocked',
+      name: `黑名單`, // TODO: lang.tr
+      order: 999,
+      userId,
+    });
 
     // Handlers
     const handleOpenSearchUser = (userId: User['userId']) => {
@@ -472,7 +539,7 @@ const FriendListViewer: React.FC<FriendListViewerProps> = React.memo(
           <div className={styles['scrollView']}>
             {/* Friend Groups */}
             <div className={styles['friendList']}>
-              {[defaultFriendGroup, ...friendGroups]
+              {[defaultFriendGroup, ...friendGroups, outlanderFriendGroup, blockedFriendGroup]
                 .sort((a, b) =>
                   a.order !== b.order
                     ? a.order - b.order
