@@ -38,9 +38,16 @@ export const RequestAccountRecoverHandler: RequestHandler = {
       const userEmail = 'user@example.com'; // Placeholder for user's email, in a real app, fetch from userAccount
       const resetLink = `${serverConfig.frontendUrl}/reset-password?userId=${userAccount.userId}&token=${resetToken}`; // Changed
       const emailSubject = 'RiceCall 密碼重設請求';
+      const attachments = [
+        {
+          filename: 'login_logo.png',
+          path: './email/resource/login_logo.png',
+          cid: 'login_logo', // Content ID for embedding
+        },
+      ];
       const emailHtml = getEmailHtml(resetLink, account);
 
-      await sendEmail(userEmail, emailSubject, emailHtml);
+      await sendEmail(userEmail, emailSubject, emailHtml, attachments);
       new Logger('AccountRecover').info(`Password reset email sent to ${userEmail}`);
 
       return {
