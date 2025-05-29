@@ -276,7 +276,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
             </div>
             )}
             <div className={directMessage['notifyArea']}>
-              {isFriend ? '' : '對方不在你的好友列表，一些功能將無法使用!'}
+              {isFriend ? '' : '對方不在你的好友列表，一些功能將無法使用!'  /* TODO: lang.tr */ } 
             </div>
             <div className={directMessage['messageArea']}>
               <MessageViewer messages={directMessages} />

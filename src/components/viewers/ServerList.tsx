@@ -55,31 +55,31 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
           contextMenu.showContextMenu(x, y, false, false, [
             {
               id: 'joinServer',
-              label: '進入',
+              label: '進入', // TODO: lang.tr
               onClick: onClick,
             },
             {
               id: 'viewServerInfo',
-              label: '查看群資料',
+              label: '查看群資料', // TODO: lang.tr
               disabled: true,
               onClick: () => {
-                /* handleOpenServerSetting(userId, serverId); */
+                /* TODO: handleOpenServerSetting(userId, serverId); */
               },
             },
             {
               id: 'setFavorite',
-              label: !serverFavorite ? '加入收藏' : '取消收藏',
+              label: !serverFavorite ? '加入收藏' : '取消收藏', // TODO: lang.tr
               onClick: () => {
                 handleFavoriteServer(serverId);
               },
             },
             {
               id: 'removeMemberShip',
-              label: '解除會員關係',
+              label: '解除會員關係', // TODO: lang.tr
               disabled: true,
               show: canRemoveMemberShip,
               onClick: () => {
-                /* handleUpdateMember() */
+                /* TODO: handleUpdateMember() */
               },
             },
           ]);

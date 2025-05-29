@@ -305,7 +305,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'joinChannel',
-                label: '進入此頻道',
+                label: '進入此頻道', // TODO: lang.tr
                 show: canJoin,
                 onClick: () => {
                   if (!canJoin) return;
@@ -356,7 +356,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               },
               {
                 id: 'broadcastChannel',
-                label: '頻道廣播',
+                label: '頻道廣播', // TODO: lang.tr
                 disabled: true,
                 show: canManageChannel,
                 onClick: () => {
@@ -365,7 +365,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               },
               {
                 id: 'broadcastServer',
-                label: '廣播',
+                label: '廣播', // TODO: lang.tr
                 disabled: true,
                 show: canManageChannel,
                 onClick: () => {
@@ -374,7 +374,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               },
               {
                 id: 'moveAllUserToChannel',
-                label: '批量移動到我的房間',
+                label: '批量移動到我的房間', // TODO: lang.tr
                 show: canMoveToChannel,
                 onClick: () =>
                   categoryUserIds.forEach((userId) =>
@@ -718,7 +718,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'joinChannel',
-                label: '進入此頻道',
+                label: '進入此頻道', // TODO: lang.tr
                 show: canJoin,
                 onClick: () => {
                   if (needPassword) {
@@ -769,7 +769,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               },
               {
                 id: 'broadcastChannel',
-                label: '頻道廣播',
+                label: '頻道廣播', // TODO: lang.tr
                 disabled: true,
                 show: canManageChannel,
                 onClick: () => {
@@ -778,7 +778,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               },
               {
                 id: 'broadcastServer',
-                label: '廣播',
+                label: '廣播', // TODO: lang.tr
                 disabled: true,
                 show: canManageChannel,
                 onClick: () => {
@@ -1583,7 +1583,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                       },
                       {
                         id: 'report',
-                        label: '舉報',
+                        label: '舉報', // TODO: lang.tr
                         disabled: true,
                         onClick: () => {},
                       },

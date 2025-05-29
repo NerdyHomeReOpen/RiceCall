@@ -239,6 +239,7 @@ const WarnMessageTab: React.FC<WarnMessageTabProps> = React.memo(
           return translatedText;
         }
       }
+      // TODO: lang.tr
       content = content.replace(
         'timeoutMemberMessage',
         '【{user}】被管理員【{operator}】踢出群',
@@ -305,6 +306,7 @@ const EventMessageTab: React.FC<EventMessageTabProps> = React.memo(
           return translatedText;
         }
       }
+      // TODO: lang.tr
       content = content.replace(
         'updateMemberMessage',
         '加入了群，成為本群會員。',
