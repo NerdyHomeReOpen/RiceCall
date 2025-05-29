@@ -31,14 +31,14 @@ export const getEmailHtml = (resetLink: string, account: string): string => {
 <html lang="zh-TW">
 <head></head>
 <body>
-<table style="border:transparent solid 0px; border-collapse: collapse; width: 100%; height: 54px;" border="1 ">
+<table style="border:transparent solid 0px; border-collapse: collapse; width: 100%; height: 54px;">
 <tbody>
 <tr style="height: 18px;">
 <td style="width: 100%; background-color: #0073c6; height: 35px;"></td>
 </tr>
 <tr style="height: 18px;">
 <td style="width: 100%; height: 18px;">
-<img src="cid:login_logo" alt="RiceCall Logo" style="display: block; margin: 0 auto; max-width: 100%; height: auto;" />
+<img src="cid:login_logo" alt="RiceCall Logo" style="display: block; margin: 0 auto; max-width: 100%; height: auto; padding-top: 20px; padding-bottom: 20px;" />
 <div align="center">
 <table role="presentation" border="0" width="100%" cellspacing="0" cellpadding="0">
 <tbody>
@@ -50,8 +50,8 @@ export const getEmailHtml = (resetLink: string, account: string): string => {
 </div>
 <div align="center">
 <div style="width: 480px;" align="left">
-<p style="font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 16px;">您好 ${account}，</p>
-<p style="font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 16px;">您已要求重設您的 RiceCall 帳號密碼。<br />請點擊以下連結重設您的帳號密碼：</p>
+<p style="font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 16px; color: #000;">您好 ${account}，</p>
+<p style="font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 16px; color: #000;">您已要求重設您的 RiceCall 帳號密碼。<br />請點擊以下連結重設您的帳號密碼：</p>
 <div class="alignment" align="center"><center dir="false" style="color: #ffffff; font-family: sans-serif; font-size: 15px;">
 <a href="${resetLink}">
 <span class="button" style="background-color: #0073c6; border-radius: 4px; color: #ffffff; display: inline-block; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 15px; font-weight: 400; mso-border-alt: none; text-align: center; width: auto; word-break: keep-all; letter-spacing: normal; border: 0px solid transparent; padding: 10px 55px 10px 55px;">
@@ -61,8 +61,8 @@ export const getEmailHtml = (resetLink: string, account: string): string => {
 </a>
 </center></div>
 <br />
-<p style="font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 16px;">如果您沒有發出此請求，請忽略此電子郵件。</p>
-<p style="font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 16px;">此致，<br />RiceCall 團隊</p>
+<p style="font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 16px; color: #000;">如果您沒有發出此請求，請忽略此電子郵件。</p>
+<p style="font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 16px; color: #000;">此致，<br />RiceCall 團隊</p>
 </div>
 </div>
 <div align="center">
