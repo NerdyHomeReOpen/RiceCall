@@ -40,7 +40,7 @@ interface ServerPageProps {
   friends: UserFriend[];
   currentChannel: Channel;
   channelMessages: ChannelMessage[];
-  broadcastMessages: ChannelMessage[];
+  actionMessages: ChannelMessage[];
   display: boolean;
 }
 
@@ -53,7 +53,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     friends,
     currentChannel,
     channelMessages,
-    broadcastMessages,
+    actionMessages,
     display,
   }) => {
     // Hooks
@@ -295,10 +295,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             <div className={styles['inputArea']}>
               <div
                 className={styles['broadcastArea']}
-                style={{ display: (broadcastMessages.length == 0 ? 'none' : 'flex') }}
+                style={{ display: (actionMessages.length == 0 ? 'none' : 'flex') }}
               >
                 <div className={styles['broadcastContent']}>
-                  <MessageViewer messages={broadcastMessages} />
+                  <MessageViewer messages={actionMessages} />
                 </div>
               </div>
               <MessageInputBox

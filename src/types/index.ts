@@ -722,7 +722,7 @@ export enum SocketClientEvent {
   APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
   // Message
   SEND_MESSAGE = 'message',
-  SEND_BROADCAST_SERVER = 'broadcastServer',
+  SEND_ACTION_MESSAGE = 'actionMessage',
   SEND_DIRECT_MESSAGE = 'directMessage',
   SEND_SHAKE_WINDOW = 'shakeWindow',
   // RTC
@@ -781,7 +781,7 @@ export enum SocketServerEvent {
   MEMBER_APPROVAL = 'memberApproval',
   // Message
   ON_MESSAGE = 'onMessage',
-  ON_SERVER_BROADCAST = 'onServerBroadcast',
+  ON_ACTION_MESSAGE = 'onActionMessage',
   ON_DIRECT_MESSAGE = 'onDirectMessage',
   ON_SHAKE_WINDOW = 'onShakeWindow',
   // RTC

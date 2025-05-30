@@ -425,7 +425,7 @@ const RootPageComponent = () => {
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
   const [channel, setChannel] = useState<Channel>(createDefault.channel());
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
-  const [broadcastMessages, setBroadcastMessages] = useState<ChannelMessage[]>([]);
+  const [actionMessages, setActionMessages] = useState<ChannelMessage[]>([]);
 
   // Variables
   const { userId } = user;
@@ -574,8 +574,8 @@ const RootPageComponent = () => {
     setChannelMessages((prev) => [...prev, ...channelMessages]);
   };
 
-  const handleOnServerBroadcast = (...broadcastMessages: ChannelMessage[]): void => {
-    setBroadcastMessages((prev) => [...prev, ...broadcastMessages]);
+  const handleOnActionMessage = (...actionMessages: ChannelMessage[]): void => {
+    setActionMessages((prev) => [...prev, ...actionMessages]);
   }
 
   const handleOpenPopup = (popup: {
@@ -601,7 +601,7 @@ const RootPageComponent = () => {
     } else {
       if (mainTab.selectedTabId === 'server') mainTab.setSelectedTabId('home');
     }
-    setBroadcastMessages([]);
+    setActionMessages([]);
     setChannelMessages([]);
   }, [user.currentServerId]);
 
@@ -645,7 +645,7 @@ const RootPageComponent = () => {
       [SocketServerEvent.SERVER_CHANNEL_UPDATE]: handleServerChannelUpdate,
       [SocketServerEvent.SERVER_CHANNEL_DELETE]: handleServerChannelDelete,
       [SocketServerEvent.ON_MESSAGE]: handleOnMessages,
-      [SocketServerEvent.ON_SERVER_BROADCAST]: handleOnServerBroadcast,
+      [SocketServerEvent.ON_ACTION_MESSAGE]: handleOnActionMessage,
       [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
     };
     const unsubscribe: (() => void)[] = [];
@@ -731,7 +731,7 @@ const RootPageComponent = () => {
             serverMembers={serverMembers}
             serverChannels={serverChannels}
             channelMessages={channelMessages}
-            broadcastMessages={broadcastMessages}
+            actionMessages={actionMessages}
             display={mainTab.selectedTabId === 'server'}
           />
         </ExpandedProvider>

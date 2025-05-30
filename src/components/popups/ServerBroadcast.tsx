@@ -36,7 +36,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
       serverId: Server['serverId'],
       channelId: Channel['channelId'] | null,
     ) => {
-      socket.send.broadcastServer({ content, channelId, serverId });
+      socket.send.actionMessage({ content, channelId, serverId });
     };
 
     const handleClose = () => {
