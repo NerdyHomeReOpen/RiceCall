@@ -218,7 +218,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
 
         // Send event messages to self
         if (update.permissionLevel === 2 || userMember.permissionLevel > 2) { // Target User set to Member
-          if (userMember.permissionLevel === 3 || userMember.permissionLevel === 4) {
+          if (userCurrentChannelId && (userMember.permissionLevel === 3 || userMember.permissionLevel === 4)) {
             // Original PermissionLevel is Channel Manager or Category Manager
             targetSocket.emit('onServerBroadcast', {
               serverId: serverId,
@@ -228,7 +228,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
                 ...operator
               },
               receiver: {
-                ...updatedUserMember,
+                ...userMember,
                 ...user
               },
               type: 'event',
@@ -246,7 +246,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
                 ...operator
               },
               receiver: {
-                ...updatedUserMember,
+                ...userMember,
                 ...user
               },
               type: 'event',
@@ -264,7 +264,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
               ...operator
             },
             receiver: {
-              ...updatedUserMember,
+              ...userMember,
               ...user
             },
             type: 'event',
@@ -277,25 +277,25 @@ export const UpdateMemberHandler: SocketRequestHandler = {
       // Send event messages to all channel
       if (update.permissionLevel === 3 || update.permissionLevel === 4) {
         // update member to Channel Manager or Category Manager
-        if (targetSocket) {
-          targetSocket.emit('onServerBroadcast', {
-            serverId: serverId,
-            channelId: null,
-            sender: {
-              ...operatorMember,
-              ...operator
-            },
-            receiver: {
-              ...updatedUserMember,
-              ...user
-            },
-            type: 'event',
-            content: 'upgradeChannelManagerMessage',
-            timestamp: Date.now().valueOf(),
-          });
-        }
-
         if (userCurrentChannelId) { // If user in channel
+          if (targetSocket) {
+            targetSocket.emit('onServerBroadcast', {
+              serverId: serverId,
+              channelId: null,
+              sender: {
+                ...operatorMember,
+                ...operator
+              },
+              receiver: {
+                ...updatedUserMember,
+                ...user
+              },
+              type: 'event',
+              content: 'upgradeChannelManagerMessage',
+              timestamp: Date.now().valueOf(),
+            });
+          }
+
           io.to(`channel_${userCurrentChannelId}`).emit('onMessage', {
             serverId: serverId,
             channelId: userCurrentChannelId,
