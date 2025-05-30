@@ -224,7 +224,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
           if (update.permissionLevel === 2 || userMember.permissionLevel > 2) { // Target User set to Member
             if (userCurrentChannelId && (userMember.permissionLevel === 3 || userMember.permissionLevel === 4)) {
               // Original PermissionLevel is Channel Manager or Category Manager
-              targetSocket.emit('onServerBroadcast', {
+              targetSocket.emit('onActionMessage', {
                 serverId: serverId,
                 channelId: null,
                 sender: {
@@ -242,7 +242,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
 
             } else if (userMember.permissionLevel === 5) {
               // Original PermissionLevel is Server Manager
-              targetSocket.emit('onServerBroadcast', {
+              targetSocket.emit('onActionMessage', {
                 serverId: serverId,
                 channelId: null,
                 sender: {
@@ -261,7 +261,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
 
           } else if (update.permissionLevel === 1) { // Target User set to Guest
             // Original PermissionLevel is above Guest
-            targetSocket.emit('onServerBroadcast', {
+            targetSocket.emit('onActionMessage', {
               serverId: serverId,
               channelId: null,
               sender: {
@@ -286,7 +286,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
           // update member to Channel Manager or Category Manager
           if (userCurrentChannelId) { // If user in channel
             if (targetSocket) {
-              targetSocket.emit('onServerBroadcast', {
+              targetSocket.emit('onActionMessage', {
                 serverId: serverId,
                 channelId: null,
                 sender: {
@@ -323,7 +323,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         } else if (update.permissionLevel === 5) {
           // update member to Server Manager
           if (targetSocket) {
-            targetSocket.emit('onServerBroadcast', {
+            targetSocket.emit('onActionMessage', {
               serverId: serverId,
               channelId: null,
               sender: {
