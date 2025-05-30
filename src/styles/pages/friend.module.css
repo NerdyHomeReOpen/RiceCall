@@ -473,6 +473,10 @@
   text-overflow: ellipsis;
 }
 
+.friendCard .name.isVIP {
+  color: #d16059 !important;
+}
+
 .friendCard .signature {
   color: #888;
   overflow: hidden;

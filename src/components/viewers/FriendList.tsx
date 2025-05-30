@@ -47,7 +47,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     const { userId } = user;
     const { friendGroupId, name: friendGroupName } = friendGroup;
     const friendGroupFriends =
-      friendGroupId === '' ? friends.sort((a, b) => {
+      friendGroupId === '' ? friends.filter((fd) => !fd.friendGroupId).sort((a, b) => {
           return (b.online ? 1 : 0) - (a.online ? 1 : 0);
         })
       : friendGroupId === 'blocked' ? friends.filter((friend) => {
@@ -402,7 +402,7 @@ const FriendCard: React.FC<FriendCardProps> = React.memo(
                   }`}
                 />
               )}
-              <div className={styles['name']}>{friendName}</div>
+              <div className={`${styles['name']} ${friendVip > 0 ? styles['isVIP'] : ''}`}>{friendName}</div>
               <div
                 className={`
                   ${styles['gradeIcon']} 
