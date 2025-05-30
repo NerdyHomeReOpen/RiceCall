@@ -1421,6 +1421,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       name: currentChannelName,
       voiceMode: currentChannelVoiceMode,
     } = currentChannel;
+    const isVerifyServer = false;
     const canEditNickname = userPermission > 1;
     const canApplyMember = userPermission < 2;
     const canOpenSettings = userPermission > 4;
@@ -1533,7 +1534,9 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
           </div>
           <div className={styles['baseInfoBox']}>
             <div className={styles['container']}>
-              <div className={styles['verifyIcon']}></div>
+              {isVerifyServer ? (
+                <div className={styles['verifyIcon']} title={'官方認證語音群' /* TODO: lang.tr */}></div>
+              ) : ('')}
               <div className={styles['name']}>{serverName} </div>
             </div>
             <div className={styles['container']}>
