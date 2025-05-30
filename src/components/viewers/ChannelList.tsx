@@ -217,6 +217,19 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       });
     };
 
+    const handleOpenServerBroadcast = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+      channelId: Channel['channelId'],
+    ) => {
+      ipcService.popup.open(PopupType.SERVER_BROADCAST, 'serverBroadcast');
+      ipcService.initialData.onRequest('serverBroadcast', {
+        userId,
+        serverId,
+        channelId,
+      });
+    };
+
     const handleDragStart = (
       e: React.DragEvent,
       userIds: User['userId'][],
@@ -355,21 +368,11 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 show: canManageChannel,
               },
               {
-                id: 'broadcastChannel',
-                label: '頻道廣播', // TODO: lang.tr
-                disabled: true,
-                show: canManageChannel,
-                onClick: () => {
-                  // TODO: channelBroadcast
-                } 
-              },
-              {
                 id: 'broadcastServer',
                 label: '廣播', // TODO: lang.tr
-                disabled: true,
                 show: canManageChannel,
                 onClick: () => {
-                  // TODO: serverBroadcast
+                  handleOpenServerBroadcast(userId, serverId, categoryId);
                 } 
               },
               {
@@ -630,6 +633,19 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       });
     };
 
+    const handleOpenServerBroadcast = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+      channelId: Channel['channelId'],
+    ) => {
+      ipcService.popup.open(PopupType.SERVER_BROADCAST, 'serverBroadcast');
+      ipcService.initialData.onRequest('serverBroadcast', {
+        userId,
+        serverId,
+        channelId,
+      });
+    };
+
     const handleDragStart = (
       e: React.DragEvent,
       userIds: User['userId'][],
@@ -768,21 +784,11 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 show: canManageChannel,
               },
               {
-                id: 'broadcastChannel',
-                label: '頻道廣播', // TODO: lang.tr
-                disabled: true,
-                show: canManageChannel,
-                onClick: () => {
-                  // TODO: channelBroadcast
-                } 
-              },
-              {
                 id: 'broadcastServer',
                 label: '廣播', // TODO: lang.tr
-                disabled: true,
                 show: canManageChannel,
                 onClick: () => {
-                  // TODO: serverBroadcast
+                  handleOpenServerBroadcast(userId, serverId, channelCategoryId ? channelCategoryId : channelId);
                 } 
               },
               {

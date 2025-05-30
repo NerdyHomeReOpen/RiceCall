@@ -12,6 +12,7 @@ import { PopupType } from '@/types';
 // Components
 import UserSetting from '@/components/popups/UserSetting';
 import ServerSetting from '@/components/popups/ServerSetting';
+import ServerBroadcast from '@/components/popups/ServerBroadcast';
 import ChannelSetting from '@/components/popups/ChannelSetting';
 import SystemSetting from '@/components/popups/SystemSetting';
 import ChannelPassword from '@/components/popups/ChannelPassword';
@@ -243,6 +244,11 @@ const Popup = React.memo(() => {
         setHeaderTitle(lang.tr.editServer);
         setHeaderButtons(['close']);
         setContent(<ServerSetting {...popupInitialData} />);
+        break;
+      case PopupType.SERVER_BROADCAST:
+        setHeaderTitle('頻道廣播'); // TODO: lang.tr
+        setHeaderButtons(['close']);
+        setContent(<ServerBroadcast {...popupInitialData} />);
         break;
       case PopupType.CHANNEL_SETTING:
         setHeaderTitle(lang.tr.editChannel);
