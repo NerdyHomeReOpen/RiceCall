@@ -176,18 +176,21 @@ export const UpdateMemberHandler: SocketRequestHandler = {
           reason = 'Cannot give permission higher than self';
 
         if (update.permissionLevel > 5) reason = 'Permission level too high';
-      } else {
-        if (update.permissionLevel == 1) {  // Remove self membership
-          if (operatorMember.permissionLevel == 1) {
-            reason = 'not a member';
+
+      } else { // update Self Member Data
+        if (update.permissionLevel) {
+          if (update.permissionLevel == 1) {  // Remove self membership
+            if (operatorMember.permissionLevel == 1) {
+              reason = 'not a member';
+            }
+
+            if (operatorMember.permissionLevel > 5) {
+              reason = 'Cannot remove self membership';
+            }
           }
 
-          if (operatorMember.permissionLevel > 5) {
-            reason = 'Cannot remove self membership';
-          }
+          if (update.permissionLevel !== 1) reason = 'Cannot edit self permission';
         }
-        
-        if (update.permissionLevel !== 1) reason = 'Cannot edit self permission';
       }
 
       if (reason) {
@@ -217,9 +220,47 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         targetSocket.emit('serverUpdate', serverId, update);
 
         // Send event messages to self
-        if (update.permissionLevel === 2 || userMember.permissionLevel > 2) { // Target User set to Member
-          if (userCurrentChannelId && (userMember.permissionLevel === 3 || userMember.permissionLevel === 4)) {
-            // Original PermissionLevel is Channel Manager or Category Manager
+        if (update.permissionLevel) {
+          if (update.permissionLevel === 2 || userMember.permissionLevel > 2) { // Target User set to Member
+            if (userCurrentChannelId && (userMember.permissionLevel === 3 || userMember.permissionLevel === 4)) {
+              // Original PermissionLevel is Channel Manager or Category Manager
+              targetSocket.emit('onServerBroadcast', {
+                serverId: serverId,
+                channelId: null,
+                sender: {
+                  ...operatorMember,
+                  ...operator
+                },
+                receiver: {
+                  ...userMember,
+                  ...user
+                },
+                type: 'event',
+                content: 'removeFromChannelManagerMessage',
+                timestamp: Date.now().valueOf(),
+              });
+
+            } else if (userMember.permissionLevel === 5) {
+              // Original PermissionLevel is Server Manager
+              targetSocket.emit('onServerBroadcast', {
+                serverId: serverId,
+                channelId: null,
+                sender: {
+                  ...operatorMember,
+                  ...operator
+                },
+                receiver: {
+                  ...userMember,
+                  ...user
+                },
+                type: 'event',
+                content: 'removeFromServerManagerMessage',
+                timestamp: Date.now().valueOf(),
+              });
+            }
+
+          } else if (update.permissionLevel === 1) { // Target User set to Guest
+            // Original PermissionLevel is above Guest
             targetSocket.emit('onServerBroadcast', {
               serverId: serverId,
               channelId: null,
@@ -232,52 +273,55 @@ export const UpdateMemberHandler: SocketRequestHandler = {
                 ...user
               },
               type: 'event',
-              content: 'removeFromChannelManagerMessage',
-              timestamp: Date.now().valueOf(),
-            });
-            
-          } else if (userMember.permissionLevel === 5) {
-            // Original PermissionLevel is Server Manager
-            targetSocket.emit('onServerBroadcast', {
-              serverId: serverId,
-              channelId: null,
-              sender: {
-                ...operatorMember,
-                ...operator
-              },
-              receiver: {
-                ...userMember,
-                ...user
-              },
-              type: 'event',
-              content: 'removeFromServerManagerMessage',
+              content: 'removeFromMemberMessage',
               timestamp: Date.now().valueOf(),
             });
           }
-        } else if (update.permissionLevel === 1) { // Target User set to Guest
-          // Original PermissionLevel is above Guest
-          targetSocket.emit('onServerBroadcast', {
-            serverId: serverId,
-            channelId: null,
-            sender: {
-              ...operatorMember,
-              ...operator
-            },
-            receiver: {
-              ...userMember,
-              ...user
-            },
-            type: 'event',
-            content: 'removeFromMemberMessage',
-            timestamp: Date.now().valueOf(),
-          });
         }
       }
 
       // Send event messages to all channel
-      if (update.permissionLevel === 3 || update.permissionLevel === 4) {
-        // update member to Channel Manager or Category Manager
-        if (userCurrentChannelId) { // If user in channel
+      if (update.permissionLevel) {
+        if (update.permissionLevel === 3 || update.permissionLevel === 4) {
+          // update member to Channel Manager or Category Manager
+          if (userCurrentChannelId) { // If user in channel
+            if (targetSocket) {
+              targetSocket.emit('onServerBroadcast', {
+                serverId: serverId,
+                channelId: null,
+                sender: {
+                  ...operatorMember,
+                  ...operator
+                },
+                receiver: {
+                  ...updatedUserMember,
+                  ...user
+                },
+                type: 'event',
+                content: 'upgradeChannelManagerMessage',
+                timestamp: Date.now().valueOf(),
+              });
+            }
+
+            io.to(`channel_${userCurrentChannelId}`).emit('onMessage', {
+              serverId: serverId,
+              channelId: userCurrentChannelId,
+              sender: {
+                ...operatorMember,
+                ...operator
+              },
+              receiver: {
+                ...updatedUserMember,
+                ...user
+              },
+              type: 'event',
+              content: 'updateChannelManagerMessage',
+              timestamp: Date.now().valueOf(),
+            });
+          }
+
+        } else if (update.permissionLevel === 5) {
+          // update member to Server Manager
           if (targetSocket) {
             targetSocket.emit('onServerBroadcast', {
               serverId: serverId,
@@ -291,32 +335,12 @@ export const UpdateMemberHandler: SocketRequestHandler = {
                 ...user
               },
               type: 'event',
-              content: 'upgradeChannelManagerMessage',
+              content: 'upgradeServerManagerMessage',
               timestamp: Date.now().valueOf(),
             });
           }
-
-          io.to(`channel_${userCurrentChannelId}`).emit('onMessage', {
-            serverId: serverId,
-            channelId: userCurrentChannelId,
-            sender: {
-              ...operatorMember,
-              ...operator
-            },
-            receiver: {
-              ...updatedUserMember,
-              ...user
-            },
-            type: 'event',
-            content: 'updateChannelManagerMessage',
-            timestamp: Date.now().valueOf(),
-          });
-        }
-
-      } else if (update.permissionLevel === 5) {
-        // update member to Server Manager
-        if (targetSocket) {
-          targetSocket.emit('onServerBroadcast', {
+          
+          io.to(`server_${serverId}`).emit('onMessage', {
             serverId: serverId,
             channelId: null,
             sender: {
@@ -328,30 +352,14 @@ export const UpdateMemberHandler: SocketRequestHandler = {
               ...user
             },
             type: 'event',
-            content: 'upgradeServerManagerMessage',
+            content: 'updateServerManagerMessage',
             timestamp: Date.now().valueOf(),
           });
         }
-
-        io.to(`server_${serverId}`).emit('onMessage', {
-          serverId: serverId,
-          channelId: null,
-          sender: {
-            ...operatorMember,
-            ...operator
-          },
-          receiver: {
-            ...updatedUserMember,
-            ...user
-          },
-          type: 'event',
-          content: 'updateServerManagerMessage',
-          timestamp: Date.now().valueOf(),
-        });
       }
 
-      // Blocked member
-      if (update.isBlocked !== 0) {
+      // Blocked member Message
+      if (update.isBlocked && update.isBlocked !== 0) {
         if (update.isBlocked === -1) { // Ban member
           io.to(`server_${serverId}`).emit('onMessage', {
             serverId: serverId,
