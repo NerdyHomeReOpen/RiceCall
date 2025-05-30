@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Types
-import {  Server, Channel, User } from '@/types';
+import {  Server, Channel, Message } from '@/types';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -26,17 +26,17 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
     const socket = useSocket();
 
     // Variables
-    const [channelType, setChannelType] = useState<String>('current');
-    const [sendType, setSendType] = useState<String>('text');
-    const [broadcastContent, setBroadcastContent] = useState<String>('');
+    const [channelType, setChannelType] = useState<string>('current');
+    const [sendType, setSendType] = useState<string>('text');
+    const [broadcastContent, setBroadcastContent] = useState<string>('');
 
     // Handlers
     const handleBroadcastServer = (
-      content: String,
+      content: Partial<Message>,
       serverId: Server['serverId'],
       channelId: Channel['channelId'] | null,
     ) => {
-      // TODO: socket.send.broadcastServer({ content, channelId, serverId });
+      socket.send.broadcastServer({ content, channelId, serverId });
     };
 
     const handleClose = () => {
@@ -137,7 +137,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
             className={popup['button']}
             onClick={() => {
               handleBroadcastServer(
-                broadcastContent,
+                { type: 'general', content: broadcastContent },
                 serverId,
                 (channelType === 'current' ? channelId : null),
               )

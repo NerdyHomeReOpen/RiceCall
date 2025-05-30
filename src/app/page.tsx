@@ -425,6 +425,7 @@ const RootPageComponent = () => {
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
   const [channel, setChannel] = useState<Channel>(createDefault.channel());
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
+  const [broadcastMessages, setBroadcastMessages] = useState<ChannelMessage[]>([]);
 
   // Variables
   const { userId } = user;
@@ -573,6 +574,10 @@ const RootPageComponent = () => {
     setChannelMessages((prev) => [...prev, ...channelMessages]);
   };
 
+  const handleOnServerBroadcast = (...broadcastMessages: ChannelMessage[]): void => {
+    setBroadcastMessages((prev) => [...prev, ...broadcastMessages]);
+  }
+
   const handleOpenPopup = (popup: {
     type: PopupType;
     id: string;
@@ -596,7 +601,7 @@ const RootPageComponent = () => {
     } else {
       if (mainTab.selectedTabId === 'server') mainTab.setSelectedTabId('home');
     }
-
+    setBroadcastMessages([]);
     setChannelMessages([]);
   }, [user.currentServerId]);
 
@@ -640,6 +645,7 @@ const RootPageComponent = () => {
       [SocketServerEvent.SERVER_CHANNEL_UPDATE]: handleServerChannelUpdate,
       [SocketServerEvent.SERVER_CHANNEL_DELETE]: handleServerChannelDelete,
       [SocketServerEvent.ON_MESSAGE]: handleOnMessages,
+      [SocketServerEvent.ON_SERVER_BROADCAST]: handleOnServerBroadcast,
       [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
     };
     const unsubscribe: (() => void)[] = [];
@@ -725,6 +731,7 @@ const RootPageComponent = () => {
             serverMembers={serverMembers}
             serverChannels={serverChannels}
             channelMessages={channelMessages}
+            broadcastMessages={broadcastMessages}
             display={mainTab.selectedTabId === 'server'}
           />
         </ExpandedProvider>

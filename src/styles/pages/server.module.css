@@ -465,8 +465,8 @@
   align-items: center;
   background-color: #fefee4;
   justify-content: flex-start;
-  border: solid 2px #f9c55d;
-  border-radius: 5px;
+  border: solid 1.5px #f9c55d;
+  border-radius: 2px;
   margin: 0 0.75rem;
   padding: 1px 5px;
 }

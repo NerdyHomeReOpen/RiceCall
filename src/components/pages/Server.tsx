@@ -40,6 +40,7 @@ interface ServerPageProps {
   friends: UserFriend[];
   currentChannel: Channel;
   channelMessages: ChannelMessage[];
+  broadcastMessages: ChannelMessage[];
   display: boolean;
 }
 
@@ -52,6 +53,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     friends,
     currentChannel,
     channelMessages,
+    broadcastMessages,
     display,
   }) => {
     // Hooks
@@ -293,29 +295,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             <div className={styles['inputArea']}>
               <div
                 className={styles['broadcastArea']}
-                style={{ display: 'none' }}
+                style={{ display: (broadcastMessages.length == 0 ? 'none' : 'flex') }}
               >
                 <div className={styles['broadcastContent']}>
-                  {''}
+                  <MessageViewer messages={broadcastMessages} />
                 </div>
-                <svg
-                    className={styles['broadcastClose']}
-                    onClick={() => {
-                      // TODO: closeBroadcastArea
-                    }}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                >
-                  <path
-                      d="M17 7L7 17M7 7l10 10"
-                      stroke="#fff"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                </svg>
               </div>
               <MessageInputBox
                 onSendMessage={(msg) => {
