@@ -17,6 +17,7 @@ import {
   Category,
   UserFriend,
   UserServer,
+  SocketServerEvent,
 } from '@/types';
 
 // Providers
@@ -30,6 +31,7 @@ import { useWebRTC } from '@/providers/WebRTC';
 import BadgeListViewer from '@/components/viewers/BadgeList';
 
 // Services
+import refreshService from '@/services/refresh.service';
 import ipcService from '@/services/ipc.service';
 import { createDefault } from '@/utils/createDefault';
 
@@ -1443,6 +1445,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
     const [selectedItemType, setSelectedItemType] = useState<string | null>(
       'channel',
     );
+    const [hasMemberApplication, setHasMemberApplication] = useState<boolean>(false);
 
     // Variables
     const connectStatus = 4 - Math.floor(Number(latency) / 50);
@@ -1524,6 +1527,12 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       handleSetChannelExpanded();
     };
 
+    const handleServerMemberApplicationAdd = () => {
+      if (userPermission < 4) return;
+      if (hasMemberApplication) return;
+      setHasMemberApplication(true);
+    };
+
     // Effects
     useEffect(() => {
       for (const channel of serverChannels) {
@@ -1553,6 +1562,40 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       return () => {
         clearInterval(measure);
         clearPong();
+      };
+    }, [socket]);
+
+    useEffect(() => {
+      if (!currentServer.serverId) return;
+      const refresh = async () => {
+        Promise.all([
+          refreshService.serverMemberApplications({
+            serverId: currentServer.serverId,
+          }),
+        ]).then(([memberApplications]) => {
+          if (userPermission > 4) {
+            setHasMemberApplication(memberApplications?.length !== 0);
+          }
+        });
+      };
+      refresh();
+    }, [currentServer]);
+
+    useEffect(() => {
+      if (!socket) return;
+
+      const eventHandlers = {
+        [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]:handleServerMemberApplicationAdd,
+      };
+      const unsubscribe: (() => void)[] = [];
+
+      Object.entries(eventHandlers).map(([event, handler]) => {
+        const unsub = socket.on[event as SocketServerEvent](handler);
+        unsubscribe.push(unsub);
+      });
+
+      return () => {
+        unsubscribe.forEach((unsub) => unsub());
       };
     }, [socket]);
 
@@ -1638,7 +1681,11 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                       },
                     ]);
                   }}
-                />
+                >
+                  {hasMemberApplication && (
+                    <div className={styles['notify']} />
+                  )}
+                </div>
               </div>
             </div>
           </div>

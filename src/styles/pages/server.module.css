@@ -179,7 +179,19 @@
   min-height: 16px;
   min-width: 24px;
   cursor: pointer;
+  position: relative;
   background-image: url('../../../public/channel/icon_group_option.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.notify {
+  min-height: 16px;
+  min-width: 16px;
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  background-image: url('../../../public/ctrl/callout_icon.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
