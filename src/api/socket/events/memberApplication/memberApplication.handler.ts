@@ -27,6 +27,7 @@ import { DataValidator } from '@/middleware/data.validator';
 
 import { MemberHandlerServerSide } from '../member/memberHandlerServerSide';
 import { MemberApplicationHandlerServerSide } from './memberApplicationHandlerServerSide';
+import SocketServer from '../..';
 
 export const CreateMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
@@ -265,6 +266,8 @@ export const ApproveMemberApplicationHandler: SocketRequestHandler = {
       await MemberApplicationHandlerServerSide.deleteMemberApplication(userId, serverId);
       await MemberHandlerServerSide.updateMember(userId, serverId, { permissionLevel: 2 });
 
+      const targetSocket = SocketServer.getSocket(userId);
+
       const updatedUserMember = {
         ...userMember,
         ...{ permissionLevel: 2 },
@@ -285,6 +288,24 @@ export const ApproveMemberApplicationHandler: SocketRequestHandler = {
         content: 'updateMemberMessage',
         timestamp: Date.now().valueOf(),
       });
+
+      if (targetSocket) {
+        targetSocket.emit('onActionMessage', {
+          serverId: serverId,
+          channelId: null,
+          sender: {
+            ...operatorMember,
+            ...operator
+          },
+          receiver: {
+            ...updatedUserMember,
+            ...user
+          },
+          type: 'event',
+          content: 'upgradeMemberMessage',
+          timestamp: Date.now().valueOf(),
+        });
+      }
 
       socket.emit('memberApproval', {
         userId,
