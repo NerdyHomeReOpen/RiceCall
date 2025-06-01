@@ -27,13 +27,14 @@ import { DataValidator } from '@/middleware/data.validator';
 
 export const SearchUserHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'SEARCHUSER';
     try {
       /* ========== Start of Handling ========== */
 
       const { query } = await DataValidator.validate(
         SearchUserSchema,
         data,
-        'SEARCHUSER',
+        part,
       );
 
       /* ========== Start of Main Logic ========== */
@@ -50,7 +51,7 @@ export const SearchUserHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `搜尋使用者失敗，請稍後再試`,
-          part: 'SEARCHUSER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -63,6 +64,7 @@ export const SearchUserHandler: SocketRequestHandler = {
 
 export const ConnectUserHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket) {
+    const part = 'CONNECTUSER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -104,7 +106,7 @@ export const ConnectUserHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `連接使用者失敗，請稍後再試`,
-          part: 'CONNECTUSER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -117,6 +119,7 @@ export const ConnectUserHandler: SocketRequestHandler = {
 
 export const DisconnectUserHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket) {
+    const part = 'DISCONNECTUSER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -153,7 +156,7 @@ export const DisconnectUserHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `斷開使用者失敗，請稍後再試`,
-          part: 'DISCONNECTUSER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -166,6 +169,7 @@ export const DisconnectUserHandler: SocketRequestHandler = {
 
 export const UpdateUserHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'UPDATEUSER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -176,7 +180,7 @@ export const UpdateUserHandler: SocketRequestHandler = {
       const { userId, user: update } = await DataValidator.validate(
         UpdateUserSchema,
         data,
-        'UPDATEUSER',
+        part,
       );
 
       if (operatorId !== userId) {
@@ -208,7 +212,7 @@ export const UpdateUserHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `更新使用者失敗，請稍後再試`,
-          part: 'UPDATEUSER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });

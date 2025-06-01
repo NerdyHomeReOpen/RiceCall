@@ -35,13 +35,14 @@ import { DataValidator } from '@/middleware/data.validator';
 
 export const SearchServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'SEARCHSERVER';
     try {
       /* ========== Start of Handling ========== */
 
       const { query } = await DataValidator.validate(
         SearchServerSchema,
         data,
-        'SEARCHSERVER',
+        part,
       );
 
       /* ========== Start of Main Logic ========== */
@@ -58,7 +59,7 @@ export const SearchServerHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `搜尋群組失敗，請稍後再試`,
-          part: 'SEARCHSERVER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -71,6 +72,7 @@ export const SearchServerHandler: SocketRequestHandler = {
 
 export const ConnectServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'CONNECTSERVER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -81,7 +83,7 @@ export const ConnectServerHandler: SocketRequestHandler = {
       const { userId, serverId } = await DataValidator.validate(
         ConnectServerSchema,
         data,
-        'CONNECTSERVER',
+        part,
       );
 
       const user = await database.get.user(userId);
@@ -224,7 +226,7 @@ export const ConnectServerHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `連接群組失敗，請稍後再試`,
-          part: 'CONNECTSERVER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -237,6 +239,7 @@ export const ConnectServerHandler: SocketRequestHandler = {
 
 export const DisconnectServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'DISCONNECTSERVER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -247,7 +250,7 @@ export const DisconnectServerHandler: SocketRequestHandler = {
       const { userId, serverId } = await DataValidator.validate(
         DisconnectServerSchema,
         data,
-        'DISCONNECTSERVER',
+        part,
       );
 
       // Target User
@@ -344,7 +347,7 @@ export const DisconnectServerHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `斷開群組失敗，請稍後再試`,
-          part: 'DISCONNECTSERVER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -357,6 +360,7 @@ export const DisconnectServerHandler: SocketRequestHandler = {
 
 export const CreateServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'CREATESERVER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -367,7 +371,7 @@ export const CreateServerHandler: SocketRequestHandler = {
       const { server: preset } = await DataValidator.validate(
         CreateServerSchema,
         data,
-        'CREATESERVER',
+        part,
       );
 
       const operator = await database.get.user(operatorId);
@@ -444,7 +448,7 @@ export const CreateServerHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `建立群組失敗，請稍後再試`,
-          part: 'CREATESERVER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -457,6 +461,7 @@ export const CreateServerHandler: SocketRequestHandler = {
 
 export const UpdateServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'UPDATESERVER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -467,7 +472,7 @@ export const UpdateServerHandler: SocketRequestHandler = {
       const { serverId, server: update } = await DataValidator.validate(
         UpdateServerSchema,
         data,
-        'UPDATESERVER',
+        part,
       );
 
       const operatorMember = await database.get.member(operatorId, serverId);
@@ -503,7 +508,7 @@ export const UpdateServerHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `更新群組失敗，請稍後再試`,
-          part: 'UPDATESERVER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -516,6 +521,7 @@ export const UpdateServerHandler: SocketRequestHandler = {
 
 export const FavoriteServerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'FAVORITESERVER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -524,7 +530,7 @@ export const FavoriteServerHandler: SocketRequestHandler = {
       const { serverId } = await DataValidator.validate(
         FavoriteServerSchema,
         data,
-        'FAVORITESERVER',
+        part,
       );
 
       const userServer = await database.get.userServer(operatorId, serverId);
@@ -554,7 +560,7 @@ export const FavoriteServerHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `收藏群組失敗，請稍後再試`,
-          part: 'FAVORITESERVER',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });

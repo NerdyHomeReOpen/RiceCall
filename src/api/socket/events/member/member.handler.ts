@@ -25,6 +25,7 @@ import { DataValidator } from '@/middleware/data.validator';
 
 export const CreateMemberHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'CREATEMEMBER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -39,7 +40,7 @@ export const CreateMemberHandler: SocketRequestHandler = {
       } = await DataValidator.validate(
         CreateMemberSchema,
         data,
-        'CREATEMEMBER',
+        part,
       );
 
       const server = await database.get.server(serverId);
@@ -108,7 +109,7 @@ export const CreateMemberHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `建立成員失敗，請稍後再試`,
-          part: 'CREATEMEMBER',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -121,6 +122,7 @@ export const CreateMemberHandler: SocketRequestHandler = {
 
 export const UpdateMemberHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'UPDATEMEMBER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -135,7 +137,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
       } = await DataValidator.validate(
         UpdateMemberSchema,
         data,
-        'UPDATEMEMBER',
+        part,
       );
 
       // Target User
@@ -415,7 +417,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `更新成員失敗，請稍後再試`,
-          part: 'UPDATEMEMBER',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -428,6 +430,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
 
 export const DeleteMemberHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'DELETEMEMBER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -438,7 +441,7 @@ export const DeleteMemberHandler: SocketRequestHandler = {
       const { userId, serverId } = await DataValidator.validate(
         DeleteMemberSchema,
         data,
-        'DELETEMEMBER',
+        part,
       );
 
       const userMember = await database.get.member(userId, serverId);
@@ -494,7 +497,7 @@ export const DeleteMemberHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `刪除成員失敗，請稍後再試`,
-          part: 'DELETEMEMBER',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });

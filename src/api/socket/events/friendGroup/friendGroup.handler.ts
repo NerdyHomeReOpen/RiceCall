@@ -28,6 +28,7 @@ import { DataValidator } from '@/middleware/data.validator';
 
 export const CreateFriendGroupHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'CREATEFRIENDGROUP';
     try {
       /* ========== Start of Handling ========== */
 
@@ -38,7 +39,7 @@ export const CreateFriendGroupHandler: SocketRequestHandler = {
       const { userId, group: preset } = await DataValidator.validate(
         CreateFriendGroupSchema,
         data,
-        'CREATEFRIENDGROUP',
+        part,
       );
 
       if (operatorId !== userId) {
@@ -80,7 +81,7 @@ export const CreateFriendGroupHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `建立好友群組失敗，請稍後再試`,
-          part: 'CREATEFRIENDGROUP',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -93,6 +94,7 @@ export const CreateFriendGroupHandler: SocketRequestHandler = {
 
 export const UpdateFriendGroupHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'UPDATEFRIENDGROUP';
     try {
       /* ========== Start of Handling ========== */
 
@@ -107,7 +109,7 @@ export const UpdateFriendGroupHandler: SocketRequestHandler = {
       } = await DataValidator.validate(
         UpdateFriendGroupSchema,
         data,
-        'UPDATEFRIENDGROUP',
+        part,
       );
 
       if (operatorId !== userId) {
@@ -141,7 +143,7 @@ export const UpdateFriendGroupHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `更新好友群組失敗，請稍後再試`,
-          part: 'UPDATEFRIENDGROUP',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -154,6 +156,7 @@ export const UpdateFriendGroupHandler: SocketRequestHandler = {
 
 export const DeleteFriendGroupHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'DELETEFRIENDGROUP';
     try {
       /* ========== Start of Handling ========== */
 
@@ -164,7 +167,7 @@ export const DeleteFriendGroupHandler: SocketRequestHandler = {
       const { userId, friendGroupId } = await DataValidator.validate(
         DeleteFriendGroupSchema,
         data,
-        'DELETEFRIENDGROUP',
+        part,
       );
 
       const friendGroupFriends = await database.get.friendGroupFriends(
@@ -216,7 +219,7 @@ export const DeleteFriendGroupHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `刪除好友群組失敗，請稍後再試`,
-          part: 'DELETEFRIENDGROUP',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });

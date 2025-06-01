@@ -30,6 +30,7 @@ import { FriendHandlerServerSide } from '../friend/friend.handler';
 
 export const CreateFriendApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'CREATEFRIENDAPPLICATION';
     try {
       /* ========== Start of Handling ========== */
 
@@ -44,7 +45,7 @@ export const CreateFriendApplicationHandler: SocketRequestHandler = {
       } = await DataValidator.validate(
         CreateFriendApplicationSchema,
         data,
-        'CREATEFRIENDAPPLICATION',
+        part,
       );
 
       const reverseFriendApplication = await database.get.friendApplication(
@@ -111,7 +112,7 @@ export const CreateFriendApplicationHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `發送好友申請失敗，請稍後再試`,
-          part: 'CREATEFRIENDAPPLICATION',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -124,6 +125,7 @@ export const CreateFriendApplicationHandler: SocketRequestHandler = {
 
 export const UpdateFriendApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'UPDATEFRIENDAPPLICATION';
     try {
       /* ========== Start of Handling ========== */
 
@@ -138,7 +140,7 @@ export const UpdateFriendApplicationHandler: SocketRequestHandler = {
       } = await DataValidator.validate(
         UpdateFriendApplicationSchema,
         data,
-        'UPDATEFRIENDAPPLICATION',
+        part,
       );
 
       if (operatorId !== senderId && operatorId !== receiverId) {
@@ -181,7 +183,7 @@ export const UpdateFriendApplicationHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `更新好友申請失敗，請稍後再試`,
-          part: 'UPDATEFRIENDAPPLICATION',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -194,6 +196,7 @@ export const UpdateFriendApplicationHandler: SocketRequestHandler = {
 
 export const DeleteFriendApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'DELETEFRIENDAPPLICATION';
     try {
       /* ========== Start of Handling ========== */
 
@@ -204,7 +207,7 @@ export const DeleteFriendApplicationHandler: SocketRequestHandler = {
       const { senderId, receiverId } = await DataValidator.validate(
         DeleteFriendApplicationSchema,
         data,
-        'DELETEFRIENDAPPLICATION',
+        part,
       );
 
       if (operatorId !== senderId && operatorId !== receiverId) {
@@ -242,7 +245,7 @@ export const DeleteFriendApplicationHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `刪除好友申請失敗，請稍後再試`,
-          part: 'DELETEFRIENDAPPLICATION',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -255,13 +258,14 @@ export const DeleteFriendApplicationHandler: SocketRequestHandler = {
 
 export const ApproveFriendApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'FRIENDAPPROVAL';
     try {
       const operatorId = socket.data.userId;
 
       const { targetId, friend } = await DataValidator.validate(
         ApproveFriendApplicationSchema,
         data,
-        'APPROVEFRIENDAPPLICATION',
+        part,
       );
 
       new Logger('ApproveFriendApplication').info(
@@ -310,7 +314,7 @@ export const ApproveFriendApplicationHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `處理好友申請失敗，請稍後再試`,
-          part: 'FRIENDAPPROVAL',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });

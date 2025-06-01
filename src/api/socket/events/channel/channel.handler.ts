@@ -32,6 +32,7 @@ import { DataValidator } from '@/middleware/data.validator';
 
 export const ConnectChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'CONNECTCHANNEL';
     try {
       /* ========== Start of Handling ========== */
 
@@ -43,7 +44,7 @@ export const ConnectChannelHandler: SocketRequestHandler = {
         await DataValidator.validate(
           ConnectChannelSchema,
           data,
-          'CONNECTCHANNEL',
+          part,
         );
 
       const user = await database.get.user(userId);
@@ -171,7 +172,7 @@ export const ConnectChannelHandler: SocketRequestHandler = {
                 : 'voiceChangeToQueue',
             timestamp: Date.now().valueOf(),
           });
-        }, 500);
+        }, 100);
       }
 
       io.to(`server_${serverId}`).emit(
@@ -193,7 +194,7 @@ export const ConnectChannelHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `連接頻道失敗，請稍後再試`,
-          part: 'CONNECTCHANNEL',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -206,6 +207,7 @@ export const ConnectChannelHandler: SocketRequestHandler = {
 
 export const DisconnectChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'DISCONNECTCHANNEL';
     try {
       /* ========== Start of Handling ========== */
 
@@ -216,7 +218,7 @@ export const DisconnectChannelHandler: SocketRequestHandler = {
       const { userId, channelId, serverId } = await DataValidator.validate(
         DisconnectChannelSchema,
         data,
-        'DISCONNECTCHANNEL',
+        part,
       );
 
       const user = await database.get.user(userId);
@@ -303,7 +305,7 @@ export const DisconnectChannelHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `離開頻道失敗，請稍後再試`,
-          part: 'DISCONNECTCHANNEL',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -316,6 +318,7 @@ export const DisconnectChannelHandler: SocketRequestHandler = {
 
 export const CreateChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'CREATECHANNEL';
     try {
       /* ========== Start of Handling ========== */
 
@@ -326,7 +329,7 @@ export const CreateChannelHandler: SocketRequestHandler = {
       const { serverId, channel: preset } = await DataValidator.validate(
         CreateChannelSchema,
         data,
-        'CREATECHANNEL',
+        part,
       );
 
       const category = await database.get.channel(preset.categoryId);
@@ -389,7 +392,7 @@ export const CreateChannelHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `建立頻道失敗，請稍後再試`,
-          part: 'CREATECHANNEL',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -402,6 +405,7 @@ export const CreateChannelHandler: SocketRequestHandler = {
 
 export const UpdateChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'UPDATECHANNEL';
     try {
       /* ========== Start of Handling ========== */
 
@@ -416,7 +420,7 @@ export const UpdateChannelHandler: SocketRequestHandler = {
       } = await DataValidator.validate(
         UpdateChannelSchema,
         data,
-        'UPDATECHANNEL',
+        part,
       );
 
       const channel = await database.get.channel(channelId);
@@ -584,7 +588,7 @@ export const UpdateChannelHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `更新頻道失敗，請稍後再試`,
-          part: 'UPDATECHANNEL',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -597,13 +601,14 @@ export const UpdateChannelHandler: SocketRequestHandler = {
 
 export const UpdateChannelsHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'UPDATECHANNELS';
     try {
       /* ========== Start of Handling ========== */
 
       const { serverId, channels } = await DataValidator.validate(
         UpdateChannelsSchema,
         data,
-        'UPDATECHANNELS',
+        part,
       );
 
       /* ========== Start of Main Logic ========== */
@@ -626,7 +631,7 @@ export const UpdateChannelsHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `更新頻道失敗，請稍後再試`,
-          part: 'UPDATECHANNELS',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -639,6 +644,7 @@ export const UpdateChannelsHandler: SocketRequestHandler = {
 
 export const DeleteChannelHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'DELETECHANNEL';
     try {
       /* ========== Start of Handling ========== */
 
@@ -649,7 +655,7 @@ export const DeleteChannelHandler: SocketRequestHandler = {
       const { channelId, serverId } = await DataValidator.validate(
         DeleteChannelSchema,
         data,
-        'DELETECHANNEL',
+        part,
       );
 
       const channel = await database.get.channel(channelId);
@@ -730,7 +736,7 @@ export const DeleteChannelHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `刪除頻道失敗，請稍後再試`,
-          part: 'DELETECHANNEL',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });

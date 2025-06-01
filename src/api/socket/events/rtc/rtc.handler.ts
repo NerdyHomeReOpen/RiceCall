@@ -21,6 +21,7 @@ import { DataValidator } from '@/middleware/data.validator';
 
 export const RTCOfferHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'RTCOFFER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -29,7 +30,7 @@ export const RTCOfferHandler: SocketRequestHandler = {
       const { to, offer } = await DataValidator.validate(
         RTCOfferSchema,
         data,
-        'RTCOFFER',
+        part,
       );
 
       /* ========== Start of Handling ========== */
@@ -49,7 +50,7 @@ export const RTCOfferHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `連接 RTC 失敗，請稍後再試`,
-          part: 'SEARCHSERVER',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -62,6 +63,7 @@ export const RTCOfferHandler: SocketRequestHandler = {
 
 export const RTCAnswerHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'RTCANSWER';
     try {
       /* ========== Start of Handling ========== */
 
@@ -70,7 +72,7 @@ export const RTCAnswerHandler: SocketRequestHandler = {
       const { to, answer } = await DataValidator.validate(
         RTCAnswerSchema,
         data,
-        'RTCANSWER',
+        part,
       );
 
       /* ========== Start of Main Logic ========== */
@@ -90,7 +92,7 @@ export const RTCAnswerHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `連接 RTC 失敗，請稍後再試`,
-          part: 'SEARCHSERVER',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -103,6 +105,7 @@ export const RTCAnswerHandler: SocketRequestHandler = {
 
 export const RTCCandidateHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'RTCCANDIDATE';
     try {
       /* ========== Start of Handling ========== */
 
@@ -111,7 +114,7 @@ export const RTCCandidateHandler: SocketRequestHandler = {
       const { to, candidate } = await DataValidator.validate(
         RTCCandidateSchema,
         data,
-        'RTCCANDIDATE',
+        part,
       );
 
       /* ========== Start of Main Logic ========== */
@@ -131,7 +134,7 @@ export const RTCCandidateHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `連接 RTC 失敗，請稍後再試`,
-          part: 'SEARCHSERVER',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });

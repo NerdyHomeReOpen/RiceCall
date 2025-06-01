@@ -30,6 +30,7 @@ import { MemberApplicationHandlerServerSide } from './memberApplicationHandlerSe
 
 export const CreateMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'CREATEMEMBERAPPLICATION';
     try {
       /* ========== Start of Handling ========== */
 
@@ -44,7 +45,7 @@ export const CreateMemberApplicationHandler: SocketRequestHandler = {
       } = await DataValidator.validate(
         CreateMemberApplicationSchema,
         data,
-        'CREATEMEMBERAPPLICATION',
+        part,
       );
 
       const operatorMember = await database.get.member(operatorId, serverId);
@@ -90,7 +91,7 @@ export const CreateMemberApplicationHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `創建成員申請失敗，請稍後再試`,
-          part: 'CREATEMEMBERAPPLICATION',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -103,6 +104,7 @@ export const CreateMemberApplicationHandler: SocketRequestHandler = {
 
 export const UpdateMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'UPDATEMEMBERAPPLICATION';
     try {
       /* ========== Start of Handling ========== */
 
@@ -117,7 +119,7 @@ export const UpdateMemberApplicationHandler: SocketRequestHandler = {
       } = await DataValidator.validate(
         UpdateMemberApplicationSchema,
         data,
-        'UPDATEMEMBERAPPLICATION',
+        part,
       );
 
       const operatorMember = await database.get.member(operatorId, serverId);
@@ -160,7 +162,7 @@ export const UpdateMemberApplicationHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `更新成員申請失敗，請稍後再試`,
-          part: 'UPDATEMEMBERAPPLICATION',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -173,6 +175,7 @@ export const UpdateMemberApplicationHandler: SocketRequestHandler = {
 
 export const DeleteMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'DELETEMEMBERAPPLICATION';
     try {
       /* ========== Start of Handling ========== */
 
@@ -183,7 +186,7 @@ export const DeleteMemberApplicationHandler: SocketRequestHandler = {
       const { userId, serverId } = await DataValidator.validate(
         DeleteMemberApplicationSchema,
         data,
-        'DELETEMEMBERAPPLICATION',
+        part,
       );
 
       const operatorMember = await database.get.member(operatorId, serverId);
@@ -217,7 +220,7 @@ export const DeleteMemberApplicationHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `刪除成員申請失敗，請稍後再試`,
-          part: 'DELETEMEMBERAPPLICATION',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -230,13 +233,14 @@ export const DeleteMemberApplicationHandler: SocketRequestHandler = {
 
 export const ApproveMemberApplicationHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'APPROVEMEMBERAPPLICATION';
     try {
       const operatorId = socket.data.userId;
 
       const { userId, serverId, member: preset } = await DataValidator.validate(
         ApproveMemberApplicationSchema,
         data,
-        'APPROVEMEMBERAPPLICATION',
+        part,
       );
       // Target User
       const user = await database.get.user(userId);
@@ -293,7 +297,7 @@ export const ApproveMemberApplicationHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `處理成員申請失敗，請稍後再試`,
-          part: 'APPROVEMEMBERAPPLICATION',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });

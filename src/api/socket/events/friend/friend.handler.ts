@@ -112,6 +112,7 @@ export const FriendHandlerServerSide = {
 
 export const CreateFriendHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'CREATEFRIEND';
     try {
       /* ========== Start of Handling ========== */
 
@@ -126,7 +127,7 @@ export const CreateFriendHandler: SocketRequestHandler = {
       } = await DataValidator.validate(
         CreateFriendSchema,
         data,
-        'CREATEFRIEND',
+        part,
       );
 
       const friend = await database.get.friend(userId, targetId);
@@ -175,7 +176,7 @@ export const CreateFriendHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `建立好友失敗，請稍後再試`,
-          part: 'CREATEFRIEND',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -188,6 +189,7 @@ export const CreateFriendHandler: SocketRequestHandler = {
 
 export const UpdateFriendHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'UPDATEFRIEND';
     try {
       /* ========== Start of Handling ========== */
 
@@ -198,7 +200,7 @@ export const UpdateFriendHandler: SocketRequestHandler = {
       const { userId, targetId, friend } = await DataValidator.validate(
         UpdateFriendSchema,
         data,
-        'UPDATEFRIEND',
+        part,
       );
 
       if (operatorId !== userId) reason = 'Cannot modify non-self friends';
@@ -230,7 +232,7 @@ export const UpdateFriendHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `更新好友失敗，請稍後再試`,
-          part: 'UPDATEFRIEND',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
@@ -243,6 +245,7 @@ export const UpdateFriendHandler: SocketRequestHandler = {
 
 export const DeleteFriendHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'DELETEFRIEND';
     try {
       /* ========== Start of Handling ========== */
 
@@ -253,7 +256,7 @@ export const DeleteFriendHandler: SocketRequestHandler = {
       const { userId, targetId } = await DataValidator.validate(
         DeleteFriendSchema,
         data,
-        'DELETEFRIEND',
+        part,
       );
 
       if (operatorId !== userId) reason = 'Cannot delete non-self friends';
@@ -292,7 +295,7 @@ export const DeleteFriendHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `刪除好友失敗，請稍後再試`,
-          part: 'DELETEFRIEND',
+          part: part,
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
         });
