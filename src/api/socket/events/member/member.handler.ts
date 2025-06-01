@@ -221,8 +221,8 @@ export const UpdateMemberHandler: SocketRequestHandler = {
       if (targetSocket) {
         targetSocket.emit('serverUpdate', serverId, update);
 
-        // Send event messages to self
-        if (update.permissionLevel) {
+        // Send event messages to Target User
+        if (update.permissionLevel && operatorId !== userId) {
           if (update.permissionLevel === 2 || userMember.permissionLevel > 2) { // Target User set to Member
             if (userCurrentChannelId && (userMember.permissionLevel === 3 || userMember.permissionLevel === 4)) {
               // Original PermissionLevel is Channel Manager or Category Manager
@@ -341,7 +341,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
               timestamp: Date.now().valueOf(),
             });
           }
-          
+
           io.to(`server_${serverId}`).emit('onMessage', {
             serverId: serverId,
             channelId: null,
