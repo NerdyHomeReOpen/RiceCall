@@ -1113,14 +1113,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         }`}
         onMouseEnter={() => {
           if (!userTabRef.current) return;
-          if (selectedItemId !== memberUserId || selectedItemType !== 'user') {
-            contextMenu.closeUserInfoBlock();
-            return;
-          };
-          const x =
-            userTabRef.current.getBoundingClientRect().left +
-            userTabRef.current.getBoundingClientRect().width -
-            10;
+          const x = userTabRef.current.getBoundingClientRect().left + 
+                    userTabRef.current.getBoundingClientRect().width + 
+                    10;
           const y = userTabRef.current.getBoundingClientRect().top;
           contextMenu.showUserInfoBlock(x, y, false, member);
         }}
