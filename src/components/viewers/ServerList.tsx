@@ -8,7 +8,10 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useSocket } from '@/providers/Socket';
 
 // Type
-import { UserServer, User, Server } from '@/types';
+import { PopupType, UserServer, User, Member, Server } from '@/types';
+
+// Services
+import ipcService from '@/services/ipc.service';
 
 interface ServerCardProps {
   user: User;
@@ -33,10 +36,50 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
       favorite: serverFavorite,
       permissionLevel: serverPermissionLevel,
     } = server;
-    const canRemoveMemberShip =
-      serverPermissionLevel > 1 && serverPermissionLevel < 6;
+
     const { userId } = user;
     const isOwner = serverOwnerId === userId;
+    const canRemoveMemberShip = serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
+
+    // Handles
+    const handleOpenWarning = (message: string, callback: () => void) => {
+      ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
+      ipcService.initialData.onRequest('warningDialog', {
+        title: message,
+        submitTo: 'warningDialog',
+      });
+      ipcService.popup.onSubmit('warningDialog', callback);
+    };
+
+    const handleUpdateMember = (
+      member: Partial<Member>,
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
+      if (!socket) return;
+      socket.send.updateMember({
+        member,
+        userId,
+        serverId,
+      });
+    };
+
+    const handleRemoveMembership = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
+      if (!socket) return;
+      handleOpenWarning(
+        '確定要解除自己與語音群的會員關係嗎', // lang.tr
+        () => {
+          handleUpdateMember(
+            { permissionLevel: 1 },
+            userId,
+            serverId,
+          )
+        }
+      );
+    };
 
     const handleFavoriteServer = (serverId: Server['serverId']) => {
       if (!socket) return;
@@ -76,10 +119,9 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
             {
               id: 'removeMemberShip',
               label: '解除會員關係', // TODO: lang.tr
-              disabled: true,
               show: canRemoveMemberShip,
               onClick: () => {
-                /* TODO: handleUpdateMember() */
+                handleRemoveMembership(userId, serverId)
               },
             },
           ]);
