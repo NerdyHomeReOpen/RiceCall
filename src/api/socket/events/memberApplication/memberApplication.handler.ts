@@ -301,7 +301,7 @@ export const ApproveMemberApplicationHandler: SocketRequestHandler = {
             ...updatedUserMember,
             ...user
           },
-          type: 'event',
+          type: 'info',
           content: 'upgradeMemberMessage',
           timestamp: Date.now().valueOf(),
         });
