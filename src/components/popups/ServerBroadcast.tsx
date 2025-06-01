@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // Types
 import {  Server, Channel, Message } from '@/types';
@@ -10,6 +10,7 @@ import { useSocket } from '@/providers/Socket';
 // CSS
 import popup from '@/styles/popup.module.css';
 import broadcast from '@/styles/popups/serverBroadcast.module.css';
+import messageInputBox from '@/styles/messageInputBox.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -25,23 +26,31 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
     const lang = useLanguage();
     const socket = useSocket();
 
-    // Variables
+    // States
     const [channelType, setChannelType] = useState<string>('current');
     const [sendType, setSendType] = useState<string>('text');
     const [broadcastContent, setBroadcastContent] = useState<string>('');
 
+    // Variables
+    const maxLength = 300;
+    const canSend = broadcastContent.trim();
+
     // Handlers
     const handleBroadcastServer = (
-      content: Partial<Message>,
+      message: Partial<Message>,
       serverId: Server['serverId'],
       channelId: Channel['channelId'] | null,
     ) => {
-      socket.send.actionMessage({ content, channelId, serverId });
+      socket.send.actionMessage({ message, serverId, channelId });
     };
 
     const handleClose = () => {
       ipcService.window.close();
     };
+
+    useEffect(() => {
+      console.log(broadcastContent);
+    }, [broadcastContent]);
 
     return (
       <form className={popup['popupContainer']}>
@@ -124,8 +133,13 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
                     setBroadcastContent(e.target.value);
                   }}
                 />
-                <div className={`${popup['label']} ${popup['disabled']}`}>
-                  {'支援連結，不超過300字' /* TODO: lang.tr */} 
+                <div className={broadcast['labelArea']}>
+                  <div className={`${popup['label']} ${popup['disabled']}`}>
+                    {'支援連結，不超過300字' /* TODO: lang.tr */} 
+                  </div>
+                  <div className={broadcast['messageInputLength']}>
+                    {broadcastContent.length}/{maxLength}
+                  </div>
                 </div>
               </div>
             </div>
@@ -135,9 +149,10 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
         <div className={popup['popupFooter']}>
           <button
             className={popup['button']}
+            disabled={!canSend}
             onClick={() => {
               handleBroadcastServer(
-                { type: 'general', content: broadcastContent },
+                { type: 'alert', content: broadcastContent },
                 serverId,
                 (channelType === 'current' ? channelId : null),
               )

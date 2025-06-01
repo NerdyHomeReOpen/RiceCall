@@ -40,6 +40,24 @@
   flex-direction: row;
   align-items: center;
   padding: 5px 0;
+  gap: 3px;
+}
+
+.alertIcon {
+  display: flex;
+  min-width: 12px;
+  min-height: 12px;
+  background-image: url('/channel/NT_ANNOUNCEMENT.png');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.messageActionEvent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
 }
 
 .messageEvent .username {

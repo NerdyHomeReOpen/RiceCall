@@ -78,6 +78,7 @@ enum SocketClientEvent {
   APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
   // Message
   SEND_MESSAGE = 'message',
+  SEND_ACTION_MESSAGE = 'actionMessage',
   SEND_DIRECT_MESSAGE = 'directMessage',
   SEND_SHAKE_WINDOW = 'shakeWindow',
   // RTC
@@ -135,6 +136,7 @@ enum SocketServerEvent {
   SERVER_MEMBER_APPLICATION_DELETE = 'serverMemberApplicationDelete',
   // Message
   ON_MESSAGE = 'onMessage',
+  ON_ACTION_MESSAGE = 'onActionMessage',
   ON_DIRECT_MESSAGE = 'onDirectMessage',
   // RTC
   RTC_OFFER = 'RTCOffer',

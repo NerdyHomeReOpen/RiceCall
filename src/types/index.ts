@@ -589,7 +589,7 @@ export type Message = {
   // Change name to BaseMessage
   messageId: string;
   content: string;
-  type: 'general' | 'info' | 'warn' | 'event' | 'dm';
+  type: 'general' | 'info' | 'warn' | 'event' | 'alert' | 'dm';
   timestamp: number;
 };
 
@@ -631,6 +631,14 @@ export type EventMessage = Message & {
   serverId: string;
   channelId: string | null;
   type: 'event';
+}
+
+export type AlertMessage = Message & {
+  sender: ServerMember;
+  receiver: ServerMember;
+  serverId: string;
+  channelId: string | null;
+  type: 'alert';
 }
 
 export type UserServerStatus = {

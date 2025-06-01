@@ -76,6 +76,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [showMicVolume, setShowMicVolume] = useState(false);
     const [showSpeakerVolume, setShowSpeakerVolume] = useState(false);
     const [currentTime, setCurrentTime] = useState<number>(Date.now());
+    const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
+    const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
 
     // Variables
     const { userId } = user;
@@ -219,6 +221,18 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [channelBitrate]); // Please ignore this warning
 
     useEffect(() => {
+      if (actionMessages.length == 0) return;
+      if (actionMessageTimer.current) {
+        clearTimeout(actionMessageTimer.current);
+      }
+      if (!showActionMessage) setShowActionMessage(true);
+      
+      actionMessageTimer.current = setTimeout(() => {
+        setShowActionMessage(false);
+      }, 8000);
+    }, [actionMessages])
+
+    useEffect(() => {
       const timer = setInterval(() => {
         setCurrentTime(Date.now());
       }, 1000);
@@ -295,10 +309,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             <div className={styles['inputArea']}>
               <div
                 className={styles['broadcastArea']}
-                style={{ display: (actionMessages.length == 0 ? 'none' : 'flex') }}
+                style={{ display: (showActionMessage ? 'flex' : 'none') }}
               >
                 <div className={styles['broadcastContent']}>
-                  <MessageViewer messages={actionMessages} />
+                  <MessageViewer messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} isActionMessage={true} />
                 </div>
               </div>
               <MessageInputBox

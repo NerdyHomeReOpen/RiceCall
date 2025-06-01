@@ -464,7 +464,7 @@
   min-height: 25px;
   align-items: center;
   background-color: #fefee4;
-  justify-content: flex-start;
+  justify-content: center;
   border: solid 1.5px #f9c55d;
   border-radius: 2px;
   margin: 0 0.75rem;
@@ -473,6 +473,7 @@
 
 .broadcastArea .broadcastContent {
   flex: 5;
+  display: flex;
 }
 
 .broadcastArea .broadcastClose {
