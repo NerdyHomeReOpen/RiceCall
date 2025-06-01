@@ -962,7 +962,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       memberPermission < 6 &&
       userPermission > memberPermission;
     const canEditNickname =
-      canManageMember || (isCurrentUser && userPermission > 1);
+      (canManageMember && memberPermission != 1) || (isCurrentUser && userPermission > 1);
     const canChangeToGuest =
       canManageMember && memberPermission !== 1 && userPermission > 4;
     const canChangeToMember =
@@ -992,6 +992,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       canManageMember && memberCurrentChannelId !== currentChannelId;
     const canMute = !isCurrentUser && !isMutedByUser;
     const canUnmute = !isCurrentUser && isMutedByUser;
+    const canRemoveMembership = isCurrentUser && userPermission > 1 && userPermission < 6;
 
     // Handlers
     const handleMuteUser = (userId: User['userId']) => {
@@ -1090,6 +1091,32 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         userId,
         targetId,
       });
+    };
+
+    const handleOpenWarning = (message: string, callback: () => void) => {
+      ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
+      ipcService.initialData.onRequest('warningDialog', {
+        title: message,
+        submitTo: 'warningDialog',
+      });
+      ipcService.popup.onSubmit('warningDialog', callback);
+    };
+
+    const handleRemoveMembership = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
+      if (!socket) return;
+      handleOpenWarning(
+        '確定要解除自己與語音群的會員關係嗎', // lang.tr
+        () => {
+          handleUpdateMember(
+            { permissionLevel: 1 },
+            userId,
+            serverId,
+          )
+        }
+      );
     };
 
     const handleDragStart = (
@@ -1246,7 +1273,15 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             {
               id: 'separator',
               label: '',
-              show: canManageMember,
+              show: canManageMember || canRemoveMembership,
+            },
+            {
+              id: 'remove-self-membership',
+              label: '解除會員關係', // lang.tr
+              show: canRemoveMembership,
+              onClick: () => {
+                handleRemoveMembership(userId, serverId)
+              },
             },
             {
               id: 'send-member-application',
