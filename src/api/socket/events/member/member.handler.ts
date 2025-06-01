@@ -299,7 +299,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
                   ...updatedUserMember,
                   ...user
                 },
-                type: 'event',
+                type: 'info',
                 content: 'upgradeChannelManagerMessage',
                 timestamp: Date.now().valueOf(),
               });
@@ -336,7 +336,7 @@ export const UpdateMemberHandler: SocketRequestHandler = {
                 ...updatedUserMember,
                 ...user
               },
-              type: 'event',
+              type: 'info',
               content: 'upgradeServerManagerMessage',
               timestamp: Date.now().valueOf(),
             });
