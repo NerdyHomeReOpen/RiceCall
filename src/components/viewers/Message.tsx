@@ -198,7 +198,7 @@ const InfoMessageTab: React.FC<InfoMessageTabProps> = React.memo(
         '{gender}已被提升為本頻道的管理員。',
       );
       content = content.replace(
-        'upgradeChannelManagerMessage',
+        'upgradeMemberMessage',
         '{gender}已加入成為本群會員。',
       );
 
