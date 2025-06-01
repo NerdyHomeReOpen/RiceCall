@@ -172,6 +172,7 @@ export const SendActionMessageHandler: SocketRequestHandler = {
 
       // Send socket event
       if (channelId) { // Channel Alert
+        io.to(`channel_${channelId}`).emit('onActionMessage', message);
         for (const child of channelChildren) {
           io.to(`channel_${child.channelId}`).emit('onActionMessage', message);
         }
