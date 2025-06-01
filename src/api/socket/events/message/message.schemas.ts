@@ -5,6 +5,11 @@ export const MessageSchema = z.object({
   type: z.enum(['general', 'info', 'warn', 'event', 'dm']),
 });
 
+export const ActionMessageSchema = z.object({
+  content: z.string().min(1),
+  type: z.enum(['alert']),
+});
+
 export const ChannelMessageSchema = MessageSchema.extend({
   type: z.literal('general'),
 });
@@ -19,6 +24,14 @@ export const SendMessageSchema = z
     serverId: z.string().length(36),
     channelId: z.string().length(36),
     message: MessageSchema.partial(),
+  })
+  .strict();
+
+export const SendActionMessageSchema = z
+  .object({
+    serverId: z.string().length(36),
+    channelId: z.string().length(36).nullable(),
+    message: ActionMessageSchema.partial(),
   })
   .strict();
 

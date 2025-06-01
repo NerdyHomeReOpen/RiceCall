@@ -16,6 +16,7 @@ import { database } from '@/index';
 // Schemas
 import {
   SendDirectMessageSchema,
+  SendActionMessageSchema,
   SendMessageSchema,
   ShakeWindowSchema,
 } from '@/api/socket/events/message/message.schemas';
@@ -25,6 +26,7 @@ import { DataValidator } from '@/middleware/data.validator';
 
 export const SendMessageHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'SENDMESSAGE';
     try {
       /* ========== Start of Handling ========== */
 
@@ -37,7 +39,7 @@ export const SendMessageHandler: SocketRequestHandler = {
         serverId,
         channelId,
         message: preset,
-      } = await DataValidator.validate(SendMessageSchema, data, 'SENDMESSAGE');
+      } = await DataValidator.validate(SendMessageSchema, data, part);
 
       const channel = await database.get.channel(channelId);
 
@@ -71,8 +73,7 @@ export const SendMessageHandler: SocketRequestHandler = {
           ...operatorMember,
           ...operator,
         },
-        receiver: null, // Channel message does not have a receiver
-        senderId: userId, // 前端改完格式後刪除
+        receiver: null, // Channel message does not have receiver
         serverId: serverId,
         channelId: channelId,
         timestamp: Date.now().valueOf(),
@@ -104,7 +105,95 @@ export const SendMessageHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `傳送訊息失敗，請稍後再試`,
-          part: 'SEARCHSERVER',
+          part: part,
+          tag: 'SERVER_ERROR',
+          statusCode: 500,
+        });
+      }
+
+      socket.emit('error', error);
+    }
+  },
+};
+
+export const SendActionMessageHandler: SocketRequestHandler = {
+  async handle(io: Server, socket: Socket, data: any) {
+    const part = 'SENDACTIONMESSAGE';
+    try {
+      /* ========== Start of Handling ========== */
+      
+      let reason: string | null = null;
+
+      const operatorId = socket.data.userId;
+
+      const {
+        serverId,
+        channelId,
+        message: preset,
+      } = await DataValidator.validate(SendActionMessageSchema, data, part);
+
+      const channel = channelId === null ? null : await database.get.channel(channelId);
+      const serverChannels = await database.get.serverChannels(serverId);
+
+      // Operator
+      const operator = await database.get.user(operatorId);
+      const operatorMember = await database.get.member(operatorId, serverId);
+
+      if (operatorMember.permissionLevel < 3) {
+        reason = 'Cannot sent alert message without high permissionLevel';
+      }
+
+      if (reason) {
+        new Logger('SendActionMessage').warn(
+          `User(${operatorId}) failed to send action message to server(${serverId}): ${reason}`,
+        );
+        return;
+      }
+
+      /* ========== Start of Main Logic ========== */
+
+      const categoryId = channel?.categoryId ?? null;
+      const channelChildren = categoryId === null ? [] : serverChannels?.filter(
+        (ch) => ch.categoryId === categoryId,
+      );
+
+      // Create new message
+      const message = {
+        ...preset,
+        sender: {
+          ...operatorMember,
+          ...operator,
+        },
+        receiver: null,
+        serverId: serverId,
+        channelId: channelId,
+        timestamp: Date.now().valueOf(),
+      };
+
+      // Send socket event
+      if (channelChildren) { // Channel Alert
+        for (const child of channelChildren) {
+          io.to(`channel_${child.channelId}`).emit('onActionMessage', message);
+        }
+
+      } else { // Server Alert
+        io.to(`server_${serverId}`).emit('onActionMessage', message);
+      }
+
+      /* ========== End of Handling ========== */
+
+      new Logger('SendActionMessage').info(
+        `User(${operatorId}) sent action message to server(${serverId})`,
+      );
+
+    } catch (error: any) {
+      if (!(error instanceof StandardizedError)) {
+        new Logger('SendActionMessage').error(error.message);
+
+        error = new StandardizedError({
+          name: 'ServerError',
+          message: `傳送訊息失敗，請稍後再試`,
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -117,6 +206,7 @@ export const SendMessageHandler: SocketRequestHandler = {
 
 export const SendDirectMessageHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'SENDDIRECTMESSAGE';
     try {
       /* ========== Start of Handling ========== */
 
@@ -128,11 +218,7 @@ export const SendDirectMessageHandler: SocketRequestHandler = {
         userId,
         targetId,
         directMessage: preset,
-      } = await DataValidator.validate(
-        SendDirectMessageSchema,
-        data,
-        'SENDDIRECTMESSAGE',
-      );
+      } = await DataValidator.validate(SendDirectMessageSchema, data, part);
 
       if (operatorId !== userId) {
         reason = 'Cannot send non-self direct message';
@@ -177,7 +263,7 @@ export const SendDirectMessageHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `傳送私訊失敗，請稍後再試`,
-          part: 'SEARCHSERVER',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });
@@ -190,6 +276,7 @@ export const SendDirectMessageHandler: SocketRequestHandler = {
 
 export const ShakeWindowHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
+    const part = 'SHAKEWINDOW';
     try {
       /* ========== Start of Handling ========== */
 
@@ -197,11 +284,7 @@ export const ShakeWindowHandler: SocketRequestHandler = {
 
       const operatorId = socket.data.userId;
 
-      const { userId, targetId } = await DataValidator.validate(
-        ShakeWindowSchema,
-        data,
-        'SHAKEWINDOW',
-      );
+      const { userId, targetId } = await DataValidator.validate(ShakeWindowSchema, data, part);
 
       const friend = await database.get.userFriend(targetId, userId);
 
@@ -241,7 +324,7 @@ export const ShakeWindowHandler: SocketRequestHandler = {
         error = new StandardizedError({
           name: 'ServerError',
           message: `搖動視窗失敗，請稍後再試`,
-          part: 'SHAKEWINDOW',
+          part: part,
           tag: 'SERVER_ERROR',
           statusCode: 500,
         });

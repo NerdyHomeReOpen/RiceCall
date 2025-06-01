@@ -38,6 +38,7 @@ import {
 } from './memberApplication/memberApplication.handler';
 import {
   SendDirectMessageHandler,
+  SendActionMessageHandler,
   SendMessageHandler,
   ShakeWindowHandler,
 } from './message/message.handler';
@@ -128,6 +129,7 @@ export default function (eventRouter: EventRouters) {
 
   // Message
   eventRouter.addRoute('message', SendMessageHandler);
+  eventRouter.addRoute('actionMessage', SendActionMessageHandler);
   eventRouter.addRoute('directMessage', SendDirectMessageHandler);
   eventRouter.addRoute('shakeWindow', ShakeWindowHandler);
 
