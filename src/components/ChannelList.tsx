@@ -274,6 +274,18 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                         onClick: () => handleOpenApplyMember(userId, serverId),
                       },
                       {
+                        id: 'memberManagement',
+                        label: '會員管理',
+                        show: canOpenSettings,
+                        icon: 'memberManagement',
+                        onClick: () => handleOpenServerSetting(userId, serverId),
+                      },
+                      {
+                        id: 'separator',
+                        show: canOpenSettings || canApplyMember,
+                        label: '',
+                      },
+                      {
                         id: 'editNickname',
                         label: lang.tr.editNickname,
                         icon: 'editGroupcard',
@@ -294,7 +306,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                         id: 'report',
                         label: '舉報', // TODO: lang.tr
                         disabled: true,
-                        onClick: () => {},
+                        onClick: () => { /* TODO: handleOpenReport */ },
                       },
                       {
                         id: 'favorite',
@@ -310,10 +322,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                   <div
                     className={`
                       ${styles['overlay']}
-                      ${
-                        canOpenSettings && memberApplicationsCount > 0
-                          ? styles['new']
-                          : ''
+                      ${canOpenSettings && memberApplicationsCount > 0
+                        ? styles['new']
+                        : ''
                       }
                     `}
                   />
@@ -379,7 +390,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                 expanded={{ [currentChannelId]: true }}
                 selectedItemId={selectedItemId}
                 selectedItemType={selectedItemType}
-                setExpanded={() => {}}
+                setExpanded={() => { }}
                 setSelectedItemId={setSelectedItemId}
                 setSelectedItemType={setSelectedItemType}
               />
