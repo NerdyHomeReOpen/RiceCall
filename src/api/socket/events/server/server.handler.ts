@@ -191,12 +191,15 @@ export const ConnectServerHandler: SocketRequestHandler = {
 
         if (currentServerId) {
           targetSocket.leave(`server_${currentServerId}`);
-          targetSocket
-            .to(`server_${currentServerId}`)
+          targetSocket.leave(`serverManager_${currentServerId}`);
+          io.to(`server_${currentServerId}`)
             .emit('serverOnlineMemberDelete', userId, currentServerId);
         }
 
         targetSocket.join(`server_${serverId}`);
+        if (userMember.permissionLevel > 4) {
+          targetSocket.join(`serverManager_${currentServerId}`);
+        }
         targetSocket.emit('serverUpdate', serverId, serverUpdate);
         targetSocket.emit(
           'serverChannelsSet',
@@ -206,8 +209,16 @@ export const ConnectServerHandler: SocketRequestHandler = {
           'serverOnlineMembersSet',
           await database.get.serverOnlineMembers(serverId),
         );
-        targetSocket
-          .to(`server_${serverId}`)
+
+        if (userMember.permissionLevel > 4) {
+          const serverMemberApplications = await database.get.serverMemberApplications(serverId);
+          targetSocket.emit('serverMemberApplicationsSet', {
+            count: serverMemberApplications.length,
+          });
+        }
+
+        // to Server Members
+        io.to(`server_${serverId}`)
           .emit(
             'serverOnlineMemberAdd',
             await database.get.serverMember(serverId, userId),
@@ -301,29 +312,15 @@ export const DisconnectServerHandler: SocketRequestHandler = {
 
       if (targetSocket) {
         targetSocket.leave(`server_${serverId}`);
+        targetSocket.leave(`serverManager_${serverId}`);
+        
         targetSocket.emit('serverChannelsSet', []);
         targetSocket.emit('serverOnlineMembersSet', []);
         targetSocket
           .to(`server_${serverId}`)
           .emit('serverOnlineMemberDelete', userId, serverId);
 
-        if (operatorId !== userId) {
-          // io.to(`server_${serverId}`).emit('onMessage', {
-          //   serverId: serverId,
-          //   channelId: null,
-          //   sender: {
-          //     ...operatorMember,
-          //     ...operator
-          //   },
-          //   receiver: {
-          //     ...userMember,
-          //     ...user
-          //   }, 
-          //   type: 'warn',
-          //   content: 'userKickedServerMessage',
-          //   timestamp: Date.now().valueOf(),
-          // });
-          
+        if (operatorId !== userId) {  
           targetSocket.emit('openPopup', {
             type: 'dialogAlert',
             id: 'kick',

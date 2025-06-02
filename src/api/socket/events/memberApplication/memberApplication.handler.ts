@@ -75,11 +75,11 @@ export const CreateMemberApplicationHandler: SocketRequestHandler = {
       });
 
       // Send socket event
-      io.to(`server_${serverId}`).emit(
+      io.to(`serverManager_${serverId}`).emit(
         'serverMemberApplicationAdd',
         await database.get.serverMemberApplication(serverId, userId),
       );
-
+      
       /* ========== End of Handling ========== */
 
       new Logger('CreateMemberApplication').info(
@@ -144,7 +144,7 @@ export const UpdateMemberApplicationHandler: SocketRequestHandler = {
       await database.set.memberApplication(userId, serverId, update);
 
       // Send socket event
-      io.to(`server_${serverId}`).emit(
+      io.to(`serverManager_${serverId}`).emit(
         'serverMemberApplicationUpdate',
         userId,
         serverId,
@@ -207,8 +207,13 @@ export const DeleteMemberApplicationHandler: SocketRequestHandler = {
 
       /* ========== Start of Main Logic ========== */
 
-      await MemberApplicationHandlerServerSide.deleteMemberApplication(userId, serverId);
+      // await MemberApplicationHandlerServerSide.deleteMemberApplication(userId, serverId);
 
+      await database.delete.memberApplication(userId, serverId);
+
+      // Send socket event
+      io.to(`serverManager_${serverId}`).emit('serverMemberApplicationDelete', userId, serverId);
+      
       /* ========== End of Handling ========== */
 
       new Logger('DeleteMemberApplication').info(

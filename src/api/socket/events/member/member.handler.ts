@@ -221,29 +221,55 @@ export const UpdateMemberHandler: SocketRequestHandler = {
       if (targetSocket) {
         targetSocket.emit('serverUpdate', serverId, update);
 
-        // Send event messages to Target User
-        if (update.permissionLevel && operatorId !== userId) {
-          if (update.permissionLevel === 2 || userMember.permissionLevel > 2) { // Target User set to Member
-            if (userCurrentChannelId && (userMember.permissionLevel === 3 || userMember.permissionLevel === 4)) {
-              // Original PermissionLevel is Channel Manager or Category Manager
-              targetSocket.emit('onActionMessage', {
-                serverId: serverId,
-                channelId: null,
-                sender: {
-                  ...operatorMember,
-                  ...operator
-                },
-                receiver: {
-                  ...userMember,
-                  ...user
-                },
-                type: 'event',
-                content: 'removeFromChannelManagerMessage',
-                timestamp: Date.now().valueOf(),
-              });
+        if (update.permissionLevel) {
+          if (updatedUserMember.permissionLevel > 4) {
+            targetSocket.join(`serverManager_${serverId}`);
+          } else {
+            targetSocket.leave(`serverManager_${serverId}`);
+          }
 
-            } else if (userMember.permissionLevel === 5) {
-              // Original PermissionLevel is Server Manager
+          // Send event messages to Target User
+          if (operatorId !== userId) {
+            if (update.permissionLevel === 2 || userMember.permissionLevel > 2) { // Target User set to Member
+              if (userCurrentChannelId && (userMember.permissionLevel === 3 || userMember.permissionLevel === 4)) {
+                // Original PermissionLevel is Channel Manager or Category Manager
+                targetSocket.emit('onActionMessage', {
+                  serverId: serverId,
+                  channelId: null,
+                  sender: {
+                    ...operatorMember,
+                    ...operator
+                  },
+                  receiver: {
+                    ...userMember,
+                    ...user
+                  },
+                  type: 'event',
+                  content: 'removeFromChannelManagerMessage',
+                  timestamp: Date.now().valueOf(),
+                });
+
+              } else if (userMember.permissionLevel === 5) {
+                // Original PermissionLevel is Server Manager
+                targetSocket.emit('onActionMessage', {
+                  serverId: serverId,
+                  channelId: null,
+                  sender: {
+                    ...operatorMember,
+                    ...operator
+                  },
+                  receiver: {
+                    ...userMember,
+                    ...user
+                  },
+                  type: 'event',
+                  content: 'removeFromServerManagerMessage',
+                  timestamp: Date.now().valueOf(),
+                });
+              }
+
+            } else if (update.permissionLevel === 1) { // Target User set to Guest
+              // Original PermissionLevel is above Guest
               targetSocket.emit('onActionMessage', {
                 serverId: serverId,
                 channelId: null,
@@ -256,28 +282,10 @@ export const UpdateMemberHandler: SocketRequestHandler = {
                   ...user
                 },
                 type: 'event',
-                content: 'removeFromServerManagerMessage',
+                content: 'removeFromMemberMessage',
                 timestamp: Date.now().valueOf(),
               });
             }
-
-          } else if (update.permissionLevel === 1) { // Target User set to Guest
-            // Original PermissionLevel is above Guest
-            targetSocket.emit('onActionMessage', {
-              serverId: serverId,
-              channelId: null,
-              sender: {
-                ...operatorMember,
-                ...operator
-              },
-              receiver: {
-                ...userMember,
-                ...user
-              },
-              type: 'event',
-              content: 'removeFromMemberMessage',
-              timestamp: Date.now().valueOf(),
-            });
           }
         }
       }
