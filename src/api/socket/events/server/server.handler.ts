@@ -197,9 +197,6 @@ export const ConnectServerHandler: SocketRequestHandler = {
         }
 
         targetSocket.join(`server_${serverId}`);
-        if (userMember.permissionLevel > 4) {
-          targetSocket.join(`serverManager_${currentServerId}`);
-        }
         targetSocket.emit('serverUpdate', serverId, serverUpdate);
         targetSocket.emit(
           'serverChannelsSet',
@@ -211,6 +208,8 @@ export const ConnectServerHandler: SocketRequestHandler = {
         );
 
         if (userMember.permissionLevel > 4) {
+          targetSocket.join(`serverManager_${serverId}`);
+
           const serverMemberApplications = await database.get.serverMemberApplications(serverId);
           targetSocket.emit('serverMemberApplicationsSet', {
             count: serverMemberApplications.length,
