@@ -11,6 +11,7 @@ pub struct StandardizedError {
 }
 
 impl StandardizedError {
+    #[allow(dead_code)]
     pub fn new(
         error_message: &str,
         name: &str,

@@ -1,4 +1,3 @@
-mod models;
 mod socket;
 mod utils;
 mod database;
