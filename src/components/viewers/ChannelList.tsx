@@ -1445,7 +1445,7 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
     const [selectedItemType, setSelectedItemType] = useState<string | null>(
       'channel',
     );
-    const [hasMemberApplication, setHasMemberApplication] = useState<boolean>(false);
+    const [memberApplicationsCount, setMemberApplicationsCount] = useState<number>(0);
 
     // Variables
     const connectStatus = 4 - Math.floor(Number(latency) / 50);
@@ -1527,10 +1527,16 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
       handleSetChannelExpanded();
     };
 
+    const handleServerMemberApplicationsSet = (data: { count: number }) => {
+      setMemberApplicationsCount(data.count);
+    };
+
     const handleServerMemberApplicationAdd = () => {
-      if (userPermission < 4) return;
-      if (hasMemberApplication) return;
-      setHasMemberApplication(true);
+      setMemberApplicationsCount((prev) => prev + 1);
+    };
+
+    const handleServerMemberApplicationDelete = () => {
+      setMemberApplicationsCount((prev) => Math.max(prev - 1, 0));
     };
 
     // Effects
@@ -1566,26 +1572,12 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
     }, [socket]);
 
     useEffect(() => {
-      if (!currentServer.serverId) return;
-      const refresh = async () => {
-        Promise.all([
-          refreshService.serverMemberApplications({
-            serverId: currentServer.serverId,
-          }),
-        ]).then(([memberApplications]) => {
-          if (userPermission > 4) {
-            setHasMemberApplication(memberApplications?.length !== 0);
-          }
-        });
-      };
-      refresh();
-    }, [currentServer]);
-
-    useEffect(() => {
       if (!socket) return;
 
       const eventHandlers = {
-        [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]:handleServerMemberApplicationAdd,
+        [SocketServerEvent.SERVER_MEMBER_APPLICATIONS_SET]: handleServerMemberApplicationsSet,
+        [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]: handleServerMemberApplicationAdd,
+        [SocketServerEvent.SERVER_MEMBER_APPLICATION_DELETE]: handleServerMemberApplicationDelete,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -1682,9 +1674,12 @@ const ChannelListViewer: React.FC<ChannelListViewerProps> = React.memo(
                     ]);
                   }}
                 >
-                  {hasMemberApplication && (
-                    <div className={styles['notify']} />
-                  )}
+                  <div
+                    className={`
+                      ${styles['overlay']}
+                      ${canOpenSettings && memberApplicationsCount > 0 ? styles['new'] : ''}
+                    `}
+                  />
                 </div>
               </div>
             </div>
