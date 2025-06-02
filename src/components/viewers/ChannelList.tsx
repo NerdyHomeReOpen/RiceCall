@@ -1095,13 +1095,13 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       });
     };
 
-    const handleOpenWarning = (message: string, callback: () => void) => {
-      ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
-      ipcService.initialData.onRequest('warningDialog', {
+    const handleOpeAlert = (message: string, callback: () => void) => {
+      ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
+      ipcService.initialData.onRequest('alertDialog', {
         title: message,
-        submitTo: 'warningDialog',
+        submitTo: 'alertDialog',
       });
-      ipcService.popup.onSubmit('warningDialog', callback);
+      ipcService.popup.onSubmit('alertDialog', callback);
     };
 
     const handleRemoveMembership = (
@@ -1109,7 +1109,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      handleOpenWarning(
+      handleOpeAlert(
         '確定要解除自己與語音群的會員關係嗎', // lang.tr
         () => {
           handleUpdateMember(
