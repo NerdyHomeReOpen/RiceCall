@@ -11,6 +11,7 @@ import type {
   WarnMessage,
   EventMessage,
   AlertMessage,
+  PromptMessage,
 } from '@/types';
 
 // Components
@@ -21,6 +22,7 @@ import WarnMessageTab from '@/components/WarnMessage';
 import EventMessageTab from '@/components/EventMessage';
 import AlertMessageTab from '@/components/AlertMessage';
 import ActionMessageTab from '@/components/ActionMessage';
+import PromptMessageTab from '@/components/PromptMessage';
 
 type MessageGroup = (
   | DirectMessage
@@ -41,12 +43,12 @@ type MessageGroup = (
 
 interface MessageViewerProps {
   messages:
-    | DirectMessage[]
-    | ChannelMessage[]
-    | InfoMessage[]
-    | WarnMessage[]
-    | EventMessage[]
-    | AlertMessage[];
+  | DirectMessage[]
+  | ChannelMessage[]
+  | InfoMessage[]
+  | WarnMessage[]
+  | EventMessage[]
+  | AlertMessage[];
   forbidGuestUrl?: boolean;
   isActionMessage?: boolean;
 }
@@ -111,7 +113,22 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
         {messageGroups.map((messageGroup, index) => {
           return (
             <div key={index} className={styles['messageWrapper']}>
-              {messageGroup.type === 'info' ? (
+              {messageGroup.type === 'general' ? (
+                <ChannelMessageTab
+                  messageGroup={messageGroup}
+                  forbidGuestUrl={forbidGuestUrl}
+                />
+              ) : messageGroup.type === 'dm' ? (
+                <DirectMessageTab messageGroup={messageGroup} />
+              ) : (
+                <PromptMessageTab
+                  messageGroup={messageGroup}
+                  forbidGuestUrl={forbidGuestUrl}
+                  messageType={messageGroup.type}
+                  isActionMessage={isActionMessage}
+                />
+              )}
+              {/* {messageGroup.type === 'info' ? (
                 <InfoMessageTab
                   messageGroup={messageGroup}
                   forbidGuestUrl={forbidGuestUrl}
@@ -143,7 +160,7 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
                 />
               ) : messageGroup.type === 'dm' ? (
                 <DirectMessageTab messageGroup={messageGroup} />
-              ) : null}
+              ) : null} */}
             </div>
           );
         })}

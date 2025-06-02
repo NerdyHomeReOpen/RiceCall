@@ -609,6 +609,13 @@ export type DirectMessage = Message &
     type: 'dm';
   };
 
+export type PromptMessage = Message & {
+  sender: ServerMember;
+  receiver: ServerMember;
+  serverId: string;
+  channelId: string | null;
+};
+
 export type InfoMessage = Message & {
   sender: ServerMember;
   receiver: ServerMember;
