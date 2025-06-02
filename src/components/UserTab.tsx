@@ -230,7 +230,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       });
     };
 
-    const handleOpeAlert = (message: string, callback: () => void) => {
+    const handleOpenAlert = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
       ipcService.initialData.onRequest('alertDialog', {
         title: message,
@@ -244,12 +244,23 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      handleOpeAlert(
+      handleOpenAlert(
         '確定要解除自己與語音群的會員關係嗎', // lang.tr
         () => {
           handleUpdateMember({ permissionLevel: 1 }, userId, serverId);
         },
       );
+    };
+
+    const handleOpenBlockMember = (
+      userId: User['userId'],
+      serverId: Server['serverId'],
+    ) => {
+      ipcService.popup.open(PopupType.BLOCK_MEMBER, `blockMember-${userId}`);
+      ipcService.initialData.onRequest(`blockMember-${userId}`, {
+        userId,
+        serverId,
+      });
     };
 
     const handleDragStart = (
@@ -381,13 +392,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.kickServer,
               show: canKickServer,
               onClick: () => {
-                handleUpdateMember(
-                  {
-                    isBlocked: Date.now() + 1000 * 60 * 60 * 24 * 30, // 30 days TODO: user can set the time
-                  },
-                  memberUserId,
-                  serverId,
-                );
                 handleKickServer(memberUserId, serverId);
               },
             },
@@ -396,12 +400,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.ban,
               show: canBan,
               onClick: () => {
-                handleUpdateMember(
-                  { permissionLevel: 1, isBlocked: -1 },
-                  memberUserId,
-                  serverId,
-                );
-                handleKickServer(memberUserId, serverId);
+                handleOpenBlockMember(memberUserId, serverId);
               },
             },
             {

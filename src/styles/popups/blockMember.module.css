@@ -1,0 +1,21 @@
+.content {
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inputBox {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.optionBox {
+    display: flex;
+    flex-direction: row;
+}
+
+.optionBox .label {
+    padding: 5px;
+    min-width: 2rem;
+}
