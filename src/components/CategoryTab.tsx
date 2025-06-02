@@ -26,7 +26,7 @@ import ChannelTab from '@/components/ChannelTab';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface CategoryTabProps {
   category: Category;
@@ -83,7 +83,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       .filter((ch) => ch.categoryId === categoryId);
     const categoryLobby =
       categoryVisibility !== 'readonly'
-        ? createDefault.channel({
+        ? Default.channel({
             ...category,
             channelId: categoryId,
             name: lang.tr.lobby,

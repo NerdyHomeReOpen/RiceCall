@@ -17,7 +17,7 @@ import ipcService from '@/services/ipc.service';
 import refreshService from '@/services/refresh.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
@@ -39,8 +39,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
     // States
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const [showPreview, setShowPreview] = useState<boolean>(false);
-    const [channel, setChannel] = useState<Channel>(createDefault.channel());
-    const [server, setServer] = useState<Server>(createDefault.server());
+    const [channel, setChannel] = useState<Channel>(Default.channel());
+    const [server, setServer] = useState<Server>(Default.server());
 
     // Variables
     const { lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } =

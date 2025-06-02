@@ -31,7 +31,7 @@ import permission from '@/styles/permission.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface UserSettingPopupProps {
   userId: User['userId'];
@@ -58,8 +58,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const CURRENT_DAY = TODAY.getDate();
 
     // States
-    const [user, setUser] = useState<User>(createDefault.user());
-    const [friend, setFriend] = useState<Friend>(createDefault.friend());
+    const [user, setUser] = useState<User>(Default.user());
+    const [friend, setFriend] = useState<Friend>(Default.friend());
     const [servers, setServers] = useState<UserServer[]>([]);
     const [serversView, setServersView] = useState('joined');
     const [selectedTabId, setSelectedTabId] = useState<

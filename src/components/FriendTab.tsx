@@ -18,7 +18,7 @@ import ipcService from '@/services/ipc.service';
 import refreshService from '@/services/refresh.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 // Components
 import BadgeList from '@/components/BadgeList';
@@ -43,9 +43,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
     const refreshed = useRef(false);
 
     // States
-    const [friendServer, setFriendServer] = useState<Server>(
-      createDefault.server(),
-    );
+    const [friendServer, setFriendServer] = useState<Server>(Default.server());
 
     // Variables
     const { userId } = user;

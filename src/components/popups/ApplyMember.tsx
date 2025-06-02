@@ -16,7 +16,7 @@ import { useSocket } from '@/providers/Socket';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 import refreshService from '@/services/refresh.service';
 
 interface ApplyMemberPopupProps {
@@ -35,9 +35,9 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
 
     // State
     const [section, setSection] = useState<number>(0);
-    const [server, setServer] = useState<Server>(createDefault.server());
+    const [server, setServer] = useState<Server>(Default.server());
     const [memberApplication, setMemberApplication] =
-      useState<MemberApplication>(createDefault.memberApplication());
+      useState<MemberApplication>(Default.memberApplication());
 
     // Variables
     const {

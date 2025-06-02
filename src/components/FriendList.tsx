@@ -13,7 +13,7 @@ import { useLanguage } from '@/providers/Language';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 // Components
 import FriendGroupTab from '@/components/FriendGroupTab';
@@ -45,18 +45,18 @@ const FriendList: React.FC<FriendListProps> = React.memo(
     const filteredFriends = friends.filter((fd) =>
       fd.name.includes(searchQuery),
     );
-    const defaultFriendGroup: FriendGroup = createDefault.friendGroup({
+    const defaultFriendGroup: FriendGroup = Default.friendGroup({
       name: `${lang.tr.myFriends}`,
       order: 0,
       userId,
     });
-    const outlanderFriendGroup: FriendGroup = createDefault.friendGroup({
+    const outlanderFriendGroup: FriendGroup = Default.friendGroup({
       friendGroupId: 'outlander',
       name: `陌生人`, // TODO: lang.tr
       order: 998,
       userId,
     });
-    const blockedFriendGroup: FriendGroup = createDefault.friendGroup({
+    const blockedFriendGroup: FriendGroup = Default.friendGroup({
       friendGroupId: 'blocked',
       name: `黑名單`, // TODO: lang.tr
       order: 999,

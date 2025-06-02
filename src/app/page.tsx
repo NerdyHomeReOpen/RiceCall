@@ -32,7 +32,7 @@ import ServerPage from '@/components/pages/Server';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
@@ -416,14 +416,14 @@ const RootPageComponent = () => {
   const mainTab = useMainTab();
 
   // States
-  const [user, setUser] = useState<User>(createDefault.user());
+  const [user, setUser] = useState<User>(Default.user());
   const [servers, setServers] = useState<UserServer[]>([]);
   const [friends, setFriends] = useState<UserFriend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
-  const [server, setServer] = useState<UserServer>(createDefault.userServer());
+  const [server, setServer] = useState<UserServer>(Default.userServer());
   const [serverMembers, setServerMembers] = useState<ServerMember[]>([]);
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
-  const [channel, setChannel] = useState<Channel>(createDefault.channel());
+  const [channel, setChannel] = useState<Channel>(Default.channel());
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<ChannelMessage[]>([]);
 
@@ -576,7 +576,7 @@ const RootPageComponent = () => {
 
   const handleOnActionMessage = (...actionMessages: ChannelMessage[]): void => {
     setActionMessages((prev) => [...prev, ...actionMessages]);
-  }
+  };
 
   const handleOpenPopup = (popup: {
     type: PopupType;
@@ -608,14 +608,14 @@ const RootPageComponent = () => {
   useEffect(() => {
     const channel =
       serverChannels.find((item) => item.channelId === user.currentChannelId) ||
-      createDefault.channel();
+      Default.channel();
     setChannel(channel);
   }, [user.currentChannelId, serverChannels]);
 
   useEffect(() => {
     const server =
       servers.find((item) => item.serverId === user.currentServerId) ||
-      createDefault.userServer();
+      Default.userServer();
     setServer(server);
   }, [user.currentServerId, servers]);
 
@@ -693,9 +693,9 @@ const RootPageComponent = () => {
       mainTab.setSelectedTabId('home');
     } else {
       mainTab.setSelectedTabId('home');
-      setUser(createDefault.user());
-      setServer(createDefault.userServer());
-      setChannel(createDefault.channel());
+      setUser(Default.user());
+      setServer(Default.userServer());
+      setChannel(Default.channel());
     }
   }, [socket.isConnected]);
 

@@ -24,7 +24,7 @@ import ipcService from '@/services/ipc.service';
 import refreshService from '@/services/refresh.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface EditChannelOrderPopupProps {
   userId: string;
@@ -56,7 +56,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
     // Variables
     const isSelected = selectedChannel;
     const { channelId: selectedChannelId, isLobby } =
-      selectedChannel ?? createDefault.channel();
+      selectedChannel ?? Default.channel();
     const currentIndex = groupChannels.findIndex(
       (ch) => ch.channelId === selectedChannelId,
     );

@@ -34,8 +34,8 @@ import apiService from '@/services/api.service';
 import refreshService from '@/services/refresh.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
-import { createSorter } from '@/utils/createSorter';
+import Default from '@/utils/default';
+import Sorter from '@/utils/sorter';
 
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
@@ -101,8 +101,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const popupRef = useRef<HTMLDivElement>(null);
 
     // States
-    const [server, setServer] = useState<Server>(createDefault.server());
-    const [member, setMember] = useState<Member>(createDefault.member());
+    const [server, setServer] = useState<Server>(Default.server());
+    const [member, setMember] = useState<Member>(Default.member());
     const [serverMembers, setServerMembers] = useState<ServerMember[]>([]);
     const [serverApplications, setServerApplications] = useState<
       MemberApplication[]
@@ -253,7 +253,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       const newDirection = direction === 1 ? -1 : 1;
       // setSortField(String(field)); temp: not used
       setSortDirection(newDirection);
-      return [...array].sort(createSorter(field, newDirection));
+      return [...array].sort(Sorter(field, newDirection));
     };
 
     const handleUpdateServer = (

@@ -14,7 +14,7 @@ import {
   UserServerStatus,
 } from '@/types';
 
-export const createDefault = {
+const Default = {
   user: (overrides: Partial<User> = {}): User => ({
     userId: '',
     name: '',
@@ -105,8 +105,8 @@ export const createDefault = {
   }),
 
   userFriend: (overrides: Partial<UserFriend> = {}): UserFriend => ({
-    ...createDefault.friend(),
-    ...createDefault.user(),
+    ...Default.friend(),
+    ...Default.user(),
     ...overrides,
   }),
 
@@ -134,15 +134,15 @@ export const createDefault = {
   }),
 
   userServer: (overrides: Partial<UserServer> = {}): UserServer => ({
-    ...createDefault.server(),
-    ...createDefault.member(),
-    ...createDefault.userServerStatus(),
+    ...Default.server(),
+    ...Default.member(),
+    ...Default.userServerStatus(),
     ...overrides,
   }),
 
   serverMember: (overrides: Partial<ServerMember> = {}): ServerMember => ({
-    ...createDefault.user(),
-    ...createDefault.member(),
+    ...Default.user(),
+    ...Default.member(),
     ...overrides,
   }),
 
@@ -152,7 +152,7 @@ export const createDefault = {
     senderId: '',
     receiverId: '',
     description: '',
-    ...createDefault.user(),
+    ...Default.user(),
     ...overrides,
   }),
 
@@ -161,7 +161,9 @@ export const createDefault = {
   ): MemberApplication => ({
     serverId: '',
     description: '',
-    ...createDefault.user(),
+    ...Default.user(),
     ...overrides,
   }),
 };
+
+export default Default;

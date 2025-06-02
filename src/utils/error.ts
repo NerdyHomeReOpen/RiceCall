@@ -26,32 +26,20 @@ export default class StandardizedError {
     this.part = options.part;
     this.tag = options.tag;
     this.statusCode = options.statusCode;
-    this.handler = options.handler;
-  }
-
-  handle() {
-    if (this.handler) this.handler();
-  }
-}
-
-export class errorHandler {
-  error: StandardizedError;
-
-  constructor(error: StandardizedError) {
-    this.error = error;
+    this.handler = options.handler || (() => {});
   }
 
   show() {
     console.error(
-      `[${this.error.tag}] ${this.error.message} (${this.error.statusCode}) (${
-        this.error.part
+      `[${this.tag}] ${this.message} (${this.statusCode}) (${
+        this.part
       }) (${new Date().toLocaleString()})`,
     );
-    const errorMessage = `${this.error.message} (${this.error.statusCode})`;
+    const errorMessage = `${this.message} (${this.statusCode})`;
 
     ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
     ipcService.popup.onSubmit('errorDialog', () => {
-      if (this.error.handler) this.error.handler();
+      if (this.handler) this.handler();
     });
     ipcService.initialData.onRequest('errorDialog', {
       title: errorMessage,

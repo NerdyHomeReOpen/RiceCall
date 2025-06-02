@@ -18,7 +18,7 @@ import apiService from '@/services/api.service';
 import refreshService from '@/services/refresh.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface CreateServerPopupProps {
   userId: User['userId'];
@@ -50,9 +50,9 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
     ];
 
     // States
-    const [user, setUser] = useState<User>(createDefault.user());
+    const [user, setUser] = useState<User>(Default.user());
     const [servers, setServers] = useState<UserServer[]>([]);
-    const [server, setServer] = useState<Server>(createDefault.server());
+    const [server, setServer] = useState<Server>(Default.server());
     const [section, setSection] = useState<number>(0);
 
     // Variables

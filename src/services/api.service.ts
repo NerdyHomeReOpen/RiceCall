@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import StandardizedError, { errorHandler } from '@/utils/errorHandler';
+import StandardizedError from '@/utils/error';
 
 const API_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
@@ -16,7 +16,7 @@ const handleResponse = async (response: Response): Promise<any> => {
   try {
     const data = await response.json();
     if (!response.ok) {
-      new errorHandler(data.error).show();
+      new StandardizedError(data.error).show();
     }
     return data;
   } catch (error: Error | any) {
@@ -29,7 +29,7 @@ const handleResponse = async (response: Response): Promise<any> => {
         statusCode: 500,
       });
     }
-    new errorHandler(error).show();
+    error.show();
     return null;
   }
 };
@@ -53,7 +53,7 @@ const apiService = {
           statusCode: 500,
         });
       }
-      new errorHandler(error).show();
+      error.show();
       return null;
     }
   },
@@ -91,7 +91,7 @@ const apiService = {
           statusCode: 500,
         });
       }
-      new errorHandler(error).show();
+      error.show();
       return null;
     }
   },
@@ -123,7 +123,7 @@ const apiService = {
           statusCode: 500,
         });
       }
-      new errorHandler(error).show();
+      error.show();
       return null;
     }
   },

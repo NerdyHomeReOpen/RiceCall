@@ -16,7 +16,7 @@ import ipcService from '@/services/ipc.service';
 import refreshService from '@/services/refresh.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface editChannelNamePopupProps {
   channelId: Channel['channelId'];
@@ -33,7 +33,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
     const refreshRef = useRef(false);
 
     // States
-    const [channel, setChannel] = useState<Channel>(createDefault.channel());
+    const [channel, setChannel] = useState<Channel>(Default.channel());
 
     // Variables
     const { name: channelName } = channel;

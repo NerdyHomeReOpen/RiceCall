@@ -16,7 +16,7 @@ import ipcService from '@/services/ipc.service';
 import refreshService from '@/services/refresh.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface EditFriendGroupPopupProps {
   userId: User['userId'];
@@ -34,7 +34,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
 
     // States
     const [friendGroup, setFriendGroup] = useState<FriendGroup>(
-      createDefault.friendGroup(),
+      Default.friendGroup(),
     );
 
     // Variables

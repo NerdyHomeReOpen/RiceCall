@@ -24,7 +24,7 @@ import ipcService from '@/services/ipc.service';
 import refreshService from '@/services/refresh.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface ApplyFriendPopupProps {
   userId: User['userId'];
@@ -43,9 +43,9 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
     // State
     const [section, setSection] = useState<number>(0);
     const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
-    const [target, setTarget] = useState<User>(createDefault.user());
+    const [target, setTarget] = useState<User>(Default.user());
     const [friendApplication, setFriendApplication] =
-      useState<FriendApplication>(createDefault.friendApplication());
+      useState<FriendApplication>(Default.friendApplication());
     const [selectedFriendGroupId, setSelectedFriendGroupId] = useState<
       FriendGroup['friendGroupId'] | null
     >(null);

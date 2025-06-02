@@ -16,7 +16,7 @@ import refreshService from '@/services/refresh.service';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface EditNicknamePopupProps {
   userId: User['userId'];
@@ -33,8 +33,8 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
     const refreshRef = useRef(false);
 
     // States
-    const [member, setMember] = useState<Member>(createDefault.member());
-    const [user, setUser] = useState<User>(createDefault.user());
+    const [member, setMember] = useState<Member>(Default.member());
+    const [user, setUser] = useState<User>(Default.user());
 
     // Variables
     const { nickname: memberNickname } = member;
@@ -86,7 +86,9 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
           <div className={setting['body']}>
             <div className={popup['inputGroup']}>
               <div className={popup['inputBox']}>
-                <div className={popup['label']} style={{ minWidth: '2rem'}}>{lang.tr.nickname}:</div>
+                <div className={popup['label']} style={{ minWidth: '2rem' }}>
+                  {lang.tr.nickname}:
+                </div>
                 <div className={popup['label']}>{userName}</div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']}`}>

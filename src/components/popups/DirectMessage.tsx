@@ -17,7 +17,7 @@ import refreshService from '@/services/refresh.service';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 // CSS
 import directMessage from '@/styles/popups/directMessage.module.css';
@@ -44,10 +44,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     const cooldownRef = useRef(0);
 
     // States
-    const [user, setUser] = useState<User>(createDefault.user());
-    const [target, setTarget] = useState<User>(createDefault.user());
+    const [user, setUser] = useState<User>(Default.user());
+    const [target, setTarget] = useState<User>(Default.user());
     const [targetCurrentServer, setTargetCurrentServer] = useState<Server>(
-      createDefault.server(),
+      Default.server(),
     );
     const [directMessages, setDirectMessages] = useState<DirectMessage[]>([]);
     const [messageInput, setMessageInput] = useState<string>('');

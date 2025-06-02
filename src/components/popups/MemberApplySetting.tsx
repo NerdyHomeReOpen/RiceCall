@@ -16,7 +16,7 @@ import refreshService from '@/services/refresh.service';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface MemberApplySettingPopupProps {
   serverId: Server['serverId'];
@@ -32,7 +32,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
     const refreshRef = useRef(false);
 
     // States
-    const [server, setServer] = useState<Server>(createDefault.server());
+    const [server, setServer] = useState<Server>(Default.server());
 
     // Variables
     const { receiveApply: serverReceiveApply, applyNotice: serverApplyNotice } =

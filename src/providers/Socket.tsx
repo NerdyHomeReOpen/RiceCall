@@ -10,7 +10,7 @@ import { SocketServerEvent, SocketClientEvent } from '@/types';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import StandardizedError, { errorHandler } from '@/utils/errorHandler';
+import StandardizedError from '@/utils/error';
 
 type SocketContextType = {
   send: Record<SocketClientEvent, (...args: any[]) => void>;
@@ -72,7 +72,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
       tag: 'ERROR',
       statusCode: 500,
     });
-    new errorHandler(error).show();
+    error.show();
   };
 
   const handleConnectError = (error: any) => {
@@ -84,7 +84,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
       statusCode: 500,
       handler: () => ipcService.auth.logout(),
     });
-    new errorHandler(error).show();
+    error.show();
   };
 
   const handleReconnectError = (error: any) => {
@@ -96,7 +96,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
       statusCode: 500,
       handler: () => ipcService.auth.logout(),
     });
-    new errorHandler(error).show();
+    error.show();
   };
 
   // Effects
