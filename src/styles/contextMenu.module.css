@@ -82,6 +82,10 @@
   transform: rotate(180deg);
 }
 
+.contextMenu .option[data-type='memberManagement']::before {
+  background-image: url('../../public/channel/icon_membermgr.png');
+}
+
 .contextMenu .option[data-type='memberapply']::before {
   background-image: url('../../public/channel/icon_memberapply.png');
 }
