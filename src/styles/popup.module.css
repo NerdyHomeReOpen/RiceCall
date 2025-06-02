@@ -132,22 +132,6 @@
   color: #777;
 }
 
-/* Layout Styles */
-
-.col {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 5px;
-}
-
 /* Input Styles */
 
 .inputGroup {
@@ -390,4 +374,20 @@
   align-items: center;
   justify-content: flex-start;
   margin: 0 20px;
+}
+
+/* Layout Styles */
+
+.col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 }
