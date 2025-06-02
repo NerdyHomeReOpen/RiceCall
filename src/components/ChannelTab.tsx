@@ -191,13 +191,11 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     };
 
     const handleOpenServerBroadcast = (
-      userId: User['userId'],
       serverId: Server['serverId'],
       channelId: Channel['channelId'],
     ) => {
       ipcService.popup.open(PopupType.SERVER_BROADCAST, 'serverBroadcast');
       ipcService.initialData.onRequest('serverBroadcast', {
-        userId,
         serverId,
         channelId,
       });
@@ -346,7 +344,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 show: canManageChannel,
                 onClick: () => {
                   handleOpenServerBroadcast(
-                    userId,
                     serverId,
                     channelCategoryId ? channelCategoryId : channelId,
                   );
