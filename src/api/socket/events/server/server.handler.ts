@@ -217,11 +217,10 @@ export const ConnectServerHandler: SocketRequestHandler = {
         }
 
         // to Server Members
-        io.to(`server_${serverId}`)
-          .emit(
-            'serverOnlineMemberAdd',
-            await database.get.serverMember(serverId, userId),
-          );
+        targetSocket.to(`server_${serverId}`).emit(
+          'serverOnlineMemberAdd',
+          await database.get.serverMember(serverId, userId),
+        );
       }
 
       /* ========== End of Handling ========== */
