@@ -14,7 +14,7 @@ interface LanguageContextType {
   getFormatTimestamp: (timestamp: number) => string;
   getTranslatedMessage: (
     content: string,
-    params?: Record<string, string>,
+    params?: Record<string, string> | undefined,
   ) => string;
 }
 
@@ -89,8 +89,24 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
 
   const getTranslatedMessage = (
     content: string,
-    params?: Record<string, string>,
+    params?: Record<string, string> | undefined,
   ) => {
+    if (content.includes(' ')) {
+      const [key, ...params] = content.split(' ');
+      if (Object.prototype.hasOwnProperty.call(translation, key)) {
+        let translatedText = translation[key as keyof typeof translation];
+        params.forEach((param, index) => {
+          translatedText = translatedText.replace(`{${index}}`, param);
+        });
+        content = translatedText;
+      }
+
+    } else {
+      content = Object.prototype.hasOwnProperty.call(translation, content)
+        ? translation[content as keyof typeof translation]
+        : content;
+    }
+
     content = content.replace(
       'removeFromMemberMessage',
       '移除了{gender}的會員身分。',
