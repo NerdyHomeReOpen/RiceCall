@@ -10,7 +10,6 @@ import { useSocket } from '@/providers/Socket';
 // CSS
 import popup from '@/styles/popup.module.css';
 import broadcast from '@/styles/popups/serverBroadcast.module.css';
-import messageInputBox from '@/styles/messageInputBox.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -48,12 +47,8 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
       ipcService.window.close();
     };
 
-    useEffect(() => {
-      console.log(broadcastContent);
-    }, [broadcastContent]);
-
     return (
-      <form className={popup['popupContainer']}>
+      <div className={popup['popupContainer']}>
         {/* Body */}
         <div className={popup['popupBody']}>
           <div className={broadcast['content']}>
@@ -169,7 +164,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
             {lang.tr.cancel}
           </button>
         </div>
-      </form>
+      </div>
     );
   },
 )
