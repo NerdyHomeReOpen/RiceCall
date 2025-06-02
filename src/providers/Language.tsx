@@ -12,6 +12,10 @@ interface LanguageContextType {
   set: (lang: LanguageKey) => void;
   getPermissionText: (permission: Permission) => string;
   getFormatTimestamp: (timestamp: number) => string;
+  getTranslatedMessage: (
+    content: string,
+    params?: Record<string, string>,
+  ) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | null>(null);
@@ -83,6 +87,63 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
     return `${messageDate.toLocaleDateString(timezoneLang)} ${timeString}`;
   };
 
+  const getTranslatedMessage = (
+    content: string,
+    params?: Record<string, string>,
+  ) => {
+    content = content.replace(
+      'removeFromMemberMessage',
+      '移除了{gender}的會員身分。',
+    );
+    content = content.replace(
+      'removeFromChannelManagerMessage',
+      '移除了{gender}的頻道管理員身分。',
+    );
+    content = content.replace(
+      'removeFromServerManagerMessage',
+      '移除了{gender}的群管理員身分。',
+    );
+    content = content.replace(
+      'updateMemberMessage',
+      '加入了群，成為本群會員。',
+    );
+    content = content.replace(
+      'updateChannelManagerMessage',
+      '被提升為本頻道的頻道管理員。',
+    );
+    content = content.replace(
+      'updateServerManagerMessage',
+      '被提升為本群的管理員。',
+    );
+    content = content.replace(
+      'upgradeServerManagerMessage',
+      '{gender}已被提升為本群的管理員。',
+    );
+    content = content.replace(
+      'upgradeChannelManagerMessage',
+      '{gender}已被提升為本頻道的管理員。',
+    );
+    content = content.replace(
+      'upgradeMemberMessage',
+      '{gender}已加入成為本群會員。',
+    );
+    content = content.replace(
+      'timeoutMemberMessage',
+      '【{user}】被管理員【{operator}】踢出群',
+    );
+    content = content.replace(
+      'blockedMemberMessage',
+      '【{user}】被管理員【{operator}】封鎖',
+    );
+    content = content.replace(
+      /{(\w+)}/gm,
+      (match, p1) => params?.[p1] || match,
+    );
+
+    const isPlainText = !/[#>*\-\[\]`|!_~]/.test(content);
+    return isPlainText ? content.replace(/\n/g, '<br />') : content;
+  };
+
   return (
     <LanguageContext.Provider
       value={{
@@ -91,6 +152,7 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
         set: setLanguage,
         getPermissionText,
         getFormatTimestamp,
+        getTranslatedMessage,
       }}
     >
       {children}

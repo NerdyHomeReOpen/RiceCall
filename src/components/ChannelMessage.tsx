@@ -32,6 +32,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
       contents: messageContents,
       timestamp: messageTimestamp,
     } = messageGroup;
+
     const {
       gender: senderGender,
       name: senderName,
@@ -42,19 +43,14 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
 
     const timestamp = lang.getFormatTimestamp(messageTimestamp);
 
-    const processContent = (content: string) => {
-      const replaced = content.replace(
-        /{{GUEST_SEND_AN_EXTERNAL_LINK}}/g,
-        lang.tr.GUEST_SEND_AN_EXTERNAL_LINK,
-      );
-      const isPlainText = !/[#>*\-\[\]`|!_~]/.test(replaced);
-      return isPlainText ? replaced.replace(/\n/g, '<br />') : replaced;
-    };
+    const formatMessages = messageContents.map((content) =>
+      lang.getTranslatedMessage(content),
+    );
 
     return (
       <>
         <div
-          className={`${styles['senderIcon']} ${permission[senderGender]} ${
+          className={`${styles['gradeIcon']} ${permission[senderGender]} ${
             permission[`lv-${messagePermission}`]
           }`}
         />
@@ -70,10 +66,10 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
             </div>
             <div className={styles['timestamp']}>{timestamp}</div>
           </div>
-          {messageContents.map((content, index) => (
+          {formatMessages.map((content, index) => (
             <div key={index} className={styles['content']}>
               <MarkdownViewer
-                markdownText={processContent(content)}
+                markdownText={content}
                 forbidGuestUrl={forbidGuestUrl}
               />
             </div>

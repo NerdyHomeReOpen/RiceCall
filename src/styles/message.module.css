@@ -13,7 +13,7 @@
   gap: 0.25rem;
 }
 
-.senderIcon {
+.gradeIcon {
   display: flex;
 }
 
@@ -35,14 +35,6 @@
   background-position: center;
 }
 
-.messageEvent {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 5px 0;
-  gap: 3px;
-}
-
 .alertIcon {
   display: flex;
   min-width: 12px;
@@ -52,20 +44,6 @@
   background-position: center;
 }
 
-.messageActionEvent {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-}
-
-.messageEvent .username {
-  max-width: 35vw;
-  overflow-x: hidden;
-}
-
-
 .messageBox {
   flex: 1;
   display: flex;
@@ -74,28 +52,38 @@
   gap: 0.25rem;
 }
 
-.messageBox .header {
+.infoBox {
+  flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  align-items: start;
   gap: 0.25rem;
 }
 
-.messageBox .header .name {
+.header {
+  display: flex;
+  align-items: center;
+  height: fit-content;
+  gap: 0.25rem;
+}
+
+.header .name {
   font-weight: bold;
 }
 
-.messageBox .header .timestamp {
+.header .timestamp {
   margin-left: 0.2rem;
   color: #888;
   font-size: 12px;
 }
 
-.messageBox .content {
+.content {
   color: #000;
   user-select: text;
   word-break: break-all;
 }
 
 .username {
+  align-self: center;
   color: #2f94db;
 }

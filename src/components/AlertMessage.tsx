@@ -39,47 +39,33 @@ const AlertMessage: React.FC<AlertMessageProps> = React.memo(
       name: targetName,
     } = messageSender ?? {};
 
-    const getTranslatedContent = (content: string) => {
-      if (content.includes(' ')) {
-        const [key, ...params] = content.split(' ');
-        if (Object.prototype.hasOwnProperty.call(lang.tr, key)) {
-          let translatedText = lang.tr[key as keyof typeof lang.tr];
-          params.forEach((param, index) => {
-            translatedText = translatedText.replace(`{${index}}`, param);
-          });
-          return translatedText;
-        }
-      }
-      return Object.prototype.hasOwnProperty.call(lang.tr, content)
-        ? lang.tr[content as keyof typeof lang.tr]
-        : content;
-    };
+    const formatMessages = messageContents.map((content) =>
+      lang.getTranslatedMessage(content),
+    );
 
     return (
       <>
-        <div className={styles['messageActionEvent']}>
-          <div className={styles['alertIcon']} />
+        <div className={styles['header']}>
+          <div className={styles['infoIcon']} />
           <div
-            className={`
-            ${styles['senderIcon']}
-            ${permission[targetGender]}
-            ${permission[`lv-${targetPermissionLevel}`]}
-          `}
+            className={`${styles['gradeIcon']} ${permission[targetGender]} ${
+              permission[`lv-${targetPermissionLevel}`]
+            }`}
           />
           <div className={styles['username']}>
             {targetNickname || targetName}
           </div>
-          <div className={styles['messageBox']}>
-            {messageContents.map((content, index) => (
-              <div key={index}>
-                <MarkdownViewer
-                  markdownText={`${
-                    messageChannelId !== null ? '頻道廣播：' : '群廣播：'
-                  }${getTranslatedContent(content)}`}
-                />
-              </div>
-            ))}
-          </div>
+        </div>
+        <div className={styles['messageBox']}>
+          {formatMessages.map((content, index) => (
+            <div key={index}>
+              <MarkdownViewer
+                markdownText={`${
+                  messageChannelId !== null ? '頻道廣播：' : '群廣播：'
+                }${content}`}
+              />
+            </div>
+          ))}
         </div>
       </>
     );
