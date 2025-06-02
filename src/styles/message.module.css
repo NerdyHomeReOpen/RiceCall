@@ -63,7 +63,6 @@
 .header {
   display: flex;
   align-items: center;
-  height: fit-content;
   gap: 0.25rem;
 }
 
