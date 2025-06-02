@@ -211,16 +211,16 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
                 <p className={popup['hint']}>{lang.tr.applySuccess}</p>
               </div>
             </div>
+          </div>
 
-            {/* Footer */}
-            <div className={popup['popupFooter']}>
-              <button className={popup['button']} onClick={() => setSection(0)}>
-                {lang.tr.modify}
-              </button>
-              <button className={popup['button']} onClick={() => handleClose()}>
-                {lang.tr.confirm}
-              </button>
-            </div>
+          {/* Footer */}
+          <div className={popup['popupFooter']}>
+            <button className={popup['button']} onClick={() => setSection(0)}>
+              {lang.tr.modify}
+            </button>
+            <button className={popup['button']} onClick={() => handleClose()}>
+              {lang.tr.confirm}
+            </button>
           </div>
         </div>
       </>
