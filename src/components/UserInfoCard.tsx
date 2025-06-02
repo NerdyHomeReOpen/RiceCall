@@ -7,7 +7,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Components
-import BadgeListViewer from '@/components/viewers/BadgeList';
+import BadgeListViewer from '@/components/BadgeList';
 
 // Types
 import type { ServerMember } from '@/types';

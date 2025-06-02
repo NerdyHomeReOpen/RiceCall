@@ -6,9 +6,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Components
-import MarkdownViewer from '@/components/viewers/Markdown';
-import MessageViewer from '@/components/viewers/Message';
-import ChannelListViewer from '@/components/viewers/ChannelList';
+import MarkdownViewer from '@/components/MarkdownViewer';
+import MessageViewer from '@/components/MessageViewer';
+import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
@@ -226,11 +226,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         clearTimeout(actionMessageTimer.current);
       }
       if (!showActionMessage) setShowActionMessage(true);
-      
+
       actionMessageTimer.current = setTimeout(() => {
         setShowActionMessage(false);
       }, 8000);
-    }, [actionMessages])
+    }, [actionMessages]);
 
     useEffect(() => {
       const timer = setInterval(() => {
@@ -309,10 +309,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             <div className={styles['inputArea']}>
               <div
                 className={styles['broadcastArea']}
-                style={{ display: (showActionMessage ? 'flex' : 'none') }}
+                style={{ display: showActionMessage ? 'flex' : 'none' }}
               >
                 <div className={styles['broadcastContent']}>
-                  <MessageViewer messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} isActionMessage={true} />
+                  <MessageViewer
+                    messages={
+                      actionMessages.length !== 0
+                        ? [actionMessages[actionMessages.length - 1]]
+                        : []
+                    }
+                    isActionMessage={true}
+                  />
                 </div>
               </div>
               <MessageInputBox

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 // CSS
 import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
-import markdown from '@/styles/viewers/markdown.module.css';
+import markdown from '@/styles/markdown.module.css';
 
 // Types
 import { Channel, Server } from '@/types';
@@ -20,7 +20,7 @@ import refreshService from '@/services/refresh.service';
 import { createDefault } from '@/utils/createDefault';
 
 // Components
-import MarkdownViewer from '@/components/viewers/Markdown';
+import MarkdownViewer from '@/components/MarkdownViewer';
 
 interface ChannelSettingPopupProps {
   serverId: Server['serverId'];

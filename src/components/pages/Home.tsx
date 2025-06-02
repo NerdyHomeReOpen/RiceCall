@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import homePage from '@/styles/pages/home.module.css';
 
 // Components
-import ServerListViewer from '@/components/viewers/ServerList';
+import ServerListViewer from '@/components/ServerList';
 
 // Type
 import { PopupType, SocketServerEvent, User, UserServer } from '@/types';

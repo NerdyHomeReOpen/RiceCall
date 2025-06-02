@@ -14,7 +14,7 @@ import { emojis } from '@/components/emojis';
 
 // CSS
 import 'highlight.js/styles/github.css';
-import markdown from '@/styles/viewers/markdown.module.css';
+import markdown from '@/styles/markdown.module.css';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -68,13 +68,13 @@ const PURIFY_CONFIG: PurifyConfig = {
   ALLOWED_URI_REGEXP: /^(https?:\/\/)|^\/smiles\//,
 };
 
-interface MarkdownProps {
+interface MarkdownViewerProps {
   markdownText: string;
   isGuest?: boolean;
   forbidGuestUrl?: boolean;
 }
 
-const Markdown: React.FC<MarkdownProps> = React.memo(
+const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
   ({ markdownText, isGuest = false, forbidGuestUrl = false }) => {
     const safeMarkdownText =
       typeof markdownText === 'string' ? markdownText : '';
@@ -193,40 +193,19 @@ const Markdown: React.FC<MarkdownProps> = React.memo(
         return <pre {...props} />;
       },
     };
-    return (
-      <>
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeRaw]}
-          components={components}
-          skipHtml={false}
-          unwrapDisallowed={false}
-        >
-          {sanitized}
-        </ReactMarkdown>
-      </>
-    );
-  },
-);
 
-Markdown.displayName = 'Markdown';
-
-interface MarkdownViewerProps {
-  markdownText: string;
-  isGuest?: boolean;
-  forbidGuestUrl?: boolean;
-}
-
-const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
-  ({ markdownText, isGuest = false, forbidGuestUrl = false }) => {
     return (
       <div className={markdown.container}>
         <div className={markdown.markdownContent}>
-          <Markdown
-            markdownText={markdownText}
-            isGuest={isGuest}
-            forbidGuestUrl={forbidGuestUrl}
-          />
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+            components={components}
+            skipHtml={false}
+            unwrapDisallowed={false}
+          >
+            {sanitized}
+          </ReactMarkdown>
         </div>
       </div>
     );

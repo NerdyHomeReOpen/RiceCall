@@ -10,7 +10,7 @@ import React, {
 import { Server, User, UserServer, PopupType, Friend } from '@/types';
 
 // Components
-import BadgeListViewer from '@/components/viewers/BadgeList';
+import BadgeListViewer from '@/components/BadgeList';
 
 // Providers
 import { useSocket } from '@/providers/Socket';

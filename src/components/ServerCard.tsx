@@ -39,7 +39,8 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
 
     const { userId } = user;
     const isOwner = serverOwnerId === userId;
-    const canRemoveMemberShip = serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
+    const canRemoveMemberShip =
+      serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
 
     // Handles
     const handleOpenWarning = (message: string, callback: () => void) => {
@@ -72,12 +73,8 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
       handleOpenWarning(
         '確定要解除自己與語音群的會員關係嗎', // lang.tr
         () => {
-          handleUpdateMember(
-            { permissionLevel: 1 },
-            userId,
-            serverId,
-          )
-        }
+          handleUpdateMember({ permissionLevel: 1 }, userId, serverId);
+        },
       );
     };
 
@@ -121,7 +118,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
               label: '解除會員關係', // TODO: lang.tr
               show: canRemoveMemberShip,
               onClick: () => {
-                handleRemoveMembership(userId, serverId)
+                handleRemoveMembership(userId, serverId);
               },
             },
           ]);
@@ -153,30 +150,4 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
 
 ServerCard.displayName = 'ServerCard';
 
-// ServerGrid Component
-interface ServerListViewerProps {
-  user: User;
-  servers: UserServer[];
-  onServerClick?: (server: UserServer) => void;
-}
-
-const ServerListViewer: React.FC<ServerListViewerProps> = React.memo(
-  ({ user, servers, onServerClick }) => {
-    return (
-      <div className={homePage['serverCards']}>
-        {servers.map((server) => (
-          <ServerCard
-            key={server.serverId}
-            user={user}
-            server={server}
-            onClick={() => onServerClick?.(server)}
-          />
-        ))}
-      </div>
-    );
-  },
-);
-
-ServerListViewer.displayName = 'ServerListViewer';
-
-export default ServerListViewer;
+export default ServerCard;

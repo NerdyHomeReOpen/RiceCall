@@ -10,7 +10,7 @@ import React, {
 import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 import permission from '@/styles/permission.module.css';
-import markdown from '@/styles/viewers/markdown.module.css';
+import markdown from '@/styles/markdown.module.css';
 
 // Types
 import {
@@ -38,7 +38,7 @@ import { createDefault } from '@/utils/createDefault';
 import { createSorter } from '@/utils/createSorter';
 
 // Components
-import MarkdownViewer from '@/components/viewers/Markdown';
+import MarkdownViewer from '@/components/MarkdownViewer';
 
 interface ServerSettingPopupProps {
   serverId: Server['serverId'];

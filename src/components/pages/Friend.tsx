@@ -8,8 +8,8 @@ import vip from '@/styles/vip.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Components
-import FriendListViewer from '@/components/viewers/FriendList';
-import BadgeListViewer from '@/components/viewers/BadgeList';
+import FriendListViewer from '@/components/FriendList';
+import BadgeListViewer from '@/components/BadgeList';
 
 // Types
 import { User, UserFriend, FriendGroup } from '@/types';

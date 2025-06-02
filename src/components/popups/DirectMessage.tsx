@@ -9,8 +9,8 @@ import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
 
 // Components
-import MessageViewer from '@/components/viewers/Message';
-import BadgeListViewer from '@/components/viewers/BadgeList';
+import MessageViewer from '@/components/MessageViewer';
+import BadgeListViewer from '@/components/BadgeList';
 
 // Services
 import refreshService from '@/services/refresh.service';
@@ -263,20 +263,24 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
           {/* Main Content */}
           <div className={directMessage['mainContent']}>
             {isFriend && isOnline && targetCurrentServerId && (
-            <div
-              className={directMessage['serverInArea']}
-              onClick={() => {
-                handleServerSelect(userId, targetCurrentServer)
-              }}
-            >
-              <div className={directMessage['serverInIcon']} />
-              <div className={directMessage['serverInName']}>
-                {targetCurrentServerName}
+              <div
+                className={directMessage['serverInArea']}
+                onClick={() => {
+                  handleServerSelect(userId, targetCurrentServer);
+                }}
+              >
+                <div className={directMessage['serverInIcon']} />
+                <div className={directMessage['serverInName']}>
+                  {targetCurrentServerName}
+                </div>
               </div>
-            </div>
             )}
             <div className={directMessage['notifyArea']}>
-              {isFriend ? '' : '對方不在你的好友列表，一些功能將無法使用!'  /* TODO: lang.tr */ } 
+              {
+                isFriend
+                  ? ''
+                  : '對方不在你的好友列表，一些功能將無法使用!' /* TODO: lang.tr */
+              }
             </div>
             <div className={directMessage['messageArea']}>
               <MessageViewer messages={directMessages} />
