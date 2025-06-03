@@ -24,6 +24,7 @@ export const mockDatabase: DeepMocked<Database> = {
     member: jest.fn(),
     message: jest.fn(),
     serverMembers: jest.fn(),
+    serverOnlineMembers: jest.fn(),
     serverUsers: jest.fn(),
     channel: jest.fn(),
     channelMessages: jest.fn(),
@@ -37,8 +38,10 @@ export const mockDatabase: DeepMocked<Database> = {
     friendGroup: jest.fn(),
     userFriendGroups: jest.fn(),
     friend: jest.fn(),
+    userFriend: jest.fn(),
     userFriends: jest.fn(),
     friendApplication: jest.fn(),
+    userFriendApplication: jest.fn(),
     userFriendApplications: jest.fn(),
     serverChannels: jest.fn(),
     friendGroupFriends: jest.fn(),
@@ -46,6 +49,8 @@ export const mockDatabase: DeepMocked<Database> = {
     userServer: jest.fn(),
     allUserServerData: jest.fn(),
     allServerData: jest.fn(),
+    serverMember: jest.fn(),
+    serverMemberApplication: jest.fn(),
   } as any, // Using 'as any' temporarily if Database type is complex and causes issues here
   set: {
     user: jest.fn(),
@@ -70,6 +75,7 @@ export const mockDatabase: DeepMocked<Database> = {
     userServer: jest.fn(),
     server: jest.fn(),
     member: jest.fn(),
+    memberApplication: jest.fn(),
   } as any,
 };
 
@@ -108,7 +114,6 @@ export const MockStandardizedError = jest.fn(
 );
 
 export const mockSocketServerGetSocket = jest.fn();
-
 
 // Utility to create a basic mock socket for handlers
 export const createMockSocket = (
