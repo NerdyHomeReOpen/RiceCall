@@ -21,6 +21,7 @@ import {
   UserFriend,
   ServerMember,
   ChannelMessage,
+  FriendApplication,
 } from '@/types';
 
 // Pages
@@ -53,9 +54,10 @@ import { SoundEffectPlayer } from '@/components/SoundEffectPlayer';
 interface HeaderProps {
   user: User;
   userServer: UserServer;
+  friendApplications: FriendApplication[];
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendApplications }) => {
   // Hooks
   const socket = useSocket();
   const lang = useLanguage();
@@ -152,10 +154,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
     localStorage.setItem('language', language);
   };
 
-  // const handleOpenFriendVerification = () => {
-  //   ipcService.popup.open(PopupType.FRIEND_VERIFICATION, 'friendVerification');
-  //   ipcService.initialData.onRequest('friendVerification', {});
-  // };
+  const handleOpenFriendVerification = () => {
+    ipcService.popup.open(PopupType.FRIEND_VERIFICATION, 'friendVerification');
+    ipcService.initialData.onRequest('friendVerification', { userId });
+  };
 
   // Effects
   useEffect(() => {
@@ -192,9 +194,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
           <div className={header['statusDisplay']} datatype={userStatus} />
           <div className={header['statusTriangle']} />
           <div
-            className={`${header['statusDropdown']} ${
-              showStatusDropdown ? '' : header['hidden']
-            }`}
+            className={`${header['statusDropdown']} ${showStatusDropdown ? '' : header['hidden']
+              }`}
           >
             {STATUS_OPTIONS.map((option) => (
               <div
@@ -221,9 +222,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
             <div
               key={`Tabs-${TabId}`}
               data-tab-id={TabId}
-              className={`${header['tab']} ${
-                TabId === mainTab.selectedTabId ? header['selected'] : ''
-              }`}
+              className={`${header['tab']} ${TabId === mainTab.selectedTabId ? header['selected'] : ''
+                }`}
               onClick={() =>
                 mainTab.setSelectedTabId(TabId as 'home' | 'friends' | 'server')
               }
@@ -265,7 +265,19 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer }) => {
       <div className={header['buttons']}>
         <div className={header['gift']} />
         <div className={header['game']} />
-        <div className={header['notice']} />
+        <div
+          className={header['notice']}
+          onClick={() => {
+            handleOpenFriendVerification();
+          }}
+        >
+          <div
+            className={`
+              ${header['overlay']}
+              ${friendApplications.length > 0 ? header['new'] : ''}
+            `}
+          />
+        </div>
         <div className={header['spliter']} />
         <div
           ref={menuRef}
@@ -420,6 +432,7 @@ const RootPageComponent = () => {
   const [servers, setServers] = useState<UserServer[]>([]);
   const [friends, setFriends] = useState<UserFriend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
+  const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
   const [server, setServer] = useState<UserServer>(Default.userServer());
   const [serverMembers, setServerMembers] = useState<ServerMember[]>([]);
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
@@ -464,6 +477,9 @@ const RootPageComponent = () => {
 
   const handleFriendAdd = (friend: UserFriend) => {
     setFriends((prev) => [...prev, friend]);
+    setFriendApplications((prev) => {
+      return prev.filter((item) => item.senderId !== friend.targetId)
+    })
   };
 
   const handleFriendUpdate = (
@@ -513,6 +529,17 @@ const RootPageComponent = () => {
   const handleFriendGroupDelete = (id: FriendGroup['friendGroupId']) => {
     setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== id));
   };
+
+  const handleFriendApplicationAdd = (friendApplication: FriendApplication) => {
+    setFriendApplications((prev) => [...prev, friendApplication])
+  }
+
+  const handleFriendApplicationDelete = (
+    senderId: User['userId'],
+    receiverId: User['userId']
+  ) => {
+    setFriendApplications((prev) => prev.filter((item) => item.senderId !== senderId));
+  }
 
   const handleServerMembersSet = (members: ServerMember[]) => {
     setServerMembers(members);
@@ -636,6 +663,8 @@ const RootPageComponent = () => {
       [SocketServerEvent.FRIEND_GROUP_ADD]: handleFriendGroupAdd,
       [SocketServerEvent.FRIEND_GROUP_UPDATE]: handleFriendGroupUpdate,
       [SocketServerEvent.FRIEND_GROUP_DELETE]: handleFriendGroupDelete,
+      [SocketServerEvent.FRIEND_APPLICATION_ADD]: handleFriendApplicationAdd,
+      [SocketServerEvent.FRIEND_APPLICATION_DELETE]: handleFriendApplicationDelete,
       [SocketServerEvent.SERVER_ONLINE_MEMBERS_SET]: handleServerMembersSet,
       [SocketServerEvent.SERVER_ONLINE_MEMBER_ADD]: handleServerMemberAdd,
       [SocketServerEvent.SERVER_MEMBER_UPDATE]: handleServerMemberUpdate,
@@ -673,7 +702,10 @@ const RootPageComponent = () => {
         refreshService.userFriendGroups({
           userId: userId,
         }),
-      ]).then(([servers, friends, friendGroups]) => {
+        refreshService.userFriendApplications({
+          userId: userId,
+        }),
+      ]).then(([servers, friends, friendGroups, friendApplications]) => {
         if (servers) {
           setServers(servers);
         }
@@ -682,6 +714,9 @@ const RootPageComponent = () => {
         }
         if (friendGroups) {
           setFriendGroups(friendGroups);
+        }
+        if (friendApplications) {
+          setFriendApplications(friendApplications);
         }
       });
     };
@@ -742,7 +777,11 @@ const RootPageComponent = () => {
   return (
     <WebRTCProvider>
       <div className="wrapper">
-        <Header user={user} userServer={server} />
+        <Header
+          user={user}
+          userServer={server}
+          friendApplications={friendApplications}
+        />
         {/* Main Content */}
         <div className="content">{getMainContent()}</div>
       </div>

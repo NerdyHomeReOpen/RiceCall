@@ -461,7 +461,7 @@ export type User = {
   birthYear: number;
   birthMonth: number;
   birthDay: number;
-  status: 'online' | 'dnd' | 'idle' | 'gn';
+  status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
   gender: 'Male' | 'Female';
   currentChannelId: string;
   currentServerId: string;
@@ -876,7 +876,7 @@ export const PopupSize = {
   [PopupType.DIALOG_INFO]: { height: 200, width: 370 },
   [PopupType.CHANGE_THEME]: { height: 340, width: 480 },
   [PopupType.ABOUTUS]: { height: 440, width: 480 },
-  [PopupType.FRIEND_VERIFICATION]: { height: 320, width: 500 },
+  [PopupType.FRIEND_VERIFICATION]: { height: 550, width: 500 },
   Settings: { height: 520, width: 600 },
   Apply: { height: 320, width: 500 },
   Small: { height: 200, width: 370 },

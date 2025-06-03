@@ -1,13 +1,15 @@
 .body {
-  justify-content: unset;
-  padding-top: 10px;
+  padding: 0 15px;
   background-color: #fff;
+  display: flex;
+  align-items: center;
 }
 
 .contentHeader {
   display: flex;
+  width: 100%;
+  padding: 10px 0;
   justify-content: space-between;
-  align-items: center;
   color: #444444;
 }
 
@@ -27,12 +29,15 @@
 }
 
 .contentBody {
-  height: 100%;
-  margin-top: 2rem;
+  width: 100%;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .userInfoBox {
   display: flex;
+  margin: 1.5rem auto;
+  justify-content: center;
 }
 
 .userInfo {
@@ -56,7 +61,7 @@
 }
 
 .userApplyContentBox {
-  width: 31rem;
+  flex: 1;
 }
 
 .userApplyContent {
@@ -65,15 +70,20 @@
   justify-content: space-between;
   border: 1px solid #d8d8d8;
   background-color: #f6f6f6;
-  height: 5.3rem;
   border-radius: 0.1rem;
   padding: 0.5rem;
 }
 
 .userApplyContentText {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: column;
   color: #5e5e5e;
+  word-break: break-word;
+}
+
+.userApplyContentRow {
+  display: flex;
 }
 
 .userApplyContentButtonBox {
