@@ -69,13 +69,16 @@ export const LoginHandler: RequestHandler = {
         lastActiveAt: Date.now(),
       });
 
-      const token = generateJWT({ userId: accountData.userId });
+      const userId = user.userId;
+
+      const token = generateJWT({ userId });
 
       return {
         statusCode: 200,
         message: 'success',
         data: {
           token,
+          userId,
         },
       };
     } catch (error: any) {
