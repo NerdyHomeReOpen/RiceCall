@@ -43,20 +43,21 @@ export const SearchUserHandler: SocketRequestHandler = {
 
       const result = await database.get.searchUser(query);
 
-      if (!result) { // Not found User
-        socket.emit('userSearch', result);
-
-      } else {
-        // Check friend ship
-        const isFriend = await database.get.friend(operatorId, result.userId);
-
-        const searchResult = {
-          ...result,
-          friend: !!isFriend,
+      if (result) {
+        const friend = await database.get.friend(operatorId, result.userId);
+        if (friend) {
+          socket.emit('openPopup', {
+          type: 'dialogAlert',
+          id: 'alreadyFriend',
+          initialData: {
+            title: '已經是好友',
+          },
+          });
+          return;
         }
-
-        socket.emit('userSearch', searchResult);
       }
+
+      socket.emit('userSearch', result);
 
       /* ========== End of Handling ========== */
     } catch (error: any) {
