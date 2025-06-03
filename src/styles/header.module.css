@@ -515,3 +515,18 @@
 .statusDropdown .option[datatype='gn']::before {
   background-position: -39px 0;
 }
+
+/* Overlay */
+.overlay {
+    width: 24px;
+    height: 24px;
+    background: url('../../public/icon_notice_overlay.png') no-repeat center center;
+    background-position: 0 0;
+    cursor: pointer;
+    position: absolute;
+    background-size: cover;
+}
+
+.overlay.new {
+    background-position: -24px 0px;
+}
