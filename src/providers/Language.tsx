@@ -11,6 +11,7 @@ interface LanguageContextType {
   tr: Translation;
   set: (lang: LanguageKey) => void;
   getPermissionText: (permission: Permission) => string;
+  getFormatTimeDiff: (timestamp: number) => string;
   getFormatTimestamp: (timestamp: number) => string;
   getTranslatedMessage: (
     content: string,
@@ -54,6 +55,37 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
     const savedLang = localStorage.getItem('language') as LanguageKey;
     if (savedLang) setLanguage(savedLang);
   }, []);
+
+  const getFormatTimeDiff = (timestamp: number): string => {
+    const now = Date.now();
+    const diff = Math.floor((timestamp - now) / 1000);
+    const isFuture = diff > 0;
+    const absDiff = Math.abs(diff);
+
+    const intervals = [
+      { label: '年', seconds: 31536000 },
+      { label: '個月', seconds: 2592000 },
+      { label: '周', seconds: 604800 },
+      { label: '天', seconds: 86400 },
+      { label: '小時', seconds: 3600 },
+      { label: '分鐘', seconds: 60 },
+      { label: '秒', seconds: 10 },
+    ];
+
+    for (const interval of intervals) {
+      const count = Math.floor(absDiff / interval.seconds);
+      if (count >= 1) {
+        const label = interval.label;
+        const timesAgo = '{0}前';
+        const timesFuture = '{0}後'
+        return isFuture
+          ? timesFuture.replace('{0}', `${count}${label}`)
+          : timesAgo.replace('{0}', `${count}${label}`)
+      }
+    }
+
+    return '剛剛';
+  }
 
   const getFormatTimestamp = (timestamp: number): string => {
     const langMap: Record<LanguageKey, string> = {
@@ -167,6 +199,7 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
         key: language,
         set: setLanguage,
         getPermissionText,
+        getFormatTimeDiff,
         getFormatTimestamp,
         getTranslatedMessage,
       }}
