@@ -104,6 +104,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  cursor: pointer;
   border-top: 1px solid #fff0;
   border-bottom: 1px solid #fff0;
   border-right: 1px solid #fff0;
@@ -525,6 +526,7 @@
   width: 50%;
   padding-bottom: 6px;
   gap: 5px;
+  cursor: pointer;
   background-image: url('../../../public/im/userpage_tab.png');
   background-size: auto;
   background-repeat: repeat;
