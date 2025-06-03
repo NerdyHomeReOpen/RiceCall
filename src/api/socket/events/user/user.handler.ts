@@ -39,9 +39,24 @@ export const SearchUserHandler: SocketRequestHandler = {
 
       /* ========== Start of Main Logic ========== */
 
+      const operatorId = socket.data.userId;
+
       const result = await database.get.searchUser(query);
 
-      socket.emit('userSearch', result);
+      if (!result) { // Not found User
+        socket.emit('userSearch', result);
+
+      } else {
+        // Check friend ship
+        const isFriend = await database.get.friend(operatorId, result.userId);
+
+        const searchResult = {
+          ...result,
+          friend: !!isFriend,
+        }
+
+        socket.emit('userSearch', searchResult);
+      }
 
       /* ========== End of Handling ========== */
     } catch (error: any) {
