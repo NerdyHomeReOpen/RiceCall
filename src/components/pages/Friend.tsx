@@ -127,11 +127,10 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
             <div className={friendPage['container']}>
               <div className={friendPage['levelIcon']} />
               <div
-                className={`${grade['grade']} ${
-                  grade[`lv-${Math.min(56, userLevel)}`]
-                }`}
+                className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]
+                  }`}
                 title={
-                  `${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${userRequiredXP}` /** LEVEL:{userLevel} EXP:{userXP} LEVEL UP REQUIRED:{userRequiredXP}**/
+                  `${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${userRequiredXP - userXP}`
                 }
               />
               <div className={friendPage['wealthIcon']} />

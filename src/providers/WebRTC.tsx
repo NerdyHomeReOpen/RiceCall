@@ -737,8 +737,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     //   console.info('New output stream device info:', deviceInfo);
     // };
 
-    ipcService.systemSettings.inputAudioDevice.get(() => {});
-    ipcService.systemSettings.outputAudioDevice.get(() => {});
+    ipcService.systemSettings.inputAudioDevice.get(() => { });
+    ipcService.systemSettings.outputAudioDevice.get(() => { });
 
     const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate(
       (deviceId) => {

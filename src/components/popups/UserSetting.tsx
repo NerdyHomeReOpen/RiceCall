@@ -283,9 +283,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             </div>
 
             <div
-              className={`${setting['avatar']} ${
-                isSelf ? setting['editable'] : ''
-              }`}
+              className={`${setting['avatar']} ${isSelf ? setting['editable'] : ''
+                }`}
               style={{ backgroundImage: `url(${userAvatarUrl})` }}
               onClick={() => {
                 if (!isSelf) return;
@@ -332,7 +331,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   ${grade[`lv-${Math.min(56, userLevel)}`]}
                 `}
                 title={
-                  `${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${userRequiredXP}` /** LEVEL:{userLevel} EXP:{userXP} LEVEL UP REQUIRED:{userRequiredXP}**/
+                  `${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${userRequiredXP - userXP}`
                 }
               />
             </div>
@@ -359,11 +358,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
             <div className={setting['tab']}>
               <div
                 className={`${setting['item']} ${setting['about']}
-                ${
-                  selectedTabId === 'userSetting'
+                ${selectedTabId === 'userSetting'
                     ? `${setting['selected']} ${setting['editable']}`
                     : ''
-                }
+                  }
                 ${selectedTabId === 'about' ? setting['selected'] : ''}`}
                 onClick={() => {
                   if (selectedTabId !== 'userSetting') {
@@ -455,15 +453,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               <div className={setting['serverItems']}>
                 {isProfilePrivate
                   ? PrivateElement(
-                      <>
-                        {lang.tr.notPublicRecentServersTop}
-                        <br />
-                        {lang.tr.notPublicRecentServersBottom}
-                      </>,
-                    )
+                    <>
+                      {lang.tr.notPublicRecentServersTop}
+                      <br />
+                      {lang.tr.notPublicRecentServersBottom}
+                    </>,
+                  )
                   : recentServers.length === 0
-                  ? PrivateElement(lang.tr.noRecentServers)
-                  : recentServers.map((server) => (
+                    ? PrivateElement(lang.tr.noRecentServers)
+                    : recentServers.map((server) => (
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
@@ -481,11 +479,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                           </div>
                           <div className={setting['serverInfo']}>
                             <div
-                              className={`${
-                                isSelf && server.ownerId === userId
-                                  ? setting['isOwner']
-                                  : ''
-                              }`}
+                              className={`${isSelf && server.ownerId === userId
+                                ? setting['isOwner']
+                                : ''
+                                }`}
                             />
                             <div className={setting['id']} />
                             <div className={setting['displayId']}>
@@ -530,15 +527,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               >
                 {isProfilePrivate
                   ? PrivateElement(
-                      <>
-                        {lang.tr.notPublicJoinedServersTop}
-                        <br />
-                        {lang.tr.notPublicJoinedServersBottom}
-                      </>,
-                    )
+                    <>
+                      {lang.tr.notPublicJoinedServersTop}
+                      <br />
+                      {lang.tr.notPublicJoinedServersBottom}
+                    </>,
+                  )
                   : joinedServers.length === 0
-                  ? PrivateElement(lang.tr.noJoinedServers)
-                  : joinedServers.map((server) => (
+                    ? PrivateElement(lang.tr.noJoinedServers)
+                    : joinedServers.map((server) => (
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
@@ -561,10 +558,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                               className={`
                                 ${setting['permission']}
                                 ${permission[userGender]} 
-                                ${
-                                  server.ownerId === targetId
-                                    ? permission[`lv-6`]
-                                    : permission[`lv-${server.permissionLevel}`]
+                                ${server.ownerId === targetId
+                                  ? permission[`lv-6`]
+                                  : permission[`lv-${server.permissionLevel}`]
                                 }`}
                             />
                             <div className={setting['contributionBox']}>
@@ -584,15 +580,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               >
                 {isProfilePrivate
                   ? PrivateElement(
-                      <>
-                        {lang.tr.notPublicFavoriteServersTop}
-                        <br />
-                        {lang.tr.notPublicFavoriteServersBottom}
-                      </>,
-                    )
+                    <>
+                      {lang.tr.notPublicFavoriteServersTop}
+                      <br />
+                      {lang.tr.notPublicFavoriteServersBottom}
+                    </>,
+                  )
                   : favoriteServers.length === 0
-                  ? PrivateElement(lang.tr.noFavoriteServers)
-                  : favoriteServers.map((server) => (
+                    ? PrivateElement(lang.tr.noFavoriteServers)
+                    : favoriteServers.map((server) => (
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
@@ -615,11 +611,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                               className={`
                               ${setting['permission']}
                               ${permission[userGender]} 
-                              ${
-                                server.ownerId === targetId
+                              ${server.ownerId === targetId
                                   ? permission[`lv-6`]
                                   : permission[`lv-${server.permissionLevel}`]
-                              }`}
+                                }`}
                             />
                             <div className={setting['contributionBox']}>
                               <div className={setting['contributionIcon']} />
