@@ -30,7 +30,7 @@ export const RefreshFriendHandler: RequestHandler = {
       );
 
       const friend = {
-        ...(await database.get.friend(userId, targetId)),
+        data: (await database.get.friend(userId, targetId)),
         online: SocketServer.hasSocket(targetId),
       };
 
