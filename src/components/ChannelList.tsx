@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
+import header from '@/styles/header.module.css';
 
 // Types
 import {
@@ -321,9 +322,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                 >
                   <div
                     className={`
-                      ${styles['overlay']}
+                      ${header['overlay']}
                       ${canOpenSettings && memberApplicationsCount > 0
-                        ? styles['new']
+                        ? header['new']
                         : ''
                       }
                     `}
