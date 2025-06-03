@@ -53,7 +53,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     const [messageInput, setMessageInput] = useState<string>('');
     const [isComposing, setIsComposing] = useState<boolean>(false);
     const [isFriend, setIsFriend] = useState<boolean>(false);
-    const [isOnline, setIsOnline] = useState<boolean>(false);
 
     // Variables
     const { avatarUrl: userAvatarUrl } = user;
@@ -61,9 +60,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       avatarUrl: targetAvatarUrl,
       level: targetLevel,
       vip: targetVip,
+      status: targetStatus,
       currentServerId: targetCurrentServerId,
       badges: targetBadges,
     } = target;
+    const isOnline = targetStatus !== 'offline';
     const { name: targetCurrentServerName } = targetCurrentServer;
 
     // Handlers
@@ -194,9 +195,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
             setUser(user);
           }
           if (friend) {
-            if (friend.online) {
-              setIsOnline(friend.online);
-            }
             setIsFriend(true);
           }
         });
@@ -205,7 +203,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     }, [userId, targetId]);
 
     useEffect(() => {
-      setIsOnline(targetCurrentServerId ? true : false); // 後端更新後移除
       if (!targetCurrentServerId) return;
       Promise.all([
         refreshService.server({
@@ -224,9 +221,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
           <div className={directMessage['sidebar']}>
             <div className={directMessage['targetBox']}>
               <div
-                className={`${directMessage['avatarPicture']} ${
-                  isFriend && isOnline ? '' : directMessage['offline']
-                }`}
+                className={`${directMessage['avatarPicture']} ${isFriend && isOnline ? '' : directMessage['offline']
+                  }`}
                 style={{ backgroundImage: `url(${targetAvatarUrl})` }}
               />
               {targetVip > 0 && (
