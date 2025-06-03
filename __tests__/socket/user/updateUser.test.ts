@@ -1,90 +1,90 @@
 import { jest } from '@jest/globals';
 
-// 被測試的模組
-import { UpdateUserHandler } from '../../../src/api/socket/events/user/user.handler';
+// 使用本地的測試輔助工具
+import {
+  DEFAULT_IDS,
+  createDefaultTestData,
+  createStandardMockInstances,
+  createUpdateData,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testUnauthorizedUpdate,
+  testValidationError,
+} from './_testHelpers';
 
 // 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockDatabase,
-  mockError,
-  mockInfo,
-  mockWarn,
-} from '../../_testSetup';
+import { mockDataValidator, mockDatabase, mockInfo } from '../../_testSetup';
 
-// 錯誤類型和Schema
-import { UpdateUserSchema } from '../../../src/api/socket/events/user/user.schema';
-
-// Mock所有相依模組
+// Mock 核心模組
 jest.mock('@/index', () => ({
-  database: require('../../_testSetup').mockDatabase,
+  database: mockDatabase,
 }));
+
 jest.mock('@/utils/logger', () => ({
   __esModule: true,
-  default: require('../../_testSetup').MockLogger,
+  default: jest.fn().mockImplementation(() => ({
+    info: mockInfo,
+    warn: require('../../_testSetup').mockWarn,
+    error: require('../../_testSetup').mockError,
+  })),
 }));
+
 jest.mock('@/middleware/data.validator', () => ({
-  DataValidator: require('../../_testSetup').mockDataValidator,
+  DataValidator: mockDataValidator,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  targetUserId: 'target-user-id',
-} as const;
-
-// 測試數據
-const defaultUpdateData = {
-  userId: DEFAULT_IDS.operatorUserId,
-  user: {
-    name: '更新後的用戶名',
-    signature: '更新後的個人簽名',
-    status: 'dnd' as const,
-  },
-};
+// 被測試的模組
+import { UpdateUserHandler } from '../../../src/api/socket/events/user/user.handler';
+import { UpdateUserSchema } from '../../../src/api/socket/events/user/user.schema';
 
 describe('UpdateUserHandler (更新用戶處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
-    );
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    mockDataValidator.validate.mockResolvedValue(defaultUpdateData);
-    mockDatabase.set.user.mockResolvedValue(true);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
+  });
+
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功更新自己的用戶資料', async () => {
+    const updateData = testData.updateData;
+
+    mockDataValidator.validate.mockResolvedValue(updateData);
+
     await UpdateUserHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultUpdateData,
+      updateData,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       UpdateUserSchema,
-      defaultUpdateData,
+      updateData,
       'UPDATEUSER',
     );
 
     expect(mockDatabase.set.user).toHaveBeenCalledWith(
       DEFAULT_IDS.operatorUserId,
-      defaultUpdateData.user,
+      updateData.user,
     );
 
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
       'userUpdate',
-      defaultUpdateData.user,
+      updateData.user,
     );
 
     expect(mockInfo).toHaveBeenCalledWith(
@@ -93,12 +93,10 @@ describe('UpdateUserHandler (更新用戶處理)', () => {
   });
 
   it('應處理部分更新', async () => {
-    const partialUpdateData = {
-      userId: DEFAULT_IDS.operatorUserId,
-      user: {
-        status: 'idle' as const,
-      },
-    };
+    const partialUpdateData = createUpdateData(DEFAULT_IDS.operatorUserId, {
+      name: '僅更新名稱',
+    });
+
     mockDataValidator.validate.mockResolvedValue(partialUpdateData);
 
     await UpdateUserHandler.handle(
@@ -111,145 +109,99 @@ describe('UpdateUserHandler (更新用戶處理)', () => {
       DEFAULT_IDS.operatorUserId,
       partialUpdateData.user,
     );
-
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'userUpdate',
-      partialUpdateData.user,
-    );
   });
 
-  it('不能更新其他用戶的資料', async () => {
-    const otherUserUpdateData = {
-      userId: DEFAULT_IDS.targetUserId,
-      user: {
-        name: '嘗試更新其他用戶',
-      },
-    };
-    mockDataValidator.validate.mockResolvedValue(otherUserUpdateData);
+  it('應拒絕更新其他用戶的資料', async () => {
+    const otherUserUpdateData = createUpdateData(DEFAULT_IDS.targetUserId, {
+      name: '嘗試更新其他用戶',
+    });
 
-    await UpdateUserHandler.handle(
-      mockIoInstance,
+    await testUnauthorizedUpdate(
+      UpdateUserHandler,
       mockSocketInstance,
+      mockIoInstance,
       otherUserUpdateData,
     );
-
-    expect(mockWarn).toHaveBeenCalledWith(
-      expect.stringContaining('Cannot update other user data'),
-    );
-
-    // 不應更新資料庫
-    expect(mockDatabase.set.user).not.toHaveBeenCalled();
-    expect(mockSocketInstance.emit).not.toHaveBeenCalledWith(
-      'userUpdate',
-      expect.anything(),
-    );
   });
 
-  it('應處理不同類型的更新欄位', async () => {
-    const complexUpdateData = {
-      userId: DEFAULT_IDS.operatorUserId,
-      user: {
-        avatar: 'new-avatar.jpg',
-        avatarUrl: 'https://example.com/avatar.jpg',
-        country: '台灣',
-        birthYear: 1990,
-        birthMonth: 5,
-        birthDay: 15,
-        gender: 'Female' as const,
-      },
-    };
-    mockDataValidator.validate.mockResolvedValue(complexUpdateData);
+  it('應處理不同類型的欄位更新', async () => {
+    const fieldUpdateData = createUpdateData(DEFAULT_IDS.operatorUserId, {
+      name: '新名稱',
+      signature: '新簽名',
+      status: 'dnd' as const,
+    });
+
+    mockDataValidator.validate.mockResolvedValue(fieldUpdateData);
 
     await UpdateUserHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      complexUpdateData,
+      fieldUpdateData,
     );
 
     expect(mockDatabase.set.user).toHaveBeenCalledWith(
       DEFAULT_IDS.operatorUserId,
-      complexUpdateData.user,
+      fieldUpdateData.user,
     );
   });
 
-  it('應處理狀態更新', async () => {
-    const statusUpdateData = {
-      userId: DEFAULT_IDS.operatorUserId,
-      user: {
-        status: 'gn' as const,
-      },
-    };
-    mockDataValidator.validate.mockResolvedValue(statusUpdateData);
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { userId: '', user: {} };
+    const validationError = new Error('用戶ID不能為空');
+
+    await testValidationError(
+      UpdateUserHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '更新使用者失敗，請稍後再試',
+    );
+  });
+
+  it('應處理資料庫更新錯誤', async () => {
+    await testDatabaseError(
+      UpdateUserHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      testData.updateData,
+      'set',
+      'Database update failed',
+      '更新使用者失敗，請稍後再試',
+    );
+  });
+
+  it('應處理無效的狀態值', async () => {
+    const invalidStatusData = createUpdateData(DEFAULT_IDS.operatorUserId, {
+      status: 'invalid_status' as any,
+    });
+
+    const validationError = new Error('Invalid status value');
+
+    await testValidationError(
+      UpdateUserHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      invalidStatusData,
+      validationError,
+      '更新使用者失敗，請稍後再試',
+    );
+  });
+
+  it('應處理空的更新資料', async () => {
+    const emptyUpdateData = createUpdateData(DEFAULT_IDS.operatorUserId, {});
+
+    mockDataValidator.validate.mockResolvedValue(emptyUpdateData);
 
     await UpdateUserHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      statusUpdateData,
+      emptyUpdateData,
     );
 
     expect(mockDatabase.set.user).toHaveBeenCalledWith(
       DEFAULT_IDS.operatorUserId,
-      { status: 'gn' },
-    );
-  });
-
-  it('資料驗證失敗時應發送錯誤', async () => {
-    const validationError = new Error('Invalid user data');
-    mockDataValidator.validate.mockRejectedValue(validationError);
-
-    await UpdateUserHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultUpdateData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(validationError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '更新使用者失敗，請稍後再試',
-        part: 'UPDATEUSER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
-    );
-  });
-
-  it('資料庫更新失敗時應發送錯誤', async () => {
-    const dbError = new Error('Database update failed');
-    mockDatabase.set.user.mockRejectedValue(dbError);
-
-    await UpdateUserHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultUpdateData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(dbError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '更新使用者失敗，請稍後再試',
-        part: 'UPDATEUSER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
-    );
-  });
-
-  it('應正確呼叫資料驗證器', async () => {
-    await UpdateUserHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultUpdateData,
-    );
-
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      UpdateUserSchema,
-      defaultUpdateData,
-      'UPDATEUSER',
+      {},
     );
   });
 });

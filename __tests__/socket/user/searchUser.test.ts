@@ -1,88 +1,79 @@
 import { jest } from '@jest/globals';
 
-// 被測試的模組
-import { SearchUserHandler } from '../../../src/api/socket/events/user/user.handler';
+// 使用本地的測試輔助工具
+import {
+  createDefaultTestData,
+  createMockSearchResults,
+  createSearchData,
+  createStandardMockInstances,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testValidationError,
+} from './_testHelpers';
 
 // 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockDatabase,
-  mockError,
-} from '../../_testSetup';
+import { mockDataValidator, mockDatabase } from '../../_testSetup';
 
-// 錯誤類型和Schema
-import { SearchUserSchema } from '../../../src/api/socket/events/user/user.schema';
-
-// Mock所有相依模組
+// Mock 核心模組
 jest.mock('@/index', () => ({
-  database: require('../../_testSetup').mockDatabase,
+  database: mockDatabase,
 }));
+
 jest.mock('@/utils/logger', () => ({
   __esModule: true,
-  default: require('../../_testSetup').MockLogger,
+  default: jest.fn().mockImplementation(() => ({
+    info: require('../../_testSetup').mockInfo,
+    warn: require('../../_testSetup').mockWarn,
+    error: require('../../_testSetup').mockError,
+  })),
 }));
+
 jest.mock('@/middleware/data.validator', () => ({
-  DataValidator: require('../../_testSetup').mockDataValidator,
+  DataValidator: mockDataValidator,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-} as const;
-
-// 測試數據
-const defaultSearchData = {
-  query: '測試用戶',
-};
-
-const mockSearchResults = [
-  {
-    userId: 'user-1',
-    name: '測試用戶1',
-    avatar: 'avatar1.jpg',
-    status: 'online',
-    signature: '這是第一個測試用戶',
-  },
-  {
-    userId: 'user-2',
-    name: '測試用戶2',
-    avatar: 'avatar2.jpg',
-    status: 'dnd',
-    signature: '這是第二個測試用戶',
-  },
-];
+// 被測試的模組
+import { SearchUserHandler } from '../../../src/api/socket/events/user/user.handler';
+import { SearchUserSchema } from '../../../src/api/socket/events/user/user.schema';
 
 describe('SearchUserHandler (搜尋用戶處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
-    );
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    mockDataValidator.validate.mockResolvedValue(defaultSearchData);
-    mockDatabase.get.searchUser.mockResolvedValue(mockSearchResults);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
+  });
+
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功搜尋用戶', async () => {
+    const searchData = createSearchData('測試用戶');
+
+    mockDataValidator.validate.mockResolvedValue(searchData);
+    mockDatabase.get.searchUser.mockResolvedValue(testData.searchResults);
+
     await SearchUserHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultSearchData,
+      searchData,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       SearchUserSchema,
-      defaultSearchData,
+      searchData,
       'SEARCHUSER',
     );
 
@@ -90,92 +81,88 @@ describe('SearchUserHandler (搜尋用戶處理)', () => {
 
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
       'userSearch',
-      mockSearchResults,
+      testData.searchResults,
     );
   });
 
   it('應處理空的搜尋結果', async () => {
+    const searchData = testData.searchQueries.empty;
+
+    mockDataValidator.validate.mockResolvedValue(searchData);
     mockDatabase.get.searchUser.mockResolvedValue([]);
 
     await SearchUserHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultSearchData,
+      searchData,
     );
 
+    expect(mockDatabase.get.searchUser).toHaveBeenCalledWith('不存在的用戶');
     expect(mockSocketInstance.emit).toHaveBeenCalledWith('userSearch', []);
   });
 
-  it('應處理不同的搜尋查詢', async () => {
-    const customSearchData = { query: '管理員' };
-    mockDataValidator.validate.mockResolvedValue(customSearchData);
+  it('應處理不同的搜尋條件', async () => {
+    const queries = ['管理員', 'user123', '特殊字符!@#'];
 
-    await SearchUserHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      customSearchData,
-    );
+    for (const query of queries) {
+      jest.clearAllMocks();
+      setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
 
-    expect(mockDatabase.get.searchUser).toHaveBeenCalledWith('管理員');
+      const searchData = createSearchData(query);
+      const mockResults = createMockSearchResults(query);
+
+      mockDataValidator.validate.mockResolvedValue(searchData);
+      mockDatabase.get.searchUser.mockResolvedValue(mockResults);
+
+      await SearchUserHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        searchData,
+      );
+
+      expect(mockDatabase.get.searchUser).toHaveBeenCalledWith(query);
+      expect(mockSocketInstance.emit).toHaveBeenCalledWith(
+        'userSearch',
+        mockResults,
+      );
+    }
   });
 
-  it('資料驗證失敗時應發送錯誤', async () => {
-    const validationError = new Error('Invalid query');
-    mockDataValidator.validate.mockRejectedValue(validationError);
-
-    await SearchUserHandler.handle(
-      mockIoInstance,
+  it('應處理搜尋錯誤', async () => {
+    await testDatabaseError(
+      SearchUserHandler,
       mockSocketInstance,
-      defaultSearchData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(validationError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '搜尋使用者失敗，請稍後再試',
-        part: 'SEARCHUSER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
-    );
-  });
-
-  it('資料庫查詢失敗時應發送錯誤', async () => {
-    const dbError = new Error('Database error');
-    mockDatabase.get.searchUser.mockRejectedValue(dbError);
-
-    await SearchUserHandler.handle(
       mockIoInstance,
-      mockSocketInstance,
-      defaultSearchData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(dbError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '搜尋使用者失敗，請稍後再試',
-        part: 'SEARCHUSER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+      testData.searchQueries.basic,
+      'get',
+      '搜尋服務暫時無法使用',
+      '搜尋使用者失敗，請稍後再試',
     );
   });
 
-  it('應正確呼叫資料驗證器', async () => {
-    await SearchUserHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultSearchData,
-    );
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { query: '' };
+    const validationError = new Error('搜尋關鍵字不能為空');
 
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      SearchUserSchema,
-      defaultSearchData,
-      'SEARCHUSER',
+    await testValidationError(
+      SearchUserHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '搜尋使用者失敗，請稍後再試',
+    );
+  });
+
+  it('應處理資料庫錯誤', async () => {
+    await testDatabaseError(
+      SearchUserHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      testData.searchQueries.basic,
+      'get',
+      'Database connection failed',
+      '搜尋使用者失敗，請稍後再試',
     );
   });
 });

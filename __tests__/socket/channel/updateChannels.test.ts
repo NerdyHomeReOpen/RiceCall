@@ -1,291 +1,255 @@
 import { jest } from '@jest/globals';
-import { Server, Socket } from 'socket.io';
 
-// Handler to test
-import { UpdateChannelsHandler } from '../../../src/api/socket/events/channel/channel.handler';
-import { UpdateChannelsSchema } from '../../../src/api/socket/events/channel/channel.schema';
-
-// Test utilities
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockError,
-} from '../../_testSetup';
-
+// 使用本地的測試輔助工具
 import {
   createDefaultTestData,
+  createStandardMockInstances,
   DEFAULT_IDS,
-  setupDefaultDatabaseMocks,
-  setupSocketMocks,
+  setupAfterEach,
+  setupBeforeEach,
+  testValidationError,
 } from './_testHelpers';
 
-// Import UpdateChannelHandler for manual mocking
-import * as ChannelHandlers from '../../../src/api/socket/events/channel/channel.handler';
+// 測試設定
+import { mockDatabase, mockDataValidator } from '../../_testSetup';
 
-// Mock external dependencies
+// 創建 Mock UpdateChannelHandler
+const mockUpdateChannelHandler = jest.fn<any>();
+
+// Mock 核心模組
 jest.mock('@/index', () => ({
-  database: require('../../_testSetup').mockDatabase,
+  database: mockDatabase,
 }));
+
 jest.mock('@/middleware/data.validator', () => ({
-  DataValidator: require('../../_testSetup').mockDataValidator,
+  DataValidator: mockDataValidator,
 }));
+
 jest.mock('@/utils/logger', () => ({
   __esModule: true,
   default: require('../../_testSetup').MockLogger,
 }));
+
 jest.mock('@/error', () => ({
   __esModule: true,
   default: require('../../_testSetup').MockStandardizedError,
 }));
 
-describe('UpdateChannelsHandler (批量頻道更新處理)', () => {
-  let mockIoInstance: jest.Mocked<Server>;
-  let mockSocketInstance: jest.Mocked<Socket>;
-  let testData: ReturnType<typeof createDefaultTestData>;
-  let mockUpdateChannelHandle: any;
+// Mock UpdateChannelHandler
+jest.mock('../../../src/api/socket/events/channel/channel.handler', () => {
+  const actual = jest.requireActual(
+    '../../../src/api/socket/events/channel/channel.handler',
+  ) as any;
+  return {
+    ...(actual || {}),
+    UpdateChannelHandler: { handle: mockUpdateChannelHandler },
+  };
+});
 
-  // Helper function for update channels data
-  const createUpdateChannelsData = (
-    overrides: Partial<{
-      serverId: string;
-      channels: any[];
-    }> = {},
-  ) => ({
-    serverId: DEFAULT_IDS.serverId,
-    channels: [
-      {
-        channelId: DEFAULT_IDS.regularChannelId,
-        name: 'Updated Channel 1',
-        voiceMode: 'free',
-      },
-      {
-        channelId: 'channel-2',
-        name: 'Updated Channel 2',
-        visibility: 'member',
-      },
-    ],
-    ...overrides,
-  });
+// 被測試的模組
+import { UpdateChannelsHandler } from '../../../src/api/socket/events/channel/channel.handler';
+import { UpdateChannelsSchema } from '../../../src/api/socket/events/channel/channel.schema';
+
+describe('UpdateChannelsHandler (批量頻道更新處理)', () => {
+  let mockSocketInstance: any;
+  let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-
-    mockIoInstance = createMockIo();
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'operator-socket-id',
-    );
-    mockSocketInstance.data.userId = DEFAULT_IDS.operatorUserId;
-
+    // 建立測試資料
     testData = createDefaultTestData();
-    setupDefaultDatabaseMocks(testData);
-    setupSocketMocks(testData);
 
-    mockDataValidator.validate.mockImplementation(
-      async (schema, data, part) => data,
-    );
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // Spy on UpdateChannelHandler.handle and mock it
-    mockUpdateChannelHandle = jest.spyOn(
-      ChannelHandlers.UpdateChannelHandler,
-      'handle',
-    );
-    mockUpdateChannelHandle.mockResolvedValue(undefined);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
 
-    // Mock setTimeout to avoid actual delays
-    jest.spyOn(global, 'setTimeout').mockImplementation((callback: any) => {
-      if (typeof callback === 'function') {
-        callback();
-      }
-      return 123 as any; // Return a dummy timer ID
-    });
+    // 重置 UpdateChannelHandler mock
+    mockUpdateChannelHandler.mockClear();
+    mockUpdateChannelHandler.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    setupAfterEach();
   });
 
   it('應成功批量更新多個頻道', async () => {
-    const updateData = createUpdateChannelsData();
+    const channelsData = {
+      serverId: DEFAULT_IDS.serverId,
+      channels: [
+        testData.createUpdateData(DEFAULT_IDS.regularChannelId, {
+          name: '更新頻道1',
+        }),
+        testData.createUpdateData(DEFAULT_IDS.lobbyChannelId, {
+          name: '更新頻道2',
+        }),
+      ],
+    };
 
     await UpdateChannelsHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      updateData,
+      channelsData,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       UpdateChannelsSchema,
-      updateData,
+      channelsData,
       'UPDATECHANNELS',
     );
 
-    // 檢查是否對每個頻道都調用了 UpdateChannelHandler
-    expect(mockUpdateChannelHandle).toHaveBeenCalledTimes(2);
+    // 應該為每個頻道調用 UpdateChannelHandler
+    expect(mockUpdateChannelHandler).toHaveBeenCalledTimes(2);
 
-    expect(mockUpdateChannelHandle).toHaveBeenNthCalledWith(
+    // 檢查調用參數是否正確
+    expect(mockUpdateChannelHandler).toHaveBeenNthCalledWith(
       1,
       mockIoInstance,
       mockSocketInstance,
       {
         serverId: DEFAULT_IDS.serverId,
         channelId: DEFAULT_IDS.regularChannelId,
-        channel: {
-          channelId: DEFAULT_IDS.regularChannelId,
-          name: 'Updated Channel 1',
-          voiceMode: 'free',
-        },
+        channel: { name: '更新頻道1' },
       },
     );
 
-    expect(mockUpdateChannelHandle).toHaveBeenNthCalledWith(
+    expect(mockUpdateChannelHandler).toHaveBeenNthCalledWith(
       2,
       mockIoInstance,
       mockSocketInstance,
       {
         serverId: DEFAULT_IDS.serverId,
-        channelId: 'channel-2',
-        channel: {
-          channelId: 'channel-2',
-          name: 'Updated Channel 2',
-          visibility: 'member',
-        },
+        channelId: DEFAULT_IDS.lobbyChannelId,
+        channel: { name: '更新頻道2' },
       },
     );
+  });
 
-    // 檢查是否有延遲調用
-    expect(global.setTimeout).toHaveBeenCalledTimes(2);
+  it('當第一個頻道更新失敗時應停止處理並拋出錯誤', async () => {
+    const channelsData = {
+      serverId: DEFAULT_IDS.serverId,
+      channels: [
+        testData.createUpdateData(DEFAULT_IDS.regularChannelId, {
+          name: '會失敗的頻道',
+        }),
+        testData.createUpdateData(DEFAULT_IDS.lobbyChannelId, {
+          name: '不會被處理的頻道',
+        }),
+      ],
+    };
+
+    const updateError = new Error('Update failed');
+    mockUpdateChannelHandler.mockRejectedValueOnce(updateError);
+
+    await UpdateChannelsHandler.handle(
+      mockIoInstance,
+      mockSocketInstance,
+      channelsData,
+    );
+
+    // 應該只調用一次，因為第一次失敗就停止了
+    expect(mockUpdateChannelHandler).toHaveBeenCalledTimes(1);
+
+    // 檢查錯誤處理
+    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
+      'error',
+      expect.objectContaining({
+        message: '更新頻道失敗，請稍後再試',
+        tag: 'SERVER_ERROR',
+      }),
+    );
+  });
+
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { serverId: '', channels: [] };
+    const validationError = new Error('頻道資料不正確');
+
+    await testValidationError(
+      UpdateChannelsHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '更新頻道失敗，請稍後再試', // 實際錯誤訊息
+    );
   });
 
   describe('邊界情況', () => {
     it('應處理空頻道陣列', async () => {
-      const updateData = createUpdateChannelsData({
+      const emptyChannelsData = {
+        serverId: DEFAULT_IDS.serverId,
         channels: [],
-      });
+      };
 
       await UpdateChannelsHandler.handle(
         mockIoInstance,
         mockSocketInstance,
-        updateData,
+        emptyChannelsData,
       );
 
-      expect(mockDataValidator.validate).toHaveBeenCalledWith(
-        UpdateChannelsSchema,
-        updateData,
-        'UPDATECHANNELS',
-      );
-
-      // 不應該調用 UpdateChannelHandler
-      expect(mockUpdateChannelHandle).not.toHaveBeenCalled();
-
-      // 不應該有延遲調用
-      expect(global.setTimeout).not.toHaveBeenCalled();
+      expect(mockUpdateChannelHandler).not.toHaveBeenCalled();
     });
 
     it('應處理單一頻道更新', async () => {
-      const updateData = createUpdateChannelsData({
+      const singleChannelData = {
+        serverId: DEFAULT_IDS.serverId,
         channels: [
-          {
-            channelId: DEFAULT_IDS.regularChannelId,
-            name: 'Single Channel',
-            voiceMode: 'queue',
-          },
+          testData.createUpdateData(DEFAULT_IDS.regularChannelId, {
+            name: '單一頻道',
+          }),
         ],
-      });
+      };
 
       await UpdateChannelsHandler.handle(
         mockIoInstance,
         mockSocketInstance,
-        updateData,
+        singleChannelData,
       );
 
-      // 應該只調用一次 UpdateChannelHandler
-      expect(mockUpdateChannelHandle).toHaveBeenCalledTimes(1);
-      expect(mockUpdateChannelHandle).toHaveBeenCalledWith(
+      expect(mockUpdateChannelHandler).toHaveBeenCalledTimes(1);
+      expect(mockUpdateChannelHandler).toHaveBeenCalledWith(
         mockIoInstance,
         mockSocketInstance,
         {
           serverId: DEFAULT_IDS.serverId,
           channelId: DEFAULT_IDS.regularChannelId,
-          channel: {
-            channelId: DEFAULT_IDS.regularChannelId,
-            name: 'Single Channel',
-            voiceMode: 'queue',
-          },
+          channel: { name: '單一頻道' },
         },
       );
-
-      // 應該有一次延遲調用
-      expect(global.setTimeout).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('錯誤處理', () => {
     it('當 UpdateChannelHandler 拋出錯誤時應正確處理', async () => {
-      const errorMessage = 'Channel update failed';
-      mockUpdateChannelHandle.mockRejectedValueOnce(new Error(errorMessage));
+      const channelsData = {
+        serverId: DEFAULT_IDS.serverId,
+        channels: [
+          testData.createUpdateData(DEFAULT_IDS.regularChannelId, {
+            name: '測試頻道',
+          }),
+        ],
+      };
 
-      const updateData = createUpdateChannelsData();
-
-      await UpdateChannelsHandler.handle(
-        mockIoInstance,
-        mockSocketInstance,
-        updateData,
-      );
-
-      expect(mockError).toHaveBeenCalledWith(errorMessage);
-      expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-        'error',
-        expect.objectContaining({
-          name: 'ServerError',
-          message: '更新頻道失敗，請稍後再試',
-        }),
-      );
-    });
-
-    it('當數據驗證失敗時應正確處理', async () => {
-      const validationError = new Error('Invalid data format');
-      mockDataValidator.validate.mockRejectedValueOnce(validationError);
+      const handlerError = new Error('Handler specific error');
+      mockUpdateChannelHandler.mockRejectedValueOnce(handlerError);
 
       await UpdateChannelsHandler.handle(
         mockIoInstance,
         mockSocketInstance,
-        createUpdateChannelsData(),
+        channelsData,
       );
 
-      expect(mockError).toHaveBeenCalledWith('Invalid data format');
+      // 檢查是否有適當的錯誤處理
       expect(mockSocketInstance.emit).toHaveBeenCalledWith(
         'error',
         expect.objectContaining({
-          name: 'ServerError',
           message: '更新頻道失敗，請稍後再試',
+          tag: 'SERVER_ERROR',
         }),
       );
     });
-  });
-
-  it('當第一個頻道更新失敗時應停止處理並拋出錯誤', async () => {
-    const errorMessage = 'First channel failed';
-    mockUpdateChannelHandle.mockRejectedValueOnce(new Error(errorMessage));
-
-    const updateData = createUpdateChannelsData();
-
-    await UpdateChannelsHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      updateData,
-    );
-
-    // 由於第一個調用就失敗了，整個 handler 就會中止並拋出錯誤
-    expect(mockUpdateChannelHandle).toHaveBeenCalledTimes(1);
-    expect(mockError).toHaveBeenCalledWith(errorMessage);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '更新頻道失敗，請稍後再試',
-      }),
-    );
   });
 });

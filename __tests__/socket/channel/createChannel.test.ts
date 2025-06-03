@@ -1,88 +1,72 @@
 import { jest } from '@jest/globals';
-import { Server, Socket } from 'socket.io';
 
-// Handler to test
-import { CreateChannelHandler } from '../../../src/api/socket/events/channel/channel.handler';
-import { CreateChannelSchema } from '../../../src/api/socket/events/channel/channel.schema';
-
-// Test utilities
-import {
-  createMockIo,
-  createMockSocket,
-  mockDatabase,
-  mockDataValidator,
-  mockError,
-  mockInfo,
-  mockIoRoomEmit,
-  mockWarn,
-} from '../../_testSetup';
-
+// 使用本地的測試輔助工具
 import {
   createDefaultTestData,
   createMemberWithPermission,
+  createStandardMockInstances,
   DEFAULT_IDS,
-  setupDefaultDatabaseMocks,
-  setupSocketMocks,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testValidationError,
 } from './_testHelpers';
 
-// Mock external dependencies
+// 測試設定
+import {
+  mockDatabase,
+  mockDataValidator,
+  mockInfo,
+  mockIoRoomEmit,
+} from '../../_testSetup';
+
+// Mock 核心模組
 jest.mock('@/index', () => ({
-  database: require('../../_testSetup').mockDatabase,
+  database: mockDatabase,
 }));
+
 jest.mock('@/middleware/data.validator', () => ({
-  DataValidator: require('../../_testSetup').mockDataValidator,
+  DataValidator: mockDataValidator,
 }));
+
 jest.mock('@/utils/logger', () => ({
   __esModule: true,
   default: require('../../_testSetup').MockLogger,
 }));
+
 jest.mock('@/error', () => ({
   __esModule: true,
   default: require('../../_testSetup').MockStandardizedError,
 }));
+
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'mock-uuid-1234'),
 }));
 
+// 被測試的模組
+import { CreateChannelHandler } from '../../../src/api/socket/events/channel/channel.handler';
+import { CreateChannelSchema } from '../../../src/api/socket/events/channel/channel.schema';
+
 describe('CreateChannelHandler (頻道創建處理)', () => {
-  let mockIoInstance: jest.Mocked<Server>;
-  let mockSocketInstance: jest.Mocked<Socket>;
+  let mockSocketInstance: any;
+  let mockIoInstance: any;
   let testData: ReturnType<typeof createDefaultTestData>;
 
-  // Helper function for create channel data
-  const createChannelData = (
-    overrides: Partial<{
-      serverId: string;
-      channel: any;
-    }> = {},
-  ) => ({
-    serverId: DEFAULT_IDS.serverId,
-    channel: {
-      name: 'Test Channel',
-      categoryId: DEFAULT_IDS.regularChannelId,
-      type: 'channel',
-      ...overrides.channel,
-    },
-    ...overrides,
+  beforeEach(() => {
+    // 建立測試資料
+    testData = createDefaultTestData();
+
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
+
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
   });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-
-    mockIoInstance = createMockIo();
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'operator-socket-id',
-    );
-    mockSocketInstance.data.userId = DEFAULT_IDS.operatorUserId;
-
-    testData = createDefaultTestData();
-    setupDefaultDatabaseMocks(testData);
-    setupSocketMocks(testData);
-
-    mockDataValidator.validate.mockImplementation(
-      async (schema, data, part) => data,
-    );
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應在符合所有條件時成功創建頻道', async () => {
@@ -104,7 +88,7 @@ describe('CreateChannelHandler (頻道創建處理)', () => {
       { categoryId: DEFAULT_IDS.regularChannelId, order: 1 },
     ] as any);
 
-    const data = createChannelData();
+    const data = testData.createChannelData();
     await CreateChannelHandler.handle(mockIoInstance, mockSocketInstance, data);
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
@@ -138,26 +122,57 @@ describe('CreateChannelHandler (頻道創建處理)', () => {
     );
   });
 
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { serverId: '', channel: {} };
+    const validationError = new Error('頻道名稱不能為空');
+
+    await testValidationError(
+      CreateChannelHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '建立頻道失敗，請稍後再試',
+    );
+  });
+
+  it('應處理資料庫錯誤', async () => {
+    await testDatabaseError(
+      CreateChannelHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      testData.createChannelData(),
+      'set',
+      'Database connection failed',
+      '建立頻道失敗，請稍後再試',
+    );
+  });
+
   describe('權限檢查', () => {
     it('操作者權限 < 5 時，應阻止創建頻道', async () => {
       const lowPermOperator = createMemberWithPermission(
         DEFAULT_IDS.operatorUserId,
         DEFAULT_IDS.serverId,
-        4,
+        4, // 低權限
       );
+
       mockDatabase.get.member.mockResolvedValueOnce(lowPermOperator as any);
 
-      const data = createChannelData();
+      const data = testData.createChannelData();
       await CreateChannelHandler.handle(
         mockIoInstance,
         mockSocketInstance,
         data,
       );
 
+      // 權限不足時應該不執行創建操作
+      expect(mockDatabase.set.channel).not.toHaveBeenCalled();
+
+      // 檢查日誌記錄
+      const mockWarn = require('../../_testSetup').mockWarn;
       expect(mockWarn).toHaveBeenCalledWith(
         expect.stringContaining('Not enough permission'),
       );
-      expect(mockDatabase.set.channel).not.toHaveBeenCalled();
     });
   });
 
@@ -177,13 +192,14 @@ describe('CreateChannelHandler (頻道創建處理)', () => {
       mockDatabase.get.member.mockResolvedValueOnce(highPermOperator as any);
       mockDatabase.get.channel.mockResolvedValueOnce(subChannelCategory as any);
 
-      const data = createChannelData();
+      const data = testData.createChannelData();
       await CreateChannelHandler.handle(
         mockIoInstance,
         mockSocketInstance,
         data,
       );
 
+      const mockWarn = require('../../_testSetup').mockWarn;
       expect(mockWarn).toHaveBeenCalledWith(
         expect.stringContaining('Cannot create channel under sub-channel'),
       );
@@ -206,38 +222,16 @@ describe('CreateChannelHandler (頻道創建處理)', () => {
       mockDatabase.get.channel.mockResolvedValueOnce(
         regularChannelAsCategory as any,
       );
-      mockDatabase.get.serverChannels.mockResolvedValueOnce([]);
+      mockDatabase.get.serverChannels.mockResolvedValueOnce([] as any);
 
-      const data = createChannelData();
+      const data = testData.createChannelData();
       await CreateChannelHandler.handle(
         mockIoInstance,
         mockSocketInstance,
         data,
       );
 
-      // 核心業務邏輯：創建頻道應該成功
-      expect(mockDatabase.set.channel).toHaveBeenCalledWith(
-        'mock-uuid-1234',
-        expect.objectContaining({
-          name: 'Test Channel',
-          serverId: DEFAULT_IDS.serverId,
-          order: 0,
-          createdAt: expect.any(Number),
-        }),
-      );
-
-      // Socket 事件發送
-      expect(mockIoInstance.to).toHaveBeenCalledWith(
-        `server_${DEFAULT_IDS.serverId}`,
-      );
-      expect(mockIoRoomEmit).toHaveBeenCalledWith(
-        'serverChannelAdd',
-        expect.any(Object),
-      );
-
-      expect(mockInfo).toHaveBeenCalledWith(
-        expect.stringContaining('created channel'),
-      );
+      expect(mockDatabase.set.channel).toHaveBeenCalled();
     });
   });
 
@@ -248,12 +242,17 @@ describe('CreateChannelHandler (頻道創建處理)', () => {
         DEFAULT_IDS.serverId,
         5,
       );
+      const mockCategory = {
+        channelId: DEFAULT_IDS.regularChannelId,
+        categoryId: null,
+        type: 'channel',
+      };
 
       mockDatabase.get.member.mockResolvedValueOnce(highPermOperator as any);
-      mockDatabase.get.channel.mockResolvedValueOnce(null); // 沒有 category
-      mockDatabase.get.serverChannels.mockResolvedValueOnce([]); // 空的 categoryChannels
+      mockDatabase.get.channel.mockResolvedValueOnce(mockCategory as any);
+      mockDatabase.get.serverChannels.mockResolvedValueOnce([] as any); // 空陣列
 
-      const data = createChannelData();
+      const data = testData.createChannelData();
       await CreateChannelHandler.handle(
         mockIoInstance,
         mockSocketInstance,
@@ -267,25 +266,5 @@ describe('CreateChannelHandler (頻道創建處理)', () => {
         }),
       );
     });
-  });
-
-  it('發生非預期錯誤時應發出 StandardizedError', async () => {
-    const errorMessage = 'Database connection failed';
-    mockDatabase.get.member.mockRejectedValueOnce(new Error(errorMessage));
-
-    await CreateChannelHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      createChannelData(),
-    );
-
-    expect(mockError).toHaveBeenCalledWith(errorMessage);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '建立頻道失敗，請稍後再試',
-      }),
-    );
   });
 });

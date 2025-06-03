@@ -1,85 +1,70 @@
 import { jest } from '@jest/globals';
 
-// Mock相依的handler - 需要在jest.mock之前定義
-const mockDisconnectServerHandler = {
-  handle: jest.fn(),
-};
+// 使用本地的測試輔助工具
+import {
+  DEFAULT_IDS,
+  DEFAULT_TIME,
+  createDefaultTestData,
+  createMockServerHandlers,
+  createStandardMockInstances,
+  setupAfterEach,
+  setupConnectDisconnectBeforeEach,
+  testDatabaseError,
+} from './_testHelpers';
+
+// 測試設定
+import { mockDatabase, mockInfo } from '../../_testSetup';
+
+// Mock相依的handler
+const mockServerHandlers = createMockServerHandlers();
+
+// Mock 核心模組
+jest.mock('@/index', () => ({
+  database: mockDatabase,
+}));
+
+jest.mock('@/utils/logger', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation(() => ({
+    info: mockInfo,
+    warn: require('../../_testSetup').mockWarn,
+    error: require('../../_testSetup').mockError,
+  })),
+}));
+
+jest.mock('@/api/socket/events/server/server.handler', () => ({
+  DisconnectServerHandler: mockServerHandlers.disconnectServer,
+  ConnectServerHandler: mockServerHandlers.connectServer,
+}));
 
 // 被測試的模組
 import { DisconnectUserHandler } from '../../../src/api/socket/events/user/user.handler';
 
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDatabase,
-  mockError,
-  mockInfo,
-} from '../../_testSetup';
-
-// Mock所有相依模組
-jest.mock('@/index', () => ({
-  database: require('../../_testSetup').mockDatabase,
-}));
-jest.mock('@/utils/logger', () => ({
-  __esModule: true,
-  default: require('../../_testSetup').MockLogger,
-}));
-jest.mock('@/api/socket/events/server/server.handler', () => ({
-  DisconnectServerHandler: mockDisconnectServerHandler,
-}));
-
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  serverId: 'server-id-123',
-} as const;
-
-// 測試數據
-const mockUser = {
-  userId: DEFAULT_IDS.operatorUserId,
-  name: '測試用戶',
-  avatar: 'avatar.jpg',
-  status: 'online',
-  currentServerId: null,
-  currentChannelId: null,
-  lastActiveAt: 1640995200000,
-};
-
-const mockUserWithServer = {
-  ...mockUser,
-  currentServerId: DEFAULT_IDS.serverId,
-  currentChannelId: 'channel-id-123',
-};
-
 describe('DisconnectUserHandler (斷開用戶處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
-  let mockCurrentTime: number;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // Mock Date.now()
-    mockCurrentTime = 1640995200000;
-    jest.spyOn(Date, 'now').mockReturnValue(mockCurrentTime);
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
+    // 設定 connect/disconnect 專用的 beforeEach
+    setupConnectDisconnectBeforeEach(
+      mockSocketInstance,
+      mockIoInstance,
+      testData,
+      mockServerHandlers,
     );
-    mockIoInstance = createMockIo();
-
-    // 預設mock回傳值
-    mockDatabase.get.user.mockResolvedValue(mockUser);
-    mockDatabase.set.user.mockResolvedValue(true);
-
-    (mockDisconnectServerHandler.handle as any).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    setupAfterEach();
   });
 
   it('應成功斷開用戶（無現有伺服器）', async () => {
@@ -92,7 +77,7 @@ describe('DisconnectUserHandler (斷開用戶處理)', () => {
     expect(mockDatabase.set.user).toHaveBeenCalledWith(
       DEFAULT_IDS.operatorUserId,
       {
-        lastActiveAt: mockCurrentTime,
+        lastActiveAt: DEFAULT_TIME,
       },
     );
 
@@ -106,12 +91,12 @@ describe('DisconnectUserHandler (斷開用戶處理)', () => {
   });
 
   it('應斷開現有伺服器連接', async () => {
-    mockDatabase.get.user.mockResolvedValue(mockUserWithServer);
+    mockDatabase.get.user.mockResolvedValue(testData.userWithServer);
 
     await DisconnectUserHandler.handle(mockIoInstance, mockSocketInstance);
 
     // 應先斷開現有伺服器連接
-    expect(mockDisconnectServerHandler.handle).toHaveBeenCalledWith(
+    expect(mockServerHandlers.disconnectServer.handle).toHaveBeenCalledWith(
       mockIoInstance,
       mockSocketInstance,
       {
@@ -133,7 +118,7 @@ describe('DisconnectUserHandler (斷開用戶處理)', () => {
     expect(mockDatabase.set.user).toHaveBeenCalledWith(
       DEFAULT_IDS.operatorUserId,
       {
-        lastActiveAt: mockCurrentTime,
+        lastActiveAt: DEFAULT_TIME,
       },
     );
   });
@@ -146,29 +131,25 @@ describe('DisconnectUserHandler (斷開用戶處理)', () => {
 
   it('不應在無伺服器時呼叫斷開伺服器', async () => {
     // 用戶沒有連接到任何伺服器
-    mockDatabase.get.user.mockResolvedValue(mockUser);
+    mockDatabase.get.user.mockResolvedValue(testData.operatorUser);
 
     await DisconnectUserHandler.handle(mockIoInstance, mockSocketInstance);
 
-    expect(mockDisconnectServerHandler.handle).not.toHaveBeenCalled();
+    expect(mockServerHandlers.disconnectServer.handle).not.toHaveBeenCalled();
   });
 
   it('資料庫查詢失敗時應發送錯誤', async () => {
-    const dbError = new Error('Database error');
-    mockDatabase.get.user.mockRejectedValue(dbError);
-
-    await DisconnectUserHandler.handle(mockIoInstance, mockSocketInstance);
-
-    expect(mockError).toHaveBeenCalledWith(dbError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '斷開使用者失敗，請稍後再試',
-        part: 'DISCONNECTUSER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+    await testDatabaseError(
+      {
+        handle: (io: any, socket: any) =>
+          DisconnectUserHandler.handle(io, socket),
+      },
+      mockSocketInstance,
+      mockIoInstance,
+      undefined,
+      'get',
+      'Database error',
+      '斷開使用者失敗，請稍後再試',
     );
   });
 
@@ -178,7 +159,6 @@ describe('DisconnectUserHandler (斷開用戶處理)', () => {
 
     await DisconnectUserHandler.handle(mockIoInstance, mockSocketInstance);
 
-    expect(mockError).toHaveBeenCalledWith(dbError.message);
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
       'error',
       expect.objectContaining({
@@ -193,12 +173,13 @@ describe('DisconnectUserHandler (斷開用戶處理)', () => {
 
   it('伺服器斷開處理器失敗時應發送錯誤', async () => {
     const serverError = new Error('Server disconnect failed');
-    mockDatabase.get.user.mockResolvedValue(mockUserWithServer);
-    (mockDisconnectServerHandler.handle as any).mockRejectedValue(serverError);
+    mockDatabase.get.user.mockResolvedValue(testData.userWithServer);
+    (mockServerHandlers.disconnectServer.handle as any).mockRejectedValue(
+      serverError,
+    );
 
     await DisconnectUserHandler.handle(mockIoInstance, mockSocketInstance);
 
-    expect(mockError).toHaveBeenCalledWith(serverError.message);
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
       'error',
       expect.objectContaining({

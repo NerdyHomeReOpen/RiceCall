@@ -1,112 +1,90 @@
 import { jest } from '@jest/globals';
-import { Server, Socket } from 'socket.io';
+
+// 使用本地的測試輔助工具
+import {
+  createDefaultTestData,
+  createStandardMockInstances,
+  DEFAULT_IDS,
+  setupAfterEach,
+  setupBeforeEach,
+  setupBiDirectionalMock,
+  testDatabaseError,
+  testPermissionFailure,
+  testValidationError,
+} from './_testHelpers';
+
+// 測試設定
+import {
+  mockDatabase,
+  mockDataValidator,
+  mockInfo,
+  mockSocketServerGetSocket,
+} from '../../_testSetup';
+
+// Mock 核心模組
+jest.mock('@/index', () => ({
+  database: mockDatabase,
+}));
+
+jest.mock('@/middleware/data.validator', () => ({
+  DataValidator: mockDataValidator,
+}));
+
+jest.mock('@/api/socket', () => ({
+  __esModule: true,
+  default: { getSocket: mockSocketServerGetSocket },
+}));
+
+jest.mock('@/utils/logger', () => ({
+  __esModule: true,
+  default: require('../../_testSetup').MockLogger,
+}));
+
+jest.mock('@/error', () => ({
+  __esModule: true,
+  default: require('../../_testSetup').MockStandardizedError,
+}));
+
+// Mock biDirectionalAsyncOperation
+const mockBiDirectional = setupBiDirectionalMock();
 
 // 被測試的模組
 import { CreateFriendHandler } from '../../../src/api/socket/events/friend/friend.handler';
 import { CreateFriendSchema } from '../../../src/api/socket/events/friend/friend.schema';
 
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDatabase,
-  mockDataValidator,
-  mockError,
-  mockInfo,
-  mockSocketServerGetSocket,
-  mockWarn,
-} from '../../_testSetup';
-
-// Mock所有相依模組
-jest.mock('@/index', () => ({
-  database: require('../../_testSetup').mockDatabase,
-}));
-jest.mock('@/middleware/data.validator', () => ({
-  DataValidator: require('../../_testSetup').mockDataValidator,
-}));
-jest.mock('@/api/socket', () => ({
-  __esModule: true,
-  default: { getSocket: require('../../_testSetup').mockSocketServerGetSocket },
-}));
-jest.mock('@/utils/logger', () => ({
-  __esModule: true,
-  default: require('../../_testSetup').MockLogger,
-}));
-jest.mock('@/error', () => ({
-  __esModule: true,
-  default: require('../../_testSetup').MockStandardizedError,
-}));
-jest.mock('@/utils', () => ({
-  biDirectionalAsyncOperation: jest.fn(async (func: any, args: any[]) => {
-    await func(args[0], args[1]);
-    await func(args[1], args[0]);
-  }),
-}));
-
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  targetUserId: 'target-user-id',
-  friendGroupId: 'friend-group-id',
-} as const;
-
 describe('CreateFriendHandler (好友創建處理)', () => {
-  let mockIoInstance: jest.Mocked<Server>;
-  let mockSocketInstance: jest.Mocked<Socket>;
-
-  // Helper function for create friend data
-  const createFriendData = (
-    overrides: Partial<{
-      userId: string;
-      targetId: string;
-      friend: any;
-    }> = {},
-  ) => ({
-    userId: DEFAULT_IDS.operatorUserId,
-    targetId: DEFAULT_IDS.targetUserId,
-    friend: {
-      isBlocked: false,
-      friendGroupId: null,
-      ...overrides.friend,
-    },
-    ...overrides,
-  });
+  let mockSocketInstance: any;
+  let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    mockIoInstance = createMockIo();
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'operator-socket-id',
-    );
-    mockSocketInstance.data.userId = DEFAULT_IDS.operatorUserId;
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    mockDataValidator.validate.mockImplementation(
-      async (schema, data, part) => data,
-    );
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
 
-    // 預設mock回傳值
-    mockDatabase.get.friend.mockResolvedValue(null); // 預設不是好友
-    mockDatabase.get.userFriend.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      targetId: DEFAULT_IDS.targetUserId,
-      isBlocked: false,
-      friendGroupId: null,
-    });
+    // 重設 biDirectional mock
+    mockBiDirectional.mockClear();
+  });
 
-    // 設定database.set.friend mock
-    (mockDatabase.set.friend as any).mockResolvedValue(true);
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應在符合所有條件時成功創建好友', async () => {
-    const targetSocket = createMockSocket(
+    const targetSocket = require('../../_testSetup').createMockSocket(
       DEFAULT_IDS.targetUserId,
       'target-socket-id',
     );
     mockSocketServerGetSocket.mockReturnValue(targetSocket);
 
-    const data = createFriendData();
+    const data = testData.createFriendData();
     await CreateFriendHandler.handle(mockIoInstance, mockSocketInstance, data);
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
@@ -122,25 +100,10 @@ describe('CreateFriendHandler (好友創建處理)', () => {
     );
 
     // 核心業務邏輯：建立雙向好友關係
-    expect(mockDatabase.set.friend).toHaveBeenCalledTimes(2);
-    expect(mockDatabase.set.friend).toHaveBeenCalledWith(
+    expect(mockBiDirectional).toHaveBeenCalledWith(expect.any(Function), [
       DEFAULT_IDS.operatorUserId,
       DEFAULT_IDS.targetUserId,
-      expect.objectContaining({
-        isBlocked: false,
-        friendGroupId: null,
-        createdAt: expect.any(Number),
-      }),
-    );
-    expect(mockDatabase.set.friend).toHaveBeenCalledWith(
-      DEFAULT_IDS.targetUserId,
-      DEFAULT_IDS.operatorUserId,
-      expect.objectContaining({
-        isBlocked: false,
-        friendGroupId: null,
-        createdAt: expect.any(Number),
-      }),
-    );
+    ]);
 
     // Socket 事件發送
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
@@ -157,27 +120,48 @@ describe('CreateFriendHandler (好友創建處理)', () => {
     );
   });
 
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { userId: '', targetId: '', friend: {} };
+    const validationError = new Error('好友資料不正確');
+
+    await testValidationError(
+      CreateFriendHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '建立好友失敗，請稍後再試',
+    );
+  });
+
+  it('應處理資料庫錯誤', async () => {
+    await testDatabaseError(
+      CreateFriendHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      testData.createFriendData(),
+      'set',
+      'Database connection failed',
+      '建立好友失敗，請稍後再試',
+    );
+  });
+
   describe('權限檢查', () => {
     it('操作者不能新增非自己的好友', async () => {
-      mockSocketInstance.data.userId = 'different-user-id';
-
-      const data = createFriendData();
-      await CreateFriendHandler.handle(
-        mockIoInstance,
+      await testPermissionFailure(
+        CreateFriendHandler,
         mockSocketInstance,
-        data,
+        mockIoInstance,
+        testData.createFriendData(),
+        'different-user-id',
+        'Cannot add non-self friends',
       );
-
-      expect(mockWarn).toHaveBeenCalledWith(
-        expect.stringContaining('Cannot add non-self friends'),
-      );
-      expect(mockDatabase.set.friend).not.toHaveBeenCalled();
     });
   });
 
   describe('業務規則檢查', () => {
     it('不能新增自己為好友', async () => {
-      const data = createFriendData({
+      const data = testData.createFriendData({
         targetId: DEFAULT_IDS.operatorUserId, // 目標是自己
       });
 
@@ -187,6 +171,7 @@ describe('CreateFriendHandler (好友創建處理)', () => {
         data,
       );
 
+      const mockWarn = require('../../_testSetup').mockWarn;
       expect(mockWarn).toHaveBeenCalledWith(
         expect.stringContaining('Cannot add self as a friend'),
       );
@@ -199,15 +184,17 @@ describe('CreateFriendHandler (好友創建處理)', () => {
         userId: DEFAULT_IDS.operatorUserId,
         targetId: DEFAULT_IDS.targetUserId,
         isBlocked: false,
+        friendGroupId: null,
       });
 
-      const data = createFriendData();
+      const data = testData.createFriendData();
       await CreateFriendHandler.handle(
         mockIoInstance,
         mockSocketInstance,
         data,
       );
 
+      const mockWarn = require('../../_testSetup').mockWarn;
       expect(mockWarn).toHaveBeenCalledWith(
         expect.stringContaining('Already friends'),
       );
@@ -219,33 +206,36 @@ describe('CreateFriendHandler (好友創建處理)', () => {
     it('當目標用戶離線時，只發送給操作者', async () => {
       mockSocketServerGetSocket.mockReturnValue(null); // 目標用戶離線
 
-      const data = createFriendData();
+      const data = testData.createFriendData();
       await CreateFriendHandler.handle(
         mockIoInstance,
         mockSocketInstance,
         data,
       );
 
-      // 只發送給操作者
+      // 發送給操作者
       expect(mockSocketInstance.emit).toHaveBeenCalledWith(
         'friendAdd',
         expect.any(Object),
       );
 
-      // 沒有發送給目標用戶
+      // 檢查是否嘗試取得目標socket
       expect(mockSocketServerGetSocket).toHaveBeenCalledWith(
         DEFAULT_IDS.targetUserId,
       );
+
+      // 應該執行建立操作
+      expect(mockBiDirectional).toHaveBeenCalled();
     });
 
     it('當目標用戶線上時，應發送給雙方', async () => {
-      const targetSocket = createMockSocket(
+      const targetSocket = require('../../_testSetup').createMockSocket(
         DEFAULT_IDS.targetUserId,
         'target-socket-id',
       );
       mockSocketServerGetSocket.mockReturnValue(targetSocket);
 
-      const data = createFriendData();
+      const data = testData.createFriendData();
       await CreateFriendHandler.handle(
         mockIoInstance,
         mockSocketInstance,
@@ -266,42 +256,45 @@ describe('CreateFriendHandler (好友創建處理)', () => {
     });
   });
 
-  describe('資料驗證', () => {
-    it('應正確呼叫資料驗證器', async () => {
-      const data = createFriendData();
+  describe('好友分組處理', () => {
+    it('應正確處理指定的好友分組', async () => {
+      const data = testData.createFriendData({
+        friend: {
+          friendGroupId: DEFAULT_IDS.friendGroupId,
+          isBlocked: false,
+        },
+      });
+
       await CreateFriendHandler.handle(
         mockIoInstance,
         mockSocketInstance,
         data,
       );
 
-      expect(mockDataValidator.validate).toHaveBeenCalledWith(
-        CreateFriendSchema,
-        data,
-        'CREATEFRIEND',
-      );
+      expect(mockBiDirectional).toHaveBeenCalledWith(expect.any(Function), [
+        DEFAULT_IDS.operatorUserId,
+        DEFAULT_IDS.targetUserId,
+      ]);
     });
-  });
 
-  describe('錯誤處理', () => {
-    it('發生非預期錯誤時應發出 StandardizedError', async () => {
-      const errorMessage = 'Database connection failed';
-      mockDatabase.get.friend.mockRejectedValueOnce(new Error(errorMessage));
+    it('應正確處理封鎖狀態設定', async () => {
+      const data = testData.createFriendData({
+        friend: {
+          isBlocked: true,
+          friendGroupId: null,
+        },
+      });
 
       await CreateFriendHandler.handle(
         mockIoInstance,
         mockSocketInstance,
-        createFriendData(),
+        data,
       );
 
-      expect(mockError).toHaveBeenCalledWith(errorMessage);
-      expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-        'error',
-        expect.objectContaining({
-          name: 'ServerError',
-          message: '建立好友失敗，請稍後再試',
-        }),
-      );
+      expect(mockBiDirectional).toHaveBeenCalledWith(expect.any(Function), [
+        DEFAULT_IDS.operatorUserId,
+        DEFAULT_IDS.targetUserId,
+      ]);
     });
   });
 });
