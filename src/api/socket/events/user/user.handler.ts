@@ -106,6 +106,7 @@ export const ConnectUserHandler: SocketRequestHandler = {
 
       // Update user
       await database.set.user(operatorId, {
+        status: 'online',
         lastActiveAt: Date.now(),
       });
 
@@ -156,6 +157,7 @@ export const DisconnectUserHandler: SocketRequestHandler = {
 
       // Update user
       await database.set.user(operatorId, {
+        status: 'offline',
         lastActiveAt: Date.now(),
       });
 

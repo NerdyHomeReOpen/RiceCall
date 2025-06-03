@@ -29,10 +29,7 @@ export const RefreshFriendHandler: RequestHandler = {
         'REFRESHFRIEND',
       );
 
-      const friend = {
-        data: (await database.get.friend(userId, targetId)),
-        online: SocketServer.hasSocket(targetId),
-      };
+      const friend = await database.get.friend(userId, targetId);
 
       return {
         statusCode: 200,
