@@ -48,6 +48,7 @@
 .mainTabs,
 .buttons {
   -webkit-app-region: no-drag;
+  cursor: pointer;
 }
 
 /* Buttons */
@@ -228,7 +229,6 @@
 .mainTabs {
   display: flex;
   align-items: flex-end;
-  cursor: pointer;
   height: 43px;
   margin-right: auto;
   margin-left: 0;
