@@ -25,6 +25,9 @@ import {
 // Middleware
 import { DataValidator } from '@/middleware/data.validator';
 
+// Socket
+import SocketServer from '@/api/socket';
+
 export const SearchUserHandler: SocketRequestHandler = {
   async handle(io: Server, socket: Socket, data: any) {
     const part = 'SEARCHUSER';
@@ -105,13 +108,34 @@ export const ConnectUserHandler: SocketRequestHandler = {
 
       /* ========== Start of Main Logic ========== */
 
-      // Update user
-      await database.set.user(operatorId, {
+      const updatePayload = {
         status: 'online',
         lastActiveAt: Date.now(),
-      });
+      };
 
-      socket.emit('userUpdate', await database.get.user(operatorId));
+      // Update user
+      await database.set.user(operatorId, updatePayload);
+
+      const updatedUser = {
+        ...user,
+        ...updatePayload,
+      };
+
+      socket.emit('userUpdate', updatedUser);
+
+      // send edited data to all online friends
+      const userFriends = await database.get.userFriends(operatorId);
+      
+      for(const friend of userFriends) {
+        const targetSocket = SocketServer.getSocket(friend.targetId);
+        if (targetSocket && friend.status !== 'offline') {
+          targetSocket.emit('friendUpdate',
+            friend.targetId, 
+            operatorId, 
+            updatedUser
+          );
+        }
+      }
 
       /* ========== End of Handling ========== */
 
@@ -155,14 +179,35 @@ export const DisconnectUserHandler: SocketRequestHandler = {
       }
 
       /* ========== Start of Main Logic ========== */
-
-      // Update user
-      await database.set.user(operatorId, {
+      
+      const updatePayload = {
         status: 'offline',
         lastActiveAt: Date.now(),
-      });
+      };
+
+      // Update user
+      await database.set.user(operatorId, updatePayload);
+
+      const updatedUser = {
+        ...user,
+        ...updatePayload
+      };
 
       socket.emit('userUpdate', null);
+
+      // send edited data to all online friends
+      const userFriends = await database.get.userFriends(operatorId);
+      
+      for(const friend of userFriends) {
+        const targetSocket = SocketServer.getSocket(friend.targetId);
+        if (targetSocket && friend.status !== 'offline') {
+          targetSocket.emit('friendUpdate',
+            friend.targetId, 
+            operatorId, 
+            updatedUser
+          );
+        }
+      }
 
       /* ========== End of Handling ========== */
 
@@ -219,6 +264,20 @@ export const UpdateUserHandler: SocketRequestHandler = {
 
       // Send socket event
       socket.emit('userUpdate', update);
+
+      // send edited data to all online friends
+      const userFriends = await database.get.userFriends(userId);
+      
+      for(const friend of userFriends) {
+        const targetSocket = SocketServer.getSocket(friend.targetId);
+        if (targetSocket && friend.status !== 'offline') {
+          targetSocket.emit('friendUpdate',
+            friend.targetId, 
+            userId, 
+            update
+          );
+        }
+      }
 
       /* ========== End of Handling ========== */
 

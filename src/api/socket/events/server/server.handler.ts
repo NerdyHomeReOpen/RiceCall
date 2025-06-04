@@ -221,6 +221,22 @@ export const ConnectServerHandler: SocketRequestHandler = {
           'serverOnlineMemberAdd',
           await database.get.serverMember(serverId, userId),
         );
+        
+        // send edited data to all online friends
+        const userFriends = await database.get.userFriends(userId);
+        
+        for(const friend of userFriends) {
+          const targetSocket = SocketServer.getSocket(friend.targetId);
+          if (targetSocket && friend.status !== 'offline') {
+            targetSocket.emit('friendUpdate',
+              friend.targetId, 
+              userId, 
+              {
+                currentServerId: serverId,
+              }
+            );
+          }
+        }
       }
 
       /* ========== End of Handling ========== */
@@ -327,6 +343,22 @@ export const DisconnectServerHandler: SocketRequestHandler = {
               submitTo: 'kick',
             },
           });
+        }
+
+        // send edited data to all online friends
+        const userFriends = await database.get.userFriends(userId);
+        
+        for(const friend of userFriends) {
+          const targetSocket = SocketServer.getSocket(friend.targetId);
+          if (targetSocket && friend.status !== 'offline') {
+            targetSocket.emit('friendUpdate',
+              friend.targetId, 
+              userId, 
+              {
+                currentServerId: null,
+              }
+            );
+          }
         }
       }
 
