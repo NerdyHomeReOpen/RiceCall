@@ -37,25 +37,24 @@ const FriendList: React.FC<FriendListProps> = React.memo(
 
     // Variables
     const { userId } = user;
-    friends.sort((a, b) => {
-      if (a.currentServerId && !b.currentServerId) return -1;
-      if (!a.currentServerId && b.currentServerId) return 1;
-      return 0;
-    });
+
     const filteredFriends = friends.filter((fd) =>
       fd.name.includes(searchQuery),
     );
+
     const defaultFriendGroup: FriendGroup = Default.friendGroup({
       name: `${lang.tr.myFriends}`,
       order: 0,
       userId,
     });
+
     const outlanderFriendGroup: FriendGroup = Default.friendGroup({
       friendGroupId: 'outlander',
       name: `陌生人`, // TODO: lang.tr
       order: 998,
       userId,
     });
+
     const blockedFriendGroup: FriendGroup = Default.friendGroup({
       friendGroupId: 'blocked',
       name: `黑名單`, // TODO: lang.tr
@@ -83,17 +82,15 @@ const FriendList: React.FC<FriendListProps> = React.memo(
         {/* Navigation Tabs */}
         <div className={styles['navigateTabs']} ref={viewerRef}>
           <div
-            className={`${styles['tab']} ${
-              selectedTabId == 0 ? styles['selected'] : ''
-            }`}
+            className={`${styles['tab']} ${selectedTabId == 0 ? styles['selected'] : ''
+              }`}
             onClick={() => setSelectedTabId(0)}
           >
             <div className={styles['friendListIcon']} />
           </div>
           <div
-            className={`${styles['tab']} ${
-              selectedTabId == 1 ? styles['selected'] : ''
-            }`}
+            className={`${styles['tab']} ${selectedTabId == 1 ? styles['selected'] : ''
+              }`}
             onClick={() => setSelectedTabId(1)}
           >
             <div className={styles['recentIcon']} />
