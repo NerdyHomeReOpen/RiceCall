@@ -12,6 +12,8 @@ import { PopupType, User, UserFriend, Server } from '@/types';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
+import { useMainTab } from '@/providers/MainTab';
+import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -35,6 +37,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
     // Hooks
     const lang = useLanguage();
     const contextMenu = useContextMenu();
+    const mainTab = useMainTab();
+    const loadingBox = useLoading();
 
     // Socket
     const socket = useSocket();
@@ -46,7 +50,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
     const [friendServer, setFriendServer] = useState<Server>(Default.server());
 
     // Variables
-    const { userId } = user;
+    const {
+      userId,
+      currentServerId: userCurrentServerId,
+    } = user;
     const {
       userId: friendUserId,
       targetId: friendTargetId,
@@ -66,16 +73,18 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
 
     // Handlers
     const handleServerSelect = (userId: User['userId'], server: Server) => {
-      window.localStorage.setItem(
-        'trigger-handle-server-select',
-        JSON.stringify({
-          serverDisplayId: server.displayId,
-          timestamp: Date.now(),
-        }),
-      );
+      if (server.serverId === userCurrentServerId) {
+        mainTab.setSelectedTabId('server');
+        return;
+      }
+
+      mainTab.setSelectedTabId('home');
+      loadingBox.setIsLoading(true);
+      loadingBox.setLoadingServerId(server.displayId);
+
       setTimeout(() => {
         socket.send.connectServer({ userId, serverId: server.serverId });
-      }, 1500);
+      }, loadingBox.loadingTimeStamp);
     };
 
     const handleDeleteFriend = (
@@ -141,9 +150,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
     };
 
     useEffect(() => {
-      if (!friendCurrentServerId || refreshed.current) return;
+      if (!friendCurrentServerId) return;
       const refresh = async () => {
-        refreshed.current = true;
         Promise.all([
           refreshService.server({
             serverId: friendCurrentServerId,

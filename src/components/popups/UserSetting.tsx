@@ -16,6 +16,7 @@ import BadgeListViewer from '@/components/BadgeList';
 import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
 import { useContextMenu } from '@/providers/ContextMenu';
+import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -44,6 +45,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const socket = useSocket();
     const lang = useLanguage();
     const contextMenu = useContextMenu();
+    const loadingBox = useLoading();
 
     // Refs
     const refreshRef = useRef(false);
@@ -82,6 +84,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       birthDay: userBirthDay,
       country: userCountry,
       badges: userBadges,
+      currentServerId: userCurrentServerId,
     } = user;
     const isSelf = targetId === userId;
     const isFriend = !!friend.targetId;
@@ -196,16 +199,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       setTimeout(() => {
         isSelectingRef.current = false;
       }, 3000);
+
       window.localStorage.setItem(
         'trigger-handle-server-select',
         JSON.stringify({
           serverDisplayId: server.displayId,
+          serverId: server.serverId,
           timestamp: Date.now(),
         }),
       );
-      setTimeout(() => {
-        socket.send.connectServer({ userId, serverId: server.serverId });
-      }, 1500);
     };
 
     // Effects
@@ -237,7 +239,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
         });
       };
       refresh();
-    }, [userId, targetId]);
+    }, [userId, targetId, userCurrentServerId]);
 
     useEffect(() => {
       const daysInMonth = new Date(userBirthYear, userBirthMonth, 0).getDate();

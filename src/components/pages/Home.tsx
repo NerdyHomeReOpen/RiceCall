@@ -15,6 +15,7 @@ import { PopupType, SocketServerEvent, User, UserServer } from '@/types';
 import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
 import { useMainTab } from '@/providers/MainTab';
+import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -99,6 +100,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     const lang = useLanguage();
     const socket = useSocket();
     const mainTab = useMainTab();
+    const loadingBox = useLoading();
 
     // Refs
     const searchRef = useRef<HTMLDivElement>(null);
@@ -108,8 +110,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     const [exactMatch, setExactMatch] = useState<UserServer | null>(null);
     const [personalResults, setPersonalResults] = useState<UserServer[]>([]);
     const [relatedResults, setRelatedResults] = useState<UserServer[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [loadingServerID, setLoadingServerID] = useState<string>();
     const [section, setSection] = useState<number>(0);
 
     // Variables
@@ -141,13 +141,24 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         mainTab.setSelectedTabId('server');
         return;
       }
-      socket.send.connectServer({
-        serverId,
-        userId: userId,
-      });
+
+      if (currentServerId) {
+        socket.send.disconnectServer({
+          serverId: currentServerId,
+          userId: userId,
+        });
+      }
+
       handleClearSearchState();
-      setIsLoading(true);
-      setLoadingServerID(serverDisplayId);
+      loadingBox.setIsLoading(true);
+      loadingBox.setLoadingServerId(serverDisplayId);
+
+      setTimeout(() => {
+        socket.send.connectServer({
+          serverId,
+          userId: userId,
+        });
+      }, loadingBox.loadingTimeStamp);
     };
 
     const handleServerSearch = (results: UserServer[]) => {
@@ -252,13 +263,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     }, [socket, searchQuery]);
 
     useEffect(() => {
+      if (!loadingBox.isLoading) return;
       if (mainTab.selectedTabId == 'server') {
-        if (!currentServer) return;
-        setIsLoading(false);
-        setLoadingServerID('');
-        localStorage.removeItem('trigger-handle-server-select');
+        loadingBox.setIsLoading(false);
+        loadingBox.setLoadingServerId('');
       }
-    }, [currentServer, isLoading, mainTab]);
+    }, [loadingBox.isLoading, currentServer, mainTab]);
 
     useEffect(() => {
       const offDeepLink = ipcService.deepLink.onDeepLink(handleDeepLink);
@@ -287,10 +297,27 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     useEffect(() => {
       const handler = ({ key, newValue }: StorageEvent) => {
         if (key !== 'trigger-handle-server-select' || !newValue) return;
-        const { serverDisplayId } = JSON.parse(newValue);
+        const { serverDisplayId, serverId } = JSON.parse(newValue);
+        if (serverId === currentServer.serverId) {
+          mainTab.setSelectedTabId('server');
+          return;
+        }
+
+        if (currentServer.serverId) {
+          socket.send.disconnectServer({
+            serverId: currentServer.serverId,
+            userId: userId,
+          });
+        }
+
         mainTab.setSelectedTabId('home');
-        setIsLoading(true);
-        setLoadingServerID(serverDisplayId);
+        handleClearSearchState();
+        loadingBox.setIsLoading(true);
+        loadingBox.setLoadingServerId(serverDisplayId);
+
+        setTimeout(() => {
+          socket.send.connectServer({ userId, serverId: serverId });
+        }, loadingBox.loadingTimeStamp);
       };
       window.addEventListener('storage', handler);
       return () => window.removeEventListener('storage', handler);
@@ -397,27 +424,24 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
 
           <div className={homePage['mid']}>
             <div
-              className={`${homePage['navegateItem']} ${
-                section === 0 ? homePage['active'] : ''
-              }`}
+              className={`${homePage['navegateItem']} ${section === 0 ? homePage['active'] : ''
+                }`}
               data-key="60060"
               onClick={() => setSection(0)}
             >
               {lang.tr.home}
             </div>
             <div
-              className={`${homePage['navegateItem']} ${
-                section === 1 ? homePage['active'] : ''
-              }`}
+              className={`${homePage['navegateItem']} ${section === 1 ? homePage['active'] : ''
+                }`}
               data-key="40007"
               onClick={() => setSection(1)}
             >
               {lang.tr.game}
             </div>
             <div
-              className={`${homePage['navegateItem']} ${
-                section === 2 ? homePage['active'] : ''
-              }`}
+              className={`${homePage['navegateItem']} ${section === 2 ? homePage['active'] : ''
+                }`}
               data-key="30375"
               onClick={() => setSection(2)}
             >
@@ -490,19 +514,19 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         </main>
 
         {/* Loading */}
-        {isLoading && (
+        {loadingBox.isLoading && (
           <div className={homePage['loadingWrapper']}>
             <div className={homePage['loadingBox']}>
               <div className={homePage['loadingTitleContain']}>
                 <div>{lang.tr.connectingServer}</div>
                 <div className={homePage['loadingServerID']}>
-                  {loadingServerID}
+                  {loadingBox.loadingServerId}
                 </div>
               </div>
               <div className={homePage['loadingGif']}></div>
               <div
                 className={homePage['loadingCloseBtn']}
-                onClick={() => setIsLoading(false)}
+                onClick={() => loadingBox.setIsLoading(false)}
               />
             </div>
           </div>

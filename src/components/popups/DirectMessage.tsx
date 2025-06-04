@@ -7,6 +7,7 @@ import { User, DirectMessage, SocketServerEvent, Server } from '@/types';
 // Providers
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
+import { useLoading } from '@/providers/Loading';
 
 // Components
 import MessageViewer from '@/components/MessageViewer';
@@ -38,6 +39,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
+    const loadingBox = useLoading();
 
     // Refs
     const refreshRef = useRef(false);
@@ -55,7 +57,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     const [isFriend, setIsFriend] = useState<boolean>(false);
 
     // Variables
-    const { avatarUrl: userAvatarUrl } = user;
+    const {
+      avatarUrl: userAvatarUrl,
+      currentServerId: userCurrentServerId,
+    } = user;
+
     const {
       avatarUrl: targetAvatarUrl,
       level: targetLevel,
@@ -137,12 +143,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
         'trigger-handle-server-select',
         JSON.stringify({
           serverDisplayId: server.displayId,
+          serverId: server.serverId,
           timestamp: Date.now(),
         }),
       );
-      setTimeout(() => {
-        socket.send.connectServer({ userId, serverId: server.serverId });
-      }, 1500);
     };
 
     // Effects
