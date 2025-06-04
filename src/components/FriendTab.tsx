@@ -58,12 +58,11 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       badges: friendBadges,
       status: friendStatus,
       currentServerId: friendCurrentServerId,
-      online: friendOnlineStatus = null,
     } = friend;
     const { name: friendServerName } = friendServer;
     const isCurrentUser = friendTargetId === friendUserId;
     const canManageFriend = !isCurrentUser;
-    const isFriendOnline = friendOnlineStatus ?? friendCurrentServerId !== null;
+    const isFriendOnline = friendStatus !== 'offline';
 
     // Handlers
     const handleServerSelect = (userId: User['userId'], server: Server) => {
@@ -160,9 +159,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       <div key={friendTargetId}>
         {/* User View */}
         <div
-          className={`${styles['friendCard']} ${
-            selectedItemId === `${friendTargetId}` ? styles['selected'] : ''
-          }`}
+          className={`${styles['friendCard']} ${selectedItemId === `${friendTargetId}` ? styles['selected'] : ''
+            }`}
           onClick={() => setSelectedItemId(friendTargetId)}
           onContextMenu={(e) => {
             const x = e.clientX;
@@ -273,15 +271,13 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
             <div className={styles['container']}>
               {friendVip > 0 && (
                 <div
-                  className={`${vip['vipIcon']} ${
-                    vip[`vip-small-${friendVip}`]
-                  }`}
+                  className={`${vip['vipIcon']} ${vip[`vip-small-${friendVip}`]
+                    }`}
                 />
               )}
               <div
-                className={`${styles['name']} ${
-                  friendVip > 0 ? styles['isVIP'] : ''
-                }`}
+                className={`${styles['name']} ${friendVip > 0 ? styles['isVIP'] : ''
+                  }`}
               >
                 {friendName}
               </div>
