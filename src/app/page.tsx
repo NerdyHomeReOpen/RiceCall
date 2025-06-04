@@ -71,7 +71,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
-  const { userId, name: userName, status: userStatus } = user;
+  const {
+    userId,
+    name: userName,
+    status: userStatus,
+  } = user;
   const { serverId, name: serverName } = userServer;
 
   // Constants
