@@ -132,7 +132,7 @@ export const ConnectUserHandler: SocketRequestHandler = {
           targetSocket.emit('friendUpdate',
             friend.targetId, 
             operatorId, 
-            updatedUser
+            updatePayload,
           );
         }
       }
@@ -188,11 +188,6 @@ export const DisconnectUserHandler: SocketRequestHandler = {
       // Update user
       await database.set.user(operatorId, updatePayload);
 
-      const updatedUser = {
-        ...user,
-        ...updatePayload
-      };
-
       socket.emit('userUpdate', null);
 
       // send edited data to all online friends
@@ -204,7 +199,7 @@ export const DisconnectUserHandler: SocketRequestHandler = {
           targetSocket.emit('friendUpdate',
             friend.targetId, 
             operatorId, 
-            updatedUser
+            updatePayload,
           );
         }
       }
@@ -274,7 +269,7 @@ export const UpdateUserHandler: SocketRequestHandler = {
           targetSocket.emit('friendUpdate',
             friend.targetId, 
             userId, 
-            update
+            update,
           );
         }
       }
