@@ -480,7 +480,7 @@
 .friendCard .signature {
   color: #888;
   overflow: hidden;
-  min-height: 15px;
+  min-height: 18px;
   white-space: nowrap;
   text-overflow: ellipsis;
   display: flex;
@@ -491,12 +491,14 @@
   color: #3a9abe;
   white-space: nowrap;
   overflow: hidden;
+  min-height: 18px;
+  line-height: 18px;
   text-overflow: ellipsis;
 }
 
 .friendCard .location {
   content: '';
-  min-height: 16px;
+  min-height: 18px;
   min-width: 16px;
   background-image: url('../../../public/mylocation.png');
   background-size: auto;
