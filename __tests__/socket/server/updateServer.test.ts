@@ -1,22 +1,5 @@
 import { jest } from '@jest/globals';
-
-// 被測試的模組
-import { UpdateServerHandler } from '../../../src/api/socket/events/server/server.handler';
-
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockDatabase,
-  mockError,
-  mockInfo,
-  mockIoRoomEmit,
-  mockWarn,
-} from '../../_testSetup';
-
-// 錯誤類型和Schema
-import { UpdateServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import { mockDatabase, mockDataValidator, mockInfo } from '../../_testSetup';
 
 // Mock所有相依模組
 jest.mock('@/index', () => ({
@@ -30,59 +13,61 @@ jest.mock('@/middleware/data.validator', () => ({
   DataValidator: require('../../_testSetup').mockDataValidator,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  serverId: 'server-id-123',
-} as const;
-
-// 測試數據
-const defaultUpdateData = {
-  serverId: DEFAULT_IDS.serverId,
-  server: {
-    name: '更新後的伺服器名稱',
-    description: '更新後的描述',
-    announcement: '重要公告',
-  },
-};
+// 被測試的模組和測試輔助工具
+import { UpdateServerHandler } from '../../../src/api/socket/events/server/server.handler';
+import { UpdateServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import {
+  createDefaultTestData,
+  createMemberVariant,
+  createStandardMockInstances,
+  DEFAULT_IDS,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testInsufficientPermission,
+  testValidationError,
+} from './_testHelpers';
 
 describe('UpdateServerHandler (更新伺服器處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
-    );
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    mockDataValidator.validate.mockResolvedValue(defaultUpdateData);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
 
+    // 設定管理員權限（預設為可更新）
     mockDatabase.get.member.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
+      ...testData.operatorMember,
       permissionLevel: 5, // 管理員權限
-      isBlocked: 0,
-    });
+    } as any);
+  });
 
-    mockDatabase.set.server.mockResolvedValue(true);
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功更新伺服器', async () => {
+    const updateData = testData.createUpdateServerData();
+
     await UpdateServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultUpdateData,
+      updateData,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       UpdateServerSchema,
-      defaultUpdateData,
+      updateData,
       'UPDATESERVER',
     );
 
@@ -93,13 +78,14 @@ describe('UpdateServerHandler (更新伺服器處理)', () => {
 
     expect(mockDatabase.set.server).toHaveBeenCalledWith(
       DEFAULT_IDS.serverId,
-      defaultUpdateData.server,
+      updateData.server,
     );
 
+    const mockIoRoomEmit = require('../../_testSetup').mockIoRoomEmit;
     expect(mockIoRoomEmit).toHaveBeenCalledWith(
       'serverUpdate',
       DEFAULT_IDS.serverId,
-      defaultUpdateData.server,
+      updateData.server,
     );
 
     expect(mockInfo).toHaveBeenCalledWith(
@@ -108,13 +94,11 @@ describe('UpdateServerHandler (更新伺服器處理)', () => {
   });
 
   it('應處理部分更新', async () => {
-    const partialUpdateData = {
-      serverId: DEFAULT_IDS.serverId,
+    const partialUpdateData = testData.createUpdateServerData({
       server: {
         name: '只更新名稱',
       },
-    };
-    mockDataValidator.validate.mockResolvedValue(partialUpdateData);
+    });
 
     await UpdateServerHandler.handle(
       mockIoInstance,
@@ -127,6 +111,7 @@ describe('UpdateServerHandler (更新伺服器處理)', () => {
       partialUpdateData.server,
     );
 
+    const mockIoRoomEmit = require('../../_testSetup').mockIoRoomEmit;
     expect(mockIoRoomEmit).toHaveBeenCalledWith(
       'serverUpdate',
       DEFAULT_IDS.serverId,
@@ -134,57 +119,14 @@ describe('UpdateServerHandler (更新伺服器處理)', () => {
     );
   });
 
-  it('權限不足時應拒絕更新', async () => {
-    mockDatabase.get.member.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      permissionLevel: 3, // 權限不足
-      isBlocked: 0,
-    });
-
-    await UpdateServerHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultUpdateData,
-    );
-
-    expect(mockWarn).toHaveBeenCalledWith(
-      expect.stringContaining('Not enough permission'),
-    );
-
-    // 不應更新伺服器
-    expect(mockDatabase.set.server).not.toHaveBeenCalled();
-    expect(mockIoRoomEmit).not.toHaveBeenCalled();
-  });
-
-  it('應向伺服器房間廣播更新', async () => {
-    await UpdateServerHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultUpdateData,
-    );
-
-    expect(mockIoInstance.to).toHaveBeenCalledWith(
-      `server_${DEFAULT_IDS.serverId}`,
-    );
-    expect(mockIoRoomEmit).toHaveBeenCalledWith(
-      'serverUpdate',
-      DEFAULT_IDS.serverId,
-      defaultUpdateData.server,
-    );
-  });
-
   it('應處理不同類型的更新欄位', async () => {
-    const complexUpdateData = {
-      serverId: DEFAULT_IDS.serverId,
+    const complexUpdateData = testData.createUpdateServerData({
       server: {
         visibility: 'private' as const,
         type: 'entertainment' as const,
-        receiveApply: false,
-        slogan: '新標語',
+        description: '更新為娛樂伺服器',
       },
-    };
-    mockDataValidator.validate.mockResolvedValue(complexUpdateData);
+    });
 
     await UpdateServerHandler.handle(
       mockIoInstance,
@@ -198,63 +140,95 @@ describe('UpdateServerHandler (更新伺服器處理)', () => {
     );
   });
 
-  it('資料驗證失敗時應發送錯誤', async () => {
-    const validationError = new Error('Invalid update data');
-    mockDataValidator.validate.mockRejectedValue(validationError);
+  it('應向伺服器房間廣播更新', async () => {
+    const updateData = testData.createUpdateServerData();
 
     await UpdateServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultUpdateData,
+      updateData,
     );
 
-    expect(mockError).toHaveBeenCalledWith(validationError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '更新群組失敗，請稍後再試',
-        part: 'UPDATESERVER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+    expect(mockIoInstance.to).toHaveBeenCalledWith(
+      `server_${DEFAULT_IDS.serverId}`,
     );
   });
 
-  it('資料庫更新失敗時應發送錯誤', async () => {
-    const dbError = new Error('Database update failed');
-    mockDatabase.set.server.mockRejectedValue(dbError);
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { serverId: '', server: {} };
+    const validationError = new Error('伺服器ID不能為空');
 
-    await UpdateServerHandler.handle(
-      mockIoInstance,
+    await testValidationError(
+      UpdateServerHandler,
       mockSocketInstance,
-      defaultUpdateData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(dbError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '更新群組失敗，請稍後再試',
-        part: 'UPDATESERVER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '更新群組失敗，請稍後再試',
     );
   });
 
-  it('應正確呼叫資料驗證器', async () => {
-    await UpdateServerHandler.handle(
-      mockIoInstance,
+  it('應處理資料庫錯誤', async () => {
+    await testDatabaseError(
+      UpdateServerHandler,
       mockSocketInstance,
-      defaultUpdateData,
+      mockIoInstance,
+      testData.createUpdateServerData(),
+      'set',
+      'Database update failed',
+      '更新群組失敗，請稍後再試',
     );
+  });
 
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      UpdateServerSchema,
-      defaultUpdateData,
-      'UPDATESERVER',
-    );
+  describe('權限檢查', () => {
+    it('權限不足時應拒絕更新', async () => {
+      const lowPermissionMember = createMemberVariant(testData.operatorMember, {
+        permissionLevel: 3, // 權限不足
+      });
+
+      await testInsufficientPermission(
+        UpdateServerHandler,
+        mockSocketInstance,
+        mockIoInstance,
+        testData.createUpdateServerData(),
+        lowPermissionMember,
+        'warning',
+      );
+    });
+
+    it('邊界權限等級（權限等級4）應拒絕更新', async () => {
+      const borderlineMember = createMemberVariant(testData.operatorMember, {
+        permissionLevel: 4, // 邊界權限，不足以更新
+      });
+
+      await testInsufficientPermission(
+        UpdateServerHandler,
+        mockSocketInstance,
+        mockIoInstance,
+        testData.createUpdateServerData(),
+        borderlineMember,
+        'warning',
+      );
+    });
+
+    it('權限等級5應允許更新', async () => {
+      const sufficientMember = createMemberVariant(testData.operatorMember, {
+        permissionLevel: 5, // 足夠權限
+      });
+
+      mockDatabase.get.member.mockResolvedValue(sufficientMember as any);
+
+      const updateData = testData.createUpdateServerData();
+      await UpdateServerHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        updateData,
+      );
+
+      expect(mockDatabase.set.server).toHaveBeenCalledWith(
+        DEFAULT_IDS.serverId,
+        updateData.server,
+      );
+    });
   });
 });

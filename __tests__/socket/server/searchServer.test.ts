@@ -1,19 +1,5 @@
 import { jest } from '@jest/globals';
-
-// 被測試的模組
-import { SearchServerHandler } from '../../../src/api/socket/events/server/server.handler';
-
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockDatabase,
-  mockError,
-} from '../../_testSetup';
-
-// 錯誤類型和Schema
-import { SearchServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import { mockDataValidator, mockDatabase } from '../../_testSetup';
 
 // Mock所有相依模組
 jest.mock('@/index', () => ({
@@ -27,62 +13,52 @@ jest.mock('@/middleware/data.validator', () => ({
   DataValidator: require('../../_testSetup').mockDataValidator,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-} as const;
-
-// 測試數據
-const defaultSearchData = {
-  query: '測試伺服器',
-};
-
-const mockSearchResults = [
-  {
-    serverId: 'server-1',
-    name: '測試伺服器1',
-    description: '這是第一個測試伺服器',
-    type: 'game',
-    visibility: 'public',
-  },
-  {
-    serverId: 'server-2',
-    name: '測試伺服器2',
-    description: '這是第二個測試伺服器',
-    type: 'entertainment',
-    visibility: 'public',
-  },
-];
+// 被測試的模組和測試輔助工具
+import { SearchServerHandler } from '../../../src/api/socket/events/server/server.handler';
+import { SearchServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import {
+  createDefaultTestData,
+  createSearchResults,
+  createStandardMockInstances,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testValidationError,
+} from './_testHelpers';
 
 describe('SearchServerHandler (搜尋伺服器處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
-    );
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    mockDataValidator.validate.mockResolvedValue(defaultSearchData);
-    mockDatabase.get.searchServer.mockResolvedValue(mockSearchResults);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
+  });
+
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功搜尋伺服器', async () => {
-    await SearchServerHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultSearchData,
-    );
+    const searchResults = createSearchResults(2);
+    const data = testData.createSearchServerData();
+
+    mockDatabase.get.searchServer.mockResolvedValue(searchResults);
+
+    await SearchServerHandler.handle(mockIoInstance, mockSocketInstance, data);
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       SearchServerSchema,
-      defaultSearchData,
+      data,
       'SEARCHSERVER',
     );
 
@@ -90,25 +66,28 @@ describe('SearchServerHandler (搜尋伺服器處理)', () => {
 
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
       'serverSearch',
-      mockSearchResults,
+      searchResults,
     );
   });
 
   it('應處理空的搜尋結果', async () => {
+    const data = testData.createSearchServerData();
+
     mockDatabase.get.searchServer.mockResolvedValue([]);
 
-    await SearchServerHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultSearchData,
-    );
+    await SearchServerHandler.handle(mockIoInstance, mockSocketInstance, data);
 
     expect(mockSocketInstance.emit).toHaveBeenCalledWith('serverSearch', []);
   });
 
   it('應處理不同的搜尋查詢', async () => {
-    const customSearchData = { query: '遊戲伺服器' };
+    const customSearchData = testData.createSearchServerData({
+      query: '遊戲伺服器',
+    });
+    const searchResults = createSearchResults(1);
+
     mockDataValidator.validate.mockResolvedValue(customSearchData);
+    mockDatabase.get.searchServer.mockResolvedValue(searchResults);
 
     await SearchServerHandler.handle(
       mockIoInstance,
@@ -117,65 +96,83 @@ describe('SearchServerHandler (搜尋伺服器處理)', () => {
     );
 
     expect(mockDatabase.get.searchServer).toHaveBeenCalledWith('遊戲伺服器');
-  });
-
-  it('資料驗證失敗時應發送錯誤', async () => {
-    const validationError = new Error('Invalid query');
-    mockDataValidator.validate.mockRejectedValue(validationError);
-
-    await SearchServerHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultSearchData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(validationError.message);
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '搜尋群組失敗，請稍後再試',
-        part: 'SEARCHSERVER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+      'serverSearch',
+      searchResults,
     );
   });
 
-  it('資料庫查詢失敗時應發送錯誤', async () => {
-    const dbError = new Error('Database error');
-    mockDatabase.get.searchServer.mockRejectedValue(dbError);
+  it('應處理多種搜尋結果', async () => {
+    const searchResults = createSearchResults(5);
+    const data = testData.createSearchServerData();
 
-    await SearchServerHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultSearchData,
-    );
+    mockDatabase.get.searchServer.mockResolvedValue(searchResults);
 
-    expect(mockError).toHaveBeenCalledWith(dbError.message);
+    await SearchServerHandler.handle(mockIoInstance, mockSocketInstance, data);
+
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '搜尋群組失敗，請稍後再試',
-        part: 'SEARCHSERVER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+      'serverSearch',
+      searchResults,
+    );
+    expect(searchResults).toHaveLength(5);
+  });
+
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { query: '' };
+    const validationError = new Error('搜尋關鍵字不能為空');
+
+    await testValidationError(
+      SearchServerHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '搜尋群組失敗，請稍後再試',
     );
   });
 
-  it('應正確呼叫資料驗證器', async () => {
-    await SearchServerHandler.handle(
-      mockIoInstance,
+  it('應處理資料庫錯誤', async () => {
+    await testDatabaseError(
+      SearchServerHandler,
       mockSocketInstance,
-      defaultSearchData,
+      mockIoInstance,
+      testData.createSearchServerData(),
+      'get',
+      'Database connection failed',
+      '搜尋群組失敗，請稍後再試',
     );
+  });
 
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      SearchServerSchema,
-      defaultSearchData,
-      'SEARCHSERVER',
-    );
+  describe('業務邏輯檢查', () => {
+    it('應正確呼叫資料驗證器', async () => {
+      const data = testData.createSearchServerData();
+
+      await SearchServerHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDataValidator.validate).toHaveBeenCalledWith(
+        SearchServerSchema,
+        data,
+        'SEARCHSERVER',
+      );
+    });
+
+    it('應按正確順序執行搜尋流程', async () => {
+      const data = testData.createSearchServerData();
+
+      await SearchServerHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      // 檢查所有操作都被執行
+      expect(mockDataValidator.validate).toHaveBeenCalledTimes(1);
+      expect(mockDatabase.get.searchServer).toHaveBeenCalledTimes(1);
+      expect(mockSocketInstance.emit).toHaveBeenCalledTimes(1);
+    });
   });
 });

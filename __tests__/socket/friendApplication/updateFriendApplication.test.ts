@@ -1,143 +1,270 @@
 import { jest } from '@jest/globals';
 
-// 被測試的模組
-import { UpdateFriendApplicationHandler } from '../../../src/api/socket/events/friendApplication/friendApplication.handler';
+// 使用本地的測試輔助工具
+import {
+  createDefaultTestData,
+  createStandardMockInstances,
+  DEFAULT_IDS,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testValidationError,
+} from './_testHelpers';
 
 // 測試設定
 import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
   mockDatabase,
+  mockDataValidator,
   mockInfo,
   mockWarn,
 } from '../../_testSetup';
 
-// 錯誤類型和Schema
-import { UpdateFriendApplicationSchema } from '../../../src/api/socket/events/friendApplication/friendApplication.schema';
-
-// Mock所有相依模組
+// Mock 核心模組
 jest.mock('@/index', () => ({
-  database: require('../../_testSetup').mockDatabase,
+  database: mockDatabase,
 }));
+
+jest.mock('@/middleware/data.validator', () => ({
+  DataValidator: mockDataValidator,
+}));
+
 jest.mock('@/api/socket', () => ({
   __esModule: true,
   default: { getSocket: require('../../_testSetup').mockSocketServerGetSocket },
 }));
+
 jest.mock('@/utils/logger', () => ({
   __esModule: true,
   default: require('../../_testSetup').MockLogger,
 }));
-jest.mock('@/middleware/data.validator', () => ({
-  DataValidator: require('../../_testSetup').mockDataValidator,
+
+jest.mock('@/error', () => ({
+  __esModule: true,
+  default: require('../../_testSetup').MockStandardizedError,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  senderId: 'sender-user-id',
-  receiverId: 'receiver-user-id',
-  otherUserId: 'other-user-id',
-} as const;
-
-// 測試數據
-const defaultUpdateData = {
-  senderId: DEFAULT_IDS.senderId,
-  receiverId: DEFAULT_IDS.receiverId,
-  friendApplication: {
-    description: '更新後的描述',
-  },
-};
+// 被測試的模組
+import { UpdateFriendApplicationHandler } from '../../../src/api/socket/events/friendApplication/friendApplication.handler';
+import { UpdateFriendApplicationSchema } from '../../../src/api/socket/events/friendApplication/friendApplication.schema';
 
 describe('UpdateFriendApplicationHandler (好友申請更新處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例，操作者ID設為senderId
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.senderId,
-      'test-socket-id',
-    );
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例（操作者ID設為senderId）
+    const mockInstances = createStandardMockInstances(DEFAULT_IDS.senderId);
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    (mockDatabase.set.friendApplication as any).mockResolvedValue(true);
-    mockDataValidator.validate.mockResolvedValue(defaultUpdateData);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
+  });
+
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功更新好友申請', async () => {
+    const data = testData.createUpdateData();
     await UpdateFriendApplicationHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultUpdateData,
+      data,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       UpdateFriendApplicationSchema,
-      defaultUpdateData,
+      data,
       'UPDATEFRIENDAPPLICATION',
     );
 
-    expect(mockInfo).toHaveBeenCalledWith(
-      expect.stringContaining('updated friend application'),
-    );
-  });
-
-  it('發送者可以修改自己的好友申請', async () => {
-    mockSocketInstance.data.userId = DEFAULT_IDS.senderId;
-
-    await UpdateFriendApplicationHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultUpdateData,
-    );
+    // 核心業務邏輯：更新好友申請
+    expect(mockDatabase.set.friendApplication).toHaveBeenCalled();
 
     expect(mockInfo).toHaveBeenCalledWith(
       expect.stringContaining('updated friend application'),
     );
   });
 
-  it('接收者可以修改好友申請', async () => {
-    mockSocketInstance.data.userId = DEFAULT_IDS.receiverId;
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { senderId: '', receiverId: '', friendApplication: {} };
+    const validationError = new Error('好友申請資料不正確');
 
-    await UpdateFriendApplicationHandler.handle(
-      mockIoInstance,
+    await testValidationError(
+      UpdateFriendApplicationHandler,
       mockSocketInstance,
-      defaultUpdateData,
-    );
-
-    expect(mockInfo).toHaveBeenCalledWith(
-      expect.stringContaining('updated friend application'),
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '更新好友申請失敗，請稍後再試',
     );
   });
 
-  it('操作者不能修改非自己相關的好友申請', async () => {
-    mockSocketInstance.data.userId = DEFAULT_IDS.otherUserId;
-
-    await UpdateFriendApplicationHandler.handle(
-      mockIoInstance,
+  it('應處理資料庫錯誤', async () => {
+    await testDatabaseError(
+      UpdateFriendApplicationHandler,
       mockSocketInstance,
-      defaultUpdateData,
-    );
-
-    expect(mockWarn).toHaveBeenCalledWith(
-      expect.stringContaining('Cannot modify non-self friend applications'),
+      mockIoInstance,
+      testData.createUpdateData(),
+      'set',
+      'Database connection failed',
+      '更新好友申請失敗，請稍後再試',
     );
   });
 
-  it('應正確呼叫資料驗證器', async () => {
-    await UpdateFriendApplicationHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultUpdateData,
-    );
+  describe('權限檢查', () => {
+    it('發送者可以修改自己的好友申請', async () => {
+      mockSocketInstance.data.userId = DEFAULT_IDS.senderId;
 
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      UpdateFriendApplicationSchema,
-      defaultUpdateData,
-      'UPDATEFRIENDAPPLICATION',
-    );
+      const data = testData.createUpdateData();
+      await UpdateFriendApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendApplication).toHaveBeenCalled();
+      expect(mockInfo).toHaveBeenCalledWith(
+        expect.stringContaining('updated friend application'),
+      );
+    });
+
+    it('接收者可以修改好友申請', async () => {
+      mockSocketInstance.data.userId = DEFAULT_IDS.receiverId;
+
+      const data = testData.createUpdateData();
+      await UpdateFriendApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendApplication).toHaveBeenCalled();
+      expect(mockInfo).toHaveBeenCalledWith(
+        expect.stringContaining('updated friend application'),
+      );
+    });
+
+    it('操作者不能修改非自己相關的好友申請', async () => {
+      mockSocketInstance.data.userId = DEFAULT_IDS.otherUserId;
+
+      const data = testData.createUpdateData();
+      await UpdateFriendApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockWarn).toHaveBeenCalledWith(
+        expect.stringContaining('Cannot modify non-self friend applications'),
+      );
+      expect(mockDatabase.set.friendApplication).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('好友申請內容更新', () => {
+    it('應正確處理描述更新', async () => {
+      const data = testData.createUpdateData({
+        friendApplication: {
+          description: '自定義的更新描述',
+        },
+      });
+
+      await UpdateFriendApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendApplication).toHaveBeenCalled();
+      expect(mockInfo).toHaveBeenCalledWith(
+        expect.stringContaining('updated friend application'),
+      );
+    });
+
+    it('應正確處理不同的發送者和接收者組合', async () => {
+      const data = testData.createUpdateData({
+        senderId: 'custom-sender-id',
+        receiverId: 'custom-receiver-id',
+        friendApplication: {
+          description: '自定義更新',
+        },
+      });
+
+      // 設定操作者為發送者
+      mockSocketInstance.data.userId = 'custom-sender-id';
+
+      await UpdateFriendApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendApplication).toHaveBeenCalled();
+    });
+
+    it('應在執行更新前進行適當的驗證', async () => {
+      const data = testData.createUpdateData();
+      await UpdateFriendApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDataValidator.validate).toHaveBeenCalledWith(
+        UpdateFriendApplicationSchema,
+        data,
+        'UPDATEFRIENDAPPLICATION',
+      );
+    });
+  });
+
+  describe('業務邏輯檢查', () => {
+    it('應正確處理更新操作的參數', async () => {
+      const data = testData.createUpdateData();
+      await UpdateFriendApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendApplication).toHaveBeenCalled();
+    });
+
+    it('應能處理空的friendApplication物件', async () => {
+      const data = testData.createUpdateData({
+        friendApplication: {},
+      });
+
+      await UpdateFriendApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendApplication).toHaveBeenCalled();
+    });
+
+    it('應能處理多個欄位的更新', async () => {
+      const data = testData.createUpdateData({
+        friendApplication: {
+          description: '新的描述',
+          message: '新的訊息',
+        },
+      });
+
+      await UpdateFriendApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendApplication).toHaveBeenCalled();
+    });
   });
 });

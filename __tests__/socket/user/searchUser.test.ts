@@ -4,7 +4,6 @@ import { jest } from '@jest/globals';
 import {
   createDefaultTestData,
   createMockSearchResults,
-  createSearchData,
   createStandardMockInstances,
   setupAfterEach,
   setupBeforeEach,
@@ -60,7 +59,7 @@ describe('SearchUserHandler (搜尋用戶處理)', () => {
   });
 
   it('應成功搜尋用戶', async () => {
-    const searchData = createSearchData('測試用戶');
+    const searchData = testData.createSearchData('測試用戶');
 
     mockDataValidator.validate.mockResolvedValue(searchData);
     mockDatabase.get.searchUser.mockResolvedValue(testData.searchResults);
@@ -108,7 +107,7 @@ describe('SearchUserHandler (搜尋用戶處理)', () => {
       jest.clearAllMocks();
       setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
 
-      const searchData = createSearchData(query);
+      const searchData = testData.createSearchData(query);
       const mockResults = createMockSearchResults(query);
 
       mockDataValidator.validate.mockResolvedValue(searchData);

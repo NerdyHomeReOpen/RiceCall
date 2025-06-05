@@ -140,11 +140,12 @@ export const createMockSocket = (
 
 // Utility to create a basic mock IO server for handlers
 export const mockIoRoomEmit = jest.fn(); // Export this mock
+export const mockIoTo = jest.fn(); // Export this mock
 
 export const createMockIo = (): jest.Mocked<Server> => {
   const mockMap = new Map();
   return {
-    to: jest.fn().mockReturnValue({ emit: mockIoRoomEmit }), // to() returns an object with our specific emit mock
+    to: mockIoTo.mockReturnValue({ emit: mockIoRoomEmit }), // to() returns an object with our specific emit mock
     emit: jest.fn(), // For direct io.emit()
     sockets: {
       sockets: mockMap,

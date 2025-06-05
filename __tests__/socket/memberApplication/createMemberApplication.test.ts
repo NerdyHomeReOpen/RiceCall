@@ -1,94 +1,79 @@
 import { jest } from '@jest/globals';
+import { mockDatabase, mockDataValidator, mockInfo } from '../../_testSetup';
 
-// 被測試的模組
-import { CreateMemberApplicationHandler } from '../../../src/api/socket/events/memberApplication/memberApplication.handler';
-
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockDatabase,
-  mockInfo,
-  mockIoRoomEmit,
-  mockWarn,
-} from '../../_testSetup';
-
-// 錯誤類型和Schema
-import { CreateMemberApplicationSchema } from '../../../src/api/socket/events/memberApplication/memberApplication.schema';
-
-// Mock所有相依模組
+// Mock Database
 jest.mock('@/index', () => ({
   database: require('../../_testSetup').mockDatabase,
 }));
-jest.mock('@/utils/logger', () => ({
-  __esModule: true,
-  default: require('../../_testSetup').MockLogger,
-}));
+
+// Mock DataValidator
 jest.mock('@/middleware/data.validator', () => ({
   DataValidator: require('../../_testSetup').mockDataValidator,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  serverId: 'server-id-123',
-} as const;
+jest.mock('@/utils/logger', () => ({
+  __esModule: true,
+  default: require('../../_testSetup').MockLogger,
+}));
 
-// 測試數據
-const defaultCreateData = {
-  userId: DEFAULT_IDS.operatorUserId,
-  serverId: DEFAULT_IDS.serverId,
-  memberApplication: {
-    description: '申請加入伺服器',
-  },
-};
+jest.mock('@/error', () => ({
+  __esModule: true,
+  default: require('../../_testSetup').MockStandardizedError,
+}));
+
+// 被測試的模組和測試輔助工具
+import { CreateMemberApplicationHandler } from '../../../src/api/socket/events/memberApplication/memberApplication.handler';
+import { CreateMemberApplicationSchema } from '../../../src/api/socket/events/memberApplication/memberApplication.schema';
+import {
+  createDefaultTestData,
+  createStandardMockInstances,
+  DEFAULT_IDS,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testValidationError,
+} from './_testHelpers';
 
 describe('CreateMemberApplicationHandler (成員申請創建處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances(
       DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
     );
-    mockIoInstance = createMockIo();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    mockDatabase.get.member.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      permissionLevel: 1, // 預設為訪客，可以申請
-      nickname: null,
-      isBlocked: 0,
-    });
-
-    (mockDatabase.set.memberApplication as any).mockResolvedValue(true);
-
-    mockDatabase.get.serverMemberApplication.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      description: '申請加入伺服器',
-      createdAt: Date.now(),
-    });
-
-    mockDataValidator.validate.mockResolvedValue(defaultCreateData);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
   });
 
-  it('應成功創建成員申請', async () => {
+  afterEach(() => {
+    setupAfterEach();
+  });
+
+  it('應成功創建成員申請（操作者為自己）', async () => {
+    // 設定為訪客身份
+    testData.operatorMember.permissionLevel = 1;
+    const data = testData.createMemberApplicationCreateData({
+      userId: DEFAULT_IDS.operatorUserId,
+    });
+
     await CreateMemberApplicationHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultCreateData,
+      data,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       CreateMemberApplicationSchema,
-      defaultCreateData,
+      data,
       'CREATEMEMBERAPPLICATION',
     );
 
@@ -101,6 +86,7 @@ describe('CreateMemberApplicationHandler (成員申請創建處理)', () => {
       }),
     );
 
+    const mockIoRoomEmit = require('../../_testSetup').mockIoRoomEmit;
     expect(mockIoRoomEmit).toHaveBeenCalledWith(
       'serverMemberApplicationAdd',
       expect.any(Object),
@@ -111,68 +97,229 @@ describe('CreateMemberApplicationHandler (成員申請創建處理)', () => {
     );
   });
 
-  it('不能為其他用戶創建申請', async () => {
-    const otherUserData = {
-      ...defaultCreateData,
-      userId: 'other-user-id',
-    };
-    mockDataValidator.validate.mockResolvedValue(otherUserData);
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { userId: '', serverId: '', memberApplication: {} };
+    const validationError = new Error('成員申請資料不正確');
 
-    await CreateMemberApplicationHandler.handle(
-      mockIoInstance,
+    await testValidationError(
+      CreateMemberApplicationHandler,
       mockSocketInstance,
-      otherUserData,
-    );
-
-    expect(mockWarn).toHaveBeenCalledWith(
-      expect.stringContaining('Cannot create non-self member application'),
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '創建成員申請失敗，請稍後再試',
     );
   });
 
-  it('非訪客不能創建成員申請', async () => {
-    mockDatabase.get.member.mockResolvedValue({
+  it('應處理資料庫錯誤', async () => {
+    testData.operatorMember.permissionLevel = 1; // 設定為訪客
+    const data = testData.createMemberApplicationCreateData({
       userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      permissionLevel: 2, // 已經是成員
     });
 
-    await CreateMemberApplicationHandler.handle(
-      mockIoInstance,
+    await testDatabaseError(
+      CreateMemberApplicationHandler,
       mockSocketInstance,
-      defaultCreateData,
-    );
-
-    expect(mockWarn).toHaveBeenCalledWith(
-      expect.stringContaining('Cannot create member application as non-guest'),
+      mockIoInstance,
+      data,
+      'set',
+      'Database connection failed',
+      '創建成員申請失敗，請稍後再試',
     );
   });
 
-  it('應正確呼叫資料驗證器', async () => {
-    await CreateMemberApplicationHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultCreateData,
-    );
+  describe('權限檢查', () => {
+    it('不能為其他用戶創建申請', async () => {
+      const otherUserData = testData.createMemberApplicationCreateData({
+        userId: 'other-user-id',
+      });
+      mockDataValidator.validate.mockResolvedValue(otherUserData);
 
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      CreateMemberApplicationSchema,
-      defaultCreateData,
-      'CREATEMEMBERAPPLICATION',
-    );
+      await CreateMemberApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        otherUserData,
+      );
+
+      expect(mockDatabase.set.memberApplication).not.toHaveBeenCalled();
+
+      const mockWarnFromSetup = require('../../_testSetup').mockWarn;
+      expect(mockWarnFromSetup).toHaveBeenCalledWith(
+        expect.stringContaining('Cannot create non-self member application'),
+      );
+    });
+
+    it('非訪客不能創建成員申請', async () => {
+      // 設定操作者為已有成員權限
+      testData.operatorMember.permissionLevel = 2;
+      const data = testData.createMemberApplicationCreateData({
+        userId: DEFAULT_IDS.operatorUserId,
+      });
+
+      await CreateMemberApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.memberApplication).not.toHaveBeenCalled();
+
+      const mockWarnFromSetup = require('../../_testSetup').mockWarn;
+      expect(mockWarnFromSetup).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Cannot create member application as non-guest',
+        ),
+      );
+    });
   });
 
-  it('應包含創建時間戳', async () => {
-    await CreateMemberApplicationHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultCreateData,
-    );
+  describe('成員申請資料處理', () => {
+    it('應包含創建時間戳', async () => {
+      testData.operatorMember.permissionLevel = 1; // 設定為訪客
+      const data = testData.createMemberApplicationCreateData({
+        userId: DEFAULT_IDS.operatorUserId,
+      });
 
-    const setMemberApplicationCall =
-      mockDatabase.set.memberApplication.mock.calls[0];
-    const memberApplicationData = setMemberApplicationCall[2];
+      await CreateMemberApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
 
-    expect(memberApplicationData.createdAt).toBeGreaterThan(0);
-    expect(typeof memberApplicationData.createdAt).toBe('number');
+      const setMemberApplicationCall =
+        mockDatabase.set.memberApplication.mock.calls[0];
+      const memberApplicationData = setMemberApplicationCall[2];
+
+      expect(memberApplicationData.createdAt).toBeGreaterThan(0);
+      expect(typeof memberApplicationData.createdAt).toBe('number');
+    });
+
+    it('應正確處理自定義描述', async () => {
+      testData.operatorMember.permissionLevel = 1; // 設定為訪客
+      const customDescription = '我想加入這個伺服器，請批准我的申請';
+      const data = testData.createMemberApplicationCreateData({
+        userId: DEFAULT_IDS.operatorUserId,
+        memberApplication: {
+          description: customDescription,
+        },
+      });
+
+      await CreateMemberApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.memberApplication).toHaveBeenCalledWith(
+        DEFAULT_IDS.operatorUserId,
+        DEFAULT_IDS.serverId,
+        expect.objectContaining({
+          description: customDescription,
+        }),
+      );
+    });
+
+    it('應正確處理不同的伺服器ID', async () => {
+      testData.operatorMember.permissionLevel = 1; // 設定為訪客
+      const customServerId = 'custom-server-id';
+      const data = testData.createMemberApplicationCreateData({
+        userId: DEFAULT_IDS.operatorUserId,
+        serverId: customServerId,
+      });
+
+      await CreateMemberApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.memberApplication).toHaveBeenCalledWith(
+        DEFAULT_IDS.operatorUserId,
+        customServerId,
+        expect.any(Object),
+      );
+    });
+  });
+
+  describe('Socket事件處理', () => {
+    it('應發送正確的房間事件', async () => {
+      testData.operatorMember.permissionLevel = 1; // 設定為訪客
+      const data = testData.createMemberApplicationCreateData({
+        userId: DEFAULT_IDS.operatorUserId,
+      });
+
+      await CreateMemberApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      const mockIoRoomEmit = require('../../_testSetup').mockIoRoomEmit;
+      expect(mockIoRoomEmit).toHaveBeenCalledWith(
+        'serverMemberApplicationAdd',
+        expect.any(Object),
+      );
+    });
+
+    it('應在socket事件中包含正確的申請資料', async () => {
+      testData.operatorMember.permissionLevel = 1; // 設定為訪客
+      const data = testData.createMemberApplicationCreateData({
+        userId: DEFAULT_IDS.operatorUserId,
+      });
+
+      await CreateMemberApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      const mockIoRoomEmit = require('../../_testSetup').mockIoRoomEmit;
+      const emitCall = mockIoRoomEmit.mock.calls.find(
+        (call: any[]) => call[0] === 'serverMemberApplicationAdd',
+      );
+
+      expect(emitCall).toBeDefined();
+      if (emitCall) {
+        expect(emitCall[1]).toBeDefined();
+      }
+    });
+  });
+
+  describe('業務邏輯檢查', () => {
+    it('應正確呼叫資料驗證器', async () => {
+      testData.operatorMember.permissionLevel = 1; // 設定為訪客
+      const data = testData.createMemberApplicationCreateData({
+        userId: DEFAULT_IDS.operatorUserId,
+      });
+
+      await CreateMemberApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDataValidator.validate).toHaveBeenCalledWith(
+        CreateMemberApplicationSchema,
+        data,
+        'CREATEMEMBERAPPLICATION',
+      );
+    });
+
+    it('應按正確順序執行創建流程', async () => {
+      testData.operatorMember.permissionLevel = 1; // 設定為訪客
+      const data = testData.createMemberApplicationCreateData({
+        userId: DEFAULT_IDS.operatorUserId,
+      });
+
+      await CreateMemberApplicationHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      // 檢查所有操作都被執行
+      expect(mockDataValidator.validate).toHaveBeenCalledTimes(1);
+      expect(mockDatabase.set.memberApplication).toHaveBeenCalledTimes(1);
+    });
   });
 });

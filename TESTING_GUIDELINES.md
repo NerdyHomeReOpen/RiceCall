@@ -676,3 +676,319 @@ describe('FeatureHandler', () => {
 ---
 
 **記住**: 好的測試是**預防回歸**的安全網，不是**證明程式正確**的文件。專注於**真正重要**的邏輯，使用**統一的輔助函數**保持測試**簡潔有力**且**易於維護**！
+
+---
+
+## 🔄 測試重構最佳實踐
+
+### **重構流程步驟**
+
+#### **1. 重構前準備**
+
+```bash
+# 確保所有測試都通過
+npm test -- __tests__/socket/[module] --passWithNoTests
+
+# 記錄當前測試數量作為基準
+# 例如：4 suites, 29 tests
+```
+
+#### **2. 重構順序**
+
+1. **先重構 `_testHelpers.ts`**
+   - 統一錯誤測試函數
+   - 整合資料建立函數
+   - 標準化 Mock 設定
+2. **再更新測試檔案**
+   - 更新 import 聲明
+   - 調整函數調用模式
+3. **最後驗證**
+   - 確保測試數量不變
+   - 確保所有測試通過
+
+#### **3. 重構驗證檢查清單**
+
+- [ ] 測試套件數量保持不變
+- [ ] 測試案例數量保持不變
+- [ ] 所有測試都通過
+- [ ] 沒有 TypeScript 錯誤
+- [ ] 沒有未使用的 import
+
+---
+
+## 📦 輔助函數組織策略
+
+### **資料建立函數的決策樹**
+
+```typescript
+// ✅ 整合到 createDefaultTestData 的情況：
+// - 函數簡單且模組專用
+// - 需要存取 testData 中的常數
+// - 大部分測試都會使用
+
+export const createDefaultTestData = () => {
+  // ... 預設資料
+
+  // 整合簡單的建立函數
+  const createSearchData = (query: string): SearchUserQuery => ({ query });
+
+  const createUpdateData = (
+    userId: string = DEFAULT_IDS.operatorUserId,
+    userUpdates: Partial<User> = {},
+  ): UpdateUserData => ({
+    userId,
+    user: userUpdates,
+  });
+
+  return {
+    // ... 其他資料
+    // 輔助函數
+    createSearchData,
+    createUpdateData,
+  };
+};
+
+// ✅ 保持獨立的情況：
+// - 函數複雜且可重用
+// - 不依賴 testData 內部狀態
+// - 多個模組可能使用
+
+// 獨立的複雜函數
+export const createMockSearchResults = (
+  query: string,
+  count: number = 1,
+): UserSearchResult[] => {
+  return Array.from({ length: count }, (_, index) => ({
+    userId: `result-${index + 1}`,
+    name: `符合${query}的用戶${index + 1}`,
+    // ... 複雜邏輯
+  }));
+};
+```
+
+### **Import 清理原則**
+
+```typescript
+// ❌ 重構前 - 有重複的 import
+import {
+  createDefaultTestData,
+  createSearchData, // 已移到 testData 中
+  createUpdateData, // 已移到 testData 中
+  setupBeforeEach,
+} from './_testHelpers';
+
+// ✅ 重構後 - 清理不需要的 import
+import { createDefaultTestData, setupBeforeEach } from './_testHelpers';
+
+// 使用方式：testData.createXxx() 而不是 createXxx()
+```
+
+---
+
+## 🔧 Mock 設定最佳實踐
+
+### **Validator Mock 的正確設定**
+
+```typescript
+// ❌ 簡單但不靈活
+mockDataValidator.validate.mockResolvedValue({});
+
+// ✅ 靈活且正確
+mockDataValidator.validate.mockImplementation(
+  async (schema, data, part) => data,
+);
+```
+
+**原因說明**：
+
+- `mockImplementation` 確保返回的是實際傳入的資料
+- 避免測試中的資料不一致問題
+- 更符合實際 validator 的行為
+
+### **Socket Instance 初始化**
+
+```typescript
+// ✅ 確保 socket 有必要的屬性
+export const createStandardMockInstances = (
+  operatorUserId: string = DEFAULT_IDS.operatorUserId,
+  socketId: string = DEFAULT_IDS.socketId,
+) => {
+  const mockSocketInstance = createMockSocket(operatorUserId, socketId);
+  const mockIoInstance = require('../../_testSetup').createMockIo();
+
+  // 重要：確保 socket.data.userId 正確設定
+  mockSocketInstance.data.userId = operatorUserId;
+
+  return { mockSocketInstance, mockIoInstance };
+};
+```
+
+---
+
+## 🎯 模組間一致性原則
+
+### **統一的錯誤測試格式**
+
+```typescript
+// ✅ 所有模組應使用相同的錯誤回應格式
+expect(mockSocketInstance.emit).toHaveBeenCalledWith(
+  'error',
+  expect.objectContaining({
+    name: 'ServerError', // 統一錯誤名稱
+    message: expectedErrorMessage, // 具體錯誤訊息
+    tag: 'EXCEPTION_ERROR', // 統一標籤
+    statusCode: 500, // 統一狀態碼
+  }),
+);
+```
+
+### **權限測試的一致性**
+
+```typescript
+// 不同模組可能有不同的權限檢查模式：
+
+// Server 模組：使用權限等級檢查
+export const testInsufficientPermission = async (
+  handler: any,
+  mockSocketInstance: any,
+  mockIoInstance: any,
+  testData: any,
+  lowPermissionMember: Member,
+  expectationType: 'warning' | 'none' = 'warning',
+) => {
+  // 檢查權限等級...
+};
+
+// User 模組：使用用戶 ID 檢查
+export const testUnauthorizedUpdate = async (
+  handler: any,
+  mockSocketInstance: any,
+  mockIoInstance: any,
+  unauthorizedData: UpdateUserData,
+) => {
+  // 檢查用戶 ID 權限...
+};
+```
+
+**原則**：每個模組保持其特有的權限檢查邏輯，但函數結構和命名應保持一致。
+
+---
+
+## 📋 重構檢查清單範本
+
+### **開始重構前**
+
+```bash
+# 1. 記錄基準
+npm test -- __tests__/socket/[module] --passWithNoTests | grep "Test Suites\|Tests"
+# 例如：Test Suites: 4 passed, Tests: 29 passed
+
+# 2. 確保乾淨狀態
+git status  # 確保沒有未提交的變更
+```
+
+### **重構過程中**
+
+- [ ] 重構 `_testHelpers.ts` 的錯誤測試函數
+- [ ] 整合簡單的資料建立函數到 `createDefaultTestData`
+- [ ] 更新 `createStandardMockInstances` 加入必要參數
+- [ ] 改進 Mock 設定使用 `mockImplementation`
+- [ ] 更新測試檔案的 import 聲明
+- [ ] 調整測試檔案中的函數調用模式
+
+### **重構完成後**
+
+```bash
+# 1. 測試通過檢查
+npm test -- __tests__/socket/[module] --passWithNoTests
+
+# 2. TypeScript 檢查
+npx tsc --noEmit
+
+# 3. 確認測試數量一致
+# 應該與基準記錄相同
+```
+
+### **程式碼品質檢查**
+
+- [ ] 沒有重複的輔助函數定義
+- [ ] 沒有未使用的 import
+- [ ] 錯誤測試使用統一的輔助函數
+- [ ] Mock 設定標準化
+- [ ] 測試描述保持原有意圖
+
+---
+
+## 🚨 常見重構陷阱
+
+### **1. Import 清理不完整**
+
+```typescript
+// ❌ 忘記移除已整合的函數
+import {
+  createDefaultTestData,
+  createUpdateData, // 這個已經移到 testData 中了！
+} from './_testHelpers';
+```
+
+**解決方法**：重構後檢查 TypeScript 錯誤，移除未使用的 import。
+
+### **2. Mock 狀態不一致**
+
+```typescript
+// ❌ 不同測試間 mock 狀態不一致
+beforeEach(() => {
+  mockDataValidator.validate.mockResolvedValue({}); // 太簡單
+});
+
+// ✅ 確保 mock 返回正確資料
+beforeEach(() => {
+  mockDataValidator.validate.mockImplementation(
+    async (schema, data, part) => data,
+  );
+});
+```
+
+### **3. 測試邏輯意外改變**
+
+```typescript
+// ❌ 重構時意外改變測試邏輯
+it('應處理不同的搜尋條件', async () => {
+  // 重構前：使用 for 迴圈測試多個查詢
+  // 重構後：誤刪了迴圈邏輯，只測試一個查詢
+});
+```
+
+**預防方法**：重構時專注於代碼結構，不改變測試邏輯。
+
+### **4. 權限檢查邏輯不一致**
+
+不同模組可能有不同的權限檢查方式，不要強行統一，而是保持各自的邏輯合理性。
+
+---
+
+## 💡 下次重構速查表
+
+### **快速重構步驟**
+
+1. **備份測試結果** → `npm test -- __tests__/socket/[module]`
+2. **重構 \_testHelpers.ts**：
+   - 統一 `testDatabaseError` 格式
+   - 統一 `testValidationError` 格式
+   - 整合簡單資料建立函數到 `createDefaultTestData`
+   - 改進 `createStandardMockInstances`
+3. **更新測試檔案**：
+   - 清理 import
+   - 使用 `testData.createXxx()` 模式
+4. **驗證結果** → 測試數量和通過率不變
+
+### **檢查重點**
+
+- ✅ 錯誤回應格式：`{ name, message, tag, statusCode }`
+- ✅ Mock 設定：使用 `mockImplementation` 而非 `mockResolvedValue({})`
+- ✅ Import 清理：移除已整合的函數
+- ✅ 測試邏輯：保持原有邏輯不變
+
+---
+
+**記住**：重構的目標是**提高一致性和可維護性**，而不是改變測試邏輯。每次重構後都應該有**相同數量的測試**並且**全部通過**！

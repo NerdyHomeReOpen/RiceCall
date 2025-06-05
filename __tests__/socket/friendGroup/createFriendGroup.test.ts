@@ -1,89 +1,80 @@
 import { jest } from '@jest/globals';
+import { mockDatabase, mockDataValidator, mockInfo } from '../../_testSetup';
 
-// 被測試的模組
-import { CreateFriendGroupHandler } from '../../../src/api/socket/events/friendGroup/friendGroup.handler';
-
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockDatabase,
-  mockInfo,
-  mockWarn,
-} from '../../_testSetup';
-
-// 錯誤類型和Schema
-import { CreateFriendGroupSchema } from '../../../src/api/socket/events/friendGroup/friendGroup.schema';
-
-// Mock所有相依模組
+// Mock Database
 jest.mock('@/index', () => ({
   database: require('../../_testSetup').mockDatabase,
 }));
-jest.mock('@/utils/logger', () => ({
-  __esModule: true,
-  default: require('../../_testSetup').MockLogger,
-}));
+
+// Mock DataValidator
 jest.mock('@/middleware/data.validator', () => ({
   DataValidator: require('../../_testSetup').mockDataValidator,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  userId: 'user-id-123',
-  otherUserId: 'other-user-id',
-  friendGroupId: 'friend-group-id-123',
-} as const;
+jest.mock('@/utils/logger', () => ({
+  __esModule: true,
+  default: require('../../_testSetup').MockLogger,
+}));
 
-// 測試數據
-const defaultCreateData = {
-  userId: DEFAULT_IDS.userId,
-  group: {
-    name: '我的好友群組',
-    order: 0,
-  },
-};
+jest.mock('@/error', () => ({
+  __esModule: true,
+  default: require('../../_testSetup').MockStandardizedError,
+}));
+
+// 被測試的模組和測試輔助工具
+import { CreateFriendGroupHandler } from '../../../src/api/socket/events/friendGroup/friendGroup.handler';
+import { CreateFriendGroupSchema } from '../../../src/api/socket/events/friendGroup/friendGroup.schema';
+import {
+  createDefaultTestData,
+  createStandardMockInstances,
+  DEFAULT_IDS,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testPermissionFailure,
+  testValidationError,
+} from './_testHelpers';
 
 describe('CreateFriendGroupHandler (好友群組創建處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例，操作者ID設為userId
-    mockSocketInstance = createMockSocket(DEFAULT_IDS.userId, 'test-socket-id');
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances(DEFAULT_IDS.userId);
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    (mockDatabase.set.friendGroup as any).mockResolvedValue(true);
-    mockDatabase.get.friendGroup.mockResolvedValue({
-      friendGroupId: DEFAULT_IDS.friendGroupId,
-      name: '我的好友群組',
-      order: 0,
-      userId: DEFAULT_IDS.userId,
-      createdAt: Date.now(),
-    });
-    mockDataValidator.validate.mockResolvedValue(defaultCreateData);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
+  });
+
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功創建好友群組', async () => {
+    const data = testData.createFriendGroupCreateData();
     await CreateFriendGroupHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultCreateData,
+      data,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       CreateFriendGroupSchema,
-      defaultCreateData,
+      data,
       'CREATEFRIENDGROUP',
     );
 
     expect(mockDatabase.set.friendGroup).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        name: '我的好友群組',
+        name: '新建群組',
         order: 0,
         userId: DEFAULT_IDS.userId,
         createdAt: expect.any(Number),
@@ -100,61 +91,183 @@ describe('CreateFriendGroupHandler (好友群組創建處理)', () => {
     );
   });
 
-  it('操作者不能創建非自己的好友群組', async () => {
-    mockSocketInstance.data.userId = DEFAULT_IDS.otherUserId;
+  it('應處理資料驗證錯誤', async () => {
+    const invalidData = { userId: '', group: {} };
+    const validationError = new Error('好友群組資料不正確');
 
-    await CreateFriendGroupHandler.handle(
-      mockIoInstance,
+    await testValidationError(
+      CreateFriendGroupHandler,
       mockSocketInstance,
-      defaultCreateData,
-    );
-
-    expect(mockWarn).toHaveBeenCalledWith(
-      expect.stringContaining('Cannot create non-self friend groups'),
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '建立好友群組失敗，請稍後再試',
     );
   });
 
-  it('應正確呼叫資料驗證器', async () => {
-    await CreateFriendGroupHandler.handle(
-      mockIoInstance,
+  it('應處理資料庫錯誤', async () => {
+    await testDatabaseError(
+      CreateFriendGroupHandler,
       mockSocketInstance,
-      defaultCreateData,
-    );
-
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      CreateFriendGroupSchema,
-      defaultCreateData,
-      'CREATEFRIENDGROUP',
+      mockIoInstance,
+      testData.createFriendGroupCreateData(),
+      'set',
+      'Database connection failed',
+      '建立好友群組失敗，請稍後再試',
     );
   });
 
-  it('應生成UUID作為friendGroupId', async () => {
-    await CreateFriendGroupHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultCreateData,
-    );
-
-    const setFriendGroupCall = mockDatabase.set.friendGroup.mock.calls[0];
-    const friendGroupId = setFriendGroupCall[0];
-
-    // 檢查UUID格式 (36字符，包含連字符)
-    expect(friendGroupId).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-    );
+  describe('權限檢查', () => {
+    it('操作者不能創建非自己的好友群組', async () => {
+      await testPermissionFailure(
+        CreateFriendGroupHandler,
+        mockSocketInstance,
+        mockIoInstance,
+        testData.createFriendGroupCreateData(),
+        DEFAULT_IDS.otherUserId,
+        'Cannot create non-self friend groups',
+      );
+    });
   });
 
-  it('應包含創建時間戳', async () => {
-    await CreateFriendGroupHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultCreateData,
-    );
+  describe('好友群組創建處理', () => {
+    it('應生成UUID作為friendGroupId', async () => {
+      const data = testData.createFriendGroupCreateData();
+      await CreateFriendGroupHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
 
-    const setFriendGroupCall = mockDatabase.set.friendGroup.mock.calls[0];
-    const friendGroupData = setFriendGroupCall[1];
+      const setFriendGroupCall = mockDatabase.set.friendGroup.mock.calls[0];
+      const friendGroupId = setFriendGroupCall[0];
 
-    expect(friendGroupData.createdAt).toBeGreaterThan(0);
-    expect(typeof friendGroupData.createdAt).toBe('number');
+      // 檢查UUID格式 (36字符，包含連字符)
+      expect(friendGroupId).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      );
+    });
+
+    it('應包含創建時間戳', async () => {
+      const data = testData.createFriendGroupCreateData();
+      await CreateFriendGroupHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      const setFriendGroupCall = mockDatabase.set.friendGroup.mock.calls[0];
+      const friendGroupData = setFriendGroupCall[1];
+
+      expect(friendGroupData.createdAt).toBeGreaterThan(0);
+      expect(typeof friendGroupData.createdAt).toBe('number');
+    });
+
+    it('應正確處理自定義群組名稱', async () => {
+      const data = testData.createFriendGroupCreateData({
+        group: {
+          name: '自定義群組名稱',
+          order: 5,
+        },
+      });
+
+      await CreateFriendGroupHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendGroup).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          name: '自定義群組名稱',
+          order: 5,
+          userId: DEFAULT_IDS.userId,
+        }),
+      );
+    });
+
+    it('應正確處理群組順序', async () => {
+      const data = testData.createFriendGroupCreateData({
+        group: {
+          name: '測試群組',
+          order: 10,
+        },
+      });
+
+      await CreateFriendGroupHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendGroup).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          order: 10,
+        }),
+      );
+    });
+
+    it('應正確處理不同的用戶ID', async () => {
+      const customUserId = 'custom-user-id';
+      const customMockInstances = createStandardMockInstances(customUserId);
+      const customSocketInstance = customMockInstances.mockSocketInstance;
+
+      const data = testData.createFriendGroupCreateData({
+        userId: customUserId,
+      });
+
+      await CreateFriendGroupHandler.handle(
+        mockIoInstance,
+        customSocketInstance,
+        data,
+      );
+
+      expect(mockDatabase.set.friendGroup).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          userId: customUserId,
+        }),
+      );
+    });
+  });
+
+  describe('Socket事件處理', () => {
+    it('創建成功後應發送friendGroupAdd事件', async () => {
+      const data = testData.createFriendGroupCreateData();
+      await CreateFriendGroupHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockSocketInstance.emit).toHaveBeenCalledWith(
+        'friendGroupAdd',
+        expect.any(Object),
+      );
+    });
+
+    it('應在socket事件中包含正確的群組資料', async () => {
+      const data = testData.createFriendGroupCreateData({
+        group: {
+          name: '測試群組事件',
+          order: 3,
+        },
+      });
+
+      await CreateFriendGroupHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      // 檢查emit被調用時的第二個參數
+      const emitCall = mockSocketInstance.emit.mock.calls.find(
+        (call: any[]) => call[0] === 'friendGroupAdd',
+      );
+      expect(emitCall).toBeDefined();
+      expect(emitCall[1]).toBeDefined();
+    });
   });
 });

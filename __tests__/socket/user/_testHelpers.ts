@@ -90,6 +90,17 @@ export const createDefaultTestData = () => {
     special: { query: '特殊字符!@#' },
   };
 
+  // 輔助資料建立函數
+  const createSearchData = (query: string): SearchUserQuery => ({ query });
+
+  const createUpdateData = (
+    userId: string = DEFAULT_IDS.operatorUserId,
+    userUpdates: Partial<User> = {},
+  ): UpdateUserData => ({
+    userId,
+    user: userUpdates,
+  });
+
   return {
     operatorUser,
     targetUser,
@@ -97,6 +108,9 @@ export const createDefaultTestData = () => {
     searchResults,
     updateData,
     searchQueries,
+    // 輔助資料建立函數
+    createSearchData,
+    createUpdateData,
   };
 };
 
@@ -118,7 +132,9 @@ export const setupDefaultDatabaseMocks = (
   mockDatabase.set.user.mockResolvedValue(true);
 
   // Data validator mocks
-  mockDataValidator.validate.mockResolvedValue({});
+  mockDataValidator.validate.mockImplementation(
+    async (schema, data, part) => data,
+  );
 };
 
 // 設定 Socket mock
@@ -142,17 +158,6 @@ export const setupSocketMocks = (
 export const createMockServerHandlers = () => ({
   disconnectServer: { handle: jest.fn() },
   connectServer: { handle: jest.fn() },
-});
-
-// 工具函數
-export const createSearchData = (query: string): SearchUserQuery => ({ query });
-
-export const createUpdateData = (
-  userId: string = DEFAULT_IDS.operatorUserId,
-  userUpdates: Partial<User> = {},
-): UpdateUserData => ({
-  userId,
-  user: userUpdates,
 });
 
 // 用戶變種創建函數
@@ -206,7 +211,7 @@ export const setupConnectDisconnectBeforeEach = (
   (serverHandlers.connectServer.handle as any).mockResolvedValue(undefined);
 };
 
-// 通用錯誤測試輔助函數
+// 統一資料庫錯誤測試輔助函數
 export const testDatabaseError = async (
   handler: any,
   mockSocketInstance: any,
@@ -222,13 +227,14 @@ export const testDatabaseError = async (
   jest.clearAllMocks();
 
   if (errorType === 'get') {
+    // 讓各種 get 操作失敗
     mockDatabase.get.user.mockRejectedValue(dbError);
     mockDatabase.get.searchUser.mockRejectedValue(dbError);
   } else {
     // 確保前面的 get 操作成功，只有 set 失敗
-    mockDatabase.get.user.mockResolvedValue(
-      testData?.operatorUser || { userId: DEFAULT_IDS.operatorUserId },
-    );
+    if (testData?.operatorUser) {
+      mockDatabase.get.user.mockResolvedValue(testData.operatorUser);
+    }
     mockDatabase.set.user.mockRejectedValue(dbError);
   }
 
@@ -250,7 +256,7 @@ export const testDatabaseError = async (
   );
 };
 
-// 通用驗證錯誤測試輔助函數
+// 統一驗證錯誤測試輔助函數
 export const testValidationError = async (
   handler: any,
   mockSocketInstance: any,
@@ -259,7 +265,6 @@ export const testValidationError = async (
   validationError: Error,
   expectedErrorMessage: string,
 ) => {
-  // 先清除所有 mock
   jest.clearAllMocks();
 
   mockDataValidator.validate.mockRejectedValue(validationError);
@@ -289,12 +294,14 @@ export const createMockSearchResults = (
 };
 
 // 創建標準的 Mock 實例設定
-export const createStandardMockInstances = () => {
-  const mockSocketInstance = createMockSocket(
-    DEFAULT_IDS.operatorUserId,
-    DEFAULT_IDS.socketId,
-  );
+export const createStandardMockInstances = (
+  operatorUserId: string = DEFAULT_IDS.operatorUserId,
+  socketId: string = DEFAULT_IDS.socketId,
+) => {
+  const mockSocketInstance = createMockSocket(operatorUserId, socketId);
   const mockIoInstance = require('../../_testSetup').createMockIo();
+
+  mockSocketInstance.data.userId = operatorUserId;
 
   return { mockSocketInstance, mockIoInstance };
 };

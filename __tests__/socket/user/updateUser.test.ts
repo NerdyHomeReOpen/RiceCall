@@ -5,7 +5,6 @@ import {
   DEFAULT_IDS,
   createDefaultTestData,
   createStandardMockInstances,
-  createUpdateData,
   setupAfterEach,
   setupBeforeEach,
   testDatabaseError,
@@ -93,9 +92,12 @@ describe('UpdateUserHandler (更新用戶處理)', () => {
   });
 
   it('應處理部分更新', async () => {
-    const partialUpdateData = createUpdateData(DEFAULT_IDS.operatorUserId, {
-      name: '僅更新名稱',
-    });
+    const partialUpdateData = testData.createUpdateData(
+      DEFAULT_IDS.operatorUserId,
+      {
+        name: '僅更新名稱',
+      },
+    );
 
     mockDataValidator.validate.mockResolvedValue(partialUpdateData);
 
@@ -112,9 +114,12 @@ describe('UpdateUserHandler (更新用戶處理)', () => {
   });
 
   it('應拒絕更新其他用戶的資料', async () => {
-    const otherUserUpdateData = createUpdateData(DEFAULT_IDS.targetUserId, {
-      name: '嘗試更新其他用戶',
-    });
+    const otherUserUpdateData = testData.createUpdateData(
+      DEFAULT_IDS.targetUserId,
+      {
+        name: '嘗試更新其他用戶',
+      },
+    );
 
     await testUnauthorizedUpdate(
       UpdateUserHandler,
@@ -125,11 +130,14 @@ describe('UpdateUserHandler (更新用戶處理)', () => {
   });
 
   it('應處理不同類型的欄位更新', async () => {
-    const fieldUpdateData = createUpdateData(DEFAULT_IDS.operatorUserId, {
-      name: '新名稱',
-      signature: '新簽名',
-      status: 'dnd' as const,
-    });
+    const fieldUpdateData = testData.createUpdateData(
+      DEFAULT_IDS.operatorUserId,
+      {
+        name: '新名稱',
+        signature: '新簽名',
+        status: 'dnd' as const,
+      },
+    );
 
     mockDataValidator.validate.mockResolvedValue(fieldUpdateData);
 
@@ -172,9 +180,12 @@ describe('UpdateUserHandler (更新用戶處理)', () => {
   });
 
   it('應處理無效的狀態值', async () => {
-    const invalidStatusData = createUpdateData(DEFAULT_IDS.operatorUserId, {
-      status: 'invalid_status' as any,
-    });
+    const invalidStatusData = testData.createUpdateData(
+      DEFAULT_IDS.operatorUserId,
+      {
+        status: 'invalid_status' as any,
+      },
+    );
 
     const validationError = new Error('Invalid status value');
 
@@ -189,7 +200,10 @@ describe('UpdateUserHandler (更新用戶處理)', () => {
   });
 
   it('應處理空的更新資料', async () => {
-    const emptyUpdateData = createUpdateData(DEFAULT_IDS.operatorUserId, {});
+    const emptyUpdateData = testData.createUpdateData(
+      DEFAULT_IDS.operatorUserId,
+      {},
+    );
 
     mockDataValidator.validate.mockResolvedValue(emptyUpdateData);
 

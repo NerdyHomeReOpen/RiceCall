@@ -1,20 +1,5 @@
 import { jest } from '@jest/globals';
-
-// 被測試的模組
-import { FavoriteServerHandler } from '../../../src/api/socket/events/server/server.handler';
-
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockDatabase,
-  mockError,
-  mockInfo,
-} from '../../_testSetup';
-
-// 錯誤類型和Schema
-import { FavoriteServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import { mockDatabase, mockDataValidator, mockInfo } from '../../_testSetup';
 
 // Mock所有相依模組
 jest.mock('@/index', () => ({
@@ -28,54 +13,62 @@ jest.mock('@/middleware/data.validator', () => ({
   DataValidator: require('../../_testSetup').mockDataValidator,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  serverId: 'server-id-123',
-} as const;
-
-// 測試數據
-const defaultFavoriteData = {
-  serverId: DEFAULT_IDS.serverId,
-};
+// 被測試的模組和測試輔助工具
+import { FavoriteServerHandler } from '../../../src/api/socket/events/server/server.handler';
+import { FavoriteServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import {
+  createDefaultTestData,
+  createStandardMockInstances,
+  createUserServerVariant,
+  DEFAULT_IDS,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testValidationError,
+} from './_testHelpers';
 
 describe('FavoriteServerHandler (收藏伺服器處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
-    );
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    mockDataValidator.validate.mockResolvedValue(defaultFavoriteData);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
+  });
 
-    mockDatabase.get.userServer.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      favorite: false, // 預設未收藏
-      recent: true,
-    });
-
-    mockDatabase.set.userServer.mockResolvedValue(true);
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功收藏伺服器', async () => {
+    const data = testData.createFavoriteServerData();
+    const unfavoritedUserServer = createUserServerVariant(
+      testData.operatorUserServer,
+      {
+        favorite: false,
+      },
+    );
+
+    mockDatabase.get.userServer.mockResolvedValue(unfavoritedUserServer as any);
+
     await FavoriteServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultFavoriteData,
+      data,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       FavoriteServerSchema,
-      defaultFavoriteData,
+      data,
       'FAVORITESERVER',
     );
 
@@ -106,18 +99,20 @@ describe('FavoriteServerHandler (收藏伺服器處理)', () => {
   });
 
   it('應成功取消收藏伺服器', async () => {
-    // 模擬伺服器已收藏的狀態
-    mockDatabase.get.userServer.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      favorite: true, // 已收藏
-      recent: true,
-    });
+    const data = testData.createFavoriteServerData();
+    const favoritedUserServer = createUserServerVariant(
+      testData.operatorUserServer,
+      {
+        favorite: true,
+      },
+    );
+
+    mockDatabase.get.userServer.mockResolvedValue(favoritedUserServer as any);
 
     await FavoriteServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultFavoriteData,
+      data,
     );
 
     expect(mockDatabase.set.userServer).toHaveBeenCalledWith(
@@ -142,11 +137,21 @@ describe('FavoriteServerHandler (收藏伺服器處理)', () => {
   });
 
   it('應正確切換收藏狀態', async () => {
+    const data = testData.createFavoriteServerData();
+    const unfavoritedUserServer = createUserServerVariant(
+      testData.operatorUserServer,
+      {
+        favorite: false,
+      },
+    );
+
+    mockDatabase.get.userServer.mockResolvedValue(unfavoritedUserServer as any);
+
     // 測試從未收藏到收藏
     await FavoriteServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultFavoriteData,
+      data,
     );
 
     const firstCallArgs = mockDatabase.set.userServer.mock.calls[0];
@@ -154,20 +159,21 @@ describe('FavoriteServerHandler (收藏伺服器處理)', () => {
 
     // 重新設定為已收藏狀態
     jest.clearAllMocks();
-    mockDataValidator.validate.mockResolvedValue(defaultFavoriteData);
-    mockDatabase.get.userServer.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      favorite: true, // 現在已收藏
-      recent: true,
-    });
-    mockDatabase.set.userServer.mockResolvedValue(true);
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
+
+    const favoritedUserServer = createUserServerVariant(
+      testData.operatorUserServer,
+      {
+        favorite: true,
+      },
+    );
+    mockDatabase.get.userServer.mockResolvedValue(favoritedUserServer as any);
 
     // 測試從收藏到取消收藏
     await FavoriteServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultFavoriteData,
+      data,
     );
 
     const secondCallArgs = mockDatabase.set.userServer.mock.calls[0];
@@ -175,10 +181,12 @@ describe('FavoriteServerHandler (收藏伺服器處理)', () => {
   });
 
   it('應向用戶發送更新事件', async () => {
+    const data = testData.createFavoriteServerData();
+
     await FavoriteServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultFavoriteData,
+      data,
     );
 
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
@@ -191,118 +199,130 @@ describe('FavoriteServerHandler (收藏伺服器處理)', () => {
   });
 
   it('應處理不同的伺服器ID', async () => {
-    const differentServerData = {
-      serverId: 'different-server-id',
-    };
-    mockDataValidator.validate.mockResolvedValue(differentServerData);
-
-    mockDatabase.get.userServer.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: 'different-server-id',
-      favorite: false,
-      recent: true,
+    const customServerId = 'different-server-id';
+    const data = testData.createFavoriteServerData({
+      serverId: customServerId,
     });
+    const customUserServer = createUserServerVariant(
+      testData.operatorUserServer,
+      {
+        serverId: customServerId,
+        favorite: false,
+      },
+    );
+
+    mockDataValidator.validate.mockResolvedValue(data);
+    mockDatabase.get.userServer.mockResolvedValue(customUserServer as any);
 
     await FavoriteServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      differentServerData,
+      data,
     );
 
     expect(mockDatabase.get.userServer).toHaveBeenCalledWith(
       DEFAULT_IDS.operatorUserId,
-      'different-server-id',
+      customServerId,
     );
 
     expect(mockDatabase.set.userServer).toHaveBeenCalledWith(
       DEFAULT_IDS.operatorUserId,
-      'different-server-id',
+      customServerId,
       expect.objectContaining({
         favorite: true,
       }),
     );
   });
 
+  it('應處理顯式的收藏狀態設定', async () => {
+    const data = testData.createFavoriteServerData({
+      favorite: false, // 明確設定為不收藏
+    });
+
+    await FavoriteServerHandler.handle(
+      mockIoInstance,
+      mockSocketInstance,
+      data,
+    );
+
+    expect(mockDatabase.set.userServer).toHaveBeenCalledWith(
+      DEFAULT_IDS.operatorUserId,
+      DEFAULT_IDS.serverId,
+      expect.objectContaining({
+        favorite: false,
+      }),
+    );
+  });
+
   it('資料驗證失敗時應發送錯誤', async () => {
-    const validationError = new Error('Invalid server ID');
-    mockDataValidator.validate.mockRejectedValue(validationError);
+    const invalidData = { serverId: '' };
+    const validationError = new Error('伺服器ID不能為空');
 
-    await FavoriteServerHandler.handle(
-      mockIoInstance,
+    await testValidationError(
+      FavoriteServerHandler,
       mockSocketInstance,
-      defaultFavoriteData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(validationError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '收藏群組失敗，請稍後再試',
-        part: 'FAVORITESERVER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '收藏群組失敗，請稍後再試',
     );
   });
 
-  it('資料庫查詢失敗時應發送錯誤', async () => {
-    const dbError = new Error('Database query failed');
-    mockDatabase.get.userServer.mockRejectedValue(dbError);
-
-    await FavoriteServerHandler.handle(
-      mockIoInstance,
+  it('應處理資料庫查詢錯誤', async () => {
+    await testDatabaseError(
+      FavoriteServerHandler,
       mockSocketInstance,
-      defaultFavoriteData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(dbError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '收藏群組失敗，請稍後再試',
-        part: 'FAVORITESERVER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+      mockIoInstance,
+      testData.createFavoriteServerData(),
+      'get',
+      'Database query error',
+      '收藏群組失敗，請稍後再試',
     );
   });
 
-  it('資料庫更新失敗時應發送錯誤', async () => {
-    const dbError = new Error('Database update failed');
-    mockDatabase.set.userServer.mockRejectedValue(dbError);
-
-    await FavoriteServerHandler.handle(
-      mockIoInstance,
+  it('應處理資料庫更新錯誤', async () => {
+    await testDatabaseError(
+      FavoriteServerHandler,
       mockSocketInstance,
-      defaultFavoriteData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(dbError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '收藏群組失敗，請稍後再試',
-        part: 'FAVORITESERVER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+      mockIoInstance,
+      testData.createFavoriteServerData(),
+      'set',
+      'Database update error',
+      '收藏群組失敗，請稍後再試',
     );
   });
 
-  it('應正確呼叫資料驗證器', async () => {
-    await FavoriteServerHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultFavoriteData,
-    );
+  describe('業務邏輯檢查', () => {
+    it('應正確呼叫資料驗證器', async () => {
+      const data = testData.createFavoriteServerData();
 
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      FavoriteServerSchema,
-      defaultFavoriteData,
-      'FAVORITESERVER',
-    );
+      await FavoriteServerHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDataValidator.validate).toHaveBeenCalledWith(
+        FavoriteServerSchema,
+        data,
+        'FAVORITESERVER',
+      );
+    });
+
+    it('應按正確順序執行收藏流程', async () => {
+      const data = testData.createFavoriteServerData();
+
+      await FavoriteServerHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      // 檢查所有操作都被執行
+      expect(mockDataValidator.validate).toHaveBeenCalledTimes(1);
+      expect(mockDatabase.get.userServer).toHaveBeenCalledTimes(1);
+      expect(mockDatabase.set.userServer).toHaveBeenCalledTimes(1);
+      expect(mockSocketInstance.emit).toHaveBeenCalledTimes(1);
+    });
   });
 });

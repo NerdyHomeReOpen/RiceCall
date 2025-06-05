@@ -1,18 +1,5 @@
 import { jest } from '@jest/globals';
-
-// 被測試的模組
-import { RTCOfferHandler } from '../../../src/api/socket/events/rtc/rtc.handler';
-
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockError,
-} from '../../_testSetup';
-
-// 錯誤類型和Schema
-import { RTCOfferSchema } from '../../../src/api/socket/events/rtc/rtc.schemas';
+import { mockDataValidator } from '../../_testSetup';
 
 // Mock所有相依模組
 jest.mock('@/utils/logger', () => ({
@@ -23,49 +10,56 @@ jest.mock('@/middleware/data.validator', () => ({
   DataValidator: require('../../_testSetup').mockDataValidator,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  targetSocketId: 'target-socket-id',
-} as const;
+jest.mock('@/error', () => ({
+  __esModule: true,
+  default: require('../../_testSetup').MockStandardizedError,
+}));
 
-// 測試數據
-const defaultOfferData = {
-  to: DEFAULT_IDS.targetSocketId,
-  offer: {
-    type: 'offer',
-    sdp: 'v=0\r\no=alice 2890844526 2890844527 IN IP4 host.atlanta.com\r\n...',
-  },
-};
+// 被測試的模組和測試輔助工具
+import { RTCOfferHandler } from '../../../src/api/socket/events/rtc/rtc.handler';
+import { RTCOfferSchema } from '../../../src/api/socket/events/rtc/rtc.schemas';
+import {
+  createDefaultTestData,
+  createRTCOfferVariant,
+  createStandardMockInstances,
+  DEFAULT_IDS,
+  expectRTCEventData,
+  findSocketEmitCall,
+  setupAfterEach,
+  setupBeforeEach,
+  testValidationError,
+} from './_testHelpers';
 
 describe('RTCOfferHandler (RTC Offer處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
-    );
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    mockDataValidator.validate.mockResolvedValue(defaultOfferData);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
+  });
+
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功發送RTC offer', async () => {
-    await RTCOfferHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultOfferData,
-    );
+    const data = testData.createRTCOfferData();
+
+    await RTCOfferHandler.handle(mockIoInstance, mockSocketInstance, data);
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       RTCOfferSchema,
-      defaultOfferData,
+      data,
       'RTCOFFER',
     );
 
@@ -73,99 +67,124 @@ describe('RTCOfferHandler (RTC Offer處理)', () => {
       DEFAULT_IDS.targetSocketId,
     );
 
-    const emitCalls = mockSocketInstance.to().emit.mock.calls;
-    const rtcOfferCall = emitCalls.find((call: any) => call[0] === 'RTCOffer');
-    expect(rtcOfferCall).toBeTruthy();
-
-    if (rtcOfferCall) {
-      expect(rtcOfferCall[1]).toEqual({
-        from: 'test-socket-id',
-        userId: DEFAULT_IDS.operatorUserId,
-        offer: defaultOfferData.offer,
-      });
-    }
+    const rtcOfferCall = findSocketEmitCall(mockSocketInstance, 'RTCOffer');
+    expectRTCEventData(rtcOfferCall, {
+      from: DEFAULT_IDS.socketId,
+      userId: DEFAULT_IDS.operatorUserId,
+      offer: testData.defaultOffer,
+    });
   });
 
   it('應正確傳遞offer資料', async () => {
-    const customOffer = {
-      type: 'offer',
+    const customOffer = createRTCOfferVariant(testData.defaultOffer, {
       sdp: 'custom sdp data',
-    };
-    const customData = {
-      ...defaultOfferData,
+    });
+    const data = testData.createRTCOfferData({
       offer: customOffer,
-    };
-    mockDataValidator.validate.mockResolvedValue(customData);
+    });
 
-    await RTCOfferHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      customData,
-    );
+    await RTCOfferHandler.handle(mockIoInstance, mockSocketInstance, data);
 
-    const emitCalls = mockSocketInstance.to().emit.mock.calls;
-    const rtcOfferCall = emitCalls.find((call: any) => call[0] === 'RTCOffer');
+    const rtcOfferCall = findSocketEmitCall(mockSocketInstance, 'RTCOffer');
+    expectRTCEventData(rtcOfferCall, {
+      from: DEFAULT_IDS.socketId,
+      userId: DEFAULT_IDS.operatorUserId,
+      offer: customOffer,
+    });
+  });
 
-    if (rtcOfferCall) {
-      expect(rtcOfferCall[1].offer).toEqual(customOffer);
-    }
+  it('應正確處理不同的目標Socket ID', async () => {
+    const customTargetSocketId = 'custom-target-socket';
+    const data = testData.createRTCOfferData({
+      to: customTargetSocketId,
+    });
+
+    await RTCOfferHandler.handle(mockIoInstance, mockSocketInstance, data);
+
+    expect(mockSocketInstance.to).toHaveBeenCalledWith(customTargetSocketId);
+
+    const rtcOfferCall = findSocketEmitCall(mockSocketInstance, 'RTCOffer');
+    expectRTCEventData(rtcOfferCall, {
+      from: DEFAULT_IDS.socketId,
+      userId: DEFAULT_IDS.operatorUserId,
+      offer: testData.defaultOffer,
+    });
   });
 
   it('資料驗證失敗時應發送錯誤', async () => {
+    const invalidData = { to: '', offer: {} };
     const validationError = new Error('Invalid data');
-    mockDataValidator.validate.mockRejectedValue(validationError);
 
-    await RTCOfferHandler.handle(
-      mockIoInstance,
+    await testValidationError(
+      RTCOfferHandler,
       mockSocketInstance,
-      defaultOfferData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(validationError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '連接 RTC 失敗，請稍後再試',
-        part: 'RTCOFFER',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      }),
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '連接 RTC 失敗，請稍後再試',
     );
   });
 
-  it('應正確呼叫資料驗證器', async () => {
-    await RTCOfferHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultOfferData,
-    );
+  describe('RTC Offer 資料處理', () => {
+    it('應包含正確的socket資訊', async () => {
+      const data = testData.createRTCOfferData();
 
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      RTCOfferSchema,
-      defaultOfferData,
-      'RTCOFFER',
-    );
+      await RTCOfferHandler.handle(mockIoInstance, mockSocketInstance, data);
+
+      const rtcOfferCall = findSocketEmitCall(mockSocketInstance, 'RTCOffer');
+      expect(rtcOfferCall).toBeTruthy();
+      if (rtcOfferCall) {
+        expect(rtcOfferCall[1]).toEqual(
+          expect.objectContaining({
+            from: DEFAULT_IDS.socketId,
+            userId: DEFAULT_IDS.operatorUserId,
+            offer: expect.any(Object),
+          }),
+        );
+      }
+    });
+
+    it('應正確處理不同類型的offer', async () => {
+      const customOffer = createRTCOfferVariant(testData.defaultOffer, {
+        type: 'offer',
+        sdp: 'v=0\r\no=custom 1234567890 1234567891 IN IP4 custom.host.com\r\n...',
+      });
+      const data = testData.createRTCOfferData({
+        offer: customOffer,
+      });
+
+      await RTCOfferHandler.handle(mockIoInstance, mockSocketInstance, data);
+
+      const rtcOfferCall = findSocketEmitCall(mockSocketInstance, 'RTCOffer');
+      expectRTCEventData(rtcOfferCall, {
+        from: DEFAULT_IDS.socketId,
+        userId: DEFAULT_IDS.operatorUserId,
+        offer: customOffer,
+      });
+    });
   });
 
-  it('應包含正確的socket資訊', async () => {
-    await RTCOfferHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultOfferData,
-    );
+  describe('業務邏輯檢查', () => {
+    it('應正確呼叫資料驗證器', async () => {
+      const data = testData.createRTCOfferData();
 
-    const emitCalls = mockSocketInstance.to().emit.mock.calls;
-    const rtcOfferCall = emitCalls.find((call: any) => call[0] === 'RTCOffer');
+      await RTCOfferHandler.handle(mockIoInstance, mockSocketInstance, data);
 
-    if (rtcOfferCall) {
-      expect(rtcOfferCall[1]).toEqual(
-        expect.objectContaining({
-          from: 'test-socket-id',
-          userId: DEFAULT_IDS.operatorUserId,
-          offer: expect.any(Object),
-        }),
+      expect(mockDataValidator.validate).toHaveBeenCalledWith(
+        RTCOfferSchema,
+        data,
+        'RTCOFFER',
       );
-    }
+    });
+
+    it('應按正確順序執行發送流程', async () => {
+      const data = testData.createRTCOfferData();
+
+      await RTCOfferHandler.handle(mockIoInstance, mockSocketInstance, data);
+
+      // 檢查所有操作都被執行
+      expect(mockDataValidator.validate).toHaveBeenCalledTimes(1);
+      expect(mockSocketInstance.to).toHaveBeenCalledTimes(1);
+    });
   });
 });

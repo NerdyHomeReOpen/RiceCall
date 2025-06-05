@@ -1,18 +1,5 @@
 import { jest } from '@jest/globals';
-
-// 被測試的模組
-import { RTCCandidateHandler } from '../../../src/api/socket/events/rtc/rtc.handler';
-
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockError,
-} from '../../_testSetup';
-
-// 錯誤類型和Schema
-import { RTCCandidateSchema } from '../../../src/api/socket/events/rtc/rtc.schemas';
+import { mockDataValidator } from '../../_testSetup';
 
 // Mock所有相依模組
 jest.mock('@/utils/logger', () => ({
@@ -23,50 +10,56 @@ jest.mock('@/middleware/data.validator', () => ({
   DataValidator: require('../../_testSetup').mockDataValidator,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  targetSocketId: 'target-socket-id',
-} as const;
+jest.mock('@/error', () => ({
+  __esModule: true,
+  default: require('../../_testSetup').MockStandardizedError,
+}));
 
-// 測試數據
-const defaultCandidateData = {
-  to: DEFAULT_IDS.targetSocketId,
-  candidate: {
-    candidate: 'candidate:1 1 UDP 2130706431 192.168.1.100 54400 typ host',
-    sdpMLineIndex: 0,
-    sdpMid: '0',
-  },
-};
+// 被測試的模組和測試輔助工具
+import { RTCCandidateHandler } from '../../../src/api/socket/events/rtc/rtc.handler';
+import { RTCCandidateSchema } from '../../../src/api/socket/events/rtc/rtc.schemas';
+import {
+  createDefaultTestData,
+  createRTCCandidateVariant,
+  createStandardMockInstances,
+  DEFAULT_IDS,
+  expectRTCEventData,
+  findSocketEmitCall,
+  setupAfterEach,
+  setupBeforeEach,
+  testValidationError,
+} from './_testHelpers';
 
 describe('RTCCandidateHandler (RTC Candidate處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
-    );
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    mockDataValidator.validate.mockResolvedValue(defaultCandidateData);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
+  });
+
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功發送RTC candidate', async () => {
-    await RTCCandidateHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultCandidateData,
-    );
+    const data = testData.createRTCCandidateData();
+
+    await RTCCandidateHandler.handle(mockIoInstance, mockSocketInstance, data);
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       RTCCandidateSchema,
-      defaultCandidateData,
+      data,
       'RTCCANDIDATE',
     );
 
@@ -74,130 +67,205 @@ describe('RTCCandidateHandler (RTC Candidate處理)', () => {
       DEFAULT_IDS.targetSocketId,
     );
 
-    const emitCalls = mockSocketInstance.to().emit.mock.calls;
-    const rtcCandidateCall = emitCalls.find(
-      (call: any) => call[0] === 'RTCIceCandidate',
+    const rtcCandidateCall = findSocketEmitCall(
+      mockSocketInstance,
+      'RTCIceCandidate',
     );
-    expect(rtcCandidateCall).toBeTruthy();
-
-    if (rtcCandidateCall) {
-      expect(rtcCandidateCall[1]).toEqual({
-        from: 'test-socket-id',
-        userId: DEFAULT_IDS.operatorUserId,
-        candidate: defaultCandidateData.candidate,
-      });
-    }
+    expectRTCEventData(rtcCandidateCall, {
+      from: DEFAULT_IDS.socketId,
+      userId: DEFAULT_IDS.operatorUserId,
+      candidate: testData.defaultCandidate,
+    });
   });
 
   it('應正確傳遞candidate資料', async () => {
-    const customCandidate = {
-      candidate:
-        'candidate:2 1 TCP 2130706431 10.0.0.1 9 typ host tcptype active',
-      sdpMLineIndex: 1,
-      sdpMid: '1',
-    };
-    const customData = {
-      ...defaultCandidateData,
+    const customCandidate = createRTCCandidateVariant(
+      testData.defaultCandidate,
+      {
+        candidate:
+          'candidate:2 1 TCP 2130706431 10.0.0.1 9 typ host tcptype active',
+        sdpMLineIndex: 1,
+        sdpMid: '1',
+      },
+    );
+    const data = testData.createRTCCandidateData({
       candidate: customCandidate,
-    };
-    mockDataValidator.validate.mockResolvedValue(customData);
+    });
 
-    await RTCCandidateHandler.handle(
-      mockIoInstance,
+    await RTCCandidateHandler.handle(mockIoInstance, mockSocketInstance, data);
+
+    const rtcCandidateCall = findSocketEmitCall(
       mockSocketInstance,
-      customData,
+      'RTCIceCandidate',
     );
-
-    const emitCalls = mockSocketInstance.to().emit.mock.calls;
-    const rtcCandidateCall = emitCalls.find(
-      (call: any) => call[0] === 'RTCIceCandidate',
-    );
-
-    if (rtcCandidateCall) {
-      expect(rtcCandidateCall[1].candidate).toEqual(customCandidate);
-    }
+    expectRTCEventData(rtcCandidateCall, {
+      from: DEFAULT_IDS.socketId,
+      userId: DEFAULT_IDS.operatorUserId,
+      candidate: customCandidate,
+    });
   });
 
-  it('資料驗證失敗時應發送錯誤', async () => {
-    const validationError = new Error('Invalid candidate data');
-    mockDataValidator.validate.mockRejectedValue(validationError);
+  it('應正確處理不同的目標Socket ID', async () => {
+    const customTargetSocketId = 'custom-target-socket';
+    const data = testData.createRTCCandidateData({
+      to: customTargetSocketId,
+    });
 
-    await RTCCandidateHandler.handle(
-      mockIoInstance,
+    await RTCCandidateHandler.handle(mockIoInstance, mockSocketInstance, data);
+
+    expect(mockSocketInstance.to).toHaveBeenCalledWith(customTargetSocketId);
+
+    const rtcCandidateCall = findSocketEmitCall(
       mockSocketInstance,
-      defaultCandidateData,
+      'RTCIceCandidate',
     );
-
-    expect(mockError).toHaveBeenCalledWith(validationError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '連接 RTC 失敗，請稍後再試',
-        part: 'RTCCANDIDATE',
-        tag: 'SERVER_ERROR',
-        statusCode: 500,
-      }),
-    );
-  });
-
-  it('應正確呼叫資料驗證器', async () => {
-    await RTCCandidateHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultCandidateData,
-    );
-
-    expect(mockDataValidator.validate).toHaveBeenCalledWith(
-      RTCCandidateSchema,
-      defaultCandidateData,
-      'RTCCANDIDATE',
-    );
-  });
-
-  it('應包含正確的socket資訊', async () => {
-    await RTCCandidateHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      defaultCandidateData,
-    );
-
-    const emitCalls = mockSocketInstance.to().emit.mock.calls;
-    const rtcCandidateCall = emitCalls.find(
-      (call: any) => call[0] === 'RTCIceCandidate',
-    );
-
-    if (rtcCandidateCall) {
-      expect(rtcCandidateCall[1]).toEqual(
-        expect.objectContaining({
-          from: 'test-socket-id',
-          userId: DEFAULT_IDS.operatorUserId,
-          candidate: expect.any(Object),
-        }),
-      );
-    }
+    expectRTCEventData(rtcCandidateCall, {
+      from: DEFAULT_IDS.socketId,
+      userId: DEFAULT_IDS.operatorUserId,
+      candidate: testData.defaultCandidate,
+    });
   });
 
   it('應處理空的candidate資料', async () => {
-    const emptyCandidateData = {
-      to: DEFAULT_IDS.targetSocketId,
+    const data = testData.createRTCCandidateData({
       candidate: null,
-    };
-    mockDataValidator.validate.mockResolvedValue(emptyCandidateData);
+    });
 
-    await RTCCandidateHandler.handle(
-      mockIoInstance,
+    await RTCCandidateHandler.handle(mockIoInstance, mockSocketInstance, data);
+
+    const rtcCandidateCall = findSocketEmitCall(
       mockSocketInstance,
-      emptyCandidateData,
+      'RTCIceCandidate',
     );
+    expectRTCEventData(rtcCandidateCall, {
+      from: DEFAULT_IDS.socketId,
+      userId: DEFAULT_IDS.operatorUserId,
+      candidate: null,
+    });
+  });
 
-    const emitCalls = mockSocketInstance.to().emit.mock.calls;
-    const rtcCandidateCall = emitCalls.find(
-      (call: any) => call[0] === 'RTCIceCandidate',
+  it('資料驗證失敗時應發送錯誤', async () => {
+    const invalidData = { to: '', candidate: {} };
+    const validationError = new Error('Invalid candidate data');
+
+    await testValidationError(
+      RTCCandidateHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '連接 RTC 失敗，請稍後再試',
     );
+  });
 
-    if (rtcCandidateCall) {
-      expect(rtcCandidateCall[1].candidate).toBeNull();
-    }
+  describe('RTC Candidate 資料處理', () => {
+    it('應包含正確的socket資訊', async () => {
+      const data = testData.createRTCCandidateData();
+
+      await RTCCandidateHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      const rtcCandidateCall = findSocketEmitCall(
+        mockSocketInstance,
+        'RTCIceCandidate',
+      );
+      expect(rtcCandidateCall).toBeTruthy();
+      if (rtcCandidateCall) {
+        expect(rtcCandidateCall[1]).toEqual(
+          expect.objectContaining({
+            from: DEFAULT_IDS.socketId,
+            userId: DEFAULT_IDS.operatorUserId,
+            candidate: expect.any(Object),
+          }),
+        );
+      }
+    });
+
+    it('應正確處理不同類型的candidate', async () => {
+      const customCandidate = createRTCCandidateVariant(
+        testData.defaultCandidate,
+        {
+          candidate:
+            'candidate:3 1 UDP 2130706431 192.168.2.100 12345 typ srflx raddr 192.168.2.1 rport 54321',
+          sdpMLineIndex: 2,
+          sdpMid: 'audio',
+        },
+      );
+      const data = testData.createRTCCandidateData({
+        candidate: customCandidate,
+      });
+
+      await RTCCandidateHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      const rtcCandidateCall = findSocketEmitCall(
+        mockSocketInstance,
+        'RTCIceCandidate',
+      );
+      expectRTCEventData(rtcCandidateCall, {
+        from: DEFAULT_IDS.socketId,
+        userId: DEFAULT_IDS.operatorUserId,
+        candidate: customCandidate,
+      });
+    });
+
+    it('應正確處理 null candidate (終止指示)', async () => {
+      const data = testData.createRTCCandidateData({
+        candidate: null,
+      });
+
+      await RTCCandidateHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      const rtcCandidateCall = findSocketEmitCall(
+        mockSocketInstance,
+        'RTCIceCandidate',
+      );
+      expect(rtcCandidateCall).toBeTruthy();
+      if (rtcCandidateCall) {
+        expect(rtcCandidateCall[1].candidate).toBeNull();
+      }
+    });
+  });
+
+  describe('業務邏輯檢查', () => {
+    it('應正確呼叫資料驗證器', async () => {
+      const data = testData.createRTCCandidateData();
+
+      await RTCCandidateHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      expect(mockDataValidator.validate).toHaveBeenCalledWith(
+        RTCCandidateSchema,
+        data,
+        'RTCCANDIDATE',
+      );
+    });
+
+    it('應按正確順序執行發送流程', async () => {
+      const data = testData.createRTCCandidateData();
+
+      await RTCCandidateHandler.handle(
+        mockIoInstance,
+        mockSocketInstance,
+        data,
+      );
+
+      // 檢查所有操作都被執行
+      expect(mockDataValidator.validate).toHaveBeenCalledTimes(1);
+      expect(mockSocketInstance.to).toHaveBeenCalledTimes(1);
+    });
   });
 });
