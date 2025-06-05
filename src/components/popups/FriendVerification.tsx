@@ -209,6 +209,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
               <div
                 className={friendVerification['allCancel']}
                 onClick={() => {
+                  if (friendApplications.length === 0) return;
                   handleDeleteAllFriendApplication();
                 }}
               >
