@@ -1,29 +1,5 @@
 import { jest } from '@jest/globals';
-
-// Mock SocketServer和DisconnectChannelHandler - 需要在jest.mock之前定義
-const mockSocketServer = {
-  getSocket: jest.fn(),
-};
-const mockDisconnectChannelHandler = {
-  handle: jest.fn(),
-};
-
-// 被測試的模組
-import { DisconnectServerHandler } from '../../../src/api/socket/events/server/server.handler';
-
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockDatabase,
-  mockError,
-  mockInfo,
-  mockWarn,
-} from '../../_testSetup';
-
-// 錯誤類型和Schema
-import { DisconnectServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import { mockDatabase, mockDataValidator, mockInfo } from '../../_testSetup';
 
 // Mock所有相依模組
 jest.mock('@/index', () => ({
@@ -36,6 +12,15 @@ jest.mock('@/utils/logger', () => ({
 jest.mock('@/middleware/data.validator', () => ({
   DataValidator: require('../../_testSetup').mockDataValidator,
 }));
+
+// Mock handlers - 需要在 beforeEach 中定義
+const mockSocketServer = {
+  getSocket: jest.fn(),
+};
+const mockDisconnectChannelHandler = {
+  handle: jest.fn(),
+};
+
 jest.mock('@/api/socket', () => ({
   __esModule: true,
   default: mockSocketServer,
@@ -44,64 +29,70 @@ jest.mock('@/api/socket/events/channel/channel.handler', () => ({
   DisconnectChannelHandler: mockDisconnectChannelHandler,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  targetUserId: 'target-user-id',
-  serverId: 'server-id-123',
-  channelId: 'channel-id-123',
-} as const;
-
-// 測試數據
-const defaultDisconnectData = {
-  userId: DEFAULT_IDS.operatorUserId,
-  serverId: DEFAULT_IDS.serverId,
-};
+// 被測試的模組和測試輔助工具
+import { DisconnectServerHandler } from '../../../src/api/socket/events/server/server.handler';
+import { DisconnectServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import {
+  createDefaultTestData,
+  createMemberVariant,
+  createStandardMockInstances,
+  createUserVariant,
+  DEFAULT_IDS,
+  setupAfterEach,
+  setupConnectDisconnectBeforeEach,
+  testValidationError,
+} from './_testHelpers';
 
 describe('DisconnectServerHandler (斷開伺服器處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
+
+    // 設定 connect/disconnect 專用的 beforeEach
+    setupConnectDisconnectBeforeEach(
+      mockSocketInstance,
+      mockIoInstance,
+      testData,
     );
-    mockIoInstance = createMockIo();
 
-    // 預設mock回傳值
-    mockDataValidator.validate.mockResolvedValue(defaultDisconnectData);
+    // 設定 disconnect 專用的額外 mock
+    (mockDisconnectChannelHandler.handle as any).mockResolvedValue(undefined);
+    mockSocketServer.getSocket.mockReturnValue(mockSocketInstance);
 
-    mockDatabase.get.user.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      username: 'testuser',
+    // 設定用戶在伺服器中的狀態
+    const userInServer = createUserVariant(testData.operatorUser, {
       currentServerId: DEFAULT_IDS.serverId,
       currentChannelId: DEFAULT_IDS.channelId,
     });
+    mockDatabase.get.user.mockResolvedValue(userInServer as any);
+    mockDatabase.get.member.mockResolvedValue(testData.operatorMember as any);
+  });
 
-    mockDatabase.get.member.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      permissionLevel: 3,
-      isBlocked: 0,
-    });
-
-    (mockDisconnectChannelHandler.handle as any).mockResolvedValue(undefined);
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功斷開自己的伺服器連接', async () => {
+    const disconnectData = testData.createDisconnectServerData();
+
     await DisconnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultDisconnectData,
+      disconnectData,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       DisconnectServerSchema,
-      defaultDisconnectData,
+      disconnectData,
       'DISCONNECTSERVER',
     );
 
@@ -126,10 +117,12 @@ describe('DisconnectServerHandler (斷開伺服器處理)', () => {
   });
 
   it('應在斷開前離開當前頻道', async () => {
+    const disconnectData = testData.createDisconnectServerData();
+
     await DisconnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultDisconnectData,
+      disconnectData,
     );
 
     expect(mockDisconnectChannelHandler.handle).toHaveBeenCalledWith(
@@ -144,46 +137,47 @@ describe('DisconnectServerHandler (斷開伺服器處理)', () => {
   });
 
   it('管理員可以踢出其他用戶', async () => {
-    const kickData = {
+    const kickData = testData.createDisconnectServerData({
       userId: DEFAULT_IDS.targetUserId,
-      serverId: DEFAULT_IDS.serverId,
-    };
-    mockDataValidator.validate.mockResolvedValue(kickData);
+    });
 
     // 目標用戶資料
+    const targetUserInServer = createUserVariant(testData.targetUser, {
+      currentServerId: DEFAULT_IDS.serverId,
+      currentChannelId: DEFAULT_IDS.channelId,
+    });
+    const operatorUserInServer = createUserVariant(testData.operatorUser, {
+      currentServerId: DEFAULT_IDS.serverId,
+      currentChannelId: DEFAULT_IDS.channelId,
+    });
+
+    // 按照實際 handler 的調用順序設定 mock：
+    // 1. database.get.user(userId) - target user
+    // 2. database.get.member(userId, serverId) - target member
+    // 3. database.get.user(operatorId) - operator user
+    // 4. database.get.member(operatorId, serverId) - operator member
     mockDatabase.get.user
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.operatorUserId,
-        username: 'operator',
-        currentServerId: DEFAULT_IDS.serverId,
-        currentChannelId: DEFAULT_IDS.channelId,
-      })
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.targetUserId,
-        username: 'targetuser',
-        currentServerId: DEFAULT_IDS.serverId,
-        currentChannelId: DEFAULT_IDS.channelId,
-      });
+      .mockResolvedValueOnce(targetUserInServer as any) // target user
+      .mockResolvedValueOnce(operatorUserInServer as any); // operator user
 
-    // 操作者是管理員
+    // 操作者是管理員，目標用戶是一般用戶
+    const regularMember = createMemberVariant(testData.targetMember, {
+      permissionLevel: 3, // 一般用戶權限
+    });
+    const adminMember = createMemberVariant(testData.operatorMember, {
+      permissionLevel: 5, // 管理員權限
+    });
+
     mockDatabase.get.member
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.targetUserId,
-        serverId: DEFAULT_IDS.serverId,
-        permissionLevel: 3, // 一般用戶權限
-        isBlocked: 0,
-      })
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.operatorUserId,
-        serverId: DEFAULT_IDS.serverId,
-        permissionLevel: 5, // 管理員權限
-        isBlocked: 0,
-      });
+      .mockResolvedValueOnce(regularMember as any) // target member
+      .mockResolvedValueOnce(adminMember as any); // operator member
 
-    const targetSocket = createMockSocket(
+    const targetSocket = require('../../_testSetup').createMockSocket(
       DEFAULT_IDS.targetUserId,
       'target-socket-id',
     );
+
+    // 在調用 handler 之前設定 getSocket mock
     mockSocketServer.getSocket.mockReturnValue(targetSocket);
 
     await DisconnectServerHandler.handle(
@@ -209,26 +203,21 @@ describe('DisconnectServerHandler (斷開伺服器處理)', () => {
   });
 
   it('權限不足時不能踢出其他用戶', async () => {
-    const kickData = {
+    const kickData = testData.createDisconnectServerData({
       userId: DEFAULT_IDS.targetUserId,
-      serverId: DEFAULT_IDS.serverId,
-    };
-    mockDataValidator.validate.mockResolvedValue(kickData);
+    });
 
-    // 操作者權限不足（權限低且目標用戶權限更高）
+    // 操作者權限不足，目標用戶權限更高
+    const lowPermissionMember = createMemberVariant(testData.operatorMember, {
+      permissionLevel: 3, // 權限不足
+    });
+    const higherPermissionMember = createMemberVariant(testData.targetMember, {
+      permissionLevel: 4, // 目標用戶權限更高
+    });
+
     mockDatabase.get.member
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.operatorUserId,
-        serverId: DEFAULT_IDS.serverId,
-        permissionLevel: 3, // 權限不足
-        isBlocked: 0,
-      })
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.targetUserId,
-        serverId: DEFAULT_IDS.serverId,
-        permissionLevel: 4, // 目標用戶權限更高
-        isBlocked: 0,
-      });
+      .mockResolvedValueOnce(lowPermissionMember as any)
+      .mockResolvedValueOnce(higherPermissionMember as any);
 
     await DisconnectServerHandler.handle(
       mockIoInstance,
@@ -236,32 +225,28 @@ describe('DisconnectServerHandler (斷開伺服器處理)', () => {
       kickData,
     );
 
+    const mockWarn = require('../../_testSetup').mockWarn;
     expect(mockWarn).toHaveBeenCalledWith(
       expect.stringContaining('Not enough permission'),
     );
   });
 
   it('不能踢出權限相等或更高的用戶', async () => {
-    const kickData = {
+    const kickData = testData.createDisconnectServerData({
       userId: DEFAULT_IDS.targetUserId,
-      serverId: DEFAULT_IDS.serverId,
-    };
-    mockDataValidator.validate.mockResolvedValue(kickData);
+    });
 
-    // 目標用戶權限相等
+    // 兩個用戶權限相等
+    const adminMember = createMemberVariant(testData.operatorMember, {
+      permissionLevel: 5, // 管理員權限
+    });
+    const equalPermissionMember = createMemberVariant(testData.targetMember, {
+      permissionLevel: 5, // 相同權限
+    });
+
     mockDatabase.get.member
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.operatorUserId,
-        serverId: DEFAULT_IDS.serverId,
-        permissionLevel: 5, // 管理員權限
-        isBlocked: 0,
-      })
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.targetUserId,
-        serverId: DEFAULT_IDS.serverId,
-        permissionLevel: 5, // 相同權限
-        isBlocked: 0,
-      });
+      .mockResolvedValueOnce(adminMember as any)
+      .mockResolvedValueOnce(equalPermissionMember as any);
 
     await DisconnectServerHandler.handle(
       mockIoInstance,
@@ -269,38 +254,34 @@ describe('DisconnectServerHandler (斷開伺服器處理)', () => {
       kickData,
     );
 
+    const mockWarn = require('../../_testSetup').mockWarn;
     expect(mockWarn).toHaveBeenCalledWith(
       expect.stringContaining('Target has higher or equal permission'),
     );
   });
 
   it('目標用戶不在伺服器時不能踢出', async () => {
-    const kickData = {
+    const kickData = testData.createDisconnectServerData({
       userId: DEFAULT_IDS.targetUserId,
-      serverId: DEFAULT_IDS.serverId,
-    };
-    mockDataValidator.validate.mockResolvedValue(kickData);
+    });
 
-    mockDatabase.get.user.mockResolvedValue({
-      userId: DEFAULT_IDS.targetUserId,
-      username: 'targetuser',
+    const targetUserNotInServer = createUserVariant(testData.targetUser, {
       currentServerId: 'other-server-id', // 不在目標伺服器
       currentChannelId: null,
     });
 
+    mockDatabase.get.user.mockResolvedValue(targetUserNotInServer as any);
+
+    const adminMember = createMemberVariant(testData.operatorMember, {
+      permissionLevel: 5,
+    });
+    const regularMember = createMemberVariant(testData.targetMember, {
+      permissionLevel: 3,
+    });
+
     mockDatabase.get.member
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.operatorUserId,
-        serverId: DEFAULT_IDS.serverId,
-        permissionLevel: 5,
-        isBlocked: 0,
-      })
-      .mockResolvedValueOnce({
-        userId: DEFAULT_IDS.targetUserId,
-        serverId: DEFAULT_IDS.serverId,
-        permissionLevel: 3,
-        isBlocked: 0,
-      });
+      .mockResolvedValueOnce(adminMember as any)
+      .mockResolvedValueOnce(regularMember as any);
 
     await DisconnectServerHandler.handle(
       mockIoInstance,
@@ -308,16 +289,19 @@ describe('DisconnectServerHandler (斷開伺服器處理)', () => {
       kickData,
     );
 
+    const mockWarn = require('../../_testSetup').mockWarn;
     expect(mockWarn).toHaveBeenCalledWith(
       expect.stringContaining('Target not in the server'),
     );
   });
 
   it('應清空伺服器相關資料', async () => {
+    const disconnectData = testData.createDisconnectServerData();
+
     await DisconnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultDisconnectData,
+      disconnectData,
     );
 
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
@@ -335,38 +319,31 @@ describe('DisconnectServerHandler (斷開伺服器處理)', () => {
   });
 
   it('資料驗證失敗時應發送錯誤', async () => {
+    const invalidData = { userId: '', serverId: '' };
     const validationError = new Error('Invalid data');
-    mockDataValidator.validate.mockRejectedValue(validationError);
 
-    await DisconnectServerHandler.handle(
-      mockIoInstance,
+    await testValidationError(
+      DisconnectServerHandler,
       mockSocketInstance,
-      defaultDisconnectData,
-    );
-
-    expect(mockError).toHaveBeenCalledWith(validationError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '斷開群組失敗，請稍後再試',
-        part: 'DISCONNECTSERVER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '斷開群組失敗，請稍後再試',
     );
   });
 
   it('應正確呼叫資料驗證器', async () => {
+    const disconnectData = testData.createDisconnectServerData();
+
     await DisconnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultDisconnectData,
+      disconnectData,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       DisconnectServerSchema,
-      defaultDisconnectData,
+      disconnectData,
       'DISCONNECTSERVER',
     );
   });

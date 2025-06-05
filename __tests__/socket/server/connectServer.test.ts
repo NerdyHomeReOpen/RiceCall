@@ -1,32 +1,5 @@
 import { jest } from '@jest/globals';
-
-// Mock SocketServer和CreateMemberHandler - 需要在jest.mock之前定義
-const mockSocketServer = {
-  getSocket: jest.fn(),
-};
-const mockCreateMemberHandler = {
-  handle: jest.fn(),
-};
-const mockConnectChannelHandler = {
-  handle: jest.fn(),
-};
-
-// 被測試的模組
-import { ConnectServerHandler } from '../../../src/api/socket/events/server/server.handler';
-
-// 測試設定
-import {
-  createMockIo,
-  createMockSocket,
-  mockDataValidator,
-  mockDatabase,
-  mockError,
-  mockInfo,
-  mockWarn,
-} from '../../_testSetup';
-
-// 錯誤類型和Schema
-import { ConnectServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import { mockDatabase, mockDataValidator, mockInfo } from '../../_testSetup';
 
 // Mock所有相依模組
 jest.mock('@/index', () => ({
@@ -39,6 +12,18 @@ jest.mock('@/utils/logger', () => ({
 jest.mock('@/middleware/data.validator', () => ({
   DataValidator: require('../../_testSetup').mockDataValidator,
 }));
+
+// Mock handlers - 需要在 beforeEach 中定義
+const mockSocketServer = {
+  getSocket: jest.fn(),
+};
+const mockCreateMemberHandler = {
+  handle: jest.fn(),
+};
+const mockConnectChannelHandler = {
+  handle: jest.fn(),
+};
+
 jest.mock('@/api/socket', () => ({
   __esModule: true,
   default: mockSocketServer,
@@ -50,83 +35,74 @@ jest.mock('@/api/socket/events/channel/channel.handler', () => ({
   ConnectChannelHandler: mockConnectChannelHandler,
 }));
 
-// 常用的測試ID
-const DEFAULT_IDS = {
-  operatorUserId: 'operator-user-id',
-  targetUserId: 'target-user-id',
-  serverId: 'server-id-123',
-  lobbyId: 'lobby-id-123',
-  receptionLobbyId: 'reception-lobby-id-123',
-} as const;
-
-// 測試數據
-const defaultConnectData = {
-  userId: DEFAULT_IDS.operatorUserId,
-  serverId: DEFAULT_IDS.serverId,
-};
+// 被測試的模組和測試輔助工具
+import { ConnectServerHandler } from '../../../src/api/socket/events/server/server.handler';
+import { ConnectServerSchema } from '../../../src/api/socket/events/server/server.schema';
+import {
+  createDefaultTestData,
+  createMemberVariant,
+  createServerVariant,
+  createStandardMockInstances,
+  DEFAULT_IDS,
+  setupAfterEach,
+  setupBeforeEach,
+  testDatabaseError,
+  testValidationError,
+} from './_testHelpers';
 
 describe('ConnectServerHandler (連接伺服器處理)', () => {
   let mockSocketInstance: any;
   let mockIoInstance: any;
+  let testData: ReturnType<typeof createDefaultTestData>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // 建立測試資料
+    testData = createDefaultTestData();
 
-    // 建立mock socket和io實例
-    mockSocketInstance = createMockSocket(
-      DEFAULT_IDS.operatorUserId,
-      'test-socket-id',
-    );
-    mockIoInstance = createMockIo();
+    // 建立 mock 實例
+    const mockInstances = createStandardMockInstances();
+    mockSocketInstance = mockInstances.mockSocketInstance;
+    mockIoInstance = mockInstances.mockIoInstance;
 
-    // 預設mock回傳值
-    mockDataValidator.validate.mockResolvedValue(defaultConnectData);
+    // 設定通用的 beforeEach
+    setupBeforeEach(mockSocketInstance, mockIoInstance, testData);
 
-    mockDatabase.get.user.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      username: 'testuser',
-      currentServerId: null,
-      currentChannelId: null,
-    });
-
-    mockDatabase.get.server.mockResolvedValue({
-      serverId: DEFAULT_IDS.serverId,
-      name: '測試伺服器',
-      visibility: 'public',
-      lobbyId: DEFAULT_IDS.lobbyId,
-      receptionLobbyId: DEFAULT_IDS.receptionLobbyId,
-    });
-
-    mockDatabase.get.member.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      permissionLevel: 3,
-      isBlocked: 0,
-    });
-
-    mockDatabase.set.userServer.mockResolvedValue(true);
-    mockDatabase.get.serverChannels.mockResolvedValue([]);
-    mockDatabase.get.serverOnlineMembers.mockResolvedValue([]);
-    mockDatabase.get.serverMember.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      permissionLevel: 3,
-    });
-    mockDatabase.get.serverMemberApplications.mockResolvedValue([]);
-
+    // 設定 connect 專用的額外 mock
+    (mockCreateMemberHandler.handle as any).mockResolvedValue(undefined);
     (mockConnectChannelHandler.handle as any).mockResolvedValue(undefined);
+    mockSocketServer.getSocket.mockReturnValue(mockSocketInstance);
+
+    // 設定預設的伺服器和成員資料
+    mockDatabase.get.server.mockResolvedValue(testData.defaultServer as any);
+    mockDatabase.get.member.mockResolvedValue(testData.operatorMember as any);
+    mockDatabase.get.serverChannels.mockResolvedValue([
+      testData.lobbyChannel,
+    ] as any);
+    mockDatabase.get.serverOnlineMembers.mockResolvedValue([
+      testData.operatorMember,
+    ] as any);
+    mockDatabase.get.serverMember.mockResolvedValue(
+      testData.operatorMember as any,
+    );
+    mockDatabase.get.serverMemberApplications.mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    setupAfterEach();
   });
 
   it('應成功連接到公開伺服器', async () => {
+    const connectData = testData.createConnectServerData();
+
     await ConnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultConnectData,
+      connectData,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       ConnectServerSchema,
-      defaultConnectData,
+      connectData,
       'CONNECTSERVER',
     );
 
@@ -151,10 +127,12 @@ describe('ConnectServerHandler (連接伺服器處理)', () => {
   it('應為新用戶建立成員資格', async () => {
     mockDatabase.get.member.mockResolvedValue(null); // 沒有現有成員資格
 
+    const connectData = testData.createConnectServerData();
+
     await ConnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultConnectData,
+      connectData,
     );
 
     expect(mockCreateMemberHandler.handle).toHaveBeenCalledWith(
@@ -172,26 +150,22 @@ describe('ConnectServerHandler (連接伺服器處理)', () => {
   });
 
   it('不可見伺服器應顯示申請成員彈窗（權限不足）', async () => {
-    const testServer = {
-      serverId: DEFAULT_IDS.serverId,
-      name: '測試伺服器',
+    const invisibleServer = createServerVariant(testData.defaultServer, {
       visibility: 'invisible',
-      lobbyId: DEFAULT_IDS.lobbyId,
-      receptionLobbyId: DEFAULT_IDS.receptionLobbyId,
-    };
-    mockDatabase.get.server.mockResolvedValue(testServer);
-
-    mockDatabase.get.member.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      permissionLevel: 1, // 權限不足
-      isBlocked: 0,
     });
+    const lowPermissionMember = createMemberVariant(testData.operatorMember, {
+      permissionLevel: 1, // 權限不足
+    });
+
+    mockDatabase.get.server.mockResolvedValue(invisibleServer as any);
+    mockDatabase.get.member.mockResolvedValue(lowPermissionMember as any);
+
+    const connectData = testData.createConnectServerData();
 
     await ConnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultConnectData,
+      connectData,
     );
 
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
@@ -208,17 +182,18 @@ describe('ConnectServerHandler (連接伺服器處理)', () => {
   });
 
   it('被封鎖的用戶應顯示錯誤彈窗', async () => {
-    mockDatabase.get.member.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      permissionLevel: 3,
+    const blockedMember = createMemberVariant(testData.operatorMember, {
       isBlocked: -1, // 永久封鎖
     });
+
+    mockDatabase.get.member.mockResolvedValue(blockedMember as any);
+
+    const connectData = testData.createConnectServerData();
 
     await ConnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultConnectData,
+      connectData,
     );
 
     expect(mockSocketInstance.emit).toHaveBeenCalledWith(
@@ -234,11 +209,9 @@ describe('ConnectServerHandler (連接伺服器處理)', () => {
   });
 
   it('不能為其他用戶連接伺服器', async () => {
-    const otherUserData = {
+    const otherUserData = testData.createConnectServerData({
       userId: DEFAULT_IDS.targetUserId,
-      serverId: DEFAULT_IDS.serverId,
-    };
-    mockDataValidator.validate.mockResolvedValue(otherUserData);
+    });
 
     await ConnectServerHandler.handle(
       mockIoInstance,
@@ -246,31 +219,29 @@ describe('ConnectServerHandler (連接伺服器處理)', () => {
       otherUserData,
     );
 
+    const mockWarn = require('../../_testSetup').mockWarn;
     expect(mockWarn).toHaveBeenCalledWith(
       expect.stringContaining("Cannot move other user's server"),
     );
   });
 
   it('應連接到接待大廳（私人伺服器）', async () => {
-    mockDatabase.get.server.mockResolvedValue({
-      serverId: DEFAULT_IDS.serverId,
-      name: '測試伺服器',
+    const privateServer = createServerVariant(testData.defaultServer, {
       visibility: 'private',
-      lobbyId: DEFAULT_IDS.lobbyId,
-      receptionLobbyId: DEFAULT_IDS.receptionLobbyId,
+    });
+    const lowPermissionMember = createMemberVariant(testData.operatorMember, {
+      permissionLevel: 1, // 權限較低
     });
 
-    mockDatabase.get.member.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
-      permissionLevel: 1, // 權限較低
-      isBlocked: 0,
-    });
+    mockDatabase.get.server.mockResolvedValue(privateServer as any);
+    mockDatabase.get.member.mockResolvedValue(lowPermissionMember as any);
+
+    const connectData = testData.createConnectServerData();
 
     await ConnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultConnectData,
+      connectData,
     );
 
     // 應該連接到lobby和receptionLobby
@@ -296,17 +267,18 @@ describe('ConnectServerHandler (連接伺服器處理)', () => {
   });
 
   it('高權限用戶應加入管理群組', async () => {
-    mockDatabase.get.member.mockResolvedValue({
-      userId: DEFAULT_IDS.operatorUserId,
-      serverId: DEFAULT_IDS.serverId,
+    const adminMember = createMemberVariant(testData.operatorMember, {
       permissionLevel: 5, // 管理員權限
-      isBlocked: 0,
     });
+
+    mockDatabase.get.member.mockResolvedValue(adminMember as any);
+
+    const connectData = testData.createConnectServerData();
 
     await ConnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultConnectData,
+      connectData,
     );
 
     expect(mockSocketInstance.join).toHaveBeenCalledWith(
@@ -322,39 +294,44 @@ describe('ConnectServerHandler (連接伺服器處理)', () => {
   });
 
   it('應正確呼叫資料驗證器', async () => {
+    const connectData = testData.createConnectServerData();
+
     await ConnectServerHandler.handle(
       mockIoInstance,
       mockSocketInstance,
-      defaultConnectData,
+      connectData,
     );
 
     expect(mockDataValidator.validate).toHaveBeenCalledWith(
       ConnectServerSchema,
-      defaultConnectData,
+      connectData,
       'CONNECTSERVER',
     );
   });
 
   it('資料驗證失敗時應發送錯誤', async () => {
+    const invalidData = { userId: '', serverId: '' };
     const validationError = new Error('Invalid data');
-    mockDataValidator.validate.mockRejectedValue(validationError);
 
-    await ConnectServerHandler.handle(
-      mockIoInstance,
+    await testValidationError(
+      ConnectServerHandler,
       mockSocketInstance,
-      defaultConnectData,
+      mockIoInstance,
+      invalidData,
+      validationError,
+      '連接群組失敗，請稍後再試',
     );
+  });
 
-    expect(mockError).toHaveBeenCalledWith(validationError.message);
-    expect(mockSocketInstance.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({
-        name: 'ServerError',
-        message: '連接群組失敗，請稍後再試',
-        part: 'CONNECTSERVER',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-      }),
+  it('應處理資料庫錯誤', async () => {
+    await testDatabaseError(
+      ConnectServerHandler,
+      mockSocketInstance,
+      mockIoInstance,
+      testData.createConnectServerData(),
+      'get',
+      'Database connection failed',
+      '連接群組失敗，請稍後再試',
     );
   });
 });

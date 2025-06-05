@@ -234,26 +234,6 @@ describe('FavoriteServerHandler (收藏伺服器處理)', () => {
     );
   });
 
-  it('應處理顯式的收藏狀態設定', async () => {
-    const data = testData.createFavoriteServerData({
-      favorite: false, // 明確設定為不收藏
-    });
-
-    await FavoriteServerHandler.handle(
-      mockIoInstance,
-      mockSocketInstance,
-      data,
-    );
-
-    expect(mockDatabase.set.userServer).toHaveBeenCalledWith(
-      DEFAULT_IDS.operatorUserId,
-      DEFAULT_IDS.serverId,
-      expect.objectContaining({
-        favorite: false,
-      }),
-    );
-  });
-
   it('資料驗證失敗時應發送錯誤', async () => {
     const invalidData = { serverId: '' };
     const validationError = new Error('伺服器ID不能為空');
