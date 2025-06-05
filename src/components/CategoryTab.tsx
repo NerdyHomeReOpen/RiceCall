@@ -84,20 +84,22 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const categoryLobby =
       categoryVisibility !== 'readonly'
         ? Default.channel({
-            ...category,
-            channelId: categoryId,
-            name: lang.tr.lobby,
-            type: 'channel',
-            categoryId: categoryId,
-            visibility: categoryVisibility,
-            order: -1,
-          })
+          ...category,
+          channelId: categoryId,
+          name: lang.tr.lobby,
+          type: 'channel',
+          categoryId: categoryId,
+          visibility: categoryVisibility,
+          order: -1,
+        })
         : null;
+
+    const categoryChannelIds = new Set(categoryChannels.map((ch) => ch.channelId));
+    const isAllChannelReadOnly = categoryChannels.every(
+      (channel) => channel.visibility === 'readonly'
+    );
     const categoryMembers = serverMembers.filter(
-      (mb) =>
-        categoryChannels
-          .map((ch) => ch.channelId)
-          .includes(mb.currentChannelId) || mb.currentChannelId === categoryId,
+      (mb) => categoryChannelIds.has(mb.currentChannelId) || mb.currentChannelId === categoryId,
     );
     const categoryUserIds = categoryMembers.map((mb) => mb.userId);
     const userInCategory = categoryMembers.some(
@@ -278,11 +280,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         {/* Category View */}
         <div
           key={categoryId}
-          className={`${styles['channelTab']} ${
-            selectedItemId === categoryId && selectedItemType === 'category'
-              ? styles['selected']
-              : ''
-          }`}
+          className={`${styles['channelTab']} ${selectedItemId === categoryId && selectedItemType === 'category'
+            ? styles['selected']
+            : ''
+            }`}
           onClick={() => {
             if (
               selectedItemId === categoryId &&
@@ -424,9 +425,11 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           >
             {categoryName}
           </div>
-          <div className={styles['channelTabCount']}>
-            {`(${categoryMembers.length})`}
-          </div>
+          {!isAllChannelReadOnly && (
+            <div className={styles['channelTabCount']}>
+              {`(${categoryMembers.length})`}
+            </div>
+          )}
           {!expanded[categoryId] && userInCategory && (
             <div className={styles['myLocationIcon']} />
           )}
