@@ -17,7 +17,7 @@ import ipcService from '@/services/ipc.service';
 
 // Utils
 import Default from '@/utils/default';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 interface ApplyMemberPopupProps {
   serverId: Server['serverId'];
@@ -83,10 +83,10 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.server({
+          getService.server({
             serverId: serverId,
           }),
-          refreshService.memberApplication({
+          getService.memberApplication({
             userId: userId,
             serverId: serverId,
           }),

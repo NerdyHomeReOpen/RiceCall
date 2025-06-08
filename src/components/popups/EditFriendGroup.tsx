@@ -13,7 +13,7 @@ import popup from '@/styles/popup.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -61,7 +61,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.friendGroup({
+          getService.friendGroup({
             friendGroupId: friendGroupId,
           }),
         ]).then(([friendGroup]) => {

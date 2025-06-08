@@ -7,14 +7,13 @@ import { User, DirectMessage, SocketServerEvent, Server } from '@/types';
 // Providers
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
-import { useLoading } from '@/providers/Loading';
 
 // Components
 import MessageViewer from '@/components/MessageViewer';
 import BadgeListViewer from '@/components/BadgeList';
 
 // Services
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 import ipcService from '@/services/ipc.service';
 
 // Utils
@@ -39,7 +38,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
-    const loadingBox = useLoading();
 
     // Refs
     const refreshRef = useRef(false);
@@ -57,10 +55,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     const [isFriend, setIsFriend] = useState<boolean>(false);
 
     // Variables
-    const {
-      avatarUrl: userAvatarUrl,
-      currentServerId: userCurrentServerId,
-    } = user;
+    const { avatarUrl: userAvatarUrl } = user;
 
     const {
       avatarUrl: targetAvatarUrl,
@@ -104,7 +99,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       return () => clearInterval(timer);
     };
 
-    const handleOnDirectMessage = (data: DirectMessage) => {
+    const handleDirectMessage = (data: DirectMessage) => {
       if (!data) return;
       // !! THIS IS IMPORTANT !!
       const user1Id = userId.localeCompare(targetId) < 0 ? userId : targetId;
@@ -162,7 +157,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       if (!socket) return;
 
       const eventHandlers = {
-        [SocketServerEvent.ON_DIRECT_MESSAGE]: handleOnDirectMessage,
+        [SocketServerEvent.DIRECT_MESSAGE]: handleDirectMessage,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -181,13 +176,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.user({
+          getService.user({
             userId: targetId,
           }),
-          refreshService.user({
+          getService.user({
             userId: userId,
           }),
-          refreshService.friend({
+          getService.friend({
             userId: userId,
             targetId: targetId,
           }),
@@ -209,7 +204,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     useEffect(() => {
       if (!targetCurrentServerId) return;
       Promise.all([
-        refreshService.server({
+        getService.server({
           serverId: targetCurrentServerId,
         }),
       ]).then(([server]) => {
@@ -225,8 +220,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
           <div className={directMessage['sidebar']}>
             <div className={directMessage['targetBox']}>
               <div
-                className={`${directMessage['avatarPicture']} ${isFriend && isOnline ? '' : directMessage['offline']
-                  }`}
+                className={`${directMessage['avatarPicture']} ${
+                  isFriend && isOnline ? '' : directMessage['offline']
+                }`}
                 style={{ backgroundImage: `url(${targetAvatarUrl})` }}
               />
               {targetVip > 0 && (

@@ -17,7 +17,7 @@ import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -50,10 +50,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
     const [friendServer, setFriendServer] = useState<Server>(Default.server());
 
     // Variables
-    const {
-      userId,
-      currentServerId: userCurrentServerId,
-    } = user;
+    const { userId, currentServerId: userCurrentServerId } = user;
     const {
       userId: friendUserId,
       targetId: friendTargetId,
@@ -153,7 +150,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       if (!friendCurrentServerId) return;
       const refresh = async () => {
         Promise.all([
-          refreshService.server({
+          getService.server({
             serverId: friendCurrentServerId,
           }),
         ]).then(([server]) => {
@@ -167,8 +164,9 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       <div key={friendTargetId}>
         {/* User View */}
         <div
-          className={`${styles['friendCard']} ${selectedItemId === `${friendTargetId}` ? styles['selected'] : ''
-            }`}
+          className={`${styles['friendCard']} ${
+            selectedItemId === `${friendTargetId}` ? styles['selected'] : ''
+          }`}
           onClick={() => setSelectedItemId(friendTargetId)}
           onContextMenu={(e) => {
             const x = e.clientX;
@@ -279,13 +277,15 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
             <div className={styles['container']}>
               {friendVip > 0 && (
                 <div
-                  className={`${vip['vipIcon']} ${vip[`vip-small-${friendVip}`]
-                    }`}
+                  className={`${vip['vipIcon']} ${
+                    vip[`vip-small-${friendVip}`]
+                  }`}
                 />
               )}
               <div
-                className={`${styles['name']} ${friendVip > 0 ? styles['isVIP'] : ''
-                  }`}
+                className={`${styles['name']} ${
+                  friendVip > 0 ? styles['isVIP'] : ''
+                }`}
               >
                 {friendName}
               </div>

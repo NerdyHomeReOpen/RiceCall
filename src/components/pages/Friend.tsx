@@ -66,7 +66,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     ) => {
       if (!socket) return;
       if (signature === userSignature) return;
-      socket.send.updateUser({ user: { signature }, userId });
+      socket.send.editUser({ user: { signature }, userId });
     };
 
     const handleResize = useCallback(
@@ -127,11 +127,14 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
             <div className={friendPage['container']}>
               <div className={friendPage['levelIcon']} />
               <div
-                className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]
-                  }`}
-                title={
-                  `${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${userRequiredXP - userXP}`
-                }
+                className={`${grade['grade']} ${
+                  grade[`lv-${Math.min(56, userLevel)}`]
+                }`}
+                title={`${lang.tr.level}：${userLevel}，${
+                  lang.tr.xp
+                }：${userXP}，${lang.tr.xpDifference}：${
+                  userRequiredXP - userXP
+                }`}
               />
               <div className={friendPage['wealthIcon']} />
               <div className={friendPage['wealthValue']}>0</div>

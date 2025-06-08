@@ -12,7 +12,7 @@ import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 import ipcService from '@/services/ipc.service';
 
 // Utils
@@ -60,10 +60,10 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.user({
+          getService.user({
             userId: userId,
           }),
-          refreshService.member({
+          getService.member({
             userId: userId,
             serverId: serverId,
           }),

@@ -21,7 +21,7 @@ import popup from '@/styles/popup.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -93,7 +93,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       );
     };
 
-    const handleServerChannelDelete = (id: Channel['channelId']): void => {
+    const handleServerChannelRemove = (id: Channel['channelId']): void => {
       setServerChannels((prev) => prev.filter((item) => item.channelId !== id));
     };
 
@@ -102,7 +102,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateChannels({ channels, serverId });
+      socket.send.editChannels({ channels, serverId });
     };
 
     const handleDeleteChannel = (
@@ -208,7 +208,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       const eventHandlers = {
         [SocketServerEvent.SERVER_CHANNEL_ADD]: handleServerChannelAdd,
         [SocketServerEvent.SERVER_CHANNEL_UPDATE]: handleServerChannelUpdate,
-        [SocketServerEvent.SERVER_CHANNEL_DELETE]: handleServerChannelDelete,
+        [SocketServerEvent.SERVER_CHANNEL_REMOVE]: handleServerChannelRemove,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -227,7 +227,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       const refresh = async () => {
         refreshed.current = true;
         Promise.all([
-          refreshService.serverChannels({
+          getService.serverChannels({
             serverId,
           }),
         ]).then(([serverChannels]) => {

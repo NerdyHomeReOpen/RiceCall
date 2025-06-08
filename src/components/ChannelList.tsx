@@ -158,7 +158,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       setMemberApplicationsCount((prev) => prev + 1);
     };
 
-    const handleServerMemberApplicationDelete = () => {
+    const handleServerMemberApplicationRemove = () => {
       setMemberApplicationsCount((prev) => Math.max(prev - 1, 0));
     };
 
@@ -202,8 +202,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
           handleServerMemberApplicationsSet,
         [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]:
           handleServerMemberApplicationAdd,
-        [SocketServerEvent.SERVER_MEMBER_APPLICATION_DELETE]:
-          handleServerMemberApplicationDelete,
+        [SocketServerEvent.SERVER_MEMBER_APPLICATION_REMOVE]:
+          handleServerMemberApplicationRemove,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -279,7 +279,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                         label: '會員管理',
                         show: canOpenSettings,
                         icon: 'memberManagement',
-                        onClick: () => handleOpenServerSetting(userId, serverId),
+                        onClick: () =>
+                          handleOpenServerSetting(userId, serverId),
                       },
                       {
                         id: 'separator',
@@ -307,7 +308,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                         id: 'report',
                         label: '舉報', // TODO: lang.tr
                         disabled: true,
-                        onClick: () => { /* TODO: handleOpenReport */ },
+                        onClick: () => {
+                          /* TODO: handleOpenReport */
+                        },
                       },
                       {
                         id: 'favorite',
@@ -323,9 +326,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                   <div
                     className={`
                       ${header['overlay']}
-                      ${canOpenSettings && memberApplicationsCount > 0
-                        ? header['new']
-                        : ''
+                      ${
+                        canOpenSettings && memberApplicationsCount > 0
+                          ? header['new']
+                          : ''
                       }
                     `}
                   />
@@ -391,7 +395,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                 expanded={{ [currentChannelId]: true }}
                 selectedItemId={selectedItemId}
                 selectedItemType={selectedItemType}
-                setExpanded={() => { }}
+                setExpanded={() => {}}
                 setSelectedItemId={setSelectedItemId}
                 setSelectedItemType={setSelectedItemType}
               />

@@ -12,7 +12,7 @@ import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 import ipcService from '@/services/ipc.service';
 
 // Utils
@@ -59,7 +59,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
       );
     };
 
-    const handleFriendGroupDelete = (id: FriendGroup['friendGroupId']) => {
+    const handleFriendGroupRemove = (id: FriendGroup['friendGroupId']) => {
       setFriendGroups((prev) =>
         prev.filter((item) => item.friendGroupId !== id),
       );
@@ -71,7 +71,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
       targetId: User['userId'],
     ) => {
       if (!socket) return;
-      socket.send.updateFriend({ friend, userId, targetId });
+      socket.send.editFriend({ friend, userId, targetId });
     };
 
     // Effects
@@ -81,7 +81,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
       const eventHandlers = {
         [SocketServerEvent.FRIEND_GROUP_ADD]: handleFriendGroupAdd,
         [SocketServerEvent.FRIEND_GROUP_UPDATE]: handleFriendGroupUpdate,
-        [SocketServerEvent.FRIEND_GROUP_DELETE]: handleFriendGroupDelete,
+        [SocketServerEvent.FRIEND_GROUP_REMOVE]: handleFriendGroupRemove,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -100,10 +100,10 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.userFriendGroups({
+          getService.userFriendGroups({
             userId: userId,
           }),
-          refreshService.friend({
+          getService.friend({
             userId: userId,
             targetId: targetId,
           }),

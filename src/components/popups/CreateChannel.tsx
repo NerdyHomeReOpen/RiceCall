@@ -13,7 +13,7 @@ import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -59,7 +59,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.channel({
+          getService.channel({
             channelId: channelId,
           }),
         ]).then(([parent]) => {

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 // Types
-import {  Server, Channel, Message } from '@/types';
+import { Server, Channel, Message } from '@/types';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -54,66 +54,78 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
           <div className={broadcast['content']}>
             <div className={`${popup['inputGroup']}`}>
               <div className={`${popup['row']}`}>
-              <div className={`${popup['label']} ${broadcast['label']}`}>{'接收頻道' /* TODO: lang.tr */}</div>
-              <div className={broadcast['inputBox']}>
-                <div className={`${popup['row']}`}>
-                <input
-                  name="channelType"
-                  type="radio"
-                  checked={channelType === 'current'}
-                  onChange={() => {
-                    setChannelType('current');
-                  }}
-                />
-                <div>
-                  <div className={popup['label']}>{'當前頻道' /* TODO: lang.tr */}</div>
+                <div className={`${popup['label']} ${broadcast['label']}`}>
+                  {'接收頻道' /* TODO: lang.tr */}
                 </div>
+                <div className={broadcast['inputBox']}>
+                  <div className={`${popup['row']}`}>
+                    <input
+                      name="channelType"
+                      type="radio"
+                      checked={channelType === 'current'}
+                      onChange={() => {
+                        setChannelType('current');
+                      }}
+                    />
+                    <div>
+                      <div className={popup['label']}>
+                        {'當前頻道' /* TODO: lang.tr */}
+                      </div>
+                    </div>
+                  </div>
+                  <div className={`${popup['row']}`}>
+                    <input
+                      name="channelType"
+                      type="radio"
+                      checked={channelType === 'all'}
+                      onChange={() => {
+                        setChannelType('all');
+                      }}
+                    />
+                    <div>
+                      <div className={popup['label']}>
+                        {'所有頻道' /* TODO: lang.tr */}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className={`${popup['row']}`}>
-                <input
-                  name="channelType"
-                  type="radio"
-                  checked={channelType === 'all'}
-                  onChange={() => {
-                    setChannelType('all');
-                  }}
-                />
-                <div>
-                  <div className={popup['label']}>{'所有頻道' /* TODO: lang.tr */}</div>
-                </div>
-                </div>
-              </div>
               </div>
               <div className={`${popup['row']}`}>
-              <div className={`${popup['label']} ${broadcast['label']}`}>{'廣播' /* TODO: lang.tr */}</div>
-              <div className={broadcast['inputBox']}>
-                <div className={`${popup['row']}`}>
-                  <input
-                    name="sendType"
-                    type="radio"
-                    checked={sendType === 'text'}
-                    onChange={() => {
-                      setSendType('text');
-                    }}
-                  />
-                  <div>
-                    <div className={popup['label']}>{'文字廣播' /* TODO: lang.tr */}</div>
+                <div className={`${popup['label']} ${broadcast['label']}`}>
+                  {'廣播' /* TODO: lang.tr */}
+                </div>
+                <div className={broadcast['inputBox']}>
+                  <div className={`${popup['row']}`}>
+                    <input
+                      name="sendType"
+                      type="radio"
+                      checked={sendType === 'text'}
+                      onChange={() => {
+                        setSendType('text');
+                      }}
+                    />
+                    <div>
+                      <div className={popup['label']}>
+                        {'文字廣播' /* TODO: lang.tr */}
+                      </div>
+                    </div>
+                  </div>
+                  <div className={`${popup['row']} ${popup['disabled']}`}>
+                    <input
+                      name="sendType"
+                      type="radio"
+                      checked={sendType === 'voice'}
+                      onChange={() => {
+                        setSendType('voice');
+                      }}
+                    />
+                    <div>
+                      <div className={popup['label']}>{`${
+                        '語音廣播' /* TODO: lang.tr */
+                      } ${lang.tr.soon}`}</div>
+                    </div>
                   </div>
                 </div>
-                <div className={`${popup['row']} ${popup['disabled']}`}>
-                  <input
-                    name="sendType"
-                    type="radio"
-                    checked={sendType === 'voice'}
-                    onChange={() => {
-                      setSendType('voice');
-                    }}
-                  />
-                  <div>
-                    <div className={popup['label']}>{`${'語音廣播' /* TODO: lang.tr */} ${lang.tr.soon}`}</div>
-                  </div>
-                </div>
-              </div>
               </div>
             </div>
             <div className={`${popup['inputGroup']} ${popup['row']}`}>
@@ -130,7 +142,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
                 />
                 <div className={broadcast['labelArea']}>
                   <div className={`${popup['label']} ${popup['disabled']}`}>
-                    {'支援連結，不超過300字' /* TODO: lang.tr */} 
+                    {'支援連結，不超過300字' /* TODO: lang.tr */}
                   </div>
                   <div className={broadcast['messageInputLength']}>
                     {broadcastContent.length}/{maxLength}
@@ -149,8 +161,8 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
               handleBroadcastServer(
                 { type: 'alert', content: broadcastContent },
                 serverId,
-                (channelType === 'current' ? channelId : null),
-              )
+                channelType === 'current' ? channelId : null,
+              );
               handleClose();
             }}
           >
@@ -167,7 +179,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(
       </div>
     );
   },
-)
+);
 
 ServerBroadcastPopup.displayName = 'ServerBroadcastPopup';
 

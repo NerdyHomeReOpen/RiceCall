@@ -21,7 +21,7 @@ import { useLanguage } from '@/providers/Language';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -70,7 +70,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       );
     };
 
-    const handleFriendGroupDelete = (id: FriendGroup['friendGroupId']) => {
+    const handleFriendGroupRemove = (id: FriendGroup['friendGroupId']) => {
       setFriendGroups((prev) =>
         prev.filter((item) => item.friendGroupId !== id),
       );
@@ -131,7 +131,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       const eventHandlers = {
         [SocketServerEvent.FRIEND_GROUP_ADD]: handleFriendGroupAdd,
         [SocketServerEvent.FRIEND_GROUP_UPDATE]: handleFriendGroupUpdate,
-        [SocketServerEvent.FRIEND_GROUP_DELETE]: handleFriendGroupDelete,
+        [SocketServerEvent.FRIEND_GROUP_REMOVE]: handleFriendGroupRemove,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -150,17 +150,17 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.user({
+          getService.user({
             userId: targetId,
           }),
-          refreshService.userFriendGroups({
+          getService.userFriendGroups({
             userId: userId,
           }),
-          refreshService.friendApplication({
+          getService.friendApplication({
             senderId: userId,
             receiverId: targetId,
           }),
-          refreshService.friendApplication({
+          getService.friendApplication({
             senderId: targetId,
             receiverId: userId,
           }),

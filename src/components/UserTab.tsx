@@ -165,7 +165,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateMember({
+      socket.send.editMember({
         member,
         userId,
         serverId,

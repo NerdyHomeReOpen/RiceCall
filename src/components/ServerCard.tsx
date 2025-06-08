@@ -58,7 +58,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateMember({
+      socket.send.editMember({
         member,
         userId,
         serverId,

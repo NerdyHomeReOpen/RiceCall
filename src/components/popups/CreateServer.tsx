@@ -15,7 +15,7 @@ import { useLanguage } from '@/providers/Language';
 // Services
 import ipcService from '@/services/ipc.service';
 import apiService from '@/services/api.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -101,10 +101,10 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.user({
+          getService.user({
             userId: userId,
           }),
-          refreshService.userServers({
+          getService.userServers({
             userId: userId,
           }),
         ]).then(([user, servers]) => {

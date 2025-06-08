@@ -14,7 +14,7 @@ import { useSocket } from '@/providers/Socket';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -85,10 +85,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.channel({
+          getService.channel({
             channelId: channelId,
           }),
-          refreshService.server({
+          getService.server({
             serverId: serverId,
           }),
         ]).then(([channel, server]) => {

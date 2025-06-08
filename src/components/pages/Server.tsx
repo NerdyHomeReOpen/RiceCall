@@ -135,7 +135,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       channelId: Channel['channelId'],
     ): void => {
       if (!socket) return;
-      socket.send.message({ message, channelId, serverId, userId });
+      socket.send.channelMessage({ message, channelId, serverId, userId });
     };
 
     const handleUpdateChannel = (
@@ -144,7 +144,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateChannel({ channel, channelId, serverId });
+      socket.send.editChannel({ channel, channelId, serverId });
     };
 
     const handleResizeSidebar = useCallback(

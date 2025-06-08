@@ -110,7 +110,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateServer({ serverId, server });
+      socket.send.editServer({ serverId, server });
     };
 
     const handleJoinChannel = (
