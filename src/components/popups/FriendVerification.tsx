@@ -81,7 +81,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
       });
     };
 
-    const handleOpenAlert = (message: string, callback: () => void) => {
+    const handleOpenAlertDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
       ipcService.initialData.onRequest('alertDialog', {
         title: message,
@@ -92,7 +92,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
 
     const handleDeleteAllFriendApplication = () => {
       if (!socket) return;
-      handleOpenAlert(
+      handleOpenAlertDialog(
         '確定要拒絕全部的好友請求嗎', // lang.tr
         () => {
           for (const item of friendApplications) {

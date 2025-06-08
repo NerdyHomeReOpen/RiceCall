@@ -66,13 +66,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
     const canSubmit = channelName.trim();
 
     // Handlers
-    const handleUpdateChannel = (
+    const handleEditChannel = (
       channel: Partial<Channel>,
       channelId: Channel['channelId'],
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateChannel({ channel, channelId, serverId });
+      socket.send.editChannel({ channel, channelId, serverId });
     };
 
     const handleClose = () => {
@@ -608,7 +608,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
             disabled={!canSubmit}
             onClick={() => {
               if (!canSubmit) return;
-              handleUpdateChannel(
+              handleEditChannel(
                 {
                   name: channelName,
                   announcement: channelAnnouncement,

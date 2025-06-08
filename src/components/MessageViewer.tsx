@@ -11,17 +11,11 @@ import type {
   WarnMessage,
   EventMessage,
   AlertMessage,
-  PromptMessage,
 } from '@/types';
 
 // Components
 import DirectMessageTab from '@/components/DirectMessage';
 import ChannelMessageTab from '@/components/ChannelMessage';
-import InfoMessageTab from '@/components/InfoMessage';
-import WarnMessageTab from '@/components/WarnMessage';
-import EventMessageTab from '@/components/EventMessage';
-import AlertMessageTab from '@/components/AlertMessage';
-import ActionMessageTab from '@/components/ActionMessage';
 import PromptMessageTab from '@/components/PromptMessage';
 
 type MessageGroup = (
@@ -43,12 +37,12 @@ type MessageGroup = (
 
 interface MessageViewerProps {
   messages:
-  | DirectMessage[]
-  | ChannelMessage[]
-  | InfoMessage[]
-  | WarnMessage[]
-  | EventMessage[]
-  | AlertMessage[];
+    | DirectMessage[]
+    | ChannelMessage[]
+    | InfoMessage[]
+    | WarnMessage[]
+    | EventMessage[]
+    | AlertMessage[];
   forbidGuestUrl?: boolean;
   isActionMessage?: boolean;
 }
@@ -128,39 +122,6 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
                   isActionMessage={isActionMessage}
                 />
               )}
-              {/* {messageGroup.type === 'info' ? (
-                <InfoMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'warn' ? (
-                <WarnMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'event' && isActionMessage ? (
-                <ActionMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'alert' && isActionMessage ? (
-                <AlertMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'event' ? (
-                <EventMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'general' ? (
-                <ChannelMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'dm' ? (
-                <DirectMessageTab messageGroup={messageGroup} />
-              ) : null} */}
             </div>
           );
         })}

@@ -100,7 +100,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       });
     };
 
-    const handleOpenAlert = (message: string) => {
+    const handleOpenAlertDialog = (message: string) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
       ipcService.initialData.onRequest('alertDialog', {
         title: message,
@@ -123,7 +123,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!serverReceiveApply) {
-        handleOpenAlert(lang.tr.cannotApply);
+        handleOpenAlertDialog(lang.tr.cannotApply);
         return;
       }
       ipcService.popup.open(PopupType.APPLY_MEMBER, 'applyMember');

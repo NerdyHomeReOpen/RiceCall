@@ -89,7 +89,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       targetId: User['userId'],
     ) => {
       if (!socket) return;
-      handleOpenWarning(
+      handleOpenWarningDialog(
         lang.tr.deleteFriendDialog.replace('{0}', friendName),
         () => socket.send.deleteFriend({ userId, targetId }),
       );
@@ -99,7 +99,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       setFriendServer(data);
     };
 
-    const handleOpenWarning = (message: string, callback: () => void) => {
+    const handleOpenWarningDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', {
         title: message,
@@ -156,6 +156,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
         ]).then(([server]) => {
           if (server) handleServerUpdate(server);
         });
+        refreshed.current = true;
       };
       refresh();
     }, [friendCurrentServerId]);

@@ -42,13 +42,13 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
     const canSubmit = groupName.trim();
 
     // Handlers
-    const handleUpdateFriendGroup = (
+    const handleEditFriendGroup = (
       group: Partial<FriendGroup>,
       friendGroupId: FriendGroup['friendGroupId'],
       userId: User['userId'],
     ) => {
       if (!socket) return;
-      socket.send.updateFriendGroup({ group, friendGroupId, userId });
+      socket.send.editFriendGroup({ group, friendGroupId, userId });
     };
 
     const handleClose = () => {
@@ -107,7 +107,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
             disabled={!canSubmit}
             onClick={() => {
               if (!canSubmit) return;
-              handleUpdateFriendGroup(
+              handleEditFriendGroup(
                 { name: groupName, order: groupOrder },
                 friendGroupId,
                 userId,

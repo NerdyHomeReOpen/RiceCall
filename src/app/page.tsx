@@ -97,7 +97,7 @@ const Header: React.FC<HeaderProps> = React.memo(
       socket.send.disconnectServer({ userId, serverId });
     };
 
-    const handleUpdateStatus = (
+    const handleChangeStatus = (
       status: User['status'],
       userId: User['userId'],
     ) => {
@@ -208,7 +208,7 @@ const Header: React.FC<HeaderProps> = React.memo(
                   className={header['option']}
                   datatype={option.status}
                   onClick={() => {
-                    handleUpdateStatus(option.status as User['status'], userId);
+                    handleChangeStatus(option.status as User['status'], userId);
                     setShowStatusDropdown(false);
                   }}
                 />

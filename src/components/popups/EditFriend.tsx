@@ -65,7 +65,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
       );
     };
 
-    const handleUpdateFriend = (
+    const handleEditFriend = (
       friend: Partial<Friend>,
       userId: User['userId'],
       targetId: User['userId'],
@@ -161,7 +161,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(
           <button
             className={`${popup['button']}`}
             onClick={() => {
-              handleUpdateFriend(
+              handleEditFriend(
                 { friendGroupId: friendGroupId },
                 userId,
                 targetId,

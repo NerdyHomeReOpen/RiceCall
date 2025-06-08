@@ -18,12 +18,17 @@ interface PromptMessageProps {
     contents: string[];
   };
   forbidGuestUrl?: boolean;
-  messageType: string;
-  isActionMessage: boolean;
+  messageType?: string;
+  isActionMessage?: boolean;
 }
 
 const PromptMessage: React.FC<PromptMessageProps> = React.memo(
-  ({ messageGroup, forbidGuestUrl, messageType = 'info', isActionMessage = false }) => {
+  ({
+    messageGroup,
+    forbidGuestUrl = false,
+    messageType = 'info',
+    isActionMessage = false,
+  }) => {
     // Hooks
     const lang = useLanguage();
 
@@ -42,7 +47,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(
     const isEventInChannel = messageType === 'event' && !isActionMessage;
 
     // using in Event Message, Sender to Action, Receiver to Channel
-    const target = (isActionMessage && !isWarn) ? messageSender : messageReceiver;
+    const target = isActionMessage && !isWarn ? messageSender : messageReceiver;
     const {
       name: targetName = '',
       nickname: targetNickname = null,
@@ -50,14 +55,14 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(
       gender: targetGender = 'Male',
     } = target ?? {};
 
-
-    const { // in Info Message, Sender is null
+    const {
+      // in Info Message, Sender is null
       name: senderName = '',
       nickname: senderNickname = null,
     } = messageSender ?? {};
 
-
-    const { // in Alert Message, Receiver is null
+    const {
+      // in Alert Message, Receiver is null
       name: receiverName = '',
       nickname: receiverNickname = null,
       gender: receiverGender = 'Male',
@@ -91,13 +96,15 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(
       return (
         <>
           {iconMap[messageType] ?? ''}
-          {(isEventOrAlert) && (
+          {isEventOrAlert && (
             <>
-              <div className={`
+              <div
+                className={`
                 ${styles['gradeIcon']}
                 ${permission[targetGender]}
                 ${permission[`lv-${targetPermissionLevel}`]}
-              `} />
+              `}
+              />
               <div className={styles['username']}>
                 {targetNickname || targetName}
               </div>
@@ -112,18 +119,26 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(
         ? `${messageChannelId ? '頻道' : '群'}廣播：${content}`
         : content;
 
-
     const formatKey = getFormatKey();
 
     return (
       <>
-        <div className={`${styles['header']} ${isEventInChannel ? styles['event'] : ''}`}>
+        <div
+          className={`${styles['header']} ${
+            isEventInChannel ? styles['event'] : ''
+          }`}
+        >
           {getHeaderElements()}
         </div>
         <div className={styles['messageBox']}>
           {messageContents.map((content, index) => (
             <div key={index}>
-              <MarkdownViewer markdownText={lang.getTranslatedMessage(getContentWithType(content), formatKey)} />
+              <MarkdownViewer
+                markdownText={lang.getTranslatedMessage(
+                  getContentWithType(content),
+                  formatKey,
+                )}
+              />
             </div>
           ))}
         </div>

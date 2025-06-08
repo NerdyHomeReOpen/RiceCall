@@ -159,7 +159,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       socket.send.connectChannel({ userId, channelId: lobbyId, serverId });
     };
 
-    const handleUpdateMember = (
+    const handleEditMember = (
       member: Partial<Member>,
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -230,7 +230,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       });
     };
 
-    const handleOpenAlert = (message: string, callback: () => void) => {
+    const handleOpenAlertDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
       ipcService.initialData.onRequest('alertDialog', {
         title: message,
@@ -244,10 +244,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      handleOpenAlert(
+      handleOpenAlertDialog(
         '確定要解除自己與語音群的會員關係嗎', // lang.tr
         () => {
-          handleUpdateMember({ permissionLevel: 1 }, userId, serverId);
+          handleEditMember({ permissionLevel: 1 }, userId, serverId);
         },
       );
     };
@@ -437,7 +437,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   label: lang.tr.setGuest,
                   show: canChangeToGuest,
                   onClick: () =>
-                    handleUpdateMember(
+                    handleEditMember(
                       { permissionLevel: 1 },
                       memberUserId,
                       serverId,
@@ -448,7 +448,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   label: lang.tr.setMember,
                   show: canChangeToMember,
                   onClick: () =>
-                    handleUpdateMember(
+                    handleEditMember(
                       { permissionLevel: 2 },
                       memberUserId,
                       serverId,
@@ -459,7 +459,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   label: lang.tr.setChannelAdmin,
                   show: canChangeToChannelAdmin,
                   onClick: () =>
-                    handleUpdateMember(
+                    handleEditMember(
                       { permissionLevel: 3 },
                       memberUserId,
                       serverId,
@@ -470,7 +470,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   label: lang.tr.setCategoryAdmin,
                   show: canChangeToCategoryAdmin,
                   onClick: () =>
-                    handleUpdateMember(
+                    handleEditMember(
                       { permissionLevel: 4 },
                       memberUserId,
                       serverId,
@@ -481,7 +481,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   label: lang.tr.setAdmin,
                   show: canChangeToAdmin,
                   onClick: () =>
-                    handleUpdateMember(
+                    handleEditMember(
                       { permissionLevel: 5 },
                       memberUserId,
                       serverId,

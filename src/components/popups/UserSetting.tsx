@@ -16,7 +16,7 @@ import BadgeListViewer from '@/components/BadgeList';
 import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useLoading } from '@/providers/Loading';
+// import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -45,7 +45,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const socket = useSocket();
     const lang = useLanguage();
     const contextMenu = useContextMenu();
-    const loadingBox = useLoading();
+    // const loadingBox = useLoading();
 
     // Refs
     const refreshRef = useRef(false);
@@ -167,9 +167,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     );
 
     // Handlers
-    const handleUpdateUser = (user: Partial<User>) => {
+    const handleEditUser = (user: Partial<User>) => {
       if (!socket) return;
-
       socket.send.editUser({ user, userId });
     };
 
@@ -192,7 +191,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       ipcService.window.close();
     };
 
-    const handleServerSelect = (userId: User['userId'], server: Server) => {
+    const handleServerSelect = (
+      serverId: Server['serverId'],
+      serverDisplayId: Server['displayId'],
+    ) => {
       if (isSelectingRef.current || isLoading.current || isSelectingRef.current)
         return;
       isSelectingRef.current = true;
@@ -203,8 +205,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       window.localStorage.setItem(
         'trigger-handle-server-select',
         JSON.stringify({
-          serverDisplayId: server.displayId,
-          serverId: server.serverId,
+          serverDisplayId,
+          serverId,
           timestamp: Date.now(),
         }),
       );
@@ -406,7 +408,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   disabled={!canSubmit}
                   onClick={() => {
                     if (!canSubmit) return;
-                    handleUpdateUser({
+                    handleEditUser({
                       avatar: userAvatar,
                       avatarUrl: userAvatarUrl,
                       name: userName,
@@ -471,7 +473,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
-                        onClick={() => handleServerSelect(userId, server)}
+                        onClick={() =>
+                          handleServerSelect(server.serverId, server.displayId)
+                        }
                       >
                         <div
                           className={setting['serverAvatarPicture']}
@@ -546,7 +550,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
-                        onClick={() => handleServerSelect(userId, server)}
+                        onClick={() =>
+                          handleServerSelect(server.serverId, server.displayId)
+                        }
                       >
                         <div
                           className={setting['serverAvatarPicture']}
@@ -600,7 +606,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
-                        onClick={() => handleServerSelect(userId, server)}
+                        onClick={() =>
+                          handleServerSelect(server.serverId, server.displayId)
+                        }
                       >
                         <div
                           className={setting['serverAvatarPicture']}

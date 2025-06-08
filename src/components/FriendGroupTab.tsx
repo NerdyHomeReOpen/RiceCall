@@ -43,23 +43,31 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     const friendGroupFriends =
       friendGroupId === ''
         ? friends
-          .filter((fd) => !fd.friendGroupId)
-          .sort((a, b) => {
-            return (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0);
-          })
+            .filter((fd) => !fd.friendGroupId)
+            .sort((a, b) => {
+              return (
+                (b.status !== 'offline' ? 1 : 0) -
+                (a.status !== 'offline' ? 1 : 0)
+              );
+            })
         : friendGroupId === 'blocked'
-          ? friends.filter((friend) => {
+        ? friends.filter((friend) => {
             return friend.isBlocked;
           })
-          : friends
+        : friends
             .filter((fd) => fd.friendGroupId === friendGroupId)
             .sort((a, b) => {
-              return (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0);
+              return (
+                (b.status !== 'offline' ? 1 : 0) -
+                (a.status !== 'offline' ? 1 : 0)
+              );
             });
     const friendsOnlineCount = friendGroupFriends.filter(
       (fd) => fd.status !== 'offline',
     ).length;
-    const canManageFriendGroup = !['', 'blocked', 'outlander'].includes(friendGroupId);
+    const canManageFriendGroup = !['', 'blocked', 'outlander'].includes(
+      friendGroupId,
+    );
 
     // Handlers
     const handleDeleteFriendGroup = (
@@ -67,13 +75,13 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
       userId: User['userId'],
     ) => {
       if (!socket) return;
-      handleOpenWarning(
+      handleOpenWarningDialog(
         lang.tr.deleteFriendGroupDialog.replace('{0}', friendGroupName),
         () => socket.send.deleteFriendGroup({ friendGroupId, userId }),
       );
     };
 
-    const handleOpenWarning = (message: string, callback: () => void) => {
+    const handleOpenWarningDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', {
         title: message,
@@ -97,8 +105,9 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
       <div key={friendGroupId}>
         {/* Tab View */}
         <div
-          className={`${styles['tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''
-            }`}
+          className={`${styles['tab']} ${
+            selectedItemId === friendGroupId ? styles['selected'] : ''
+          }`}
           onClick={() => {
             setExpanded(!expanded);
             setSelectedItemId(friendGroupId);
@@ -123,8 +132,9 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
           }}
         >
           <div
-            className={`${styles['toggleIcon']} ${expanded ? styles['expanded'] : ''
-              }`}
+            className={`${styles['toggleIcon']} ${
+              expanded ? styles['expanded'] : ''
+            }`}
           />
           <div className={styles['tabLable']}>{friendGroupName}</div>
           <div className={styles['tabCount']}>

@@ -41,13 +41,13 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
     const { name: userName } = user;
 
     // Handlers
-    const handleUpdateMember = (
+    const handleEditMember = (
       member: Partial<Member>,
       userId: User['userId'],
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateMember({ member, userId, serverId });
+      socket.send.editMember({ member, userId, serverId });
     };
 
     const handleClose = () => {
@@ -117,11 +117,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
           <button
             className={popup['button']}
             onClick={() => {
-              handleUpdateMember(
-                { nickname: memberNickname },
-                userId,
-                serverId,
-              );
+              handleEditMember({ nickname: memberNickname }, userId, serverId);
               handleClose();
             }}
           >
@@ -138,11 +134,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
             type="button"
             className={`${popup['button']}`}
             onClick={() => {
-              handleUpdateMember(
-                { nickname: memberNickname },
-                userId,
-                serverId,
-              );
+              handleEditMember({ nickname: memberNickname }, userId, serverId);
             }}
           >
             {lang.tr.set}

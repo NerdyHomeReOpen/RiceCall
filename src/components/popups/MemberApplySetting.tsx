@@ -39,12 +39,12 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
       server;
 
     // Handlers
-    const handleUpdateServer = (
+    const handleEditServer = (
       server: Partial<Server>,
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateServer({ server, serverId });
+      socket.send.editServer({ server, serverId });
     };
 
     const handleClose = () => {
@@ -112,7 +112,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
           <button
             className={popup['button']}
             onClick={() => {
-              handleUpdateServer(
+              handleEditServer(
                 {
                   receiveApply: !!serverReceiveApply,
                   applyNotice: serverApplyNotice,

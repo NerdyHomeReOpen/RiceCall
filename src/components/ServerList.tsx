@@ -12,20 +12,14 @@ import ServerCard from '@/components/ServerCard';
 interface ServerListProps {
   user: User;
   servers: UserServer[];
-  onServerClick?: (server: UserServer) => void;
 }
 
 const ServerList: React.FC<ServerListProps> = React.memo(
-  ({ user, servers, onServerClick }) => {
+  ({ user, servers }) => {
     return (
       <div className={homePage['serverCards']}>
         {servers.map((server) => (
-          <ServerCard
-            key={server.serverId}
-            user={user}
-            server={server}
-            onClick={() => onServerClick?.(server)}
-          />
+          <ServerCard key={server.serverId} user={user} server={server} />
         ))}
       </div>
     );

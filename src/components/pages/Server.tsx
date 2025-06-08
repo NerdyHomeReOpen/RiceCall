@@ -65,6 +65,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     // Refs
     const announcementAreaRef = useRef<HTMLDivElement>(null);
     const voiceModeRef = useRef<HTMLDivElement>(null);
+    const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
 
     // States
     const [sidebarWidth, setSidebarWidth] = useState<number>(270);
@@ -77,7 +78,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [showSpeakerVolume, setShowSpeakerVolume] = useState(false);
     const [currentTime, setCurrentTime] = useState<number>(Date.now());
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
-    const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
 
     // Variables
     const { userId } = user;
@@ -138,7 +138,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       socket.send.channelMessage({ message, channelId, serverId, userId });
     };
 
-    const handleUpdateChannel = (
+    const handleEditChannel = (
       channel: Partial<Channel>,
       channelId: Channel['channelId'],
       serverId: Server['serverId'],
@@ -217,7 +217,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     useEffect(() => {
       if (!webRTC || !channelBitrate) return;
-      webRTC.handleUpdateBitrate(channelBitrate);
+      webRTC.handleEditBitrate(channelBitrate);
     }, [channelBitrate]); // Please ignore this warning
 
     useEffect(() => {
@@ -367,7 +367,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         label: lang.tr.freeSpeech,
                         show: canChangeToFreeSpeech,
                         onClick: () => {
-                          handleUpdateChannel(
+                          handleEditChannel(
                             { voiceMode: 'free' },
                             channelId,
                             serverId,
@@ -380,7 +380,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         show: canChangeToForbiddenSpeech,
                         disabled: true,
                         onClick: () => {
-                          handleUpdateChannel(
+                          handleEditChannel(
                             { voiceMode: 'forbidden' },
                             channelId,
                             serverId,
@@ -396,7 +396,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         hasSubmenu: true,
                         disabled: true,
                         onClick: () => {
-                          handleUpdateChannel(
+                          handleEditChannel(
                             { voiceMode: 'queue' },
                             channelId,
                             serverId,
@@ -409,7 +409,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                             show: canChangeToForbiddenQueue,
                             disabled: true,
                             onClick: () => {
-                              // handleUpdateChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
+                              // handleEditChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
                             },
                           },
                           {
@@ -418,7 +418,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                             show: canChangeToControlQueue,
                             disabled: true,
                             onClick: () => {
-                              // handleUpdateChannel({ queueMode: 'control' }, currentChannelId, serverId);
+                              // handleEditChannel({ queueMode: 'control' }, currentChannelId, serverId);
                             },
                           },
                         ],
@@ -497,7 +497,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                           max="200"
                           value={webRTC.micVolume}
                           onChange={(e) => {
-                            webRTC.handleUpdateMicVolume?.(
+                            webRTC.handleEditMicVolume?.(
                               parseInt(e.target.value),
                             );
                           }}
@@ -542,7 +542,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                           max="100"
                           value={webRTC.speakerVolume}
                           onChange={(e) => {
-                            webRTC.handleUpdateSpeakerVolume(
+                            webRTC.handleEditSpeakerVolume(
                               parseInt(e.target.value),
                             );
                           }}

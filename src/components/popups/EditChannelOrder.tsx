@@ -97,7 +97,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       setServerChannels((prev) => prev.filter((item) => item.channelId !== id));
     };
 
-    const handleUpdateChannels = (
+    const handleEditChannels = (
       channels: Partial<Channel>[],
       serverId: Server['serverId'],
     ) => {
@@ -140,7 +140,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
       });
     };
 
-    const handleOpenWarning = (message: string) => {
+    const handleOpenWarningDialog = (message: string) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'deleteChannel');
       ipcService.initialData.onRequest('deleteChannel', {
         title: message,
@@ -430,7 +430,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
             `}
             onClick={() => {
               if (!selectedChannel) return;
-              handleOpenWarning(
+              handleOpenWarningDialog(
                 lang.tr.warningDeleteChannel.replace(
                   '{0}',
                   selectedChannel.name,
@@ -549,7 +549,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(
                     });
                 });
               if (editedChannels.length > 0) {
-                handleUpdateChannels(editedChannels, serverId);
+                handleEditChannels(editedChannels, serverId);
               }
               handleClose();
             }}

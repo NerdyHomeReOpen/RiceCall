@@ -256,7 +256,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       return [...array].sort(Sorter(field, newDirection));
     };
 
-    const handleUpdateServer = (
+    const handleEditServer = (
       server: Partial<Server>,
       serverId: Server['serverId'],
     ) => {
@@ -264,7 +264,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       socket.send.editServer({ server, serverId });
     };
 
-    const handleUpdateMember = (
+    const handleEditMember = (
       member: Partial<Member>,
       userId: User['userId'],
       serverId: Server['serverId'],
@@ -273,7 +273,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       socket.send.editMember({ member, userId, serverId });
     };
 
-    const handleOpenAlert = (message: string, callback: () => void) => {
+    const handleOpenAlertDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
       ipcService.initialData.onRequest('alertDialog', {
         title: message,
@@ -288,10 +288,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      handleOpenAlert(
+      handleOpenAlertDialog(
         `確定要解除 ${userName} 與語音群的會員關係嗎`, // lang.tr
         () => {
-          handleUpdateMember({ permissionLevel: 1 }, userId, serverId);
+          handleEditMember({ permissionLevel: 1 }, userId, serverId);
         },
       );
     };
@@ -302,10 +302,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      handleOpenAlert(
+      handleOpenAlertDialog(
         `確定要解除封鎖 ${userName} 嗎`, // lang.tr
         () => {
-          handleUpdateMember({ isBlocked: 0 }, userId, serverId);
+          handleEditMember({ isBlocked: 0 }, userId, serverId);
         },
       );
     };
@@ -936,7 +936,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                     label: lang.tr.setMember,
                                     show: canChangeToMember,
                                     onClick: () =>
-                                      handleUpdateMember(
+                                      handleEditMember(
                                         { permissionLevel: 2 },
                                         memberUserId,
                                         serverId,
@@ -947,7 +947,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                     label: lang.tr.setChannelAdmin,
                                     show: canChangeToChannelAdmin,
                                     onClick: () =>
-                                      handleUpdateMember(
+                                      handleEditMember(
                                         { permissionLevel: 3 },
                                         memberUserId,
                                         serverId,
@@ -958,7 +958,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                     label: lang.tr.setCategoryAdmin,
                                     show: canChangeToCategoryAdmin,
                                     onClick: () =>
-                                      handleUpdateMember(
+                                      handleEditMember(
                                         { permissionLevel: 4 },
                                         memberUserId,
                                         serverId,
@@ -969,7 +969,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                     label: lang.tr.setAdmin,
                                     show: canChangeToAdmin,
                                     onClick: () =>
-                                      handleUpdateMember(
+                                      handleEditMember(
                                         { permissionLevel: 5 },
                                         memberUserId,
                                         serverId,
@@ -1355,7 +1355,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
             disabled={!canSubmit}
             onClick={() => {
               if (!canSubmit) return;
-              handleUpdateServer(
+              handleEditServer(
                 {
                   name: serverName,
                   avatar: serverAvatar,
