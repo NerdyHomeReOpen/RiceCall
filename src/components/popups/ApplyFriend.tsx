@@ -98,6 +98,17 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       socket.send.approveFriendApplication({ userId, targetId, friend });
     };
 
+    const handleOpenUserInfo = (
+      userId: User['userId'],
+      targetId: User['userId'],
+    ) => {
+      ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
+      ipcService.initialData.onRequest(`userInfo-${targetId}`, {
+        userId,
+        targetId,
+      });
+    };
+
     const handleOpenSuccessDialog = (message: string) => {
       ipcService.popup.open(PopupType.DIALOG_SUCCESS, 'successDialog');
       ipcService.initialData.onRequest('successDialog', {
@@ -192,7 +203,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
             <div className={setting['body']}>
               <div className={popup['col']}>
                 <div className={popup['label']}>{lang.tr.friendLabel}</div>
-                <div className={popup['row']}>
+                <div
+                  className={popup['row']}
+                  onClick={() => {
+                    handleOpenUserInfo(userId, targetId);
+                  }}
+                >
                   <div className={applyFriend['avatarWrapper']}>
                     <div
                       className={applyFriend['avatarPicture']}
@@ -254,7 +270,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
             <div className={setting['body']}>
               <div className={popup['col']}>
                 <div className={popup['label']}>{lang.tr.friendLabel}</div>
-                <div className={popup['row']}>
+                <div
+                  className={popup['row']}
+                  onClick={() => {
+                    handleOpenUserInfo(userId, targetId);
+                  }}
+                >
                   <div className={applyFriend['avatarWrapper']}>
                     <div
                       className={applyFriend['avatarPicture']}
@@ -293,7 +314,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
             <div className={setting['body']}>
               <div className={popup['col']}>
                 <div className={popup['label']}>{lang.tr.friendLabel}</div>
-                <div className={popup['row']}>
+                <div
+                  className={popup['row']}
+                  onClick={() => {
+                    handleOpenUserInfo(userId, targetId);
+                  }}
+                >
                   <div className={applyFriend['avatarWrapper']}>
                     <div
                       className={applyFriend['avatarPicture']}
