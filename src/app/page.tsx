@@ -42,6 +42,7 @@ import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
+import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -441,6 +442,7 @@ const RootPageComponent = () => {
   const socket = useSocket();
   const lang = useLanguage();
   const mainTab = useMainTab();
+  const loadingBox = useLoading();
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -640,12 +642,19 @@ const RootPageComponent = () => {
   // Effects
   useEffect(() => {
     if (user.currentServerId) {
-      if (mainTab.selectedTabId === 'home') mainTab.setSelectedTabId('server');
+      if (mainTab.selectedTabId !== 'server') {
+        mainTab.setSelectedTabId('server');
+      }
     } else {
-      if (mainTab.selectedTabId === 'server') mainTab.setSelectedTabId('home');
+      if (mainTab.selectedTabId === 'server') {
+        mainTab.setSelectedTabId('home');
+      }
     }
     setActionMessages([]);
     setChannelMessages([]);
+
+    loadingBox.setIsLoading(false);
+    loadingBox.setLoadingServerId('');
   }, [user.currentServerId]);
 
   useEffect(() => {
@@ -741,55 +750,48 @@ const RootPageComponent = () => {
   }, [userId]);
 
   useEffect(() => {
-    if (socket.isConnected) {
-      mainTab.setSelectedTabId('home');
-    } else {
-      mainTab.setSelectedTabId('home');
+    if (!socket.isConnected) {
       setUser(Default.user());
       setServer(Default.userServer());
       setChannel(Default.channel());
     }
+    mainTab.setSelectedTabId('home');
   }, [socket.isConnected]);
+
+  useEffect(() => {
+    const handler = ({ key, newValue }: StorageEvent) => {
+      if (key !== 'trigger-handle-server-select' || !newValue) return;
+      const { serverDisplayId, serverId } = JSON.parse(newValue);
+
+      if (serverId === server.serverId) {
+        mainTab.setSelectedTabId('server');
+        return;
+      }
+
+      loadingBox.setIsLoading(true);
+      loadingBox.setLoadingServerId(serverDisplayId);
+
+      setTimeout(() => {
+        socket.send.connectServer({ userId, serverId });
+      }, loadingBox.loadingTimeStamp);
+    };
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, [mainTab]);
+
+  // useEffect(() => {
+  //   if (!loadingBox.isLoading) return;
+  //   if (mainTab.selectedTabId == 'server') {
+  //     loadingBox.setIsLoading(false);
+  //     loadingBox.setLoadingServerId('');
+  //   }
+  // }, [loadingBox.isLoading, server, mainTab]);
 
   useEffect(() => {
     if (!lang) return;
     const language = localStorage.getItem('language');
     if (language) lang.set(language as LanguageKey);
   }, [lang]);
-
-  const getMainContent = () => {
-    if (!socket.isConnected) return <LoadingSpinner />;
-    return (
-      <>
-        <SoundEffectPlayer />
-        <HomePage
-          user={user}
-          servers={servers}
-          currentServer={server}
-          display={mainTab.selectedTabId === 'home'}
-        />
-        <FriendPage
-          user={user}
-          friends={friends}
-          friendGroups={friendGroups}
-          display={mainTab.selectedTabId === 'friends'}
-        />
-        <ExpandedProvider>
-          <ServerPage
-            user={user}
-            currentServer={server}
-            currentChannel={channel}
-            friends={friends}
-            serverMembers={serverMembers}
-            serverChannels={serverChannels}
-            channelMessages={channelMessages}
-            actionMessages={actionMessages}
-            display={mainTab.selectedTabId === 'server'}
-          />
-        </ExpandedProvider>
-      </>
-    );
-  };
 
   return (
     <WebRTCProvider>
@@ -800,7 +802,39 @@ const RootPageComponent = () => {
           friendApplications={friendApplications}
         />
         {/* Main Content */}
-        <div className="content">{getMainContent()}</div>
+        <div className="content">
+          {!socket.isConnected ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <SoundEffectPlayer />
+              <HomePage
+                user={user}
+                servers={servers}
+                display={mainTab.selectedTabId === 'home'}
+              />
+              <FriendPage
+                user={user}
+                friends={friends}
+                friendGroups={friendGroups}
+                display={mainTab.selectedTabId === 'friends'}
+              />
+              <ExpandedProvider>
+                <ServerPage
+                  user={user}
+                  currentServer={server}
+                  currentChannel={channel}
+                  friends={friends}
+                  serverMembers={serverMembers}
+                  serverChannels={serverChannels}
+                  channelMessages={channelMessages}
+                  actionMessages={actionMessages}
+                  display={mainTab.selectedTabId === 'server'}
+                />
+              </ExpandedProvider>
+            </>
+          )}
+        </div>
       </div>
     </WebRTCProvider>
   );

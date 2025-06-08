@@ -55,7 +55,6 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
       return;
     }
 
-    mainTab.setSelectedTabId('home');
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(serverDisplayId);
 

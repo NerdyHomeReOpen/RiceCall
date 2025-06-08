@@ -75,7 +75,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
         return;
       }
 
-      mainTab.setSelectedTabId('home');
       loadingBox.setIsLoading(true);
       loadingBox.setLoadingServerId(server.displayId);
 
