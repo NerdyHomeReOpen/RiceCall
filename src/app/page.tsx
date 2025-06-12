@@ -199,9 +199,13 @@ const Header: React.FC<HeaderProps> = React.memo(
             <div className={header['statusDisplay']} datatype={userStatus} />
             <div className={header['statusTriangle']} />
             <div
-              className={`${header['statusDropdown']} ${
-                showStatusDropdown ? '' : header['hidden']
-              }`}
+              className={`
+                ${header['statusDropdown']}
+                ${showStatusDropdown
+                  ? ''
+                  : header['hidden']
+                }
+              `}
             >
               {STATUS_OPTIONS.map((option) => (
                 <div
@@ -228,9 +232,13 @@ const Header: React.FC<HeaderProps> = React.memo(
               <div
                 key={`Tabs-${TabId}`}
                 data-tab-id={TabId}
-                className={`${header['tab']} ${
-                  TabId === mainTab.selectedTabId ? header['selected'] : ''
-                }`}
+                className={`
+                  ${header['tab']}
+                  ${TabId === mainTab.selectedTabId
+                    ? header['selected']
+                    : ''
+                  }
+                `}
                 onClick={() =>
                   mainTab.setSelectedTabId(
                     TabId as 'home' | 'friends' | 'server',
@@ -762,6 +770,13 @@ const RootPageComponent = () => {
     const handler = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
+      if (!serverDisplayId || !serverId) return;
+
+      if (serverDisplayId === '' && serverId === '') {
+        loadingBox.setIsLoading(false);
+        loadingBox.setLoadingServerId(serverDisplayId);
+        return;
+      }
 
       if (serverId === server.serverId) {
         mainTab.setSelectedTabId('server');

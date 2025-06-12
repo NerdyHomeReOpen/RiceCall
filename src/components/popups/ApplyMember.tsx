@@ -9,6 +9,7 @@ import applyMember from '@/styles/popups/apply.module.css';
 import { PopupType, Server, MemberApplication, User } from '@/types';
 
 // Providers
+import { useLoading } from '@/providers/Loading';
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
 
@@ -29,6 +30,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
+    const loadingBox = useLoading();
 
     // Refs
     const refreshRef = useRef(false);
@@ -101,6 +103,17 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
         });
       };
       refresh();
+
+      if (loadingBox.isLoading) {
+        window.localStorage.setItem(
+          'trigger-handle-server-select',
+          JSON.stringify({
+            serverDisplayId: '',
+            serverId: '',
+            timestamp: Date.now(),
+          }),
+        );
+      }
     }, [serverId, userId]);
 
     return (

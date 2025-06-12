@@ -9,6 +9,7 @@ import ipcService from '@/services/ipc.service';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
+import { useLoading } from '@/providers/Loading';
 
 enum DIALOG_ICON {
   ALERT = 'alert',
@@ -32,6 +33,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({
 }) => {
   // Hooks
   const lang = useLanguage();
+  const loadingBox = useLoading();
 
   // Refs
   const containerRef = useRef<HTMLFormElement>(null);
@@ -49,6 +51,17 @@ const DialogPopup: React.FC<DialogPopupProps> = ({
   // Effects
   useEffect(() => {
     containerRef.current?.focus();
+
+    if (loadingBox.isLoading) {
+      window.localStorage.setItem(
+        'trigger-handle-server-select',
+        JSON.stringify({
+          serverDisplayId: '',
+          serverId: '',
+          timestamp: Date.now(),
+        }),
+      );
+    }
   }, []);
 
   return (
@@ -65,9 +78,10 @@ const DialogPopup: React.FC<DialogPopupProps> = ({
         <div className={setting['body']}>
           <div className={popup['dialogContent']}>
             <div
-              className={`${popup['dialogIcon']} ${
-                popup[DIALOG_ICON[iconType]]
-              }`}
+              className={`
+                ${popup['dialogIcon']}
+                ${popup[DIALOG_ICON[iconType]]}
+              `}
             />
             <div className={popup['label']}>{title}</div>
           </div>
