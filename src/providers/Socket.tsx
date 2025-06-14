@@ -52,16 +52,19 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
   // Handlers
   const handleConnect = () => {
     console.info('Socket connected');
+    ipcService.popup.close('errorDialog');
     setIsConnected(true);
   };
 
   const handleDisconnect = () => {
     console.info('Socket disconnected');
+    ipcService.popup.closeAll();
     setIsConnected(false);
   };
 
   const handleReconnect = (attemptNumber: number) => {
     console.info('Socket reconnecting, attempt number:', attemptNumber);
+    ipcService.popup.close('errorDialog');
   };
 
   const handleError = (error: any) => {
