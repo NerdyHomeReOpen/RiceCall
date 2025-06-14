@@ -78,10 +78,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
   ({ markdownText, isGuest = false, forbidGuestUrl = false }) => {
     const safeMarkdownText =
       typeof markdownText === 'string' ? markdownText : '';
-    const processedText = safeMarkdownText.replace(
-      /(^> .+)(\n)([^>\n])/gm,
-      '$1\n\n$3',
-    );
+    const processedText = safeMarkdownText.replace(/\n/g, '  \n');
     const withEmojis = processedText.replace(
       /(\[emoji_[\w-]+\])/g,
       (match: string) => {
