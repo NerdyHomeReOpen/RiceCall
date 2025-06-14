@@ -14,6 +14,9 @@ import { useLanguage } from '@/providers/Language';
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
 
+// Utils
+import Default from '@/utils/default';
+
 interface ChannelMessageProps {
   messageGroup: ChannelMessage & {
     contents: string[];
@@ -28,15 +31,21 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
 
     // Variables
     const {
-      name: senderName,
-      nickname: senderNickname,
-      vip: senderVip,
-      gender: senderGender,
-      permissionLevel: senderPermissionLevel,
+      sender: messagesSender,
       parameter: messageParameter,
       contents: messageContents,
       timestamp: messageTimestamp,
     } = messageGroup;
+
+    const {
+      name: senderName,
+      vip: senderVip,
+      gender: senderGender,
+      permissionLevel: senderPermissionLevel,
+    } = {
+      ...Default.serverMember(),
+      ...messagesSender,
+    };
 
     const timestamp = lang.getFormatTimestamp(messageTimestamp);
 
@@ -59,7 +68,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
               />
             )}
             <div className={styles['username']}>
-              {senderNickname || senderName}
+              {senderName}
             </div>
             <div className={styles['timestamp']}>{timestamp}</div>
           </div>

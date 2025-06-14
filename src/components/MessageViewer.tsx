@@ -19,10 +19,11 @@ type MessageGroup =
 interface MessageViewerProps {
   messages: DirectMessage[] | ChannelMessage[] | PromptMessage[];
   forbidGuestUrl?: boolean;
+  isActionMessage?: boolean;
 }
 
 const MessageViewer: React.FC<MessageViewerProps> = React.memo(
-  ({ messages, forbidGuestUrl = false }) => {
+  ({ messages, forbidGuestUrl = false, isActionMessage = false }) => {
     // Variables
     const sortedMessages = [...messages].sort(
       (a, b) => a.timestamp - b.timestamp,
@@ -39,10 +40,10 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
           lastGroup &&
           ((lastGroup.type === 'general' &&
             message.type === 'general' &&
-            message.userId === lastGroup.userId) ||
+            message.sender.userId === lastGroup.sender.userId) ||
             (lastGroup.type === 'dm' &&
               message.type === 'dm' &&
-              message.userId === lastGroup.userId));
+              message.sender.userId === lastGroup.sender.userId));
 
         if (sameSender && nearTime && sameType && (isGeneral || isDm)) {
           lastGroup.contents.push(message.content);
@@ -84,6 +85,7 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
                 <PromptMessageTab
                   messageGroup={messageGroup}
                   messageType={messageGroup.type}
+                  isActionMessage={isActionMessage}
                 />
               )}
             </div>
