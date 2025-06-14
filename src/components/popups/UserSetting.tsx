@@ -67,11 +67,12 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const [selectedTabId, setSelectedTabId] = useState<
       'about' | 'groups' | 'userSetting'
     >('about');
+    const [reloadAvatarKey, setReloadAvatarKey] = useState(0);
 
     // Variables
     const {
       name: userName,
-      avatar: userAvatar,
+      // avatar: userAvatar,
       avatarUrl: userAvatarUrl,
       gender: userGender,
       signature: userSignature,
@@ -290,7 +291,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               className={`${setting['avatar']} ${
                 isSelf ? setting['editable'] : ''
               }`}
-              style={{ backgroundImage: `url(${userAvatarUrl})` }}
+              style={{
+                backgroundImage: `url(${userAvatarUrl}?v=${reloadAvatarKey})`,
+              }}
               onClick={() => {
                 if (!isSelf) return;
                 const fileInput = document.createElement('input');
@@ -312,6 +315,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                         avatar: data.avatar,
                         avatarUrl: data.avatarUrl,
                       }));
+                      setReloadAvatarKey((prev) => prev + 1);
+                      handleEditUser({
+                        avatar: data.avatar,
+                        avatarUrl: data.avatarUrl,
+                      });
                     }
                   };
                   reader.readAsDataURL(file);
@@ -409,8 +417,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   onClick={() => {
                     if (!canSubmit) return;
                     handleEditUser({
-                      avatar: userAvatar,
-                      avatarUrl: userAvatarUrl,
                       name: userName,
                       gender: userGender,
                       country: userCountry,

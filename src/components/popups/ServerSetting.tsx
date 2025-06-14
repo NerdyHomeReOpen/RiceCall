@@ -114,6 +114,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const [showPreview, setShowPreview] = useState(false);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const [selectedRowType, setSelectedRowType] = useState<string | null>(null);
+    const [reloadAvatarKey, setReloadAvatarKey] = useState(0);
 
     // Variables
     const {
@@ -604,9 +605,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 </div>
                 <div className={setting['avatarWrapper']}>
                   <div
+                    key={reloadAvatarKey}
                     className={setting['avatarPicture']}
                     style={{
-                      backgroundImage: `url(${serverAvatarUrl})`,
+                      backgroundImage: `url(${serverAvatarUrl}?v=${reloadAvatarKey})`,
                     }}
                   />
                   <input
@@ -639,6 +641,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             avatar: data.avatar,
                             avatarUrl: data.avatarUrl,
                           }));
+                          setReloadAvatarKey((prev) => prev + 1);
                         }
                       };
                       reader.readAsDataURL(file);
