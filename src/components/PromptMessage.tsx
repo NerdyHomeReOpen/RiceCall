@@ -40,6 +40,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(
     const isAlertMessage = messageType === 'alert';
     const isEventMessage = messageType === 'event';
     const isAlertOrEvent = isAlertMessage || isEventMessage;
+    const alertMessageType = isActionMessage ? lang.getTranslatedMessage(messageParameter.alertType) : false;
 
     const {
       name: userName,
@@ -74,7 +75,14 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(
         )}
         <div className={styles['messageBox']}>
           {formatMessages.map((content, index) => (
-            <MarkdownViewer key={index} markdownText={content} />
+            <MarkdownViewer
+              key={index}
+              markdownText={
+                isAlertMessage 
+                  ? `${alertMessageType}:${content}` 
+                  : content
+              }
+            />
           ))}
         </div>
       </>
