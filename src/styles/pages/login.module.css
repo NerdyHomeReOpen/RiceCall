@@ -214,7 +214,6 @@
 .checkWrapper .checkBox {
   display: flex;
   align-items: center;
-  cursor: pointer;
 }
 
 .checkWrapper .check {
@@ -222,7 +221,7 @@
   cursor: pointer;
 }
 
-.checkWrapper .check::before {
+.checkBox .check::before {
   display: block;
   content: '';
   min-height: 18px;
@@ -232,15 +231,15 @@
   background-position: 0 0;
 }
 
-.checkBox:hover > .check::before {
-  background-position: -18px 0;
-}
-
 .checkBox .check:checked::before {
   background-position: 0 -18px;
 }
 
-.checkBox:hover > .check:checked::before {
+.checkBox .check:hover::before {
+  background-position: -18px 0;
+}
+
+.checkBox .check:hover:checked::before {
   background-position: -18px -18px;
 }
 
