@@ -187,15 +187,11 @@
   width: 100%;
 }
 
-.notifyArea {
-  display: flex;
-  padding: 5px;
-}
-
 .messageArea {
   display: flex;
   flex: 5;
   padding: 0.75rem;
+  margin-bottom: 0.75rem;
   overflow-y: auto;
 }
 
@@ -234,6 +230,8 @@
 }
 
 .inputArea .topBar .buttons .button.font {
+  filter: grayscale(100%);
+  cursor: not-allowed;
   background-image: url('../../../public/FontButton.png');
 }
 
@@ -242,6 +240,8 @@
 }
 
 .inputArea .topBar .buttons .button.screenShot {
+  filter: grayscale(100%);
+  cursor: not-allowed;
   background-image: url('../../../public/ScreenShot.png');
 }
 
@@ -250,12 +250,13 @@
 }
 
 .inputArea .topBar .historyMessage {
+  filter: grayscale(100%);
+  cursor: not-allowed;
   height: 100%;
   width: auto;
   display: flex;
   align-items: center;
   margin-right: 15px;
-  cursor: pointer;
 }
 
 .inputArea .topBar .historyMessage:before {

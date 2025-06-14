@@ -7,6 +7,7 @@ import { User, DirectMessage, SocketServerEvent, Server } from '@/types';
 // Providers
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
+import { useContextMenu } from '@/providers/ContextMenu';
 
 // Components
 import MessageViewer from '@/components/MessageViewer';
@@ -38,10 +39,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
+    const contextMenu = useContextMenu();
 
     // Refs
     const refreshRef = useRef(false);
     const cooldownRef = useRef(0);
+    const emojiIconRef = useRef<HTMLDivElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // States
     const [user, setUser] = useState<User>(Default.user());
@@ -271,13 +275,18 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
                 </div>
               </div>
             )}
-            <div className={directMessage['notifyArea']}>
-              {
-                isFriend
-                  ? ''
-                  : '對方不在你的好友列表，一些功能將無法使用!' /* TODO: lang.tr */
-              }
-            </div>
+            {!isFriend && (
+              <div
+                className={directMessage['serverInArea']}
+                onClick={() => {
+                  handleServerSelect(userId, targetCurrentServer);
+                }}
+              >
+                <div className={directMessage['serverInName']}>
+                  {'對方不在你的好友列表，一些功能將無法使用!'}
+                </div>
+              </div>
+            )}
             <div className={directMessage['messageArea']}>
               <MessageViewer messages={directMessages} />
             </div>
@@ -288,7 +297,24 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
                     className={`${directMessage['button']} ${directMessage['font']}`}
                   />
                   <div
+                    ref={emojiIconRef}
                     className={`${directMessage['button']} ${directMessage['emoji']}`}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      if (!emojiIconRef.current) return;
+                      const x = emojiIconRef.current.getBoundingClientRect().x;
+                      const y = emojiIconRef.current.getBoundingClientRect().y;
+                      contextMenu.showEmojiPicker(
+                        x,
+                        y,
+                        true,
+                        'unicode',
+                        (emoji) => {
+                          setMessageInput((prev) => prev + emoji);
+                          if (textareaRef.current) textareaRef.current.focus();
+                        },
+                      );
+                    }}
                   />
                   <div
                     className={`${directMessage['button']} ${directMessage['screenShot']}`}
@@ -305,6 +331,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
                 </div>
               </div>
               <textarea
+                ref={textareaRef}
                 className={directMessage['input']}
                 value={messageInput}
                 onChange={(e) => {
