@@ -35,6 +35,39 @@ type StoreSchema = {
 };
 const store = new Store<StoreSchema>();
 
+export enum PopupType {
+  USER_INFO = 'userInfo',
+  USER_SETTING = 'userSetting',
+  CHANNEL_SETTING = 'channelSetting',
+  CHANNEL_PASSWORD = 'channelPassword',
+  SERVER_SETTING = 'serverSetting',
+  SERVER_BROADCAST = 'serverBroadcast',
+  BLOCK_MEMBER = 'blockMember',
+  SYSTEM_SETTING = 'systemSetting',
+  MEMBERAPPLY_SETTING = 'memberApplySetting',
+  CREATE_SERVER = 'createServer',
+  CREATE_CHANNEL = 'createChannel',
+  CREATE_FRIENDGROUP = 'createFriendGroup',
+  EDIT_CHANNEL_ORDER = 'editChannelOrder',
+  EDIT_CHANNEL_NAME = 'editChannelName',
+  EDIT_NICKNAME = 'editNickname',
+  EDIT_FRIENDGROUP = 'editFriendGroup',
+  EDIT_FRIEND = 'editFriend',
+  APPLY_MEMBER = 'applyMember',
+  APPLY_FRIEND = 'applyFriend',
+  SEARCH_USER = 'searchUser',
+  DIRECT_MESSAGE = 'directMessage',
+  DIALOG_ALERT = 'dialogAlert',
+  DIALOG_ALERT2 = 'dialogAlert2',
+  DIALOG_SUCCESS = 'dialogSuccess',
+  DIALOG_WARNING = 'dialogWarning',
+  DIALOG_ERROR = 'dialogError',
+  DIALOG_INFO = 'dialogInfo',
+  CHANGE_THEME = 'changeTheme',
+  ABOUTUS = 'aboutus',
+  FRIEND_VERIFICATION = 'friendVerification',
+}
+
 export enum SocketClientEvent {
   // User
   SEARCH_USER = 'searchUser',
@@ -153,6 +186,42 @@ export enum SocketServerEvent {
   // Popup
   OPEN_POPUP = 'openPopup',
 }
+
+export const PopupSize = {
+  [PopupType.USER_INFO]: { height: 630, width: 440 },
+  [PopupType.USER_SETTING]: { height: 700, width: 500 },
+  [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
+  [PopupType.CHANNEL_PASSWORD]: { height: 200, width: 370 },
+  [PopupType.SERVER_SETTING]: { height: 520, width: 600 },
+  [PopupType.SERVER_BROADCAST]: { height: 300, width: 450 },
+  [PopupType.BLOCK_MEMBER]: { height: 250, width: 400 },
+  [PopupType.SYSTEM_SETTING]: { height: 520, width: 600 },
+  [PopupType.MEMBERAPPLY_SETTING]: { height: 200, width: 370 },
+  [PopupType.CREATE_SERVER]: { height: 436, width: 478 },
+  [PopupType.CREATE_CHANNEL]: { height: 200, width: 370 },
+  [PopupType.CREATE_FRIENDGROUP]: { height: 200, width: 370 },
+  [PopupType.EDIT_CHANNEL_ORDER]: { height: 550, width: 500 },
+  [PopupType.EDIT_CHANNEL_NAME]: { height: 200, width: 370 },
+  [PopupType.EDIT_NICKNAME]: { height: 200, width: 370 },
+  [PopupType.EDIT_FRIENDGROUP]: { height: 200, width: 370 },
+  [PopupType.EDIT_FRIEND]: { height: 200, width: 370 },
+  [PopupType.APPLY_FRIEND]: { height: 320, width: 500 },
+  [PopupType.APPLY_MEMBER]: { height: 320, width: 500 },
+  [PopupType.SEARCH_USER]: { height: 200, width: 370 },
+  [PopupType.DIRECT_MESSAGE]: { height: 550, width: 650 },
+  [PopupType.DIALOG_ALERT]: { height: 200, width: 370 },
+  [PopupType.DIALOG_ALERT2]: { height: 200, width: 370 },
+  [PopupType.DIALOG_SUCCESS]: { height: 200, width: 370 },
+  [PopupType.DIALOG_WARNING]: { height: 200, width: 370 },
+  [PopupType.DIALOG_ERROR]: { height: 200, width: 370 },
+  [PopupType.DIALOG_INFO]: { height: 200, width: 370 },
+  [PopupType.CHANGE_THEME]: { height: 340, width: 480 },
+  [PopupType.ABOUTUS]: { height: 440, width: 480 },
+  [PopupType.FRIEND_VERIFICATION]: { height: 550, width: 500 },
+  Settings: { height: 520, width: 600 },
+  Apply: { height: 320, width: 500 },
+  Small: { height: 200, width: 370 },
+};
 
 // Constants
 const DEV = process.argv.includes('--dev');
@@ -345,6 +414,11 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
     return { action: 'deny' };
   });
 
+  mainWindow.show();
+  mainWindow.focus();
+  mainWindow.setAlwaysOnTop(true);
+  mainWindow.setAlwaysOnTop(false);
+
   return mainWindow;
 }
 
@@ -391,17 +465,32 @@ async function createAuthWindow() {
     app.exit();
   });
 
+  authWindow.show();
+  authWindow.focus();
+  authWindow.setAlwaysOnTop(true);
+  authWindow.setAlwaysOnTop(false);
+
   return authWindow;
 }
 
 async function createPopup(
-  type: string,
+  type: PopupType,
   id: string,
-  height: number,
-  width: number,
+  force = true,
 ): Promise<BrowserWindow | null> {
-  if (popups[id] && !popups[id].isDestroyed()) {
-    popups[id].destroy();
+  // If force is true, destroy the popup
+  if (force) {
+    if (popups[id] && !popups[id].isDestroyed()) {
+      popups[id].destroy();
+    }
+  } else {
+    if (popups[id] && !popups[id].isDestroyed()) {
+      popups[id].show();
+      popups[id].focus();
+      popups[id].setAlwaysOnTop(true);
+      popups[id].setAlwaysOnTop(false);
+      return popups[id];
+    }
   }
 
   if (DEV) {
@@ -412,8 +501,8 @@ async function createPopup(
   }
 
   popups[id] = new BrowserWindow({
-    width: width ?? 800,
-    height: height ?? 600,
+    width: PopupSize[type].width,
+    height: PopupSize[type].height,
     resizable: false,
     frame: false,
     transparent: true,
@@ -434,6 +523,11 @@ async function createPopup(
     popups[id].loadURL(`${BASE_URI}/popup?type=${type}&id=${id}`);
     // popups[id].webContents.openDevTools();
   }
+
+  popups[id].show();
+  popups[id].focus();
+  popups[id].setAlwaysOnTop(true);
+  popups[id].setAlwaysOnTop(false);
 
   return popups[id];
 }
@@ -479,6 +573,86 @@ function connectSocket(token: string): Socket | null {
       socket.on(event, (...args) => {
         // console.log('socket.on', event, ...args);
         console.log('socket.on', event);
+
+        // // Catch open direct message popup
+        // if (event === SocketServerEvent.DIRECT_MESSAGE) {
+        //   const data = args[0];
+        //   if (!data) return;
+
+        //   const windowId = `directMessage-${data.userId}`;
+
+        //   if (popups[windowId] && !popups[windowId].isDestroyed()) {
+        //     popups[windowId].setAlwaysOnTop(true);
+        //     popups[windowId].setAlwaysOnTop(false);
+        //     popups[windowId].focus();
+        //     popups[windowId].webContents.send(
+        //       SocketServerEvent.DIRECT_MESSAGE,
+        //       ...args,
+        //     );
+        //   } else {
+        //     createPopup(PopupType.DIRECT_MESSAGE, windowId).then((window) => {
+        //       if (!window) return;
+
+        //       ipcMain.once('request-initial-data', async (_, to) => {
+        //         if (to === windowId) {
+        //           window.webContents.send('response-initial-data', windowId, {
+        //             userId: data.targetId,
+        //             targetId: data.userId,
+        //             targetName: data.name,
+        //           });
+        //           await new Promise((resolve) => setTimeout(resolve, 1000));
+        //           window.setAlwaysOnTop(true);
+        //           window.setAlwaysOnTop(false);
+        //           window.focus();
+        //           window.webContents.send(
+        //             SocketServerEvent.DIRECT_MESSAGE,
+        //             ...args,
+        //           );
+        //         }
+        //       });
+        //     });
+        //   }
+        // }
+
+        // if (event === SocketServerEvent.SHAKE_WINDOW) {
+        //   const data = args[0];
+        //   if (!data) return;
+
+        //   const windowId = `directMessage-${data.userId}`;
+
+        //   if (popups[windowId] && !popups[windowId].isDestroyed()) {
+        //     popups[windowId].setAlwaysOnTop(true);
+        //     popups[windowId].setAlwaysOnTop(false);
+        //     popups[windowId].focus();
+        //     popups[windowId].webContents.send(
+        //       SocketServerEvent.SHAKE_WINDOW,
+        //       ...args,
+        //     );
+        //   } else {
+        //     createPopup(PopupType.DIRECT_MESSAGE, windowId).then((window) => {
+        //       if (!window) return;
+
+        //       ipcMain.once('request-initial-data', async (_, to) => {
+        //         if (to === windowId) {
+        //           window.webContents.send('response-initial-data', windowId, {
+        //             userId: data.targetId,
+        //             targetId: data.userId,
+        //             targetName: data.name,
+        //           });
+        //           await new Promise((resolve) => setTimeout(resolve, 1000));
+        //           window.setAlwaysOnTop(true);
+        //           window.setAlwaysOnTop(false);
+        //           window.focus();
+        //           window.webContents.send(
+        //             SocketServerEvent.SHAKE_WINDOW,
+        //             ...args,
+        //           );
+        //         }
+        //       });
+        //     });
+        //   }
+        // }
+
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
@@ -524,38 +698,6 @@ function connectSocket(token: string): Socket | null {
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect_error', error);
     });
-  });
-
-  socket.on('shakeWindow', (data) => {
-    if (!data) return;
-
-    const windowId = `directMessage-${data.targetId}`;
-
-    if (popups[windowId] && !popups[windowId].isDestroyed()) {
-      popups[windowId].setAlwaysOnTop(true);
-      popups[windowId].setAlwaysOnTop(false);
-      popups[windowId].focus();
-      popups[windowId].webContents.send('shakeWindow');
-    } else {
-      createPopup('directMessage', windowId, 550, 650).then((window) => {
-        if (!window) return;
-
-        ipcMain.once('request-initial-data', async (_, to) => {
-          if (to === windowId) {
-            window.webContents.send('response-initial-data', windowId, {
-              userId: data.userId,
-              targetId: data.targetId,
-              targetName: data.name,
-            });
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            window.setAlwaysOnTop(true);
-            window.setAlwaysOnTop(false);
-            window.focus();
-            window.webContents.send('shakeWindow');
-          }
-        });
-      });
-    }
   });
 
   socket.connect();
@@ -804,8 +946,16 @@ app.on('ready', async () => {
   });
 
   // Popup handlers
-  ipcMain.on('open-popup', (_, type, id, height, width) => {
-    createPopup(type, id, height, width);
+  ipcMain.on('open-popup', (_, type, id, force = true) => {
+    createPopup(type, id, force);
+  });
+
+  ipcMain.on('close-popup', (_, id) => {
+    popups[id]?.close();
+  });
+
+  ipcMain.on('close-all-popups', () => {
+    closePopups();
   });
 
   ipcMain.on('popup-submit', (_, to) => {
