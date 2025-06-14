@@ -36,7 +36,7 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
   // States
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingServerId, setLoadingServerId] = useState<string>('');
-  const [loadingTimeStamp, setLoadingTimeStamp] = useState<number>(1000);
+  const [loadingTimeStamp, setLoadingTimeStamp] = useState<number>(500);
 
   return (
     <LoadingContext.Provider
