@@ -54,13 +54,13 @@ interface WebRTCContextType {
   handleMute: (userId: string) => void;
   handleUnmute: (userId: string) => void;
   handleToggleMute: () => void;
-  handleUpdateBitrate: (newBitrate: number) => void;
-  handleUpdateMicVolume: (volume: number) => void;
-  handleUpdateMusicVolume: (volume: number) => void;
-  handleUpdateSpeakerVolume: (volume: number) => void;
-  handleUpdateInputStream: (deviceId: string) => void;
-  handleUpdateOutputStream: (deviceId: string) => void;
-  handleUpdateMusicInputStream: (audioBuffer: AudioBuffer) => void;
+  handleEditBitrate: (newBitrate: number) => void;
+  handleEditMicVolume: (volume: number) => void;
+  handleEditMusicVolume: (volume: number) => void;
+  handleEditSpeakerVolume: (volume: number) => void;
+  handleEditInputStream: (deviceId: string) => void;
+  handleEditOutputStream: (deviceId: string) => void;
+  handleEditMusicInputStream: (audioBuffer: AudioBuffer) => void;
   muteList: string[];
   isMute: boolean;
   bitrate: number;
@@ -152,7 +152,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     localMute.current = newIsMute;
   }, []);
 
-  const handleUpdateMute = useCallback((muted?: boolean) => {
+  const handleEditMute = useCallback((muted?: boolean) => {
     if (!localStream.current) {
       console.warn('No local stream');
       return;
@@ -168,7 +168,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     localMute.current = newIsMute;
   }, []);
 
-  const handleUpdateBitrate = useCallback((bitrate?: number) => {
+  const handleEditBitrate = useCallback((bitrate?: number) => {
     if (bitrate === localBitrate.current) {
       console.warn(`Bitrate already set to ${bitrate}, skipping...`);
       return;
@@ -194,7 +194,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     localBitrate.current = newBitrate;
   }, []);
 
-  const handleUpdateMicVolume = useCallback((volume?: number) => {
+  const handleEditMicVolume = useCallback((volume?: number) => {
     if (!localStream.current) {
       console.warn('No local stream');
       return;
@@ -243,7 +243,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     localMicVolume.current = newVolume;
   }, []);
 
-  const handleUpdateMusicVolume = useCallback((volume?: number) => {
+  const handleEditMusicVolume = useCallback((volume?: number) => {
     if (!musicGainNode.current) {
       console.warn('No music gain node');
       return;
@@ -279,7 +279,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     localMusicVolume.current = newVolume;
   }, []);
 
-  const handleUpdateSpeakerVolume = useCallback((volume?: number) => {
+  const handleEditSpeakerVolume = useCallback((volume?: number) => {
     const newVolume = volume ?? localSpeakerVolume.current;
 
     Object.values(peerAudioRefs.current).forEach((audio) => {
@@ -290,7 +290,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     localSpeakerVolume.current = newVolume;
   }, []);
 
-  const handleUpdateInputStream = useCallback(
+  const handleEditInputStream = useCallback(
     (deviceId: string) => {
       if (localStream.current) {
         localStream.current.getTracks().forEach((track) => track.stop());
@@ -351,15 +351,15 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             }
           });
 
-          handleUpdateMute();
-          handleUpdateMicVolume();
+          handleEditMute();
+          handleEditMicVolume();
         })
         .catch((err) => console.error('Error accessing microphone', err));
     },
-    [handleUpdateMute, handleUpdateMicVolume],
+    [handleEditMute, handleEditMicVolume],
   );
 
-  const handleUpdateOutputStream = useCallback(
+  const handleEditOutputStream = useCallback(
     (deviceId: string) => {
       Object.values(peerAudioRefs.current).forEach((audio) => {
         audio
@@ -367,12 +367,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           .catch((err) => console.error('Error accessing speaker:', err));
       });
 
-      handleUpdateSpeakerVolume();
+      handleEditSpeakerVolume();
     },
-    [handleUpdateSpeakerVolume],
+    [handleEditSpeakerVolume],
   );
 
-  const handleUpdateMusicInputStream = useCallback(
+  const handleEditMusicInputStream = useCallback(
     (stream: AudioBuffer) => {
       if (musicSourceNode.current) {
         musicSourceNode.current.disconnect();
@@ -418,9 +418,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         }
       });
 
-      handleUpdateMusicVolume();
+      handleEditMusicVolume();
     },
-    [handleUpdateMusicVolume],
+    [handleEditMusicVolume],
   );
 
   const handleSendRTCOffer = (
@@ -613,7 +613,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         );
         peerAudioRefs.current[userId].autoplay = true;
         peerAudioRefs.current[userId].oncanplay = () =>
-          handleUpdateSpeakerVolume();
+          handleEditSpeakerVolume();
       }
       peerAudioRefs.current[userId].srcObject = event.streams[0];
       peerStreams.current[userId] = event.streams[0];
@@ -737,25 +737,25 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     //   console.info('New output stream device info:', deviceInfo);
     // };
 
-    ipcService.systemSettings.inputAudioDevice.get(() => { });
-    ipcService.systemSettings.outputAudioDevice.get(() => { });
+    ipcService.systemSettings.inputAudioDevice.get(() => {});
+    ipcService.systemSettings.outputAudioDevice.get(() => {});
 
     const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate(
       (deviceId) => {
-        handleUpdateInputStream(deviceId || '');
+        handleEditInputStream(deviceId || '');
       },
     );
 
     const offUpdateOutput =
       ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
-        handleUpdateOutputStream(deviceId || '');
+        handleEditOutputStream(deviceId || '');
       });
 
     return () => {
       offUpdateInput();
       offUpdateOutput();
     };
-  }, [handleUpdateInputStream, handleUpdateOutputStream]);
+  }, [handleEditInputStream, handleEditOutputStream]);
 
   useEffect(() => {
     window.localStorage.setItem('mic-volume', micVolume.toString());
@@ -805,13 +805,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         handleMute,
         handleUnmute,
         handleToggleMute,
-        handleUpdateBitrate,
-        handleUpdateMicVolume,
-        handleUpdateMusicVolume,
-        handleUpdateSpeakerVolume,
-        handleUpdateInputStream,
-        handleUpdateOutputStream,
-        handleUpdateMusicInputStream,
+        handleEditBitrate,
+        handleEditMicVolume,
+        handleEditMusicVolume,
+        handleEditSpeakerVolume,
+        handleEditInputStream,
+        handleEditOutputStream,
+        handleEditMusicInputStream,
         muteList,
         isMute,
         bitrate,

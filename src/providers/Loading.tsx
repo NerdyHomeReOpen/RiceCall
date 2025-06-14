@@ -1,5 +1,11 @@
 import React, { useContext, createContext, ReactNode, useState } from 'react';
 
+// CSS
+import homePage from '@/styles/pages/home.module.css';
+
+// Providers
+import { useLanguage } from '@/providers/Language';
+
 interface LoadingContextType {
   setIsLoading: (value: boolean) => void;
   setLoadingServerId: (value: string) => void;
@@ -24,6 +30,9 @@ interface LoadingProviderProps {
 }
 
 const LoadingProvider = ({ children }: LoadingProviderProps) => {
+  // Hooks
+  const lang = useLanguage();
+
   // States
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingServerId, setLoadingServerId] = useState<string>('');
@@ -40,6 +49,24 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
         loadingTimeStamp,
       }}
     >
+      {/* Loading */}
+      {isLoading && (
+        <div className={homePage['loadingWrapper']}>
+          <div className={homePage['loadingBox']}>
+            <div className={homePage['loadingTitleContain']}>
+              <div>{lang.tr.connectingServer}</div>
+              <div className={homePage['loadingServerID']}>
+                {loadingServerId}
+              </div>
+            </div>
+            <div className={homePage['loadingGif']}></div>
+            <div
+              className={homePage['loadingCloseBtn']}
+              onClick={() => setIsLoading(false)}
+            />
+          </div>
+        </div>
+      )}
       {children}
     </LoadingContext.Provider>
   );

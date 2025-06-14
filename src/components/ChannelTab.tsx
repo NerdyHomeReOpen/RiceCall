@@ -105,12 +105,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       channelVisibility !== 'readonly';
 
     // Handlers
-    const handleUpdateServer = (
+    const handleEditServer = (
       server: Partial<Server>,
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateServer({ serverId, server });
+      socket.send.editServer({ serverId, server });
     };
 
     const handleJoinChannel = (
@@ -127,13 +127,13 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      handleOpenWarning(
+      handleOpenWarningDialog(
         lang.tr.warningDeleteChannel.replace('{0}', channelName),
         () => socket.send.deleteChannel({ channelId, serverId }),
       );
     };
 
-    const handleOpenWarning = (message: string, callback: () => void) => {
+    const handleOpenWarningDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', {
         title: message,
@@ -374,7 +374,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 label: lang.tr.setDefaultChannel,
                 show: canSetReceptionLobby,
                 onClick: () =>
-                  handleUpdateServer({ receptionLobbyId: channelId }, serverId),
+                  handleEditServer({ receptionLobbyId: channelId }, serverId),
               },
             ]);
           }}

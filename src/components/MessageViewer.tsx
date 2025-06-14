@@ -4,57 +4,25 @@ import React, { useLayoutEffect, useRef } from 'react';
 import styles from '@/styles/message.module.css';
 
 // Types
-import type {
-  ChannelMessage,
-  DirectMessage,
-  InfoMessage,
-  WarnMessage,
-  EventMessage,
-  AlertMessage,
-  PromptMessage,
-} from '@/types';
+import type { ChannelMessage, DirectMessage, PromptMessage } from '@/types';
 
 // Components
 import DirectMessageTab from '@/components/DirectMessage';
 import ChannelMessageTab from '@/components/ChannelMessage';
-import InfoMessageTab from '@/components/InfoMessage';
-import WarnMessageTab from '@/components/WarnMessage';
-import EventMessageTab from '@/components/EventMessage';
-import AlertMessageTab from '@/components/AlertMessage';
-import ActionMessageTab from '@/components/ActionMessage';
 import PromptMessageTab from '@/components/PromptMessage';
 
-type MessageGroup = (
-  | DirectMessage
-  | ChannelMessage
-  | InfoMessage
-  | WarnMessage
-  | EventMessage
-  | AlertMessage
-) & {
-  /*
-    ChannelMessage: 'general' | 'info' | 'warn' | 'event'
-    DirectMessage: 'dm'
-    ActionMessage: 'alert' | 'info' | 'warn' | 'event'
-  */
-  type: 'general' | 'info' | 'warn' | 'event' | 'alert' | 'dm';
-  contents: string[];
-};
+type MessageGroup =
+  | (DirectMessage & { contents: string[] })
+  | (ChannelMessage & { contents: string[] })
+  | (PromptMessage & { contents: string[] });
 
 interface MessageViewerProps {
-  messages:
-  | DirectMessage[]
-  | ChannelMessage[]
-  | InfoMessage[]
-  | WarnMessage[]
-  | EventMessage[]
-  | AlertMessage[];
+  messages: DirectMessage[] | ChannelMessage[] | PromptMessage[];
   forbidGuestUrl?: boolean;
-  isActionMessage?: boolean;
 }
 
 const MessageViewer: React.FC<MessageViewerProps> = React.memo(
-  ({ messages, forbidGuestUrl = false, isActionMessage = false }) => {
+  ({ messages, forbidGuestUrl = false }) => {
     // Variables
     const sortedMessages = [...messages].sort(
       (a, b) => a.timestamp - b.timestamp,
@@ -65,26 +33,18 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
         const timeDiff = lastGroup && message.timestamp - lastGroup.timestamp;
         const nearTime = lastGroup && timeDiff <= 5 * 60 * 1000;
         const sameType = lastGroup && message.type === lastGroup.type;
-        const isInfo = message.type === 'info';
-        const isAlert = message.type === 'alert';
         const isGeneral = message.type === 'general';
-        const isWarn = message.type === 'warn';
-        const isEvent = message.type === 'event';
         const isDm = message.type === 'dm';
         const sameSender =
           lastGroup &&
-          !isInfo &&
-          !isWarn &&
-          !isEvent &&
-          !isAlert &&
-          ((isGeneral &&
-            lastGroup.type === 'general' &&
-            message.sender.userId === lastGroup.sender.userId) ||
-            (isDm &&
-              lastGroup.type === 'dm' &&
-              message.senderId === lastGroup.senderId));
+          ((lastGroup.type === 'general' &&
+            message.type === 'general' &&
+            message.userId === lastGroup.userId) ||
+            (lastGroup.type === 'dm' &&
+              message.type === 'dm' &&
+              message.userId === lastGroup.userId));
 
-        if (sameSender && nearTime && sameType && !isInfo) {
+        if (sameSender && nearTime && sameType && (isGeneral || isDm)) {
           lastGroup.contents.push(message.content);
         } else {
           acc.push({
@@ -123,44 +83,9 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
               ) : (
                 <PromptMessageTab
                   messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
                   messageType={messageGroup.type}
-                  isActionMessage={isActionMessage}
                 />
               )}
-              {/* {messageGroup.type === 'info' ? (
-                <InfoMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'warn' ? (
-                <WarnMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'event' && isActionMessage ? (
-                <ActionMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'alert' && isActionMessage ? (
-                <AlertMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'event' ? (
-                <EventMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'general' ? (
-                <ChannelMessageTab
-                  messageGroup={messageGroup}
-                  forbidGuestUrl={forbidGuestUrl}
-                />
-              ) : messageGroup.type === 'dm' ? (
-                <DirectMessageTab messageGroup={messageGroup} />
-              ) : null} */}
             </div>
           );
         })}

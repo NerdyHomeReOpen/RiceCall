@@ -37,7 +37,7 @@ import FriendVerification from '@/components/popups/FriendVerification';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -195,7 +195,7 @@ const Popup = React.memo(() => {
       let isActive = true;
       setDirectMessageTargetSignature(null);
 
-      refreshService
+      getService
         .user({ userId: currentTargetId })
         .then((targetUser) => {
           if (isActive) {

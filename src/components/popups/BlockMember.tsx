@@ -15,7 +15,7 @@ import styles from '@/styles/popups/blockMember.module.css';
 import ipcService from '@/services/ipc.service';
 
 interface BlockMemberPopupProps {
-  userId: User['userId'],
+  userId: User['userId'];
   serverId: Server['serverId'];
 }
 
@@ -32,13 +32,15 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
     const [blockTime, setBlockTime] = useState<number>(0);
 
     // Variables
-    const BLOCK_TYPE_OPTIONS = [ // TODO: lang.tr
+    const BLOCK_TYPE_OPTIONS = [
+      // TODO: lang.tr
       { key: 'timeout', label: '暫時封鎖', disabled: false },
       { key: 'block', label: '永久封鎖', disabled: false },
       { key: 'blockIP', label: '永久封鎖IP', disabled: true },
     ];
 
-    const FORMAT_TYPE_OPTIONS = [ // TODO: lang.tr
+    const FORMAT_TYPE_OPTIONS = [
+      // TODO: lang.tr
       { key: 'seconds', label: '秒' },
       { key: 'minutes', label: '分鐘' },
       { key: 'hours', label: '小時' },
@@ -51,14 +53,17 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
 
     // Handles
     const handleBlockMember = () => {
-      const memberData = (blockType === 'timeout' ? {
-        isBlocked: Date.now() + blockTime,
-      } : {
-        isBlocked: -1,
-        permissionLevel: 1,
-      });
+      const memberData =
+        blockType === 'timeout'
+          ? {
+              isBlocked: Date.now() + blockTime,
+            }
+          : {
+              isBlocked: -1,
+              permissionLevel: 1,
+            };
 
-      socket.send.updateMember({
+      socket.send.editMember({
         member: memberData,
         userId,
         serverId,
@@ -93,7 +98,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
         default:
           setBlockTime(1000);
       }
-    }, [formatType, selectTime])
+    }, [formatType, selectTime]);
 
     return (
       <div className={popup['popupContainer']}>
@@ -101,8 +106,12 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
         <div className={popup['popupBody']}>
           <div className={`${styles['content']}`}>
             <div className={`${popup['inputGroup']} ${popup['col']}`}>
-              <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
-                <div className={`${popup['label']}`}>{'封鎖類型' /* TODO: lang.tr */}</div>
+              <div
+                className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}
+              >
+                <div className={`${popup['label']}`}>
+                  {'封鎖類型' /* TODO: lang.tr */}
+                </div>
                 <div className={`${popup['selectBox']}`}>
                   <select
                     value={blockType}
@@ -120,8 +129,12 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
                   </select>
                 </div>
               </div>
-              <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
-                <div className={`${popup['label']}`}>{'封鎖時間' /* TODO: lang.tr */}</div>
+              <div
+                className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}
+              >
+                <div className={`${popup['label']}`}>
+                  {'封鎖時間' /* TODO: lang.tr */}
+                </div>
                 <div className={`${popup['selectBox']}`}>
                   <select
                     value={selectTime}
@@ -142,10 +155,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
                     onChange={(e) => setFormatType(e.target.value)}
                   >
                     {FORMAT_TYPE_OPTIONS.map((option) => (
-                      <option
-                        key={option.key}
-                        value={option.key}
-                      >
+                      <option key={option.key} value={option.key}>
                         {option.label}
                       </option>
                     ))}
@@ -177,7 +187,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
       </div>
     );
   },
-)
+);
 
 BlockMemberPopup.displayName = 'BlockMemberPopup';
 

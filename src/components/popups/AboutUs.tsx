@@ -16,7 +16,7 @@ import ipcService from '@/services/ipc.service';
 import { useLanguage } from '@/providers/Language';
 
 const AboutPopup: React.FC = React.memo(() => {
-  // Language
+  // Hooks
   const lang = useLanguage();
 
   // Handlers

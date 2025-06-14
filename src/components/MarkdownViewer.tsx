@@ -195,18 +195,16 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
     };
 
     return (
-      <div className={markdown.container}>
-        <div className={markdown.markdownContent}>
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw]}
-            components={components}
-            skipHtml={false}
-            unwrapDisallowed={false}
-          >
-            {sanitized}
-          </ReactMarkdown>
-        </div>
+      <div className={markdown.markdownContent}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw]}
+          components={components}
+          skipHtml={false}
+          unwrapDisallowed={false}
+        >
+          {sanitized}
+        </ReactMarkdown>
       </div>
     );
   },

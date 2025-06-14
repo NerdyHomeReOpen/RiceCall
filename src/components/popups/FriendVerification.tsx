@@ -5,7 +5,6 @@ import {
   User,
   UserFriend,
   FriendApplication,
-  Friend,
   PopupType,
   SocketServerEvent,
 } from '@/types';
@@ -17,14 +16,13 @@ import friendVerification from '@/styles/popups/friendVerification.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
 
 // Utils
-import Default from '@/utils/default';
 import Sorter from '@/utils/sorter';
 
 interface FriendVerificationPopupProps {
@@ -42,7 +40,9 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
     const containerRef = useRef<HTMLFormElement>(null);
 
     // State
-    const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
+    const [friendApplications, setFriendApplications] = useState<
+      FriendApplication[]
+    >([]);
 
     // Handlers
     const handleSort = <T extends UserFriend | FriendApplication>(
@@ -78,10 +78,10 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
       ipcService.initialData.onRequest('applyFriend', {
         userId,
         targetId,
-      })
+      });
     };
 
-    const handleOpenAlert = (message: string, callback: () => void) => {
+    const handleOpenAlertDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
       ipcService.initialData.onRequest('alertDialog', {
         title: message,
@@ -92,13 +92,13 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
 
     const handleDeleteAllFriendApplication = () => {
       if (!socket) return;
-      handleOpenAlert(
+      handleOpenAlertDialog(
         '確定要拒絕全部的好友請求嗎', // lang.tr
         () => {
           for (const item of friendApplications) {
             const senderId = item.senderId;
             const receiverId = item.receiverId;
-            socket.send.deleteFriendApplication({ senderId, receiverId })
+            socket.send.deleteFriendApplication({ senderId, receiverId });
           }
           setFriendApplications([]);
         },
@@ -110,19 +110,15 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
       receiverId: User['userId'],
     ) => {
       setFriendApplications((prev) => {
-        return prev.filter((friend) => friend.senderId !== senderId)
-      })
-      socket.send.deleteFriendApplication({ senderId, receiverId })
+        return prev.filter((friend) => friend.senderId !== senderId);
+      });
+      socket.send.deleteFriendApplication({ senderId, receiverId });
     };
 
-    const handleFriendAdd = (data: Friend) => {
-      setFriendApplications((prev) => {
-        return prev.filter((friend) => friend.senderId !== data.targetId)
-      })
-    };
-
-    const handleFriendApplicationAdd = (friendApplication: FriendApplication): void => {
-      setFriendApplications((prev) => [...prev, friendApplication])
+    const handleFriendApplicationAdd = (
+      friendApplication: FriendApplication,
+    ): void => {
+      setFriendApplications((prev) => [...prev, friendApplication]);
     };
 
     const handleFriendApplicationUpdate = (
@@ -137,15 +133,10 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
       );
     };
 
-    const handleFriendApplicationDelete = (
-      senderId: User['userId'],
-      receiverId: User['userId']
-    ) => {
-      setFriendApplications((prev) => prev.filter((item) => item.senderId !== senderId));
-    }
-
-    const handleClose = () => {
-      ipcService.window.close();
+    const handleFriendApplicationRemove = (senderId: User['userId']) => {
+      setFriendApplications((prev) =>
+        prev.filter((item) => item.senderId !== senderId),
+      );
     };
 
     // Effects
@@ -153,10 +144,11 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
       if (!socket) return;
 
       const eventHandlers = {
-        [SocketServerEvent.FRIEND_ADD]: handleFriendAdd,
         [SocketServerEvent.FRIEND_APPLICATION_ADD]: handleFriendApplicationAdd,
-        [SocketServerEvent.FRIEND_APPLICATION_UPDATE]: handleFriendApplicationUpdate,
-        [SocketServerEvent.FRIEND_APPLICATION_DELETE]: handleFriendApplicationDelete,
+        [SocketServerEvent.FRIEND_APPLICATION_UPDATE]:
+          handleFriendApplicationUpdate,
+        [SocketServerEvent.FRIEND_APPLICATION_REMOVE]:
+          handleFriendApplicationRemove,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -174,18 +166,22 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.userFriendApplications({
+          getService.userFriendApplications({
             userId: userId,
           }),
         ]).then(([userFriendApplications]) => {
           if (userFriendApplications) {
-            const sortedApplications = handleSort('createdAt', userFriendApplications, 1);
+            const sortedApplications = handleSort(
+              'createdAt',
+              userFriendApplications,
+              1,
+            );
             setFriendApplications(sortedApplications);
           }
         });
       };
       refresh();
-    }, [userId])
+    }, [userId]);
 
     // Effects
     useEffect(() => {
@@ -193,10 +189,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
     }, []);
 
     return (
-      <div
-        className={popup['popupContainer']}
-        tabIndex={0}
-      >
+      <div className={popup['popupContainer']} tabIndex={0}>
         <div className={popup['popupBody']}>
           <div className={`${setting['body']} ${friendVerification['body']}`}>
             <div className={friendVerification['contentHeader']}>
@@ -217,12 +210,15 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
               </div>
             </div>
             <div className={friendVerification['contentBody']}>
-              {friendApplications.map((friend, index) => {
+              {friendApplications.map((friend) => {
                 return (
-                  <div key={friend.senderId} className={friendVerification['userInfoBox']}>
+                  <div
+                    key={friend.senderId}
+                    className={friendVerification['userInfoBox']}
+                  >
                     <div
                       className={friendVerification['avatarBox']}
-                      style={{ backgroundImage: `url(${friend.avatarUrl})`, }}
+                      style={{ backgroundImage: `url(${friend.avatarUrl})` }}
                     />
                     <div className={friendVerification['userApplyContentBox']}>
                       <div className={friendVerification['userInfo']}>
@@ -237,14 +233,20 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
                         </div>
                       </div>
                       <div className={friendVerification['userApplyContent']}>
-                        <div className={friendVerification['userApplyContentText']}>
+                        <div
+                          className={friendVerification['userApplyContentText']}
+                        >
                           <div
-                            className={friendVerification['userApplyContentRow']}
+                            className={
+                              friendVerification['userApplyContentRow']
+                            }
                           >
                             請求加您為好友
                           </div>
                           <div
-                            className={friendVerification['userApplyContentRow']}
+                            className={
+                              friendVerification['userApplyContentRow']
+                            }
                           >
                             附言：{friend.description}
                           </div>
@@ -256,7 +258,9 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
                         >
                           <div
                             className={
-                              friendVerification['userApplyContentActionButtons']
+                              friendVerification[
+                                'userApplyContentActionButtons'
+                              ]
                             }
                           >
                             <button
@@ -264,7 +268,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
                                 friendVerification['userApplyContentButton']
                               }
                               onClick={() => {
-                                handleOpenApplyFriend(userId, friend.senderId)
+                                handleOpenApplyFriend(userId, friend.senderId);
                               }}
                             >
                               接受
@@ -274,16 +278,25 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
                                 friendVerification['userApplyContentButton']
                               }
                               onClick={() => {
-                                handleDeleteFriendApplication(friend.senderId, friend.receiverId)
+                                handleDeleteFriendApplication(
+                                  friend.senderId,
+                                  friend.receiverId,
+                                );
                               }}
                             >
                               拒絕
                             </button>
                           </div>
                           <div
-                            className={friendVerification['directMessageButton']}
+                            className={
+                              friendVerification['directMessageButton']
+                            }
                             onClick={() => {
-                              handleOpenDirectMessage(friend.receiverId, friend.senderId, friend.name)
+                              handleOpenDirectMessage(
+                                friend.receiverId,
+                                friend.senderId,
+                                friend.name,
+                              );
                             }}
                           >
                             <div
@@ -296,7 +309,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
                       </div>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           </div>

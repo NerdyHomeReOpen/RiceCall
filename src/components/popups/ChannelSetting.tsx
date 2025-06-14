@@ -14,7 +14,7 @@ import { useSocket } from '@/providers/Socket';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -66,13 +66,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
     const canSubmit = channelName.trim();
 
     // Handlers
-    const handleUpdateChannel = (
+    const handleEditChannel = (
       channel: Partial<Channel>,
       channelId: Channel['channelId'],
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateChannel({ channel, channelId, serverId });
+      socket.send.editChannel({ channel, channelId, serverId });
     };
 
     const handleClose = () => {
@@ -85,10 +85,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.channel({
+          getService.channel({
             channelId: channelId,
           }),
-          refreshService.server({
+          getService.server({
             serverId: serverId,
           }),
         ]).then(([channel, server]) => {
@@ -608,7 +608,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
             disabled={!canSubmit}
             onClick={() => {
               if (!canSubmit) return;
-              handleUpdateChannel(
+              handleEditChannel(
                 {
                   name: channelName,
                   announcement: channelAnnouncement,

@@ -17,7 +17,7 @@ import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -50,10 +50,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
     const [friendServer, setFriendServer] = useState<Server>(Default.server());
 
     // Variables
-    const {
-      userId,
-      currentServerId: userCurrentServerId,
-    } = user;
+    const { userId, currentServerId: userCurrentServerId } = user;
     const {
       userId: friendUserId,
       targetId: friendTargetId,
@@ -78,7 +75,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
         return;
       }
 
-      mainTab.setSelectedTabId('home');
       loadingBox.setIsLoading(true);
       loadingBox.setLoadingServerId(server.displayId);
 
@@ -92,7 +88,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       targetId: User['userId'],
     ) => {
       if (!socket) return;
-      handleOpenWarning(
+      handleOpenWarningDialog(
         lang.tr.deleteFriendDialog.replace('{0}', friendName),
         () => socket.send.deleteFriend({ userId, targetId }),
       );
@@ -102,7 +98,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       setFriendServer(data);
     };
 
-    const handleOpenWarning = (message: string, callback: () => void) => {
+    const handleOpenWarningDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', {
         title: message,
@@ -153,12 +149,13 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       if (!friendCurrentServerId) return;
       const refresh = async () => {
         Promise.all([
-          refreshService.server({
+          getService.server({
             serverId: friendCurrentServerId,
           }),
         ]).then(([server]) => {
           if (server) handleServerUpdate(server);
         });
+        refreshed.current = true;
       };
       refresh();
     }, [friendCurrentServerId]);
@@ -167,8 +164,9 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       <div key={friendTargetId}>
         {/* User View */}
         <div
-          className={`${styles['friendCard']} ${selectedItemId === `${friendTargetId}` ? styles['selected'] : ''
-            }`}
+          className={`${styles['friendCard']} ${
+            selectedItemId === `${friendTargetId}` ? styles['selected'] : ''
+          }`}
           onClick={() => setSelectedItemId(friendTargetId)}
           onContextMenu={(e) => {
             const x = e.clientX;
@@ -279,13 +277,15 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
             <div className={styles['container']}>
               {friendVip > 0 && (
                 <div
-                  className={`${vip['vipIcon']} ${vip[`vip-small-${friendVip}`]
-                    }`}
+                  className={`${vip['vipIcon']} ${
+                    vip[`vip-small-${friendVip}`]
+                  }`}
                 />
               )}
               <div
-                className={`${styles['name']} ${friendVip > 0 ? styles['isVIP'] : ''
-                  }`}
+                className={`${styles['name']} ${
+                  friendVip > 0 ? styles['isVIP'] : ''
+                }`}
               >
                 {friendName}
               </div>

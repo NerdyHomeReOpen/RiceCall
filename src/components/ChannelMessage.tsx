@@ -28,30 +28,27 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
 
     // Variables
     const {
-      sender: messageSender,
+      name: senderName,
+      nickname: senderNickname,
+      vip: senderVip,
+      gender: senderGender,
+      permissionLevel: senderPermissionLevel,
+      parameter: messageParameter,
       contents: messageContents,
       timestamp: messageTimestamp,
     } = messageGroup;
 
-    const {
-      gender: senderGender,
-      name: senderName,
-      vip: senderVip,
-      nickname: senderNickname,
-      permissionLevel: messagePermission,
-    } = messageSender;
-
     const timestamp = lang.getFormatTimestamp(messageTimestamp);
 
     const formatMessages = messageContents.map((content) =>
-      lang.getTranslatedMessage(content),
+      lang.getTranslatedMessage(content, messageParameter),
     );
 
     return (
       <>
         <div
           className={`${styles['gradeIcon']} ${permission[senderGender]} ${
-            permission[`lv-${messagePermission}`]
+            permission[`lv-${senderPermissionLevel}`]
           }`}
         />
         <div className={styles['messageBox']}>
@@ -59,7 +56,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
             {senderVip > 0 && (
               <div
                 className={`${vip['vipIcon']} ${vip[`vip-small-${senderVip}`]}`}
-              ></div>
+              />
             )}
             <div className={styles['username']}>
               {senderNickname || senderName}
@@ -67,12 +64,11 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
             <div className={styles['timestamp']}>{timestamp}</div>
           </div>
           {formatMessages.map((content, index) => (
-            <div key={index} className={styles['content']}>
-              <MarkdownViewer
-                markdownText={content}
-                forbidGuestUrl={forbidGuestUrl}
-              />
-            </div>
+            <MarkdownViewer
+              key={index}
+              markdownText={content}
+              forbidGuestUrl={forbidGuestUrl}
+            />
           ))}
         </div>
       </>

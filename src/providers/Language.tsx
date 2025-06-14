@@ -139,49 +139,101 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
         : content;
     }
 
+    // Action Event Messages
+
     content = content.replace(
       'removeFromMemberMessage',
-      '移除了{gender}的會員身分。',
+      '移除了你的會員身分。',
     );
     content = content.replace(
       'removeFromChannelManagerMessage',
-      '移除了{gender}的頻道管理員身分。',
+      '移除了你的頻道管理員身分。',
     );
     content = content.replace(
       'removeFromServerManagerMessage',
-      '移除了{gender}的群管理員身分。',
+      '移除了你的群管理員身分。',
     );
-    content = content.replace(
-      'updateMemberMessage',
-      '加入了群，成為本群會員。',
-    );
-    content = content.replace(
-      'updateChannelManagerMessage',
-      '被提升為本頻道的頻道管理員。',
-    );
-    content = content.replace(
-      'updateServerManagerMessage',
-      '被提升為本群的管理員。',
-    );
+
     content = content.replace(
       'upgradeServerManagerMessage',
-      '{gender}已被提升為本群的管理員。',
+      '您已被提升為本群的管理員。',
     );
     content = content.replace(
       'upgradeChannelManagerMessage',
-      '{gender}已被提升為本頻道的管理員。',
+      '您已被提升為本頻道的管理員。',
     );
     content = content.replace(
       'upgradeMemberMessage',
-      '{gender}已加入成為本群會員。',
+      '您已加入成為本群會員。',
+    );
+
+    // Action Warn Messages
+
+    content = content.replace(
+      'forbidVoiceMessage',
+      '您被管理員【{operator}】禁止語音',
+    );
+    content = content.replace(
+      'unForbidVoiceMessage',
+      '您被管理員【{operator}】重新開啟語音',
+    );
+    content = content.replace(
+      'forbidTextMessage',
+      '您被管理員【{operator}】禁止傳送文字訊息',
+    );
+    content = content.replace(
+      'unForbidTextMessage',
+      '您被管理員【{operator}】重新開啟傳送文字訊息',
+    );
+    content = content.replace(
+      'timeoutChannelMessage',
+      '您在【{channel}】頻道被管理員【{operator}】踢出 {time} 分鐘',
+    );
+
+    // Channel Event Messages
+
+    content = content.replace(
+      'setMemberMessage',
+      '加入了群，成為本群會員。',
+    );
+    content = content.replace(
+      'setChannelManagerMessage',
+      '被提升為本頻道的頻道管理員。',
+    );
+    content = content.replace(
+      'setServerManagerMessage',
+      '被提升為本群的管理員。',
+    );
+
+    // Channel Warn Messages
+
+    content = content.replace(
+      'forbidVoiceMemberMessage',
+      '【{target}】被管理員【{operator}】禁止語音',
+    );
+    content = content.replace(
+      'unForbidVoiceMemberMessage',
+      '【{target}】被管理員【{operator}】重新開啟語音',
+    );
+    content = content.replace(
+      'forbidTextMemberMessage',
+      '【{target}】被管理員【{operator}】禁止傳送文字訊息',
+    );
+    content = content.replace(
+      'unForbidTextMemberMessage',
+      '【{target}】被管理員【{operator}】重新開啟傳送文字訊息',
+    );
+    content = content.replace(
+      'timeoutMemberChannelMessage',
+      '【{target}】被管理員【{operator}】踢出頻道',
     );
     content = content.replace(
       'timeoutMemberMessage',
-      '【{user}】被管理員【{operator}】踢出群',
+      '【{target}】被管理員【{operator}】踢出群',
     );
     content = content.replace(
       'blockedMemberMessage',
-      '【{user}】被管理員【{operator}】封鎖',
+      '【{target}】被管理員【{operator}】封鎖',
     );
     content = content.replace(
       /{(\w+)}/gm,

@@ -84,22 +84,26 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const categoryLobby =
       categoryVisibility !== 'readonly'
         ? Default.channel({
-          ...category,
-          channelId: categoryId,
-          name: lang.tr.lobby,
-          type: 'channel',
-          categoryId: categoryId,
-          visibility: categoryVisibility,
-          order: -1,
-        })
+            ...category,
+            channelId: categoryId,
+            name: lang.tr.lobby,
+            type: 'channel',
+            categoryId: categoryId,
+            visibility: categoryVisibility,
+            order: -1,
+          })
         : null;
 
-    const categoryChannelIds = new Set(categoryChannels.map((ch) => ch.channelId));
+    const categoryChannelIds = new Set(
+      categoryChannels.map((ch) => ch.channelId),
+    );
     const isAllChannelReadOnly = categoryChannels.every(
-      (channel) => channel.visibility === 'readonly'
+      (channel) => channel.visibility === 'readonly',
     );
     const categoryMembers = serverMembers.filter(
-      (mb) => categoryChannelIds.has(mb.currentChannelId) || mb.currentChannelId === categoryId,
+      (mb) =>
+        categoryChannelIds.has(mb.currentChannelId) ||
+        mb.currentChannelId === categoryId,
     );
     const categoryUserIds = categoryMembers.map((mb) => mb.userId);
     const userInCategory = categoryMembers.some(
@@ -129,12 +133,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       categoryVisibility !== 'readonly';
 
     // Handlers
-    const handleUpdateServer = (
+    const handleEditServer = (
       server: Partial<Server>,
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateServer({ serverId, server });
+      socket.send.editServer({ serverId, server });
     };
 
     const handleJoinChannel = (
@@ -151,13 +155,13 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      handleOpenWarning(
+      handleOpenWarningDialog(
         lang.tr.warningDeleteChannel.replace('{0}', categoryName),
         () => socket.send.deleteChannel({ channelId, serverId }),
       );
     };
 
-    const handleOpenWarning = (message: string, callback: () => void) => {
+    const handleOpenWarningDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', {
         title: message,
@@ -280,10 +284,11 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         {/* Category View */}
         <div
           key={categoryId}
-          className={`${styles['channelTab']} ${selectedItemId === categoryId && selectedItemType === 'category'
-            ? styles['selected']
-            : ''
-            }`}
+          className={`${styles['channelTab']} ${
+            selectedItemId === categoryId && selectedItemType === 'category'
+              ? styles['selected']
+              : ''
+          }`}
           onClick={() => {
             if (
               selectedItemId === categoryId &&
@@ -396,10 +401,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 label: lang.tr.setDefaultChannel,
                 show: canSetReceptionLobby,
                 onClick: () =>
-                  handleUpdateServer(
-                    { receptionLobbyId: categoryId },
-                    serverId,
-                  ),
+                  handleEditServer({ receptionLobbyId: categoryId }, serverId),
               },
             ]);
           }}

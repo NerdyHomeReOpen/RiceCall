@@ -12,7 +12,7 @@ import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 import ipcService from '@/services/ipc.service';
 
 // Utils
@@ -41,13 +41,13 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
     const { name: userName } = user;
 
     // Handlers
-    const handleUpdateMember = (
+    const handleEditMember = (
       member: Partial<Member>,
       userId: User['userId'],
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateMember({ member, userId, serverId });
+      socket.send.editMember({ member, userId, serverId });
     };
 
     const handleClose = () => {
@@ -60,10 +60,10 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.user({
+          getService.user({
             userId: userId,
           }),
-          refreshService.member({
+          getService.member({
             userId: userId,
             serverId: serverId,
           }),
@@ -117,11 +117,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
           <button
             className={popup['button']}
             onClick={() => {
-              handleUpdateMember(
-                { nickname: memberNickname },
-                userId,
-                serverId,
-              );
+              handleEditMember({ nickname: memberNickname }, userId, serverId);
               handleClose();
             }}
           >
@@ -138,11 +134,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(
             type="button"
             className={`${popup['button']}`}
             onClick={() => {
-              handleUpdateMember(
-                { nickname: memberNickname },
-                userId,
-                serverId,
-              );
+              handleEditMember({ nickname: memberNickname }, userId, serverId);
             }}
           >
             {lang.tr.set}
