@@ -96,7 +96,7 @@
 }
 
 .baseInfoBox .container.hasServer {
-  cursor: pointer
+  cursor: pointer;
 }
 
 .gradeIcon {
@@ -348,7 +348,7 @@
 
 .sidebarFooter {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
   gap: 10px;
   padding: 10px;
@@ -358,18 +358,16 @@
 }
 
 .sidebarFooter .button {
-  flex: 1;
   display: flex;
-  border: 1px solid #dbdde0;
+  border: 1px solid #ccc;
   border-radius: 5px;
   background: #fff;
   text-align: center;
-  height: auto;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: #6e7c7e;
-  padding: 5px;
+  padding: 5px 20px;
 }
 
 .sidebarFooter .button:hover {

@@ -839,24 +839,13 @@
 
 .bottomNav {
   display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
   border-top: 2px solid #e2e8f0;
 }
 
-.bottomNav:has(.navItem:last-child.active)::before {
-  left: calc(75% - 60px);
-}
-
-.navItemLeft {
-  justify-content: flex-end !important;
-}
-
-.navItemRight {
-  justify-content: flex-start !important;
-}
-
-.navItemLeft.active:after,
-.navItemRight.active:after {
+.navItem.active:after {
   content: '';
   position: absolute;
   min-height: 20px;
@@ -869,16 +858,7 @@
   background-position: 0 0;
 }
 
-.navItemLeft:after {
-  right: 10px;
-}
-
-.navItemRight:after {
-  left: 10px;
-}
-
 .navItem {
-  flex: 1;
   padding: 8px;
   text-align: center;
   cursor: pointer;

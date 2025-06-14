@@ -61,7 +61,7 @@
   justify-content: center;
   cursor: pointer;
   max-width: 79px;
-  border: 1px solid #cbcccd;
+  border: 1px solid #ccc;
   width: auto;
   border-radius: 5px;
   background: linear-gradient(#fafafb, #e9e9ed);
@@ -149,14 +149,14 @@
 
 .inputBox input[type='text'],
 .inputBox input[type='number'] {
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   padding: 2px;
   background: #fff;
   position: relative;
   display: inline-block;
   width: 100%;
   height: 2rem;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
 }
 
 .inputBox table {
@@ -233,7 +233,7 @@
 }
 
 .inputBox textarea {
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   padding: 2px;
   background: #fff;
   position: relative;
@@ -241,7 +241,7 @@
   width: 100%;
   height: 4rem;
   resize: none;
-  box-shadow: inset 0 1px 2px #00000026;
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
 }
 
 .inputBox .selectBox {
@@ -257,7 +257,7 @@
 }
 
 .inputBox .selectBox select {
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   padding: 2px;
   padding-right: 25px;
   background: #fff;
@@ -268,7 +268,7 @@
   height: 2rem;
   appearance: none;
   text-decoration: none;
-  box-shadow: inset 0 1px 2px #00000026;
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
 }
 
 .inputBox .selectBox::before {
@@ -314,7 +314,7 @@
   padding: 5px;
   display: inline-block;
   position: relative;
-  box-shadow: inset 0 1px 2px #00000026;
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
 }
 
 .hidden {
