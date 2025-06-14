@@ -69,18 +69,20 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
       { label: '天', seconds: 86400 },
       { label: '小時', seconds: 3600 },
       { label: '分鐘', seconds: 60 },
-      { label: '秒', seconds: 10 },
+      { label: '秒', seconds: 1 },
     ];
 
-    for (const interval of intervals) {
-      const count = Math.floor(absDiff / interval.seconds);
-      if (count >= 1) {
-        const label = interval.label;
-        const timesAgo = '{0}前';
-        const timesFuture = '{0}後'
-        return isFuture
-          ? timesFuture.replace('{0}', `${count}${label}`)
-          : timesAgo.replace('{0}', `${count}${label}`)
+    if (absDiff > 10) {
+      for (const interval of intervals) {
+        const count = Math.floor(absDiff / interval.seconds);
+        if (count >= 1) {
+          const label = interval.label;
+          const timesAgo = '{0}前';
+          const timesFuture = '{0}後'
+          return isFuture
+            ? timesFuture.replace('{0}', `${count}${label}`)
+            : timesAgo.replace('{0}', `${count}${label}`)
+        }
       }
     }
 
