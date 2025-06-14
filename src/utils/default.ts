@@ -29,6 +29,7 @@ const Default = {
     country: 'taiwan',
     level: 0,
     vip: 0,
+    vxp: 0,
     xp: 0,
     requiredXp: 0,
     currentChannelId: '',
@@ -91,7 +92,6 @@ const Default = {
     isBlocked: false,
     friendGroupId: '',
     createdAt: 0,
-    online: false,
     ...overrides,
   }),
 
