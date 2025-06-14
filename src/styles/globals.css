@@ -158,3 +158,9 @@ form {
 .hljs {
   line-height: 1.25rem;
 }
+
+*:disabled,
+.disabled {
+  filter: grayscale(100%);
+  cursor: not-allowed;
+}
