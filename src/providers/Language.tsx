@@ -237,6 +237,18 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
       'blockedMemberMessage',
       '【{target}】被管理員【{operator}】封鎖',
     );
+
+    // Alert Messages
+    content = content.replace(
+      'channelAlert',
+      '頻道廣播',
+    );
+
+    content = content.replace(
+      'serverAlert',
+      '群廣播',
+    );
+
     content = content.replace(
       /{(\w+)}/gm,
       (match, p1) => params?.[p1] || match,
