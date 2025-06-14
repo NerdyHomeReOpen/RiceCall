@@ -7,7 +7,6 @@ import applyFriend from '@/styles/popups/apply.module.css';
 
 // Types
 import {
-  Friend,
   FriendApplication,
   FriendGroup,
   PopupType,
@@ -89,13 +88,15 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       });
     };
 
-    const handleCreateFriend = (
-      friend: Partial<Friend>,
-      userId: User['userId'],
-      targetId: User['userId'],
+    const handleApproveFriendApplication = (
+      senderId: User['userId'],
+      receiverId: User['userId'],
     ) => {
       if (!socket) return;
-      socket.send.approveFriendApplication({ userId, targetId, friend });
+      socket.send.approveFriendApplication({
+        senderId,
+        receiverId,
+      });
     };
 
     const handleOpenUserInfo = (
@@ -370,11 +371,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
             <button
               className={popup['button']}
               onClick={() => {
-                handleCreateFriend(
-                  { friendGroupId: selectedFriendGroupId },
-                  userId,
-                  targetId,
-                );
+                handleApproveFriendApplication(targetId, userId);
                 handleClose();
               }}
             >

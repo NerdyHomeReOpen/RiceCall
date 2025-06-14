@@ -455,9 +455,9 @@ export type User = {
   country: string;
   level: number;
   vip: number;
+  vxp: number; // New: VIP Experience Points
   xp: number;
   requiredXp: number;
-  // progress: number; (Not used but still in database column)
   birthYear: number;
   birthMonth: number;
   birthDay: number;
@@ -516,11 +516,10 @@ export type Server = {
   level: number;
   wealth: number;
   receiveApply: boolean;
-  // allowDirectMessage: boolean; (Not used but still in database column)
   type: 'game' | 'entertainment' | 'other';
   visibility: 'public' | 'private' | 'invisible';
   lobbyId: string;
-  receptionLobbyId: string | null; // New: Reception Lobby ID
+  receptionLobbyId: string | null;
   ownerId: string;
   createdAt: number;
 };
@@ -528,7 +527,7 @@ export type Server = {
 export type BaseChannel = {
   channelId: string;
   name: string;
-  announcement: string; // New:
+  announcement: string;
   password: string;
   order: number;
   bitrate: number;
@@ -536,9 +535,7 @@ export type BaseChannel = {
   guestTextGapTime: number;
   guestTextWaitTime: number;
   guestTextMaxLength: number;
-  // isRoot: boolean; (Not used but still in database column)
   isLobby: boolean;
-  // slowmode: boolean; (Not used but still in database column)
   forbidText: boolean;
   forbidGuestText: boolean;
   forbidGuestUrl: boolean;
@@ -586,65 +583,26 @@ export type MemberApplication = User & {
 
 export type Message = {
   // Change name to BaseMessage
-  messageId: string;
   content: string;
   type: 'general' | 'info' | 'warn' | 'event' | 'alert' | 'dm';
   timestamp: number;
 };
 
-export type ChannelMessage = Message & {
-  sender: ServerMember;
-  receiver: ServerMember;
-  serverId: string;
-  channelId: string | null;
-  type: 'general';
-};
+export type ChannelMessage = Message &
+  ServerMember & {
+    parameter: Record<string, string>;
+    type: 'general';
+  };
 
 export type DirectMessage = Message &
   UserFriend & {
-    senderId: string;
-    user1Id: string;
-    user2Id: string;
+    parameter: Record<string, string>;
     type: 'dm';
   };
 
 export type PromptMessage = Message & {
-  sender: ServerMember;
-  receiver: ServerMember;
-  serverId: string;
-  channelId: string | null;
-};
-
-export type InfoMessage = Message & {
-  sender: ServerMember;
-  receiver: ServerMember;
-  serverId: string;
-  channelId: string | null;
-  type: 'info';
-};
-
-export type WarnMessage = Message & {
-  sender: ServerMember;
-  receiver: ServerMember;
-  serverId: string;
-  channelId: string | null;
-  type: 'warn';
-};
-
-export type EventMessage = Message & {
-  sender: ServerMember;
-  receiver: ServerMember;
-  serverId: string;
-  channelId: string | null;
-  type: 'event';
-};
-
-export type AlertMessage = Message & {
-  sender: ServerMember;
-  receiver: ServerMember;
-  serverId: string;
-  channelId: string | null;
-  type: 'alert';
+  parameter: Record<string, string>;
+  type: 'alert' | 'info' | 'warn' | 'event';
 };
 
 export type UserServerStatus = {

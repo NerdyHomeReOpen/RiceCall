@@ -26,6 +26,15 @@
   background-position: center;
 }
 
+.eventIcon {
+  display: flex;
+  min-width: 12px;
+  min-height: 12px;
+  background-image: url('/channel/NT_NOTIFY.png');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .warnIcon {
   display: flex;
   min-width: 12px;
@@ -68,7 +77,7 @@
 }
 
 .header.event {
-  padding: 5px 0; 
+  padding: 5px 0;
 }
 
 .header .name {

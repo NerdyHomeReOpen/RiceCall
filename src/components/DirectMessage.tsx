@@ -29,17 +29,12 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(
       contents: messageContents,
       timestamp: messageTimestamp,
     } = messageGroup;
+
     const timestamp = lang.getFormatTimestamp(messageTimestamp);
 
-    const processContent = (content: string) => {
-      const replaced = content.replace(
-        /{{GUEST_SEND_AN_EXTERNAL_LINK}}/g,
-        lang.tr.GUEST_SEND_AN_EXTERNAL_LINK,
-      );
-      // 判斷是否為純文字（沒有明顯 markdown 語法）
-      const isPlainText = !/[#>*\-\[\]`|!_~]/.test(replaced);
-      return isPlainText ? replaced.replace(/\n/g, '<br />') : replaced;
-    };
+    const formatMessages = messageContents.map((content) =>
+      lang.getTranslatedMessage(content),
+    );
 
     return (
       <div className={styles['messageBox']}>
@@ -47,10 +42,8 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(
           <div className={styles['username']}>{senderName}</div>
           <div className={styles['timestamp']}>{timestamp}</div>
         </div>
-        {messageContents.map((content, index) => (
-          <div key={index} className={styles['content']}>
-            <MarkdownViewer markdownText={processContent(content)} />
-          </div>
+        {formatMessages.map((content, index) => (
+          <MarkdownViewer key={index} markdownText={content} />
         ))}
       </div>
     );

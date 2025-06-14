@@ -1,6 +1,7 @@
 .markdownContent {
   color: #222;
   word-break: break-word;
+  user-select: text;
 }
 
 .markdownContent:has(img[alt^='[emoji']) {
