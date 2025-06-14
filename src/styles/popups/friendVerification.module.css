@@ -2,7 +2,9 @@
   padding: 0 15px;
   background-color: #fff;
   display: flex;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+  overflow-y: scroll;
 }
 
 .contentHeader {
@@ -11,19 +13,20 @@
   padding: 10px 0;
   justify-content: space-between;
   color: #444444;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 1;
 }
 
-.ProcessingStatus,
 .allCancel {
   cursor: pointer;
 }
 
-.ProcessingStatus:hover,
 .allCancel:hover {
   color: #666666;
 }
 
-.ProcessingStatus:active,
 .allCancel:active {
   color: #999999;
 }
@@ -31,7 +34,6 @@
 .contentBody {
   width: 100%;
   flex: 1;
-  overflow-y: auto;
 }
 
 .userInfoBox {
