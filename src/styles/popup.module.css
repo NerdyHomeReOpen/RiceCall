@@ -186,17 +186,17 @@
 }
 
 .inputBox table tr.selected {
-  background-color: rgb(216, 218, 220);
+  background-color: #00000010;
 }
 
 .inputBox table tr th {
-  height: 28px;
+  height: auto;
   width: 100%;
   background: #e9ebec;
   border: 1px solid #ccc;
   border-top: 0;
   border-left: 0;
-  padding-left: 5px;
+  padding: 5px;
   text-align: left;
   font-weight: unset;
   display: flex;
@@ -204,14 +204,15 @@
 }
 
 .inputBox table tr td {
-  height: 28px;
+  height: auto;
   width: 100%;
   border: 1px solid #ccc;
   border-top: 0;
   border-left: 0;
-  padding-left: 5px;
+  padding: 5px;
   display: flex;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   overflow: hidden;
 }
 
