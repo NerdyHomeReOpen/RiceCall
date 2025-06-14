@@ -2,7 +2,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { User, DirectMessage, SocketServerEvent, Server } from '@/types';
+import {
+  User,
+  DirectMessage,
+  SocketServerEvent,
+  Server,
+  PromptMessage,
+} from '@/types';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -53,7 +59,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
     const [targetCurrentServer, setTargetCurrentServer] = useState<Server>(
       Default.server(),
     );
-    const [directMessages, setDirectMessages] = useState<DirectMessage[]>([]);
+    const [directMessages, setDirectMessages] = useState<
+      (DirectMessage | PromptMessage)[]
+    >([]);
     const [messageInput, setMessageInput] = useState<string>('');
     const [isComposing, setIsComposing] = useState<boolean>(false);
     const [isFriend, setIsFriend] = useState<boolean>(false);
@@ -84,7 +92,21 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
 
     const handleSendShakeWindow = () => {
       if (!socket || cooldownRef.current > 0) return;
-      socket.send.shakeWindow({ userId, targetId });
+
+      if (isFriend) {
+        socket.send.shakeWindow({ userId, targetId });
+      } else {
+        setDirectMessages((prev) => [
+          ...prev,
+          {
+            type: 'warn',
+            content: '無法對搖動非好友的視窗!',
+            timestamp: Date.now(),
+            parameter: {},
+          },
+        ]);
+      }
+
       cooldownRef.current = SHAKE_COOLDOWN;
 
       // debounce

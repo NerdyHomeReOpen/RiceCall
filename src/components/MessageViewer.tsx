@@ -17,7 +17,7 @@ type MessageGroup =
   | (PromptMessage & { contents: string[] });
 
 interface MessageViewerProps {
-  messages: DirectMessage[] | ChannelMessage[] | PromptMessage[];
+  messages: (DirectMessage | ChannelMessage | PromptMessage)[];
   forbidGuestUrl?: boolean;
   isActionMessage?: boolean;
 }
@@ -40,10 +40,10 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
           lastGroup &&
           ((lastGroup.type === 'general' &&
             message.type === 'general' &&
-            message.sender.userId === lastGroup.sender.userId) ||
+            message.userId === lastGroup.userId) ||
             (lastGroup.type === 'dm' &&
               message.type === 'dm' &&
-              message.sender.userId === lastGroup.sender.userId));
+              message.userId === lastGroup.userId));
 
         if (sameSender && nearTime && sameType && (isGeneral || isDm)) {
           lastGroup.contents.push(message.content);

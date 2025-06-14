@@ -588,23 +588,26 @@ export type Message = {
   timestamp: number;
 };
 
-export type ChannelMessage = Message & {
-  sender: Partial<ServerMember>;
-  parameter: Record<string, string>;
-  type: 'general';
-};
+export type ChannelMessage = Message &
+  ServerMember & {
+    parameter: Record<string, string>;
+    type: 'general';
+  };
 
-export type DirectMessage = Message & {
-  sender: Partial<UserFriend>;
-  parameter: Record<string, string>;
-  type: 'dm';
-  user1Id: string;
-  user2Id: string;
-};
+export type DirectMessage = Message &
+  UserFriend & {
+    parameter: Record<string, string>;
+    type: 'dm';
+    user1Id: string;
+    user2Id: string;
+  };
 
 export type PromptMessage = Message & {
-  operator: Partial<ServerMember>;
-  target: Partial<ServerMember>;
+  target?: {
+    name: User['name'];
+    gender: User['gender'];
+    permissionLevel: Permission;
+  }[];
   parameter: Record<string, string>;
   type: 'alert' | 'info' | 'warn' | 'event';
 };
