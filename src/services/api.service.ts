@@ -15,11 +15,13 @@ type ApiRequestData = {
 const handleResponse = async (response: Response): Promise<any> => {
   try {
     const data = await response.json();
+
     if (!response.ok) {
-      new StandardizedError(data.error).show();
+      new StandardizedError({ ...data.error, handler: () => {} }).show();
     }
+
     return data;
-  } catch (error: Error | any) {
+  } catch (error: any) {
     if (!(error instanceof StandardizedError)) {
       error = new StandardizedError({
         name: 'ServerError',
@@ -27,9 +29,11 @@ const handleResponse = async (response: Response): Promise<any> => {
         part: 'RESPONSE',
         tag: 'EXCEPTION_ERROR',
         statusCode: 500,
+        handler: () => {},
       });
     }
     error.show();
+
     return null;
   }
 };
@@ -40,10 +44,12 @@ const apiService = {
     try {
       // Fetch
       const response = await fetch(`${API_URL}${endpoint}`);
+
       // Handle response
       const result = await handleResponse(response);
+
       return result;
-    } catch (error: Error | any) {
+    } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
@@ -51,9 +57,11 @@ const apiService = {
           part: 'GET',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
+          handler: () => {},
         });
       }
       error.show();
+
       return null;
     }
   },
@@ -72,16 +80,19 @@ const apiService = {
         ...(options?.headers || {}),
       });
 
+      // Fetch
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: headers,
         credentials: options?.credentials || 'omit',
         body: data instanceof FormData ? data : JSON.stringify(data),
       });
+
       // Handle response
       const result = await handleResponse(response);
+
       return result;
-    } catch (error: Error | any) {
+    } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
@@ -89,9 +100,11 @@ const apiService = {
           part: 'POST',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
+          handler: () => {},
         });
       }
       error.show();
+
       return null;
     }
   },
@@ -102,18 +115,22 @@ const apiService = {
     data: Record<string, any>,
   ): Promise<any | null> => {
     try {
+      const headers = new Headers({
+        'Content-Type': 'application/json',
+      });
+
       // Fetch
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: headers,
         body: JSON.stringify(data),
       });
+
       // Handle response
       const result = await handleResponse(response);
+
       return result;
-    } catch (error: Error | any) {
+    } catch (error: any) {
       if (!(error instanceof StandardizedError)) {
         error = new StandardizedError({
           name: 'ServerError',
@@ -121,9 +138,11 @@ const apiService = {
           part: 'PATCH',
           tag: 'EXCEPTION_ERROR',
           statusCode: 500,
+          handler: () => {},
         });
       }
       error.show();
+
       return null;
     }
   },
