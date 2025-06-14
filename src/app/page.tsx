@@ -201,10 +201,7 @@ const Header: React.FC<HeaderProps> = React.memo(
             <div
               className={`
                 ${header['statusDropdown']}
-                ${showStatusDropdown
-                  ? ''
-                  : header['hidden']
-                }
+                ${showStatusDropdown ? '' : header['hidden']}
               `}
             >
               {STATUS_OPTIONS.map((option) => (
@@ -234,10 +231,7 @@ const Header: React.FC<HeaderProps> = React.memo(
                 data-tab-id={TabId}
                 className={`
                   ${header['tab']}
-                  ${TabId === mainTab.selectedTabId
-                    ? header['selected']
-                    : ''
-                  }
+                  ${TabId === mainTab.selectedTabId ? header['selected'] : ''}
                 `}
                 onClick={() =>
                   mainTab.setSelectedTabId(
@@ -635,8 +629,9 @@ const RootPageComponent = () => {
     type: PopupType;
     id: string;
     initialData: any;
+    force?: boolean;
   }) => {
-    ipcService.popup.open(popup.type, popup.id);
+    ipcService.popup.open(popup.type, popup.id, popup.force);
     ipcService.initialData.onRequest(popup.id, popup.initialData);
     ipcService.popup.onSubmit(popup.id, () => {
       switch (popup.id) {
