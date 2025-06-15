@@ -286,8 +286,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           if (!userTabRef.current) return;
           const x =
             userTabRef.current.getBoundingClientRect().left +
-            userTabRef.current.getBoundingClientRect().width +
-            10;
+            userTabRef.current.getBoundingClientRect().width;
           const y = userTabRef.current.getBoundingClientRect().top;
           contextMenu.showUserInfoBlock(x, y, false, member);
         }}
