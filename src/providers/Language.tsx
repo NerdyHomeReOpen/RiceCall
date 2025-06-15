@@ -145,15 +145,15 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
 
     content = content.replace(
       'removeFromMemberMessage',
-      '移除了你的會員身分。',
+      '移除了你的會員身份。',
     );
     content = content.replace(
       'removeFromChannelManagerMessage',
-      '移除了你的頻道管理員身分。',
+      '移除了你的頻道管理員身份。',
     );
     content = content.replace(
       'removeFromServerManagerMessage',
-      '移除了你的群管理員身分。',
+      '移除了你的群管理員身份。',
     );
 
     content = content.replace(
