@@ -100,9 +100,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
           ...prev,
           {
             type: 'warn',
-            content: '無法對搖動非好友的視窗!',
+            content: "<span style='color: #038792'>你還不是對方的好友，這項功能無法使用!</span>",
             timestamp: Date.now(),
             parameter: {},
+            contentMetadata: {},
           },
         ]);
       }
