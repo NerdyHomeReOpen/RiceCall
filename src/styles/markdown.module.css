@@ -45,16 +45,17 @@
 .markdownContent p {
   margin-block: 0.125rem;
   margin-inline: 0;
-  display: inline-flex;
+  display: inline-block;
   align-items: center;
   cursor: text;
-  white-space: pre-wrap;
+  white-space: wrap;
 }
 
 .markdownContent span {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
+  align-self: center;
   cursor: pointer;
+  white-space: wrap;
 }
 
 .markdownContent a {
@@ -62,7 +63,7 @@
   font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 0.125rem;
-  white-space: nowrap;
+  white-space: wrap;
   cursor: pointer;
 }
 

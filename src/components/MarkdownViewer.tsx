@@ -29,7 +29,6 @@ interface PurifyConfig {
 
 const PURIFY_CONFIG: PurifyConfig = {
   ALLOWED_TAGS: [
-    'div',
     'span',
     'img',
     'p',
@@ -93,13 +92,15 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
       })
       .replace(/<@([^>]+)>/g, (_, content) => {
         const [name, gender, level] = content.split('_');
-        return `<span class='${permission[gender || 'Male']} ${
-          permission[`lv-${level || '1'}`]
-        }'></span> <span class='${message.username}'>${
+        return `<span class='${
+          message.username
+        }' alt='<@${content}'> <span style='vertical-align: bottom;' class='${
+          permission[gender || 'Male']
+        } ${permission[`lv-${level || '1'}`]}'></span>${
           name || 'Unknown'
         }</span>`;
       })
-      .split('\n');
+      .replace(/\n/g, '  \n');
 
     // Hooks
     const lang = useLanguage();
@@ -190,23 +191,36 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
       },
     };
 
+    const sanitized = DOMPurify.sanitize(processedLines, PURIFY_CONFIG);
+
     return (
+      // <div className={markdown.markdownContent}>
+      //   {processedLines.split('  \n').map((line, index) => {
+      //     const sanitized = DOMPurify.sanitize(line, PURIFY_CONFIG);
+      //     return (
+      //       <ReactMarkdown
+      //         key={index}
+      //         remarkPlugins={[remarkGfm]}
+      //         rehypePlugins={[rehypeRaw]}
+      //         components={components}
+      //         skipHtml={false}
+      //         unwrapDisallowed={false}
+      //       >
+      //         {sanitized}
+      //       </ReactMarkdown>
+      //     );
+      //   })}
+      // </div>
       <div className={markdown.markdownContent}>
-        {processedLines.map((line, index) => {
-          const sanitized = DOMPurify.sanitize(line, PURIFY_CONFIG);
-          return (
-            <ReactMarkdown
-              key={index}
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw]}
-              components={components}
-              skipHtml={false}
-              unwrapDisallowed={false}
-            >
-              {sanitized}
-            </ReactMarkdown>
-          );
-        })}
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw]}
+          components={components}
+          skipHtml={false}
+          unwrapDisallowed={false}
+        >
+          {sanitized}
+        </ReactMarkdown>
       </div>
     );
   },
