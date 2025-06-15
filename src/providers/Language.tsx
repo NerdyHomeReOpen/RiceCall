@@ -141,6 +141,12 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
         : content;
     }
 
+    // Direct Event Message 
+    content = content.replace(
+      'sendShakeWindowMessage',
+      '向您發送了一次視窗震動'
+    );
+
     // Action Event Messages
 
     content = content.replace(
