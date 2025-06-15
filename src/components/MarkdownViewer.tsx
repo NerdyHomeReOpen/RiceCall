@@ -10,7 +10,7 @@ import DOMPurify from 'dompurify';
 import hljs from 'highlight.js';
 
 // Components
-import { emojis } from '@/components/emojis';
+import { Emoji, emojis } from '@/components/emojis';
 
 // CSS
 import 'highlight.js/styles/github.css';
@@ -73,6 +73,65 @@ const PURIFY_CONFIG: PurifyConfig = {
   ALLOWED_URI_REGEXP: /^(https?:\/\/)|^\/smiles\//,
 };
 
+/**
+ * Escape 非白名單 HTML tag，保留在 safeTags 中的 tag
+ * @param input 要處理的 HTML 字串
+ * @param safeTags 白名單的 tag
+ * @returns 處理後的 HTML 字串
+ */
+function escapeUnsafeTags(input: string, safeTags: string[]): string {
+  return input.replace(/<\/?([a-zA-Z0-9-]+)(\s[^>]*)?>?/g, (match, tagName) => {
+    return safeTags.includes(tagName.toLowerCase())
+      ? match
+      : match.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  });
+}
+
+/**
+ * 主處理函式
+ * @param markdownText 要處理的 markdown 字串
+ * @param emojis 表情符號列表
+ * @param permission 權限列表
+ * @returns 處理後的 HTML 字串
+ */
+export function sanitizeMarkdownWithSafeTags(
+  markdownText: string,
+  emojis: Emoji[],
+  permission: Record<string, string>,
+): string {
+  const safeMarkdownText = typeof markdownText === 'string' ? markdownText : '';
+
+  const replaced = safeMarkdownText
+    // 替換 emoji
+    .replace(/\[emoji_[\w-]+\]/g, (match: string) => {
+      const emoji = emojis.find((emoji) => emoji.char === match);
+      if (!emoji) return match;
+      return `<img id='${emoji.char}' src='${emoji.path}' alt="${emoji.char}" style="width: 19px; height: 19px;" />`;
+    })
+    // 替換 <@name_gender_level>
+    .replace(/<@([^>]+)>/g, (_, content) => {
+      const [name, gender, level] = content.split('_');
+      return `<span class='${
+        message.username
+      }' alt='<@${content}'> <span style='vertical-align: bottom;' class='${
+        permission[gender || 'Male']
+      } ${permission[`lv-${level || '1'}`]}'></span>${
+        name || 'Unknown'
+      }</span>`;
+    })
+    // 保留換行
+    .replace(/\n/g, '  \n');
+
+  // 先手動 escape 危險標籤
+  const escaped = escapeUnsafeTags(replaced, PURIFY_CONFIG.ALLOWED_TAGS);
+
+  // 再進行 DOMPurify 清洗（保留 img 和 span）
+  return DOMPurify.sanitize(escaped, {
+    ALLOWED_TAGS: PURIFY_CONFIG.ALLOWED_TAGS,
+    ALLOWED_ATTR: PURIFY_CONFIG.ALLOWED_ATTR,
+  });
+}
+
 interface MarkdownViewerProps {
   markdownText: string;
   isGuest?: boolean;
@@ -81,27 +140,6 @@ interface MarkdownViewerProps {
 
 const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
   ({ markdownText, isGuest = false, forbidGuestUrl = false }) => {
-    const safeMarkdownText =
-      typeof markdownText === 'string' ? markdownText : '';
-
-    const processedLines = safeMarkdownText
-      .replace(/\[emoji_[\w-]+\]/g, (match: string) => {
-        const emoji = emojis.find((emoji) => emoji.char === match);
-        if (!emoji) return match;
-        return `<img id='${emoji.char}' src='${emoji.path}' alt="${emoji.char}" style="width: 19px; height: 19px;" />`;
-      })
-      .replace(/<@([^>]+)>/g, (_, content) => {
-        const [name, gender, level] = content.split('_');
-        return `<span class='${
-          message.username
-        }' alt='<@${content}'> <span style='vertical-align: bottom;' class='${
-          permission[gender || 'Male']
-        } ${permission[`lv-${level || '1'}`]}'></span>${
-          name || 'Unknown'
-        }</span>`;
-      })
-      .replace(/\n/g, '  \n');
-
     // Hooks
     const lang = useLanguage();
 
@@ -191,26 +229,13 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
       },
     };
 
-    const sanitized = DOMPurify.sanitize(processedLines, PURIFY_CONFIG);
+    const sanitized = sanitizeMarkdownWithSafeTags(
+      markdownText,
+      emojis,
+      permission,
+    );
 
     return (
-      // <div className={markdown.markdownContent}>
-      //   {processedLines.split('  \n').map((line, index) => {
-      //     const sanitized = DOMPurify.sanitize(line, PURIFY_CONFIG);
-      //     return (
-      //       <ReactMarkdown
-      //         key={index}
-      //         remarkPlugins={[remarkGfm]}
-      //         rehypePlugins={[rehypeRaw]}
-      //         components={components}
-      //         skipHtml={false}
-      //         unwrapDisallowed={false}
-      //       >
-      //         {sanitized}
-      //       </ReactMarkdown>
-      //     );
-      //   })}
-      // </div>
       <div className={markdown.markdownContent}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
