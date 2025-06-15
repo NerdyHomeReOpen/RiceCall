@@ -109,6 +109,8 @@
   background: #00000005;
   border: 1px solid #00000010;
   cursor: text;
+  line-height: 1.5rem;
+  align-self: baseline;
 }
 
 /* block code */
@@ -127,40 +129,80 @@
 }
 
 .markdownContent table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-block: 0;
-  margin-inline: 0;
-  background-color: #00000005;
-  border-radius: 8px;
-  text-align: left;
-  cursor: default;
+  background: #fff;
+  display: flex;
+  height: auto;
+  border: 1px solid #ccc;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
-.markdownContent thead {
-  background-color: #00000015;
+.markdownContent table thead {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background: #f4f4f5;
 }
 
-.markdownContent tbody {
-  background-color: #00000005;
+.markdownContent table tr {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
 }
 
-.markdownContent th {
-  padding: 12px 16px;
-  border: 1px solid #00000010;
-  white-space: nowrap;
-  cursor: pointer;
+.markdownContent table tr:not(.selected):hover {
+  background: #f4f4f5;
 }
 
-.markdownContent td {
-  padding: 12px 16px;
-  border: 1px solid #00000010;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.markdownContent td:hover {
+.markdownContent table tr.selected {
   background-color: #00000010;
+}
+
+.markdownContent table tr th {
+  height: auto;
+  width: 100%;
+  background: #e9ebec;
+  border: 1px solid #ccc;
+  border-top: 0;
+  border-left: 0;
+  padding: 5px;
+  text-align: left;
+  font-weight: unset;
+  display: flex;
+  align-items: center;
+}
+
+.markdownContent table tr td {
+  height: auto;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-top: 0;
+  border-left: 0;
+  padding: 5px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.markdownContent table tr th:last-child,
+.markdownContent table tr td:last-child {
+  border-right: 0;
+}
+
+.markdownContent table tr:last-child td {
+  border-bottom: 0;
+}
+
+.markdownContent table tr th:hover {
+  cursor: pointer;
+  background: #d1d1d1;
+}
+
+.markdownContent table .p1 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .markdownContent img {
@@ -177,27 +219,10 @@
   overflow-x: hidden;
 }
 
-.tableWrapper {
+.markdownContent .tableWrapper {
   background: transparent;
   max-width: 100%;
   overflow-x: auto;
-  border-radius: 8px;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f1f5f9;
-}
-
-.tableWrapper::-webkit-scrollbar {
-  height: 8px;
-}
-
-.tableWrapper::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-.tableWrapper::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 4px;
 }
 
 .markdownContent .codeWrapper {
@@ -226,9 +251,9 @@
   position: absolute;
   top: 0.375rem;
   right: 0.375rem;
-  padding: 0.15rem;
-  background: #00000005;
-  border: 1px solid #00000010;
+  padding: 0.125rem;
+  background: #ffffff;
+  border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
@@ -238,7 +263,7 @@
 }
 
 .copyButton:hover {
-  background: #00000010;
+  background: #f1f5f9;
 }
 
 .markdownContent pre:hover .copyButton {
