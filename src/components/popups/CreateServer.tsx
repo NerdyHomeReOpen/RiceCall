@@ -54,6 +54,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
     const [servers, setServers] = useState<UserServer[]>([]);
     const [server, setServer] = useState<Server>(Default.server());
     const [section, setSection] = useState<number>(0);
+    const [reloadAvatarKey, setReloadAvatarKey] = useState<number>(0);
 
     // Variables
     const { level: userLevel } = user;
@@ -190,8 +191,11 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
               <div className={popup['inputGroup']}>
                 <div className={createServer['avatarWrapper']}>
                   <div
+                    key={reloadAvatarKey}
                     className={createServer['avatarPicture']}
-                    style={{ backgroundImage: `url(${serverAvatarUrl})` }}
+                    style={{
+                      backgroundImage: `url(${serverAvatarUrl}?v=${reloadAvatarKey})`,
+                    }}
                   />
                   <input
                     name="avatar"
@@ -220,6 +224,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
                             avatar: data.avatar,
                             avatarUrl: data.avatarUrl,
                           }));
+                          setReloadAvatarKey((prev) => prev + 1);
                         }
                       };
                       reader.readAsDataURL(file);
