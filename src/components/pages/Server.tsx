@@ -318,7 +318,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         ? [actionMessages[actionMessages.length - 1]]
                         : []
                     }
-                    isActionMessage={true}
                   />
                 </div>
               </div>

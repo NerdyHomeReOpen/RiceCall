@@ -583,6 +583,8 @@ export type MemberApplication = User & {
 
 export type Message = {
   // Change name to BaseMessage
+  parameter: Record<string, string>;
+  contentMetadata: Record<string, string>;
   content: string;
   type: 'general' | 'info' | 'warn' | 'event' | 'alert' | 'dm';
   timestamp: number;
@@ -590,20 +592,17 @@ export type Message = {
 
 export type ChannelMessage = Message &
   ServerMember & {
-    parameter: Record<string, string>;
     type: 'general';
   };
 
 export type DirectMessage = Message &
   UserFriend & {
-    parameter: Record<string, string>;
     type: 'dm';
     user1Id: string;
     user2Id: string;
   };
 
 export type PromptMessage = Message & {
-  parameter: Record<string, string>;
   type: 'alert' | 'info' | 'warn' | 'event';
 };
 

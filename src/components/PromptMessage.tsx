@@ -17,23 +17,16 @@ interface PromptMessageProps {
     contents: string[];
   };
   messageType?: string;
-  isActionMessage: boolean;
 }
 
 const PromptMessage: React.FC<PromptMessageProps> = React.memo(
-  ({ messageGroup, messageType = 'info', isActionMessage }) => {
+  ({ messageGroup, messageType = 'info' }) => {
     // Hooks
     const lang = useLanguage();
 
     // Variables
     const { contents: messageContents, parameter: messageParameter } =
       messageGroup;
-
-    const isAlertMessage = messageType === 'alert';
-
-    const alertMessageType = isActionMessage
-      ? lang.getTranslatedMessage(messageParameter.alertType)
-      : '';
 
     const formatMessages = messageContents.map((content) =>
       lang.getTranslatedMessage(content, messageParameter),
@@ -49,9 +42,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(
           {formatMessages.map((content, index) => (
             <MarkdownViewer
               key={index}
-              markdownText={
-                isAlertMessage ? `${alertMessageType}:${content}` : content
-              }
+              markdownText={content}
             />
           ))}
         </div>
