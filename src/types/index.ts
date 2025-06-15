@@ -603,11 +603,6 @@ export type DirectMessage = Message &
   };
 
 export type PromptMessage = Message & {
-  target?: {
-    name: User['name'];
-    gender: User['gender'];
-    permissionLevel: Permission;
-  }[];
   parameter: Record<string, string>;
   type: 'alert' | 'info' | 'warn' | 'event';
 };

@@ -45,9 +45,16 @@
 .markdownContent p {
   margin-block: 0.125rem;
   margin-inline: 0;
-  display: inline-block;
-  align-self: baseline;
+  display: inline-flex;
+  align-items: center;
   cursor: text;
+  white-space: pre-wrap;
+}
+
+.markdownContent span {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
 }
 
 .markdownContent a {
@@ -65,7 +72,7 @@
 
 .markdownContent ul,
 .markdownContent ol {
-  margin-block: 0.5em;
+  margin-block: 0.125rem;
   margin-inline: 0;
   padding-inline-start: 20px;
   list-style-position: outside;
@@ -73,14 +80,14 @@
 }
 
 .markdownContent li {
-  margin-block: 0.5em;
+  margin-block: 0.125rem;
   cursor: text;
 }
 
 .markdownContent blockquote {
   margin-block: 0;
   margin-inline: 0;
-  padding: 0.25rem;
+  padding: 0.125rem;
   padding-left: 1rem;
   color: #4f545c;
   border-left: 4px solid #00000020;
@@ -159,8 +166,9 @@
   max-width: 100%;
   margin-block: 0;
   margin-inline: 0;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   cursor: pointer;
+  pointer-events: none;
 }
 
 .container {

@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
-import permission from '@/styles/permission.module.css';
 
 // Types
 import type { PromptMessage } from '@/types';
@@ -12,9 +11,6 @@ import { useLanguage } from '@/providers/Language';
 
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
-
-// Utils
-import Default from '@/utils/default';
 
 interface PromptMessageProps {
   messageGroup: PromptMessage & {
@@ -30,26 +26,14 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(
     const lang = useLanguage();
 
     // Variables
-    const {
-      contents: messageContents,
-      parameter: messageParameter,
-      operator: messageOperator,
-      target: messageTarget,
-    } = messageGroup;
+    const { contents: messageContents, parameter: messageParameter } =
+      messageGroup;
 
     const isAlertMessage = messageType === 'alert';
-    const isEventMessage = messageType === 'event';
-    const isAlertOrEvent = isAlertMessage || isEventMessage;
-    const alertMessageType = isActionMessage ? lang.getTranslatedMessage(messageParameter.alertType) : false;
 
-    const {
-      name: userName,
-      gender: userGender,
-      permissionLevel: userPermissionLevel,
-    } = {
-      ...Default.serverMember(),
-      ...(isActionMessage || isAlertMessage ? messageOperator : messageTarget),
-    };
+    const alertMessageType = isActionMessage
+      ? lang.getTranslatedMessage(messageParameter.alertType)
+      : '';
 
     const formatMessages = messageContents.map((content) =>
       lang.getTranslatedMessage(content, messageParameter),
@@ -60,27 +44,13 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(
         <div className={styles['header']}>
           <div className={styles[`${messageType}Icon`]} />
         </div>
-        {isAlertOrEvent && (
-          <>
-            <div
-              className={`
-                ${styles['gradeIcon']}
-                ${permission[userGender]}
-                ${permission[`lv-${userPermissionLevel}`]}`}
-            />
-            <div className={styles['username']}>
-              {userName}
-            </div>
-          </>
-        )}
+
         <div className={styles['messageBox']}>
           {formatMessages.map((content, index) => (
             <MarkdownViewer
               key={index}
               markdownText={
-                isAlertMessage 
-                  ? `${alertMessageType}:${content}` 
-                  : content
+                isAlertMessage ? `${alertMessageType}:${content}` : content
               }
             />
           ))}

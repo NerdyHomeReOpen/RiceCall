@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
+import React, { Children, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -15,6 +15,8 @@ import { emojis } from '@/components/emojis';
 // CSS
 import 'highlight.js/styles/github.css';
 import markdown from '@/styles/markdown.module.css';
+import message from '@/styles/message.module.css';
+import permission from '@/styles/permission.module.css';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -27,6 +29,8 @@ interface PurifyConfig {
 
 const PURIFY_CONFIG: PurifyConfig = {
   ALLOWED_TAGS: [
+    'div',
+    'span',
     'img',
     'p',
     'h1',
@@ -55,6 +59,7 @@ const PURIFY_CONFIG: PurifyConfig = {
     'iframe',
   ],
   ALLOWED_ATTR: [
+    'id',
     'src',
     'alt',
     'class',
@@ -64,6 +69,7 @@ const PURIFY_CONFIG: PurifyConfig = {
     'height',
     'allowfullscreen',
     'type',
+    'style',
   ],
   ALLOWED_URI_REGEXP: /^(https?:\/\/)|^\/smiles\//,
 };
@@ -78,16 +84,22 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
   ({ markdownText, isGuest = false, forbidGuestUrl = false }) => {
     const safeMarkdownText =
       typeof markdownText === 'string' ? markdownText : '';
-    const processedText = safeMarkdownText.replace(/\n/g, '  \n');
-    const withEmojis = processedText.replace(
-      /(\[emoji_[\w-]+\])/g,
-      (match: string) => {
+
+    const processedLines = safeMarkdownText
+      .replace(/\[emoji_[\w-]+\]/g, (match: string) => {
         const emoji = emojis.find((emoji) => emoji.char === match);
         if (!emoji) return match;
-        return `<img src="${emoji.path}" alt="${emoji.char}" />`;
-      },
-    );
-    const sanitized = DOMPurify.sanitize(withEmojis, PURIFY_CONFIG);
+        return `<img id='${emoji.char}' src='${emoji.path}' alt="${emoji.char}" style="width: 19px; height: 19px;" />`;
+      })
+      .replace(/<@([^>]+)>/g, (_, content) => {
+        const [name, gender, level] = content.split('_');
+        return `<span class='${permission[gender || 'Male']} ${
+          permission[`lv-${level || '1'}`]
+        }'></span> <span class='${message.username}'>${
+          name || 'Unknown'
+        }</span>`;
+      })
+      .split('\n');
 
     // Hooks
     const lang = useLanguage();
@@ -96,6 +108,8 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
     const [isCopied, setIsCopied] = useState(false);
 
     const components: Components = {
+      div: ({ node, ...props }: any) => <div {...props} />,
+      span: ({ node, ...props }: any) => <span {...props} />,
       h1: ({ node, ...props }: any) => <h1 {...props} />,
       h2: ({ node, ...props }: any) => <h2 {...props} />,
       h3: ({ node, ...props }: any) => <h3 {...props} />,
@@ -116,23 +130,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
       th: ({ node, ...props }: any) => <th {...props} />,
       td: ({ node, ...props }: any) => <td {...props} />,
       hr: ({ node, ...props }: any) => <hr {...props} />,
-      img: ({ node, src, alt, ...props }: any) => {
-        if (isGuest && forbidGuestUrl) return <span {...props} />;
-        // TODO: Need a better way to handle this
-        if (alt.startsWith('[emoji_')) {
-          return (
-            <img
-              src={src}
-              alt={alt}
-              width="19"
-              height="19"
-              draggable={false}
-              {...props}
-            />
-          );
-        }
-        return <img src={src} alt={alt} {...props} />;
-      },
+      img: ({ node, ...props }: any) => <img {...props} />,
       code: ({ node, className, children, ...props }: any) => {
         const language = className?.replace('language-', '') ?? '';
         const code = String(children).trim();
@@ -187,21 +185,28 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
             child.block = true;
           }
         });
+
         return <pre {...props} />;
       },
     };
 
     return (
       <div className={markdown.markdownContent}>
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeRaw]}
-          components={components}
-          skipHtml={false}
-          unwrapDisallowed={false}
-        >
-          {sanitized}
-        </ReactMarkdown>
+        {processedLines.map((line, index) => {
+          const sanitized = DOMPurify.sanitize(line, PURIFY_CONFIG);
+          return (
+            <ReactMarkdown
+              key={index}
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+              components={components}
+              skipHtml={false}
+              unwrapDisallowed={false}
+            >
+              {sanitized}
+            </ReactMarkdown>
+          );
+        })}
       </div>
     );
   },

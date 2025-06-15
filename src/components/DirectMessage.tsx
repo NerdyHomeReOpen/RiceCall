@@ -12,9 +12,6 @@ import { useLanguage } from '@/providers/Language';
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
 
-// Utils
-import Default from '@/utils/default';
-
 interface DirectMessageProps {
   messageGroup: DirectMessage & {
     contents: string[];
@@ -28,17 +25,10 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(
 
     // Variables
     const {
-      sender: messagesSender,
+      name: senderName,
       contents: messageContents,
       timestamp: messageTimestamp,
     } = messageGroup;
-
-    const {
-      name: senderName,
-    } = {
-      ...Default.userFriend(),
-      ...messagesSender,
-    }
 
     const timestamp = lang.getFormatTimestamp(messageTimestamp);
 
