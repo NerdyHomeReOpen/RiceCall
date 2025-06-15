@@ -97,6 +97,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
 
     // Refs
     const searchRef = useRef<HTMLDivElement>(null);
+    const searchTimeerRef = useRef<NodeJS.Timeout | null>(null);
 
     // States
     const [searchQuery, setSearchQuery] = useState('');
@@ -121,8 +122,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         handleClearSearchState();
         return;
       }
-      socket.send.searchServer({ query });
       setSearchQuery(query);
+      if (searchTimeerRef.current) {
+        clearTimeout(searchTimeerRef.current);
+      }
+      searchTimeerRef.current = setTimeout(() => {
+        socket.send.searchServer({ query });
+      }, 500);
     };
 
     const handleConnectServer = (
