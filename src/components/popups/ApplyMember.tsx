@@ -103,17 +103,6 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
         });
       };
       refresh();
-
-      if (loadingBox.isLoading) {
-        window.localStorage.setItem(
-          'trigger-handle-server-select',
-          JSON.stringify({
-            serverDisplayId: '',
-            serverId: '',
-            timestamp: Date.now(),
-          }),
-        );
-      }
     }, [serverId, userId]);
 
     return (

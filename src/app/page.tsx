@@ -631,6 +631,9 @@ const RootPageComponent = () => {
     initialData: any;
     force?: boolean;
   }) => {
+    loadingBox.setIsLoading(false);
+    loadingBox.setLoadingServerId('');
+    
     ipcService.popup.open(popup.type, popup.id, popup.force);
     ipcService.initialData.onRequest(popup.id, popup.initialData);
     ipcService.popup.onSubmit(popup.id, () => {
@@ -766,12 +769,6 @@ const RootPageComponent = () => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
       if (!serverDisplayId || !serverId) return;
-
-      if (serverDisplayId === '' && serverId === '') {
-        loadingBox.setIsLoading(false);
-        loadingBox.setLoadingServerId(serverDisplayId);
-        return;
-      }
 
       if (serverId === server.serverId) {
         mainTab.setSelectedTabId('server');
