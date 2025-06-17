@@ -225,7 +225,7 @@ export const PopupSize = {
 
 // Constants
 const DEV = process.argv.includes('--dev');
-const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+// const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 const WS_URL_SECONDARY = process.env.NEXT_PUBLIC_SERVER_URL_SECONDARY;
 const BASE_URI = DEV ? 'http://localhost:3000' : 'app://-';
 const FILE_PATH = fileURLToPath(import.meta.url);
@@ -253,7 +253,7 @@ let authWindow: BrowserWindow;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
-let websocketUrl = WS_URL;
+let websocketUrl = WS_URL_SECONDARY;
 let socketInstance: Socket | null = null;
 
 // Discord RPC
