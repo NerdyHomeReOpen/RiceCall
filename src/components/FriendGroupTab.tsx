@@ -41,27 +41,27 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     const { userId } = user;
     const { friendGroupId, name: friendGroupName } = friendGroup;
     const friendGroupFriends =
-      friendGroupId === ''
-        ? friends
-            .filter((fd) => !fd.friendGroupId)
-            .sort((a, b) => {
-              return (
-                (b.status !== 'offline' ? 1 : 0) -
-                (a.status !== 'offline' ? 1 : 0)
-              );
-            })
-        : friendGroupId === 'blocked'
-        ? friends.filter((friend) => {
-            return friend.isBlocked;
+      !friendGroupId
+      ? friends
+          .filter((fd) => !fd.friendGroupId && !fd.isBlocked)
+          .sort((a, b) => {
+            return (
+              (b.status !== 'offline' ? 1 : 0) -
+              (a.status !== 'offline' ? 1 : 0)
+            );
           })
-        : friends
-            .filter((fd) => fd.friendGroupId === friendGroupId)
-            .sort((a, b) => {
-              return (
-                (b.status !== 'offline' ? 1 : 0) -
-                (a.status !== 'offline' ? 1 : 0)
-              );
-            });
+      : friendGroupId === 'blocked'
+      ? friends.filter((friend) => {
+          return friend.isBlocked;
+        })
+      : friends
+          .filter((fd) => fd.friendGroupId === friendGroupId && !fd.isBlocked)
+          .sort((a, b) => {
+            return (
+              (b.status !== 'offline' ? 1 : 0) -
+              (a.status !== 'offline' ? 1 : 0)
+            );
+          });
     const friendsOnlineCount = friendGroupFriends.filter(
       (fd) => fd.status !== 'offline',
     ).length;
@@ -138,7 +138,10 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
           />
           <div className={styles['tabLable']}>{friendGroupName}</div>
           <div className={styles['tabCount']}>
-            {`(${friendsOnlineCount}/${friendGroupFriends.length})`}
+            { friendGroupId !== 'blocked' && friendGroupId !== 'outlander'
+              ? `(${friendsOnlineCount}/${friendGroupFriends.length})`
+              :`(${friendGroupFriends.length})`
+            }
           </div>
         </div>
 

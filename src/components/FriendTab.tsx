@@ -61,12 +61,13 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       level: friendLevel,
       badges: friendBadges,
       status: friendStatus,
+      isBlocked: friendIsBlocked,
       currentServerId: friendCurrentServerId,
     } = friend;
     const { name: friendServerName } = friendServer;
     const isCurrentUser = friendTargetId === friendUserId;
-    const canManageFriend = !isCurrentUser;
-    const isFriendOnline = friendStatus !== 'offline';
+    const canManageFriend = !isCurrentUser && !friendIsBlocked;
+    const isFriendOnline = friendStatus !== 'offline' && !friendIsBlocked;
 
     // Handlers
     const handleServerSelect = (userId: User['userId'], server: Server) => {
@@ -145,6 +146,29 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
       });
     };
 
+    const handleBlockFriend = (
+      userId: User['userId'],
+      targetId: User['userId'],
+      isBlocked: UserFriend['isBlocked']
+    ) => {
+      if (!socket) return;
+      handleOpenWarningDialog(
+        lang.getTranslatedMessage(
+          '確定要{blockType}好友 {userName} 嗎?',
+          {
+            blockType: isBlocked ? '解除封鎖' : '封鎖',
+            userName: friendName,
+          }
+        ),
+        () => socket.send.editFriend({
+          friend: { isBlocked: !isBlocked},
+          userId,
+          targetId,
+        }),
+      );
+      
+    };
+
     useEffect(() => {
       if (!friendCurrentServerId) return;
       const refresh = async () => {
@@ -186,12 +210,12 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
               {
                 id: 'separator',
                 label: '',
-                show: canManageFriend,
+                show: !isCurrentUser,
               },
               {
                 id: 'info',
                 label: lang.tr.viewProfile,
-                show: canManageFriend,
+                show: !isCurrentUser,
                 onClick: () => handleOpenUserInfo(friendUserId, friendTargetId),
               },
               {
@@ -206,19 +230,19 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
               {
                 id: 'separator',
                 label: '',
-                show: canManageFriend,
+                show: !isCurrentUser,
               },
               {
                 id: 'permission-setting',
                 label: '權限設定',
-                show: canManageFriend,
+                show: canManageFriend && !friendIsBlocked,
                 icon: 'submenu',
                 hasSubmenu: true,
                 submenuItems: [
                   {
                     id: 'set-private',
                     label: '對好友隱藏上線', // TODO: lang.tr
-                    show: canManageFriend,
+                    show: canManageFriend && !friendIsBlocked,
                     disabled: true,
                     onClick: () => {
                       /* TODO: handlePrivateFriend() */
@@ -227,7 +251,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
                   {
                     id: 'set-notify',
                     label: '好友上線提醒我', // TODO: lang.tr
-                    show: canManageFriend,
+                    show: canManageFriend && !friendIsBlocked,
                     disabled: true,
                     onClick: () => {
                       /* TODO: handleNotifyFriendOnline() */
@@ -238,23 +262,21 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
               {
                 id: 'editGroup',
                 label: lang.tr.editFriendGroup,
-                show: canManageFriend,
+                show: canManageFriend && !friendIsBlocked,
                 onClick: () =>
                   handleOpenEditFriend(friendUserId, friendTargetId),
               },
               {
                 id: 'setBlock',
-                label: '封鎖', // TODO: lang.tr
-                show: canManageFriend,
-                disabled: true,
-                onClick: () => {
-                  /* TODO: handleBlocdFriend */
-                },
+                label: friendIsBlocked ? '解除封鎖' : '封鎖',
+                show: !isCurrentUser,
+                onClick: () => 
+                  handleBlockFriend(friendUserId, friendTargetId, friendIsBlocked),
               },
               {
                 id: 'delete',
                 label: lang.tr.deleteFriend,
-                show: canManageFriend,
+                show: !isCurrentUser,
                 onClick: () => handleDeleteFriend(friendUserId, friendTargetId),
               },
             ]);
