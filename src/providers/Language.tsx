@@ -194,8 +194,13 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
       '您被管理員【{operator}】重新開啟傳送文字訊息',
     );
     content = content.replace(
-      'timeoutChannelMessage',
+      'timeoutChannelWithTimeMessage',
       '您在【{channel}】頻道被管理員【{operator}】踢出 {time} 分鐘',
+    );
+
+    content = content.replace(
+      'timeoutChannelMessage',
+      '您在【{channel}】頻道被管理員【{operator}】踢出',
     );
 
     // Channel Event Messages
