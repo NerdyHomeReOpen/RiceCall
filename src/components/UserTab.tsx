@@ -152,11 +152,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
 
     const handleKickChannel = (
       userId: User['userId'],
-      lobbyId: Channel['channelId'],
+      channelId: Channel['channelId'],
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.connectChannel({ userId, channelId: lobbyId, serverId });
+      socket.send.disconnectChannel({ userId, channelId, serverId });
     };
 
     const handleEditMember = (
@@ -255,11 +255,13 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const handleOpenBlockMember = (
       userId: User['userId'],
       serverId: Server['serverId'],
+      userName: User['name'],
     ) => {
       ipcService.popup.open(PopupType.BLOCK_MEMBER, `blockMember-${userId}`);
       ipcService.initialData.onRequest(`blockMember-${userId}`, {
         userId,
         serverId,
+        userName,
       });
     };
 
@@ -383,7 +385,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.kickChannel,
               show: canKickChannel,
               onClick: () => {
-                handleKickChannel(memberUserId, serverLobbyId, serverId);
+                handleKickChannel(memberUserId, memberCurrentChannelId, serverId);
               },
             },
             {
@@ -399,7 +401,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.ban,
               show: canBan,
               onClick: () => {
-                handleOpenBlockMember(memberUserId, serverId);
+                handleOpenBlockMember(memberUserId, serverId, memberNickname ?? memberName);
               },
             },
             {
