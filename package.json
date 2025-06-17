@@ -14,13 +14,11 @@
   },
   "type": "module",
   "scripts": {
+    "start": "concurrently \"npm run dev\" \"npm run electron-dev\"",
     "dev": "next dev --turbopack",
-    "start": "next start",
     "build": "next build",
-    "export": "next export",
     "lint": "next lint",
-    "electron-dev": "concurrently \"npm run dev\" \"electron -r tsx -r dotenv/config main.ts --dev\"",
-    "electron-start": "npm run start && electron -r tsx -r dotenv/config main.ts",
+    "electron-dev": "electron -r tsx -r dotenv/config main.ts --dev",
     "electron-build": "npm run build && tsc -p tsconfig.electron.json && electron-builder",
     "electron-build-deb": "npm run build && tsc -p tsconfig.electron.json && electron-builder --linux deb",
     "electron-build-mac": "npm run build && tsc -p tsconfig.electron.json && electron-builder --mac dmg"
