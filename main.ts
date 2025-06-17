@@ -35,51 +35,85 @@ type StoreSchema = {
 };
 const store = new Store<StoreSchema>();
 
-enum SocketClientEvent {
+export enum PopupType {
+  USER_INFO = 'userInfo',
+  USER_SETTING = 'userSetting',
+  CHANNEL_SETTING = 'channelSetting',
+  CHANNEL_PASSWORD = 'channelPassword',
+  SERVER_SETTING = 'serverSetting',
+  SERVER_BROADCAST = 'serverBroadcast',
+  BLOCK_MEMBER = 'blockMember',
+  SYSTEM_SETTING = 'systemSetting',
+  MEMBERAPPLY_SETTING = 'memberApplySetting',
+  CREATE_SERVER = 'createServer',
+  CREATE_CHANNEL = 'createChannel',
+  CREATE_FRIENDGROUP = 'createFriendGroup',
+  EDIT_CHANNEL_ORDER = 'editChannelOrder',
+  EDIT_CHANNEL_NAME = 'editChannelName',
+  EDIT_NICKNAME = 'editNickname',
+  EDIT_FRIENDGROUP = 'editFriendGroup',
+  EDIT_FRIEND = 'editFriend',
+  APPLY_MEMBER = 'applyMember',
+  APPLY_FRIEND = 'applyFriend',
+  SEARCH_USER = 'searchUser',
+  DIRECT_MESSAGE = 'directMessage',
+  DIALOG_ALERT = 'dialogAlert',
+  DIALOG_ALERT2 = 'dialogAlert2',
+  DIALOG_SUCCESS = 'dialogSuccess',
+  DIALOG_WARNING = 'dialogWarning',
+  DIALOG_ERROR = 'dialogError',
+  DIALOG_INFO = 'dialogInfo',
+  CHANGE_THEME = 'changeTheme',
+  ABOUTUS = 'aboutus',
+  FRIEND_VERIFICATION = 'friendVerification',
+}
+
+export enum SocketClientEvent {
   // User
   SEARCH_USER = 'searchUser',
-  UPDATE_USER = 'updateUser',
+  EDIT_USER = 'editUser',
+  // Friend Group
+  CREATE_FRIEND_GROUP = 'createFriendGroup',
+  EDIT_FRIEND_GROUP = 'editFriendGroup',
+  DELETE_FRIEND_GROUP = 'deleteFriendGroup',
+  // Friend
+  CREATE_FRIEND = 'createFriend',
+  EDIT_FRIEND = 'editFriend',
+  DELETE_FRIEND = 'deleteFriend',
+  // Friend Application
+  CREATE_FRIEND_APPLICATION = 'createFriendApplication',
+  EDIT_FRIEND_APPLICATION = 'editFriendApplication',
+  DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
+  APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
   // Server
   FAVORITE_SERVER = 'favoriteServer',
   SEARCH_SERVER = 'searchServer',
   CONNECT_SERVER = 'connectServer',
   DISCONNECT_SERVER = 'disconnectServer',
   CREATE_SERVER = 'createServer',
-  UPDATE_SERVER = 'updateServer',
+  EDIT_SERVER = 'editServer',
   DELETE_SERVER = 'deleteServer',
   // Channel
   CONNECT_CHANNEL = 'connectChannel',
   DISCONNECT_CHANNEL = 'disconnectChannel',
   CREATE_CHANNEL = 'createChannel',
-  UPDATE_CHANNEL = 'updateChannel',
-  UPDATE_CHANNELS = 'updateChannels',
+  EDIT_CHANNEL = 'editChannel',
+  EDIT_CHANNELS = 'editChannels',
   DELETE_CHANNEL = 'deleteChannel',
-  // Friend Group
-  CREATE_FRIEND_GROUP = 'createFriendGroup',
-  UPDATE_FRIEND_GROUP = 'updateFriendGroup',
-  DELETE_FRIEND_GROUP = 'deleteFriendGroup',
   // Member
   CREATE_MEMBER = 'createMember',
-  UPDATE_MEMBER = 'updateMember',
+  EDIT_MEMBER = 'editMember',
   DELETE_MEMBER = 'deleteMember',
-  // Friend
-  CREATE_FRIEND = 'createFriend',
-  UPDATE_FRIEND = 'updateFriend',
-  DELETE_FRIEND = 'deleteFriend',
   // Member Application
   CREATE_MEMBER_APPLICATION = 'createMemberApplication',
-  UPDATE_MEMBER_APPLICATION = 'updateMemberApplication',
+  EDIT_MEMBER_APPLICATION = 'editMemberApplication',
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
   APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
-  // Friend Application
-  CREATE_FRIEND_APPLICATION = 'createFriendApplication',
-  UPDATE_FRIEND_APPLICATION = 'updateFriendApplication',
-  DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
-  APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
   // Message
-  SEND_MESSAGE = 'message',
-  SEND_DIRECT_MESSAGE = 'directMessage',
-  SEND_SHAKE_WINDOW = 'shakeWindow',
+  CHANNEL_MESSAGE = 'channelMessage',
+  ACTION_MESSAGE = 'actionMessage',
+  DIRECT_MESSAGE = 'directMessage',
+  SHAKE_WINDOW = 'shakeWindow',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
@@ -88,7 +122,7 @@ enum SocketClientEvent {
   PING = 'ping',
 }
 
-enum SocketServerEvent {
+export enum SocketServerEvent {
   // Notification
   NOTIFICATION = 'notification', // not used yet
   // User
@@ -98,57 +132,96 @@ enum SocketServerEvent {
   FRIEND_GROUPS_SET = 'friendGroupsSet',
   FRIEND_GROUP_ADD = 'friendGroupAdd',
   FRIEND_GROUP_UPDATE = 'friendGroupUpdate',
-  FRIEND_GROUP_DELETE = 'friendGroupDelete',
+  FRIEND_GROUP_REMOVE = 'friendGroupRemove',
   // Friend
   FRIENDS_SET = 'friendsSet',
   FRIEND_ADD = 'friendAdd',
   FRIEND_UPDATE = 'friendUpdate',
-  FRIEND_DELETE = 'friendDelete',
+  FRIEND_REMOVE = 'friendRemove',
   // Friend Application
   FRIEND_APPLICATIONS_SET = 'friendApplicationsSet',
   FRIEND_APPLICATION_ADD = 'friendApplicationAdd',
   FRIEND_APPLICATION_UPDATE = 'friendApplicationUpdate',
-  FRIEND_APPLICATION_DELETE = 'friendApplicationDelete',
+  FRIEND_APPLICATION_REMOVE = 'friendApplicationRemove',
   // Server
   SERVER_SEARCH = 'serverSearch',
   SERVERS_SET = 'serversSet',
   SERVER_ADD = 'serverAdd',
   SERVER_UPDATE = 'serverUpdate',
-  SERVER_DELETE = 'serverDelete',
+  SERVER_REMOVE = 'serverRemove',
   // Channel
   SERVER_CHANNELS_SET = 'serverChannelsSet',
   SERVER_CHANNEL_ADD = 'serverChannelAdd',
   SERVER_CHANNEL_UPDATE = 'serverChannelUpdate',
-  SERVER_CHANNEL_DELETE = 'serverChannelDelete',
+  SERVER_CHANNEL_REMOVE = 'serverChannelRemove',
   // Member
   SERVER_MEMBERS_SET = 'serverMembersSet',
   SERVER_MEMBER_ADD = 'serverMemberAdd',
   SERVER_MEMBER_UPDATE = 'serverMemberUpdate',
-  SERVER_MEMBER_DELETE = 'serverMemberDelete',
+  SERVER_MEMBER_REMOVE = 'serverMemberRemove',
   SERVER_ONLINE_MEMBERS_SET = 'serverOnlineMembersSet',
   SERVER_ONLINE_MEMBER_ADD = 'serverOnlineMemberAdd',
-  SERVER_ONLINE_MEMBER_DELETE = 'serverOnlineMemberDelete',
+  SERVER_ONLINE_MEMBER_REMOVE = 'serverOnlineMemberRemove',
   // Member Application
   SERVER_MEMBER_APPLICATIONS_SET = 'serverMemberApplicationsSet',
   SERVER_MEMBER_APPLICATION_ADD = 'serverMemberApplicationAdd',
   SERVER_MEMBER_APPLICATION_UPDATE = 'serverMemberApplicationUpdate',
-  SERVER_MEMBER_APPLICATION_DELETE = 'serverMemberApplicationDelete',
+  SERVER_MEMBER_APPLICATION_REMOVE = 'serverMemberApplicationRemove',
+  MEMBER_APPROVAL = 'memberApproval',
   // Message
-  ON_MESSAGE = 'onMessage',
-  ON_DIRECT_MESSAGE = 'onDirectMessage',
+  CHANNEL_MESSAGE = 'channelMessage',
+  ACTION_MESSAGE = 'actionMessage',
+  DIRECT_MESSAGE = 'directMessage',
+  SHAKE_WINDOW = 'shakeWindow',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
   RTC_ICE_CANDIDATE = 'RTCIceCandidate',
   RTC_JOIN = 'RTCJoin',
   RTC_LEAVE = 'RTCLeave',
-  // Play
+  // Play Sound
   PLAY_SOUND = 'playSound',
   // Echo
   PONG = 'pong',
   // Popup
   OPEN_POPUP = 'openPopup',
 }
+
+export const PopupSize = {
+  [PopupType.USER_INFO]: { height: 630, width: 440 },
+  [PopupType.USER_SETTING]: { height: 700, width: 500 },
+  [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
+  [PopupType.CHANNEL_PASSWORD]: { height: 200, width: 370 },
+  [PopupType.SERVER_SETTING]: { height: 520, width: 600 },
+  [PopupType.SERVER_BROADCAST]: { height: 300, width: 450 },
+  [PopupType.BLOCK_MEMBER]: { height: 250, width: 400 },
+  [PopupType.SYSTEM_SETTING]: { height: 520, width: 600 },
+  [PopupType.MEMBERAPPLY_SETTING]: { height: 200, width: 370 },
+  [PopupType.CREATE_SERVER]: { height: 436, width: 478 },
+  [PopupType.CREATE_CHANNEL]: { height: 200, width: 370 },
+  [PopupType.CREATE_FRIENDGROUP]: { height: 200, width: 370 },
+  [PopupType.EDIT_CHANNEL_ORDER]: { height: 550, width: 500 },
+  [PopupType.EDIT_CHANNEL_NAME]: { height: 200, width: 370 },
+  [PopupType.EDIT_NICKNAME]: { height: 200, width: 370 },
+  [PopupType.EDIT_FRIENDGROUP]: { height: 200, width: 370 },
+  [PopupType.EDIT_FRIEND]: { height: 200, width: 370 },
+  [PopupType.APPLY_FRIEND]: { height: 320, width: 500 },
+  [PopupType.APPLY_MEMBER]: { height: 320, width: 500 },
+  [PopupType.SEARCH_USER]: { height: 200, width: 370 },
+  [PopupType.DIRECT_MESSAGE]: { height: 550, width: 650 },
+  [PopupType.DIALOG_ALERT]: { height: 200, width: 370 },
+  [PopupType.DIALOG_ALERT2]: { height: 200, width: 370 },
+  [PopupType.DIALOG_SUCCESS]: { height: 200, width: 370 },
+  [PopupType.DIALOG_WARNING]: { height: 200, width: 370 },
+  [PopupType.DIALOG_ERROR]: { height: 200, width: 370 },
+  [PopupType.DIALOG_INFO]: { height: 200, width: 370 },
+  [PopupType.CHANGE_THEME]: { height: 340, width: 480 },
+  [PopupType.ABOUTUS]: { height: 440, width: 480 },
+  [PopupType.FRIEND_VERIFICATION]: { height: 550, width: 500 },
+  Settings: { height: 520, width: 600 },
+  Apply: { height: 320, width: 500 },
+  Small: { height: 200, width: 370 },
+};
 
 // Constants
 const DEV = process.argv.includes('--dev');
@@ -341,6 +414,11 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
     return { action: 'deny' };
   });
 
+  mainWindow.show();
+  mainWindow.focus();
+  mainWindow.setAlwaysOnTop(true);
+  mainWindow.setAlwaysOnTop(false);
+
   return mainWindow;
 }
 
@@ -387,17 +465,32 @@ async function createAuthWindow() {
     app.exit();
   });
 
+  authWindow.show();
+  authWindow.focus();
+  authWindow.setAlwaysOnTop(true);
+  authWindow.setAlwaysOnTop(false);
+
   return authWindow;
 }
 
 async function createPopup(
-  type: string,
+  type: PopupType,
   id: string,
-  height: number,
-  width: number,
+  force = true,
 ): Promise<BrowserWindow | null> {
-  if (popups[id] && !popups[id].isDestroyed()) {
-    popups[id].destroy();
+  // If force is true, destroy the popup
+  if (force) {
+    if (popups[id] && !popups[id].isDestroyed()) {
+      popups[id].destroy();
+    }
+  } else {
+    if (popups[id] && !popups[id].isDestroyed()) {
+      popups[id].show();
+      popups[id].focus();
+      popups[id].setAlwaysOnTop(true);
+      popups[id].setAlwaysOnTop(false);
+      return popups[id];
+    }
   }
 
   if (DEV) {
@@ -408,8 +501,8 @@ async function createPopup(
   }
 
   popups[id] = new BrowserWindow({
-    width: width ?? 800,
-    height: height ?? 600,
+    width: PopupSize[type].width,
+    height: PopupSize[type].height,
     resizable: false,
     frame: false,
     transparent: true,
@@ -430,6 +523,11 @@ async function createPopup(
     popups[id].loadURL(`${BASE_URI}/popup?type=${type}&id=${id}`);
     // popups[id].webContents.openDevTools();
   }
+
+  popups[id].show();
+  popups[id].focus();
+  popups[id].setAlwaysOnTop(true);
+  popups[id].setAlwaysOnTop(false);
 
   return popups[id];
 }
@@ -520,38 +618,6 @@ function connectSocket(token: string): Socket | null {
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect_error', error);
     });
-  });
-
-  socket.on('onShakeWindow', (data) => {
-    if (!data) return;
-
-    const windowId = `directMessage-${data.targetId}`;
-
-    if (popups[windowId] && !popups[windowId].isDestroyed()) {
-      popups[windowId].setAlwaysOnTop(true);
-      popups[windowId].setAlwaysOnTop(false);
-      popups[windowId].focus();
-      popups[windowId].webContents.send('shakeWindow');
-    } else {
-      createPopup('directMessage', windowId, 550, 650).then((window) => {
-        if (!window) return;
-
-        ipcMain.once('request-initial-data', async (_, to) => {
-          if (to === windowId) {
-            window.webContents.send('response-initial-data', windowId, {
-              userId: data.userId,
-              targetId: data.targetId,
-              targetName: data.name,
-            });
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            window.setAlwaysOnTop(true);
-            window.setAlwaysOnTop(false);
-            window.focus();
-            window.webContents.send('shakeWindow');
-          }
-        });
-      });
-    }
   });
 
   socket.connect();
@@ -800,8 +866,18 @@ app.on('ready', async () => {
   });
 
   // Popup handlers
-  ipcMain.on('open-popup', (_, type, id, height, width) => {
-    createPopup(type, id, height, width);
+  ipcMain.on('open-popup', (_, type, id, force = true) => {
+    createPopup(type, id, force);
+  });
+
+  ipcMain.on('close-popup', (_, id) => {
+    if (popups[id] && !popups[id].isDestroyed()) {
+      popups[id].close();
+    }
+  });
+
+  ipcMain.on('close-all-popups', () => {
+    closePopups();
   });
 
   ipcMain.on('popup-submit', (_, to) => {
@@ -953,46 +1029,11 @@ async function handleDeepLink(url: string) {
   try {
     const { hostname } = new URL(url);
     switch (hostname) {
-      // 執行主程式 應該用不到 測試用的
-      // case 'run':
-      //   if (authWindow?.isDestroyed() === false) {
-      //     authWindow.show();
-      //     authWindow.focus();
-      //   } else if (mainWindow?.isDestroyed() === false) {
-      //     mainWindow.show();
-      //     mainWindow.focus();
-      //   } else {
-      //     (await createMainWindow()).show();
-      //   }
-      //   break;
       case 'join':
         const serverId = new URL(url).searchParams.get('serverId');
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send('deepLink', serverId);
         });
-        // // 如果已經登入才能發進群請求
-        // if (serverId && userId && socketInstance && socketInstance.connected) {
-        //   socketInstance.emit(SocketClientEvent.SEARCH_SERVER, {
-        //     query: serverId,
-        //   });
-        //   socketInstance.on(
-        //     SocketServerEvent.SERVER_SEARCH,
-        //     (serverInfoList) => {
-        //       // 對照DisplayId 如果找不到就不會進群也不會通知前端
-        //       const matchedServer = serverInfoList.find(
-        //         (server: any) => server.displayId === serverId,
-        //       );
-        //       if (matchedServer) {
-        //         mainWindow.show();
-        //         mainWindow.focus();
-        //         socketInstance?.emit(SocketClientEvent.CONNECT_SERVER, {
-        //           userId,
-        //           serverId: matchedServer.serverId,
-        //         });
-        //       }
-        //     },
-        //   );
-        // }
         break;
     }
   } catch (error) {

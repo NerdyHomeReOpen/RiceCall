@@ -8,8 +8,8 @@ import vip from '@/styles/vip.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Components
-import FriendListViewer from '@/components/viewers/FriendList';
-import BadgeListViewer from '@/components/viewers/BadgeList';
+import FriendListViewer from '@/components/FriendList';
+import BadgeListViewer from '@/components/BadgeList';
 
 // Types
 import { User, UserFriend, FriendGroup } from '@/types';
@@ -52,6 +52,8 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
       name: userName,
       signature: userSignature,
       avatarUrl: userAvatarUrl,
+      xp: userXP,
+      requiredXp: userRequiredXP,
       level: userLevel,
       vip: userVip,
       badges: userBadges,
@@ -64,7 +66,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
     ) => {
       if (!socket) return;
       if (signature === userSignature) return;
-      socket.send.updateUser({ user: { signature }, userId });
+      socket.send.editUser({ user: { signature }, userId });
     };
 
     const handleResize = useCallback(
@@ -128,6 +130,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
                 className={`${grade['grade']} ${
                   grade[`lv-${Math.min(56, userLevel)}`]
                 }`}
+                title={`${lang.tr.level}：${userLevel}，${
+                  lang.tr.xp
+                }：${userXP}，${lang.tr.xpDifference}：${
+                  userRequiredXP - userXP
+                }`}
               />
               <div className={friendPage['wealthIcon']} />
               <div className={friendPage['wealthValue']}>0</div>
@@ -172,8 +179,9 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
                   emojiIconRef.current.getBoundingClientRect().y +
                   emojiIconRef.current.getBoundingClientRect().height;
                 contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
-                  signatureInputRef.current?.focus();
                   setSignatureInput((prev) => prev + emoji);
+                  if (signatureInputRef.current)
+                    signatureInputRef.current.focus();
                 });
               }}
             />

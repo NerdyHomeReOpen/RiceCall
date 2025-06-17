@@ -6,9 +6,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Components
-import MarkdownViewer from '@/components/viewers/Markdown';
-import MessageViewer from '@/components/viewers/Message';
-import ChannelListViewer from '@/components/viewers/ChannelList';
+import MarkdownViewer from '@/components/MarkdownViewer';
+import MessageViewer from '@/components/MessageViewer';
+import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
@@ -19,6 +19,7 @@ import {
   Channel,
   ServerMember,
   ChannelMessage,
+  PromptMessage,
   UserServer,
   UserFriend,
 } from '@/types';
@@ -40,6 +41,7 @@ interface ServerPageProps {
   friends: UserFriend[];
   currentChannel: Channel;
   channelMessages: ChannelMessage[];
+  actionMessages: PromptMessage[];
   display: boolean;
 }
 
@@ -52,6 +54,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     friends,
     currentChannel,
     channelMessages,
+    actionMessages,
     display,
   }) => {
     // Hooks
@@ -63,6 +66,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     // Refs
     const announcementAreaRef = useRef<HTMLDivElement>(null);
     const voiceModeRef = useRef<HTMLDivElement>(null);
+    const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
 
     // States
     const [sidebarWidth, setSidebarWidth] = useState<number>(270);
@@ -74,6 +78,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [showMicVolume, setShowMicVolume] = useState(false);
     const [showSpeakerVolume, setShowSpeakerVolume] = useState(false);
     const [currentTime, setCurrentTime] = useState<number>(Date.now());
+    const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
 
     // Variables
     const { userId } = user;
@@ -131,16 +136,16 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       channelId: Channel['channelId'],
     ): void => {
       if (!socket) return;
-      socket.send.message({ message, channelId, serverId, userId });
+      socket.send.channelMessage({ message, channelId, serverId, userId });
     };
 
-    const handleUpdateChannel = (
+    const handleEditChannel = (
       channel: Partial<Channel>,
       channelId: Channel['channelId'],
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateChannel({ channel, channelId, serverId });
+      socket.send.editChannel({ channel, channelId, serverId });
     };
 
     const handleResizeSidebar = useCallback(
@@ -213,8 +218,20 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     useEffect(() => {
       if (!webRTC || !channelBitrate) return;
-      webRTC.handleUpdateBitrate(channelBitrate);
+      webRTC.handleEditBitrate(channelBitrate);
     }, [channelBitrate]); // Please ignore this warning
+
+    useEffect(() => {
+      if (actionMessages.length == 0) return;
+      if (actionMessageTimer.current) {
+        clearTimeout(actionMessageTimer.current);
+      }
+      if (!showActionMessage) setShowActionMessage(true);
+
+      actionMessageTimer.current = setTimeout(() => {
+        setShowActionMessage(false);
+      }, 8000);
+    }, [actionMessages]);
 
     useEffect(() => {
       const timer = setInterval(() => {
@@ -288,9 +305,24 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               onMouseUp={() => setIsResizingAnnouncementArea(false)}
             />
             <div className={styles['messageArea']}>
-              <MessageViewer messages={channelMessages} />
+              <MessageViewer messages={channelMessages} userId={userId} />
             </div>
             <div className={styles['inputArea']}>
+              <div
+                className={styles['broadcastArea']}
+                style={{ display: showActionMessage ? 'flex' : 'none' }}
+              >
+                <div className={styles['broadcastContent']}>
+                  <MessageViewer
+                    messages={
+                      actionMessages.length !== 0
+                        ? [actionMessages[actionMessages.length - 1]]
+                        : []
+                    }
+                    userId={userId}
+                  />
+                </div>
+              </div>
               <MessageInputBox
                 onSendMessage={(msg) => {
                   handleSendMessage(
@@ -336,7 +368,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         label: lang.tr.freeSpeech,
                         show: canChangeToFreeSpeech,
                         onClick: () => {
-                          handleUpdateChannel(
+                          handleEditChannel(
                             { voiceMode: 'free' },
                             channelId,
                             serverId,
@@ -349,7 +381,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         show: canChangeToForbiddenSpeech,
                         disabled: true,
                         onClick: () => {
-                          handleUpdateChannel(
+                          handleEditChannel(
                             { voiceMode: 'forbidden' },
                             channelId,
                             serverId,
@@ -365,7 +397,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         hasSubmenu: true,
                         disabled: true,
                         onClick: () => {
-                          handleUpdateChannel(
+                          handleEditChannel(
                             { voiceMode: 'queue' },
                             channelId,
                             serverId,
@@ -378,7 +410,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                             show: canChangeToForbiddenQueue,
                             disabled: true,
                             onClick: () => {
-                              // handleUpdateChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
+                              // handleEditChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
                             },
                           },
                           {
@@ -387,7 +419,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                             show: canChangeToControlQueue,
                             disabled: true,
                             onClick: () => {
-                              // handleUpdateChannel({ queueMode: 'control' }, currentChannelId, serverId);
+                              // handleEditChannel({ queueMode: 'control' }, currentChannelId, serverId);
                             },
                           },
                         ],
@@ -466,7 +498,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                           max="200"
                           value={webRTC.micVolume}
                           onChange={(e) => {
-                            webRTC.handleUpdateMicVolume?.(
+                            webRTC.handleEditMicVolume?.(
                               parseInt(e.target.value),
                             );
                           }}
@@ -511,7 +543,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                           max="100"
                           value={webRTC.speakerVolume}
                           onChange={(e) => {
-                            webRTC.handleUpdateSpeakerVolume(
+                            webRTC.handleEditSpeakerVolume(
                               parseInt(e.target.value),
                             );
                           }}

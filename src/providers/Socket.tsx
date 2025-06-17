@@ -10,7 +10,7 @@ import { SocketServerEvent, SocketClientEvent } from '@/types';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import StandardizedError, { errorHandler } from '@/utils/errorHandler';
+import StandardizedError from '@/utils/error';
 
 type SocketContextType = {
   send: Record<SocketClientEvent, (...args: any[]) => void>;
@@ -52,51 +52,48 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
   // Handlers
   const handleConnect = () => {
     console.info('Socket connected');
+    ipcService.popup.close('errorDialog');
     setIsConnected(true);
   };
 
   const handleDisconnect = () => {
     console.info('Socket disconnected');
+    ipcService.popup.closeAll();
     setIsConnected(false);
   };
 
   const handleReconnect = (attemptNumber: number) => {
     console.info('Socket reconnecting, attempt number:', attemptNumber);
+    ipcService.popup.close('errorDialog');
   };
 
   const handleError = (error: any) => {
-    error = new StandardizedError({
-      name: 'Error',
-      message: error.message,
-      part: 'SOCKET',
-      tag: 'ERROR',
-      statusCode: 500,
-    });
-    new errorHandler(error).show();
+    console.error('Socket error:', error);
+    new StandardizedError({ ...error, handler: () => {} }).show();
   };
 
   const handleConnectError = (error: any) => {
-    error = new StandardizedError({
+    console.error('Socket connect error:', error);
+    new StandardizedError({
       name: 'ConnectError',
       message: '連線失敗，正在嘗試重新連線，按下確定後將自動登出',
       part: 'SOCKET',
       tag: 'CONNECT_ERROR',
       statusCode: 500,
       handler: () => ipcService.auth.logout(),
-    });
-    new errorHandler(error).show();
+    }).show();
   };
 
   const handleReconnectError = (error: any) => {
-    error = new StandardizedError({
+    console.error('Socket reconnect error:', error);
+    new StandardizedError({
       name: 'ReconnectError',
       message: '重新連線失敗，按下確定後將自動登出',
       part: 'SOCKET',
       tag: 'RECONNECT_ERROR',
       statusCode: 500,
       handler: () => ipcService.auth.logout(),
-    });
-    new errorHandler(error).show();
+    }).show();
   };
 
   // Effects

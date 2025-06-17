@@ -15,7 +15,7 @@ import setting from '@/styles/popups/setting.module.css';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface CreateFriendGroupPopupProps {
   userId: User['userId'];
@@ -29,7 +29,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> =
 
     // States
     const [friendGroup, setFriendGroup] = useState<FriendGroup>(
-      createDefault.friendGroup(),
+      Default.friendGroup(),
     );
 
     // Variables

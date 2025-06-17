@@ -1,38 +1,45 @@
 .body {
-  justify-content: unset;
-  padding-top: 10px;
+  padding: 0 15px;
   background-color: #fff;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  overflow-y: scroll;
 }
 
 .contentHeader {
   display: flex;
+  width: 100%;
+  padding: 10px 0;
   justify-content: space-between;
-  align-items: center;
   color: #444444;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 1;
 }
 
-.ProcessingStatus,
 .allCancel {
   cursor: pointer;
 }
 
-.ProcessingStatus:hover,
 .allCancel:hover {
   color: #666666;
 }
 
-.ProcessingStatus:active,
 .allCancel:active {
   color: #999999;
 }
 
 .contentBody {
-  height: 100%;
-  margin-top: 2rem;
+  width: 100%;
+  flex: 1;
 }
 
 .userInfoBox {
   display: flex;
+  margin: 1.5rem auto;
+  justify-content: center;
 }
 
 .userInfo {
@@ -56,7 +63,7 @@
 }
 
 .userApplyContentBox {
-  width: 31rem;
+  flex: 1;
 }
 
 .userApplyContent {
@@ -65,15 +72,20 @@
   justify-content: space-between;
   border: 1px solid #d8d8d8;
   background-color: #f6f6f6;
-  height: 5.3rem;
   border-radius: 0.1rem;
   padding: 0.5rem;
 }
 
 .userApplyContentText {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: column;
   color: #5e5e5e;
+  word-break: break-word;
+}
+
+.userApplyContentRow {
+  display: flex;
 }
 
 .userApplyContentButtonBox {

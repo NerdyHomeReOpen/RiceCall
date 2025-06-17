@@ -1,7 +1,21 @@
 type SortDirection = 1 | -1;
 type SortField<T> = keyof T;
 
-export const createSorter = <T extends object>(
+/**
+ * Create a sorter function for sorting an array of objects
+ *
+ * Example usage:
+ * ```ts
+ * const users = [{ name: 'Alice', age: 25 }, { name: 'Bob', age: 30 }];
+ * users.sort(createSorter('age', -1)); // Sort by age in descending order
+ * users.sort(createSorter('name')); // Sort by name in ascending order
+ * ```
+ *
+ * @param field - The field to sort by
+ * @param direction - The direction to sort by (1 for ascending, -1 for descending)
+ * @returns A function that sorts an array of objects by the specified field in the specified direction
+ */
+const Sorter = <T extends object>(
   field: SortField<T>,
   direction: SortDirection = 1,
 ) => {
@@ -28,7 +42,4 @@ export const createSorter = <T extends object>(
   };
 };
 
-// Example usage:
-// const users = [{ name: 'Alice', age: 25 }, { name: 'Bob', age: 30 }];
-// users.sort(createSorter('age', -1)); // Sort by age in descending order
-// users.sort(createSorter('name')); // Sort by name in ascending order
+export default Sorter;

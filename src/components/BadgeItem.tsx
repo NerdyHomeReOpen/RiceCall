@@ -1,7 +1,7 @@
 import React from 'react';
 
 // CSS
-import styles from '@/styles/viewers/badge.module.css';
+import styles from '@/styles/badge.module.css';
 
 // Types
 import type { Badge } from '@/types';
@@ -12,12 +12,12 @@ import { useContextMenu } from '@/providers/ContextMenu';
 // Cache
 const failedImageCache = new Set<string>();
 
-interface BadgeContainerProps {
+interface BadgeItemProps {
   badge: Badge;
   preferTop?: boolean;
 }
 
-const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
+const BadgeItem: React.FC<BadgeItemProps> = React.memo(
   ({ badge, preferTop = false }) => {
     // Hooks
     const contextMenu = useContextMenu();
@@ -51,36 +51,6 @@ const BadgeContainer: React.FC<BadgeContainerProps> = React.memo(
   },
 );
 
-BadgeContainer.displayName = 'BadgeContainer';
+BadgeItem.displayName = 'BadgeItem';
 
-interface BadgeListViewerProps {
-  badges: Badge[];
-  maxDisplay?: number;
-  preferTop?: boolean;
-}
-
-const BadgeListViewer: React.FC<BadgeListViewerProps> = React.memo(
-  ({ badges, preferTop, maxDisplay = 21 }) => {
-    const sortedBadges = [...badges]
-      .sort((a, b) =>
-        a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt,
-      )
-      .slice(0, maxDisplay);
-
-    return (
-      <div className={styles.badgeViewerWrapper}>
-        {sortedBadges.map((badge) => (
-          <BadgeContainer
-            key={badge.badgeId}
-            badge={badge}
-            preferTop={preferTop}
-          />
-        ))}
-      </div>
-    );
-  },
-);
-
-BadgeListViewer.displayName = 'BadgeListViewer';
-
-export default BadgeListViewer;
+export default BadgeItem;

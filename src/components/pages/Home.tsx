@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import homePage from '@/styles/pages/home.module.css';
 
 // Components
-import ServerListViewer from '@/components/viewers/ServerList';
+import ServerListViewer from '@/components/ServerList';
 
 // Type
 import { PopupType, SocketServerEvent, User, UserServer } from '@/types';
@@ -15,6 +15,7 @@ import { PopupType, SocketServerEvent, User, UserServer } from '@/types';
 import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
 import { useMainTab } from '@/providers/MainTab';
+import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -23,14 +24,12 @@ export interface ServerListSectionProps {
   title: string;
   servers: UserServer[];
   user: User;
-  onServerClick?: (server: UserServer) => void;
 }
 
 const ServerListSection: React.FC<ServerListSectionProps> = ({
   title,
   user,
   servers,
-  onServerClick,
 }) => {
   // Hooks
   const lang = useLanguage();
@@ -45,11 +44,7 @@ const ServerListSection: React.FC<ServerListSectionProps> = ({
   return (
     <div className={homePage['serverList']}>
       <div className={homePage['serverListTitle']}>{title}</div>
-      <ServerListViewer
-        user={user}
-        servers={displayedServers}
-        onServerClick={onServerClick}
-      />
+      <ServerListViewer user={user} servers={displayedServers} />
       {canExpand && (
         <button
           className={`
@@ -89,27 +84,26 @@ const SearchResultItem: React.FC<{
 interface HomePageProps {
   user: User;
   servers: UserServer[];
-  currentServer: UserServer;
   display: boolean;
 }
 
 const HomePageComponent: React.FC<HomePageProps> = React.memo(
-  ({ user, servers, currentServer, display }) => {
+  ({ user, servers, display }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
     const mainTab = useMainTab();
+    const loadingBox = useLoading();
 
     // Refs
     const searchRef = useRef<HTMLDivElement>(null);
+    const searchTimeerRef = useRef<NodeJS.Timeout | null>(null);
 
     // States
     const [searchQuery, setSearchQuery] = useState('');
     const [exactMatch, setExactMatch] = useState<UserServer | null>(null);
     const [personalResults, setPersonalResults] = useState<UserServer[]>([]);
     const [relatedResults, setRelatedResults] = useState<UserServer[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [loadingServerID, setLoadingServerID] = useState<string>();
     const [section, setSection] = useState<number>(0);
 
     // Variables
@@ -128,8 +122,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         handleClearSearchState();
         return;
       }
-      socket.send.searchServer({ query });
       setSearchQuery(query);
+      if (searchTimeerRef.current) {
+        clearTimeout(searchTimeerRef.current);
+      }
+      searchTimeerRef.current = setTimeout(() => {
+        socket.send.searchServer({ query });
+      }, 500);
     };
 
     const handleConnectServer = (
@@ -141,13 +140,24 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         mainTab.setSelectedTabId('server');
         return;
       }
-      socket.send.connectServer({
-        serverId,
-        userId: userId,
-      });
+
+      if (currentServerId) {
+        socket.send.disconnectServer({
+          serverId: currentServerId,
+          userId: userId,
+        });
+      }
+
       handleClearSearchState();
-      setIsLoading(true);
-      setLoadingServerID(serverDisplayId);
+      loadingBox.setIsLoading(true);
+      loadingBox.setLoadingServerId(serverDisplayId);
+
+      setTimeout(() => {
+        socket.send.connectServer({
+          serverId,
+          userId: userId,
+        });
+      }, loadingBox.loadingTimeStamp);
     };
 
     const handleServerSearch = (results: UserServer[]) => {
@@ -252,15 +262,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     }, [socket, searchQuery]);
 
     useEffect(() => {
-      if (mainTab.selectedTabId == 'server') {
-        if (!currentServer) return;
-        setIsLoading(false);
-        setLoadingServerID('');
-        localStorage.removeItem('trigger-handle-server-select');
-      }
-    }, [currentServer, isLoading, mainTab]);
-
-    useEffect(() => {
       const offDeepLink = ipcService.deepLink.onDeepLink(handleDeepLink);
       return () => offDeepLink();
     }, [handleDeepLink]);
@@ -283,18 +284,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         ],
       });
     }, [lang, userName]);
-
-    useEffect(() => {
-      const handler = ({ key, newValue }: StorageEvent) => {
-        if (key !== 'trigger-handle-server-select' || !newValue) return;
-        const { serverDisplayId } = JSON.parse(newValue);
-        mainTab.setSelectedTabId('home');
-        setIsLoading(true);
-        setLoadingServerID(serverDisplayId);
-      };
-      window.addEventListener('storage', handler);
-      return () => window.removeEventListener('storage', handler);
-    }, [mainTab]);
 
     return (
       <div
@@ -459,25 +448,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
             title={lang.tr.recentVisits}
             servers={recentServers}
             user={user}
-            onServerClick={(server) => {
-              handleConnectServer(server.serverId, server.displayId);
-            }}
           />
           <ServerListSection
             title={lang.tr.myServers}
             servers={ownedServers}
             user={user}
-            onServerClick={(server) => {
-              handleConnectServer(server.serverId, server.displayId);
-            }}
           />
           <ServerListSection
             title={lang.tr.favoriteServers}
             servers={favoriteServers}
             user={user}
-            onServerClick={(server) => {
-              handleConnectServer(server.serverId, server.displayId);
-            }}
           />
         </main>
 
@@ -488,25 +468,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
         >
           <div>{'抱歉，此頁面尚未開放'}</div>
         </main>
-
-        {/* Loading */}
-        {isLoading && (
-          <div className={homePage['loadingWrapper']}>
-            <div className={homePage['loadingBox']}>
-              <div className={homePage['loadingTitleContain']}>
-                <div>{lang.tr.connectingServer}</div>
-                <div className={homePage['loadingServerID']}>
-                  {loadingServerID}
-                </div>
-              </div>
-              <div className={homePage['loadingGif']}></div>
-              <div
-                className={homePage['loadingCloseBtn']}
-                onClick={() => setIsLoading(false)}
-              />
-            </div>
-          </div>
-        )}
       </div>
     );
   },

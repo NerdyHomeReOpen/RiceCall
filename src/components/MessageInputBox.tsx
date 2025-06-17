@@ -32,6 +32,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
 
     // Refs
     const emojiIconRef = useRef<HTMLDivElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // States
     const [messageInput, setMessageInput] = useState<string>('');
@@ -50,17 +51,20 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
         <div
           ref={emojiIconRef}
           className={emoji['emojiIcon']}
-          onClick={() => {
+          onMouseDown={(e) => {
+            e.preventDefault();
             if (!emojiIconRef.current) return;
             const x = emojiIconRef.current.getBoundingClientRect().x;
             const y = emojiIconRef.current.getBoundingClientRect().y;
             contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
               setMessageInput((prev) => prev + emoji);
+              if (textareaRef.current) textareaRef.current.focus();
             });
           }}
         />
 
         <textarea
+          ref={textareaRef}
           rows={2}
           placeholder={placeholder}
           value={messageInput}

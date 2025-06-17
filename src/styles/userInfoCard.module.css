@@ -1,7 +1,7 @@
 .userInfoCard {
+  z-index: 500;
   position: absolute;
   background: #f4f6fa;
-  z-index: 1000;
   height: 190px;
   width: 275px;
   display: flex;

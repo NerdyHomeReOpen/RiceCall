@@ -7,7 +7,6 @@ import applyFriend from '@/styles/popups/apply.module.css';
 
 // Types
 import {
-  Friend,
   FriendApplication,
   FriendGroup,
   PopupType,
@@ -21,10 +20,10 @@ import { useLanguage } from '@/providers/Language';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface ApplyFriendPopupProps {
   userId: User['userId'];
@@ -43,9 +42,9 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
     // State
     const [section, setSection] = useState<number>(0);
     const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
-    const [target, setTarget] = useState<User>(createDefault.user());
+    const [target, setTarget] = useState<User>(Default.user());
     const [friendApplication, setFriendApplication] =
-      useState<FriendApplication>(createDefault.friendApplication());
+      useState<FriendApplication>(Default.friendApplication());
     const [selectedFriendGroupId, setSelectedFriendGroupId] = useState<
       FriendGroup['friendGroupId'] | null
     >(null);
@@ -70,7 +69,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       );
     };
 
-    const handleFriendGroupDelete = (id: FriendGroup['friendGroupId']) => {
+    const handleFriendGroupRemove = (id: FriendGroup['friendGroupId']) => {
       setFriendGroups((prev) =>
         prev.filter((item) => item.friendGroupId !== id),
       );
@@ -89,13 +88,26 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       });
     };
 
-    const handleCreateFriend = (
-      friend: Partial<Friend>,
+    const handleApproveFriendApplication = (
+      senderId: User['userId'],
+      receiverId: User['userId'],
+    ) => {
+      if (!socket) return;
+      socket.send.approveFriendApplication({
+        senderId,
+        receiverId,
+      });
+    };
+
+    const handleOpenUserInfo = (
       userId: User['userId'],
       targetId: User['userId'],
     ) => {
-      if (!socket) return;
-      socket.send.approveFriendApplication({ userId, targetId, friend });
+      ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
+      ipcService.initialData.onRequest(`userInfo-${targetId}`, {
+        userId,
+        targetId,
+      });
     };
 
     const handleOpenSuccessDialog = (message: string) => {
@@ -120,7 +132,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       const eventHandlers = {
         [SocketServerEvent.FRIEND_GROUP_ADD]: handleFriendGroupAdd,
         [SocketServerEvent.FRIEND_GROUP_UPDATE]: handleFriendGroupUpdate,
-        [SocketServerEvent.FRIEND_GROUP_DELETE]: handleFriendGroupDelete,
+        [SocketServerEvent.FRIEND_GROUP_REMOVE]: handleFriendGroupRemove,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -139,17 +151,17 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.user({
+          getService.user({
             userId: targetId,
           }),
-          refreshService.userFriendGroups({
+          getService.userFriendGroups({
             userId: userId,
           }),
-          refreshService.friendApplication({
+          getService.friendApplication({
             senderId: userId,
             receiverId: targetId,
           }),
-          refreshService.friendApplication({
+          getService.friendApplication({
             senderId: targetId,
             receiverId: userId,
           }),
@@ -192,7 +204,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
             <div className={setting['body']}>
               <div className={popup['col']}>
                 <div className={popup['label']}>{lang.tr.friendLabel}</div>
-                <div className={popup['row']}>
+                <div
+                  className={popup['row']}
+                  onClick={() => {
+                    handleOpenUserInfo(userId, targetId);
+                  }}
+                >
                   <div className={applyFriend['avatarWrapper']}>
                     <div
                       className={applyFriend['avatarPicture']}
@@ -254,7 +271,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
             <div className={setting['body']}>
               <div className={popup['col']}>
                 <div className={popup['label']}>{lang.tr.friendLabel}</div>
-                <div className={popup['row']}>
+                <div
+                  className={popup['row']}
+                  onClick={() => {
+                    handleOpenUserInfo(userId, targetId);
+                  }}
+                >
                   <div className={applyFriend['avatarWrapper']}>
                     <div
                       className={applyFriend['avatarPicture']}
@@ -293,7 +315,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
             <div className={setting['body']}>
               <div className={popup['col']}>
                 <div className={popup['label']}>{lang.tr.friendLabel}</div>
-                <div className={popup['row']}>
+                <div
+                  className={popup['row']}
+                  onClick={() => {
+                    handleOpenUserInfo(userId, targetId);
+                  }}
+                >
                   <div className={applyFriend['avatarWrapper']}>
                     <div
                       className={applyFriend['avatarPicture']}
@@ -344,11 +371,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
             <button
               className={popup['button']}
               onClick={() => {
-                handleCreateFriend(
-                  { friendGroupId: selectedFriendGroupId },
-                  userId,
-                  targetId,
-                );
+                handleApproveFriendApplication(targetId, userId);
                 handleClose();
               }}
             >

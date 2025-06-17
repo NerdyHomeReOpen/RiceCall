@@ -16,7 +16,7 @@ import ipcService from '@/services/ipc.service';
 import { useLanguage } from '@/providers/Language';
 
 const AboutPopup: React.FC = React.memo(() => {
-  // Language
+  // Hooks
   const lang = useLanguage();
 
   // Handlers
@@ -140,11 +140,9 @@ const AboutPopup: React.FC = React.memo(() => {
     <div className={`${popup['popupContainer']}`}>
       {/* Body */}
       <div className={`${popup['popupBody']} ${aboutUs['aboutContainer']}`}>
-        <div className={`${aboutUs['logoArea']}`}>
-          <div className={`${aboutUs['logoPlaceholder']}`}></div>
-        </div>
-
         <div className={aboutUs['contentBox']}>
+          <div className={`${aboutUs['logoPlaceholder']}`}></div>
+
           <div className={aboutUs['appInfo']}>
             <p className={aboutUs['appInfoVersion']}>RiceCall {version}</p>
             <p className={aboutUs['appInfoCopyright']}>

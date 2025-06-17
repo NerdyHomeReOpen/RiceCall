@@ -13,10 +13,10 @@ import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface editChannelNamePopupProps {
   channelId: Channel['channelId'];
@@ -33,20 +33,20 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
     const refreshRef = useRef(false);
 
     // States
-    const [channel, setChannel] = useState<Channel>(createDefault.channel());
+    const [channel, setChannel] = useState<Channel>(Default.channel());
 
     // Variables
     const { name: channelName } = channel;
     const canSubmit = channelName.trim();
 
     // Handlers
-    const handleUpdateChannel = (
+    const handleEditChannel = (
       channel: Partial<Channel>,
       channelId: Channel['channelId'],
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateChannel({ channel, channelId, serverId });
+      socket.send.editChannel({ channel, channelId, serverId });
     };
 
     const handleClose = () => {
@@ -59,7 +59,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.channel({
+          getService.channel({
             channelId: channelId,
           }),
         ]).then(([channel]) => {
@@ -103,7 +103,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(
             disabled={!canSubmit}
             onClick={() => {
               if (!canSubmit) return;
-              handleUpdateChannel({ name: channelName }, channelId, serverId);
+              handleEditChannel({ name: channelName }, channelId, serverId);
               handleClose();
             }}
           >

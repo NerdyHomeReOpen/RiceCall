@@ -12,11 +12,11 @@ import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
 
 // Services
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface MemberApplySettingPopupProps {
   serverId: Server['serverId'];
@@ -32,19 +32,19 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
     const refreshRef = useRef(false);
 
     // States
-    const [server, setServer] = useState<Server>(createDefault.server());
+    const [server, setServer] = useState<Server>(Default.server());
 
     // Variables
     const { receiveApply: serverReceiveApply, applyNotice: serverApplyNotice } =
       server;
 
     // Handlers
-    const handleUpdateServer = (
+    const handleEditServer = (
       server: Partial<Server>,
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateServer({ server, serverId });
+      socket.send.editServer({ server, serverId });
     };
 
     const handleClose = () => {
@@ -57,7 +57,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.server({
+          getService.server({
             serverId: serverId,
           }),
         ]).then(([server]) => {
@@ -112,7 +112,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
           <button
             className={popup['button']}
             onClick={() => {
-              handleUpdateServer(
+              handleEditServer(
                 {
                   receiveApply: !!serverReceiveApply,
                   applyNotice: serverApplyNotice,

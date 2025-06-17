@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   DiscordPresence,
-  PopupSize,
   PopupType,
   SocketClientEvent,
   SocketServerEvent,
@@ -145,15 +144,19 @@ const ipcService = {
   },
 
   popup: {
-    open: (type: PopupType, id: string) => {
+    open: (type: PopupType, id: string, force?: boolean) => {
       if (!isElectron) return;
-      ipcRenderer.send(
-        'open-popup',
-        type,
-        id,
-        PopupSize[type].height,
-        PopupSize[type].width,
-      );
+      ipcRenderer.send('open-popup', type, id, force);
+    },
+
+    close: (id: string) => {
+      if (!isElectron) return;
+      ipcRenderer.send('close-popup', id);
+    },
+
+    closeAll: () => {
+      if (!isElectron) return;
+      ipcRenderer.send('close-all-popups');
     },
 
     submit: (to: string, data?: any) => {

@@ -173,7 +173,7 @@
 
 .colorSelectedSave {
   background-image: url(../../../public/palette_ok.png);
-  background-size: contain;
+  background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
   margin-right: 3px;
@@ -181,7 +181,7 @@
 
 .colorSelectedCancel {
   background-image: url(../../../public/palette_cancel.png);
-  background-size: contain;
+  background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
 }

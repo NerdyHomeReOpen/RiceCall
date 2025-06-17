@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import emoji from '@/styles/emoji.module.css';
 
 // Components
-import { emojis, unicodeEmojis, Emoji } from './emojis';
+import { emojis, Emoji } from './emojis';
 
 interface EmojiPickerProps {
   onEmojiSelect: (emoji: string) => void;
@@ -15,7 +15,7 @@ interface EmojiPickerProps {
 }
 
 const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
-  ({ onEmojiSelect, type, x = 0, y = 0, preferTop = false }) => {
+  ({ onEmojiSelect, x = 0, y = 0, preferTop = false }) => {
     // Refs
     const emojiPickerRef = useRef<HTMLDivElement>(null);
 
@@ -62,65 +62,35 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       setPickerY(newPosY);
     }, [x, y, preferTop]);
 
-    switch (type) {
-      case 'custom':
-        return (
-          <div
-            ref={emojiPickerRef}
-            className={`context-menu-container ${emoji['emojiGrid']}`}
-            style={{
-              left: pickerX,
-              top: pickerY,
-            }}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
-            {emojis.map((e: Emoji) => (
-              <div
-                key={e.id}
-                className={emoji['emoji']}
-                style={{
-                  backgroundImage: `url(${e.path})`,
-                }}
-                onClick={() => {
-                  onEmojiSelect?.(e.char);
-                }}
-              />
-            ))}
-          </div>
-        );
+    console.log(emojis);
 
-      case 'unicode':
-        return (
+    return (
+      <div
+        ref={emojiPickerRef}
+        className={`context-menu-container ${emoji['emojiGrid']}`}
+        style={{
+          left: pickerX,
+          top: pickerY,
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        {emojis.map((e: Emoji) => (
           <div
-            ref={emojiPickerRef}
-            className={`context-menu-container ${emoji['emojiGrid']}`}
+            key={e.id}
+            className={emoji['emoji']}
             style={{
-              left: pickerX,
-              top: pickerY,
+              backgroundImage: `url(${e.path})`,
             }}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            onClick={() => {
+              onEmojiSelect?.(e.char);
             }}
-          >
-            {unicodeEmojis.map((e: Emoji) => (
-              <div
-                key={e.id}
-                className={emoji['emoji']}
-                style={{
-                  backgroundImage: `url(${e.path})`,
-                }}
-                onClick={() => {
-                  onEmojiSelect?.(e.char);
-                }}
-              />
-            ))}
-          </div>
-        );
-    }
+          />
+        ))}
+      </div>
+    );
   },
 );
 

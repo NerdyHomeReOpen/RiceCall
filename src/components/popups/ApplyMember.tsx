@@ -16,8 +16,8 @@ import { useSocket } from '@/providers/Socket';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
-import refreshService from '@/services/refresh.service';
+import Default from '@/utils/default';
+import getService from '@/services/get.service';
 
 interface ApplyMemberPopupProps {
   serverId: Server['serverId'];
@@ -35,9 +35,9 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
 
     // State
     const [section, setSection] = useState<number>(0);
-    const [server, setServer] = useState<Server>(createDefault.server());
+    const [server, setServer] = useState<Server>(Default.server());
     const [memberApplication, setMemberApplication] =
-      useState<MemberApplication>(createDefault.memberApplication());
+      useState<MemberApplication>(Default.memberApplication());
 
     // Variables
     const {
@@ -83,10 +83,10 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.server({
+          getService.server({
             serverId: serverId,
           }),
-          refreshService.memberApplication({
+          getService.memberApplication({
             userId: userId,
             serverId: serverId,
           }),
@@ -186,45 +186,41 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(
           {/* Body */}
           <div className={popup['popupBody']}>
             <div className={setting['body']}>
-              <div className={setting['body']}>
-                <div className={popup['col']}>
-                  <div className={popup['row']}>
-                    <div className={applyMember['avatarWrapper']}>
-                      <div
-                        className={applyMember['avatarPicture']}
-                        style={{ backgroundImage: `url(${serverAvatarUrl})` }}
-                      />
-                    </div>
-                    <div className={applyMember['infoWrapper']}>
-                      <div className={applyMember['mainText']}>
-                        {serverName}
-                      </div>
-                      <div className={applyMember['subText']}>
-                        {`ID: ${serverDisplayId}`}
-                      </div>
+              <div className={popup['col']}>
+                <div className={popup['row']}>
+                  <div className={applyMember['avatarWrapper']}>
+                    <div
+                      className={applyMember['avatarPicture']}
+                      style={{ backgroundImage: `url(${serverAvatarUrl})` }}
+                    />
+                  </div>
+                  <div className={applyMember['infoWrapper']}>
+                    <div className={applyMember['mainText']}>{serverName}</div>
+                    <div className={applyMember['subText']}>
+                      {`ID: ${serverDisplayId}`}
                     </div>
                   </div>
-                  <div className={`${popup['inputBox']} ${popup['col']}`}>
-                    <div>{lang.tr.serverApplyNotice}</div>
-                    <div className={popup['hint']}>
-                      {serverApplyNotice || lang.tr.none}
-                    </div>
-                  </div>
-                  <div className={applyMember['split']} />
-                  <p className={popup['hint']}>{lang.tr.applySuccess}</p>
                 </div>
+                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                  <div>{lang.tr.serverApplyNotice}</div>
+                  <div className={popup['hint']}>
+                    {serverApplyNotice || lang.tr.none}
+                  </div>
+                </div>
+                <div className={applyMember['split']} />
+                <p className={popup['hint']}>{lang.tr.applySuccess}</p>
               </div>
             </div>
+          </div>
 
-            {/* Footer */}
-            <div className={popup['popupFooter']}>
-              <button className={popup['button']} onClick={() => setSection(0)}>
-                {lang.tr.modify}
-              </button>
-              <button className={popup['button']} onClick={() => handleClose()}>
-                {lang.tr.confirm}
-              </button>
-            </div>
+          {/* Footer */}
+          <div className={popup['popupFooter']}>
+            <button className={popup['button']} onClick={() => setSection(0)}>
+              {lang.tr.modify}
+            </button>
+            <button className={popup['button']} onClick={() => handleClose()}>
+              {lang.tr.confirm}
+            </button>
           </div>
         </div>
       </>

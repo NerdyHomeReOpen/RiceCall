@@ -60,6 +60,7 @@ body,
 
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -157,4 +158,10 @@ form {
 
 .hljs {
   line-height: 1.25rem;
+}
+
+*:disabled,
+.disabled {
+  filter: grayscale(100%);
+  cursor: not-allowed;
 }

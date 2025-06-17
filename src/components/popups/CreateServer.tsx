@@ -15,10 +15,10 @@ import { useLanguage } from '@/providers/Language';
 // Services
 import ipcService from '@/services/ipc.service';
 import apiService from '@/services/api.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface CreateServerPopupProps {
   userId: User['userId'];
@@ -50,10 +50,11 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
     ];
 
     // States
-    const [user, setUser] = useState<User>(createDefault.user());
+    const [user, setUser] = useState<User>(Default.user());
     const [servers, setServers] = useState<UserServer[]>([]);
-    const [server, setServer] = useState<Server>(createDefault.server());
+    const [server, setServer] = useState<Server>(Default.server());
     const [section, setSection] = useState<number>(0);
+    const [reloadAvatarKey, setReloadAvatarKey] = useState<number>(0);
 
     // Variables
     const { level: userLevel } = user;
@@ -101,10 +102,10 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.user({
+          getService.user({
             userId: userId,
           }),
-          refreshService.userServers({
+          getService.userServers({
             userId: userId,
           }),
         ]).then(([user, servers]) => {
@@ -190,8 +191,11 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
               <div className={popup['inputGroup']}>
                 <div className={createServer['avatarWrapper']}>
                   <div
+                    key={reloadAvatarKey}
                     className={createServer['avatarPicture']}
-                    style={{ backgroundImage: `url(${serverAvatarUrl})` }}
+                    style={{
+                      backgroundImage: `url(${serverAvatarUrl}?v=${reloadAvatarKey})`,
+                    }}
                   />
                   <input
                     name="avatar"
@@ -220,6 +224,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(
                             avatar: data.avatar,
                             avatarUrl: data.avatarUrl,
                           }));
+                          setReloadAvatarKey((prev) => prev + 1);
                         }
                       };
                       reader.readAsDataURL(file);

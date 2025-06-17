@@ -455,13 +455,13 @@ export type User = {
   country: string;
   level: number;
   vip: number;
+  vxp: number; // New: VIP Experience Points
   xp: number;
   requiredXp: number;
-  // progress: number; (Not used but still in database column)
   birthYear: number;
   birthMonth: number;
   birthDay: number;
-  status: 'online' | 'dnd' | 'idle' | 'gn';
+  status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
   gender: 'Male' | 'Female';
   currentChannelId: string;
   currentServerId: string;
@@ -516,11 +516,10 @@ export type Server = {
   level: number;
   wealth: number;
   receiveApply: boolean;
-  // allowDirectMessage: boolean; (Not used but still in database column)
   type: 'game' | 'entertainment' | 'other';
   visibility: 'public' | 'private' | 'invisible';
   lobbyId: string;
-  receptionLobbyId: string | null; // New: Reception Lobby ID
+  receptionLobbyId: string | null;
   ownerId: string;
   createdAt: number;
 };
@@ -528,7 +527,7 @@ export type Server = {
 export type BaseChannel = {
   channelId: string;
   name: string;
-  announcement: string; // New:
+  announcement: string;
   password: string;
   order: number;
   bitrate: number;
@@ -536,9 +535,7 @@ export type BaseChannel = {
   guestTextGapTime: number;
   guestTextWaitTime: number;
   guestTextMaxLength: number;
-  // isRoot: boolean; (Not used but still in database column)
   isLobby: boolean;
-  // slowmode: boolean; (Not used but still in database column)
   forbidText: boolean;
   forbidGuestText: boolean;
   forbidGuestUrl: boolean;
@@ -586,51 +583,28 @@ export type MemberApplication = User & {
 
 export type Message = {
   // Change name to BaseMessage
-  messageId: string;
+  parameter: Record<string, string>;
+  contentMetadata: Record<string, string>;
   content: string;
-  type: 'general' | 'info' | 'warn' | 'event' | 'dm';
+  type: 'general' | 'info' | 'warn' | 'event' | 'alert' | 'dm';
   timestamp: number;
 };
 
-export type ChannelMessage = Message & {
-    sender: ServerMember;
-    receiver: ServerMember;
-    serverId: string;
-    channelId: string | null;
+export type ChannelMessage = Message &
+  ServerMember & {
     type: 'general';
   };
 
 export type DirectMessage = Message &
   UserFriend & {
-    senderId: string;
+    type: 'dm';
     user1Id: string;
     user2Id: string;
-    type: 'dm';
   };
 
-export type InfoMessage = Message & {
-  sender: ServerMember;
-  receiver: ServerMember;
-  serverId: string;
-  channelId: string | null;
-  type: 'info';
+export type PromptMessage = Message & {
+  type: 'alert' | 'info' | 'warn' | 'event';
 };
-
-export type WarnMessage = Message & {
-  sender: ServerMember;
-  receiver: ServerMember;
-  serverId: string;
-  channelId: string | null;
-  type: 'warn';
-};
-
-export type EventMessage = Message & {
-  sender: ServerMember;
-  receiver: ServerMember;
-  serverId: string;
-  channelId: string | null;
-  type: 'event';
-}
 
 export type UserServerStatus = {
   recent: boolean;
@@ -681,18 +655,18 @@ export type DiscordPresence = {
 export enum SocketClientEvent {
   // User
   SEARCH_USER = 'searchUser',
-  UPDATE_USER = 'updateUser',
+  EDIT_USER = 'editUser',
   // Friend Group
   CREATE_FRIEND_GROUP = 'createFriendGroup',
-  UPDATE_FRIEND_GROUP = 'updateFriendGroup',
+  EDIT_FRIEND_GROUP = 'editFriendGroup',
   DELETE_FRIEND_GROUP = 'deleteFriendGroup',
   // Friend
   CREATE_FRIEND = 'createFriend',
-  UPDATE_FRIEND = 'updateFriend',
+  EDIT_FRIEND = 'editFriend',
   DELETE_FRIEND = 'deleteFriend',
   // Friend Application
   CREATE_FRIEND_APPLICATION = 'createFriendApplication',
-  UPDATE_FRIEND_APPLICATION = 'updateFriendApplication',
+  EDIT_FRIEND_APPLICATION = 'editFriendApplication',
   DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
   APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
   // Server
@@ -701,28 +675,29 @@ export enum SocketClientEvent {
   CONNECT_SERVER = 'connectServer',
   DISCONNECT_SERVER = 'disconnectServer',
   CREATE_SERVER = 'createServer',
-  UPDATE_SERVER = 'updateServer',
+  EDIT_SERVER = 'editServer',
   DELETE_SERVER = 'deleteServer',
   // Channel
   CONNECT_CHANNEL = 'connectChannel',
   DISCONNECT_CHANNEL = 'disconnectChannel',
   CREATE_CHANNEL = 'createChannel',
-  UPDATE_CHANNEL = 'updateChannel',
-  UPDATE_CHANNELS = 'updateChannels',
+  EDIT_CHANNEL = 'editChannel',
+  EDIT_CHANNELS = 'editChannels',
   DELETE_CHANNEL = 'deleteChannel',
   // Member
   CREATE_MEMBER = 'createMember',
-  UPDATE_MEMBER = 'updateMember',
+  EDIT_MEMBER = 'editMember',
   DELETE_MEMBER = 'deleteMember',
   // Member Application
   CREATE_MEMBER_APPLICATION = 'createMemberApplication',
-  UPDATE_MEMBER_APPLICATION = 'updateMemberApplication',
+  EDIT_MEMBER_APPLICATION = 'editMemberApplication',
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
   APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
   // Message
-  SEND_MESSAGE = 'message',
-  SEND_DIRECT_MESSAGE = 'directMessage',
-  SEND_SHAKE_WINDOW = 'shakeWindow',
+  CHANNEL_MESSAGE = 'channelMessage',
+  ACTION_MESSAGE = 'actionMessage',
+  DIRECT_MESSAGE = 'directMessage',
+  SHAKE_WINDOW = 'shakeWindow',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
@@ -741,46 +716,47 @@ export enum SocketServerEvent {
   FRIEND_GROUPS_SET = 'friendGroupsSet',
   FRIEND_GROUP_ADD = 'friendGroupAdd',
   FRIEND_GROUP_UPDATE = 'friendGroupUpdate',
-  FRIEND_GROUP_DELETE = 'friendGroupDelete',
+  FRIEND_GROUP_REMOVE = 'friendGroupRemove',
   // Friend
   FRIENDS_SET = 'friendsSet',
   FRIEND_ADD = 'friendAdd',
   FRIEND_UPDATE = 'friendUpdate',
-  FRIEND_DELETE = 'friendDelete',
+  FRIEND_REMOVE = 'friendRemove',
   // Friend Application
   FRIEND_APPLICATIONS_SET = 'friendApplicationsSet',
   FRIEND_APPLICATION_ADD = 'friendApplicationAdd',
   FRIEND_APPLICATION_UPDATE = 'friendApplicationUpdate',
-  FRIEND_APPLICATION_DELETE = 'friendApplicationDelete',
+  FRIEND_APPLICATION_REMOVE = 'friendApplicationRemove',
   // Server
   SERVER_SEARCH = 'serverSearch',
   SERVERS_SET = 'serversSet',
   SERVER_ADD = 'serverAdd',
   SERVER_UPDATE = 'serverUpdate',
-  SERVER_DELETE = 'serverDelete',
+  SERVER_REMOVE = 'serverRemove',
   // Channel
   SERVER_CHANNELS_SET = 'serverChannelsSet',
   SERVER_CHANNEL_ADD = 'serverChannelAdd',
   SERVER_CHANNEL_UPDATE = 'serverChannelUpdate',
-  SERVER_CHANNEL_DELETE = 'serverChannelDelete',
+  SERVER_CHANNEL_REMOVE = 'serverChannelRemove',
   // Member
   SERVER_MEMBERS_SET = 'serverMembersSet',
   SERVER_MEMBER_ADD = 'serverMemberAdd',
   SERVER_MEMBER_UPDATE = 'serverMemberUpdate',
-  SERVER_MEMBER_DELETE = 'serverMemberDelete',
+  SERVER_MEMBER_REMOVE = 'serverMemberRemove',
   SERVER_ONLINE_MEMBERS_SET = 'serverOnlineMembersSet',
   SERVER_ONLINE_MEMBER_ADD = 'serverOnlineMemberAdd',
-  SERVER_ONLINE_MEMBER_DELETE = 'serverOnlineMemberDelete',
+  SERVER_ONLINE_MEMBER_REMOVE = 'serverOnlineMemberRemove',
   // Member Application
   SERVER_MEMBER_APPLICATIONS_SET = 'serverMemberApplicationsSet',
   SERVER_MEMBER_APPLICATION_ADD = 'serverMemberApplicationAdd',
   SERVER_MEMBER_APPLICATION_UPDATE = 'serverMemberApplicationUpdate',
-  SERVER_MEMBER_APPLICATION_DELETE = 'serverMemberApplicationDelete',
+  SERVER_MEMBER_APPLICATION_REMOVE = 'serverMemberApplicationRemove',
   MEMBER_APPROVAL = 'memberApproval',
   // Message
-  ON_MESSAGE = 'onMessage',
-  ON_DIRECT_MESSAGE = 'onDirectMessage',
-  ON_SHAKE_WINDOW = 'onShakeWindow',
+  CHANNEL_MESSAGE = 'channelMessage',
+  ACTION_MESSAGE = 'actionMessage',
+  DIRECT_MESSAGE = 'directMessage',
+  SHAKE_WINDOW = 'shakeWindow',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
@@ -801,6 +777,8 @@ export enum PopupType {
   CHANNEL_SETTING = 'channelSetting',
   CHANNEL_PASSWORD = 'channelPassword',
   SERVER_SETTING = 'serverSetting',
+  SERVER_BROADCAST = 'serverBroadcast',
+  BLOCK_MEMBER = 'blockMember',
   SYSTEM_SETTING = 'systemSetting',
   MEMBERAPPLY_SETTING = 'memberApplySetting',
   CREATE_SERVER = 'createServer',
@@ -825,37 +803,3 @@ export enum PopupType {
   ABOUTUS = 'aboutus',
   FRIEND_VERIFICATION = 'friendVerification',
 }
-
-export const PopupSize = {
-  [PopupType.USER_INFO]: { height: 630, width: 440 },
-  [PopupType.USER_SETTING]: { height: 700, width: 500 },
-  [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
-  [PopupType.CHANNEL_PASSWORD]: { height: 200, width: 370 },
-  [PopupType.SERVER_SETTING]: { height: 520, width: 600 },
-  [PopupType.SYSTEM_SETTING]: { height: 520, width: 600 },
-  [PopupType.MEMBERAPPLY_SETTING]: { height: 200, width: 370 },
-  [PopupType.CREATE_SERVER]: { height: 436, width: 478 },
-  [PopupType.CREATE_CHANNEL]: { height: 200, width: 370 },
-  [PopupType.CREATE_FRIENDGROUP]: { height: 200, width: 370 },
-  [PopupType.EDIT_CHANNEL_ORDER]: { height: 550, width: 500 },
-  [PopupType.EDIT_CHANNEL_NAME]: { height: 200, width: 370 },
-  [PopupType.EDIT_NICKNAME]: { height: 200, width: 370 },
-  [PopupType.EDIT_FRIENDGROUP]: { height: 200, width: 370 },
-  [PopupType.EDIT_FRIEND]: { height: 200, width: 370 },
-  [PopupType.APPLY_FRIEND]: { height: 320, width: 500 },
-  [PopupType.APPLY_MEMBER]: { height: 320, width: 500 },
-  [PopupType.SEARCH_USER]: { height: 200, width: 370 },
-  [PopupType.DIRECT_MESSAGE]: { height: 550, width: 650 },
-  [PopupType.DIALOG_ALERT]: { height: 200, width: 370 },
-  [PopupType.DIALOG_ALERT2]: { height: 200, width: 370 },
-  [PopupType.DIALOG_SUCCESS]: { height: 200, width: 370 },
-  [PopupType.DIALOG_WARNING]: { height: 200, width: 370 },
-  [PopupType.DIALOG_ERROR]: { height: 200, width: 370 },
-  [PopupType.DIALOG_INFO]: { height: 200, width: 370 },
-  [PopupType.CHANGE_THEME]: { height: 340, width: 480 },
-  [PopupType.ABOUTUS]: { height: 440, width: 480 },
-  [PopupType.FRIEND_VERIFICATION]: { height: 320, width: 500 },
-  Settings: { height: 520, width: 600 },
-  Apply: { height: 320, width: 500 },
-  Small: { height: 200, width: 370 },
-};

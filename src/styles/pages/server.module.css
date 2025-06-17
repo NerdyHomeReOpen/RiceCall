@@ -119,6 +119,10 @@
   align-items: center;
 }
 
+.memberText {
+  min-width: 55px;
+}
+
 .idText:before {
   content: '';
   min-height: 12px;
@@ -175,6 +179,7 @@
   min-height: 16px;
   min-width: 24px;
   cursor: pointer;
+  position: relative;
   background-image: url('../../../public/channel/icon_group_option.png');
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -451,9 +456,45 @@
   overflow-y: auto;
 }
 
+.broadcastArea {
+  position: absolute;
+  right: 0;
+  left: 0;
+  bottom: 6rem;
+  display: flex;
+  min-height: 25px;
+  align-items: center;
+  background-color: #fefee4;
+  justify-content: center;
+  border: solid 1.5px #f9c55d;
+  border-radius: 2px;
+  margin: 0 0.75rem;
+  padding: 1px 5px;
+}
+
+.broadcastArea .broadcastContent {
+  flex: 5;
+  display: flex;
+}
+
+.broadcastArea .broadcastClose {
+  z-index: 2;
+  min-width: 12px;
+  min-height: 12px;
+  position: relative;
+  border-radius: 50%;
+  background-color: #f9c55d;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
 /* Input Area */
 
 .inputArea {
+  position: relative;
   display: flex;
   min-height: 80px;
   padding: 0.75rem;
@@ -798,24 +839,13 @@
 
 .bottomNav {
   display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
   border-top: 2px solid #e2e8f0;
 }
 
-.bottomNav:has(.navItem:last-child.active)::before {
-  left: calc(75% - 60px);
-}
-
-.navItemLeft {
-  justify-content: flex-end !important;
-}
-
-.navItemRight {
-  justify-content: flex-start !important;
-}
-
-.navItemLeft.active:after,
-.navItemRight.active:after {
+.navItem.active:after {
   content: '';
   position: absolute;
   min-height: 20px;
@@ -828,16 +858,7 @@
   background-position: 0 0;
 }
 
-.navItemLeft:after {
-  right: 10px;
-}
-
-.navItemRight:after {
-  left: 10px;
-}
-
 .navItem {
-  flex: 1;
   padding: 8px;
   text-align: center;
   cursor: pointer;

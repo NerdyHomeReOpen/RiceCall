@@ -20,19 +20,21 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  width: 226px;
-  height: 54px;
-  margin: 2rem 0rem 0.5rem 0rem;
+  min-width: 226px;
+  min-height: 54px;
+  align-self: center;
 }
 
 .contentBox {
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: start;
+  justify-content: flex-start;
+  align-items: flex-start;
   width: 100%;
-  padding: 0.5rem 2rem;
-  text-align: start;
+  padding: 20px;
+  text-align: flex-start;
+  overflow: hidden;
+  gap: 10px;
 }
 
 .appInfo {
@@ -51,11 +53,11 @@
 
 .appInfoVersion {
   font-weight: bold;
-  padding-bottom: 0.5rem;
+  padding-bottom: 5px;
 }
 
 .appInfoCopyright {
-  padding-bottom: 0.5rem;
+  padding-bottom: 5px;
 }
 
 .websiteLink {
@@ -71,12 +73,12 @@
 }
 
 .teamMembers {
-  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 10px;
   border: 1px solid #cccccc;
-  padding: 0.5rem 0.5rem;
-  height: 160px;
-  width: 418px;
-  box-shadow: inset 0 1px 2px #00000026;
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
   overflow-y: scroll;
 }
 

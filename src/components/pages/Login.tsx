@@ -26,6 +26,8 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
 
   // Refs
   const comboRef = useRef<HTMLDivElement>(null);
+  const rememberAccountRef = useRef<HTMLInputElement>(null);
+  const autoLoginRef = useRef<HTMLInputElement>(null);
 
   // States
   const [formData, setFormData] = useState<FormDatas>({
@@ -206,16 +208,9 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                 </div>
               </div>
               <div className={styles['checkWrapper']}>
-                <div
-                  className={styles['checkBox']}
-                  onClick={() => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      rememberAccount: !prev.rememberAccount,
-                    }));
-                  }}
-                >
+                <div className={styles['checkBox']}>
                   <input
+                    ref={rememberAccountRef}
                     type="checkbox"
                     name="rememberAccount"
                     checked={formData.rememberAccount}
@@ -225,16 +220,9 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                   />
                   {lang.tr.rememberAccount}
                 </div>
-                <div
-                  className={styles['checkBox']}
-                  onClick={() => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      autoLogin: !prev.autoLogin,
-                    }));
-                  }}
-                >
+                <div className={styles['checkBox']}>
                   <input
+                    ref={autoLoginRef}
                     type="checkbox"
                     name="autoLogin"
                     checked={formData.autoLogin}

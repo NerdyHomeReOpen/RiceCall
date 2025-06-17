@@ -9,8 +9,6 @@
   </div>
 </div>
 
-This project is tested with BrowserStack
-
 ## v0.1.10 更新日誌 (Change Log)
 
 - 新增主題系統
@@ -19,32 +17,32 @@ This project is tested with BrowserStack
 - 修正錯誤文本內容
 - 調整主頁伺服器卡片大小
 - 調整各種介面樣式及行為
+- 
+## 常見問題 (FAQ)
+
+### Q: 我卡在轉圈圈畫面怎麼辦
+
+A: 請從右上角選單 -> 登出，然後再登入一次
+
+### Q: 我沒辦法加入伺服器
+
+A: 請從右上角選單 -> 登出，然後再登入一次
+
+### Q: 我語音一直沒聲音
+
+A: 如果你正在使用學校、公司等網路，可能會導致連線不到，請換一個網路連線，目前還沒有根除方法
+
+### Q: 我開機自動啟動後沒有連線
+
+A: 重新啟動應用程式再試一次
+
+### Q: 我的問題不在以上的內容中
+
+A: 請加入我們的 [Discord](https://discord.gg/adCWzv6wwS) 伺服器或至 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面詳細描述你所遇到的問題
 
 ## 安裝方法
 
 請至 [下載點](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest)，先閱讀過說明文件後再開始下載
-
-## 常見問題 (FAQ)
-
-### :question: Q: 我卡在轉圈圈畫面怎麼辦
-
-:white_check_mark: A: 請從右上角選單 -> 登出，然後再登入一次
-
-### :question: Q: 我沒辦法加入伺服器
-
-:white_check_mark: A: 請從右上角選單 -> 登出，然後再登入一次
-
-### :question: Q: 我語音一直沒聲音
-
-:white_check_mark: A: 如果你正在使用學校、公司等網路，可能會導致連線不到，請換一個網路連線，目前還沒有根除方法
-
-### :question: Q: 我開機自動啟動後沒有連線
-
-:white_check_mark: A: 重新啟動應用程式再試一次
-
-### :question: Q: 我的問題不在以上的內容中
-
-:white_check_mark: A: 請加入我們的 [Discord](https://discord.gg/adCWzv6wwS) 伺服器或至 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面詳細描述你所遇到的問題
 
 ## 技術架構 (Tech Stack)
 
@@ -58,7 +56,7 @@ This project is tested with BrowserStack
 我們歡迎所有開發者參與 RiceCall 的開發！你可以透過以下方式貢獻：
 
 - 至[此表單](https://forms.gle/ZowwAS22dGpKkGcZ8)填寫幫助意願 (記得先加入我們的 [Discord](https://discord.gg/adCWzv6wwS)，若我們需要你的幫忙會給予你身份組)
-- Fork 此專案，進行修改後提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)
+- 若想直接新增功能，可以 Fork 此專案，進行修改後提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)
 - 回報 Bug 或提出新功能建議，請到 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面
 
 ## 專案架構 (Framework)
@@ -103,6 +101,7 @@ yarn install
 
 ```env
 NEXT_PUBLIC_SERVER_URL=你的伺服器公開網址
+NEXT_PUBLIC_SERVER_URL_SECONDARY=備援網址(使用中華電信網路將會使用該網址，若無則設定和 NEXT_PUBLIC_SERVER_URL 相同)
 ```
 
 3. 啟動 Client (Development)
@@ -113,7 +112,7 @@ yarn electron-dev
 
 客戶端即會運行於本地電腦上
 
-> [客戶端](localhost:3000) (localhost:3000)
+> http://localhost:3000
 
 ## 免責聲明 (Disclaimer)
 

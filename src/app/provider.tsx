@@ -8,6 +8,7 @@ import ContextMenuProvider from '@/providers/ContextMenu';
 import LanguageProvider from '@/providers/Language';
 import MainTabProvider from '@/providers/MainTab';
 import ThemeProvider from '@/providers/Theme';
+import LoadingProvider from '@/providers/Loading';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -19,7 +20,9 @@ const Providers = ({ children }: ProvidersProps) => {
       <LanguageProvider>
         <SocketProvider>
           <MainTabProvider>
-            <ContextMenuProvider>{children}</ContextMenuProvider>
+            <LoadingProvider>
+              <ContextMenuProvider>{children}</ContextMenuProvider>
+            </LoadingProvider>
           </MainTabProvider>
         </SocketProvider>
       </LanguageProvider>

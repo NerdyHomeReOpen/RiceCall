@@ -10,16 +10,17 @@ import React, {
 import { Server, User, UserServer, PopupType, Friend } from '@/types';
 
 // Components
-import BadgeListViewer from '@/components/viewers/BadgeList';
+import BadgeListViewer from '@/components/BadgeList';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
 import { useContextMenu } from '@/providers/ContextMenu';
+// import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 import apiService from '@/services/api.service';
 
 // CSS
@@ -31,7 +32,7 @@ import permission from '@/styles/permission.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 interface UserSettingPopupProps {
   userId: User['userId'];
@@ -44,6 +45,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const socket = useSocket();
     const lang = useLanguage();
     const contextMenu = useContextMenu();
+    // const loadingBox = useLoading();
 
     // Refs
     const refreshRef = useRef(false);
@@ -58,18 +60,19 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const CURRENT_DAY = TODAY.getDate();
 
     // States
-    const [user, setUser] = useState<User>(createDefault.user());
-    const [friend, setFriend] = useState<Friend>(createDefault.friend());
+    const [user, setUser] = useState<User>(Default.user());
+    const [friend, setFriend] = useState<Friend>(Default.friend());
     const [servers, setServers] = useState<UserServer[]>([]);
     const [serversView, setServersView] = useState('joined');
     const [selectedTabId, setSelectedTabId] = useState<
       'about' | 'groups' | 'userSetting'
     >('about');
+    const [reloadAvatarKey, setReloadAvatarKey] = useState(0);
 
     // Variables
     const {
       name: userName,
-      avatar: userAvatar,
+      // avatar: userAvatar,
       avatarUrl: userAvatarUrl,
       gender: userGender,
       signature: userSignature,
@@ -82,6 +85,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       birthDay: userBirthDay,
       country: userCountry,
       badges: userBadges,
+      currentServerId: userCurrentServerId,
     } = user;
     const isSelf = targetId === userId;
     const isFriend = !!friend.targetId;
@@ -164,10 +168,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     );
 
     // Handlers
-    const handleUpdateUser = (user: Partial<User>) => {
+    const handleEditUser = (user: Partial<User>) => {
       if (!socket) return;
-
-      socket.send.updateUser({ user, userId });
+      socket.send.editUser({ user, userId });
     };
 
     const handleOpenApplyFriend = (
@@ -189,23 +192,25 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       ipcService.window.close();
     };
 
-    const handleServerSelect = (userId: User['userId'], server: Server) => {
+    const handleServerSelect = (
+      serverId: Server['serverId'],
+      serverDisplayId: Server['displayId'],
+    ) => {
       if (isSelectingRef.current || isLoading.current || isSelectingRef.current)
         return;
       isSelectingRef.current = true;
       setTimeout(() => {
         isSelectingRef.current = false;
       }, 3000);
+
       window.localStorage.setItem(
         'trigger-handle-server-select',
         JSON.stringify({
-          serverDisplayId: server.displayId,
+          serverDisplayId,
+          serverId,
           timestamp: Date.now(),
         }),
       );
-      setTimeout(() => {
-        socket.send.connectServer({ userId, serverId: server.serverId });
-      }, 1500);
     };
 
     // Effects
@@ -214,13 +219,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.user({
+          getService.user({
             userId: targetId,
           }),
-          refreshService.userServers({
+          getService.userServers({
             userId: targetId,
           }),
-          refreshService.friend({
+          getService.friend({
             userId: userId,
             targetId: targetId,
           }),
@@ -237,7 +242,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
         });
       };
       refresh();
-    }, [userId, targetId]);
+    }, [userId, targetId, userCurrentServerId]);
 
     useEffect(() => {
       const daysInMonth = new Date(userBirthYear, userBirthMonth, 0).getDate();
@@ -286,7 +291,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
               className={`${setting['avatar']} ${
                 isSelf ? setting['editable'] : ''
               }`}
-              style={{ backgroundImage: `url(${userAvatarUrl})` }}
+              style={{
+                backgroundImage: `url(${userAvatarUrl}?v=${reloadAvatarKey})`,
+              }}
               onClick={() => {
                 if (!isSelf) return;
                 const fileInput = document.createElement('input');
@@ -308,6 +315,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                         avatar: data.avatar,
                         avatarUrl: data.avatarUrl,
                       }));
+                      setReloadAvatarKey((prev) => prev + 1);
+                      handleEditUser({
+                        avatar: data.avatar,
+                        avatarUrl: data.avatarUrl,
+                      });
                     }
                   };
                   reader.readAsDataURL(file);
@@ -331,9 +343,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   ${grade['grade']} 
                   ${grade[`lv-${Math.min(56, userLevel)}`]}
                 `}
-                title={
-                  `${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${userRequiredXP}` /** LEVEL:{userLevel} EXP:{userXP} LEVEL UP REQUIRED:{userRequiredXP}**/
-                }
+                title={`${lang.tr.level}：${userLevel}，${
+                  lang.tr.xp
+                }：${userXP}，${lang.tr.xpDifference}：${
+                  userRequiredXP - userXP
+                }`}
               />
             </div>
 
@@ -402,9 +416,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                   disabled={!canSubmit}
                   onClick={() => {
                     if (!canSubmit) return;
-                    handleUpdateUser({
-                      avatar: userAvatar,
-                      avatarUrl: userAvatarUrl,
+                    handleEditUser({
                       name: userName,
                       gender: userGender,
                       country: userCountry,
@@ -467,7 +479,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
-                        onClick={() => handleServerSelect(userId, server)}
+                        onClick={() =>
+                          handleServerSelect(server.serverId, server.displayId)
+                        }
                       >
                         <div
                           className={setting['serverAvatarPicture']}
@@ -542,7 +556,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
-                        onClick={() => handleServerSelect(userId, server)}
+                        onClick={() =>
+                          handleServerSelect(server.serverId, server.displayId)
+                        }
                       >
                         <div
                           className={setting['serverAvatarPicture']}
@@ -596,7 +612,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
                       <div
                         key={server.serverId}
                         className={setting['serverItem']}
-                        onClick={() => handleServerSelect(userId, server)}
+                        onClick={() =>
+                          handleServerSelect(server.serverId, server.displayId)
+                        }
                       >
                         <div
                           className={setting['serverAvatarPicture']}

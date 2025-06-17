@@ -4,20 +4,30 @@
   flex-direction: column;
   min-width: 0;
   max-width: 100%;
-  gap: 0.25rem;
+  margin-top: 0.125rem;
+  gap: 0.125rem;
 }
 
 .messageWrapper {
   display: flex;
   flex-direction: row;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
-.senderIcon {
+.gradeIcon {
   display: flex;
 }
 
 .infoIcon {
+  display: flex;
+  min-width: 12px;
+  min-height: 12px;
+  background-image: url('/channel/NT_NOTIFY.png');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.eventIcon {
   display: flex;
   min-width: 12px;
   min-height: 12px;
@@ -35,44 +45,60 @@
   background-position: center;
 }
 
-.messageEvent {
+.alertIcon {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 5px 0;
+  min-width: 12px;
+  min-height: 12px;
+  background-image: url('/channel/NT_ANNOUNCEMENT.png');
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .messageBox {
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-width: 0;
-  max-width: 100%;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
-.messageBox .header {
+.messageBox .username {
+  align-self: center;
+  color: #2f94db;
+}
+
+.infoBox {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.125rem;
+}
+
+.header {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
-.messageBox .header .name {
-  font-weight: bold;
+.header .username {
+  cursor: pointer;
+  color: #2f94db;
 }
 
-.messageBox .header .timestamp {
+.header:hover .username {
+  color: #226ba0;
+}
+
+.header .timestamp {
   margin-left: 0.2rem;
   color: #888;
   font-size: 12px;
 }
 
-.messageBox .content {
+.content {
   color: #000;
   user-select: text;
   word-break: break-all;
-}
-
-.username {
-  color: #2f94db;
 }

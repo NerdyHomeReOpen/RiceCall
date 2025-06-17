@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 // CSS
 import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
-import markdown from '@/styles/viewers/markdown.module.css';
+import markdown from '@/styles/markdown.module.css';
 
 // Types
 import { Channel, Server } from '@/types';
@@ -14,13 +14,13 @@ import { useSocket } from '@/providers/Socket';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Utils
-import { createDefault } from '@/utils/createDefault';
+import Default from '@/utils/default';
 
 // Components
-import MarkdownViewer from '@/components/viewers/Markdown';
+import MarkdownViewer from '@/components/MarkdownViewer';
 
 interface ChannelSettingPopupProps {
   serverId: Server['serverId'];
@@ -39,8 +39,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
     // States
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const [showPreview, setShowPreview] = useState<boolean>(false);
-    const [channel, setChannel] = useState<Channel>(createDefault.channel());
-    const [server, setServer] = useState<Server>(createDefault.server());
+    const [channel, setChannel] = useState<Channel>(Default.channel());
+    const [server, setServer] = useState<Server>(Default.server());
 
     // Variables
     const { lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } =
@@ -66,13 +66,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
     const canSubmit = channelName.trim();
 
     // Handlers
-    const handleUpdateChannel = (
+    const handleEditChannel = (
       channel: Partial<Channel>,
       channelId: Channel['channelId'],
       serverId: Server['serverId'],
     ) => {
       if (!socket) return;
-      socket.send.updateChannel({ channel, channelId, serverId });
+      socket.send.editChannel({ channel, channelId, serverId });
     };
 
     const handleClose = () => {
@@ -85,10 +85,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
       const refresh = async () => {
         refreshRef.current = true;
         Promise.all([
-          refreshService.channel({
+          getService.channel({
             channelId: channelId,
           }),
-          refreshService.server({
+          getService.server({
             serverId: serverId,
           }),
         ]).then(([channel, server]) => {
@@ -608,7 +608,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(
             disabled={!canSubmit}
             onClick={() => {
               if (!canSubmit) return;
-              handleUpdateChannel(
+              handleEditChannel(
                 {
                   name: channelName,
                   announcement: channelAnnouncement,

@@ -1,14 +1,14 @@
 .contextMenu:not(:empty) {
-  position: fixed;
   z-index: 1000;
+  position: fixed;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  min-width: 120px;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0 1px 1px #00000080;
-  min-width: 120px;
 }
 
 .contextMenu.hidden {
@@ -80,6 +80,10 @@
 .contextMenu .option[data-type='submenu']::before {
   background-image: url('../../public/ctrl/icon_submenu.png');
   transform: rotate(180deg);
+}
+
+.contextMenu .option[data-type='memberManagement']::before {
+  background-image: url('../../public/channel/icon_membermgr.png');
 }
 
 .contextMenu .option[data-type='memberapply']::before {

@@ -12,6 +12,8 @@ import { PopupType } from '@/types';
 // Components
 import UserSetting from '@/components/popups/UserSetting';
 import ServerSetting from '@/components/popups/ServerSetting';
+import ServerBroadcast from '@/components/popups/ServerBroadcast';
+import BlockMember from '@/components/popups/BlockMember';
 import ChannelSetting from '@/components/popups/ChannelSetting';
 import SystemSetting from '@/components/popups/SystemSetting';
 import ChannelPassword from '@/components/popups/ChannelPassword';
@@ -33,12 +35,9 @@ import ChangeTheme from '@/components/popups/ChangeTheme';
 import About from '@/components/popups/AboutUs';
 import FriendVerification from '@/components/popups/FriendVerification';
 
-// Utils
-import { emojiList, convertEmojiPlaceholderToHtml } from '@/utils/emoji';
-
 // Services
 import ipcService from '@/services/ipc.service';
-import refreshService from '@/services/refresh.service';
+import getService from '@/services/get.service';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -48,12 +47,9 @@ import directMessageStyles from '@/styles/popups/directMessage.module.css';
 
 const directMessageHeader = (targetSignature: string) => (
   <div className={directMessageStyles['header']}>
-    <div
-      className={directMessageStyles['userSignature']}
-      dangerouslySetInnerHTML={{
-        __html: convertEmojiPlaceholderToHtml(targetSignature || '', emojiList),
-      }}
-    />
+    <div className={directMessageStyles['userSignature']}>
+      {targetSignature}
+    </div>
     <div className={directMessageStyles['directOptionButtons']}>
       <div
         className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`}
@@ -199,7 +195,7 @@ const Popup = React.memo(() => {
       let isActive = true;
       setDirectMessageTargetSignature(null);
 
-      refreshService
+      getService
         .user({ userId: currentTargetId })
         .then((targetUser) => {
           if (isActive) {
@@ -249,6 +245,16 @@ const Popup = React.memo(() => {
         setHeaderTitle(lang.tr.editServer);
         setHeaderButtons(['close']);
         setContent(<ServerSetting {...popupInitialData} />);
+        break;
+      case PopupType.SERVER_BROADCAST:
+        setHeaderTitle('頻道廣播'); // TODO: lang.tr
+        setHeaderButtons(['close']);
+        setContent(<ServerBroadcast {...popupInitialData} />);
+        break;
+      case PopupType.BLOCK_MEMBER:
+        setHeaderTitle('封鎖'); // TODO: lang.tr
+        setHeaderButtons(['close']);
+        setContent(<BlockMember {...popupInitialData} />);
         break;
       case PopupType.CHANNEL_SETTING:
         setHeaderTitle(lang.tr.editChannel);

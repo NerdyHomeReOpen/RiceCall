@@ -9,6 +9,7 @@
   background-repeat: no-repeat;
   background-position: 0 20%;
   background-size: cover;
+  color: var(--secondary-color);
 }
 
 .popupHeader {
@@ -24,6 +25,9 @@
 
 .header .big {
   min-height: 40px;
+  min-width: 14rem;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .appIcon {
@@ -44,6 +48,7 @@
 .mainTabs,
 .buttons {
   -webkit-app-region: no-drag;
+  cursor: pointer;
 }
 
 /* Buttons */
@@ -224,9 +229,8 @@
 .mainTabs {
   display: flex;
   align-items: flex-end;
-  cursor: pointer;
-  width: auto;
   height: 43px;
+  margin-right: auto;
   margin-left: 0;
 }
 
@@ -513,4 +517,30 @@
 
 .statusDropdown .option[datatype='gn']::before {
   background-position: -39px 0;
+}
+
+/* Overlay */
+.overlay {
+    width: 24px;
+    height: 24px;
+    background: url('../../public/icon_notice_overlay.png') no-repeat center center;
+    background-position: 0 0;
+    cursor: pointer;
+    position: absolute;
+    background-size: cover;
+}
+/* 
+.overlay {
+  min-width: 24px;
+  min-height: 24px;
+  background-image: url('../../public/icon_notice_overlay.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+  display: inline-block;
+  cursor: pointer;
+} */
+
+.overlay.new {
+  background-position: -24px 0px;
 }

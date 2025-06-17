@@ -8,6 +8,14 @@
   background-position: 0 0;
 }
 
+.isVIP {
+  color: #e4493e /* #d16059 */ !important;
+}
+
+.isVIP.clickable:hover {
+  color: #9c3028 !important;
+}
+
 .vip-small-1 {
   background-position: 0 0;
 }
