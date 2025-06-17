@@ -21,6 +21,7 @@ import {
   UserFriend,
   ServerMember,
   ChannelMessage,
+  PromptMessage,
   FriendApplication,
 } from '@/types';
 
@@ -459,7 +460,7 @@ const RootPageComponent = () => {
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
   const [channel, setChannel] = useState<Channel>(Default.channel());
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
-  const [actionMessages, setActionMessages] = useState<ChannelMessage[]>([]);
+  const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
 
   // Variables
   const { userId } = user;
@@ -621,7 +622,7 @@ const RootPageComponent = () => {
     setChannelMessages((prev) => [...prev, ...channelMessages]);
   };
 
-  const handleActionMessage = (...actionMessages: ChannelMessage[]): void => {
+  const handleActionMessage = (...actionMessages: PromptMessage[]): void => {
     setActionMessages((prev) => [...prev, ...actionMessages]);
   };
 

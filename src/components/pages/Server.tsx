@@ -19,6 +19,7 @@ import {
   Channel,
   ServerMember,
   ChannelMessage,
+  PromptMessage,
   UserServer,
   UserFriend,
 } from '@/types';
@@ -40,7 +41,7 @@ interface ServerPageProps {
   friends: UserFriend[];
   currentChannel: Channel;
   channelMessages: ChannelMessage[];
-  actionMessages: ChannelMessage[];
+  actionMessages: PromptMessage[];
   display: boolean;
 }
 
