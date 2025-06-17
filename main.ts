@@ -951,7 +951,9 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('close-popup', (_, id) => {
-    popups[id]?.close();
+    if (popups[id] && !popups[id].isDestroyed()) {
+      popups[id].close();
+    }
   });
 
   ipcMain.on('close-all-popups', () => {
