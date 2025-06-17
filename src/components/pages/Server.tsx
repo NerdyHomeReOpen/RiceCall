@@ -305,7 +305,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               onMouseUp={() => setIsResizingAnnouncementArea(false)}
             />
             <div className={styles['messageArea']}>
-              <MessageViewer messages={channelMessages} />
+              <MessageViewer messages={channelMessages} userId={userId} />
             </div>
             <div className={styles['inputArea']}>
               <div
@@ -319,6 +319,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         ? [actionMessages[actionMessages.length - 1]]
                         : []
                     }
+                    userId={userId}
                   />
                 </div>
               </div>

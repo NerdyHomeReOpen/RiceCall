@@ -311,7 +311,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
               </div>
             )}
             <div className={directMessage['messageArea']}>
-              <MessageViewer messages={directMessages} />
+              <MessageViewer messages={directMessages} userId={userId} />
             </div>
             <div className={directMessage['inputArea']}>
               <div className={directMessage['topBar']}>

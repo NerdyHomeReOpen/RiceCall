@@ -63,6 +63,11 @@
   gap: 0.125rem;
 }
 
+.messageBox .username {
+  align-self: center;
+  color: #2f94db;
+}
+
 .infoBox {
   flex: 1;
   display: flex;
@@ -77,12 +82,13 @@
   gap: 0.125rem;
 }
 
-.header.event {
-  padding: 5px 0;
+.header .username {
+  cursor: pointer;  
+  color: #2f94db;
 }
 
-.header .name {
-  font-weight: bold;
+.header:hover .username {
+  color: #226ba0;
 }
 
 .header .timestamp {
@@ -95,9 +101,4 @@
   color: #000;
   user-select: text;
   word-break: break-all;
-}
-
-.username {
-  align-self: center;
-  color: #2f94db;
 }

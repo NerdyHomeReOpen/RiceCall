@@ -4,7 +4,7 @@ import React, { useLayoutEffect, useRef } from 'react';
 import styles from '@/styles/message.module.css';
 
 // Types
-import type { ChannelMessage, DirectMessage, PromptMessage } from '@/types';
+import type { User, ChannelMessage, DirectMessage, PromptMessage } from '@/types';
 
 // Components
 import DirectMessageTab from '@/components/DirectMessage';
@@ -18,11 +18,12 @@ type MessageGroup =
 
 interface MessageViewerProps {
   messages: (DirectMessage | ChannelMessage | PromptMessage)[];
+  userId: User['userId'];
   forbidGuestUrl?: boolean;
 }
 
 const MessageViewer: React.FC<MessageViewerProps> = React.memo(
-  ({ messages, forbidGuestUrl = false }) => {
+  ({ messages, userId, forbidGuestUrl = false }) => {
     // Variables
     const sortedMessages = [...messages].sort(
       (a, b) => a.timestamp - b.timestamp,
@@ -76,6 +77,7 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(
               {messageGroup.type === 'general' ? (
                 <ChannelMessageTab
                   messageGroup={messageGroup}
+                  userId={userId}
                   forbidGuestUrl={forbidGuestUrl}
                 />
               ) : messageGroup.type === 'dm' ? (
