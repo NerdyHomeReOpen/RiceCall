@@ -573,86 +573,6 @@ function connectSocket(token: string): Socket | null {
       socket.on(event, (...args) => {
         // console.log('socket.on', event, ...args);
         console.log('socket.on', event);
-
-        // // Catch open direct message popup
-        // if (event === SocketServerEvent.DIRECT_MESSAGE) {
-        //   const data = args[0];
-        //   if (!data) return;
-
-        //   const windowId = `directMessage-${data.userId}`;
-
-        //   if (popups[windowId] && !popups[windowId].isDestroyed()) {
-        //     popups[windowId].setAlwaysOnTop(true);
-        //     popups[windowId].setAlwaysOnTop(false);
-        //     popups[windowId].focus();
-        //     popups[windowId].webContents.send(
-        //       SocketServerEvent.DIRECT_MESSAGE,
-        //       ...args,
-        //     );
-        //   } else {
-        //     createPopup(PopupType.DIRECT_MESSAGE, windowId).then((window) => {
-        //       if (!window) return;
-
-        //       ipcMain.once('request-initial-data', async (_, to) => {
-        //         if (to === windowId) {
-        //           window.webContents.send('response-initial-data', windowId, {
-        //             userId: data.targetId,
-        //             targetId: data.userId,
-        //             targetName: data.name,
-        //           });
-        //           await new Promise((resolve) => setTimeout(resolve, 1000));
-        //           window.setAlwaysOnTop(true);
-        //           window.setAlwaysOnTop(false);
-        //           window.focus();
-        //           window.webContents.send(
-        //             SocketServerEvent.DIRECT_MESSAGE,
-        //             ...args,
-        //           );
-        //         }
-        //       });
-        //     });
-        //   }
-        // }
-
-        // if (event === SocketServerEvent.SHAKE_WINDOW) {
-        //   const data = args[0];
-        //   if (!data) return;
-
-        //   const windowId = `directMessage-${data.userId}`;
-
-        //   if (popups[windowId] && !popups[windowId].isDestroyed()) {
-        //     popups[windowId].setAlwaysOnTop(true);
-        //     popups[windowId].setAlwaysOnTop(false);
-        //     popups[windowId].focus();
-        //     popups[windowId].webContents.send(
-        //       SocketServerEvent.SHAKE_WINDOW,
-        //       ...args,
-        //     );
-        //   } else {
-        //     createPopup(PopupType.DIRECT_MESSAGE, windowId).then((window) => {
-        //       if (!window) return;
-
-        //       ipcMain.once('request-initial-data', async (_, to) => {
-        //         if (to === windowId) {
-        //           window.webContents.send('response-initial-data', windowId, {
-        //             userId: data.targetId,
-        //             targetId: data.userId,
-        //             targetName: data.name,
-        //           });
-        //           await new Promise((resolve) => setTimeout(resolve, 1000));
-        //           window.setAlwaysOnTop(true);
-        //           window.setAlwaysOnTop(false);
-        //           window.focus();
-        //           window.webContents.send(
-        //             SocketServerEvent.SHAKE_WINDOW,
-        //             ...args,
-        //           );
-        //         }
-        //       });
-        //     });
-        //   }
-        // }
-
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
@@ -1109,46 +1029,11 @@ async function handleDeepLink(url: string) {
   try {
     const { hostname } = new URL(url);
     switch (hostname) {
-      // 執行主程式 應該用不到 測試用的
-      // case 'run':
-      //   if (authWindow?.isDestroyed() === false) {
-      //     authWindow.show();
-      //     authWindow.focus();
-      //   } else if (mainWindow?.isDestroyed() === false) {
-      //     mainWindow.show();
-      //     mainWindow.focus();
-      //   } else {
-      //     (await createMainWindow()).show();
-      //   }
-      //   break;
       case 'join':
         const serverId = new URL(url).searchParams.get('serverId');
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send('deepLink', serverId);
         });
-        // // 如果已經登入才能發進群請求
-        // if (serverId && userId && socketInstance && socketInstance.connected) {
-        //   socketInstance.emit(SocketClientEvent.SEARCH_SERVER, {
-        //     query: serverId,
-        //   });
-        //   socketInstance.on(
-        //     SocketServerEvent.SERVER_SEARCH,
-        //     (serverInfoList) => {
-        //       // 對照DisplayId 如果找不到就不會進群也不會通知前端
-        //       const matchedServer = serverInfoList.find(
-        //         (server: any) => server.displayId === serverId,
-        //       );
-        //       if (matchedServer) {
-        //         mainWindow.show();
-        //         mainWindow.focus();
-        //         socketInstance?.emit(SocketClientEvent.CONNECT_SERVER, {
-        //           userId,
-        //           serverId: matchedServer.serverId,
-        //         });
-        //       }
-        //     },
-        //   );
-        // }
         break;
     }
   } catch (error) {
