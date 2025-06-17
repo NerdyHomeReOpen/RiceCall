@@ -28,11 +28,11 @@
 .contentBox {
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: start;
+  justify-content: flex-start;
+  align-items: flex-start;
   width: 100%;
   padding: 20px;
-  text-align: start;
+  text-align: flex-start;
   overflow: hidden;
   gap: 10px;
 }
