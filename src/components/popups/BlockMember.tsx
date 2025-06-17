@@ -65,6 +65,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
           : {
               isBlocked: -1,
               permissionLevel: 1,
+              nickname: null,
             };
 
       socket.send.editMember({

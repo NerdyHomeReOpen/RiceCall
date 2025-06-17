@@ -63,13 +63,13 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     }, loadingBox.loadingTimeStamp);
   };
 
-  const handleOpenWarningDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
-    ipcService.initialData.onRequest('warningDialog', {
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
+    ipcService.initialData.onRequest('alertDialog', {
       title: message,
-      submitTo: 'warningDialog',
+      submitTo: 'alertDialog',
     });
-    ipcService.popup.onSubmit('warningDialog', callback);
+    ipcService.popup.onSubmit('alertDialog', callback);
   };
 
   const handleEditMember = (
@@ -90,11 +90,18 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     serverId: Server['serverId'],
   ) => {
     if (!socket) return;
-    handleOpenWarningDialog(
-      '確定要解除自己與語音群的會員關係嗎', // lang.tr
+    handleOpenAlertDialog(
+      '確定要解除 自己 與語音群的會員關係嗎', // lang.tr
       () => {
-        handleEditMember({ permissionLevel: 1 }, userId, serverId);
-      },
+          handleEditMember(
+            {
+              permissionLevel: 1,
+              nickname: null,
+            },
+            userId,
+            serverId
+          );
+        },
     );
   };
 

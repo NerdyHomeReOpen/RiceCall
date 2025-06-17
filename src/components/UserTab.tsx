@@ -145,18 +145,36 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const handleKickServer = (
       userId: User['userId'],
       serverId: Server['serverId'],
+      userName: User['name'],
     ) => {
       if (!socket) return;
-      socket.send.disconnectServer({ userId, serverId });
+      handleOpenAlertDialog(
+        lang.getTranslatedMessage(
+          '確定要將 {userName} 踢出語音群嗎?', 
+          { userName: userName }
+        ),
+        () => {
+          socket.send.disconnectServer({ userId, serverId });
+        },
+      );
     };
 
     const handleKickChannel = (
       userId: User['userId'],
       channelId: Channel['channelId'],
       serverId: Server['serverId'],
+      userName: User['name'],
     ) => {
       if (!socket) return;
-      socket.send.disconnectChannel({ userId, channelId, serverId });
+      handleOpenAlertDialog(
+        lang.getTranslatedMessage(
+          '確定要將 {userName} 踢出頻道嗎?', 
+          { userName: userName }
+        ),
+        () => {
+          socket.send.disconnectChannel({ userId, channelId, serverId });
+        },
+      );
     };
 
     const handleEditMember = (
@@ -240,14 +258,25 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     };
 
     const handleRemoveMembership = (
-      userId: User['userId'],
+      memberId: User['userId'],
       serverId: Server['serverId'],
+      memberName: User['name'] | null = null,
     ) => {
       if (!socket) return;
       handleOpenAlertDialog(
-        '確定要解除自己與語音群的會員關係嗎', // lang.tr
+        lang.getTranslatedMessage(
+          '確定要解除 {userName} 與語音群的會員關係嗎?', 
+          { userName: memberId === userId ? '自己' : `${memberName}` }
+        ),
         () => {
-          handleEditMember({ permissionLevel: 1 }, userId, serverId);
+          handleEditMember(
+            {
+              permissionLevel: 1,
+              nickname: null,
+            },
+            memberId,
+            serverId
+          );
         },
       );
     };
@@ -385,7 +414,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.kickChannel,
               show: canKickChannel,
               onClick: () => {
-                handleKickChannel(memberUserId, memberCurrentChannelId, serverId);
+                handleKickChannel(memberUserId, memberCurrentChannelId, serverId, memberNickname || memberName);
               },
             },
             {
@@ -393,7 +422,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.kickServer,
               show: canKickServer,
               onClick: () => {
-                handleKickServer(memberUserId, serverId);
+                handleKickServer(memberUserId, serverId, memberNickname || memberName);
               },
             },
             {
@@ -401,7 +430,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.ban,
               show: canBan,
               onClick: () => {
-                handleOpenBlockMember(memberUserId, serverId, memberNickname ?? memberName);
+                handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
               },
             },
             {
@@ -438,11 +467,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   label: lang.tr.setGuest,
                   show: canChangeToGuest,
                   onClick: () =>
-                    handleEditMember(
-                      { permissionLevel: 1 },
-                      memberUserId,
-                      serverId,
-                    ),
+                    handleRemoveMembership(memberUserId, serverId, memberNickname || memberName)
                 },
                 {
                   id: 'set-member',
@@ -519,7 +544,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           className={`
             ${styles['userTabName']} 
             ${memberNickname ? styles['member'] : ''}
-            ${memberVip > 0 ? styles['isVIP'] : ''}
+            ${memberVip > 0 ? vip['isVIP'] : ''}
           `}
         >
           {memberNickname || memberName}
