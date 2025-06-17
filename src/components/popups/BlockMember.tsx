@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+// Components
+import MarkdownViewer from '@/components/MarkdownViewer';
+
 // Types
 import { Server, User } from '@/types';
 
@@ -17,10 +20,11 @@ import ipcService from '@/services/ipc.service';
 interface BlockMemberPopupProps {
   userId: User['userId'];
   serverId: Server['serverId'];
+  userName: User['name'];
 }
 
 const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
-  ({ userId, serverId }) => {
+  ({ userId, serverId, userName }) => {
     // Hooks
     const lang = useLanguage();
     const socket = useSocket();
@@ -103,63 +107,81 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(
     return (
       <div className={popup['popupContainer']}>
         {/* Body */}
-        <div className={popup['popupBody']}>
+        <div className={`${popup['popupBody']}`}>
           <div className={`${styles['content']}`}>
-            <div className={`${popup['inputGroup']} ${popup['col']}`}>
+            <div className={`${popup['dialogContent']} ${styles['top']}`}>
               <div
-                className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}
-              >
-                <div className={`${popup['label']}`}>
-                  {'封鎖類型' /* TODO: lang.tr */}
+                className={`
+                  ${popup['dialogIcon']}
+                  ${popup['alert']}
+                `}
+              />
+              <div className={`${styles['content']}`}>
+                <div className={`${popup['label']} ${styles['label']}`}>
+                  <MarkdownViewer 
+                    markdownText={lang.getTranslatedMessage(
+                      '確定要封鎖 <span>{userName}</span> 嗎?',
+                      { userName: userName }
+                    )}
+                  />
                 </div>
-                <div className={`${popup['selectBox']}`}>
-                  <select
-                    value={blockType}
-                    onChange={(e) => setBlockType(e.target.value)}
+                <div className={`${popup['inputGroup']} ${popup['col']}`}>
+                  <div
+                    className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}
                   >
-                    {BLOCK_TYPE_OPTIONS.map((option) => (
-                      <option
-                        key={option.key}
-                        value={option.key}
-                        disabled={option.disabled}
+                    <div className={`${popup['label']}`}>
+                      {'封鎖類型' /* TODO: lang.tr */}
+                    </div>
+                    <div className={`${popup['selectBox']}`}>
+                      <select
+                        value={blockType}
+                        onChange={(e) => setBlockType(e.target.value)}
                       >
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div
-                className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}
-              >
-                <div className={`${popup['label']}`}>
-                  {'封鎖時間' /* TODO: lang.tr */}
-                </div>
-                <div className={`${popup['selectBox']}`}>
-                  <select
-                    value={selectTime}
-                    disabled={isForeverBlock}
-                    onChange={(e) => setSelectTime(parseInt(e.target.value))}
+                        {BLOCK_TYPE_OPTIONS.map((option) => (
+                          <option
+                            key={option.key}
+                            value={option.key}
+                            disabled={option.disabled}
+                          >
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div
+                    className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}
                   >
-                    {Array.from({ length: 60 }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className={`${popup['selectBox']}`}>
-                  <select
-                    value={formatType}
-                    disabled={isForeverBlock}
-                    onChange={(e) => setFormatType(e.target.value)}
-                  >
-                    {FORMAT_TYPE_OPTIONS.map((option) => (
-                      <option key={option.key} value={option.key}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                    <div className={`${popup['label']}`}>
+                      {'封鎖時間' /* TODO: lang.tr */}
+                    </div>
+                    <div className={`${popup['selectBox']}`}>
+                      <select
+                        value={selectTime}
+                        disabled={isForeverBlock}
+                        onChange={(e) => setSelectTime(parseInt(e.target.value))}
+                      >
+                        {Array.from({ length: 60 }, (_, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {i + 1}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className={`${popup['selectBox']}`}>
+                      <select
+                        value={formatType}
+                        disabled={isForeverBlock}
+                        onChange={(e) => setFormatType(e.target.value)}
+                      >
+                        {FORMAT_TYPE_OPTIONS.map((option) => (
+                          <option key={option.key} value={option.key}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

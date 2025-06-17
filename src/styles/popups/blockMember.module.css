@@ -1,21 +1,27 @@
 .content {
-    margin: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.top {
+  align-items: flex-start;
+}
+
+.label {
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+}
+
+.label span {
+  color: #2f94db;
+  cursor: pointer;
 }
 
 .inputBox {
-    display: flex;
-    justify-content: flex-start;
-}
-
-.optionBox {
-    display: flex;
-    flex-direction: row;
-}
-
-.optionBox .label {
-    padding: 5px;
-    min-width: 2rem;
+  display: flex;
+  justify-content: flex-start;
 }
