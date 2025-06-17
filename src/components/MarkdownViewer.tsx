@@ -169,7 +169,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
       th: ({ node, ...props }: any) => <th {...props} />,
       td: ({ node, ...props }: any) => <td {...props} />,
       hr: ({ node, ...props }: any) => <hr {...props} />,
-      img: ({ node, ...props }: any) => <img {...props} />,
+      img: ({ node, alt, ...props }: any) => <img alt={alt} {...props} />,
       code: ({ node, className, children, ...props }: any) => {
         const language = className?.replace('language-', '') ?? '';
         const code = String(children).trim();
