@@ -118,7 +118,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(
                   gap: 4,
                 }}
               >
-                <div className={userInfoCard['name']}>{memberName}</div>
+                <div className={`${userInfoCard['name']} ${memberVip > 0 && vip['isVIP']}`}>{memberName}</div>
                 <div
                   className={`
                     ${grade['grade']} 

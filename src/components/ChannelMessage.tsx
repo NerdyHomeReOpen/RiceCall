@@ -98,7 +98,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
               />
             )}
             <div
-              className={`${styles['username']} ${senderVip > 0 ? vip['isVIP'] : ''}`}
+              className={`${styles['username']} ${senderVip > 0 ? `${vip['isVIP']} ${vip['clickable']}` : ''}`}
               onClick={() => handleOpenUserInfo(userId, senderUserId)}
               onContextMenu={(e) => {
                 const x = e.clientX;

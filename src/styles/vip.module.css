@@ -12,7 +12,7 @@
   color: #e4493e /* #d16059 */ !important;
 }
 
-.isVIP:hover {
+.isVIP.clickable:hover {
   color: #9c3028 !important;
 }
 
