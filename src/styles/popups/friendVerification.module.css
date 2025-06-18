@@ -2,7 +2,10 @@
   padding: 0 15px;
   background-color: #fff;
   display: flex;
-  justify-content: flex-start;
+  width: 100%;
+  height: auto;
+  flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
   overflow-y: scroll;
 }
@@ -33,6 +36,7 @@
 
 .contentBody {
   width: 100%;
+  padding-top: 17rem;
   flex: 1;
 }
 
