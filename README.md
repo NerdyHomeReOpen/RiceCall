@@ -8,23 +8,40 @@
     <img src="https://img.shields.io/badge/Latest-v0.1.10-green"/>
   </div>
 </div>
+ 
+## 使用聲明 (Disclaimer)
 
-## v0.1.10 更新日誌 (Change Log)
+**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)** (下稱 RC 語音) 是由 **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)** (下稱本團隊) **獨立開發**的專案，與 RaidCall 的原開發團隊、伺服器或任何官方組織**沒有任何關聯，請謹慎下載並使用 (Use on your own risks)**
 
-- 新增主題系統
-- 新增表情符號
-- 修正無法切換輸入輸出裝置問題
-- 修正錯誤文本內容
-- 調整主頁伺服器卡片大小
-- 調整各種介面樣式及行為
-- 
+RC 語音現行版本均為測試版本，若在運行時發現問題，請至[問題回報](https://github.com/NerdyHomeReOpen/RiceCall/issues)或是應用程式內 [右上角選單 > 意見反饋] 回報您遇到的問題，另外也可以加入我們的 [Discord](https://discord.gg/adCWzv6wwS) 伺服器以獲取最新資訊。
+
+RC 語音之**資料 (包括但不限於: 帳號、等級、VIP、語音群) 皆可能遺失或移除**，本團隊保有最終決議權。
+
+RC 語音**並非** RaidCall 的延續或官方授權版本，亦**不涉及恢復過去的 RaidCall 服務或其伺服器**。
+
+RC 語音的開發純屬愛好者社群的自主行動，目的在於提供一個新的語音交流平台，並非商業化項目。
+
+RC 語音所有內容僅供學術研究與技術交流使用。如涉及任何版權、商標或其他權利問題，請聯繫我們進行溝通。
+
+RC 語音可能會參考或取用部分 RaidCall 相關的素材，但所有內容皆屬本團隊的獨立創作，且不代表 RaidCall 官方立場或意圖。
+
+RC 語音不負責與 RaidCall 相關的任何技術支援、帳號恢復或資料遺失等問題。如有任何與 RaidCall 相關的問題，請直接聯繫其原開發團隊或官方渠道。
+
+本團隊歡迎所有開發者參與 RC 語音的開發！你可以透過以下方式貢獻：
+
+- 至[此表單](https://forms.gle/ZowwAS22dGpKkGcZ8)填寫幫助意願 (記得先加入我們的 [Discord](https://discord.gg/adCWzv6wwS)，若我們需要你的幫忙會給予你身份組)
+- 若想直接新增功能，可以 Fork 此專案，進行修改後提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)
+- 回報 Bug 或提出新功能建議，請到 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面
+
+## 安裝方法
+
+下方為載點，請先閱讀過說明文件後再開始下載:
+
+[下載點](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest)
+
 ## 常見問題 (FAQ)
 
 ### Q: 我卡在轉圈圈畫面怎麼辦
-
-A: 請從右上角選單 -> 登出，然後再登入一次
-
-### Q: 我沒辦法加入伺服器
 
 A: 請從右上角選單 -> 登出，然後再登入一次
 
@@ -40,24 +57,12 @@ A: 重新啟動應用程式再試一次
 
 A: 請加入我們的 [Discord](https://discord.gg/adCWzv6wwS) 伺服器或至 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面詳細描述你所遇到的問題
 
-## 安裝方法
-
-請至 [下載點](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest)，先閱讀過說明文件後再開始下載
-
 ## 技術架構 (Tech Stack)
 
 - **前端 (Client):** React, Electron
 - **後端 (Server):** Node.js
 - **資料庫 (Database):** SQLite
 - **通訊協定 (Protocol):** WebRTC / WebSocket
-
-## 如何貢獻 (Contributing)
-
-我們歡迎所有開發者參與 RiceCall 的開發！你可以透過以下方式貢獻：
-
-- 至[此表單](https://forms.gle/ZowwAS22dGpKkGcZ8)填寫幫助意願 (記得先加入我們的 [Discord](https://discord.gg/adCWzv6wwS)，若我們需要你的幫忙會給予你身份組)
-- 若想直接新增功能，可以 Fork 此專案，進行修改後提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)
-- 回報 Bug 或提出新功能建議，請到 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面
 
 ## 專案架構 (Framework)
 
@@ -114,12 +119,4 @@ yarn electron-dev
 
 > http://localhost:3000
 
-## 免責聲明 (Disclaimer)
 
-**RiceCall** 是一個**獨立開發**的專案，與 RaidCall 的原開發團隊、伺服器或任何官方組織 **沒有任何關聯**。本專案**並非** RaidCall 的延續或官方授權版本，亦**不涉及恢復過去的 RaidCall 服務或其伺服器**。
-
-RiceCall 的開發純屬愛好者社群的自主行動，目的在於提供一個新的語音交流平台，並非商業化項目。本專案可能會參考或取用部分 RaidCall 相關的素材，但所有內容皆屬我們的獨立創作，且不代表 RaidCall 官方立場或意圖。
-
-如有任何與 RaidCall 相關的問題，請直接聯繫其原開發團隊或官方渠道。**RiceCall 不負責與 RaidCall 相關的任何技術支援**、帳號恢復或資料遺失等問題。
-
-本專案完全獨立開發，所有內容僅供學術研究與技術交流使用。如涉及任何版權、商標或其他權利問題，請聯繫我們進行溝通。
