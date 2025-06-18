@@ -1,14 +1,12 @@
-# RiceCall
-
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/74f23cae-f3aa-4deb-bbd1-72290d9193f3" width="200px" align="center">
+  <img src="https://github.com/user-attachments/assets/cd9fb652-f032-4fb7-b949-91305d37f103" height="100px" align="center">
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
     <img src="https://img.shields.io/badge/Latest-v0.1.10-green"/>
   </div>
 </div>
- 
+
 ## 使用聲明 (Disclaimer)
 
 **[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)** (下稱 RC 語音) 是由 **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)** (下稱本團隊) **獨立開發**的專案，與 RaidCall 的原開發團隊、伺服器或任何官方組織**沒有任何關聯，請謹慎下載並使用 (Use on your own risks)**
@@ -33,7 +31,7 @@ RC 語音不負責與 RaidCall 相關的任何技術支援、帳號恢復或資�
 - 若想直接新增功能，可以 Fork 此專案，進行修改後提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)
 - 回報 Bug 或提出新功能建議，請到 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面
 
-## 安裝方法
+## 安裝方法 (Download)
 
 下方為載點，請先閱讀過說明文件後再開始下載:
 
@@ -109,7 +107,7 @@ NEXT_PUBLIC_SERVER_URL=你的伺服器公開網址
 NEXT_PUBLIC_SERVER_URL_SECONDARY=備援網址(使用中華電信網路將會使用該網址，若無則設定和 NEXT_PUBLIC_SERVER_URL 相同)
 ```
 
-3. 啟動 Client (Development)
+3. 啟動 Client
 
 ```bash
 yarn electron-dev
