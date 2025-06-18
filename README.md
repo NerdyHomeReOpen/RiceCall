@@ -7,7 +7,7 @@
   </div>
 </div>
 
-## 使用聲明 (Disclaimer)
+## 使用聲明
 
 **[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)** (下稱 RC 語音) 是由 **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)** (下稱本團隊) **獨立開發**的專案，與 RaidCall 的原開發團隊、伺服器或任何官方組織**沒有任何關聯，請謹慎下載並使用 (Use on your own risks)**
 
@@ -31,13 +31,13 @@ RC 語音不負責與 RaidCall 相關的任何技術支援、帳號恢復或資�
 - 若想直接新增功能，可以 Fork 此專案，進行修改後提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)
 - 回報 Bug 或提出新功能建議，請到 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面
 
-## 安裝方法 (Download)
+## 安裝方法
 
 下方為載點，請先閱讀過說明文件後再開始下載:
 
 [下載點](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest)
 
-## 常見問題 (FAQ)
+## 常見問題
 
 ### Q: 我卡在轉圈圈畫面怎麼辦
 
@@ -55,14 +55,14 @@ A: 重新啟動應用程式再試一次
 
 A: 請加入我們的 [Discord](https://discord.gg/adCWzv6wwS) 伺服器或至 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面詳細描述你所遇到的問題
 
-## 技術架構 (Tech Stack)
+## 技術架構
 
 - **前端 (Client):** React, Electron
 - **後端 (Server):** Node.js
 - **資料庫 (Database):** SQLite
 - **通訊協定 (Protocol):** WebRTC / WebSocket
 
-## 專案架構 (Framework)
+## 專案架構
 
 ```bash
 RiceCall
@@ -92,7 +92,7 @@ RiceCall
 ├── yarn.lock                 # Yarn 鎖定依賴版本
 ```
 
-## 建置本地環境 (Build)
+## 建置本地環境
 
 1. 安裝 Modules
 
