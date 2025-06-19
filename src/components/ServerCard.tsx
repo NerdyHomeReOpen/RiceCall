@@ -54,6 +54,10 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
       mainTab.setSelectedTabId('server');
       return;
     }
+    
+    if (userCurrentServerId) {
+      socket.send.disconnectServer({ userId, serverId: userCurrentServerId });
+    }
 
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(serverDisplayId);

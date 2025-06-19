@@ -81,8 +81,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
       });
     };
 
-    console.log(userId, senderUserId);
-
     return (
       <>
         <div

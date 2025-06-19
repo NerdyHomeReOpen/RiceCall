@@ -7,8 +7,8 @@ import React, {
 } from 'react';
 
 // CSS
-import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
+import setting from '@/styles/popups/setting.module.css';
 import permission from '@/styles/permission.module.css';
 import markdown from '@/styles/markdown.module.css';
 
@@ -115,6 +115,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const [selectedRowType, setSelectedRowType] = useState<string | null>(null);
     const [reloadAvatarKey, setReloadAvatarKey] = useState(0);
+    const [canViewGuest, setCanViewGuest] = useState(false);
 
     // Variables
     const {
@@ -136,7 +137,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const filteredMembers = serverMembers.filter((member) => {
       const searchLower = searchText.toLowerCase();
       return (
-        member.permissionLevel > 1 &&
+        member.permissionLevel > ( !canViewGuest ? 1 : 0 ) &&
         (member.nickname?.toLowerCase().includes(searchLower) ||
           member.name.toLowerCase().includes(searchLower))
       );
@@ -775,7 +776,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               <div
                 className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}
               >
-                <div className={popup['label']}>
+                <div className={popup['label']} onDoubleClick={() => setCanViewGuest((prev) => !prev)}>
                   {lang.tr.members}: {filteredMembers.length}
                 </div>
                 <div className={setting['searchWrapper']}>

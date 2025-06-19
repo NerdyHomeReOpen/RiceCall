@@ -62,8 +62,6 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       setPickerY(newPosY);
     }, [x, y, preferTop]);
 
-    console.log(emojis);
-
     return (
       <div
         ref={emojiPickerRef}
