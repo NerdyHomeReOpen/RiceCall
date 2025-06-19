@@ -49,8 +49,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
 
     // Refs
     const refreshRef = useRef(false);
-    const isSelectingRef = useRef(false);
-    const isLoading = useRef(false);
     const emojiIconRef = useRef<HTMLDivElement>(null);
 
     // Constants
@@ -196,20 +194,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       serverId: Server['serverId'],
       serverDisplayId: Server['displayId'],
     ) => {
-      if (isSelectingRef.current || isLoading.current || isSelectingRef.current)
-        return;
-      isSelectingRef.current = true;
-      setTimeout(() => {
-        isSelectingRef.current = false;
-      }, 3000);
-
       window.localStorage.setItem(
         'trigger-handle-server-select',
-        JSON.stringify({
-          serverDisplayId,
-          serverId,
-          timestamp: Date.now(),
-        }),
+        JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }),
       );
     };
 

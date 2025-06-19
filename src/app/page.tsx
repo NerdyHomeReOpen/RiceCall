@@ -634,7 +634,7 @@ const RootPageComponent = () => {
   }) => {
     loadingBox.setIsLoading(false);
     loadingBox.setLoadingServerId('');
-    
+
     ipcService.popup.open(popup.type, popup.id, popup.force);
     ipcService.initialData.onRequest(popup.id, popup.initialData);
     ipcService.popup.onSubmit(popup.id, () => {
@@ -769,7 +769,10 @@ const RootPageComponent = () => {
     const handler = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
+
       if (!serverDisplayId || !serverId) return;
+
+      if (loadingBox.isLoading) return;
 
       if (serverId === server.serverId) {
         mainTab.setSelectedTabId('server');
@@ -783,17 +786,10 @@ const RootPageComponent = () => {
         socket.send.connectServer({ userId, serverId });
       }, loadingBox.loadingTimeStamp);
     };
+
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
-  }, [mainTab]);
-
-  // useEffect(() => {
-  //   if (!loadingBox.isLoading) return;
-  //   if (mainTab.selectedTabId == 'server') {
-  //     loadingBox.setIsLoading(false);
-  //     loadingBox.setLoadingServerId('');
-  //   }
-  // }, [loadingBox.isLoading, server, mainTab]);
+  }, [mainTab, loadingBox.isLoading]);
 
   useEffect(() => {
     if (!lang) return;
