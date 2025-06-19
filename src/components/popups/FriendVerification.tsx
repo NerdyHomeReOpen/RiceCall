@@ -11,7 +11,6 @@ import {
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 import friendVerification from '@/styles/popups/friendVerification.module.css';
 
 // Services
