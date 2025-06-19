@@ -7,7 +7,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  overflow-y: scroll;
 }
 
 .contentHeader {
@@ -36,13 +35,13 @@
 
 .contentBody {
   width: 100%;
-  padding-top: 17rem;
   flex: 1;
+  overflow-y: scroll;
 }
 
 .userInfoBox {
   display: flex;
-  margin: 1.5rem auto;
+  margin: 1.5rem 0;
   justify-content: center;
 }
 
