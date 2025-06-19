@@ -8,6 +8,10 @@
   line-height: 0;
 }
 
+.markdownContent *:last-child {
+  margin-block-end: 0;
+}
+
 .markdownContent h1 {
   font-size: 1.75rem;
   font-weight: bold;
@@ -43,19 +47,18 @@
 }
 
 .markdownContent p {
-  margin-block: 0.125rem;
-  margin-inline: 0;
-  display: inline-block;
+  margin-block-start: 0;
+  display: block;
   align-items: center;
   cursor: text;
-  white-space: wrap;
+  white-space: pre-wrap;
 }
 
 .markdownContent span {
   display: inline-block;
   align-self: center;
   cursor: pointer;
-  white-space: wrap;
+  white-space: pre-wrap;
 }
 
 .markdownContent a {
@@ -63,7 +66,7 @@
   font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 0.125rem;
-  white-space: wrap;
+  white-space: pre-wrap;
   cursor: pointer;
 }
 
@@ -73,7 +76,7 @@
 
 .markdownContent ul,
 .markdownContent ol {
-  margin-block: 0.125rem;
+  margin-block-start: 0;
   margin-inline: 0;
   padding-inline-start: 20px;
   list-style-position: outside;
@@ -81,7 +84,7 @@
 }
 
 .markdownContent li {
-  margin-block: 0.125rem;
+  margin-block-start: 0;
   cursor: text;
 }
 
@@ -99,24 +102,24 @@
 
 /* inline code */
 .markdownContent code {
-  font-family: monospace;
-  font-size: 0.875rem;
-  font-weight: bold;
-  margin-block: 0;
+  margin-block-start: 0;
   margin-inline: 0;
   padding: 0.125rem 0.25rem;
   border-radius: 4px;
   background: #00000005;
   border: 1px solid #00000010;
   cursor: text;
-  line-height: 1.5rem;
   align-self: baseline;
+  line-height: 1.5rem;
+  font-family: monospace;
+  font-size: 0.875rem;
+  font-weight: bold;
 }
 
 /* block code */
 .markdownContent pre {
   position: relative;
-  margin-block: 0.125rem;
+  margin-block-start: 0;
   margin-inline: 0;
   cursor: text;
 }
@@ -124,7 +127,7 @@
 .markdownContent hr {
   border: none;
   border-top: 1px dashed #d1d5db;
-  margin-block: 0.5rem;
+  margin-block-start: 0.5rem;
   margin-inline: 0;
 }
 
@@ -200,14 +203,14 @@
 }
 
 .markdownContent table .p1 {
-  white-space: nowrap;
+  white-space: pre-wrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .markdownContent img {
   max-width: 100%;
-  margin-block: 0;
+  margin-block-start: 0;
   margin-inline: 0;
   /* border-radius: 8px; */
   cursor: pointer;
