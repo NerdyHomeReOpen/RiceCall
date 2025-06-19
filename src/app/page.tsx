@@ -789,7 +789,7 @@ const RootPageComponent = () => {
 
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
-  }, [mainTab, loadingBox.isLoading]);
+  }, [user, mainTab, loadingBox.isLoading]);
 
   useEffect(() => {
     if (!lang) return;
