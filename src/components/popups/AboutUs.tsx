@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 
 // Package
@@ -19,6 +19,9 @@ import MarkdownViewer from '../MarkdownViewer';
 const AboutPopup: React.FC = React.memo(() => {
   // Hooks
   const lang = useLanguage();
+
+  // States
+  const [dontShowNextTime, setDontShowNextTime] = useState(false);
 
   // Handlers
   const handleClose = () => {
@@ -256,7 +259,31 @@ const AboutPopup: React.FC = React.memo(() => {
 
       {/* Footer */}
       <div className={`${popup['popupFooter']} aboutFooter`}>
-        <button className={popup['button']} onClick={handleClose}>
+        <div
+          className={`${popup['inputBox']} ${popup['row']}`}
+          style={{ width: 'fit-content' }}
+        >
+          <input
+            type="checkbox"
+            name="showDisclaimer"
+            checked={dontShowNextTime}
+            onChange={() => {
+              setDontShowNextTime(!dontShowNextTime);
+            }}
+          />
+          <div>
+            <div className={popup['label']}>{lang.tr.dontShowNextTime}</div>
+          </div>
+        </div>
+        <button
+          className={popup['button']}
+          onClick={() => {
+            if (dontShowNextTime) {
+              ipcService.systemSettings.disclaimer.dontShowNextTime();
+            }
+            handleClose();
+          }}
+        >
           {lang.tr.close}
         </button>
       </div>

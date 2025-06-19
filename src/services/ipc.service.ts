@@ -315,6 +315,13 @@ const ipcService = {
         callback(data);
       });
     },
+
+    disclaimer: {
+      dontShowNextTime: () => {
+        if (!isElectron) return;
+        ipcRenderer.send('dont-show-disclaimer-next-time');
+      },
+    },
   },
 };
 

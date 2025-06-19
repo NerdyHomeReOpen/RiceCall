@@ -32,6 +32,7 @@ type StoreSchema = {
   theme: string;
   audioInputDevice: string;
   audioOutputDevice: string;
+  dontShowDisclaimer: boolean;
 };
 const store = new Store<StoreSchema>();
 
@@ -804,6 +805,12 @@ app.on('ready', async () => {
   await createAuthWindow();
   await createMainWindow();
 
+  if (!store.get('dontShowDisclaimer')) {
+    await createPopup(PopupType.ABOUTUS, 'aboutUs');
+
+    popups['aboutUs'].setAlwaysOnTop(true);
+  }
+
   mainWindow.hide();
   authWindow.show();
 
@@ -923,6 +930,7 @@ app.on('ready', async () => {
       soundEffect: store.get('soundEffect') || true,
       inputAudioDevice: store.get('audioInputDevice') || '',
       outputAudioDevice: store.get('audioOutputDevice') || '',
+      dontShowDisclaimer: store.get('dontShowDisclaimer') || false,
     };
     event.reply('system-settings-status', settings);
   });
@@ -972,6 +980,10 @@ app.on('ready', async () => {
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('output-audio-device-status', deviceId);
     });
+  });
+
+  ipcMain.on('dont-show-disclaimer-next-time', () => {
+    store.set('dontShowDisclaimer', true);
   });
 
   // Open external url handlers
