@@ -21,7 +21,7 @@ import {
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useExpandedContext } from '@/providers/Expanded';
+import { useFindMeContext } from '@/providers/FindMe';
 
 // Components
 import ChannelTab from '@/components/ChannelTab';
@@ -50,8 +50,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
     const lang = useLanguage();
     const socket = useSocket();
     const contextMenu = useContextMenu();
-    const { handleSetCategoryExpanded, handleSetChannelExpanded } =
-      useExpandedContext();
+    const findMe = useFindMeContext();
 
     // Refs
     const viewerRef = useRef<HTMLDivElement>(null);
@@ -145,9 +144,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
     };
 
     const handleLocateUser = () => {
-      if (!handleSetCategoryExpanded || !handleSetChannelExpanded) return;
-      handleSetCategoryExpanded();
-      handleSetChannelExpanded();
+      if (!findMe) return;
+      findMe.findMe();
     };
 
     const handleServerMemberApplicationsSet = (data: { count: number }) => {

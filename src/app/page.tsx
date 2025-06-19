@@ -38,7 +38,7 @@ import Default from '@/utils/default';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
-import ExpandedProvider from '@/providers/Expanded';
+import ExpandedProvider from '@/providers/FindMe';
 import { useSocket } from '@/providers/Socket';
 import { useLanguage } from '@/providers/Language';
 import { useContextMenu } from '@/providers/ContextMenu';

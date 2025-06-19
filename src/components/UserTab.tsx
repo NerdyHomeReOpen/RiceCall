@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -22,6 +22,7 @@ import {
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
+import { useFindMeContext } from '@/providers/FindMe';
 import { useWebRTC } from '@/providers/WebRTC';
 
 // Components
@@ -57,6 +58,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const contextMenu = useContextMenu();
     const socket = useSocket();
     const webRTC = useWebRTC();
+    const findMe = useFindMeContext();
 
     // Refs
     const userTabRef = useRef<HTMLDivElement>(null);
@@ -149,10 +151,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     ) => {
       if (!socket) return;
       handleOpenAlertDialog(
-        lang.getTranslatedMessage(
-          '確定要將 {userName} 踢出語音群嗎?', 
-          { userName: userName }
-        ),
+        lang.getTranslatedMessage('確定要將 {userName} 踢出語音群嗎?', {
+          userName: userName,
+        }),
         () => {
           socket.send.disconnectServer({ userId, serverId });
         },
@@ -167,10 +168,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     ) => {
       if (!socket) return;
       handleOpenAlertDialog(
-        lang.getTranslatedMessage(
-          '確定要將 {userName} 踢出頻道嗎?', 
-          { userName: userName }
-        ),
+        lang.getTranslatedMessage('確定要將 {userName} 踢出頻道嗎?', {
+          userName: userName,
+        }),
         () => {
           socket.send.disconnectChannel({ userId, channelId, serverId });
         },
@@ -265,8 +265,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       if (!socket) return;
       handleOpenAlertDialog(
         lang.getTranslatedMessage(
-          '確定要解除 {userName} 與語音群的會員關係嗎?', 
-          { userName: memberId === userId ? '自己' : `${memberName}` }
+          '確定要解除 {userName} 與語音群的會員關係嗎?',
+          { userName: memberId === userId ? '自己' : `${memberName}` },
         ),
         () => {
           handleEditMember(
@@ -275,7 +275,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               nickname: null,
             },
             memberId,
-            serverId
+            serverId,
           );
         },
       );
@@ -303,6 +303,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       e.dataTransfer.setData('userId', userId);
       e.dataTransfer.setData('currentChannelId', channelId);
     };
+
+    // Effect
+    useEffect(() => {
+      if (!findMe || !isCurrentUser) return;
+      findMe.userTabRef.current = userTabRef.current;
+    }, [findMe, isCurrentUser]);
 
     return (
       <div
@@ -414,7 +420,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.kickChannel,
               show: canKickChannel,
               onClick: () => {
-                handleKickChannel(memberUserId, memberCurrentChannelId, serverId, memberNickname || memberName);
+                handleKickChannel(
+                  memberUserId,
+                  memberCurrentChannelId,
+                  serverId,
+                  memberNickname || memberName,
+                );
               },
             },
             {
@@ -422,7 +433,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.kickServer,
               show: canKickServer,
               onClick: () => {
-                handleKickServer(memberUserId, serverId, memberNickname || memberName);
+                handleKickServer(
+                  memberUserId,
+                  serverId,
+                  memberNickname || memberName,
+                );
               },
             },
             {
@@ -430,7 +445,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.ban,
               show: canBan,
               onClick: () => {
-                handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
+                handleOpenBlockMember(
+                  memberUserId,
+                  serverId,
+                  memberNickname || memberName,
+                );
               },
             },
             {
@@ -467,7 +486,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   label: lang.tr.setGuest,
                   show: canChangeToGuest,
                   onClick: () =>
-                    handleRemoveMembership(memberUserId, serverId, memberNickname || memberName)
+                    handleRemoveMembership(
+                      memberUserId,
+                      serverId,
+                      memberNickname || memberName,
+                    ),
                 },
                 {
                   id: 'set-member',

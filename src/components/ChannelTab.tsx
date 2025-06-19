@@ -18,7 +18,7 @@ import {
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useExpandedContext } from '@/providers/Expanded';
+import { useFindMeContext } from '@/providers/FindMe';
 
 // Components
 import UserTab from '@/components/UserTab';
@@ -58,7 +58,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const lang = useLanguage();
     const socket = useSocket();
     const contextMenu = useContextMenu();
-    const { setChannelExpanded } = useExpandedContext();
+    const findMe = useFindMeContext();
 
     // Variables
     const {
@@ -241,13 +241,14 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     // Effect
     useEffect(() => {
-      if (setChannelExpanded && userInChannel)
-        setChannelExpanded.current = () =>
-          setExpanded((prev) => ({
-            ...prev,
-            [channelId]: true,
-          }));
-    }, [channelId, setChannelExpanded, setExpanded, userInChannel]);
+      if (!findMe || !userInChannel) return;
+      findMe.handleChannelExpanded.current = () => {
+        setExpanded((prev) => ({
+          ...prev,
+          [channelId]: true,
+        }));
+      };
+    }, [channelId, findMe, setExpanded, userInChannel]);
 
     return (
       <>

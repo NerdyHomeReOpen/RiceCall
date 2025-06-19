@@ -19,7 +19,7 @@ import {
 import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useExpandedContext } from '@/providers/Expanded';
+import { useFindMeContext } from '@/providers/FindMe';
 
 // Components
 import ChannelTab from '@/components/ChannelTab';
@@ -62,7 +62,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const lang = useLanguage();
     const socket = useSocket();
     const contextMenu = useContextMenu();
-    const { setCategoryExpanded } = useExpandedContext();
+    const findMe = useFindMeContext();
 
     // Variables
     const {
@@ -271,13 +271,15 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     // Effect
     useEffect(() => {
-      if (setCategoryExpanded && userInCategory)
-        setCategoryExpanded.current = () =>
-          setExpanded((prev) => ({
-            ...prev,
-            [categoryId]: true,
-          }));
-    }, [categoryId, setCategoryExpanded, setExpanded, userInCategory]);
+      if (!findMe || !userInCategory) return;
+
+      findMe.handleCategoryExpanded.current = () => {
+        setExpanded((prev) => ({
+          ...prev,
+          [categoryId]: true,
+        }));
+      };
+    }, [categoryId, findMe, setExpanded, userInCategory]);
 
     return (
       <>
