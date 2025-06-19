@@ -121,6 +121,8 @@ export function sanitizeMarkdownWithSafeTags(
     // 處裡 <br> to \n
     .replace(/<br\s*\/?>/g, '\n');
 
+  console.log(replaced);
+
   // 先手動 escape 危險標籤
   const escaped = escapeUnsafeTags(replaced, PURIFY_CONFIG.ALLOWED_TAGS);
 

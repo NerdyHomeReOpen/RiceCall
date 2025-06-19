@@ -76,10 +76,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(
         return;
       }
 
-      if (userCurrentServerId) {
-        socket.send.disconnectServer({ userId, serverId: userCurrentServerId });
-      }
-
       loadingBox.setIsLoading(true);
       loadingBox.setLoadingServerId(server.displayId);
 

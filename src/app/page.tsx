@@ -649,19 +649,19 @@ const RootPageComponent = () => {
   // Effects
   useEffect(() => {
     if (user.currentServerId) {
-      loadingBox.setIsLoading(false);
-      loadingBox.setLoadingServerId('');
-
       if (mainTab.selectedTabId !== 'server') {
         mainTab.setSelectedTabId('server');
       }
     } else {
-      if (mainTab.selectedTabId !== 'home') {
+      if (mainTab.selectedTabId === 'server') {
         mainTab.setSelectedTabId('home');
       }
     }
     setActionMessages([]);
     setChannelMessages([]);
+
+    loadingBox.setIsLoading(false);
+    loadingBox.setLoadingServerId('');
   }, [user.currentServerId]);
 
   useEffect(() => {
@@ -768,34 +768,32 @@ const RootPageComponent = () => {
   useEffect(() => {
     const handler = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
-      const { serverDisplayId, serverId: targetServerId } = JSON.parse(newValue);
-      if (!serverDisplayId || !targetServerId) return;
+      const { serverDisplayId, serverId } = JSON.parse(newValue);
+      if (!serverDisplayId || !serverId) return;
 
-      if (targetServerId === user.currentServerId) {
+      if (serverId === server.serverId) {
         mainTab.setSelectedTabId('server');
         return;
-      }
-
-      if (user.currentServerId) {
-        socket.send.disconnectServer({ userId: userId, serverId: user.currentServerId});
       }
 
       loadingBox.setIsLoading(true);
       loadingBox.setLoadingServerId(serverDisplayId);
 
       setTimeout(() => {
-        socket.send.connectServer({ userId: userId, serverId: targetServerId });
+        socket.send.connectServer({ userId, serverId });
       }, loadingBox.loadingTimeStamp);
     };
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
-  }, [user]);
+  }, [mainTab]);
 
-  useEffect(() => {
-    if (!loadingBox.isLoading) return;
-    if (mainTab.selectedTabId === 'home') return;
-    mainTab.setSelectedTabId('home');
-  }, [loadingBox.isLoading]);
+  // useEffect(() => {
+  //   if (!loadingBox.isLoading) return;
+  //   if (mainTab.selectedTabId == 'server') {
+  //     loadingBox.setIsLoading(false);
+  //     loadingBox.setLoadingServerId('');
+  //   }
+  // }, [loadingBox.isLoading, server, mainTab]);
 
   useEffect(() => {
     if (!lang) return;
