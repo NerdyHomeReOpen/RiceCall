@@ -47,7 +47,6 @@ const PURIFY_CONFIG: PurifyConfig = {
     'th',
     'td',
     'hr',
-    'br',
     'strong',
     'em',
     'code',
@@ -119,8 +118,8 @@ export function sanitizeMarkdownWithSafeTags(
         name || 'Unknown'
       }</span>`;
     })
-    // 保留換行
-    .replace(/\n/g, '  \n');
+    // 處裡 <br> to \n
+    .replace(/<br\s*\/?>/g, '\n');
 
   // 先手動 escape 危險標籤
   const escaped = escapeUnsafeTags(replaced, PURIFY_CONFIG.ALLOWED_TAGS);
@@ -162,9 +161,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
         return <a target="_blank" href={href} {...props} />;
       },
       table: ({ node, ...props }: any) => (
-        <div className={markdown.tableWrapper}>
-          <table {...props} />
-        </div>
+        <table className={markdown.tableWrapper} {...props} />
       ),
       th: ({ node, ...props }: any) => <th {...props} />,
       td: ({ node, ...props }: any) => <td {...props} />,

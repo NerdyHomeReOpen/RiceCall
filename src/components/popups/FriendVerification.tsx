@@ -11,7 +11,6 @@ import {
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 import friendVerification from '@/styles/popups/friendVerification.module.css';
 
 // Services
@@ -191,7 +190,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> =
     return (
       <div className={popup['popupContainer']} tabIndex={0}>
         <div className={popup['popupBody']}>
-          <div className={`${setting['body']} ${friendVerification['body']}`}>
+          <div className={`${friendVerification['body']}`}>
             <div className={friendVerification['contentHeader']}>
               <div className={friendVerification['ProcessingStatus']}>
                 未處理

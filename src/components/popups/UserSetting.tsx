@@ -45,12 +45,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
     const socket = useSocket();
     const lang = useLanguage();
     const contextMenu = useContextMenu();
-    // const loadingBox = useLoading();
 
     // Refs
     const refreshRef = useRef(false);
-    const isSelectingRef = useRef(false);
-    const isLoading = useRef(false);
     const emojiIconRef = useRef<HTMLDivElement>(null);
 
     // Constants
@@ -106,7 +103,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       .sort((a, b) => b.permissionLevel - a.permissionLevel);
     const recentServers = servers
       .filter((s) => s.recent)
-      .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 4);
 
@@ -196,20 +192,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(
       serverId: Server['serverId'],
       serverDisplayId: Server['displayId'],
     ) => {
-      if (isSelectingRef.current || isLoading.current || isSelectingRef.current)
-        return;
-      isSelectingRef.current = true;
-      setTimeout(() => {
-        isSelectingRef.current = false;
-      }, 3000);
-
       window.localStorage.setItem(
         'trigger-handle-server-select',
-        JSON.stringify({
-          serverDisplayId,
-          serverId,
-          timestamp: Date.now(),
-        }),
+        JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }),
       );
     };
 

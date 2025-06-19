@@ -431,6 +431,8 @@ export interface Translation {
   copyCode: string;
   copied: string;
   copy: string;
+  readmeContent: string;
+  dontShowNextTime: string;
 }
 
 export type LanguageKey = 'tw' | 'cn' | 'en' | 'jp';

@@ -221,10 +221,16 @@ const Popup = React.memo(() => {
 
   useEffect(() => {
     const popupInitialData = initialData;
-    if (type === PopupType.SYSTEM_SETTING || type === PopupType.CHANGE_THEME) {
-    } else if (!popupInitialData || !type) {
+
+    if (
+      type !== PopupType.SYSTEM_SETTING &&
+      type !== PopupType.CHANGE_THEME &&
+      type !== PopupType.ABOUTUS &&
+      !popupInitialData
+    ) {
       return;
     }
+
     switch (type) {
       case PopupType.CHANNEL_PASSWORD:
         setHeaderTitle(lang.tr.pleaseEnterTheChannelPassword);

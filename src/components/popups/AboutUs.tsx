@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 
 // Package
@@ -14,10 +14,14 @@ import ipcService from '@/services/ipc.service';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
+import MarkdownViewer from '../MarkdownViewer';
 
 const AboutPopup: React.FC = React.memo(() => {
   // Hooks
   const lang = useLanguage();
+
+  // States
+  const [dontShowNextTime, setDontShowNextTime] = useState(false);
 
   // Handlers
   const handleClose = () => {
@@ -144,10 +148,13 @@ const AboutPopup: React.FC = React.memo(() => {
           <div className={`${aboutUs['logoPlaceholder']}`}></div>
 
           <div className={aboutUs['appInfo']}>
-            <p className={aboutUs['appInfoVersion']}>RiceCall {version}</p>
-            <p className={aboutUs['appInfoCopyright']}>
+            <div className={aboutUs['appInfoVersion']}>RiceCall v{version}</div>
+            <div className={aboutUs['appInfoCopyright']}>
               COPYRIGHT @ {currentYear} RiceCall.com ,ALL RIGHTS RESERVED.
-            </p>
+            </div>
+
+            <MarkdownViewer markdownText={lang.tr.readmeContent} />
+
             <a
               className={aboutUs['websiteLink']}
               target="_blank"
@@ -183,6 +190,7 @@ const AboutPopup: React.FC = React.memo(() => {
               {lang.tr.officialWebsite}
             </a>
           </div>
+
           <div className={aboutUs['teamMembers']}>
             <p>{lang.tr.teamMembers}:</p>
             {teamMembers.map((member, index) => {
@@ -251,7 +259,31 @@ const AboutPopup: React.FC = React.memo(() => {
 
       {/* Footer */}
       <div className={`${popup['popupFooter']} aboutFooter`}>
-        <button className={popup['button']} onClick={handleClose}>
+        <div
+          className={`${popup['inputBox']} ${popup['row']}`}
+          style={{ width: 'fit-content' }}
+        >
+          <input
+            type="checkbox"
+            name="showDisclaimer"
+            checked={dontShowNextTime}
+            onChange={() => {
+              setDontShowNextTime(!dontShowNextTime);
+            }}
+          />
+          <div>
+            <div className={popup['label']}>{lang.tr.dontShowNextTime}</div>
+          </div>
+        </div>
+        <button
+          className={popup['button']}
+          onClick={() => {
+            if (dontShowNextTime) {
+              ipcService.systemSettings.disclaimer.dontShowNextTime();
+            }
+            handleClose();
+          }}
+        >
           {lang.tr.close}
         </button>
       </div>

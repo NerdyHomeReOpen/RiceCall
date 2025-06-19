@@ -1,30 +1,48 @@
-# RiceCall
-
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/74f23cae-f3aa-4deb-bbd1-72290d9193f3" width="200px" align="center">
+  <img src="https://github.com/user-attachments/assets/cd9fb652-f032-4fb7-b949-91305d37f103" height="100px" align="center">
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-v0.1.10-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.1.12-green"/>
   </div>
 </div>
 
-## v0.1.10 更新日誌 (Change Log)
+## 使用聲明
 
-- 新增主題系統
-- 新增表情符號
-- 修正無法切換輸入輸出裝置問題
-- 修正錯誤文本內容
-- 調整主頁伺服器卡片大小
-- 調整各種介面樣式及行為
-- 
-## 常見問題 (FAQ)
+**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)**（以下簡稱 RC 語音）為 **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)**（以下簡稱本團隊）**獨立開發**之專案，**與 RaidCall 原開發團隊、伺服器或任何官方組織無任何關聯**。請使用者自行斟酌並承擔使用風險（*Use at your own risk*）。
+
+目前 RC 語音所有版本皆為測試版本，若在使用過程中發現問題，歡迎透過以下方式回報：
+
+* 應用程式內：右上角選單 > 意見反饋
+* GitHub：[問題回報](https://github.com/NerdyHomeReOpen/RiceCall/issues)
+* Discord：加入 [官方群組](https://discord.gg/adCWzv6wwS) 以獲取最新資訊
+
+請注意，RC 語音之所有資料（包括但不限於帳號、等級、VIP、語音群等）**可能會遭到重置、遺失或刪除**，本團隊保有最終決策權。
+
+RC 語音**並非 RaidCall 的延續、重製或官方授權版本**，亦**不提供 RaidCall 服務的還原、支援或帳號資料恢復**。此專案純屬愛好者社群自發性的開發行動，旨在提供一個新的語音交流平台，**不以商業化為目的**。
+
+RC 語音所有內容僅供學術研究與技術交流使用。如涉及任何版權、商標或其他權利問題，歡迎來信與我們聯繫協商。
+
+RC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為本團隊獨立創作，**不代表 RaidCall 官方立場或意圖**。因此，我們**不提供與 RaidCall 相關之任何技術支援、帳號恢復或資料查詢服務**。如有相關問題，請洽原 RaidCall 官方。
+
+### 開源參與方式
+
+我們歡迎各界開發者參與 RC 語音的開發與維護。您可透過以下方式加入貢獻：
+
+* 填寫 [意願表單](https://forms.gle/ZowwAS22dGpKkGcZ8)（請先加入 [Discord 官方群組](https://discord.gg/adCWzv6wwS)，若我們有需要會聯繫您並指派身份組）
+* Fork 本專案並提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)，貢獻新功能或修復
+
+感謝您的支持與參與！
+
+## 安裝方法
+
+下方為載點，請先閱讀過說明文件後再開始下載:
+
+[下載點](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest)
+
+## 常見問題
 
 ### Q: 我卡在轉圈圈畫面怎麼辦
-
-A: 請從右上角選單 -> 登出，然後再登入一次
-
-### Q: 我沒辦法加入伺服器
 
 A: 請從右上角選單 -> 登出，然後再登入一次
 
@@ -38,28 +56,16 @@ A: 重新啟動應用程式再試一次
 
 ### Q: 我的問題不在以上的內容中
 
-A: 請加入我們的 [Discord](https://discord.gg/adCWzv6wwS) 伺服器或至 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面詳細描述你所遇到的問題
+A: 請加入我們的 [Discord 官方群組](https://discord.gg/adCWzv6wwS) 或至 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面詳細描述你所遇到的問題
 
-## 安裝方法
-
-請至 [下載點](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest)，先閱讀過說明文件後再開始下載
-
-## 技術架構 (Tech Stack)
+## 技術架構
 
 - **前端 (Client):** React, Electron
 - **後端 (Server):** Node.js
 - **資料庫 (Database):** SQLite
 - **通訊協定 (Protocol):** WebRTC / WebSocket
 
-## 如何貢獻 (Contributing)
-
-我們歡迎所有開發者參與 RiceCall 的開發！你可以透過以下方式貢獻：
-
-- 至[此表單](https://forms.gle/ZowwAS22dGpKkGcZ8)填寫幫助意願 (記得先加入我們的 [Discord](https://discord.gg/adCWzv6wwS)，若我們需要你的幫忙會給予你身份組)
-- 若想直接新增功能，可以 Fork 此專案，進行修改後提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)
-- 回報 Bug 或提出新功能建議，請到 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面
-
-## 專案架構 (Framework)
+## 專案架構
 
 ```bash
 RiceCall
@@ -89,7 +95,7 @@ RiceCall
 ├── yarn.lock                 # Yarn 鎖定依賴版本
 ```
 
-## 建置本地環境 (Build)
+## 建置本地環境
 
 1. 安裝 Modules
 
@@ -104,7 +110,7 @@ NEXT_PUBLIC_SERVER_URL=你的伺服器公開網址
 NEXT_PUBLIC_SERVER_URL_SECONDARY=備援網址(使用中華電信網路將會使用該網址，若無則設定和 NEXT_PUBLIC_SERVER_URL 相同)
 ```
 
-3. 啟動 Client (Development)
+3. 啟動 Client
 
 ```bash
 yarn electron-dev
@@ -114,12 +120,4 @@ yarn electron-dev
 
 > http://localhost:3000
 
-## 免責聲明 (Disclaimer)
 
-**RiceCall** 是一個**獨立開發**的專案，與 RaidCall 的原開發團隊、伺服器或任何官方組織 **沒有任何關聯**。本專案**並非** RaidCall 的延續或官方授權版本，亦**不涉及恢復過去的 RaidCall 服務或其伺服器**。
-
-RiceCall 的開發純屬愛好者社群的自主行動，目的在於提供一個新的語音交流平台，並非商業化項目。本專案可能會參考或取用部分 RaidCall 相關的素材，但所有內容皆屬我們的獨立創作，且不代表 RaidCall 官方立場或意圖。
-
-如有任何與 RaidCall 相關的問題，請直接聯繫其原開發團隊或官方渠道。**RiceCall 不負責與 RaidCall 相關的任何技術支援**、帳號恢復或資料遺失等問題。
-
-本專案完全獨立開發，所有內容僅供學術研究與技術交流使用。如涉及任何版權、商標或其他權利問題，請聯繫我們進行溝通。

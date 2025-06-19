@@ -33,7 +33,7 @@
   width: 100%;
   padding: 20px;
   text-align: flex-start;
-  overflow: hidden;
+  overflow: scroll;
   gap: 10px;
 }
 
@@ -45,19 +45,17 @@
   display: flex;
 }
 
-.appInfo p,
-.teamMembers p {
-  margin-block-start: 0em;
-  margin-block-end: 0em;
-}
-
 .appInfoVersion {
   font-weight: bold;
   padding-bottom: 5px;
+  width: 100%;
+  text-align: center;
 }
 
 .appInfoCopyright {
   padding-bottom: 5px;
+  width: 100%;
+  text-align: center;
 }
 
 .websiteLink {
@@ -76,10 +74,10 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-height: fit-content;
   padding: 10px;
   border: 1px solid #cccccc;
   box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
-  overflow-y: scroll;
 }
 
 .teamMemberLink {

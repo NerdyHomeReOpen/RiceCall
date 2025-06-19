@@ -100,7 +100,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
           ...prev,
           {
             type: 'warn',
-            content: "<span style='color: #038792'>你還不是對方的好友，這項功能無法使用!</span>",
+            content:
+              "<span style='color: #038792'>你還不是對方的好友，這項功能無法使用!</span>",
             timestamp: Date.now(),
             parameter: {},
             contentMetadata: {},
@@ -160,14 +161,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
       requestAnimationFrame(shake);
     };
 
-    const handleServerSelect = (userId: User['userId'], server: Server) => {
+    const handleServerSelect = (
+      serverId: Server['serverId'],
+      serverDisplayId: Server['displayId'],
+    ) => {
       window.localStorage.setItem(
         'trigger-handle-server-select',
-        JSON.stringify({
-          serverDisplayId: server.displayId,
-          serverId: server.serverId,
-          timestamp: Date.now(),
-        }),
+        JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }),
       );
     };
 
@@ -287,25 +287,25 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
           <div className={directMessage['mainContent']}>
             {isFriend && isOnline && targetCurrentServerId && (
               <div
-                className={directMessage['serverInArea']}
+                className={`${directMessage['actionArea']} ${directMessage['clickable']}`}
                 onClick={() => {
-                  handleServerSelect(userId, targetCurrentServer);
+                  handleServerSelect(
+                    targetCurrentServer.serverId,
+                    targetCurrentServer.displayId,
+                  );
                 }}
               >
-                <div className={directMessage['serverInIcon']} />
-                <div className={directMessage['serverInName']}>
+                <div
+                  className={`${directMessage['actionIcon']} ${directMessage['inServer']}`}
+                />
+                <div className={directMessage['actionTitle']}>
                   {targetCurrentServerName}
                 </div>
               </div>
             )}
             {!isFriend && (
-              <div
-                className={directMessage['serverInArea']}
-                onClick={() => {
-                  handleServerSelect(userId, targetCurrentServer);
-                }}
-              >
-                <div className={directMessage['serverInName']}>
+              <div className={directMessage['actionArea']}>
+                <div className={directMessage['actionTitle']}>
                   {'對方不在你的好友列表，一些功能將無法使用!'}
                 </div>
               </div>

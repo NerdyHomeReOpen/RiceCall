@@ -440,6 +440,33 @@ export const translations: Record<LanguageKey, Translation> = {
     copyCode: '複製程式碼',
     copied: '已複製！',
     copy: '複製',
+    dontShowNextTime: '下次不再顯示',
+    readmeContent: `## 使用聲明
+
+**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)**（以下簡稱 RC 語音）為 **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)**（以下簡稱本團隊）**獨立開發**之專案，**與 RaidCall 原開發團隊、伺服器或任何官方組織無任何關聯**。請使用者自行斟酌並承擔使用風險（*Use at your own risk*）。
+
+目前 RC 語音所有版本皆為測試版本，若在使用過程中發現問題，歡迎透過以下方式回報：
+- 應用程式內：右上角選單 > 意見反饋
+- GitHub：[問題回報](https://github.com/NerdyHomeReOpen/RiceCall/issues)
+- Discord：加入 [官方群組](https://discord.gg/adCWzv6wwS) 以獲取最新資訊
+
+請注意，RC 語音之所有資料（包括但不限於帳號、等級、VIP、語音群等）**可能會遭到重置、遺失或刪除**，本團隊保有最終決策權。
+
+RC 語音**並非 RaidCall 的延續、重製或官方授權版本**，亦**不提供 RaidCall 服務的還原、支援或帳號資料恢復**。此專案純屬愛好者社群自發性的開發行動，旨在提供一個新的語音交流平台，**不以商業化為目的**。
+
+RC 語音所有內容僅供學術研究與技術交流使用。如涉及任何版權、商標或其他權利問題，歡迎來信與我們聯繫協商。
+
+RC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為本團隊獨立創作，**不代表 RaidCall 官方立場或意圖**。因此，我們**不提供與 RaidCall 相關之任何技術支援、帳號恢復或資料查詢服務**。如有相關問題，請洽原 RaidCall 官方。
+
+### 開源參與方式
+
+我們歡迎各界開發者參與 RC 語音的開發與維護。您可透過以下方式加入貢獻：
+* 填寫 [意願表單](https://forms.gle/ZowwAS22dGpKkGcZ8)（請先加入 [Discord 官方群組](https://discord.gg/adCWzv6wwS)，若我們有需要會聯繫您並指派身份組）
+* Fork 本專案並提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)，貢獻新功能或修復
+
+感謝您的支持與參與！
+
+此聲明可在應用程式中找到：右上角選單 > 幫助中心 > 關於 RiceCall。`,
   },
   cn: {
     RPCHomePage: '正在浏览主页',
@@ -879,6 +906,33 @@ export const translations: Record<LanguageKey, Translation> = {
     copyCode: '复制程式码',
     copied: '已复制！ ',
     copy: '复制',
+    dontShowNextTime: '下次不再显示',
+    readmeContent: `## 使用声明
+
+**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)**（以下简称为 RC 语音）为 **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)**（以下简称本团队）**独立开发**之专案，**与 RaidCall 原开发团队、服务器或任何官方组织无任何关联**。请使用者自行斟酌并承担使用风险（*Use at your own risk*）。
+
+目前 RC 语音所有版本皆为测试版本，若在使用过程中发现问题，欢迎通过以下方式反馈：
+- 应用程式内：右上角选单 > 意见反馈
+- GitHub：[问题反馈](https://github.com/NerdyHomeReOpen/RiceCall/issues)
+- Discord：加入 [官方群组](https://discord.gg/adCWzv6wwS) 以获取最新资讯
+
+请注意，RC 语音之所有资料（包括但不限於账号、等级、VIP、语音群等）**可能遭到重置、遗失或删除**，本团队保有最终决策权。
+
+RC 语音**并非 RaidCall 的延续、重制或官方授权版本**，亦**不提供 RaidCall 服务之还原、支援或账号资料恢复**。此专案纯属爱好者社群自发性的开发行动，旨在提供一个全新的语音交流平台，**不以商业化为目的**。
+
+RC 语音所有内容仅供学术研究与技术交流使用。如涉及任何版权、商标或其他权利问题，欢迎来信与我们联系协商。
+
+RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为本团队独立创作，**不代表 RaidCall 官方立场或意图**。因此，我们**不提供与 RaidCall 相关之任何技术支援、账号恢复或资料查询服务**。如有相关问题，请洽原 RaidCall 官方。
+
+### 开源参与方式
+
+我们欢迎各界开发者参与 RC 语音的开发与维护。您可通过以下方式加入贡献：
+* 填写 [意愿表单](https://forms.gle/ZowwAS22dGpKkGcZ8)（请先加入 [Discord 官方群组](https://discord.gg/adCWzv6wwS)，若我们有需要会联系您并指派身份组）
+* Fork 本专案并提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)，贡献新功能或修复
+
+感谢您的支持与参与！
+
+此声明可在应用程式中找到：右上角选单 > 帮助中心 > 关于 RiceCall。`,
   },
   en: {
     RPCHomePage: 'Browsing Homepage',
@@ -1344,6 +1398,33 @@ export const translations: Record<LanguageKey, Translation> = {
     copyCode: 'Copy code',
     copied: 'Copied!',
     copy: 'Copy',
+    dontShowNextTime: "Don't show this message next time",
+    readmeContent: `## Disclaimer
+
+**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)** (referred to as RC voice) is an **independent development** project by **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)** (referred to as this team). It is **not affiliated with the original development team, server, or any official organization of RaidCall**. Please use it at your own risk.
+
+Currently, all versions of RC voice are test versions. If you find any issues during use, please report them through the following methods:
+- In the application: Menu > Feedback
+- GitHub: [Issue Report](https://github.com/NerdyHomeReOpen/RiceCall/issues)
+- Discord: Join [Official Discord](https://discord.gg/adCWzv6wwS) to get the latest information
+
+Please note that all data (including but not limited to account, level, VIP, voice group, etc.) of RC voice **may be reset, lost, or deleted**, and this team reserves the final decision.
+
+RC voice **is not a continuation, remake, or official authorization version of RaidCall**, and **does not provide restoration, support, or account data recovery for RaidCall services**. This project is purely a self-initiated development action by the enthusiast community, aiming to provide a new voice communication platform, **not for commercial purposes**.
+
+RC voice's content is only for academic research and technical exchange. If you have any copyright, trademark, or other rights issues, please contact us for consultation.
+
+Although RC voice refers to or uses some related materials of RaidCall, the final product is entirely created by this team, **not representing the official stance or intention of RaidCall**. Therefore, we **do not provide any technical support, account recovery, or data query services related to RaidCall**. If you have any related issues, please contact the official RaidCall.
+
+### Open Source Participation
+
+We welcome all developers to participate in the development and maintenance of RC voice. You can contribute through the following methods:
+* Fill in the [intention form](https://forms.gle/ZowwAS22dGpKkGcZ8) (please join the [Official Discord](https://discord.gg/adCWzv6wwS) first, and we will contact you if we need to assign you an identity group)
+* Fork this project and submit a [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls) to contribute new features or fixes
+
+Thank you for your support and participation!
+
+This disclaimer can be found in the application: Menu > Help Center > About RiceCall.`,
   },
   jp: {
     RPCHomePage: 'ホームページを閲覧中',
@@ -1803,5 +1884,34 @@ export const translations: Record<LanguageKey, Translation> = {
     copyCode: 'コードをコピー',
     copied: 'コピーしました! ',
     copy: 'コピー',
+    dontShowNextTime: '次回から表示しない',
+    readmeContent: `## 利用規約
+
+**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)**（以下、RCボイスと呼称）は、**[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)**（以下、本チーム）によって**独自に開発されたプロジェクト**です。**RaidCallの元開発チーム、サーバー、またはその他の公式組織とは一切関係ありません**。ご利用は自己責任でお願いいたします（*Use at your own risk*）。
+
+現在のRCボイスはすべてテストバージョンです。ご利用中に不具合などを発見された場合は、以下の方法でご報告ください：
+
+* アプリ内：右上のメニュー > フィードバック
+* GitHub：[Issueを報告](https://github.com/NerdyHomeReOpen/RiceCall/issues)
+* Discord：[公式サーバー](https://discord.gg/adCWzv6wwS) に参加して最新情報を入手
+
+RCボイスに関する**すべてのデータ（アカウント、レベル、VIP、ボイスグループなどを含むがそれに限らない）については、リセット・紛失・削除される可能性があります**。最終的な判断は本チームが行います。
+
+RCボイスは**RaidCallの継続、リメイク、または公式認可を受けたバージョンではありません**。**RaidCallのサービスの復元、サポート、アカウントデータの回復なども提供しておりません**。本プロジェクトは愛好家による自発的な開発活動であり、**営利目的ではありません**。
+
+RCボイスの内容はすべて、学術研究および技術的な交流を目的として提供されます。著作権、商標、その他の権利に関する問題がございましたら、お手数ですがご連絡のうえご相談ください。
+
+RCボイスはRaidCallに関する素材を一部参考または使用している場合がありますが、最終的な成果物はすべて本チームによって**独自に制作されたもの**であり、**RaidCall公式の立場や意図を示すものではありません**。そのため、**RaidCallに関連する技術サポート、アカウント回復、データの照会などのサービスは一切提供しておりません**。関連する問題については、元のRaidCall公式にお問い合わせください。
+
+### オープンソースへの参加方法
+
+RCボイスの開発および保守にご協力いただける開発者の皆様を歓迎いたします。以下の方法でご参加いただけます：
+
+* [参加希望フォーム](https://forms.gle/ZowwAS22dGpKkGcZ8) を記入（まずは [Discord公式サーバー](https://discord.gg/adCWzv6wwS) にご参加ください。必要があればこちらからご連絡し、ロールを付与します）
+* 本プロジェクトをForkし、[Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls) を送信して機能追加や不具合修正を行う
+
+ご支援・ご参加に心より感謝いたします！
+
+この免責事項はアプリ内で確認できます：メニュー > ヘルプセンター > RCボイスについて`,
   },
 };

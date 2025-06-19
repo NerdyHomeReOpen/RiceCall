@@ -62,7 +62,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({
         }),
       );
     }
-  }, []);
+  }, [loadingBox.isLoading]);
 
   return (
     <form

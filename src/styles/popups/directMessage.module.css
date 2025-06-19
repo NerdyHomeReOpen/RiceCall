@@ -153,15 +153,18 @@
   min-width: 0;
 }
 
-.serverInArea {
+.actionArea {
   height: 22px;
   width: 100%;
   display: flex;
   align-items: center;
+}
+
+.actionArea.clickable {
   cursor: pointer;
 }
 
-.serverInArea:after {
+.actionArea:after {
   content: '';
   position: absolute;
   min-height: 22px;
@@ -172,17 +175,20 @@
   background-position: 0 0;
 }
 
-.serverInIcon {
+.actionIcon {
   min-height: 12px;
   min-width: 12px;
   margin-left: 10px;
-  background-image: url(../../../public/im/server_in.png);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
-.serverInName {
+.actionIcon.inServer {
+  background-image: url(../../../public/im/server_in.png);
+}
+
+.actionTitle {
   margin-left: 5px;
   width: 100%;
 }
