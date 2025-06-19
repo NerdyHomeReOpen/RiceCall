@@ -14,6 +14,7 @@ import ipcService from '@/services/ipc.service';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
+import MarkdownViewer from '../MarkdownViewer';
 
 const AboutPopup: React.FC = React.memo(() => {
   // Hooks
@@ -144,10 +145,13 @@ const AboutPopup: React.FC = React.memo(() => {
           <div className={`${aboutUs['logoPlaceholder']}`}></div>
 
           <div className={aboutUs['appInfo']}>
-            <p className={aboutUs['appInfoVersion']}>RiceCall {version}</p>
-            <p className={aboutUs['appInfoCopyright']}>
+            <div className={aboutUs['appInfoVersion']}>RiceCall v{version}</div>
+            <div className={aboutUs['appInfoCopyright']}>
               COPYRIGHT @ {currentYear} RiceCall.com ,ALL RIGHTS RESERVED.
-            </p>
+            </div>
+
+            <MarkdownViewer markdownText={lang.tr.readmeContent} />
+
             <a
               className={aboutUs['websiteLink']}
               target="_blank"
@@ -183,6 +187,7 @@ const AboutPopup: React.FC = React.memo(() => {
               {lang.tr.officialWebsite}
             </a>
           </div>
+
           <div className={aboutUs['teamMembers']}>
             <p>{lang.tr.teamMembers}:</p>
             {teamMembers.map((member, index) => {
