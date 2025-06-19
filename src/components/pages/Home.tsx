@@ -107,7 +107,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
     const [section, setSection] = useState<number>(0);
 
     // Variables
-    const { userId, name: userName, currentServerId } = user;
+    const {
+      userId,
+      name: userName,
+      currentServerId: userCurrentServerId,
+    } = user;
     const hasResults =
       exactMatch || personalResults.length > 0 || relatedResults.length > 0;
     const recentServers = servers
@@ -136,14 +140,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(
       serverDisplayId: UserServer['displayId'],
     ) => {
       if (!socket) return;
-      if (currentServerId == serverId) {
+      if (userCurrentServerId === serverId) {
         mainTab.setSelectedTabId('server');
         return;
       }
 
-      if (currentServerId) {
+      if (userCurrentServerId) {
         socket.send.disconnectServer({
-          serverId: currentServerId,
+          serverId: userCurrentServerId,
           userId: userId,
         });
       }
