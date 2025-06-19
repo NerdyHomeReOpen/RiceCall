@@ -287,25 +287,20 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(
           <div className={directMessage['mainContent']}>
             {isFriend && isOnline && targetCurrentServerId && (
               <div
-                className={directMessage['serverInArea']}
+                className={`${directMessage['actionArea']} ${directMessage['clickable']}`}
                 onClick={() => {
                   handleServerSelect(userId, targetCurrentServer);
                 }}
               >
-                <div className={directMessage['serverInIcon']} />
-                <div className={directMessage['serverInName']}>
+                <div className={`${directMessage['actionIcon']} ${directMessage['inServer']}`} />
+                <div className={directMessage['actionTitle']}>
                   {targetCurrentServerName}
                 </div>
               </div>
             )}
             {!isFriend && (
-              <div
-                className={directMessage['serverInArea']}
-                onClick={() => {
-                  handleServerSelect(userId, targetCurrentServer);
-                }}
-              >
-                <div className={directMessage['serverInName']}>
+              <div className={directMessage['actionArea']}>
+                <div className={directMessage['actionTitle']}>
                   {'對方不在你的好友列表，一些功能將無法使用!'}
                 </div>
               </div>
