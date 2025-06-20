@@ -2,7 +2,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   width: 100%;
   overflow-y: auto;
 }
@@ -572,7 +572,7 @@
   justify-content: flex-start;
   align-items: center;
   gap: 5px;
-  margin-top: 1rem;
+  margin-top: .5rem;
 }
 
 .serverItem {
@@ -706,7 +706,7 @@
   border: 1px solid #d7d7d7;
   padding: 5px;
   background: #e8e8eb;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
 }
 
 .inputBox {
