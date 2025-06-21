@@ -110,17 +110,6 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
       });
     };
 
-    const handleOpenSuccessDialog = (message: string) => {
-      ipcService.popup.open(PopupType.DIALOG_SUCCESS, 'successDialog');
-      ipcService.initialData.onRequest('successDialog', {
-        title: message,
-        submitTo: 'successDialog',
-      });
-      ipcService.popup.onSubmit('successDialog', () => {
-        handleClose();
-      });
-    };
-
     const handleClose = () => {
       ipcService.window.close();
     };
@@ -250,7 +239,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
                   userId,
                   targetId,
                 );
-                handleOpenSuccessDialog(lang.tr.friendApply);
+                handleClose();
               }}
             >
               {lang.tr.sendRequest}

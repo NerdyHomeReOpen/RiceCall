@@ -38,6 +38,9 @@ const DialogPopup: React.FC<DialogPopupProps> = ({
   // Refs
   const containerRef = useRef<HTMLFormElement>(null);
 
+  // Variables
+  const formatedTitle = typeof title === 'string' ? lang.getTranslatedMessage(title) : title;
+
   // Handlers
   const handleSubmit = () => {
     ipcService.popup.submit(submitTo);
@@ -83,7 +86,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({
                 ${popup[DIALOG_ICON[iconType]]}
               `}
             />
-            <div className={popup['label']}>{title}</div>
+            <div className={popup['label']}>{formatedTitle}</div>
           </div>
         </div>
       </div>
