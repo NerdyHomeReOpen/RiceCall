@@ -141,6 +141,27 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
         : content;
     }
 
+    // Dialog Message
+    content = content.replace(
+      'blockedSelfMessage',
+      '你已被該語音群封鎖，無法加入群組'
+    );
+
+    content = content.replace(
+      'blockedSelfWithTimeMessage',
+      '你已被該語音群踢出，無法加入群組，直到'
+    );
+
+    content = content.replace(
+      'kickedSelfMessage',
+      '你已被踢出群組'
+    );
+
+    content = content.replace(
+      'permissionsDenied',
+      '許可權不足'
+    );
+
     // Direct Event Message 
     content = content.replace(
       'sendShakeWindowMessage',
