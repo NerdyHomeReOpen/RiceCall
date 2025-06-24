@@ -10,14 +10,11 @@ import { SocketServerEvent, SocketClientEvent } from '@/types';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import StandardizedError from '@/utils/error';
+import ErrorHandler from '@/utils/error';
 
 type SocketContextType = {
   send: Record<SocketClientEvent, (...args: any[]) => void>;
-  on: Record<
-    SocketServerEvent,
-    (callback: (...args: any[]) => void) => () => void
-  >;
+  on: Record<SocketServerEvent, (callback: (...args: any[]) => void) => () => void>;
   isConnected: boolean;
 };
 
@@ -25,8 +22,7 @@ const SocketContext = createContext<SocketContextType | null>(null);
 
 export const useSocket = (): SocketContextType => {
   const context = useContext(SocketContext);
-  if (!context || !context.on || !context.send)
-    throw new Error('useSocket must be used within a SocketProvider');
+  if (!context || !context.on || !context.send) throw new Error('useSocket must be used within a SocketProvider');
   return context;
 };
 
@@ -36,12 +32,8 @@ interface SocketProviderProps {
 
 const SocketProvider = ({ children }: SocketProviderProps) => {
   // States
-  const [on, setOn] = useState<SocketContextType['on']>(
-    {} as SocketContextType['on'],
-  );
-  const [send, setSend] = useState<SocketContextType['send']>(
-    {} as SocketContextType['send'],
-  );
+  const [on, setOn] = useState<SocketContextType['on']>({} as SocketContextType['on']);
+  const [send, setSend] = useState<SocketContextType['send']>({} as SocketContextType['send']);
 
   // Refs
   const cleanupRef = useRef<(() => void)[]>([]);
@@ -67,33 +59,21 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
     ipcService.popup.close('errorDialog');
   };
 
-  const handleError = (error: any) => {
-    console.error('Socket error:', error);
-    new StandardizedError({ ...error, handler: () => {} }).show();
+  const handleError = (message: string) => {
+    console.error('Socket error:', message);
+    new ErrorHandler(new Error(message)).show();
   };
 
   const handleConnectError = (error: any) => {
     console.error('Socket connect error:', error);
-    new StandardizedError({
-      name: 'ConnectError',
-      message: '連線失敗，正在嘗試重新連線，按下確定後將自動登出',
-      part: 'SOCKET',
-      tag: 'CONNECT_ERROR',
-      statusCode: 500,
-      handler: () => ipcService.auth.logout(),
-    }).show();
+    new ErrorHandler(new Error('連線失敗，正在嘗試重新連線，按下確定後將自動登出'), () =>
+      ipcService.auth.logout(),
+    ).show();
   };
 
   const handleReconnectError = (error: any) => {
     console.error('Socket reconnect error:', error);
-    new StandardizedError({
-      name: 'ReconnectError',
-      message: '重新連線失敗，按下確定後將自動登出',
-      part: 'SOCKET',
-      tag: 'RECONNECT_ERROR',
-      statusCode: 500,
-      handler: () => ipcService.auth.logout(),
-    }).show();
+    new ErrorHandler(new Error('重新連線失敗，按下確定後將自動登出'), () => ipcService.auth.logout()).show();
   };
 
   // Effects
@@ -102,8 +82,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
     setOn(
       Object.values(SocketServerEvent).reduce((acc, event) => {
-        acc[event] = (callback: (...args: any[]) => void) =>
-          ipcService.socket.on(event, callback);
+        acc[event] = (callback: (...args: any[]) => void) => ipcService.socket.on(event, callback);
         return acc;
       }, {} as SocketContextType['on']),
     );
@@ -130,11 +109,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
     };
   }, []);
 
-  return (
-    <SocketContext.Provider value={{ on, send, isConnected }}>
-      {children}
-    </SocketContext.Provider>
-  );
+  return <SocketContext.Provider value={{ on, send, isConnected }}>{children}</SocketContext.Provider>;
 };
 
 SocketProvider.displayName = 'SocketProvider';

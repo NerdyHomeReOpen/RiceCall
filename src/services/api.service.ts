@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import StandardizedError from '@/utils/error';
+import ErrorHandler from '@/utils/error';
 
 const API_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
@@ -14,26 +14,11 @@ type ApiRequestData = {
 
 const handleResponse = async (response: Response): Promise<any> => {
   try {
-    const data = await response.json();
-
-    if (!response.ok) {
-      new StandardizedError({ ...data.error, handler: () => {} }).show();
-    }
-
-    return data;
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message);
+    return result.data;
   } catch (error: any) {
-    if (!(error instanceof StandardizedError)) {
-      error = new StandardizedError({
-        name: 'ServerError',
-        message: `請求失敗: ${error.message}`,
-        part: 'RESPONSE',
-        tag: 'EXCEPTION_ERROR',
-        statusCode: 500,
-        handler: () => {},
-      });
-    }
-    error.show();
-
+    new ErrorHandler(error).show();
     return null;
   }
 };
@@ -42,45 +27,23 @@ const apiService = {
   // GET request
   get: async (endpoint: string): Promise<any | null> => {
     try {
-      // Fetch
       const response = await fetch(`${API_URL}${endpoint}`);
 
-      // Handle response
-      const result = await handleResponse(response);
-
-      return result;
+      return await handleResponse(response);
     } catch (error: any) {
-      if (!(error instanceof StandardizedError)) {
-        error = new StandardizedError({
-          name: 'ServerError',
-          message: `獲取資料時發生預期外的錯誤: ${error.message}`,
-          part: 'GET',
-          tag: 'EXCEPTION_ERROR',
-          statusCode: 500,
-          handler: () => {},
-        });
-      }
-      error.show();
-
+      new ErrorHandler(error).show();
       return null;
     }
   },
 
   // POST request
-  post: async (
-    endpoint: string,
-    data: ApiRequestData | FormData,
-    options?: RequestOptions,
-  ): Promise<any | null> => {
+  post: async (endpoint: string, data: ApiRequestData | FormData, options?: RequestOptions): Promise<any | null> => {
     try {
       const headers = new Headers({
-        ...(data instanceof FormData
-          ? {}
-          : { 'Content-Type': 'application/json' }),
+        ...(data instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...(options?.headers || {}),
       });
 
-      // Fetch
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: headers,
@@ -88,61 +51,29 @@ const apiService = {
         body: data instanceof FormData ? data : JSON.stringify(data),
       });
 
-      // Handle response
-      const result = await handleResponse(response);
-
-      return result;
+      return await handleResponse(response);
     } catch (error: any) {
-      if (!(error instanceof StandardizedError)) {
-        error = new StandardizedError({
-          name: 'ServerError',
-          message: `提交資料時發生預期外的錯誤: ${error.message}`,
-          part: 'POST',
-          tag: 'EXCEPTION_ERROR',
-          statusCode: 500,
-          handler: () => {},
-        });
-      }
-      error.show();
-
+      new ErrorHandler(error).show();
       return null;
     }
   },
 
   // PATCH request
-  patch: async (
-    endpoint: string,
-    data: Record<string, any>,
-  ): Promise<any | null> => {
+  patch: async (endpoint: string, data: Record<string, any>): Promise<any | null> => {
     try {
       const headers = new Headers({
         'Content-Type': 'application/json',
       });
 
-      // Fetch
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'PATCH',
         headers: headers,
         body: JSON.stringify(data),
       });
 
-      // Handle response
-      const result = await handleResponse(response);
-
-      return result;
+      return await handleResponse(response);
     } catch (error: any) {
-      if (!(error instanceof StandardizedError)) {
-        error = new StandardizedError({
-          name: 'ServerError',
-          message: `更新資料時發生預期外的錯誤: ${error.message}`,
-          part: 'PATCH',
-          tag: 'EXCEPTION_ERROR',
-          statusCode: 500,
-          handler: () => {},
-        });
-      }
-      error.show();
-
+      new ErrorHandler(error).show();
       return null;
     }
   },
