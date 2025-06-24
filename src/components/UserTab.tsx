@@ -98,6 +98,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       userPermission > 4 &&
       memberPermission < 6 &&
       userPermission > memberPermission;
+    const isServerManager = userPermission >= 5;
     const canEditNickname =
       (canManageMember && memberPermission != 1) ||
       (isCurrentUser && userPermission > 1);
@@ -127,7 +128,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       canManageMember && memberCurrentChannelId !== serverLobbyId;
     const canBan = canManageMember;
     const canMoveToChannel =
-      canManageMember && memberCurrentChannelId !== currentChannelId;
+      isServerManager && userPermission >= memberPermission &&
+      memberCurrentChannelId !== currentChannelId;
     const canMute = !isCurrentUser && !isMutedByUser;
     const canUnmute = !isCurrentUser && isMutedByUser;
     const canRemoveMembership =
@@ -340,7 +342,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           if (isCurrentUser) return;
           handleOpenDirectMessage(userId, memberUserId, memberName);
         }}
-        draggable={userPermission >= 5 && memberUserId !== userId}
+        draggable={isServerManager && !isCurrentUser}
         onDragStart={(e) =>
           handleDragStart(e, memberUserId, memberCurrentChannelId)
         }
