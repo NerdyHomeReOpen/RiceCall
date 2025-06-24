@@ -112,7 +112,7 @@ export function sanitizeMarkdownWithSafeTags(
       const [name, gender, level] = content.split('_');
       return `<span class='${
         message.username
-      }' alt='<@${content}'> <span style='vertical-align: bottom;' class='${
+      }' alt='<@${content}>'> <span style='vertical-align: bottom;' class='${
         permission[gender || 'Male']
       } ${permission[`lv-${level || '1'}`]}'></span>${
         name || 'Unknown'
