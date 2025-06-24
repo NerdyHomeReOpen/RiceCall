@@ -7,16 +7,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import {
-  PopupType,
-  ServerMember,
-  Channel,
-  Server,
-  User,
-  Member,
-  UserFriend,
-  UserServer,
-} from '@/types';
+import { PopupType, ServerMember, Channel, Server, User, Member, UserFriend, UserServer } from '@/types';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -76,64 +67,34 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       currentChannelId: memberCurrentChannelId,
       currentServerId: memberCurrentServerId,
     } = member;
-    const {
-      userId,
-      serverId,
-      permissionLevel: userPermission,
-      lobbyId: serverLobbyId,
-    } = currentServer;
+    const { userId, serverId, permissionLevel: userPermission, lobbyId: serverLobbyId } = currentServer;
     const { channelId: currentChannelId } = currentChannel;
     const isCurrentUser = memberUserId === userId;
-    const speakingStatus =
-      webRTC.speakStatus?.[memberUserId] ||
-      (isCurrentUser && webRTC.volumePercent) ||
-      0;
+    const speakingStatus = webRTC.speakStatus?.[memberUserId] || (isCurrentUser && webRTC.volumePercent) || 0;
     const isSpeaking = speakingStatus !== 0;
     const isMuted = speakingStatus === -1;
     const isMutedByUser = webRTC.muteList.includes(memberUserId);
     const isFriend = friends.some((fd) => fd.targetId === memberUserId);
     const canApplyFriend = !isFriend && !isCurrentUser;
     const canManageMember =
-      !isCurrentUser &&
-      userPermission > 4 &&
-      memberPermission < 6 &&
-      userPermission > memberPermission;
+      !isCurrentUser && userPermission > 4 && memberPermission < 6 && userPermission > memberPermission;
     const isServerManager = userPermission >= 5;
-    const canEditNickname =
-      (canManageMember && memberPermission != 1) ||
-      (isCurrentUser && userPermission > 1);
-    const canChangeToGuest =
-      canManageMember && memberPermission !== 1 && userPermission > 4;
-    const canChangeToMember =
-      canManageMember &&
-      memberPermission !== 2 &&
-      (memberPermission > 1 || userPermission > 5);
+    const canEditNickname = (canManageMember && memberPermission != 1) || (isCurrentUser && userPermission > 1);
+    const canChangeToGuest = canManageMember && memberPermission !== 1 && userPermission > 4;
+    const canChangeToMember = canManageMember && memberPermission !== 2 && (memberPermission > 1 || userPermission > 5);
     const canChangeToChannelAdmin =
-      canManageMember &&
-      memberPermission !== 3 &&
-      memberPermission > 1 &&
-      userPermission > 3;
+      canManageMember && memberPermission !== 3 && memberPermission > 1 && userPermission > 3;
     const canChangeToCategoryAdmin =
-      canManageMember &&
-      memberPermission !== 4 &&
-      memberPermission > 1 &&
-      userPermission > 4;
-    const canChangeToAdmin =
-      canManageMember &&
-      memberPermission !== 5 &&
-      memberPermission > 1 &&
-      userPermission > 5;
+      canManageMember && memberPermission !== 4 && memberPermission > 1 && userPermission > 4;
+    const canChangeToAdmin = canManageMember && memberPermission !== 5 && memberPermission > 1 && userPermission > 5;
     const canKickServer = canManageMember && memberCurrentServerId === serverId;
-    const canKickChannel =
-      canManageMember && memberCurrentChannelId !== serverLobbyId;
+    const canKickChannel = canManageMember && memberCurrentChannelId !== serverLobbyId;
     const canBan = canManageMember;
     const canMoveToChannel =
-      isServerManager && userPermission >= memberPermission &&
-      memberCurrentChannelId !== currentChannelId;
+      isServerManager && userPermission >= memberPermission && memberCurrentChannelId !== currentChannelId;
     const canMute = !isCurrentUser && !isMutedByUser;
     const canUnmute = !isCurrentUser && isMutedByUser;
-    const canRemoveMembership =
-      isCurrentUser && userPermission > 1 && userPermission < 6;
+    const canRemoveMembership = isCurrentUser && userPermission > 1 && userPermission < 6;
 
     // Handlers
     const handleMuteUser = (userId: User['userId']) => {
@@ -146,11 +107,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       webRTC.handleUnmute(userId);
     };
 
-    const handleKickServer = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-      userName: User['name'],
-    ) => {
+    const handleKickServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
       if (!socket) return;
       handleOpenAlertDialog(
         lang.getTranslatedMessage('確定要將 {userName} 踢出語音群嗎?', {
@@ -179,11 +136,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       );
     };
 
-    const handleEditMember = (
-      member: Partial<Member>,
-      userId: User['userId'],
-      serverId: Server['serverId'],
-    ) => {
+    const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
       if (!socket) return;
       socket.send.editMember({
         member,
@@ -201,10 +154,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       socket.send.connectChannel({ userId, serverId, channelId });
     };
 
-    const handleOpenEditNickname = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-    ) => {
+    const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
       ipcService.popup.open(PopupType.EDIT_NICKNAME, 'editNickname');
       ipcService.initialData.onRequest('editNickname', {
         serverId,
@@ -212,10 +162,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       });
     };
 
-    const handleOpenApplyFriend = (
-      userId: User['userId'],
-      targetId: User['userId'],
-    ) => {
+    const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
       ipcService.popup.open(PopupType.APPLY_FRIEND, 'applyFriend');
       ipcService.initialData.onRequest('applyFriend', {
         userId,
@@ -223,15 +170,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       });
     };
 
-    const handleOpenDirectMessage = (
-      userId: User['userId'],
-      targetId: User['userId'],
-      targetName: User['name'],
-    ) => {
-      ipcService.popup.open(
-        PopupType.DIRECT_MESSAGE,
-        `directMessage-${targetId}`,
-      );
+    const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
+      ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
       ipcService.initialData.onRequest(`directMessage-${targetId}`, {
         userId,
         targetId,
@@ -239,10 +179,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       });
     };
 
-    const handleOpenUserInfo = (
-      userId: User['userId'],
-      targetId: User['userId'],
-    ) => {
+    const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
       ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
       ipcService.initialData.onRequest(`userInfo-${targetId}`, {
         userId,
@@ -266,10 +203,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     ) => {
       if (!socket) return;
       handleOpenAlertDialog(
-        lang.getTranslatedMessage(
-          '確定要解除 {userName} 與語音群的會員關係嗎?',
-          { userName: memberId === userId ? '自己' : `${memberName}` },
-        ),
+        lang.getTranslatedMessage('確定要解除 {userName} 與語音群的會員關係嗎?', {
+          userName: memberId === userId ? '自己' : `${memberName}`,
+        }),
         () => {
           handleEditMember(
             {
@@ -283,11 +219,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       );
     };
 
-    const handleOpenBlockMember = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-      userName: User['name'],
-    ) => {
+    const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
       ipcService.popup.open(PopupType.BLOCK_MEMBER, `blockMember-${userId}`);
       ipcService.initialData.onRequest(`blockMember-${userId}`, {
         userId,
@@ -296,11 +228,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       });
     };
 
-    const handleDragStart = (
-      e: React.DragEvent,
-      userId: User['userId'],
-      channelId: Channel['channelId'],
-    ) => {
+    const handleDragStart = (e: React.DragEvent, userId: User['userId'], channelId: Channel['channelId']) => {
       e.dataTransfer.setData('type', 'moveUser');
       e.dataTransfer.setData('userId', userId);
       e.dataTransfer.setData('currentChannelId', channelId);
@@ -317,15 +245,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         ref={userTabRef}
         key={memberUserId}
         className={`context-menu-container ${styles['userTab']} ${
-          selectedItemId === memberUserId && selectedItemType === 'user'
-            ? styles['selected']
-            : ''
+          selectedItemId === memberUserId && selectedItemType === 'user' ? styles['selected'] : ''
         }`}
         onMouseEnter={() => {
           if (!userTabRef.current) return;
-          const x =
-            userTabRef.current.getBoundingClientRect().left +
-            userTabRef.current.getBoundingClientRect().width;
+          const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
           const y = userTabRef.current.getBoundingClientRect().top;
           contextMenu.showUserInfoBlock(x, y, false, member);
         }}
@@ -343,9 +267,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           handleOpenDirectMessage(userId, memberUserId, memberName);
         }}
         draggable={isServerManager && !isCurrentUser}
-        onDragStart={(e) =>
-          handleDragStart(e, memberUserId, memberCurrentChannelId)
-        }
+        onDragStart={(e) => handleDragStart(e, memberUserId, memberCurrentChannelId)}
         onContextMenu={(e) => {
           const x = e.clientX;
           const y = e.clientY;
@@ -354,8 +276,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               id: 'direct-message',
               label: lang.tr.directMessage,
               show: !isCurrentUser,
-              onClick: () =>
-                handleOpenDirectMessage(userId, memberUserId, memberName),
+              onClick: () => handleOpenDirectMessage(userId, memberUserId, memberName),
             },
             {
               id: 'view-profile',
@@ -395,8 +316,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               id: 'move-to-channel',
               label: lang.tr.moveToChannel,
               show: canMoveToChannel,
-              onClick: () =>
-                handleMoveToChannel(memberUserId, serverId, currentChannelId),
+              onClick: () => handleMoveToChannel(memberUserId, serverId, currentChannelId),
             },
             {
               id: 'separator',
@@ -422,12 +342,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.kickChannel,
               show: canKickChannel,
               onClick: () => {
-                handleKickChannel(
-                  memberUserId,
-                  memberCurrentChannelId,
-                  serverId,
-                  memberNickname || memberName,
-                );
+                handleKickChannel(memberUserId, memberCurrentChannelId, serverId, memberNickname || memberName);
               },
             },
             {
@@ -435,11 +350,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.kickServer,
               show: canKickServer,
               onClick: () => {
-                handleKickServer(
-                  memberUserId,
-                  serverId,
-                  memberNickname || memberName,
-                );
+                handleKickServer(memberUserId, serverId, memberNickname || memberName);
               },
             },
             {
@@ -447,11 +358,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: lang.tr.ban,
               show: canBan,
               onClick: () => {
-                handleOpenBlockMember(
-                  memberUserId,
-                  serverId,
-                  memberNickname || memberName,
-                );
+                handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
               },
             },
             {
@@ -487,56 +394,31 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   id: 'set-guest',
                   label: lang.tr.setGuest,
                   show: canChangeToGuest,
-                  onClick: () =>
-                    handleRemoveMembership(
-                      memberUserId,
-                      serverId,
-                      memberNickname || memberName,
-                    ),
+                  onClick: () => handleRemoveMembership(memberUserId, serverId, memberNickname || memberName),
                 },
                 {
                   id: 'set-member',
                   label: lang.tr.setMember,
                   show: canChangeToMember,
-                  onClick: () =>
-                    handleEditMember(
-                      { permissionLevel: 2 },
-                      memberUserId,
-                      serverId,
-                    ),
+                  onClick: () => handleEditMember({ permissionLevel: 2 }, memberUserId, serverId),
                 },
                 {
                   id: 'set-channel-admin',
                   label: lang.tr.setChannelAdmin,
                   show: canChangeToChannelAdmin,
-                  onClick: () =>
-                    handleEditMember(
-                      { permissionLevel: 3 },
-                      memberUserId,
-                      serverId,
-                    ),
+                  onClick: () => handleEditMember({ permissionLevel: 3 }, memberUserId, serverId),
                 },
                 {
                   id: 'set-category-admin',
                   label: lang.tr.setCategoryAdmin,
                   show: canChangeToCategoryAdmin,
-                  onClick: () =>
-                    handleEditMember(
-                      { permissionLevel: 4 },
-                      memberUserId,
-                      serverId,
-                    ),
+                  onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId),
                 },
                 {
                   id: 'set-admin',
                   label: lang.tr.setAdmin,
                   show: canChangeToAdmin,
-                  onClick: () =>
-                    handleEditMember(
-                      { permissionLevel: 5 },
-                      memberUserId,
-                      serverId,
-                    ),
+                  onClick: () => handleEditMember({ permissionLevel: 5 }, memberUserId, serverId),
                 },
               ],
             },

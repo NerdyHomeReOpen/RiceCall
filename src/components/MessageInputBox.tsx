@@ -19,13 +19,7 @@ interface MessageInputBoxProps {
 }
 
 const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
-  ({
-    onSendMessage,
-    disabled = false,
-    warning = false,
-    placeholder = '',
-    maxLength = 2000,
-  }) => {
+  ({ onSendMessage, disabled = false, warning = false, placeholder = '', maxLength = 2000 }) => {
     // Hooks
     const lang = useLanguage();
     const contextMenu = useContextMenu();

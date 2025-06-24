@@ -17,39 +17,34 @@ interface BadgeItemProps {
   preferTop?: boolean;
 }
 
-const BadgeItem: React.FC<BadgeItemProps> = React.memo(
-  ({ badge, preferTop = false }) => {
-    // Hooks
-    const contextMenu = useContextMenu();
-    const badgeRef = React.useRef<HTMLDivElement>(null);
+const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, preferTop = false }) => {
+  // Hooks
+  const contextMenu = useContextMenu();
+  const badgeRef = React.useRef<HTMLDivElement>(null);
 
-    const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
+  const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
 
-    if (failedImageCache.has(badgeUrl)) {
-      // Fallback Badge
-      return <div className={styles['badgeBigImage']} />;
-    }
+  if (failedImageCache.has(badgeUrl)) {
+    // Fallback Badge
+    return <div className={styles['badgeBigImage']} />;
+  }
 
-    return (
-      <div
-        ref={badgeRef}
-        onMouseEnter={(e) => {
-          const x = e.clientX;
-          const y = e.clientY;
-          contextMenu.showBadgeInfoCard(x, y, preferTop, false, badge);
-        }}
-        onMouseLeave={() => {
-          contextMenu.closeBadgeInfoCard();
-        }}
-      >
-        <div
-          className={styles.badgeImage}
-          style={{ backgroundImage: `url(${badgeUrl})` }}
-        />
-      </div>
-    );
-  },
-);
+  return (
+    <div
+      ref={badgeRef}
+      onMouseEnter={(e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+        contextMenu.showBadgeInfoCard(x, y, preferTop, false, badge);
+      }}
+      onMouseLeave={() => {
+        contextMenu.closeBadgeInfoCard();
+      }}
+    >
+      <div className={styles.badgeImage} style={{ backgroundImage: `url(${badgeUrl})` }} />
+    </div>
+  );
+});
 
 BadgeItem.displayName = 'BadgeItem';
 

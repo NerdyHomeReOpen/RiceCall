@@ -64,8 +64,7 @@ export const translations: Record<LanguageKey, Translation> = {
     edit: '編輯',
     preview: '預覽',
     permission: '身份',
-    markdownSupport:
-      '支援 Markdown 語法：**粗體**, *斜體*, # 標題, - 列表, ```程式碼```, [連結](https://)',
+    markdownSupport: '支援 Markdown 語法：**粗體**, *斜體*, # 標題, - 列表, ```程式碼```, [連結](https://)',
     members: '會員',
     memberInfo: '會員資料',
     identity: '身分',
@@ -86,8 +85,7 @@ export const translations: Record<LanguageKey, Translation> = {
     semiPublicServer: '半公開群',
     semiPublicServerDescription: '(非會員只允許加入大廳)',
     privateServer: '私密群',
-    privateServerDescription:
-      '(該群只允許會員進入，不參與排行，只能通過ID搜索到)',
+    privateServerDescription: '(該群只允許會員進入，不參與排行，只能通過ID搜索到)',
     applicants: '申請人數',
     applicationSettings: '申請設定',
     nickname: '暱稱',
@@ -153,8 +151,7 @@ export const translations: Record<LanguageKey, Translation> = {
     uploadAvatar: '更換頭像',
     serverType: '群類型',
     serverName: '群名稱',
-    serverNamePlaceholder:
-      '6-30個字元組成，首尾輸入的空格無效，不能包含不雅詞彙。',
+    serverNamePlaceholder: '6-30個字元組成，首尾輸入的空格無效，不能包含不雅詞彙。',
     serverSlogan: '口號',
     serverSloganPlaceholder: '0-30個字元，口號是您建立團隊的目標',
     unknownUser: '未知使用者',
@@ -266,8 +263,7 @@ export const translations: Record<LanguageKey, Translation> = {
     passwordRequired: '密碼為必填',
     passwordMinLength: '密碼至少需要 8 個字',
     passwordMaxLength: '密碼最多 20 個字',
-    passwordInvalidFormat:
-      '密碼長度需要在8-20個字之間，且不包含@$!%*#?&以外的特殊字元',
+    passwordInvalidFormat: '密碼長度需要在8-20個字之間，且不包含@$!%*#?&以外的特殊字元',
     usernameRequired: '顯示名稱為必填',
     usernameMinLength: '顯示名稱至少需要 1 個字',
     usernameMaxLength: '顯示名稱最多 32 個字',
@@ -331,8 +327,7 @@ export const translations: Record<LanguageKey, Translation> = {
     chatMode: '聊天模式',
     chatModeDescription: '低延遲，音質流暢（適用於自由、指揮模式下的頻道語音）',
     entertainmentMode: '娛樂模式',
-    entertainmentModeDescription:
-      '原汁原味，立體聲效（適用於排麥模式下的頻道、K歌等型活動語音）',
+    entertainmentModeDescription: '原汁原味，立體聲效（適用於排麥模式下的頻道、K歌等型活動語音）',
     forbidGuestQueue: '禁止遊客排麥發言',
     forbidGuestVoice: '自由發言模式禁止遊客語音',
     forbidOnlyAdminText: '此頻道被設定為只允許管理員發送文字訊息',
@@ -389,8 +384,7 @@ export const translations: Record<LanguageKey, Translation> = {
     addFriendGroup: '分組名稱',
     getHelp: '獲得協助',
     discord: 'Discord',
-    TEXT_CHANGE_TO_FORBIDDEN_URL:
-      '此頻道已被設定為禁止訪客發送包含URL的文字訊息',
+    TEXT_CHANGE_TO_FORBIDDEN_URL: '此頻道已被設定為禁止訪客發送包含URL的文字訊息',
     TEXT_CHANGE_TO_FORBIDDEN_TEXT: '此頻道已被設定為禁止訪客發送文字訊息',
     TEXT_CHANGE_TO_ALLOWED_TEXT: '此頻道已被設定為允許訪客發送文字訊息',
     TEXT_CHANGE_TO_ALLOWED_URL: '此頻道已被設定為允許訪客發送包含URL的文字訊息',
@@ -531,8 +525,7 @@ RC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為�
     edit: '编辑',
     preview: '预览',
     permission: '权限',
-    markdownSupport:
-      '支持 Markdown 语法：**粗体**, *斜体*, # 标题, - 列表, ```代码```, [链接](https://)',
+    markdownSupport: '支持 Markdown 语法：**粗体**, *斜体*, # 标题, - 列表, ```代码```, [链接](https://)',
     members: '会员',
     memberInfo: '会员资料',
     identity: '身份',
@@ -553,8 +546,7 @@ RC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為�
     semiPublicServer: '半公开群',
     semiPublicServerDescription: '(非会员只允许加入大厅)',
     privateServer: '私密群',
-    privateServerDescription:
-      '(该群只允许会员进入，不参与排行，只能通过ID搜索到)',
+    privateServerDescription: '(该群只允许会员进入，不参与排行，只能通过ID搜索到)',
     applicants: '申请人数',
     applicationSettings: '申请设置',
     nickname: '昵称',
@@ -620,8 +612,7 @@ RC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為�
     uploadAvatar: '更换头像',
     serverType: '群类型',
     serverName: '群名称',
-    serverNamePlaceholder:
-      '6-30个字符组成，首尾输入的空格无效，不能包含不雅词汇。',
+    serverNamePlaceholder: '6-30个字符组成，首尾输入的空格无效，不能包含不雅词汇。',
     serverSlogan: '口号',
     serverSloganPlaceholder: '0-30个字符，口号是您建立团队的目标',
     unknownUser: '未知用户',
@@ -733,8 +724,7 @@ RC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為�
     passwordRequired: '密码为必填',
     passwordMinLength: '密码至少需要 8 个字',
     passwordMaxLength: '密码最多 20 个字',
-    passwordInvalidFormat:
-      '密码长度需要在8-20个字之间，且不包含@$!%*#?&以外的特殊字符',
+    passwordInvalidFormat: '密码长度需要在8-20个字之间，且不包含@$!%*#?&以外的特殊字符',
     usernameRequired: '显示名称为必填',
     usernameMinLength: '显示名称至少需要 1 个字',
     usernameMaxLength: '显示名称最多 32 个字',
@@ -798,8 +788,7 @@ RC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為�
     chatMode: '聊天模式',
     chatModeDescription: '低延迟，音质流畅（适用于自由、指挥模式下的频道语音）',
     entertainmentMode: '娱乐模式',
-    entertainmentModeDescription:
-      '原汁原味，立体声效（适用于排麦模式下的频道、K歌等型活动语音）',
+    entertainmentModeDescription: '原汁原味，立体声效（适用于排麦模式下的频道、K歌等型活动语音）',
     forbidGuestQueue: '禁止游客排麦发言',
     forbidGuestVoice: '自由发言模式禁止游客语音',
     forbidOnlyAdminText: '此频道被设定为仅管理员可以发送文字消息',
@@ -997,8 +986,7 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     edit: 'Edit',
     preview: 'Preview',
     permission: 'Permission',
-    markdownSupport:
-      'Supports Markdown syntax: **bold**, *italic*, # heading, - list, ```code```, [link](https://)',
+    markdownSupport: 'Supports Markdown syntax: **bold**, *italic*, # heading, - list, ```code```, [link](https://)',
     members: 'Members',
     memberInfo: 'Member Info',
     identity: 'Identity',
@@ -1017,8 +1005,7 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     accessPermission: 'Access Permission',
     publicServer: 'Public Server',
     semiPublicServer: 'Semi-Public Server',
-    semiPublicServerDescription:
-      '(Non-members are only allowed to join the lobby)',
+    semiPublicServerDescription: '(Non-members are only allowed to join the lobby)',
     privateServer: 'Private Server',
     privateServerDescription:
       '(The server only allows members to enter, does not participate in rankings, and can only be searched by ID)',
@@ -1082,8 +1069,7 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     selectServerTypeDescription: 'Please select the type of server',
     fillInfo: 'Fill in the information',
     remainingServer1: 'You can still create',
-    remainingServer2:
-      'servers, once created, they cannot be deleted or transferred',
+    remainingServer2: 'servers, once created, they cannot be deleted or transferred',
     canNotReadImage: 'Cannot read image',
     imageTooLarge: 'Image size cannot exceed 5MB',
     uploadAvatar: 'Upload avatar',
@@ -1131,13 +1117,10 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     forbiddenQueue: 'Forbidden queue',
     controlQueue: 'Control queue',
     textChangeToFreeSpeech: 'The channel chat has been set to free speech',
-    textChangeToForbiddenSpeech:
-      'The channel chat has been set to admin-only speech',
+    textChangeToForbiddenSpeech: 'The channel chat has been set to admin-only speech',
     voiceChangeToFreeSpeech: 'The channel voice has been set to free speech',
-    voiceChangeToForbiddenSpeech:
-      'The channel voice has been set to admin-only speech',
-    voiceChangeToQueue:
-      'The channel voice has been set to queue, please click "Take mic" to wait for speech',
+    voiceChangeToForbiddenSpeech: 'The channel voice has been set to admin-only speech',
+    voiceChangeToQueue: 'The channel voice has been set to queue, please click "Take mic" to wait for speech',
     voiceChangeToForbiddenQueue: 'The queue mode has been changed to forbidden',
     voiceChangeToControlQueue: 'The queue mode has been changed to control',
     takeMic: 'Take mic',
@@ -1201,18 +1184,15 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     accountRequired: 'Account is required',
     accountMinLength: 'Account must be at least 4 characters',
     accountMaxLength: 'Account cannot exceed 16 characters',
-    accountInvalidFormat:
-      'Account can only contain letters, numbers, underscore(_) and dot(.)',
+    accountInvalidFormat: 'Account can only contain letters, numbers, underscore(_) and dot(.)',
     passwordRequired: 'Password is required',
     passwordMinLength: 'Password must be at least 8 characters',
     passwordMaxLength: 'Password cannot exceed 20 characters',
-    passwordInvalidFormat:
-      'Password must be 8-20 characters and can only contain @$!%*#?& as special characters',
+    passwordInvalidFormat: 'Password must be 8-20 characters and can only contain @$!%*#?& as special characters',
     usernameRequired: 'Display name is required',
     usernameMinLength: 'Display name must be at least 1 character',
     usernameMaxLength: 'Display name cannot exceed 32 characters',
-    usernameInvalidFormat:
-      'Display name can only contain English, numbers, and Chinese',
+    usernameInvalidFormat: 'Display name can only contain English, numbers, and Chinese',
     accountCannotChange: 'Account cannot be changed after registration',
     passwordsDoNotMatch: 'Passwords do not match',
     basicSettings: 'Basic Settings',
@@ -1223,14 +1203,11 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     autoStartup: 'Auto Startup',
     autoStartupDescription: 'Auto start application on boot',
     minimizeToTray: 'Minimize to Tray',
-    minimizeToTrayDescription:
-      'Minimize to tray instead of exiting when closing window',
+    minimizeToTrayDescription: 'Minimize to tray instead of exiting when closing window',
     startMinimized: 'Start Minimized',
-    startMinimizedDescription:
-      'Auto minimize to tray when starting application',
+    startMinimizedDescription: 'Auto minimize to tray when starting application',
     notificationSound: 'Notification Sound',
-    notificationSoundDescription:
-      'Play notification sound when receiving new message',
+    notificationSoundDescription: 'Play notification sound when receiving new message',
     inputDevice: 'Input Device',
     outputDevice: 'Output Device',
     defaultMicrophone: 'Default Microphone',
@@ -1250,18 +1227,13 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     copyright: 'Copyright',
     isReceiveApply: 'Receive Member Application',
     setApplyNotice: 'Application Notice',
-    cannotApply:
-      'Cannot apply for membership, this server does not accept membership applications',
+    cannotApply: 'Cannot apply for membership, this server does not accept membership applications',
     applySuccess: 'Application submitted, please wait for admin review',
     TEXT_CHANGE_TO_FREE_SPEECH: 'The channel chat has been set to free speech',
-    TEXT_CHANGE_TO_FORBIDDEN_SPEECH:
-      'The channel chat has been set to admin-only speech',
-    VOICE_CHANGE_TO_FREE_SPEECH:
-      'The channel voice has been set to free speech',
-    VOICE_CHANGE_TO_FORBIDDEN_SPEECH:
-      'The channel voice has been set to admin-only speech',
-    VOICE_CHANGE_TO_QUEUE:
-      'The channel voice has been set to queue, please click "Take mic" to wait for speech',
+    TEXT_CHANGE_TO_FORBIDDEN_SPEECH: 'The channel chat has been set to admin-only speech',
+    VOICE_CHANGE_TO_FREE_SPEECH: 'The channel voice has been set to free speech',
+    VOICE_CHANGE_TO_FORBIDDEN_SPEECH: 'The channel voice has been set to admin-only speech',
+    VOICE_CHANGE_TO_QUEUE: 'The channel voice has been set to queue, please click "Take mic" to wait for speech',
     pleaseInputFriendAccount: 'Please input friend account:',
     pleaseInputFriendGroupName: 'Please input group name:',
     friendGroupOrder: 'Group Order:',
@@ -1278,15 +1250,12 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     queueSpeech: 'Queue Speech',
     channelAudioQuality: 'Channel Audio Quality',
     chatMode: 'Chat Mode',
-    chatModeDescription:
-      'Low latency, smooth quality (for free speech and command mode channels)',
+    chatModeDescription: 'Low latency, smooth quality (for free speech and command mode channels)',
     entertainmentMode: 'Entertainment Mode',
-    entertainmentModeDescription:
-      'Original quality, stereo effect (for queued channels, karaoke etc)',
+    entertainmentModeDescription: 'Original quality, stereo effect (for queued channels, karaoke etc)',
     forbidGuestQueue: 'Forbid guest queue speech',
     forbidGuestVoice: 'Forbid guest voice in free speech mode',
-    forbidOnlyAdminText:
-      'This channel is set to allow only admin to send text messages',
+    forbidOnlyAdminText: 'This channel is set to allow only admin to send text messages',
     forbidGuestText: 'Forbid guests from sending text messages in this channel',
     forbidGuestUrl: 'Forbid guests from sending messages containing URLs',
     guestTextMaxLength: 'Maximum length of guest text messages:',
@@ -1340,20 +1309,13 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     addFriendGroup: 'Please fill in the subgroup name',
     getHelp: 'Get Help',
     discord: 'Discord',
-    TEXT_CHANGE_TO_FORBIDDEN_URL:
-      'This channel has been set to forbid guests from sending messages containing URLs',
-    TEXT_CHANGE_TO_FORBIDDEN_TEXT:
-      'This channel has been set to forbid guests from sending text messages',
-    TEXT_CHANGE_TO_ALLOWED_TEXT:
-      'This channel has been set to allow guests to send text messages',
-    TEXT_CHANGE_TO_ALLOWED_URL:
-      'This channel has been set to allow guests to send messages containing URLs',
-    TEXT_CHANGE_TO_MAX_LENGTH:
-      'The maximum length of guest text messages has been changed to: {0} characters',
-    TEXT_CHANGE_TO_WAIT_TIME:
-      'The wait time before guests can send messages has been changed to: {0} seconds',
-    TEXT_CHANGE_TO_GAP_TIME:
-      'The interval between guest messages has been changed to: {0} seconds',
+    TEXT_CHANGE_TO_FORBIDDEN_URL: 'This channel has been set to forbid guests from sending messages containing URLs',
+    TEXT_CHANGE_TO_FORBIDDEN_TEXT: 'This channel has been set to forbid guests from sending text messages',
+    TEXT_CHANGE_TO_ALLOWED_TEXT: 'This channel has been set to allow guests to send text messages',
+    TEXT_CHANGE_TO_ALLOWED_URL: 'This channel has been set to allow guests to send messages containing URLs',
+    TEXT_CHANGE_TO_MAX_LENGTH: 'The maximum length of guest text messages has been changed to: {0} characters',
+    TEXT_CHANGE_TO_WAIT_TIME: 'The wait time before guests can send messages has been changed to: {0} seconds',
+    TEXT_CHANGE_TO_GAP_TIME: 'The interval between guest messages has been changed to: {0} seconds',
     vipUpgradeBoost: '(Member {0}x upgrade boost active)',
     GUEST_SEND_AN_EXTERNAL_LINK: '[Guest sent an external link]',
     invitation: 'Apply for membership',
@@ -1367,8 +1329,7 @@ RC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为�
     denyApplication: 'Deny application',
     pleaseEnterTheChannelPassword: 'Please enter the channel password',
     setChannelPassword: 'Set channel password',
-    setChannelPasswordDescription:
-      'Please enter the channel password (1-4 digits)',
+    setChannelPasswordDescription: 'Please enter the channel password (1-4 digits)',
     editFriend: 'Edit friend',
     connectingServer: 'Connecting',
     mute: 'Mute this user',
@@ -1489,8 +1450,7 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     edit: '編集',
     preview: 'プレビュー',
     permission: '許可',
-    markdownSupport:
-      'Markdown構文をサポート：**太字**, *斜体*, # 見出し, - リスト, ```コード```, [リンク](https://)',
+    markdownSupport: 'Markdown構文をサポート：**太字**, *斜体*, # 見出し, - リスト, ```コード```, [リンク](https://)',
     members: 'メンバー',
     memberInfo: 'メンバー情報',
     identity: 'アイデンティティ',
@@ -1511,8 +1471,7 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     semiPublicServer: '半公開グループ',
     semiPublicServerDescription: '(非メンバーはロビーにのみ参加できます)',
     privateServer: 'プライベートグループ',
-    privateServerDescription:
-      '(グループはメンバーのみが参加でき、ランキングには参加せず、IDでのみ検索できます)',
+    privateServerDescription: '(グループはメンバーのみが参加でき、ランキングには参加せず、IDでのみ検索できます)',
     applicants: '応募者',
     applicationSettings: 'アプリケーション設定',
     nickname: 'ニックネーム',
@@ -1579,8 +1538,7 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     uploadAvatar: 'アバターをアップロード',
     serverType: 'グループの種類',
     serverName: 'グループ名',
-    serverNamePlaceholder:
-      '6〜30文字、先頭と末尾のスペースは無効で、不適切な言葉を含めることはできません。',
+    serverNamePlaceholder: '6〜30文字、先頭と末尾のスペースは無効で、不適切な言葉を含めることはできません。',
     serverSlogan: 'スローガン',
     serverSloganPlaceholder: '0〜30文字、スローガンはチームの目標です',
     unknownUser: '不明なユーザー',
@@ -1620,13 +1578,10 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     queue: '排麦',
     forbiddenQueue: '禁止排麦',
     controlQueue: '控麦',
-    textChangeToFreeSpeech:
-      'チャンネルのチャットは自由な発言に設定されています',
-    textChangeToForbiddenSpeech:
-      'チャンネルのチャットは管理者のみの発言に設定されています',
+    textChangeToFreeSpeech: 'チャンネルのチャットは自由な発言に設定されています',
+    textChangeToForbiddenSpeech: 'チャンネルのチャットは管理者のみの発言に設定されています',
     voiceChangeToFreeSpeech: 'チャンネルの音声は自由な発言に設定されています',
-    voiceChangeToForbiddenSpeech:
-      'チャンネルの音声は管理者のみの発言に設定されています',
+    voiceChangeToForbiddenSpeech: 'チャンネルの音声は管理者のみの発言に設定されています',
     voiceChangeToQueue:
       'チャンネルの音声は排麦才能発言に設定されています。"マイクを取る"をクリックして発言を待ってください',
     voiceChangeToForbiddenQueue: '排麦モードは禁止に設定されています',
@@ -1692,8 +1647,7 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     accountRequired: 'アカウントは必須です',
     accountMinLength: 'アカウントは最低4文字必要です',
     accountMaxLength: 'アカウントは最大16文字です',
-    accountInvalidFormat:
-      'アカウントは英数字、下線(_)、ドット(.)のみ使用できます',
+    accountInvalidFormat: 'アカウントは英数字、下線(_)、ドット(.)のみ使用できます',
     passwordRequired: 'パスワードは必須です',
     passwordMinLength: 'パスワードは最低8文字必要です',
     passwordMaxLength: 'パスワードは最大20文字です',
@@ -1713,13 +1667,11 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     autoStartup: '自動起動',
     autoStartupDescription: '起動時に自動でアプリを起動',
     minimizeToTray: 'システムトレイに最小化',
-    minimizeToTrayDescription:
-      'ウィンドウを閉じた時にシステムトレイに最小化する',
+    minimizeToTrayDescription: 'ウィンドウを閉じた時にシステムトレイに最小化する',
     startMinimized: '最小化して起動',
     startMinimizedDescription: 'アプリを起動時に自動でシステムトレイに最小化',
     notificationSound: '通知音',
-    notificationSoundDescription:
-      '新しいメッセージを受け取った時に通知音を再生',
+    notificationSoundDescription: '新しいメッセージを受け取った時に通知音を再生',
     inputDevice: '入力デバイス',
     outputDevice: '出力デバイス',
     defaultMicrophone: 'システムデフォルトのマイク',
@@ -1741,14 +1693,10 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     setApplyNotice: 'メンバー申請須知',
     cannotApply: 'メンバー申請を受け取ることができません',
     applySuccess: 'メンバー申請が送信されました',
-    TEXT_CHANGE_TO_FREE_SPEECH:
-      'チャンネルのチャットは自由な発言に設定されています',
-    TEXT_CHANGE_TO_FORBIDDEN_SPEECH:
-      'チャンネルのチャットは管理者のみの発言に設定されています',
-    VOICE_CHANGE_TO_FREE_SPEECH:
-      'チャンネルの音声は自由な発言に設定されています',
-    VOICE_CHANGE_TO_FORBIDDEN_SPEECH:
-      'チャンネルの音声は管理者のみの発言に設定されています',
+    TEXT_CHANGE_TO_FREE_SPEECH: 'チャンネルのチャットは自由な発言に設定されています',
+    TEXT_CHANGE_TO_FORBIDDEN_SPEECH: 'チャンネルのチャットは管理者のみの発言に設定されています',
+    VOICE_CHANGE_TO_FREE_SPEECH: 'チャンネルの音声は自由な発言に設定されています',
+    VOICE_CHANGE_TO_FORBIDDEN_SPEECH: 'チャンネルの音声は管理者のみの発言に設定されています',
     VOICE_CHANGE_TO_QUEUE:
       'チャンネルの音声は排麦才能発言に設定されています。"マイクを取る"をクリックして発言を待ってください',
     pleaseInputFriendAccount: 'フレンドアカウントを入力してください:',
@@ -1767,15 +1715,12 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     queueSpeech: '順番待ち発言',
     channelAudioQuality: 'チャンネル音質',
     chatMode: 'チャットモード',
-    chatModeDescription:
-      '低遅延、音質スムーズ（自由発言、指示モードのチャンネル向け）',
+    chatModeDescription: '低遅延、音質スムーズ（自由発言、指示モードのチャンネル向け）',
     entertainmentMode: 'エンターテイメントモード',
-    entertainmentModeDescription:
-      '原音質、ステレオ効果（順番待ちモード、カラオケなどのイベント向け）',
+    entertainmentModeDescription: '原音質、ステレオ効果（順番待ちモード、カラオケなどのイベント向け）',
     forbidGuestQueue: 'ゲストの順番待ち発言を禁止',
     forbidGuestVoice: '自由発言モードでゲストの音声を禁止',
-    forbidOnlyAdminText:
-      'このチャンネルでは管理員のみがテキストメッセージを送信できます',
+    forbidOnlyAdminText: 'このチャンネルでは管理員のみがテキストメッセージを送信できます',
     forbidGuestText: 'このチャンネルではゲストのテキストメッセージを禁止',
     forbidGuestUrl: 'ゲストのURL含むメッセージを禁止',
     guestTextMaxLength: 'ゲストのテキストメッセージ最大長:',
@@ -1829,14 +1774,10 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     addFriendGroup: 'サブグループ名を記入してください',
     getHelp: 'ヘルプを取得',
     discord: 'Discord',
-    TEXT_CHANGE_TO_FORBIDDEN_URL:
-      'このチャンネルはゲストのURL含むメッセージを禁止しています',
-    TEXT_CHANGE_TO_FORBIDDEN_TEXT:
-      'このチャンネルはゲストのテキストメッセージを禁止しています',
-    TEXT_CHANGE_TO_ALLOWED_TEXT:
-      'このチャンネルはゲストのテキストメッセージを許可しています',
-    TEXT_CHANGE_TO_ALLOWED_URL:
-      'このチャンネルはゲストのURL含むメッセージを許可しています',
+    TEXT_CHANGE_TO_FORBIDDEN_URL: 'このチャンネルはゲストのURL含むメッセージを禁止しています',
+    TEXT_CHANGE_TO_FORBIDDEN_TEXT: 'このチャンネルはゲストのテキストメッセージを禁止しています',
+    TEXT_CHANGE_TO_ALLOWED_TEXT: 'このチャンネルはゲストのテキストメッセージを許可しています',
+    TEXT_CHANGE_TO_ALLOWED_URL: 'このチャンネルはゲストのURL含むメッセージを許可しています',
     TEXT_CHANGE_TO_MAX_LENGTH: 'ゲストのテキストメッセージ最大長: {0} 文字',
     TEXT_CHANGE_TO_WAIT_TIME: 'ゲストのメッセージ待機時間: {0} 秒',
     TEXT_CHANGE_TO_GAP_TIME: 'ゲストのメッセージ間隔: {0}',
@@ -1853,8 +1794,7 @@ This disclaimer can be found in the application: Menu > Help Center > About Rice
     denyApplication: '申請を拒否',
     pleaseEnterTheChannelPassword: 'チャンネルパスワードを入力してください',
     setChannelPassword: 'チャンネルパスワードを設定',
-    setChannelPasswordDescription:
-      'チャンネルパスワードを入力してください (1-4位数字)',
+    setChannelPasswordDescription: 'チャンネルパスワードを入力してください (1-4位数字)',
     editFriend: '編輯友達',
     connectingServer: '接続中',
     mute: 'このユーザーの音声を拒聴',

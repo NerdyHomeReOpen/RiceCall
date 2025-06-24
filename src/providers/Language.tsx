@@ -13,18 +13,14 @@ interface LanguageContextType {
   getPermissionText: (permission: Permission) => string;
   getFormatTimeDiff: (timestamp: number) => string;
   getFormatTimestamp: (timestamp: number) => string;
-  getTranslatedMessage: (
-    content: string,
-    params?: Record<string, string> | undefined,
-  ) => string;
+  getTranslatedMessage: (content: string, params?: Record<string, string> | undefined) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
-  if (!context)
-    throw new Error('useLanguage must be used within a LanguageProvider');
+  if (!context) throw new Error('useLanguage must be used within a LanguageProvider');
   return context;
 };
 
@@ -78,16 +74,16 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
         if (count >= 1) {
           const label = interval.label;
           const timesAgo = '{0}前';
-          const timesFuture = '{0}後'
+          const timesFuture = '{0}後';
           return isFuture
             ? timesFuture.replace('{0}', `${count}${label}`)
-            : timesAgo.replace('{0}', `${count}${label}`)
+            : timesAgo.replace('{0}', `${count}${label}`);
         }
       }
     }
 
     return '剛剛';
-  }
+  };
 
   const getFormatTimestamp = (timestamp: number): string => {
     const langMap: Record<LanguageKey, string> = {
@@ -99,11 +95,7 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
     const timezoneLang = langMap[language] || 'zh-TW';
     const now = new Date();
     const messageDate = new Date(timestamp);
-    const messageDay = new Date(
-      messageDate.getFullYear(),
-      messageDate.getMonth(),
-      messageDate.getDate(),
-    );
+    const messageDay = new Date(messageDate.getFullYear(), messageDate.getMonth(), messageDate.getDate());
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -121,10 +113,7 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
     return `${messageDate.toLocaleDateString(timezoneLang)} ${timeString}`;
   };
 
-  const getTranslatedMessage = (
-    content: string,
-    params?: Record<string, string> | undefined,
-  ) => {
+  const getTranslatedMessage = (content: string, params?: Record<string, string> | undefined) => {
     if (content.includes(' ')) {
       const [key, ...params] = content.split(' ');
       if (Object.prototype.hasOwnProperty.call(translation, key)) {
@@ -134,7 +123,6 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
         });
         content = translatedText;
       }
-
     } else {
       content = Object.prototype.hasOwnProperty.call(translation, content)
         ? translation[content as keyof typeof translation]
@@ -142,149 +130,62 @@ const LanguageProvider = ({ children }: LanguageProviderProps) => {
     }
 
     // Dialog Message
-    content = content.replace(
-      'blockedSelfMessage',
-      '你已被該語音群封鎖，無法加入群組'
-    );
+    content = content.replace('blockedSelfMessage', '你已被該語音群封鎖，無法加入群組');
 
-    content = content.replace(
-      'blockedSelfWithTimeMessage',
-      '你已被該語音群踢出，無法加入群組，直到'
-    );
+    content = content.replace('blockedSelfWithTimeMessage', '你已被該語音群踢出，無法加入群組，直到');
 
-    content = content.replace(
-      'kickedSelfMessage',
-      '你已被踢出群組'
-    );
+    content = content.replace('kickedSelfMessage', '你已被踢出群組');
 
-    content = content.replace(
-      'permissionsDenied',
-      '許可權不足'
-    );
+    content = content.replace('permissionsDenied', '許可權不足');
 
-    // Direct Event Message 
-    content = content.replace(
-      'sendShakeWindowMessage',
-      '向您發送了一次視窗震動'
-    );
+    // Direct Event Message
+    content = content.replace('sendShakeWindowMessage', '向您發送了一次視窗震動');
 
     // Action Event Messages
 
-    content = content.replace(
-      'removeFromMemberMessage',
-      '移除了你的會員身份。',
-    );
-    content = content.replace(
-      'removeFromChannelManagerMessage',
-      '移除了你的頻道管理員身份。',
-    );
-    content = content.replace(
-      'removeFromServerManagerMessage',
-      '移除了你的群管理員身份。',
-    );
+    content = content.replace('removeFromMemberMessage', '移除了你的會員身份。');
+    content = content.replace('removeFromChannelManagerMessage', '移除了你的頻道管理員身份。');
+    content = content.replace('removeFromServerManagerMessage', '移除了你的群管理員身份。');
 
-    content = content.replace(
-      'upgradeServerManagerMessage',
-      '您已被提升為本群的管理員。',
-    );
-    content = content.replace(
-      'upgradeChannelManagerMessage',
-      '您已被提升為本頻道的管理員。',
-    );
-    content = content.replace(
-      'upgradeMemberMessage',
-      '您已加入成為本群會員。',
-    );
+    content = content.replace('upgradeServerManagerMessage', '您已被提升為本群的管理員。');
+    content = content.replace('upgradeChannelManagerMessage', '您已被提升為本頻道的管理員。');
+    content = content.replace('upgradeMemberMessage', '您已加入成為本群會員。');
 
     // Action Warn Messages
 
-    content = content.replace(
-      'forbidVoiceMessage',
-      '您被管理員【{operator}】禁止語音',
-    );
-    content = content.replace(
-      'unForbidVoiceMessage',
-      '您被管理員【{operator}】重新開啟語音',
-    );
-    content = content.replace(
-      'forbidTextMessage',
-      '您被管理員【{operator}】禁止傳送文字訊息',
-    );
-    content = content.replace(
-      'unForbidTextMessage',
-      '您被管理員【{operator}】重新開啟傳送文字訊息',
-    );
+    content = content.replace('forbidVoiceMessage', '您被管理員【{operator}】禁止語音');
+    content = content.replace('unForbidVoiceMessage', '您被管理員【{operator}】重新開啟語音');
+    content = content.replace('forbidTextMessage', '您被管理員【{operator}】禁止傳送文字訊息');
+    content = content.replace('unForbidTextMessage', '您被管理員【{operator}】重新開啟傳送文字訊息');
     content = content.replace(
       'timeoutChannelWithTimeMessage',
       '您在【{channel}】頻道被管理員【{operator}】踢出 {time} 分鐘',
     );
 
-    content = content.replace(
-      'timeoutChannelMessage',
-      '您在【{channel}】頻道被管理員【{operator}】踢出',
-    );
+    content = content.replace('timeoutChannelMessage', '您在【{channel}】頻道被管理員【{operator}】踢出');
 
     // Channel Event Messages
 
-    content = content.replace(
-      'setMemberMessage',
-      '加入了群，成為本群會員。',
-    );
-    content = content.replace(
-      'setChannelManagerMessage',
-      '被提升為本頻道的頻道管理員。',
-    );
-    content = content.replace(
-      'setServerManagerMessage',
-      '被提升為本群的管理員。',
-    );
+    content = content.replace('setMemberMessage', '加入了群，成為本群會員。');
+    content = content.replace('setChannelManagerMessage', '被提升為本頻道的頻道管理員。');
+    content = content.replace('setServerManagerMessage', '被提升為本群的管理員。');
 
     // Channel Warn Messages
 
-    content = content.replace(
-      'forbidVoiceMemberMessage',
-      '【{target}】被管理員【{operator}】禁止語音',
-    );
-    content = content.replace(
-      'unForbidVoiceMemberMessage',
-      '【{target}】被管理員【{operator}】重新開啟語音',
-    );
-    content = content.replace(
-      'forbidTextMemberMessage',
-      '【{target}】被管理員【{operator}】禁止傳送文字訊息',
-    );
-    content = content.replace(
-      'unForbidTextMemberMessage',
-      '【{target}】被管理員【{operator}】重新開啟傳送文字訊息',
-    );
-    content = content.replace(
-      'timeoutMemberChannelMessage',
-      '【{target}】被管理員【{operator}】踢出頻道',
-    );
-    content = content.replace(
-      'timeoutMemberMessage',
-      '【{target}】被管理員【{operator}】踢出群',
-    );
-    content = content.replace(
-      'blockedMemberMessage',
-      '【{target}】被管理員【{operator}】封鎖',
-    );
+    content = content.replace('forbidVoiceMemberMessage', '【{target}】被管理員【{operator}】禁止語音');
+    content = content.replace('unForbidVoiceMemberMessage', '【{target}】被管理員【{operator}】重新開啟語音');
+    content = content.replace('forbidTextMemberMessage', '【{target}】被管理員【{operator}】禁止傳送文字訊息');
+    content = content.replace('unForbidTextMemberMessage', '【{target}】被管理員【{operator}】重新開啟傳送文字訊息');
+    content = content.replace('timeoutMemberChannelMessage', '【{target}】被管理員【{operator}】踢出頻道');
+    content = content.replace('timeoutMemberMessage', '【{target}】被管理員【{operator}】踢出群');
+    content = content.replace('blockedMemberMessage', '【{target}】被管理員【{operator}】封鎖');
 
     // Alert Messages
-    content = content.replace(
-      'channelAlert',
-      '頻道廣播',
-    );
+    content = content.replace('channelAlert', '頻道廣播');
 
-    content = content.replace(
-      'serverAlert',
-      '群廣播',
-    );
+    content = content.replace('serverAlert', '群廣播');
 
-    content = content.replace(
-      /{(\w+)}/gm,
-      (match, p1) => params?.[p1] || match,
-    );
+    content = content.replace(/{(\w+)}/gm, (match, p1) => params?.[p1] || match);
 
     const isPlainText = !/[#>*\-\[\]`|!_~]/.test(content);
     return isPlainText ? content.replace(/\n/g, '<br />') : content;

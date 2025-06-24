@@ -160,9 +160,7 @@ const AboutPopup: React.FC = React.memo(() => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
-                ipcService.window.openExternal(
-                  'https://discord.com/invite/adCWzv6wwS',
-                );
+                ipcService.window.openExternal('https://discord.com/invite/adCWzv6wwS');
               }}
             >
               {lang.tr.getHelp}
@@ -172,9 +170,7 @@ const AboutPopup: React.FC = React.memo(() => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
-                ipcService.window.openExternal(
-                  'https://github.com/NerdyHomeReOpen/RiceCall',
-                );
+                ipcService.window.openExternal('https://github.com/NerdyHomeReOpen/RiceCall');
               }}
             >
               {lang.tr.projectRepo}
@@ -194,21 +190,13 @@ const AboutPopup: React.FC = React.memo(() => {
           <div className={aboutUs['teamMembers']}>
             <p>{lang.tr.teamMembers}:</p>
             {teamMembers.map((member, index) => {
-              const githubInfo = member.info.find(
-                (item) => item.label === 'Github' && item.value,
-              );
-              const discordInfo = member.info.find(
-                (item) => item.label === 'Discord' && item.value,
-              );
+              const githubInfo = member.info.find((item) => item.label === 'Github' && item.value);
+              const discordInfo = member.info.find((item) => item.label === 'Discord' && item.value);
               return (
                 <React.Fragment key={member.contact + index}>
                   <div className={aboutUs['teamMemberLink']}>
                     <div className={aboutUs['teamMemberNameGroup']}>
-                      <span
-                        className={`${aboutUs['developerTitle']} ${
-                          titleColorClasses[member.title as JobTitle]
-                        }`}
-                      >
+                      <span className={`${aboutUs['developerTitle']} ${titleColorClasses[member.title as JobTitle]}`}>
                         {member.title}
                       </span>
                       <span>{member.contact}</span>
@@ -223,9 +211,7 @@ const AboutPopup: React.FC = React.memo(() => {
                           title="GitHub"
                           onClick={(e) => {
                             e.preventDefault();
-                            ipcService.window.openExternal(
-                              `https://github.com/${githubInfo.value}`,
-                            );
+                            ipcService.window.openExternal(`https://github.com/${githubInfo.value}`);
                           }}
                         >
                           <FaGithub size={20} />
@@ -240,9 +226,7 @@ const AboutPopup: React.FC = React.memo(() => {
                           title="Discord"
                           onClick={(e) => {
                             e.preventDefault();
-                            ipcService.window.openExternal(
-                              `http://discordapp.com/users/${discordInfo.value}`,
-                            );
+                            ipcService.window.openExternal(`http://discordapp.com/users/${discordInfo.value}`);
                           }}
                         >
                           <FaDiscord size={20} />
@@ -259,10 +243,7 @@ const AboutPopup: React.FC = React.memo(() => {
 
       {/* Footer */}
       <div className={`${popup['popupFooter']} aboutFooter`}>
-        <div
-          className={`${popup['inputBox']} ${popup['row']}`}
-          style={{ width: 'fit-content' }}
-        >
+        <div className={`${popup['inputBox']} ${popup['row']}`} style={{ width: 'fit-content' }}>
           <input
             type="checkbox"
             name="showDisclaimer"

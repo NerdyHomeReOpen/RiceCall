@@ -55,15 +55,10 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
           <div className={homePage['loadingBox']}>
             <div className={homePage['loadingTitleContain']}>
               <div>{lang.tr.connectingServer}</div>
-              <div className={homePage['loadingServerID']}>
-                {loadingServerId}
-              </div>
+              <div className={homePage['loadingServerID']}>{loadingServerId}</div>
             </div>
             <div className={homePage['loadingGif']}></div>
-            <div
-              className={homePage['loadingCloseBtn']}
-              onClick={() => setIsLoading(false)}
-            />
+            <div className={homePage['loadingCloseBtn']} onClick={() => setIsLoading(false)} />
           </div>
         </div>
       )}

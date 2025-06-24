@@ -14,17 +14,15 @@ interface ServerListProps {
   servers: UserServer[];
 }
 
-const ServerList: React.FC<ServerListProps> = React.memo(
-  ({ user, servers }) => {
-    return (
-      <div className={homePage['serverCards']}>
-        {servers.map((server) => (
-          <ServerCard key={server.serverId} user={user} server={server} />
-        ))}
-      </div>
-    );
-  },
-);
+const ServerList: React.FC<ServerListProps> = React.memo(({ user, servers }) => {
+  return (
+    <div className={homePage['serverCards']}>
+      {servers.map((server) => (
+        <ServerCard key={server.serverId} user={user} server={server} />
+      ))}
+    </div>
+  );
+});
 
 ServerList.displayName = 'ServerList';
 

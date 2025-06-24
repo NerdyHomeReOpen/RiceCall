@@ -18,85 +18,50 @@ import {
 } from '@/types';
 
 export const getService = {
-  user: async ({
-    userId,
-  }: {
-    userId: User['userId'];
-  }): Promise<User | null> => {
+  user: async ({ userId }: { userId: User['userId'] }): Promise<User | null> => {
     const user = await apiService.post('/user', { userId });
     return user;
   },
 
-  userFriends: async ({
-    userId,
-  }: {
-    userId: User['userId'];
-  }): Promise<UserFriend[] | null> => {
+  userFriends: async ({ userId }: { userId: User['userId'] }): Promise<UserFriend[] | null> => {
     const userFriends = await apiService.post('/userFriends', {
       userId,
     });
     return userFriends;
   },
 
-  userFriendGroups: async ({
-    userId,
-  }: {
-    userId: User['userId'];
-  }): Promise<FriendGroup[] | null> => {
+  userFriendGroups: async ({ userId }: { userId: User['userId'] }): Promise<FriendGroup[] | null> => {
     const userFriendGroups = await apiService.post('/userFriendGroups', {
       userId,
     });
     return userFriendGroups;
   },
 
-  userFriendApplications: async ({
-    userId,
-  }: {
-    userId: User['userId'];
-  }): Promise<FriendApplication[] | null> => {
-    const userFriendApplications = await apiService.post(
-      '/userFriendApplications',
-      { userId },
-    );
+  userFriendApplications: async ({ userId }: { userId: User['userId'] }): Promise<FriendApplication[] | null> => {
+    const userFriendApplications = await apiService.post('/userFriendApplications', { userId });
     return userFriendApplications;
   },
 
-  userServers: async ({
-    userId,
-  }: {
-    userId: User['userId'];
-  }): Promise<UserServer[] | null> => {
+  userServers: async ({ userId }: { userId: User['userId'] }): Promise<UserServer[] | null> => {
     const userServers = await apiService.post('/userServers', {
       userId,
     });
     return userServers;
   },
 
-  server: async ({
-    serverId,
-  }: {
-    serverId: Server['serverId'];
-  }): Promise<Server | null> => {
+  server: async ({ serverId }: { serverId: Server['serverId'] }): Promise<Server | null> => {
     const server = await apiService.post('/server', { serverId });
     return server;
   },
 
-  serverChannels: async ({
-    serverId,
-  }: {
-    serverId: Server['serverId'];
-  }): Promise<Channel[] | null> => {
+  serverChannels: async ({ serverId }: { serverId: Server['serverId'] }): Promise<Channel[] | null> => {
     const serverChannels = await apiService.post('/serverChannels', {
       serverId,
     });
     return serverChannels;
   },
 
-  serverMembers: async ({
-    serverId,
-  }: {
-    serverId: Server['serverId'];
-  }): Promise<ServerMember[] | null> => {
+  serverMembers: async ({ serverId }: { serverId: Server['serverId'] }): Promise<ServerMember[] | null> => {
     const serverMembers = await apiService.post('/serverMembers', {
       serverId,
     });
@@ -108,18 +73,11 @@ export const getService = {
   }: {
     serverId: Server['serverId'];
   }): Promise<MemberApplication[] | null> => {
-    const serverMemberApplications = await apiService.post(
-      '/serverMemberApplications',
-      { serverId },
-    );
+    const serverMemberApplications = await apiService.post('/serverMemberApplications', { serverId });
     return serverMemberApplications;
   },
 
-  channel: async ({
-    channelId,
-  }: {
-    channelId: Channel['channelId'];
-  }): Promise<Channel | null> => {
+  channel: async ({ channelId }: { channelId: Channel['channelId'] }): Promise<Channel | null> => {
     const channel = await apiService.post('/channel', { channelId });
     return channel;
   },

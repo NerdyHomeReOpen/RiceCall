@@ -19,37 +19,29 @@ interface PromptMessageProps {
   messageType?: string;
 }
 
-const PromptMessage: React.FC<PromptMessageProps> = React.memo(
-  ({ messageGroup, messageType = 'info' }) => {
-    // Hooks
-    const lang = useLanguage();
+const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, messageType = 'info' }) => {
+  // Hooks
+  const lang = useLanguage();
 
-    // Variables
-    const { contents: messageContents, parameter: messageParameter } =
-      messageGroup;
+  // Variables
+  const { contents: messageContents, parameter: messageParameter } = messageGroup;
 
-    const formatMessages = messageContents.map((content) =>
-      lang.getTranslatedMessage(content, messageParameter),
-    );
+  const formatMessages = messageContents.map((content) => lang.getTranslatedMessage(content, messageParameter));
 
-    return (
-      <>
-        <div className={styles['header']}>
-          <div className={styles[`${messageType}Icon`]} />
-        </div>
+  return (
+    <>
+      <div className={styles['header']}>
+        <div className={styles[`${messageType}Icon`]} />
+      </div>
 
-        <div className={styles['messageBox']}>
-          {formatMessages.map((content, index) => (
-            <MarkdownViewer
-              key={index}
-              markdownText={content}
-            />
-          ))}
-        </div>
-      </>
-    );
-  },
-);
+      <div className={styles['messageBox']}>
+        {formatMessages.map((content, index) => (
+          <MarkdownViewer key={index} markdownText={content} />
+        ))}
+      </div>
+    </>
+  );
+});
 
 PromptMessage.displayName = 'PromptMessage';
 

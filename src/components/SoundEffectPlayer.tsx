@@ -25,11 +25,9 @@ export const SoundEffectPlayer = () => {
       setSoundEffect(enabled);
     });
 
-    const offUpdate = ipcService.systemSettings.soundEffect.onUpdate(
-      (enabled) => {
-        setSoundEffect(enabled);
-      },
-    );
+    const offUpdate = ipcService.systemSettings.soundEffect.onUpdate((enabled) => {
+      setSoundEffect(enabled);
+    });
 
     return () => offUpdate();
   }, []);

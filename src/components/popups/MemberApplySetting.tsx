@@ -22,115 +22,110 @@ interface MemberApplySettingPopupProps {
   serverId: Server['serverId'];
 }
 
-const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> =
-  React.memo(({ serverId }) => {
-    // Hooks
-    const socket = useSocket();
-    const lang = useLanguage();
+const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.memo(({ serverId }) => {
+  // Hooks
+  const socket = useSocket();
+  const lang = useLanguage();
 
-    // Refs
-    const refreshRef = useRef(false);
+  // Refs
+  const refreshRef = useRef(false);
 
-    // States
-    const [server, setServer] = useState<Server>(Default.server());
+  // States
+  const [server, setServer] = useState<Server>(Default.server());
 
-    // Variables
-    const { receiveApply: serverReceiveApply, applyNotice: serverApplyNotice } =
-      server;
+  // Variables
+  const { receiveApply: serverReceiveApply, applyNotice: serverApplyNotice } = server;
 
-    // Handlers
-    const handleEditServer = (
-      server: Partial<Server>,
-      serverId: Server['serverId'],
-    ) => {
-      if (!socket) return;
-      socket.send.editServer({ server, serverId });
+  // Handlers
+  const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
+    if (!socket) return;
+    socket.send.editServer({ server, serverId });
+  };
+
+  const handleClose = () => {
+    ipcService.window.close();
+  };
+
+  // Effects
+  useEffect(() => {
+    if (!serverId || refreshRef.current) return;
+    const refresh = async () => {
+      refreshRef.current = true;
+      Promise.all([
+        getService.server({
+          serverId: serverId,
+        }),
+      ]).then(([server]) => {
+        if (server) {
+          setServer(server);
+        }
+      });
     };
+    refresh();
+  }, [serverId]);
 
-    const handleClose = () => {
-      ipcService.window.close();
-    };
-
-    // Effects
-    useEffect(() => {
-      if (!serverId || refreshRef.current) return;
-      const refresh = async () => {
-        refreshRef.current = true;
-        Promise.all([
-          getService.server({
-            serverId: serverId,
-          }),
-        ]).then(([server]) => {
-          if (server) {
-            setServer(server);
-          }
-        });
-      };
-      refresh();
-    }, [serverId]);
-
-    return (
-      <form className={popup['popupContainer']}>
-        {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['inputGroup']}>
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
-                <div className={popup['label']}>{lang.tr.isReceiveApply}</div>
-                <input
-                  name="receiveApply"
-                  type="checkbox"
-                  checked={serverReceiveApply}
-                  onChange={() => {
-                    setServer((prev) => ({
-                      ...prev,
-                      receiveApply: !serverReceiveApply,
-                    }));
-                  }}
-                />
-              </div>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{lang.tr.setApplyNotice}</div>
-                <textarea
-                  name="applyNotice"
-                  value={serverApplyNotice}
-                  maxLength={100}
-                  onChange={(e) => {
-                    setServer((prev) => ({
-                      ...prev,
-                      applyNotice: e.target.value,
-                    }));
-                  }}
-                />
-              </div>
+  return (
+    <form className={popup['popupContainer']}>
+      {/* Body */}
+      <div className={popup['popupBody']}>
+        <div className={setting['body']}>
+          <div className={popup['inputGroup']}>
+            <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <div className={popup['label']}>{lang.tr.isReceiveApply}</div>
+              <input
+                name="receiveApply"
+                type="checkbox"
+                checked={serverReceiveApply}
+                onChange={() => {
+                  setServer((prev) => ({
+                    ...prev,
+                    receiveApply: !serverReceiveApply,
+                  }));
+                }}
+              />
+            </div>
+            <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={popup['label']}>{lang.tr.setApplyNotice}</div>
+              <textarea
+                name="applyNotice"
+                value={serverApplyNotice}
+                maxLength={100}
+                onChange={(e) => {
+                  setServer((prev) => ({
+                    ...prev,
+                    applyNotice: e.target.value,
+                  }));
+                }}
+              />
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button
-            className={popup['button']}
-            onClick={() => {
-              handleEditServer(
-                {
-                  receiveApply: !!serverReceiveApply,
-                  applyNotice: serverApplyNotice,
-                },
-                serverId,
-              );
-              handleClose();
-            }}
-          >
-            {lang.tr.confirm}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.cancel}
-          </button>
-        </div>
-      </form>
-    );
-  });
+      {/* Footer */}
+      <div className={popup['popupFooter']}>
+        <button
+          className={popup['button']}
+          onClick={() => {
+            handleEditServer(
+              {
+                receiveApply: !!serverReceiveApply,
+                applyNotice: serverApplyNotice,
+              },
+              serverId,
+            );
+            handleClose();
+          }}
+        >
+          {lang.tr.confirm}
+        </button>
+        <button className={popup['button']} onClick={() => handleClose()}>
+          {lang.tr.cancel}
+        </button>
+      </div>
+    </form>
+  );
+});
 
 MemberApplySettingPopup.displayName = 'MemberApplySettingPopup';
 

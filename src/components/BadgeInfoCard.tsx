@@ -87,19 +87,12 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
       >
         <div className={badgeInfoCardStyles.badgeInfoWrapper}>
           <div className={badgeInfoCardStyles.badgeAvatarBox}>
-            <div
-              className={badgeInfoCardStyles.badgeImage}
-              style={{ backgroundImage: `url(${badgeUrl})` }}
-            />
-            <div className={badgeInfoCardStyles.badgeRarityText}>
-              {`[${badge.rare}]`}
-            </div>
+            <div className={badgeInfoCardStyles.badgeImage} style={{ backgroundImage: `url(${badgeUrl})` }} />
+            <div className={badgeInfoCardStyles.badgeRarityText}>{`[${badge.rare}]`}</div>
           </div>
           <div className={badgeInfoCardStyles.badgeDescriptionBox}>
             <div className={badgeInfoCardStyles.badgeName}>{badge.name}</div>
-            <div className={badgeInfoCardStyles.badgeDescription}>
-              {badge.description}
-            </div>
+            <div className={badgeInfoCardStyles.badgeDescription}>{badge.description}</div>
           </div>
         </div>
         <div className={badgeInfoCardStyles.badgeShowTimeBox}>

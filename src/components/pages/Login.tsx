@@ -38,8 +38,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   });
   const [accounts, setAccounts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showAccountSelectBox, setShowAccountSelectBox] =
-    useState<boolean>(false);
+  const [showAccountSelectBox, setShowAccountSelectBox] = useState<boolean>(false);
 
   // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,8 +110,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (!comboRef.current?.contains(e.target as Node))
-        setShowAccountSelectBox(false);
+      if (!comboRef.current?.contains(e.target as Node)) setShowAccountSelectBox(false);
     };
 
     document.addEventListener('click', handleClickOutside);
@@ -135,9 +133,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
         >
           {isLoading && (
             <>
-              <div className={styles['loadingIndicator']}>
-                {lang.tr.onLogin}
-              </div>
+              <div className={styles['loadingIndicator']}>{lang.tr.onLogin}</div>
               <div className={styles['loadingBar']} />
             </>
           )}
@@ -162,10 +158,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                       setShowAccountSelectBox((prev) => !prev);
                     }}
                   />
-                  <div
-                    className={styles['accountSelectBox']}
-                    style={showAccountSelectBox ? {} : { display: 'none' }}
-                  >
+                  <div className={styles['accountSelectBox']} style={showAccountSelectBox ? {} : { display: 'none' }}>
                     {accounts.map((account) => (
                       <div
                         key={account}

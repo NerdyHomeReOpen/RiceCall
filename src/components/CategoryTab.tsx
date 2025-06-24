@@ -4,16 +4,7 @@ import React, { useEffect } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Types
-import {
-  PopupType,
-  ServerMember,
-  Channel,
-  Server,
-  User,
-  Category,
-  UserFriend,
-  UserServer,
-} from '@/types';
+import { PopupType, ServerMember, Channel, Server, User, Category, UserFriend, UserServer } from '@/types';
 
 // Providers
 import { useLanguage } from '@/providers/Language';
@@ -71,12 +62,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       visibility: categoryVisibility,
       userLimit: channelUserLimit,
     } = category;
-    const {
-      userId,
-      serverId,
-      permissionLevel,
-      receptionLobbyId: serverReceptionLobbyId,
-    } = currentServer;
+    const { userId, serverId, permissionLevel, receptionLobbyId: serverReceptionLobbyId } = currentServer;
     const { channelId: currentChannelId } = currentChannel;
     const categoryChannels = serverChannels
       .filter((ch) => ch.type === 'channel')
@@ -94,49 +80,29 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           })
         : null;
 
-    const categoryChannelIds = new Set(
-      categoryChannels.map((ch) => ch.channelId),
-    );
-    const isAllChannelReadOnly = categoryChannels.every(
-      (channel) => channel.visibility === 'readonly',
-    );
+    const categoryChannelIds = new Set(categoryChannels.map((ch) => ch.channelId));
+    const isAllChannelReadOnly = categoryChannels.every((channel) => channel.visibility === 'readonly');
     const categoryMembers = serverMembers.filter(
-      (mb) =>
-        categoryChannelIds.has(mb.currentChannelId) ||
-        mb.currentChannelId === categoryId,
+      (mb) => categoryChannelIds.has(mb.currentChannelId) || mb.currentChannelId === categoryId,
     );
     const categoryUserIds = categoryMembers.map((mb) => mb.userId);
-    const userInCategory = categoryMembers.some(
-      (mb) => mb.currentChannelId === currentChannelId,
-    );
-    const channelMembers = serverMembers.filter(
-      (mb) => mb.currentChannelId === categoryId,
-    );
+    const userInCategory = categoryMembers.some((mb) => mb.currentChannelId === currentChannelId);
+    const channelMembers = serverMembers.filter((mb) => mb.currentChannelId === categoryId);
     const isReceptionLobby = serverReceptionLobbyId === categoryId;
     const userInChannel = currentChannelId === categoryId;
-    const needPassword =
-      categoryVisibility === 'private' && permissionLevel < 3;
+    const needPassword = categoryVisibility === 'private' && permissionLevel < 3;
     const canJoin =
       !userInChannel &&
       categoryVisibility !== 'readonly' &&
       !(categoryVisibility === 'member' && permissionLevel < 2) &&
-      (channelUserLimit === 0 ||
-        channelUserLimit > channelMembers.length ||
-        permissionLevel > 4);
+      (channelUserLimit === 0 || channelUserLimit > channelMembers.length || permissionLevel > 4);
     const canManageChannel = permissionLevel > 4;
-    const canMoveToChannel =
-      canManageChannel && !userInChannel && categoryUserIds.length !== 0;
+    const canMoveToChannel = canManageChannel && !userInChannel && categoryUserIds.length !== 0;
     const canSetReceptionLobby =
-      canManageChannel &&
-      !isReceptionLobby &&
-      categoryVisibility !== 'private' &&
-      categoryVisibility !== 'readonly';
+      canManageChannel && !isReceptionLobby && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
 
     // Handlers
-    const handleEditServer = (
-      server: Partial<Server>,
-      serverId: Server['serverId'],
-    ) => {
+    const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
       if (!socket) return;
       socket.send.editServer({ serverId, server });
     };
@@ -150,14 +116,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       socket.send.connectChannel({ userId, channelId, serverId });
     };
 
-    const handleDeleteChannel = (
-      channelId: Channel['channelId'],
-      serverId: Server['serverId'],
-    ) => {
+    const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(
-        lang.tr.warningDeleteChannel.replace('{0}', categoryName),
-        () => socket.send.deleteChannel({ channelId, serverId }),
+      handleOpenWarningDialog(lang.tr.warningDeleteChannel.replace('{0}', categoryName), () =>
+        socket.send.deleteChannel({ channelId, serverId }),
       );
     };
 
@@ -170,10 +132,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       ipcService.popup.onSubmit('warningDialog', callback);
     };
 
-    const handleOpenChannelSetting = (
-      channelId: Channel['channelId'],
-      serverId: Server['serverId'],
-    ) => {
+    const handleOpenChannelSetting = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       ipcService.popup.open(PopupType.CHANNEL_SETTING, 'channelSetting');
       ipcService.initialData.onRequest('channelSetting', {
         channelId,
@@ -194,10 +153,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       });
     };
 
-    const handleOpenChangeChannelOrder = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-    ) => {
+    const handleOpenChangeChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
       ipcService.popup.open(PopupType.EDIT_CHANNEL_ORDER, 'editChannelOrder');
       ipcService.initialData.onRequest('editChannelOrder', {
         serverId,
@@ -231,27 +187,18 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       });
     };
 
-    const handleDragStart = (
-      e: React.DragEvent,
-      userIds: User['userId'][],
-      currentChannelId: Channel['channelId'],
-    ) => {
+    const handleDragStart = (e: React.DragEvent, userIds: User['userId'][], currentChannelId: Channel['channelId']) => {
       e.dataTransfer.setData('type', 'moveChannelUser');
       e.dataTransfer.setData('userIds', userIds.join(','));
       e.dataTransfer.setData('currentChannelId', currentChannelId);
     };
 
-    const handleDrop = (
-      e: React.DragEvent,
-      serverId: Server['serverId'],
-      channelId: Channel['channelId'],
-    ) => {
+    const handleDrop = (e: React.DragEvent, serverId: Server['serverId'], channelId: Channel['channelId']) => {
       e.preventDefault();
       if (!socket) return;
       const moveType = e.dataTransfer.getData('type');
       const currentChannelId = e.dataTransfer.getData('currentChannelId');
-      if (!moveType || !currentChannelId || currentChannelId === channelId)
-        return;
+      if (!moveType || !currentChannelId || currentChannelId === channelId) return;
 
       switch (moveType) {
         case 'moveUser':
@@ -287,15 +234,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         <div
           key={categoryId}
           className={`${styles['channelTab']} ${
-            selectedItemId === categoryId && selectedItemType === 'category'
-              ? styles['selected']
-              : ''
+            selectedItemId === categoryId && selectedItemType === 'category' ? styles['selected'] : ''
           }`}
           onClick={() => {
-            if (
-              selectedItemId === categoryId &&
-              selectedItemType === 'category'
-            ) {
+            if (selectedItemId === categoryId && selectedItemType === 'category') {
               setSelectedItemId(null);
               setSelectedItemType(null);
               return;
@@ -353,8 +295,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 id: 'createSubChannel',
                 label: lang.tr.addSubChannel,
                 show: canManageChannel,
-                onClick: () =>
-                  handleOpenCreateChannel(serverId, categoryId, userId),
+                onClick: () => handleOpenCreateChannel(serverId, categoryId, userId),
               },
               {
                 id: 'deleteChannel',
@@ -383,9 +324,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 label: '批量移動到我的房間', // TODO: lang.tr
                 show: canMoveToChannel,
                 onClick: () =>
-                  categoryUserIds.forEach((userId) =>
-                    handleJoinChannel(userId, serverId, currentChannelId),
-                  ),
+                  categoryUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
               },
               {
                 id: 'changeChannelOrder',
@@ -402,8 +341,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 id: 'setReceptionLobby',
                 label: lang.tr.setDefaultChannel,
                 show: canSetReceptionLobby,
-                onClick: () =>
-                  handleEditServer({ receptionLobbyId: categoryId }, serverId),
+                onClick: () => handleEditServer({ receptionLobbyId: categoryId }, serverId),
               },
             ]);
           }}
@@ -429,21 +367,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           >
             {categoryName}
           </div>
-          {!isAllChannelReadOnly && (
-            <div className={styles['channelTabCount']}>
-              {`(${categoryMembers.length})`}
-            </div>
-          )}
-          {!expanded[categoryId] && userInCategory && (
-            <div className={styles['myLocationIcon']} />
-          )}
+          {!isAllChannelReadOnly && <div className={styles['channelTabCount']}>{`(${categoryMembers.length})`}</div>}
+          {!expanded[categoryId] && userInCategory && <div className={styles['myLocationIcon']} />}
         </div>
 
         {/* Expanded Sections */}
-        <div
-          className={styles['channelList']}
-          style={expanded[categoryId] ? {} : { display: 'none' }}
-        >
+        <div className={styles['channelList']} style={expanded[categoryId] ? {} : { display: 'none' }}>
           {[categoryLobby, ...categoryChannels]
             .filter((ch) => !!ch)
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))

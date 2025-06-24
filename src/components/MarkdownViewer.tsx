@@ -80,9 +80,7 @@ const PURIFY_CONFIG: PurifyConfig = {
  */
 function escapeUnsafeTags(input: string, safeTags: string[]): string {
   return input.replace(/<\/?([a-zA-Z0-9-]+)(\s[^>]*)?>?/g, (match, tagName) => {
-    return safeTags.includes(tagName.toLowerCase())
-      ? match
-      : match.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return safeTags.includes(tagName.toLowerCase()) ? match : match.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   });
 }
 
@@ -110,13 +108,9 @@ export function sanitizeMarkdownWithSafeTags(
     // 替換 <@name_gender_level>
     .replace(/<@([^>]+)>/g, (_, content) => {
       const [name, gender, level] = content.split('_');
-      return `<span class='${
-        message.username
-      }' alt='<@${content}>'> <span style='vertical-align: bottom;' class='${
+      return `<span class='${message.username}' alt='<@${content}>'> <span style='vertical-align: bottom;' class='${
         permission[gender || 'Male']
-      } ${permission[`lv-${level || '1'}`]}'></span>${
-        name || 'Unknown'
-      }</span>`;
+      } ${permission[`lv-${level || '1'}`]}'></span>${name || 'Unknown'}</span>`;
     })
     // 處裡 <br> to \n
     .replace(/<br\s*\/?>/g, '\n');
@@ -160,9 +154,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
         if (isGuest && forbidGuestUrl) return <span {...props} />;
         return <a target="_blank" href={href} {...props} />;
       },
-      table: ({ node, ...props }: any) => (
-        <table className={markdown.tableWrapper} {...props} />
-      ),
+      table: ({ node, ...props }: any) => <table className={markdown.tableWrapper} {...props} />,
       th: ({ node, ...props }: any) => <th {...props} />,
       td: ({ node, ...props }: any) => <td {...props} />,
       hr: ({ node, ...props }: any) => <hr {...props} />,
@@ -200,11 +192,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
 
         return (
           <>
-            <button
-              className={markdown.copyButton}
-              onClick={handleCopy}
-              aria-label={lang.tr.copyCode}
-            >
+            <button className={markdown.copyButton} onClick={handleCopy} aria-label={lang.tr.copyCode}>
               {isCopied ? lang.tr.copied : lang.tr.copy}
             </button>
             <code
@@ -226,11 +214,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
       },
     };
 
-    const sanitized = sanitizeMarkdownWithSafeTags(
-      markdownText,
-      emojis,
-      permission,
-    );
+    const sanitized = sanitizeMarkdownWithSafeTags(markdownText, emojis, permission);
 
     return (
       <div className={markdown.markdownContent}>

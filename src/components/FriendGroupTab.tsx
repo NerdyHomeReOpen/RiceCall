@@ -40,15 +40,11 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     // Variables
     const { userId } = user;
     const { friendGroupId, name: friendGroupName } = friendGroup;
-    const friendGroupFriends =
-      !friendGroupId
+    const friendGroupFriends = !friendGroupId
       ? friends
           .filter((fd) => !fd.friendGroupId && !fd.isBlocked)
           .sort((a, b) => {
-            return (
-              (b.status !== 'offline' ? 1 : 0) -
-              (a.status !== 'offline' ? 1 : 0)
-            );
+            return (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0);
           })
       : friendGroupId === 'blocked'
       ? friends.filter((friend) => {
@@ -57,27 +53,16 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
       : friends
           .filter((fd) => fd.friendGroupId === friendGroupId && !fd.isBlocked)
           .sort((a, b) => {
-            return (
-              (b.status !== 'offline' ? 1 : 0) -
-              (a.status !== 'offline' ? 1 : 0)
-            );
+            return (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0);
           });
-    const friendsOnlineCount = friendGroupFriends.filter(
-      (fd) => fd.status !== 'offline',
-    ).length;
-    const canManageFriendGroup = !['', 'blocked', 'outlander'].includes(
-      friendGroupId,
-    );
+    const friendsOnlineCount = friendGroupFriends.filter((fd) => fd.status !== 'offline').length;
+    const canManageFriendGroup = !['', 'blocked', 'outlander'].includes(friendGroupId);
 
     // Handlers
-    const handleDeleteFriendGroup = (
-      friendGroupId: FriendGroup['friendGroupId'],
-      userId: User['userId'],
-    ) => {
+    const handleDeleteFriendGroup = (friendGroupId: FriendGroup['friendGroupId'], userId: User['userId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(
-        lang.tr.deleteFriendGroupDialog.replace('{0}', friendGroupName),
-        () => socket.send.deleteFriendGroup({ friendGroupId, userId }),
+      handleOpenWarningDialog(lang.tr.deleteFriendGroupDialog.replace('{0}', friendGroupName), () =>
+        socket.send.deleteFriendGroup({ friendGroupId, userId }),
       );
     };
 
@@ -90,10 +75,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
       ipcService.popup.onSubmit('warningDialog', callback);
     };
 
-    const handleOpenEditFriendGroup = (
-      friendGroupId: FriendGroup['friendGroupId'],
-      userId: User['userId'],
-    ) => {
+    const handleOpenEditFriendGroup = (friendGroupId: FriendGroup['friendGroupId'], userId: User['userId']) => {
       ipcService.popup.open(PopupType.EDIT_FRIENDGROUP, 'editFriendGroup');
       ipcService.initialData.onRequest('editFriendGroup', {
         friendGroupId,
@@ -105,9 +87,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
       <div key={friendGroupId}>
         {/* Tab View */}
         <div
-          className={`${styles['tab']} ${
-            selectedItemId === friendGroupId ? styles['selected'] : ''
-          }`}
+          className={`${styles['tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''}`}
           onClick={() => {
             setExpanded(!expanded);
             setSelectedItemId(friendGroupId);
@@ -131,17 +111,12 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
             ]);
           }}
         >
-          <div
-            className={`${styles['toggleIcon']} ${
-              expanded ? styles['expanded'] : ''
-            }`}
-          />
+          <div className={`${styles['toggleIcon']} ${expanded ? styles['expanded'] : ''}`} />
           <div className={styles['tabLable']}>{friendGroupName}</div>
           <div className={styles['tabCount']}>
-            { friendGroupId !== 'blocked' && friendGroupId !== 'outlander'
+            {friendGroupId !== 'blocked' && friendGroupId !== 'outlander'
               ? `(${friendsOnlineCount}/${friendGroupFriends.length})`
-              :`(${friendGroupFriends.length})`
-            }
+              : `(${friendGroupFriends.length})`}
           </div>
         </div>
 

@@ -47,25 +47,13 @@ import directMessageStyles from '@/styles/popups/directMessage.module.css';
 
 const directMessageHeader = (targetSignature: string) => (
   <div className={directMessageStyles['header']}>
-    <div className={directMessageStyles['userSignature']}>
-      {targetSignature}
-    </div>
+    <div className={directMessageStyles['userSignature']}>{targetSignature}</div>
     <div className={directMessageStyles['directOptionButtons']}>
-      <div
-        className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`}
-      />
-      <div
-        className={`${directMessageStyles['blockUser']} ${directMessageStyles['disabled']}`}
-      />
-      <div
-        className={`${directMessageStyles['unBlockUser']} ${directMessageStyles['disabled']}`}
-      />
-      <div
-        className={`${directMessageStyles['inviteTempGroup']} ${directMessageStyles['disabled']}`}
-      />
-      <div
-        className={`${directMessageStyles['report']} ${directMessageStyles['disabled']}`}
-      />
+      <div className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`} />
+      <div className={`${directMessageStyles['blockUser']} ${directMessageStyles['disabled']}`} />
+      <div className={`${directMessageStyles['unBlockUser']} ${directMessageStyles['disabled']}`} />
+      <div className={`${directMessageStyles['inviteTempGroup']} ${directMessageStyles['disabled']}`} />
+      <div className={`${directMessageStyles['report']} ${directMessageStyles['disabled']}`} />
     </div>
   </div>
 );
@@ -77,66 +65,53 @@ interface HeaderProps {
   titleBoxContent?: ReactNode;
 }
 
-const Header: React.FC<HeaderProps> = React.memo(
-  ({ title, buttons, titleBoxIcon, titleBoxContent }) => {
-    // States
-    const [isFullscreen, setIsFullscreen] = useState(false);
+const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon, titleBoxContent }) => {
+  // States
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-    // Handlers
-    const handleFullscreen = () => {
-      if (isFullscreen) {
-        ipcService.window.unmaximize();
-      } else {
-        ipcService.window.maximize();
-      }
-    };
-    const handleMinimize = () => {
-      ipcService.window.minimize();
-    };
-    const handleClose = () => {
-      ipcService.window.close();
-    };
+  // Handlers
+  const handleFullscreen = () => {
+    if (isFullscreen) {
+      ipcService.window.unmaximize();
+    } else {
+      ipcService.window.maximize();
+    }
+  };
+  const handleMinimize = () => {
+    ipcService.window.minimize();
+  };
+  const handleClose = () => {
+    ipcService.window.close();
+  };
 
-    // Effects
-    useEffect(() => {
-      const offMaximize = ipcService.window.onMaximize(() =>
-        setIsFullscreen(true),
-      );
-      const offUnmaximize = ipcService.window.onUnmaximize(() =>
-        setIsFullscreen(false),
-      );
-      return () => {
-        offMaximize();
-        offUnmaximize();
-      };
-    }, []);
+  // Effects
+  useEffect(() => {
+    const offMaximize = ipcService.window.onMaximize(() => setIsFullscreen(true));
+    const offUnmaximize = ipcService.window.onUnmaximize(() => setIsFullscreen(false));
+    return () => {
+      offMaximize();
+      offUnmaximize();
+    };
+  }, []);
 
-    return (
-      <header className={`${header['header']} ${header['popupHeader']}`}>
-        <div className={header['titleWrapper']}>
-          <div className={`${header['titleBox']} ${titleBoxIcon}`}>
-            <div className={header['title']}>{title}</div>
-          </div>
-          <div className={header['buttons']}>
-            {buttons.includes('minimize') && (
-              <div className={header['minimize']} onClick={handleMinimize} />
-            )}
-            {buttons.includes('maxsize') && (
-              <div
-                className={isFullscreen ? header['restore'] : header['maxsize']}
-                onClick={handleFullscreen}
-              />
-            )}
-            {buttons.includes('close') && (
-              <div className={header['close']} onClick={handleClose} />
-            )}
-          </div>
+  return (
+    <header className={`${header['header']} ${header['popupHeader']}`}>
+      <div className={header['titleWrapper']}>
+        <div className={`${header['titleBox']} ${titleBoxIcon}`}>
+          <div className={header['title']}>{title}</div>
         </div>
-        {titleBoxContent}
-      </header>
-    );
-  },
-);
+        <div className={header['buttons']}>
+          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimize} />}
+          {buttons.includes('maxsize') && (
+            <div className={isFullscreen ? header['restore'] : header['maxsize']} onClick={handleFullscreen} />
+          )}
+          {buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}
+        </div>
+      </div>
+      {titleBoxContent}
+    </header>
+  );
+});
 
 Header.displayName = 'Header';
 
@@ -151,13 +126,10 @@ const Popup = React.memo(() => {
   const [id, setId] = useState<string | null>(null);
   const [type, setType] = useState<PopupType | null>(null);
   const [headerTitle, setHeaderTitle] = useState<string>('');
-  const [headerButtons, setHeaderButtons] = useState<
-    ('minimize' | 'maxsize' | 'close')[]
-  >([]);
+  const [headerButtons, setHeaderButtons] = useState<('minimize' | 'maxsize' | 'close')[]>([]);
   const [content, setContent] = useState<ReactNode | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
-  const [directMessageTargetSignature, setDirectMessageTargetSignature] =
-    useState<string | null>(null);
+  const [directMessageTargetSignature, setDirectMessageTargetSignature] = useState<string | null>(null);
 
   // Effects
   useEffect(() => {
@@ -346,16 +318,12 @@ const Popup = React.memo(() => {
       case PopupType.DIALOG_SUCCESS:
         setHeaderTitle(lang.tr.dialogSuccess);
         setHeaderButtons(['close']);
-        setContent(
-          <Dialog {...{ ...popupInitialData, iconType: 'SUCCESS' }} />,
-        );
+        setContent(<Dialog {...{ ...popupInitialData, iconType: 'SUCCESS' }} />);
         break;
       case PopupType.DIALOG_WARNING:
         setHeaderTitle(lang.tr.dialogWarning);
         setHeaderButtons(['close']);
-        setContent(
-          <Dialog {...{ ...popupInitialData, iconType: 'WARNING' }} />,
-        );
+        setContent(<Dialog {...{ ...popupInitialData, iconType: 'WARNING' }} />);
         break;
       case PopupType.DIALOG_ERROR:
         setHeaderTitle(lang.tr.dialogError);
@@ -390,26 +358,24 @@ const Popup = React.memo(() => {
   return (
     <div className="wrapper" ref={windowRef}>
       {/* Top Nevigation */}
-      {(type !== PopupType.USER_INFO || headerTitle !== lang.tr.userInfo) &&
-        headerButtons.length > 0 && (
-          <Header
-            title={headerTitle}
-            buttons={headerButtons}
-            titleBoxIcon={
-              type === PopupType.CHANGE_THEME
-                ? header['titleBoxSkinIcon']
-                : type === PopupType.DIRECT_MESSAGE
-                ? header['titleBoxDirectMessageIcon']
-                : undefined
-            }
-            titleBoxContent={
-              type === PopupType.DIRECT_MESSAGE &&
-              directMessageTargetSignature !== null
-                ? directMessageHeader(directMessageTargetSignature)
-                : undefined
-            }
-          />
-        )}
+      {(type !== PopupType.USER_INFO || headerTitle !== lang.tr.userInfo) && headerButtons.length > 0 && (
+        <Header
+          title={headerTitle}
+          buttons={headerButtons}
+          titleBoxIcon={
+            type === PopupType.CHANGE_THEME
+              ? header['titleBoxSkinIcon']
+              : type === PopupType.DIRECT_MESSAGE
+              ? header['titleBoxDirectMessageIcon']
+              : undefined
+          }
+          titleBoxContent={
+            type === PopupType.DIRECT_MESSAGE && directMessageTargetSignature !== null
+              ? directMessageHeader(directMessageTargetSignature)
+              : undefined
+          }
+        />
+      )}
       {/* Main Content */}
       <div className="content">{content}</div>
     </div>

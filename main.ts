@@ -8,16 +8,7 @@ import dotenv from 'dotenv';
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import ElectronUpdater from 'electron-updater';
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  dialog,
-  shell,
-  Tray,
-  Menu,
-  nativeImage,
-} from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 
 dotenv.config();
 
@@ -281,9 +272,7 @@ const appServe = serve({ directory: path.join(ROOT_PATH, 'out') });
 
 // Functions
 async function checkIsHinet() {
-  const ipData = await fetch('https://ipinfo.io/json').then((res) =>
-    res.json(),
-  );
+  const ipData = await fetch('https://ipinfo.io/json').then((res) => res.json());
   return ipData.org.startsWith('AS3462');
 }
 
@@ -317,11 +306,7 @@ function waitForPort(port: number) {
 
 function focusWindow() {
   const window =
-    authWindow.isDestroyed() === false
-      ? authWindow
-      : mainWindow.isDestroyed() === false
-      ? mainWindow
-      : null;
+    authWindow.isDestroyed() === false ? authWindow : mainWindow.isDestroyed() === false ? mainWindow : null;
   if (window) {
     if (window.isMinimized()) window.restore();
     window.focus();
@@ -405,9 +390,7 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
   });
 
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send(
-      mainWindow.isMaximized() ? 'window-maximized' : 'window-unmaximized',
-    );
+    mainWindow.webContents.send(mainWindow.isMaximized() ? 'window-maximized' : 'window-unmaximized');
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -474,11 +457,7 @@ async function createAuthWindow() {
   return authWindow;
 }
 
-async function createPopup(
-  type: PopupType,
-  id: string,
-  force = true,
-): Promise<BrowserWindow | null> {
+async function createPopup(type: PopupType, id: string, force = true): Promise<BrowserWindow | null> {
   // If force is true, destroy the popup
   if (force) {
     if (popups[id] && !popups[id].isDestroyed()) {
@@ -854,9 +833,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-socket-status', () => {
-    return socketInstance && socketInstance.connected
-      ? 'connected'
-      : 'disconnected';
+    return socketInstance && socketInstance.connected ? 'connected' : 'disconnected';
   });
 
   // Initial data request handlers
@@ -944,17 +921,11 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-input-audio-device', (event) => {
-    event.reply(
-      'input-audio-device-status',
-      store.get('audioInputDevice') || '',
-    );
+    event.reply('input-audio-device-status', store.get('audioInputDevice') || '');
   });
 
   ipcMain.on('get-output-audio-device', (event) => {
-    event.reply(
-      'output-audio-device-status',
-      store.get('audioOutputDevice') || '',
-    );
+    event.reply('output-audio-device-status', store.get('audioOutputDevice') || '');
   });
 
   ipcMain.on('set-auto-launch', (_, enable) => {
@@ -1004,14 +975,9 @@ app.on('activate', async () => {
 
 app.whenReady().then(() => {
   const protocolClient = process.execPath;
-  const args =
-    process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
+  const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
 
-  app.setAsDefaultProtocolClient(
-    'ricecall',
-    app.isPackaged ? undefined : protocolClient,
-    args,
-  );
+  app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
 });
 
 if (!app.requestSingleInstanceLock()) {

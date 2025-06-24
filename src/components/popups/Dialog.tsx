@@ -26,11 +26,7 @@ interface DialogPopupProps {
   submitTo: string;
 }
 
-const DialogPopup: React.FC<DialogPopupProps> = ({
-  iconType,
-  title,
-  submitTo,
-}) => {
+const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, title, submitTo }) => {
   // Hooks
   const lang = useLanguage();
   const loadingBox = useLoading();
