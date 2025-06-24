@@ -78,7 +78,7 @@ interface WebRTCProviderProps {
 
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // States
-  const [isMute, setIsMute] = useState<boolean>(false);
+  const [isMute, setIsMute] = useState<boolean>(true);
   const [bitrate, setBitrate] = useState<number>(64000);
   const [micVolume, setMicVolume] = useState<number>(100);
   const [musicVolume, setMusicVolume] = useState<number>(100);
