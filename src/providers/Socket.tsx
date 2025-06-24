@@ -16,6 +16,7 @@ type SocketContextType = {
   send: Record<SocketClientEvent, (...args: any[]) => void>;
   on: Record<SocketServerEvent, (callback: (...args: any[]) => void) => () => void>;
   isConnected: boolean;
+  hasError: number;
 };
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -40,6 +41,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
   // States
   const [isConnected, setIsConnected] = useState(false);
+  const [hasError, setHasError] = useState(0);
 
   // Handlers
   const handleConnect = () => {
@@ -60,6 +62,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
   };
 
   const handleError = (message: string) => {
+    setHasError((prev) => prev + 1);
     console.error('Socket error:', message);
     new ErrorHandler(new Error(message)).show();
   };
@@ -109,7 +112,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
     };
   }, []);
 
-  return <SocketContext.Provider value={{ on, send, isConnected }}>{children}</SocketContext.Provider>;
+  return <SocketContext.Provider value={{ on, send, isConnected, hasError }}>{children}</SocketContext.Provider>;
 };
 
 SocketProvider.displayName = 'SocketProvider';

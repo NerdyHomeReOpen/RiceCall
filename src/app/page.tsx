@@ -623,6 +623,11 @@ const RootPageComponent = () => {
   }, [socket]);
 
   useEffect(() => {
+    loadingBox.setIsLoading(false);
+    loadingBox.setLoadingServerId('');
+  }, [socket.hasError]);
+
+  useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
       Promise.all([
