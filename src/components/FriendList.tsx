@@ -7,7 +7,7 @@ import styles from '@/styles/pages/friend.module.css';
 import { PopupType, User, FriendGroup, UserFriend } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -26,7 +26,7 @@ interface FriendListProps {
 
 const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, friends }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const viewerRef = useRef<HTMLDivElement>(null);
 
   // States
@@ -40,21 +40,21 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   const filteredFriends = friends.filter((fd) => fd.name.includes(searchQuery));
 
   const defaultFriendGroup: FriendGroup = Default.friendGroup({
-    name: `${lang.tr.myFriends}`,
+    name: `${t('myFriends')}`,
     order: 0,
     userId,
   });
 
   const outlanderFriendGroup: FriendGroup = Default.friendGroup({
     friendGroupId: 'outlander',
-    name: `陌生人`, // TODO: lang.tr
+    name: t('stranger'),
     order: 998,
     userId,
   });
 
   const blockedFriendGroup: FriendGroup = Default.friendGroup({
     friendGroupId: 'blocked',
-    name: `黑名單`, // TODO: lang.tr
+    name: t('blocked'),
     order: 999,
     userId,
   });
@@ -99,7 +99,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
           name="query"
           type="text"
           className={styles['searchInput']}
-          placeholder={lang.tr.searchFriend}
+          placeholder={t('searchFriend')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -134,10 +134,10 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
       {/* Bottom Buttons */}
       <div className={styles['sidebarFooter']}>
         <div className={styles['button']} datatype="addGroup" onClick={() => handleOpenCreateFriendGroup()}>
-          {lang.tr.friendAddGroup}
+          {t('friendAddGroup')}
         </div>
         <div className={styles['button']} datatype="addFriend" onClick={() => handleOpenSearchUser(userId)}>
-          {lang.tr.addFriend}
+          {t('addFriend')}
         </div>
       </div>
     </>

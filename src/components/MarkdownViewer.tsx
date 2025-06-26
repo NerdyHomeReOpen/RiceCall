@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { Children, useState } from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -19,7 +19,7 @@ import message from '@/styles/message.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 interface PurifyConfig {
   ALLOWED_TAGS: string[];
@@ -134,7 +134,7 @@ interface MarkdownViewerProps {
 const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
   ({ markdownText, isGuest = false, forbidGuestUrl = false }) => {
     // Hooks
-    const lang = useLanguage();
+    const { t } = useTranslation();
 
     // States
     const [isCopied, setIsCopied] = useState(false);
@@ -192,8 +192,8 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
 
         return (
           <>
-            <button className={markdown.copyButton} onClick={handleCopy} aria-label={lang.tr.copyCode}>
-              {isCopied ? lang.tr.copied : lang.tr.copy}
+            <button className={markdown.copyButton} onClick={handleCopy} aria-label={t('copyCode')}>
+              {isCopied ? t('copied') : t('copy')}
             </button>
             <code
               className={`hljs ${langClass} ${markdown.codeWrapper}`}

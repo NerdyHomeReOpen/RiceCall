@@ -12,8 +12,8 @@ import ServerListViewer from '@/components/ServerList';
 import { PopupType, SocketServerEvent, User, UserServer } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
@@ -28,7 +28,7 @@ export interface ServerListSectionProps {
 
 const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, servers }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // States
   const [expanded, setExpanded] = useState(false);
@@ -49,7 +49,7 @@ const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, serv
           `}
           onClick={() => setExpanded(!expanded)}
         >
-          {expanded ? lang.tr.viewLess : lang.tr.viewMore}
+          {expanded ? t('viewLess') : t('viewMore')}
         </button>
       )}
     </div>
@@ -85,7 +85,7 @@ interface HomePageProps {
 
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, display }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const socket = useSocket();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
@@ -252,23 +252,22 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, [handleDeepLink]);
 
   useEffect(() => {
-    if (!lang) return;
     ipcService.discord.updatePresence({
-      details: lang.tr.RPCHomePage,
-      state: `${lang.tr.RPCUser} ${userName}`,
+      details: t('RPCHomePage'),
+      state: `${t('RPCUser')} ${userName}`,
       largeImageKey: 'app_icon',
       largeImageText: 'RC Voice',
       smallImageKey: 'home_icon',
-      smallImageText: lang.tr.RPCHome,
+      smallImageText: t('RPCHome'),
       timestamp: Date.now(),
       buttons: [
         {
-          label: lang.tr.RPCJoinServer,
+          label: t('RPCJoinServer'),
           url: 'https://discord.gg/adCWzv6wwS',
         },
       ],
     });
-  }, [lang, userName]);
+  }, [t, userName]);
 
   return (
     <div className={homePage['homeWrapper']} style={display ? {} : { display: 'none' }}>
@@ -279,7 +278,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={homePage['forwardBtn']} />
           <div className={homePage['searchBar']} ref={searchRef}>
             <input
-              placeholder={lang.tr.searchPlaceholder}
+              placeholder={t('searchPlaceholder')}
               className={homePage['searchInput']}
               value={searchQuery}
               onChange={(e) => {
@@ -305,14 +304,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                   className={`${homePage['dropdownHeaderText']} ${homePage['exactMatch']}`}
                   style={exactMatch ? {} : { display: 'none' }}
                 >
-                  {lang.tr.quickEnterServer}
+                  {t('quickEnterServer')}
                   {exactMatch.displayId}
                 </div>
               )}
               {personalResults.length > 0 && (
                 <>
                   <div className={homePage['dropdownHeaderText']}>
-                    <div>{lang.tr.personalExclusive}</div>
+                    <div>{t('personalExclusive')}</div>
                   </div>
                   {personalResults.map((server) => (
                     <SearchResultItem
@@ -328,7 +327,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               {relatedResults.length > 0 && (
                 <>
                   <div className={homePage['dropdownHeaderText']}>
-                    <div>{lang.tr.relatedSearch}</div>
+                    <div>{t('relatedSearch')}</div>
                   </div>
                   {relatedResults.map((server) => (
                     <SearchResultItem
@@ -345,7 +344,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 className={`${homePage['dropdownItem']} ${homePage['inputEmptyItem']}`}
                 style={!searchQuery ? {} : { display: 'none' }}
               >
-                {lang.tr.searchEmpty}
+                {t('searchEmpty')}
               </div>
             </div>
           </div>
@@ -357,30 +356,30 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             data-key="60060"
             onClick={() => setSection(0)}
           >
-            {lang.tr.home}
+            {t('home')}
           </div>
           <div
             className={`${homePage['navegateItem']} ${section === 1 ? homePage['active'] : ''}`}
             data-key="40007"
             onClick={() => setSection(1)}
           >
-            {lang.tr.game}
+            {t('game')}
           </div>
           <div
             className={`${homePage['navegateItem']} ${section === 2 ? homePage['active'] : ''}`}
             data-key="30375"
             onClick={() => setSection(2)}
           >
-            {lang.tr.live}
+            {t('live')}
           </div>
         </div>
 
         <div className={homePage['right']}>
           <div className={homePage['navegateItem']} data-key="30014" onClick={() => handleOpenCreateServer(userId)}>
-            {lang.tr.createServers}
+            {t('createServers')}
           </div>
           <div className={homePage['navegateItem']} data-key="60004" onClick={() => setSection(3)}>
-            {lang.tr.personalExclusive}
+            {t('personalExclusive')}
           </div>
         </div>
       </header>
@@ -394,14 +393,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
       {/* Personal Exclusive */}
       <main className={homePage['homeContent']} style={section === 3 ? {} : { display: 'none' }}>
-        <ServerListSection title={lang.tr.recentVisits} servers={recentServers} user={user} />
-        <ServerListSection title={lang.tr.myServers} servers={ownedServers} user={user} />
-        <ServerListSection title={lang.tr.favoriteServers} servers={favoriteServers} user={user} />
+        <ServerListSection title={t('recentVisits')} servers={recentServers} user={user} />
+        <ServerListSection title={t('myServers')} servers={ownedServers} user={user} />
+        <ServerListSection title={t('favoriteServers')} servers={favoriteServers} user={user} />
       </main>
 
       {/* Not Available */}
       <main className={homePage['homeContent']} style={section === 1 || section === 2 ? {} : { display: 'none' }}>
-        <div>{'抱歉，此頁面尚未開放'}</div>
+        <div>{t('notAvailablePageMessage')}</div>
       </main>
     </div>
   );

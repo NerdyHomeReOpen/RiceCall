@@ -5,7 +5,7 @@ import { Member, User, Server } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // CSS
 import setting from '@/styles/popups/setting.module.css';
@@ -26,7 +26,7 @@ interface EditNicknamePopupProps {
 const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId, serverId }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // Refs
   const refreshRef = useRef(false);
@@ -82,12 +82,12 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
           <div className={popup['inputGroup']}>
             <div className={popup['inputBox']}>
               <div className={popup['label']} style={{ minWidth: '2rem' }}>
-                {lang.tr.nickname}:
+                {t('nickname')}:
               </div>
               <div className={popup['label']}>{userName}</div>
             </div>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{lang.tr.pleaseEnterTheMemberNickname}</div>
+              <div className={popup['label']}>{t('pleaseEnterTheMemberNickname')}</div>
               <input
                 name="nickname"
                 type="text"
@@ -114,10 +114,10 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button type="button" className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
         <button
           type="button"
@@ -126,7 +126,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
             handleEditMember({ nickname: memberNickname }, userId, serverId);
           }}
         >
-          {lang.tr.set}
+          {t('set')}
         </button>
       </div>
     </form>

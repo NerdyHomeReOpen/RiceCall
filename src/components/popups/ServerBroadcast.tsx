@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Server, Channel, Message } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 
 // CSS
@@ -21,7 +21,7 @@ interface ServerBroadcastPopupProps {
 
 const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ serverId, channelId }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const socket = useSocket();
 
   // States
@@ -53,7 +53,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
         <div className={broadcast['content']}>
           <div className={`${popup['inputGroup']}`}>
             <div className={`${popup['row']}`}>
-              <div className={`${popup['label']} ${broadcast['label']}`}>{'接收頻道' /* TODO: lang.tr */}</div>
+              <div className={`${popup['label']} ${broadcast['label']}`}>{t('receiveChannel')}</div>
               <div className={broadcast['inputBox']}>
                 <div className={`${popup['row']}`}>
                   <input
@@ -65,7 +65,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                     }}
                   />
                   <div>
-                    <div className={popup['label']}>{'當前頻道' /* TODO: lang.tr */}</div>
+                    <div className={popup['label']}>{t('currentChannel')}</div>
                   </div>
                 </div>
                 <div className={`${popup['row']}`}>
@@ -78,13 +78,13 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                     }}
                   />
                   <div>
-                    <div className={popup['label']}>{'所有頻道' /* TODO: lang.tr */}</div>
+                    <div className={popup['label']}>{t('allChannel')}</div>
                   </div>
                 </div>
               </div>
             </div>
             <div className={`${popup['row']}`}>
-              <div className={`${popup['label']} ${broadcast['label']}`}>{'廣播' /* TODO: lang.tr */}</div>
+              <div className={`${popup['label']} ${broadcast['label']}`}>{t('broadcast')}</div>
               <div className={broadcast['inputBox']}>
                 <div className={`${popup['row']}`}>
                   <input
@@ -96,7 +96,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                     }}
                   />
                   <div>
-                    <div className={popup['label']}>{'文字廣播' /* TODO: lang.tr */}</div>
+                    <div className={popup['label']}>{t('textBroadcast')}</div>
                   </div>
                 </div>
                 <div className={`${popup['row']} ${popup['disabled']}`}>
@@ -109,7 +109,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                     }}
                   />
                   <div>
-                    <div className={popup['label']}>{`${'語音廣播' /* TODO: lang.tr */} ${lang.tr.soon}`}</div>
+                    <div className={popup['label']}>{`${t('voiceBroadcast')} ${t('soon')}`}</div>
                   </div>
                 </div>
               </div>
@@ -117,7 +117,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
           </div>
           <div className={`${popup['inputGroup']} ${popup['row']}`}>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{'廣播內容' /* TODO: lang.tr */}</div>
+              <div className={popup['label']}>{t('broadcastContent')}</div>
               <textarea
                 name="content"
                 maxLength={300}
@@ -126,9 +126,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                 }}
               />
               <div className={broadcast['labelArea']}>
-                <div className={`${popup['label']} ${popup['disabled']}`}>
-                  {'支援連結，不超過300字' /* TODO: lang.tr */}
-                </div>
+                <div className={`${popup['label']} ${popup['disabled']}`}>{t('supportLink')}</div>
                 <div className={broadcast['messageInputLength']}>
                   {broadcastContent.length}/{maxLength}
                 </div>
@@ -151,10 +149,10 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button type="button" className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </div>

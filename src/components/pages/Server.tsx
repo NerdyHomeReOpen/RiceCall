@@ -25,7 +25,7 @@ import {
 } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
@@ -58,7 +58,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     display,
   }) => {
     // Hooks
-    const lang = useLanguage();
+    const { t } = useTranslation();
     const socket = useSocket();
     const webRTC = useWebRTC();
     const contextMenu = useContextMenu();
@@ -215,22 +215,22 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     useEffect(() => {
       if (serverName) {
         ipcService.discord.updatePresence({
-          details: `${lang.tr.in} ${serverName}`,
-          state: `${lang.tr.chatWithMembers.replace('{0}', activeServerMembers.length.toString())}`,
+          details: `${t('in')} ${serverName}`,
+          state: `${t('chatWithMembers').replace('{0}', activeServerMembers.length.toString())}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
           smallImageKey: 'home_icon',
-          smallImageText: lang.tr.RPCServer,
+          smallImageText: t('RPCServer'),
           timestamp: Date.now(),
           buttons: [
             {
-              label: lang.tr.RPCJoinServer,
+              label: t('RPCJoinServer'),
               url: 'https://discord.gg/adCWzv6wwS',
             },
           ],
         });
       }
-    }, [lang, serverName, activeServerMembers]);
+    }, [t, serverName, activeServerMembers]);
 
     return (
       <div className={styles['serverWrapper']} style={display ? {} : { display: 'none' }}>
@@ -288,14 +288,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 }
                 placeholder={
                   isForbidByChatMode
-                    ? lang.tr.forbidOnlyAdminText
+                    ? t('forbidOnlyAdminText')
                     : isForbidByGuestText
-                    ? lang.tr.forbidGuestText
+                    ? t('forbidGuestText')
                     : isForbidByGuestTextGap
-                    ? `${lang.tr.guestTextGapTime} ${leftGapTime} ${lang.tr.seconds}`
+                    ? `${t('guestTextGapTime')} ${leftGapTime} ${t('seconds')}`
                     : isForbidByGuestTextWait
-                    ? `${lang.tr.guestTextWaitTime} ${leftWaitTime} ${lang.tr.seconds}`
-                    : lang.tr.inputMessage
+                    ? `${t('guestTextWaitTime')} ${leftWaitTime} ${t('seconds')}`
+                    : t('inputMessage')
                 }
                 maxLength={textMaxLength}
               />
@@ -313,7 +313,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     contextMenu.showContextMenu(x, y, true, false, [
                       {
                         id: 'freeSpeech',
-                        label: lang.tr.freeSpeech,
+                        label: t('freeSpeech'),
                         show: canChangeToFreeSpeech,
                         onClick: () => {
                           handleEditChannel({ voiceMode: 'free' }, channelId, serverId);
@@ -321,7 +321,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       },
                       {
                         id: 'forbiddenSpeech',
-                        label: lang.tr.forbiddenSpeech,
+                        label: t('forbiddenSpeech'),
                         show: canChangeToForbiddenSpeech,
                         disabled: true,
                         onClick: () => {
@@ -330,7 +330,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       },
                       {
                         id: 'queue',
-                        label: lang.tr.queue,
+                        label: t('queue'),
                         icon: 'submenu',
                         show: canChangeToForbiddenQueue || canChangeToControlQueue,
                         hasSubmenu: true,
@@ -341,7 +341,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         submenuItems: [
                           {
                             id: 'forbiddenQueue',
-                            label: lang.tr.forbiddenQueue,
+                            label: t('forbiddenQueue'),
                             show: canChangeToForbiddenQueue,
                             disabled: true,
                             onClick: () => {
@@ -350,7 +350,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                           },
                           {
                             id: 'controlQueue',
-                            label: lang.tr.controlQueue,
+                            label: t('controlQueue'),
                             show: canChangeToControlQueue,
                             disabled: true,
                             onClick: () => {
@@ -363,11 +363,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   }}
                 >
                   {channelVoiceMode === 'queue'
-                    ? lang.tr.queue
+                    ? t('queue')
                     : channelVoiceMode === 'free'
-                    ? lang.tr.freeSpeech
+                    ? t('freeSpeech')
                     : channelVoiceMode === 'forbidden'
-                    ? lang.tr.forbiddenSpeech
+                    ? t('forbiddenSpeech')
                     : ''}
                 </div>
               </div>
@@ -384,14 +384,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   `}
                 />
                 <div className={styles['micText']}>
-                  {webRTC.isMute ? lang.tr.takeMic : lang.tr.takenMic}
+                  {webRTC.isMute ? t('takeMic') : t('takenMic')}
                   <div className={styles['micSubText']}>
-                    {!webRTC.isMute && webRTC.micVolume === 0 ? lang.tr.micMuted : ''}
+                    {!webRTC.isMute && webRTC.micVolume === 0 ? t('micMuted') : ''}
                   </div>
                 </div>
               </div>
               <div className={styles['buttons']}>
-                <div className={styles['bkgModeButton']}>{lang.tr.mixing}</div>
+                <div className={styles['bkgModeButton']}>{t('mixing')}</div>
                 <div className={styles['saperator']} />
                 <div className={styles['micVolumeContainer']}>
                   <div

@@ -4,8 +4,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { PopupType, SocketServerEvent, User } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -21,7 +21,7 @@ interface SearchUserPopupProps {
 const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // States
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -72,7 +72,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{lang.tr.pleaseInputFriendAccount}</div>
+              <div className={popup['label']}>{t('pleaseInputFriendAccount')}</div>
               <input
                 name="query"
                 type="text"
@@ -93,10 +93,10 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
           disabled={!searchQuery.trim()}
           onClick={() => handleSearchUser(searchQuery)}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </div>

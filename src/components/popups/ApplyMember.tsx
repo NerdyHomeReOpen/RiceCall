@@ -9,7 +9,7 @@ import applyMember from '@/styles/popups/apply.module.css';
 import { Server, MemberApplication, User } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 
 // Services
@@ -26,7 +26,7 @@ interface ApplyMemberPopupProps {
 
 const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, serverId }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const socket = useSocket();
 
   // Refs
@@ -111,12 +111,12 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
                 </div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div>{lang.tr.serverApplyNotice}</div>
-                <div className={popup['hint']}>{serverApplyNotice || lang.tr.none}</div>
+                <div>{t('serverApplyNotice')}</div>
+                <div className={popup['hint']}>{serverApplyNotice || t('none')}</div>
               </div>
               <div className={applyMember['split']} />
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div>{lang.tr.serverApplyDescription}</div>
+                <div>{t('serverApplyDescription')}</div>
                 <textarea
                   rows={2}
                   value={applicationDes}
@@ -142,10 +142,10 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
               handleClose();
             }}
           >
-            {lang.tr.submit}
+            {t('submit')}
           </button>
           <button type="button" className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.cancel}
+            {t('cancel')}
           </button>
         </div>
       </div>
@@ -169,11 +169,11 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
                 </div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div>{lang.tr.serverApplyNotice}</div>
-                <div className={popup['hint']}>{serverApplyNotice || lang.tr.none}</div>
+                <div>{t('serverApplyNotice')}</div>
+                <div className={popup['hint']}>{serverApplyNotice || t('none')}</div>
               </div>
               <div className={applyMember['split']} />
-              <p className={popup['hint']}>{lang.tr.applySuccess}</p>
+              <p className={popup['hint']}>{t('applySuccess')}</p>
             </div>
           </div>
         </div>
@@ -181,10 +181,10 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
         {/* Footer */}
         <div className={popup['popupFooter']}>
           <button className={popup['button']} onClick={() => setSection(0)}>
-            {lang.tr.modify}
+            {t('modify')}
           </button>
           <button className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.confirm}
+            {t('confirm')}
           </button>
         </div>
       </div>

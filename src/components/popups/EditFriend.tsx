@@ -5,7 +5,7 @@ import { User, Friend, FriendGroup, SocketServerEvent } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // CSS
 import setting from '@/styles/popups/setting.module.css';
@@ -26,7 +26,7 @@ interface EditFriendPopupProps {
 const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, targetId }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // Refs
   const refreshRef = useRef(false);
@@ -112,7 +112,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={`${popup['inputBox']} ${popup['row']}`}>
-              <div className={popup['label']}>{lang.tr.friendSelectGroup}</div>
+              <div className={popup['label']}>{t('friendSelectGroup')}</div>
               <div className={popup['selectBox']}>
                 <select
                   className={popup['input']}
@@ -124,7 +124,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
                     }));
                   }}
                 >
-                  <option value={''}>{lang.tr.none}</option>
+                  <option value={''}>{t('none')}</option>
                   {friendGroups.map((group) => (
                     <option key={group.friendGroupId} value={group.friendGroupId}>
                       {group.name}
@@ -146,10 +146,10 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </div>

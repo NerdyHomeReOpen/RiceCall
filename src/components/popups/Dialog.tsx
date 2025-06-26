@@ -8,7 +8,7 @@ import setting from '@/styles/popups/setting.module.css';
 import ipcService from '@/services/ipc.service';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/providers/Loading';
 
 enum DIALOG_ICON {
@@ -28,14 +28,14 @@ interface DialogPopupProps {
 
 const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, title, submitTo }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const loadingBox = useLoading();
 
   // Refs
   const containerRef = useRef<HTMLFormElement>(null);
 
   // Variables
-  const formatedTitle = typeof title === 'string' ? lang.getTranslatedMessage(title) : title;
+  const formatedTitle = typeof title === 'string' ? t(title) : title;
 
   // Handlers
   const handleSubmit = () => {
@@ -90,10 +90,10 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, title, submitTo }) 
       {/* Footer */}
       <div className={popup['popupFooter']}>
         <button className={popup['button']} onClick={() => handleSubmit()}>
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </form>

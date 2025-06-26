@@ -7,7 +7,7 @@ import styles from '@/styles/pages/server.module.css';
 import { PopupType, ServerMember, Channel, Server, User, UserFriend, UserServer } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
@@ -47,7 +47,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     setSelectedItemType,
   }) => {
     // Hooks
-    const lang = useLanguage();
+    const { t } = useTranslation();
     const socket = useSocket();
     const contextMenu = useContextMenu();
     const findMe = useFindMeContext();
@@ -105,7 +105,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(lang.tr.warningDeleteChannel.replace('{0}', channelName), () =>
+      handleOpenWarningDialog(t('warningDeleteChannel').replace('{0}', channelName), () =>
         socket.send.deleteChannel({ channelId, serverId }),
       );
     };
@@ -244,7 +244,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'joinChannel',
-                label: '進入此頻道', // TODO: lang.tr
+                label: t('joinChannel'),
                 show: canJoin,
                 onClick: () => {
                   if (needPassword) {
@@ -256,7 +256,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               },
               {
                 id: 'editChannel',
-                label: lang.tr.editChannel,
+                label: t('editChannel'),
                 show: canEdit,
                 onClick: () => handleOpenChannelSetting(channelId, serverId),
               },
@@ -267,20 +267,20 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               },
               {
                 id: 'createChannel',
-                label: lang.tr.addChannel,
+                label: t('addChannel'),
                 show: canCreate,
                 onClick: () => handleOpenCreateChannel(serverId, null, userId),
               },
               {
                 id: 'createSubChannel',
-                label: lang.tr.addSubChannel,
+                label: t('addSubChannel'),
                 show: canCreateSub,
                 onClick: () =>
                   handleOpenCreateChannel(serverId, channelCategoryId ? channelCategoryId : channelId, userId),
               },
               {
                 id: 'deleteChannel',
-                label: lang.tr.deleteChannel,
+                label: t('deleteChannel'),
                 show: canDelete,
                 onClick: () => handleDeleteChannel(channelId, serverId),
               },
@@ -290,8 +290,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 show: canManageChannel,
               },
               {
-                id: 'broadcastServer',
-                label: '廣播', // TODO: lang.tr
+                id: 'broadcast',
+                label: t('broadcast'),
                 show: canManageChannel,
                 onClick: () => {
                   handleOpenServerBroadcast(serverId, channelCategoryId ? channelCategoryId : channelId);
@@ -299,14 +299,14 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               },
               {
                 id: 'moveAllUserToChannel',
-                label: lang.tr.moveAllUserToChannel,
+                label: t('moveAllUserToChannel'),
                 show: canMoveAllUserToChannel,
                 onClick: () =>
                   channelUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
               },
               {
                 id: 'editChannelOrder',
-                label: lang.tr.editChannelOrder,
+                label: t('editChannelOrder'),
                 show: canManageChannel,
                 onClick: () => handleOpenEditChannelOrder(serverId, userId),
               },
@@ -317,7 +317,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               },
               {
                 id: 'setReceptionLobby',
-                label: lang.tr.setDefaultChannel,
+                label: t('setDefaultChannel'),
                 show: canSetReceptionLobby,
                 onClick: () => handleEditServer({ receptionLobbyId: channelId }, serverId),
               },

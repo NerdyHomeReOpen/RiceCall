@@ -12,7 +12,6 @@ import header from '@/styles/header.module.css';
 import {
   PopupType,
   SocketServerEvent,
-  LanguageKey,
   Server,
   User,
   Channel,
@@ -24,6 +23,9 @@ import {
   PromptMessage,
   FriendApplication,
 } from '@/types';
+
+// i18n
+import i18n, { LanguageKey } from '@/i18n';
 
 // Pages
 import FriendPage from '@/components/pages/Friend';
@@ -39,8 +41,8 @@ import Default from '@/utils/default';
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
 import ExpandedProvider from '@/providers/FindMe';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
@@ -62,9 +64,9 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendApplications }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
   const contextMenu = useContextMenu();
   const mainTab = useMainTab();
+  const { t } = useTranslation();
 
   // Refs
   const menuRef = useRef<HTMLDivElement>(null);
@@ -78,15 +80,15 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
 
   // Constants
   const MAIN_TABS = [
-    { id: 'home', label: lang.tr.home },
-    { id: 'friends', label: lang.tr.friends },
+    { id: 'home', label: t('home') },
+    { id: 'friends', label: t('friends') },
     { id: 'server', label: serverName },
   ];
   const STATUS_OPTIONS = [
-    { status: 'online', label: lang.tr.online },
-    { status: 'dnd', label: lang.tr.dnd },
-    { status: 'idle', label: lang.tr.idle },
-    { status: 'gn', label: lang.tr.gn },
+    { status: 'online', label: t('online') },
+    { status: 'dnd', label: t('dnd') },
+    { status: 'idle', label: t('idle') },
+    { status: 'gn', label: t('gn') },
   ];
 
   // Handlers
@@ -146,7 +148,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
   };
 
   const handleLanguageChange = (language: LanguageKey) => {
-    lang.set(language);
+    i18n.changeLanguage(language);
     localStorage.setItem('language', language);
   };
 
@@ -279,7 +281,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
             contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'system-setting',
-                label: lang.tr.systemSettings,
+                label: t('systemSettings'),
                 icon: 'setting',
                 onClick: () => handleOpenSystemSetting(),
               },
@@ -291,13 +293,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
               // },
               {
                 id: 'change-theme',
-                label: lang.tr.changeTheme,
+                label: t('changeTheme'),
                 icon: 'skin',
                 onClick: () => handleOpenChangeTheme(),
               },
               {
                 id: 'feedback',
-                label: lang.tr.feedback,
+                label: t('feedback'),
                 icon: 'feedback',
                 onClick: () => {
                   window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank');
@@ -305,19 +307,19 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
               },
               {
                 id: 'language-select',
-                label: lang.tr.languageSelect,
+                label: t('languageSelect'),
                 icon: 'submenu',
                 hasSubmenu: true,
                 submenuItems: [
                   {
                     id: 'language-select-tw',
                     label: '繁體中文',
-                    onClick: () => handleLanguageChange('tw'),
+                    onClick: () => handleLanguageChange('zh-Hant-TW'),
                   },
                   {
                     id: 'language-select-cn',
                     label: '简体中文',
-                    onClick: () => handleLanguageChange('cn'),
+                    onClick: () => handleLanguageChange('zh-Hans-CN'),
                   },
                   {
                     id: 'language-select-en',
@@ -327,60 +329,65 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                   {
                     id: 'language-select-jp',
                     label: '日本語',
-                    onClick: () => handleLanguageChange('jp'),
+                    onClick: () => handleLanguageChange('ja-JP'),
+                  },
+                  {
+                    id: 'language-select-br',
+                    label: 'Português (BR)',
+                    onClick: () => handleLanguageChange('pt-BR'),
                   },
                 ],
               },
               {
                 id: 'help-center',
-                label: lang.tr.helpCenter,
+                label: t('helpCenter'),
                 icon: 'submenu',
                 hasSubmenu: true,
                 submenuItems: [
                   {
                     id: 'faq',
-                    label: lang.tr.faq,
+                    label: t('faq'),
                     onClick: () => {
                       window.open('https://ricecall.com.tw/faq', '_blank');
                     },
                   },
                   {
                     id: 'agreement',
-                    label: lang.tr.agreement,
+                    label: t('agreement'),
                     onClick: () => {
                       window.open('https://ricecall.com.tw/agreement', '_blank');
                     },
                   },
                   {
                     id: 'specification',
-                    label: lang.tr.specification,
+                    label: t('specification'),
                     onClick: () => {
                       window.open('https://ricecall.com.tw/specification', '_blank');
                     },
                   },
                   {
                     id: 'contact-us',
-                    label: lang.tr.contactUs,
+                    label: t('contactUs'),
                     onClick: () => {
                       window.open('https://ricecall.com.tw/contactus', '_blank');
                     },
                   },
                   {
                     id: 'about-us',
-                    label: lang.tr.aboutUs,
+                    label: t('aboutUs'),
                     onClick: () => handleOpenAboutUs(),
                   },
                 ],
               },
               {
                 id: 'logout',
-                label: lang.tr.logout,
+                label: t('logout'),
                 icon: 'logout',
                 onClick: () => handleLogout(),
               },
               {
                 id: 'exit',
-                label: lang.tr.exit,
+                label: t('exit'),
                 icon: 'exit',
                 onClick: () => handleExit(),
               },
@@ -400,7 +407,6 @@ Header.displayName = 'Header';
 const RootPageComponent = () => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
 
@@ -697,10 +703,9 @@ const RootPageComponent = () => {
   }, [user, mainTab, loadingBox.isLoading]);
 
   useEffect(() => {
-    if (!lang) return;
-    const language = localStorage.getItem('language');
-    if (language) lang.set(language as LanguageKey);
-  }, [lang]);
+    const language = localStorage.getItem('language') as LanguageKey;
+    if (language) i18n.changeLanguage(language);
+  }, []);
 
   return (
     <WebRTCProvider>

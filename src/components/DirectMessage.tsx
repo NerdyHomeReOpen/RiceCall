@@ -7,10 +7,13 @@ import styles from '@/styles/message.module.css';
 import type { DirectMessage } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
+
+// Utils
+import { getFormatTimestamp, getTranslatedMessage } from '@/utils/language';
 
 interface DirectMessageProps {
   messageGroup: DirectMessage & {
@@ -20,22 +23,22 @@ interface DirectMessageProps {
 
 const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // Variables
   const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
 
-  const timestamp = lang.getFormatTimestamp(messageTimestamp);
+  const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
 
-  const formatMessages = messageContents.map((content) => lang.getTranslatedMessage(content));
+  const translatedMessages = messageContents.map((content) => getTranslatedMessage(t, content));
 
   return (
     <div className={styles['messageBox']}>
       <div className={styles['header']}>
         <div className={styles['username']}>{senderName}</div>
-        <div className={styles['timestamp']}>{timestamp}</div>
+        <div className={styles['timestamp']}>{formattedTimestamp}</div>
       </div>
-      {formatMessages.map((content, index) => (
+      {translatedMessages.map((content, index) => (
         <MarkdownViewer key={index} markdownText={content} />
       ))}
     </div>

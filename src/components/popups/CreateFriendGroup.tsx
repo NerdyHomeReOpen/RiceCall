@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { FriendGroup, User } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -24,7 +24,7 @@ interface CreateFriendGroupPopupProps {
 const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo(({ userId }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // States
   const [friendGroup, setFriendGroup] = useState<FriendGroup>(Default.friendGroup());
@@ -50,7 +50,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{lang.tr.pleaseInputFriendGroupName}</div>
+              <div className={popup['label']}>{t('pleaseInputFriendGroupName')}</div>
               <input
                 name="name"
                 type="text"
@@ -78,10 +78,10 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </div>

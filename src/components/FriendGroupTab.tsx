@@ -7,8 +7,8 @@ import styles from '@/styles/pages/friend.module.css';
 import { PopupType, User, FriendGroup, UserFriend } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
 
 // Services
@@ -28,7 +28,7 @@ interface FriendGroupTabProps {
 const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
   ({ user, friendGroup, friends, selectedItemId, setSelectedItemId }) => {
     // Hooks
-    const lang = useLanguage();
+    const { t } = useTranslation();
     const contextMenu = useContextMenu();
 
     // States
@@ -61,7 +61,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     // Handlers
     const handleDeleteFriendGroup = (friendGroupId: FriendGroup['friendGroupId'], userId: User['userId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(lang.tr.deleteFriendGroupDialog.replace('{0}', friendGroupName), () =>
+      handleOpenWarningDialog(t('deleteFriendGroupDialog').replace('{0}', friendGroupName), () =>
         socket.send.deleteFriendGroup({ friendGroupId, userId }),
       );
     };
@@ -98,13 +98,13 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
             contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'edit',
-                label: lang.tr.renameFriendGroup,
+                label: t('renameFriendGroup'),
                 show: canManageFriendGroup,
                 onClick: () => handleOpenEditFriendGroup(friendGroupId, userId),
               },
               {
                 id: 'delete',
-                label: lang.tr.friendDeleteGroup,
+                label: t('friendDeleteGroup'),
                 show: canManageFriendGroup,
                 onClick: () => handleDeleteFriendGroup(friendGroupId, userId),
               },

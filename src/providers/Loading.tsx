@@ -4,7 +4,7 @@ import React, { useContext, createContext, ReactNode, useState } from 'react';
 import homePage from '@/styles/pages/home.module.css';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 interface LoadingContextType {
   setIsLoading: (value: boolean) => void;
@@ -31,7 +31,7 @@ interface LoadingProviderProps {
 
 const LoadingProvider = ({ children }: LoadingProviderProps) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // States
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -54,7 +54,7 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
         <div className={homePage['loadingWrapper']}>
           <div className={homePage['loadingBox']}>
             <div className={homePage['loadingTitleContain']}>
-              <div>{lang.tr.connectingServer}</div>
+              <div>{t('connectingServer')}</div>
               <div className={homePage['loadingServerID']}>{loadingServerId}</div>
             </div>
             <div className={homePage['loadingGif']}></div>

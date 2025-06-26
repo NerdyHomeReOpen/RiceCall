@@ -9,8 +9,8 @@ import applyFriend from '@/styles/popups/apply.module.css';
 import { FriendApplication, FriendGroup, PopupType, SocketServerEvent, User } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -26,7 +26,7 @@ interface ApplyFriendPopupProps {
 
 const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, targetId }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const socket = useSocket();
 
   // Refs
@@ -157,7 +157,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['col']}>
-              <div className={popup['label']}>{lang.tr.friendLabel}</div>
+              <div className={popup['label']}>{t('friendLabel')}</div>
               <div
                 className={popup['row']}
                 onClick={() => {
@@ -177,7 +177,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
               </div>
               <div className={applyFriend['split']} />
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{lang.tr.friendNote}</div>
+                <div className={popup['label']}>{t('friendNote')}</div>
                 <textarea
                   rows={2}
                   value={applicationDesc}
@@ -188,7 +188,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
                     }))
                   }
                 />
-                <div className={popup['hint']}>{lang.tr.max120content}</div>
+                <div className={popup['hint']}>{t('max120content')}</div>
               </div>
             </div>
           </div>
@@ -203,10 +203,10 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
               handleClose();
             }}
           >
-            {lang.tr.sendRequest}
+            {t('sendRequest')}
           </button>
           <button className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.cancel}
+            {t('cancel')}
           </button>
         </div>
       </div>
@@ -217,7 +217,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['col']}>
-              <div className={popup['label']}>{lang.tr.friendLabel}</div>
+              <div className={popup['label']}>{t('friendLabel')}</div>
               <div
                 className={popup['row']}
                 onClick={() => {
@@ -236,7 +236,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
                 </div>
               </div>
               <div className={applyFriend['split']} />
-              <div className={popup['hint']}>{lang.tr.friendApplySent}</div>
+              <div className={popup['hint']}>{t('friendApplySent')}</div>
             </div>
           </div>
         </div>
@@ -244,10 +244,10 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
         {/* Footer */}
         <div className={popup['popupFooter']}>
           <button className={popup['button']} onClick={() => setSection(0)}>
-            {lang.tr.modify}
+            {t('modify')}
           </button>
           <button className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.confirm}
+            {t('confirm')}
           </button>
         </div>
       </div>
@@ -258,7 +258,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={popup['col']}>
-              <div className={popup['label']}>{lang.tr.friendLabel}</div>
+              <div className={popup['label']}>{t('friendLabel')}</div>
               <div
                 className={popup['row']}
                 onClick={() => {
@@ -278,7 +278,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
               </div>
               <div className={applyFriend['split']} />
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{lang.tr.friendSelectGroup}</div>
+                <div className={popup['label']}>{t('friendSelectGroup')}</div>
                 <div className={popup['row']}>
                   <div className={popup['selectBox']}>
                     <select
@@ -286,7 +286,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
                       value={selectedFriendGroupId || ''}
                       onChange={(e) => setSelectedFriendGroupId(e.target.value)}
                     >
-                      <option value={''}>{lang.tr.none}</option>
+                      <option value={''}>{t('none')}</option>
                       {friendGroups.map((group) => (
                         <option key={group.friendGroupId} value={group.friendGroupId}>
                           {group.name}
@@ -294,7 +294,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
                       ))}
                     </select>
                   </div>
-                  <div className={popup['link']}>{lang.tr.friendAddGroup}</div>
+                  <div className={popup['link']}>{t('friendAddGroup')}</div>
                 </div>
               </div>
             </div>
@@ -310,10 +310,10 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
               handleClose();
             }}
           >
-            {lang.tr.add}
+            {t('add')}
           </button>
           <button className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.cancel}
+            {t('cancel')}
           </button>
         </div>
       </div>

@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { User, DirectMessage, SocketServerEvent, Server, PromptMessage } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -36,7 +36,7 @@ const SHAKE_COOLDOWN = 3000;
 
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, windowRef }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const socket = useSocket();
   const contextMenu = useContextMenu();
 
@@ -241,7 +241,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             )}
             <div className={directMessage['userStateBox']}>
               <div
-                title={`${lang.tr.level}: ${targetLevel}`}
+                title={`${t('level')}: ${targetLevel}`}
                 className={`
                     ${grade['grade']}
                     ${grade[`lv-${Math.min(56, targetLevel)}`]}
@@ -304,7 +304,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 />
               </div>
               <div className={directMessage['buttons']}>
-                <div className={directMessage['historyMessage']}>{lang.tr.messageHistory}</div>
+                <div className={directMessage['historyMessage']}>{t('messageHistory')}</div>
               </div>
             </div>
             <textarea

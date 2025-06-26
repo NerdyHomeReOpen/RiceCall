@@ -435,8 +435,6 @@ export interface Translation {
   dontShowNextTime: string;
 }
 
-export type LanguageKey = 'tw' | 'cn' | 'en' | 'jp';
-
 export const enum Permission {
   Guest = 1,
   Member = 2,

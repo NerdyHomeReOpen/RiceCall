@@ -10,7 +10,7 @@ import { User, Server, PopupType, UserServer } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -26,7 +26,7 @@ interface CreateServerPopupProps {
 
 const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const socket = useSocket();
 
   // Refs
@@ -36,15 +36,15 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   const SERVER_TYPES: { value: Server['type']; name: string }[] = [
     {
       value: 'game',
-      name: lang.tr.game,
+      name: t('game'),
     },
     {
       value: 'entertainment',
-      name: lang.tr.entertainment,
+      name: t('entertainment'),
     },
     {
       value: 'other',
-      name: lang.tr.other,
+      name: t('other'),
     },
   ];
 
@@ -123,17 +123,17 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
       <div className={popup['popupContainer']} style={section === 0 ? {} : { display: 'none' }}>
         {/* Tab */}
         <div className={popup['popupTab']}>
-          <div className={`${popup['item']} ${popup['active']}`}>{lang.tr.selectServerType}</div>
-          <div className={popup['item']}>{lang.tr.fillInfo}</div>
+          <div className={`${popup['item']} ${popup['active']}`}>{t('selectServerType')}</div>
+          <div className={popup['item']}>{t('fillInfo')}</div>
         </div>
 
         {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={`${createServer['message']}`}>
-              {`${lang.tr.remainingServer1} ${remainingServers} ${lang.tr.remainingServer2}`}
+              {`${t('remainingServer1')} ${remainingServers} ${t('remainingServer2')}`}
             </div>
-            <div className={createServer['type']}>{lang.tr.selectServerTypeDescription}</div>
+            <div className={createServer['type']}>{t('selectServerTypeDescription')}</div>
             <div className={createServer['buttonGroup']}>
               {SERVER_TYPES.map((type) => (
                 <div
@@ -157,7 +157,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         {/* Footer */}
         <div className={popup['popupFooter']}>
           <button className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.cancel}
+            {t('cancel')}
           </button>
         </div>
       </div>
@@ -165,8 +165,8 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
       <div className={popup['popupContainer']} style={section === 1 ? {} : { display: 'none' }}>
         {/* Tab */}
         <div className={popup['popupTab']}>
-          <div className={popup['item']}>{lang.tr.selectServerType}</div>
-          <div className={`${popup['item']}  ${popup['active']}`}>{lang.tr.fillInfo}</div>
+          <div className={popup['item']}>{t('selectServerType')}</div>
+          <div className={`${popup['item']}  ${popup['active']}`}>{t('fillInfo')}</div>
         </div>
 
         {/* Body */}
@@ -191,7 +191,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
                     const file = e.target.files?.[0];
                     if (!file) return;
                     if (file.size > 5 * 1024 * 1024) {
-                      handleOpenErrorDialog(lang.tr.imageTooLarge);
+                      handleOpenErrorDialog(t('imageTooLarge'));
                       return;
                     }
 
@@ -215,24 +215,24 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
                   }}
                 />
                 <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popup['button']}>
-                  {lang.tr.uploadAvatar}
+                  {t('uploadAvatar')}
                 </label>
               </div>
               <div className={popup['inputGroup']}>
                 <div className={createServer['inputWrapper']}>
                   <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={createServer['label']}>{lang.tr.serverType}</div>
-                    <input name="type" type="text" disabled value={lang.tr[serverType as keyof typeof lang.tr]} />
+                    <div className={createServer['label']}>{t('serverType')}</div>
+                    <input name="type" type="text" disabled value={t(serverType as keyof typeof t)} />
                   </div>
                 </div>
                 <div className={createServer['inputWrapper']}>
                   <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={createServer['label']}>{lang.tr.serverName}</div>
+                    <div className={createServer['label']}>{t('serverName')}</div>
                     <input
                       name="name"
                       type="text"
                       value={serverName}
-                      placeholder={lang.tr.serverNamePlaceholder}
+                      placeholder={t('serverNamePlaceholder')}
                       maxLength={32}
                       onChange={(e) =>
                         setServer((prev) => ({
@@ -245,12 +245,12 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
                 </div>
                 <div className={createServer['inputWrapper']}>
                   <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={createServer['label']}>{lang.tr.serverSlogan}</div>
+                    <div className={createServer['label']}>{t('serverSlogan')}</div>
                     <input
                       name="slogan"
                       type="text"
                       value={serverSlogan}
-                      placeholder={lang.tr.serverSloganPlaceholder}
+                      placeholder={t('serverSloganPlaceholder')}
                       maxLength={32}
                       onChange={(e) =>
                         setServer((prev) => ({
@@ -269,7 +269,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         {/* Footer */}
         <div className={popup['popupFooter']}>
           <button className={popup['button']} onClick={() => setSection(0)}>
-            {lang.tr.previous}
+            {t('previous')}
           </button>
           <button
             className={popup['button']}
@@ -279,10 +279,10 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
               handleClose();
             }}
           >
-            {lang.tr.created}
+            {t('created')}
           </button>
           <button className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.cancel}
+            {t('cancel')}
           </button>
         </div>
       </div>

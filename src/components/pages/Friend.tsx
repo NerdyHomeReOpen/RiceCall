@@ -15,8 +15,8 @@ import BadgeListViewer from '@/components/BadgeList';
 import { User, UserFriend, FriendGroup } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
@@ -31,7 +31,7 @@ interface FriendPageProps {
 
 const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, friends, friendGroups, display }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const socket = useSocket();
   const contextMenu = useContextMenu();
 
@@ -89,23 +89,22 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   }, [userSignature]);
 
   useEffect(() => {
-    if (!lang) return;
     ipcService.discord.updatePresence({
-      details: lang.tr.RPCFriendPage,
-      state: `${lang.tr.RPCUser} ${userName}`,
+      details: t('RPCFriendPage'),
+      state: `${t('RPCUser')} ${userName}`,
       largeImageKey: 'app_icon',
       largeImageText: 'RC Voice',
       smallImageKey: 'home_icon',
-      smallImageText: lang.tr.RPCFriend,
+      smallImageText: t('RPCFriend'),
       timestamp: Date.now(),
       buttons: [
         {
-          label: lang.tr.RPCJoinServer,
+          label: t('RPCJoinServer'),
           url: 'https://discord.gg/adCWzv6wwS',
         },
       ],
     });
-  }, [lang, userName]);
+  }, [t, userName]);
 
   return (
     <div className={friendPage['friendWrapper']} style={display ? {} : { display: 'none' }}>
@@ -121,7 +120,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             <div className={friendPage['levelIcon']} />
             <div
               className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
-              title={`${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${
+              title={`${t('level')}：${userLevel}，${t('xp')}：${userXP}，${t('xpDifference')}：${
                 userRequiredXP - userXP
               }`}
             />
@@ -138,7 +137,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             ref={signatureInputRef}
             className={friendPage['signatureInput']}
             value={signatureInput}
-            placeholder={lang.tr.signaturePlaceholder}
+            placeholder={t('signaturePlaceholder')}
             maxLength={300}
             onChange={(e) => setSignatureInput(e.target.value)}
             onBlur={() => {
@@ -181,7 +180,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
 
         {/* Right Content */}
         <div className={friendPage['mainContent']}>
-          <div className={friendPage['header']}>{lang.tr.friendActive}</div>
+          <div className={friendPage['header']}>{t('friendActive')}</div>
         </div>
       </main>
     </div>

@@ -7,10 +7,9 @@ import { Server, User, UserServer, PopupType, Friend } from '@/types';
 import BadgeListViewer from '@/components/BadgeList';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 import { useContextMenu } from '@/providers/ContextMenu';
-// import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -36,7 +35,7 @@ interface UserSettingPopupProps {
 const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, targetId }) => {
   // Props
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const contextMenu = useContextMenu();
 
   // Refs
@@ -262,7 +261,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   ${grade['grade']} 
                   ${grade[`lv-${Math.min(56, userLevel)}`]}
                 `}
-              title={`${lang.tr.level}：${userLevel}，${lang.tr.xp}：${userXP}，${lang.tr.xpDifference}：${
+              title={`${t('level')}：${userLevel}，${t('xp')}：${userXP}，${t('xpDifference')}：${
                 userRequiredXP - userXP
               }`}
             />
@@ -278,8 +277,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           </div>
 
           <div className={setting['userContent']}>
-            {lang.tr[userGender === 'Male' ? 'male' : 'female']} . {userAge} .
-            {lang.tr[userCountry as keyof typeof lang.tr]}
+            {t(userGender === 'Male' ? 'male' : 'female')} . {userAge} .{t(userCountry as keyof typeof t)}
           </div>
 
           <div className={setting['userSignature']} dangerouslySetInnerHTML={{ __html: userSignature }} />
@@ -295,7 +293,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 }
               }}
             >
-              {lang.tr.about}
+              {t('about')}
             </div>
             <div
               className={`${setting['item']} ${setting['groups']}
@@ -307,7 +305,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 }
               }}
             >
-              {lang.tr.servers}
+              {t('servers')}
             </div>
           </div>
         </div>
@@ -333,15 +331,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   setSelectedTabId('about');
                 }}
               >
-                {lang.tr.confirm}
+                {t('confirm')}
               </button>
               <button className={setting['button']} onClick={() => setSelectedTabId('about')}>
-                {lang.tr.cancel}
+                {t('cancel')}
               </button>
             </>
           ) : (
             <button className={setting['button']} onClick={() => setSelectedTabId('userSetting')}>
-              {lang.tr.editProfile}
+              {t('editProfile')}
             </button>
           )}
         </div>
@@ -354,18 +352,18 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             </div>
           )}
           <div className={setting['userProfileContent']}>
-            <div className={setting['title']}>{lang.tr.recentlyJoinServer}</div>
+            <div className={setting['title']}>{t('recentlyJoinServer')}</div>
             <div className={setting['serverItems']}>
               {isProfilePrivate
                 ? PrivateElement(
                     <>
-                      {lang.tr.notPublicRecentServersTop}
+                      {t('notPublicRecentServersTop')}
                       <br />
-                      {lang.tr.notPublicRecentServersBottom}
+                      {t('notPublicRecentServersBottom')}
                     </>,
                   )
                 : recentServers.length === 0
-                ? PrivateElement(lang.tr.noRecentServers)
+                ? PrivateElement(t('noRecentServers'))
                 : recentServers.map((server) => (
                     <div
                       key={server.serverId}
@@ -391,7 +389,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             </div>
           </div>
           <div className={`${setting['userProfileContent']}`}>
-            <div className={setting['title']}>{lang.tr.recentlyEarnedBadges}</div>
+            <div className={setting['title']}>{t('recentlyEarnedBadges')}</div>
             <div className={setting['badgeViewer']}>
               <BadgeListViewer badges={userBadges} maxDisplay={13} />
             </div>
@@ -404,8 +402,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             <div className={`${popup['inputBox']}`}>
               <div className={`${popup['selectBox']}`}>
                 <select value={serversView} onChange={(e) => setServersView(e.target.value)}>
-                  <option value="joined">{lang.tr.joinedServers}</option>
-                  <option value="favorite">{lang.tr.favoritedServers}</option>
+                  <option value="joined">{t('joinedServers')}</option>
+                  <option value="favorite">{t('favoritedServers')}</option>
                 </select>
               </div>
             </div>
@@ -413,13 +411,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               {isProfilePrivate
                 ? PrivateElement(
                     <>
-                      {lang.tr.notPublicJoinedServersTop}
+                      {t('notPublicJoinedServersTop')}
                       <br />
-                      {lang.tr.notPublicJoinedServersBottom}
+                      {t('notPublicJoinedServersBottom')}
                     </>,
                   )
                 : joinedServers.length === 0
-                ? PrivateElement(lang.tr.noJoinedServers)
+                ? PrivateElement(t('noJoinedServers'))
                 : joinedServers.map((server) => (
                     <div
                       key={server.serverId}
@@ -458,13 +456,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               {isProfilePrivate
                 ? PrivateElement(
                     <>
-                      {lang.tr.notPublicFavoriteServersTop}
+                      {t('notPublicFavoriteServersTop')}
                       <br />
-                      {lang.tr.notPublicFavoriteServersBottom}
+                      {t('notPublicFavoriteServersBottom')}
                     </>,
                   )
                 : favoriteServers.length === 0
-                ? PrivateElement(lang.tr.noFavoriteServers)
+                ? PrivateElement(t('noFavoriteServers'))
                 : favoriteServers.map((server) => (
                     <div
                       key={server.serverId}
@@ -508,7 +506,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             <div className={popup['col']}>
               <div className={popup['row']}>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <div className={popup['label']}>{lang.tr.nickname}</div>
+                  <div className={popup['label']}>{t('nickname')}</div>
                   <input
                     name="name"
                     type="text"
@@ -519,7 +517,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 </div>
 
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <div className={popup['label']}>{lang.tr.gender}</div>
+                  <div className={popup['label']}>{t('gender')}</div>
                   <div className={`${popup['selectBox']} ${popup['selectBoxMax']}`}>
                     <select
                       value={userGender}
@@ -530,8 +528,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         }))
                       }
                     >
-                      <option value="Male">{lang.tr.male}</option>
-                      <option value="Female">{lang.tr.female}</option>
+                      <option value="Male">{t('male')}</option>
+                      <option value="Female">{t('female')}</option>
                     </select>
                   </div>
                 </div>
@@ -539,7 +537,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
               <div className={popup['row']}>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <div className={popup['label']}>{lang.tr.country}</div>
+                  <div className={popup['label']}>{t('country')}</div>
                   <div className={popup['selectBox']}>
                     <select
                       value={userCountry}
@@ -550,51 +548,51 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         }))
                       }
                     >
-                      <option value="taiwan">{lang.tr.taiwan}</option>
-                      <option value="china">{lang.tr.china}</option>
-                      <option value="japan">{lang.tr.japan}</option>
-                      <option value="korea">{lang.tr.korea}</option>
-                      <option value="usa">{lang.tr.usa}</option>
-                      <option value="uk">{lang.tr.uk}</option>
-                      <option value="france">{lang.tr.france}</option>
-                      <option value="germany">{lang.tr.germany}</option>
-                      <option value="italy">{lang.tr.italy}</option>
-                      <option value="spain">{lang.tr.spain}</option>
-                      <option value="portugal">{lang.tr.portugal}</option>
-                      <option value="brazil">{lang.tr.brazil}</option>
-                      <option value="argentina">{lang.tr.argentina}</option>
-                      <option value="mexico">{lang.tr.mexico}</option>
-                      <option value="colombia">{lang.tr.colombia}</option>
-                      <option value="chile">{lang.tr.chile}</option>
-                      <option value="peru">{lang.tr.peru}</option>
-                      <option value="venezuela">{lang.tr.venezuela}</option>
-                      <option value="bolivia">{lang.tr.bolivia}</option>
-                      <option value="ecuador">{lang.tr.ecuador}</option>
-                      <option value="paraguay">{lang.tr.paraguay}</option>
-                      <option value="uruguay">{lang.tr.uruguay}</option>
-                      <option value="nigeria">{lang.tr.nigeria}</option>
-                      <option value="southAfrica">{lang.tr.southAfrica}</option>
-                      <option value="india">{lang.tr.india}</option>
-                      <option value="indonesia">{lang.tr.indonesia}</option>
-                      <option value="malaysia">{lang.tr.malaysia}</option>
-                      <option value="philippines">{lang.tr.philippines}</option>
-                      <option value="thailand">{lang.tr.thailand}</option>
-                      <option value="vietnam">{lang.tr.vietnam}</option>
-                      <option value="turkey">{lang.tr.turkey}</option>
-                      <option value="saudiArabia">{lang.tr.saudiArabia}</option>
-                      <option value="qatar">{lang.tr.qatar}</option>
-                      <option value="kuwait">{lang.tr.kuwait}</option>
-                      <option value="oman">{lang.tr.oman}</option>
-                      <option value="bahrain">{lang.tr.bahrain}</option>
-                      <option value="algeria">{lang.tr.algeria}</option>
-                      <option value="morocco">{lang.tr.morocco}</option>
-                      <option value="tunisia">{lang.tr.tunisia}</option>
-                      <option value="nigeria">{lang.tr.nigeria}</option>
+                      <option value="taiwan">{t('taiwan')}</option>
+                      <option value="china">{t('china')}</option>
+                      <option value="japan">{t('japan')}</option>
+                      <option value="korea">{t('korea')}</option>
+                      <option value="usa">{t('usa')}</option>
+                      <option value="uk">{t('uk')}</option>
+                      <option value="france">{t('france')}</option>
+                      <option value="germany">{t('germany')}</option>
+                      <option value="italy">{t('italy')}</option>
+                      <option value="spain">{t('spain')}</option>
+                      <option value="portugal">{t('portugal')}</option>
+                      <option value="brazil">{t('brazil')}</option>
+                      <option value="argentina">{t('argentina')}</option>
+                      <option value="mexico">{t('mexico')}</option>
+                      <option value="colombia">{t('colombia')}</option>
+                      <option value="chile">{t('chile')}</option>
+                      <option value="peru">{t('peru')}</option>
+                      <option value="venezuela">{t('venezuela')}</option>
+                      <option value="bolivia">{t('bolivia')}</option>
+                      <option value="ecuador">{t('ecuador')}</option>
+                      <option value="paraguay">{t('paraguay')}</option>
+                      <option value="uruguay">{t('uruguay')}</option>
+                      <option value="nigeria">{t('nigeria')}</option>
+                      <option value="southAfrica">{t('southAfrica')}</option>
+                      <option value="india">{t('india')}</option>
+                      <option value="indonesia">{t('indonesia')}</option>
+                      <option value="malaysia">{t('malaysia')}</option>
+                      <option value="philippines">{t('philippines')}</option>
+                      <option value="thailand">{t('thailand')}</option>
+                      <option value="vietnam">{t('vietnam')}</option>
+                      <option value="turkey">{t('turkey')}</option>
+                      <option value="saudiArabia">{t('saudiArabia')}</option>
+                      <option value="qatar">{t('qatar')}</option>
+                      <option value="kuwait">{t('kuwait')}</option>
+                      <option value="oman">{t('oman')}</option>
+                      <option value="bahrain">{t('bahrain')}</option>
+                      <option value="algeria">{t('algeria')}</option>
+                      <option value="morocco">{t('morocco')}</option>
+                      <option value="tunisia">{t('tunisia')}</option>
+                      <option value="nigeria">{t('nigeria')}</option>
                     </select>
                   </div>
                 </div>
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
-                  <div className={popup['label']}>{lang.tr.birthdate}</div>
+                  <div className={popup['label']}>{t('birthdate')}</div>
                   <div className={popup['row']}>
                     <div className={popup['selectBox']}>
                       <select
@@ -667,7 +665,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               </div>
 
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{lang.tr.signature}</div>
+                <div className={popup['label']}>{t('signature')}</div>
                 <div className={popup['row']}>
                   <input
                     name="signature"
@@ -698,7 +696,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 </div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']} ${popup['disabled']}`}>
-                <div className={popup['label']}>{lang.tr.about}</div>
+                <div className={popup['label']}>{t('about')}</div>
                 <textarea name="about" />
               </div>
             </div>
@@ -713,11 +711,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             className={`${setting['confirmedButton']} ${setting['greenBtn']}`}
             onClick={() => handleOpenApplyFriend(userId, targetId)}
           >
-            {lang.tr.addFriend}
+            {t('addFriend')}
           </div>
         )}
         <div className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.close}
+          {t('close')}
         </div>
       </div>
     </div>

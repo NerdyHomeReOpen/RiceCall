@@ -9,8 +9,8 @@ import vip from '@/styles/vip.module.css';
 import { PopupType, User, UserFriend, Server } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useLanguage } from '@/providers/Language';
 import { useSocket } from '@/providers/Socket';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
@@ -34,7 +34,7 @@ interface FriendTabProps {
 
 const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selectedItemId, setSelectedItemId }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
@@ -85,7 +85,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
 
   const handleDeleteFriend = (userId: User['userId'], targetId: User['userId']) => {
     if (!socket) return;
-    handleOpenWarningDialog(lang.tr.deleteFriendDialog.replace('{0}', friendName), () =>
+    handleOpenWarningDialog(t('deleteFriendDialog', { friendName }), () =>
       socket.send.deleteFriend({ userId, targetId }),
     );
   };
@@ -131,16 +131,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   const handleBlockFriend = (userId: User['userId'], targetId: User['userId'], isBlocked: UserFriend['isBlocked']) => {
     if (!socket) return;
     handleOpenWarningDialog(
-      lang.getTranslatedMessage('確定要{blockType}好友 {userName} 嗎?', {
-        blockType: isBlocked ? '解除封鎖' : '封鎖',
-        userName: friendName,
-      }),
-      () =>
-        socket.send.editFriend({
-          friend: { isBlocked: !isBlocked },
-          userId,
-          targetId,
-        }),
+      t('confirmBlockFriend', { blockType: isBlocked ? t('unblock') : t('block'), userName: friendName }),
+      () => socket.send.editFriend({ friend: { isBlocked: !isBlocked }, userId, targetId }),
     );
   };
 
@@ -171,7 +163,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           contextMenu.showContextMenu(x, y, false, false, [
             {
               id: 'driectMessage',
-              label: '傳送即時訊息', // TODO: lang.tr
+              label: t('sendDirectMessage'),
               show: !isCurrentUser,
               onClick: () => handleOpenDirectMessage(friendUserId, friendTargetId, friendName),
             },
@@ -182,13 +174,13 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             },
             {
               id: 'info',
-              label: lang.tr.viewProfile,
+              label: t('viewProfile'),
               show: !isCurrentUser,
               onClick: () => handleOpenUserInfo(friendUserId, friendTargetId),
             },
             {
               id: 'editNote',
-              label: '修改備註', // TODO: lang.tr
+              label: t('editNote'),
               show: canManageFriend,
               disabled: true,
               onClick: () => {
@@ -202,14 +194,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             },
             {
               id: 'permission-setting',
-              label: '權限設定',
+              label: t('permissionSetting'),
               show: canManageFriend && !friendIsBlocked,
               icon: 'submenu',
               hasSubmenu: true,
               submenuItems: [
                 {
                   id: 'set-private',
-                  label: '對好友隱藏上線', // TODO: lang.tr
+                  label: t('hideFriendOnline'),
                   show: canManageFriend && !friendIsBlocked,
                   disabled: true,
                   onClick: () => {
@@ -218,7 +210,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
                 },
                 {
                   id: 'set-notify',
-                  label: '好友上線提醒我', // TODO: lang.tr
+                  label: t('notifyFriendOnline'),
                   show: canManageFriend && !friendIsBlocked,
                   disabled: true,
                   onClick: () => {
@@ -229,19 +221,19 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             },
             {
               id: 'editGroup',
-              label: lang.tr.editFriendGroup,
+              label: t('editFriendGroup'),
               show: canManageFriend && !friendIsBlocked,
               onClick: () => handleOpenEditFriend(friendUserId, friendTargetId),
             },
             {
               id: 'setBlock',
-              label: friendIsBlocked ? '解除封鎖' : '封鎖',
+              label: friendIsBlocked ? t('unblock') : t('block'),
               show: !isCurrentUser,
               onClick: () => handleBlockFriend(friendUserId, friendTargetId, friendIsBlocked),
             },
             {
               id: 'delete',
-              label: lang.tr.deleteFriend,
+              label: t('deleteFriend'),
               show: !isCurrentUser,
               onClick: () => handleDeleteFriend(friendUserId, friendTargetId),
             },

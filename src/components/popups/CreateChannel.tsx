@@ -5,7 +5,7 @@ import { Channel, Server } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -26,7 +26,7 @@ interface CreateChannelPopupProps {
 const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ channelId, serverId }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // Refs
   const refreshRef = useRef(false);
@@ -74,11 +74,11 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={popup['inputBox']}>
-              <div className={popup['label']}>{lang.tr.parentChannel}</div>
-              <div className={popup['label']}>{parentName || lang.tr.none}</div>
+              <div className={popup['label']}>{t('parentChannel')}</div>
+              <div className={popup['label']}>{parentName || t('none')}</div>
             </div>
             <div className={popup['inputBox']}>
-              <div className={popup['label']}>{lang.tr.channelName}</div>
+              <div className={popup['label']}>{t('channelName')}</div>
               <input
                 name="name"
                 type="text"
@@ -107,10 +107,10 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </div>

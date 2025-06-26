@@ -10,7 +10,7 @@ import { User, PopupType } from '@/types';
 import type { ChannelMessage } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Components
@@ -18,6 +18,9 @@ import MarkdownViewer from '@/components/MarkdownViewer';
 
 // Services
 import ipcService from '@/services/ipc.service';
+
+// Utils
+import { getFormatTimestamp, getTranslatedMessage } from '@/utils/language';
 
 interface ChannelMessageProps {
   messageGroup: ChannelMessage & {
@@ -29,8 +32,8 @@ interface ChannelMessageProps {
 
 const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup, userId, forbidGuestUrl = false }) => {
   // Hooks
-  const lang = useLanguage();
   const contextMenu = useContextMenu();
+  const { t } = useTranslation();
 
   // Variables
   const {
@@ -46,9 +49,9 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
 
   const isCurrentUser = senderUserId === userId;
 
-  const timestamp = lang.getFormatTimestamp(messageTimestamp);
+  const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
 
-  const formatMessages = messageContents.map((content) => lang.getTranslatedMessage(content, messageParameter));
+  const translatedMessages = messageContents.map((content) => getTranslatedMessage(t, content, messageParameter));
 
   // handles
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
@@ -85,13 +88,13 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
               contextMenu.showContextMenu(x, y, false, false, [
                 {
                   id: 'direct-message',
-                  label: lang.tr.directMessage,
+                  label: t('directMessage'),
                   show: !isCurrentUser,
                   onClick: () => handleOpenDirectMessage(userId, senderUserId, senderName),
                 },
                 {
                   id: 'view-profile',
-                  label: lang.tr.viewProfile,
+                  label: t('viewProfile'),
                   onClick: () => handleOpenUserInfo(userId, senderUserId),
                 },
               ]);
@@ -99,9 +102,9 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
           >
             {senderName}
           </div>
-          <div className={styles['timestamp']}>{timestamp}</div>
+          <div className={styles['timestamp']}>{formattedTimestamp}</div>
         </div>
-        {formatMessages.map((content, index) => (
+        {translatedMessages.map((content, index) => (
           <MarkdownViewer key={index} markdownText={content} forbidGuestUrl={forbidGuestUrl} />
         ))}
       </div>

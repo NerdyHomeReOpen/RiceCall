@@ -7,7 +7,7 @@ import MarkdownViewer from '@/components/MarkdownViewer';
 import { Server, User } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 
 // CSS
@@ -17,6 +17,9 @@ import styles from '@/styles/popups/blockMember.module.css';
 // Services
 import ipcService from '@/services/ipc.service';
 
+// Utils
+import { getTranslatedMessage } from '@/utils/language';
+
 interface BlockMemberPopupProps {
   userId: User['userId'];
   serverId: Server['serverId'];
@@ -25,7 +28,7 @@ interface BlockMemberPopupProps {
 
 const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, serverId, userName }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const socket = useSocket();
 
   // States
@@ -34,22 +37,20 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const [selectTime, setSelectTime] = useState<number>(1);
   const [blockTime, setBlockTime] = useState<number>(0);
 
-  // Variables
+  // Constants
   const BLOCK_TYPE_OPTIONS = [
-    // TODO: lang.tr
-    { key: 'timeout', label: '暫時封鎖', disabled: false },
-    { key: 'block', label: '永久封鎖', disabled: false },
-    { key: 'blockIP', label: '永久封鎖IP', disabled: true },
+    { key: 'timeout', label: t('timeout'), disabled: false },
+    { key: 'block', label: t('block'), disabled: false },
+    { key: 'blockIP', label: t('blockIP'), disabled: true },
   ];
 
   const FORMAT_TYPE_OPTIONS = [
-    // TODO: lang.tr
-    { key: 'seconds', label: '秒' },
-    { key: 'minutes', label: '分鐘' },
-    { key: 'hours', label: '小時' },
-    { key: 'days', label: '天' },
-    { key: 'month', label: '月' },
-    { key: 'years', label: '年' },
+    { key: 'seconds', label: t('seconds') },
+    { key: 'minutes', label: t('minutes') },
+    { key: 'hours', label: t('hours') },
+    { key: 'days', label: t('days') },
+    { key: 'month', label: t('month') },
+    { key: 'years', label: t('years') },
   ];
 
   const isForeverBlock = blockType !== 'timeout';
@@ -118,15 +119,11 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
             />
             <div className={`${styles['content']}`}>
               <div className={`${popup['label']} ${styles['label']}`}>
-                <MarkdownViewer
-                  markdownText={lang.getTranslatedMessage('確定要封鎖 <span>{userName}</span> 嗎?', {
-                    userName: userName,
-                  })}
-                />
+                <MarkdownViewer markdownText={getTranslatedMessage(t, 'sureBlockMember', { userName: userName })} />
               </div>
               <div className={`${popup['inputGroup']} ${popup['col']}`}>
                 <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
-                  <div className={`${popup['label']}`}>{'封鎖類型' /* TODO: lang.tr */}</div>
+                  <div className={`${popup['label']}`}>{t('封鎖類型')}</div>
                   <div className={`${popup['selectBox']}`}>
                     <select value={blockType} onChange={(e) => setBlockType(e.target.value)}>
                       {BLOCK_TYPE_OPTIONS.map((option) => (
@@ -138,7 +135,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
                   </div>
                 </div>
                 <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
-                  <div className={`${popup['label']}`}>{'封鎖時間' /* TODO: lang.tr */}</div>
+                  <div className={`${popup['label']}`}>{t('封鎖時間')}</div>
                   <div className={`${popup['selectBox']}`}>
                     <select
                       value={selectTime}
@@ -180,10 +177,10 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button type="button" className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </div>

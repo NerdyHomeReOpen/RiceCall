@@ -13,7 +13,10 @@ import BadgeListViewer from '@/components/BadgeList';
 import type { ServerMember } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
+
+// Utils
+import { getPermissionText } from '@/utils/language';
 
 interface UserInfoCardProps {
   member: ServerMember;
@@ -27,7 +30,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Language
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // State
   const [cardX, setCardX] = useState(x);
@@ -132,13 +135,13 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
             {/* VIP Info Text */}
             {memberVip > 0 && (
               <div className={userInfoCard['vipText']}>
-                {lang.tr.vipUpgradeBoost.replace('{0}', vipBoostMultiplier.toString())}
+                {t('vipUpgradeBoost', { vipBoostMultiplier: vipBoostMultiplier.toString() })}
               </div>
             )}
 
             {/* Xp Info */}
             <div className={userInfoCard['xpWrapper']}>
-              <div className={userInfoCard['levelText']}>{`${lang.tr.level} ${memberLevel} `}</div>
+              <div className={userInfoCard['levelText']}>{`${t('level')} ${memberLevel} `}</div>
               <div className={userInfoCard['xpBox']}>
                 <div
                   className={userInfoCard['xpProgress']}
@@ -169,14 +172,14 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
                       ${permission[memberGender]} 
                       ${permission[`lv-${memberPermission}`]}`}
               />
-              <div className={userInfoCard['permissionText']}>{lang.getPermissionText(memberPermission)}</div>
+              <div className={userInfoCard['permissionText']}>{getPermissionText(t, memberPermission)}</div>
             </div>
 
             <div className={userInfoCard['saperator']} />
 
             {/* Contribution */}
             <div className={userInfoCard['contributionBox']}>
-              <div className={userInfoCard['contributionText']}>{lang.tr.contribution}:</div>
+              <div className={userInfoCard['contributionText']}>{t('contribution')}:</div>
               <div className={userInfoCard['contributionValue']}>{memberContributions}</div>
             </div>
           </div>

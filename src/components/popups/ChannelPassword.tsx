@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { User, Channel, Server } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -23,7 +23,7 @@ interface ChannelPasswordPopupProps {
 const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ userId, serverId, channelId }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // States
   const [password, setPassword] = useState<string | null>(null);
@@ -49,7 +49,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
       <div className={popup['popupBody']}>
         <div className={setting['body']}>
           <div className={`${popup['inputBox']} ${popup['col']}`}>
-            <div className={popup['label']}>{lang.tr.pleaseEnterTheChannelPassword}</div>
+            <div className={popup['label']}>{t('pleaseEnterTheChannelPassword')}</div>
             <input
               type="text"
               value={password || ''}
@@ -73,10 +73,10 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </div>

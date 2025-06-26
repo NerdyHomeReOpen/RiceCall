@@ -5,7 +5,7 @@ import { FriendGroup, User } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // CSS
 import setting from '@/styles/popups/setting.module.css';
@@ -26,7 +26,7 @@ interface EditFriendGroupPopupProps {
 const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ userId, friendGroupId }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // Refs
   const refreshRef = useRef(false);
@@ -77,7 +77,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{lang.tr.pleaseInputFriendGroupName}</div>
+              <div className={popup['label']}>{t('pleaseInputFriendGroupName')}</div>
               <input
                 name="name"
                 type="text"
@@ -106,10 +106,10 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </form>

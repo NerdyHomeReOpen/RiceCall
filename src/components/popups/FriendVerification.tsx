@@ -12,11 +12,12 @@ import ipcService from '@/services/ipc.service';
 import getService from '@/services/get.service';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 
 // Utils
 import Sorter from '@/utils/sorter';
+import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
 interface FriendVerificationPopupProps {
   userId: User['userId'];
@@ -24,7 +25,7 @@ interface FriendVerificationPopupProps {
 
 const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.memo(({ userId }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
   const socket = useSocket();
 
   // Refs
@@ -68,17 +69,14 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
 
   const handleDeleteAllFriendApplication = () => {
     if (!socket) return;
-    handleOpenAlertDialog(
-      '確定要拒絕全部的好友請求嗎', // lang.tr
-      () => {
-        for (const item of friendApplications) {
-          const senderId = item.senderId;
-          const receiverId = item.receiverId;
-          socket.send.deleteFriendApplication({ senderId, receiverId });
-        }
-        setFriendApplications([]);
-      },
-    );
+    handleOpenAlertDialog(t('confirmToRejectAllFriendRequests'), () => {
+      for (const item of friendApplications) {
+        const senderId = item.senderId;
+        const receiverId = item.receiverId;
+        socket.send.deleteFriendApplication({ senderId, receiverId });
+      }
+      setFriendApplications([]);
+    });
   };
 
   const handleDeleteFriendApplication = (senderId: User['userId'], receiverId: User['userId']) => {
@@ -155,7 +153,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
         <div className={`${friendVerification['body']}`}>
           <div className={friendVerification['contentHeader']}>
             <div className={friendVerification['ProcessingStatus']}>
-              未處理
+              {t('unprocessed')}
               <span className={friendVerification['ProcessingStatusCount']}>({friendApplications.length})</span>
             </div>
             <div
@@ -165,7 +163,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                 handleDeleteAllFriendApplication();
               }}
             >
-              全部拒絕/忽略
+              {t('rejectAll')}
             </div>
           </div>
           <div className={friendVerification['contentBody']}>
@@ -179,14 +177,16 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                   <div className={friendVerification['userApplyContentBox']}>
                     <div className={friendVerification['userInfo']}>
                       <div className={friendVerification['userName']}>{friend.name}</div>
-                      <div className={friendVerification['time']} title={lang.getFormatTimestamp(friend.createdAt)}>
-                        {lang.getFormatTimeDiff(friend.createdAt)}
+                      <div className={friendVerification['time']} title={getFormatTimestamp(t, friend.createdAt)}>
+                        {getFormatTimeDiff(t, friend.createdAt)}
                       </div>
                     </div>
                     <div className={friendVerification['userApplyContent']}>
                       <div className={friendVerification['userApplyContentText']}>
-                        <div className={friendVerification['userApplyContentRow']}>請求加您為好友</div>
-                        <div className={friendVerification['userApplyContentRow']}>附言：{friend.description}</div>
+                        <div className={friendVerification['userApplyContentRow']}>{t('requestToAddYouAsAFriend')}</div>
+                        <div className={friendVerification['userApplyContentRow']}>
+                          {t('description')}: {friend.description}
+                        </div>
                       </div>
                       <div className={friendVerification['userApplyContentButtonBox']}>
                         <div className={friendVerification['userApplyContentActionButtons']}>
@@ -196,7 +196,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                               handleOpenApplyFriend(userId, friend.senderId);
                             }}
                           >
-                            接受
+                            {t('accept')}
                           </button>
                           <button
                             className={friendVerification['userApplyContentButton']}
@@ -204,7 +204,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                               handleDeleteFriendApplication(friend.senderId, friend.receiverId);
                             }}
                           >
-                            拒絕
+                            {t('reject')}
                           </button>
                         </div>
                         <div

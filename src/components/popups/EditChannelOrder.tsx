@@ -4,8 +4,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { PopupType, Channel, Category, Server, User, SocketServerEvent } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 
 // CSS
 import editChannelOrder from '@/styles/popups/editChannelOrder.module.css';
@@ -27,7 +27,7 @@ interface EditChannelOrderPopupProps {
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ userId, serverId }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // Refs
   const refreshed = useRef(false);
@@ -331,7 +331,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleOpenCreateChannel(userId, selectedChannelId || null, serverId);
           }}
         >
-          {lang.tr.create}
+          {t('create')}
         </div>
 
         <div
@@ -344,7 +344,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleOpenEditChannelName(serverId, selectedChannelId);
           }}
         >
-          {lang.tr.changeName}
+          {t('changeName')}
         </div>
 
         <div
@@ -354,10 +354,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             `}
           onClick={() => {
             if (!selectedChannel) return;
-            handleOpenWarningDialog(lang.tr.warningDeleteChannel.replace('{0}', selectedChannel.name));
+            handleOpenWarningDialog(t('warningDeleteChannel').replace('{0}', selectedChannel.name));
           }}
         >
-          {lang.tr.delete}
+          {t('delete')}
         </div>
 
         <div
@@ -370,7 +370,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleChangeOrder(currentIndex, currentIndex - 1);
           }}
         >
-          {lang.tr.moveUp}
+          {t('moveUp')}
         </div>
 
         <div
@@ -383,7 +383,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleChangeOrder(currentIndex, currentIndex + 1);
           }}
         >
-          {lang.tr.moveDown}
+          {t('moveDown')}
         </div>
 
         <div
@@ -396,7 +396,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleChangeOrder(currentIndex, 0);
           }}
         >
-          {lang.tr.moveTop}
+          {t('moveTop')}
         </div>
 
         <div
@@ -409,7 +409,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleChangeOrder(currentIndex, groupChannels.length - 1);
           }}
         >
-          {lang.tr.moveBottom}
+          {t('moveBottom')}
         </div>
       </div>
 
@@ -460,10 +460,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </div>

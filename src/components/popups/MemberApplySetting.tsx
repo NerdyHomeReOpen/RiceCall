@@ -4,8 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Server } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -25,7 +25,7 @@ interface MemberApplySettingPopupProps {
 const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.memo(({ serverId }) => {
   // Hooks
   const socket = useSocket();
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // Refs
   const refreshRef = useRef(false);
@@ -71,7 +71,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={`${popup['inputBox']} ${popup['row']}`}>
-              <div className={popup['label']}>{lang.tr.isReceiveApply}</div>
+              <div className={popup['label']}>{t('isReceiveApply')}</div>
               <input
                 name="receiveApply"
                 type="checkbox"
@@ -85,7 +85,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
               />
             </div>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{lang.tr.setApplyNotice}</div>
+              <div className={popup['label']}>{t('setApplyNotice')}</div>
               <textarea
                 name="applyNotice"
                 value={serverApplyNotice}
@@ -117,10 +117,10 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
             handleClose();
           }}
         >
-          {lang.tr.confirm}
+          {t('confirm')}
         </button>
         <button className={popup['button']} onClick={() => handleClose()}>
-          {lang.tr.cancel}
+          {t('cancel')}
         </button>
       </div>
     </form>

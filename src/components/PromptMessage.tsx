@@ -7,10 +7,13 @@ import styles from '@/styles/message.module.css';
 import type { PromptMessage } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
+
+// Utils
+import { getTranslatedMessage } from '@/utils/language';
 
 interface PromptMessageProps {
   messageGroup: PromptMessage & {
@@ -21,12 +24,12 @@ interface PromptMessageProps {
 
 const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, messageType = 'info' }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // Variables
   const { contents: messageContents, parameter: messageParameter } = messageGroup;
 
-  const formatMessages = messageContents.map((content) => lang.getTranslatedMessage(content, messageParameter));
+  const translatedMessages = messageContents.map((content) => getTranslatedMessage(t, content, messageParameter));
 
   return (
     <>
@@ -35,7 +38,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
       </div>
 
       <div className={styles['messageBox']}>
-        {formatMessages.map((content, index) => (
+        {translatedMessages.map((content, index) => (
           <MarkdownViewer key={index} markdownText={content} />
         ))}
       </div>

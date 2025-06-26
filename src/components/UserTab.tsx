@@ -10,7 +10,7 @@ import permission from '@/styles/permission.module.css';
 import { PopupType, ServerMember, Channel, Server, User, Member, UserFriend, UserServer } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
@@ -45,7 +45,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     setSelectedItemType,
   }) => {
     // Hooks
-    const lang = useLanguage();
+    const { t } = useTranslation();
     const contextMenu = useContextMenu();
     const socket = useSocket();
     const webRTC = useWebRTC();
@@ -109,14 +109,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
 
     const handleKickServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
       if (!socket) return;
-      handleOpenAlertDialog(
-        lang.getTranslatedMessage('確定要將 {userName} 踢出語音群嗎?', {
-          userName: userName,
-        }),
-        () => {
-          socket.send.disconnectServer({ userId, serverId });
-        },
-      );
+      handleOpenAlertDialog(t('confirmKickServer', { userName: userName }), () => {
+        socket.send.disconnectServer({ userId, serverId });
+      });
     };
 
     const handleKickChannel = (
@@ -126,14 +121,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       userName: User['name'],
     ) => {
       if (!socket) return;
-      handleOpenAlertDialog(
-        lang.getTranslatedMessage('確定要將 {userName} 踢出頻道嗎?', {
-          userName: userName,
-        }),
-        () => {
-          socket.send.disconnectChannel({ userId, channelId, serverId });
-        },
-      );
+      handleOpenAlertDialog(t('confirmKickChannel', { userName: userName }), () => {
+        socket.send.disconnectChannel({ userId, channelId, serverId });
+      });
     };
 
     const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
@@ -203,18 +193,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     ) => {
       if (!socket) return;
       handleOpenAlertDialog(
-        lang.getTranslatedMessage('確定要解除 {userName} 與語音群的會員關係嗎?', {
-          userName: memberId === userId ? '自己' : `${memberName}`,
-        }),
+        t('confirmRemoveMembership', { userName: memberId === userId ? t('self') : `${memberName}` }),
         () => {
-          handleEditMember(
-            {
-              permissionLevel: 1,
-              nickname: null,
-            },
-            memberId,
-            serverId,
-          );
+          handleEditMember({ permissionLevel: 1, nickname: null }, memberId, serverId);
         },
       );
     };
@@ -274,36 +255,36 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           contextMenu.showContextMenu(x, y, false, false, [
             {
               id: 'direct-message',
-              label: lang.tr.directMessage,
+              label: t('directMessage'),
               show: !isCurrentUser,
               onClick: () => handleOpenDirectMessage(userId, memberUserId, memberName),
             },
             {
               id: 'view-profile',
-              label: lang.tr.viewProfile,
+              label: t('viewProfile'),
               onClick: () => handleOpenUserInfo(userId, memberUserId),
             },
             {
               id: 'apply-friend',
-              label: lang.tr.addFriend,
+              label: t('addFriend'),
               show: canApplyFriend,
               onClick: () => handleOpenApplyFriend(userId, memberUserId),
             },
             {
               id: 'mute',
-              label: lang.tr.mute,
+              label: t('mute'),
               show: canMute,
               onClick: () => handleMuteUser(memberUserId),
             },
             {
               id: 'unmute',
-              label: lang.tr.unmute,
+              label: t('unmute'),
               show: canUnmute,
               onClick: () => handleUnmuteUser(memberUserId),
             },
             {
               id: 'edit-nickname',
-              label: lang.tr.editNickname,
+              label: t('editNickname'),
               show: canEditNickname,
               onClick: () => handleOpenEditNickname(memberUserId, serverId),
             },
@@ -314,7 +295,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'move-to-channel',
-              label: lang.tr.moveToChannel,
+              label: t('moveToChannel'),
               show: canMoveToChannel,
               onClick: () => handleMoveToChannel(memberUserId, serverId, currentChannelId),
             },
@@ -325,21 +306,21 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'forbid-voice',
-              label: lang.tr.forbidVoice,
+              label: t('forbidVoice'),
               show: canManageMember,
               disabled: true,
               onClick: () => {},
             },
             {
               id: 'forbid-text',
-              label: lang.tr.forbidText,
+              label: t('forbidText'),
               show: canManageMember,
               disabled: true,
               onClick: () => {},
             },
             {
               id: 'kick-channel',
-              label: lang.tr.kickChannel,
+              label: t('kickChannel'),
               show: canKickChannel,
               onClick: () => {
                 handleKickChannel(memberUserId, memberCurrentChannelId, serverId, memberNickname || memberName);
@@ -347,7 +328,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'kick-server',
-              label: lang.tr.kickServer,
+              label: t('kickServer'),
               show: canKickServer,
               onClick: () => {
                 handleKickServer(memberUserId, serverId, memberNickname || memberName);
@@ -355,7 +336,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'ban',
-              label: lang.tr.ban,
+              label: t('ban'),
               show: canBan,
               onClick: () => {
                 handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
@@ -368,7 +349,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'remove-self-membership',
-              label: '解除會員關係', // lang.tr
+              label: t('removeSelfMembership'),
               show: canRemoveMembership,
               onClick: () => {
                 handleRemoveMembership(userId, serverId);
@@ -376,7 +357,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'send-member-application',
-              label: lang.tr.sendMemberApplication,
+              label: t('sendMemberApplication'),
               show: canManageMember && memberPermission === 1,
               disabled: true,
               onClick: () => {
@@ -385,38 +366,38 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'member-management',
-              label: lang.tr.memberManagement,
+              label: t('memberManagement'),
               show: canManageMember && memberPermission > 1,
               icon: 'submenu',
               hasSubmenu: true,
               submenuItems: [
                 {
                   id: 'set-guest',
-                  label: lang.tr.setGuest,
+                  label: t('setGuest'),
                   show: canChangeToGuest,
                   onClick: () => handleRemoveMembership(memberUserId, serverId, memberNickname || memberName),
                 },
                 {
                   id: 'set-member',
-                  label: lang.tr.setMember,
+                  label: t('setMember'),
                   show: canChangeToMember,
                   onClick: () => handleEditMember({ permissionLevel: 2 }, memberUserId, serverId),
                 },
                 {
                   id: 'set-channel-admin',
-                  label: lang.tr.setChannelAdmin,
+                  label: t('setChannelAdmin'),
                   show: canChangeToChannelAdmin,
                   onClick: () => handleEditMember({ permissionLevel: 3 }, memberUserId, serverId),
                 },
                 {
                   id: 'set-category-admin',
-                  label: lang.tr.setCategoryAdmin,
+                  label: t('setCategoryAdmin'),
                   show: canChangeToCategoryAdmin,
                   onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId),
                 },
                 {
                   id: 'set-admin',
-                  label: lang.tr.setAdmin,
+                  label: t('setAdmin'),
                   show: canChangeToAdmin,
                   onClick: () => handleEditMember({ permissionLevel: 5 }, memberUserId, serverId),
                 },

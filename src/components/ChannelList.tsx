@@ -18,7 +18,7 @@ import {
 } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
@@ -41,7 +41,7 @@ interface ChannelListProps {
 const ChannelList: React.FC<ChannelListProps> = React.memo(
   ({ currentServer, currentChannel, serverMembers, serverChannels, friends }) => {
     // Hooks
-    const lang = useLanguage();
+    const { t } = useTranslation();
     const socket = useSocket();
     const contextMenu = useContextMenu();
     const findMe = useFindMeContext();
@@ -105,7 +105,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
 
     const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
       if (!serverReceiveApply) {
-        handleOpenAlertDialog(lang.tr.cannotApply);
+        handleOpenAlertDialog(t('cannotApply'));
         return;
       }
       ipcService.popup.open(PopupType.APPLY_MEMBER, 'applyMember');
@@ -234,7 +234,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                     contextMenu.showContextMenu(x, y, false, false, [
                       {
                         id: 'invitation',
-                        label: lang.tr.invitation,
+                        label: t('invitation'),
                         show: canApplyMember,
                         icon: 'memberapply',
                         onClick: () => handleOpenApplyMember(userId, serverId),
@@ -253,14 +253,14 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                       },
                       {
                         id: 'editNickname',
-                        label: lang.tr.editNickname,
+                        label: t('editNickname'),
                         icon: 'editGroupcard',
                         show: canEditNickname,
                         onClick: () => handleOpenEditNickname(userId, serverId),
                       },
                       {
                         id: 'locateMe',
-                        label: lang.tr.locateMe,
+                        label: t('locateMe'),
                         icon: 'locateme',
                         onClick: () => handleLocateUser(),
                       },
@@ -278,7 +278,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                       },
                       {
                         id: 'favorite',
-                        label: isFavorite ? lang.tr.unfavorite : lang.tr.favorite,
+                        label: isFavorite ? t('unfavorite') : t('favorite'),
                         icon: isFavorite ? 'collect' : 'uncollect',
                         onClick: () => handleFavoriteServer(serverId),
                       },
@@ -313,7 +313,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
         {/* Mic Queue */}
         {currentChannelVoiceMode === 'queue' && (
           <>
-            <div className={styles['sectionTitle']}>{lang.tr.micOrder}</div>
+            <div className={styles['sectionTitle']}>{t('micOrder')}</div>
             <div className={styles['micQueueBox']}>
               <div className={styles['userList']}>
                 {/* {micQueueUsers.map((user) => (
@@ -331,7 +331,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
         )}
 
         {/* Channel List Title */}
-        <div className={styles['sectionTitle']}>{view === 'current' ? lang.tr.currentChannel : lang.tr.allChannel}</div>
+        <div className={styles['sectionTitle']}>{view === 'current' ? t('currentChannel') : t('allChannel')}</div>
 
         {/* Channel List */}
         <div className={styles['scrollView']}>
@@ -403,7 +403,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
             `}
             onClick={() => setView('current')}
           >
-            {lang.tr.currentChannel}
+            {t('currentChannel')}
           </div>
           <div
             className={`
@@ -413,7 +413,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
             `}
             onClick={() => setView('all')}
           >
-            {lang.tr.allChannel}
+            {t('allChannel')}
           </div>
         </div>
       </>

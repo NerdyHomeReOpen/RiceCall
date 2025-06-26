@@ -7,7 +7,7 @@ import styles from '@/styles/pages/server.module.css';
 import { PopupType, ServerMember, Channel, Server, User, Category, UserFriend, UserServer } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
@@ -50,7 +50,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     setSelectedItemType,
   }) => {
     // Hooks
-    const lang = useLanguage();
+    const { t } = useTranslation();
     const socket = useSocket();
     const contextMenu = useContextMenu();
     const findMe = useFindMeContext();
@@ -72,7 +72,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         ? Default.channel({
             ...category,
             channelId: categoryId,
-            name: lang.tr.lobby,
+            name: t('lobby'),
             type: 'channel',
             categoryId: categoryId,
             visibility: categoryVisibility,
@@ -118,7 +118,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(lang.tr.warningDeleteChannel.replace('{0}', categoryName), () =>
+      handleOpenWarningDialog(t('warningDeleteChannel').replace('{0}', categoryName), () =>
         socket.send.deleteChannel({ channelId, serverId }),
       );
     };
@@ -276,7 +276,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               },
               {
                 id: 'edit',
-                label: lang.tr.editChannel,
+                label: t('editChannel'),
                 show: canManageChannel,
                 onClick: () => handleOpenChannelSetting(categoryId, serverId),
               },
@@ -287,19 +287,19 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               },
               {
                 id: 'createChannel',
-                label: lang.tr.addChannel,
+                label: t('addChannel'),
                 show: canManageChannel,
                 onClick: () => handleOpenCreateChannel(serverId, null, userId),
               },
               {
                 id: 'createSubChannel',
-                label: lang.tr.addSubChannel,
+                label: t('addSubChannel'),
                 show: canManageChannel,
                 onClick: () => handleOpenCreateChannel(serverId, categoryId, userId),
               },
               {
                 id: 'deleteChannel',
-                label: lang.tr.deleteChannel,
+                label: t('deleteChannel'),
                 show: canManageChannel,
                 onClick: () => {
                   if (!categoryName) return;
@@ -328,7 +328,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               },
               {
                 id: 'changeChannelOrder',
-                label: lang.tr.editChannelOrder,
+                label: t('editChannelOrder'),
                 show: canManageChannel,
                 onClick: () => handleOpenChangeChannelOrder(userId, serverId),
               },
@@ -339,7 +339,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               },
               {
                 id: 'setReceptionLobby',
-                label: lang.tr.setDefaultChannel,
+                label: t('setDefaultChannel'),
                 show: canSetReceptionLobby,
                 onClick: () => handleEditServer({ receptionLobbyId: categoryId }, serverId),
               },
