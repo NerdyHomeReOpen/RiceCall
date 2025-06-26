@@ -1994,6 +1994,13 @@ crc@^3.8.0:
   dependencies:
     buffer "^5.1.0"
 
+cross-fetch@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-4.1.0.tgz#8f69355007ee182e47fa692ecbaa37a52e43c3d2"
+  integrity sha512-uKm5PU+MHTootlWEY+mZ4vvXoCn4fLQxT9dSc1sXVMSFkINTJVN8cAQROpwcKm8bJ/c7rgZVIBWzH5T78sNZZw==
+  dependencies:
+    node-fetch "^2.7.0"
+
 cross-spawn@^7.0.1, cross-spawn@^7.0.3, cross-spawn@^7.0.6:
   version "7.0.6"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.6.tgz#8a58fe78f00dcd70c370451759dfbfaf03e8ee9f"
@@ -3766,6 +3773,13 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
+i18next-locize-backend@^7.0.4:
+  version "7.0.4"
+  resolved "https://registry.yarnpkg.com/i18next-locize-backend/-/i18next-locize-backend-7.0.4.tgz#d1223cc17aa05855cc286972840db07e5013c34a"
+  integrity sha512-saRyIQAX0k+YA6XzirU6cyudWDj1W7bGDz/Szq+8OIs3JJnNuMZCADuNgCwmo+dQm9P69bbALymV+9t9ffywBA==
+  dependencies:
+    cross-fetch "4.1.0"
+
 i18next@^25.2.1:
   version "25.2.1"
   resolved "https://registry.yarnpkg.com/i18next/-/i18next-25.2.1.tgz#23cf8794904f551f577558d93c84b0fb6cd489a2"
@@ -5285,7 +5299,7 @@ node-api-version@^0.2.0:
   dependencies:
     semver "^7.3.5"
 
-node-fetch@2.7.0, node-fetch@^2.6.1:
+node-fetch@2.7.0, node-fetch@^2.6.1, node-fetch@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.7.0.tgz#d0f0fa6e3e2dc1d27efcd8ad99d550bda94d187d"
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==

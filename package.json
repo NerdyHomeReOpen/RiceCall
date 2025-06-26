@@ -15,7 +15,7 @@
   "type": "module",
   "scripts": {
     "i18n": "dotenv -e .env -- npm run locize-sync",
-    "locize-sync": "locize sync --project-id=%LOCIZE_PROJECT_ID% --api-key=%LOCIZE_API_KEY% --path src/locales",
+    "locize-sync": "locize sync --project-id=%NEXT_PUBLIC_LOCIZE_PROJECT_ID% --api-key=%NEXT_PUBLIC_LOCIZE_API_KEY% --path src/locales",
     "dev": "next dev --turbopack",
     "start": "next start",
     "build": "next build",
@@ -37,6 +37,7 @@
     "emoji.json": "^15.1.0",
     "highlight.js": "^11.11.1",
     "i18next": "^25.2.1",
+    "i18next-locize-backend": "^7.0.4",
     "net": "^1.0.2",
     "next": "^15.3.2",
     "path": "^0.12.7",
