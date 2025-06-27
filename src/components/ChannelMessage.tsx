@@ -51,7 +51,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
 
   const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
 
-  const translatedMessages = messageContents.map((content) => getTranslatedMessage(t, content, messageParameter));
+  // const translatedMessages = messageContents.map((content) => getTranslatedMessage(t, content, messageParameter));
 
   // handles
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
@@ -104,7 +104,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
           </div>
           <div className={styles['timestamp']}>{formattedTimestamp}</div>
         </div>
-        {translatedMessages.map((content, index) => (
+        {messageContents.map((content, index) => (
           <MarkdownViewer key={index} markdownText={content} forbidGuestUrl={forbidGuestUrl} />
         ))}
       </div>
