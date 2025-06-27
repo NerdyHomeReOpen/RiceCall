@@ -77,25 +77,21 @@ export const getTranslatedMessage = (
   params?: Record<string, string> | undefined,
 ) => {
   if (content.includes(' ')) {
-    //     const [key, ...params] = content.split(' ');
-    //     if (Object.prototype.hasOwnProperty.call(translation, key)) {
-    //       let translatedText = translation[key as keyof typeof translation];
-    //       params.forEach((param, index) => {
-    //         translatedText = translatedText.replace(`{${index}}`, param);
-    //       });
-    //       content = translatedText;
-    //     }
-    //   } else {
-    //     content = Object.prototype.hasOwnProperty.call(translation, content)
-    //       ? translation[content as keyof typeof translation]
-    //       : content;
+    let translateContent: string = '';
+    const messageKeys = content.split(' ');
+    for (const key of messageKeys) {
+      translateContent += t(key);
+    }
+    content = translateContent;
+  } else {
+    content = t(content);
   }
 
   //   // Dialog Message
   //   content = content.replace('blockedSelfMessage', '你已被該語音群封鎖，無法加入群組');
   //   content = content.replace('blockedSelfWithTimeMessage', '你已被該語音群踢出，無法加入群組，直到');
   //   content = content.replace('kickedSelfMessage', '你已被踢出群組');
-  //   content = content.replace('permissionsDenied', '許可權不足');
+  //   content = content.replace('permissionsDeniedMessage', '許可權不足');
 
   //   // Direct Event Message
   //   content = content.replace('receiveShakeWindowMessage', '對方向您發送了一次視窗震動');
@@ -142,56 +138,6 @@ export const getTranslatedMessage = (
   //   content = content.replace('channelAlert', '頻道廣播');
   //   content = content.replace('serverAlert', '群廣播');
 
-  //   // Replace Params
-  //   content = content.replace(/{(\w+)}/gm, (match, p1) => params?.[p1] || match);
-
-  // Dialog Message
-  content = content.replace('blockedSelfMessage', t('blockedSelfMessage'));
-  content = content.replace('blockedSelfWithTimeMessage', t('blockedSelfWithTimeMessage'));
-  content = content.replace('kickedSelfMessage', t('kickedSelfMessage'));
-  content = content.replace('permissionsDenied', t('permissionsDeniedMessage')); // Change to permissionsDeniedMessage
-
-  // Direct Event Message
-  content = content.replace('receiveShakeWindowMessage', t('receiveShakeWindowMessage'));
-  content = content.replace('sendShakeWindowMessage', t('sendShakeWindowMessage'));
-
-  // Action Event Messages
-
-  content = content.replace('removeFromMemberMessage', t('removeFromMemberMessage'));
-  content = content.replace('removeFromChannelManagerMessage', t('removeFromChannelManagerMessage'));
-  content = content.replace('removeFromServerManagerMessage', t('removeFromServerManagerMessage'));
-
-  content = content.replace('upgradeServerManagerMessage', t('upgradeServerManagerMessage'));
-  content = content.replace('upgradeChannelManagerMessage', t('upgradeChannelManagerMessage'));
-  content = content.replace('upgradeMemberMessage', t('upgradeMemberMessage'));
-
-  // Action Warn Messages
-
-  content = content.replace('forbidVoiceMessage', t('forbidVoiceMessage'));
-  content = content.replace('unForbidVoiceMessage', t('unForbidVoiceMessage'));
-  content = content.replace('forbidTextMessage', t('forbidTextMessage'));
-  content = content.replace('unForbidTextMessage', t('unForbidTextMessage'));
-  content = content.replace('timeoutChannelWithTimeMessage', t('timeoutChannelWithTimeMessage'));
-
-  content = content.replace('timeoutChannelMessage', t('timeoutChannelMessage'));
-
-  // Channel Event Messages
-  content = content.replace('setMemberMessage', t('setMemberMessage'));
-  content = content.replace('setChannelManagerMessage', t('setChannelManagerMessage'));
-  content = content.replace('setServerManagerMessage', t('setServerManagerMessage'));
-
-  // Channel Warn Messages
-  content = content.replace('forbidVoiceMemberMessage', t('forbidVoiceMemberMessage'));
-  content = content.replace('unForbidVoiceMemberMessage', t('unForbidVoiceMemberMessage'));
-  content = content.replace('forbidTextMemberMessage', t('forbidTextMemberMessage'));
-  content = content.replace('unForbidTextMemberMessage', t('unForbidTextMemberMessage'));
-  content = content.replace('timeoutMemberChannelMessage', t('timeoutMemberChannelMessage'));
-  content = content.replace('timeoutMemberMessage', t('timeoutMemberMessage'));
-  content = content.replace('blockedMemberMessage', t('blockedMemberMessage'));
-
-  // Alert Messages
-  content = content.replace('channelAlert', t('channelAlert'));
-  content = content.replace('serverAlert', t('serverAlert'));
 
   // Replace Params
   content = content.replace(/{(\w+)}/gm, (match, p1) => params?.[p1] || match);
