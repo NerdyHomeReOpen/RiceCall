@@ -20,7 +20,7 @@ import MarkdownViewer from '@/components/MarkdownViewer';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { getFormatTimestamp, getTranslatedMessage } from '@/utils/language';
+import { getFormatTimestamp } from '@/utils/language';
 
 interface ChannelMessageProps {
   messageGroup: ChannelMessage & {
@@ -42,7 +42,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     vip: senderVip,
     gender: senderGender,
     permissionLevel: senderPermissionLevel,
-    parameter: messageParameter,
     contents: messageContents,
     timestamp: messageTimestamp,
   } = messageGroup;
@@ -50,8 +49,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   const isCurrentUser = senderUserId === userId;
 
   const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
-
-  // const translatedMessages = messageContents.map((content) => getTranslatedMessage(t, content, messageParameter));
 
   // handles
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
