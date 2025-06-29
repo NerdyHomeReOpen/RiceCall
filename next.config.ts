@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
     NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
+    NEXT_PUBLIC_PORT: process.env.NEXT_PUBLIC_PORT,
   },
 };
 
