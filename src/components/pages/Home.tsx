@@ -300,13 +300,21 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             <div className={homePage['searchInputIcon']} style={!searchQuery ? {} : { display: 'none' }} />
             <div className={homePage['searchDropdown']} style={hasResults ? {} : { display: 'none' }}>
               {exactMatch && (
-                <div
-                  className={`${homePage['dropdownHeaderText']} ${homePage['exactMatch']}`}
-                  style={exactMatch ? {} : { display: 'none' }}
-                >
-                  {t('quickEnterServer')}
-                  {exactMatch.displayId}
-                </div>
+                <>
+                  <div
+                    className={`${homePage['dropdownHeaderText']} ${homePage['exactMatch']}`}
+                    style={exactMatch ? {} : { display: 'none' }}
+                  >
+                    {t('quickEnterServer')}
+                  </div>
+                  <SearchResultItem
+                    key={exactMatch.serverId}
+                    server={exactMatch}
+                    onClick={() => {
+                      handleConnectServer(exactMatch.serverId, exactMatch.displayId);
+                    }}
+                  />
+                </>
               )}
               {personalResults.length > 0 && (
                 <>
