@@ -78,24 +78,20 @@
 
 /* Text Styles */
 
-.pageHeaderText {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-}
-
-.pageHeaderText::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #0073c6;
-}
-
 .label {
   display: flex;
   min-height: 2rem;
   min-width: 5rem;
   padding: 5px 5px 5px 0;
+}
+
+.label.header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  margin-left: 5px;
+  background: #0073c6;
+  align-self: center;
 }
 
 .required::after {

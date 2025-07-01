@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import net from 'net';
 import path from 'path';
+import fontList from 'font-list';
 import { fileURLToPath } from 'url';
 import { io, Socket } from 'socket.io-client';
 import DiscordRPC from 'discord-rpc';
@@ -922,11 +923,24 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-input-audio-device', (event) => {
-    event.reply('input-audio-device-status', store.get('audioInputDevice') || '');
+    event.reply('input-audio-device', store.get('audioInputDevice') || '');
   });
 
   ipcMain.on('get-output-audio-device', (event) => {
-    event.reply('output-audio-device-status', store.get('audioOutputDevice') || '');
+    event.reply('output-audio-device', store.get('audioOutputDevice') || '');
+  });
+
+  ipcMain.on('get-font', (event) => {
+    event.reply('font', store.get('font') || '');
+  });
+
+  ipcMain.on('get-font-size', (event) => {
+    event.reply('font-size', store.get('fontSize') || 13);
+  });
+
+  ipcMain.on('get-font-list', async (event) => {
+    const fonts = await fontList.getFonts();
+    event.reply('font-list', fonts);
   });
 
   ipcMain.on('set-auto-launch', (_, enable) => {
@@ -943,14 +957,28 @@ app.on('ready', async () => {
   ipcMain.on('set-input-audio-device', (_, deviceId) => {
     store.set('audioInputDevice', deviceId || '');
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('input-audio-device-status', deviceId);
+      window.webContents.send('input-audio-device', deviceId);
     });
   });
 
   ipcMain.on('set-output-audio-device', (_, deviceId) => {
     store.set('audioOutputDevice', deviceId || '');
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('output-audio-device-status', deviceId);
+      window.webContents.send('output-audio-device', deviceId);
+    });
+  });
+
+  ipcMain.on('set-font', (_, font) => {
+    store.set('font', font || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('font', font);
+    });
+  });
+
+  ipcMain.on('set-font-size', (_, fontSize) => {
+    store.set('fontSize', fontSize || 13);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('font-size', fontSize);
     });
   });
 

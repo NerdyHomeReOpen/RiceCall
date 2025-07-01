@@ -19,7 +19,6 @@
   border: none;
   box-sizing: border-box;
   font-size: 1rem;
-  font-family: SimSun, Arial, Helvetica, sans-serif;
 }
 
 html,
@@ -38,6 +37,10 @@ body,
   color: var(--foreground);
   background: none;
   user-select: none;
+}
+
+body {
+  font-family: SimSun, Arial, Helvetica, sans-serif;
 }
 
 .wrapper {

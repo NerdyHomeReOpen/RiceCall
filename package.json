@@ -34,6 +34,7 @@
     "electron-store": "^10.0.1",
     "electron-updater": "^6.6.2",
     "emoji.json": "^15.1.0",
+    "font-list": "^1.5.1",
     "highlight.js": "^11.11.1",
     "i18next": "^25.2.1",
     "i18next-http-backend": "^3.0.2",
