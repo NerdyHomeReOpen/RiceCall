@@ -707,11 +707,6 @@ const RootPageComponent = () => {
     return () => window.removeEventListener('storage', handler);
   }, [user, mainTab, loadingBox.isLoading]);
 
-  useEffect(() => {
-    const language = localStorage.getItem('language') as LanguageKey;
-    if (language) i18n.changeLanguage(language);
-  }, []);
-
   return (
     <WebRTCProvider>
       <div className="wrapper">
