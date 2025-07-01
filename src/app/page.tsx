@@ -333,8 +333,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                   },
                   {
                     id: 'language-select-br',
-                    label: 'Português (BR)',
+                    label: 'Português',
                     onClick: () => handleLanguageChange('pt-BR'),
+                  },
+                  {
+                    id: 'language-select-ru',
+                    label: 'Русский',
+                    onClick: () => handleLanguageChange('ru'),
                   },
                 ],
               },
