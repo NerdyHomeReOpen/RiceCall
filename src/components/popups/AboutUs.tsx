@@ -181,7 +181,7 @@ const AboutPopup: React.FC = React.memo(() => {
           </div>
 
           <div className={aboutUs['teamMembers']}>
-            <p>{t('teamMembers')}:</p>
+            <p>{t('team-members')}:</p>
             {teamMembers.map((member, index) => {
               const githubInfo = member.info.find((item) => item.label === 'Github' && item.value);
               const discordInfo = member.info.find((item) => item.label === 'Discord' && item.value);

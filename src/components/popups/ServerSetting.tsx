@@ -215,7 +215,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   };
 
   const handleOpenMemberApplySetting = () => {
-    ipcService.popup.open(PopupType.MEMBERAPPLY_SETTING, 'memberApplySetting');
+    ipcService.popup.open(PopupType.MEMBER_APPLY_SETTING, 'memberApplySetting');
     ipcService.initialData.onRequest('memberApplySetting', {
       serverId,
     });
@@ -390,7 +390,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
               t('member-management'),
               t('access-permission'),
               `${t('member-application-management')} (${serverApplications.length})`,
-              t('blocklist-management'),
+              t('blacklist-management'),
             ].map((title, index) => (
               <div
                 className={`${setting['item']} ${activeTabIndex === index ? setting['active'] : ''}`}
@@ -509,7 +509,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   }}
                 />
                 <label htmlFor="avatar-upload" className={popup['button']} style={{ marginTop: '10px' }}>
-                  {t('changeImage')}
+                  {t('change-avatar')}
                 </label>
               </div>
             </div>
@@ -533,7 +533,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 <input name="link" type="text" value={`https://ricecall.com.tw/join?sid=${serverDisplayId}`} readOnly />
               </div>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('server-description')}</div>
+                <div className={popup['label']}>{t('description')}</div>
                 <textarea
                   name="description"
                   value={serverDescription}
@@ -596,7 +596,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
           <div className={popup['col']}>
             <div className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}>
               <div className={popup['label']}>
-                {t('members')} ({filteredMembers.length})
+                {t('member')} ({filteredMembers.length})
               </div>
               <div className={setting['searchWrapper']}>
                 <div className={setting['searchBorder']}>
@@ -838,7 +838,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 className={popup['button']}
                 onClick={() => handleOpenMemberApplySetting()}
               >
-                {t('edit-apply')}
+                {t('apply-setting')}
               </button>
               <div className={setting['searchWrapper']}>
                 <div className={setting['searchBorder']}>
@@ -942,7 +942,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}>
-              <div className={popup['label']}>{`${t('blocklist')}: (${filteredBlockMembers.length})`}</div>
+              <div className={popup['label']}>{`${t('blacklist')}: (${filteredBlockMembers.length})`}</div>
               <div className={setting['searchWrapper']}>
                 <div className={setting['searchBorder']}>
                   <div className={setting['searchIcon']}></div>

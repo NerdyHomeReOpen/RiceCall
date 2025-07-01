@@ -17,9 +17,6 @@ import styles from '@/styles/popups/blockMember.module.css';
 // Services
 import ipcService from '@/services/ipc.service';
 
-// Utils
-import { getTranslatedMessage } from '@/utils/language';
-
 interface BlockMemberPopupProps {
   userId: User['userId'];
   serverId: Server['serverId'];
@@ -40,17 +37,17 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   // Constants
   const BLOCK_TYPE_OPTIONS = [
     { key: 'timeout', label: t('timeout'), disabled: false },
-    { key: 'block', label: t('block'), disabled: false },
+    { key: 'block-forever', label: t('block-forever'), disabled: false },
     { key: 'blockIP', label: t('block-ip'), disabled: true },
   ];
 
   const FORMAT_TYPE_OPTIONS = [
-    { key: 'seconds', label: t('seconds') },
-    { key: 'minutes', label: t('minutes') },
-    { key: 'hours', label: t('hours') },
-    { key: 'days', label: t('days') },
+    { key: 'seconds', label: t('second') },
+    { key: 'minutes', label: t('minute') },
+    { key: 'hours', label: t('hour') },
+    { key: 'days', label: t('day') },
     { key: 'month', label: t('month') },
-    { key: 'years', label: t('years') },
+    { key: 'years', label: t('year') },
   ];
 
   const isForeverBlock = blockType !== 'timeout';
@@ -119,9 +116,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
             />
             <div className={`${styles['content']}`}>
               <div className={`${popup['label']} ${styles['label']}`}>
-                <MarkdownViewer
-                  markdownText={getTranslatedMessage(t, 'confirm-block-member', { userName: userName })}
-                />
+                <MarkdownViewer markdownText={t('confirm-block-user').replace('{0}', userName)} />
               </div>
               <div className={`${popup['inputGroup']} ${popup['col']}`}>
                 <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>

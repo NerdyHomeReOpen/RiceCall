@@ -278,7 +278,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={homePage['forwardBtn']} />
           <div className={homePage['searchBar']} ref={searchRef}>
             <input
-              placeholder={t('search-placeholder')}
+              placeholder={t('search-server-placeholder')}
               className={homePage['searchInput']}
               value={searchQuery}
               onChange={(e) => {
@@ -403,12 +403,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       <main className={homePage['homeContent']} style={section === 3 ? {} : { display: 'none' }}>
         <ServerListSection title={t('recent-servers')} servers={recentServers} user={user} />
         <ServerListSection title={t('my-servers')} servers={ownedServers} user={user} />
-        <ServerListSection title={t('favorite-servers')} servers={favoriteServers} user={user} />
+        <ServerListSection title={t('favorited-servers')} servers={favoriteServers} user={user} />
       </main>
 
       {/* Not Available */}
       <main className={homePage['homeContent']} style={section === 1 || section === 2 ? {} : { display: 'none' }}>
-        <div>{t('not-available-page-message')}</div>
+        <div>{t('not-available-page')}</div>
       </main>
     </div>
   );

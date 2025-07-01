@@ -120,7 +120,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             <div className={friendPage['levelIcon']} />
             <div
               className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
-              title={`${t('level')}：${userLevel}，${t('xp')}：${userXP}，${t('require-xp')}：${
+              title={`${t('level')}: ${userLevel}, ${t('xp')}: ${userXP}, ${t('required-xp')}: ${
                 userRequiredXP - userXP
               }`}
             />

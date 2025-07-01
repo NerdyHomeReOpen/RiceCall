@@ -69,7 +69,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
 
   const handleDeleteAllFriendApplication = () => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirm-reject-all-friend-requests'), () => {
+    handleOpenAlertDialog(t('confirm-reject-all-friend-application'), () => {
       for (const item of friendApplications) {
         const senderId = item.senderId;
         const receiverId = item.receiverId;

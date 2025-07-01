@@ -45,16 +45,16 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
     userId,
   });
 
-  const outlanderFriendGroup: FriendGroup = Default.friendGroup({
+  const strangerFriendGroup: FriendGroup = Default.friendGroup({
     friendGroupId: 'stranger',
     name: t('stranger'),
     order: 998,
     userId,
   });
 
-  const blockedFriendGroup: FriendGroup = Default.friendGroup({
-    friendGroupId: 'blocked',
-    name: t('blocked'),
+  const blacklistFriendGroup: FriendGroup = Default.friendGroup({
+    friendGroupId: 'blacklist',
+    name: t('blacklist'),
     order: 999,
     userId,
   });
@@ -99,7 +99,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
           name="query"
           type="text"
           className={styles['searchInput']}
-          placeholder={t('searchFriend')}
+          placeholder={t('search-friend-placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -112,7 +112,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
         <div className={styles['scrollView']}>
           {/* Friend Groups */}
           <div className={styles['friendList']}>
-            {[defaultFriendGroup, ...friendGroups, outlanderFriendGroup, blockedFriendGroup]
+            {[defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup]
               .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
               .map((friendGroup) => (
                 <FriendGroupTab

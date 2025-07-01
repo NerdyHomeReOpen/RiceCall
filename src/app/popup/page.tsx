@@ -239,8 +239,8 @@ const Popup = React.memo(() => {
         setHeaderButtons(['close']);
         setContent(<ChannelSetting {...popupInitialData} />);
         break;
-      case PopupType.MEMBERAPPLY_SETTING:
-        setHeaderTitle(t('edit-apply-setting'));
+      case PopupType.MEMBER_APPLY_SETTING:
+        setHeaderTitle(t('member-apply-setting'));
         setHeaderButtons(['close']);
         setContent(<MemberApplySetting {...popupInitialData} />);
         break;

@@ -107,7 +107,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
 
     const handleKickServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
       if (!socket) return;
-      handleOpenAlertDialog(t('confirm-kick-server', { userName: userName }), () => {
+      handleOpenAlertDialog(t('confirm-kick-user').replace('{0}', userName), () => {
         socket.send.disconnectServer({ userId, serverId });
       });
     };
@@ -119,7 +119,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       userName: User['name'],
     ) => {
       if (!socket) return;
-      handleOpenAlertDialog(t('confirm-kick-channel', { userName: userName }), () => {
+      handleOpenAlertDialog(t('confirm-kick-user').replace('{0}', userName), () => {
         socket.send.disconnectChannel({ userId, channelId, serverId });
       });
     };
@@ -187,11 +187,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const handleRemoveMembership = (
       memberId: User['userId'],
       serverId: Server['serverId'],
-      memberName: User['name'] | null = null,
+      memberName: User['name'],
     ) => {
       if (!socket) return;
       handleOpenAlertDialog(
-        t('confirm-remove-membership', { userName: memberId === userId ? t('self') : `${memberName}` }),
+        t('confirm-remove-membership').replace('{0}', memberId === userId ? t('self') : memberName),
         () => {
           handleEditMember({ permissionLevel: 1, nickname: null }, memberId, serverId);
         },
@@ -270,12 +270,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'set-mute',
-              label: isMutedByUser ? t('unmute-user') : t('mute-user'),
+              label: isMutedByUser ? t('unmute') : t('mute'),
               onClick: () => (isMutedByUser ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
             },
             {
               id: 'edit-nickname',
-              label: t('editNickname'),
+              label: t('edit-nickname'),
               show: canEditNickname,
               onClick: () => handleOpenEditNickname(memberUserId, serverId),
             },
@@ -326,8 +326,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               },
             },
             {
-              id: 'ban',
-              label: t('ban'),
+              id: 'block',
+              label: t('block'),
               show: canBan,
               onClick: () => {
                 handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
@@ -343,7 +343,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: t('remove-self-membership'),
               show: canRemoveMembership,
               onClick: () => {
-                handleRemoveMembership(userId, serverId);
+                handleRemoveMembership(userId, serverId, memberName);
               },
             },
             {

@@ -312,8 +312,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 show: canManageChannel,
               },
               {
-                id: 'server-broadcast',
-                label: t('server-broadcast'),
+                id: 'broadcast',
+                label: t('broadcast'),
                 show: canManageChannel,
                 onClick: () => {
                   handleOpenServerBroadcast(userId, serverId, categoryId);

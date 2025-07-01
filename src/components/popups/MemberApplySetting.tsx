@@ -85,7 +85,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
               />
             </div>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('set-apply-notice')}</div>
+              <div className={popup['label']}>{t('member-apply-note')}</div>
               <textarea
                 name="applyNotice"
                 value={serverApplyNotice}

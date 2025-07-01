@@ -293,7 +293,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 }
               }}
             >
-              {t('about')}
+              {t('about-me')}
             </div>
             <div
               className={`${setting['item']} ${setting['groups']}
@@ -339,7 +339,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             </>
           ) : (
             <button className={setting['button']} onClick={() => setSelectedTabId('userSetting')}>
-              {t('editProfile')}
+              {t('edit-profile')}
             </button>
           )}
         </div>

@@ -84,7 +84,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
               </div>
             </div>
             <div className={`${popup['row']}`}>
-              <div className={`${popup['label']} ${broadcast['label']}`}>{t('server-broadcast')}</div>
+              <div className={`${popup['label']} ${broadcast['label']}`}>{t('broadcast-type')}</div>
               <div className={broadcast['inputBox']}>
                 <div className={`${popup['row']}`}>
                   <input
@@ -126,7 +126,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                 }}
               />
               <div className={broadcast['labelArea']}>
-                <div className={`${popup['label']} ${popup['disabled']}`}>{t('support-link')}</div>
+                <div className={`${popup['label']} ${popup['disabled']}`}>{t('markdown-support')}</div>
                 <div className={broadcast['messageInputLength']}>
                   {broadcastContent.length}/{maxLength}
                 </div>

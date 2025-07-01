@@ -215,7 +215,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
                   }}
                 />
                 <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popup['button']}>
-                  {t('uploadAvatar')}
+                  {t('upload-avatar')}
                 </label>
               </div>
               <div className={popup['inputGroup']}>
@@ -279,7 +279,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
               handleClose();
             }}
           >
-            {t('created')}
+            {t('confirm')}
           </button>
           <button className={popup['button']} onClick={() => handleClose()}>
             {t('cancel')}

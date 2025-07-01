@@ -344,7 +344,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleOpenEditChannelName(serverId, selectedChannelId);
           }}
         >
-          {t('changeName')}
+          {t('change-name')}
         </div>
 
         <div

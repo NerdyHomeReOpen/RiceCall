@@ -109,7 +109,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         <div className={setting['left']}>
           <div className={setting['tabs']}>
             {[
-              t('basic-info'),
+              t('channel-info'),
               t('channel-announcement'),
               t('access-permission'),
               t('speaking-permission'),
@@ -295,7 +295,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }}
                 />
                 <div>
-                  <div className={popup['label']}>{t('channel-public')}</div>
+                  <div className={popup['label']}>{t('anyone-can-access')}</div>
                 </div>
               </div>
 
@@ -318,7 +318,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }}
                 />
                 <div>
-                  <div className={popup['label']}>{t('channel-member')}</div>
+                  <div className={popup['label']}>{t('forbid-guest-access')}</div>
                 </div>
               </div>
 
@@ -341,7 +341,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }}
                 />
                 <div>
-                  <div className={popup['label']}>{t('channel-readonly')}</div>
+                  <div className={popup['label']}>{t('message-only')}</div>
                 </div>
               </div>
 
@@ -363,7 +363,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                     }));
                   }}
                 />
-                <div className={popup['label']}>{t('channel-private')}</div>
+                <div className={popup['label']}>{t('require-password')}</div>
               </div>
 
               {channelVisibility === 'private' && (

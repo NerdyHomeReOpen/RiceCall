@@ -54,7 +54,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         {/* Sidebar */}
         <div className={setting['left']}>
           <div className={setting['tabs']}>
-            {[t('basic-settings'), t('voice-settings')].map((title, index) => (
+            {[t('basic-setting'), t('voice-setting')].map((title, index) => (
               <div
                 className={`${setting['item']} ${activeTabIndex === index ? setting['active'] : ''}`}
                 onClick={() => setActiveTabIndex(index)}
@@ -69,7 +69,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         {/* System Settings */}
         <div className={setting['right']} style={activeTabIndex === 0 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('general-settings')}</div>
+            <div className={popup['label']}>{t('general-setting')}</div>
             <div className={popup['inputGroup']}>
               <div className={`${popup['inputBox']} ${popup['row']}`}>
                 <input
@@ -128,7 +128,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         {/* Voice Settings */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('voice-settings')}</div>
+            <div className={popup['label']}>{t('voice-setting')}</div>
             <div className={popup['inputGroup']}>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('input-device')}</div>
