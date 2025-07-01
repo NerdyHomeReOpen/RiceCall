@@ -41,6 +41,3 @@ next-env.d.ts
 
 # lock files
 package-lock.json
-
-# i18n
-src/locales/**/*.json

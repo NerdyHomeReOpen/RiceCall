@@ -1,40 +1,36 @@
-import i18n from 'i18next';
-import Backend from 'i18next-locize-backend';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import otaClient from '@crowdin/ota-client';
+import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import en from './locales/en/translation.json';
-import jaJP from './locales/ja-JP/translation.json';
-import ptBR from './locales/pt-BR/translation.json';
-import ru from './locales/ru/translation.json';
-import zhHantTW from './locales/zh-Hant-TW/translation.json';
-import zhHansCN from './locales/zh-Hans-CN/translation.json';
+export type LanguageKey = 'en' | 'ru' | 'ja' | 'pt-BR' | 'zh-TW' | 'zh-CN';
 
-export type LanguageKey = 'en' | 'ru' | 'ja-JP' | 'pt-BR' | 'zh-Hant-TW' | 'zh-Hans-CN';
+class CrowdinBackend {
+  type = 'backend' as const;
+  client: otaClient;
 
-const DEV = process.env.NODE_ENV === 'development';
+  constructor(options: { hash: string }) {
+    this.client = new otaClient(options.hash);
+  }
 
-i18n
-  .use(Backend)
+  read(lang: string, ns: string, cb: any) {
+    this.client
+      .getStringsByLocale(lang)
+      .then((data) => cb(null, data)) // data => i18next JSON
+      .catch((err) => cb(err, null));
+  }
+}
+
+i18next
+  .use(CrowdinBackend)
   .use(initReactI18next)
   .init({
     backend: {
-      projectId: DEV ? process.env.NEXT_PUBLIC_LOCIZE_PROJECT_ID : '',
-      apiKey: DEV ? process.env.NEXT_PUBLIC_LOCIZE_API_KEY : '',
-      referenceLng: 'zh-Hant-TW',
+      hash: process.env.NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH,
     },
-    resources: {
-      'en': { translation: en },
-      'ru': { translation: ru },
-      'ja-JP': { translation: jaJP },
-      'pt-BR': { translation: ptBR },
-      'zh-Hant-TW': { translation: zhHantTW },
-      'zh-Hans-CN': { translation: zhHansCN },
-    },
-    lng: 'zh-Hant-TW',
-    fallbackLng: 'zh-Hant-TW',
-    saveMissing: true,
-    debug: DEV,
+    lng: 'zh-TW',
+    fallbackLng: 'zh-TW',
     interpolation: { escapeValue: false },
   });
 
-export default i18n;
+export default i18next;

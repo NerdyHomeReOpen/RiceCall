@@ -314,12 +314,12 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                   {
                     id: 'language-select-tw',
                     label: '繁體中文',
-                    onClick: () => handleLanguageChange('zh-Hant-TW'),
+                    onClick: () => handleLanguageChange('zh-TW'),
                   },
                   {
                     id: 'language-select-cn',
                     label: '简体中文',
-                    onClick: () => handleLanguageChange('zh-Hans-CN'),
+                    onClick: () => handleLanguageChange('zh-CN'),
                   },
                   {
                     id: 'language-select-en',
@@ -329,7 +329,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                   {
                     id: 'language-select-jp',
                     label: '日本語',
-                    onClick: () => handleLanguageChange('ja-JP'),
+                    onClick: () => handleLanguageChange('ja'),
                   },
                   {
                     id: 'language-select-br',
