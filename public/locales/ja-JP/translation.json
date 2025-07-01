@@ -1,6 +1,6 @@
 {
   "about-me": "關於我",
-  "about-ricecall": "關於RiceCall",
+  "about-ricecall": "RiceCallについて",
   "about-us": "關於我們",
   "accept-application": "接受申請",
   "access-permission": "訪問許可權",
@@ -395,7 +395,7 @@
   "please-input-channel-password": "請輸入頻道密碼 (限1-4位數字)",
   "private-server-description": "(該群只允許會員進入，不參與排行，只能通過ID搜索到)",
   "remaining-server": "您還可以創建 {0} 個群，創建之後不能刪除或轉讓",
-  "readme": "## 使用聲明\n\n**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)**（以下簡稱 RC 語音）為 **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)**（以下簡稱本團隊）**獨立開發**之專案，**與 RaidCall 原開發團隊、伺服器或任何官方組織無任何關聯**。請使用者自行斟酌並承擔使用風險（*Use at your own risk*）。\n\n目前 RC 語音所有版本皆為測試版本，若在使用過程中發現問題，歡迎透過以下方式回報: \n- 應用程式內: 右上角選單 > 意見反饋\n- GitHub: [問題回報](https://github.com/NerdyHomeReOpen/RiceCall/issues)\n- Discord: 加入 [官方群組](https://discord.gg/adCWzv6wwS) 以獲取最新資訊\n\n請注意，RC 語音之所有資料（包括但不限於帳號、等級、VIP、語音群等）**可能會遭到重置、遺失或刪除**，本團隊保有最終決策權。\n\nRC 語音**並非 RaidCall 的延續、重製或官方授權版本**，亦**不提供 RaidCall 服務的還原、支援或帳號資料恢復**。此專案純屬愛好者社群自發性的開發行動，旨在提供一個新的語音交流平台，**不以商業化為目的**。\n\nRC 語音所有內容僅供學術研究與技術交流使用。如涉及任何版權、商標或其他權利問題，歡迎來信與我們聯繫協商。\n\nRC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為本團隊獨立創作，**不代表 RaidCall 官方立場或意圖**。因此，我們**不提供與 RaidCall 相關之任何技術支援、帳號恢復或資料查詢服務**。如有相關問題，請洽原 RaidCall 官方。\n\n### 開源參與方式\n\n我們歡迎各界開發者參與 RC 語音的開發與維護。您可透過以下方式加入貢獻: \n* 填寫 [意願表單](https://forms.gle/ZowwAS22dGpKkGcZ8)（請先加入 [Discord 官方群組](https://discord.gg/adCWzv6wwS)，若我們有需要會聯繫您並指派身份組）\n* Fork 本專案並提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)，貢獻新功能或修復\n\n感謝您的支持與參與！\n\n此聲明可在應用程式中找到: 右上角選單 > 幫助中心 > 關於 RiceCall。",
+  "readme": "## 利用規約\n\n**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)**（以下、RCボイスと呼称）は、**[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)**（以下、本チーム）によって**独自に開発されたプロジェクト**です。**RaidCallの元開発チーム、サーバー、またはその他の公式組織とは一切関係ありません**。ご利用は自己責任でお願いいたします（*Use at your own risk*）。\n\n現在のRCボイスはすべてテストバージョンです。ご利用中に不具合などを発見された場合は、以下の方法でご報告ください：\n\n* アプリ内：右上のメニュー > フィードバック\n* GitHub：[Issueを報告](https://github.com/NerdyHomeReOpen/RiceCall/issues)\n* Discord：[公式サーバー](https://discord.gg/adCWzv6wwS) に参加して最新情報を入手\n\nRCボイスに関する**すべてのデータ（アカウント、レベル、VIP、ボイスグループなどを含むがそれに限らない）については、リセット・紛失・削除される可能性があります**。最終的な判断は本チームが行います。\n\nRCボイスは**RaidCallの継続、リメイク、または公式認可を受けたバージョンではありません**。**RaidCallのサービスの復元、サポート、アカウントデータの回復なども提供しておりません**。本プロジェクトは愛好家による自発的な開発活動であり、**営利目的ではありません**。\n\nRCボイスの内容はすべて、学術研究および技術的な交流を目的として提供されます。著作権、商標、その他の権利に関する問題がございましたら、お手数ですがご連絡のうえご相談ください。\n\nRCボイスはRaidCallに関する素材を一部参考または使用している場合がありますが、最終的な成果物はすべて本チームによって**独自に制作されたもの**であり、**RaidCall公式の立場や意図を示すものではありません**。そのため、**RaidCallに関連する技術サポート、アカウント回復、データの照会などのサービスは一切提供しておりません**。関連する問題については、元のRaidCall公式にお問い合わせください。\n\n### オープンソースへの参加方法\n\nRCボイスの開発および保守にご協力いただける開発者の皆様を歓迎いたします。以下の方法でご参加いただけます：\n\n* [参加希望フォーム](https://forms.gle/ZowwAS22dGpKkGcZ8) を記入（まずは [Discord公式サーバー](https://discord.gg/adCWzv6wwS) にご参加ください。必要があればこちらからご連絡し、ロールを付与します）\n* 本プロジェクトをForkし、[Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls) を送信して機能追加や不具合修正を行う\n\nご支援・ご参加に心より感謝いたします！\n\nこの免責事項はアプリ内で確認できます：メニュー > ヘルプセンター > RCボイスについて",
   "semi-public-server-description": "(非會員只允許加入大廳)",
   "server-name-placeholder": "6-30個字元組成，首尾輸入的空格無效，不能包含不雅詞彙。",
   "server-slogan-placeholder": "0-30個字元，口號是您建立團隊的目標",
