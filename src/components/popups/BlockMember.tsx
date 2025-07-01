@@ -41,7 +41,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const BLOCK_TYPE_OPTIONS = [
     { key: 'timeout', label: t('timeout'), disabled: false },
     { key: 'block', label: t('block'), disabled: false },
-    { key: 'blockIP', label: t('blockIP'), disabled: true },
+    { key: 'blockIP', label: t('block-ip'), disabled: true },
   ];
 
   const FORMAT_TYPE_OPTIONS = [
@@ -119,11 +119,13 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
             />
             <div className={`${styles['content']}`}>
               <div className={`${popup['label']} ${styles['label']}`}>
-                <MarkdownViewer markdownText={getTranslatedMessage(t, 'sureBlockMember', { userName: userName })} />
+                <MarkdownViewer
+                  markdownText={getTranslatedMessage(t, 'confirm-block-member', { userName: userName })}
+                />
               </div>
               <div className={`${popup['inputGroup']} ${popup['col']}`}>
                 <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
-                  <div className={`${popup['label']}`}>{t('封鎖類型')}</div>
+                  <div className={`${popup['label']}`}>{t('block-type')}</div>
                   <div className={`${popup['selectBox']}`}>
                     <select value={blockType} onChange={(e) => setBlockType(e.target.value)}>
                       {BLOCK_TYPE_OPTIONS.map((option) => (
@@ -135,7 +137,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
                   </div>
                 </div>
                 <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
-                  <div className={`${popup['label']}`}>{t('封鎖時間')}</div>
+                  <div className={`${popup['label']}`}>{t('block-time')}</div>
                   <div className={`${popup['selectBox']}`}>
                     <select
                       value={selectTime}

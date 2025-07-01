@@ -97,7 +97,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
           </div>
         </div>
         <div className={badgeInfoCardStyles.badgeShowTimeBox}>
-          <div>{t('showTo')}:</div>
+          <div>{t('show-to')}:</div>
           <div>1970-01-01</div>
         </div>
       </div>

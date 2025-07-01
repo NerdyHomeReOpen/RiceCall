@@ -105,7 +105,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(t('warningDeleteChannel').replace('{0}', channelName), () =>
+      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', channelName), () =>
         socket.send.deleteChannel({ channelId, serverId }),
       );
     };
@@ -243,8 +243,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             const y = e.clientY;
             contextMenu.showContextMenu(x, y, false, false, [
               {
-                id: 'joinChannel',
-                label: t('joinChannel'),
+                id: 'join-channel',
+                label: t('join-channel'),
                 show: canJoin,
                 onClick: () => {
                   if (needPassword) {
@@ -255,8 +255,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 },
               },
               {
-                id: 'editChannel',
-                label: t('editChannel'),
+                id: 'edit-channel',
+                label: t('edit-channel'),
                 show: canEdit,
                 onClick: () => handleOpenChannelSetting(channelId, serverId),
               },
@@ -266,21 +266,21 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 show: canManageChannel,
               },
               {
-                id: 'createChannel',
-                label: t('addChannel'),
+                id: 'create-channel',
+                label: t('create-channel'),
                 show: canCreate,
                 onClick: () => handleOpenCreateChannel(serverId, null, userId),
               },
               {
-                id: 'createSubChannel',
-                label: t('addSubChannel'),
+                id: 'create-sub-channel',
+                label: t('create-sub-channel'),
                 show: canCreateSub,
                 onClick: () =>
                   handleOpenCreateChannel(serverId, channelCategoryId ? channelCategoryId : channelId, userId),
               },
               {
-                id: 'deleteChannel',
-                label: t('deleteChannel'),
+                id: 'delete-channel',
+                label: t('delete-channel'),
                 show: canDelete,
                 onClick: () => handleDeleteChannel(channelId, serverId),
               },
@@ -290,23 +290,23 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 show: canManageChannel,
               },
               {
-                id: 'broadcast',
-                label: t('broadcast'),
+                id: 'server-broadcast',
+                label: t('server-broadcast'),
                 show: canManageChannel,
                 onClick: () => {
                   handleOpenServerBroadcast(serverId, channelCategoryId ? channelCategoryId : channelId);
                 },
               },
               {
-                id: 'moveAllUserToChannel',
-                label: t('moveAllUserToChannel'),
+                id: 'move-all-user-to-channel',
+                label: t('move-all-user-to-channel'),
                 show: canMoveAllUserToChannel,
                 onClick: () =>
                   channelUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
               },
               {
-                id: 'editChannelOrder',
-                label: t('editChannelOrder'),
+                id: 'edit-channel-order',
+                label: t('edit-channel-order'),
                 show: canManageChannel,
                 onClick: () => handleOpenEditChannelOrder(serverId, userId),
               },
@@ -316,8 +316,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 show: canSetReceptionLobby,
               },
               {
-                id: 'setReceptionLobby',
-                label: t('setDefaultChannel'),
+                id: 'set-reception-lobby',
+                label: t('set-reception-lobby'),
                 show: canSetReceptionLobby,
                 onClick: () => handleEditServer({ receptionLobbyId: channelId }, serverId),
               },

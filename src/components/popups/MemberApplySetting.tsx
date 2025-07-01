@@ -71,7 +71,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={`${popup['inputBox']} ${popup['row']}`}>
-              <div className={popup['label']}>{t('isReceiveApply')}</div>
+              <div className={popup['label']}>{t('is-receive-apply')}</div>
               <input
                 name="receiveApply"
                 type="checkbox"
@@ -85,7 +85,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
               />
             </div>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('setApplyNotice')}</div>
+              <div className={popup['label']}>{t('set-apply-notice')}</div>
               <textarea
                 name="applyNotice"
                 value={serverApplyNotice}

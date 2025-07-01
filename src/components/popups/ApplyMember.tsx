@@ -111,12 +111,12 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
                 </div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div>{t('serverApplyNotice')}</div>
+                <div>{t('server-apply-notice')}</div>
                 <div className={popup['hint']}>{serverApplyNotice || t('none')}</div>
               </div>
               <div className={applyMember['split']} />
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div>{t('serverApplyDescription')}</div>
+                <div>{t('server-apply-description')}</div>
                 <textarea
                   rows={2}
                   value={applicationDes}
@@ -169,11 +169,11 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
                 </div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div>{t('serverApplyNotice')}</div>
+                <div>{t('server-apply-notice')}</div>
                 <div className={popup['hint']}>{serverApplyNotice || t('none')}</div>
               </div>
               <div className={applyMember['split']} />
-              <p className={popup['hint']}>{t('applySuccess')}</p>
+              <p className={popup['hint']}>{t('apply-success')}</p>
             </div>
           </div>
         </div>

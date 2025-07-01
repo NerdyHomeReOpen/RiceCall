@@ -304,7 +304,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 />
               </div>
               <div className={directMessage['buttons']}>
-                <div className={directMessage['historyMessage']}>{t('messageHistory')}</div>
+                <div className={directMessage['historyMessage']}>{t('message-history')}</div>
               </div>
             </div>
             <textarea

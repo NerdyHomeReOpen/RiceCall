@@ -192,7 +192,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
 
         return (
           <>
-            <button className={markdown.copyButton} onClick={handleCopy} aria-label={t('copyCode')}>
+            <button className={markdown.copyButton} onClick={handleCopy} aria-label={t('copy-code')}>
               {isCopied ? t('copied') : t('copy')}
             </button>
             <code

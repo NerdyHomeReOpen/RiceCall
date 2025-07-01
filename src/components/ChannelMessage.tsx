@@ -85,13 +85,13 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
               contextMenu.showContextMenu(x, y, false, false, [
                 {
                   id: 'direct-message',
-                  label: t('directMessage'),
+                  label: t('direct-message'),
                   show: !isCurrentUser,
                   onClick: () => handleOpenDirectMessage(userId, senderUserId, senderName),
                 },
                 {
                   id: 'view-profile',
-                  label: t('viewProfile'),
+                  label: t('view-profile'),
                   onClick: () => handleOpenUserInfo(userId, senderUserId),
                 },
               ]);

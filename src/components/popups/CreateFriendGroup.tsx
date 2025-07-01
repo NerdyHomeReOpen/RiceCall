@@ -50,7 +50,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('pleaseInputFriendGroupName')}</div>
+              <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
               <input
                 name="name"
                 type="text"

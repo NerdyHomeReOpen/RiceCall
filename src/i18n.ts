@@ -2,6 +2,13 @@
 import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import HttpBackend from 'i18next-http-backend';
+
+const distributionHash = process.env.NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH;
+
+const localBackend = new HttpBackend(null, {
+  loadPath: '/locales/{{lng}}/translation.json',
+});
 
 export type LanguageKey = 'en' | 'ru' | 'ja' | 'pt-BR' | 'zh-TW' | 'zh-CN';
 
@@ -22,14 +29,20 @@ class CrowdinBackend {
 }
 
 i18next
-  .use(CrowdinBackend)
+  .use(localBackend)
   .use(initReactI18next)
   .init({
-    backend: {
-      hash: process.env.NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH,
-    },
     lng: 'zh-TW',
     fallbackLng: 'zh-TW',
+    supportedLngs: ['en', 'ru', 'ja', 'pt-BR', 'zh-TW', 'zh-CN'],
+
+    ns: ['translation'],
+    defaultNS: 'translation',
+
+    backend: {
+      loadPath: '/locales/{{lng}}/translation.json',
+    },
+
     interpolation: { escapeValue: false },
   });
 

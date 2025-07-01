@@ -40,13 +40,13 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   const filteredFriends = friends.filter((fd) => fd.name.includes(searchQuery));
 
   const defaultFriendGroup: FriendGroup = Default.friendGroup({
-    name: `${t('myFriends')}`,
+    name: `${t('my-friends')}`,
     order: 0,
     userId,
   });
 
   const outlanderFriendGroup: FriendGroup = Default.friendGroup({
-    friendGroupId: 'outlander',
+    friendGroupId: 'stranger',
     name: t('stranger'),
     order: 998,
     userId,
@@ -134,10 +134,10 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
       {/* Bottom Buttons */}
       <div className={styles['sidebarFooter']}>
         <div className={styles['button']} datatype="addGroup" onClick={() => handleOpenCreateFriendGroup()}>
-          {t('friendAddGroup')}
+          {t('create-friend-group')}
         </div>
         <div className={styles['button']} datatype="addFriend" onClick={() => handleOpenSearchUser(userId)}>
-          {t('addFriend')}
+          {t('add-friend')}
         </div>
       </div>
     </>

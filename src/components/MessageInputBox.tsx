@@ -81,7 +81,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
           }}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
-          aria-label={t('messageInputBox')}
+          aria-label={t('message-input-box')}
         />
         <div className={messageInputBox['messageInputLength']}>
           {messageInput.length}/{maxLength}

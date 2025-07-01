@@ -118,7 +118,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(t('warningDeleteChannel').replace('{0}', categoryName), () =>
+      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', categoryName), () =>
         socket.send.deleteChannel({ channelId, serverId }),
       );
     };
@@ -262,8 +262,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             const y = e.clientY;
             contextMenu.showContextMenu(x, y, false, false, [
               {
-                id: 'joinChannel',
-                label: '進入此頻道', // TODO: lang.tr
+                id: 'join-channel',
+                label: t('join-channel'),
                 show: canJoin,
                 onClick: () => {
                   if (!canJoin) return;
@@ -275,8 +275,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 },
               },
               {
-                id: 'edit',
-                label: t('editChannel'),
+                id: 'edit-channel',
+                label: t('edit-channel'),
                 show: canManageChannel,
                 onClick: () => handleOpenChannelSetting(categoryId, serverId),
               },
@@ -286,20 +286,20 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 show: canManageChannel,
               },
               {
-                id: 'createChannel',
-                label: t('addChannel'),
+                id: 'create-channel',
+                label: t('create-channel'),
                 show: canManageChannel,
                 onClick: () => handleOpenCreateChannel(serverId, null, userId),
               },
               {
-                id: 'createSubChannel',
-                label: t('addSubChannel'),
+                id: 'create-sub-channel',
+                label: t('create-sub-channel'),
                 show: canManageChannel,
                 onClick: () => handleOpenCreateChannel(serverId, categoryId, userId),
               },
               {
-                id: 'deleteChannel',
-                label: t('deleteChannel'),
+                id: 'delete-channel',
+                label: t('delete-channel'),
                 show: canManageChannel,
                 onClick: () => {
                   if (!categoryName) return;
@@ -312,23 +312,23 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 show: canManageChannel,
               },
               {
-                id: 'broadcastServer',
-                label: '廣播', // TODO: lang.tr
+                id: 'server-broadcast',
+                label: t('server-broadcast'),
                 show: canManageChannel,
                 onClick: () => {
                   handleOpenServerBroadcast(userId, serverId, categoryId);
                 },
               },
               {
-                id: 'moveAllUserToChannel',
-                label: '批量移動到我的房間', // TODO: lang.tr
+                id: 'move-all-user-to-channel',
+                label: t('move-all-user-to-channel'),
                 show: canMoveToChannel,
                 onClick: () =>
                   categoryUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
               },
               {
-                id: 'changeChannelOrder',
-                label: t('editChannelOrder'),
+                id: 'edit-channel-order',
+                label: t('edit-channel-order'),
                 show: canManageChannel,
                 onClick: () => handleOpenChangeChannelOrder(userId, serverId),
               },
@@ -338,8 +338,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 show: canSetReceptionLobby,
               },
               {
-                id: 'setReceptionLobby',
-                label: t('setDefaultChannel'),
+                id: 'set-reception-lobby',
+                label: t('set-reception-lobby'),
                 show: canSetReceptionLobby,
                 onClick: () => handleEditServer({ receptionLobbyId: categoryId }, serverId),
               },

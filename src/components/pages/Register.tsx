@@ -28,33 +28,33 @@ interface FormDatas {
 
 function validateAccount(value: string, t: TFunction): string {
   value = value.trim();
-  if (!value) return t('accountRequired');
-  if (value.length < 4) return t('accountMinLength');
-  if (value.length > 16) return t('accountMaxLength');
-  if (!/^[A-Za-z0-9_\.]+$/.test(value)) return t('accountInvalidFormat');
+  if (!value) return t('account-required');
+  if (value.length < 4) return t('account-min-length');
+  if (value.length > 16) return t('account-max-length');
+  if (!/^[A-Za-z0-9_\.]+$/.test(value)) return t('account-invalid-format');
   return '';
 }
 
 function validatePassword(value: string, t: TFunction): string {
   value = value.trim();
-  if (!value) return t('passwordRequired');
-  if (value.length < 8) return t('passwordMinLength');
-  if (value.length > 20) return t('passwordMaxLength');
-  if (!/^[A-Za-z0-9@$!%*#?&]{8,20}$/.test(value)) return t('passwordInvalidFormat');
+  if (!value) return t('password-required');
+  if (value.length < 8) return t('password-min-length');
+  if (value.length > 20) return t('password-max-length');
+  if (!/^[A-Za-z0-9@$!%*#?&]{8,20}$/.test(value)) return t('password-invalid-format');
   return '';
 }
 
 function validateUsername(value: string, t: TFunction): string {
   value = value.trim();
-  if (!value) return t('usernameRequired');
-  if (value.length < 2) return t('usernameMinLength');
-  if (value.length > 32) return t('usernameMaxLength');
-  if (!/^[A-Za-z0-9\u4e00-\u9fa5]+$/.test(value)) return t('usernameInvalidFormat');
+  if (!value) return t('username-required');
+  if (value.length < 2) return t('username-min-length');
+  if (value.length > 32) return t('username-max-length');
+  if (!/^[A-Za-z0-9\u4e00-\u9fa5]+$/.test(value)) return t('username-invalid-format');
   return '';
 }
 
 function validateCheckPassword(value: string, check: string, t: TFunction): string {
-  if (value !== check) return t('passwordsDoNotMatch');
+  if (value !== check) return t('passwords-do-not-match');
   return '';
 }
 
@@ -143,22 +143,22 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
   const handleSubmit = async () => {
     const validationErrors: FormErrors = {};
     if (!formData.account.trim()) {
-      validationErrors.account = t('pleaseInputAccount');
+      validationErrors.account = t('please-input-account');
     }
     if (!formData.password.trim()) {
-      validationErrors.password = t('pleaseInputPassword');
+      validationErrors.password = t('please-input-password');
     }
     if (!formData.username.trim()) {
-      validationErrors.username = t('pleaseInputNickname');
+      validationErrors.username = t('please-input-nickname');
     }
     if (!confirmPassword.trim()) {
-      validationErrors.confirmPassword = t('pleaseInputPasswordAgain');
+      validationErrors.confirmPassword = t('please-input-password-again');
     }
     if (Object.keys(validationErrors).length > 0) {
       setErrors((prev) => ({
         ...prev,
         ...validationErrors,
-        general: t('pleaseInputAllRequired'),
+        general: t('please-input-all-required'),
       }));
       return;
     }
@@ -189,7 +189,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                     value={formData.account}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    placeholder={t('pleaseInputAccount')}
+                    placeholder={t('please-input-account')}
                     className={styles['input']}
                     style={{
                       borderColor: errors.account ? '#f87171' : '#d1d5db',
@@ -199,7 +199,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                 {errors.account ? (
                   <div className={styles['warning']}>{errors.account}</div>
                 ) : (
-                  <div className={styles['hint']}>{t('accountCannotChange')}</div>
+                  <div className={styles['hint']}>{t('account-cannot-change')}</div>
                 )}
               </div>
               <div className={styles['inputWrapper']}>
@@ -211,7 +211,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                     value={formData.password}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    placeholder={t('pleaseInputPassword')}
+                    placeholder={t('please-input-password')}
                     className={styles['input']}
                     style={{
                       borderColor: errors.password ? '#f87171' : '#d1d5db',
@@ -221,19 +221,19 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                 {errors.password ? (
                   <div className={styles['warning']}>{errors.password}</div>
                 ) : (
-                  <div className={styles['hint']}>{t('passwordHint')}</div>
+                  <div className={styles['hint']}>{t('password-hint')}</div>
                 )}
               </div>
               <div className={styles['inputWrapper']}>
                 <div className={styles['inputBox']}>
-                  <div className={styles['label']}>{t('confirmPassword')}</div>
+                  <div className={styles['label']}>{t('confirm-password')}</div>
                   <input
                     type="password"
                     name="confirmPassword"
                     value={confirmPassword}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    placeholder={t('pleaseInputPasswordAgain')}
+                    placeholder={t('please-input-password-again')}
                     className={styles['input']}
                     style={{
                       borderColor: errors.confirmPassword ? '#f87171' : '#d1d5db',
@@ -243,7 +243,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                 {errors.confirmPassword ? (
                   <div className={styles['warning']}>{errors.confirmPassword}</div>
                 ) : (
-                  <div className={styles['hint']}>{t('repeatInputPassword')}</div>
+                  <div className={styles['hint']}>{t('repeat-input-password')}</div>
                 )}
               </div>
               <div className={styles['inputWrapper']}>
@@ -254,7 +254,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                     value={formData.username}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    placeholder={t('pleaseInputNickname')}
+                    placeholder={t('please-input-nickname')}
                     className={styles['input']}
                     style={{
                       borderColor: errors.username ? '#f87171' : '#d1d5db',
@@ -264,7 +264,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                 {errors.username ? (
                   <div className={styles['warning']}>{errors.username}</div>
                 ) : (
-                  <div className={styles['hint']}>{t('nicknameHint')}</div>
+                  <div className={styles['hint']}>{t('nickname-hint')}</div>
                 )}
               </div>
               <button
@@ -289,7 +289,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
       </div>
       <div className={styles['loginFooter']}>
         <div className={styles['backToLogin']} onClick={() => setSection('login')}>
-          {t('backToLogin')}
+          {t('back-to-login')}
         </div>
       </div>
     </div>

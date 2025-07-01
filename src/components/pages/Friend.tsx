@@ -90,16 +90,16 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
 
   useEffect(() => {
     ipcService.discord.updatePresence({
-      details: t('RPCFriendPage'),
-      state: `${t('RPCUser')} ${userName}`,
+      details: t('rpc:friend-page'),
+      state: `${t('rpc:user')} ${userName}`,
       largeImageKey: 'app_icon',
       largeImageText: 'RC Voice',
       smallImageKey: 'home_icon',
-      smallImageText: t('RPCFriend'),
+      smallImageText: t('rpc:vewing-friend-page'),
       timestamp: Date.now(),
       buttons: [
         {
-          label: t('RPCJoinServer'),
+          label: t('rpc:join-server'),
           url: 'https://discord.gg/adCWzv6wwS',
         },
       ],
@@ -120,7 +120,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             <div className={friendPage['levelIcon']} />
             <div
               className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
-              title={`${t('level')}：${userLevel}，${t('xp')}：${userXP}，${t('xpDifference')}：${
+              title={`${t('level')}：${userLevel}，${t('xp')}：${userXP}，${t('require-xp')}：${
                 userRequiredXP - userXP
               }`}
             />
@@ -137,7 +137,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             ref={signatureInputRef}
             className={friendPage['signatureInput']}
             value={signatureInput}
-            placeholder={t('signaturePlaceholder')}
+            placeholder={t('signature-placeholder')}
             maxLength={300}
             onChange={(e) => setSignatureInput(e.target.value)}
             onBlur={() => {
@@ -180,7 +180,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
 
         {/* Right Content */}
         <div className={friendPage['mainContent']}>
-          <div className={friendPage['header']}>{t('friendActive')}</div>
+          <div className={friendPage['header']}>{t('friend-active')}</div>
         </div>
       </main>
     </div>

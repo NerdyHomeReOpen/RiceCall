@@ -54,7 +54,7 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
         <div className={homePage['loadingWrapper']}>
           <div className={homePage['loadingBox']}>
             <div className={homePage['loadingTitleContain']}>
-              <div>{t('connectingServer')}</div>
+              <div>{t('connecting-server')}</div>
               <div className={homePage['loadingServerID']}>{loadingServerId}</div>
             </div>
             <div className={homePage['loadingGif']}></div>

@@ -69,7 +69,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
 
   const handleDeleteAllFriendApplication = () => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirmToRejectAllFriendRequests'), () => {
+    handleOpenAlertDialog(t('confirm-reject-all-friend-requests'), () => {
       for (const item of friendApplications) {
         const senderId = item.senderId;
         const receiverId = item.receiverId;
@@ -163,7 +163,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                 handleDeleteAllFriendApplication();
               }}
             >
-              {t('rejectAll')}
+              {t('reject-all')}
             </div>
           </div>
           <div className={friendVerification['contentBody']}>
@@ -183,7 +183,9 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                     </div>
                     <div className={friendVerification['userApplyContent']}>
                       <div className={friendVerification['userApplyContentText']}>
-                        <div className={friendVerification['userApplyContentRow']}>{t('requestToAddYouAsAFriend')}</div>
+                        <div className={friendVerification['userApplyContentRow']}>
+                          {t('request-to-add-you-as-a-friend')}
+                        </div>
                         <div className={friendVerification['userApplyContentRow']}>
                           {t('description')}: {friend.description}
                         </div>

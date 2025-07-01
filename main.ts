@@ -218,8 +218,9 @@ export const PopupSize = {
 // Constants
 const DEV = process.argv.includes('--dev');
 // const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const PORT = Number(process.env.NEXT_PUBLIC_PORT);
 const WS_URL_SECONDARY = process.env.NEXT_PUBLIC_SERVER_URL_SECONDARY;
-const BASE_URI = DEV ? `http://localhost:${process.env.NEXT_PUBLIC_PORT}` : 'app://-';
+const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
 const FILE_PATH = fileURLToPath(import.meta.url);
 const DIR_PATH = path.dirname(FILE_PATH);
 const ROOT_PATH = DEV ? DIR_PATH : path.join(DIR_PATH, '../');
@@ -352,7 +353,7 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
   }
 
   if (DEV) {
-    waitForPort(3000).catch((err) => {
+    waitForPort(PORT).catch((err) => {
       console.error('Cannot connect to Next.js server:', err);
       app.exit();
     });
@@ -413,7 +414,7 @@ async function createAuthWindow() {
   }
 
   if (DEV) {
-    waitForPort(3000).catch((err) => {
+    waitForPort(PORT).catch((err) => {
       console.error('Cannot connect to Next.js server:', err);
       app.quit();
     });
@@ -474,7 +475,7 @@ async function createPopup(type: PopupType, id: string, force = true): Promise<B
   }
 
   if (DEV) {
-    waitForPort(3000).catch((err) => {
+    waitForPort(PORT).catch((err) => {
       console.error('Cannot connect to Next.js server:', err);
       app.exit();
     });

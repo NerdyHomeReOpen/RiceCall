@@ -205,148 +205,148 @@ const Popup = React.memo(() => {
 
     switch (type) {
       case PopupType.CHANNEL_PASSWORD:
-        setHeaderTitle(t('pleaseEnterTheChannelPassword'));
+        setHeaderTitle(t('please-enter-the-channel-password'));
         setHeaderButtons(['close']);
         setContent(<ChannelPassword {...popupInitialData} />);
         break;
       case PopupType.USER_INFO:
-        setHeaderTitle(t('userInfo'));
+        setHeaderTitle(t('user-info'));
         setHeaderButtons(['close']);
         setContent(<UserSetting {...popupInitialData} />);
         break;
       case PopupType.USER_SETTING:
-        setHeaderTitle(t('editUser'));
+        setHeaderTitle(t('edit-user'));
         setHeaderButtons(['close']);
         setContent(<UserSetting {...popupInitialData} />);
         break;
       case PopupType.SERVER_SETTING:
-        setHeaderTitle(t('editServer'));
+        setHeaderTitle(t('edit-server'));
         setHeaderButtons(['close']);
         setContent(<ServerSetting {...popupInitialData} />);
         break;
       case PopupType.SERVER_BROADCAST:
-        setHeaderTitle('頻道廣播'); // TODO: lang.tr
+        setHeaderTitle(t('server-broadcast'));
         setHeaderButtons(['close']);
         setContent(<ServerBroadcast {...popupInitialData} />);
         break;
       case PopupType.BLOCK_MEMBER:
-        setHeaderTitle('封鎖'); // TODO: lang.tr
+        setHeaderTitle(t('block'));
         setHeaderButtons(['close']);
         setContent(<BlockMember {...popupInitialData} />);
         break;
       case PopupType.CHANNEL_SETTING:
-        setHeaderTitle(t('editChannel'));
+        setHeaderTitle(t('edit-channel'));
         setHeaderButtons(['close']);
         setContent(<ChannelSetting {...popupInitialData} />);
         break;
       case PopupType.MEMBERAPPLY_SETTING:
-        setHeaderTitle(t('editApplySettings'));
+        setHeaderTitle(t('edit-apply-setting'));
         setHeaderButtons(['close']);
         setContent(<MemberApplySetting {...popupInitialData} />);
         break;
       case PopupType.SYSTEM_SETTING:
-        setHeaderTitle(t('systemSetting'));
+        setHeaderTitle(t('system-setting'));
         setHeaderButtons(['close']);
         setContent(<SystemSetting {...popupInitialData} />);
         break;
       case PopupType.CREATE_SERVER:
-        setHeaderTitle(t('createServer'));
+        setHeaderTitle(t('create-server'));
         setHeaderButtons(['close']);
         setContent(<CreateServer {...popupInitialData} />);
         break;
       case PopupType.CREATE_CHANNEL:
-        setHeaderTitle(t('createChannel'));
+        setHeaderTitle(t('create-channel'));
         setHeaderButtons(['close']);
         setContent(<CreateChannel {...popupInitialData} />);
         break;
       case PopupType.CREATE_FRIENDGROUP:
-        setHeaderTitle(t('addFriendGroup'));
+        setHeaderTitle(t('create-friend-group'));
         setHeaderButtons(['close']);
         setContent(<CreateFriendGroup {...popupInitialData} />);
         break;
       case PopupType.EDIT_CHANNEL_ORDER:
-        setHeaderTitle(t('editChannelOrder'));
+        setHeaderTitle(t('edit-channel-order'));
         setHeaderButtons(['close']);
         setContent(<EditChannelOrder {...popupInitialData} />);
         break;
       case PopupType.EDIT_CHANNEL_NAME:
-        setHeaderTitle(t('editChannelName'));
+        setHeaderTitle(t('edit-channel-name'));
         setHeaderButtons(['close']);
         setContent(<EditChannelName {...popupInitialData} />);
         break;
       case PopupType.EDIT_NICKNAME:
-        setHeaderTitle(t('editMemberCard'));
+        setHeaderTitle(t('edit-member-card'));
         setHeaderButtons(['close']);
         setContent(<EditNickname {...popupInitialData} />);
         break;
       case PopupType.EDIT_FRIENDGROUP:
-        setHeaderTitle(t('editFriendGroup'));
+        setHeaderTitle(t('edit-friend-group'));
         setHeaderButtons(['close']);
         setContent(<EditFriendGroup {...popupInitialData} />);
         break;
       case PopupType.EDIT_FRIEND:
-        setHeaderTitle(t('editFriend'));
+        setHeaderTitle(t('edit-friend'));
         setHeaderButtons(['close']);
         setContent(<EditFriend {...popupInitialData} />);
         break;
       case PopupType.APPLY_MEMBER:
-        setHeaderTitle(t('applyMember'));
+        setHeaderTitle(t('apply-member'));
         setHeaderButtons(['close']);
         setContent(<ApplyMember {...popupInitialData} />);
         break;
       case PopupType.APPLY_FRIEND:
-        setHeaderTitle(t('applyFriend'));
+        setHeaderTitle(t('apply-friend'));
         setHeaderButtons(['close']);
         setContent(<ApplyFriend {...popupInitialData} />);
         break;
       case PopupType.SEARCH_USER:
-        setHeaderTitle(t('addFriend'));
+        setHeaderTitle(t('add-friend'));
         setHeaderButtons(['close']);
         setContent(<SearchUser {...popupInitialData} />);
         break;
       case PopupType.DIRECT_MESSAGE:
-        setHeaderTitle(popupInitialData?.targetName || t('directMessage'));
+        setHeaderTitle(popupInitialData?.targetName || t('direct-message'));
         setHeaderButtons(['close', 'minimize', 'maxsize']);
         setContent(<DirectMessage {...{ ...popupInitialData, windowRef }} />);
         break;
       case PopupType.DIALOG_ALERT:
       case PopupType.DIALOG_ALERT2:
-        setHeaderTitle(t('dialogAlert'));
+        setHeaderTitle(t('dialog-alert'));
         setHeaderButtons(['close']);
         setContent(<Dialog {...{ ...popupInitialData, iconType: 'ALERT' }} />);
         break;
       case PopupType.DIALOG_SUCCESS:
-        setHeaderTitle(t('dialogSuccess'));
+        setHeaderTitle(t('dialog-success'));
         setHeaderButtons(['close']);
         setContent(<Dialog {...{ ...popupInitialData, iconType: 'SUCCESS' }} />);
         break;
       case PopupType.DIALOG_WARNING:
-        setHeaderTitle(t('dialogWarning'));
+        setHeaderTitle(t('dialog-warning'));
         setHeaderButtons(['close']);
         setContent(<Dialog {...{ ...popupInitialData, iconType: 'WARNING' }} />);
         break;
       case PopupType.DIALOG_ERROR:
-        setHeaderTitle(t('dialogError'));
+        setHeaderTitle(t('dialog-error'));
         setHeaderButtons(['close']);
         setContent(<Dialog {...{ ...popupInitialData, iconType: 'ERROR' }} />);
         break;
       case PopupType.DIALOG_INFO:
-        setHeaderTitle(t('dialogInfo'));
+        setHeaderTitle(t('dialog-info'));
         setHeaderButtons(['close']);
         setContent(<Dialog {...{ ...popupInitialData, iconType: 'INFO' }} />);
         break;
       case PopupType.CHANGE_THEME:
-        setHeaderTitle(t('changeTheme'));
+        setHeaderTitle(t('change-theme'));
         setHeaderButtons(['close']);
         setContent(<ChangeTheme {...popupInitialData} />);
         break;
       case PopupType.ABOUTUS:
-        setHeaderTitle(t('aboutUs'));
+        setHeaderTitle(t('about-ricecall'));
         setHeaderButtons(['close']);
         setContent(<About {...popupInitialData} />);
         break;
       case PopupType.FRIEND_VERIFICATION:
-        setHeaderTitle(t('friendVerification'));
+        setHeaderTitle(t('friend-verification'));
         setHeaderButtons(['close']);
         setContent(<FriendVerification {...popupInitialData} />);
         break;
@@ -358,7 +358,7 @@ const Popup = React.memo(() => {
   return (
     <div className="wrapper" ref={windowRef}>
       {/* Top Nevigation */}
-      {(type !== PopupType.USER_INFO || headerTitle !== t('userInfo')) && headerButtons.length > 0 && (
+      {(type !== PopupType.USER_INFO || headerTitle !== t('user-info')) && headerButtons.length > 0 && (
         <Header
           title={headerTitle}
           buttons={headerButtons}

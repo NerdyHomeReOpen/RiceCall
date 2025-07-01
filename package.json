@@ -36,6 +36,7 @@
     "emoji.json": "^15.1.0",
     "highlight.js": "^11.11.1",
     "i18next": "^25.2.1",
+    "i18next-http-backend": "^3.0.2",
     "net": "^1.0.2",
     "next": "^15.3.2",
     "path": "^0.12.7",

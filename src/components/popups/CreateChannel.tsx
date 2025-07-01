@@ -74,11 +74,11 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={popup['inputBox']}>
-              <div className={popup['label']}>{t('parentChannel')}</div>
+              <div className={popup['label']}>{t('parent-channel')}</div>
               <div className={popup['label']}>{parentName || t('none')}</div>
             </div>
             <div className={popup['inputBox']}>
-              <div className={popup['label']}>{t('channelName')}</div>
+              <div className={popup['label']}>{t('channel-name')}</div>
               <input
                 name="name"
                 type="text"

@@ -123,17 +123,17 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
       <div className={popup['popupContainer']} style={section === 0 ? {} : { display: 'none' }}>
         {/* Tab */}
         <div className={popup['popupTab']}>
-          <div className={`${popup['item']} ${popup['active']}`}>{t('selectServerType')}</div>
-          <div className={popup['item']}>{t('fillInfo')}</div>
+          <div className={`${popup['item']} ${popup['active']}`}>{t('select-server-type')}</div>
+          <div className={popup['item']}>{t('fill-info')}</div>
         </div>
 
         {/* Body */}
         <div className={popup['popupBody']}>
           <div className={setting['body']}>
             <div className={`${createServer['message']}`}>
-              {`${t('remainingServer1')} ${remainingServers} ${t('remainingServer2')}`}
+              {`${t('remaining-server').replace('{0}', remainingServers.toString())}`}
             </div>
-            <div className={createServer['type']}>{t('selectServerTypeDescription')}</div>
+            <div className={createServer['type']}>{t('select-server-type-description')}</div>
             <div className={createServer['buttonGroup']}>
               {SERVER_TYPES.map((type) => (
                 <div
@@ -165,8 +165,8 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
       <div className={popup['popupContainer']} style={section === 1 ? {} : { display: 'none' }}>
         {/* Tab */}
         <div className={popup['popupTab']}>
-          <div className={popup['item']}>{t('selectServerType')}</div>
-          <div className={`${popup['item']}  ${popup['active']}`}>{t('fillInfo')}</div>
+          <div className={popup['item']}>{t('select-server-type')}</div>
+          <div className={`${popup['item']}  ${popup['active']}`}>{t('fill-info')}</div>
         </div>
 
         {/* Body */}
@@ -221,18 +221,18 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
               <div className={popup['inputGroup']}>
                 <div className={createServer['inputWrapper']}>
                   <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={createServer['label']}>{t('serverType')}</div>
+                    <div className={createServer['label']}>{t('server-type')}</div>
                     <input name="type" type="text" disabled value={t(serverType as keyof typeof t)} />
                   </div>
                 </div>
                 <div className={createServer['inputWrapper']}>
                   <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={createServer['label']}>{t('serverName')}</div>
+                    <div className={createServer['label']}>{t('server-name')}</div>
                     <input
                       name="name"
                       type="text"
                       value={serverName}
-                      placeholder={t('serverNamePlaceholder')}
+                      placeholder={t('server-name-placeholder')}
                       maxLength={32}
                       onChange={(e) =>
                         setServer((prev) => ({
@@ -245,12 +245,12 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
                 </div>
                 <div className={createServer['inputWrapper']}>
                   <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={createServer['label']}>{t('serverSlogan')}</div>
+                    <div className={createServer['label']}>{t('server-slogan')}</div>
                     <input
                       name="slogan"
                       type="text"
                       value={serverSlogan}
-                      placeholder={t('serverSloganPlaceholder')}
+                      placeholder={t('server-slogan-placeholder')}
                       maxLength={32}
                       onChange={(e) =>
                         setServer((prev) => ({

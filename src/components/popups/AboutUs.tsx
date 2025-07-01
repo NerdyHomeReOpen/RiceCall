@@ -32,17 +32,17 @@ const AboutPopup: React.FC = React.memo(() => {
 
   // Variables
   const titleColorClasses: Record<string, string> = {
-    [t('mainDeveloper')]: aboutUs.mainDeveloper,
-    [t('backendDeveloper')]: aboutUs.backendDeveloper,
-    [t('frontendDeveloper')]: aboutUs.frontendDeveloper,
-    [t('machineNetwork')]: aboutUs.machineNetwork,
-    [t('technicalSupport')]: aboutUs.technicalSupport,
-    [t('customerService')]: aboutUs.customerService,
+    [t('main-developer')]: aboutUs.mainDeveloper,
+    [t('backend-developer')]: aboutUs.backendDeveloper,
+    [t('frontend-developer')]: aboutUs.frontendDeveloper,
+    [t('machine-network')]: aboutUs.machineNetwork,
+    [t('technical-support')]: aboutUs.technicalSupport,
+    [t('customer-service')]: aboutUs.customerService,
   };
   const currentYear = new Date().getFullYear();
   const teamMembers = [
     {
-      title: t('mainDeveloper'),
+      title: t('main-developer'),
       contact: 'JoshHuang9508',
       info: [
         { label: 'Github', value: 'JoshHuang9508' },
@@ -50,7 +50,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('mainDeveloper'),
+      title: t('main-developer'),
       contact: 'yeci226',
       info: [
         { label: 'Github', value: 'yeci226' },
@@ -58,7 +58,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('backendDeveloper'),
+      title: t('backend-developer'),
       contact: 'yuusukealmal',
       info: [
         { label: 'Github', value: 'yuusukealmal' },
@@ -66,7 +66,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('frontendDeveloper'),
+      title: t('frontend-developer'),
       contact: 'cablate',
       info: [
         { label: 'Github', value: 'cablate' },
@@ -74,7 +74,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('frontendDeveloper'),
+      title: t('frontend-developer'),
       contact: 'cstrikeasia',
       info: [
         { label: 'Github', value: 'cstrikeasia' },
@@ -82,7 +82,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('machineNetwork'),
+      title: t('machine-network'),
       contact: 'Cooookie16',
       info: [
         { label: 'Github', value: 'Cooookie16' },
@@ -90,7 +90,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('machineNetwork'),
+      title: t('machine-network'),
       contact: 'yayacat',
       info: [
         { label: 'Github', value: 'yayacat' },
@@ -98,7 +98,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('machineNetwork'),
+      title: t('machine-network'),
       contact: 'codingbear',
       info: [
         { label: 'Github', value: 'mcg25035' },
@@ -106,7 +106,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('technicalSupport'),
+      title: t('technical-support'),
       contact: 'orlys',
       info: [
         { label: 'Github', value: 'Orlys' },
@@ -114,7 +114,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('technicalSupport'),
+      title: t('technical-support'),
       contact: '5026',
       info: [
         { label: 'Github', value: 'SN-Koarashi' },
@@ -122,12 +122,12 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: t('customerService'),
+      title: t('customer-service'),
       contact: 'lingyu1121',
       info: [{ label: 'Discord', value: '371580417096155137' }],
     },
     {
-      title: t('customerService'),
+      title: t('customer-service'),
       contact: 'goujuanji_',
       info: [{ label: 'Discord', value: '415152218690420736' }],
     },
@@ -146,7 +146,7 @@ const AboutPopup: React.FC = React.memo(() => {
               COPYRIGHT @ {currentYear} RiceCall.com ,ALL RIGHTS RESERVED.
             </div>
 
-            <MarkdownViewer markdownText={t('readmeContent')} />
+            <MarkdownViewer markdownText={t('readme')} />
 
             <a
               className={aboutUs['websiteLink']}
@@ -156,7 +156,7 @@ const AboutPopup: React.FC = React.memo(() => {
                 ipcService.window.openExternal('https://discord.com/invite/adCWzv6wwS');
               }}
             >
-              {t('getHelp')}
+              {t('get-help')}
             </a>
             <a
               className={aboutUs['websiteLink']}
@@ -166,7 +166,7 @@ const AboutPopup: React.FC = React.memo(() => {
                 ipcService.window.openExternal('https://github.com/NerdyHomeReOpen/RiceCall');
               }}
             >
-              {t('projectRepo')}
+              {t('project-repo')}
             </a>
             <a
               className={aboutUs['websiteLink']}
@@ -176,7 +176,7 @@ const AboutPopup: React.FC = React.memo(() => {
                 ipcService.window.openExternal('http://ricecall.com.tw');
               }}
             >
-              {t('officialWebsite')}
+              {t('official-website')}
             </a>
           </div>
 
@@ -246,7 +246,7 @@ const AboutPopup: React.FC = React.memo(() => {
             }}
           />
           <div>
-            <div className={popup['label']}>{t('dontShowNextTime')}</div>
+            <div className={popup['label']}>{t('dont-show-next-time')}</div>
           </div>
         </div>
         <button

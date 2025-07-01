@@ -61,7 +61,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     // Handlers
     const handleDeleteFriendGroup = (friendGroupId: FriendGroup['friendGroupId'], userId: User['userId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(t('deleteFriendGroupDialog').replace('{0}', friendGroupName), () =>
+      handleOpenWarningDialog(t('confirm-delete-friend-group').replace('{0}', friendGroupName), () =>
         socket.send.deleteFriendGroup({ friendGroupId, userId }),
       );
     };
@@ -97,14 +97,14 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
             const y = e.clientY;
             contextMenu.showContextMenu(x, y, false, false, [
               {
-                id: 'edit',
-                label: t('renameFriendGroup'),
+                id: 'edit-friend-group',
+                label: t('edit-friend-group'),
                 show: canManageFriendGroup,
                 onClick: () => handleOpenEditFriendGroup(friendGroupId, userId),
               },
               {
-                id: 'delete',
-                label: t('friendDeleteGroup'),
+                id: 'delete-friend-group',
+                label: t('delete-friend-group'),
                 show: canManageFriendGroup,
                 onClick: () => handleDeleteFriendGroup(friendGroupId, userId),
               },

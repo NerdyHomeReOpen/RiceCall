@@ -133,7 +133,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
         >
           {isLoading && (
             <>
-              <div className={styles['loadingIndicator']}>{t('onLogin')}</div>
+              <div className={styles['loadingIndicator']}>{t('on-login')}</div>
               <div className={styles['loadingBar']} />
             </>
           )}
@@ -148,7 +148,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     value={formData.account}
                     onChange={handleInputChange}
                     onBlur={() => {}}
-                    placeholder={t('pleaseInputAccount')}
+                    placeholder={t('please-input-account')}
                     className={styles['input']}
                   />
                   <div
@@ -195,7 +195,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     value={formData.password}
                     onChange={handleInputChange}
                     onBlur={() => {}}
-                    placeholder={t('pleaseInputPassword')}
+                    placeholder={t('please-input-password')}
                     className={styles['input']}
                   />
                 </div>
@@ -211,7 +211,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     className={styles['check']}
                     tabIndex={-1}
                   />
-                  {t('rememberAccount')}
+                  {t('remember-account')}
                 </div>
                 <div className={styles['checkBox']}>
                   <input
@@ -223,7 +223,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     className={styles['check']}
                     tabIndex={-1}
                   />
-                  {t('autoLogin')}
+                  {t('auto-login')}
                 </div>
               </div>
               <button
@@ -246,9 +246,16 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
             setSection('register');
           }}
         >
-          {t('registerAccount')}
+          {t('register-account')}
         </div>
-        <div className={styles['forgetPassword']}>{t('forgotPassword')}</div>
+        <div
+          className={styles['forgetPassword']}
+          onClick={() => {
+            /*TODO: handleForgotPassword() */
+          }}
+        >
+          {t('forgot-password')}
+        </div>
       </div>
     </div>
   );

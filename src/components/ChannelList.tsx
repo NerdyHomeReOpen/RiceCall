@@ -105,7 +105,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
 
     const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
       if (!serverReceiveApply) {
-        handleOpenAlertDialog(t('cannotApply'));
+        handleOpenAlertDialog(t('cannot-apply'));
         return;
       }
       ipcService.popup.open(PopupType.APPLY_MEMBER, 'applyMember');
@@ -240,8 +240,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                         onClick: () => handleOpenApplyMember(userId, serverId),
                       },
                       {
-                        id: 'memberManagement',
-                        label: '會員管理',
+                        id: 'member-management',
+                        label: t('member-management'),
                         show: canOpenSettings,
                         icon: 'memberManagement',
                         onClick: () => handleOpenServerSetting(userId, serverId),
@@ -252,15 +252,15 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                         label: '',
                       },
                       {
-                        id: 'editNickname',
-                        label: t('editNickname'),
+                        id: 'edit-nickname',
+                        label: t('edit-member-card'),
                         icon: 'editGroupcard',
                         show: canEditNickname,
                         onClick: () => handleOpenEditNickname(userId, serverId),
                       },
                       {
-                        id: 'locateMe',
-                        label: t('locateMe'),
+                        id: 'locate-me',
+                        label: t('locate-me'),
                         icon: 'locateme',
                         onClick: () => handleLocateUser(),
                       },
@@ -270,7 +270,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                       },
                       {
                         id: 'report',
-                        label: '舉報', // TODO: lang.tr
+                        label: t('report'),
                         disabled: true,
                         onClick: () => {
                           /* TODO: handleOpenReport */
@@ -313,7 +313,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
         {/* Mic Queue */}
         {currentChannelVoiceMode === 'queue' && (
           <>
-            <div className={styles['sectionTitle']}>{t('micOrder')}</div>
+            <div className={styles['sectionTitle']}>{t('mic-order')}</div>
             <div className={styles['micQueueBox']}>
               <div className={styles['userList']}>
                 {/* {micQueueUsers.map((user) => (
@@ -331,7 +331,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
         )}
 
         {/* Channel List Title */}
-        <div className={styles['sectionTitle']}>{view === 'current' ? t('currentChannel') : t('allChannel')}</div>
+        <div className={styles['sectionTitle']}>{view === 'current' ? t('current-channel') : t('all-channel')}</div>
 
         {/* Channel List */}
         <div className={styles['scrollView']}>
@@ -403,7 +403,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
             `}
             onClick={() => setView('current')}
           >
-            {t('currentChannel')}
+            {t('current-channel')}
           </div>
           <div
             className={`
@@ -413,7 +413,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
             `}
             onClick={() => setView('all')}
           >
-            {t('allChannel')}
+            {t('all-channel')}
           </div>
         </div>
       </>

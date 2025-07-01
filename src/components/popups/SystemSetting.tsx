@@ -54,7 +54,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         {/* Sidebar */}
         <div className={setting['left']}>
           <div className={setting['tabs']}>
-            {[t('basicSettings'), t('voiceSettings')].map((title, index) => (
+            {[t('basic-settings'), t('voice-settings')].map((title, index) => (
               <div
                 className={`${setting['item']} ${activeTabIndex === index ? setting['active'] : ''}`}
                 onClick={() => setActiveTabIndex(index)}
@@ -69,7 +69,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         {/* System Settings */}
         <div className={setting['right']} style={activeTabIndex === 0 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('generalSettings')}</div>
+            <div className={popup['label']}>{t('general-settings')}</div>
             <div className={popup['inputGroup']}>
               <div className={`${popup['inputBox']} ${popup['row']}`}>
                 <input
@@ -79,8 +79,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   onChange={(e) => setAutoLaunch(e.target.checked)}
                 />
                 <div>
-                  <div className={popup['label']}>{t('autoStartup')}</div>
-                  <div className={popup['hint']}>{t('autoStartupDescription')}</div>
+                  <div className={popup['label']}>{t('auto-startup')}</div>
+                  <div className={popup['hint']}>{t('auto-startup-description')}</div>
                 </div>
               </div>
 
@@ -92,8 +92,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   onChange={(e) => setMinimizeToTray(e.target.checked)}
                 />
                 <div>
-                  <div className={popup['label']}>{t('minimizeToTray') + t('soon')}</div>
-                  <div className={popup['hint']}>{t('minimizeToTrayDescription')}</div>
+                  <div className={popup['label']}>{`${t('minimize-to-tray')} ${t('soon')}`}</div>
+                  <div className={popup['hint']}>{t('minimize-to-tray-description')}</div>
                 </div>
               </div>
               <div className={`${popup['inputBox']} ${popup['row']} ${popup['disabled']}`}>
@@ -104,8 +104,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   onChange={(e) => setStartMinimized(e.target.checked)}
                 />
                 <div>
-                  <div className={popup['label']}>{t('startMinimized') + t('soon')}</div>
-                  <div className={popup['hint']}>{t('startMinimizedDescription')}</div>
+                  <div className={popup['label']}>{`${t('start-minimized')} ${t('soon')}`}</div>
+                  <div className={popup['hint']}>{t('start-minimized-description')}</div>
                 </div>
               </div>
 
@@ -117,8 +117,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   onChange={(e) => setSoundEffect(e.target.checked)}
                 />
                 <div>
-                  <div className={popup['label']}>{t('notificationSound')}</div>
-                  <div className={popup['hint']}>{t('notificationSoundDescription')}</div>
+                  <div className={popup['label']}>{t('notification-sound')}</div>
+                  <div className={popup['hint']}>{t('notification-sound-description')}</div>
                 </div>
               </div>
             </div>
@@ -128,10 +128,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         {/* Voice Settings */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('voiceSettings')}</div>
+            <div className={popup['label']}>{t('voice-settings')}</div>
             <div className={popup['inputGroup']}>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('inputDevice')}</div>
+                <div className={popup['label']}>{t('input-device')}</div>
                 <div className={popup['selectBox']}>
                   <select
                     value={selectedInput}
@@ -141,7 +141,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     }}
                   >
                     <option value="">
-                      {t('defaultMicrophone')} ({inputDevices[0]?.label || t('unknownDevice')})
+                      {t('default-microphone')} ({inputDevices[0]?.label || t('unknown-device')})
                     </option>
                     {inputDevices.map((device) => (
                       <option key={device.deviceId} value={device.deviceId}>
@@ -152,7 +152,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 </div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('outputDevice')}</div>
+                <div className={popup['label']}>{t('output-device')}</div>
                 <div className={popup['selectBox']}>
                   <select
                     value={selectedOutput}
@@ -162,7 +162,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     }}
                   >
                     <option value="">
-                      {t('defaultSpeaker')} ({outputDevices[0]?.label || t('unknownDevice')})
+                      {t('default-speaker')} ({outputDevices[0]?.label || t('unknown-device')})
                     </option>
                     {outputDevices.map((device) => (
                       <option key={device.deviceId} value={device.deviceId}>

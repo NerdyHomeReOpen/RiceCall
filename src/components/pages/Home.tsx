@@ -49,7 +49,7 @@ const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, serv
           `}
           onClick={() => setExpanded(!expanded)}
         >
-          {expanded ? t('viewLess') : t('viewMore')}
+          {expanded ? t('view-less') : t('view-more')}
         </button>
       )}
     </div>
@@ -253,16 +253,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   useEffect(() => {
     ipcService.discord.updatePresence({
-      details: t('RPCHomePage'),
-      state: `${t('RPCUser')} ${userName}`,
+      details: t('rpc:home-page'),
+      state: `${t('rpc:user')} ${userName}`,
       largeImageKey: 'app_icon',
       largeImageText: 'RC Voice',
       smallImageKey: 'home_icon',
-      smallImageText: t('RPCHome'),
+      smallImageText: t('rpc:home-page'),
       timestamp: Date.now(),
       buttons: [
         {
-          label: t('RPCJoinServer'),
+          label: t('rpc:join-server'),
           url: 'https://discord.gg/adCWzv6wwS',
         },
       ],
@@ -278,7 +278,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={homePage['forwardBtn']} />
           <div className={homePage['searchBar']} ref={searchRef}>
             <input
-              placeholder={t('searchPlaceholder')}
+              placeholder={t('search-placeholder')}
               className={homePage['searchInput']}
               value={searchQuery}
               onChange={(e) => {
@@ -305,7 +305,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                     className={`${homePage['dropdownHeaderText']} ${homePage['exactMatch']}`}
                     style={exactMatch ? {} : { display: 'none' }}
                   >
-                    {t('quickEnterServer')}
+                    {t('quick-enter-server')}
                   </div>
                   <SearchResultItem
                     key={exactMatch.serverId}
@@ -319,7 +319,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               {personalResults.length > 0 && (
                 <>
                   <div className={homePage['dropdownHeaderText']}>
-                    <div>{t('personalExclusive')}</div>
+                    <div>{t('personal-exclusive')}</div>
                   </div>
                   {personalResults.map((server) => (
                     <SearchResultItem
@@ -335,7 +335,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               {relatedResults.length > 0 && (
                 <>
                   <div className={homePage['dropdownHeaderText']}>
-                    <div>{t('relatedSearch')}</div>
+                    <div>{t('related-search')}</div>
                   </div>
                   {relatedResults.map((server) => (
                     <SearchResultItem
@@ -384,10 +384,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
         <div className={homePage['right']}>
           <div className={homePage['navegateItem']} data-key="30014" onClick={() => handleOpenCreateServer(userId)}>
-            {t('createServers')}
+            {t('create-servers')}
           </div>
           <div className={homePage['navegateItem']} data-key="60004" onClick={() => setSection(3)}>
-            {t('personalExclusive')}
+            {t('personal-exclusive')}
           </div>
         </div>
       </header>
@@ -401,14 +401,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
       {/* Personal Exclusive */}
       <main className={homePage['homeContent']} style={section === 3 ? {} : { display: 'none' }}>
-        <ServerListSection title={t('recentVisits')} servers={recentServers} user={user} />
-        <ServerListSection title={t('myServers')} servers={ownedServers} user={user} />
-        <ServerListSection title={t('favoriteServers')} servers={favoriteServers} user={user} />
+        <ServerListSection title={t('recent-servers')} servers={recentServers} user={user} />
+        <ServerListSection title={t('my-servers')} servers={ownedServers} user={user} />
+        <ServerListSection title={t('favorite-servers')} servers={favoriteServers} user={user} />
       </main>
 
       {/* Not Available */}
       <main className={homePage['homeContent']} style={section === 1 || section === 2 ? {} : { display: 'none' }}>
-        <div>{t('notAvailablePageMessage')}</div>
+        <div>{t('not-available-page-message')}</div>
       </main>
     </div>
   );

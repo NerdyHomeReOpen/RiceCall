@@ -370,7 +370,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleChangeOrder(currentIndex, currentIndex - 1);
           }}
         >
-          {t('moveUp')}
+          {t('move-up')}
         </div>
 
         <div
@@ -383,7 +383,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleChangeOrder(currentIndex, currentIndex + 1);
           }}
         >
-          {t('moveDown')}
+          {t('move-down')}
         </div>
 
         <div
@@ -396,7 +396,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleChangeOrder(currentIndex, 0);
           }}
         >
-          {t('moveTop')}
+          {t('move-top')}
         </div>
 
         <div
@@ -409,7 +409,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             handleChangeOrder(currentIndex, groupChannels.length - 1);
           }}
         >
-          {t('moveBottom')}
+          {t('move-bottom')}
         </div>
       </div>
 

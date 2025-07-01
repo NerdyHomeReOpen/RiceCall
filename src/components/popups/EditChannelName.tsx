@@ -77,7 +77,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('channelNameLabel')}</div>
+              <div className={popup['label']}>{t('channel-name-label')}</div>
               <input
                 name="name"
                 type="text"

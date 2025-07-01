@@ -8,14 +8,14 @@ export const getPermissionText = (t: TFunction<'translation', undefined>, permis
   const permissionMap: Record<number, string> = {
     [Permission.Guest]: t('guest'), // 1
     [Permission.Member]: t('member'), // 2
-    [Permission.ChannelAdmin]: t('channelAdmin'), // 3
-    [Permission.ChannelManager]: t('channelManager'), // 4
-    [Permission.ServerAdmin]: t('serverAdmin'), // 5
-    [Permission.ServerOwner]: t('serverOwner'), // 6
+    [Permission.ChannelAdmin]: t('category-admin'), // 3
+    [Permission.ChannelManager]: t('channel-manager'), // 4
+    [Permission.ServerAdmin]: t('server-admin'), // 5
+    [Permission.ServerOwner]: t('server-owner'), // 6
     [Permission.Official]: t('official'), // 7
-    [Permission.EventStaff]: t('eventStaff'), // 8
+    [Permission.EventStaff]: t('event-staff'), // 8
   };
-  return permissionMap[permission] || t('unknownUser');
+  return permissionMap[permission] || t('unknown-user');
 };
 
 export const getFormatTimeDiff = (t: TFunction<'translation', undefined>, timestamp: number): string => {
@@ -39,14 +39,14 @@ export const getFormatTimeDiff = (t: TFunction<'translation', undefined>, timest
       const count = Math.floor(absDiff / interval.seconds);
       if (count >= 1) {
         const label = interval.label;
-        const timesAgo = t('timesAgo');
-        const timesFuture = t('timesFuture');
+        const timesAgo = t('times-ago');
+        const timesFuture = t('times-future');
         return isFuture ? timesFuture.replace('{0}', `${count}${label}`) : timesAgo.replace('{0}', `${count}${label}`);
       }
     }
   }
 
-  return t('justNow');
+  return t('just-now');
 };
 
 export const getFormatTimestamp = (t: TFunction<'translation', undefined>, timestamp: number): string => {
@@ -137,7 +137,6 @@ export const getTranslatedMessage = (
   //   // Alert Messages
   //   content = content.replace('channelAlert', '頻道廣播');
   //   content = content.replace('serverAlert', '群廣播');
-
 
   // Replace Params
   content = content.replace(/{(\w+)}/gm, (match, p1) => params?.[p1] || match);

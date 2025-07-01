@@ -53,7 +53,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
         <div className={broadcast['content']}>
           <div className={`${popup['inputGroup']}`}>
             <div className={`${popup['row']}`}>
-              <div className={`${popup['label']} ${broadcast['label']}`}>{t('receiveChannel')}</div>
+              <div className={`${popup['label']} ${broadcast['label']}`}>{t('receive-channel')}</div>
               <div className={broadcast['inputBox']}>
                 <div className={`${popup['row']}`}>
                   <input
@@ -65,7 +65,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                     }}
                   />
                   <div>
-                    <div className={popup['label']}>{t('currentChannel')}</div>
+                    <div className={popup['label']}>{t('current-channel')}</div>
                   </div>
                 </div>
                 <div className={`${popup['row']}`}>
@@ -78,13 +78,13 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                     }}
                   />
                   <div>
-                    <div className={popup['label']}>{t('allChannel')}</div>
+                    <div className={popup['label']}>{t('all-channel')}</div>
                   </div>
                 </div>
               </div>
             </div>
             <div className={`${popup['row']}`}>
-              <div className={`${popup['label']} ${broadcast['label']}`}>{t('broadcast')}</div>
+              <div className={`${popup['label']} ${broadcast['label']}`}>{t('server-broadcast')}</div>
               <div className={broadcast['inputBox']}>
                 <div className={`${popup['row']}`}>
                   <input
@@ -96,7 +96,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                     }}
                   />
                   <div>
-                    <div className={popup['label']}>{t('textBroadcast')}</div>
+                    <div className={popup['label']}>{t('text-broadcast')}</div>
                   </div>
                 </div>
                 <div className={`${popup['row']} ${popup['disabled']}`}>
@@ -109,7 +109,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                     }}
                   />
                   <div>
-                    <div className={popup['label']}>{`${t('voiceBroadcast')} ${t('soon')}`}</div>
+                    <div className={popup['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
                   </div>
                 </div>
               </div>
@@ -117,7 +117,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
           </div>
           <div className={`${popup['inputGroup']} ${popup['row']}`}>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('broadcastContent')}</div>
+              <div className={popup['label']}>{t('broadcast-content')}</div>
               <textarea
                 name="content"
                 maxLength={300}
@@ -126,7 +126,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                 }}
               />
               <div className={broadcast['labelArea']}>
-                <div className={`${popup['label']} ${popup['disabled']}`}>{t('supportLink')}</div>
+                <div className={`${popup['label']} ${popup['disabled']}`}>{t('support-link')}</div>
                 <div className={broadcast['messageInputLength']}>
                   {broadcastContent.length}/{maxLength}
                 </div>

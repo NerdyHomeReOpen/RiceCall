@@ -92,8 +92,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const canBan = canManageMember;
     const canMoveToChannel =
       isServerManager && userPermission >= memberPermission && memberCurrentChannelId !== currentChannelId;
-    const canMute = !isCurrentUser && !isMutedByUser;
-    const canUnmute = !isCurrentUser && isMutedByUser;
     const canRemoveMembership = isCurrentUser && userPermission > 1 && userPermission < 6;
 
     // Handlers
@@ -109,7 +107,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
 
     const handleKickServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
       if (!socket) return;
-      handleOpenAlertDialog(t('confirmKickServer', { userName: userName }), () => {
+      handleOpenAlertDialog(t('confirm-kick-server', { userName: userName }), () => {
         socket.send.disconnectServer({ userId, serverId });
       });
     };
@@ -121,7 +119,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       userName: User['name'],
     ) => {
       if (!socket) return;
-      handleOpenAlertDialog(t('confirmKickChannel', { userName: userName }), () => {
+      handleOpenAlertDialog(t('confirm-kick-channel', { userName: userName }), () => {
         socket.send.disconnectChannel({ userId, channelId, serverId });
       });
     };
@@ -193,7 +191,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     ) => {
       if (!socket) return;
       handleOpenAlertDialog(
-        t('confirmRemoveMembership', { userName: memberId === userId ? t('self') : `${memberName}` }),
+        t('confirm-remove-membership', { userName: memberId === userId ? t('self') : `${memberName}` }),
         () => {
           handleEditMember({ permissionLevel: 1, nickname: null }, memberId, serverId);
         },
@@ -255,32 +253,25 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           contextMenu.showContextMenu(x, y, false, false, [
             {
               id: 'direct-message',
-              label: t('directMessage'),
+              label: t('direct-message'),
               show: !isCurrentUser,
               onClick: () => handleOpenDirectMessage(userId, memberUserId, memberName),
             },
             {
               id: 'view-profile',
-              label: t('viewProfile'),
+              label: t('view-profile'),
               onClick: () => handleOpenUserInfo(userId, memberUserId),
             },
             {
-              id: 'apply-friend',
-              label: t('addFriend'),
+              id: 'add-friend',
+              label: t('add-friend'),
               show: canApplyFriend,
               onClick: () => handleOpenApplyFriend(userId, memberUserId),
             },
             {
-              id: 'mute',
-              label: t('mute'),
-              show: canMute,
-              onClick: () => handleMuteUser(memberUserId),
-            },
-            {
-              id: 'unmute',
-              label: t('unmute'),
-              show: canUnmute,
-              onClick: () => handleUnmuteUser(memberUserId),
+              id: 'set-mute',
+              label: isMutedByUser ? t('unmute-user') : t('mute-user'),
+              onClick: () => (isMutedByUser ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
             },
             {
               id: 'edit-nickname',
@@ -295,7 +286,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'move-to-channel',
-              label: t('moveToChannel'),
+              label: t('move-to-channel'),
               show: canMoveToChannel,
               onClick: () => handleMoveToChannel(memberUserId, serverId, currentChannelId),
             },
@@ -306,21 +297,21 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'forbid-voice',
-              label: t('forbidVoice'),
+              label: t('forbid-voice'),
               show: canManageMember,
               disabled: true,
               onClick: () => {},
             },
             {
               id: 'forbid-text',
-              label: t('forbidText'),
+              label: t('forbid-text'),
               show: canManageMember,
               disabled: true,
               onClick: () => {},
             },
             {
               id: 'kick-channel',
-              label: t('kickChannel'),
+              label: t('kick-channel'),
               show: canKickChannel,
               onClick: () => {
                 handleKickChannel(memberUserId, memberCurrentChannelId, serverId, memberNickname || memberName);
@@ -328,7 +319,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'kick-server',
-              label: t('kickServer'),
+              label: t('kick-server'),
               show: canKickServer,
               onClick: () => {
                 handleKickServer(memberUserId, serverId, memberNickname || memberName);
@@ -349,7 +340,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'remove-self-membership',
-              label: t('removeSelfMembership'),
+              label: t('remove-self-membership'),
               show: canRemoveMembership,
               onClick: () => {
                 handleRemoveMembership(userId, serverId);
@@ -357,7 +348,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'send-member-application',
-              label: t('sendMemberApplication'),
+              label: t('send-member-application'),
               show: canManageMember && memberPermission === 1,
               disabled: true,
               onClick: () => {
@@ -366,38 +357,38 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             },
             {
               id: 'member-management',
-              label: t('memberManagement'),
+              label: t('member-management'),
               show: canManageMember && memberPermission > 1,
               icon: 'submenu',
               hasSubmenu: true,
               submenuItems: [
                 {
                   id: 'set-guest',
-                  label: t('setGuest'),
+                  label: t('set-guest'),
                   show: canChangeToGuest,
                   onClick: () => handleRemoveMembership(memberUserId, serverId, memberNickname || memberName),
                 },
                 {
                   id: 'set-member',
-                  label: t('setMember'),
+                  label: t('set-member'),
                   show: canChangeToMember,
                   onClick: () => handleEditMember({ permissionLevel: 2 }, memberUserId, serverId),
                 },
                 {
                   id: 'set-channel-admin',
-                  label: t('setChannelAdmin'),
+                  label: t('set-channel-admin'),
                   show: canChangeToChannelAdmin,
                   onClick: () => handleEditMember({ permissionLevel: 3 }, memberUserId, serverId),
                 },
                 {
                   id: 'set-category-admin',
-                  label: t('setCategoryAdmin'),
+                  label: t('set-category-admin'),
                   show: canChangeToCategoryAdmin,
                   onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId),
                 },
                 {
                   id: 'set-admin',
-                  label: t('setAdmin'),
+                  label: t('set-admin'),
                   show: canChangeToAdmin,
                   onClick: () => handleEditMember({ permissionLevel: 5 }, memberUserId, serverId),
                 },

@@ -281,7 +281,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
             contextMenu.showContextMenu(x, y, false, false, [
               {
                 id: 'system-setting',
-                label: t('systemSettings'),
+                label: t('system-setting'),
                 icon: 'setting',
                 onClick: () => handleOpenSystemSetting(),
               },
@@ -293,7 +293,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
               // },
               {
                 id: 'change-theme',
-                label: t('changeTheme'),
+                label: t('change-theme'),
                 icon: 'skin',
                 onClick: () => handleOpenChangeTheme(),
               },
@@ -307,7 +307,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
               },
               {
                 id: 'language-select',
-                label: t('languageSelect'),
+                label: t('language-select'),
                 icon: 'submenu',
                 hasSubmenu: true,
                 submenuItems: [
@@ -345,7 +345,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
               },
               {
                 id: 'help-center',
-                label: t('helpCenter'),
+                label: t('help-center'),
                 icon: 'submenu',
                 hasSubmenu: true,
                 submenuItems: [
@@ -372,14 +372,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                   },
                   {
                     id: 'contact-us',
-                    label: t('contactUs'),
+                    label: t('contact-us'),
                     onClick: () => {
                       window.open('https://ricecall.com.tw/contactus', '_blank');
                     },
                   },
                   {
                     id: 'about-us',
-                    label: t('aboutUs'),
+                    label: t('about-ricecall'),
                     onClick: () => handleOpenAboutUs(),
                   },
                 ],

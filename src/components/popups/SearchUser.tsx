@@ -72,7 +72,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         <div className={setting['body']}>
           <div className={popup['inputGroup']}>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('pleaseInputFriendAccount')}</div>
+              <div className={popup['label']}>{t('please-input-friend-account')}</div>
               <input
                 name="query"
                 type="text"
