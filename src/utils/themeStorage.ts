@@ -1,16 +1,11 @@
 export const THEME_CHANGE_EVENT = 'themeChange';
 
-export function setThemeValue(
-  key: 'theme-header-image' | 'theme-main-color' | 'theme-secondary-color',
-  value: string,
-) {
+export function setThemeValue(key: 'theme-header-image' | 'theme-main-color' | 'theme-secondary-color', value: string) {
   localStorage.setItem(key, value);
   window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT));
 }
 
-export function removeThemeValue(
-  key: 'theme-header-image' | 'theme-main-color' | 'theme-secondary-color',
-) {
+export function removeThemeValue(key: 'theme-header-image' | 'theme-main-color' | 'theme-secondary-color') {
   localStorage.removeItem(key);
   window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT));
 }

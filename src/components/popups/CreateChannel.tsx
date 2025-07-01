@@ -5,7 +5,7 @@ import { Channel, Server } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -23,109 +23,99 @@ interface CreateChannelPopupProps {
   serverId: Server['serverId'];
 }
 
-const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(
-  ({ channelId, serverId }) => {
-    // Hooks
-    const socket = useSocket();
-    const lang = useLanguage();
+const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ channelId, serverId }) => {
+  // Hooks
+  const socket = useSocket();
+  const { t } = useTranslation();
 
-    // Refs
-    const refreshRef = useRef(false);
+  // Refs
+  const refreshRef = useRef(false);
 
-    // States
-    const [parent, setParent] = useState<Channel>(Default.channel());
-    const [channel, setChannel] = useState<Channel>(Default.channel());
+  // States
+  const [parent, setParent] = useState<Channel>(Default.channel());
+  const [channel, setChannel] = useState<Channel>(Default.channel());
 
-    // Variables
-    const { name: parentName } = parent;
-    const { name: channelName } = channel;
-    const canCreate = channelName.trim();
+  // Variables
+  const { name: parentName } = parent;
+  const { name: channelName } = channel;
+  const canCreate = channelName.trim();
 
-    const handleCreateChannel = (
-      channel: Partial<Channel>,
-      serverId: Server['serverId'],
-    ) => {
-      if (!socket) return;
-      socket.send.createChannel({ channel, serverId });
+  const handleCreateChannel = (channel: Partial<Channel>, serverId: Server['serverId']) => {
+    if (!socket) return;
+    socket.send.createChannel({ channel, serverId });
+  };
+
+  const handleClose = () => {
+    ipcService.window.close();
+  };
+
+  // Effects
+  useEffect(() => {
+    if (!channelId || refreshRef.current) return;
+    const refresh = async () => {
+      refreshRef.current = true;
+      Promise.all([
+        getService.channel({
+          channelId: channelId,
+        }),
+      ]).then(([parent]) => {
+        if (parent) {
+          setParent(parent);
+        }
+      });
     };
+    refresh();
+  }, [channelId]);
 
-    const handleClose = () => {
-      ipcService.window.close();
-    };
-
-    // Effects
-    useEffect(() => {
-      if (!channelId || refreshRef.current) return;
-      const refresh = async () => {
-        refreshRef.current = true;
-        Promise.all([
-          getService.channel({
-            channelId: channelId,
-          }),
-        ]).then(([parent]) => {
-          if (parent) {
-            setParent(parent);
-          }
-        });
-      };
-      refresh();
-    }, [channelId]);
-
-    return (
-      <div className={popup['popupContainer']}>
-        {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['inputGroup']}>
-              <div className={popup['inputBox']}>
-                <div className={popup['label']}>{lang.tr.parentChannel}</div>
-                <div className={popup['label']}>
-                  {parentName || lang.tr.none}
-                </div>
-              </div>
-              <div className={popup['inputBox']}>
-                <div className={popup['label']}>{lang.tr.channelName}</div>
-                <input
-                  name="name"
-                  type="text"
-                  value={channelName}
-                  maxLength={32}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      name: e.target.value,
-                    }))
-                  }
-                  required
-                />
-              </div>
+  return (
+    <div className={popup['popupContainer']}>
+      {/* Body */}
+      <div className={popup['popupBody']}>
+        <div className={setting['body']}>
+          <div className={popup['inputGroup']}>
+            <div className={popup['inputBox']}>
+              <div className={popup['label']}>{t('parent-channel')}</div>
+              <div className={popup['label']}>{parentName || t('none')}</div>
+            </div>
+            <div className={popup['inputBox']}>
+              <div className={popup['label']}>{t('channel-name')}</div>
+              <input
+                name="name"
+                type="text"
+                value={channelName}
+                maxLength={32}
+                onChange={(e) =>
+                  setChannel((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
+                required
+              />
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button
-            className={popup['button']}
-            disabled={!canCreate}
-            onClick={() => {
-              handleCreateChannel(
-                { name: channelName, categoryId: channelId },
-                serverId,
-              );
-              handleClose();
-            }}
-          >
-            {lang.tr.confirm}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.cancel}
-          </button>
-        </div>
       </div>
-    );
-  },
-);
+
+      {/* Footer */}
+      <div className={popup['popupFooter']}>
+        <button
+          className={popup['button']}
+          disabled={!canCreate}
+          onClick={() => {
+            handleCreateChannel({ name: channelName, categoryId: channelId }, serverId);
+            handleClose();
+          }}
+        >
+          {t('confirm')}
+        </button>
+        <button className={popup['button']} onClick={() => handleClose()}>
+          {t('cancel')}
+        </button>
+      </div>
+    </div>
+  );
+});
 
 CreateChannelPopup.displayName = 'CreateChannelPopup';
 

@@ -9,16 +9,18 @@ const version = packageJson.version;
 import popup from '@/styles/popup.module.css';
 import aboutUs from '@/styles/popups/aboutUs.module.css';
 
+// Providers
+import { useTranslation } from 'react-i18next';
+
+// Components
+import MarkdownViewer from '@/components/MarkdownViewer';
+
 // Services
 import ipcService from '@/services/ipc.service';
 
-// Providers
-import { useLanguage } from '@/providers/Language';
-import MarkdownViewer from '../MarkdownViewer';
-
 const AboutPopup: React.FC = React.memo(() => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // States
   const [dontShowNextTime, setDontShowNextTime] = useState(false);
@@ -28,28 +30,19 @@ const AboutPopup: React.FC = React.memo(() => {
     ipcService.window.close();
   };
 
-  // Types
-  type JobTitle =
-    | typeof lang.tr.mainDeveloper
-    | typeof lang.tr.backendDeveloper
-    | typeof lang.tr.frontendDeveloper
-    | typeof lang.tr.machineNetwork
-    | typeof lang.tr.technicalSupport
-    | typeof lang.tr.customerService;
-
   // Variables
-  const titleColorClasses: Record<JobTitle, string> = {
-    [lang.tr.mainDeveloper]: aboutUs.mainDeveloper,
-    [lang.tr.backendDeveloper]: aboutUs.backendDeveloper,
-    [lang.tr.frontendDeveloper]: aboutUs.frontendDeveloper,
-    [lang.tr.machineNetwork]: aboutUs.machineNetwork,
-    [lang.tr.technicalSupport]: aboutUs.technicalSupport,
-    [lang.tr.customerService]: aboutUs.customerService,
+  const titleColorClasses: Record<string, string> = {
+    [t('main-developer')]: aboutUs.mainDeveloper,
+    [t('backend-developer')]: aboutUs.backendDeveloper,
+    [t('frontend-developer')]: aboutUs.frontendDeveloper,
+    [t('machine-network')]: aboutUs.machineNetwork,
+    [t('technical-support')]: aboutUs.technicalSupport,
+    [t('customer-service')]: aboutUs.customerService,
   };
   const currentYear = new Date().getFullYear();
   const teamMembers = [
     {
-      title: lang.tr.mainDeveloper,
+      title: t('main-developer'),
       contact: 'JoshHuang9508',
       info: [
         { label: 'Github', value: 'JoshHuang9508' },
@@ -57,7 +50,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.mainDeveloper,
+      title: t('main-developer'),
       contact: 'yeci226',
       info: [
         { label: 'Github', value: 'yeci226' },
@@ -65,7 +58,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.backendDeveloper,
+      title: t('backend-developer'),
       contact: 'yuusukealmal',
       info: [
         { label: 'Github', value: 'yuusukealmal' },
@@ -73,7 +66,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.frontendDeveloper,
+      title: t('frontend-developer'),
       contact: 'cablate',
       info: [
         { label: 'Github', value: 'cablate' },
@@ -81,7 +74,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.frontendDeveloper,
+      title: t('frontend-developer'),
       contact: 'cstrikeasia',
       info: [
         { label: 'Github', value: 'cstrikeasia' },
@@ -89,7 +82,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.machineNetwork,
+      title: t('machine-network'),
       contact: 'Cooookie16',
       info: [
         { label: 'Github', value: 'Cooookie16' },
@@ -97,7 +90,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.machineNetwork,
+      title: t('machine-network'),
       contact: 'yayacat',
       info: [
         { label: 'Github', value: 'yayacat' },
@@ -105,7 +98,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.machineNetwork,
+      title: t('machine-network'),
       contact: 'codingbear',
       info: [
         { label: 'Github', value: 'mcg25035' },
@@ -113,7 +106,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.technicalSupport,
+      title: t('technical-support'),
       contact: 'orlys',
       info: [
         { label: 'Github', value: 'Orlys' },
@@ -121,7 +114,7 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.technicalSupport,
+      title: t('technical-support'),
       contact: '5026',
       info: [
         { label: 'Github', value: 'SN-Koarashi' },
@@ -129,12 +122,12 @@ const AboutPopup: React.FC = React.memo(() => {
       ],
     },
     {
-      title: lang.tr.customerService,
+      title: t('customer-service'),
       contact: 'lingyu1121',
       info: [{ label: 'Discord', value: '371580417096155137' }],
     },
     {
-      title: lang.tr.customerService,
+      title: t('customer-service'),
       contact: 'goujuanji_',
       info: [{ label: 'Discord', value: '415152218690420736' }],
     },
@@ -153,31 +146,27 @@ const AboutPopup: React.FC = React.memo(() => {
               COPYRIGHT @ {currentYear} RiceCall.com ,ALL RIGHTS RESERVED.
             </div>
 
-            <MarkdownViewer markdownText={lang.tr.readmeContent} />
+            <MarkdownViewer markdownText={t('readme')} />
 
             <a
               className={aboutUs['websiteLink']}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
-                ipcService.window.openExternal(
-                  'https://discord.com/invite/adCWzv6wwS',
-                );
+                ipcService.window.openExternal('https://discord.com/invite/adCWzv6wwS');
               }}
             >
-              {lang.tr.getHelp}
+              {t('get-help')}
             </a>
             <a
               className={aboutUs['websiteLink']}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
-                ipcService.window.openExternal(
-                  'https://github.com/NerdyHomeReOpen/RiceCall',
-                );
+                ipcService.window.openExternal('https://github.com/NerdyHomeReOpen/RiceCall');
               }}
             >
-              {lang.tr.projectRepo}
+              {t('project-repo')}
             </a>
             <a
               className={aboutUs['websiteLink']}
@@ -187,28 +176,20 @@ const AboutPopup: React.FC = React.memo(() => {
                 ipcService.window.openExternal('http://ricecall.com.tw');
               }}
             >
-              {lang.tr.officialWebsite}
+              {t('official-website')}
             </a>
           </div>
 
           <div className={aboutUs['teamMembers']}>
-            <p>{lang.tr.teamMembers}:</p>
+            <p>{t('team-members')}:</p>
             {teamMembers.map((member, index) => {
-              const githubInfo = member.info.find(
-                (item) => item.label === 'Github' && item.value,
-              );
-              const discordInfo = member.info.find(
-                (item) => item.label === 'Discord' && item.value,
-              );
+              const githubInfo = member.info.find((item) => item.label === 'Github' && item.value);
+              const discordInfo = member.info.find((item) => item.label === 'Discord' && item.value);
               return (
                 <React.Fragment key={member.contact + index}>
                   <div className={aboutUs['teamMemberLink']}>
                     <div className={aboutUs['teamMemberNameGroup']}>
-                      <span
-                        className={`${aboutUs['developerTitle']} ${
-                          titleColorClasses[member.title as JobTitle]
-                        }`}
-                      >
+                      <span className={`${aboutUs['developerTitle']} ${titleColorClasses[member.title]}`}>
                         {member.title}
                       </span>
                       <span>{member.contact}</span>
@@ -223,9 +204,7 @@ const AboutPopup: React.FC = React.memo(() => {
                           title="GitHub"
                           onClick={(e) => {
                             e.preventDefault();
-                            ipcService.window.openExternal(
-                              `https://github.com/${githubInfo.value}`,
-                            );
+                            ipcService.window.openExternal(`https://github.com/${githubInfo.value}`);
                           }}
                         >
                           <FaGithub size={20} />
@@ -240,9 +219,7 @@ const AboutPopup: React.FC = React.memo(() => {
                           title="Discord"
                           onClick={(e) => {
                             e.preventDefault();
-                            ipcService.window.openExternal(
-                              `http://discordapp.com/users/${discordInfo.value}`,
-                            );
+                            ipcService.window.openExternal(`http://discordapp.com/users/${discordInfo.value}`);
                           }}
                         >
                           <FaDiscord size={20} />
@@ -259,10 +236,7 @@ const AboutPopup: React.FC = React.memo(() => {
 
       {/* Footer */}
       <div className={`${popup['popupFooter']} aboutFooter`}>
-        <div
-          className={`${popup['inputBox']} ${popup['row']}`}
-          style={{ width: 'fit-content' }}
-        >
+        <div className={`${popup['inputBox']} ${popup['row']}`} style={{ width: 'fit-content' }}>
           <input
             type="checkbox"
             name="showDisclaimer"
@@ -272,7 +246,7 @@ const AboutPopup: React.FC = React.memo(() => {
             }}
           />
           <div>
-            <div className={popup['label']}>{lang.tr.dontShowNextTime}</div>
+            <div className={popup['label']}>{t('dont-show-next-time')}</div>
           </div>
         </div>
         <button
@@ -284,7 +258,7 @@ const AboutPopup: React.FC = React.memo(() => {
             handleClose();
           }}
         >
-          {lang.tr.close}
+          {t('close')}
         </button>
       </div>
     </div>

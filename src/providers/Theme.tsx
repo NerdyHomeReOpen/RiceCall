@@ -1,10 +1,7 @@
 import React, { useEffect, useContext, createContext, ReactNode } from 'react';
 
 // Utils
-import {
-  applyThemeToReactState,
-  THEME_CHANGE_EVENT,
-} from '@/utils/themeStorage';
+import { applyThemeToReactState, THEME_CHANGE_EVENT } from '@/utils/themeStorage';
 
 interface ThemeContextType {
   headerImage: string | null;
@@ -28,9 +25,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   // States
   const [headerImage, setHeaderImage] = React.useState<string | null>(null);
   const [mainColor, setMainColor] = React.useState<string | null>(null);
-  const [secondaryColor, setSecondaryColor] = React.useState<string | null>(
-    null,
-  );
+  const [secondaryColor, setSecondaryColor] = React.useState<string | null>(null);
 
   // Effects
   useEffect(() => {
@@ -68,9 +63,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
         } as React.CSSProperties
       }
     >
-      <ThemeContext.Provider value={{ headerImage, mainColor, secondaryColor }}>
-        {children}
-      </ThemeContext.Provider>
+      <ThemeContext.Provider value={{ headerImage, mainColor, secondaryColor }}>{children}</ThemeContext.Provider>
     </div>
   );
 };

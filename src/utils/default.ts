@@ -123,9 +123,7 @@ const Default = {
     ...overrides,
   }),
 
-  userServerStatus: (
-    overrides: Partial<UserServerStatus> = {},
-  ): UserServerStatus => ({
+  userServerStatus: (overrides: Partial<UserServerStatus> = {}): UserServerStatus => ({
     recent: false,
     owned: false,
     favorite: false,
@@ -146,9 +144,7 @@ const Default = {
     ...overrides,
   }),
 
-  friendApplication: (
-    overrides: Partial<FriendApplication> = {},
-  ): FriendApplication => ({
+  friendApplication: (overrides: Partial<FriendApplication> = {}): FriendApplication => ({
     senderId: '',
     receiverId: '',
     description: '',
@@ -156,9 +152,7 @@ const Default = {
     ...overrides,
   }),
 
-  memberApplication: (
-    overrides: Partial<MemberApplication> = {},
-  ): MemberApplication => ({
+  memberApplication: (overrides: Partial<MemberApplication> = {}): MemberApplication => ({
     serverId: '',
     description: '',
     ...Default.user(),

@@ -1,10 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  DiscordPresence,
-  PopupType,
-  SocketClientEvent,
-  SocketServerEvent,
-} from '@/types';
+import { DiscordPresence, PopupType, SocketClientEvent, SocketServerEvent } from '@/types';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
@@ -39,14 +34,7 @@ const ipcService = {
       ipcRenderer.send(event, ...args);
     },
     on: (
-      event:
-        | SocketServerEvent
-        | 'connect'
-        | 'reconnect'
-        | 'disconnect'
-        | 'connect_error'
-        | 'reconnect_error'
-        | 'error',
+      event: SocketServerEvent | 'connect' | 'reconnect' | 'disconnect' | 'connect_error' | 'reconnect_error' | 'error',
       callback: (...args: any[]) => void,
     ) => {
       if (!isElectron) return () => {};
@@ -59,9 +47,7 @@ const ipcService = {
   deepLink: {
     onDeepLink: (callback: (serverId: string) => void) => {
       if (!isElectron) return () => {};
-      ipcRenderer.on('deepLink', (_: any, serverId: string) =>
-        callback(serverId),
-      );
+      ipcRenderer.on('deepLink', (_: any, serverId: string) => callback(serverId));
       return () => ipcRenderer.removeAllListeners('deepLink');
     },
   },
@@ -71,14 +57,11 @@ const ipcService = {
     request: (id: string, callback: (data: any) => void) => {
       if (!isElectron) return;
       ipcRenderer.send('request-initial-data', id);
-      ipcRenderer.on(
-        'response-initial-data',
-        (_: any, to: string, data: any) => {
-          if (to != id) return;
-          ipcRenderer.removeAllListeners('response-initial-data');
-          callback(data);
-        },
-      );
+      ipcRenderer.on('response-initial-data', (_: any, to: string, data: any) => {
+        if (to != id) return;
+        ipcRenderer.removeAllListeners('response-initial-data');
+        callback(data);
+      });
     },
 
     onRequest: (id: string, data: any, callback?: () => void) => {
@@ -245,12 +228,9 @@ const ipcService = {
       get: (callback: (deviceId: string) => void) => {
         if (!isElectron) return;
         ipcRenderer.send('get-input-audio-device');
-        ipcRenderer.once(
-          'input-audio-device-status',
-          (_: any, deviceId: string) => {
-            callback(deviceId);
-          },
-        );
+        ipcRenderer.once('input-audio-device-status', (_: any, deviceId: string) => {
+          callback(deviceId);
+        });
       },
 
       set: (deviceId: string) => {
@@ -260,14 +240,10 @@ const ipcService = {
 
       onUpdate: (callback: (deviceId: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on(
-          'input-audio-device-status',
-          (_: any, deviceId: string) => {
-            callback(deviceId);
-          },
-        );
-        return () =>
-          ipcRenderer.removeAllListeners('input-audio-device-status');
+        ipcRenderer.on('input-audio-device-status', (_: any, deviceId: string) => {
+          callback(deviceId);
+        });
+        return () => ipcRenderer.removeAllListeners('input-audio-device-status');
       },
     },
 
@@ -275,12 +251,9 @@ const ipcService = {
       get: (callback: (deviceId: string) => void) => {
         if (!isElectron) return;
         ipcRenderer.send('get-output-audio-device');
-        ipcRenderer.once(
-          'output-audio-device-status',
-          (_: any, deviceId: string) => {
-            callback(deviceId);
-          },
-        );
+        ipcRenderer.once('output-audio-device-status', (_: any, deviceId: string) => {
+          callback(deviceId);
+        });
       },
 
       set: (deviceId: string) => {
@@ -290,14 +263,10 @@ const ipcService = {
 
       onUpdate: (callback: (deviceId: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on(
-          'output-audio-device-status',
-          (_: any, deviceId: string) => {
-            callback(deviceId);
-          },
-        );
-        return () =>
-          ipcRenderer.removeAllListeners('output-audio-device-status');
+        ipcRenderer.on('output-audio-device-status', (_: any, deviceId: string) => {
+          callback(deviceId);
+        });
+        return () => ipcRenderer.removeAllListeners('output-audio-device-status');
       },
     },
 

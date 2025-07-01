@@ -8,16 +8,7 @@ import dotenv from 'dotenv';
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import ElectronUpdater from 'electron-updater';
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  dialog,
-  shell,
-  Tray,
-  Menu,
-  nativeImage,
-} from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 
 dotenv.config();
 
@@ -45,7 +36,7 @@ export enum PopupType {
   SERVER_BROADCAST = 'serverBroadcast',
   BLOCK_MEMBER = 'blockMember',
   SYSTEM_SETTING = 'systemSetting',
-  MEMBERAPPLY_SETTING = 'memberApplySetting',
+  MEMBER_APPLY_SETTING = 'memberApplySetting',
   CREATE_SERVER = 'createServer',
   CREATE_CHANNEL = 'createChannel',
   CREATE_FRIENDGROUP = 'createFriendGroup',
@@ -212,7 +203,7 @@ export const PopupSize = {
   [PopupType.EDIT_FRIENDGROUP]: { height: 200, width: 370 },
   [PopupType.EDIT_FRIEND]: { height: 200, width: 370 },
   [PopupType.FRIEND_VERIFICATION]: { height: 550, width: 500 },
-  [PopupType.MEMBERAPPLY_SETTING]: { height: 200, width: 370 },
+  [PopupType.MEMBER_APPLY_SETTING]: { height: 200, width: 370 },
   [PopupType.SEARCH_USER]: { height: 200, width: 370 },
   [PopupType.SERVER_SETTING]: { height: 520, width: 600 },
   [PopupType.SERVER_BROADCAST]: { height: 300, width: 450 },
@@ -227,8 +218,9 @@ export const PopupSize = {
 // Constants
 const DEV = process.argv.includes('--dev');
 // const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const PORT = Number(process.env.NEXT_PUBLIC_PORT);
 const WS_URL_SECONDARY = process.env.NEXT_PUBLIC_SERVER_URL_SECONDARY;
-const BASE_URI = DEV ? 'http://localhost:3000' : 'app://-';
+const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
 const FILE_PATH = fileURLToPath(import.meta.url);
 const DIR_PATH = path.dirname(FILE_PATH);
 const ROOT_PATH = DEV ? DIR_PATH : path.join(DIR_PATH, '../');
@@ -281,9 +273,7 @@ const appServe = serve({ directory: path.join(ROOT_PATH, 'out') });
 
 // Functions
 async function checkIsHinet() {
-  const ipData = await fetch('https://ipinfo.io/json').then((res) =>
-    res.json(),
-  );
+  const ipData = await fetch('https://ipinfo.io/json').then((res) => res.json());
   return ipData.org.startsWith('AS3462');
 }
 
@@ -317,11 +307,7 @@ function waitForPort(port: number) {
 
 function focusWindow() {
   const window =
-    authWindow.isDestroyed() === false
-      ? authWindow
-      : mainWindow.isDestroyed() === false
-      ? mainWindow
-      : null;
+    authWindow.isDestroyed() === false ? authWindow : mainWindow.isDestroyed() === false ? mainWindow : null;
   if (window) {
     if (window.isMinimized()) window.restore();
     window.focus();
@@ -367,7 +353,7 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
   }
 
   if (DEV) {
-    waitForPort(3000).catch((err) => {
+    waitForPort(PORT).catch((err) => {
       console.error('Cannot connect to Next.js server:', err);
       app.exit();
     });
@@ -405,9 +391,7 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
   });
 
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send(
-      mainWindow.isMaximized() ? 'window-maximized' : 'window-unmaximized',
-    );
+    mainWindow.webContents.send(mainWindow.isMaximized() ? 'window-maximized' : 'window-unmaximized');
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -430,7 +414,7 @@ async function createAuthWindow() {
   }
 
   if (DEV) {
-    waitForPort(3000).catch((err) => {
+    waitForPort(PORT).catch((err) => {
       console.error('Cannot connect to Next.js server:', err);
       app.quit();
     });
@@ -474,11 +458,7 @@ async function createAuthWindow() {
   return authWindow;
 }
 
-async function createPopup(
-  type: PopupType,
-  id: string,
-  force = true,
-): Promise<BrowserWindow | null> {
+async function createPopup(type: PopupType, id: string, force = true): Promise<BrowserWindow | null> {
   // If force is true, destroy the popup
   if (force) {
     if (popups[id] && !popups[id].isDestroyed()) {
@@ -495,7 +475,7 @@ async function createPopup(
   }
 
   if (DEV) {
-    waitForPort(3000).catch((err) => {
+    waitForPort(PORT).catch((err) => {
       console.error('Cannot connect to Next.js server:', err);
       app.exit();
     });
@@ -854,9 +834,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-socket-status', () => {
-    return socketInstance && socketInstance.connected
-      ? 'connected'
-      : 'disconnected';
+    return socketInstance && socketInstance.connected ? 'connected' : 'disconnected';
   });
 
   // Initial data request handlers
@@ -944,17 +922,11 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-input-audio-device', (event) => {
-    event.reply(
-      'input-audio-device-status',
-      store.get('audioInputDevice') || '',
-    );
+    event.reply('input-audio-device-status', store.get('audioInputDevice') || '');
   });
 
   ipcMain.on('get-output-audio-device', (event) => {
-    event.reply(
-      'output-audio-device-status',
-      store.get('audioOutputDevice') || '',
-    );
+    event.reply('output-audio-device-status', store.get('audioOutputDevice') || '');
   });
 
   ipcMain.on('set-auto-launch', (_, enable) => {
@@ -1004,14 +976,9 @@ app.on('activate', async () => {
 
 app.whenReady().then(() => {
   const protocolClient = process.execPath;
-  const args =
-    process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
+  const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
 
-  app.setAsDefaultProtocolClient(
-    'ricecall',
-    app.isPackaged ? undefined : protocolClient,
-    args,
-  );
+  app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
 });
 
 if (!app.requestSingleInstanceLock()) {

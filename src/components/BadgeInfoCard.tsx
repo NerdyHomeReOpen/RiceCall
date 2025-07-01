@@ -7,7 +7,7 @@ import badgeInfoCardStyles from '@/styles/badgeInfoCard.module.css';
 import type { Badge } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 interface BadgeInfoCardProps {
   badge: Badge;
@@ -22,7 +22,8 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
     // Refs
     const cardRef = useRef<HTMLDivElement>(null);
 
-    const lang = useLanguage();
+    // Hooks
+    const { t } = useTranslation();
 
     // State
     const [cardX, setCardX] = useState(0);
@@ -87,23 +88,16 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
       >
         <div className={badgeInfoCardStyles.badgeInfoWrapper}>
           <div className={badgeInfoCardStyles.badgeAvatarBox}>
-            <div
-              className={badgeInfoCardStyles.badgeImage}
-              style={{ backgroundImage: `url(${badgeUrl})` }}
-            />
-            <div className={badgeInfoCardStyles.badgeRarityText}>
-              {`[${badge.rare}]`}
-            </div>
+            <div className={badgeInfoCardStyles.badgeImage} style={{ backgroundImage: `url(${badgeUrl})` }} />
+            <div className={badgeInfoCardStyles.badgeRarityText}>{`[${badge.rare}]`}</div>
           </div>
           <div className={badgeInfoCardStyles.badgeDescriptionBox}>
             <div className={badgeInfoCardStyles.badgeName}>{badge.name}</div>
-            <div className={badgeInfoCardStyles.badgeDescription}>
-              {badge.description}
-            </div>
+            <div className={badgeInfoCardStyles.badgeDescription}>{badge.description}</div>
           </div>
         </div>
         <div className={badgeInfoCardStyles.badgeShowTimeBox}>
-          <div>{lang.tr.showTo}:</div>
+          <div>{t('show-to')}:</div>
           <div>1970-01-01</div>
         </div>
       </div>

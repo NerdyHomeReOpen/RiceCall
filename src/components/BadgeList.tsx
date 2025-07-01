@@ -15,23 +15,19 @@ interface BadgeListProps {
   preferTop?: boolean;
 }
 
-const BadgeList: React.FC<BadgeListProps> = React.memo(
-  ({ badges, preferTop, maxDisplay = 21 }) => {
-    const sortedBadges = [...badges]
-      .sort((a, b) =>
-        a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt,
-      )
-      .slice(0, maxDisplay);
+const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, preferTop, maxDisplay = 21 }) => {
+  const sortedBadges = [...badges]
+    .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
+    .slice(0, maxDisplay);
 
-    return (
-      <div className={styles.badgeViewerWrapper}>
-        {sortedBadges.map((badge) => (
-          <BadgeItem key={badge.badgeId} badge={badge} preferTop={preferTop} />
-        ))}
-      </div>
-    );
-  },
-);
+  return (
+    <div className={styles.badgeViewerWrapper}>
+      {sortedBadges.map((badge) => (
+        <BadgeItem key={badge.badgeId} badge={badge} preferTop={preferTop} />
+      ))}
+    </div>
+  );
+});
 
 BadgeList.displayName = 'BadgeList';
 

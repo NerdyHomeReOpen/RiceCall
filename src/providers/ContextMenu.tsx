@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useContext,
-  createContext,
-  ReactNode,
-  useCallback,
-} from 'react';
+import React, { useEffect, useContext, createContext, ReactNode, useCallback } from 'react';
 
 // Types
 import { ContextMenuItem, ServerMember, Badge } from '@/types';
@@ -16,26 +10,9 @@ import BadgeInfoCard from '@/components/BadgeInfoCard';
 import EmojiPicker from '@/components/EmojiPicker';
 
 interface ContextMenuContextType {
-  showContextMenu: (
-    x: number,
-    y: number,
-    preferTop: boolean,
-    preferLeft: boolean,
-    items: ContextMenuItem[],
-  ) => void;
-  showUserInfoBlock: (
-    x: number,
-    y: number,
-    preferTop: boolean,
-    member: ServerMember,
-  ) => void;
-  showBadgeInfoCard: (
-    x: number,
-    y: number,
-    preferTop: boolean,
-    preferLeft: boolean,
-    badge: Badge,
-  ) => void;
+  showContextMenu: (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: ContextMenuItem[]) => void;
+  showUserInfoBlock: (x: number, y: number, preferTop: boolean, member: ServerMember) => void;
+  showBadgeInfoCard: (x: number, y: number, preferTop: boolean, preferLeft: boolean, badge: Badge) => void;
   showEmojiPicker: (
     x: number,
     y: number,
@@ -57,8 +34,7 @@ const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
 
 export const useContextMenu = (): ContextMenuContextType => {
   const context = useContext(ContextMenuContext);
-  if (!context)
-    throw new Error('useContextMenu must be used within a ContextMenuProvider');
+  if (!context) throw new Error('useContextMenu must be used within a ContextMenuProvider');
   return context;
 };
 
@@ -119,13 +95,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     };
   }, [handleKeyDown, handleClickOutside, handleMouseMove]);
 
-  const showContextMenu = (
-    x: number,
-    y: number,
-    preferTop: boolean,
-    preferLeft: boolean,
-    items: ContextMenuItem[],
-  ) => {
+  const showContextMenu = (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: ContextMenuItem[]) => {
     setContextMenu(
       <ContextMenu
         items={items}
@@ -144,15 +114,8 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsContextMenuVisible(false);
   };
 
-  const showUserInfoBlock = (
-    x: number,
-    y: number,
-    preferTop: boolean,
-    member: ServerMember,
-  ) => {
-    setUserInfo(
-      <UserInfoCard member={member} x={x} y={y} preferTop={preferTop} />,
-    );
+  const showUserInfoBlock = (x: number, y: number, preferTop: boolean, member: ServerMember) => {
+    setUserInfo(<UserInfoCard member={member} x={x} y={y} preferTop={preferTop} />);
     setIsUserInfoVisible(true);
   };
 
@@ -161,22 +124,8 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsUserInfoVisible(false);
   };
 
-  const showBadgeInfoCard = (
-    x: number,
-    y: number,
-    preferTop: boolean,
-    preferLeft: boolean,
-    badge: Badge,
-  ) => {
-    setBadgeInfo(
-      <BadgeInfoCard
-        badge={badge}
-        x={x}
-        y={y}
-        preferTop={preferTop}
-        preferLeft={preferLeft}
-      />,
-    );
+  const showBadgeInfoCard = (x: number, y: number, preferTop: boolean, preferLeft: boolean, badge: Badge) => {
+    setBadgeInfo(<BadgeInfoCard badge={badge} x={x} y={y} preferTop={preferTop} preferLeft={preferLeft} />);
     setIsBadgeInfoVisible(true);
   };
 
@@ -192,15 +141,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     type: 'custom' | 'unicode',
     onEmojiSelect: (emoji: string) => void,
   ) => {
-    setEmojiPicker(
-      <EmojiPicker
-        type={type}
-        onEmojiSelect={onEmojiSelect}
-        x={x}
-        y={y}
-        preferTop={preferTop}
-      />,
-    );
+    setEmojiPicker(<EmojiPicker type={type} onEmojiSelect={onEmojiSelect} x={x} y={y} preferTop={preferTop} />);
     setIsEmojiPickerVisible(true);
   };
 

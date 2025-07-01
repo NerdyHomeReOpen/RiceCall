@@ -10,7 +10,7 @@ import { User, PopupType } from '@/types';
 import type { ChannelMessage } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Components
@@ -18,6 +18,9 @@ import MarkdownViewer from '@/components/MarkdownViewer';
 
 // Services
 import ipcService from '@/services/ipc.service';
+
+// Utils
+import { getFormatTimestamp } from '@/utils/language';
 
 interface ChannelMessageProps {
   messageGroup: ChannelMessage & {
@@ -27,112 +30,84 @@ interface ChannelMessageProps {
   forbidGuestUrl?: boolean;
 }
 
-const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(
-  ({ messageGroup, userId, forbidGuestUrl = false }) => {
-    // Hooks
-    const lang = useLanguage();
-    const contextMenu = useContextMenu();
+const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup, userId, forbidGuestUrl = false }) => {
+  // Hooks
+  const contextMenu = useContextMenu();
+  const { t } = useTranslation();
 
-    // Variables
-    const {
-      userId: senderUserId,
-      name: senderName,
-      vip: senderVip,
-      gender: senderGender,
-      permissionLevel: senderPermissionLevel,
-      parameter: messageParameter,
-      contents: messageContents,
-      timestamp: messageTimestamp,
-    } = messageGroup;
+  // Variables
+  const {
+    userId: senderUserId,
+    name: senderName,
+    vip: senderVip,
+    gender: senderGender,
+    permissionLevel: senderPermissionLevel,
+    contents: messageContents,
+    timestamp: messageTimestamp,
+  } = messageGroup;
 
-    const isCurrentUser = senderUserId === userId;
+  const isCurrentUser = senderUserId === userId;
 
-    const timestamp = lang.getFormatTimestamp(messageTimestamp);
+  const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
 
-    const formatMessages = messageContents.map((content) =>
-      lang.getTranslatedMessage(content, messageParameter),
-    );
+  // handles
+  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
+    ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
+    ipcService.initialData.onRequest(`directMessage-${targetId}`, {
+      userId,
+      targetId,
+      targetName,
+    });
+  };
 
-    // handles
-    const handleOpenDirectMessage = (
-      userId: User['userId'],
-      targetId: User['userId'],
-      targetName: User['name'],
-    ) => {
-      ipcService.popup.open(
-        PopupType.DIRECT_MESSAGE,
-        `directMessage-${targetId}`,
-      );
-      ipcService.initialData.onRequest(`directMessage-${targetId}`, {
-        userId,
-        targetId,
-        targetName,
-      });
-    };
-    
-    const handleOpenUserInfo = (
-      userId: User['userId'],
-      targetId: User['userId'],
-    ) => {
-      ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
-      ipcService.initialData.onRequest(`userInfo-${targetId}`, {
-        userId,
-        targetId,
-      });
-    };
+  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
+    ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
+    ipcService.initialData.onRequest(`userInfo-${targetId}`, {
+      userId,
+      targetId,
+    });
+  };
 
-    return (
-      <>
-        <div
-          className={`${styles['gradeIcon']} ${permission[senderGender]} ${
-            permission[`lv-${senderPermissionLevel}`]
-          }`}
-        />
-        <div className={styles['messageBox']}>
-          <div className={styles['header']}>
-            {senderVip > 0 && (
-              <div
-                className={`${vip['vipIcon']} ${vip[`vip-small-${senderVip}`]}`}
-              />
-            )}
-            <div
-              className={`${styles['username']} ${senderVip > 0 ? `${vip['isVIP']} ${vip['clickable']}` : ''}`}
-              onClick={() => handleOpenUserInfo(userId, senderUserId)}
-              onContextMenu={(e) => {
-                const x = e.clientX;
-                const y = e.clientY;
-                contextMenu.showContextMenu(x, y, false, false, [
-                  {
-                    id: 'direct-message',
-                    label: lang.tr.directMessage,
-                    show: !isCurrentUser,
-                    onClick: () =>
-                      handleOpenDirectMessage(userId, senderUserId, senderName),
-                  },
-                  {
-                    id: 'view-profile',
-                    label: lang.tr.viewProfile,
-                    onClick: () => handleOpenUserInfo(userId, senderUserId),
-                  },
-                ]);
-              }}
-            >
-              {senderName}
-            </div>
-            <div className={styles['timestamp']}>{timestamp}</div>
+  return (
+    <>
+      <div
+        className={`${styles['gradeIcon']} ${permission[senderGender]} ${permission[`lv-${senderPermissionLevel}`]}`}
+      />
+      <div className={styles['messageBox']}>
+        <div className={styles['header']}>
+          {senderVip > 0 && <div className={`${vip['vipIcon']} ${vip[`vip-small-${senderVip}`]}`} />}
+          <div
+            className={`${styles['username']} ${senderVip > 0 ? `${vip['isVIP']} ${vip['clickable']}` : ''}`}
+            onClick={() => handleOpenUserInfo(userId, senderUserId)}
+            onContextMenu={(e) => {
+              const x = e.clientX;
+              const y = e.clientY;
+              contextMenu.showContextMenu(x, y, false, false, [
+                {
+                  id: 'direct-message',
+                  label: t('direct-message'),
+                  show: !isCurrentUser,
+                  onClick: () => handleOpenDirectMessage(userId, senderUserId, senderName),
+                },
+                {
+                  id: 'view-profile',
+                  label: t('view-profile'),
+                  onClick: () => handleOpenUserInfo(userId, senderUserId),
+                },
+              ]);
+            }}
+          >
+            {senderName}
           </div>
-          {formatMessages.map((content, index) => (
-            <MarkdownViewer
-              key={index}
-              markdownText={content}
-              forbidGuestUrl={forbidGuestUrl}
-            />
-          ))}
+          <div className={styles['timestamp']}>{formattedTimestamp}</div>
         </div>
-      </>
-    );
-  },
-);
+        {messageContents.map((content, index) => (
+          <MarkdownViewer key={index} markdownText={content} forbidGuestUrl={forbidGuestUrl} />
+        ))}
+      </div>
+    </>
+  );
+});
 
 ChannelMessage.displayName = 'ChannelMessage';
 

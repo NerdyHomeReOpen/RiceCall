@@ -7,7 +7,7 @@ import styles from '@/styles/pages/login.module.css';
 import authService from '@/services/auth.service';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 interface FormDatas {
   account: string;
@@ -22,7 +22,7 @@ interface LoginPageProps {
 
 const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   // Hooks
-  const lang = useLanguage();
+  const { t } = useTranslation();
 
   // Refs
   const comboRef = useRef<HTMLDivElement>(null);
@@ -38,8 +38,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   });
   const [accounts, setAccounts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showAccountSelectBox, setShowAccountSelectBox] =
-    useState<boolean>(false);
+  const [showAccountSelectBox, setShowAccountSelectBox] = useState<boolean>(false);
 
   // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,8 +110,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (!comboRef.current?.contains(e.target as Node))
-        setShowAccountSelectBox(false);
+      if (!comboRef.current?.contains(e.target as Node)) setShowAccountSelectBox(false);
     };
 
     document.addEventListener('click', handleClickOutside);
@@ -135,16 +133,14 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
         >
           {isLoading && (
             <>
-              <div className={styles['loadingIndicator']}>
-                {lang.tr.onLogin}
-              </div>
+              <div className={styles['loadingIndicator']}>{t('on-login')}</div>
               <div className={styles['loadingBar']} />
             </>
           )}
           {!isLoading && (
             <>
               <div className={styles['inputBox']}>
-                <div className={styles['label']}>{lang.tr.account}</div>
+                <div className={styles['label']}>{t('account')}</div>
                 <div className={styles['loginAccountBox']} ref={comboRef}>
                   <input
                     type="text"
@@ -152,7 +148,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     value={formData.account}
                     onChange={handleInputChange}
                     onBlur={() => {}}
-                    placeholder={lang.tr.pleaseInputAccount}
+                    placeholder={t('please-input-account')}
                     className={styles['input']}
                   />
                   <div
@@ -162,10 +158,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                       setShowAccountSelectBox((prev) => !prev);
                     }}
                   />
-                  <div
-                    className={styles['accountSelectBox']}
-                    style={showAccountSelectBox ? {} : { display: 'none' }}
-                  >
+                  <div className={styles['accountSelectBox']} style={showAccountSelectBox ? {} : { display: 'none' }}>
                     {accounts.map((account) => (
                       <div
                         key={account}
@@ -194,7 +187,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                 </div>
               </div>
               <div className={styles['inputBox']}>
-                <div className={styles['label']}>{lang.tr.password}</div>
+                <div className={styles['label']}>{t('password')}</div>
                 <div className={styles['loginAccountBox']}>
                   <input
                     type="password"
@@ -202,7 +195,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     value={formData.password}
                     onChange={handleInputChange}
                     onBlur={() => {}}
-                    placeholder={lang.tr.pleaseInputPassword}
+                    placeholder={t('please-input-password')}
                     className={styles['input']}
                   />
                 </div>
@@ -218,7 +211,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     className={styles['check']}
                     tabIndex={-1}
                   />
-                  {lang.tr.rememberAccount}
+                  {t('remember-account')}
                 </div>
                 <div className={styles['checkBox']}>
                   <input
@@ -230,7 +223,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     className={styles['check']}
                     tabIndex={-1}
                   />
-                  {lang.tr.autoLogin}
+                  {t('auto-login')}
                 </div>
               </div>
               <button
@@ -239,7 +232,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                 tabIndex={-1}
                 disabled={!formData.account || !formData.password}
               >
-                {lang.tr.login}
+                {t('login')}
               </button>
             </>
           )}
@@ -253,9 +246,16 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
             setSection('register');
           }}
         >
-          {lang.tr.registerAccount}
+          {t('register-account')}
         </div>
-        <div className={styles['forgetPassword']}>{lang.tr.forgotPassword}</div>
+        <div
+          className={styles['forgetPassword']}
+          onClick={() => {
+            /*TODO: handleForgotPassword() */
+          }}
+        >
+          {t('forgot-password')}
+        </div>
       </div>
     </div>
   );

@@ -1,11 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useContext,
-  createContext,
-  useCallback,
-} from 'react';
+import React, { useEffect, useRef, useState, useContext, createContext, useCallback } from 'react';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
@@ -75,8 +68,7 @@ const WebRTCContext = createContext<WebRTCContextType>({} as WebRTCContextType);
 
 export const useWebRTC = (): WebRTCContextType => {
   const context = useContext(WebRTCContext);
-  if (!context)
-    throw new Error('useWebRTC must be used within a WebRTCProvider');
+  if (!context) throw new Error('useWebRTC must be used within a WebRTCProvider');
   return context;
 };
 
@@ -86,7 +78,7 @@ interface WebRTCProviderProps {
 
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // States
-  const [isMute, setIsMute] = useState<boolean>(false);
+  const [isMute, setIsMute] = useState<boolean>(true);
   const [bitrate, setBitrate] = useState<number>(64000);
   const [micVolume, setMicVolume] = useState<number>(100);
   const [musicVolume, setMusicVolume] = useState<number>(100);
@@ -231,11 +223,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       const senders = connection.getSenders();
       const audioSender = senders.find((s) => s.track?.kind === 'audio');
       if (audioSender) {
-        audioSender
-          .replaceTrack(processedTrack)
-          .catch((error) =>
-            console.error('Error replacing audio track:', error),
-          );
+        audioSender.replaceTrack(processedTrack).catch((error) => console.error('Error replacing audio track:', error));
       }
     });
 
@@ -267,11 +255,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       const senders = connection.getSenders();
       const audioSender = senders.find((s) => s.track?.kind === 'audio');
       if (audioSender) {
-        audioSender
-          .replaceTrack(processedTrack)
-          .catch((error) =>
-            console.error('Error replacing audio track:', error),
-          );
+        audioSender.replaceTrack(processedTrack).catch((error) => console.error('Error replacing audio track:', error));
       }
     });
 
@@ -343,11 +327,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             const senders = connection.getSenders();
             const audioSender = senders.find((s) => s.track?.kind === 'audio');
             if (audioSender) {
-              audioSender
-                .replaceTrack(newTrack)
-                .catch((error) =>
-                  console.error('Error replacing audio track:', error),
-                );
+              audioSender.replaceTrack(newTrack).catch((error) => console.error('Error replacing audio track:', error));
             }
           });
 
@@ -362,9 +342,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const handleEditOutputStream = useCallback(
     (deviceId: string) => {
       Object.values(peerAudioRefs.current).forEach((audio) => {
-        audio
-          .setSinkId(deviceId)
-          .catch((err) => console.error('Error accessing speaker:', err));
+        audio.setSinkId(deviceId).catch((err) => console.error('Error accessing speaker:', err));
       });
 
       handleEditSpeakerVolume();
@@ -410,11 +388,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         const senders = connection.getSenders();
         const audioSender = senders.find((s) => s.track?.kind === 'audio');
         if (audioSender) {
-          audioSender
-            .replaceTrack(newTrack)
-            .catch((error) =>
-              console.error('Error replacing audio track:', error),
-            );
+          audioSender.replaceTrack(newTrack).catch((error) => console.error('Error replacing audio track:', error));
         }
       });
 
@@ -423,10 +397,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     [handleEditMusicVolume],
   );
 
-  const handleSendRTCOffer = (
-    socketId: string,
-    offer: RTCSessionDescriptionInit,
-  ) => {
+  const handleSendRTCOffer = (socketId: string, offer: RTCSessionDescriptionInit) => {
     if (!socket) return;
     socket.send.RTCOffer({
       to: socketId,
@@ -437,10 +408,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     });
   };
 
-  const handleSendRTCAnswer = (
-    socketId: string,
-    answer: RTCSessionDescriptionInit,
-  ) => {
+  const handleSendRTCAnswer = (socketId: string, answer: RTCSessionDescriptionInit) => {
     if (!socket) return;
     socket.send.RTCAnswer({
       to: socketId,
@@ -451,10 +419,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     });
   };
 
-  const handleSendRTCIceCandidate = (
-    socketId: string,
-    candidate: RTCIceCandidate,
-  ) => {
+  const handleSendRTCIceCandidate = (socketId: string, candidate: RTCIceCandidate) => {
     if (!socket) return;
     socket.send.RTCIceCandidate({
       to: socketId,
@@ -485,9 +450,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       console.warn(`Connection (${userId}) not found, creating`);
       createPeerConnection(userId, socketId);
     } else if (peerConnections.current[userId].signalingState === 'stable') {
-      console.warn(
-        `Connection (${userId}) already in stable state, recreating`,
-      );
+      console.warn(`Connection (${userId}) already in stable state, recreating`);
       removePeerConnection(userId);
       createPeerConnection(userId, socketId);
     }
@@ -509,9 +472,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       console.warn(`Connection (${userId}) not found`);
       return;
     } else if (peerConnections.current[userId].signalingState === 'stable') {
-      console.warn(
-        `Connection (${userId}) already in stable state, ignoring answer`,
-      );
+      console.warn(`Connection (${userId}) already in stable state, ignoring answer`);
       return;
     }
 
@@ -584,36 +545,27 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
     peerConnection.oniceconnectionstatechange = () => {
       console.info(userId, 'Connection State:', peerConnection.connectionState);
-      const isFailed = ['disconnected', 'failed', 'closed'].includes(
-        peerConnection.connectionState,
-      );
+      const isFailed = ['disconnected', 'failed', 'closed'].includes(peerConnection.connectionState);
       if (isFailed) removePeerConnection(userId);
     };
 
     peerConnection.onconnectionstatechange = () => {
       console.info(userId, 'Connection State:', peerConnection.connectionState);
-      const isFailed = ['disconnected', 'failed', 'closed'].includes(
-        peerConnection.connectionState,
-      );
+      const isFailed = ['disconnected', 'failed', 'closed'].includes(peerConnection.connectionState);
       if (isFailed) removePeerConnection(userId);
     };
 
     peerConnection.onsignalingstatechange = () => {
       console.info(userId, 'Signaling State:', peerConnection.signalingState);
-      const isFailed = ['disconnected', 'failed', 'closed'].includes(
-        peerConnection.signalingState,
-      );
+      const isFailed = ['disconnected', 'failed', 'closed'].includes(peerConnection.signalingState);
       if (isFailed) removePeerConnection(userId);
     };
 
     peerConnection.ontrack = (event) => {
       if (!peerAudioRefs.current[userId]) {
-        peerAudioRefs.current[userId] = document.body.appendChild(
-          document.createElement('audio'),
-        );
+        peerAudioRefs.current[userId] = document.body.appendChild(document.createElement('audio'));
         peerAudioRefs.current[userId].autoplay = true;
-        peerAudioRefs.current[userId].oncanplay = () =>
-          handleEditSpeakerVolume();
+        peerAudioRefs.current[userId].oncanplay = () => handleEditSpeakerVolume();
       }
       peerAudioRefs.current[userId].srcObject = event.streams[0];
       peerStreams.current[userId] = event.streams[0];
@@ -631,8 +583,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     };
 
     peerConnections.current[userId] = peerConnection;
-    peerDataChannels.current[userId] =
-      peerConnection.createDataChannel('volume');
+    peerDataChannels.current[userId] = peerConnection.createDataChannel('volume');
 
     setSpeakStatus((prev) => {
       const newState = { ...prev };
@@ -640,13 +591,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       return newState;
     });
 
-    const processedAudioTrack =
-      destinationNode.current.stream.getAudioTracks()[0];
+    const processedAudioTrack = destinationNode.current.stream.getAudioTracks()[0];
     if (processedAudioTrack) {
-      peerConnection.addTrack(
-        processedAudioTrack,
-        destinationNode.current.stream,
-      );
+      peerConnection.addTrack(processedAudioTrack, destinationNode.current.stream);
     }
   };
 
@@ -656,9 +603,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     const localMute = window.localStorage.getItem('is-mute');
 
     setMicVolume(localMicVolume !== null ? parseInt(localMicVolume) : 100);
-    setSpeakerVolume(
-      localSpeakerVolume !== null ? parseInt(localSpeakerVolume) : 100,
-    );
+    setSpeakerVolume(localSpeakerVolume !== null ? parseInt(localSpeakerVolume) : 100);
     setIsMute(localMute !== null ? localMute === 'true' : false);
   }, []);
 
@@ -718,8 +663,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
     return () => {
       if (audioContext.current) audioContext.current.close();
-      if (localStream.current)
-        localStream.current.getTracks().forEach((track) => track.stop());
+      if (localStream.current) localStream.current.getTracks().forEach((track) => track.stop());
     };
   }, []);
 
@@ -740,16 +684,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     ipcService.systemSettings.inputAudioDevice.get(() => {});
     ipcService.systemSettings.outputAudioDevice.get(() => {});
 
-    const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate(
-      (deviceId) => {
-        handleEditInputStream(deviceId || '');
-      },
-    );
+    const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate((deviceId) => {
+      handleEditInputStream(deviceId || '');
+    });
 
-    const offUpdateOutput =
-      ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
-        handleEditOutputStream(deviceId || '');
-      });
+    const offUpdateOutput = ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
+      handleEditOutputStream(deviceId || '');
+    });
 
     return () => {
       offUpdateInput();

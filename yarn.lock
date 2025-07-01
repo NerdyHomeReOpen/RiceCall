@@ -26,6 +26,16 @@
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.27.1.tgz#9fce313d12c9a77507f264de74626e87fd0dc541"
   integrity sha512-1x3D2xEk2fRo3PAhwQwu5UubzgiVWSXTBfWpVd2Mx2AzRqJuDJCsgaDVZ7HB5iGzDW1Hl1sWN2mFyKjmR9uAog==
 
+"@babel/runtime@^7.27.1", "@babel/runtime@^7.27.6":
+  version "7.27.6"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.27.6.tgz#ec4070a04d76bae8ddbb10770ba55714a417b7c6"
+  integrity sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==
+
+"@crowdin/ota-client@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@crowdin/ota-client/-/ota-client-2.0.1.tgz#27f6c92d46d6b16aadd860f04ce5e9b73c19356b"
+  integrity sha512-iIg3jjWQFUROWgOpghmDXbyAGhYCz4bXbLaYuTGIc2fvlON6OY4+osTT9c/bL6gLct4zw8mF25+AWXf9m+X+Zg==
+
 "@csstools/css-parser-algorithms@^3.0.4":
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/@csstools/css-parser-algorithms/-/css-parser-algorithms-3.0.4.tgz#74426e93bd1c4dcab3e441f5cc7ba4fb35d94356"
@@ -1921,6 +1931,13 @@ crc@^3.8.0:
   dependencies:
     buffer "^5.1.0"
 
+cross-fetch@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-4.0.0.tgz#f037aef1580bb3a1a35164ea2a848ba81b445983"
+  integrity sha512-e4a5N8lVvuLgAWgnCrLr2PP0YyDOTHa9H/Rj54dirp61qXnNq46m82bRhNqIA5VccJtWBvPTFRV3TtvHUKPB1g==
+  dependencies:
+    node-fetch "^2.6.12"
+
 cross-spawn@^7.0.1, cross-spawn@^7.0.3, cross-spawn@^7.0.6:
   version "7.0.6"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.6.tgz#8a58fe78f00dcd70c370451759dfbfaf03e8ee9f"
@@ -2180,6 +2197,21 @@ dot-prop@^9.0.0:
   dependencies:
     type-fest "^4.18.2"
 
+dotenv-cli@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv-cli/-/dotenv-cli-8.0.0.tgz#cea1519f5a06c7372a1428fca4605fcf3d50e1cf"
+  integrity sha512-aLqYbK7xKOiTMIRf1lDPbI+Y+Ip/wo5k3eyp6ePysVaSqbyxjyK3dK35BTxG+rmd7djf5q2UPs4noPNH+cj0Qw==
+  dependencies:
+    cross-spawn "^7.0.6"
+    dotenv "^16.3.0"
+    dotenv-expand "^10.0.0"
+    minimist "^1.2.6"
+
+dotenv-expand@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-10.0.0.tgz#12605d00fb0af6d0a592e6558585784032e4ef37"
+  integrity sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==
+
 dotenv-expand@^11.0.6:
   version "11.0.7"
   resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-11.0.7.tgz#af695aea007d6fdc84c86cd8d0ad7beb40a0bd08"
@@ -2187,7 +2219,7 @@ dotenv-expand@^11.0.6:
   dependencies:
     dotenv "^16.4.5"
 
-dotenv@^16.4.5, dotenv@^16.5.0:
+dotenv@^16.3.0, dotenv@^16.4.5, dotenv@^16.5.0:
   version "16.5.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.5.0.tgz#092b49f25f808f020050051d1ff258e404c78692"
   integrity sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==
@@ -3490,6 +3522,13 @@ hosted-git-info@^4.1.0:
   dependencies:
     lru-cache "^6.0.0"
 
+html-parse-stringify@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/html-parse-stringify/-/html-parse-stringify-3.0.1.tgz#dfc1017347ce9f77c8141a507f233040c59c55d2"
+  integrity sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==
+  dependencies:
+    void-elements "3.1.0"
+
 html-tags@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/html-tags/-/html-tags-3.3.1.tgz#a04026a18c882e4bba8a01a3d39cfe465d40b5ce"
@@ -3568,6 +3607,20 @@ humanize-ms@^1.2.1:
   integrity sha512-Fl70vYtsAFb/C06PTS9dZBo7ihau+Tu/DNCk/OyHhea07S+aeMWpFFkUaXRa8fI+ScZbEI8dfSxwY7gxZ9SAVQ==
   dependencies:
     ms "^2.0.0"
+
+i18next-http-backend@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/i18next-http-backend/-/i18next-http-backend-3.0.2.tgz#7c8daa31aa69679e155ec1f96a37846225bdf907"
+  integrity sha512-PdlvPnvIp4E1sYi46Ik4tBYh/v/NbYfFFgTjkwFl0is8A18s7/bx9aXqsrOax9WUbeNS6mD2oix7Z0yGGf6m5g==
+  dependencies:
+    cross-fetch "4.0.0"
+
+i18next@^25.2.1:
+  version "25.2.1"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-25.2.1.tgz#23cf8794904f551f577558d93c84b0fb6cd489a2"
+  integrity sha512-+UoXK5wh+VlE1Zy5p6MjcvctHXAhRwQKCxiJD8noKZzIXmnAX8gdHX5fLPA3MEVxEN4vbZkQFy8N0LyD9tUqPw==
+  dependencies:
+    "@babel/runtime" "^7.27.1"
 
 iconv-corefoundation@^1.1.7:
   version "1.1.7"
@@ -4998,7 +5051,7 @@ node-api-version@^0.2.0:
   dependencies:
     semver "^7.3.5"
 
-node-fetch@^2.6.1:
+node-fetch@^2.6.1, node-fetch@^2.6.12:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.7.0.tgz#d0f0fa6e3e2dc1d27efcd8ad99d550bda94d187d"
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
@@ -5511,6 +5564,14 @@ react-dom@^19:
   integrity sha512-Xs1hdnE+DyKgeHJeJznQmYMIBG3TKIHJJT95Q58nHLSrElKlGQqDTR2HQ9fx5CN/Gk6Vh/kupBTDLU11/nDk/g==
   dependencies:
     scheduler "^0.26.0"
+
+react-i18next@^15.5.3:
+  version "15.5.3"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-15.5.3.tgz#63cae235d540d1b6bde5495b5ebe0c1d5c76de0f"
+  integrity sha512-ypYmOKOnjqPEJZO4m1BI0kS8kWqkBNsKYyhVUfij0gvjy9xJNoG/VcGkxq5dRlVwzmrmY1BQMAmpbbUBLwC4Kw==
+  dependencies:
+    "@babel/runtime" "^7.27.6"
+    html-parse-stringify "^3.0.1"
 
 react-icons@^5.5.0:
   version "5.5.0"
@@ -6842,6 +6903,11 @@ vfile@^6.0.0:
   dependencies:
     "@types/unist" "^3.0.0"
     vfile-message "^4.0.0"
+
+void-elements@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-3.1.0.tgz#614f7fbf8d801f0bb5f0661f5b2f5785750e4f09"
+  integrity sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==
 
 wcwidth@^1.0.1:
   version "1.0.1"

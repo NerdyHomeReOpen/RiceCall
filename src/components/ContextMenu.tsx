@@ -87,7 +87,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
               key={index}
               className={`
                 ${contextMenu['option']}
-                ${item.icon ? contextMenu['hasIcon'] : ''}
                 ${item.hasSubmenu ? contextMenu['hasSubmenu'] : ''}
                 ${item.disabled ? contextMenu['disabled'] : ''}
               `}

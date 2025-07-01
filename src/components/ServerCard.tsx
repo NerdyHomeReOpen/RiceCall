@@ -41,8 +41,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
 
   const { userId, currentServerId: userCurrentServerId } = user;
   const isOwner = serverOwnerId === userId;
-  const canRemoveMemberShip =
-    serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
+  const canRemoveMemberShip = serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
 
   // Handles
   const handleServerSelect = (
@@ -72,11 +71,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     ipcService.popup.onSubmit('alertDialog', callback);
   };
 
-  const handleEditMember = (
-    member: Partial<Member>,
-    userId: User['userId'],
-    serverId: Server['serverId'],
-  ) => {
+  const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
     if (!socket) return;
     socket.send.editMember({
       member,
@@ -85,23 +80,20 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     });
   };
 
-  const handleRemoveMembership = (
-    userId: User['userId'],
-    serverId: Server['serverId'],
-  ) => {
+  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId']) => {
     if (!socket) return;
     handleOpenAlertDialog(
       '確定要解除 自己 與語音群的會員關係嗎', // lang.tr
       () => {
-          handleEditMember(
-            {
-              permissionLevel: 1,
-              nickname: null,
-            },
-            userId,
-            serverId
-          );
-        },
+        handleEditMember(
+          {
+            permissionLevel: 1,
+            nickname: null,
+          },
+          userId,
+          serverId,
+        );
+      },
     );
   };
 
@@ -123,8 +115,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
           {
             id: 'joinServer',
             label: '進入', // TODO: lang.tr
-            onClick: () =>
-              handleServerSelect(userId, serverId, serverDisplayId),
+            onClick: () => handleServerSelect(userId, serverId, serverDisplayId),
           },
           {
             id: 'viewServerInfo',
@@ -152,10 +143,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
         ]);
       }}
     >
-      <div
-        className={homePage['serverAvatarPicture']}
-        style={{ backgroundImage: `url(${serverAvatarUrl})` }}
-      ></div>
+      <div className={homePage['serverAvatarPicture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>
       <div className={homePage['serverInfoText']}>
         <div className={homePage['serverNameText']}>{serverName}</div>
         <div className={homePage['serverIdBox']}>

@@ -18,10 +18,10 @@ import {
 } from '@/types';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useExpandedContext } from '@/providers/Expanded';
+import { useFindMeContext } from '@/providers/FindMe';
 
 // Components
 import ChannelTab from '@/components/ChannelTab';
@@ -39,19 +39,12 @@ interface ChannelListProps {
 }
 
 const ChannelList: React.FC<ChannelListProps> = React.memo(
-  ({
-    currentServer,
-    currentChannel,
-    serverMembers,
-    serverChannels,
-    friends,
-  }) => {
+  ({ currentServer, currentChannel, serverMembers, serverChannels, friends }) => {
     // Hooks
-    const lang = useLanguage();
+    const { t } = useTranslation();
     const socket = useSocket();
     const contextMenu = useContextMenu();
-    const { handleSetCategoryExpanded, handleSetChannelExpanded } =
-      useExpandedContext();
+    const findMe = useFindMeContext();
 
     // Refs
     const viewerRef = useRef<HTMLDivElement>(null);
@@ -61,14 +54,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const [view, setView] = useState<'all' | 'current'>('all');
     const [latency, setLatency] = useState<string>('0');
-    const [selectedItemId, setSelectedItemId] = useState<string | null>(
-      currentChannel.channelId,
-    );
-    const [selectedItemType, setSelectedItemType] = useState<string | null>(
-      'channel',
-    );
-    const [memberApplicationsCount, setMemberApplicationsCount] =
-      useState<number>(0);
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(currentChannel.channelId);
+    const [selectedItemType, setSelectedItemType] = useState<string | null>('channel');
+    const [memberApplicationsCount, setMemberApplicationsCount] = useState<number>(0);
 
     // Variables
     const connectStatus = 4 - Math.floor(Number(latency) / 50);
@@ -107,10 +95,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       });
     };
 
-    const handleOpenServerSetting = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-    ) => {
+    const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
       ipcService.popup.open(PopupType.SERVER_SETTING, 'serverSetting');
       ipcService.initialData.onRequest('serverSetting', {
         serverId,
@@ -118,12 +103,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       });
     };
 
-    const handleOpenApplyMember = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-    ) => {
+    const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
       if (!serverReceiveApply) {
-        handleOpenAlertDialog(lang.tr.cannotApply);
+        handleOpenAlertDialog(t('cannot-apply'));
         return;
       }
       ipcService.popup.open(PopupType.APPLY_MEMBER, 'applyMember');
@@ -133,10 +115,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       });
     };
 
-    const handleOpenEditNickname = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-    ) => {
+    const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
       ipcService.popup.open(PopupType.EDIT_NICKNAME, 'editNickname');
       ipcService.initialData.onRequest('editNickname', {
         serverId,
@@ -145,9 +124,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
     };
 
     const handleLocateUser = () => {
-      if (!handleSetCategoryExpanded || !handleSetChannelExpanded) return;
-      handleSetCategoryExpanded();
-      handleSetChannelExpanded();
+      if (!findMe) return;
+      findMe.findMe();
     };
 
     const handleServerMemberApplicationsSet = (data: { count: number }) => {
@@ -167,10 +145,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       for (const channel of serverChannels) {
         setExpanded((prev) => ({
           ...prev,
-          [channel.channelId]:
-            prev[channel.channelId] != undefined
-              ? prev[channel.channelId]
-              : true,
+          [channel.channelId]: prev[channel.channelId] != undefined ? prev[channel.channelId] : true,
         }));
       }
     }, [serverChannels]);
@@ -198,12 +173,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       if (!socket) return;
 
       const eventHandlers = {
-        [SocketServerEvent.SERVER_MEMBER_APPLICATIONS_SET]:
-          handleServerMemberApplicationsSet,
-        [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]:
-          handleServerMemberApplicationAdd,
-        [SocketServerEvent.SERVER_MEMBER_APPLICATION_REMOVE]:
-          handleServerMemberApplicationRemove,
+        [SocketServerEvent.SERVER_MEMBER_APPLICATIONS_SET]: handleServerMemberApplicationsSet,
+        [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]: handleServerMemberApplicationAdd,
+        [SocketServerEvent.SERVER_MEMBER_APPLICATION_REMOVE]: handleServerMemberApplicationRemove,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -228,18 +200,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
               handleOpenServerSetting(userId, serverId);
             }}
           >
-            <div
-              className={styles['avatarPicture']}
-              style={{ backgroundImage: `url(${serverAvatarUrl})` }}
-            />
+            <div className={styles['avatarPicture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
           </div>
           <div className={styles['baseInfoBox']}>
             <div className={styles['container']}>
               {isVerifyServer ? (
-                <div
-                  className={styles['verifyIcon']}
-                  title={'官方認證語音群' /* TODO: lang.tr */}
-                ></div>
+                <div className={styles['verifyIcon']} title={'官方認證語音群' /* TODO: lang.tr */}></div>
               ) : (
                 ''
               )}
@@ -261,26 +227,24 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                   className={styles['setting']}
                   onClick={() => {
                     if (!settingButtonRef.current) return;
-                    const x =
-                      settingButtonRef.current.getBoundingClientRect().left;
+                    const x = settingButtonRef.current.getBoundingClientRect().left;
                     const y =
                       settingButtonRef.current.getBoundingClientRect().top +
                       settingButtonRef.current.getBoundingClientRect().height;
                     contextMenu.showContextMenu(x, y, false, false, [
                       {
                         id: 'invitation',
-                        label: lang.tr.invitation,
+                        label: t('invitation'),
                         show: canApplyMember,
                         icon: 'memberapply',
                         onClick: () => handleOpenApplyMember(userId, serverId),
                       },
                       {
-                        id: 'memberManagement',
-                        label: '會員管理',
+                        id: 'member-management',
+                        label: t('member-management'),
                         show: canOpenSettings,
                         icon: 'memberManagement',
-                        onClick: () =>
-                          handleOpenServerSetting(userId, serverId),
+                        onClick: () => handleOpenServerSetting(userId, serverId),
                       },
                       {
                         id: 'separator',
@@ -288,15 +252,15 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                         label: '',
                       },
                       {
-                        id: 'editNickname',
-                        label: lang.tr.editNickname,
+                        id: 'edit-nickname',
+                        label: t('edit-member-card'),
                         icon: 'editGroupcard',
                         show: canEditNickname,
                         onClick: () => handleOpenEditNickname(userId, serverId),
                       },
                       {
-                        id: 'locateMe',
-                        label: lang.tr.locateMe,
+                        id: 'locate-me',
+                        label: t('locate-me'),
                         icon: 'locateme',
                         onClick: () => handleLocateUser(),
                       },
@@ -306,7 +270,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                       },
                       {
                         id: 'report',
-                        label: '舉報', // TODO: lang.tr
+                        label: t('report'),
                         disabled: true,
                         onClick: () => {
                           /* TODO: handleOpenReport */
@@ -314,9 +278,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                       },
                       {
                         id: 'favorite',
-                        label: isFavorite
-                          ? lang.tr.unfavorite
-                          : lang.tr.favorite,
+                        label: isFavorite ? t('unfavorite') : t('favorite'),
                         icon: isFavorite ? 'collect' : 'uncollect',
                         onClick: () => handleFavoriteServer(serverId),
                       },
@@ -326,11 +288,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
                   <div
                     className={`
                       ${header['overlay']}
-                      ${
-                        canOpenSettings && memberApplicationsCount > 0
-                          ? header['new']
-                          : ''
-                      }
+                      ${canOpenSettings && memberApplicationsCount > 0 ? header['new'] : ''}
                     `}
                   />
                 </div>
@@ -347,19 +305,15 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
               ${styles[`status${connectStatus}`]}
             `}
           >
-            <div
-              className={`${styles['currentChannelPing']}`}
-            >{`${latency}ms`}</div>
+            <div className={`${styles['currentChannelPing']}`}>{`${latency}ms`}</div>
           </div>
-          <div className={styles['currentChannelText']}>
-            {currentChannelName}
-          </div>
+          <div className={styles['currentChannelText']}>{currentChannelName}</div>
         </div>
 
         {/* Mic Queue */}
         {currentChannelVoiceMode === 'queue' && (
           <>
-            <div className={styles['sectionTitle']}>{lang.tr.micOrder}</div>
+            <div className={styles['sectionTitle']}>{t('mic-order')}</div>
             <div className={styles['micQueueBox']}>
               <div className={styles['userList']}>
                 {/* {micQueueUsers.map((user) => (
@@ -377,9 +331,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
         )}
 
         {/* Channel List Title */}
-        <div className={styles['sectionTitle']}>
-          {view === 'current' ? lang.tr.currentChannel : lang.tr.allChannel}
-        </div>
+        <div className={styles['sectionTitle']}>{view === 'current' ? t('current-channel') : t('all-channel')}</div>
 
         {/* Channel List */}
         <div className={styles['scrollView']}>
@@ -402,11 +354,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
             ) : (
               serverChannels
                 .filter((ch) => !!ch && !ch.categoryId)
-                .sort((a, b) =>
-                  a.order !== b.order
-                    ? a.order - b.order
-                    : a.createdAt - b.createdAt,
-                )
+                .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
                 .map((item) =>
                   item.type === 'category' ? (
                     <CategoryTab
@@ -455,7 +403,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
             `}
             onClick={() => setView('current')}
           >
-            {lang.tr.currentChannel}
+            {t('current-channel')}
           </div>
           <div
             className={`
@@ -465,7 +413,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
             `}
             onClick={() => setView('all')}
           >
-            {lang.tr.allChannel}
+            {t('all-channel')}
           </div>
         </div>
       </>

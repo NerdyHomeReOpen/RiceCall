@@ -49,9 +49,7 @@ function getDominantColor(url: string): Promise<[number, number, number]> {
         colorCount[key] = (colorCount[key] || 0) + 1;
       }
 
-      const dominant = Object.entries(colorCount).sort(
-        (a, b) => b[1] - a[1],
-      )[0][0];
+      const dominant = Object.entries(colorCount).sort((a, b) => b[1] - a[1])[0][0];
       const [r, g, b] = dominant.split(',').map(Number);
       resolve([r, g, b]);
     };
@@ -79,16 +77,10 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   const colorSelectorRef = useRef<HTMLDivElement>(null);
 
   // States
-  const [hoveredThemeIndex, setHoveredThemeIndex] = useState<number | null>(
-    null,
-  );
+  const [hoveredThemeIndex, setHoveredThemeIndex] = useState<number | null>(null);
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
-  const [pickedColor, setPickedColor] = useState<[number, number, number]>([
-    0, 0, 0,
-  ]);
-  const [customThemes, setCustomThemes] = useState<Theme[]>(
-    Array.from({ length: 7 }),
-  );
+  const [pickedColor, setPickedColor] = useState<[number, number, number]>([0, 0, 0]);
+  const [customThemes, setCustomThemes] = useState<Theme[]>(Array.from({ length: 7 }));
   const [isSelectingColor, setIsSelectingColor] = useState<boolean>(false);
 
   // Handlers
@@ -113,9 +105,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
     setThemeValue('theme-header-image', headerImage);
   };
 
-  const handleSaveSelectedImage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleSaveSelectedImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -189,20 +179,10 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-        const safeOffsetX = Math.max(
-          0,
-          Math.min(offsetX, img.naturalWidth - 1),
-        );
-        const safeOffsetY = Math.max(
-          0,
-          Math.min(offsetY, img.naturalHeight - 1),
-        );
+        const safeOffsetX = Math.max(0, Math.min(offsetX, img.naturalWidth - 1));
+        const safeOffsetY = Math.max(0, Math.min(offsetY, img.naturalHeight - 1));
         const pixelData = ctx.getImageData(safeOffsetX, safeOffsetY, 1, 1).data;
-        const color: [number, number, number] = [
-          pixelData[0],
-          pixelData[1],
-          pixelData[2],
-        ];
+        const color: [number, number, number] = [pixelData[0], pixelData[1], pixelData[2]];
         setPickedColor(color);
       }
     };
@@ -273,10 +253,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                   ))}
 
                   {/* Color Selector */}
-                  <div
-                    className={changeTheme['colorSelector']}
-                    onClick={() => setShowColorPicker(!showColorPicker)}
-                  />
+                  <div className={changeTheme['colorSelector']} onClick={() => setShowColorPicker(!showColorPicker)} />
 
                   {/* Custom Colors */}
                   {customThemes.slice(0, 7).map((_, i) => {
@@ -296,19 +273,13 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                           }
                           onClick={(e) => handleSelectTheme(e)}
                           onContextMenu={(e) => {
-                            contextMenu.showContextMenu(
-                              e.clientX,
-                              e.clientY,
-                              false,
-                              false,
-                              [
-                                {
-                                  id: 'remove-custom-color',
-                                  label: '刪除',
-                                  onClick: () => handleRemoveCustom(i),
-                                },
-                              ],
-                            );
+                            contextMenu.showContextMenu(e.clientX, e.clientY, false, false, [
+                              {
+                                id: 'remove-custom-color',
+                                label: '刪除',
+                                onClick: () => handleRemoveCustom(i),
+                              },
+                            ]);
                           }}
                         />
                       );
@@ -318,10 +289,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                   })}
 
                   {/* Image Selector */}
-                  <div
-                    className={changeTheme['imageSelector']}
-                    onClick={() => fileInputRef.current?.click()}
-                  />
+                  <div className={changeTheme['imageSelector']} onClick={() => fileInputRef.current?.click()} />
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -354,14 +322,8 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                         }}
                       />
                       <div className={changeTheme['colorSelectedBtn']}>
-                        <div
-                          className={changeTheme['colorSelectedSave']}
-                          onClick={() => handleSaveSelectedColor()}
-                        />
-                        <div
-                          className={changeTheme['colorSelectedCancel']}
-                          onClick={() => setShowColorPicker(false)}
-                        />
+                        <div className={changeTheme['colorSelectedSave']} onClick={() => handleSaveSelectedColor()} />
+                        <div className={changeTheme['colorSelectedCancel']} onClick={() => setShowColorPicker(false)} />
                       </div>
                     </div>
                   </div>

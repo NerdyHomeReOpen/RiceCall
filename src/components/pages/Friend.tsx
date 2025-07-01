@@ -15,8 +15,8 @@ import BadgeListViewer from '@/components/BadgeList';
 import { User, UserFriend, FriendGroup } from '@/types';
 
 // Providers
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
@@ -29,195 +29,163 @@ interface FriendPageProps {
   display: boolean;
 }
 
-const FriendPageComponent: React.FC<FriendPageProps> = React.memo(
-  ({ user, friends, friendGroups, display }) => {
-    // Hooks
-    const lang = useLanguage();
-    const socket = useSocket();
-    const contextMenu = useContextMenu();
+const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, friends, friendGroups, display }) => {
+  // Hooks
+  const { t } = useTranslation();
+  const socket = useSocket();
+  const contextMenu = useContextMenu();
 
-    // Refs
-    const signatureInputRef = useRef<HTMLTextAreaElement>(null);
-    const emojiIconRef = useRef<HTMLDivElement>(null);
+  // Refs
+  const signatureInputRef = useRef<HTMLTextAreaElement>(null);
+  const emojiIconRef = useRef<HTMLDivElement>(null);
 
-    // States
-    const [isComposing, setIsComposing] = useState<boolean>(false);
-    const [sidebarWidth, setSidebarWidth] = useState<number>(270);
-    const [isResizing, setIsResizing] = useState<boolean>(false);
-    const [signatureInput, setSignatureInput] = useState<string>('');
+  // States
+  const [isComposing, setIsComposing] = useState<boolean>(false);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(270);
+  const [isResizing, setIsResizing] = useState<boolean>(false);
+  const [signatureInput, setSignatureInput] = useState<string>('');
 
-    // Variables
-    const {
-      userId,
-      name: userName,
-      signature: userSignature,
-      avatarUrl: userAvatarUrl,
-      xp: userXP,
-      requiredXp: userRequiredXP,
-      level: userLevel,
-      vip: userVip,
-      badges: userBadges,
-    } = user;
+  // Variables
+  const {
+    userId,
+    name: userName,
+    signature: userSignature,
+    avatarUrl: userAvatarUrl,
+    xp: userXP,
+    requiredXp: userRequiredXP,
+    level: userLevel,
+    vip: userVip,
+    badges: userBadges,
+  } = user;
 
-    // Handlers
-    const handleChangeSignature = (
-      signature: User['signature'],
-      userId: User['userId'],
-    ) => {
-      if (!socket) return;
-      if (signature === userSignature) return;
-      socket.send.editUser({ user: { signature }, userId });
+  // Handlers
+  const handleChangeSignature = (signature: User['signature'], userId: User['userId']) => {
+    if (!socket) return;
+    if (signature === userSignature) return;
+    socket.send.editUser({ user: { signature }, userId });
+  };
+
+  const handleResize = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing) return;
+      const newWidth = e.clientX;
+      setSidebarWidth(newWidth);
+    },
+    [isResizing],
+  );
+
+  // Effects
+  useEffect(() => {
+    window.addEventListener('mousemove', handleResize);
+    window.addEventListener('mouseup', () => setIsResizing(false));
+    return () => {
+      window.removeEventListener('mousemove', handleResize);
+      window.removeEventListener('mouseup', () => setIsResizing(false));
     };
+  }, [handleResize]);
 
-    const handleResize = useCallback(
-      (e: MouseEvent) => {
-        if (!isResizing) return;
-        const newWidth = e.clientX;
-        setSidebarWidth(newWidth);
-      },
-      [isResizing],
-    );
+  useEffect(() => {
+    setSignatureInput(userSignature);
+  }, [userSignature]);
 
-    // Effects
-    useEffect(() => {
-      window.addEventListener('mousemove', handleResize);
-      window.addEventListener('mouseup', () => setIsResizing(false));
-      return () => {
-        window.removeEventListener('mousemove', handleResize);
-        window.removeEventListener('mouseup', () => setIsResizing(false));
-      };
-    }, [handleResize]);
+  useEffect(() => {
+    ipcService.discord.updatePresence({
+      details: t('rpc:friend-page'),
+      state: `${t('rpc:user')} ${userName}`,
+      largeImageKey: 'app_icon',
+      largeImageText: 'RC Voice',
+      smallImageKey: 'home_icon',
+      smallImageText: t('rpc:vewing-friend-page'),
+      timestamp: Date.now(),
+      buttons: [
+        {
+          label: t('rpc:join-server'),
+          url: 'https://discord.gg/adCWzv6wwS',
+        },
+      ],
+    });
+  }, [t, userName]);
 
-    useEffect(() => {
-      setSignatureInput(userSignature);
-    }, [userSignature]);
-
-    useEffect(() => {
-      if (!lang) return;
-      ipcService.discord.updatePresence({
-        details: lang.tr.RPCFriendPage,
-        state: `${lang.tr.RPCUser} ${userName}`,
-        largeImageKey: 'app_icon',
-        largeImageText: 'RC Voice',
-        smallImageKey: 'home_icon',
-        smallImageText: lang.tr.RPCFriend,
-        timestamp: Date.now(),
-        buttons: [
-          {
-            label: lang.tr.RPCJoinServer,
-            url: 'https://discord.gg/adCWzv6wwS',
-          },
-        ],
-      });
-    }, [lang, userName]);
-
-    return (
-      <div
-        className={friendPage['friendWrapper']}
-        style={display ? {} : { display: 'none' }}
-      >
-        {/* Header */}
-        <header className={friendPage['friendHeader']}>
-          <div
-            className={friendPage['avatarPicture']}
-            style={{ backgroundImage: `url(${userAvatarUrl})` }}
-            datatype={''}
-          />
-          <div className={friendPage['baseInfoBox']}>
-            <div className={friendPage['container']}>
-              <div className={friendPage['levelIcon']} />
-              <div
-                className={`${grade['grade']} ${
-                  grade[`lv-${Math.min(56, userLevel)}`]
-                }`}
-                title={`${lang.tr.level}：${userLevel}，${
-                  lang.tr.xp
-                }：${userXP}，${lang.tr.xpDifference}：${
-                  userRequiredXP - userXP
-                }`}
-              />
-              <div className={friendPage['wealthIcon']} />
-              <div className={friendPage['wealthValue']}>0</div>
-              {userVip > 0 && (
-                <div
-                  className={`${vip['vipIcon']} ${vip[`vip-small-${userVip}`]}`}
-                />
-              )}
-            </div>
+  return (
+    <div className={friendPage['friendWrapper']} style={display ? {} : { display: 'none' }}>
+      {/* Header */}
+      <header className={friendPage['friendHeader']}>
+        <div
+          className={friendPage['avatarPicture']}
+          style={{ backgroundImage: `url(${userAvatarUrl})` }}
+          datatype={''}
+        />
+        <div className={friendPage['baseInfoBox']}>
+          <div className={friendPage['container']}>
+            <div className={friendPage['levelIcon']} />
             <div
-              className={`${friendPage['container']} ${friendPage['myBadges']}`}
-            >
-              <BadgeListViewer badges={userBadges} maxDisplay={5} />
-            </div>
-          </div>
-          <div className={`${friendPage['signatureBox']}`}>
-            <textarea
-              ref={signatureInputRef}
-              className={friendPage['signatureInput']}
-              value={signatureInput}
-              placeholder={lang.tr.signaturePlaceholder}
-              maxLength={300}
-              onChange={(e) => setSignatureInput(e.target.value)}
-              onBlur={() => {
-                handleChangeSignature(signatureInput, userId);
-              }}
-              onKeyDown={(e) => {
-                if (isComposing) return;
-                if (e.key === 'Enter') signatureInputRef.current?.blur();
-              }}
-              onCompositionStart={() => setIsComposing(true)}
-              onCompositionEnd={() => setIsComposing(false)}
+              className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
+              title={`${t('level')}: ${userLevel}, ${t('xp')}: ${userXP}, ${t('required-xp')}: ${
+                userRequiredXP - userXP
+              }`}
             />
-            <div
-              ref={emojiIconRef}
-              className={emoji['emojiIcon']}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                if (!emojiIconRef.current) return;
-                const x = emojiIconRef.current.getBoundingClientRect().x;
-                const y =
-                  emojiIconRef.current.getBoundingClientRect().y +
-                  emojiIconRef.current.getBoundingClientRect().height;
-                contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
-                  setSignatureInput((prev) => prev + emoji);
-                  if (signatureInputRef.current)
-                    signatureInputRef.current.focus();
-                });
-              }}
-            />
+            <div className={friendPage['wealthIcon']} />
+            <div className={friendPage['wealthValue']}>0</div>
+            {userVip > 0 && <div className={`${vip['vipIcon']} ${vip[`vip-small-${userVip}`]}`} />}
           </div>
-        </header>
-
-        {/* Main Content */}
-        <main className={friendPage['friendContent']}>
-          {/* Left Sidebar */}
-          <div
-            className={friendPage['sidebar']}
-            style={{ width: `${sidebarWidth}px` }}
-          >
-            <FriendListViewer
-              friendGroups={friendGroups}
-              friends={friends}
-              user={user}
-            />
+          <div className={`${friendPage['container']} ${friendPage['myBadges']}`}>
+            <BadgeListViewer badges={userBadges} maxDisplay={5} />
           </div>
-
-          {/* Resize Handle */}
-          <div
-            className="resizeHandle"
-            onMouseDown={() => setIsResizing(true)}
-            onMouseUp={() => setIsResizing(false)}
+        </div>
+        <div className={`${friendPage['signatureBox']}`}>
+          <textarea
+            ref={signatureInputRef}
+            className={friendPage['signatureInput']}
+            value={signatureInput}
+            placeholder={t('signature-placeholder')}
+            maxLength={300}
+            onChange={(e) => setSignatureInput(e.target.value)}
+            onBlur={() => {
+              handleChangeSignature(signatureInput, userId);
+            }}
+            onKeyDown={(e) => {
+              if (isComposing) return;
+              if (e.key === 'Enter') signatureInputRef.current?.blur();
+            }}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
           />
+          <div
+            ref={emojiIconRef}
+            className={emoji['emojiIcon']}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              if (!emojiIconRef.current) return;
+              const x = emojiIconRef.current.getBoundingClientRect().x;
+              const y =
+                emojiIconRef.current.getBoundingClientRect().y + emojiIconRef.current.getBoundingClientRect().height;
+              contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
+                setSignatureInput((prev) => prev + emoji);
+                if (signatureInputRef.current) signatureInputRef.current.focus();
+              });
+            }}
+          />
+        </div>
+      </header>
 
-          {/* Right Content */}
-          <div className={friendPage['mainContent']}>
-            <div className={friendPage['header']}>{lang.tr.friendActive}</div>
-          </div>
-        </main>
-      </div>
-    );
-  },
-);
+      {/* Main Content */}
+      <main className={friendPage['friendContent']}>
+        {/* Left Sidebar */}
+        <div className={friendPage['sidebar']} style={{ width: `${sidebarWidth}px` }}>
+          <FriendListViewer friendGroups={friendGroups} friends={friends} user={user} />
+        </div>
+
+        {/* Resize Handle */}
+        <div className="resizeHandle" onMouseDown={() => setIsResizing(true)} onMouseUp={() => setIsResizing(false)} />
+
+        {/* Right Content */}
+        <div className={friendPage['mainContent']}>
+          <div className={friendPage['header']}>{t('friend-active')}</div>
+        </div>
+      </main>
+    </div>
+  );
+});
 
 FriendPageComponent.displayName = 'FriendPageComponent';
 

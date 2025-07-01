@@ -5,7 +5,7 @@ import { FriendGroup, User } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 
 // CSS
 import setting from '@/styles/popups/setting.module.css';
@@ -23,108 +23,98 @@ interface EditFriendGroupPopupProps {
   friendGroupId: FriendGroup['friendGroupId'];
 }
 
-const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(
-  ({ userId, friendGroupId }) => {
-    // Hooks
-    const socket = useSocket();
-    const lang = useLanguage();
+const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ userId, friendGroupId }) => {
+  // Hooks
+  const socket = useSocket();
+  const { t } = useTranslation();
 
-    // Refs
-    const refreshRef = useRef(false);
+  // Refs
+  const refreshRef = useRef(false);
 
-    // States
-    const [friendGroup, setFriendGroup] = useState<FriendGroup>(
-      Default.friendGroup(),
-    );
+  // States
+  const [friendGroup, setFriendGroup] = useState<FriendGroup>(Default.friendGroup());
 
-    // Variables
-    const { name: groupName, order: groupOrder } = friendGroup;
-    const canSubmit = groupName.trim();
+  // Variables
+  const { name: groupName, order: groupOrder } = friendGroup;
+  const canSubmit = groupName.trim();
 
-    // Handlers
-    const handleEditFriendGroup = (
-      group: Partial<FriendGroup>,
-      friendGroupId: FriendGroup['friendGroupId'],
-      userId: User['userId'],
-    ) => {
-      if (!socket) return;
-      socket.send.editFriendGroup({ group, friendGroupId, userId });
+  // Handlers
+  const handleEditFriendGroup = (
+    group: Partial<FriendGroup>,
+    friendGroupId: FriendGroup['friendGroupId'],
+    userId: User['userId'],
+  ) => {
+    if (!socket) return;
+    socket.send.editFriendGroup({ group, friendGroupId, userId });
+  };
+
+  const handleClose = () => {
+    ipcService.window.close();
+  };
+
+  // Effects
+  useEffect(() => {
+    if (!friendGroupId || refreshRef.current) return;
+    const refresh = async () => {
+      refreshRef.current = true;
+      Promise.all([
+        getService.friendGroup({
+          friendGroupId: friendGroupId,
+        }),
+      ]).then(([friendGroup]) => {
+        if (friendGroup) {
+          setFriendGroup(friendGroup);
+        }
+      });
     };
+    refresh();
+  }, [friendGroupId]);
 
-    const handleClose = () => {
-      ipcService.window.close();
-    };
-
-    // Effects
-    useEffect(() => {
-      if (!friendGroupId || refreshRef.current) return;
-      const refresh = async () => {
-        refreshRef.current = true;
-        Promise.all([
-          getService.friendGroup({
-            friendGroupId: friendGroupId,
-          }),
-        ]).then(([friendGroup]) => {
-          if (friendGroup) {
-            setFriendGroup(friendGroup);
-          }
-        });
-      };
-      refresh();
-    }, [friendGroupId]);
-
-    return (
-      <form className={popup['popupContainer']}>
-        {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['inputGroup']}>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>
-                  {lang.tr.pleaseInputFriendGroupName}
-                </div>
-                <input
-                  name="name"
-                  type="text"
-                  value={groupName}
-                  maxLength={32}
-                  onChange={(e) =>
-                    setFriendGroup((prev) => ({
-                      ...prev,
-                      name: e.target.value,
-                    }))
-                  }
-                />
-              </div>
+  return (
+    <form className={popup['popupContainer']}>
+      {/* Body */}
+      <div className={popup['popupBody']}>
+        <div className={setting['body']}>
+          <div className={popup['inputGroup']}>
+            <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
+              <input
+                name="name"
+                type="text"
+                value={groupName}
+                maxLength={32}
+                onChange={(e) =>
+                  setFriendGroup((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
+              />
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button
-            className={popup['button']}
-            disabled={!canSubmit}
-            onClick={() => {
-              if (!canSubmit) return;
-              handleEditFriendGroup(
-                { name: groupName, order: groupOrder },
-                friendGroupId,
-                userId,
-              );
-              handleClose();
-            }}
-          >
-            {lang.tr.confirm}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
-            {lang.tr.cancel}
-          </button>
-        </div>
-      </form>
-    );
-  },
-);
+      {/* Footer */}
+      <div className={popup['popupFooter']}>
+        <button
+          className={popup['button']}
+          disabled={!canSubmit}
+          onClick={() => {
+            if (!canSubmit) return;
+            handleEditFriendGroup({ name: groupName, order: groupOrder }, friendGroupId, userId);
+            handleClose();
+          }}
+        >
+          {t('confirm')}
+        </button>
+        <button className={popup['button']} onClick={() => handleClose()}>
+          {t('cancel')}
+        </button>
+      </div>
+    </form>
+  );
+});
 
 EditFriendGroupPopup.displayName = 'EditFriendGroupPopup';
 

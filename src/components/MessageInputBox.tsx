@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import messageInputBox from '@/styles/messageInputBox.module.css';
 
 // Providers
-import { useLanguage } from '@/providers/Language';
+import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Styles
@@ -19,15 +19,9 @@ interface MessageInputBoxProps {
 }
 
 const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
-  ({
-    onSendMessage,
-    disabled = false,
-    warning = false,
-    placeholder = '',
-    maxLength = 2000,
-  }) => {
+  ({ onSendMessage, disabled = false, warning = false, placeholder = '', maxLength = 2000 }) => {
     // Hooks
-    const lang = useLanguage();
+    const { t } = useTranslation();
     const contextMenu = useContextMenu();
 
     // Refs
@@ -87,7 +81,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
           }}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
-          aria-label={lang.tr.messageInputBox}
+          aria-label={t('message-input-box')}
         />
         <div className={messageInputBox['messageInputLength']}>
           {messageInput.length}/{maxLength}

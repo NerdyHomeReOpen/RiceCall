@@ -3,9 +3,9 @@
 import React from 'react';
 
 // Providers
+import '@/i18n';
 import SocketProvider from '@/providers/Socket';
 import ContextMenuProvider from '@/providers/ContextMenu';
-import LanguageProvider from '@/providers/Language';
 import MainTabProvider from '@/providers/MainTab';
 import ThemeProvider from '@/providers/Theme';
 import LoadingProvider from '@/providers/Loading';
@@ -17,15 +17,13 @@ interface ProvidersProps {
 const Providers = ({ children }: ProvidersProps) => {
   return (
     <ThemeProvider>
-      <LanguageProvider>
-        <SocketProvider>
-          <MainTabProvider>
-            <LoadingProvider>
-              <ContextMenuProvider>{children}</ContextMenuProvider>
-            </LoadingProvider>
-          </MainTabProvider>
-        </SocketProvider>
-      </LanguageProvider>
+      <SocketProvider>
+        <MainTabProvider>
+          <LoadingProvider>
+            <ContextMenuProvider>{children}</ContextMenuProvider>
+          </LoadingProvider>
+        </MainTabProvider>
+      </SocketProvider>
     </ThemeProvider>
   );
 };
