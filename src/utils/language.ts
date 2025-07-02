@@ -87,57 +87,6 @@ export const getTranslatedMessage = (
     content = t(content);
   }
 
-  //   // Dialog Message
-  //   content = content.replace('blockedSelfMessage', '你已被該語音群封鎖，無法加入群組');
-  //   content = content.replace('blockedSelfWithTimeMessage', '你已被該語音群踢出，無法加入群組，直到');
-  //   content = content.replace('kickedSelfMessage', '你已被踢出群組');
-  //   content = content.replace('permissionsDeniedMessage', '許可權不足');
-
-  //   // Direct Event Message
-  //   content = content.replace('receiveShakeWindowMessage', '對方向您發送了一次視窗震動');
-  //   content = content.replace('sendShakeWindowMessage', '您向對方發送了一次視窗震動');
-
-  //   // Action Event Messages
-
-  //   content = content.replace('removeFromMemberMessage', '移除了你的會員身份。');
-  //   content = content.replace('removeFromChannelManagerMessage', '移除了你的頻道管理員身份。');
-  //   content = content.replace('removeFromServerManagerMessage', '移除了你的群管理員身份。');
-
-  //   content = content.replace('upgradeServerManagerMessage', '您已被提升為本群的管理員。');
-  //   content = content.replace('upgradeChannelManagerMessage', '您已被提升為本頻道的管理員。');
-  //   content = content.replace('upgradeMemberMessage', '您已加入成為本群會員。');
-
-  //   // Action Warn Messages
-
-  //   content = content.replace('forbidVoiceMessage', '您被管理員【{operator}】禁止語音');
-  //   content = content.replace('unForbidVoiceMessage', '您被管理員【{operator}】重新開啟語音');
-  //   content = content.replace('forbidTextMessage', '您被管理員【{operator}】禁止傳送文字訊息');
-  //   content = content.replace('unForbidTextMessage', '您被管理員【{operator}】重新開啟傳送文字訊息');
-  //   content = content.replace(
-  //     'timeoutChannelWithTimeMessage',
-  //     '您在【{channel}】頻道被管理員【{operator}】踢出 {time} 分鐘',
-  //   );
-
-  //   content = content.replace('timeoutChannelMessage', '您在【{channel}】頻道被管理員【{operator}】踢出');
-
-  //   // Channel Event Messages
-  //   content = content.replace('setMemberMessage', '加入了群，成為本群會員。');
-  //   content = content.replace('setChannelManagerMessage', '被提升為本頻道的頻道管理員。');
-  //   content = content.replace('setServerManagerMessage', '被提升為本群的管理員。');
-
-  //   // Channel Warn Messages
-  //   content = content.replace('forbidVoiceMemberMessage', '【{target}】被管理員【{operator}】禁止語音');
-  //   content = content.replace('unForbidVoiceMemberMessage', '【{target}】被管理員【{operator}】重新開啟語音');
-  //   content = content.replace('forbidTextMemberMessage', '【{target}】被管理員【{operator}】禁止傳送文字訊息');
-  //   content = content.replace('unForbidTextMemberMessage', '【{target}】被管理員【{operator}】重新開啟傳送文字訊息');
-  //   content = content.replace('timeoutMemberChannelMessage', '【{target}】被管理員【{operator}】踢出頻道');
-  //   content = content.replace('timeoutMemberMessage', '【{target}】被管理員【{operator}】踢出群');
-  //   content = content.replace('blockedMemberMessage', '【{target}】被管理員【{operator}】封鎖');
-
-  //   // Alert Messages
-  //   content = content.replace('channelAlert', '頻道廣播');
-  //   content = content.replace('serverAlert', '群廣播');
-
   // Replace Params
   content = content.replace(/{(\w+)}/gm, (match, p1) => params?.[p1] || match);
 
