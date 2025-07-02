@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Types
 import { SocketServerEvent } from '@/types';
@@ -32,31 +32,34 @@ export const SoundEffectPlayer = () => {
     return () => offUpdate();
   }, []);
 
-  const handlePlaySound = (sound: string) => {
-    if (!soundEffect) return;
+  const handlePlaySound = useCallback(
+    (sound: string) => {
+      if (!soundEffect) return;
 
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
 
-    switch (sound) {
-      case 'leave':
-        audioRef.current = new Audio('./sounds/Ydisconnect.wav');
-        break;
-      case 'join':
-        audioRef.current = new Audio('./sounds/Yconnect.wav');
-        break;
-      case 'recieveChannelMessage':
-        audioRef.current = new Audio('./sounds/ReceiveChannelMsg.wav');
-        break;
-      default:
-        audioRef.current = new Audio();
-        break;
-    }
+      switch (sound) {
+        case 'leave':
+          audioRef.current = new Audio('./sounds/Ydisconnect.wav');
+          break;
+        case 'join':
+          audioRef.current = new Audio('./sounds/Yconnect.wav');
+          break;
+        case 'recieveChannelMessage':
+          audioRef.current = new Audio('./sounds/ReceiveChannelMsg.wav');
+          break;
+        default:
+          audioRef.current = new Audio();
+          break;
+      }
 
-    audioRef.current.volume = 0.5;
-    audioRef.current.play();
-  };
+      audioRef.current.volume = 0.5;
+      audioRef.current.play();
+    },
+    [soundEffect],
+  );
 
   useEffect(() => {
     if (!socket) return;
