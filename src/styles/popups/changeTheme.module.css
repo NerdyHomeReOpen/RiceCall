@@ -6,7 +6,6 @@
 .ctWrapper {
   height: 100%;
   display: flex;
-  font-family: 'SimSun', sans-serif;
   flex-direction: column;
   background: url(../../../public/dialog_body_bg.png) no-repeat center center;
   background-size: cover;

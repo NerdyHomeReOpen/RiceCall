@@ -232,8 +232,7 @@
   margin-left: 5px;
 }
 
-.searchBorder:hover:not(:has(.searchPrev:hover, .searchNext:hover))
-  .searchIcon {
+.searchBorder:hover:not(:has(.searchPrev:hover, .searchNext:hover)) .searchIcon {
   background-position: -17px 0;
 }
 
@@ -372,7 +371,8 @@
   color: white;
   background-image: url('../../../public/im/wallpaper.png');
   background-size: cover;
-  gap: 8px;
+  gap: 3px;
+  padding-bottom: 38px;
   -webkit-app-region: drag;
 }
 
@@ -474,13 +474,12 @@
 
 .userProfile .userName {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: bold;
   color: #fff;
 }
 
 .userProfile .userAccount {
   font-size: 1rem;
-  font-weight: 400;
   color: #fff;
 }
 
@@ -493,12 +492,8 @@
   color: #fff;
   width: 30rem;
   font-size: 0.95rem;
-  font-weight: 400;
   overflow-y: scroll;
-  margin-bottom: 1.5rem;
   text-align: center;
-  min-height: 17.52px;
-  max-height: 17.52px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -572,7 +567,7 @@
   justify-content: flex-start;
   align-items: center;
   gap: 5px;
-  margin-top: .5rem;
+  margin-top: 0.5rem;
 }
 
 .serverItem {
@@ -661,7 +656,6 @@
 
 .displayId {
   color: #6d6d6d;
-  font-weight: 500;
 }
 
 .isOwner::before {

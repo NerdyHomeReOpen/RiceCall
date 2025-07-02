@@ -910,6 +910,8 @@ app.on('ready', async () => {
       inputAudioDevice: store.get('audioInputDevice') || '',
       outputAudioDevice: store.get('audioOutputDevice') || '',
       dontShowDisclaimer: store.get('dontShowDisclaimer') || false,
+      font: store.get('font') || '',
+      fontSize: store.get('fontSize') || 13,
     };
     event.reply('system-settings-status', settings);
   });

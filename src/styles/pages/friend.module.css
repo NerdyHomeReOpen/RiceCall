@@ -418,14 +418,6 @@
   background-color: #d1d5da;
 }
 
-.friendList .tab .tabLable {
-  font-weight: 100;
-}
-
-.friendList .tab .tabCount {
-  font-weight: 100;
-}
-
 .friendList .tab .toggleIcon {
   content: '';
   display: inline-block;

@@ -152,11 +152,11 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <div className={popup['selectBox']}>
                   <select
                     value={fontFamily}
-                    style={{ minWidth: '100px' }}
+                    style={{ minWidth: '100px', fontFamily: fontFamily }}
                     onChange={(e) => setFontFamily(e.target.value)}
                   >
                     {fontList.map((font) => (
-                      <option key={font} value={font}>
+                      <option key={font} value={font} style={{ fontFamily: font }}>
                         {font}
                       </option>
                     ))}

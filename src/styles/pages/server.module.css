@@ -922,7 +922,6 @@
   opacity: 0;
 }
 
-.currentChannelIcon:not(.currentChannelPing, .currentChannelText):hover
-  .currentChannelPing {
+.currentChannelIcon:not(.currentChannelPing, .currentChannelText):hover .currentChannelPing {
   opacity: 1;
 }
