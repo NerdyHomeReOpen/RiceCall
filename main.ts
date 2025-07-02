@@ -451,6 +451,11 @@ async function createAuthWindow() {
     app.exit();
   });
 
+  authWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
   authWindow.show();
   authWindow.focus();
   authWindow.setAlwaysOnTop(true);
@@ -485,15 +490,17 @@ async function createPopup(type: PopupType, id: string, force = true): Promise<B
   popups[id] = new BrowserWindow({
     width: PopupSize[type].width,
     height: PopupSize[type].height,
-    resizable: false,
+    modal: true,
     frame: false,
     transparent: true,
+    resizable: false,
     hasShadow: true,
-    modal: true,
     fullscreen: false,
+    icon: APP_ICON,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      webviewTag: true,
     },
   });
 
@@ -505,6 +512,11 @@ async function createPopup(type: PopupType, id: string, force = true): Promise<B
     popups[id].loadURL(`${BASE_URI}/popup?type=${type}&id=${id}`);
     // popups[id].webContents.openDevTools();
   }
+
+  popups[id].webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
 
   popups[id].show();
   popups[id].focus();
