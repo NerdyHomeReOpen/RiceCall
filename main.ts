@@ -204,7 +204,7 @@ export const PopupSize = {
   [PopupType.EDIT_FRIENDGROUP]: { height: 200, width: 370 },
   [PopupType.EDIT_FRIEND]: { height: 200, width: 370 },
   [PopupType.FRIEND_VERIFICATION]: { height: 550, width: 500 },
-  [PopupType.MEMBER_APPLY_SETTING]: { height: 200, width: 370 },
+  [PopupType.MEMBER_APPLY_SETTING]: { height: 250, width: 370 },
   [PopupType.SEARCH_USER]: { height: 200, width: 370 },
   [PopupType.SERVER_SETTING]: { height: 520, width: 600 },
   [PopupType.SERVER_BROADCAST]: { height: 300, width: 450 },
