@@ -30,8 +30,15 @@ const Providers = ({ children }: ProvidersProps) => {
       document.body.style.fontFamily = font;
     };
 
+    const setFontSize = (fontSize: number | null) => {
+      if (!fontSize) return;
+      // document.body.style.fontSize = `${fontSize}px`;
+    };
+
     ipcService.systemSettings.font.get(setFont);
     ipcService.systemSettings.font.onUpdate(setFont);
+    ipcService.systemSettings.fontSize.get(setFontSize);
+    ipcService.systemSettings.fontSize.onUpdate(setFontSize);
   }, []);
 
   return (
