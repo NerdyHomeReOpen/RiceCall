@@ -441,5 +441,8 @@
   "receive-channel": "接收頻道",
   "text-broadcast": "文字廣播",
   "voice-broadcast": "語音廣播",
-  "broadcast-content": "廣播內容"
+  "broadcast-content": "廣播內容",
+  "font-setting": "字型設定",
+  "font-size": "字型大小",
+  "font": "字型"
 }
