@@ -933,7 +933,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-font', (event) => {
-    event.reply('font', store.get('font') || '');
+    event.reply('font', store.get('font') || 'Arial');
   });
 
   ipcMain.on('get-font-size', (event) => {
@@ -971,7 +971,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-font', (_, font) => {
-    store.set('font', font || '');
+    store.set('font', font || 'Arial');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('font', font);
     });
