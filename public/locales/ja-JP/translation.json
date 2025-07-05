@@ -1,7 +1,7 @@
 {
-  "about-me": "關於我",
+  "about-me": "自己紹介",
   "about-ricecall": "RiceCallについて",
-  "about-us": "關於我們",
+  "about-us": "RiceCallについて",
   "accept-application": "接受申請",
   "access-permission": "訪問許可權",
   "account": "帳號",
@@ -21,7 +21,7 @@
   "apply-friend": "好友請求",
   "apply-member": "申請會員",
   "argentina": "阿根廷",
-  "auto-login": "自動登入",
+  "auto-login": "自動ログイン",
   "auto-startup": "開機自動啟動",
   "avatar": "頭像",
   "back-to-login": "返回登入",
