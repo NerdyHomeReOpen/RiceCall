@@ -112,9 +112,6 @@ NEXT_PUBLIC_WS_URL= 你的 WebSocket 伺服器公開網址
 
 # Crowdin Settings
 NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH= Crowdin 哈希碼 (取得 i18n 資源使用)
-
-# Port Settings
-NEXT_PUBLIC_DEV_PORT= dev 模式使用的 port
 ```
 
 3. 啟動 Client

@@ -219,7 +219,7 @@ export const PopupSize = {
 // Constants
 const DEV = process.argv.includes('--dev');
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
-const PORT = Number(process.env.NEXT_PUBLIC_DEV_PORT);
+const PORT = 3000;
 const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
 const FILE_PATH = fileURLToPath(import.meta.url);
 const DIR_PATH = path.dirname(FILE_PATH);
