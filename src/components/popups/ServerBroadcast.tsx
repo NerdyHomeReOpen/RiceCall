@@ -121,12 +121,12 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
               <textarea
                 name="content"
                 maxLength={300}
+                placeholder={t('markdown-support')}
                 onChange={(e) => {
                   setBroadcastContent(e.target.value);
                 }}
               />
               <div className={broadcast['labelArea']}>
-                <div className={`${popup['label']} ${popup['disabled']}`}>{t('markdown-support')}</div>
                 <div className={broadcast['messageInputLength']}>
                   {broadcastContent.length}/{maxLength}
                 </div>
