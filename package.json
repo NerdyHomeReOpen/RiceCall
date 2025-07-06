@@ -14,7 +14,7 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack --port %NEXT_PUBLIC_DEV_PORT%",
+    "dev": "next dev",
     "start": "next start",
     "build": "next build",
     "export": "next export",
