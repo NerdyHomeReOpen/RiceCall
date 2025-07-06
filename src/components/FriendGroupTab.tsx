@@ -93,6 +93,8 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
             setSelectedItemId(friendGroupId);
           }}
           onContextMenu={(e) => {
+            const defaultFriendGroupKeys = new Set(['stranger', 'blacklist']);
+            if (defaultFriendGroupKeys.has(friendGroupId)) return;
             const x = e.clientX;
             const y = e.clientY;
             contextMenu.showContextMenu(x, y, false, false, [
