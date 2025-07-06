@@ -218,9 +218,8 @@ export const PopupSize = {
 
 // Constants
 const DEV = process.argv.includes('--dev');
-// const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
-const PORT = Number(process.env.NEXT_PUBLIC_PORT);
-const WS_URL_SECONDARY = process.env.NEXT_PUBLIC_SERVER_URL_SECONDARY;
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
+const PORT = Number(process.env.NEXT_PUBLIC_DEV_PORT);
 const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
 const FILE_PATH = fileURLToPath(import.meta.url);
 const DIR_PATH = path.dirname(FILE_PATH);
@@ -247,7 +246,7 @@ let authWindow: BrowserWindow;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
-let websocketUrl = WS_URL_SECONDARY;
+const websocketUrl = WS_URL;
 let socketInstance: Socket | null = null;
 
 // Discord RPC
@@ -273,10 +272,10 @@ const defaultPrecence = {
 const appServe = serve({ directory: path.join(ROOT_PATH, 'out') });
 
 // Functions
-async function checkIsHinet() {
-  const ipData = await fetch('https://ipinfo.io/json').then((res) => res.json());
-  return ipData.org.startsWith('AS3462');
-}
+// async function checkIsHinet() {
+//   const ipData = await fetch('https://ipinfo.io/json').then((res) => res.json());
+//   return ipData.org.startsWith('AS3462');
+// }
 
 function waitForPort(port: number) {
   return new Promise((resolve, reject) => {
@@ -793,7 +792,7 @@ app.on('ready', async () => {
   configureDiscordRPC();
   configureTray();
 
-  if (await checkIsHinet()) websocketUrl = WS_URL_SECONDARY;
+  // if (await checkIsHinet()) websocketUrl = WS_URL;
 
   await createAuthWindow();
   await createMainWindow();

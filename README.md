@@ -106,8 +106,15 @@ yarn install
 2. 建立 .env 或複製 .env.example 後更名為 .env，以下為環境變數範例
 
 ```env
-NEXT_PUBLIC_SERVER_URL=你的伺服器公開網址
-NEXT_PUBLIC_SERVER_URL_SECONDARY=備援網址(使用中華電信網路將會使用該網址，若無則設定和 NEXT_PUBLIC_SERVER_URL 相同)
+# Server Settings
+NEXT_PUBLIC_API_URL= 你的 API 伺服器公開網址
+NEXT_PUBLIC_WS_URL= 你的 WebSocket 伺服器公開網址
+
+# Crowdin Settings
+NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH= Crowdin 哈希碼 (取得 i18n 資源使用)
+
+# Port Settings
+NEXT_PUBLIC_DEV_PORT= dev 模式使用的 port
 ```
 
 3. 啟動 Client

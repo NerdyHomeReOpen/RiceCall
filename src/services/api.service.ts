@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import ErrorHandler from '@/utils/error';
 
-const API_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type RequestOptions = {
   headers?: Record<string, string>;
