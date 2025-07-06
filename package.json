@@ -14,7 +14,7 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "start": "next start",
     "build": "next build",
     "export": "next export",
