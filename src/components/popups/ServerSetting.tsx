@@ -389,8 +389,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
               t('server-announcement'),
               t('member-management'),
               t('access-permission'),
-              `${t('member-application-management')} (${serverApplications.length})`,
-              t('blacklist-management'),
+              `${t('member-application-management')} (${filteredApplications.length})`,
+              `${t('blacklist-management')} (${filteredBlockMembers.length})`,
             ].map((title, index) => (
               <div
                 className={`${setting['item']} ${activeTabIndex === index ? setting['active'] : ''}`}
@@ -827,9 +827,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         <div className={setting['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={`${popup['inputBox']} ${popup['row']}`}>
-              <div className={popup['label']}>
-                {t('applicants')}: {filteredApplications.length}
-              </div>
+              <div className={popup['label']}>{`${t('applicants')} (${filteredApplications.length})`}</div>
               <button
                 style={{ marginLeft: 'auto' }}
                 className={popup['button']}
@@ -939,7 +937,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}>
-              <div className={popup['label']}>{`${t('blacklist')}: (${filteredBlockMembers.length})`}</div>
+              <div className={popup['label']}>{`${t('blacklist')} (${filteredBlockMembers.length})`}</div>
               <div className={setting['searchWrapper']}>
                 <div className={setting['searchBorder']}>
                   <div className={setting['searchIcon']}></div>
