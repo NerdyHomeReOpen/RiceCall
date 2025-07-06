@@ -373,6 +373,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                     type="text"
                     value={channelPassword}
                     maxLength={4}
+                    placeholder={t('require-password-placeholder')}
                     onChange={(e) => {
                       setChannel((prev) => ({
                         ...prev,
