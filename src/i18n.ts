@@ -40,7 +40,7 @@ i18next
     },
 
     lng: 'zh-TW',
-    fallbackLng: 'en',
+    fallbackLng: 'zh-TW',
     supportedLngs: ['en', 'ru', 'ja', 'pt-BR', 'zh-TW', 'zh-CN'],
 
     ns: ['translation', 'rpc', 'message'],
