@@ -84,6 +84,7 @@
   "delete": "刪除",
   "delete-channel": "刪除頻道",
   "delete-friend": "刪除好友",
+  "delete-friend-group": "刪除分組",
   "delete-server": "刪除語音群",
   "deny-application": "拒絕申請",
   "description": "介紹",
@@ -445,5 +446,9 @@
   "broadcast-content": "廣播內容",
   "font-setting": "字型設定",
   "font-size": "字型大小",
-  "font": "字型"
+  "font": "字型",
+  "edit-note": "修改備註",
+  "permission-setting": "權限設置",
+  "hide-online-to-friend": "對好友隱藏上線",
+  "notify-friend-online": "好友上線提醒我"
 }
