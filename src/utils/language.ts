@@ -77,14 +77,12 @@ export const getTranslatedMessage = (
   params?: Record<string, string> | undefined,
 ) => {
   if (content.includes(' ')) {
-    let translateContent: string = '';
-    const messageKeys = content.split(' ');
-    for (const key of messageKeys) {
-      translateContent += t(key);
-    }
-    content = translateContent;
+    content = content
+      .split(' ')
+      .map((_) => t(_, { ns: 'message' }))
+      .join(' ');
   } else {
-    content = t(content);
+    content = t(content, { ns: 'message' });
   }
 
   // Replace Params
