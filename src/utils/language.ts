@@ -86,7 +86,7 @@ export const getTranslatedMessage = (
   }
 
   // Replace Params
-  content = content.replace(/{(\w+)}/gm, (match, p1) => params?.[p1] || match);
+  content = content.replace(/{(\w+)}/gm, (match, p1) => params?.[p1] ?? match);
 
   const isPlainText = !/[#>*\-\[\]`|!_~]/.test(content);
   return isPlainText ? content.replace(/\n/g, '<br />') : content;
