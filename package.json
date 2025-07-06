@@ -37,6 +37,7 @@
     "font-list": "^1.5.1",
     "highlight.js": "^11.11.1",
     "i18next": "^25.2.1",
+    "i18next-chained-backend": "^4.6.2",
     "i18next-http-backend": "^3.0.2",
     "net": "^1.0.2",
     "next": "^15.3.2",
