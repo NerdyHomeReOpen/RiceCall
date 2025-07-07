@@ -269,16 +269,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               <div className={directMessage['actionTitle']}>{targetCurrentServerName}</div>
             </div>
           )}
-          {!isFriend && (
-            <div className={directMessage['actionArea']}>
-              <div className={directMessage['actionTitle']}>{t('non-friend-notice')}</div>
-            </div>
-          )}
-          {(isFriend || !isOnline) && (
-            <div className={directMessage['actionArea']}>
-              <div className={directMessage['actionTitle']}>{t('non-online-notice')}</div>
-            </div>
-          )}
+          <div className={directMessage['actionArea']}>
+            {!isFriend && <div className={directMessage['actionTitle']}>{t('non-friend-notice')}</div>}
+            {isFriend && !isOnline && <div className={directMessage['actionTitle']}>{t('non-online-notice')}</div>}
+          </div>
           <div className={directMessage['messageArea']}>
             <MessageViewer messages={directMessages} userId={userId} />
           </div>
