@@ -89,7 +89,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         ...prev,
         {
           type: 'warn',
-          content: "<span style='color: #038792'>你還不是對方的好友，這項功能無法使用!</span>",
+          content: `<span style='color: #038792'>${t('non-friend-warning-message')}</span>`,
           timestamp: Date.now(),
           parameter: {},
           contentMetadata: {},

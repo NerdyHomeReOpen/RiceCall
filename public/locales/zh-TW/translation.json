@@ -15,6 +15,7 @@
   "all-channel": "所有頻道",
   "server-info": "查看群資料",
   "server-announcement": "群公告",
+  "server-broadcast": "群廣播",
   "applicants": "申請人數",
   "application-description": "申請說明",
   "application-setting": "申請設定",
@@ -244,6 +245,7 @@
   "remove-admin": "移除群管理員",
   "remove-category-admin": "移除類別管理員",
   "remove-channel-admin": "移除頻道管理員",
+  "remove-self-membership": "解除會員關係",
   "rename-friend-group": "重命名分組",
   "repeat-input-password": "重複輸入密碼",
   "saudi-arabia": "沙烏地阿拉伯",
@@ -451,5 +453,8 @@
   "edit-note": "修改備註",
   "permission-setting": "權限設置",
   "hide-online-to-friend": "對好友隱藏上線",
-  "notify-friend-online": "好友上線提醒我"
+  "notify-friend-online": "好友上線提醒我",
+  "non-friend-warning-message": "你還不是對方的好友，這項功能無法使用!",
+  "non-friend-notice": "對方不在你的好友列表，一些功能將無法使用!",
+  "non-online-notice": "對方目前不在線上，無法馬上回覆您"
 }
