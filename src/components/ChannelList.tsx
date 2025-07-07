@@ -204,11 +204,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
           </div>
           <div className={styles['baseInfoBox']}>
             <div className={styles['container']}>
-              {isVerifyServer ? (
-                <div className={styles['verifyIcon']} title={'官方認證語音群' /* TODO: lang.tr */}></div>
-              ) : (
-                ''
-              )}
+              {isVerifyServer ? <div className={styles['verifyIcon']} title={t('official-verify-server')}></div> : ''}
               <div className={styles['name']}>{serverName} </div>
             </div>
             <div className={styles['container']}>

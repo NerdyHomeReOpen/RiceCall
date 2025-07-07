@@ -184,18 +184,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       ipcService.popup.onSubmit('alertDialog', callback);
     };
 
-    const handleRemoveMembership = (
-      memberId: User['userId'],
-      serverId: Server['serverId'],
-      memberName: User['name'],
-    ) => {
+    const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
       if (!socket) return;
-      handleOpenAlertDialog(
-        t('confirm-remove-membership').replace('{0}', memberId === userId ? t('self') : memberName),
-        () => {
-          handleEditMember({ permissionLevel: 1, nickname: null }, memberId, serverId);
-        },
-      );
+      handleOpenAlertDialog(t('confirm-remove-membership').replace('{0}', memberName), () => {
+        handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId);
+      });
     };
 
     const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
@@ -343,7 +336,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
               label: t('remove-self-membership'),
               show: canRemoveMembership,
               onClick: () => {
-                handleRemoveMembership(userId, serverId, memberName);
+                handleRemoveMembership(userId, serverId, t('self'));
               },
             },
             {
@@ -387,8 +380,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId),
                 },
                 {
-                  id: 'set-admin',
-                  label: t('set-admin'),
+                  id: 'set-server-admin',
+                  label: t('set-server-admin'),
                   show: canChangeToAdmin,
                   onClick: () => handleEditMember({ permissionLevel: 5 }, memberUserId, serverId),
                 },

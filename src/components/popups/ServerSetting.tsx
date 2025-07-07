@@ -194,24 +194,18 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     ipcService.popup.onSubmit('alertDialog', callback);
   };
 
-  const handleRemoveMembership = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
+  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
     if (!socket) return;
-    handleOpenAlertDialog(
-      `確定要解除 ${userName} 與語音群的會員關係嗎`, // lang.tr
-      () => {
-        handleEditMember({ permissionLevel: 1 }, userId, serverId);
-      },
-    );
+    handleOpenAlertDialog(t('confirm-remove-membership').replace('{0}', userName), () => {
+      handleEditMember({ permissionLevel: 1 }, userId, serverId);
+    });
   };
 
   const handleRemoveBlockMember = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
     if (!socket) return;
-    handleOpenAlertDialog(
-      `確定要解除封鎖 ${userName} 嗎`, // lang.tr
-      () => {
-        handleEditMember({ isBlocked: 0 }, userId, serverId);
-      },
-    );
+    handleOpenAlertDialog(t('confirm-unblock-user').replace('{0}', userName), () => {
+      handleEditMember({ isBlocked: 0 }, userId, serverId);
+    });
   };
 
   const handleOpenMemberApplySetting = () => {
@@ -706,7 +700,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                                   label: t('set-guest'),
                                   show: canChangeToGuest,
                                   onClick: () =>
-                                    handleRemoveMembership(memberUserId, memberNickname || memberName, serverId),
+                                    handleRemoveMembership(memberUserId, serverId, memberNickname || memberName),
                                 },
                                 {
                                   id: 'set-member',

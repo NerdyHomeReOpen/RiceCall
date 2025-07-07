@@ -8,8 +8,11 @@ import changeTheme from '@/styles/popups/changeTheme.module.css';
 import ipcService from '@/services/ipc.service';
 
 // Providers
-import { setThemeValue } from '@/utils/themeStorage';
 import { useContextMenu } from '@/providers/ContextMenu';
+import { useTranslation } from 'react-i18next';
+
+// Utils
+import { setThemeValue } from '@/utils/themeStorage';
 
 interface ChangeThemePopupProps {
   submitTo: string;
@@ -70,6 +73,7 @@ function getContrastColor([r, g, b]: [number, number, number]): string {
 const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   // Hooks
   const contextMenu = useContextMenu();
+  const { t } = useTranslation();
 
   // Refs
   const containerRef = useRef<HTMLFormElement>(null);
@@ -187,7 +191,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       }
     };
     img.onerror = () => {
-      console.error('載入顏色選擇器圖片時發生錯誤。');
+      console.error(`Error loading color selector image: ${imgSrc}`);
     };
   };
 
@@ -231,10 +235,10 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                     >
                       {hoveredThemeIndex === i && (
                         <div className={changeTheme['themeDescription']}>
-                          {i === 0 && '粉紅回憶'}
-                          {i === 1 && '純真童年'}
-                          {i === 2 && '可愛貓咪'}
-                          {i === 3 && '那一年'}
+                          {i === 0 && t('pink-memory')}
+                          {i === 1 && t('pure-childhood')}
+                          {i === 2 && t('cute-cat')}
+                          {i === 3 && t('that-year')}
                         </div>
                       )}
                     </div>
@@ -275,8 +279,8 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                           onContextMenu={(e) => {
                             contextMenu.showContextMenu(e.clientX, e.clientY, false, false, [
                               {
-                                id: 'remove-custom-color',
-                                label: '刪除',
+                                id: 'delete',
+                                label: t('delete'),
                                 onClick: () => handleRemoveCustom(i),
                               },
                             ]);

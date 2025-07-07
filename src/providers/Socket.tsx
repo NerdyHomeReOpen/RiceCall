@@ -12,6 +12,9 @@ import ipcService from '@/services/ipc.service';
 // Utils
 import ErrorHandler from '@/utils/error';
 
+// Providers
+import { useTranslation } from 'react-i18next';
+
 type SocketContextType = {
   send: Record<SocketClientEvent, (...args: any[]) => void>;
   on: Record<SocketServerEvent, (callback: (...args: any[]) => void) => () => void>;
@@ -32,6 +35,9 @@ interface SocketProviderProps {
 }
 
 const SocketProvider = ({ children }: SocketProviderProps) => {
+  // Hooks
+  const { t } = useTranslation();
+
   // States
   const [on, setOn] = useState<SocketContextType['on']>({} as SocketContextType['on']);
   const [send, setSend] = useState<SocketContextType['send']>({} as SocketContextType['send']);
@@ -69,14 +75,12 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
   const handleConnectError = (error: any) => {
     console.error('Socket connect error:', error);
-    new ErrorHandler(new Error('連線失敗，正在嘗試重新連線，按下確定後將自動登出'), () =>
-      ipcService.auth.logout(),
-    ).show();
+    new ErrorHandler(new Error(t('connection-failed-message')), () => ipcService.auth.logout()).show();
   };
 
   const handleReconnectError = (error: any) => {
     console.error('Socket reconnect error:', error);
-    new ErrorHandler(new Error('重新連線失敗，按下確定後將自動登出'), () => ipcService.auth.logout()).show();
+    new ErrorHandler(new Error(t('reconnection-failed-message')), () => ipcService.auth.logout()).show();
   };
 
   // Effects

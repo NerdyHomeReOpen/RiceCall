@@ -456,5 +456,8 @@
   "notify-friend-online": "好友上線提醒我",
   "non-friend-warning-message": "你還不是對方的好友，這項功能無法使用!",
   "non-friend-notice": "對方不在你的好友列表，一些功能將無法使用!",
-  "non-online-notice": "對方目前不在線上，無法馬上回覆您"
+  "non-online-notice": "對方目前不在線上，無法馬上回覆您",
+  "official-verify-server": "官方認證語音群",
+  "connection-failed-message": "連線失敗，正在嘗試重新連線，按下確定後將自動登出",
+  "reconnection-failed-message": "重新連線失敗，按下確定後將自動登出"
 }

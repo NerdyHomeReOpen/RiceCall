@@ -8,6 +8,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useSocket } from '@/providers/Socket';
 import { useLoading } from '@/providers/Loading';
 import { useMainTab } from '@/providers/MainTab';
+import { useTranslation } from 'react-i18next';
 
 // Type
 import { PopupType, UserServer, User, Member, Server } from '@/types';
@@ -26,6 +27,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   const socket = useSocket();
   const loadingBox = useLoading();
   const mainTab = useMainTab();
+  const { t } = useTranslation();
 
   // Variables
   const {
@@ -80,21 +82,11 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     });
   };
 
-  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId']) => {
+  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
     if (!socket) return;
-    handleOpenAlertDialog(
-      '確定要解除 自己 與語音群的會員關係嗎', // lang.tr
-      () => {
-        handleEditMember(
-          {
-            permissionLevel: 1,
-            nickname: null,
-          },
-          userId,
-          serverId,
-        );
-      },
-    );
+    handleOpenAlertDialog(t('confirm-remove-membership').replace('{0}', memberName), () => {
+      handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId);
+    });
   };
 
   const handleFavoriteServer = (serverId: Server['serverId']) => {
@@ -113,31 +105,31 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
         const y = e.clientY;
         contextMenu.showContextMenu(x, y, false, false, [
           {
-            id: 'joinServer',
-            label: '進入', // TODO: lang.tr
+            id: 'join-server',
+            label: t('join-server'),
             onClick: () => handleServerSelect(userId, serverId, serverDisplayId),
           },
           {
-            id: 'viewServerInfo',
-            label: '查看群資料', // TODO: lang.tr
+            id: 'view-server-info',
+            label: t('view-server-info'),
             disabled: true,
             onClick: () => {
               /* TODO: handleOpenServerSetting(userId, serverId); */
             },
           },
           {
-            id: 'setFavorite',
-            label: !serverFavorite ? '加入收藏' : '取消收藏', // TODO: lang.tr
+            id: 'set-favorite',
+            label: !serverFavorite ? t('add-to-favorite') : t('remove-from-favorite'),
             onClick: () => {
               handleFavoriteServer(serverId);
             },
           },
           {
-            id: 'removeMemberShip',
-            label: '解除會員關係', // TODO: lang.tr
+            id: 'remove-membership',
+            label: t('remove-self-membership'),
             show: canRemoveMemberShip,
             onClick: () => {
-              handleRemoveMembership(userId, serverId);
+              handleRemoveMembership(userId, serverId, t('self'));
             },
           },
         ]);

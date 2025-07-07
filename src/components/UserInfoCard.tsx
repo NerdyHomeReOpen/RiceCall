@@ -135,7 +135,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
             {/* VIP Info Text */}
             {memberVip > 0 && (
               <div className={userInfoCard['vipText']}>
-                {t('vip-upgrade-boost', { vipBoostMultiplier: vipBoostMultiplier.toString() })}
+                {t('vip-upgrade-boost').replace('{0}', vipBoostMultiplier.toString())}
               </div>
             )}
 
