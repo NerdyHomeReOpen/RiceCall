@@ -30,7 +30,7 @@
   "unforbid-voice-for-member": "[{target}] включен микрофон администратором [{operator}]",
   "forbid-text-for-member": "[{target}] запрещена отправка текстовых сообщений администратором [{operator}]",
   "unforbid-text-for-member": "[{target}] разрешена отправка текстовых сообщений администратором [{operator}]",
-  "forbid-voice-fro-self": "Ваш микрофон отключен администраторов [{operator}]",
+  "forbid-voice-fro-self": "Ваш микрофон отключен администратором [{operator}]",
   "unforbid-voice-fro-self": "Администратор [{operator}] включил вам микрофон",
   "forbid-text-fro-self": "Администратор [{operator}] запретил вам отправлять текстовые сообщения.",
   "unforbid-text-fro-self": "Администратор [{operator}] разрешил вам отправлять текстовые сообщения.",
