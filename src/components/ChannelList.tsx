@@ -75,7 +75,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       name: currentChannelName,
       voiceMode: currentChannelVoiceMode,
     } = currentChannel;
-    const isVerfyServer = false;
+    const isVerifiedServer = false;
     const canEditNickname = userPermission > 1;
     const canApplyMember = userPermission < 2;
     const canOpenSettings = userPermission > 4;
@@ -202,7 +202,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
           </div>
           <div className={styles['baseInfoBox']}>
             <div className={styles['container']}>
-              {isVerfyServer && <div className={styles['verifyIcon']} title={t('official-verify-server')}></div>}
+              {isVerifiedServer && <div className={styles['verifyIcon']} title={t('official-verified-server')}></div>}
               <div className={styles['name']}>{serverName} </div>
             </div>
             <div className={styles['container']}>
