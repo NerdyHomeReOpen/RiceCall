@@ -119,13 +119,13 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
           },
           {
             id: 'set-favorite',
-            label: !serverFavorite ? t('add-to-favorite') : t('remove-from-favorite'),
+            label: !serverFavorite ? t('favorite') : t('unfavorite'),
             onClick: () => {
               handleFavoriteServer(serverId);
             },
           },
           {
-            id: 'remove-membership',
+            id: 'remove-self-membership',
             label: t('remove-self-membership'),
             show: canRemoveMemberShip,
             onClick: () => {
