@@ -178,7 +178,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }
                 >
                   <option value="free">{t('free-speech')}</option>
-                  <option value="forbidden">{t('forbid-speech')}</option>
+                  <option value="forbidden" disabled>
+                    {t('forbid-speech')}
+                  </option>
                   <option value="queue" disabled>
                     {t('queue-speech')}
                   </option>
