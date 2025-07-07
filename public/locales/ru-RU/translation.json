@@ -450,6 +450,6 @@
   "font": "Шрифт",
   "edit-note": "Изменить примечание",
   "permission-setting": "Настройка доступа",
-  "hide-online-to-friend": "Не показывать свой online",
-  "notify-friend-online": "Напомни мне, когда друг выходит в online"
+  "hide-online-to-friend": "Не показывать когда я online",
+  "notify-friend-online": "Напомни мне, когда друг online"
 }
