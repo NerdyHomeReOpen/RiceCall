@@ -271,7 +271,12 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
           )}
           {!isFriend && (
             <div className={directMessage['actionArea']}>
-              <div className={directMessage['actionTitle']}>{'對方不在你的好友列表，一些功能將無法使用!'}</div>
+              <div className={directMessage['actionTitle']}>{t('non-friend-notice')}</div>
+            </div>
+          )}
+          {(isFriend || !isOnline) && (
+            <div className={directMessage['actionArea']}>
+              <div className={directMessage['actionTitle']}>{t('non-online-notice')}</div>
             </div>
           )}
           <div className={directMessage['messageArea']}>
