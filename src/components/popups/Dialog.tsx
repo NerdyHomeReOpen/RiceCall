@@ -22,11 +22,12 @@ enum DIALOG_ICON {
 
 interface DialogPopupProps {
   iconType: keyof typeof DIALOG_ICON;
-  title: React.ReactNode;
+  message: React.ReactNode | string;
   submitTo: string;
+  timestamp?: number;
 }
 
-const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, title, submitTo }) => {
+const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, submitTo, timestamp }) => {
   // Hooks
   const { t } = useTranslation();
   const loadingBox = useLoading();
@@ -35,7 +36,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, title, submitTo }) 
   const containerRef = useRef<HTMLFormElement>(null);
 
   // Variables
-  const formatedTitle = typeof title === 'string' ? t(title) : title;
+  const formatedMessage = typeof message === 'string' ? t(message) : message;
 
   // Handlers
   const handleSubmit = () => {
@@ -82,7 +83,9 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, title, submitTo }) 
                 ${popup[DIALOG_ICON[iconType]]}
               `}
             />
-            <div className={popup['label']}>{formatedTitle}</div>
+            <div className={popup['label']}>
+              {formatedMessage} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
+            </div>
           </div>
         </div>
       </div>

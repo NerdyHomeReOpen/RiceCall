@@ -188,7 +188,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
     ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
     ipcService.initialData.onRequest('alertDialog', {
-      title: message,
+      message: message,
       submitTo: 'alertDialog',
     });
     ipcService.popup.onSubmit('alertDialog', callback);
@@ -251,7 +251,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const handleOpenErrorDialog = (message: string) => {
     ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
     ipcService.initialData.onRequest('errorDialog', {
-      title: message,
+      message: message,
       submitTo: 'errorDialog',
     });
   };

@@ -126,7 +126,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const handleOpenWarningDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', {
-        title: message,
+        message: message,
         submitTo: 'warningDialog',
       });
       ipcService.popup.onSubmit('warningDialog', callback);

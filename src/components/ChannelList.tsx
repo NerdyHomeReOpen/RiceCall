@@ -90,9 +90,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
 
     const handleOpenAlertDialog = (message: string) => {
       ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
-      ipcService.initialData.onRequest('alertDialog', {
-        title: message,
-      });
+      ipcService.initialData.onRequest('alertDialog', { message: message });
     };
 
     const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {

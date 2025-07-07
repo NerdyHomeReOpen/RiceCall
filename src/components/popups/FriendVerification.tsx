@@ -61,7 +61,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
     ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
     ipcService.initialData.onRequest('alertDialog', {
-      title: message,
+      message: message,
       submitTo: 'alertDialog',
     });
     ipcService.popup.onSubmit('alertDialog', callback);

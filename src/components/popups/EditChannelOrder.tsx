@@ -105,7 +105,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const handleOpenWarningDialog = (message: string) => {
     ipcService.popup.open(PopupType.DIALOG_WARNING, 'deleteChannel');
     ipcService.initialData.onRequest('deleteChannel', {
-      title: message,
+      message: message,
       submitTo: 'deleteChannel',
     });
     ipcService.popup.onSubmit('deleteChannel', () => {

@@ -85,7 +85,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   const handleOpenErrorDialog = (message: string) => {
     ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
     ipcService.initialData.onRequest('errorDialog', {
-      title: message,
+      message: message,
       submitTo: 'errorDialog',
     });
   };
