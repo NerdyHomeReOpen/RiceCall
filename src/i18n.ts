@@ -27,7 +27,7 @@ i18next
     fallbackLng: 'zh-TW',
     supportedLngs: ['en', 'ru', 'ja', 'pt-BR', 'zh-TW', 'zh-CN'],
 
-    ns: ['translation', 'rpc'],
+    ns: ['translation', 'rpc', 'message'],
     defaultNS: 'translation',
 
     interpolation: { escapeValue: false },
