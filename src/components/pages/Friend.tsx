@@ -99,7 +99,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
       timestamp: Date.now(),
       buttons: [
         {
-          label: t('rpc:join-server'),
+          label: t('rpc:join-discord-server'),
           url: 'https://discord.gg/adCWzv6wwS',
         },
       ],
