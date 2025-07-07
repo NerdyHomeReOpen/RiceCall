@@ -178,7 +178,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }
                 >
                   <option value="free">{t('free-speech')}</option>
-                  <option value="forbidden">{t('forbidden-speech')}</option>
+                  <option value="forbidden">{t('forbid-speech')}</option>
                   <option value="queue" disabled>
                     {t('queue-speech')}
                   </option>
@@ -373,6 +373,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                     type="text"
                     value={channelPassword}
                     maxLength={4}
+                    placeholder={t('require-password-placeholder')}
                     onChange={(e) => {
                       setChannel((prev) => ({
                         ...prev,
@@ -493,7 +494,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }
                   style={{ width: '60px' }}
                 />
-                <div className={popup['label']}>{t('seconds')}</div>
+                <div className={popup['label']}>{t('second')}</div>
               </div>
 
               <div className={`${popup['inputBox']} ${popup['row']}`}>
@@ -512,7 +513,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }
                   style={{ width: '60px' }}
                 />
-                <div className={popup['label']}>{t('seconds')}</div>
+                <div className={popup['label']}>{t('second')}</div>
               </div>
             </div>
           </div>

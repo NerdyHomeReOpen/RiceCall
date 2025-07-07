@@ -320,8 +320,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         },
                       },
                       {
-                        id: 'forbidden-speech',
-                        label: t('forbidden-speech'),
+                        id: 'forbid-speech',
+                        label: t('forbid-speech'),
                         show: canChangeToForbiddenSpeech,
                         disabled: true,
                         onClick: () => {
@@ -340,8 +340,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         },
                         submenuItems: [
                           {
-                            id: 'forbidden-queue',
-                            label: t('forbidden-queue'),
+                            id: 'forbid-queue',
+                            label: t('forbid-queue'),
                             show: canChangeToForbiddenQueue,
                             disabled: true,
                             onClick: () => {
@@ -367,7 +367,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     : channelVoiceMode === 'free'
                     ? t('free-speech')
                     : channelVoiceMode === 'forbidden'
-                    ? t('forbidden-speech')
+                    ? t('forbid-speech')
                     : ''}
                 </div>
               </div>
@@ -391,7 +391,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 </div>
               </div>
               <div className={styles['buttons']}>
-                <div className={styles['bkgModeButton']}>{t('mixing-mode')}</div>
+                <div className={styles['bkgModeButton']}>{t('mixing')}</div>
                 <div className={styles['saperator']} />
                 <div className={styles['micVolumeContainer']}>
                   <div

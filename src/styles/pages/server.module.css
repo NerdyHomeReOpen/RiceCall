@@ -519,9 +519,12 @@
 .micButton {
   min-width: 154px;
   min-height: 50px;
+  max-width: 154px;
+  max-height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 10px;
   background-image: url('../../../public/channel/mic_state_menu.png');
   background-repeat: no-repeat;
   background-size: auto;
@@ -922,7 +925,6 @@
   opacity: 0;
 }
 
-.currentChannelIcon:not(.currentChannelPing, .currentChannelText):hover
-  .currentChannelPing {
+.currentChannelIcon:not(.currentChannelPing, .currentChannelText):hover .currentChannelPing {
   opacity: 1;
 }

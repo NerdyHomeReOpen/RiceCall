@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import net from 'net';
 import path from 'path';
+import fontList from 'font-list';
 import { fileURLToPath } from 'url';
 import { io, Socket } from 'socket.io-client';
 import DiscordRPC from 'discord-rpc';
@@ -203,7 +204,7 @@ export const PopupSize = {
   [PopupType.EDIT_FRIENDGROUP]: { height: 200, width: 370 },
   [PopupType.EDIT_FRIEND]: { height: 200, width: 370 },
   [PopupType.FRIEND_VERIFICATION]: { height: 550, width: 500 },
-  [PopupType.MEMBER_APPLY_SETTING]: { height: 200, width: 370 },
+  [PopupType.MEMBER_APPLY_SETTING]: { height: 250, width: 370 },
   [PopupType.SEARCH_USER]: { height: 200, width: 370 },
   [PopupType.SERVER_SETTING]: { height: 520, width: 600 },
   [PopupType.SERVER_BROADCAST]: { height: 300, width: 450 },
@@ -217,9 +218,8 @@ export const PopupSize = {
 
 // Constants
 const DEV = process.argv.includes('--dev');
-// const WS_URL = process.env.NEXT_PUBLIC_SERVER_URL;
-const PORT = Number(process.env.NEXT_PUBLIC_PORT);
-const WS_URL_SECONDARY = process.env.NEXT_PUBLIC_SERVER_URL_SECONDARY;
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
+const PORT = 3000;
 const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
 const FILE_PATH = fileURLToPath(import.meta.url);
 const DIR_PATH = path.dirname(FILE_PATH);
@@ -246,7 +246,7 @@ let authWindow: BrowserWindow;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
-let websocketUrl = WS_URL_SECONDARY;
+const websocketUrl = WS_URL;
 let socketInstance: Socket | null = null;
 
 // Discord RPC
@@ -272,10 +272,10 @@ const defaultPrecence = {
 const appServe = serve({ directory: path.join(ROOT_PATH, 'out') });
 
 // Functions
-async function checkIsHinet() {
-  const ipData = await fetch('https://ipinfo.io/json').then((res) => res.json());
-  return ipData.org.startsWith('AS3462');
-}
+// async function checkIsHinet() {
+//   const ipData = await fetch('https://ipinfo.io/json').then((res) => res.json());
+//   return ipData.org.startsWith('AS3462');
+// }
 
 function waitForPort(port: number) {
   return new Promise((resolve, reject) => {
@@ -450,6 +450,11 @@ async function createAuthWindow() {
     app.exit();
   });
 
+  authWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
   authWindow.show();
   authWindow.focus();
   authWindow.setAlwaysOnTop(true);
@@ -484,15 +489,17 @@ async function createPopup(type: PopupType, id: string, force = true): Promise<B
   popups[id] = new BrowserWindow({
     width: PopupSize[type].width,
     height: PopupSize[type].height,
-    resizable: false,
+    modal: true,
     frame: false,
     transparent: true,
+    resizable: false,
     hasShadow: true,
-    modal: true,
     fullscreen: false,
+    icon: APP_ICON,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      webviewTag: true,
     },
   });
 
@@ -504,6 +511,11 @@ async function createPopup(type: PopupType, id: string, force = true): Promise<B
     popups[id].loadURL(`${BASE_URI}/popup?type=${type}&id=${id}`);
     // popups[id].webContents.openDevTools();
   }
+
+  popups[id].webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
 
   popups[id].show();
   popups[id].focus();
@@ -780,7 +792,7 @@ app.on('ready', async () => {
   configureDiscordRPC();
   configureTray();
 
-  if (await checkIsHinet()) websocketUrl = WS_URL_SECONDARY;
+  // if (await checkIsHinet()) websocketUrl = WS_URL;
 
   await createAuthWindow();
   await createMainWindow();
@@ -909,6 +921,8 @@ app.on('ready', async () => {
       inputAudioDevice: store.get('audioInputDevice') || '',
       outputAudioDevice: store.get('audioOutputDevice') || '',
       dontShowDisclaimer: store.get('dontShowDisclaimer') || false,
+      font: store.get('font') || '',
+      fontSize: store.get('fontSize') || 13,
     };
     event.reply('system-settings-status', settings);
   });
@@ -922,11 +936,24 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-input-audio-device', (event) => {
-    event.reply('input-audio-device-status', store.get('audioInputDevice') || '');
+    event.reply('input-audio-device', store.get('audioInputDevice') || '');
   });
 
   ipcMain.on('get-output-audio-device', (event) => {
-    event.reply('output-audio-device-status', store.get('audioOutputDevice') || '');
+    event.reply('output-audio-device', store.get('audioOutputDevice') || '');
+  });
+
+  ipcMain.on('get-font', (event) => {
+    event.reply('font', store.get('font') || 'Arial');
+  });
+
+  ipcMain.on('get-font-size', (event) => {
+    event.reply('font-size', store.get('fontSize') || 13);
+  });
+
+  ipcMain.on('get-font-list', async (event) => {
+    const fonts = await fontList.getFonts();
+    event.reply('font-list', fonts);
   });
 
   ipcMain.on('set-auto-launch', (_, enable) => {
@@ -943,14 +970,28 @@ app.on('ready', async () => {
   ipcMain.on('set-input-audio-device', (_, deviceId) => {
     store.set('audioInputDevice', deviceId || '');
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('input-audio-device-status', deviceId);
+      window.webContents.send('input-audio-device', deviceId);
     });
   });
 
   ipcMain.on('set-output-audio-device', (_, deviceId) => {
     store.set('audioOutputDevice', deviceId || '');
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('output-audio-device-status', deviceId);
+      window.webContents.send('output-audio-device', deviceId);
+    });
+  });
+
+  ipcMain.on('set-font', (_, font) => {
+    store.set('font', font || 'Arial');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('font', font);
+    });
+  });
+
+  ipcMain.on('set-font-size', (_, fontSize) => {
+    store.set('fontSize', fontSize || 13);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('font-size', fontSize);
     });
   });
 

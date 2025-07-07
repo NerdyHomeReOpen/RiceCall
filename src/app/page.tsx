@@ -506,7 +506,16 @@ const RootPageComponent = () => {
   };
 
   const handleServerMemberAdd = (member: ServerMember): void => {
-    setServerMembers((prev) => [...prev, member]);
+    setServerMembers((prev) => {
+      const index = prev.findIndex((m) => m.userId === member.userId);
+      if (index >= 0) {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], ...member };
+        return updated;
+      } else {
+        return [...prev, member];
+      }
+    });
   };
 
   const handleServerMemberUpdate = (
@@ -706,11 +715,6 @@ const RootPageComponent = () => {
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
   }, [user, mainTab, loadingBox.isLoading]);
-
-  useEffect(() => {
-    const language = localStorage.getItem('language') as LanguageKey;
-    if (language) i18n.changeLanguage(language);
-  }, []);
 
   return (
     <WebRTCProvider>

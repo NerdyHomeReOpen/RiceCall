@@ -177,7 +177,34 @@ const ipcService = {
     },
   },
 
+  fontList: {
+    get: (callback: (fonts: string[]) => void) => {
+      if (!isElectron) return;
+      ipcRenderer.send('get-font-list');
+      ipcRenderer.once('font-list', (_: any, fonts: string[]) => {
+        callback(fonts);
+      });
+    },
+  },
+
   systemSettings: {
+    get: (
+      callback: (data: {
+        autoLaunch: boolean;
+        soundEffect: boolean;
+        inputAudioDevice: string;
+        outputAudioDevice: string;
+        fontSize: number;
+        font: string;
+      }) => void,
+    ) => {
+      if (!isElectron) return;
+      ipcRenderer.send('get-system-settings');
+      ipcRenderer.once('system-settings-status', (_: any, data: any) => {
+        callback(data);
+      });
+    },
+
     autoLaunch: {
       get: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return;
@@ -228,7 +255,7 @@ const ipcService = {
       get: (callback: (deviceId: string) => void) => {
         if (!isElectron) return;
         ipcRenderer.send('get-input-audio-device');
-        ipcRenderer.once('input-audio-device-status', (_: any, deviceId: string) => {
+        ipcRenderer.once('input-audio-device', (_: any, deviceId: string) => {
           callback(deviceId);
         });
       },
@@ -240,10 +267,10 @@ const ipcService = {
 
       onUpdate: (callback: (deviceId: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('input-audio-device-status', (_: any, deviceId: string) => {
+        ipcRenderer.on('input-audio-device', (_: any, deviceId: string) => {
           callback(deviceId);
         });
-        return () => ipcRenderer.removeAllListeners('input-audio-device-status');
+        return () => ipcRenderer.removeAllListeners('input-audio-device');
       },
     },
 
@@ -251,7 +278,7 @@ const ipcService = {
       get: (callback: (deviceId: string) => void) => {
         if (!isElectron) return;
         ipcRenderer.send('get-output-audio-device');
-        ipcRenderer.once('output-audio-device-status', (_: any, deviceId: string) => {
+        ipcRenderer.once('output-audio-device', (_: any, deviceId: string) => {
           callback(deviceId);
         });
       },
@@ -263,32 +290,63 @@ const ipcService = {
 
       onUpdate: (callback: (deviceId: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('output-audio-device-status', (_: any, deviceId: string) => {
+        ipcRenderer.on('output-audio-device', (_: any, deviceId: string) => {
           callback(deviceId);
         });
-        return () => ipcRenderer.removeAllListeners('output-audio-device-status');
+        return () => ipcRenderer.removeAllListeners('output-audio-device');
       },
-    },
-
-    get: (
-      callback: (data: {
-        autoLaunch: boolean;
-        soundEffect: boolean;
-        inputAudioDevice: string;
-        outputAudioDevice: string;
-      }) => void,
-    ) => {
-      if (!isElectron) return;
-      ipcRenderer.send('get-system-settings');
-      ipcRenderer.once('system-settings-status', (_: any, data: any) => {
-        callback(data);
-      });
     },
 
     disclaimer: {
       dontShowNextTime: () => {
         if (!isElectron) return;
         ipcRenderer.send('dont-show-disclaimer-next-time');
+      },
+    },
+
+    font: {
+      get: (callback: (font: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-font');
+        ipcRenderer.once('font', (_: any, font: string) => {
+          callback(font);
+        });
+      },
+
+      set: (font: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-font', font);
+      },
+
+      onUpdate: (callback: (font: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('font', (_: any, font: string) => {
+          callback(font);
+        });
+        return () => ipcRenderer.removeAllListeners('font');
+      },
+    },
+
+    fontSize: {
+      get: (callback: (fontSize: number) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-font-size');
+        ipcRenderer.once('font-size', (_: any, fontSize: number) => {
+          callback(fontSize);
+        });
+      },
+
+      set: (fontSize: number) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-font-size', fontSize);
+      },
+
+      onUpdate: (callback: (fontSize: number) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('font-size', (_: any, fontSize: number) => {
+          callback(fontSize);
+        });
+        return () => ipcRenderer.removeAllListeners('font-size');
       },
     },
   },

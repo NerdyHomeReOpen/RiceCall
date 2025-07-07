@@ -696,7 +696,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 </div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']} ${popup['disabled']}`}>
-                <div className={popup['label']}>{t('about')}</div>
+                <div className={popup['label']}>{t('about-me')}</div>
                 <textarea name="about" />
               </div>
             </div>

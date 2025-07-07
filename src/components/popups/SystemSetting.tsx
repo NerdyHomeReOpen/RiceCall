@@ -24,6 +24,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [minimizeToTray, setMinimizeToTray] = useState<boolean>(false);
   const [startMinimized, setStartMinimized] = useState<boolean>(false);
   const [soundEffect, setSoundEffect] = useState<boolean>(true);
+  const [fontSize, setFontSize] = useState<number>(13);
+  const [fontFamily, setFontFamily] = useState<string>('Arial');
+  const [fontList, setFontList] = useState<string[]>([]);
 
   // Handlers
   const handleClose = () => {
@@ -37,6 +40,12 @@ const SystemSettingPopup: React.FC = React.memo(() => {
       setSoundEffect(data.soundEffect);
       setSelectedInput(data.inputAudioDevice);
       setSelectedOutput(data.outputAudioDevice);
+      setFontSize(data.fontSize);
+      setFontFamily(data.font);
+    });
+
+    ipcService.fontList.get((fonts) => {
+      setFontList(fonts);
     });
 
     navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -69,7 +78,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         {/* System Settings */}
         <div className={setting['right']} style={activeTabIndex === 0 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('general-setting')}</div>
+            {/* General Setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('general-setting')}</div>
             <div className={popup['inputGroup']}>
               <div className={`${popup['inputBox']} ${popup['row']}`}>
                 <input
@@ -83,7 +93,6 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   <div className={popup['hint']}>{t('auto-startup-description')}</div>
                 </div>
               </div>
-
               <div className={`${popup['inputBox']} ${popup['row']} ${popup['disabled']}`}>
                 <input
                   name="minimizeToTray"
@@ -108,7 +117,6 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   <div className={popup['hint']}>{t('start-minimized-description')}</div>
                 </div>
               </div>
-
               <div className={`${popup['inputBox']} ${popup['row']}`}>
                 <input
                   name="soundEffect"
@@ -119,6 +127,41 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <div>
                   <div className={popup['label']}>{t('notification-sound')}</div>
                   <div className={popup['hint']}>{t('notification-sound-description')}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Font Setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('font-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <div className={popup['label']}>{t('font-size')}</div>
+                <div className={popup['inputBox']}>
+                  <input
+                    disabled
+                    type="number"
+                    value={fontSize}
+                    min={10}
+                    max={20}
+                    style={{ maxWidth: '100px' }}
+                    onChange={(e) => setFontSize(Number(e.target.value))}
+                  />
+                </div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <div className={popup['label']}>{t('font')}</div>
+                <div className={popup['selectBox']}>
+                  <select
+                    value={fontFamily}
+                    style={{ minWidth: '100px', fontFamily: fontFamily }}
+                    onChange={(e) => setFontFamily(e.target.value)}
+                  >
+                    {fontList.map((font) => (
+                      <option key={font} value={font} style={{ fontFamily: font }}>
+                        {font}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
@@ -186,6 +229,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             ipcService.systemSettings.soundEffect.set(soundEffect);
             ipcService.systemSettings.inputAudioDevice.set(selectedInput);
             ipcService.systemSettings.outputAudioDevice.set(selectedOutput);
+            ipcService.systemSettings.font.set(fontFamily);
+            ipcService.systemSettings.fontSize.set(fontSize);
             handleClose();
           }}
         >
