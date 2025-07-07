@@ -727,8 +727,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                                   onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId),
                                 },
                                 {
-                                  id: 'set-admin',
-                                  label: t('set-admin'),
+                                  id: 'set-server-admin',
+                                  label: t('set-server-admin'),
                                   show: canChangeToAdmin,
                                   onClick: () => handleEditMember({ permissionLevel: 5 }, memberUserId, serverId),
                                 },

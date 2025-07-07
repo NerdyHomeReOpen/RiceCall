@@ -268,7 +268,7 @@
   "server-type": "群類型",
   "servers": "語音群",
   "set": "套用",
-  "set-admin": "設為群管理員",
+  "set-server-admin": "設為群管理員",
   "set-channel-mod": "設為二級頻道管理員",
   "set-channel-admin": "設為頻道管理員",
   "set-channel-password": "設定頻道密碼",
