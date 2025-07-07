@@ -8,12 +8,12 @@ export const getPermissionText = (t: TFunction<'translation', undefined>, permis
   const permissionMap: Record<number, string> = {
     [Permission.Guest]: t('guest'), // 1
     [Permission.Member]: t('member'), // 2
-    [Permission.ChannelAdmin]: t('channel-admin'), // 3
-    [Permission.ChannelManager]: t('category-admin'), // 4
+    [Permission.ChannelMod]: t('channel-mod'), // 3
+    [Permission.ChannelAdmin]: t('channel-admin'), // 4
     [Permission.ServerAdmin]: t('server-admin'), // 5
     [Permission.ServerOwner]: t('server-owner'), // 6
-    [Permission.Official]: t('official'), // 7
-    [Permission.EventStaff]: t('event-staff'), // 8
+    [Permission.Staff]: t('staff'), // 7
+    [Permission.Official]: t('official'), // 8
   };
   return permissionMap[permission] || t('unknown-user');
 };

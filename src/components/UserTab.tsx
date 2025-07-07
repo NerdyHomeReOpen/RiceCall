@@ -78,7 +78,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const canApplyFriend = !isFriend && !isCurrentUser;
     const canManageMember =
       !isCurrentUser && userPermission > 4 && memberPermission < 6 && userPermission > memberPermission;
-    const isServerManager = userPermission >= 5;
+    const isServerAdmin = userPermission >= 5;
     const canEditNickname = (canManageMember && memberPermission != 1) || (isCurrentUser && userPermission > 1);
     const canChangeToGuest = canManageMember && memberPermission !== 1 && userPermission > 4;
     const canChangeToMember = canManageMember && memberPermission !== 2 && (memberPermission > 1 || userPermission > 5);
@@ -91,7 +91,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
     const canKickChannel = canManageMember && memberCurrentChannelId !== serverLobbyId;
     const canBan = canManageMember;
     const canMoveToChannel =
-      isServerManager && userPermission >= memberPermission && memberCurrentChannelId !== currentChannelId;
+      isServerAdmin && userPermission >= memberPermission && memberCurrentChannelId !== currentChannelId;
     const canRemoveMembership = isCurrentUser && userPermission > 1 && userPermission < 6;
 
     // Handlers
@@ -245,7 +245,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           if (isCurrentUser) return;
           handleOpenDirectMessage(userId, memberUserId, memberName);
         }}
-        draggable={isServerManager && !isCurrentUser}
+        draggable={isServerAdmin && !isCurrentUser}
         onDragStart={(e) => handleDragStart(e, memberUserId, memberCurrentChannelId)}
         onContextMenu={(e) => {
           const x = e.clientX;
@@ -375,14 +375,14 @@ const UserTab: React.FC<UserTabProps> = React.memo(
                   onClick: () => handleEditMember({ permissionLevel: 2 }, memberUserId, serverId),
                 },
                 {
-                  id: 'set-channel-admin',
-                  label: t('set-channel-admin'),
+                  id: 'set-channel-mod',
+                  label: t('set-channel-mod'),
                   show: canChangeToChannelAdmin,
                   onClick: () => handleEditMember({ permissionLevel: 3 }, memberUserId, serverId),
                 },
                 {
-                  id: 'set-category-admin',
-                  label: t('set-category-admin'),
+                  id: 'set-channel-admin',
+                  label: t('set-channel-admin'),
                   show: canChangeToCategoryAdmin,
                   onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId),
                 },

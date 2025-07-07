@@ -715,14 +715,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                                   onClick: () => handleEditMember({ permissionLevel: 2 }, memberUserId, serverId),
                                 },
                                 {
-                                  id: 'set-channel-admin',
-                                  label: t('set-channel-admin'),
+                                  id: 'set-channel-mod',
+                                  label: t('set-channel-mod'),
                                   show: canChangeToChannelAdmin,
                                   onClick: () => handleEditMember({ permissionLevel: 3 }, memberUserId, serverId),
                                 },
                                 {
-                                  id: 'set-category-admin',
-                                  label: t('set-category-admin'),
+                                  id: 'set-channel-admin',
+                                  label: t('set-channel-admin'),
                                   show: canChangeToCategoryAdmin,
                                   onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId),
                                 },

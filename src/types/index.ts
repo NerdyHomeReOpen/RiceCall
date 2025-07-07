@@ -1,11 +1,11 @@
 export const enum Permission {
   Guest = 1,
   Member = 2,
-  ChannelAdmin = 3,
-  ChannelManager = 4,
+  ChannelMod = 3,
+  ChannelAdmin = 4,
   ServerAdmin = 5,
   ServerOwner = 6,
-  EventStaff = 7,
+  Staff = 7,
   Official = 8,
 }
 
