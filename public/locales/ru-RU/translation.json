@@ -122,7 +122,7 @@
   "forbid-text": "Отключить чат",
   "forbid-voice": "Отключить голос",
   "forbid-queue": "Отключить очередь",
-  "forbid-speech": "Прервать выступление",
+  "forbid-speech": "Режим администратора",
   "forgot-password": "Забыли пароль?",
   "france": "Франция",
   "free-speech": "Свободный режим",
@@ -232,7 +232,7 @@
   "public-server": "Публичный сервер",
   "qatar": "Катар",
   "queue": "Очередь",
-  "queue-speech": "Включить очередь",
+  "queue-speech": "Режим очереди",
   "recent-visits": "Недавние посещения",
   "recently-earned-badges": "Последние значки",
   "recently-join-server": "Недавно посещенные серверы",
@@ -451,5 +451,6 @@
   "edit-note": "Изменить примечание",
   "permission-setting": "Настройка доступа",
   "hide-online-to-friend": "Не показывать когда я online",
-  "notify-friend-online": "Напомни мне, когда друг online"
+  "notify-friend-online": "Напомни мне, когда друг online",
+  "channel-manager": "Администратор канала"
 }
