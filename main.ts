@@ -654,21 +654,19 @@ function configureAutoUpdater() {
 
   autoUpdater.on('error', (error: any) => {
     if (DEV && error.message.includes('dev-app-update.yml')) {
-      console.info('開發環境中跳過更新檢查');
+      console.info('Skip update check in development environment');
       return;
     }
-    dialog.showMessageBox({
-      type: 'error',
-      title: '更新錯誤',
-      message: '檢查更新時發生錯誤：' + error.message,
-    });
+    console.error('Cannot check for updates:', error.message);
   });
 
   autoUpdater.on('update-available', (info: any) => {
     dialog.showMessageBox({
       type: 'info',
       title: '有新版本可用',
-      message: `正在下載新版本 ${info.version} 發布於 ${info.releaseDate}，請不要關閉此視窗及進行其他操作...`,
+      message: `新版本 ${info.version} 發布於 ${new Date(
+        info.releaseDate,
+      ).toLocaleDateString()}，點擊確認後將開始下載...`,
     });
   });
 
@@ -698,8 +696,8 @@ function configureAutoUpdater() {
       });
   });
 
-  // Check update every hour
-  setInterval(checkUpdate, 60 * 60 * 1000);
+  // Check update every minute
+  setInterval(checkUpdate, 60 * 1000);
   checkUpdate();
 }
 
