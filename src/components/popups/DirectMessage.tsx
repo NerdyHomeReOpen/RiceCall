@@ -67,6 +67,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     badges: targetBadges,
   } = target;
   const isOnline = targetStatus !== 'offline';
+  const isVerificationUser = false;
   const { name: targetCurrentServerName } = targetCurrentServer;
 
   // Handlers
@@ -269,10 +270,18 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               <div className={directMessage['actionTitle']}>{targetCurrentServerName}</div>
             </div>
           )}
-          <div className={directMessage['actionArea']}>
-            {!isFriend && <div className={directMessage['actionTitle']}>{t('non-friend-notice')}</div>}
-            {isFriend && !isOnline && <div className={directMessage['actionTitle']}>{t('non-online-notice')}</div>}
-          </div>
+          {(!isFriend || !isOnline) && (
+            <div className={directMessage['actionArea']}>
+              {!isFriend && <div className={directMessage['actionTitle']}>{t('non-friend-notice')}</div>}
+              {isFriend && !isOnline && <div className={directMessage['actionTitle']}>{t('non-online-notice')}</div>}
+            </div>
+          )}
+          {isVerificationUser && ( // TODO: 官方相關人員徽章
+            <div className={directMessage['actionArea']}>
+              <div className={`${directMessage['actionIcon']} ${''}`} />
+              <div className={directMessage['actionTitle']}>{''}</div>
+            </div>
+          )}
           <div className={directMessage['messageArea']}>
             <MessageViewer messages={directMessages} userId={userId} />
           </div>
