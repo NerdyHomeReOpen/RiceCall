@@ -8,8 +8,8 @@ export const getPermissionText = (t: TFunction<'translation', undefined>, permis
   const permissionMap: Record<number, string> = {
     [Permission.Guest]: t('guest'), // 1
     [Permission.Member]: t('member'), // 2
-    [Permission.ChannelAdmin]: t('category-admin'), // 3
-    [Permission.ChannelManager]: t('channel-manager'), // 4
+    [Permission.ChannelAdmin]: t('channel-admin'), // 3
+    [Permission.ChannelManager]: t('category-admin'), // 4
     [Permission.ServerAdmin]: t('server-admin'), // 5
     [Permission.ServerOwner]: t('server-owner'), // 6
     [Permission.Official]: t('official'), // 7
