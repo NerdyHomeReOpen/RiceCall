@@ -108,28 +108,26 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
       </div>
 
       {/* Friend List */}
-      {selectedTabId == 0 && (
-        <div className={styles['scrollView']}>
-          {/* Friend Groups */}
-          <div className={styles['friendList']}>
-            {[defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup]
-              .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
-              .map((friendGroup) => (
-                <FriendGroupTab
-                  key={friendGroup.friendGroupId}
-                  friendGroup={friendGroup}
-                  friends={filteredFriends}
-                  user={user}
-                  selectedItemId={selectedItemId}
-                  setSelectedItemId={setSelectedItemId}
-                />
-              ))}
-          </div>
+      <div className={styles['scrollView']} style={selectedTabId == 0 ? {} : { display: 'none' }}>
+        {/* Friend Groups */}
+        <div className={styles['friendList']}>
+          {[defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup]
+            .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
+            .map((friendGroup) => (
+              <FriendGroupTab
+                key={friendGroup.friendGroupId}
+                friendGroup={friendGroup}
+                friends={filteredFriends}
+                user={user}
+                selectedItemId={selectedItemId}
+                setSelectedItemId={setSelectedItemId}
+              />
+            ))}
         </div>
-      )}
+      </div>
 
       {/* Recent */}
-      {selectedTabId == 1 && <div className={styles['recentList']}></div>}
+      <div className={styles['recentList']} style={selectedTabId == 1 ? {} : { display: 'none' }}></div>
 
       {/* Bottom Buttons */}
       <div className={styles['sidebarFooter']}>

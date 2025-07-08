@@ -590,19 +590,14 @@
 }
 
 .micText {
-  color: #2594ca;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-left: 5px;
   font-family: Noto Sans TC;
-  font-size: 1.25em;
-  display: flex;
+  font-size: 1.25rem;
   font-weight: bold;
+  color: #2594ca;
 }
 
 .micSubText {
-  font-size: 0.875em;
+  font-size: 0.8em;
   color: #777;
 }
 

@@ -394,13 +394,11 @@
 
 .friendList {
   flex: 1;
-  padding: 0.75rem;
 }
 
 .friendList .tab {
   position: sticky;
   top: 0;
-  font-weight: bold;
   display: flex;
   align-items: center;
   padding: 5px;

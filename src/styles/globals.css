@@ -18,6 +18,7 @@
 * {
   border: none;
   box-sizing: border-box;
+  outline: none;
 }
 
 html,
@@ -39,7 +40,7 @@ body,
 
 html,
 body {
-  font-family: SimSun, Arial, Helvetica, sans-serif;
+  font-family: Arial;
   font-size: 13px;
 }
 
@@ -140,18 +141,6 @@ input[type='checkbox']:hover {
 input[type='radio']:checked:hover,
 input[type='checkbox']:checked:hover {
   background-position: -18px -18px;
-}
-
-div,
-p,
-textarea,
-input,
-select,
-table,
-button,
-a,
-form {
-  outline: none;
 }
 
 .hljs span {

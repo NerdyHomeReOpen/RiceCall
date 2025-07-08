@@ -383,8 +383,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent / 10) - 1}`] : ''}
                   `}
                 />
-                <div className={styles['micText']}>
-                  {webRTC.isMute ? t('take-mic') : t('taken-mic')}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: '5px' }}>
+                  <div className={styles['micText']}>{webRTC.isMute ? t('take-mic') : t('taken-mic')}</div>
                   <div className={styles['micSubText']}>
                     {!webRTC.isMute && webRTC.micVolume === 0 ? t('mic-muted') : ''}
                   </div>
