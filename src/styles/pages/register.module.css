@@ -43,7 +43,7 @@
 }
 
 .label {
-  font-size: 0.9rem;
+  font-size: 0.9em;
   color: #333;
   display: inline-block;
   width: 80px;
@@ -74,7 +74,7 @@
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
   color: #721c24;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   text-align: center;
 }
 
@@ -94,7 +94,6 @@
   box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
   transition: box-shadow 0.3s ease;
   background: #fcfcfc;
-  font-size: 12px;
 }
 
 .input:focus {
@@ -146,7 +145,7 @@
 
 .backToLogin {
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   color: #838383;
   display: flex;
   align-items: flex-end;

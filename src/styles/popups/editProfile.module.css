@@ -267,7 +267,7 @@
   margin-right: 10px;
   min-width: 78px;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.9em;
   height: 25px;
   align-items: center;
   display: flex;
@@ -473,25 +473,25 @@
 }
 
 .userProfile .userName {
-  font-size: 1.5rem;
+  font-size: 1.5em;
   font-weight: bold;
   color: #fff;
 }
 
 .userProfile .userAccount {
-  font-size: 1rem;
+  font-size: 1em;
   color: #fff;
 }
 
 .userProfile .userContent {
-  font-size: 1rem;
+  font-size: 1em;
   color: #fff;
 }
 
 .userProfile .userSignature {
   color: #fff;
   width: 30rem;
-  font-size: 0.95rem;
+  font-size: 0.95em;
   overflow-y: scroll;
   text-align: center;
   display: flex;
@@ -607,7 +607,7 @@
 }
 
 .serverName {
-  font-size: 1rem;
+  font-size: 1em;
   line-height: 1rem;
   color: rgb(95, 95, 95);
   overflow: hidden;

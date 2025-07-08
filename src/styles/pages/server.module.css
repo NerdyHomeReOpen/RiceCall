@@ -252,7 +252,7 @@
 .currentChannelText {
   margin-left: 3px;
   color: #999;
-  font-size: 1.1rem;
+  font-size: 1.1em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -596,13 +596,13 @@
   align-items: center;
   margin-left: 5px;
   font-family: Noto Sans TC;
-  font-size: 1.25rem;
+  font-size: 1.25em;
   display: flex;
   font-weight: bold;
 }
 
 .micSubText {
-  font-size: 0.875rem;
+  font-size: 0.875em;
   color: #777;
 }
 

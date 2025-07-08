@@ -173,8 +173,7 @@
   background-position: 0 0;
 }
 
-.searchBorder:hover:not(:has(.searchPrev:hover, .searchNext:hover))
-  .searchIcon {
+.searchBorder:hover:not(:has(.searchPrev:hover, .searchNext:hover)) .searchIcon {
   background-position: -17px 0;
 }
 
@@ -209,7 +208,6 @@
   margin-right: 5px;
   min-width: 82px;
   text-align: center;
-  font-size: 13px;
   height: 26px;
   align-items: center;
   display: flex;
@@ -296,6 +294,6 @@
 
 .developerCard .roleText {
   color: #4b5563;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   display: block;
 }

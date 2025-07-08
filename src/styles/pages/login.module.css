@@ -56,12 +56,11 @@
   display: block;
   width: auto;
   text-align: left;
-  font-size: 12px;
 }
 
 .warning {
   color: red;
-  font-size: 0.9rem;
+  font-size: 0.9em;
 }
 
 .errorBox {
@@ -207,7 +206,7 @@
   align-items: center;
   width: 100%;
   max-width: 400px;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   color: #777;
 }
 
@@ -283,7 +282,7 @@
 .createAccount,
 .forgetPassword {
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   color: #838383;
   display: flex;
   align-items: flex-end;

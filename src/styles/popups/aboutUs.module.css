@@ -60,7 +60,7 @@
 
 .websiteLink {
   text-decoration: unset;
-  font-size: 0.97rem;
+  font-size: 0.97em;
   cursor: pointer;
   color: #0000fa;
   margin-top: 5px;
@@ -126,7 +126,7 @@
   color: #fff;
   padding: 4px;
   border-radius: 4px;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   font-weight: bold;
   margin-right: 8px;
   display: inline-block;

@@ -376,7 +376,7 @@
   max-width: 150px;
   max-height: 26px;
   padding: 0px 2px;
-  font-size: 12px;
+  font-size: 0.9em;
   font-weight: bold;
   color: #000;
 }
@@ -521,13 +521,13 @@
 
 /* Overlay */
 .overlay {
-    width: 24px;
-    height: 24px;
-    background: url('../../public/icon_notice_overlay.png') no-repeat center center;
-    background-position: 0 0;
-    cursor: pointer;
-    position: absolute;
-    background-size: cover;
+  width: 24px;
+  height: 24px;
+  background: url('../../public/icon_notice_overlay.png') no-repeat center center;
+  background-position: 0 0;
+  cursor: pointer;
+  position: absolute;
+  background-size: cover;
 }
 /* 
 .overlay {

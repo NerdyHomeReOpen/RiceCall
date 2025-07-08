@@ -32,12 +32,12 @@ body,
   padding: 0;
   overflow: hidden;
   border-radius: 5px;
-  font-size: 13px;
   color: var(--foreground);
   background: none;
   user-select: none;
 }
 
+html,
 body {
   font-family: SimSun, Arial, Helvetica, sans-serif;
   font-size: 13px;
@@ -155,7 +155,7 @@ form {
 }
 
 .hljs span {
-  font-size: 0.875rem;
+  font-size: 0.875em;
   font-family: monospace;
 }
 

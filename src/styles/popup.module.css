@@ -24,7 +24,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   text-align: center;
 }
 
@@ -101,7 +101,7 @@
 
 .hint {
   color: #777;
-  font-size: 0.9rem;
+  font-size: 0.9em;
 }
 
 .value {
@@ -120,11 +120,11 @@
 
 .h3 {
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.2em;
 }
 
 .p1 {
-  font-size: 1rem;
+  font-size: 1em;
   color: #777;
 }
 

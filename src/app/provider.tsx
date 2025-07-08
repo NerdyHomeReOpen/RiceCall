@@ -32,7 +32,7 @@ const Providers = ({ children }: ProvidersProps) => {
 
     const setFontSize = (fontSize: number | null) => {
       if (!fontSize) return;
-      // document.body.style.fontSize = `${fontSize}px`;
+      document.body.style.fontSize = `${fontSize}px`;
     };
 
     ipcService.systemSettings.font.get(setFont);

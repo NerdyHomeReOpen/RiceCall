@@ -405,7 +405,6 @@
   align-items: center;
   padding: 5px;
   border-radius: 3px;
-  font-size: 13px;
   z-index: 999;
   background-color: #f1f2f5;
 }
@@ -512,7 +511,7 @@
 }
 
 .mainContent .header {
-  font-size: 1rem;
+  font-size: 1em;
   padding: 10px;
   background-color: #f4f6fa;
   font-weight: bold;
