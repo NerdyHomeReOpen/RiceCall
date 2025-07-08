@@ -10,8 +10,6 @@
 .left {
   display: flex;
   height: 100%;
-  width: 100%;
-  max-width: 145px;
   min-height: 0;
   background-image: url('../../../public/setting_left_bg.png');
   background-size: cover;
@@ -27,13 +25,14 @@
 }
 
 .tabs .item {
-  width: 100%;
+  min-width: 100%;
   min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   cursor: pointer;
+  padding: 5px 10px;
   border-top: 1px solid #fff0;
   border-bottom: 1px solid #fff0;
   border-right: 1px solid #fff0;
@@ -48,7 +47,7 @@
   border-bottom: 1px solid #b4dbec;
   border-right: 1px solid #fff0;
   background-color: #f7f7f7;
-  width: 145px;
+  width: calc(100% + 1px);
 }
 
 .right {
@@ -196,32 +195,6 @@
   left: 2px;
   justify-content: right;
   align-items: center;
-}
-
-.btn-blue {
-  background: #4aabf0;
-  border: 1px solid #50a1db;
-}
-
-.btn-blue:hover {
-  background: #53b6f3;
-}
-
-.btn-blue:active {
-  background: #49aaef;
-}
-
-.btn-green {
-  background: #0fb11f;
-  border: 1px solid #0d9e1b;
-}
-
-.btn-green:hover {
-  background: #12bc23;
-}
-
-.btn-green:active {
-  background: #0fac1e;
 }
 
 .headerTextBox {

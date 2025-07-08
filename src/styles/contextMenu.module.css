@@ -39,17 +39,20 @@
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  padding: 6px 18px;
+  padding: 5px 30px;
   color: #333;
 }
 
-.contextMenu .option:not([data-type=''])::before {
+.contextMenu .option::before {
+  position: absolute;
   content: '';
+  left: 6px;
   min-width: 16px;
   min-height: 16px;
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
+  align-self: center;
   margin-right: 5px;
 }
 

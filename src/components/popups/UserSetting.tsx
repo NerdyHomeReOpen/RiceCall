@@ -315,7 +315,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           {selectedTabId === 'userSetting' ? (
             <>
               <button
-                className={`${popup['button']} ${popup['btn-blue']}`}
+                className={`${popup['button']} ${popup['blue']}`}
                 disabled={!canSubmit}
                 onClick={() => {
                   if (!canSubmit) return;
@@ -708,7 +708,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
       <div className={popup['popupFooter']}>
         {!isFriend && !isSelf && (
           <div
-            className={`${popup['button']} ${popup['btn-green']}`}
+            className={`${popup['button']} ${popup['green']}`}
             onClick={() => handleOpenApplyFriend(userId, targetId)}
           >
             {t('add-friend')}

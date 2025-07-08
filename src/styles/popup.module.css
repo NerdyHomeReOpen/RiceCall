@@ -76,6 +76,34 @@
   background: #f5f5f5;
 }
 
+.button.blue {
+  color: #fff;
+  background: #4aabf0;
+  border: 1px solid #50a1db;
+}
+
+.button.blue:hover {
+  background: #53b6f3;
+}
+
+.button.blue:active {
+  background: #49aaef;
+}
+
+.button.green {
+  color: #fff;
+  background: #0fb11f;
+  border: 1px solid #0d9e1b;
+}
+
+.button.green:hover {
+  background: #12bc23;
+}
+
+.button.green:active {
+  background: #0fac1e;
+}
+
 /* Text Styles */
 
 .label {

@@ -26,14 +26,6 @@
   text-align: center;
 }
 
-.body:has(.joinedServers) {
-  max-height: 450px;
-}
-
-.body .serverItems {
-  max-height: 320px;
-}
-
 .userAboutMeShow {
   height: 100%;
   display: flex;
@@ -80,104 +72,7 @@
   justify-content: flex-start;
 }
 
-.left {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  max-width: 145px;
-  min-height: 0;
-  background-image: url('../../../public/setting_left_bg.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-  border-right: 1px solid #b4dbec;
-}
-
-.tabs {
-  height: 100%;
-  width: 145px;
-  display: flex;
-  flex-direction: column;
-}
-
-.tabs .item {
-  width: 100%;
-  min-height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
-  border-top: 1px solid #fff0;
-  border-bottom: 1px solid #fff0;
-  border-right: 1px solid #fff0;
-}
-
-.tabs .item:first-child {
-  margin-top: 15px;
-}
-
-.tabs .item.active {
-  border-top: 1px solid #b4dbec;
-  border-bottom: 1px solid #b4dbec;
-  border-right: 1px solid #fff0;
-  background-color: #f7f7f7;
-  width: 145px;
-}
-
-.right {
-  height: 100%;
-  width: 100%;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.headerBar {
-  justify-content: space-between;
-}
-
-.search {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  border-width: 1px;
-  border-radius: 0.375rem;
-  padding-left: 20px;
-}
-
 /* Basic Info Section */
-
-.avatarWrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: auto;
-  width: 30%;
-}
-
-.avatarPicture {
-  position: relative;
-  cursor: pointer;
-  object-fit: cover;
-  min-width: 100px;
-  min-height: 100px;
-  background-image: url('../../../public/logo_server_def.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center center;
-}
-
-.avatarPicture::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  z-index: 99;
-  min-width: 102px;
-  min-height: 102px;
-}
 
 .wealthCoinIcon {
   display: flex;
@@ -291,7 +186,7 @@
   color: white;
   background-image: url('../../../public/im/wallpaper.png');
   background-size: cover;
-  gap: 3px;
+  gap: 5px;
   padding-bottom: 38px;
   -webkit-app-region: drag;
 }
@@ -479,8 +374,6 @@
 /* ServerItem */
 .serverItems {
   padding: 5px 0;
-  max-height: 270px;
-  overflow-y: auto;
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;

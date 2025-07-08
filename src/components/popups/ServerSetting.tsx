@@ -589,7 +589,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   }
                 />
               )}
-              <div className={popup['label']}>{t('markdown-support')}</div>
+              <div>{t('markdown-support')}</div>
             </div>
           </div>
         </div>

@@ -268,7 +268,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }
                 />
               )}
-              <div className={popup['label']}>{t('markdown-support')}</div>
+              <div>{t('markdown-support')}</div>
             </div>
           </div>
         </div>
