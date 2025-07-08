@@ -231,6 +231,15 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     });
   };
 
+  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
+    ipcService.popup.open(PopupType.BLOCK_MEMBER, `blockMember-${userId}`);
+    ipcService.initialData.onRequest(`blockMember-${userId}`, {
+      userId,
+      serverId,
+      userName,
+    });
+  };
+
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
     ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
     ipcService.initialData.onRequest(`directMessage-${targetId}`, {
@@ -687,6 +696,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                               id: 'separator',
                               label: '',
                               show: canManageMember,
+                            },
+                            {
+                              id: 'block',
+                              label: t('block'),
+                              show: canManageMember,
+                              onClick: () => {
+                                handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
+                              },
                             },
                             {
                               id: 'member-management',

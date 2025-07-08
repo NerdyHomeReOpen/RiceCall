@@ -70,7 +70,6 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
       userId,
       serverId,
     });
-    socket.send.disconnectServer({ userId, serverId });
   };
 
   const handleClose = () => {
