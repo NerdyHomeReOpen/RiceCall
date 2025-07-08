@@ -144,7 +144,6 @@ input[type='checkbox']:checked:hover {
 }
 
 .hljs span {
-  font-size: 0.875em;
   font-family: monospace;
 }
 

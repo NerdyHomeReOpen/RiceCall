@@ -27,12 +27,12 @@ const Providers = ({ children }: ProvidersProps) => {
     const setFont = (font: string | null) => {
       if (!font) return;
       console.log('font', font);
-      document.body.style.fontFamily = font;
+      document.body.style.setProperty('font-family', font, 'important');
     };
 
     const setFontSize = (fontSize: number | null) => {
       if (!fontSize) return;
-      document.body.style.fontSize = `${fontSize}px`;
+      document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
     };
 
     ipcService.systemSettings.font.get(setFont);

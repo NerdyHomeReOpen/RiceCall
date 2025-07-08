@@ -213,10 +213,6 @@
   margin-top: 3px;
 }
 
-.searchWrapper {
-  width: auto;
-}
-
 .searchBorder {
   width: max-content;
   display: flex;

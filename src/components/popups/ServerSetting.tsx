@@ -601,18 +601,16 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
               <div className={popup['label']}>
                 {t('member')} ({filteredMembers.length})
               </div>
-              <div className={setting['searchWrapper']}>
-                <div className={setting['searchBorder']}>
-                  <div className={setting['searchIcon']}></div>
-                  <input
-                    name="query"
-                    type="search"
-                    className={setting['searchInput']}
-                    placeholder={t('search-member-placeholder')}
-                    value={searchText}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
-                  />
-                </div>
+              <div className={setting['searchBorder']}>
+                <div className={setting['searchIcon']}></div>
+                <input
+                  name="query"
+                  type="search"
+                  className={setting['searchInput']}
+                  placeholder={t('search-member-placeholder')}
+                  value={searchText}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
+                />
               </div>
             </div>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
@@ -846,18 +844,16 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
               >
                 {t('apply-setting')}
               </button>
-              <div className={setting['searchWrapper']}>
-                <div className={setting['searchBorder']}>
-                  <div className={setting['searchIcon']}></div>
-                  <input
-                    name="query"
-                    type="search"
-                    className={setting['searchInput']}
-                    placeholder={t('search-member-placeholder')}
-                    value={searchText}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
-                  />
-                </div>
+              <div className={setting['searchBorder']}>
+                <div className={setting['searchIcon']}></div>
+                <input
+                  name="query"
+                  type="search"
+                  className={setting['searchInput']}
+                  placeholder={t('search-member-placeholder')}
+                  value={searchText}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
+                />
               </div>
             </div>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
@@ -949,18 +945,16 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
           <div className={popup['col']}>
             <div className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}>
               <div className={popup['label']}>{`${t('blacklist')} (${filteredBlockMembers.length})`}</div>
-              <div className={setting['searchWrapper']}>
-                <div className={setting['searchBorder']}>
-                  <div className={setting['searchIcon']}></div>
-                  <input
-                    name="query"
-                    type="search"
-                    className={setting['searchInput']}
-                    placeholder={t('search-member-placeholder')}
-                    value={searchText}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
-                  />
-                </div>
+              <div className={setting['searchBorder']}>
+                <div className={setting['searchIcon']}></div>
+                <input
+                  name="query"
+                  type="search"
+                  className={setting['searchInput']}
+                  placeholder={t('search-member-placeholder')}
+                  value={searchText}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
+                />
               </div>
             </div>
             <div className={`${popup['inputBox']} ${popup['col']}`}>
