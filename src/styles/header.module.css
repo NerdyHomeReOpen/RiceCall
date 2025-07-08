@@ -96,6 +96,7 @@
 }
 
 .overlay {
+  position: absolute;
   min-width: 24px;
   min-height: 24px;
   background-image: url('../../public/icon_notice_overlay.png');
@@ -172,7 +173,7 @@
   cursor: pointer;
 }
 
-.overlayNew {
+.overlay.new {
   background-position: -24px 0;
 }
 
@@ -247,7 +248,7 @@
   padding: 0 13px;
 }
 
-.mainTabs .tab:before {
+.mainTabs .tab::before {
   content: '';
   position: absolute;
   z-index: 100;
@@ -329,11 +330,11 @@
 }
 
 .mainTabs .tab.selected .tabLable {
-  color: var(--main-color, rgb(0, 115, 198));
+  color: var(--main-color, rgb(0 115 198));
 }
 
 .mainTabs .tab.selected .tabClose {
-  color: var(--main-color, rgb(0, 115, 198));
+  color: var(--main-color, rgb(0 115 198));
 }
 
 /* Title */
@@ -348,7 +349,7 @@
   gap: 5px;
 }
 
-.titleBox:before {
+.titleBox::before {
   content: '';
   display: inline-block;
   min-width: 18px;
@@ -375,7 +376,7 @@
   text-overflow: ellipsis;
   max-width: 150px;
   max-height: 26px;
-  padding: 0px 2px;
+  padding: 0 2px;
   font-size: 0.9em;
   font-weight: bold;
   color: #000;
@@ -517,30 +518,4 @@
 
 .statusDropdown .option[datatype='gn']::before {
   background-position: -39px 0;
-}
-
-/* Overlay */
-.overlay {
-  width: 24px;
-  height: 24px;
-  background: url('../../public/icon_notice_overlay.png') no-repeat center center;
-  background-position: 0 0;
-  cursor: pointer;
-  position: absolute;
-  background-size: cover;
-}
-/* 
-.overlay {
-  min-width: 24px;
-  min-height: 24px;
-  background-image: url('../../public/icon_notice_overlay.png');
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: cover;
-  display: inline-block;
-  cursor: pointer;
-} */
-
-.overlay.new {
-  background-position: -24px 0px;
 }

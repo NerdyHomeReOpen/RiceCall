@@ -3,7 +3,7 @@
   margin-bottom: 15px;
   background: #fff8dc;
   border: 1px solid #ffd700;
-  color: #666666;
+  color: #666;
   font-size: 0.9em;
 }
 
@@ -12,17 +12,9 @@
   color: #646464;
 }
 
-.label {
-  min-width: 80px;
-}
-
-.label:after {
-  content: '：';
-}
-
 .hint {
   margin-left: 80px;
-  color: #666666;
+  color: #666;
 }
 
 .buttonGroup {
@@ -44,7 +36,7 @@
 }
 
 .buttonGroup .button:hover {
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
 }
 
 .inputGroup {

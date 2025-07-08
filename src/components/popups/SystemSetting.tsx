@@ -138,8 +138,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <div className={popup['label']}>{t('font-size')}</div>
                 <div className={popup['inputBox']}>
                   <input
+                    disabled
                     type="number"
-                    value={fontSize}
+                    value={13}
                     min={10}
                     max={20}
                     style={{ maxWidth: '100px' }}

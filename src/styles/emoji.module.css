@@ -1,7 +1,9 @@
 .emojiIcon {
-  /* position: relative; */
-  width: 18px;
   height: 18px;
+  width: 18px;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .emojiIcon::before {
@@ -38,8 +40,7 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0 0 10px rgb(0 0 0 / 10%);
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
 }
 
 .emoji {
@@ -50,7 +51,7 @@
   min-height: 19px;
   max-height: 19px;
   cursor: pointer;
-  border: 1px solid #ffffff00;
+  border: 1px solid #fff0;
   background-position: center;
   background-repeat: no-repeat;
   background-size: 19px;
@@ -113,14 +114,6 @@
   justify-content: center;
 }
 
-.emojiIcon {
-  height: 18px;
-  width: 18px;
-  background-size: contain;
-  background-position: center center;
-  background-repeat: no-repeat;
-}
-
 .emojiIconBox:hover {
   border: 1px solid #5898ff;
 }
@@ -138,7 +131,7 @@
   display: flex;
   margin-left: 0.5rem;
   position: absolute;
-  border-top: 1px solid rgb(223, 223, 223);
+  border-top: 1px solid rgb(223 223 223);
   bottom: 3px;
 }
 
@@ -159,7 +152,7 @@
 
 .emojiHumanIcon.selected {
   background-position: 0 -33px;
-  border-top: 1px solid #ffffff00;
+  border-top: 1px solid #fff0;
 }
 
 .inputArea img[data-emoji-src] {

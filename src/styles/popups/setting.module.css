@@ -182,7 +182,6 @@
   padding: 5px;
   height: 25px;
   border: 0;
-
   box-shadow: none;
 }
 
@@ -196,49 +195,37 @@
   position: absolute;
   width: 99%;
   display: flex;
-  background: linear-gradient(to bottom, #ffffff, #f2f7f9);
+  background: linear-gradient(to bottom, #fff, #f2f7f9);
   border-bottom: 1px solid #ddd;
   left: 2px;
   justify-content: right;
   align-items: center;
 }
 
-.confirmedButton,
-.cancelButton {
-  margin-right: 5px;
-  min-width: 82px;
-  text-align: center;
-  height: 26px;
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  cursor: pointer;
-  max-width: 79px;
-  border: 1px solid #cbcccd;
-  width: auto;
-  border-radius: 5px;
-  background: #fff;
-}
-
-.cancelButton:hover {
-  background: #fafafa;
-}
-
-.cancelButton:active {
-  background: #f5f5f5;
-}
-
-.blueBtn {
+.btn-blue {
   background: #4aabf0;
   border: 1px solid #50a1db;
 }
 
-.blueBtn:hover {
+.btn-blue:hover {
   background: #53b6f3;
 }
 
-.blueBtn:active {
+.btn-blue:active {
   background: #49aaef;
+}
+
+.btn-green {
+  background: #0fb11f;
+  border: 1px solid #0d9e1b;
+}
+
+.btn-green:hover {
+  background: #12bc23;
+}
+
+.btn-green:active {
+  background: #0fac1e;
 }
 
 .headerTextBox {

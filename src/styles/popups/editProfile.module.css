@@ -12,14 +12,16 @@
 }
 
 .body .userRecentVisitsPrivate {
-  background: url(../../../public/card/bg_list_tips.png) center center no-repeat;
+  background: url('../../../public/card/bg_list_tips.png') center center no-repeat;
   background-size: auto;
   height: 76px;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font: normal 16px/1.2 '\5FAE\8F6F\96C5\9ED1', 'Arial';
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 16px;
+  line-height: 1.2;
   color: #436da1;
   text-align: center;
 }
@@ -42,8 +44,8 @@
   padding: 10px 15px;
 }
 
-.userAboutMeShow:before,
-.userAboutMeShow:after {
+.userAboutMeShow::before,
+.userAboutMeShow::after {
   content: '';
   min-height: 19px;
   min-width: 23px;
@@ -59,13 +61,13 @@
   justify-content: flex-start;
 }
 
-.userAboutMeShow:before {
+.userAboutMeShow::before {
   background-image: url('../../../public/card/bg_left_quote.png');
   background-repeat: no-repeat;
   margin-bottom: 6rem;
 }
 
-.userAboutMeShow:after {
+.userAboutMeShow::after {
   background-image: url('../../../public/card/bg_right_quote.png');
   background-repeat: no-repeat;
   margin-top: 6rem;
@@ -241,89 +243,11 @@
   padding: 5px;
   height: 25px;
   border: 0;
-
   box-shadow: none;
 }
 
 .checkBox {
   display: flex;
-}
-
-.buttonsBar {
-  height: 45px;
-  top: 19rem;
-  position: absolute;
-  width: 99%;
-  display: flex;
-  background: linear-gradient(to bottom, #ffffff, #f2f7f9);
-  border-bottom: 1px solid #ddd;
-  left: 2px;
-  justify-content: right;
-  align-items: center;
-}
-
-.confirmedButton,
-.button {
-  margin-right: 10px;
-  min-width: 78px;
-  text-align: center;
-  font-size: 0.9em;
-  height: 25px;
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  cursor: pointer;
-  max-width: 79px;
-  border: 1px solid #cbcccd;
-  width: auto;
-  border-radius: 5px;
-  background: linear-gradient(#fafafb, #e9e9ed);
-  color: #333333;
-}
-
-.button:hover {
-  background: #fafafa;
-}
-
-.button:active {
-  background: #f5f5f5;
-}
-
-.blueBtn,
-.greenBtn {
-  background-size: auto;
-  color: #fff;
-  border: 0;
-  background-position: 0 0;
-  min-width: 78px;
-  max-width: 78px;
-  height: 25px;
-}
-
-.blueBtn {
-  background: #4aabf0;
-  border: 1px solid #50a1db;
-}
-
-.blueBtn:hover {
-  background: #53b6f3;
-}
-
-.blueBtn:active {
-  background: #49aaef;
-}
-
-.greenBtn {
-  background: #0fb11f;
-  border: 1px solid #0d9e1b;
-}
-
-.greenBtn:hover {
-  background: #12bc23;
-}
-
-.greenBtn:active {
-  background: #0fac1e;
 }
 
 .headerTextBox {
@@ -401,6 +325,7 @@
   cursor: pointer;
   background-size: cover;
 }
+
 .minimizeBtn {
   background-image: url('../../../public/im/btn-min.png');
   background-repeat: no-repeat;
@@ -438,11 +363,11 @@
 }
 
 .userProfile .avatar.editable:hover {
-  box-shadow: 0 0 3px 6px rgba(255, 255, 255, 1);
+  box-shadow: 0 0 3px 6px rgb(255 255 255 / 100%);
   border-radius: 3px;
 }
 
-.userProfile .avatar.editable:hover:after {
+.userProfile .avatar.editable:hover::after {
   display: none;
 }
 
@@ -461,7 +386,6 @@
 .userProfile .avatar::after {
   position: absolute;
   content: '';
-  z-index: 2;
   top: -7px;
   left: -7px;
   width: 88px;
@@ -501,9 +425,9 @@
 }
 
 .userProfile .userSignature:hover::-webkit-scrollbar-thumb {
-  background: rgb(255, 255, 255);
+  background: rgb(255 255 255);
   border-radius: 4px;
-  border: 1px solid #ffffff;
+  border: 1px solid #fff;
 }
 
 .userProfile .tab {
@@ -562,8 +486,7 @@
   max-height: 270px;
   overflow-y: auto;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   justify-content: flex-start;
   align-items: center;
   gap: 5px;
@@ -572,7 +495,7 @@
 
 .serverItem {
   background: #ededed;
-  border: 1px solid #ffffff00;
+  border: 1px solid #fff0;
   display: flex;
   flex-direction: row;
   gap: 5px;
@@ -609,7 +532,7 @@
 .serverName {
   font-size: 1em;
   line-height: 1rem;
-  color: rgb(95, 95, 95);
+  color: rgb(95 95 95);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -687,7 +610,7 @@
   align-items: center;
   justify-content: flex-end;
   min-height: 45px;
-  background: linear-gradient(to bottom, #ffffff, #f2f7f9);
+  background: linear-gradient(to bottom, #fff, #f2f7f9);
   border-bottom: 1px solid #f1f1f1;
 }
 
@@ -720,7 +643,7 @@
   display: flex;
 }
 
-.emojiBox:before {
+.emojiBox::before {
   content: '';
   background-image: url('../../../public/channel/spliter.png');
   height: 14px;
@@ -732,8 +655,7 @@
 .inputArea {
   width: 100%;
   height: 1.5rem;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  overflow: hidden scroll;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

@@ -16,7 +16,7 @@
 }
 
 .logoPlaceholder {
-  background-image: url(../../../public/login_logo.png);
+  background-image: url('../../../public/login_logo.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -32,7 +32,6 @@
   align-items: flex-start;
   width: 100%;
   padding: 20px;
-  text-align: flex-start;
   overflow: scroll;
   gap: 10px;
 }
@@ -76,8 +75,8 @@
   width: 100%;
   min-height: fit-content;
   padding: 10px;
-  border: 1px solid #cccccc;
-  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
 }
 
 .teamMemberLink {
@@ -85,19 +84,18 @@
   align-items: center;
   margin-top: 3px;
   justify-content: space-between;
-  background-color: hsla(0, 0%, 0%, 0.1);
-  border: 1px solid hsla(0, 0%, 0%, 0.2);
+  background-color: hsl(0deg 0% 0% / 10%);
+  border: 1px solid hsl(0deg 0% 0% / 20%);
   border-radius: 5px;
   padding: 3px;
   width: 100%;
   box-sizing: border-box;
-  -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   transition: background-color 0.3s ease;
 }
 
 .teamMemberLink:hover {
-  background-color: hsla(0, 0%, 0%, 0.15);
+  background-color: hsl(0deg 0% 0% / 15%);
 }
 
 .iconGroup {
@@ -110,7 +108,6 @@
   display: flex;
   align-items: center;
   color: #000;
-  font-size: 1.2em;
   line-height: 1.4;
 }
 
@@ -122,7 +119,7 @@
 }
 
 .developerTitle {
-  background-color: rgba(115, 164, 213, 0.7);
+  background-color: rgb(115 164 213 / 70%);
   color: #fff;
   padding: 4px;
   border-radius: 4px;
@@ -135,13 +132,13 @@
 }
 
 .iconGroup svg {
-  color: #000000;
+  color: #000;
   vertical-align: middle;
   transition: color 0.3s ease;
 }
 
 .githubIconLink:hover svg {
-  color: rgb(70, 70, 70);
+  color: rgb(70 70 70);
 }
 
 .discordIconLink:hover svg {
@@ -149,15 +146,15 @@
 }
 
 .mainDeveloper {
-  background-color: rgba(216, 63, 63, 0.8);
+  background-color: rgb(216 63 63 / 80%);
 }
 
 .backendDeveloper {
-  background-color: rgba(63, 136, 216, 0.8);
+  background-color: rgb(63 136 216 / 80%);
 }
 
 .frontendDeveloper {
-  background-color: rgba(136, 63, 216, 0.8);
+  background-color: rgb(136 63 216 / 80%);
 }
 
 .machineNetwork {
@@ -165,9 +162,9 @@
 }
 
 .technicalSupport {
-  background-color: rgba(216, 166, 63, 0.8);
+  background-color: rgb(216 166 63 / 80%);
 }
 
 .customerService {
-  background-color: rgba(63, 166, 216, 0.8);
+  background-color: rgb(63 166 216 / 80%);
 }

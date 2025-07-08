@@ -15,7 +15,7 @@
   width: 100%;
   padding: 10px 0;
   justify-content: space-between;
-  color: #444444;
+  color: #444;
   position: sticky;
   top: 0;
   background-color: #fff;
@@ -27,11 +27,11 @@
 }
 
 .allCancel:hover {
-  color: #666666;
+  color: #666;
 }
 
 .allCancel:active {
-  color: #999999;
+  color: #999;
 }
 
 .contentBody {
@@ -81,10 +81,8 @@
 
 .userApplyContentText {
   display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
+  flex-flow: column wrap;
   color: #5e5e5e;
-  word-break: break-word;
 }
 
 .userApplyContentRow {
@@ -116,7 +114,7 @@
 
 .userApplyContentButton:hover {
   background-color: #fbfbfb;
-  border-color: #666666;
+  border-color: #666;
 }
 
 .userApplyContentButton:active {

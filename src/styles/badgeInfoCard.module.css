@@ -60,11 +60,11 @@
 }
 
 .badgeDescriptionBox .badgeDescription {
-  color: #777777;
+  color: #777;
 }
 
 .badgeShowTimeBox {
   display: flex;
   width: 100%;
-  color: #777777;
+  color: #777;
 }

@@ -81,7 +81,7 @@
   flex-direction: column;
   justify-content: space-around;
   height: 52px;
-  color: #777777;
+  color: #777;
   overflow: hidden;
 }
 
@@ -106,7 +106,7 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: #666666;
+  color: #666;
   line-height: 1rem;
 }
 
@@ -122,7 +122,7 @@
   min-width: 55px;
 }
 
-.idText:before {
+.idText::before {
   content: '';
   min-height: 12px;
   min-width: 12px;
@@ -133,7 +133,7 @@
   margin-right: 5px;
 }
 
-.memberText:before {
+.memberText::before {
   content: '';
   min-height: 12px;
   min-width: 12px;
@@ -345,7 +345,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #333333;
+  color: #333;
 }
 
 .channelTab .channelTabCount {
@@ -371,10 +371,6 @@
   gap: 5px;
 }
 
-.channelList .channelList .userList .userTab {
-  padding-left: 25px;
-}
-
 .userTab:not(.selected):hover {
   background-color: #d1d5da5c;
 }
@@ -383,7 +379,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #777777;
+  color: #777;
 }
 
 .userTab .userTabName.member {
@@ -392,6 +388,10 @@
 
 .userTab .userTabName.isVIP {
   color: #d16059 !important;
+}
+
+.channelList .channelList .userList .userTab {
+  padding-left: 25px;
 }
 
 .userState {
@@ -483,7 +483,7 @@
   position: relative;
   border-radius: 50%;
   background-color: #f9c55d;
-  color: #000000;
+  color: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -523,7 +523,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 0 10px;
   background-image: url('../../../public/channel/mic_state_menu.png');
   background-repeat: no-repeat;
   background-size: auto;
@@ -590,7 +590,7 @@
 }
 
 .micText {
-  font-family: Noto Sans TC;
+  font-family: 'Noto Sans TC', sans-serif;
   font-size: 1.25rem;
   font-weight: bold;
   color: #2594ca;
@@ -647,7 +647,7 @@
   padding: 0.5rem;
   border-radius: 4px;
   background: none;
-  color: #888888;
+  color: #888;
   text-align: center;
   position: relative;
 }
@@ -691,7 +691,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: #888888;
+  color: #888;
 }
 
 .bkgModeButton::before {
@@ -842,7 +842,7 @@
   border-top: 2px solid #e2e8f0;
 }
 
-.navItem.active:after {
+.navItem.active::after {
   content: '';
   position: absolute;
   min-height: 20px;

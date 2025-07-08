@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  min-width: fit-content;
+  min-width: max-content;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -30,7 +30,7 @@
   padding: 5px;
   background: #fff;
   border: 1px solid #ccc;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgb(0 0 0 / 10%);
 }
 
 .contextMenu .option {
@@ -41,10 +41,6 @@
   width: 100%;
   padding: 6px 18px;
   color: #333;
-}
-
-.language-select .option {
-  justify-content: center;
 }
 
 .contextMenu .option:not([data-type=''])::before {
@@ -106,10 +102,6 @@
   background: #eee;
 }
 
-/* .contextMenu .option.hasSubmenu {
-  position: relative;
-} */
-
 .contextMenu .option.hasSubmenu .contextMenu {
   display: none;
 }
@@ -121,16 +113,4 @@
 .contextMenu .option.disabled {
   color: #ccc;
   cursor: not-allowed;
-}
-
-.setting {
-  min-width: auto !important;
-}
-
-.setting .hasSubmenu .contextMenu {
-  min-width: 90px;
-}
-
-.setting .option:not(.hasSubmenu .option) {
-  justify-content: flex-start;
 }

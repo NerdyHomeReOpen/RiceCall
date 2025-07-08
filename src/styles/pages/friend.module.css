@@ -104,7 +104,7 @@
 }
 
 .myBadges {
-  padding: 3;
+  padding: 3px;
 }
 
 .levelIcon {
@@ -137,7 +137,7 @@
   width: 60%;
   height: 30px;
   align-items: center;
-  border: 1px solid #ffffffff;
+  border: 1px solid #ffff;
   margin-left: 100px;
   padding: 2px 5px;
 }
@@ -155,7 +155,7 @@
 
 .signatureInput:empty::before {
   content: attr(data-placeholder-text);
-  color: #000000;
+  color: #000;
   pointer-events: none;
   display: block;
 }
@@ -173,6 +173,7 @@
 .signatureBox:focus-within .emojiBtn {
   display: flex;
 }
+
 /* 
 .enterButtonIconBox {
   border: 1px solid #d1d1d1;
@@ -295,7 +296,6 @@
   padding-bottom: 0;
   padding-right: 0;
   border-top: 1px solid #ddd;
-  margin-top: 2;
   background: #fff;
 }
 
@@ -362,7 +362,7 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   background: #fff;
-  text-align: center;
+  text-align: left;
   align-items: center;
   justify-content: center;
   cursor: pointer;

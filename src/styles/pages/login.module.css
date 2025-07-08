@@ -98,7 +98,7 @@
   position: relative;
   display: flex;
   border: 1px solid #ccc;
-  box-shadow: inset 0.3px 0.5px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0.3px 0.5px 1px rgb(0 0 0 / 10%);
 }
 
 .loginAccountBox:hover:not(:has(input[type='password'])) {
@@ -126,7 +126,7 @@
   background: linear-gradient(to bottom, #e0e0e0 0%, #f3f3f3 50%, #fff 100%);
 }
 
-.comboArrow:before {
+.comboArrow::before {
   content: '';
   width: 2px;
   height: 20px;
@@ -136,7 +136,7 @@
   margin-right: 3px;
 }
 
-.comboArrow:after {
+.comboArrow::after {
   content: '';
   width: 20px;
   height: 12px;
@@ -145,11 +145,11 @@
   background-position: -7px 0;
 }
 
-.loginAccountBox:hover .comboArrow:after {
+.loginAccountBox:hover .comboArrow::after {
   background-position: -33px 0;
 }
 
-.loginAccountBox .comboArrow:active:after {
+.loginAccountBox .comboArrow:active::after {
   background-position: -59px 0;
 }
 
@@ -178,6 +178,7 @@
 .accountSelectOptionBox:hover {
   background: #ececef;
 }
+
 .accountSelectOptionBox.selected {
   background: #dfe5ea;
 }

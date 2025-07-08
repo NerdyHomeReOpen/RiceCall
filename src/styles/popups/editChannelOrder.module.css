@@ -29,8 +29,8 @@
 .bottomChannelOrderBtn {
   display: flex;
   cursor: pointer;
-  padding: 5px 8px 5px 8px;
-  border: 1px solid #ffffff00;
+  padding: 5px 8px;
+  border: 1px solid #fff0;
 }
 
 .addChannelBtn:hover,
@@ -54,13 +54,13 @@
   background: #ffffff96;
 }
 
-.addChannelBtn:before,
-.changeChannelNameBtn:before,
-.deleteChannelBtn:before,
-.upChannelOrderBtn:before,
-.downChannelOrderBtn:before,
-.topChannelOrderBtn:before,
-.bottomChannelOrderBtn:before {
+.addChannelBtn::before,
+.changeChannelNameBtn::before,
+.deleteChannelBtn::before,
+.upChannelOrderBtn::before,
+.downChannelOrderBtn::before,
+.topChannelOrderBtn::before,
+.bottomChannelOrderBtn::before {
   content: '';
   background-position: 0 0;
   background-size: auto;
@@ -70,42 +70,42 @@
   margin-right: 5px;
 }
 
-.addChannelBtn:before {
+.addChannelBtn::before {
   background-image: url('../../../public/channel/channel_add.png');
   background-repeat: no-repeat;
 }
 
-.changeChannelNameBtn:before {
+.changeChannelNameBtn::before {
   background-image: url('../../../public/channel/channel_rename.png');
   background-repeat: no-repeat;
 }
 
-.deleteChannelBtn:before {
+.deleteChannelBtn::before {
   background-image: url('../../../public/channel/channel_delete.png');
   background-repeat: no-repeat;
 }
 
-.upChannelOrderBtn:before {
+.upChannelOrderBtn::before {
   background-image: url('../../../public/channel/channel_up.png');
   background-repeat: no-repeat;
 }
 
-.downChannelOrderBtn:before {
+.downChannelOrderBtn::before {
   background-image: url('../../../public/channel/channel_down.png');
   background-repeat: no-repeat;
 }
 
-.topChannelOrderBtn:before {
+.topChannelOrderBtn::before {
   background-image: url('../../../public/channel/channel_head.png');
   background-repeat: no-repeat;
 }
 
-.bottomChannelOrderBtn:before {
+.bottomChannelOrderBtn::before {
   background-image: url('../../../public/channel/channel_end.png');
   background-repeat: no-repeat;
 }
 
-.disabledBtn:before {
+.disabledBtn::before {
   background-position: -16px 0;
 }
 
@@ -118,7 +118,7 @@
 }
 
 .channelTabIndex {
-  color: rgb(255, 0, 0);
+  color: rgb(255 0 0);
   margin-left: 5px;
 }
 
