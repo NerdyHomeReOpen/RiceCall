@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useEffect, useState, ReactNode, useRef } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -100,9 +100,6 @@ Header.displayName = 'Header';
 const Popup = React.memo(() => {
   // Language
   const { t } = useTranslation();
-
-  // Refs
-  const windowRef = useRef<HTMLDivElement>(null);
 
   // States
   const [id, setId] = useState<string | null>(null);
@@ -289,7 +286,7 @@ const Popup = React.memo(() => {
       case PopupType.DIRECT_MESSAGE:
         setHeaderTitle(popupInitialData?.targetName || t('direct-message'));
         setHeaderButtons(['close', 'minimize', 'maxsize']);
-        setContent(<DirectMessage {...{ ...popupInitialData, windowRef }} />);
+        setContent(<DirectMessage {...popupInitialData} />);
         break;
       case PopupType.DIALOG_ALERT:
       case PopupType.DIALOG_ALERT2:
@@ -335,11 +332,10 @@ const Popup = React.memo(() => {
       default:
         break;
     }
-  }, [t, initialData, type, windowRef]);
+  }, [t, initialData, type]);
 
   return (
-    <div className="wrapper" ref={windowRef}>
-      {/* Top Nevigation */}
+    <>
       {(type !== PopupType.USER_INFO || headerTitle !== t('user-info')) && headerButtons.length > 0 && (
         <Header
           title={headerTitle}
@@ -353,9 +349,8 @@ const Popup = React.memo(() => {
           }
         />
       )}
-      {/* Main Content */}
-      <div className="content">{content}</div>
-    </div>
+      {content}
+    </>
   );
 });
 

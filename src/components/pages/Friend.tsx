@@ -107,7 +107,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   }, [t, userName]);
 
   return (
-    <div className={friendPage['friend-wrapper']} style={display ? {} : { display: 'none' }}>
+    <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
       <header className={friendPage['friend-header']}>
         <div
@@ -168,22 +168,22 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className={friendPage['friend-content']}>
+      {/* Body */}
+      <main className={friendPage['friend-body']}>
         {/* Left Sidebar */}
-        <div className={friendPage['sidebar']} style={{ width: `${sidebarWidth}px` }}>
+        <aside className={friendPage['sidebar']} style={{ width: `${sidebarWidth}px` }}>
           <FriendListViewer friendGroups={friendGroups} friends={friends} user={user} />
-        </div>
+        </aside>
 
         {/* Resize Handle */}
         <div className="resize-handle" onMouseDown={() => setIsResizing(true)} onMouseUp={() => setIsResizing(false)} />
 
         {/* Right Content */}
-        <div className={friendPage['main-content']}>
-          <div className={friendPage['header']}>{t('friend-active')}</div>
-        </div>
+        <main className={friendPage['content']}>
+          <header className={friendPage['header']}>{t('friend-active')}</header>
+        </main>
       </main>
-    </div>
+    </main>
   );
 });
 

@@ -51,21 +51,13 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     };
   }, []);
 
-  return (
-    <div
-      style={
-        {
-          'width': '100%',
-          'height': '100%',
-          '--main-color': mainColor,
-          '--secondary-color': secondaryColor,
-          '--header-image': headerImage,
-        } as React.CSSProperties
-      }
-    >
-      <ThemeContext.Provider value={{ headerImage, mainColor, secondaryColor }}>{children}</ThemeContext.Provider>
-    </div>
-  );
+  useEffect(() => {
+    document.body.style.setProperty('--main-color', mainColor, 'important');
+    document.body.style.setProperty('--secondary-color', secondaryColor, 'important');
+    document.body.style.setProperty('--header-image', headerImage, 'important');
+  }, [headerImage, mainColor, secondaryColor]);
+
+  return <ThemeContext.Provider value={{ headerImage, mainColor, secondaryColor }}>{children}</ThemeContext.Provider>;
 };
 
 ThemeProvider.displayName = 'ThemeProvider';

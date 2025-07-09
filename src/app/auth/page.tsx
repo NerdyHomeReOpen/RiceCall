@@ -64,12 +64,10 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="wrapper">
-      {/* Top Navigation */}
+    <>
       <Header />
-      {/* Main Content */}
-      <div className="content">{getMainContent()}</div>
-    </div>
+      {getMainContent()}
+    </>
   );
 };
 

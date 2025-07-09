@@ -120,7 +120,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   }, []);
 
   return (
-    <div className={styles['login-wrapper']}>
+    <main className={styles['login']}>
       {/* Main Content */}
       <div className={styles['login-content']}>
         <div className={styles['app-logo']} />
@@ -253,7 +253,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
           {t('forgot-password')}
         </div>
       </div>
-    </div>
+    </main>
   );
 });
 

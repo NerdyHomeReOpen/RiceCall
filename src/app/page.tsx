@@ -711,39 +711,34 @@ const RootPageComponent = () => {
 
   return (
     <WebRTCProvider>
-      <div className="wrapper">
-        <Header user={user} userServer={server} friendApplications={friendApplications} />
-        {/* Main Content */}
-        <div className="content">
-          {!socket.isConnected ? (
-            <LoadingSpinner />
-          ) : (
-            <>
-              <SoundEffectPlayer />
-              <HomePage user={user} servers={servers} display={mainTab.selectedTabId === 'home'} />
-              <FriendPage
-                user={user}
-                friends={friends}
-                friendGroups={friendGroups}
-                display={mainTab.selectedTabId === 'friends'}
-              />
-              <ExpandedProvider>
-                <ServerPage
-                  user={user}
-                  currentServer={server}
-                  currentChannel={channel}
-                  friends={friends}
-                  serverMembers={serverMembers}
-                  serverChannels={serverChannels}
-                  channelMessages={channelMessages}
-                  actionMessages={actionMessages}
-                  display={mainTab.selectedTabId === 'server'}
-                />
-              </ExpandedProvider>
-            </>
-          )}
-        </div>
-      </div>
+      <Header user={user} userServer={server} friendApplications={friendApplications} />
+      {!socket.isConnected ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <SoundEffectPlayer />
+          <HomePage user={user} servers={servers} display={mainTab.selectedTabId === 'home'} />
+          <FriendPage
+            user={user}
+            friends={friends}
+            friendGroups={friendGroups}
+            display={mainTab.selectedTabId === 'friends'}
+          />
+          <ExpandedProvider>
+            <ServerPage
+              user={user}
+              currentServer={server}
+              currentChannel={channel}
+              friends={friends}
+              serverMembers={serverMembers}
+              serverChannels={serverChannels}
+              channelMessages={channelMessages}
+              actionMessages={actionMessages}
+              display={mainTab.selectedTabId === 'server'}
+            />
+          </ExpandedProvider>
+        </>
+      )}
     </WebRTCProvider>
   );
 };

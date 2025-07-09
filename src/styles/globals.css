@@ -22,13 +22,11 @@
 }
 
 html,
-body,
-#__next,
-.wrapper {
-  height: 100%;
-  width: 100%;
+body {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -44,19 +42,8 @@ body {
   --font-family: Arial, sans-serif;
 }
 
-.wrapper {
+body {
   border: 1px solid var(--main-color);
-}
-
-.content {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  background-color: #fff;
-  width: 100%;
-  height: 100%;
-  flex-direction: column;
-  overflow: hidden;
 }
 
 /* Scrollbar */

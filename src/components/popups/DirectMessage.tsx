@@ -29,12 +29,11 @@ import grade from '@/styles/grade.module.css';
 interface DirectMessagePopupProps {
   userId: User['userId'];
   targetId: User['userId'];
-  windowRef: React.RefObject<HTMLDivElement>;
 }
 
 const SHAKE_COOLDOWN = 3000;
 
-const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, windowRef }) => {
+const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId }) => {
   // Hooks
   const { t } = useTranslation();
   const socket = useSocket();
@@ -129,20 +128,18 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   };
 
   const handleShakeWindow = (duration = 500) => {
-    if (!windowRef.current) return;
-
     const start = performance.now();
 
     const shake = (time: number) => {
       const elapsed = time - start;
       if (elapsed > duration) {
-        windowRef.current.style.transform = 'translate(0, 0)';
+        document.body.style.transform = 'translate(0, 0)';
         return;
       }
 
       const x = Math.round((Math.random() - 0.5) * 10);
       const y = Math.round((Math.random() - 0.5) * 10);
-      windowRef.current.style.transform = `translate(${x}px, ${y}px)`;
+      document.body.style.transform = `translate(${x}px, ${y}px)`;
 
       requestAnimationFrame(shake);
     };

@@ -43,10 +43,7 @@ const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, serv
       <ServerListViewer user={user} servers={displayedServers} />
       {canExpand && (
         <div
-          className={`
-            ${homePage['view-more-btn']} 
-            ${expanded ? homePage['more-icon'] : homePage['less-icon']}
-          `}
+          className={`${homePage['view-more-btn']} ${expanded ? homePage['more-icon'] : homePage['less-icon']}`}
           onClick={() => setExpanded(!expanded)}
         >
           {expanded ? t('view-less') : t('view-more')}
@@ -270,7 +267,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, [t, userName]);
 
   return (
-    <div className={homePage['home-wrapper']} style={display ? {} : { display: 'none' }}>
+    <main className={homePage['home']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
       <header className={homePage['home-header']}>
         <div className={homePage['left']}>
@@ -396,17 +393,17 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       />
 
       {/* Personal Exclusive */}
-      <main className={homePage['home-content']} style={section === 3 ? {} : { display: 'none' }}>
+      <main className={homePage['home-body']} style={section === 3 ? {} : { display: 'none' }}>
         <ServerListSection title={t('recent-servers')} servers={recentServers} user={user} />
         <ServerListSection title={t('my-servers')} servers={ownedServers} user={user} />
         <ServerListSection title={t('favorited-servers')} servers={favoriteServers} user={user} />
       </main>
 
       {/* Not Available */}
-      <main className={homePage['homeContent']} style={section === 1 || section === 2 ? {} : { display: 'none' }}>
+      <main className={homePage['home-body']} style={section === 1 || section === 2 ? {} : { display: 'none' }}>
         <div>{t('not-available-page')}</div>
       </main>
-    </div>
+    </main>
   );
 });
 

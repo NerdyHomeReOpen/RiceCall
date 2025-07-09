@@ -168,7 +168,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
   };
 
   return (
-    <div className={styles['register-wrapper']}>
+    <main className={styles['register']}>
       {/* Main Content */}
       <div className={styles['register-content']}>
         <div className={styles['app-logo']} />
@@ -295,7 +295,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
           {t('back-to-login')}
         </div>
       </div>
-    </div>
+    </main>
   );
 });
 

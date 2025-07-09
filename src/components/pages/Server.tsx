@@ -233,11 +233,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [t, serverName, activeServerMembers]);
 
     return (
-      <div className={styles['server-wrapper']} style={display ? {} : { display: 'none' }}>
-        {/* Main Content */}
-        <main className={styles['server-content']}>
+      <main className={styles['server']} style={display ? {} : { display: 'none' }}>
+        {/* Body */}
+        <main className={styles['server-body']}>
           {/* Left Sidebar */}
-          <div className={styles['sidebar']} style={{ width: `${sidebarWidth}px` }}>
+          <aside className={styles['sidebar']} style={{ width: `${sidebarWidth}px` }}>
             <ChannelListViewer
               currentServer={currentServer}
               currentChannel={currentChannel}
@@ -245,7 +245,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               serverChannels={serverChannels}
               friends={friends}
             />
-          </div>
+          </aside>
 
           {/* Resize Handle */}
           <div
@@ -255,7 +255,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           />
 
           {/* Right Content */}
-          <div className={styles['main-content']}>
+          <main className={styles['content']}>
             {/* Announcement Area */}
             <div
               ref={announcementAreaRef}
@@ -487,9 +487,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 <div className={styles['record-mode-btn']} />
               </div>
             </div>
-          </div>
+          </main>
         </main>
-      </div>
+      </main>
     );
   },
 );
