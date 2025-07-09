@@ -53,6 +53,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
 
     // Refs
     const userTabRef = useRef<HTMLDivElement>(null);
+    const counterRef = useRef<NodeJS.Timeout | null>(null);
 
     // Variables
     const {
@@ -220,10 +221,22 @@ const UserTab: React.FC<UserTabProps> = React.memo(
           selectedItemId === memberUserId && selectedItemType === 'user' ? styles['selected'] : ''
         }`}
         onMouseEnter={() => {
-          if (!userTabRef.current) return;
-          const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
-          const y = userTabRef.current.getBoundingClientRect().top;
-          contextMenu.showUserInfoBlock(x, y, false, member);
+          if (counterRef.current) {
+            clearTimeout(counterRef.current);
+          }
+
+          counterRef.current = setTimeout(() => {
+            if (!userTabRef.current) return;
+            const x =
+              userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
+            const y = userTabRef.current.getBoundingClientRect().top;
+            contextMenu.showUserInfoBlock(x, y, false, member);
+          }, 1000);
+        }}
+        onMouseLeave={() => {
+          if (counterRef.current) {
+            clearTimeout(counterRef.current);
+          }
         }}
         onClick={() => {
           if (selectedItemId === memberUserId && selectedItemType === 'user') {
