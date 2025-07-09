@@ -430,7 +430,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
       </div>
 
       <div className={popup['popupFooter']}>
-        <button
+        <div
           className={popup['button']}
           onClick={() => {
             const editedChannels: Partial<Channel>[] = [];
@@ -461,10 +461,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

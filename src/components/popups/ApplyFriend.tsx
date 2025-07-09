@@ -196,7 +196,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
 
         {/* Footer */}
         <div className={popup['popupFooter']}>
-          <button
+          <div
             className={popup['button']}
             onClick={() => {
               handleCreateFriendApplication({ description: applicationDesc }, userId, targetId);
@@ -204,10 +204,10 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
             }}
           >
             {t('send-request')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
+          </div>
+          <div className={popup['button']} onClick={() => handleClose()}>
             {t('cancel')}
-          </button>
+          </div>
         </div>
       </div>
 
@@ -243,12 +243,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
 
         {/* Footer */}
         <div className={popup['popupFooter']}>
-          <button className={popup['button']} onClick={() => setSection(0)}>
+          <div className={popup['button']} onClick={() => setSection(0)}>
             {t('modify')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
+          </div>
+          <div className={popup['button']} onClick={() => handleClose()}>
             {t('confirm')}
-          </button>
+          </div>
         </div>
       </div>
 
@@ -303,7 +303,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
 
         {/* Footer */}
         <div className={popup['popupFooter']}>
-          <button
+          <div
             className={popup['button']}
             onClick={() => {
               handleApproveFriendApplication(targetId, userId);
@@ -311,10 +311,10 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
             }}
           >
             {t('add')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
+          </div>
+          <div className={popup['button']} onClick={() => handleClose()}>
             {t('cancel')}
-          </button>
+          </div>
         </div>
       </div>
     </>

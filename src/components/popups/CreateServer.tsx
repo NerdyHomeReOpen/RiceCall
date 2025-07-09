@@ -156,9 +156,9 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
         {/* Footer */}
         <div className={popup['popupFooter']}>
-          <button className={popup['button']} onClick={() => handleClose()}>
+          <div className={popup['button']} onClick={() => handleClose()}>
             {t('cancel')}
-          </button>
+          </div>
         </div>
       </div>
 
@@ -266,22 +266,21 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
         {/* Footer */}
         <div className={popup['popupFooter']}>
-          <button className={popup['button']} onClick={() => setSection(0)}>
+          <div className={popup['button']} onClick={() => setSection(0)}>
             {t('previous')}
-          </button>
-          <button
-            className={popup['button']}
-            disabled={!canCreate}
+          </div>
+          <div
+            className={`${popup['button']} ${!canCreate ? popup['disabled'] : ''}`}
             onClick={() => {
               handleCreateServer();
               handleClose();
             }}
           >
             {t('confirm')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
+          </div>
+          <div className={popup['button']} onClick={() => handleClose()}>
             {t('cancel')}
-          </button>
+          </div>
         </div>
       </div>
     </>

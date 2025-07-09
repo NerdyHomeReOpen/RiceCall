@@ -104,7 +104,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
+        <div
           className={popup['button']}
           onClick={() => {
             handleEditServer(
@@ -118,10 +118,10 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </form>
   );

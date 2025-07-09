@@ -107,7 +107,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
+        <div
           className={popup['button']}
           onClick={() => {
             handleEditMember({ nickname: memberNickname }, userId, serverId);
@@ -115,19 +115,16 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
           }}
         >
           {t('confirm')}
-        </button>
-        <button type="button" className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
-        <button
-          type="button"
-          className={`${popup['button']}`}
-          onClick={() => {
-            handleEditMember({ nickname: memberNickname }, userId, serverId);
-          }}
+        </div>
+        <div
+          className={popup['button']}
+          onClick={() => handleEditMember({ nickname: memberNickname }, userId, serverId)}
         >
           {t('set')}
-        </button>
+        </div>
       </div>
     </form>
   );

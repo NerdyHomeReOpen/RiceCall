@@ -524,7 +524,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
+        <div
           className={popup['button']}
           disabled={!canSubmit}
           onClick={() => {
@@ -553,10 +553,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
           }}
         >
           {t('confirm')}
-        </button>
-        <button type="button" className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

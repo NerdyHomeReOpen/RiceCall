@@ -66,7 +66,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
+        <div
           className={`${popup['button']} ${password && password.length <= 4 ? '' : popup['disabled']}`}
           onClick={() => {
             handleJoinChannel(userId, channelId, serverId, password);
@@ -74,10 +74,10 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

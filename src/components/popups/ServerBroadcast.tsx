@@ -137,9 +137,8 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
       </div>
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
-          className={popup['button']}
-          disabled={!canSend}
+        <div
+          className={`${popup['button']} ${!canSend ? popup['disabled'] : ''}`}
           onClick={() => {
             handleBroadcastServer(
               { type: 'alert', content: broadcastContent },
@@ -150,10 +149,10 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
           }}
         >
           {t('confirm')}
-        </button>
-        <button type="button" className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

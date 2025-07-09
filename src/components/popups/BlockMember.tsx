@@ -164,9 +164,10 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
           </div>
         </div>
       </div>
+
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
+        <div
           className={popup['button']}
           onClick={() => {
             handleBlockMember();
@@ -174,10 +175,10 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
           }}
         >
           {t('confirm')}
-        </button>
-        <button type="button" className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

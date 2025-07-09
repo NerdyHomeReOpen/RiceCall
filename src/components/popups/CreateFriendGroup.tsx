@@ -70,19 +70,18 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
-          className={popup['button']}
-          disabled={!canCreate}
+        <div
+          className={`${popup['button']} ${!canCreate ? popup['disabled'] : ''}`}
           onClick={() => {
             handleCreateFriendGroup({ name: groupName, order: groupOrder }, userId);
             handleClose();
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

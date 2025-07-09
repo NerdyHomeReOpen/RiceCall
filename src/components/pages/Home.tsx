@@ -42,7 +42,7 @@ const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, serv
       <div className={homePage['serverListTitle']}>{title}</div>
       <ServerListViewer user={user} servers={displayedServers} />
       {canExpand && (
-        <button
+        <div
           className={`
             ${homePage['viewMoreBtn']} 
             ${expanded ? homePage['moreIcon'] : homePage['lessIcon']}
@@ -50,7 +50,7 @@ const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, serv
           onClick={() => setExpanded(!expanded)}
         >
           {expanded ? t('view-less') : t('view-more')}
-        </button>
+        </div>
       )}
     </div>
   );

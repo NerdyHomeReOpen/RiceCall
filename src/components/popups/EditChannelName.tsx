@@ -97,9 +97,8 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
-          className={popup['button']}
-          disabled={!canSubmit}
+        <div
+          className={`${popup['button']} ${!canSubmit ? popup['disabled'] : ''}`}
           onClick={() => {
             if (!canSubmit) return;
             handleEditChannel({ name: channelName }, channelId, serverId);
@@ -107,10 +106,10 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
           }}
         >
           {t('save')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

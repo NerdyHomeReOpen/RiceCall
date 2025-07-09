@@ -249,7 +249,7 @@ const AboutPopup: React.FC = React.memo(() => {
             <div className={popup['label']}>{t('dont-show-next-time')}</div>
           </div>
         </div>
-        <button
+        <div
           className={popup['button']}
           onClick={() => {
             if (dontShowNextTime) {
@@ -259,7 +259,7 @@ const AboutPopup: React.FC = React.memo(() => {
           }}
         >
           {t('close')}
-        </button>
+        </div>
       </div>
     </div>
   );

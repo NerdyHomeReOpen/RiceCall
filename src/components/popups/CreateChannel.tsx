@@ -99,19 +99,18 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
-          className={popup['button']}
-          disabled={!canCreate}
+        <div
+          className={`${popup['button']} ${!canCreate ? popup['disabled'] : ''}`}
           onClick={() => {
             handleCreateChannel({ name: channelName, categoryId: channelId }, serverId);
             handleClose();
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

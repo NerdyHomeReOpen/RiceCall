@@ -92,12 +92,12 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, submitTo, 
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button className={popup['button']} onClick={() => handleSubmit()}>
+        <div className={popup['button']} onClick={() => handleSubmit()}>
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </form>
   );

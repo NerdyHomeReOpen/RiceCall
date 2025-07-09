@@ -101,6 +101,10 @@
 }
 
 .userApplyContentButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
   background-color: #fbfbfb;
   border: 1px solid #9d9e9f;
   border-top: 1px solid #9d9e9f;

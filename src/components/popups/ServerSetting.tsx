@@ -837,13 +837,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
           <div className={popup['col']}>
             <div className={`${popup['inputBox']} ${popup['row']}`}>
               <div className={popup['label']}>{`${t('applicants')} (${filteredApplications.length})`}</div>
-              <button
-                style={{ marginLeft: 'auto' }}
-                className={popup['button']}
-                onClick={() => handleOpenMemberApplySetting()}
-              >
+              <div className={popup['button']} onClick={() => handleOpenMemberApplySetting()}>
                 {t('apply-setting')}
-              </button>
+              </div>
               <div className={setting['searchBorder']}>
                 <div className={setting['searchIcon']}></div>
                 <input
@@ -1023,11 +1019,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
-          className={popup['button']}
-          disabled={!canSubmit}
+        <div
+          className={`${popup['button']} ${!canSubmit ? popup['disabled'] : ''}`}
           onClick={() => {
-            if (!canSubmit) return;
             handleEditServer(
               {
                 name: serverName,
@@ -1045,10 +1039,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
           }}
         >
           {t('save')}
-        </button>
-        <button type="button" className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

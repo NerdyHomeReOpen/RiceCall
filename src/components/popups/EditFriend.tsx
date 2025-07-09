@@ -139,7 +139,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
+        <div
           className={`${popup['button']}`}
           onClick={() => {
             handleEditFriend({ friendGroupId: friendGroupId || null }, userId, targetId);
@@ -147,10 +147,10 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

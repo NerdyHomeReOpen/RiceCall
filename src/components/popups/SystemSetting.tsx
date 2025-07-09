@@ -767,7 +767,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
+        <div
           className={popup['button']}
           onClick={() => {
             ipcService.systemSettings.autoLaunch.set(autoLaunch);
@@ -780,10 +780,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           }}
         >
           {t('confirm')}
-        </button>
-        <button type="button" className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

@@ -134,8 +134,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
 
         {/* Footer */}
         <div className={popup['popupFooter']}>
-          <button
-            type="submit"
+          <div
             className={popup['button']}
             onClick={() => {
               handleCreatMemberApplication({ description: applicationDes }, userId, serverId);
@@ -143,10 +142,10 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
             }}
           >
             {t('submit')}
-          </button>
-          <button type="button" className={popup['button']} onClick={() => handleClose()}>
+          </div>
+          <div className={popup['button']} onClick={() => handleClose()}>
             {t('cancel')}
-          </button>
+          </div>
         </div>
       </div>
 
@@ -180,12 +179,12 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
 
         {/* Footer */}
         <div className={popup['popupFooter']}>
-          <button className={popup['button']} onClick={() => setSection(0)}>
+          <div className={popup['button']} onClick={() => setSection(0)}>
             {t('modify')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
+          </div>
+          <div className={popup['button']} onClick={() => handleClose()}>
             {t('confirm')}
-          </button>
+          </div>
         </div>
       </div>
     </>

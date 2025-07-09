@@ -87,17 +87,15 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
 
       {/* Footer */}
       <div className={popup['popupFooter']}>
-        <button
-          type="submit"
-          className={popup['button']}
-          disabled={!searchQuery.trim()}
+        <div
+          className={`${popup['button']} ${!searchQuery.trim() ? popup['disabled'] : ''}`}
           onClick={() => handleSearchUser(searchQuery)}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

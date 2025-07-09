@@ -192,22 +192,22 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                       </div>
                       <div className={friendVerification['userApplyContentButtonBox']}>
                         <div className={friendVerification['userApplyContentActionButtons']}>
-                          <button
+                          <div
                             className={friendVerification['userApplyContentButton']}
                             onClick={() => {
                               handleOpenApplyFriend(userId, friend.senderId);
                             }}
                           >
                             {t('accept')}
-                          </button>
-                          <button
+                          </div>
+                          <div
                             className={friendVerification['userApplyContentButton']}
                             onClick={() => {
                               handleDeleteFriendApplication(friend.senderId, friend.receiverId);
                             }}
                           >
                             {t('reject')}
-                          </button>
+                          </div>
                         </div>
                         <div
                           className={friendVerification['directMessageButton']}

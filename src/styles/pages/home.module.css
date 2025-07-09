@@ -69,7 +69,7 @@
 
 .searchInputIcon {
   background-color: #fff;
-  background-image: url("../../../public/icon_search.png");
+  background-image: url('../../../public/icon_search.png');
   background-position: 0 0;
   background-size: auto;
   height: 16px;
@@ -89,7 +89,7 @@
 
 .searchInputClear {
   background-color: #fff;
-  background-image: url("../../../public/channel/searchCancel.png");
+  background-image: url('../../../public/channel/searchCancel.png');
   background-position: 0 0;
   background-size: auto;
   height: 13px;
@@ -299,6 +299,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: fit-content;
   cursor: pointer;
   border: 1px solid #cbcccd;
   border-radius: 5px;
@@ -392,7 +393,7 @@
 .dropdownSplit {
   width: 150px;
   margin-top: 3px;
-  background-image: url("../../../public/ctrl/menu_spliter.png");
+  background-image: url('../../../public/ctrl/menu_spliter.png');
   background-size: contain;
   background-repeat: no-repeat;
 }

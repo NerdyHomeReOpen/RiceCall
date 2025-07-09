@@ -314,11 +314,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
         <div className={setting['editTabBar']} style={isSelf && selectedTabId !== 'groups' ? {} : { display: 'none' }}>
           {selectedTabId === 'userSetting' ? (
             <>
-              <button
-                className={`${popup['button']} ${popup['blue']}`}
-                disabled={!canSubmit}
+              <div
+                className={`${popup['button']} ${popup['blue']} ${!canSubmit ? popup['disabled'] : ''}`}
                 onClick={() => {
-                  if (!canSubmit) return;
                   handleEditUser({
                     name: userName,
                     gender: userGender,
@@ -332,15 +330,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 }}
               >
                 {t('confirm')}
-              </button>
-              <button className={popup['button']} onClick={() => setSelectedTabId('about')}>
+              </div>
+              <div className={popup['button']} onClick={() => setSelectedTabId('about')}>
                 {t('cancel')}
-              </button>
+              </div>
             </>
           ) : (
-            <button className={popup['button']} onClick={() => setSelectedTabId('userSetting')}>
+            <div className={popup['button']} onClick={() => setSelectedTabId('userSetting')}>
               {t('edit-profile')}
-            </button>
+            </div>
           )}
         </div>
 
