@@ -139,13 +139,6 @@
   margin: 20px 0;
 }
 
-.memberName {
-  color: #6e849b;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
 .noteText {
   text-align: right;
   margin-top: 3px;

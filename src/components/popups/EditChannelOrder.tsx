@@ -319,7 +319,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   };
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       <div className={editChannelOrder['header']} onClick={handleUnselect}>
         <div
           className={`
@@ -413,7 +413,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         </div>
       </div>
 
-      <div className={popup['popupBody']} onClick={handleUnselect}>
+      <div className={popup['popup-body']} onClick={handleUnselect}>
         <div className={editChannelOrder['body']}>
           <div className={serverPage['channelList']} onClick={(e) => e.stopPropagation()}>
             {serverChannels
@@ -429,7 +429,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         </div>
       </div>
 
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={popup['button']}
           onClick={() => {

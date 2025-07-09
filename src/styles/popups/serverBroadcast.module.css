@@ -8,7 +8,7 @@
   min-width: 80px;
 }
 
-.inputBox {
+.input-box {
   display: flex;
   flex-direction: row;
 }

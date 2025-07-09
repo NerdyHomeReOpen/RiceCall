@@ -1,4 +1,4 @@
-.popupContainer {
+.popup-wrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -8,17 +8,17 @@
   background-size: cover;
 }
 
-.popupContainer:focus {
+.popup-wrapper:focus {
   box-shadow: none;
 }
 
-.popupTab {
+.popup-tabs {
   background: #f0f0f0;
   height: 40px;
   display: flex;
 }
 
-.popupTab .item {
+.popup-tabs .tab {
   height: 100%;
   width: max-content;
   min-width: 100px;
@@ -30,17 +30,17 @@
   text-align: center;
 }
 
-.popupTab .item.active {
+.popup-tabs .tab.active {
   background: #a7c0e9;
 }
 
-.popupBody {
+.popup-body {
   flex: 1;
   min-height: 0;
   display: flex;
 }
 
-.popupFooter {
+.popup-footer {
   padding: 8px 3px;
   display: flex;
   justify-content: flex-end;
@@ -123,43 +123,23 @@
   align-self: center;
 }
 
-.required::after {
-  content: '*';
-  color: red;
-}
-
-.hint {
+.hint-text {
   color: #777;
   font-size: 0.9em;
 }
 
-.value {
-  margin-left: 0.3rem;
-  color: #777;
-}
-
-.link {
+.link-text {
   color: #69a5ff;
   cursor: pointer;
 }
 
-.link:hover {
+.link-text:hover {
   text-decoration: underline;
-}
-
-.h3 {
-  font-weight: bold;
-  font-size: 1.2em;
-}
-
-.p1 {
-  font-size: 1em;
-  color: #777;
 }
 
 /* Input Styles */
 
-.inputGroup {
+.input-group {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -167,22 +147,22 @@
   padding: 0 5px;
 }
 
-.inputGroup .inputGroup {
+.input-group .input-group {
   margin-left: 10px;
 }
 
-.inputBox {
+.input-box {
   width: 100%;
   display: flex;
 }
 
-.inputBox.row,
-.inputBox.col {
+.input-box.row,
+.input-box.col {
   gap: 0;
 }
 
-.inputBox input[type='text'],
-.inputBox input[type='number'] {
+.input-box input[type='text'],
+.input-box input[type='number'] {
   border: 1px solid #ccc;
   padding: 2px;
   background: #fff;
@@ -192,7 +172,7 @@
   height: 2rem;
 }
 
-.inputBox table {
+.input-box table {
   background: #fff;
   display: flex;
   height: auto;
@@ -201,28 +181,28 @@
   overflow-y: auto;
 }
 
-.inputBox table thead {
+.input-box table thead {
   display: flex;
   position: sticky;
   top: 0;
   background: #f4f4f5;
 }
 
-.inputBox table tr {
+.input-box table tr {
   flex: 1;
   display: flex;
   flex-direction: row;
 }
 
-.inputBox table tr:not(.selected):hover {
+.input-box table tr:not(.selected):hover {
   background: #f4f4f5;
 }
 
-.inputBox table tr.selected {
+.input-box table tr.selected {
   background-color: #00000010;
 }
 
-.inputBox table tr th {
+.input-box table tr th {
   height: auto;
   width: 100%;
   background: #e9ebec;
@@ -236,7 +216,7 @@
   align-items: center;
 }
 
-.inputBox table tr td {
+.input-box table tr td {
   height: auto;
   width: 100%;
   border: 1px solid #ccc;
@@ -246,26 +226,32 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  overflow: hidden;
 }
 
-.inputBox table tr th:first-child,
-.inputBox table tr td:first-child {
+.input-box table tr td.name {
+  color: #777;
+}
+.input-box table tr td.name.highlight {
+  color: #6e849b;
+}
+
+.input-box table tr th:first-child,
+.input-box table tr td:first-child {
   border-left: 0;
 }
 
-.inputBox table tr th:hover {
+.input-box table tr th:hover {
   cursor: pointer;
   background: #d1d1d1;
 }
 
-.inputBox table .p1 {
+.input-box table .p1 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.inputBox textarea {
+.input-box textarea {
   border: 1px solid #ccc;
   padding: 2px;
   background: #fff;
@@ -276,13 +262,13 @@
   resize: none;
 }
 
-.selectBox {
+.select-box {
   display: flex;
   width: fit-content;
   position: relative;
 }
 
-.selectBox select {
+.select-box select {
   border: 1px solid #ccc;
   padding: 2px;
   padding-right: 25px;
@@ -296,7 +282,7 @@
   text-decoration: none;
 }
 
-.selectBox::before {
+.select-box::before {
   content: '';
   position: absolute;
   bottom: 0;
@@ -310,7 +296,7 @@
   pointer-events: none;
 }
 
-.selectBox::after {
+.select-box::after {
   content: '';
   position: absolute;
   bottom: 8px;
@@ -323,17 +309,17 @@
   pointer-events: none;
 }
 
-.selectBox:hover::after {
+.select-box:hover::after {
   background-position: -26px 0;
 }
 
-.selectBox:active::after {
+.select-box:active::after {
   background-position: -52px 0;
 }
 
-.inputBox input:not(:read-only),
-.inputBox textarea:not(:read-only),
-.selectBox select {
+.input-box input:not(:read-only),
+.input-box textarea:not(:read-only),
+.select-box select {
   box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
 }
 
@@ -341,7 +327,7 @@
   display: none;
 }
 
-.popupContainer :disabled {
+.popup-wrapper :disabled {
   background-image: linear-gradient(to bottom, #fdfdfd, #fafafa);
   color: #c5c5c5;
   pointer-events: none;

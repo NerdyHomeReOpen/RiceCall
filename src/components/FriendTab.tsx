@@ -251,8 +251,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
         />
         <div className={styles['baseInfoBox']}>
           <div className={styles['container']}>
-            {friendVip > 0 && <div className={`${vip['vipIcon']} ${vip[`vip-small-${friendVip}`]}`} />}
-            <div className={`${styles['name']} ${friendVip > 0 ? styles['isVIP'] : ''}`}>{friendName}</div>
+            {friendVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
+            <div className={`${styles['name-text']} ${friendVip > 0 ? styles['vip-name-color'] : ''}`}>
+              {friendName}
+            </div>
             <div
               className={`
                   ${styles['gradeIcon']} 

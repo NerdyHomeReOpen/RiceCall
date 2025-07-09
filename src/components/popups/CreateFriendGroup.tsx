@@ -44,12 +44,12 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
   };
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+          <div className={popup['input-group']}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
               <input
                 name="name"
@@ -69,7 +69,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${!canCreate ? popup['disabled'] : ''}`}
           onClick={() => {

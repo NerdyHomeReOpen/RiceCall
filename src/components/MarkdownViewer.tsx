@@ -154,7 +154,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
         if (isGuest && forbidGuestUrl) return <span {...props} />;
         return <a target="_blank" href={href} {...props} />;
       },
-      table: ({ node, ...props }: any) => <table className={markdown.tableWrapper} {...props} />,
+      table: ({ node, ...props }: any) => <table className={markdown['table-wrapper']} {...props} />,
       th: ({ node, ...props }: any) => <th {...props} />,
       td: ({ node, ...props }: any) => <td {...props} />,
       hr: ({ node, ...props }: any) => <hr {...props} />,
@@ -192,11 +192,11 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
 
         return (
           <>
-            <button className={markdown.copyButton} onClick={handleCopy} aria-label={t('copy-code')}>
+            <button className={markdown['copy-button']} onClick={handleCopy} aria-label={t('copy-code')}>
               {isCopied ? t('copied') : t('copy')}
             </button>
             <code
-              className={`hljs ${langClass} ${markdown.codeWrapper}`}
+              className={`hljs ${langClass} ${markdown['code-wrapper']}`}
               dangerouslySetInnerHTML={{ __html: highlightedHTML }}
               {...props}
             />
@@ -217,7 +217,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(
     const sanitized = sanitizeMarkdownWithSafeTags(markdownText, emojis, permission);
 
     return (
-      <div className={markdown.markdownContent}>
+      <div className={markdown['markdown-content']}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw]}

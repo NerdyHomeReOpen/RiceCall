@@ -120,15 +120,15 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
   return (
     <>
-      <div className={popup['popupContainer']} style={section === 0 ? {} : { display: 'none' }}>
+      <div className={popup['popup-wrapper']} style={section === 0 ? {} : { display: 'none' }}>
         {/* Tab */}
-        <div className={popup['popupTab']}>
-          <div className={`${popup['item']} ${popup['active']}`}>{t('select-server-type')}</div>
-          <div className={popup['item']}>{t('fill-info')}</div>
+        <div className={popup['popup-tabs']}>
+          <div className={`${popup['tab']} ${popup['active']}`}>{t('select-server-type')}</div>
+          <div className={popup['tab']}>{t('fill-info')}</div>
         </div>
 
         {/* Body */}
-        <div className={popup['popupBody']}>
+        <div className={popup['popup-body']}>
           <div className={setting['body']}>
             <div className={`${createServer['message']}`}>
               {`${t('remaining-server').replace('{0}', remainingServers.toString())}`}
@@ -155,22 +155,22 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         </div>
 
         {/* Footer */}
-        <div className={popup['popupFooter']}>
+        <div className={popup['popup-footer']}>
           <div className={popup['button']} onClick={() => handleClose()}>
             {t('cancel')}
           </div>
         </div>
       </div>
 
-      <div className={popup['popupContainer']} style={section === 1 ? {} : { display: 'none' }}>
+      <div className={popup['popup-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
         {/* Tab */}
-        <div className={popup['popupTab']}>
-          <div className={popup['item']}>{t('select-server-type')}</div>
-          <div className={`${popup['item']}  ${popup['active']}`}>{t('fill-info')}</div>
+        <div className={popup['popup-tabs']}>
+          <div className={popup['tab']}>{t('select-server-type')}</div>
+          <div className={`${popup['tab']}  ${popup['active']}`}>{t('fill-info')}</div>
         </div>
 
         {/* Body */}
-        <div className={popup['popupBody']}>
+        <div className={popup['popup-body']}>
           <div className={`${setting['body']} ${popup['col']}`} style={{ justifyContent: 'space-evenly' }}>
             <div className={createServer['avatarWrapper']}>
               <div
@@ -218,13 +218,13 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
               </label>
             </div>
             <div className={popup['col']}>
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']} style={{ width: '100px' }}>
                   {t('server-type')}
                 </div>
                 <input name="type" type="text" disabled value={t(serverType as keyof typeof t)} />
               </div>
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']} style={{ width: '100px' }}>
                   {t('server-name')}
                 </div>
@@ -242,7 +242,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
                   }
                 />
               </div>
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']} style={{ width: '100px' }}>
                   {t('server-slogan')}
                 </div>
@@ -265,7 +265,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         </div>
 
         {/* Footer */}
-        <div className={popup['popupFooter']}>
+        <div className={popup['popup-footer']}>
           <div className={popup['button']} onClick={() => setSection(0)}>
             {t('previous')}
           </div>

@@ -148,8 +148,8 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   }, []);
 
   return (
-    <div className={popup['popupContainer']} tabIndex={0}>
-      <div className={popup['popupBody']}>
+    <div className={popup['popup-wrapper']} tabIndex={0}>
+      <div className={popup['popup-body']}>
         <div className={`${friendVerification['body']}`}>
           <div className={friendVerification['contentHeader']}>
             <div className={friendVerification['ProcessingStatus']}>

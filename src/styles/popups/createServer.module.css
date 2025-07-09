@@ -39,13 +39,13 @@
   border: 1px solid #ccc;
 }
 
-.inputGroup {
+.input-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.inputBox {
+.input-box {
   flex-direction: column;
 }
 

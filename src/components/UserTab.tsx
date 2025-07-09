@@ -404,14 +404,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
             ${permission[`lv-${memberPermission}`]}
           `}
         />
-        {memberVip > 0 && (
-          <div
-            className={`
-              ${vip['vipIcon']} 
-              ${vip[`vip-small-${memberVip}`]}
-            `}
-          />
-        )}
+        {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
         <div
           className={`
             ${styles['userTabName']} 

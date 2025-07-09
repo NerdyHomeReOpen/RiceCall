@@ -134,9 +134,9 @@ const AboutPopup: React.FC = React.memo(() => {
   ];
 
   return (
-    <div className={`${popup['popupContainer']}`}>
+    <div className={`${popup['popup-wrapper']}`}>
       {/* Body */}
-      <div className={`${popup['popupBody']} ${aboutUs['aboutContainer']}`}>
+      <div className={`${popup['popup-body']} ${aboutUs['aboutContainer']}`}>
         <div className={aboutUs['contentBox']}>
           <div className={`${aboutUs['logoPlaceholder']}`}></div>
 
@@ -235,8 +235,8 @@ const AboutPopup: React.FC = React.memo(() => {
       </div>
 
       {/* Footer */}
-      <div className={`${popup['popupFooter']} aboutFooter`}>
-        <div className={`${popup['inputBox']} ${popup['row']}`} style={{ width: 'fit-content' }}>
+      <div className={`${popup['popup-footer']} aboutFooter`}>
+        <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
           <input
             type="checkbox"
             name="showDisclaimer"

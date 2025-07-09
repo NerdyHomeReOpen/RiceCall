@@ -75,18 +75,18 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
   }, [userId, serverId]);
 
   return (
-    <form className={popup['popupContainer']}>
+    <form className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={popup['inputBox']}>
+          <div className={popup['input-group']}>
+            <div className={popup['input-box']}>
               <div className={popup['label']} style={{ minWidth: '2rem' }}>
                 {t('nickname')}:
               </div>
               <div className={popup['label']}>{userName}</div>
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('please-enter-the-member-nickname')}</div>
               <input
                 name="nickname"
@@ -106,7 +106,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={popup['button']}
           onClick={() => {

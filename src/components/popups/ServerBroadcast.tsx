@@ -47,14 +47,14 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   };
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={broadcast['content']}>
-          <div className={`${popup['inputGroup']}`}>
+          <div className={`${popup['input-group']}`}>
             <div className={`${popup['row']}`}>
               <div className={`${popup['label']} ${broadcast['label']}`}>{t('receive-channel')}</div>
-              <div className={broadcast['inputBox']}>
+              <div className={broadcast['input-box']}>
                 <div className={`${popup['row']}`}>
                   <input
                     name="channelType"
@@ -81,7 +81,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
             </div>
             <div className={`${popup['row']}`}>
               <div className={`${popup['label']} ${broadcast['label']}`}>{t('broadcast-type')}</div>
-              <div className={broadcast['inputBox']}>
+              <div className={broadcast['input-box']}>
                 <div className={`${popup['row']}`}>
                   <input
                     name="sendType"
@@ -107,8 +107,8 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
               </div>
             </div>
           </div>
-          <div className={`${popup['inputGroup']} ${popup['row']}`}>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+          <div className={`${popup['input-group']} ${popup['row']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('broadcast-content')}</div>
               <textarea
                 name="content"
@@ -128,7 +128,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
         </div>
       </div>
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${!canSend ? popup['disabled'] : ''}`}
           onClick={() => {

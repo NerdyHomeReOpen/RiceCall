@@ -66,7 +66,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, submitTo, 
 
   return (
     <form
-      className={popup['popupContainer']}
+      className={popup['popup-wrapper']}
       tabIndex={0}
       ref={containerRef}
       onKeyDown={(e) => {
@@ -74,7 +74,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, submitTo, 
       }}
     >
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={setting['body']}>
           <div className={popup['dialogContent']}>
             <div
@@ -91,7 +91,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, submitTo, 
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div className={popup['button']} onClick={() => handleSubmit()}>
           {t('confirm')}
         </div>

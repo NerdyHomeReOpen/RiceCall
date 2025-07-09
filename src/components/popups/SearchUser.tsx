@@ -66,12 +66,12 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   }, [socket, handleUserSearch]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+          <div className={popup['input-group']}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('please-input-friend-account')}</div>
               <input
                 name="query"
@@ -86,7 +86,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${!searchQuery.trim() ? popup['disabled'] : ''}`}
           onClick={() => handleSearchUser(searchQuery)}

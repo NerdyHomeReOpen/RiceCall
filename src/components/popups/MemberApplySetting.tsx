@@ -65,12 +65,12 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
   }, [serverId]);
 
   return (
-    <form className={popup['popupContainer']}>
+    <form className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={`${popup['inputBox']} ${popup['row']}`}>
+          <div className={popup['input-group']}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <div className={popup['label']}>{t('is-receive-apply')}</div>
               <input
                 name="receiveApply"
@@ -84,7 +84,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
                 }}
               />
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('member-apply-note')}</div>
               <textarea
                 name="applyNotice"
@@ -103,7 +103,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={popup['button']}
           onClick={() => {

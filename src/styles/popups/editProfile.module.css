@@ -96,13 +96,6 @@
   margin: 20px 0;
 }
 
-.memberName {
-  color: #6e849b;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
 .checkBox {
   display: flex;
 }
@@ -222,7 +215,6 @@
 }
 
 .windowActionButtons,
-.vipIcon,
 .userAccount,
 .userContent,
 .userSignature,
@@ -474,7 +466,7 @@
   margin-top: 1rem;
 }
 
-.inputBox {
+.input-box {
   display: flex !important;
   align-items: center;
 }

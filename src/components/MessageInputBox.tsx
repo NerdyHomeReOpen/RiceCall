@@ -38,7 +38,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
 
     return (
       <div
-        className={`${messageInputBox['messageInputBox']} 
+        className={`${messageInputBox['messageinput-box']} 
         ${isWarning ? messageInputBox['warning'] : ''} 
         ${isDisabled ? messageInputBox['disabled'] : ''}`}
       >

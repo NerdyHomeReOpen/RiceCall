@@ -209,7 +209,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
 
   return (
     <form
-      className={popup['popupContainer']}
+      className={popup['popup-wrapper']}
       tabIndex={0}
       ref={containerRef}
       onKeyDown={(e) => {
@@ -217,7 +217,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       }}
     >
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={changeTheme['ctWrapper']}>
           <div className={changeTheme['ctContain']}>
             <div className={changeTheme['themeSelector']}>

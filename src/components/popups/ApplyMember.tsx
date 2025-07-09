@@ -93,9 +93,9 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
   return (
     <>
       {/* Member Application Form */}
-      <div className={popup['popupContainer']} style={section === 0 ? {} : { display: 'none' }}>
+      <div className={popup['popup-wrapper']} style={section === 0 ? {} : { display: 'none' }}>
         {/* Body */}
-        <div className={popup['popupBody']}>
+        <div className={popup['popup-body']}>
           <div className={setting['body']}>
             <div className={popup['col']}>
               <div className={popup['row']}>
@@ -110,12 +110,12 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
                   <div className={applyMember['subText']}>{`ID: ${serverDisplayId}`}</div>
                 </div>
               </div>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div>{t('member-apply-note')}</div>
-                <div className={popup['hint']}>{serverApplyNotice || t('none')}</div>
+                <div className={popup['hint-text']}>{serverApplyNotice || t('none')}</div>
               </div>
               <div className={applyMember['split']} />
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div>{t('member-apply-description')}</div>
                 <textarea
                   rows={2}
@@ -133,7 +133,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
         </div>
 
         {/* Footer */}
-        <div className={popup['popupFooter']}>
+        <div className={popup['popup-footer']}>
           <div
             className={popup['button']}
             onClick={() => {
@@ -150,9 +150,9 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
       </div>
 
       {/* Show Notification */}
-      <div className={popup['popupContainer']} style={section === 1 ? {} : { display: 'none' }}>
+      <div className={popup['popup-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
         {/* Body */}
-        <div className={popup['popupBody']}>
+        <div className={popup['popup-body']}>
           <div className={setting['body']}>
             <div className={popup['col']}>
               <div className={popup['row']}>
@@ -167,18 +167,18 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
                   <div className={applyMember['subText']}>{`ID: ${serverDisplayId}`}</div>
                 </div>
               </div>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div>{t('member-apply-note')}</div>
-                <div className={popup['hint']}>{serverApplyNotice || t('none')}</div>
+                <div className={popup['hint-text']}>{serverApplyNotice || t('none')}</div>
               </div>
               <div className={applyMember['split']} />
-              <p className={popup['hint']}>{t('apply-success')}</p>
+              <p className={popup['hint-text']}>{t('apply-success')}</p>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className={popup['popupFooter']}>
+        <div className={popup['popup-footer']}>
           <div className={popup['button']} onClick={() => setSection(0)}>
             {t('modify')}
           </div>

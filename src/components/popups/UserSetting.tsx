@@ -205,7 +205,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   };
 
   return (
-    <div className={`${popup['popupContainer']} ${setting['userProfile']}`}>
+    <div className={`${popup['popup-wrapper']} ${setting['userProfile']}`}>
       <div className={setting['profileBox']}>
         {/* Header */}
         <div className={setting['header']}>
@@ -255,7 +255,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
           <div className={`${popup['row']} ${setting['noDrag']}`} style={{ gap: '2px' }}>
             <div className={setting['userName']}>{userName}</div>
-            {userVip > 0 && <div className={`${vip['vipIcon']} ${vip[`vip-small-${userVip}`]}`} />}
+            {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
             <div
               className={`
                   ${grade['grade']} 
@@ -397,8 +397,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
         {/* Groups */}
         <div className={setting['body']} style={selectedTabId === 'groups' ? {} : { display: 'none' }}>
           <div className={setting['userProfileContent']}>
-            <div className={`${popup['inputBox']}`}>
-              <div className={`${popup['selectBox']}`}>
+            <div className={`${popup['input-box']}`}>
+              <div className={`${popup['select-box']}`}>
                 <select value={serversView} onChange={(e) => setServersView(e.target.value)}>
                   <option value="joined">{t('joined-servers')}</option>
                   <option value="favorite">{t('favorited-servers')}</option>
@@ -503,7 +503,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           <div className={setting['userProfileContent']}>
             <div className={popup['col']}>
               <div className={popup['row']}>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('nickname')}</div>
                   <input
                     name="name"
@@ -514,9 +514,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   />
                 </div>
 
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('gender')}</div>
-                  <div className={popup['selectBox']}>
+                  <div className={popup['select-box']}>
                     <select
                       value={userGender}
                       onChange={(e) => setUser((prev) => ({ ...prev, gender: e.target.value as User['gender'] }))}
@@ -529,9 +529,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               </div>
 
               <div className={popup['row']}>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('country')}</div>
-                  <div className={popup['selectBox']}>
+                  <div className={popup['select-box']}>
                     <select
                       value={userCountry}
                       onChange={(e) =>
@@ -584,10 +584,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     </select>
                   </div>
                 </div>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('birthdate')}</div>
                   <div className={popup['row']}>
-                    <div className={popup['selectBox']}>
+                    <div className={popup['select-box']}>
                       <select
                         id="birthYear"
                         value={userBirthYear}
@@ -605,7 +605,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         ))}
                       </select>
                     </div>
-                    <div className={popup['selectBox']}>
+                    <div className={popup['select-box']}>
                       <select
                         id="birthMonth"
                         value={userBirthMonth}
@@ -627,7 +627,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         ))}
                       </select>
                     </div>
-                    <div className={popup['selectBox']}>
+                    <div className={popup['select-box']}>
                       <select
                         id="birthDay"
                         value={userBirthDay}
@@ -655,7 +655,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 </div>
               </div>
 
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('signature')}</div>
                 <div className={popup['row']}>
                   <input
@@ -686,7 +686,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   />
                 </div>
               </div>
-              <div className={`${popup['inputBox']} ${popup['col']} ${popup['disabled']}`}>
+              <div className={`${popup['input-box']} ${popup['col']} ${popup['disabled']}`}>
                 <div className={popup['label']}>{t('about-me')}</div>
                 <textarea name="about" />
               </div>
@@ -696,7 +696,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         {!isFriend && !isSelf && (
           <div
             className={`${popup['button']} ${popup['green']}`}

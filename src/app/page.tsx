@@ -174,23 +174,23 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
   }, []);
 
   return (
-    <header className={header['header']}>
+    <header className={`${header['header']} ${header['big']}`}>
       {/* Title */}
-      <div className={`${header['titleBox']} ${header['big']}`}>
-        <div className={header['nameBox']} onClick={() => handleOpenUserSetting(userId)}>
+      <div className={header['title-box']}>
+        <div className={header['name-box']} onClick={() => handleOpenUserSetting(userId)}>
           {userName}
         </div>
         <div
-          className={header['statusBox']}
+          className={header['status-box']}
           onClick={() => {
             setShowStatusDropdown(!showStatusDropdown);
           }}
         >
-          <div className={header['statusDisplay']} datatype={userStatus} />
-          <div className={header['statusTriangle']} />
+          <div className={header['status-display']} datatype={userStatus} />
+          <div className={header['status-triangle']} />
           <div
             className={`
-                ${header['statusDropdown']}
+                ${header['status-dropdown']}
                 ${showStatusDropdown ? '' : header['hidden']}
               `}
           >
@@ -208,8 +208,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
           </div>
         </div>
       </div>
+
       {/* Main Tabs */}
-      <div className={header['mainTabs']}>
+      <div className={header['main-tabs']}>
         {MAIN_TABS.map((Tab) => {
           const TabId = Tab.id;
           const TabLable = Tab.label;
@@ -219,17 +220,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
             <div
               key={`Tabs-${TabId}`}
               data-tab-id={TabId}
-              className={`
-                  ${header['tab']}
-                  ${TabId === mainTab.selectedTabId ? header['selected'] : ''}
-                `}
+              className={`${header['tab']} ${TabId === mainTab.selectedTabId ? header['selected'] : ''}`}
               onClick={() => mainTab.setSelectedTabId(TabId as 'home' | 'friends' | 'server')}
             >
-              <div className={header['tabLable']}>{TabLable}</div>
-              <div className={header['tabBg']} />
+              <div className={header['tab-lable']}>{TabLable}</div>
+              <div className={header['tab-bg']} />
               {TabClose && (
                 <svg
-                  className={`${header['tabClose']} themeTabClose`}
+                  className={`${header['tab-close']} themeTabClose`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleLeaveServer(userId, serverId);
@@ -253,6 +251,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
           );
         })}
       </div>
+
       {/* Buttons */}
       <div className={header['buttons']}>
         <div className={header['gift']} />
@@ -285,12 +284,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                 icon: 'setting',
                 onClick: () => handleOpenSystemSetting(),
               },
-              // {
-              //   id: 'message-history',
-              //   label: lang.tr.messageHistory,
-              //   icon: 'message',
-              //   onClick: () => {},
-              // },
               {
                 id: 'change-theme',
                 label: t('change-theme'),

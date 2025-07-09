@@ -68,16 +68,16 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
   }, [channelId]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={popup['inputBox']}>
+          <div className={popup['input-group']}>
+            <div className={popup['input-box']}>
               <div className={popup['label']}>{t('parent-channel')}</div>
               <div className={popup['label']}>{parentName || t('none')}</div>
             </div>
-            <div className={popup['inputBox']}>
+            <div className={popup['input-box']}>
               <div className={popup['label']}>{t('channel-name')}</div>
               <input
                 name="name"
@@ -98,7 +98,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${!canCreate ? popup['disabled'] : ''}`}
           onClick={() => {

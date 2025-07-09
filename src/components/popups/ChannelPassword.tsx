@@ -44,11 +44,11 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
   };
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={setting['body']}>
-          <div className={`${popup['inputBox']} ${popup['col']}`}>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('please-enter-the-channel-password')}</div>
             <input
               type="text"
@@ -65,7 +65,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${password && password.length <= 4 ? '' : popup['disabled']}`}
           onClick={() => {

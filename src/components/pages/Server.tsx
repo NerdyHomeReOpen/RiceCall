@@ -248,7 +248,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           </div>
           {/* Resize Handle */}
           <div
-            className="resizeHandle"
+            className="resize-handle"
             onMouseDown={() => setIsResizingSidebar(true)}
             onMouseUp={() => setIsResizingSidebar(false)}
           />
@@ -263,7 +263,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             </div>
             {/* Resize Handle */}
             <div
-              className="resizeHandleVertical"
+              className="resize-handle-vertical"
               onMouseDown={() => setIsResizingAnnouncementArea(true)}
               onMouseUp={() => setIsResizingAnnouncementArea(false)}
             />

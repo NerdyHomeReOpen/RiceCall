@@ -126,7 +126,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             />
             <div className={friendPage['wealthIcon']} />
             <div className={friendPage['wealthValue']}>0</div>
-            {userVip > 0 && <div className={`${vip['vipIcon']} ${vip[`vip-small-${userVip}`]}`} />}
+            {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
           </div>
           <div className={`${friendPage['container']} ${friendPage['myBadges']}`}>
             <BadgeListViewer badges={userBadges} maxDisplay={5} />
@@ -176,7 +176,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         </div>
 
         {/* Resize Handle */}
-        <div className="resizeHandle" onMouseDown={() => setIsResizing(true)} onMouseUp={() => setIsResizing(false)} />
+        <div className="resize-handle" onMouseDown={() => setIsResizing(true)} onMouseUp={() => setIsResizing(false)} />
 
         {/* Right Content */}
         <div className={friendPage['mainContent']}>

@@ -75,7 +75,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       />
       <div className={styles['messageBox']}>
         <div className={styles['header']}>
-          {senderVip > 0 && <div className={`${vip['vipIcon']} ${vip[`vip-small-${senderVip}`]}`} />}
+          {senderVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
           <div
             className={`${styles['username']} ${senderVip > 0 ? `${vip['isVIP']} ${vip['clickable']}` : ''}`}
             onClick={() => handleOpenUserInfo(userId, senderUserId)}

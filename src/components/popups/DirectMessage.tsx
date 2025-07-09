@@ -223,9 +223,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, [targetCurrentServerId]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         {/* Sidebar */}
         <div className={directMessage['sidebar']}>
           <div className={directMessage['targetBox']}>
@@ -233,20 +233,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               className={`${directMessage['avatarPicture']} ${isFriend && isOnline ? '' : directMessage['offline']}`}
               style={{ backgroundImage: `url(${targetAvatarUrl})` }}
             />
-            {targetVip > 0 && (
-              <div
-                className={`
-                  ${vip['vipIconBig']}
-                  ${vip[`vip-big-${targetVip}`]}`}
-              />
-            )}
+            {targetVip > 0 && <div className={`${vip['vip-icon-big']} ${vip[`vip-${targetVip}`]}`} />}
             <div className={directMessage['userStateBox']}>
               <div
                 title={`${t('level')}: ${targetLevel}`}
-                className={`
-                    ${grade['grade']}
-                    ${grade[`lv-${Math.min(56, targetLevel)}`]}
-                  `}
+                className={`${grade['grade']} ${grade[`lv-${Math.min(56, targetLevel)}`]}`}
               />
               {targetBadges.length > 0 ? <div className={directMessage['userFriendSplit']} /> : ''}
               <BadgeListViewer badges={targetBadges} maxDisplay={13} />

@@ -381,9 +381,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   }, [setSelectedRowIdAndType]);
 
   return (
-    <div className={popup['popupContainer']} ref={popupRef}>
+    <div className={popup['popup-wrapper']} ref={popupRef}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         {/* Sidebar */}
         <div className={setting['left']}>
           <div className={setting['tabs']}>
@@ -412,7 +412,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
             <div className={popup['row']}>
               <div className={popup['col']}>
                 <div className={popup['row']}>
-                  <div className={`${popup['inputBox']} ${popup['col']}`}>
+                  <div className={`${popup['input-box']} ${popup['col']}`}>
                     <div className={popup['label']}>{t('name')}</div>
                     <input
                       name="name"
@@ -427,12 +427,12 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                       }}
                     />
                   </div>
-                  <div className={`${popup['inputBox']} ${popup['col']}`}>
+                  <div className={`${popup['input-box']} ${popup['col']}`}>
                     <div className={popup['label']}>{t('id')}</div>
                     <input name="displayId" type="text" value={serverDisplayId} readOnly />
                   </div>
                 </div>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('slogan')}</div>
                   <input
                     name="slogan"
@@ -447,9 +447,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                     }}
                   />
                 </div>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('type')}</div>
-                  <div className={popup['selectBox']}>
+                  <div className={popup['select-box']}>
                     <select
                       name="type"
                       value={serverType}
@@ -518,24 +518,24 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
             </div>
             <div className={popup['col']}>
               <div className={popup['row']}>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('level')}</div>
                   <input name="level" type="text" value={serverLevel} readOnly />
                 </div>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('create-at')}</div>
                   <input name="createdAt" type="text" value={new Date(serverCreatedAt).toLocaleString()} readOnly />
                 </div>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={`${popup['label']} ${setting['wealthCoinIcon']}`}>{t('wealth')}</div>
                   <input name="wealth" type="text" value={serverWealth} readOnly />
                 </div>
               </div>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('group-link')}</div>
                 <input name="link" type="text" value={`https://ricecall.com.tw/join?sid=${serverDisplayId}`} readOnly />
               </div>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('description')}</div>
                 <textarea
                   name="description"
@@ -555,7 +555,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         {/* Announcement */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}>
+            <div className={`${popup['input-box']} ${setting['headerBar']} ${popup['row']}`}>
               <div className={popup['label']}>{t('input-announcement')}</div>
               <div
                 className={popup['button']}
@@ -570,9 +570,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 {showPreview ? t('edit') : t('preview')}
               </div>
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               {showPreview ? (
-                <div className={markdown['settingMarkdownContainer']} style={{ minHeight: '330px' }}>
+                <div className={markdown['setting-markdown-container']} style={{ minHeight: '330px' }}>
                   <MarkdownViewer markdownText={serverAnnouncement} />
                 </div>
               ) : (
@@ -597,7 +597,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         {/* Member Management */}
         <div className={setting['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}>
+            <div className={`${popup['input-box']} ${setting['headerBar']} ${popup['row']}`}>
               <div className={popup['label']}>
                 {t('member')} ({filteredMembers.length})
               </div>
@@ -613,7 +613,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 />
               </div>
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
@@ -746,13 +746,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                           ]);
                         }}
                       >
-                        <td>
+                        <td className={`${popup['name']} ${memberNickname ? popup['highlight'] : ''}`}>
                           <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
-                          <div
-                            className={`${popup['p1']} ${memberNickname && memberName ? setting['memberName'] : ''}`}
-                          >
-                            {memberNickname || memberName}
-                          </div>
+                          {memberNickname || memberName}
                         </td>
                         <td>{getPermissionText(t, memberPermission)}</td>
                         <td>{memberContribution}</td>
@@ -771,8 +767,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         <div className={setting['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={`${popup['label']} ${popup['header']}`}>{t('access-permission')}</div>
-            <div className={popup['inputGroup']}>
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+            <div className={popup['input-group']}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
                   name="visibility"
                   type="radio"
@@ -788,8 +784,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 />
                 <div className={popup['label']}>{t('public-server')}</div>
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
                   name="visibility"
                   type="radio"
@@ -804,10 +799,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   }}
                 />
                 <div className={popup['label']}>{t('semi-public-server')}</div>
-                <div className={popup['hint']}>{t('semi-public-server-description')}</div>
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <div className={popup['hint-text']}>{t('semi-public-server-description')}</div>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
                   name="visibility"
                   type="radio"
@@ -822,8 +816,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   }}
                 />
                 <div className={popup['label']}>{t('private-server')}</div>
-                <div className={popup['hint']}>{t('private-server-description')}</div>
               </div>
+              <div className={popup['hint-text']}>{t('private-server-description')}</div>
             </div>
           </div>
         </div>
@@ -831,7 +825,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         {/* Member Application Management */}
         <div className={setting['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}>
+            <div className={`${popup['input-box']} ${setting['headerBar']} ${popup['row']}`}>
               <div className={popup['label']}>{`${t('applicants')} (${filteredApplications.length})`}</div>
               <div className={popup['row']}>
                 <div className={popup['button']} onClick={() => handleOpenMemberApplySetting()}>
@@ -850,7 +844,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 </div>
               </div>
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
@@ -919,9 +913,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                           ]);
                         }}
                       >
-                        <td>
-                          <div className={popup['p1']}>{applicationName}</div>
-                        </td>
+                        <td>{applicationName}</td>
                         <td>{applicationDescription}</td>
                         <td>{new Date(applicationCreatedAt).toISOString().slice(0, 10)}</td>
                       </tr>
@@ -937,7 +929,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         {/* Blacklist Management */}
         <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={`${popup['inputBox']} ${setting['headerBar']} ${popup['row']}`}>
+            <div className={`${popup['input-box']} ${setting['headerBar']} ${popup['row']}`}>
               <div className={popup['label']}>{`${t('blacklist')} (${filteredBlockMembers.length})`}</div>
               <div className={setting['searchBorder']}>
                 <div className={setting['searchIcon']}></div>
@@ -951,7 +943,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 />
               </div>
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
@@ -1016,7 +1008,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${!canSubmit ? popup['disabled'] : ''}`}
           onClick={() => {

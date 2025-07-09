@@ -71,12 +71,12 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
   }, [friendGroupId]);
 
   return (
-    <form className={popup['popupContainer']}>
+    <form className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+          <div className={popup['input-group']}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
               <input
                 name="name"
@@ -96,7 +96,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${!canSubmit ? popup['disabled'] : ''}`}
           onClick={() => {

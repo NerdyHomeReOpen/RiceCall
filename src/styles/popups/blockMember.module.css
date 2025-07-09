@@ -21,7 +21,7 @@
   cursor: pointer;
 }
 
-.inputBox {
+.input-box {
   display: flex;
   justify-content: flex-start;
 }

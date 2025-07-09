@@ -95,9 +95,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
   }, []);
 
   return (
-    <header className={`${header['header']} ${header['popupHeader']}`}>
-      <div className={header['titleWrapper']}>
-        <div className={`${header['titleBox']} ${titleBoxIcon}`}>
+    <header className={`${header['header']} ${header['popup']}`}>
+      <div className={header['title-wrapper']}>
+        <div className={`${header['title-box']} ${titleBoxIcon}`}>
           <div className={header['title']}>{title}</div>
         </div>
         <div className={header['buttons']}>
@@ -364,9 +364,9 @@ const Popup = React.memo(() => {
           buttons={headerButtons}
           titleBoxIcon={
             type === PopupType.CHANGE_THEME
-              ? header['titleBoxSkinIcon']
+              ? header['title-box-skin-icon']
               : type === PopupType.DIRECT_MESSAGE
-              ? header['titleBoxDirectMessageIcon']
+              ? header['title-box-direct-message-icon']
               : undefined
           }
           titleBoxContent={

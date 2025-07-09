@@ -102,9 +102,9 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   }, [formatType, selectTime]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={`${popup['popupBody']}`}>
+      <div className={`${popup['popup-body']}`}>
         <div className={`${styles['content']}`}>
           <div className={`${popup['dialogContent']} ${styles['top']}`}>
             <div
@@ -117,10 +117,10 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
               <div className={`${popup['label']} ${styles['label']}`}>
                 <MarkdownViewer markdownText={t('confirm-block-user').replace('{0}', userName)} />
               </div>
-              <div className={`${popup['inputGroup']} ${popup['col']}`}>
-                <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
+              <div className={`${popup['input-group']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${styles['input-box']} ${popup['row']}`}>
                   <div className={`${popup['label']}`}>{t('block-type')}</div>
-                  <div className={`${popup['selectBox']}`}>
+                  <div className={`${popup['select-box']}`}>
                     <select value={blockType} onChange={(e) => setBlockType(e.target.value)}>
                       {BLOCK_TYPE_OPTIONS.map((option) => (
                         <option key={option.key} value={option.key} disabled={option.disabled}>
@@ -130,9 +130,9 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
                     </select>
                   </div>
                 </div>
-                <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
+                <div className={`${popup['input-box']} ${styles['input-box']} ${popup['row']}`}>
                   <div className={`${popup['label']}`}>{t('block-time')}</div>
-                  <div className={`${popup['selectBox']}`}>
+                  <div className={`${popup['select-box']}`}>
                     <select
                       value={selectTime}
                       disabled={isForeverBlock}
@@ -145,7 +145,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
                       ))}
                     </select>
                   </div>
-                  <div className={`${popup['selectBox']}`}>
+                  <div className={`${popup['select-box']}`}>
                     <select
                       value={formatType}
                       disabled={isForeverBlock}
@@ -166,7 +166,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         <div
           className={popup['button']}
           onClick={() => {

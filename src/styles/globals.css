@@ -59,6 +59,8 @@ body {
   overflow: hidden;
 }
 
+/* Scrollbar */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -78,7 +80,9 @@ body {
   background: #6d6d6d38;
 }
 
-div.resizeHandle {
+/* Resize Handle */
+
+.resize-handle {
   min-width: 3px;
   height: 100%;
   background: rgb(229 231 235);
@@ -86,12 +90,12 @@ div.resizeHandle {
   transition: background 0.1s ease-in-out;
 }
 
-div.resizeHandle:active,
-div.resizeHandle:hover {
+.resize-handle:active,
+.resize-handle:hover {
   background: rgb(200 202 206);
 }
 
-div.resizeHandleVertical {
+.resize-handle-vertical {
   width: 100%;
   min-height: 3px;
   background: rgb(229 231 235);
@@ -99,10 +103,12 @@ div.resizeHandleVertical {
   transition: background 0.1s ease-in-out;
 }
 
-div.resizeHandleVertical:active,
-div.resizeHandleVertical:hover {
+.resize-handle-vertical:active,
+.resize-handle-vertical:hover {
   background: rgb(200 202 206);
 }
+
+/* Radio & Checkbox */
 
 input[type='radio'] {
   background-image: url('../../public/ctrl/radiobox_icon.png');
@@ -140,6 +146,8 @@ input[type='checkbox']:checked:hover {
   background-position: -18px -18px;
 }
 
+/* Input & Select & Textarea */
+
 input,
 input::placeholder,
 select,
@@ -150,6 +158,8 @@ button {
   font-family: var(--font-family);
 }
 
+/* Highlight.js */
+
 .hljs span {
   font-family: monospace;
 }
@@ -157,6 +167,8 @@ button {
 .hljs {
   line-height: 1.25rem;
 }
+
+/* Disabled */
 
 *:disabled,
 .disabled {

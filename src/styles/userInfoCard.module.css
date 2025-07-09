@@ -1,4 +1,4 @@
-.userInfoCard {
+.user-info-card {
   z-index: 500;
   position: absolute;
   background: #f4f6fa;
@@ -8,42 +8,42 @@
   flex-direction: column;
 }
 
-.userInfoCard.vip-0 {
+.vip-0 {
   background-image: url('../../public/channel/ucard_vip0_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
-.userInfoCard.vip-1 {
+.vip-1 {
   background-image: url('../../public/channel/ucard_vip1_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
-.userInfoCard.vip-2 {
+.vip-2 {
   background-image: url('../../public/channel/ucard_vip2_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
-.userInfoCard.vip-3 {
+.vip-3 {
   background-image: url('../../public/channel/ucard_vip3_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
-.userInfoCard.vip-4 {
+.vip-4 {
   background-image: url('../../public/channel/ucard_vip4_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
-.userInfoCard.vip-5 {
+.vip-5 {
   background-image: url('../../public/channel/ucard_vip5_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
@@ -66,7 +66,7 @@
   justify-content: flex-start;
 }
 
-.avatarPicture {
+.avatar-picture {
   min-height: 98px;
   min-width: 98px;
   background-image: url('../../public/im/IMLogo.png');
@@ -75,7 +75,7 @@
   background-position: center center;
 }
 
-.userInfoWrapper {
+.user-info-wrapper {
   flex: 1;
   height: 100%;
   display: flex;
@@ -94,12 +94,12 @@
   margin-top: 10px;
 }
 
-.nicknameRow {
+.nickname-row {
   display: flex;
   align-items: center;
 }
 
-.nicknameRow:not(:empty)::before {
+.nickname-row:not(:empty)::before {
   content: '';
   display: block;
   background-image: url('../../public/channel/groupcard.png');
@@ -112,19 +112,13 @@
   margin-right: 5px;
 }
 
-.nickname {
+.nickname-text {
   color: #1e667c;
 }
 
-.infoRow {
+.info-row {
   display: flex;
   align-items: center;
-}
-
-.permissionWrapper {
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .footer {
@@ -136,26 +130,32 @@
   padding: 0 5px;
 }
 
-.name {
+.name-text {
   color: #1e667c;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.vipText {
+.vip-boost-text {
   color: #f00;
 }
 
-.permissionText {
+.permission-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.permission-text {
   color: #25476a;
 }
 
-.permissionText::before {
+.permission-text::before {
   content: '[';
 }
 
-.permissionText::after {
+.permission-text::after {
   content: ']';
 }
 
@@ -169,37 +169,37 @@
   background-size: auto;
 }
 
-.contributionBox {
+.contribution-wrapper {
   display: flex;
 }
 
-.contributionValue {
+.contribution-value {
   color: #777;
 }
 
-.xpWrapper {
+.xp-wrapper {
   display: flex;
   flex-direction: column;
 }
 
-.levelText {
+.level-text {
   color: #777;
 }
 
-.xpBox {
+.xp-progress-container {
   background-color: #e5e7eb;
   border-radius: 2.5px;
   height: 5px;
   border: 1px solid #b6b6b6;
 }
 
-.xpProgress {
+.xp-progress {
   background-color: #f6b03b;
   border-radius: 0.125rem;
   height: 100%;
 }
 
-.xpText {
+.xp-text {
   display: flex;
   justify-content: space-between;
   width: 100%;
