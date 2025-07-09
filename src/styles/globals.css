@@ -32,7 +32,6 @@ body,
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border-radius: 5px;
   color: var(--foreground);
   background: none;
   user-select: none;
@@ -55,11 +54,8 @@ body {
   background-color: #fff;
   width: 100%;
   height: 100%;
-  border-radius: 5px;
   flex-direction: column;
   overflow: hidden;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
 }
 
 ::-webkit-scrollbar {

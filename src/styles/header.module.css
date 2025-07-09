@@ -230,7 +230,6 @@
 .mainTabs {
   display: flex;
   align-items: flex-end;
-  height: 43px;
   margin-right: auto;
   margin-left: 0;
 }

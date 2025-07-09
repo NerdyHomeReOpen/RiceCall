@@ -360,19 +360,23 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
   }
 
   mainWindow = new BrowserWindow({
+    title: `Raidcall v${app.getVersion()}`,
     width: 1080,
     height: 720,
     minWidth: 800,
     minHeight: 600,
-    frame: false,
-    transparent: true,
+    thickFrame: true,
+    titleBarStyle: 'hidden',
+    maximizable: true,
     resizable: true,
+    fullscreen: false,
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
-      webviewTag: true,
+      backgroundThrottling: false,
     },
   });
 
@@ -421,18 +425,21 @@ async function createAuthWindow() {
   }
 
   authWindow = new BrowserWindow({
+    title: `Raidcall v${app.getVersion()}`,
     width: 640,
     height: 480,
-    frame: false,
-    transparent: true,
+    thickFrame: true,
+    titleBarStyle: 'hidden',
+    maximizable: false,
     resizable: false,
-    hasShadow: true,
     fullscreen: false,
+    hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
-      webviewTag: true,
+      backgroundThrottling: false,
     },
   });
 
@@ -487,20 +494,23 @@ async function createPopup(type: PopupType, id: string, force = true): Promise<B
   }
 
   popups[id] = new BrowserWindow({
+    title: `Raidcall v${app.getVersion()}`,
     width: PopupSize[type].width,
     height: PopupSize[type].height,
-    modal: true,
-    frame: false,
-    transparent: true,
+    thickFrame: true,
+    titleBarStyle: 'hidden',
+    maximizable: false,
     resizable: false,
-    hasShadow: true,
     fullscreen: false,
+    hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
-      webviewTag: true,
+      backgroundThrottling: false,
     },
+    modal: true,
   });
 
   if (app.isPackaged || !DEV) {
