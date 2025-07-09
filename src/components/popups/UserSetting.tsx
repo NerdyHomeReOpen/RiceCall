@@ -448,7 +448,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 : favoriteServers.map((server) => (
                     <div
                       key={server.serverId}
-                      className={styles['server-item']}
+                      className={styles['server-card']}
                       onClick={() => handleServerSelect(server.serverId, server.displayId)}
                     >
                       <div
