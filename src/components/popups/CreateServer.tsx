@@ -258,7 +258,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
             {t('previous')}
           </div>
           <div
-            className={`${popup['button']} ${!canCreate ? popup['disabled'] : ''}`}
+            className={`${popup['button']} ${!canCreate ? 'disabled' : ''}`}
             onClick={() => {
               handleCreateServer();
               handleClose();

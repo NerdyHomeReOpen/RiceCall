@@ -253,7 +253,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
           <div className={popup['col']}>
             <div className={`${popup['label']} ${popup['header']}`}>{t('access-permission')}</div>
             <div className={popup['input-group']}>
-              <div className={`${popup['input-box']} ${popup['row']} ${isLobby ? popup['disabled'] : ''}`}>
+              <div className={`${popup['input-box']} ${popup['row']} ${isLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
@@ -265,7 +265,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 <div className={popup['label']}>{t('anyone-can-access')}</div>
               </div>
 
-              <div className={`${popup['input-box']} ${popup['row']} ${isLobby ? popup['disabled'] : ''}`}>
+              <div className={`${popup['input-box']} ${popup['row']} ${isLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
@@ -277,11 +277,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 <div className={popup['label']}>{t('forbid-guest-access')}</div>
               </div>
 
-              <div
-                className={`${popup['input-box']} ${popup['row']} ${
-                  isLobby || isReceptionLobby ? popup['disabled'] : ''
-                }`}
-              >
+              <div className={`${popup['input-box']} ${popup['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
@@ -292,11 +288,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 />
                 <div className={popup['label']}>{t('message-only')}</div>
               </div>
-              <div
-                className={`${popup['input-box']} ${popup['row']} ${
-                  isLobby || isReceptionLobby ? popup['disabled'] : ''
-                }`}
-              >
+              <div className={`${popup['input-box']} ${popup['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
@@ -330,11 +322,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
           <div className={popup['col']}>
             <div className={`${popup['label']} ${popup['header']}`}>{t('speaking-permission') + t('soon')}</div>
             <div className={popup['input-group']}>
-              <div className={`${popup['input-box']} ${popup['row']} ${popup['disabled']}`}>
+              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input name="forbidGuestQueue" type="checkbox" checked={false} onChange={() => {}} />
                 <div className={popup['label']}>{t('forbid-guest-queue')}</div>
               </div>
-              <div className={`${popup['input-box']} ${popup['row']} ${popup['disabled']}`}>
+              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input name="forbidGuestVoice" type="checkbox" checked={false} onChange={() => {}} />
                 <div className={popup['label']}>{t('forbid-guest-voice')}</div>
               </div>
@@ -438,7 +430,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
       {/* Footer */}
       <div className={popup['popup-footer']}>
         <div
-          className={`${popup['button']} ${!canSubmit ? popup['disabled'] : ''}`}
+          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
             handleEditChannel(
               {

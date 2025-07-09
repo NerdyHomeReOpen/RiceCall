@@ -225,11 +225,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       <div className={styles['header']}>
         <div className={styles['user-signature']}>{target.signature}</div>
         <div className={styles['direct-option-buttons']}>
-          <div className={`${styles['file-share']} ${popup['disabled']}`} />
-          <div className={`${styles['block-user']} ${popup['disabled']}`} />
-          <div className={`${styles['un-block-user']} ${popup['disabled']}`} />
-          <div className={`${styles['invite-temp-group']} ${popup['disabled']}`} />
-          <div className={`${styles['report']} ${popup['disabled']}`} />
+          <div className={`${styles['file-share']} ${'disabled'}`} />
+          <div className={`${styles['block-user']} ${'disabled'}`} />
+          <div className={`${styles['un-block-user']} ${'disabled'}`} />
+          <div className={`${styles['invite-temp-group']} ${'disabled'}`} />
+          <div className={`${styles['report']} ${'disabled'}`} />
         </div>
       </div>
 

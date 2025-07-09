@@ -159,8 +159,9 @@ button {
 
 *:disabled,
 .disabled {
-  filter: grayscale(100%);
-  cursor: not-allowed;
+  color: #c5c5c5 !important;
+  filter: grayscale(100%) !important;
+  pointer-events: none !important;
 }
 
 /* Tag */

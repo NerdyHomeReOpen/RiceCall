@@ -305,7 +305,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
       {/* Header */}
       <div className={styles['header']} onClick={handleUnselect}>
         <div
-          className={`${styles['add-channel-btn']} ${!canAdd ? popup['disabled'] : ''}`}
+          className={`${styles['add-channel-btn']} ${!canAdd ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             handleOpenCreateChannel(userId, selectedChannelId || null, serverId);
@@ -314,7 +314,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           {t('create')}
         </div>
         <div
-          className={`${styles['change-channel-name-btn']} ${!canRename ? popup['disabled'] : ''}`}
+          className={`${styles['change-channel-name-btn']} ${!canRename ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             handleOpenEditChannelName(serverId, selectedChannelId);
@@ -323,7 +323,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           {t('change-name')}
         </div>
         <div
-          className={`${styles['delete-channel-btn']} ${!canDelete ? popup['disabled'] : ''}`}
+          className={`${styles['delete-channel-btn']} ${!canDelete ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             handleOpenWarningDialog(t('warningDeleteChannel').replace('{0}', selectedChannel?.name ?? ''));
@@ -332,7 +332,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           {t('delete')}
         </div>
         <div
-          className={`${styles['up-channel-order-btn']} ${!canMoveUp ? popup['disabled'] : ''}`}
+          className={`${styles['up-channel-order-btn']} ${!canMoveUp ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             handleChangeOrder(currentIndex, currentIndex - 1);
@@ -341,7 +341,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           {t('move-up')}
         </div>
         <div
-          className={`${styles['down-channel-order-btn']} ${!canMoveDown ? popup['disabled'] : ''}`}
+          className={`${styles['down-channel-order-btn']} ${!canMoveDown ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             handleChangeOrder(currentIndex, currentIndex + 1);
@@ -350,7 +350,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           {t('move-down')}
         </div>
         <div
-          className={`${styles['top-channel-order-btn']} ${!canTop ? popup['disabled'] : ''}`}
+          className={`${styles['top-channel-order-btn']} ${!canTop ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             handleChangeOrder(currentIndex, 0);
@@ -359,7 +359,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           {t('move-top')}
         </div>
         <div
-          className={`${styles['bottom-channel-order-btn']} ${!canBottom ? popup['disabled'] : ''}`}
+          className={`${styles['bottom-channel-order-btn']} ${!canBottom ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             handleChangeOrder(currentIndex, groupChannels.length - 1);

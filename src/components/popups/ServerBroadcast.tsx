@@ -88,10 +88,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
               />
               <div className={popup['label']}>{t('text-broadcast')}</div>
             </div>
-            <div
-              className={`${popup['input-box']} ${popup['row']} ${popup['disabled']}`}
-              style={{ width: 'fit-content' }}
-            >
+            <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`} style={{ width: 'fit-content' }}>
               <input
                 name="sendType"
                 type="radio"
@@ -124,7 +121,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
       {/* Footer */}
       <div className={popup['popup-footer']}>
         <div
-          className={`${popup['button']} ${!canSend ? popup['disabled'] : ''}`}
+          className={`${popup['button']} ${!canSend ? 'disabled' : ''}`}
           onClick={() => {
             handleBroadcastServer(
               { type: 'alert', content: broadcastContent },

@@ -233,7 +233,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             {/* General Setting */}
             <div className={`${popup['label']} ${popup['header']}`}>{t('general-setting')}</div>
             <div className={popup['input-group']}>
-              <div className={`${popup['input-box']} ${popup['row']} ${popup['disabled']}`}>
+              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input
                   name="autoLogin"
                   type="checkbox"
@@ -251,7 +251,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 />
                 <div className={popup['label']}>{t('auto-launch-label')}</div>
               </div>
-              <div className={`${popup['input-box']} ${popup['row']} ${popup['disabled']}`}>
+              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input
                   name="alwaysOnTop"
                   type="checkbox"
@@ -767,7 +767,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       </td>
                       <td onClick={() => setEnterVoiceChannelStatus(!enterVoiceChannelStatus)}>
                         {enterVoiceChannelStatus || disableAllSoundEffect ? (
-                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                          <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
                           <div>{t('enable-sound-effect-label')}</div>
                         )}
@@ -780,7 +780,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       </td>
                       <td onClick={() => setLeaveVoiceChannelStatus(!leaveVoiceChannelStatus)}>
                         {leaveVoiceChannelStatus || disableAllSoundEffect ? (
-                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                          <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
                           <div>{t('enable-sound-effect-label')}</div>
                         )}
@@ -793,7 +793,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       </td>
                       <td onClick={() => setStartSpeakingStatus(!startSpeakingStatus)}>
                         {startSpeakingStatus || disableAllSoundEffect ? (
-                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                          <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
                           <div>{t('enable-sound-effect-label')}</div>
                         )}
@@ -806,7 +806,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       </td>
                       <td onClick={() => setStopSpeakingStatus(!stopSpeakingStatus)}>
                         {stopSpeakingStatus || disableAllSoundEffect ? (
-                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                          <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
                           <div>{t('enable-sound-effect-label')}</div>
                         )}
@@ -819,7 +819,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       </td>
                       <td onClick={() => setReceiveDirectMessageStatus(!receiveDirectMessageStatus)}>
                         {receiveDirectMessageStatus || disableAllSoundEffect ? (
-                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                          <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
                           <div>{t('enable-sound-effect-label')}</div>
                         )}
@@ -832,7 +832,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       </td>
                       <td onClick={() => setReceiveChannelMessageStatus(!receiveChannelMessageStatus)}>
                         {receiveChannelMessageStatus || disableAllSoundEffect ? (
-                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                          <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
                           <div>{t('enable-sound-effect-label')}</div>
                         )}

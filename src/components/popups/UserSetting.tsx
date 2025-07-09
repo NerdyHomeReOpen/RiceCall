@@ -305,7 +305,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           {selectedTabId === 'userSetting' ? (
             <>
               <div
-                className={`${popup['button']} ${popup['blue']} ${!canSubmit ? popup['disabled'] : ''}`}
+                className={`${popup['button']} ${popup['blue']} ${!canSubmit ? 'disabled' : ''}`}
                 onClick={() => {
                   handleEditUser({
                     name: userName,
@@ -644,7 +644,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   />
                 </div>
               </div>
-              <div className={`${popup['input-box']} ${popup['col']} ${popup['disabled']}`}>
+              <div className={`${popup['input-box']} ${popup['col']} ${'disabled'}`}>
                 <div className={popup['label']}>{t('about-me')}</div>
                 <textarea name="about" />
               </div>
