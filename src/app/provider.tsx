@@ -28,6 +28,7 @@ const Providers = ({ children }: ProvidersProps) => {
       if (!font) return;
       console.log('font', font);
       document.body.style.setProperty('font-family', font, 'important');
+      document.body.style.setProperty('--font-family', font, 'important');
     };
 
     const setFontSize = (fontSize: number | null) => {

@@ -64,9 +64,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                       setChannelType('current');
                     }}
                   />
-                  <div>
-                    <div className={popup['label']}>{t('current-channel')}</div>
-                  </div>
+                  <div className={popup['label']}>{t('current-channel')}</div>
                 </div>
                 <div className={`${popup['row']}`}>
                   <input
@@ -77,9 +75,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                       setChannelType('all');
                     }}
                   />
-                  <div>
-                    <div className={popup['label']}>{t('all-channel')}</div>
-                  </div>
+                  <div className={popup['label']}>{t('all-channel')}</div>
                 </div>
               </div>
             </div>
@@ -95,9 +91,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                       setSendType('text');
                     }}
                   />
-                  <div>
-                    <div className={popup['label']}>{t('text-broadcast')}</div>
-                  </div>
+                  <div className={popup['label']}>{t('text-broadcast')}</div>
                 </div>
                 <div className={`${popup['row']} ${popup['disabled']}`}>
                   <input
@@ -108,9 +102,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
                       setSendType('voice');
                     }}
                   />
-                  <div>
-                    <div className={popup['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
-                  </div>
+                  <div className={popup['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
                 </div>
               </div>
             </div>

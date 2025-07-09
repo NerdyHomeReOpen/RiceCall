@@ -103,49 +103,8 @@
   text-overflow: ellipsis;
 }
 
-.noteText {
-  text-align: right;
-  margin-top: 3px;
-}
-
-.searchBorder {
-  width: max-content;
-  display: flex;
-  align-items: center;
-  border: 1px solid #ccc;
-  background: #fff;
-}
-
-.searchIcon {
-  height: 17px;
-  width: 17px;
-  background-image: url('../../../public/channel/channel_search.png');
-  background-size: cover;
-  background-position: 0 0;
-  margin-left: 5px;
-}
-
-.searchBorder:hover:not(:has(.searchPrev:hover, .searchNext:hover)) .searchIcon {
-  background-position: -17px 0;
-}
-
-.searchInput {
-  width: 100%;
-  padding: 5px;
-  height: 25px;
-  border: 0;
-  box-shadow: none;
-}
-
 .checkBox {
   display: flex;
-}
-
-.headerTextBox {
-  justify-content: space-between;
-  width: 100%;
-  display: flex;
-  align-items: center;
 }
 
 .previewModeArea {

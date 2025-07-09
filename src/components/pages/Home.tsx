@@ -318,9 +318,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               )}
               {personalResults.length > 0 && (
                 <>
-                  <div className={homePage['dropdownHeaderText']}>
-                    <div>{t('personal-exclusive')}</div>
-                  </div>
+                  <div className={homePage['dropdownHeaderText']}>{t('personal-exclusive')}</div>
                   {personalResults.map((server) => (
                     <SearchResultItem
                       key={server.serverId}
@@ -334,9 +332,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               )}
               {relatedResults.length > 0 && (
                 <>
-                  <div className={homePage['dropdownHeaderText']}>
-                    <div>{t('related-search')}</div>
-                  </div>
+                  <div className={homePage['dropdownHeaderText']}>{t('related-search')}</div>
                   {relatedResults.map((server) => (
                     <SearchResultItem
                       key={server.serverId}

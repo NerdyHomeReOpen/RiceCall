@@ -245,9 +245,7 @@ const AboutPopup: React.FC = React.memo(() => {
               setDontShowNextTime(!dontShowNextTime);
             }}
           />
-          <div>
-            <div className={popup['label']}>{t('dont-show-next-time')}</div>
-          </div>
+          <div className={popup['label']}>{t('dont-show-next-time')}</div>
         </div>
         <div
           className={popup['button']}

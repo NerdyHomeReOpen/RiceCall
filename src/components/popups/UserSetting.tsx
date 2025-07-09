@@ -516,15 +516,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
                 <div className={`${popup['inputBox']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('gender')}</div>
-                  <div className={`${popup['selectBox']} ${popup['selectBoxMax']}`}>
+                  <div className={popup['selectBox']}>
                     <select
                       value={userGender}
-                      onChange={(e) =>
-                        setUser((prev) => ({
-                          ...prev,
-                          gender: e.target.value as User['gender'],
-                        }))
-                      }
+                      onChange={(e) => setUser((prev) => ({ ...prev, gender: e.target.value as User['gender'] }))}
                     >
                       <option value="Male">{t('male')}</option>
                       <option value="Female">{t('female')}</option>
@@ -612,7 +607,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     </div>
                     <div className={popup['selectBox']}>
                       <select
-                        className={popup['input']}
                         id="birthMonth"
                         value={userBirthMonth}
                         onChange={(e) =>
@@ -635,7 +629,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     </div>
                     <div className={popup['selectBox']}>
                       <select
-                        className={popup['input']}
                         id="birthDay"
                         value={userBirthDay}
                         onChange={(e) =>

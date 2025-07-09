@@ -190,7 +190,6 @@
   display: inline-block;
   width: 100%;
   height: 2rem;
-  box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
 }
 
 .inputBox table {
@@ -275,22 +274,15 @@
   width: 100%;
   height: 4rem;
   resize: none;
-  box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
 }
 
-.inputBox .selectBox {
+.selectBox {
   display: flex;
   width: fit-content;
   position: relative;
 }
 
-.selectBoxMax,
-.selectBoxMax select {
-  width: 100% !important;
-  min-width: unset !important;
-}
-
-.inputBox .selectBox select {
+.selectBox select {
   border: 1px solid #ccc;
   padding: 2px;
   padding-right: 25px;
@@ -302,10 +294,9 @@
   height: 2rem;
   appearance: none;
   text-decoration: none;
-  box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
 }
 
-.inputBox .selectBox::before {
+.selectBox::before {
   content: '';
   position: absolute;
   bottom: 0;
@@ -319,7 +310,7 @@
   pointer-events: none;
 }
 
-.inputBox .selectBox::after {
+.selectBox::after {
   content: '';
   position: absolute;
   bottom: 8px;
@@ -332,22 +323,17 @@
   pointer-events: none;
 }
 
-.inputBox .selectBox:hover::after {
+.selectBox:hover::after {
   background-position: -26px 0;
 }
 
-.inputBox .selectBox:active::after {
+.selectBox:active::after {
   background-position: -52px 0;
 }
 
-.input {
-  background: #fff;
-  border: 1px solid #ccc;
-  width: 100%;
-  height: 2.3rem;
-  padding: 5px;
-  display: inline-block;
-  position: relative;
+.inputBox input:not(:read-only),
+.inputBox textarea:not(:read-only),
+.selectBox select {
   box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
 }
 

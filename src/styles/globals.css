@@ -41,6 +41,7 @@ html,
 body {
   font-family: Arial, sans-serif;
   font-size: 13px;
+  --font-family: Arial, sans-serif;
 }
 
 .wrapper {
@@ -137,6 +138,16 @@ input[type='checkbox']:hover {
 input[type='radio']:checked:hover,
 input[type='checkbox']:checked:hover {
   background-position: -18px -18px;
+}
+
+input,
+input::placeholder,
+select,
+select::placeholder,
+textarea,
+textarea::placeholder,
+button {
+  font-family: var(--font-family);
 }
 
 .hljs span {
