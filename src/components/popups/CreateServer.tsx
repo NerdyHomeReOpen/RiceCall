@@ -171,96 +171,94 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
         {/* Body */}
         <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['inputGroup']}>
-              <div className={createServer['avatarWrapper']}>
-                <div
-                  key={reloadAvatarKey}
-                  className={createServer['avatarPicture']}
-                  style={{
-                    backgroundImage: `url(${serverAvatarUrl}?v=${reloadAvatarKey})`,
-                  }}
-                />
-                <input
-                  name="avatar"
-                  type="file"
-                  id="avatar-upload"
-                  style={{ display: 'none' }}
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    if (file.size > 5 * 1024 * 1024) {
-                      handleOpenErrorDialog(t('imageTooLarge'));
-                      return;
-                    }
+          <div className={`${setting['body']} ${popup['col']}`} style={{ justifyContent: 'space-evenly' }}>
+            <div className={createServer['avatarWrapper']}>
+              <div
+                key={reloadAvatarKey}
+                className={createServer['avatarPicture']}
+                style={{
+                  backgroundImage: `url(${serverAvatarUrl}?v=${reloadAvatarKey})`,
+                }}
+              />
+              <input
+                name="avatar"
+                type="file"
+                id="avatar-upload"
+                style={{ display: 'none' }}
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (file.size > 5 * 1024 * 1024) {
+                    handleOpenErrorDialog(t('imageTooLarge'));
+                    return;
+                  }
 
-                    const reader = new FileReader();
-                    reader.onloadend = async () => {
-                      const formData = new FormData();
-                      formData.append('_type', 'server');
-                      formData.append('_fileName', serverAvatar);
-                      formData.append('_file', reader.result as string);
-                      const data = await apiService.post('/upload', formData);
-                      if (data) {
-                        setServer((prev) => ({
-                          ...prev,
-                          avatar: data.avatar,
-                          avatarUrl: data.avatarUrl,
-                        }));
-                        setReloadAvatarKey((prev) => prev + 1);
-                      }
-                    };
-                    reader.readAsDataURL(file);
-                  }}
-                />
-                <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popup['button']}>
-                  {t('upload-avatar')}
-                </label>
+                  const reader = new FileReader();
+                  reader.onloadend = async () => {
+                    const formData = new FormData();
+                    formData.append('_type', 'server');
+                    formData.append('_fileName', serverAvatar);
+                    formData.append('_file', reader.result as string);
+                    const data = await apiService.post('/upload', formData);
+                    if (data) {
+                      setServer((prev) => ({
+                        ...prev,
+                        avatar: data.avatar,
+                        avatarUrl: data.avatarUrl,
+                      }));
+                      setReloadAvatarKey((prev) => prev + 1);
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                }}
+              />
+              <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popup['button']}>
+                {t('upload-avatar')}
+              </label>
+            </div>
+            <div className={popup['col']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <div className={popup['label']} style={{ width: '100px' }}>
+                  {t('server-type')}
+                </div>
+                <input name="type" type="text" disabled value={t(serverType as keyof typeof t)} />
               </div>
-              <div className={popup['inputGroup']}>
-                <div className={createServer['inputWrapper']}>
-                  <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={popup['label']}>{t('server-type')}</div>
-                    <input name="type" type="text" disabled value={t(serverType as keyof typeof t)} />
-                  </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <div className={popup['label']} style={{ width: '100px' }}>
+                  {t('server-name')}
                 </div>
-                <div className={createServer['inputWrapper']}>
-                  <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={popup['label']}>{t('server-name')}</div>
-                    <input
-                      name="name"
-                      type="text"
-                      value={serverName}
-                      placeholder={t('server-name-placeholder')}
-                      maxLength={32}
-                      onChange={(e) =>
-                        setServer((prev) => ({
-                          ...prev,
-                          name: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
+                <input
+                  name="name"
+                  type="text"
+                  value={serverName}
+                  placeholder={t('server-name-placeholder')}
+                  maxLength={32}
+                  onChange={(e) =>
+                    setServer((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <div className={popup['label']} style={{ width: '100px' }}>
+                  {t('server-slogan')}
                 </div>
-                <div className={createServer['inputWrapper']}>
-                  <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={popup['label']}>{t('server-slogan')}</div>
-                    <input
-                      name="slogan"
-                      type="text"
-                      value={serverSlogan}
-                      placeholder={t('server-slogan-placeholder')}
-                      maxLength={32}
-                      onChange={(e) =>
-                        setServer((prev) => ({
-                          ...prev,
-                          slogan: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
+                <input
+                  name="slogan"
+                  type="text"
+                  value={serverSlogan}
+                  placeholder={t('server-slogan-placeholder')}
+                  maxLength={32}
+                  onChange={(e) =>
+                    setServer((prev) => ({
+                      ...prev,
+                      slogan: e.target.value,
+                    }))
+                  }
+                />
               </div>
             </div>
           </div>
