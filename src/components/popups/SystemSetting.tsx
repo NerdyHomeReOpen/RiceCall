@@ -16,17 +16,60 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
   // States
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-  const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
-  const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
-  const [selectedInput, setSelectedInput] = useState<string>('');
-  const [selectedOutput, setSelectedOutput] = useState<string>('');
+
   const [autoLaunch, setAutoLaunch] = useState<boolean>(false);
-  const [minimizeToTray, setMinimizeToTray] = useState<boolean>(false);
-  const [startMinimized, setStartMinimized] = useState<boolean>(false);
-  const [soundEffect, setSoundEffect] = useState<boolean>(true);
+  const [autoLogin, setAutoLogin] = useState<boolean>(false);
+  const [alwaysOnTop, setAlwaysOnTop] = useState<boolean>(false);
+  const [statusAutoIdle, setStatusAutoIdle] = useState<boolean>(false);
+  const [statusAutoIdleMinutes, setStatusAutoIdleMinutes] = useState<number>(10);
+  const [statusAutoDnd, setStatusAutoDnd] = useState<boolean>(false);
+  const [channelMode, setChannelMode] = useState<'classic' | 'three-line' | 'auto'>('auto');
+  const [closeToTray, setCloseToTray] = useState<boolean>(false);
   const [fontSize, setFontSize] = useState<number>(13);
   const [fontFamily, setFontFamily] = useState<string>('Arial');
   const [fontList, setFontList] = useState<string[]>([]);
+
+  const [selectedInput, setSelectedInput] = useState<string>('');
+  const [selectedOutput, setSelectedOutput] = useState<string>('');
+  const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
+  const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
+  const [mixEffect, setMixEffect] = useState<boolean>(false);
+  const [mixEffectType, setMixEffectType] = useState<string>('');
+  const [autoMixSetting, setAutoMixSetting] = useState<boolean>(false);
+  const [echoCancellation, setEchoCancellation] = useState<boolean>(false);
+  const [noiseCancellation, setNoiseCancellation] = useState<boolean>(false);
+  const [microphoneAmplification, setMicrophoneAmplification] = useState<boolean>(false);
+  const [manualMixMode, setManualMixMode] = useState<boolean>(false);
+  const [mixMode, setMixMode] = useState<'all' | 'app'>('all');
+
+  const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>('key');
+  const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>('');
+  const [speakingModeAutoKey, setSpeakingModeAutoKey] = useState<boolean>(false);
+
+  const [forbidAddFriend, setForbidAddFriend] = useState<boolean>(false);
+  const [forbidShake, setForbidShake] = useState<boolean>(false);
+  const [forbidInviteGroup, setForbidInviteGroup] = useState<boolean>(false);
+  const [forbidStrangerMessage, setForbidStrangerMessage] = useState<boolean>(false);
+  const [shareNowGroup, setShareNowGroup] = useState<boolean>(false);
+  const [shareRecentGroup, setShareRecentGroup] = useState<boolean>(false);
+  const [shareJoinedGroup, setShareJoinedGroup] = useState<boolean>(false);
+  const [shareFavoriteGroup, setShareFavoriteGroup] = useState<boolean>(false);
+  const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(false);
+
+  const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>('');
+  const [hotKeyScreenshot, setHotKeyScreenshot] = useState<string>('');
+  const [hotKeyIncreaseVolume, setHotKeyIncreaseVolume] = useState<string>('');
+  const [hotKeyDecreaseVolume, setHotKeyDecreaseVolume] = useState<string>('');
+  const [hotKeyDisableSpeaker, setHotKeyDisableSpeaker] = useState<string>('');
+  const [hotKeyDisableMicrophone, setHotKeyDisableMicrophone] = useState<string>('');
+
+  const [disableAllSoundEffect, setDisableAllSoundEffect] = useState<boolean>(false);
+  const [enterVoiceChannelStatus, setEnterVoiceChannelStatus] = useState<boolean>(false);
+  const [leaveVoiceChannelStatus, setLeaveVoiceChannelStatus] = useState<boolean>(false);
+  const [startSpeakingStatus, setStartSpeakingStatus] = useState<boolean>(false);
+  const [stopSpeakingStatus, setStopSpeakingStatus] = useState<boolean>(false);
+  const [receiveDirectMessageStatus, setReceiveDirectMessageStatus] = useState<boolean>(false);
+  const [receiveChannelMessageStatus, setReceiveChannelMessageStatus] = useState<boolean>(false);
 
   // Handlers
   const handleClose = () => {
@@ -63,7 +106,14 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         {/* Sidebar */}
         <div className={setting['left']}>
           <div className={setting['tabs']}>
-            {[t('basic-setting'), t('voice-setting')].map((title, index) => (
+            {[
+              t('basic-setting'),
+              t('audio-setting'),
+              t('voice-setting'),
+              t('privacy-setting'),
+              t('hot-key-setting'),
+              t('sound-effect-setting'),
+            ].map((title, index) => (
               <div
                 className={`${setting['item']} ${activeTabIndex === index ? setting['active'] : ''}`}
                 onClick={() => setActiveTabIndex(index)}
@@ -75,12 +125,21 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           </div>
         </div>
 
-        {/* System Settings */}
+        {/* Basic Settings */}
         <div className={setting['right']} style={activeTabIndex === 0 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             {/* General Setting */}
             <div className={`${popup['label']} ${popup['header']}`}>{t('general-setting')}</div>
             <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']} ${popup['disabled']}`}>
+                <input
+                  name="autoLogin"
+                  type="checkbox"
+                  checked={autoLogin}
+                  onChange={(e) => setAutoLogin(e.target.checked)}
+                />
+                <div className={popup['label']}>{t('auto-login-label')}</div>
+              </div>
               <div className={`${popup['inputBox']} ${popup['row']}`}>
                 <input
                   name="autoLaunch"
@@ -88,67 +147,106 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   checked={autoLaunch}
                   onChange={(e) => setAutoLaunch(e.target.checked)}
                 />
-                <div>
-                  <div className={popup['label']}>{t('auto-startup')}</div>
-                  <div className={popup['hint']}>{t('auto-startup-description')}</div>
-                </div>
+                <div className={popup['label']}>{t('auto-launch-label')}</div>
               </div>
               <div className={`${popup['inputBox']} ${popup['row']} ${popup['disabled']}`}>
                 <input
-                  name="minimizeToTray"
+                  name="alwaysOnTop"
                   type="checkbox"
-                  checked={minimizeToTray}
-                  onChange={(e) => setMinimizeToTray(e.target.checked)}
+                  checked={alwaysOnTop}
+                  onChange={(e) => setAlwaysOnTop(e.target.checked)}
                 />
-                <div>
-                  <div className={popup['label']}>{`${t('minimize-to-tray')} ${t('soon')}`}</div>
-                  <div className={popup['hint']}>{t('minimize-to-tray-description')}</div>
-                </div>
+                <div className={popup['label']}>{t('always-on-top-label')}</div>
               </div>
-              <div className={`${popup['inputBox']} ${popup['row']} ${popup['disabled']}`}>
+            </div>
+
+            {/* Status Setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('status-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
                 <input
-                  name="startMinimized"
+                  name="status-auto-idle"
                   type="checkbox"
-                  checked={startMinimized}
-                  onChange={(e) => setStartMinimized(e.target.checked)}
+                  checked={statusAutoIdle}
+                  onChange={(e) => setStatusAutoIdle(e.target.checked)}
                 />
-                <div>
-                  <div className={popup['label']}>{`${t('start-minimized')} ${t('soon')}`}</div>
-                  <div className={popup['hint']}>{t('start-minimized-description')}</div>
-                </div>
+                <div className={popup['label']}>{t('status-auto-idle-label-1')}</div>
+                <input
+                  name="status-auto-idle-minutes"
+                  type="number"
+                  value={statusAutoIdleMinutes}
+                  min={1}
+                  max={60}
+                  style={{ maxWidth: '50px' }}
+                  onChange={(e) => setStatusAutoIdleMinutes(Number(e.target.value))}
+                />
+                <div className={popup['label']}>{t('status-auto-idle-label-2')}</div>
               </div>
               <div className={`${popup['inputBox']} ${popup['row']}`}>
                 <input
-                  name="soundEffect"
+                  name="status-auto-dnd"
                   type="checkbox"
-                  checked={soundEffect}
-                  onChange={(e) => setSoundEffect(e.target.checked)}
+                  checked={statusAutoDnd}
+                  onChange={(e) => setStatusAutoDnd(e.target.checked)}
                 />
-                <div>
-                  <div className={popup['label']}>{t('notification-sound')}</div>
-                  <div className={popup['hint']}>{t('notification-sound-description')}</div>
-                </div>
+                <div className={popup['label']}>{t('status-auto-dnd-label')}</div>
+              </div>
+            </div>
+
+            {/* Channel Setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('channel-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="channel-classic-mode"
+                  type="radio"
+                  checked={channelMode === 'classic'}
+                  onChange={() => setChannelMode('classic')}
+                />
+                <div className={popup['label']}>{t('channel-classic-mode-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="channel-three-line-mode"
+                  type="radio"
+                  checked={channelMode === 'three-line'}
+                  onChange={() => setChannelMode('three-line')}
+                />
+                <div className={popup['label']}>{t('channel-three-line-mode-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="channel-auto-mode"
+                  type="radio"
+                  checked={channelMode === 'auto'}
+                  onChange={() => setChannelMode('auto')}
+                />
+                <div className={popup['label']}>{t('channel-auto-mode-label')}</div>
+              </div>
+            </div>
+
+            {/* Close Setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('close-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input name="close-to-tray" type="radio" checked={closeToTray} onChange={() => setCloseToTray(true)} />
+                <div className={popup['label']}>{t('close-to-tray-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="close-to-exit"
+                  type="radio"
+                  checked={!closeToTray}
+                  onChange={() => setCloseToTray(false)}
+                />
+                <div className={popup['label']}>{t('close-to-exit-label')}</div>
               </div>
             </div>
 
             {/* Font Setting */}
             <div className={`${popup['label']} ${popup['header']}`}>{t('font-setting')}</div>
-            <div className={popup['inputGroup']}>
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
-                <div className={popup['label']}>{t('font-size')}</div>
-                <div className={popup['inputBox']}>
-                  <input
-                    disabled
-                    type="number"
-                    value={13}
-                    min={10}
-                    max={20}
-                    style={{ maxWidth: '100px' }}
-                    onChange={(e) => setFontSize(Number(e.target.value))}
-                  />
-                </div>
-              </div>
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+            <div className={`${popup['inputGroup']} ${popup['row']}`}>
+              <div className={`${popup['inputBox']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('font')}</div>
                 <div className={popup['selectBox']}>
                   <select
@@ -164,24 +262,36 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   </select>
                 </div>
               </div>
+              <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('font-size')}</div>
+                <div className={popup['inputBox']}>
+                  <input
+                    disabled
+                    type="number"
+                    value={13}
+                    min={10}
+                    max={20}
+                    onChange={(e) => setFontSize(Number(e.target.value))}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Voice Settings */}
+        {/* Audio Settings */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('voice-setting')}</div>
+            {/* Input/Output Device Setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('audio-setting')}</div>
             <div className={popup['inputGroup']}>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('input-device')}</div>
+                <div className={popup['label']}>{t('input-device-label')}</div>
                 <div className={popup['selectBox']}>
                   <select
                     value={selectedInput}
                     onChange={(e) => setSelectedInput(e.target.value)}
-                    style={{
-                      maxWidth: '250px',
-                    }}
+                    style={{ maxWidth: '300px' }}
                   >
                     <option value="">
                       {t('default-microphone')} ({inputDevices[0]?.label || t('unknown-device')})
@@ -195,14 +305,12 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 </div>
               </div>
               <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('output-device')}</div>
+                <div className={popup['label']}>{t('output-device-label')}</div>
                 <div className={popup['selectBox']}>
                   <select
                     value={selectedOutput}
                     onChange={(e) => setSelectedOutput(e.target.value)}
-                    style={{
-                      maxWidth: '250px',
-                    }}
+                    style={{ maxWidth: '300px' }}
                   >
                     <option value="">
                       {t('default-speaker')} ({outputDevices[0]?.label || t('unknown-device')})
@@ -214,6 +322,443 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     ))}
                   </select>
                 </div>
+              </div>
+            </div>
+
+            {/* Mix Setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('mix-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="mix-effect"
+                  type="checkbox"
+                  checked={mixEffect}
+                  onChange={(e) => setMixEffect(e.target.checked)}
+                />
+                <div className={popup['label']}>{t('mix-effect-label')}</div>
+                <div className={popup['selectBox']}>
+                  <select
+                    name="mix-mode"
+                    value={mixEffectType}
+                    onChange={(e) => setMixEffectType(e.target.value)}
+                    style={{ maxWidth: '250px' }}
+                  >
+                    <option value="">{t('mix-mode-classic')}</option>
+                    <option value="">{t('mix-mode-cave')}</option>
+                    <option value="">{t('mix-mode-alley')}</option>
+                    <option value="">{t('mix-mode-airplane-hangar')}</option>
+                    <option value="">{t('mix-mode-staircase')}</option>
+                  </select>
+                </div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="auto-mix-setting"
+                  type="radio"
+                  checked={autoMixSetting}
+                  onChange={() => setAutoMixSetting(true)}
+                />
+                <div className={popup['label']}>{t('auto-mix-setting-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="manual-mix-setting"
+                  type="radio"
+                  checked={!autoMixSetting}
+                  onChange={() => setAutoMixSetting(false)}
+                />
+                <div className={popup['label']}>{t('manual-mix-setting-label')}</div>
+              </div>
+              <div className={popup['inputGroup']}>
+                <div className={`${popup['inputBox']} ${popup['row']}`}>
+                  <input
+                    name="echo-cancellation"
+                    type="checkbox"
+                    checked={echoCancellation}
+                    onChange={(e) => setEchoCancellation(e.target.checked)}
+                  />
+                  <div className={popup['label']}>{t('echo-cancellation-label')}</div>
+                </div>
+                <div className={`${popup['inputBox']} ${popup['row']}`}>
+                  <input
+                    name="noise-cancellation"
+                    type="checkbox"
+                    checked={noiseCancellation}
+                    onChange={(e) => setNoiseCancellation(e.target.checked)}
+                  />
+                  <div className={popup['label']}>{t('noise-cancellation-label')}</div>
+                </div>
+                <div className={`${popup['inputBox']} ${popup['row']}`}>
+                  <input
+                    name="microphone-amplification"
+                    type="checkbox"
+                    checked={microphoneAmplification}
+                    onChange={(e) => setMicrophoneAmplification(e.target.checked)}
+                  />
+                  <div className={popup['label']}>{t('microphone-amplification-label')}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mix mode setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('mix-mode-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="manual-mix-mode"
+                  type="checkbox"
+                  checked={manualMixMode}
+                  onChange={() => setManualMixMode(!manualMixMode)}
+                />
+                <div className={popup['label']}>{t('manual-mix-mode-label')}</div>
+              </div>
+              <div className={popup['inputGroup']}>
+                <div className={`${popup['inputBox']} ${popup['row']}`}>
+                  <input
+                    name="mix-all-source"
+                    type="radio"
+                    checked={mixMode === 'all'}
+                    onChange={() => setMixMode('all')}
+                  />
+                  <div className={popup['label']}>{t('mix-all-source-label')}</div>
+                </div>
+                <div className={`${popup['inputBox']} ${popup['row']}`}>
+                  <input
+                    name="mix-app-source"
+                    type="radio"
+                    checked={mixMode === 'app'}
+                    onChange={() => setMixMode('app')}
+                  />
+                  <div className={popup['label']}>{t('mix-app-source-label')}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Voice Settings */}
+        <div className={setting['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
+          <div className={popup['col']}>
+            {/* Default Speaking Mode */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('default-speaking-mode-label')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="default-speaking-key"
+                  type="radio"
+                  checked={defaultSpeakingMode === 'key'}
+                  onChange={() => setDefaultSpeakingMode('key')}
+                />
+                <div className={popup['label']}>{t('default-speaking-key-label')}</div>
+              </div>
+              <div className={popup['inputGroup']}>
+                <div className={popup['inputBox']}>
+                  <input
+                    name="speaking-key"
+                    type="text"
+                    value={defaultSpeakingKey}
+                    style={{ maxWidth: '200px' }}
+                    onChange={(e) => setDefaultSpeakingKey(e.target.value)}
+                  />
+                </div>
+                <div className={popup['label']}>{t('speaking-mode-key-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="default-speaking-auto"
+                  type="radio"
+                  checked={defaultSpeakingMode === 'auto'}
+                  onChange={() => setDefaultSpeakingMode('auto')}
+                />
+                <div className={popup['label']}>{t('default-speaking-auto-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="speaking-mode-auto-key"
+                  type="checkbox"
+                  checked={speakingModeAutoKey}
+                  onChange={() => setSpeakingModeAutoKey(!speakingModeAutoKey)}
+                />
+                <div className={popup['label']}>{t('speaking-mode-auto-key-label')}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Privacy Settings */}
+        <div className={setting['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
+          <div className={popup['col']}>
+            {/* Anti-spam setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('anti-spam-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="forbid-add-friend"
+                  type="checkbox"
+                  checked={forbidAddFriend}
+                  onChange={() => setForbidAddFriend(!forbidAddFriend)}
+                />
+                <div className={popup['label']}>{t('forbid-add-friend-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="forbid-shake"
+                  type="checkbox"
+                  checked={forbidShake}
+                  onChange={() => setForbidShake(!forbidShake)}
+                />
+                <div className={popup['label']}>{t('forbid-shake-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="forbid-invite-group"
+                  type="checkbox"
+                  checked={forbidInviteGroup}
+                  onChange={() => setForbidInviteGroup(!forbidInviteGroup)}
+                />
+                <div className={popup['label']}>{t('forbid-invite-group-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="forbid-stranger-message"
+                  type="checkbox"
+                  checked={forbidStrangerMessage}
+                  onChange={() => setForbidStrangerMessage(!forbidStrangerMessage)}
+                />
+                <div className={popup['label']}>{t('forbid-stranger-message-label')}</div>
+              </div>
+            </div>
+
+            {/* Privacy setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('privacy-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="share-now-group"
+                  type="checkbox"
+                  checked={shareNowGroup}
+                  onChange={() => setShareNowGroup(!shareNowGroup)}
+                />
+                <div className={popup['label']}>{t('share-now-group-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="share-recent-group"
+                  type="checkbox"
+                  checked={shareRecentGroup}
+                  onChange={() => setShareRecentGroup(!shareRecentGroup)}
+                />
+                <div className={popup['label']}>{t('share-recent-group-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="share-joined-group"
+                  type="checkbox"
+                  checked={shareJoinedGroup}
+                  onChange={() => setShareJoinedGroup(!shareJoinedGroup)}
+                />
+                <div className={popup['label']}>{t('share-joined-group-label')}</div>
+              </div>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="share-favorite-group"
+                  type="checkbox"
+                  checked={shareFavoriteGroup}
+                  onChange={() => setShareFavoriteGroup(!shareFavoriteGroup)}
+                />
+                <div className={popup['label']}>{t('share-favorite-group-label')}</div>
+              </div>
+            </div>
+
+            {/* Message history setting */}
+            <div className={`${popup['label']} ${popup['header']}`}>{t('message-history-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['row']}`}>
+                <input
+                  name="not-save-message-history"
+                  type="checkbox"
+                  checked={notSaveMessageHistory}
+                  onChange={() => setNotSaveMessageHistory(!notSaveMessageHistory)}
+                />
+                <div className={popup['label']}>{t('not-save-message-history-label')}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Hot Key Settings */}
+        <div className={setting['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
+          <div className={popup['col']}>
+            <div className={popup['inputGroup']}>
+              <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-open-main-window-label')}</div>
+                <input
+                  name="hot-key-open-main-window"
+                  type="text"
+                  value={hotKeyOpenMainWindow}
+                  style={{ maxWidth: '300px' }}
+                  onChange={(e) => setHotKeyOpenMainWindow(e.target.value)}
+                />
+              </div>
+              <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-screenshot-label')}</div>
+                <input
+                  name="hot-key-screenshot"
+                  type="text"
+                  value={hotKeyScreenshot}
+                  style={{ maxWidth: '300px' }}
+                  onChange={(e) => setHotKeyScreenshot(e.target.value)}
+                />
+              </div>
+              <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-increase-volume-label')}</div>
+                <input
+                  name="hot-key-increase-volume"
+                  type="text"
+                  value={hotKeyIncreaseVolume}
+                  style={{ maxWidth: '300px' }}
+                  onChange={(e) => setHotKeyIncreaseVolume(e.target.value)}
+                />
+              </div>
+              <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-decrease-volume-label')}</div>
+                <input
+                  name="hot-key-decrease-volume"
+                  type="text"
+                  value={hotKeyDecreaseVolume}
+                  style={{ maxWidth: '300px' }}
+                  onChange={(e) => setHotKeyDecreaseVolume(e.target.value)}
+                />
+              </div>
+              <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-disable-speaker-label')}</div>
+                <input
+                  name="hot-key-disable-speaker"
+                  type="text"
+                  value={hotKeyDisableSpeaker}
+                  style={{ maxWidth: '300px' }}
+                  onChange={(e) => setHotKeyDisableSpeaker(e.target.value)}
+                />
+              </div>
+              <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-disable-microphone-label')}</div>
+                <input
+                  name="hot-key-disable-microphone"
+                  type="text"
+                  value={hotKeyDisableMicrophone}
+                  style={{ maxWidth: '300px' }}
+                  onChange={(e) => setHotKeyDisableMicrophone(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sound Effect Settings */}
+        <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
+          <div className={popup['col']}>
+            <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <input
+                name="disable-sound-effect-all"
+                type="checkbox"
+                checked={disableAllSoundEffect}
+                onChange={(e) => setDisableAllSoundEffect(e.target.checked)}
+              />
+              <div className={popup['label']}>{t('disable-all-sound-effect-label')}</div>
+            </div>
+            <div className={`${popup['label']} ${popup['header']}`}>{t('sound-effect-setting')}</div>
+            <div className={popup['inputGroup']}>
+              <div>{t('sound-effect-setting-description')}</div>
+              <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <table style={{ height: '330px' }}>
+                  <thead>
+                    <tr>
+                      <th>{t('sound-effect-type-label')}</th>
+                      <th>{t('sound-effect-preview-label')}</th>
+                      <th>{t('sound-effect-status-label')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className={setting['tableContainer']}>
+                    <tr>
+                      <td>{t('enter-voice-channel-status-label')}</td>
+                      <td>
+                        <div className={popup['sound-effect-preview']} />
+                      </td>
+                      <td onClick={() => setEnterVoiceChannelStatus(!enterVoiceChannelStatus)}>
+                        {enterVoiceChannelStatus || disableAllSoundEffect ? (
+                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                        ) : (
+                          <div>{t('enable-sound-effect-label')}</div>
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{t('leave-voice-channel-status-label')}</td>
+                      <td>
+                        <div className={popup['sound-effect-preview']} />
+                      </td>
+                      <td onClick={() => setLeaveVoiceChannelStatus(!leaveVoiceChannelStatus)}>
+                        {leaveVoiceChannelStatus || disableAllSoundEffect ? (
+                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                        ) : (
+                          <div>{t('enable-sound-effect-label')}</div>
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{t('start-speaking-status-label')}</td>
+                      <td>
+                        <div className={popup['sound-effect-preview']} />
+                      </td>
+                      <td onClick={() => setStartSpeakingStatus(!startSpeakingStatus)}>
+                        {startSpeakingStatus || disableAllSoundEffect ? (
+                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                        ) : (
+                          <div>{t('enable-sound-effect-label')}</div>
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{t('stop-speaking-status-label')}</td>
+                      <td>
+                        <div className={popup['sound-effect-preview']} />
+                      </td>
+                      <td onClick={() => setStopSpeakingStatus(!stopSpeakingStatus)}>
+                        {stopSpeakingStatus || disableAllSoundEffect ? (
+                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                        ) : (
+                          <div>{t('enable-sound-effect-label')}</div>
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{t('receive-direct-message-status-label')}</td>
+                      <td>
+                        <div className={popup['sound-effect-preview']} />
+                      </td>
+                      <td onClick={() => setReceiveDirectMessageStatus(!receiveDirectMessageStatus)}>
+                        {receiveDirectMessageStatus || disableAllSoundEffect ? (
+                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                        ) : (
+                          <div>{t('enable-sound-effect-label')}</div>
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{t('receive-channel-message-status-label')}</td>
+                      <td>
+                        <div className={popup['sound-effect-preview']} />
+                      </td>
+                      <td onClick={() => setReceiveChannelMessageStatus(!receiveChannelMessageStatus)}>
+                        {receiveChannelMessageStatus || disableAllSoundEffect ? (
+                          <div className={popup['disabled']}>{t('disable-sound-effect-label')}</div>
+                        ) : (
+                          <div>{t('enable-sound-effect-label')}</div>
+                        )}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

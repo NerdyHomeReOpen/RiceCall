@@ -162,13 +162,22 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 10px;
-  padding: 5px;
+  gap: 3px;
+  padding: 0 5px;
+}
+
+.inputGroup .inputGroup {
+  margin-left: 10px;
 }
 
 .inputBox {
   width: 100%;
   display: flex;
+}
+
+.inputBox.row,
+.inputBox.col {
+  gap: 0;
 }
 
 .inputBox input[type='text'],

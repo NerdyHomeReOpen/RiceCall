@@ -522,7 +522,7 @@
   max-height: 50px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: 0 10px;
   background-image: url('../../../public/channel/mic_state_menu.png');
   background-repeat: no-repeat;
@@ -590,8 +590,7 @@
 }
 
 .micText {
-  font-family: 'Noto Sans TC', sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: bold;
   color: #2594ca;
 }
@@ -602,25 +601,10 @@
 }
 
 .micButton.active .micText {
-  color: #b9ceb7;
+  color: #62a35b;
 }
 
-.buttons {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.voiceModeButton {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: #777;
-  gap: 5px;
-}
-
-.voiceModeButton::after {
+.micButton::after {
   display: block;
   content: '';
   min-height: 8px;
@@ -631,12 +615,19 @@
   background-position: 0 0;
 }
 
-.voiceModeButton:hover::after {
+.micButton:hover::after {
   background-position: -9px 0;
 }
 
-.voiceModeButton:active::after {
+.micButton:active::after {
   background-position: -18px 0;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .voiceModeDropdown {

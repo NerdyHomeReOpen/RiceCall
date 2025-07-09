@@ -102,9 +102,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const peerConnections = useRef<{ [id: string]: RTCPeerConnection }>({});
   const peerDataChannels = useRef<{ [id: string]: RTCDataChannel }>({});
   const audioContext = useRef<AudioContext | null>(null);
-  const sourceNode = useRef<MediaStreamAudioSourceNode | null>(null);
+  const micSourceNode = useRef<MediaStreamAudioSourceNode | null>(null);
   const musicSourceNode = useRef<AudioBufferSourceNode | null>(null);
-  const gainNode = useRef<GainNode | null>(null);
+  const micGainNode = useRef<GainNode | null>(null);
+  const mixGainNode = useRef<GainNode | null>(null);
   const musicGainNode = useRef<GainNode | null>(null);
   const destinationNode = useRef<MediaStreamAudioDestinationNode | null>(null);
 
@@ -195,12 +196,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       console.warn('No audio context');
       return;
     }
-    if (!gainNode.current) {
-      console.warn('No gain node');
+    if (!micGainNode.current) {
+      console.warn('No mic gain node');
       return;
     }
-    if (!sourceNode.current) {
-      console.warn('No source node');
+    if (!micSourceNode.current) {
+      console.warn('No mic source node');
       return;
     }
     if (!destinationNode.current) {
@@ -215,7 +216,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     // Set gain value
     const newVolume = volume ?? localMicVolume.current;
 
-    gainNode.current.gain.value = newVolume / 100;
+    micGainNode.current.gain.value = newVolume / 100;
 
     // Process audio tracks
     const processedTrack = destinationNode.current.stream.getAudioTracks()[0];
@@ -279,8 +280,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       if (localStream.current) {
         localStream.current.getTracks().forEach((track) => track.stop());
       }
-      if (sourceNode.current) {
-        sourceNode.current.disconnect();
+      if (micSourceNode.current) {
+        micSourceNode.current.disconnect();
       }
 
       navigator.mediaDevices
@@ -297,8 +298,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             console.warn('No audio context');
             return;
           }
-          if (!gainNode.current) {
-            console.warn('No gain node');
+          if (!micGainNode.current) {
+            console.warn('No mic gain node');
             return;
           }
           if (!destinationNode.current) {
@@ -316,10 +317,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           const source = audioContext.current.createMediaStreamSource(stream);
 
           // Connect nodes
-          source.connect(gainNode.current);
+          source.connect(micGainNode.current);
 
           // Set nodes
-          sourceNode.current = source;
+          micSourceNode.current = source;
 
           // Update track
           const newTrack = destinationNode.current.stream.getAudioTracks()[0];
@@ -612,20 +613,20 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     const audioCtx = new AudioContext();
 
     // Create nodes
-    const gain = audioCtx.createGain();
-    const musicGain = audioCtx.createGain();
+    const micGain = audioCtx.createGain();
+    const mixGain = audioCtx.createGain();
     const analyser = audioCtx.createAnalyser();
     const destination = audioCtx.createMediaStreamDestination();
 
     // Connect nodes
-    gain.connect(analyser);
-    musicGain.connect(analyser);
+    micGain.connect(analyser);
+    mixGain.connect(analyser);
     analyser.connect(destination);
 
     // Set nodes
     audioContext.current = audioCtx;
-    gainNode.current = gain;
-    musicGainNode.current = musicGain;
+    micGainNode.current = micGain;
+    mixGainNode.current = mixGain;
     destinationNode.current = destination;
 
     // Initialize analyser
