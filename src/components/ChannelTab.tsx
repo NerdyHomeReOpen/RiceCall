@@ -328,12 +328,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             className={`${styles['tab-icon']} ${expanded[channelId] ? styles['expanded'] : ''} ${
               isLobby ? styles['lobby'] : styles[channelVisibility]
             }`}
-            onClick={() =>
-              setExpanded((prev) => ({
-                ...prev,
-                [channelId]: !prev[channelId],
-              }))
-            }
+            onClick={() => setExpanded((prev) => ({ ...prev, [channelId]: !prev[channelId] }))}
           />
           <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>
             {channelName}

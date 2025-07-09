@@ -121,8 +121,8 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
 
   return (
     <main className={styles['login']}>
-      {/* Main Content */}
-      <div className={styles['login-content']}>
+      {/* Body */}
+      <main className={styles['login-body']}>
         <div className={styles['app-logo']} />
         <form
           className={styles['form-wrapper']}
@@ -237,7 +237,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
             </>
           )}
         </form>
-      </div>
+      </main>
 
       {/* Footer */}
       <div className={styles['login-footer']}>

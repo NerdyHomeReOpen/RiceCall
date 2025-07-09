@@ -350,12 +350,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             className={`${styles['tab-icon']} ${expanded[categoryId] ? styles['expanded'] : ''} ${
               styles[categoryVisibility]
             }`}
-            onClick={() =>
-              setExpanded((prev) => ({
-                ...prev,
-                [categoryId]: !prev[categoryId],
-              }))
-            }
+            onClick={() => setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }))}
           />
           <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>
             {categoryName}
