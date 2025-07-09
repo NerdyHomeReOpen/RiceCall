@@ -526,5 +526,6 @@
   "start-speaking-status-label": "開始說話",
   "stop-speaking-status-label": "停止說話",
   "receive-direct-message-status-label": "收到私聊訊息",
-  "receive-channel-message-status-label": "收到頻道訊息"
+  "receive-channel-message-status-label": "收到頻道訊息",
+  "set-hotkey-error": "按鍵 {0} 已被使用"
 }
