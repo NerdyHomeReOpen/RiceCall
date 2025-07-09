@@ -704,9 +704,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                           ]);
                         }}
                       >
-                        <td className={`${popup['name']} ${memberNickname ? popup['highlight'] : ''}`}>
+                        <td>
                           <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
-                          {memberNickname || memberName}
+                          <div className={`${popup['name']} ${memberNickname ? popup['highlight'] : ''}`}>
+                            {memberNickname || memberName}
+                          </div>
                         </td>
                         <td>{getPermissionText(t, memberPermission)}</td>
                         <td>{memberContribution}</td>

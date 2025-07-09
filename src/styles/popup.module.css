@@ -250,27 +250,35 @@
 }
 
 .input-box table tr td {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   height: auto;
   width: 100%;
   border: 1px solid #ccc;
   border-top: 0;
   border-left: 0;
   padding: 5px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  overflow: hidden;
 }
 
-.input-box table tr td.name {
+.input-box table tr td .name {
   color: #777;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.input-box table tr td.name.highlight {
+.input-box table tr td .name.highlight {
   color: #6e849b;
 }
 
 .input-box table tr th:first-child,
 .input-box table tr td:first-child {
   border-left: 0;
+}
+
+.input-box table tr:last-child td {
+  border-bottom: 0;
 }
 
 .input-box table tr th:hover {
