@@ -1,4 +1,4 @@
-.body {
+.content {
   height: 100%;
   width: 100%;
   padding: 15px;
@@ -17,6 +17,17 @@
   background-repeat: no-repeat;
 }
 
+.right {
+  height: 100%;
+  width: 100%;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Tabs */
+
 .tabs {
   height: 100%;
   width: 145px;
@@ -24,7 +35,7 @@
   flex-direction: column;
 }
 
-.tabs .item {
+.tabs .tab {
   min-width: 100%;
   min-height: 28px;
   display: flex;
@@ -38,11 +49,11 @@
   border-right: 1px solid #fff0;
 }
 
-.tabs .item:first-child {
+.tabs .tab:first-child {
   margin-top: 15px;
 }
 
-.tabs .item.active {
+.tabs .tab.active {
   border-top: 1px solid #b4dbec;
   border-bottom: 1px solid #b4dbec;
   border-right: 1px solid #fff0;
@@ -50,20 +61,11 @@
   width: calc(100% + 1px);
 }
 
-.right {
-  height: 100%;
-  width: 100%;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.headerBar {
+.header-bar {
   justify-content: space-between;
 }
 
-.search {
+.search-bar {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -72,12 +74,12 @@
   padding-left: 20px;
 }
 
-.linkText {
+.link-text {
   color: #3b82f6;
   transition: color 0.2s;
 }
 
-.linkText:hover {
+.link-text:hover {
   color: #2563eb;
   text-decoration: underline;
   cursor: pointer;
@@ -85,7 +87,7 @@
 
 /* Basic Info Section */
 
-.avatarWrapper {
+.avatar-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -94,7 +96,7 @@
   width: 30%;
 }
 
-.avatarPicture {
+.avatar-picture {
   position: relative;
   cursor: pointer;
   object-fit: cover;
@@ -107,7 +109,7 @@
   border: 1px solid #ccc;
 }
 
-.avatarPicture::before {
+.avatar-picture::before {
   content: '';
   position: absolute;
   top: -1px;
@@ -117,12 +119,12 @@
   min-height: 102px;
 }
 
-.wealthCoinIcon {
+.wealth-coin-icon {
   display: flex;
   align-items: center;
 }
 
-.wealthCoinIcon::after {
+.wealth-coin-icon::after {
   display: block;
   content: '';
   height: 16px;
@@ -132,19 +134,19 @@
   background-size: cover;
 }
 
-.saperator {
+.separator {
   height: 1px;
   width: 100%;
   background-color: #dbdbdb;
   margin: 20px 0;
 }
 
-.noteText {
+.note-text {
   text-align: right;
   margin-top: 3px;
 }
 
-.searchBorder {
+.search-border {
   width: max-content;
   display: flex;
   align-items: center;
@@ -152,7 +154,7 @@
   background: #fff;
 }
 
-.searchIcon {
+.search-icon {
   min-height: 17px;
   min-width: 17px;
   margin: 5px;
@@ -161,87 +163,13 @@
   background-position: 0 0;
 }
 
-.searchBorder:hover:not(:has(.searchPrev:hover, .searchNext:hover)) .searchIcon {
+.search-border:hover:not(:has(.search-prev:hover, .search-next:hover)) .search-icon {
   background-position: -17px 0;
 }
 
-.searchInput {
+.search-input {
   width: 100%;
   height: 100%;
   padding: 5px;
   border: 0;
-}
-
-.checkBox {
-  display: flex;
-}
-
-.buttonsBar {
-  height: 45px;
-  top: 19rem;
-  position: absolute;
-  width: 99%;
-  display: flex;
-  background: linear-gradient(to bottom, #fff, #f2f7f9);
-  border-bottom: 1px solid #ddd;
-  left: 2px;
-  justify-content: right;
-  align-items: center;
-}
-
-.headerTextBox {
-  justify-content: space-between;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.previewModeArea {
-  border: 1px solid #ddd;
-  padding: 2px;
-  background: #fff;
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  height: 4rem;
-  resize: none;
-  overflow-y: scroll;
-}
-
-.developerCardGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  width: 100%;
-}
-
-.developerCard {
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  transition: background-color 0.2s;
-}
-
-.developerCard:hover {
-  background-color: #f9fafb;
-}
-
-.developerCard .nameText {
-  color: #3b82f6;
-  transition: color 0.2s;
-  text-decoration: underline;
-  cursor: pointer;
-  display: block;
-  margin-bottom: 0.25rem;
-}
-
-.developerCard .nameText:hover {
-  color: #2563eb;
-}
-
-.developerCard .roleText {
-  color: #4b5563;
-  font-size: 0.9em;
-  display: block;
 }

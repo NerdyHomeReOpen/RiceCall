@@ -1,21 +1,4 @@
-.aboutContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
-}
-
-.logoArea {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: auto;
-}
-
-.logoPlaceholder {
+.app-logo {
   background-image: url('../../../public/login_logo.png');
   background-size: cover;
   background-position: center;
@@ -25,7 +8,7 @@
   align-self: center;
 }
 
-.contentBox {
+.content {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -36,40 +19,29 @@
   gap: 10px;
 }
 
-.appInfo {
+.app-info {
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   width: 100%;
   display: flex;
+  margin-bottom: 10px;
 }
 
-.appInfoVersion {
+.app-version-text {
   font-weight: bold;
   padding-bottom: 5px;
   width: 100%;
   text-align: center;
 }
 
-.appInfoCopyright {
+.copyright-text {
   padding-bottom: 5px;
   width: 100%;
   text-align: center;
 }
 
-.websiteLink {
-  text-decoration: unset;
-  font-size: 0.97em;
-  cursor: pointer;
-  color: #0000fa;
-  margin-top: 5px;
-}
-
-.websiteLink:hover {
-  color: #ba2636;
-}
-
-.teamMembers {
+.team-members {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -79,7 +51,7 @@
   box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
 }
 
-.teamMemberLink {
+.team-member-card {
   display: flex;
   align-items: center;
   margin-top: 3px;
@@ -94,31 +66,31 @@
   transition: background-color 0.3s ease;
 }
 
-.teamMemberLink:hover {
+.team-member-card:hover {
   background-color: hsl(0deg 0% 0% / 15%);
 }
 
-.iconGroup {
+.icon-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.teamMemberNameGroup {
+.name-wrapper {
   display: flex;
   align-items: center;
   color: #000;
   line-height: 1.4;
 }
 
-.teamListTextarea {
+.team-list-textarea {
   width: 100% !important;
   height: 100% !important;
   border: none;
   resize: none;
 }
 
-.developerTitle {
+.developer-title {
   background-color: rgb(115 164 213 / 70%);
   color: #fff;
   padding: 4px;
@@ -131,40 +103,40 @@
   text-align: center;
 }
 
-.iconGroup svg {
+.icon-wrapper svg {
   color: #000;
   vertical-align: middle;
   transition: color 0.3s ease;
 }
 
-.githubIconLink:hover svg {
+.github-icon-link:hover svg {
   color: rgb(70 70 70);
 }
 
-.discordIconLink:hover svg {
+.discord-icon-link:hover svg {
   color: #7289da;
 }
 
-.mainDeveloper {
+.main-developer {
   background-color: rgb(216 63 63 / 80%);
 }
 
-.backendDeveloper {
+.backend-developer {
   background-color: rgb(63 136 216 / 80%);
 }
 
-.frontendDeveloper {
+.frontend-developer {
   background-color: rgb(136 63 216 / 80%);
 }
 
-.machineNetwork {
+.machine-network {
   background-color: rgb(77 173 147 / 80%);
 }
 
-.technicalSupport {
+.technical-support {
   background-color: rgb(216 166 63 / 80%);
 }
 
-.customerService {
+.customer-service {
   background-color: rgb(63 166 216 / 80%);
 }

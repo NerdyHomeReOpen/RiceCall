@@ -1,4 +1,4 @@
-.badgeInfoCard {
+.badge-info-card {
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -12,7 +12,7 @@
   border: 1px solid #e0e0e4;
 }
 
-.badgeInfoWrapper {
+.badge-info-wrapper {
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -21,14 +21,14 @@
   gap: 10px;
 }
 
-.badgeAvatarBox {
+.badge-avatar-box {
   display: flex;
   flex-direction: column;
   align-items: center;
   max-width: 75px;
 }
 
-.badgeAvatarBox .badgeImage {
+.badge-avatar-box .badge-image {
   display: flex;
   align-items: center;
   height: 64px;
@@ -38,12 +38,12 @@
   background-repeat: no-repeat;
 }
 
-.badgeAvatarBox .badgeRarityText {
+.badge-avatar-box .badge-rarity-text {
   color: #f3644b;
   margin-top: 8px;
 }
 
-.badgeDescriptionBox {
+.badge-description-box {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -53,17 +53,17 @@
   padding: 10px;
 }
 
-.badgeDescriptionBox .badgeName {
+.badge-description-box .badge-name {
   color: #264558;
   font-size: 1.25em;
   font-weight: bold;
 }
 
-.badgeDescriptionBox .badgeDescription {
+.badge-description-box .badge-description {
   color: #777;
 }
 
-.badgeShowTimeBox {
+.badge-show-time-box {
   display: flex;
   width: 100%;
   color: #777;

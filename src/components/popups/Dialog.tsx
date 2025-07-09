@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -65,28 +64,12 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, submitTo, 
   }, [loadingBox.isLoading]);
 
   return (
-    <form
-      className={popup['popup-wrapper']}
-      tabIndex={0}
-      ref={containerRef}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') handleSubmit();
-      }}
-    >
+    <div className={popup['popup-wrapper']} tabIndex={0}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={setting['body']}>
-          <div className={popup['dialogContent']}>
-            <div
-              className={`
-                ${popup['dialogIcon']}
-                ${popup[DIALOG_ICON[iconType]]}
-              `}
-            />
-            <div className={popup['label']}>
-              {formatedMessage} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
-            </div>
-          </div>
+        <div className={popup['dialog-content']}>
+          <div className={`${popup['dialog-icon']} ${popup[DIALOG_ICON[iconType]]}`} />
+          {formatedMessage} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
         </div>
       </div>
 
@@ -99,7 +82,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, submitTo, 
           {t('cancel')}
         </div>
       </div>
-    </form>
+    </div>
   );
 };
 

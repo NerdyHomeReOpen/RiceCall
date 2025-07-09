@@ -25,7 +25,7 @@
   border: none;
 }
 
-.messageInputLength {
+.message-input-length-text {
   color: #ccc;
   font-size: 0.9em;
   align-self: flex-end;

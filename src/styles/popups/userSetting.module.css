@@ -1,4 +1,4 @@
-.body {
+.content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -7,11 +7,11 @@
   overflow-y: auto;
 }
 
-.body .userProfileContent {
+.content .user-profile-content {
   padding: 5px 15px;
 }
 
-.body .userRecentVisitsPrivate {
+.user-recent-visits-private {
   background: url('../../../public/card/bg_list_tips.png') center center no-repeat;
   background-size: auto;
   height: 76px;
@@ -26,7 +26,7 @@
   text-align: center;
 }
 
-.userAboutMeShow {
+.user-about-me-show {
   height: 100%;
   display: flex;
   justify-content: space-between;
@@ -36,8 +36,8 @@
   padding: 10px 15px;
 }
 
-.userAboutMeShow::before,
-.userAboutMeShow::after {
+.user-about-me-show::before,
+.user-about-me-show::after {
   content: '';
   min-height: 19px;
   min-width: 23px;
@@ -45,89 +45,60 @@
   background-size: cover;
 }
 
-.userAboutEmpty .userAboutMeShow {
+.user-about-empty .user-about-me-show {
   display: none;
 }
 
-.userAboutEmpty {
+.user-about-empty {
   justify-content: flex-start;
 }
 
-.userAboutMeShow::before {
+.user-about-me-show::before {
   background-image: url('../../../public/card/bg_left_quote.png');
   background-repeat: no-repeat;
   margin-bottom: 6rem;
 }
 
-.userAboutMeShow::after {
+.user-about-me-show::after {
   background-image: url('../../../public/card/bg_right_quote.png');
   background-repeat: no-repeat;
   margin-top: 6rem;
 }
 
-.userAboutMeShowText {
+.user-about-me-show-text {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
 }
 
-/* Basic Info Section */
-
-.wealthCoinIcon {
-  display: flex;
-  align-items: center;
-}
-
-.wealthCoinIcon::after {
-  content: '';
-  height: 16px;
-  width: 16px;
-  display: block;
-  background-image: url('../../../public/golden_pea.png');
-  background-size: cover;
-  margin-left: 3px;
-}
-
-.saperator {
-  height: 1px;
-  width: 100%;
-  background-color: #dbdbdb;
-  margin: 20px 0;
-}
-
-.checkBox {
-  display: flex;
-}
-
-.previewModeArea {
-  border: 1px solid #ddd;
-  padding: 2px;
-  background: #fff;
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  height: 4rem;
-  resize: none;
-  overflow-y: scroll;
+.window-action-buttons,
+.user-account-text,
+.user-info-text,
+.user-signature,
+.avatar-picture,
+.no-drag,
+.tab {
+  -webkit-app-region: no-drag;
 }
 
 /* User Profile */
-.userProfile {
+
+.user-profile {
   flex: unset;
   height: 100%;
   justify-content: space-between;
   background-image: unset !important;
 }
 
-.userProfile .profileBox {
+.profile-box {
   height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
-.userProfile .header {
+.header {
   position: relative;
   min-height: 250px;
   width: 100%;
@@ -143,13 +114,7 @@
   -webkit-app-region: drag;
 }
 
-.userProfile .header div:not(.tab, .tab div),
-.userAboutMeShow,
-.userRecentVisitsPrivate {
-  user-select: text;
-}
-
-.windowActionButtons {
+.window-action-buttons {
   width: 50px;
   display: flex;
   align-items: center;
@@ -159,8 +124,8 @@
   top: 10px;
 }
 
-.minimizeBtn,
-.closeBtn {
+.minimize-btn,
+.close-btn {
   display: inline-block;
   width: 14px;
   height: 14px;
@@ -169,27 +134,27 @@
   background-size: cover;
 }
 
-.minimizeBtn {
+.minimize-btn {
   background-image: url('../../../public/im/btn-min.png');
   background-repeat: no-repeat;
 }
 
-.closeBtn {
+.close-btn {
   background-image: url('../../../public/im/btn-close.png');
   background-repeat: no-repeat;
 }
 
-.minimizeBtn:hover,
-.closeBtn:hover {
+.minimize-btn:hover,
+.close-btn:hover {
   background-position: -13px 0;
 }
 
-.minimizeBtn:active,
-.closeBtn:active {
+.minimize-btn:active,
+.close-btn:active {
   background-position: -26px 0;
 }
 
-.userProfile .avatar {
+.avatar-picture {
   position: relative;
   min-width: 74px;
   min-height: 74px;
@@ -199,33 +164,10 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+  transition: all 0.3s ease-in-out;
 }
 
-.userProfile .avatar.editable {
-  cursor: pointer;
-}
-
-.userProfile .avatar.editable:hover {
-  box-shadow: 0 0 3px 6px rgb(255 255 255 / 100%);
-  border-radius: 3px;
-}
-
-.userProfile .avatar.editable:hover::after {
-  display: none;
-}
-
-.windowActionButtons,
-.userAccount,
-.userContent,
-.userSignature,
-.avatar,
-.noDrag,
-.tab div,
-.userRecentVisitsPrivate {
-  -webkit-app-region: no-drag;
-}
-
-.userProfile .avatar::after {
+.avatar-picture::after {
   position: absolute;
   content: '';
   top: -7px;
@@ -238,23 +180,33 @@
   z-index: 1;
 }
 
-.userProfile .userName {
+.avatar-picture.editable {
+  cursor: pointer;
+}
+
+.avatar-picture.editable:hover {
+  box-shadow: 0 0 3px 6px rgb(255 255 255 / 100%);
+  border-radius: 3px;
+}
+
+.user-name-text {
   font-size: 1.5em;
   font-weight: bold;
   color: #fff;
 }
 
-.userProfile .userAccount {
+.user-account-text {
+  font-size: 1em;
+  color: #fff;
+  cursor: pointer;
+}
+
+.user-info-text {
   font-size: 1em;
   color: #fff;
 }
 
-.userProfile .userContent {
-  font-size: 1em;
-  color: #fff;
-}
-
-.userProfile .userSignature {
+.user-signature {
   color: #fff;
   width: 30rem;
   font-size: 0.95em;
@@ -266,20 +218,20 @@
   justify-content: center;
 }
 
-.userProfile .userSignature:hover::-webkit-scrollbar-thumb {
+.user-signature:hover::-webkit-scrollbar-thumb {
   background: rgb(255 255 255);
   border-radius: 4px;
   border: 1px solid #fff;
 }
 
-.userProfile .tab {
+.tabs {
   position: absolute;
   display: flex;
   width: 100%;
   bottom: 0;
 }
 
-.userProfile .tab .item {
+.tabs .tab {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -294,15 +246,15 @@
   background-position: 0 0;
 }
 
-.userProfile .tab .item.selected {
+.tabs .tab.selected {
   background-position: 0 -38px;
 }
 
-.userProfile .tab .item.editable {
+.tabs .tab.editable {
   cursor: not-allowed;
 }
 
-.userProfile .tab .item.about::before {
+.tabs .tab.about::before {
   content: '';
   min-height: 14px;
   min-width: 13px;
@@ -312,7 +264,7 @@
   background-position: 0 0;
 }
 
-.userProfile .tab .item.groups::before {
+.tabs .tab.groups::before {
   content: '';
   min-height: 14px;
   min-width: 18px;
@@ -322,18 +274,18 @@
   background-position: 0 0;
 }
 
-/* ServerItem */
-.serverItems {
+/* Server List */
+
+.server-list {
   padding: 5px 0;
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;
   align-items: center;
   gap: 5px;
-  margin-top: 0.5rem;
 }
 
-.serverItem {
+.server-card {
   background: #ededed;
   border: 1px solid #fff0;
   display: flex;
@@ -345,12 +297,12 @@
   align-items: center;
 }
 
-.serverItem:hover {
+.server-card:hover {
   background: #e9e9e9;
   border: 1px solid #bfbfc0;
 }
 
-.serverItem .serverAvatarPicture {
+.server-avatar-picture {
   width: 35px;
   height: 35px;
   background-size: cover;
@@ -359,7 +311,7 @@
   flex-shrink: 0;
 }
 
-.serverBox {
+.server-info-box {
   flex-direction: column;
   flex: 1;
   gap: 5px;
@@ -369,7 +321,9 @@
   justify-content: space-between;
 }
 
-.serverName {
+.server-name-text {
+  display: flex;
+  align-items: center;
   font-size: 1em;
   line-height: 1rem;
   color: rgb(95 95 95);
@@ -378,50 +332,44 @@
   white-space: nowrap;
 }
 
-.serverInfo {
+.contribution-value-text {
   display: flex;
-  flex-direction: row;
   align-items: center;
+  color: #777;
+  min-width: 2.5rem;
 }
 
-.serverInfo.around {
-  justify-content: space-between;
-}
-
-.serverInfo .permission {
-  justify-items: flex-start;
-}
-
-.serverInfo .contributionBox {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.serverInfo .contributionBox div {
-  color: #888;
-}
-
-.contributionIcon {
-  margin: 0 2px;
+.contribution-value-text::before {
+  display: block;
+  content: '';
   min-width: 12px;
   min-height: 12px;
+  margin-right: 2px;
   background-image: url('../../../public/card/icon_contribu.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
 }
 
-.contributionValue {
-  color: #777;
-  min-width: 2.5rem;
-}
-
-.displayId {
+.display-id-text {
+  display: flex;
+  align-items: center;
   color: #6d6d6d;
 }
 
-.isOwner::before {
+.display-id-text::before {
+  display: block;
+  content: '';
+  width: 12px;
+  height: 12px;
+  margin-right: 2px;
+  background-image: url('../../../public/card/icon_id.jpg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: contain;
+}
+
+.is-owner::before {
   display: block;
   content: '';
   width: 13px;
@@ -432,30 +380,18 @@
   background-position: 0 0;
 }
 
-.id::before {
-  display: block;
-  content: '';
-  width: 12px;
-  height: 12px;
-  margin-right: 2px;
-  background-image: url('../../../public/card/icon_id.jpg');
-  background-size: contain;
-  background-position: 0 0;
-}
-
-/* Edit Tab Bar */
-.editTabBar {
+.edit-tab-bar {
   z-index: 1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   min-height: 45px;
+  padding: 0 15px;
   background: linear-gradient(to bottom, #fff, #f2f7f9);
   border-bottom: 1px solid #f1f1f1;
 }
 
-/* User Badges */
-.badgeViewer {
+.badge-viewer {
   display: flex;
   gap: 0.25rem;
   height: 30px;
@@ -463,41 +399,4 @@
   border: 1px solid #d7d7d7;
   padding: 5px;
   background: #e8e8eb;
-  margin-top: 1rem;
-}
-
-.input-box {
-  display: flex !important;
-  align-items: center;
-}
-
-.emojiBox {
-  height: 40px;
-  width: 40px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.emojiBoxVisible {
-  display: flex;
-}
-
-.emojiBox::before {
-  content: '';
-  background-image: url('../../../public/channel/spliter.png');
-  height: 14px;
-  width: 1px;
-  margin-right: 0.5rem;
-  margin-left: 0.5rem;
-}
-
-.inputArea {
-  width: 100%;
-  height: 1.5rem;
-  overflow: hidden scroll;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
 }

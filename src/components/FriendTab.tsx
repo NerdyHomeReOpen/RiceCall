@@ -152,135 +152,117 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   }, [friendCurrentServerId]);
 
   return (
-    <div key={friendTargetId}>
-      {/* User View */}
-      <div
-        className={`${styles['friendCard']} ${selectedItemId === `${friendTargetId}` ? styles['selected'] : ''}`}
-        onClick={() => setSelectedItemId(friendTargetId)}
-        onContextMenu={(e) => {
-          const x = e.clientX;
-          const y = e.clientY;
-          contextMenu.showContextMenu(x, y, false, false, [
-            {
-              id: 'direct-message',
-              label: t('direct-message'),
-              show: !isCurrentUser,
-              onClick: () => handleOpenDirectMessage(friendUserId, friendTargetId, friendName),
+    <div
+      key={friendTargetId}
+      className={`${styles['friend-tab']} ${selectedItemId === `${friendTargetId}` ? styles['selected'] : ''}`}
+      onClick={() => setSelectedItemId(friendTargetId)}
+      onContextMenu={(e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+        contextMenu.showContextMenu(x, y, false, false, [
+          {
+            id: 'direct-message',
+            label: t('direct-message'),
+            show: !isCurrentUser,
+            onClick: () => handleOpenDirectMessage(friendUserId, friendTargetId, friendName),
+          },
+          {
+            id: 'separator',
+            label: '',
+            show: !isCurrentUser,
+          },
+          {
+            id: 'view-profile',
+            label: t('view-profile'),
+            show: !isCurrentUser,
+            onClick: () => handleOpenUserInfo(friendUserId, friendTargetId),
+          },
+          {
+            id: 'edit-note',
+            label: t('edit-note'),
+            show: canManageFriend,
+            disabled: true,
+            onClick: () => {
+              /* handleFriendNote() */
             },
-            {
-              id: 'separator',
-              label: '',
-              show: !isCurrentUser,
-            },
-            {
-              id: 'view-profile',
-              label: t('view-profile'),
-              show: !isCurrentUser,
-              onClick: () => handleOpenUserInfo(friendUserId, friendTargetId),
-            },
-            {
-              id: 'edit-note',
-              label: t('edit-note'),
-              show: canManageFriend,
-              disabled: true,
-              onClick: () => {
-                /* handleFriendNote() */
+          },
+          {
+            id: 'separator',
+            label: '',
+            show: !isCurrentUser,
+          },
+          {
+            id: 'permission-setting',
+            label: t('permission-setting'),
+            show: canManageFriend && !friendIsBlocked,
+            icon: 'submenu',
+            hasSubmenu: true,
+            submenuItems: [
+              {
+                id: 'set-hide-or-show-online-to-friend',
+                label: t('hide-online-to-friend'),
+                show: canManageFriend && !friendIsBlocked,
+                disabled: true,
+                onClick: () => {
+                  /* TODO: handlePrivateFriend() */
+                },
               },
-            },
-            {
-              id: 'separator',
-              label: '',
-              show: !isCurrentUser,
-            },
-            {
-              id: 'permission-setting',
-              label: t('permission-setting'),
-              show: canManageFriend && !friendIsBlocked,
-              icon: 'submenu',
-              hasSubmenu: true,
-              submenuItems: [
-                {
-                  id: 'set-hide-or-show-online-to-friend',
-                  label: t('hide-online-to-friend'),
-                  show: canManageFriend && !friendIsBlocked,
-                  disabled: true,
-                  onClick: () => {
-                    /* TODO: handlePrivateFriend() */
-                  },
+              {
+                id: 'set-notify-friend-online',
+                label: t('notify-friend-online'),
+                show: canManageFriend && !friendIsBlocked,
+                disabled: true,
+                onClick: () => {
+                  /* TODO: handleNotifyFriendOnline() */
                 },
-                {
-                  id: 'set-notify-friend-online',
-                  label: t('notify-friend-online'),
-                  show: canManageFriend && !friendIsBlocked,
-                  disabled: true,
-                  onClick: () => {
-                    /* TODO: handleNotifyFriendOnline() */
-                  },
-                },
-              ],
-            },
-            {
-              id: 'edit-friend-group',
-              label: t('edit-friend-group'),
-              show: canManageFriend && !friendIsBlocked,
-              onClick: () => handleOpenEditFriend(friendUserId, friendTargetId),
-            },
-            {
-              id: 'set-block',
-              label: friendIsBlocked ? t('unblock') : t('block'),
-              show: !isCurrentUser,
-              onClick: () => handleBlockFriend(friendUserId, friendTargetId, friendIsBlocked),
-            },
-            {
-              id: 'delete-friend',
-              label: t('delete-friend'),
-              show: !isCurrentUser,
-              onClick: () => handleDeleteFriend(friendUserId, friendTargetId),
-            },
-          ]);
-        }}
-        onDoubleClick={() => handleOpenDirectMessage(friendUserId, friendTargetId, friendName)}
-      >
-        <div
-          className={styles['avatarPicture']}
-          style={{
-            backgroundImage: `url(${friendAvatarUrl})`,
-            filter: !isFriendOnline ? 'grayscale(100%)' : '',
-          }}
-          datatype={isFriendOnline && friendStatus !== 'online' ? friendStatus : ''}
-        />
-        <div className={styles['baseInfoBox']}>
-          <div className={styles['container']}>
-            {friendVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
-            <div className={`${styles['name-text']} ${friendVip > 0 ? styles['vip-name-color'] : ''}`}>
-              {friendName}
-            </div>
-            <div
-              className={`
-                  ${styles['gradeIcon']} 
-                  ${grade['grade']} 
-                  ${grade[`lv-${Math.min(56, friendLevel)}`]}
-                `}
-            />
-            <BadgeList badges={friendBadges} maxDisplay={5} />
-          </div>
-          {isFriendOnline && friendCurrentServerId ? (
-            <div
-              className={`
-                  ${styles['container']}
-                  ${friendCurrentServerId ? styles['hasServer'] : ''}
-                `}
-              onClick={() => {
-                handleServerSelect(userId, friendServer);
-              }}
-            >
-              <div className={styles['location']} />
-              <div className={styles['serverName']}>{friendServerName}</div>
-            </div>
-          ) : (
-            <div className={styles['signature']}>{friendSignature}</div>
-          )}
+              },
+            ],
+          },
+          {
+            id: 'edit-friend-group',
+            label: t('edit-friend-group'),
+            show: canManageFriend && !friendIsBlocked,
+            onClick: () => handleOpenEditFriend(friendUserId, friendTargetId),
+          },
+          {
+            id: 'set-block',
+            label: friendIsBlocked ? t('unblock') : t('block'),
+            show: !isCurrentUser,
+            onClick: () => handleBlockFriend(friendUserId, friendTargetId, friendIsBlocked),
+          },
+          {
+            id: 'delete-friend',
+            label: t('delete-friend'),
+            show: !isCurrentUser,
+            onClick: () => handleDeleteFriend(friendUserId, friendTargetId),
+          },
+        ]);
+      }}
+      onDoubleClick={() => handleOpenDirectMessage(friendUserId, friendTargetId, friendName)}
+    >
+      <div
+        className={styles['avatar-picture']}
+        style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: !isFriendOnline ? 'grayscale(100%)' : '' }}
+        datatype={isFriendOnline && friendStatus !== 'online' ? friendStatus : ''}
+      />
+      <div className={styles['base-info-wrapper']}>
+        <div className={styles['box']}>
+          {friendVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
+          <div className={`${styles['name-text']} ${friendVip > 0 ? vip['vip-name-color'] : ''}`}>{friendName}</div>
+          <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, friendLevel)}`]}`} />
+          <BadgeList badges={friendBadges} maxDisplay={5} />
         </div>
+        {isFriendOnline && friendCurrentServerId ? (
+          <div
+            className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`}
+            onClick={() => handleServerSelect(userId, friendServer)}
+          >
+            <div className={styles['location-icon']} />
+            <div className={styles['server-name-text']}>{friendServerName}</div>
+          </div>
+        ) : (
+          <div className={styles['signature']}>{friendSignature}</div>
+        )}
       </div>
     </div>
   );

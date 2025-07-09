@@ -64,7 +64,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ onEmojiSelect, x =
   return (
     <div
       ref={emojiPickerRef}
-      className={`context-menu-container ${emoji['emojiGrid']}`}
+      className={`context-menu-container ${emoji['emoji-grid']}`}
       style={{
         left: pickerX,
         top: pickerY,

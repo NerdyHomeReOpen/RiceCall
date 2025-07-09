@@ -238,14 +238,10 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
           )}
         </form>
       </div>
+
       {/* Footer */}
       <div className={styles['login-footer']}>
-        <div
-          className={styles['create-account']}
-          onClick={() => {
-            setSection('register');
-          }}
-        >
+        <div className={styles['create-account']} onClick={() => setSection('register')}>
           {t('register-account')}
         </div>
         <div

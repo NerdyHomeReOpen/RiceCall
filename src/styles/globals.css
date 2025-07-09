@@ -175,3 +175,17 @@ button {
   filter: grayscale(100%);
   cursor: not-allowed;
 }
+
+/* Tag */
+
+span#user-tag {
+  color: #226ba0;
+}
+
+span#user-tag:hover {
+  text-decoration: underline;
+}
+
+span#permission-icon {
+  vertical-align: bottom;
+}

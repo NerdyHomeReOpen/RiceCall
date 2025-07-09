@@ -44,7 +44,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
       >
         <div
           ref={emojiIconRef}
-          className={emoji['emojiIcon']}
+          className={emoji['emoji-icon']}
           onMouseDown={(e) => {
             e.preventDefault();
             if (!emojiIconRef.current) return;
@@ -83,7 +83,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
           onCompositionEnd={() => setIsComposing(false)}
           aria-label={t('message-input-box')}
         />
-        <div className={messageInputBox['messageInputLength']}>
+        <div className={messageInputBox['message-input-length-text']}>
           {messageInput.length}/{maxLength}
         </div>
       </div>

@@ -233,9 +233,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [t, serverName, activeServerMembers]);
 
     return (
-      <div className={styles['serverWrapper']} style={display ? {} : { display: 'none' }}>
+      <div className={styles['server-wrapper']} style={display ? {} : { display: 'none' }}>
         {/* Main Content */}
-        <main className={styles['serverContent']}>
+        <main className={styles['server-content']}>
           {/* Left Sidebar */}
           <div className={styles['sidebar']} style={{ width: `${sidebarWidth}px` }}>
             <ChannelListViewer
@@ -246,33 +246,41 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               friends={friends}
             />
           </div>
+
           {/* Resize Handle */}
           <div
             className="resize-handle"
             onMouseDown={() => setIsResizingSidebar(true)}
             onMouseUp={() => setIsResizingSidebar(false)}
           />
+
           {/* Right Content */}
-          <div className={styles['mainContent']}>
+          <div className={styles['main-content']}>
+            {/* Announcement Area */}
             <div
               ref={announcementAreaRef}
-              className={styles['announcementArea']}
+              className={styles['announcement-area']}
               style={{ height: `${announcementAreaHeight}px` }}
             >
               <MarkdownViewer markdownText={announcement} />
             </div>
+
             {/* Resize Handle */}
             <div
               className="resize-handle-vertical"
               onMouseDown={() => setIsResizingAnnouncementArea(true)}
               onMouseUp={() => setIsResizingAnnouncementArea(false)}
             />
-            <div className={styles['messageArea']}>
+
+            {/* Message Area */}
+            <div className={styles['message-area']}>
               <MessageViewer messages={channelMessages} userId={userId} />
             </div>
-            <div className={styles['inputArea']}>
-              <div className={styles['broadcastArea']} style={{ display: showActionMessage ? 'flex' : 'none' }}>
-                <div className={styles['broadcastContent']}>
+
+            {/* Input Area */}
+            <div className={styles['input-area']}>
+              <div className={styles['broadcast-area']} style={{ display: showActionMessage ? 'flex' : 'none' }}>
+                <div className={styles['broadcast-content']}>
                   <MessageViewer
                     messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []}
                     userId={userId}
@@ -300,11 +308,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 maxLength={textMaxLength}
               />
             </div>
-            <div className={styles['buttonArea']}>
+
+            {/* Button Area */}
+            <div className={styles['button-area']}>
               <div className={styles['buttons']}>
                 <div
                   ref={voiceModeRef}
-                  className={styles['voiceModeDropdown']}
+                  className={styles['voice-mode-dropdown']}
                   style={userPermission >= 3 ? {} : { display: 'none' }}
                   onClick={() => {
                     if (!voiceModeRef.current) return;
@@ -373,29 +383,29 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               </div>
               <div
                 className={`
-                  ${styles['micButton']} 
+                  ${styles['mic-button']} 
                   ${webRTC.isMute ? '' : styles['active']}`}
                 onClick={() => webRTC.handleToggleMute()}
               >
                 <div
                   className={`
-                    ${styles['micIcon']} 
+                    ${styles['mic-icon']} 
                     ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent / 10) - 1}`] : ''}
                   `}
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
-                  <div className={styles['micText']}>{webRTC.isMute ? t('take-mic') : t('taken-mic')}</div>
-                  <div className={styles['micSubText']}>
+                  <div className={styles['mic-text']}>{webRTC.isMute ? t('take-mic') : t('taken-mic')}</div>
+                  <div className={styles['mic-sub-text']}>
                     {!webRTC.isMute && webRTC.micVolume === 0 ? t('mic-muted') : ''}
                   </div>
                 </div>
               </div>
               <div className={styles['buttons']}>
-                <div className={styles['bkgModeButton']}>{t('mixing')}</div>
-                <div className={styles['saperator']} />
-                <div className={styles['micVolumeContainer']}>
+                <div className={styles['bkg-mode-btn']}>{t('mixing')}</div>
+                <div className={styles['saperator-1']} />
+                <div className={styles['mic-volume-container']}>
                   <div
-                    className={`${styles['micModeButton']} ${
+                    className={`${styles['mic-mode-btn']} ${
                       webRTC.isMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']
                     }`}
                     onMouseEnter={(e) => {
@@ -409,13 +419,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   />
                   {showMicVolume && (
                     <div
-                      className={styles['volumeSlider']}
+                      className={styles['volume-slider']}
                       onMouseLeave={(e) => {
                         e.stopPropagation();
                         setShowMicVolume(false);
                       }}
                     >
-                      <div className={styles['sliderContainer']}>
+                      <div className={styles['slider-container']}>
                         <input
                           className={styles['slider']}
                           type="range"
@@ -428,16 +438,16 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         />
                       </div>
                       <div
-                        className={`${styles['micModeButton']} ${
+                        className={`${styles['mic-mode-btn']} ${
                           webRTC.isMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']
                         }`}
                       />
                     </div>
                   )}
                 </div>
-                <div className={styles['speakerVolumeContainer']}>
+                <div className={styles['speaker-volume-container']}>
                   <div
-                    className={`${styles['speakerButton']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`}
+                    className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`}
                     onMouseEnter={(e) => {
                       e.stopPropagation();
                       setShowSpeakerVolume(true);
@@ -449,13 +459,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   />
                   {showSpeakerVolume && (
                     <div
-                      className={styles['volumeSlider']}
+                      className={styles['volume-slider']}
                       onMouseLeave={(e) => {
                         e.stopPropagation();
                         setShowSpeakerVolume(false);
                       }}
                     >
-                      <div className={styles['sliderContainer']}>
+                      <div className={styles['slider-container']}>
                         <input
                           type="range"
                           min="0"
@@ -469,12 +479,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       </div>
 
                       <div
-                        className={`${styles['speakerButton']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`}
+                        className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`}
                       />
                     </div>
                   )}
                 </div>
-                <div className={styles['recordModeButton']} />
+                <div className={styles['record-mode-btn']} />
               </div>
             </div>
           </div>

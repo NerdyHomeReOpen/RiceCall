@@ -9,7 +9,6 @@ import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -69,12 +68,12 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={setting['body']}>
+        <div className={popup['dialog-content']}>
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('please-input-friend-account')}</div>
               <input
-                name="query"
+                name="search-query"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

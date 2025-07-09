@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -71,7 +70,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={setting['body']}>
+        <div className={popup['dialog-content']}>
           <div className={popup['input-group']}>
             <div className={popup['input-box']}>
               <div className={popup['label']}>{t('parent-channel')}</div>
@@ -80,17 +79,11 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
             <div className={popup['input-box']}>
               <div className={popup['label']}>{t('channel-name')}</div>
               <input
-                name="name"
+                name="channel-name"
                 type="text"
                 value={channelName}
                 maxLength={32}
-                onChange={(e) =>
-                  setChannel((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
-                required
+                onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
               />
             </div>
           </div>

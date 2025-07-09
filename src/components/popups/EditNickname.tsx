@@ -8,7 +8,6 @@ import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // CSS
-import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
@@ -78,7 +77,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
     <form className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={setting['body']}>
+        <div className={popup['dialog-content']}>
           <div className={popup['input-group']}>
             <div className={popup['input-box']}>
               <div className={popup['label']} style={{ minWidth: '2rem' }}>
@@ -93,12 +92,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
                 type="text"
                 value={memberNickname || ''}
                 maxLength={32}
-                onChange={(e) => {
-                  setMember((prev) => ({
-                    ...prev,
-                    nickname: e.target.value,
-                  }));
-                }}
+                onChange={(e) => setMember((prev) => ({ ...prev, nickname: e.target.value }))}
               />
             </div>
           </div>

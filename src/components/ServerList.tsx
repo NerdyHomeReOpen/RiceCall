@@ -16,7 +16,7 @@ interface ServerListProps {
 
 const ServerList: React.FC<ServerListProps> = React.memo(({ user, servers }) => {
   return (
-    <div className={homePage['serverCards']}>
+    <div className={homePage['server-list']}>
       {servers.map((server) => (
         <ServerCard key={server.serverId} user={user} server={server} />
       ))}

@@ -35,37 +35,20 @@ import DirectMessage from '@/components/popups/DirectMessage';
 import SearchUser from '@/components/popups/SearchUser';
 import Dialog from '@/components/popups/Dialog';
 import ChangeTheme from '@/components/popups/ChangeTheme';
-import About from '@/components/popups/AboutUs';
+import About from '@/components/popups/About';
 import FriendVerification from '@/components/popups/FriendVerification';
 
 // Services
 import ipcService from '@/services/ipc.service';
 import getService from '@/services/get.service';
 
-// CSS
-import directMessageStyles from '@/styles/popups/directMessage.module.css';
-
-const directMessageHeader = (targetSignature: string) => (
-  <div className={directMessageStyles['header']}>
-    <div className={directMessageStyles['userSignature']}>{targetSignature}</div>
-    <div className={directMessageStyles['directOptionButtons']}>
-      <div className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['blockUser']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['unBlockUser']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['inviteTempGroup']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['report']} ${directMessageStyles['disabled']}`} />
-    </div>
-  </div>
-);
-
 interface HeaderProps {
   title: string;
   buttons: ('minimize' | 'maxsize' | 'close')[];
   titleBoxIcon?: string;
-  titleBoxContent?: ReactNode;
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon, titleBoxContent }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon }) => {
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -108,7 +91,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
           {buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}
         </div>
       </div>
-      {titleBoxContent}
     </header>
   );
 });
@@ -367,11 +349,6 @@ const Popup = React.memo(() => {
               ? header['title-box-skin-icon']
               : type === PopupType.DIRECT_MESSAGE
               ? header['title-box-direct-message-icon']
-              : undefined
-          }
-          titleBoxContent={
-            type === PopupType.DIRECT_MESSAGE && directMessageTargetSignature !== null
-              ? directMessageHeader(directMessageTargetSignature)
               : undefined
           }
         />

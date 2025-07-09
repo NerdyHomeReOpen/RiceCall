@@ -98,7 +98,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
 
   return (
     <div
-      className={homePage['serverCard']}
+      className={homePage['server-card']}
       onClick={() => handleServerSelect(userId, serverId, serverDisplayId)}
       onContextMenu={(e) => {
         const x = e.clientX;
@@ -135,21 +135,21 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
         ]);
       }}
     >
-      <div className={homePage['serverAvatarPicture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>
-      <div className={homePage['serverInfoText']}>
-        <div className={homePage['serverNameText']}>{serverName}</div>
-        <div className={homePage['serverIdBox']}>
+      <div className={homePage['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>
+      <div className={homePage['server-info-text']}>
+        <div className={homePage['server-name-text']}>{serverName}</div>
+        <div className={homePage['server-id-box']}>
           <div
             className={`
-                ${homePage['serverIdText']} 
-                ${isOwner ? homePage['IsOwner'] : ''}
+                ${homePage['server-id-text']} 
+                ${isOwner ? homePage['is-owner'] : ''}
               `}
           >
             ID:
           </div>
-          <div className={homePage['serverIdText']}>{serverDisplayId}</div>
+          <div className={homePage['server-id-text']}>{serverDisplayId}</div>
         </div>
-        <div className={homePage['serverSlogen']}>{serverSlogan}</div>
+        <div className={homePage['server-slogen']}>{serverSlogan}</div>
       </div>
     </div>
   );

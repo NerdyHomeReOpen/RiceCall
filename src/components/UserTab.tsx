@@ -216,7 +216,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(
       <div
         ref={userTabRef}
         key={memberUserId}
-        className={`context-menu-container ${styles['userTab']} ${
+        className={`context-menu-container ${styles['user-tab']} ${
           selectedItemId === memberUserId && selectedItemType === 'user' ? styles['selected'] : ''
         }`}
         onMouseEnter={() => {
@@ -391,38 +391,25 @@ const UserTab: React.FC<UserTabProps> = React.memo(
         }}
       >
         <div
-          className={`
-            ${styles['userState']} 
-            ${isSpeaking && !isMuted ? styles['play'] : ''} 
-            ${!isSpeaking && isMuted ? styles['muted'] : ''} 
-            ${isMutedByUser ? styles['muted'] : ''}
-          `}
+          className={`${styles['user-audio-state']} ${isSpeaking && !isMuted ? styles['play'] : ''} ${
+            !isSpeaking && isMuted ? styles['muted'] : ''
+          } ${isMutedByUser ? styles['muted'] : ''}`}
         />
-        <div
-          className={`${styles['gradeIcon']} 
-            ${permission[memberGender]} 
-            ${permission[`lv-${memberPermission}`]}
-          `}
-        />
+        <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
         {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
         <div
-          className={`
-            ${styles['userTabName']} 
-            ${memberNickname ? styles['member'] : ''}
-            ${memberVip > 0 ? vip['isVIP'] : ''}
-          `}
+          className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${
+            memberVip > 0 ? vip['vip-name-color'] : ''
+          }`}
         >
           {memberNickname || memberName}
         </div>
         <div
-          className={`
-            ${grade['grade']} 
-            ${grade[`lv-${Math.min(56, memberLevel)}`]}
-          `}
+          className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`}
           style={{ cursor: 'default' }}
         />
         <BadgeListViewer badges={memberBadges} maxDisplay={5} />
-        {isCurrentUser && <div className={styles['myLocationIcon']} />}
+        {isCurrentUser && <div className={styles['my-location-icon']} />}
       </div>
     );
   },

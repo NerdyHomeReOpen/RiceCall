@@ -1,9 +1,9 @@
-.badgeViewerWrapper {
+.badge-viewer-wrapper {
   display: flex;
   gap: 5px;
 }
 
-.badgeImage {
+.badge-image {
   width: 17px;
   height: 17px;
   background-size: cover;

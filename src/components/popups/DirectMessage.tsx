@@ -21,7 +21,7 @@ import ipcService from '@/services/ipc.service';
 import Default from '@/utils/default';
 
 // CSS
-import directMessage from '@/styles/popups/directMessage.module.css';
+import styles from '@/styles/popups/directMessage.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 import grade from '@/styles/grade.module.css';
@@ -67,7 +67,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     badges: targetBadges,
   } = target;
   const isOnline = targetStatus !== 'offline';
-  const isVerificationUser = false;
+  const isVerifiedUser = false;
   const { name: targetCurrentServerName } = targetCurrentServer;
 
   // Handlers
@@ -224,65 +224,77 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   return (
     <div className={popup['popup-wrapper']}>
+      {/* Header */}
+      <div className={styles['header']}>
+        <div className={styles['user-signature']}>{target.signature}</div>
+        <div className={styles['direct-option-buttons']}>
+          <div className={`${styles['file-share']} ${popup['disabled']}`} />
+          <div className={`${styles['block-user']} ${popup['disabled']}`} />
+          <div className={`${styles['un-block-user']} ${popup['disabled']}`} />
+          <div className={`${styles['invite-temp-group']} ${popup['disabled']}`} />
+          <div className={`${styles['report']} ${popup['disabled']}`} />
+        </div>
+      </div>
+
       {/* Body */}
       <div className={popup['popup-body']}>
         {/* Sidebar */}
-        <div className={directMessage['sidebar']}>
-          <div className={directMessage['targetBox']}>
+        <div className={styles['sidebar']}>
+          <div className={styles['target-box']}>
             <div
-              className={`${directMessage['avatarPicture']} ${isFriend && isOnline ? '' : directMessage['offline']}`}
+              className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`}
               style={{ backgroundImage: `url(${targetAvatarUrl})` }}
             />
             {targetVip > 0 && <div className={`${vip['vip-icon-big']} ${vip[`vip-${targetVip}`]}`} />}
-            <div className={directMessage['userStateBox']}>
+            <div className={styles['user-state-box']}>
               <div
                 title={`${t('level')}: ${targetLevel}`}
                 className={`${grade['grade']} ${grade[`lv-${Math.min(56, targetLevel)}`]}`}
               />
-              {targetBadges.length > 0 ? <div className={directMessage['userFriendSplit']} /> : ''}
+              {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
               <BadgeListViewer badges={targetBadges} maxDisplay={13} />
             </div>
           </div>
-          <div className={directMessage['userBox']}>
-            <div className={directMessage['avatarPicture']} style={{ backgroundImage: `url(${userAvatarUrl})` }} />
+          <div className={styles['user-box']}>
+            <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${userAvatarUrl})` }} />
           </div>
         </div>
 
         {/* Main Content */}
-        <div className={directMessage['mainContent']}>
+        <div className={styles['main-content']}>
           {isFriend && isOnline && targetCurrentServerId && (
             <div
-              className={`${directMessage['actionArea']} ${directMessage['clickable']}`}
+              className={`${styles['action-area']} ${styles['clickable']}`}
               onClick={() => {
                 handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId);
               }}
             >
-              <div className={`${directMessage['actionIcon']} ${directMessage['inServer']}`} />
-              <div className={directMessage['actionTitle']}>{targetCurrentServerName}</div>
+              <div className={`${styles['action-icon']} ${styles['in-server']}`} />
+              <div className={styles['action-title']}>{targetCurrentServerName}</div>
             </div>
           )}
           {(!isFriend || !isOnline) && (
-            <div className={directMessage['actionArea']}>
-              {!isFriend && <div className={directMessage['actionTitle']}>{t('non-friend-notice')}</div>}
-              {isFriend && !isOnline && <div className={directMessage['actionTitle']}>{t('non-online-notice')}</div>}
+            <div className={styles['action-area']}>
+              {!isFriend && <div className={styles['action-title']}>{t('non-friend-notice')}</div>}
+              {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-notice')}</div>}
             </div>
           )}
-          {isVerificationUser && ( // TODO: 官方相關人員徽章
-            <div className={directMessage['actionArea']}>
-              <div className={`${directMessage['actionIcon']} ${''}`} />
-              <div className={directMessage['actionTitle']}>{''}</div>
+          {isVerifiedUser && ( // TODO: 官方相關人員徽章
+            <div className={styles['action-area']}>
+              <div className={`${styles['action-icon']} ${''}`} />
+              <div className={styles['action-title']}>{''}</div>
             </div>
           )}
-          <div className={directMessage['messageArea']}>
+          <div className={styles['message-area']}>
             <MessageViewer messages={directMessages} userId={userId} />
           </div>
-          <div className={directMessage['inputArea']}>
-            <div className={directMessage['topBar']}>
-              <div className={directMessage['buttons']}>
-                <div className={`${directMessage['button']} ${directMessage['font']}`} />
+          <div className={styles['input-area']}>
+            <div className={styles['top-bar']}>
+              <div className={styles['buttons']}>
+                <div className={`${styles['button']} ${styles['font']}`} />
                 <div
                   ref={emojiIconRef}
-                  className={`${directMessage['button']} ${directMessage['emoji']}`}
+                  className={`${styles['button']} ${styles['emoji']}`}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     if (!emojiIconRef.current) return;
@@ -294,21 +306,19 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                     });
                   }}
                 />
-                <div className={`${directMessage['button']} ${directMessage['screenShot']}`} />
+                <div className={`${styles['button']} ${styles['screen-shot']}`} />
                 <div
-                  className={`${directMessage['button']} ${directMessage['nudge']} ${
-                    !isFriend || cooldown > 0 ? 'disabled' : ''
-                  }`}
+                  className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`}
                   onClick={() => handleSendShakeWindow()}
                 />
               </div>
-              <div className={directMessage['buttons']}>
-                <div className={directMessage['historyMessage']}>{t('message-history')}</div>
+              <div className={styles['buttons']}>
+                <div className={styles['history-message']}>{t('message-history')}</div>
               </div>
             </div>
             <textarea
               ref={textareaRef}
-              className={directMessage['input']}
+              className={styles['input']}
               value={messageInput}
               onChange={(e) => {
                 e.preventDefault();

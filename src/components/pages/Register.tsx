@@ -169,6 +169,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
 
   return (
     <div className={styles['register-wrapper']}>
+      {/* Main Content */}
       <div className={styles['register-content']}>
         <div className={styles['app-logo']} />
         <div className={styles['form-wrapper']}>
@@ -287,6 +288,8 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
           )}
         </div>
       </div>
+
+      {/* Footer */}
       <div className={styles['register-footer']}>
         <div className={styles['back-to-login']} onClick={() => setSection('login')}>
           {t('back-to-login')}

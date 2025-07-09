@@ -214,7 +214,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         {/* Channel View */}
         <div
           key={channelId}
-          className={`${styles['channelTab']} ${
+          className={`${styles['channel-tab']} ${
             selectedItemId === channelId && selectedItemType === 'channel' ? styles['selected'] : ''
           }`}
           onClick={() => {
@@ -325,11 +325,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           }}
         >
           <div
-            className={`
-              ${styles['tabIcon']} 
-              ${expanded[channelId] ? styles['expanded'] : ''} 
-              ${isLobby ? styles['lobby'] : styles[channelVisibility]} 
-            `}
+            className={`${styles['tab-icon']} ${expanded[channelId] ? styles['expanded'] : ''} ${
+              isLobby ? styles['lobby'] : styles[channelVisibility]
+            }`}
             onClick={() =>
               setExpanded((prev) => ({
                 ...prev,
@@ -337,24 +335,19 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               }))
             }
           />
-          <div
-            className={`
-              ${styles['channelTabLable']} 
-              ${isReceptionLobby ? styles['isReceptionLobby'] : ''} 
-            `}
-          >
+          <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>
             {channelName}
           </div>
           {channelVisibility !== 'readonly' && (
-            <div className={styles['channelTabCount']}>
+            <div className={styles['channel-tab-count-text']}>
               {`(${channelMembers.length}${channelUserLimit > 0 ? `/${channelUserLimit}` : ''})`}
             </div>
           )}
-          {userInChannel && !expanded[channelId] && <div className={styles['myLocationIcon']} />}
+          {userInChannel && !expanded[channelId] && <div className={styles['my-location-icon']} />}
         </div>
 
         {/* Expanded Sections */}
-        <div className={styles['userList']} style={expanded[channelId] ? {} : { display: 'none' }}>
+        <div className={styles['user-list']} style={expanded[channelId] ? {} : { display: 'none' }}>
           {channelMembers
             .filter((mb) => !!mb)
             .sort((a, b) => a.name.localeCompare(b.name))

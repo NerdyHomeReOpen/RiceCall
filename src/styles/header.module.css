@@ -7,7 +7,7 @@
   background-color: var(--main-color);
   background-image: var(--header-image);
   background-repeat: no-repeat;
-  background-position: 0 20%;
+  background-position: 0 0;
   background-size: cover;
   color: var(--secondary-color);
 }

@@ -38,14 +38,14 @@ const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, serv
   const canExpand = servers.length > 6;
 
   return (
-    <div className={homePage['serverList']}>
-      <div className={homePage['serverListTitle']}>{title}</div>
+    <div>
+      <div className={homePage['server-list-title']}>{title}</div>
       <ServerListViewer user={user} servers={displayedServers} />
       {canExpand && (
         <div
           className={`
-            ${homePage['viewMoreBtn']} 
-            ${expanded ? homePage['moreIcon'] : homePage['lessIcon']}
+            ${homePage['view-more-btn']} 
+            ${expanded ? homePage['more-icon'] : homePage['less-icon']}
           `}
           onClick={() => setExpanded(!expanded)}
         >
@@ -60,18 +60,18 @@ const SearchResultItem: React.FC<{
   server: UserServer;
   onClick: () => void;
 }> = ({ server, onClick }) => (
-  <div className={homePage['dropdownItem']} onClick={onClick}>
+  <div className={homePage['item']} onClick={onClick}>
     <div
-      className={homePage['serverAvatarPicture']}
+      className={homePage['server-avatar-picture']}
       style={{
         backgroundImage: `url(${server.avatarUrl})`,
       }}
     />
-    <div className={homePage['serverInfoText']}>
-      <div className={homePage['serverNameText']}>{server.name}</div>
-      <div className={homePage['serverIdBox']}>
-        <div className={homePage['idIcon']} />
-        <div className={homePage['serverIdText']}>{server.displayId}</div>
+    <div className={homePage['server-info-text']}>
+      <div className={homePage['server-name-text']}>{server.name}</div>
+      <div className={homePage['server-id-box']}>
+        <div className={homePage['id-icon']} />
+        <div className={homePage['server-id-text']}>{server.displayId}</div>
       </div>
     </div>
   </div>
@@ -270,16 +270,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, [t, userName]);
 
   return (
-    <div className={homePage['homeWrapper']} style={display ? {} : { display: 'none' }}>
+    <div className={homePage['home-wrapper']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
-      <header className={homePage['homeHeader']}>
+      <header className={homePage['home-header']}>
         <div className={homePage['left']}>
-          <div className={homePage['backBtn']} />
-          <div className={homePage['forwardBtn']} />
-          <div className={homePage['searchBar']} ref={searchRef}>
+          <div className={homePage['back-btn']} />
+          <div className={homePage['forward-btn']} />
+          <div className={homePage['search-bar']} ref={searchRef}>
             <input
               placeholder={t('search-server-placeholder')}
-              className={homePage['searchInput']}
+              className={homePage['search-input']}
               value={searchQuery}
               onChange={(e) => {
                 const value = e.target.value;
@@ -293,16 +293,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               }}
             />
             <div
-              className={homePage['searchInputClear']}
+              className={homePage['search-input-clear-btn']}
               onClick={handleClearSearchState}
               style={searchQuery ? {} : { display: 'none' }}
             />
-            <div className={homePage['searchInputIcon']} style={!searchQuery ? {} : { display: 'none' }} />
-            <div className={homePage['searchDropdown']} style={hasResults ? {} : { display: 'none' }}>
+            <div className={homePage['search-input-icon']} style={!searchQuery ? {} : { display: 'none' }} />
+            <div className={homePage['search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
               {exactMatch && (
                 <>
                   <div
-                    className={`${homePage['dropdownHeaderText']} ${homePage['exactMatch']}`}
+                    className={`${homePage['header-text']} ${homePage['exactMatch']}`}
                     style={exactMatch ? {} : { display: 'none' }}
                   >
                     {t('quick-enter-server')}
@@ -318,7 +318,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               )}
               {personalResults.length > 0 && (
                 <>
-                  <div className={homePage['dropdownHeaderText']}>{t('personal-exclusive')}</div>
+                  <div className={homePage['header-text']}>{t('personal-exclusive')}</div>
                   {personalResults.map((server) => (
                     <SearchResultItem
                       key={server.serverId}
@@ -332,7 +332,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               )}
               {relatedResults.length > 0 && (
                 <>
-                  <div className={homePage['dropdownHeaderText']}>{t('related-search')}</div>
+                  <div className={homePage['header-text']}>{t('related-search')}</div>
                   {relatedResults.map((server) => (
                     <SearchResultItem
                       key={server.serverId}
@@ -345,7 +345,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 </>
               )}
               <div
-                className={`${homePage['dropdownItem']} ${homePage['inputEmptyItem']}`}
+                className={`${homePage['item']} ${homePage['input-empty-item']}`}
                 style={!searchQuery ? {} : { display: 'none' }}
               >
                 {t('searchEmpty')}
@@ -356,21 +356,21 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
         <div className={homePage['mid']}>
           <div
-            className={`${homePage['navegateItem']} ${section === 0 ? homePage['active'] : ''}`}
+            className={`${homePage['navegate-tab']} ${section === 0 ? homePage['active'] : ''}`}
             data-key="60060"
             onClick={() => setSection(0)}
           >
             {t('home')}
           </div>
           <div
-            className={`${homePage['navegateItem']} ${section === 1 ? homePage['active'] : ''}`}
+            className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`}
             data-key="40007"
             onClick={() => setSection(1)}
           >
             {t('game')}
           </div>
           <div
-            className={`${homePage['navegateItem']} ${section === 2 ? homePage['active'] : ''}`}
+            className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`}
             data-key="30375"
             onClick={() => setSection(2)}
           >
@@ -379,10 +379,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         </div>
 
         <div className={homePage['right']}>
-          <div className={homePage['navegateItem']} data-key="30014" onClick={() => handleOpenCreateServer(userId)}>
+          <div className={homePage['navegate-tab']} data-key="30014" onClick={() => handleOpenCreateServer(userId)}>
             {t('create-servers')}
           </div>
-          <div className={homePage['navegateItem']} data-key="60004" onClick={() => setSection(3)}>
+          <div className={homePage['navegate-tab']} data-key="60004" onClick={() => setSection(3)}>
             {t('personal-exclusive')}
           </div>
         </div>
@@ -396,7 +396,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       />
 
       {/* Personal Exclusive */}
-      <main className={homePage['homeContent']} style={section === 3 ? {} : { display: 'none' }}>
+      <main className={homePage['home-content']} style={section === 3 ? {} : { display: 'none' }}>
         <ServerListSection title={t('recent-servers')} servers={recentServers} user={user} />
         <ServerListSection title={t('my-servers')} servers={ownedServers} user={user} />
         <ServerListSection title={t('favorited-servers')} servers={favoriteServers} user={user} />

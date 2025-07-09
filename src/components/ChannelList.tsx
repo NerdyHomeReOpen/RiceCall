@@ -190,35 +190,35 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
     return (
       <>
         {/* Header */}
-        <div className={styles['sidebarHeader']} ref={viewerRef}>
+        <div className={styles['sidebar-header']} ref={viewerRef}>
           <div
-            className={styles['avatarBox']}
+            className={styles['avatar-box']}
             onClick={() => {
               if (!canOpenSettings) return;
               handleOpenServerSetting(userId, serverId);
             }}
           >
-            <div className={styles['avatarPicture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+            <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
           </div>
-          <div className={styles['baseInfoBox']}>
-            <div className={styles['container']}>
-              {isVerifiedServer && <div className={styles['verifyIcon']} title={t('official-verified-server')}></div>}
-              <div className={styles['name']}>{serverName} </div>
+          <div className={styles['base-info-wrapper']}>
+            <div className={styles['box']}>
+              {isVerifiedServer && <div className={styles['verify-icon']} title={t('official-verified-server')}></div>}
+              <div className={styles['name-text']}>{serverName} </div>
             </div>
-            <div className={styles['container']}>
-              <div className={styles['idText']}>{serverDisplayId}</div>
-              <div className={styles['memberText']}>{serverMembers.length}</div>
-              <div className={styles['optionBox']}>
+            <div className={styles['box']}>
+              <div className={styles['id-text']}>{serverDisplayId}</div>
+              <div className={styles['member-text']}>{serverMembers.length}</div>
+              <div className={styles['options']}>
                 <div
-                  className={styles['invitation']}
+                  className={styles['invitation-icon']}
                   onClick={() => {
                     // Handle invite friends
                   }}
                 />
-                <div className={styles['saperator']} />
+                <div className={styles['saperator-1']} />
                 <div
                   ref={settingButtonRef}
-                  className={styles['setting']}
+                  className={styles['setting-icon']}
                   onClick={() => {
                     if (!settingButtonRef.current) return;
                     const x = settingButtonRef.current.getBoundingClientRect().left;
@@ -292,24 +292,19 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
         </div>
 
         {/* Current Channel */}
-        <div className={styles['currentChannelBox']}>
-          <div
-            className={`
-              ${styles['currentChannelIcon']} 
-              ${styles[`status${connectStatus}`]}
-            `}
-          >
-            <div className={`${styles['currentChannelPing']}`}>{`${latency}ms`}</div>
+        <div className={styles['current-channel-box']}>
+          <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]}`}>
+            <div className={`${styles['current-channel-ping']}`}>{`${latency}ms`}</div>
           </div>
-          <div className={styles['currentChannelText']}>{currentChannelName}</div>
+          <div className={styles['current-channel-text']}>{currentChannelName}</div>
         </div>
 
         {/* Mic Queue */}
         {currentChannelVoiceMode === 'queue' && (
           <>
-            <div className={styles['sectionTitle']}>{t('mic-order')}</div>
-            <div className={styles['micQueueBox']}>
-              <div className={styles['userList']}>
+            <div className={styles['section-title-text']}>{t('mic-order')}</div>
+            <div className={styles['mic-queue-list']}>
+              <div className={styles['user-list']}>
                 {/* {micQueueUsers.map((user) => (
                     <UserTab
                       key={user.id}
@@ -325,11 +320,13 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
         )}
 
         {/* Channel List Title */}
-        <div className={styles['sectionTitle']}>{view === 'current' ? t('current-channel') : t('all-channel')}</div>
+        <div className={styles['section-title-text']}>
+          {view === 'current' ? t('current-channel') : t('all-channel')}
+        </div>
 
         {/* Channel List */}
-        <div className={styles['scrollView']}>
-          <div className={styles['channelList']}>
+        <div className={styles['scroll-view']}>
+          <div className={styles['channel-list']}>
             {view === 'current' ? (
               <ChannelTab
                 key={currentChannelId}
@@ -387,24 +384,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
           </div>
         </div>
 
-        {/* Bottom Navigation */}
-        <div className={styles['bottomNav']}>
+        {/* Footer */}
+        <div className={styles['sidebar-footer']}>
           <div
-            className={`
-              ${styles['navItem']} 
-              ${styles['navItemLeft']} 
-              ${view === 'current' ? styles['active'] : ''}
-            `}
+            className={`${styles['navegate-tab']} ${view === 'current' ? styles['active'] : ''}`}
             onClick={() => setView('current')}
           >
             {t('current-channel')}
           </div>
           <div
-            className={`
-              ${styles['navItem']} 
-              ${styles['navItemRight']} 
-              ${view === 'all' ? styles['active'] : ''}
-            `}
+            className={`${styles['navegate-tab']} ${view === 'all' ? styles['active'] : ''}`}
             onClick={() => setView('all')}
           >
             {t('all-channel')}

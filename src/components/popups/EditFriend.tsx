@@ -8,7 +8,6 @@ import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // CSS
-import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
@@ -109,19 +108,15 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={setting['body']}>
+        <div className={popup['dialog-content']}>
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['row']}`}>
               <div className={popup['label']}>{t('friend-select-group')}</div>
               <div className={popup['select-box']}>
                 <select
+                  name="friend-group"
                   value={friendGroupId || ''}
-                  onChange={(e) => {
-                    setFriend((prev) => ({
-                      ...prev,
-                      friendGroupId: e.target.value,
-                    }));
-                  }}
+                  onChange={(e) => setFriend((prev) => ({ ...prev, friendGroupId: e.target.value }))}
                 >
                   <option value={''}>{t('none')}</option>
                   {friendGroups.map((group) => (

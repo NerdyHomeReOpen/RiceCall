@@ -115,7 +115,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               t('sound-effect-setting'),
             ].map((title, index) => (
               <div
-                className={`${setting['item']} ${activeTabIndex === index ? setting['active'] : ''}`}
+                className={`${setting['tab']} ${activeTabIndex === index ? setting['active'] : ''}`}
                 onClick={() => setActiveTabIndex(index)}
                 key={index}
               >

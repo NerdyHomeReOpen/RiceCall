@@ -9,7 +9,6 @@ import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -47,7 +46,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={setting['body']}>
+        <div className={popup['dialog-content']}>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('please-enter-the-channel-password')}</div>
             <input

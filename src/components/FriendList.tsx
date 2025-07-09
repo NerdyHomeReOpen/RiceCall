@@ -77,40 +77,40 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   return (
     <>
       {/* Navigation Tabs */}
-      <div className={styles['navigateTabs']} ref={viewerRef}>
+      <div className={styles['navigate-tabs']} ref={viewerRef}>
         <div
           className={`${styles['tab']} ${selectedTabId == 0 ? styles['selected'] : ''}`}
           onClick={() => setSelectedTabId(0)}
         >
-          <div className={styles['friendListIcon']} />
+          <div className={styles['friend-list-icon']} />
         </div>
         <div
           className={`${styles['tab']} ${selectedTabId == 1 ? styles['selected'] : ''}`}
           onClick={() => setSelectedTabId(1)}
         >
-          <div className={styles['recentIcon']} />
+          <div className={styles['recent-icon']} />
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className={styles['searchBar']}>
-        <div className={styles['searchIcon']} />
+      <div className={styles['search-bar']}>
+        <div className={styles['search-icon']} />
         <input
           name="query"
           type="text"
-          className={styles['searchInput']}
+          className={styles['search-input']}
           placeholder={t('search-friend-placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <div className={styles['prevIcon']} />
-        <div className={styles['nextIcon']} />
+        <div className={styles['prev-icon']} />
+        <div className={styles['next-icon']} />
       </div>
 
       {/* Friend List */}
-      <div className={styles['scrollView']} style={selectedTabId == 0 ? {} : { display: 'none' }}>
+      <div className={styles['scroll-view']} style={selectedTabId == 0 ? {} : { display: 'none' }}>
         {/* Friend Groups */}
-        <div className={styles['friendList']}>
+        <div className={styles['friend-group-list']}>
           {[defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup]
             .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
             .map((friendGroup) => (
@@ -127,10 +127,10 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
       </div>
 
       {/* Recent */}
-      <div className={styles['recentList']} style={selectedTabId == 1 ? {} : { display: 'none' }}></div>
+      <div className={styles['recent-list']} style={selectedTabId == 1 ? {} : { display: 'none' }}></div>
 
       {/* Bottom Buttons */}
-      <div className={styles['sidebarFooter']}>
+      <div className={styles['sidebar-footer']}>
         <div className={styles['button']} datatype="addGroup" onClick={() => handleOpenCreateFriendGroup()}>
           {t('create-friend-group')}
         </div>

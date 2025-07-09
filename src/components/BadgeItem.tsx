@@ -26,7 +26,7 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, preferTop = fal
 
   if (failedImageCache.has(badgeUrl)) {
     // Fallback Badge
-    return <div className={styles['badgeBigImage']} />;
+    return <div className={styles['badge-big-image']} />;
   }
 
   return (
@@ -41,7 +41,7 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, preferTop = fal
         contextMenu.closeBadgeInfoCard();
       }}
     >
-      <div className={styles.badgeImage} style={{ backgroundImage: `url(${badgeUrl})` }} />
+      <div className={styles['badge-image']} style={{ backgroundImage: `url(${badgeUrl})` }} />
     </div>
   );
 });

@@ -9,7 +9,6 @@ import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -47,23 +46,16 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={setting['body']}>
-          <div className={popup['input-group']}>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
-              <input
-                name="name"
-                type="text"
-                value={groupName}
-                maxLength={32}
-                onChange={(e) =>
-                  setFriendGroup((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
-              />
-            </div>
+        <div className={popup['dialog-content']}>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
+            <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
+            <input
+              name="friend-group-name"
+              type="text"
+              value={groupName}
+              maxLength={32}
+              onChange={(e) => setFriendGroup((prev) => ({ ...prev, name: e.target.value }))}
+            />
           </div>
         </div>
       </div>

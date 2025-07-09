@@ -9,7 +9,6 @@ import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -74,21 +73,16 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={setting['body']}>
+        <div className={popup['dialog-content']}>
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('channel-name-label')}</div>
               <input
-                name="name"
+                name="channel-name"
                 type="text"
                 value={channelName}
                 maxLength={32}
-                onChange={(e) =>
-                  setChannel((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
+                onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
               />
             </div>
           </div>

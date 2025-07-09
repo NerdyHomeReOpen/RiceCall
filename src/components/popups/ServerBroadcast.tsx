@@ -9,7 +9,6 @@ import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import broadcast from '@/styles/popups/serverBroadcast.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -50,83 +49,78 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={broadcast['content']}>
-          <div className={`${popup['input-group']}`}>
-            <div className={`${popup['row']}`}>
-              <div className={`${popup['label']} ${broadcast['label']}`}>{t('receive-channel')}</div>
-              <div className={broadcast['input-box']}>
-                <div className={`${popup['row']}`}>
-                  <input
-                    name="channelType"
-                    type="radio"
-                    checked={channelType === 'current'}
-                    onChange={() => {
-                      setChannelType('current');
-                    }}
-                  />
-                  <div className={popup['label']}>{t('current-channel')}</div>
-                </div>
-                <div className={`${popup['row']}`}>
-                  <input
-                    name="channelType"
-                    type="radio"
-                    checked={channelType === 'all'}
-                    onChange={() => {
-                      setChannelType('all');
-                    }}
-                  />
-                  <div className={popup['label']}>{t('all-channel')}</div>
-                </div>
-              </div>
-            </div>
-            <div className={`${popup['row']}`}>
-              <div className={`${popup['label']} ${broadcast['label']}`}>{t('broadcast-type')}</div>
-              <div className={broadcast['input-box']}>
-                <div className={`${popup['row']}`}>
-                  <input
-                    name="sendType"
-                    type="radio"
-                    checked={sendType === 'text'}
-                    onChange={() => {
-                      setSendType('text');
-                    }}
-                  />
-                  <div className={popup['label']}>{t('text-broadcast')}</div>
-                </div>
-                <div className={`${popup['row']} ${popup['disabled']}`}>
-                  <input
-                    name="sendType"
-                    type="radio"
-                    checked={sendType === 'voice'}
-                    onChange={() => {
-                      setSendType('voice');
-                    }}
-                  />
-                  <div className={popup['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className={`${popup['input-group']} ${popup['row']}`}>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('broadcast-content')}</div>
-              <textarea
-                name="content"
-                maxLength={300}
-                placeholder={t('markdown-support')}
-                onChange={(e) => {
-                  setBroadcastContent(e.target.value);
+        <div className={`${popup['content']} ${popup['col']}`}>
+          <div className={popup['row']}>
+            <div className={popup['label']}>{t('receive-channel')}</div>
+            <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
+              <input
+                name="channelType"
+                type="radio"
+                checked={channelType === 'current'}
+                onChange={() => {
+                  setChannelType('current');
                 }}
               />
-              <div className={broadcast['labelArea']}>
-                <div className={broadcast['messageInputLength']}>
-                  {broadcastContent.length}/{maxLength}
-                </div>
-              </div>
+              <div className={popup['label']}>{t('current-channel')}</div>
+            </div>
+            <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
+              <input
+                name="channelType"
+                type="radio"
+                checked={channelType === 'all'}
+                onChange={() => {
+                  setChannelType('all');
+                }}
+              />
+              <div className={popup['label']}>{t('all-channel')}</div>
+            </div>
+          </div>
+          <div className={popup['row']}>
+            <div className={popup['label']}>{t('broadcast-type')}</div>
+            <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
+              <input
+                name="sendType"
+                type="radio"
+                checked={sendType === 'text'}
+                onChange={() => {
+                  setSendType('text');
+                }}
+              />
+              <div className={popup['label']}>{t('text-broadcast')}</div>
+            </div>
+            <div
+              className={`${popup['input-box']} ${popup['row']} ${popup['disabled']}`}
+              style={{ width: 'fit-content' }}
+            >
+              <input
+                name="sendType"
+                type="radio"
+                checked={sendType === 'voice'}
+                onChange={() => {
+                  setSendType('voice');
+                }}
+              />
+              <div className={popup['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
+            </div>
+          </div>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
+            <div className={popup['label']}>{t('broadcast-content')}</div>
+            <textarea
+              name="content"
+              maxLength={300}
+              placeholder={t('markdown-support')}
+              style={{ minHeight: '90px' }}
+              onChange={(e) => {
+                setBroadcastContent(e.target.value);
+              }}
+            />
+            <div className={popup['hint-text']}>
+              {broadcastContent.length}/{maxLength}
             </div>
           </div>
         </div>
       </div>
+
       {/* Footer */}
       <div className={popup['popup-footer']}>
         <div

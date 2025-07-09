@@ -233,7 +233,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         {/* Category View */}
         <div
           key={categoryId}
-          className={`${styles['channelTab']} ${
+          className={`${styles['channel-tab']} ${
             selectedItemId === categoryId && selectedItemType === 'category' ? styles['selected'] : ''
           }`}
           onClick={() => {
@@ -347,11 +347,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           }}
         >
           <div
-            className={`
-              ${styles['tabIcon']} 
-              ${expanded[categoryId] ? styles['expanded'] : ''}
-              ${styles[categoryVisibility]}
-            `}
+            className={`${styles['tab-icon']} ${expanded[categoryId] ? styles['expanded'] : ''} ${
+              styles[categoryVisibility]
+            }`}
             onClick={() =>
               setExpanded((prev) => ({
                 ...prev,
@@ -359,20 +357,17 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               }))
             }
           />
-          <div
-            className={`
-            ${styles['channelTabLable']}
-            ${isReceptionLobby ? styles['isReceptionLobby'] : ''}
-          `}
-          >
+          <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>
             {categoryName}
           </div>
-          {!isAllChannelReadOnly && <div className={styles['channelTabCount']}>{`(${categoryMembers.length})`}</div>}
-          {!expanded[categoryId] && userInCategory && <div className={styles['myLocationIcon']} />}
+          {!isAllChannelReadOnly && (
+            <div className={styles['channel-tab-count-text']}>{`(${categoryMembers.length})`}</div>
+          )}
+          {!expanded[categoryId] && userInCategory && <div className={styles['my-location-icon']} />}
         </div>
 
         {/* Expanded Sections */}
-        <div className={styles['channelList']} style={expanded[categoryId] ? {} : { display: 'none' }}>
+        <div className={styles['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
           {[categoryLobby, ...categoryChannels]
             .filter((ch) => !!ch)
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))

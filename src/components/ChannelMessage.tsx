@@ -70,14 +70,12 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
 
   return (
     <>
-      <div
-        className={`${styles['gradeIcon']} ${permission[senderGender]} ${permission[`lv-${senderPermissionLevel}`]}`}
-      />
-      <div className={styles['messageBox']}>
+      <div className={`${permission[senderGender]} ${permission[`lv-${senderPermissionLevel}`]}`} />
+      <div className={styles['message-box']}>
         <div className={styles['header']}>
           {senderVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
           <div
-            className={`${styles['username']} ${senderVip > 0 ? `${vip['isVIP']} ${vip['clickable']}` : ''}`}
+            className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`}
             onClick={() => handleOpenUserInfo(userId, senderUserId)}
             onContextMenu={(e) => {
               const x = e.clientX;
@@ -99,7 +97,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
           >
             {senderName}
           </div>
-          <div className={styles['timestamp']}>{formattedTimestamp}</div>
+          <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
         </div>
         {messageContents.map((content, index) => (
           <MarkdownViewer key={index} markdownText={content} forbidGuestUrl={forbidGuestUrl} />

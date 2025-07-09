@@ -1,4 +1,4 @@
-.contextMenu:not(:empty) {
+.context-menu:not(:empty) {
   z-index: 1000;
   position: fixed;
   display: flex;
@@ -12,11 +12,11 @@
   overflow: hidden;
 }
 
-.contextMenu.hidden {
+.context-menu.hidden {
   display: none;
 }
 
-.contextMenu .separator {
+.context-menu .separator {
   min-height: 1px;
   min-width: 100%;
   display: block;
@@ -26,15 +26,7 @@
   background-size: 100% 100%;
 }
 
-.contextMenu .options {
-  z-index: 1000;
-  padding: 5px;
-  background: #fff;
-  border: 1px solid #ccc;
-  box-shadow: 0 2px 5px rgb(0 0 0 / 10%);
-}
-
-.contextMenu .option {
+.context-menu .option {
   position: relative;
   display: flex;
   justify-content: flex-start;
@@ -44,7 +36,7 @@
   color: #333;
 }
 
-.contextMenu .option::before {
+.context-menu .option::before {
   position: absolute;
   content: '';
   left: 6px;
@@ -57,64 +49,64 @@
   margin-right: 5px;
 }
 
-.contextMenu .option[data-type='setting']::before {
+.context-menu .option[data-type='setting']::before {
   background-image: url('../../public/set.png');
 }
 
-.contextMenu .option[data-type='message']::before {
+.context-menu .option[data-type='message']::before {
   background-image: url('../../public/message.png');
 }
 
-.contextMenu .option[data-type='skin']::before {
+.context-menu .option[data-type='skin']::before {
   background-image: url('../../public/skin.png');
 }
 
-.contextMenu .option[data-type='exit']::before {
+.context-menu .option[data-type='exit']::before {
   background-image: url('../../public/exit.png');
 }
 
-.contextMenu .option[data-type='submenu']::before {
+.context-menu .option[data-type='submenu']::before {
   background-image: url('../../public/ctrl/icon_submenu.png');
   transform: rotate(180deg);
 }
 
-.contextMenu .option[data-type='memberManagement']::before {
+.context-menu .option[data-type='memberManagement']::before {
   background-image: url('../../public/channel/icon_membermgr.png');
 }
 
-.contextMenu .option[data-type='memberapply']::before {
+.context-menu .option[data-type='memberapply']::before {
   background-image: url('../../public/channel/icon_memberapply.png');
 }
 
-.contextMenu .option[data-type='editGroupcard']::before {
+.context-menu .option[data-type='editGroupcard']::before {
   background-image: url('../../public/channel/icon_editGroupcard.png');
 }
 
-.contextMenu .option[data-type='locateme']::before {
+.context-menu .option[data-type='locateme']::before {
   background-image: url('../../public/channel/icon_locateme.png');
 }
 
-.contextMenu .option[data-type='uncollect']::before {
+.context-menu .option[data-type='uncollect']::before {
   background-image: url('../../public/channel/icon_uncollect.png');
 }
 
-.contextMenu .option[data-type='collect']::before {
+.context-menu .option[data-type='collect']::before {
   background-image: url('../../public/channel/icon_collect.png');
 }
 
-.contextMenu .option:hover {
+.context-menu .option:hover {
   background: #eee;
 }
 
-.contextMenu .option.hasSubmenu .contextMenu {
+.context-menu .option.hasSubmenu .context-menu {
   display: none;
 }
 
-.contextMenu .option.hasSubmenu:hover .contextMenu {
+.context-menu .option.hasSubmenu:hover .context-menu {
   display: flex;
 }
 
-.contextMenu .option.disabled {
+.context-menu .option.disabled {
   color: #ccc;
   cursor: not-allowed;
 }

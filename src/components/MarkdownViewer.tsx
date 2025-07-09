@@ -108,7 +108,7 @@ export function sanitizeMarkdownWithSafeTags(
     // 替換 <@name_gender_level>
     .replace(/<@([^>]+)>/g, (_, content) => {
       const [name, gender, level] = content.split('_');
-      return `<span class='${message.username}' alt='<@${content}>'> <span style='vertical-align: bottom;' class='${
+      return `<span id='user-tag' alt='<@${content}>'><span id='permission-icon' class='${
         permission[gender || 'Male']
       } ${permission[`lv-${level || '1'}`]}'></span>${name || 'Unknown'}</span>`;
     })
