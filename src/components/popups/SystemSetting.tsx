@@ -47,7 +47,6 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [mixMode, setMixMode] = useState<'all' | 'app'>('all');
 
   const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>('key');
-  const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>('');
   const [speakingModeAutoKey, setSpeakingModeAutoKey] = useState<boolean>(false);
 
   const [forbidAddFriend, setForbidAddFriend] = useState<boolean>(false);
@@ -545,26 +544,37 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             {/* Default Speaking Mode */}
             <div className={`${popup['label']} ${popup['header']}`}>{t('default-speaking-mode-label')}</div>
             <div className={popup['input-group']}>
-              <div className={popup['input-group']}>
-                <div key={'SpeakingKey'} className={popup['input-box']}>
-                  <input
-                    name="speaking-key"
-                    type="text"
-                    value={inputFocus === 'SpeakingKey' ? `> ${hotKeys['SpeakingKey']} <` : hotKeys['SpeakingKey']}
-                    style={{ maxWidth: '200px' }}
-                    onClick={() => {
-                      activeInputRef.current = 'SpeakingKey';
-                      setInputFocus('SpeakingKey');
-                    }}
-                    readOnly
-                    onBlur={() => (activeInputRef.current = null)}
-                  />
-                  {error === 'SpeakingKey' && conflicts.length > 0 && (
-                    <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
-                  )}
-                </div>
-                <div className={popup['label']}>{t('speaking-mode-key-label')}</div>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <input
+                  name="default-speaking-auto"
+                  type="radio"
+                  checked={defaultSpeakingMode === 'key'}
+                  onChange={() => setDefaultSpeakingMode('key')}
+                />
+                <div className={popup['label']}>{t('default-speaking-key-label')}</div>
               </div>
+              {defaultSpeakingMode == 'key' && (
+                <div className={popup['input-group']}>
+                  <div key={'SpeakingKey'} className={popup['input-box']}>
+                    <input
+                      name="speaking-key"
+                      type="text"
+                      value={inputFocus === 'SpeakingKey' ? `> ${hotKeys['SpeakingKey']} <` : hotKeys['SpeakingKey']}
+                      style={{ maxWidth: '200px' }}
+                      onClick={() => {
+                        activeInputRef.current = 'SpeakingKey';
+                        setInputFocus('SpeakingKey');
+                      }}
+                      readOnly
+                      onBlur={() => (activeInputRef.current = null)}
+                    />
+                    {error === 'SpeakingKey' && conflicts.length > 0 && (
+                      <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
+                    )}
+                  </div>
+                  <div className={popup['label']}>{t('speaking-mode-key-label')}</div>
+                </div>
+              )}
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
                   name="default-speaking-auto"
