@@ -394,8 +394,16 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
     mainWindow.hide();
   });
 
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('maximize');
+  });
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('unmaximize');
+  });
+
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send(mainWindow.isMaximized() ? 'window-maximized' : 'window-unmaximized');
+    mainWindow.webContents.send(mainWindow.isMaximized() ? 'maximize' : 'unmaximize');
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -902,13 +910,9 @@ app.on('ready', async () => {
         break;
       case 'maximize':
         window.maximize();
-        window.setResizable(false);
-        window.setMovable(false);
         break;
       case 'unmaximize':
         window.unmaximize();
-        window.setResizable(true);
-        window.setMovable(true);
         break;
       case 'close':
         window.close();

@@ -163,7 +163,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
       const usedBy = Object.entries(hotKeys)
         .filter(([action, value]) => value === mergeKey && action !== current)
-        .map(([action, value]) => value);
+        .map(([, value]) => value);
 
       if (usedBy.length > 0) {
         setError(current);
