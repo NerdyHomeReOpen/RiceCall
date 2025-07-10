@@ -190,12 +190,25 @@ const ipcService = {
   systemSettings: {
     get: (
       callback: (data: {
+        // Basic settings
         autoLaunch: boolean;
-        soundEffect: boolean;
+        soundEffect: boolean; // Chanege to SoundEffect Setting
         inputAudioDevice: string;
         outputAudioDevice: string;
         fontSize: number;
         font: string;
+        // Privacy settings
+        notSaveMessageHistory: boolean;
+
+        // Hotheys Settings
+        defaultSpeakingKey: string;
+        hotKeyOpenMainWindow: string;
+        hotKeyScreenshot: string;
+        hotKeyIncreaseVolume: string;
+        hotKeyDecreaseVolume: string;
+        hotKeyDisableSpeaker: string;
+        hotKeyDisableMicrophone: string;
+        // SoundEffect Setting
       }) => void,
     ) => {
       if (!isElectron) return;
@@ -347,6 +360,194 @@ const ipcService = {
           callback(fontSize);
         });
         return () => ipcRenderer.removeAllListeners('font-size');
+      },
+    },
+
+    // Privacy settings
+
+    notSaveMessageHistory: {
+      get: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-not-save-message-history');
+        ipcRenderer.once('not-save-message-history', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+      },
+
+      set: (enabled: boolean) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-not-save-message-history', enabled);
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('not-save-message-history', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+        return () => ipcRenderer.removeAllListeners('not-save-message-history');
+      },
+    },
+
+    // Hotkeys settings
+
+    defaultSpeakingKey: {
+      get: (callback: (key: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-default-speaking-key');
+        ipcRenderer.once('default-speaking-key', (_: any, key: string) => {
+          callback(key);
+        });
+      },
+
+      set: (key: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-default-speaking-key', key);
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('default-speaking-key', (_: any, key: string) => {
+          callback(key);
+        });
+        return () => ipcRenderer.removeAllListeners('default-speaking-key');
+      },
+    },
+
+    hotKeyOpenMainWindow: {
+      get: (callback: (key: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-hot-key-open-main-window');
+        ipcRenderer.once('hot-key-open-main-window', (_: any, key: string) => {
+          callback(key);
+        });
+      },
+
+      set: (key: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-hot-key-open-main-window', key);
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('hot-key-open-main-window', (_: any, key: string) => {
+          callback(key);
+        });
+        return () => ipcRenderer.removeAllListeners('hot-key-open-main-window');
+      },
+    },
+
+    hotKeyScreenshot: {
+      get: (callback: (key: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-hot-key-screenshot');
+        ipcRenderer.once('hot-key-screenshot', (_: any, key: string) => {
+          callback(key);
+        });
+      },
+
+      set: (key: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-hot-key-screenshot', key);
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('hot-key-screenshot', (_: any, key: string) => {
+          callback(key);
+        });
+        return () => ipcRenderer.removeAllListeners('hot-key-screenshot');
+      },
+    },
+
+    hotKeyIncreaseVolume: {
+      get: (callback: (key: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-hot-key-increase-volume');
+        ipcRenderer.once('hot-key-increase-volume', (_: any, key: string) => {
+          callback(key);
+        });
+      },
+
+      set: (key: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-hot-key-increase-volume', key);
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('hot-key-increase-volume', (_: any, key: string) => {
+          callback(key);
+        });
+        return () => ipcRenderer.removeAllListeners('hot-key-increase-volume');
+      },
+    },
+
+    hotKeyDecreaseVolume: {
+      get: (callback: (key: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-hot-key-decrease-volume');
+        ipcRenderer.once('hot-key-decrease-volume', (_: any, key: string) => {
+          callback(key);
+        });
+      },
+
+      set: (key: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-hot-key-decrease-volume', key);
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('hot-key-decrease-volume', (_: any, key: string) => {
+          callback(key);
+        });
+        return () => ipcRenderer.removeAllListeners('hot-key-decrease-volume');
+      },
+    },
+
+    hotKeyDisableSpeaker: {
+      get: (callback: (key: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-hot-key-disable-speaker');
+        ipcRenderer.once('hot-key-disable-speaker', (_: any, key: string) => {
+          callback(key);
+        });
+      },
+
+      set: (key: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-hot-key-disable-speaker', key);
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('hot-key-disable-speaker', (_: any, key: string) => {
+          callback(key);
+        });
+        return () => ipcRenderer.removeAllListeners('hot-key-disable-speaker');
+      },
+    },
+
+    hotKeyDisableMicrophone: {
+      get: (callback: (key: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-hot-key-disable-microphone');
+        ipcRenderer.once('hot-key-disable-microphone', (_: any, key: string) => {
+          callback(key);
+        });
+      },
+
+      set: (key: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-hot-key-disable-microphone', key);
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('hot-key-disable-microphone', (_: any, key: string) => {
+          callback(key);
+        });
+        return () => ipcRenderer.removeAllListeners('hot-key-disable-microphone');
       },
     },
   },

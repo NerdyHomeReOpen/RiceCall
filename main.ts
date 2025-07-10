@@ -929,12 +929,22 @@ app.on('ready', async () => {
   ipcMain.on('get-system-settings', (event) => {
     const settings = {
       autoLaunch: isAutoLaunchEnabled(),
-      soundEffect: store.get('soundEffect') || true,
+      soundEffect: store.get('soundEffect') ?? true,
       inputAudioDevice: store.get('audioInputDevice') || '',
       outputAudioDevice: store.get('audioOutputDevice') || '',
-      dontShowDisclaimer: store.get('dontShowDisclaimer') || false,
+      dontShowDisclaimer: store.get('dontShowDisclaimer') ?? false,
       font: store.get('font') || '',
       fontSize: store.get('fontSize') || 13,
+      // Privacy settings
+      notSaveMessageHistory: store.get('notSaveMessageHistory') ?? true,
+      // Hotkeys Settings
+      defaultSpeakingKey: store.get('defaultSpeakingKey') || '',
+      hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow') || '',
+      hotKeyScreenshot: store.get('hotKeyScreenshot') || '',
+      hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume') || '',
+      hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume') || '',
+      hotKeyDisableSpeaker: store.get('hotKeyDisableSpeaker') || '',
+      hotKeyDisableMicrophone: store.get('hotKeyDisableMicrophone') || '',
     };
     event.reply('system-settings-status', settings);
   });
@@ -968,12 +978,44 @@ app.on('ready', async () => {
     event.reply('font-list', fonts);
   });
 
+  ipcMain.on('get-not-save-message-history', (event) => {
+    event.reply('not-save-message-history', store.get('notSaveMessageHistory') || true);
+  });
+
+  ipcMain.on('get-default-speaking-key', (event) => {
+    event.reply('default-speaking-key', store.get('defaultSpeakingKey') || '');
+  });
+
+  ipcMain.on('get-hot-key-open-main-window', (event) => {
+    event.reply('hot-key-open-main-window', store.get('hotKeyOpenMainWindow') || '');
+  });
+
+  ipcMain.on('get-hot-key-screenshot', (event) => {
+    event.reply('hot-key-screenshot', store.get('hotKeyScreenshot') || '');
+  });
+
+  ipcMain.on('get-hot-key-increase-volume', (event) => {
+    event.reply('hot-key-increase-volume', store.get('hotKeyIncreaseVolume') || '');
+  });
+
+  ipcMain.on('get-hot-key-decrease-volume', (event) => {
+    event.reply('hot-key-decrease-volume', store.get('hotKeyDecreaseVolume') || '');
+  });
+
+  ipcMain.on('get-hot-key-disable-speaker', (event) => {
+    event.reply('hot-key-disable-speaker', store.get('hotKeyDisableSpeaker') || '');
+  });
+
+  ipcMain.on('get-hot-key-disable-microphone', (event) => {
+    event.reply('hot-key-disable-microphone', store.get('hotKeyDisableMicrophone') || '');
+  });
+
   ipcMain.on('set-auto-launch', (_, enable) => {
     setAutoLaunch(enable);
   });
 
   ipcMain.on('set-sound-effect', (_, enable) => {
-    store.set('soundEffect', enable || true);
+    store.set('soundEffect', enable ?? true);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('sound-effect-status', enable);
     });
@@ -1004,6 +1046,62 @@ app.on('ready', async () => {
     store.set('fontSize', fontSize || 13);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('font-size', fontSize);
+    });
+  });
+
+  ipcMain.on('set-not-save-message-history', (_, enable) => {
+    store.set('notSaveMessageHistory', enable ?? true);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('not-save-message-history', enable);
+    });
+  });
+
+  ipcMain.on('set-default-speaking-key', (_, key) => {
+    store.set('defaultSpeakingKey', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('default-speaking-key', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-open-main-window', (_, key) => {
+    store.set('hotKeyOpenMainWindow', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-open-main-window', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-screenshot', (_, key) => {
+    store.set('hotKeyScreenshot', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-screen-shot', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-increase-volume', (_, key) => {
+    store.set('hotKeyIncreaseVolume', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-increase-volume', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
+    store.set('hotKeyDecreaseVolume', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-decrease-volume', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-disable-speaker', (_, key) => {
+    store.set('hotKeyDisableSpeaker', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-disable-speaker', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-disable-microphone', (_, key) => {
+    store.set('hotKeyDisableMicrophone', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-disable-microphone', key);
     });
   });
 

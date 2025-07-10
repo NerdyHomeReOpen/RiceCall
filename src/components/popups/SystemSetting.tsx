@@ -47,6 +47,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [mixMode, setMixMode] = useState<'all' | 'app'>('all');
 
   const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>('key');
+  const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>('v');
   const [speakingModeAutoKey, setSpeakingModeAutoKey] = useState<boolean>(false);
 
   const [forbidAddFriend, setForbidAddFriend] = useState<boolean>(false);
@@ -59,15 +60,12 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [shareFavoriteGroup, setShareFavoriteGroup] = useState<boolean>(false);
   const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(false);
 
-  const [hotKeys, setHotKeys] = useState<Record<string, string>>({
-    SpeakingKey: 'v',
-    OpenMainWindow: 'F1',
-    Screenshot: 'F12',
-    IncreaseVolume: 'Ctrl+m',
-    DecreaseVolume: 'Shift+m',
-    DisableSpeaker: 'Alt+m',
-    DisableMicrophone: 'Alt+v',
-  });
+  const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>('F1');
+  const [hotKeyScreenshot, setHotKeyScreenshot] = useState<string>('F12');
+  const [hotKeyIncreaseVolume, setHotKeyIncreaseVolume] = useState<string>('Ctrl+m');
+  const [hotKeyDecreaseVolume, setHotKeyDecreaseVolume] = useState<string>('Shift+m');
+  const [hotKeyDisableSpeaker, setHotKeyDisableSpeaker] = useState<string>('Alt+m');
+  const [hotKeyDisableMicrophone, setHotKeyDisableMicrophone] = useState<string>('Alt+v');
 
   const [disableAllSoundEffect, setDisableAllSoundEffect] = useState<boolean>(false);
   const [enterVoiceChannelStatus, setEnterVoiceChannelStatus] = useState<boolean>(false);
@@ -79,27 +77,26 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
   // HotKey binds error
   const [inputFocus, setInputFocus] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [conflicts, setConflicts] = useState<string[]>([]);
+  const [hotKeys, setHotKeys] = useState<Record<string, string>>({
+    speakingKey: defaultSpeakingKey,
+    openMainWindow: hotKeyOpenMainWindow,
+    screenshot: hotKeyScreenshot,
+    increaseVolume: hotKeyIncreaseVolume,
+    decreaseVolume: hotKeyDecreaseVolume,
+    disableSpeaker: hotKeyDisableSpeaker,
+    disableMicrophone: hotKeyDisableMicrophone,
+  });
 
-  // Variable
-  const hotKeyConfig = [
-    { key: 'OpenMainWindow', labelKey: 'hot-key-open-main-window' },
-    { key: 'Screenshot', labelKey: 'hot-key-screenshot' },
-    { key: 'IncreaseVolume', labelKey: 'hot-key-increase-volume' },
-    { key: 'DecreaseVolume', labelKey: 'hot-key-decrease-volume' },
-    { key: 'DisableSpeaker', labelKey: 'hot-key-disable-speaker' },
-    { key: 'DisableMicrophone', labelKey: 'hot-key-disable-microphone' },
-  ];
-
-  const defaultHotKeybinds: Record<string, string> = {
-    SpeakingKey: 'v',
-    OpenMainWindow: 'F1',
-    Screenshot: 'F12',
-    IncreaseVolume: 'Ctrl+m',
-    DecreaseVolume: 'Shift+m',
-    DisableSpeaker: 'Alt+m',
-    DisableMicrophone: 'Alt+v',
+  // Variables
+  const defaultHotKeyConfig = {
+    speakingKey: { default: 'v', setFunc: setDefaultSpeakingKey },
+    openMainWindow: { default: 'F1', setFunc: setHotKeyOpenMainWindow },
+    screenshot: { default: 'F12', setFunc: setHotKeyScreenshot },
+    increaseVolume: { default: 'Ctrl+m', setFunc: setHotKeyIncreaseVolume },
+    decreaseVolume: { default: 'Shift+m', setFunc: setHotKeyDecreaseVolume },
+    disableSpeaker: { default: 'Alt+m', setFunc: setHotKeyDisableSpeaker },
+    disableMicrophone: { default: 'Alt+v', setFunc: setHotKeyDisableMicrophone },
   };
 
   // Handlers
@@ -107,19 +104,35 @@ const SystemSettingPopup: React.FC = React.memo(() => {
     ipcService.window.close();
   };
 
-  const setHotKey = (key: string, value: string) => {
-    setHotKeys((prev) => ({ ...prev, [key]: value }));
+  const setHotKey = (key: string, value: string | null) => {
+    const target = defaultHotKeyConfig[key as keyof typeof defaultHotKeyConfig];
+    const targetValue = value ? value : target.default;
+    target.setFunc(targetValue);
   };
 
   // Effects
   useEffect(() => {
-    const saved = localStorage.getItem('keyBinds');
-    setHotKeys(saved ? JSON.parse(saved) : defaultHotKeybinds);
-  }, []);
+    setHotKeys({
+      speakingKey: defaultSpeakingKey,
+      openMainWindow: hotKeyOpenMainWindow,
+      screenshot: hotKeyScreenshot,
+      increaseVolume: hotKeyIncreaseVolume,
+      decreaseVolume: hotKeyDecreaseVolume,
+      disableSpeaker: hotKeyDisableSpeaker,
+      disableMicrophone: hotKeyDisableMicrophone,
+    });
+  }, [
+    defaultSpeakingKey,
+    hotKeyOpenMainWindow,
+    hotKeyScreenshot,
+    hotKeyIncreaseVolume,
+    hotKeyDecreaseVolume,
+    hotKeyDisableSpeaker,
+    hotKeyDisableMicrophone,
+  ]);
 
   useEffect(() => {
-    const closeDelection = (error: string | null = null) => {
-      setError(error);
+    const closeDelection = () => {
       setConflicts([]);
       setInputFocus(null);
       activeInputRef.current = null;
@@ -139,8 +152,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
       // reset to default
       if (e.key === 'Escape') {
-        setHotKey(current, defaultHotKeybinds[current]);
-        localStorage.setItem('keyBinds', JSON.stringify(hotKeys));
+        setHotKey(current, null);
         closeDelection();
         return;
       }
@@ -166,11 +178,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         .map(([, value]) => value);
 
       if (usedBy.length > 0) {
-        setError(current);
         setConflicts(usedBy);
       } else {
         setHotKey(current, mergeKey);
-        localStorage.setItem('keyBinds', JSON.stringify(hotKeys));
         closeDelection();
       }
     };
@@ -181,12 +191,26 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
   useEffect(() => {
     ipcService.systemSettings.get((data) => {
+      // Basic settings
       setAutoLaunch(data.autoLaunch);
       setDisableAllSoundEffect(data.soundEffect);
       setSelectedInput(data.inputAudioDevice);
       setSelectedOutput(data.outputAudioDevice);
       setFontSize(data.fontSize);
       setFontFamily(data.font);
+
+      // Privacy settings
+      setNotSaveMessageHistory(data.notSaveMessageHistory);
+
+      // Hotkeys settings
+      setDefaultSpeakingKey(data.defaultSpeakingKey || defaultHotKeyConfig.speakingKey.default);
+      setHotKeyOpenMainWindow(data.hotKeyOpenMainWindow || defaultHotKeyConfig.openMainWindow.default);
+      setHotKeyScreenshot(data.hotKeyScreenshot || defaultHotKeyConfig.screenshot.default);
+      setHotKeyIncreaseVolume(data.hotKeyIncreaseVolume || defaultHotKeyConfig.increaseVolume.default);
+      setHotKeyDecreaseVolume(data.hotKeyDecreaseVolume || defaultHotKeyConfig.decreaseVolume.default);
+      setHotKeyDisableSpeaker(data.hotKeyDisableSpeaker || defaultHotKeyConfig.disableSpeaker.default);
+      setHotKeyDisableMicrophone(data.hotKeyDisableMicrophone || defaultHotKeyConfig.disableMicrophone.default);
+      activeInputRef.current = null;
     });
 
     ipcService.fontList.get((fonts) => {
@@ -555,20 +579,20 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               </div>
               {defaultSpeakingMode == 'key' && (
                 <div className={popup['input-group']}>
-                  <div key={'SpeakingKey'} className={popup['input-box']}>
+                  <div key={'speakingKey'} className={popup['input-box']}>
                     <input
                       name="speaking-key"
                       type="text"
-                      value={inputFocus === 'SpeakingKey' ? `> ${hotKeys['SpeakingKey']} <` : hotKeys['SpeakingKey']}
+                      value={inputFocus === 'speakingKey' ? `> ${hotKeys['speakingKey']} <` : hotKeys['speakingKey']}
                       style={{ maxWidth: '200px' }}
                       onClick={() => {
-                        activeInputRef.current = 'SpeakingKey';
-                        setInputFocus('SpeakingKey');
+                        activeInputRef.current = 'speakingKey';
+                        setInputFocus('speakingKey');
                       }}
                       readOnly
                       onBlur={() => (activeInputRef.current = null)}
                     />
-                    {error === 'SpeakingKey' && conflicts.length > 0 && (
+                    {inputFocus === 'speakingKey' && conflicts.length > 0 && (
                       <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
                     )}
                   </div>
@@ -702,35 +726,156 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         <div className={setting['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={popup['input-group']}>
-              {hotKeyConfig.map((config) => {
-                const value = hotKeys[config.key] ?? '';
-                return (
-                  <div key={config.key} className={`${popup['input-box']} ${popup['col']}`}>
-                    <div className={popup['label']}>{t(`${config.labelKey}-label`)}</div>
-                    <input
-                      ref={inputRef}
-                      name={config.labelKey}
-                      type="text"
-                      value={inputFocus === config.key ? `> ${value} <` : value}
-                      style={{ maxWidth: '300px' }}
-                      onClick={() => {
-                        activeInputRef.current = config.key;
-                        setInputFocus(config.key);
-                      }}
-                      readOnly
-                      onBlur={() => {
-                        setError(null);
-                        setConflicts([]);
-                        setInputFocus(null);
-                        activeInputRef.current = null;
-                      }}
-                    />
-                    {error === config.key && conflicts.length > 0 && (
-                      <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
-                    )}
-                  </div>
-                );
-              })}
+              <div key={'openMainWindow'} className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-open-main-window-label')}</div>
+                <input
+                  ref={inputRef}
+                  name={'hot-key-open-main-window'}
+                  type="text"
+                  value={
+                    inputFocus === 'openMainWindow' ? `> ${hotKeys['openMainWindow']} <` : hotKeys['openMainWindow']
+                  }
+                  style={{ maxWidth: '300px' }}
+                  onClick={() => {
+                    activeInputRef.current = 'openMainWindow';
+                    setInputFocus('openMainWindow');
+                  }}
+                  readOnly
+                  onBlur={() => {
+                    setConflicts([]);
+                    setInputFocus(null);
+                    activeInputRef.current = null;
+                  }}
+                />
+                {inputFocus === 'openMainWindow' && conflicts.length > 0 && (
+                  <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
+                )}
+              </div>
+              <div key={'screenshot'} className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-open-main-window-label')}</div>
+                <input
+                  ref={inputRef}
+                  name={'hot-key-open-main-window'}
+                  type="text"
+                  value={inputFocus === 'screenshot' ? `> ${hotKeys['screenshot']} <` : hotKeys['screenshot']}
+                  style={{ maxWidth: '300px' }}
+                  onClick={() => {
+                    activeInputRef.current = 'screenshot';
+                    setInputFocus('screenshot');
+                  }}
+                  readOnly
+                  onBlur={() => {
+                    setConflicts([]);
+                    setInputFocus(null);
+                    activeInputRef.current = null;
+                  }}
+                />
+                {inputFocus === 'screenshot' && conflicts.length > 0 && (
+                  <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
+                )}
+              </div>
+              <div key={'increaseVolume'} className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-increase-volume-label')}</div>
+                <input
+                  ref={inputRef}
+                  name={'hot-key-increase-volume'}
+                  type="text"
+                  value={
+                    inputFocus === 'increaseVolume' ? `> ${hotKeys['increaseVolume']} <` : hotKeys['increaseVolume']
+                  }
+                  style={{ maxWidth: '300px' }}
+                  onClick={() => {
+                    activeInputRef.current = 'increaseVolume';
+                    setInputFocus('increaseVolume');
+                  }}
+                  readOnly
+                  onBlur={() => {
+                    setConflicts([]);
+                    setInputFocus(null);
+                    activeInputRef.current = null;
+                  }}
+                />
+                {inputFocus === 'increaseVolume' && conflicts.length > 0 && (
+                  <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
+                )}
+              </div>
+              <div key={'decreaseVolume'} className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-decrease-volume-label')}</div>
+                <input
+                  ref={inputRef}
+                  name={'hot-key-decrease-volume'}
+                  type="text"
+                  value={
+                    inputFocus === 'decreaseVolume' ? `> ${hotKeys['decreaseVolume']} <` : hotKeys['decreaseVolume']
+                  }
+                  style={{ maxWidth: '300px' }}
+                  onClick={() => {
+                    activeInputRef.current = 'decreaseVolume';
+                    setInputFocus('decreaseVolume');
+                  }}
+                  readOnly
+                  onBlur={() => {
+                    setConflicts([]);
+                    setInputFocus(null);
+                    activeInputRef.current = null;
+                  }}
+                />
+                {inputFocus === 'decreaseVolume' && conflicts.length > 0 && (
+                  <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
+                )}
+              </div>
+              <div key={'disableSpeaker'} className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-disable-speaker-label')}</div>
+                <input
+                  ref={inputRef}
+                  name={'hot-key-disable-speaker'}
+                  type="text"
+                  value={
+                    inputFocus === 'disableSpeaker' ? `> ${hotKeys['disableSpeaker']} <` : hotKeys['disableSpeaker']
+                  }
+                  style={{ maxWidth: '300px' }}
+                  onClick={() => {
+                    activeInputRef.current = 'disableSpeaker';
+                    setInputFocus('disableSpeaker');
+                  }}
+                  readOnly
+                  onBlur={() => {
+                    setConflicts([]);
+                    setInputFocus(null);
+                    activeInputRef.current = null;
+                  }}
+                />
+                {inputFocus === 'disableSpeaker' && conflicts.length > 0 && (
+                  <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
+                )}
+              </div>
+              <div key={'disableMicrophone'} className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('hot-key-disable-microphone-label')}</div>
+                <input
+                  ref={inputRef}
+                  name={'hot-key-disable-microphone'}
+                  type="text"
+                  value={
+                    inputFocus === 'disableMicrophone'
+                      ? `> ${hotKeys['disableMicrophone']} <`
+                      : hotKeys['disableMicrophone']
+                  }
+                  style={{ maxWidth: '300px' }}
+                  onClick={() => {
+                    activeInputRef.current = 'disableMicrophone';
+                    setInputFocus('disableMicrophone');
+                  }}
+                  readOnly
+                  onBlur={() => {
+                    setConflicts([]);
+                    setInputFocus(null);
+                    activeInputRef.current = null;
+                  }}
+                />
+                {inputFocus === 'disableMicrophone' && conflicts.length > 0 && (
+                  <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -851,12 +996,25 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         <div
           className={popup['button']}
           onClick={() => {
+            // Basic
             ipcService.systemSettings.autoLaunch.set(autoLaunch);
             ipcService.systemSettings.soundEffect.set(disableAllSoundEffect);
             ipcService.systemSettings.inputAudioDevice.set(selectedInput);
             ipcService.systemSettings.outputAudioDevice.set(selectedOutput);
             ipcService.systemSettings.font.set(fontFamily);
             ipcService.systemSettings.fontSize.set(fontSize);
+
+            // Privacy
+            ipcService.systemSettings.notSaveMessageHistory.set(notSaveMessageHistory);
+
+            // Hotkeys
+            ipcService.systemSettings.defaultSpeakingKey.set(defaultSpeakingKey);
+            ipcService.systemSettings.hotKeyOpenMainWindow.set(hotKeyOpenMainWindow);
+            ipcService.systemSettings.hotKeyScreenshot.set(hotKeyScreenshot);
+            ipcService.systemSettings.hotKeyIncreaseVolume.set(hotKeyIncreaseVolume);
+            ipcService.systemSettings.hotKeyDecreaseVolume.set(hotKeyDecreaseVolume);
+            ipcService.systemSettings.hotKeyDisableSpeaker.set(hotKeyDisableSpeaker);
+            ipcService.systemSettings.hotKeyDisableMicrophone.set(hotKeyDisableMicrophone);
             handleClose();
           }}
         >
