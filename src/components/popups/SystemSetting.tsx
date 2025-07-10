@@ -496,29 +496,32 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <div className={popup['label']}>{t('manual-mix-setting-label')}</div>
               </div>
               <div className={popup['input-group']}>
-                <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={`${popup['input-box']} ${popup['row']} ${autoMixSetting && 'disabled'}`}>
                   <input
                     name="echo-cancellation"
                     type="checkbox"
                     checked={echoCancellation}
+                    disabled={autoMixSetting}
                     onChange={(e) => setEchoCancellation(e.target.checked)}
                   />
                   <div className={popup['label']}>{t('echo-cancellation-label')}</div>
                 </div>
-                <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={`${popup['input-box']} ${popup['row']} ${autoMixSetting && 'disabled'}`}>
                   <input
                     name="noise-cancellation"
                     type="checkbox"
                     checked={noiseCancellation}
+                    disabled={autoMixSetting}
                     onChange={(e) => setNoiseCancellation(e.target.checked)}
                   />
                   <div className={popup['label']}>{t('noise-cancellation-label')}</div>
                 </div>
-                <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={`${popup['input-box']} ${popup['row']} ${autoMixSetting && 'disabled'}`}>
                   <input
                     name="microphone-amplification"
                     type="checkbox"
                     checked={microphoneAmplification}
+                    disabled={autoMixSetting}
                     onChange={(e) => setMicrophoneAmplification(e.target.checked)}
                   />
                   <div className={popup['label']}>{t('microphone-amplification-label')}</div>
