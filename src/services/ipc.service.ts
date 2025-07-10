@@ -54,21 +54,21 @@ const ipcService = {
 
   // Initial data methods
   initialData: {
-    request: (id: string, callback: (data: any) => void) => {
+    request: (to: string, callback: (data: any) => void) => {
       if (!isElectron) return;
-      ipcRenderer.send('request-initial-data', id);
-      ipcRenderer.on('response-initial-data', (_: any, to: string, data: any) => {
-        if (to != id) return;
+      ipcRenderer.send('request-initial-data', to);
+      ipcRenderer.on('response-initial-data', (_: any, from: string, data: any) => {
+        if (from != to) return;
         ipcRenderer.removeAllListeners('response-initial-data');
         callback(data);
       });
     },
 
-    onRequest: (id: string, data: any, callback?: () => void) => {
+    onRequest: (host: string, data: any, callback?: () => void) => {
       if (!isElectron) return;
       ipcRenderer.on('request-initial-data', (_: any, from: string) => {
-        if (from != id) return;
-        ipcRenderer.send('response-initial-data', id, data);
+        if (from != host) return;
+        ipcRenderer.send('response-initial-data', from, data);
         ipcRenderer.removeAllListeners('request-initial-data');
         if (callback) callback();
       });
@@ -149,8 +149,8 @@ const ipcService = {
 
     onSubmit: (host: string, callback: (data: any) => void) => {
       if (!isElectron) return;
-      ipcRenderer.on('popup-submit', (_: any, to: string, data?: any) => {
-        if (to != host) return;
+      ipcRenderer.on('popup-submit', (_: any, from: string, data?: any) => {
+        if (from != host) return;
         callback(data);
         ipcRenderer.removeAllListeners('popup-submit');
       });

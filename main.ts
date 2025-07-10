@@ -866,9 +866,9 @@ app.on('ready', async () => {
   });
 
   // Initial data request handlers
-  ipcMain.on('request-initial-data', (_, from) => {
+  ipcMain.on('request-initial-data', (_, to) => {
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('request-initial-data', from);
+      window.webContents.send('request-initial-data', to);
     });
   });
 
