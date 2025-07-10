@@ -29,6 +29,7 @@ type StoreSchema = {
 const store = new Store<StoreSchema>();
 
 export enum PopupType {
+  AVATAR_CROPPER = 'avatarCropper',
   USER_INFO = 'userInfo',
   USER_SETTING = 'userSetting',
   CHANNEL_SETTING = 'channelSetting',
@@ -184,6 +185,7 @@ export const PopupSize = {
   [PopupType.ABOUTUS]: { height: 750, width: 500 },
   [PopupType.APPLY_FRIEND]: { height: 320, width: 500 },
   [PopupType.APPLY_MEMBER]: { height: 320, width: 500 },
+  [PopupType.AVATAR_CROPPER]: { height: 520, width: 650 },
   [PopupType.BLOCK_MEMBER]: { height: 250, width: 400 },
   [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
   [PopupType.CHANNEL_PASSWORD]: { height: 200, width: 370 },
@@ -893,9 +895,9 @@ app.on('ready', async () => {
     closePopups();
   });
 
-  ipcMain.on('popup-submit', (_, to) => {
+  ipcMain.on('popup-submit', (_, to, data?: any) => {
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('popup-submit', to);
+      window.webContents.send('popup-submit', to, data ?? null);
     });
   });
 

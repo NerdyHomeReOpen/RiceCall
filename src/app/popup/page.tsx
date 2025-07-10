@@ -19,6 +19,7 @@ import ServerBroadcast from '@/components/popups/ServerBroadcast';
 import BlockMember from '@/components/popups/BlockMember';
 import ChannelSetting from '@/components/popups/ChannelSetting';
 import SystemSetting from '@/components/popups/SystemSetting';
+import AvatarCropper from '@/components/popups/AvatarCropper';
 import ChannelPassword from '@/components/popups/ChannelPassword';
 import MemberApplySetting from '@/components/popups/MemberApplySetting';
 import CreateServer from '@/components/popups/CreateServer';
@@ -183,6 +184,11 @@ const Popup = React.memo(() => {
     }
 
     switch (type) {
+      case PopupType.AVATAR_CROPPER:
+        setHeaderTitle(t('avatar-cropper'));
+        setHeaderButtons(['close']);
+        setContent(<AvatarCropper {...popupInitialData} />);
+        break;
       case PopupType.CHANNEL_PASSWORD:
         setHeaderTitle(t('please-enter-the-channel-password'));
         setHeaderButtons(['close']);

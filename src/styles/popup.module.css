@@ -468,3 +468,23 @@
   height: 0%;
   border-bottom: 1px solid #e0e0e4;
 }
+
+.display-top {
+  align-items: flex-start;
+}
+
+.display-bottom {
+  align-items: flex-end;
+}
+
+.display-left {
+  justify-content: flex-start;
+}
+
+.display-right {
+  justify-content: flex-end;
+}
+
+.space-between {
+  justify-content: space-between;
+}

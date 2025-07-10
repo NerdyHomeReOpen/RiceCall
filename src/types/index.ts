@@ -335,6 +335,7 @@ export enum SocketServerEvent {
 }
 
 export enum PopupType {
+  AVATAR_CROPPER = 'avatarCropper',
   USER_INFO = 'userInfo',
   USER_SETTING = 'userSetting',
   CHANNEL_SETTING = 'channelSetting',

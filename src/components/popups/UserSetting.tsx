@@ -154,6 +154,33 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
     );
   };
 
+  const handleAvatarCropper = (userId: User['userId'], avatarData: string) => {
+    ipcService.popup.open(PopupType.AVATAR_CROPPER, 'avatarCropper');
+    ipcService.initialData.onRequest('avatarCropper', {
+      avatarData: avatarData,
+      submitTo: 'avatarCropper',
+    });
+    ipcService.popup.onSubmit('avatarCropper', async (data) => {
+      const formData = new FormData();
+      formData.append('_type', 'user');
+      formData.append('_fileName', userId);
+      formData.append('_file', data.imageDataUrl as string);
+      const response = await apiService.post('/upload', formData);
+      if (response) {
+        setUser((prev) => ({
+          ...prev,
+          avatar: response.avatar,
+          avatarUrl: response.avatarUrl,
+        }));
+        setReloadAvatarKey((prev) => prev + 1);
+        handleEditUser({
+          avatar: response.avatar,
+          avatarUrl: response.avatarUrl,
+        });
+      }
+    });
+  };
+
   // Effects
   useEffect(() => {
     if (!targetId || refreshRef.current) return;
@@ -227,23 +254,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onloadend = async () => {
-                  const formData = new FormData();
-                  formData.append('_type', 'user');
-                  formData.append('_fileName', userId);
-                  formData.append('_file', reader.result as string);
-                  const data = await apiService.post('/upload', formData);
-                  if (data) {
-                    setUser((prev) => ({
-                      ...prev,
-                      avatar: data.avatar,
-                      avatarUrl: data.avatarUrl,
-                    }));
-                    setReloadAvatarKey((prev) => prev + 1);
-                    handleEditUser({
-                      avatar: data.avatar,
-                      avatarUrl: data.avatarUrl,
-                    });
-                  }
+                  handleAvatarCropper(userId, reader.result as string);
                 };
                 reader.readAsDataURL(file);
               };
