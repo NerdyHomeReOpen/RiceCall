@@ -94,6 +94,29 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
     ipcService.window.close();
   };
 
+  const handleAvatarCropper = (serverId: Server['serverId'], avatarData: string) => {
+    ipcService.popup.open(PopupType.AVATAR_CROPPER, 'avatarCropper');
+    ipcService.initialData.onRequest('avatarCropper', {
+      avatarData: avatarData,
+      submitTo: 'avatarCropper',
+    });
+    ipcService.popup.onSubmit('avatarCropper', async (data) => {
+      const formData = new FormData();
+      formData.append('_type', 'server');
+      formData.append('_fileName', serverId);
+      formData.append('_file', data.imageDataUrl as string);
+      const response = await apiService.post('/upload', formData);
+      if (response) {
+        setServer((prev) => ({
+          ...prev,
+          avatar: response.avatar,
+          avatarUrl: response.avatarUrl,
+        }));
+        setReloadAvatarKey((prev) => prev + 1);
+      }
+    });
+  };
+
   // Effects
   useEffect(() => {
     if (!userId || refreshRef.current) return;
@@ -194,19 +217,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
                   const reader = new FileReader();
                   reader.onloadend = async () => {
-                    const formData = new FormData();
-                    formData.append('_type', 'server');
-                    formData.append('_fileName', serverAvatar);
-                    formData.append('_file', reader.result as string);
-                    const data = await apiService.post('/upload', formData);
-                    if (data) {
-                      setServer((prev) => ({
-                        ...prev,
-                        avatar: data.avatar,
-                        avatarUrl: data.avatarUrl,
-                      }));
-                      setReloadAvatarKey((prev) => prev + 1);
-                    }
+                    handleAvatarCropper(serverAvatar, reader.result as string);
                   };
                   reader.readAsDataURL(file);
                 }}
