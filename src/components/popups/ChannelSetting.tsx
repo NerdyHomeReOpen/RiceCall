@@ -136,7 +136,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 <input
                   name="channel-name"
                   type="text"
-                  value={channelName}
+                  value={isLobby ? t(`${channelName}`) : channelName}
                   maxLength={32}
                   onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
                 />

@@ -331,10 +331,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             onClick={() => setExpanded((prev) => ({ ...prev, [channelId]: !prev[channelId] }))}
           />
           <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>
-            {channelName}
+            {isLobby ? t(`${channelName}`) : channelName}
           </div>
           {channelVisibility !== 'readonly' && (
-            <div className={styles['channel-tab-count-text']}>
+            <div className={styles['channel-user-count-text']}>
               {`(${channelMembers.length}${channelUserLimit > 0 ? `/${channelUserLimit}` : ''})`}
             </div>
           )}

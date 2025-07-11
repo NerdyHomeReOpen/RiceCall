@@ -74,6 +74,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       channelId: currentChannelId,
       name: currentChannelName,
       voiceMode: currentChannelVoiceMode,
+      isLobby: currentChannelIsLobby,
     } = currentChannel;
     const isVerifiedServer = false;
     const canEditNickname = userPermission > 1;
@@ -296,7 +297,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
           <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]}`}>
             <div className={`${styles['current-channel-ping']}`}>{`${latency}ms`}</div>
           </div>
-          <div className={styles['current-channel-text']}>{currentChannelName}</div>
+          <div className={styles['current-channel-text']}>
+            {currentChannelIsLobby ? t(`${currentChannelName}`) : currentChannelName}
+          </div>
         </div>
 
         {/* Mic Queue */}
