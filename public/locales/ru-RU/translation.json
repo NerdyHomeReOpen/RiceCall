@@ -529,5 +529,6 @@
   "receive-channel-message-status-label": "Сообщения в канале",
   "set-hotkey-error": "Кнопка {0} уже используется",
   "upload": "Загрузить",
-  "avatar-cropper": "Изменить миниатюру"
+  "avatar-cropper": "Изменить миниатюру",
+  "default-lobby": "大廳"
 }
