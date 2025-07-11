@@ -529,5 +529,6 @@
   "receive-channel-message-status-label": "收到頻道訊息",
   "set-hotkey-error": "按鍵 {0} 已被使用",
   "upload": "上傳",
-  "avatar-cropper": "圖片裁剪"
+  "avatar-cropper": "圖片裁剪",
+  "default-lobby": "大廳"
 }
