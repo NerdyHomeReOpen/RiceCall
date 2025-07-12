@@ -480,15 +480,15 @@
   "mix-mode-alley": "Аллея",
   "mix-mode-airplane-hangar": "Ангар",
   "mix-mode-staircase": "Каменный коридор",
-  "auto-mix-setting-label": "Автоматическая настройка",
+  "auto-mix-setting-label": "Автоматическая регулировка усиления",
   "manual-mix-setting-label": "Ручная настройка",
   "echo-cancellation-label": "Подавление эха",
   "noise-cancellation-label": "Шумоподавление (используется при появлении шумов)",
   "microphone-amplification-label": "Усиление микрофона",
   "mix-mode-setting": "Настройка режима реверберации",
-  "manual-mix-mode-label": "Настройка смешивания звуков компьютера",
-  "mix-all-source-label": "Микс всех звуков, воспроизводимых компьютером (требуется поддержка аппаратного драйвера)",
-  "mix-app-source-label": "Смешанный звук программного обеспечения",
+  "manual-mix-mode-label": "Настройка реверберации звуков компьютера",
+  "mix-all-source-label": "Реверберация всех звуков, воспроизводимых компьютером (требуется поддержка аппаратного драйвера)",
+  "mix-app-source-label": "Реверберация программного обеспечения",
   "default-speaking-mode-label": "Активация микрофона по умолчанию",
   "default-speaking-key-label": "Активация микрофона по кнопке",
   "default-speaking-auto-label": "Активация микрофона голосом",
@@ -530,5 +530,5 @@
   "set-hotkey-error": "Кнопка {0} уже используется",
   "upload": "Загрузить",
   "avatar-cropper": "Изменить миниатюру",
-  "default-lobby": "大廳"
+  "default-lobby": "Гостевой канал"
 }
