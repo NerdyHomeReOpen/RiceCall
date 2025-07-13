@@ -19,16 +19,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: 'npm' }
+        with: { node-version: 20, cache: yarn }
 
-      - run: npm ci
+      - name: Enable corepack
+      - run: corepack enable
+
+      - name: Install dependencies
+      - run: yarn install --frozen-lockfile
 
       - name: Build electron (Windows, macOS, Linux)
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: false
-          args: --publish=never
+        run: yarn build
 
       - uses: actions/upload-artifact@v4
         with:
