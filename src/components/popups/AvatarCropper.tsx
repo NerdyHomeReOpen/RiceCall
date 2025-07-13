@@ -2,20 +2,20 @@ import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import userSettingStyles from '@/styles/popups/userSetting.module.css';
+// import userSettingStyles from '@/styles/popups/userSetting.module.css';
 
 // Types
-import { User } from '@/types';
+// import { User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
 
 // Services
-import apiService from '@/services/api.service';
+// import apiService from '@/services/api.service';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import Default from '@/utils/default';
+// import Default from '@/utils/default';
 
 interface AvatarCropperPopupProps {
   avatarData: string;
