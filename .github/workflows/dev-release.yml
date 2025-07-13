@@ -18,14 +18,17 @@ jobs:
     environment: dev
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         id: py
         with:
           python-version: '3.11'
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with: { node-version: 20, cache: yarn }
 
       - name: Enable corepack
@@ -42,17 +45,32 @@ jobs:
           NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH: ${{ secrets.CROWDIN_DISTRIBUTION_HASH }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: false
+          args: --publish=never
+          build_script_name: build:action
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-artifacts
-          path: dist/**/*
+          path: |
+            dist/*.dmg
+            dist/*.zip
+            dist/latest-mac.yml
+            dist/*.blockmap
+            dist/*Setup.exe
+            dist/*Setup.exe.blockmap
+            dist/latest.yml
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
 
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with: { path: dist }
 
       - name: Update test-version release

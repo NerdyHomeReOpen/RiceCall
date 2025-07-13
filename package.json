@@ -25,7 +25,8 @@
     "electron:build": "electron-builder",
     "dev": "concurrently \"npm run next:dev\" \"npm run electron:dev\"",
     "start": "npm run next:start && npm run electron:start",
-    "build": "npm run next:build && npm run electron:prep && npm run electron:build"
+    "build": "npm run next:build && npm run electron:prep && npm run electron:build",
+    "build:action": "npm run next:build && npm run electron:prep"
   },
   "dependencies": {
     "@crowdin/ota-client": "^2.0.1",
