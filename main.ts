@@ -2,7 +2,6 @@
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
-import { fileURLToPath } from 'url';
 import { io, Socket } from 'socket.io-client';
 import DiscordRPC from 'discord-rpc';
 import dotenv from 'dotenv';
@@ -220,26 +219,22 @@ export const PopupSize = {
 
 // Constants
 const DEV = process.argv.includes('--dev');
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
 const PORT = 3000;
 const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
-const FILE_PATH = fileURLToPath(import.meta.url);
-const DIR_PATH = path.dirname(FILE_PATH);
-const ROOT_PATH = DEV ? DIR_PATH : path.join(DIR_PATH, '../');
 const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
 const APP_ICON =
   process.platform === 'win32'
-    ? path.join(ROOT_PATH, 'resources', 'icon.ico')
-    : path.join(ROOT_PATH, 'resources', 'icon.png');
+    ? path.join(app.getAppPath(), 'resources', 'icon.ico')
+    : path.join(app.getAppPath(), 'resources', 'icon.png');
 const APP_TRAY_ICON = {
   gray:
     process.platform === 'win32'
-      ? path.join(ROOT_PATH, 'resources', 'tray_gray.ico')
-      : path.join(ROOT_PATH, 'resources', 'tray_gray.png'),
+      ? path.join(app.getAppPath(), 'resources', 'tray_gray.ico')
+      : path.join(app.getAppPath(), 'resources', 'tray_gray.png'),
   normal:
     process.platform === 'win32'
-      ? path.join(ROOT_PATH, 'resources', 'tray.ico')
-      : path.join(ROOT_PATH, 'resources', 'tray.png'),
+      ? path.join(app.getAppPath(), 'resources', 'tray.ico')
+      : path.join(app.getAppPath(), 'resources', 'tray.png'),
 };
 
 // Windows
@@ -248,7 +243,7 @@ let authWindow: BrowserWindow;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
-const websocketUrl = WS_URL;
+const websocketUrl = process.env.NEXT_PUBLIC_WS_URL;
 let socketInstance: Socket | null = null;
 
 // Discord RPC
@@ -271,7 +266,7 @@ const defaultPrecence = {
   ],
 };
 
-const appServe = serve({ directory: path.join(ROOT_PATH, 'out') });
+const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
 // Functions
 // async function checkIsHinet() {
@@ -669,7 +664,7 @@ function configureAutoUpdater() {
 
   if (DEV) {
     autoUpdater.forceDevUpdateConfig = true;
-    autoUpdater.updateConfigPath = path.join(ROOT_PATH, 'dev-app-update.yml');
+    autoUpdater.updateConfigPath = path.join(app.getAppPath(), 'dev-app-update.yml');
   }
 
   autoUpdater.on('error', (error: any) => {

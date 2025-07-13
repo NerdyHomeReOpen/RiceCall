@@ -2,8 +2,7 @@ name: Release Test Version
 
 on:
   push:
-    tags: ['*']
-    branches: ['dev']
+    tags: ['dev-*']
 
 permissions:
   contents: write
@@ -36,6 +35,12 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Make .env file
+        run: |
+          echo "NEXT_PUBLIC_API_URL=${{ secrets.API_URL }}" > .env
+          echo "NEXT_PUBLIC_WS_URL=${{ secrets.WS_URL }}" >> .env
+          echo "NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH=${{ secrets.CROWDIN_DISTRIBUTION_HASH }}" >> .env
 
       - name: Build electron
         uses: samuelmeuli/action-electron-builder@v1
