@@ -22,10 +22,10 @@ jobs:
         with: { node-version: 20, cache: yarn }
 
       - name: Enable corepack
-      - run: corepack enable
+        run: corepack enable
 
       - name: Install dependencies
-      - run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile
 
       - name: Build electron (Windows, macOS, Linux)
         run: yarn build
