@@ -14,16 +14,18 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "start": "next start",
-    "build": "next build",
-    "export": "next export",
-    "lint": "next lint",
-    "electron-dev": "concurrently \"npm run dev\" \"electron -r tsx -r dotenv/config main.ts --dev\"",
-    "electron-start": "npm run start && electron -r tsx -r dotenv/config main.ts",
-    "electron-build": "npm run build && tsc -p tsconfig.electron.json && electron-builder",
-    "electron-build-deb": "npm run build && tsc -p tsconfig.electron.json && electron-builder --linux deb",
-    "electron-build-mac": "npm run build && tsc -p tsconfig.electron.json && electron-builder --mac dmg"
+    "next:dev": "next dev --turbopack",
+    "next:start": "next start",
+    "next:build": "next build",
+    "next:export": "next export",
+    "next:lint": "next lint",
+    "electron:prep": "tsc -p tsconfig.electron.json",
+    "electron:dev": "electron -r tsx -r dotenv/config main.ts --dev",
+    "electron:start": "electron -r tsx -r dotenv/config main.ts",
+    "electron:build": "electron-builder",
+    "dev": "concurrently \"npm run next:dev\" \"npm run electron:dev\"",
+    "start": "npm run next:start && npm run electron:start",
+    "build": "npm run next:build && npm run electron:prep && npm run electron:build"
   },
   "dependencies": {
     "@crowdin/ota-client": "^2.0.1",
