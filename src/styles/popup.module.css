@@ -277,10 +277,6 @@
   border-left: 0;
 }
 
-.input-box table tr:last-child td {
-  border-bottom: 0;
-}
-
 .input-box table tr th:hover {
   cursor: pointer;
   background: #d1d1d1;
