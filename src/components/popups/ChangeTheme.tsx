@@ -298,7 +298,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                     type="file"
                     ref={fileInputRef}
                     style={{ display: 'none' }}
-                    accept="image/*"
+                    accept="image/png, image/jpg, image/jpeg, image/webp"
                     onChange={handleSaveSelectedImage}
                   />
                 </div>
