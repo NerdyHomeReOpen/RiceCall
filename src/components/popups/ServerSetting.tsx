@@ -73,6 +73,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [selectedRowType, setSelectedRowType] = useState<string | null>(null);
   const [reloadAvatarKey, setReloadAvatarKey] = useState(0);
+  const [updatedAvatar, setUpdatedAvatar] = useState<string>('');
 
   // Variables
   const {
@@ -287,26 +288,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     [setSelectedRowId, setSelectedRowType],
   );
 
-  const handleAvatarCropper = (serverId: Server['serverId'], avatarData: string) => {
+  const handleAvatarCropper = (avatarData: string) => {
     ipcService.popup.open(PopupType.AVATAR_CROPPER, 'avatarCropper');
     ipcService.initialData.onRequest('avatarCropper', {
       avatarData: avatarData,
       submitTo: 'avatarCropper',
     });
     ipcService.popup.onSubmit('avatarCropper', async (data) => {
-      const formData = new FormData();
-      formData.append('_type', 'server');
-      formData.append('_fileName', serverId);
-      formData.append('_file', data.imageDataUrl as string);
-      const response = await apiService.post('/upload', formData);
-      if (response) {
-        setServer((prev) => ({
-          ...prev,
-          avatar: response.avatar,
-          avatarUrl: response.avatarUrl,
-        }));
-        setReloadAvatarKey((prev) => prev + 1);
-      }
+      setUpdatedAvatar(data.imageDataUrl);
     });
   };
 
@@ -356,6 +345,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
       ]).then(([server, member, members, applications]) => {
         if (server) {
           setServer(server);
+          setReloadAvatarKey(0);
         }
         if (member) {
           setMember(member);
@@ -479,7 +469,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 <div
                   key={reloadAvatarKey}
                   className={setting['avatar-picture']}
-                  style={{ backgroundImage: `url(${serverAvatarUrl}?v=${reloadAvatarKey})` }}
+                  style={{
+                    backgroundImage: `url(${
+                      updatedAvatar ? updatedAvatar : `${serverAvatarUrl}?v=${reloadAvatarKey}`
+                    })`,
+                  }}
                 />
                 <input
                   name="avatar"
@@ -500,7 +494,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
                     const reader = new FileReader();
                     reader.onloadend = async () => {
-                      handleAvatarCropper(serverAvatar, reader.result as string);
+                      handleAvatarCropper(reader.result as string);
                     };
                     reader.readAsDataURL(file);
                   }}
@@ -952,7 +946,23 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
       <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
+          onClick={async () => {
+            if (updatedAvatar) {
+              const formData = new FormData();
+              formData.append('_type', 'server');
+              formData.append('_fileName', serverId);
+              formData.append('_file', updatedAvatar);
+              const response = await apiService.post('/upload', formData);
+              if (response) {
+                setServer((prev) => ({
+                  ...prev,
+                  avatar: response.avatar,
+                  avatarUrl: response.avatarUrl,
+                }));
+                setReloadAvatarKey((prev) => prev + 1);
+              }
+            }
+
             handleEditServer(
               {
                 name: serverName,
