@@ -302,8 +302,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
       if (response) {
         setServer((prev) => ({
           ...prev,
-          avatar: data.avatar,
-          avatarUrl: data.avatarUrl,
+          avatar: response.avatar,
+          avatarUrl: response.avatarUrl,
         }));
         setReloadAvatarKey((prev) => prev + 1);
       }
