@@ -2,20 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-// import userSettingStyles from '@/styles/popups/userSetting.module.css';
-
-// Types
-// import { User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
 
 // Services
-// import apiService from '@/services/api.service';
 import ipcService from '@/services/ipc.service';
-
-// Utils
-// import Default from '@/utils/default';
 
 interface AvatarCropperPopupProps {
   avatarData: string;
@@ -174,46 +166,48 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
     <>
       <div className={popup['popup-wrapper']}>
         {/* Body */}
-        <div className={`${popup['popup-body']}`}>
+        <div className={popup['popup-body']}>
           <div
-            className={`${popup['content']} ${popup['row']} ${popup['display-top']} ${popup['space-around']}`}
-            style={{ gap: '10px' }}
+            className={`${popup['content']} ${popup['row']} ${popup['display-top']}`}
+            style={{ justifyContent: 'space-around' }}
           >
-            <div className={`${popup['col']}`}>
-              <canvas
-                ref={canvasRef}
-                width={400}
-                height={400}
-                style={{ border: '1px solid #000' }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onWheel={handleWheel}
-              />
-            </div>
-            <div
-              className={`${popup['input-box']} ${popup['col']}`}
-              style={{
-                width: '150px',
-                height: '150px',
-                boxShadow: '0 1px 1px #00000080',
-                padding: '5px',
-                border: '1px solid #888',
-                borderRadius: '12px',
-              }}
-            >
-              <canvas
-                ref={previewRef}
+            <canvas
+              ref={canvasRef}
+              width={400}
+              height={400}
+              style={{ border: '1px solid #000' }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onWheel={handleWheel}
+            />
+            <div className={popup['col']}>
+              <div className={popup['label']}>{t('preview')}:</div>
+              <div
+                className={`${popup['input-box']} ${popup['col']}`}
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  width: '150px',
+                  height: '150px',
+                  boxShadow: '0 1px 1px #00000080',
+                  padding: '5px',
                   border: '1px solid #888',
-                  borderRadius: '8px',
+                  borderRadius: '12px',
                 }}
-              />
+              >
+                <canvas
+                  ref={previewRef}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    border: '1px solid #888',
+                    borderRadius: '8px',
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
+
         {/* Footer */}
         <div className={popup['popup-footer']}>
           <div className={`${popup['button']}`} onClick={() => handleCrop()}>
