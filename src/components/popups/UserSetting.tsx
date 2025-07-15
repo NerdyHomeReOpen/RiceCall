@@ -248,7 +248,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               if (!isSelf) return;
               const fileInput = document.createElement('input');
               fileInput.type = 'file';
-              fileInput.accept = 'image/*';
+              fileInput.accept = 'image/png, image/jpg, image/jpeg, image/webp';
               fileInput.onchange = (e) => {
                 const file = (e.target as HTMLInputElement).files?.[0];
                 if (!file) return;

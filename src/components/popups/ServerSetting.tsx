@@ -486,7 +486,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   type="file"
                   id="avatar-upload"
                   style={{ display: 'none' }}
-                  accept="image/*"
+                  accept="image/png, image/jpg, image/jpeg, image/webp"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (!file) {
