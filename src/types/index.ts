@@ -215,6 +215,10 @@ export type DiscordPresence = {
   }[];
 };
 
+export type speakingMode = 'key' | 'auto';
+
+export type mixMode = 'all' | 'app';
+
 export enum SocketClientEvent {
   // User
   SEARCH_USER = 'searchUser',
