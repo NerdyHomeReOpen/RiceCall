@@ -98,11 +98,11 @@
   background: #eee;
 }
 
-.context-menu .option.hasSubmenu .context-menu {
+.context-menu .option.has-submenu .context-menu {
   display: none;
 }
 
-.context-menu .option.hasSubmenu:hover .context-menu {
+.context-menu .option.has-submenu:hover .context-menu {
   display: flex;
 }
 
