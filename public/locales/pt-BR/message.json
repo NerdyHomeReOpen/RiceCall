@@ -46,7 +46,7 @@
   "channel-alert": "<@{userName}_{userGender}_{userPermissionLevel}> 頻道廣播",
   "server-alert": "<@{userName}_{userGender}_{userPermissionLevel}> 群廣播",
   "cannot-join-server-due-to-reject-member-application": "無法加入群組，此群組不開放會員申請",
-  "send-server-application-successed": "申請已送出，請等待管理員審核",
+  "send-server-application-successed": "Pedido enviado, aguardando revisão de um administrador",
   "send-friend-application-successed": "好友申請已發送，正等待對方的確認！",
   "others-device-login": "另一個設備已登入，請重新登入",
   "login-error": "發生錯誤，請重新登入",
