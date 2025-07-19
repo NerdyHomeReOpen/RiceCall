@@ -8,6 +8,7 @@ import ContextMenuProvider from '@/providers/ContextMenu';
 import MainTabProvider from '@/providers/MainTab';
 import ThemeProvider from '@/providers/Theme';
 import LoadingProvider from '@/providers/Loading';
+import SoundPlayerProvider from '@/providers/SoundPlayer';
 import i18n, { LanguageKey } from '@/i18n';
 
 // services
@@ -47,7 +48,9 @@ const Providers = ({ children }: ProvidersProps) => {
       <SocketProvider>
         <MainTabProvider>
           <LoadingProvider>
-            <ContextMenuProvider>{children}</ContextMenuProvider>
+            <ContextMenuProvider>
+              <SoundPlayerProvider>{children}</SoundPlayerProvider>
+            </ContextMenuProvider>
           </LoadingProvider>
         </MainTabProvider>
       </SocketProvider>

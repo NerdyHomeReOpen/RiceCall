@@ -1,18 +1,4 @@
-import {
-  User,
-  Channel,
-  Server,
-  FriendApplication,
-  MemberApplication,
-  ServerMember,
-  Permission,
-  UserServer,
-  Member,
-  Friend,
-  UserFriend,
-  FriendGroup,
-  UserServerStatus,
-} from '@/types';
+import { User, Channel, Server, FriendApplication, MemberApplication, ServerMember, Permission, UserServer, Member, Friend, UserFriend, FriendGroup, UserServerStatus } from '@/types';
 
 const Default = {
   user: (overrides: Partial<User> = {}): User => ({

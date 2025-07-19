@@ -9,20 +9,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import {
-  PopupType,
-  SocketServerEvent,
-  Server,
-  User,
-  Channel,
-  UserServer,
-  FriendGroup,
-  UserFriend,
-  ServerMember,
-  ChannelMessage,
-  PromptMessage,
-  FriendApplication,
-} from '@/types';
+import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication } from '@/types';
 
 // i18n
 import i18n, { LanguageKey } from '@/i18n';
@@ -46,14 +33,12 @@ import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
+import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
 import ipcService from '@/services/ipc.service';
 import authService from '@/services/auth.service';
 import getService from '@/services/get.service';
-
-// Components
-import { SoundEffectPlayer } from '@/components/SoundEffectPlayer';
 
 interface HeaderProps {
   user: User;
@@ -238,13 +223,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                   viewBox="0 0 24 24"
                 >
                   <circle cx="12" cy="12" r="12" fill="var(--main-color, rgb(55 144 206))" />
-                  <path
-                    d="M17 7L7 17M7 7l10 10"
-                    stroke="#fff"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M17 7L7 17M7 7l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </div>
@@ -407,6 +386,7 @@ const RootPageComponent = () => {
   const socket = useSocket();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
+  const soundPlayer = useSoundPlayer();
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -456,14 +436,8 @@ const RootPageComponent = () => {
     });
   };
 
-  const handleFriendUpdate = (
-    userId: UserFriend['userId'],
-    targetId: UserFriend['targetId'],
-    friend: Partial<UserFriend>,
-  ) => {
-    setFriends((prev) =>
-      prev.map((item) => (item.userId === userId && item.targetId === targetId ? { ...item, ...friend } : item)),
-    );
+  const handleFriendUpdate = (userId: UserFriend['userId'], targetId: UserFriend['targetId'], friend: Partial<UserFriend>) => {
+    setFriends((prev) => prev.map((item) => (item.userId === userId && item.targetId === targetId ? { ...item, ...friend } : item)));
   };
 
   const handleFriendDelete = (userId: UserFriend['userId'], targetId: UserFriend['targetId']) => {
@@ -511,14 +485,8 @@ const RootPageComponent = () => {
     });
   };
 
-  const handleServerMemberUpdate = (
-    userId: ServerMember['userId'],
-    serverId: ServerMember['serverId'],
-    member: Partial<ServerMember>,
-  ): void => {
-    setServerMembers((prev) =>
-      prev.map((item) => (item.userId === userId && item.serverId === serverId ? { ...item, ...member } : item)),
-    );
+  const handleServerMemberUpdate = (userId: ServerMember['userId'], serverId: ServerMember['serverId'], member: Partial<ServerMember>): void => {
+    setServerMembers((prev) => prev.map((item) => (item.userId === userId && item.serverId === serverId ? { ...item, ...member } : item)));
   };
 
   const handleServerMemberDelete = (userId: ServerMember['userId'], serverId: ServerMember['serverId']): void => {
@@ -547,6 +515,10 @@ const RootPageComponent = () => {
 
   const handleActionMessage = (...actionMessages: PromptMessage[]): void => {
     setActionMessages((prev) => [...prev, ...actionMessages]);
+  };
+
+  const handlePlaySound = (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking') => {
+    soundPlayer.playSound(sound);
   };
 
   const handleOpenPopup = (popup: { type: PopupType; id: string; initialData: any; force?: boolean }) => {
@@ -622,6 +594,7 @@ const RootPageComponent = () => {
       [SocketServerEvent.CHANNEL_MESSAGE]: handleChannelMessage,
       [SocketServerEvent.ACTION_MESSAGE]: handleActionMessage,
       [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
+      [SocketServerEvent.PLAY_SOUND]: handlePlaySound,
     };
     const unsubscribe: (() => void)[] = [];
 
@@ -711,20 +684,14 @@ const RootPageComponent = () => {
 
   return (
     <WebRTCProvider>
-      <Header user={user} userServer={server} friendApplications={friendApplications} />
-      {!socket.isConnected ? (
-        <LoadingSpinner />
-      ) : (
-        <>
-          <SoundEffectPlayer />
-          <HomePage user={user} servers={servers} display={mainTab.selectedTabId === 'home'} />
-          <FriendPage
-            user={user}
-            friends={friends}
-            friendGroups={friendGroups}
-            display={mainTab.selectedTabId === 'friends'}
-          />
-          <ExpandedProvider>
+      <ExpandedProvider>
+        <Header user={user} userServer={server} friendApplications={friendApplications} />
+        {!socket.isConnected ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <HomePage user={user} servers={servers} display={mainTab.selectedTabId === 'home'} />
+            <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
             <ServerPage
               user={user}
               currentServer={server}
@@ -736,9 +703,9 @@ const RootPageComponent = () => {
               actionMessages={actionMessages}
               display={mainTab.selectedTabId === 'server'}
             />
-          </ExpandedProvider>
-        </>
-      )}
+          </>
+        )}
+      </ExpandedProvider>
     </WebRTCProvider>
   );
 };

@@ -71,11 +71,7 @@ export const getFormatTimestamp = (t: TFunction<'translation', undefined>, times
   return `${messageDate.toLocaleDateString(timezoneLang)} ${timeString}`;
 };
 
-export const getTranslatedMessage = (
-  t: TFunction<'translation', undefined>,
-  content: string,
-  params?: Record<string, string> | undefined,
-) => {
+export const getTranslatedMessage = (t: TFunction<'translation', undefined>, content: string, params?: Record<string, string> | undefined) => {
   if (content.includes(' ')) {
     content = content
       .split(' ')

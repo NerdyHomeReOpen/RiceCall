@@ -955,20 +955,20 @@ app.on('ready', async () => {
       hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker') || '',
       hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone') || '',
       // SoundEffect settings
-      soundEffect: store.get('soundEffect') ?? true,
-      enterVoiceChannelStatus: store.get('enterVoiceChannelStatus') ?? true,
-      leaveVoiceChannelStatus: store.get('leaveVoiceChannelStatus') ?? true,
-      startSpeakingStatus: store.get('startSpeakingStatus') ?? true,
-      stopSpeakingStatus: store.get('stopSpeakingStatus') ?? true,
-      receiveDirectMessageStatus: store.get('receiveDirectMessageStatus') ?? true,
-      receiveChannelMessageStatus: store.get('receiveChannelMessageStatus') ?? true,
+      disableAllSoundEffect: store.get('disableAllSoundEffect') ?? false,
+      enterVoiceChannelSound: store.get('enterVoiceChannelSound') ?? true,
+      leaveVoiceChannelSound: store.get('leaveVoiceChannelSound') ?? true,
+      startSpeakingSound: store.get('startSpeakingSound') ?? true,
+      stopSpeakingSound: store.get('stopSpeakingSound') ?? true,
+      receiveDirectMessageSound: store.get('receiveDirectMessageSound') ?? true,
+      receiveChannelMessageSound: store.get('receiveChannelMessageSound') ?? true,
     };
-    event.reply('system-settings-status', settings);
+    event.reply('system-settings', settings);
   });
 
   // Basic
   ipcMain.on('get-auto-launch', (event) => {
-    event.reply('auto-launch-status', isAutoLaunchEnabled());
+    event.reply('auto-launch', isAutoLaunchEnabled());
   });
 
   ipcMain.on('get-font', (event) => {
@@ -992,7 +992,7 @@ app.on('ready', async () => {
   ipcMain.on('get-input-audio-device', (event) => {
     event.reply('input-audio-device', store.get('audioInputDevice') || '');
   });
-  
+
   ipcMain.on('get-output-audio-device', (event) => {
     event.reply('output-audio-device', store.get('audioOutputDevice') || '');
   });
@@ -1046,7 +1046,7 @@ app.on('ready', async () => {
   ipcMain.on('get-not-save-message-history', (event) => {
     event.reply('notSaveMessageHistory', store.get('not-save-message-history') ?? true);
   });
-  
+
   // HotKey
   ipcMain.on('get-hot-key-open-main-window', (event) => {
     event.reply('hot-key-open-main-window', store.get('hotKeyOpenMainWindow') || '');
@@ -1069,32 +1069,32 @@ app.on('ready', async () => {
   });
 
   // SoundEffect
-  ipcMain.on('get-sound-effect', (event) => {
-    event.reply('sound-effect-status', store.get('soundEffect') || true);
+  ipcMain.on('get-disable-all-sound-effect', (event) => {
+    event.reply('disable-all-sound-effect', store.get('disableAllSoundEffect') ?? false);
   });
 
-  ipcMain.on('get-enter-voice-channel-status', (event) => {
-    event.reply('enter-voice-channel-status', store.get('enterVoiceChannelStatus') ?? true);
+  ipcMain.on('get-enter-voice-channel-sound', (event) => {
+    event.reply('enter-voice-channel-sound', store.get('enterVoiceChannelSound') ?? true);
   });
 
-  ipcMain.on('get-leave-voice-channel-status', (event) => {
-    event.reply('leave-voice-channel-status', store.get('leaveVoiceChannelStatus') ?? true);
+  ipcMain.on('get-leave-voice-channel-sound', (event) => {
+    event.reply('leave-voice-channel-sound', store.get('leaveVoiceChannelSound') ?? true);
   });
 
-  ipcMain.on('get-start-speaking-status', (event) => {
-    event.reply('start-speaking-status', store.get('startSpeakingStatus') ?? true);
+  ipcMain.on('get-start-speaking-sound', (event) => {
+    event.reply('start-speaking-sound', store.get('startSpeakingSound') ?? true);
   });
 
-  ipcMain.on('get-stop-speaking-status', (event) => {
-    event.reply('stop-speaking-status', store.get('stopSpeakingStatus') ?? true);
+  ipcMain.on('get-stop-speaking-sound', (event) => {
+    event.reply('stop-speaking-sound', store.get('stopSpeakingSound') ?? true);
   });
 
-  ipcMain.on('get-receive-direct-message-status', (event) => {
-    event.reply('receive-direct-message-status', store.get('receiveDirectMessageStatus') ?? true);
+  ipcMain.on('get-receive-direct-message-sound', (event) => {
+    event.reply('receive-direct-message-sound', store.get('receiveDirectMessageSound') ?? true);
   });
 
-  ipcMain.on('get-receive-channel-message-status', (event) => {
-    event.reply('receive-channel-message-status', store.get('receiveChannelMessageStatus') ?? true);
+  ipcMain.on('get-receive-channel-message-sound', (event) => {
+    event.reply('receive-channel-message-sound', store.get('receiveChannelMessageSound') ?? true);
   });
 
   ipcMain.on('set-auto-launch', (_, enable) => {
@@ -1171,14 +1171,14 @@ app.on('ready', async () => {
       window.webContents.send('microphone-amplification', deviceId);
     });
   });
-  
+
   ipcMain.on('set-manual-mix-mode', (_, deviceId) => {
     store.set('manualMixMode', deviceId ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('manual-mix-mode', deviceId);
     });
   });
-  
+
   ipcMain.on('set-mix-mode', (_, deviceId) => {
     store.set('mixMode', deviceId || 'all');
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -1251,54 +1251,54 @@ app.on('ready', async () => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
   });
-  
+
   // SoundEffect
-  ipcMain.on('set-sound-effect', (_, enable) => {
-    store.set('soundEffect', enable ?? true);
+  ipcMain.on('set-disable-all-sound-effect', (_, enable) => {
+    store.set('disableAllSoundEffect', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('sound-effect-status', enable);
+      window.webContents.send('disable-all-sound-effect', enable);
     });
   });
 
-  ipcMain.on('set-enter-voice-channel-status', (_, enable) => {
-    store.set('enterVoiceChannelStatus', enable ?? true);
+  ipcMain.on('set-enter-voice-channel-sound', (_, enable) => {
+    store.set('enterVoiceChannelSound', enable ?? true);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('enter-voice-channel-status', enable);
+      window.webContents.send('enter-voice-channel-sound', enable);
     });
   });
 
-  ipcMain.on('set-leave-voice-channel-status', (_, enable) => {
-    store.set('leaveVoiceChannelStatus', enable ?? true);
+  ipcMain.on('set-leave-voice-channel-sound', (_, enable) => {
+    store.set('leaveVoiceChannelSound', enable ?? true);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('leave-voice-channel-status', enable);
+      window.webContents.send('leave-voice-channel-sound', enable);
     });
   });
 
-  ipcMain.on('set-start-speaking-status', (_, enable) => {
-    store.set('startSpeakingStatus', enable ?? true);
+  ipcMain.on('set-start-speaking-sound', (_, enable) => {
+    store.set('startSpeakingSound', enable ?? true);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('start-speaking-status', enable);
+      window.webContents.send('start-speaking-sound', enable);
     });
   });
 
-  ipcMain.on('set-stop-speaking-status', (_, enable) => {
-    store.set('stopSpeakingStatus', enable ?? true);
+  ipcMain.on('set-stop-speaking-sound', (_, enable) => {
+    store.set('stopSpeakingSound', enable ?? true);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('stop-speaking-status', enable);
+      window.webContents.send('stop-speaking-sound', enable);
     });
   });
 
-  ipcMain.on('set-receive-direct-message-status', (_, enable) => {
-    store.set('receiveDirectMessageStatus', enable ?? true);
+  ipcMain.on('set-receive-direct-message-sound', (_, enable) => {
+    store.set('receiveDirectMessageSound', enable ?? true);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('receive-direct-message-status', enable);
+      window.webContents.send('receive-direct-message-sound', enable);
     });
   });
 
-  ipcMain.on('set-receive-channel-message-status', (_, enable) => {
-    store.set('receiveChannelMessageStatus', enable ?? true);
+  ipcMain.on('set-receive-channel-message-sound', (_, enable) => {
+    store.set('receiveChannelMessageSound', enable ?? true);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('receive-channel-message-status', enable);
+      window.webContents.send('receive-channel-message-sound', enable);
     });
   });
 

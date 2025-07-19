@@ -16,11 +16,7 @@ export function extractFirstColor(input: string | null): string | undefined {
   return match ? `rgb(${match[1]})` : undefined;
 }
 
-export function applyThemeToReactState(setters: {
-  setHeaderImage?: (val: string | null) => void;
-  setMainColor?: (val: string | null) => void;
-  setSecondaryColor?: (val: string | null) => void;
-}) {
+export function applyThemeToReactState(setters: { setHeaderImage?: (val: string | null) => void; setMainColor?: (val: string | null) => void; setSecondaryColor?: (val: string | null) => void }) {
   const headerImage = localStorage.getItem('theme-header-image');
   const mainColor = localStorage.getItem('theme-main-color');
   const secondaryColor = localStorage.getItem('theme-secondary-color');
