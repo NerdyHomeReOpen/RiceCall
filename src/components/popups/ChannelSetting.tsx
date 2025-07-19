@@ -193,8 +193,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }}
                 />
                 <div className={popup['label']}>{t('chat-mode')}</div>
-                <div className={popup['hint-text']}>{t('chat-mode-description')}</div>
               </div>
+              <div className={popup['hint-text']}>{t('chat-mode-description')}</div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
                   name="bitrate-256000"
@@ -205,8 +205,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   }}
                 />
                 <div className={popup['label']}>{t('entertainment-mode')}</div>
-                <div className={popup['hint-text']}>{t('entertainment-mode-description')}</div>
               </div>
+              <div className={popup['hint-text']}>{t('entertainment-mode-description')}</div>
             </div>
           </div>
         </div>
@@ -375,59 +375,74 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 <div className={popup['label']}>{t('forbid-guest-url')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <div className={popup['label']}>{t('guest-text-max-length')}</div>
-                <input
-                  name="guest-text-max-length"
-                  type="number"
-                  value={channelGuestTextMaxLength}
-                  min={0}
-                  max={9999}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      guestTextMaxLength: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
-                    }))
-                  }
-                  style={{ width: '60px' }}
-                />
-                <div className={popup['label']}>{t('characters')}</div>
+                <div className={popup['label']}>
+                  {t('guest-text-max-length')}
+                  <input
+                    name="guest-text-max-length"
+                    type="number"
+                    value={channelGuestTextMaxLength}
+                    min={0}
+                    max={9999}
+                    onChange={(e) =>
+                      setChannel((prev) => ({
+                        ...prev,
+                        guestTextMaxLength: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
+                      }))
+                    }
+                    style={{ width: '60px' }}
+                  />
+                  {t('characters')}
+                </div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <div className={popup['label']}>{t('guest-text-wait-time')}</div>
-                <input
-                  name="guest-text-wait-time"
-                  type="number"
-                  value={channelGuestTextWaitTime}
-                  min={0}
-                  max={9999}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      guestTextWaitTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
-                    }))
-                  }
-                  style={{ width: '60px' }}
-                />
-                <div className={popup['label']}>{t('second')}</div>
+                <div className={popup['label']}>
+                  {t('guest-text-wait-time')}
+                  <input
+                    name="guest-text-wait-time"
+                    type="number"
+                    value={channelGuestTextWaitTime}
+                    min={0}
+                    max={9999}
+                    onChange={(e) =>
+                      setChannel((prev) => ({
+                        ...prev,
+                        guestTextWaitTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
+                      }))
+                    }
+                    style={{ width: '60px' }}
+                  />
+                  {t('second')}
+                </div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <div className={popup['label']}>{t('guest-text-gap-time')}</div>
-                <input
-                  name="guest-text-gap-time"
-                  type="number"
-                  value={channelGuestTextGapTime}
-                  min={0}
-                  max={9999}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      guestTextGapTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
-                    }))
-                  }
-                  style={{ width: '60px' }}
-                />
-                <div className={popup['label']}>{t('second')}</div>
+                <div className={popup['label']}>
+                  {t('guest-text-gap-time')}
+                  <input
+                    name="guest-text-gap-time"
+                    type="number"
+                    value={channelGuestTextGapTime}
+                    min={0}
+                    max={9999}
+                    onChange={(e) =>
+                      setChannel((prev) => ({
+                        ...prev,
+                        guestTextGapTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
+                      }))
+                    }
+                    style={{ width: '60px' }}
+                  />
+                  {t('second')}
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Channel Management */}
+        <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
+          <div className={popup['col']}>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('channel-management') + t('soon')}</div>
             </div>
           </div>
         </div>
