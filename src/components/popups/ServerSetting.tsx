@@ -731,7 +731,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         {/* Access Permission */}
         <div className={setting['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={`${popup['label']} ${popup['header']}`}>{t('access-permission')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('access-permission')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input

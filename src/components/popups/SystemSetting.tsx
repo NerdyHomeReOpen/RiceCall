@@ -271,7 +271,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         <div className={setting['right']} style={activeTabIndex === 0 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             {/* General Setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('general-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('general-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input
@@ -303,7 +305,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Status Setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('status-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('status-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
@@ -312,17 +316,19 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   checked={statusAutoIdle}
                   onChange={(e) => setStatusAutoIdle(e.target.checked)}
                 />
-                <div className={popup['label']}>{t('status-auto-idle-label-1')}</div>
-                <input
-                  name="status-auto-idle-minutes"
-                  type="number"
-                  value={statusAutoIdleMinutes}
-                  min={1}
-                  max={60}
-                  style={{ maxWidth: '50px' }}
-                  onChange={(e) => setStatusAutoIdleMinutes(Number(e.target.value))}
-                />
-                <div className={popup['label']}>{t('status-auto-idle-label-2')}</div>
+                <div className={popup['label']}>
+                  {t('status-auto-idle-label-1')}
+                  <input
+                    name="status-auto-idle-minutes"
+                    type="number"
+                    value={statusAutoIdleMinutes}
+                    min={1}
+                    max={60}
+                    style={{ maxWidth: '50px' }}
+                    onChange={(e) => setStatusAutoIdleMinutes(Number(e.target.value))}
+                  />
+                  {t('status-auto-idle-label-2')}
+                </div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
@@ -336,7 +342,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Channel Setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('channel-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('channel-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
@@ -368,7 +376,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Close Setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('close-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('close-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="close-to-tray" type="radio" checked={closeToTray} onChange={() => setCloseToTray(true)} />
@@ -386,7 +396,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Font Setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('font-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('font-setting')}</div>
+            </div>
             <div className={`${popup['input-group']} ${popup['row']}`}>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('font')}</div>
@@ -425,7 +437,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             {/* Input/Output Device Setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('audio-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('audio-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('input-device-label')}</div>
@@ -468,7 +482,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Mix Setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('mix-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('mix-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
@@ -546,7 +562,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Mix mode setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('mix-mode-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('mix-mode-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
@@ -587,7 +605,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         <div className={setting['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             {/* Default Speaking Mode */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('default-speaking-mode-label')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('default-speaking-mode-label')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
@@ -646,7 +666,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         <div className={setting['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             {/* Anti-spam setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('anti-spam-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('anti-spam-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
@@ -687,7 +709,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Privacy setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('privacy-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('privacy-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
@@ -728,7 +752,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Message history setting */}
-            <div className={`${popup['label']} ${popup['header']}`}>{t('message-history-setting')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('message-history-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
@@ -746,6 +772,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         {/* Hot Key Settings */}
         <div className={setting['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
+            {/* Hot Key Settings */}
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('hot-key-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div key={'openMainWindow'} className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('hot-key-open-main-window-label')}</div>
@@ -888,7 +918,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               />
               <div className={popup['label']}>{t('disable-all-sound-effect-label')}</div>
             </div>
-            <div className={`${popup['label']} ${popup['header']}`}>{t('sound-effect-setting')}</div>
+            {/* Sound Effect Settings */}
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('sound-effect-setting')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div>{t('sound-effect-setting-description')}</div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -906,7 +939,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       <td>
                         <div className={popup['sound-effect-preview']} />
                       </td>
-                      <td onClick={() => setEnterVoiceChannelStatus(!enterVoiceChannelStatus)}>
+                      <td
+                        className={popup['sound-effect-enable']}
+                        onClick={() => setEnterVoiceChannelStatus(!enterVoiceChannelStatus)}
+                      >
                         {!enterVoiceChannelStatus || disableAllSoundEffect ? (
                           <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
@@ -919,7 +955,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       <td>
                         <div className={popup['sound-effect-preview']} />
                       </td>
-                      <td onClick={() => setLeaveVoiceChannelStatus(!leaveVoiceChannelStatus)}>
+                      <td
+                        className={popup['sound-effect-enable']}
+                        onClick={() => setLeaveVoiceChannelStatus(!leaveVoiceChannelStatus)}
+                      >
                         {!leaveVoiceChannelStatus || disableAllSoundEffect ? (
                           <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
@@ -932,7 +971,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       <td>
                         <div className={popup['sound-effect-preview']} />
                       </td>
-                      <td onClick={() => setStartSpeakingStatus(!startSpeakingStatus)}>
+                      <td
+                        className={popup['sound-effect-enable']}
+                        onClick={() => setStartSpeakingStatus(!startSpeakingStatus)}
+                      >
                         {!startSpeakingStatus || disableAllSoundEffect ? (
                           <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
@@ -945,7 +987,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       <td>
                         <div className={popup['sound-effect-preview']} />
                       </td>
-                      <td onClick={() => setStopSpeakingStatus(!stopSpeakingStatus)}>
+                      <td
+                        className={popup['sound-effect-enable']}
+                        onClick={() => setStopSpeakingStatus(!stopSpeakingStatus)}
+                      >
                         {!stopSpeakingStatus || disableAllSoundEffect ? (
                           <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
@@ -958,7 +1003,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       <td>
                         <div className={popup['sound-effect-preview']} />
                       </td>
-                      <td onClick={() => setReceiveDirectMessageStatus(!receiveDirectMessageStatus)}>
+                      <td
+                        className={popup['sound-effect-enable']}
+                        onClick={() => setReceiveDirectMessageStatus(!receiveDirectMessageStatus)}
+                      >
                         {!receiveDirectMessageStatus || disableAllSoundEffect ? (
                           <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (
@@ -971,7 +1019,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       <td>
                         <div className={popup['sound-effect-preview']} />
                       </td>
-                      <td onClick={() => setReceiveChannelMessageStatus(!receiveChannelMessageStatus)}>
+                      <td
+                        className={popup['sound-effect-enable']}
+                        onClick={() => setReceiveChannelMessageStatus(!receiveChannelMessageStatus)}
+                      >
                         {!receiveChannelMessageStatus || disableAllSoundEffect ? (
                           <div className={'disabled'}>{t('disable-sound-effect-label')}</div>
                         ) : (

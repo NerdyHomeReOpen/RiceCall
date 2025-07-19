@@ -129,19 +129,31 @@
 /* Text Styles */
 
 .label {
-  display: flex;
+  display: inline-block;
   min-height: 2rem;
-  min-width: max-content;
+  width: max-content;
   padding: 5px 5px 5px 0;
+  white-space: normal;
+  word-break: break-word;
 }
 
-.label.header::after {
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.header::after {
   content: '';
-  flex: 1;
+  display: block;
   height: 1px;
+  width: 100%;
   margin-left: 5px;
   background: #0073c6;
   align-self: center;
+}
+
+.header .label {
+  min-width: max-content;
 }
 
 .bold-text {
@@ -487,4 +499,26 @@
 
 .space-around {
   justify-content: space-around;
+}
+
+.sound-effect-preview {
+  min-height: 17px;
+  min-width: 17px;
+  background-image: url('../../public/playback.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 0;
+  cursor: pointer;
+}
+
+.sound-effect-preview:hover {
+  background-position: -17px;
+}
+
+.sound-effect-preview:active {
+  background-position: -34px;
+}
+
+.sound-effect-enable {
+  cursor: pointer;
 }

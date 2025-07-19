@@ -251,7 +251,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         {/* Access Permissions */}
         <div className={setting['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={`${popup['label']} ${popup['header']}`}>{t('access-permission')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('access-permission')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']} ${isLobby ? 'disabled' : ''}`}>
                 <input
@@ -320,7 +322,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         {/* Speaking Permissions */}
         <div className={setting['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={`${popup['label']} ${popup['header']}`}>{t('speaking-permission') + t('soon')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('speaking-permission') + t('soon')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input name="forbidGuestQueue" type="checkbox" checked={false} onChange={() => {}} />
@@ -337,7 +341,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         {/* Text Permissions */}
         <div className={setting['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={`${popup['label']} ${popup['header']}`}>{t('text-permission')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('text-permission')}</div>
+            </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
