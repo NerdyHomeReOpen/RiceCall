@@ -26,7 +26,8 @@
     "dev": "concurrently \"npm run next:dev\" \"npm run electron:dev\"",
     "start": "npm run next:start && npm run electron:start",
     "build": "npm run next:build && npm run electron:prep && npm run electron:build",
-    "build:action": "npm run next:build && npm run electron:prep"
+    "build:action": "npm run next:build && npm run electron:prep",
+    "format": "prettier --write src/**/*.{ts,js,json,yaml,yml}"
   },
   "dependencies": {
     "@crowdin/ota-client": "^2.0.1",
@@ -69,6 +70,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "postcss": "^8",
+    "prettier": "^3.6.2",
     "stylelint": "^16.17.0",
     "stylelint-config-standard": "^37.0.0",
     "tsx": "^4.19.4",

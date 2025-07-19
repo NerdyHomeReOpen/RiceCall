@@ -8,5 +8,5 @@
   "arrowParens": "always",
   "endOfLine": "lf",
   "quoteProps": "consistent",
-  "printWidth": 120
+  "printWidth": 200
 }
