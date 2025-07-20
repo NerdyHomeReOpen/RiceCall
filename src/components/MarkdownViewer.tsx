@@ -31,21 +31,25 @@ export function sanitizeMarkdownWithSafeTags(markdownText: string, emojis: Emoji
 
   const escaped = safeMarkdownText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+  const emojiRegex = /\[emoji_.+?\]/g;
+  const userTagRegex = /(?:<|&lt;)@(.+?)(?:>|&gt;)/g;
+  const ytTagRegex = /(?:<|&lt;)YT=(.+?)(?:>|&gt;)/g;
+
   const replaced = escaped
     // 替換 emoji
-    .replace(/\[emoji_[\w-]+\]/g, (match: string) => {
+    .replace(emojiRegex, (match: string) => {
       const emoji = emojis.find((emoji) => emoji.char === match);
       if (!emoji) return match;
       return `<img class='${markdown['emoji']}' src='${emoji.path}' alt="${emoji.char}"/>`;
     })
     // 替換 <@name_gender_level>
-    .replace(/&lt;@([^&gt;]+)&gt;/g, (_, content) => {
+    .replace(userTagRegex, (_, content) => {
       const [name, gender, level] = content.split('_');
       return `<span class='${markdown['user-tag']}' alt='<@${content}>'><span class='${permission[gender || 'Male']} ${permission[`lv-${level || '1'}`]}'></span>${name || 'Unknown'}</span>`;
     })
     // 替換 <YT=https://www.youtube.com/watch?v=dQw4w9WgXcQ>
-    .replace(/&lt;YT=([^>]+)&gt;/g, (_, content) => {
-      const videoId = content.split('?v=')[1];
+    .replace(ytTagRegex, (_, content) => {
+      const videoId = content.match(/v=([^&]+)/)?.[1];
       return `<iframe class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1"></iframe>`;
     })
     // 處裡 <br> to \n
