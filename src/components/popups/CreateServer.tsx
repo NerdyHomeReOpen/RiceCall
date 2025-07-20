@@ -53,17 +53,10 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   const [servers, setServers] = useState<UserServer[]>([]);
   const [server, setServer] = useState<Server>(Default.server());
   const [section, setSection] = useState<number>(0);
-  const [reloadAvatarKey, setReloadAvatarKey] = useState<number>(0);
 
   // Variables
   const { level: userLevel } = user;
-  const {
-    name: serverName,
-    type: serverType,
-    avatar: serverAvatar,
-    avatarUrl: serverAvatarUrl,
-    slogan: serverSlogan,
-  } = server;
+  const { name: serverName, type: serverType, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan } = server;
   const MAX_GROUPS = userLevel >= 16 ? 5 : userLevel >= 6 && userLevel < 16 ? 4 : 3;
   const remainingServers = MAX_GROUPS - servers.filter((s) => s.owned).length;
   const canCreate = remainingServers > 0 && serverName.trim() !== '';
@@ -112,7 +105,6 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
           avatar: response.avatar,
           avatarUrl: response.avatarUrl,
         }));
-        setReloadAvatarKey((prev) => prev + 1);
       }
     });
   };
@@ -153,9 +145,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         {/* Body */}
         <div className={popup['popup-body']}>
           <div className={setting['content']}>
-            <div className={`${styles['message']}`}>
-              {`${t('remaining-server').replace('{0}', remainingServers.toString())}`}
-            </div>
+            <div className={`${styles['message']}`}>{`${t('remaining-server').replace('{0}', remainingServers.toString())}`}</div>
             <div className={styles['select-type-text']}>{t('select-server-type-description')}</div>
             <div className={styles['button-group']}>
               {SERVER_TYPES.map((type) => (
@@ -196,11 +186,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         <div className={popup['popup-body']}>
           <div className={`${setting['content']} ${popup['col']}`} style={{ justifyContent: 'space-evenly' }}>
             <div className={styles['avatar-wrapper']}>
-              <div
-                key={reloadAvatarKey}
-                className={styles['avatar-picture']}
-                style={{ backgroundImage: `url(${serverAvatarUrl}?v=${reloadAvatarKey})` }}
-              />
+              <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
               <input
                 name="avatar"
                 type="file"
@@ -214,7 +200,6 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
                     handleOpenErrorDialog(t('imageTooLarge'));
                     return;
                   }
-
                   const reader = new FileReader();
                   reader.onloadend = async () => {
                     handleAvatarCropper(serverAvatar, reader.result as string);

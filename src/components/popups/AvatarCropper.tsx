@@ -167,10 +167,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
       <div className={popup['popup-wrapper']}>
         {/* Body */}
         <div className={popup['popup-body']}>
-          <div
-            className={`${popup['content']} ${popup['row']} ${popup['display-top']}`}
-            style={{ justifyContent: 'space-around' }}
-          >
+          <div className={`${popup['content']} ${popup['row']}`} style={{ alignItems: 'center', justifyContent: 'space-between' }}>
             <canvas
               ref={canvasRef}
               width={400}
@@ -182,7 +179,6 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
               onWheel={handleWheel}
             />
             <div className={popup['col']}>
-              <div className={popup['label']}>{t('preview')}:</div>
               <div
                 className={`${popup['input-box']} ${popup['col']}`}
                 style={{

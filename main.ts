@@ -184,7 +184,7 @@ export const PopupSize = {
   [PopupType.ABOUTUS]: { height: 750, width: 500 },
   [PopupType.APPLY_FRIEND]: { height: 320, width: 500 },
   [PopupType.APPLY_MEMBER]: { height: 320, width: 500 },
-  [PopupType.AVATAR_CROPPER]: { height: 520, width: 600 },
+  [PopupType.AVATAR_CROPPER]: { height: 520, width: 610 },
   [PopupType.BLOCK_MEMBER]: { height: 250, width: 400 },
   [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
   [PopupType.CHANNEL_PASSWORD]: { height: 200, width: 370 },
