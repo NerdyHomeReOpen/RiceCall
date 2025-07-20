@@ -1,0 +1,142 @@
+.app-logo {
+  background-image: url('../../../public/login_logo.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-width: 226px;
+  min-height: 54px;
+  align-self: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  padding: 20px;
+  overflow: scroll;
+  gap: 10px;
+}
+
+.app-info {
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.app-version-text {
+  font-weight: bold;
+  padding-bottom: 5px;
+  width: 100%;
+  text-align: center;
+}
+
+.copyright-text {
+  padding-bottom: 5px;
+  width: 100%;
+  text-align: center;
+}
+
+.team-members {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: fit-content;
+  padding: 10px;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
+}
+
+.team-member-card {
+  display: flex;
+  align-items: center;
+  margin-top: 3px;
+  justify-content: space-between;
+  background-color: hsl(0deg 0% 0% / 10%);
+  border: 1px solid hsl(0deg 0% 0% / 20%);
+  border-radius: 5px;
+  padding: 3px;
+  width: 100%;
+  box-sizing: border-box;
+  backdrop-filter: blur(5px);
+  transition: background-color 0.3s ease;
+}
+
+.team-member-card:hover {
+  background-color: hsl(0deg 0% 0% / 15%);
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.name-wrapper {
+  display: flex;
+  align-items: center;
+  color: #000;
+  line-height: 1.4;
+}
+
+.team-list-textarea {
+  width: 100% !important;
+  height: 100% !important;
+  border: none;
+  resize: none;
+}
+
+.developer-title {
+  background-color: rgb(115 164 213 / 70%);
+  color: #fff;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: bold;
+  margin-right: 8px;
+  display: inline-block;
+  min-width: 7em;
+  text-align: center;
+}
+
+.icon-wrapper svg {
+  color: #000;
+  vertical-align: middle;
+  transition: color 0.3s ease;
+}
+
+.github-icon-link:hover svg {
+  color: rgb(70 70 70);
+}
+
+.discord-icon-link:hover svg {
+  color: #7289da;
+}
+
+.main-developer {
+  background-color: rgb(216 63 63 / 80%);
+}
+
+.backend-developer {
+  background-color: rgb(63 136 216 / 80%);
+}
+
+.frontend-developer {
+  background-color: rgb(136 63 216 / 80%);
+}
+
+.machine-network {
+  background-color: rgb(77 173 147 / 80%);
+}
+
+.technical-support {
+  background-color: rgb(216 166 63 / 80%);
+}
+
+.customer-service {
+  background-color: rgb(63 166 216 / 80%);
+}

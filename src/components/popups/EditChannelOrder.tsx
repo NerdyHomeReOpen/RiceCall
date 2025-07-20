@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
 
 // CSS
-import editChannelOrder from '@/styles/popups/editChannelOrder.module.css';
+import styles from '@/styles/popups/editChannelOrder.module.css';
 import serverPage from '@/styles/pages/server.module.css';
 import popup from '@/styles/popup.module.css';
 
@@ -105,7 +105,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const handleOpenWarningDialog = (message: string) => {
     ipcService.popup.open(PopupType.DIALOG_WARNING, 'deleteChannel');
     ipcService.initialData.onRequest('deleteChannel', {
-      title: message,
+      message: message,
       submitTo: 'deleteChannel',
     });
     ipcService.popup.onSubmit('deleteChannel', () => {
@@ -223,10 +223,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     return (
       <div key={categoryId}>
         <div
-          className={`
-              ${serverPage['channelTab']}
-              ${isSelected ? editChannelOrder['selected'] : ''}
-            `}
+          className={`${serverPage['channel-tab']} ${isSelected ? styles['selected'] : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             setSelectedChannel(selectedChannelId === categoryId ? null : category);
@@ -238,12 +235,9 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           }}
         >
           <div
-            className={`
-                ${serverPage['tabIcon']}
-                ${expanded[categoryId] ? serverPage['expanded'] : ''}
-                ${serverPage[categoryVisibility]}
-                ${categoryIsLobby ? serverPage['lobby'] : ''}
-              `}
+            className={`${serverPage['tab-icon']} ${expanded[categoryId] ? serverPage['expanded'] : ''} ${
+              serverPage[categoryVisibility]
+            } ${categoryIsLobby ? serverPage['lobby'] : ''}`}
             onClick={(e) => {
               e.stopPropagation();
               setExpanded((prev) => ({
@@ -252,17 +246,12 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
               }));
             }}
           />
-          <div className={`${serverPage['channelTabLable']} ${editChannelOrder['channelTabBox']}`}>
+          <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
             {categoryName}
-            <div className={editChannelOrder['channelTabIndex']}>{`(${categoryOrder})`}</div>
+            <div className={styles['channel-tab-index-text']}>{`(${categoryOrder})`}</div>
           </div>
         </div>
-        <div
-          className={serverPage['channelList']}
-          style={{
-            display: expanded[categoryId] ? 'block' : 'none',
-          }}
-        >
+        <div className={serverPage['channel-list']} style={{ display: expanded[categoryId] ? 'block' : 'none' }}>
           {subChannels
             .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
             .filter((ch) => ch.type === 'channel')
@@ -286,10 +275,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     return (
       <div
         key={channelId}
-        className={`
-            ${serverPage['channelTab']}
-            ${isSelected ? editChannelOrder['selected'] : ''}
-          `}
+        className={`${serverPage['channel-tab']} ${isSelected ? styles['selected'] : ''}`}
         onClick={(e) => {
           e.stopPropagation();
           setSelectedChannel(selectedChannelId === channelId ? null : channel);
@@ -301,111 +287,81 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         }}
       >
         <div
-          className={`
-              ${serverPage['tabIcon']}
-              ${serverPage[channelVisibility]}
-              ${channelIsLobby ? serverPage['lobby'] : ''}
-            `}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          className={`${serverPage['tab-icon']} ${serverPage[channelVisibility]} ${
+            channelIsLobby ? serverPage['lobby'] : ''
+          }`}
+          onClick={(e) => e.stopPropagation()}
         />
-        <div className={`${serverPage['channelTabLable']} ${editChannelOrder['channelTabBox']}`}>
+        <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
           {channelName}
-          <div className={editChannelOrder['channelTabIndex']}>{`(${channelOrder})`}</div>
+          <div className={styles['channel-tab-index-text']}>{`(${channelOrder})`}</div>
         </div>
       </div>
     );
   };
 
   return (
-    <div className={popup['popupContainer']}>
-      <div className={editChannelOrder['header']} onClick={handleUnselect}>
+    <div className={popup['popup-wrapper']}>
+      {/* Header */}
+      <div className={styles['header']} onClick={handleUnselect}>
         <div
-          className={`
-              ${editChannelOrder['addChannelBtn']} 
-              ${!canAdd ? editChannelOrder['disabledBtn'] : ''}
-            `}
-          onClick={() => {
-            if (!canAdd) return;
+          className={`${styles['add-channel-btn']} ${!canAdd ? 'disabled' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
             handleOpenCreateChannel(userId, selectedChannelId || null, serverId);
           }}
         >
           {t('create')}
         </div>
-
         <div
-          className={`
-              ${editChannelOrder['changeChannelNameBtn']} 
-              ${!canRename ? editChannelOrder['disabledBtn'] : ''}
-            `}
-          onClick={() => {
-            if (!canRename) return;
+          className={`${styles['change-channel-name-btn']} ${!canRename ? 'disabled' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
             handleOpenEditChannelName(serverId, selectedChannelId);
           }}
         >
           {t('change-name')}
         </div>
-
         <div
-          className={`
-              ${editChannelOrder['deleteChannelBtn']} 
-              ${!canDelete ? editChannelOrder['disabledBtn'] : ''}
-            `}
-          onClick={() => {
-            if (!selectedChannel) return;
-            handleOpenWarningDialog(t('warningDeleteChannel').replace('{0}', selectedChannel.name));
+          className={`${styles['delete-channel-btn']} ${!canDelete ? 'disabled' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleOpenWarningDialog(t('warningDeleteChannel').replace('{0}', selectedChannel?.name ?? ''));
           }}
         >
           {t('delete')}
         </div>
-
         <div
-          className={`
-              ${editChannelOrder['upChannelOrderBtn']} 
-              ${!canMoveUp ? editChannelOrder['disabledBtn'] : ''}
-            `}
-          onClick={() => {
-            if (!canMoveUp) return;
+          className={`${styles['up-channel-order-btn']} ${!canMoveUp ? 'disabled' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
             handleChangeOrder(currentIndex, currentIndex - 1);
           }}
         >
           {t('move-up')}
         </div>
-
         <div
-          className={`
-              ${editChannelOrder['downChannelOrderBtn']} 
-              ${!canMoveDown ? editChannelOrder['disabledBtn'] : ''}
-            `}
-          onClick={() => {
-            if (!canMoveDown) return;
+          className={`${styles['down-channel-order-btn']} ${!canMoveDown ? 'disabled' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
             handleChangeOrder(currentIndex, currentIndex + 1);
           }}
         >
           {t('move-down')}
         </div>
-
         <div
-          className={`
-              ${editChannelOrder['topChannelOrderBtn']}
-              ${!canTop ? editChannelOrder['disabledBtn'] : ''}
-            `}
-          onClick={() => {
-            if (!canTop) return;
+          className={`${styles['top-channel-order-btn']} ${!canTop ? 'disabled' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
             handleChangeOrder(currentIndex, 0);
           }}
         >
           {t('move-top')}
         </div>
-
         <div
-          className={`
-              ${editChannelOrder['bottomChannelOrderBtn']}
-              ${!canBottom ? editChannelOrder['disabledBtn'] : ''}
-            `}
-          onClick={() => {
-            if (!canBottom) return;
+          className={`${styles['bottom-channel-order-btn']} ${!canBottom ? 'disabled' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
             handleChangeOrder(currentIndex, groupChannels.length - 1);
           }}
         >
@@ -413,9 +369,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         </div>
       </div>
 
-      <div className={popup['popupBody']} onClick={handleUnselect}>
-        <div className={editChannelOrder['body']}>
-          <div className={serverPage['channelList']} onClick={(e) => e.stopPropagation()}>
+      {/* Body */}
+      <div className={popup['popup-body']} onClick={handleUnselect}>
+        <div className={styles['body']}>
+          <div className={serverPage['channel-list']} onClick={(e) => e.stopPropagation()}>
             {serverChannels
               .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
               .filter((ch) => !ch.categoryId)
@@ -429,8 +386,9 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         </div>
       </div>
 
-      <div className={popup['popupFooter']}>
-        <button
+      {/* Footer */}
+      <div className={popup['popup-footer']}>
+        <div
           className={popup['button']}
           onClick={() => {
             const editedChannels: Partial<Channel>[] = [];
@@ -461,10 +419,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

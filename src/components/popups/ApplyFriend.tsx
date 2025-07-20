@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
-import applyFriend from '@/styles/popups/apply.module.css';
 
 // Types
 import { FriendApplication, FriendGroup, PopupType, SocketServerEvent, User } from '@/types';
@@ -150,174 +148,96 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
   }, [userId, targetId, socket]);
 
   return (
-    <>
-      {/* Apply Friend */}
-      <div className={popup['popupContainer']} style={section === 0 ? {} : { display: 'none' }}>
-        {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['col']}>
-              <div className={popup['label']}>{t('friend-label')}</div>
-              <div
-                className={popup['row']}
-                onClick={() => {
-                  handleOpenUserInfo(userId, targetId);
-                }}
-              >
-                <div className={applyFriend['avatarWrapper']}>
-                  <div
-                    className={applyFriend['avatarPicture']}
-                    style={{ backgroundImage: `url(${targetAvatarUrl})` }}
-                  />
-                </div>
-                <div className={applyFriend['infoWrapper']}>
-                  <div className={applyFriend['mainText']}>{targetName}</div>
-                  <div className={applyFriend['subText']}>{targetName}</div>
-                </div>
+    <div className={popup['popup-wrapper']}>
+      {/* Body */}
+      <div className={popup['popup-body']}>
+        <div className={`${popup['content']} ${popup['col']}`}>
+          <div className={popup['label']}>{t('friend-label')}</div>
+          <div className={popup['row']} onClick={() => handleOpenUserInfo(userId, targetId)}>
+            <div className={popup['avatar-wrapper']}>
+              <div className={popup['avatar-picture']} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
+            </div>
+            <div className={popup['info-wrapper']}>
+              <div className={popup['bold-text']}>{targetName}</div>
+              <div className={popup['sub-text']}>{targetName}</div>
+            </div>
+          </div>
+          <div className={popup['split']} />
+          <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
+            <div className={popup['label']}>{t('friend-note')}</div>
+            <textarea
+              rows={2}
+              value={applicationDesc}
+              onChange={(e) =>
+                setFriendApplication((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+            />
+          </div>
+          <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
+            {t('friend-apply-sent')}
+          </div>
+          <div className={`${popup['input-box']} ${popup['col']}`} style={section === 2 ? {} : { display: 'none' }}>
+            <div className={popup['label']}>{t('friend-select-group')}</div>
+            <div className={popup['row']}>
+              <div className={popup['select-box']}>
+                <select
+                  className={popup['select']}
+                  value={selectedFriendGroupId || ''}
+                  onChange={(e) => setSelectedFriendGroupId(e.target.value)}
+                >
+                  <option value={''}>{t('none')}</option>
+                  {friendGroups.map((group) => (
+                    <option key={group.friendGroupId} value={group.friendGroupId}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className={applyFriend['split']} />
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('friend-note')}</div>
-                <textarea
-                  rows={2}
-                  value={applicationDesc}
-                  onChange={(e) =>
-                    setFriendApplication((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                />
-                <div className={popup['hint']}>{t('max-120-content')}</div>
-              </div>
+              <div className={popup['link-text']}>{t('friend-add-group')}</div>
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button
-            className={popup['button']}
-            onClick={() => {
-              handleCreateFriendApplication({ description: applicationDesc }, userId, targetId);
-              handleClose();
-            }}
-          >
-            {t('send-request')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
-            {t('cancel')}
-          </button>
-        </div>
       </div>
 
-      {/* Sent Friend Application */}
-      <div className={popup['popupContainer']} style={section === 1 ? {} : { display: 'none' }}>
-        {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['col']}>
-              <div className={popup['label']}>{t('friend-label')}</div>
-              <div
-                className={popup['row']}
-                onClick={() => {
-                  handleOpenUserInfo(userId, targetId);
-                }}
-              >
-                <div className={applyFriend['avatarWrapper']}>
-                  <div
-                    className={applyFriend['avatarPicture']}
-                    style={{ backgroundImage: `url(${targetAvatarUrl})` }}
-                  />
-                </div>
-                <div className={applyFriend['infoWrapper']}>
-                  <div className={applyFriend['mainText']}>{targetName}</div>
-                  <div className={applyFriend['subText']}>{targetName}</div>
-                </div>
-              </div>
-              <div className={applyFriend['split']} />
-              <div className={popup['hint']}>{t('friend-apply-sent')}</div>
-            </div>
-          </div>
+      {/* Footer */}
+      <div className={popup['popup-footer']}>
+        <div
+          className={popup['button']}
+          style={section === 0 ? {} : { display: 'none' }}
+          onClick={() => {
+            handleCreateFriendApplication({ description: applicationDesc }, userId, targetId);
+            handleClose();
+          }}
+        >
+          {t('send-request')}
         </div>
-
-        {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button className={popup['button']} onClick={() => setSection(0)}>
-            {t('modify')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
-            {t('confirm')}
-          </button>
+        <div className={popup['button']} style={section === 0 ? {} : { display: 'none' }} onClick={() => handleClose()}>
+          {t('cancel')}
+        </div>
+        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => setSection(0)}>
+          {t('modify')}
+        </div>
+        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => handleClose()}>
+          {t('confirm')}
+        </div>
+        <div
+          className={popup['button']}
+          style={section === 2 ? {} : { display: 'none' }}
+          onClick={() => {
+            handleApproveFriendApplication(targetId, userId);
+            handleClose();
+          }}
+        >
+          {t('add')}
+        </div>
+        <div className={popup['button']} style={section === 2 ? {} : { display: 'none' }} onClick={() => handleClose()}>
+          {t('cancel')}
         </div>
       </div>
-
-      {/* Received Friend Application */}
-      <div className={popup['popupContainer']} style={section === 2 ? {} : { display: 'none' }}>
-        {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['col']}>
-              <div className={popup['label']}>{t('friend-label')}</div>
-              <div
-                className={popup['row']}
-                onClick={() => {
-                  handleOpenUserInfo(userId, targetId);
-                }}
-              >
-                <div className={applyFriend['avatarWrapper']}>
-                  <div
-                    className={applyFriend['avatarPicture']}
-                    style={{ backgroundImage: `url(${targetAvatarUrl})` }}
-                  />
-                </div>
-                <div className={applyFriend['infoWrapper']}>
-                  <div className={applyFriend['mainText']}>{targetName}</div>
-                  <div className={applyFriend['subText']}>{targetName}</div>
-                </div>
-              </div>
-              <div className={applyFriend['split']} />
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('friend-select-group')}</div>
-                <div className={popup['row']}>
-                  <div className={popup['selectBox']}>
-                    <select
-                      className={popup['select']}
-                      value={selectedFriendGroupId || ''}
-                      onChange={(e) => setSelectedFriendGroupId(e.target.value)}
-                    >
-                      <option value={''}>{t('none')}</option>
-                      {friendGroups.map((group) => (
-                        <option key={group.friendGroupId} value={group.friendGroupId}>
-                          {group.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className={popup['link']}>{t('friend-add-group')}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button
-            className={popup['button']}
-            onClick={() => {
-              handleApproveFriendApplication(targetId, userId);
-              handleClose();
-            }}
-          >
-            {t('add')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
-            {t('cancel')}
-          </button>
-        </div>
-      </div>
-    </>
+    </div>
   );
 });
 

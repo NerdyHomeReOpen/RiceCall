@@ -1,25 +1,11 @@
-import {
-  User,
-  Channel,
-  Server,
-  FriendApplication,
-  MemberApplication,
-  ServerMember,
-  Permission,
-  UserServer,
-  Member,
-  Friend,
-  UserFriend,
-  FriendGroup,
-  UserServerStatus,
-} from '@/types';
+import { User, Channel, Server, FriendApplication, MemberApplication, ServerMember, Permission, UserServer, Member, Friend, UserFriend, FriendGroup, UserServerStatus } from '@/types';
 
 const Default = {
   user: (overrides: Partial<User> = {}): User => ({
     userId: '',
     name: '',
     avatar: `${Date.now()}`,
-    avatarUrl: `${process.env.NEXT_PUBLIC_API_URL}/images/userAvatars/`,
+    avatarUrl: `/default/userAvatar.webp`,
     signature: '',
     status: 'online',
     gender: 'Male',
@@ -68,7 +54,7 @@ const Default = {
     serverId: '',
     name: '',
     avatar: `${Date.now()}`,
-    avatarUrl: `${process.env.NEXT_PUBLIC_API_URL}/images/serverAvatars/`,
+    avatarUrl: `/default/serverAvatar.webp`,
     announcement: '',
     applyNotice: '',
     description: '',

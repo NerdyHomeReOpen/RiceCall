@@ -73,7 +73,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   return (
     <div
       ref={menuRef}
-      className={`context-menu-container ${contextMenu['contextMenu']}`}
+      className={`context-menu-container ${contextMenu['context-menu']}`}
       style={{ top: menuY, left: menuX }}
     >
       {items
@@ -85,11 +85,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           return (
             <div
               key={index}
-              className={`
-                ${contextMenu['option']}
-                ${item.hasSubmenu ? contextMenu['hasSubmenu'] : ''}
-                ${item.disabled ? contextMenu['disabled'] : ''}
-              `}
+              className={`${contextMenu['option']} ${item.hasSubmenu ? contextMenu['has-submenu'] : ''} ${
+                item.disabled ? contextMenu['disabled'] : ''
+              }`}
               data-type={item.icon || ''}
               onClick={() => {
                 if (item.disabled) return;

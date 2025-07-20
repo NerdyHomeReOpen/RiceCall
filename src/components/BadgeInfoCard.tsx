@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 // CSS
-import badgeInfoCardStyles from '@/styles/badgeInfoCard.module.css';
+import styles from '@/styles/badgeInfoCard.module.css';
 
 // Types
 import type { Badge } from '@/types';
@@ -80,23 +80,20 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
     return (
       <div
         ref={cardRef}
-        className={`context-menu-container ${badgeInfoCardStyles.badgeInfoCard}`}
-        style={{
-          top: cardY,
-          left: cardX,
-        }}
+        className={`context-menu-container ${styles['badge-info-card']}`}
+        style={{ top: cardY, left: cardX }}
       >
-        <div className={badgeInfoCardStyles.badgeInfoWrapper}>
-          <div className={badgeInfoCardStyles.badgeAvatarBox}>
-            <div className={badgeInfoCardStyles.badgeImage} style={{ backgroundImage: `url(${badgeUrl})` }} />
-            <div className={badgeInfoCardStyles.badgeRarityText}>{`[${badge.rare}]`}</div>
+        <div className={styles['badge-info-wrapper']}>
+          <div className={styles['badge-avatar-box']}>
+            <div className={styles['badge-image']} style={{ backgroundImage: `url(${badgeUrl})` }} />
+            <div className={styles['badge-rarity-text']}>{`[${badge.rare}]`}</div>
           </div>
-          <div className={badgeInfoCardStyles.badgeDescriptionBox}>
-            <div className={badgeInfoCardStyles.badgeName}>{badge.name}</div>
-            <div className={badgeInfoCardStyles.badgeDescription}>{badge.description}</div>
+          <div className={styles['badge-description-box']}>
+            <div className={styles['badge-name']}>{badge.name}</div>
+            <div className={styles['badge-description']}>{badge.description}</div>
           </div>
         </div>
-        <div className={badgeInfoCardStyles.badgeShowTimeBox}>
+        <div className={styles['badge-show-time-box']}>
           <div>{t('show-to')}:</div>
           <div>1970-01-01</div>
         </div>

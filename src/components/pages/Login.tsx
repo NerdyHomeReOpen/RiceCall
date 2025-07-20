@@ -38,7 +38,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   });
   const [accounts, setAccounts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showAccountSelectBox, setShowAccountSelectBox] = useState<boolean>(false);
+  const [showAccountselectBox, setShowAccountselectBox] = useState<boolean>(false);
 
   // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +110,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (!comboRef.current?.contains(e.target as Node)) setShowAccountSelectBox(false);
+      if (!comboRef.current?.contains(e.target as Node)) setShowAccountselectBox(false);
     };
 
     document.addEventListener('click', handleClickOutside);
@@ -120,12 +120,12 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   }, []);
 
   return (
-    <div className={styles['loginWrapper']}>
-      {/* Main Content */}
-      <div className={styles['loginContent']}>
-        <div className={styles['appLogo']} />
+    <main className={styles['login']}>
+      {/* Body */}
+      <main className={styles['login-body']}>
+        <div className={styles['app-logo']} />
         <form
-          className={styles['formWrapper']}
+          className={styles['form-wrapper']}
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
@@ -133,15 +133,15 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
         >
           {isLoading && (
             <>
-              <div className={styles['loadingIndicator']}>{t('on-login')}</div>
-              <div className={styles['loadingBar']} />
+              <div className={styles['loading-indicator']}>{t('on-login')}</div>
+              <div className={styles['loading-bar']} />
             </>
           )}
           {!isLoading && (
             <>
-              <div className={styles['inputBox']}>
+              <div className={styles['input-wrapper']}>
                 <div className={styles['label']}>{t('account')}</div>
-                <div className={styles['loginAccountBox']} ref={comboRef}>
+                <div className={styles['input-box']} ref={comboRef}>
                   <input
                     type="text"
                     name="account"
@@ -152,17 +152,17 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     className={styles['input']}
                   />
                   <div
-                    className={styles['comboArrow']}
+                    className={styles['combo-arrow']}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setShowAccountSelectBox((prev) => !prev);
+                      setShowAccountselectBox((prev) => !prev);
                     }}
                   />
-                  <div className={styles['accountSelectBox']} style={showAccountSelectBox ? {} : { display: 'none' }}>
+                  <div className={styles['account-select-box']} style={showAccountselectBox ? {} : { display: 'none' }}>
                     {accounts.map((account) => (
                       <div
                         key={account}
-                        className={styles['accountSelectOptionBox']}
+                        className={styles['account-select-option-box']}
                         onClick={() => {
                           setFormData((prev) => ({
                             ...prev,
@@ -170,12 +170,12 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                             rememberAccount: true,
                             autoLogin: true,
                           }));
-                          setShowAccountSelectBox(false);
+                          setShowAccountselectBox(false);
                         }}
                       >
                         {account}
                         <div
-                          className={styles['accountSelectCloseBtn']}
+                          className={styles['account-select-delete-btn']}
                           onClick={(e) => {
                             e.stopPropagation();
                             setAccounts(accounts.filter((a) => a !== account));
@@ -186,9 +186,9 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                   </div>
                 </div>
               </div>
-              <div className={styles['inputBox']}>
+              <div className={styles['input-wrapper']}>
                 <div className={styles['label']}>{t('password')}</div>
-                <div className={styles['loginAccountBox']}>
+                <div className={styles['input-box']}>
                   <input
                     type="password"
                     name="password"
@@ -200,8 +200,8 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                   />
                 </div>
               </div>
-              <div className={styles['checkWrapper']}>
-                <div className={styles['checkBox']}>
+              <div className={styles['check-wrapper']}>
+                <div className={styles['check-box']}>
                   <input
                     ref={rememberAccountRef}
                     type="checkbox"
@@ -213,7 +213,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                   />
                   {t('remember-account')}
                 </div>
-                <div className={styles['checkBox']}>
+                <div className={styles['check-box']}>
                   <input
                     ref={autoLoginRef}
                     type="checkbox"
@@ -227,7 +227,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                 </div>
               </div>
               <button
-                className={styles['button']}
+                className={styles['submit-button']}
                 onClick={handleSubmit}
                 tabIndex={-1}
                 disabled={!formData.account || !formData.password}
@@ -237,19 +237,15 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
             </>
           )}
         </form>
-      </div>
+      </main>
+
       {/* Footer */}
-      <div className={styles['loginFooter']}>
-        <div
-          className={styles['createAccount']}
-          onClick={() => {
-            setSection('register');
-          }}
-        >
+      <div className={styles['login-footer']}>
+        <div className={styles['create-account']} onClick={() => setSection('register')}>
           {t('register-account')}
         </div>
         <div
-          className={styles['forgetPassword']}
+          className={styles['forget-password']}
           onClick={() => {
             /*TODO: handleForgotPassword() */
           }}
@@ -257,7 +253,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
           {t('forgot-password')}
         </div>
       </div>
-    </div>
+    </main>
   );
 });
 

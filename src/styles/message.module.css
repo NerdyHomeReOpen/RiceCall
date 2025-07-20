@@ -1,4 +1,4 @@
-.messageViewerWrapper {
+.message-viewer-wrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -8,17 +8,13 @@
   gap: 0.125rem;
 }
 
-.messageWrapper {
+.message-wrapper {
   display: flex;
   flex-direction: row;
   gap: 0.125rem;
 }
 
-.gradeIcon {
-  display: flex;
-}
-
-.infoIcon {
+.info-icon {
   display: flex;
   min-width: 12px;
   min-height: 12px;
@@ -27,7 +23,7 @@
   background-position: center;
 }
 
-.eventIcon {
+.event-icon {
   display: flex;
   min-width: 12px;
   min-height: 12px;
@@ -36,7 +32,7 @@
   background-position: center;
 }
 
-.warnIcon {
+.warn-icon {
   display: flex;
   min-width: 12px;
   min-height: 12px;
@@ -45,7 +41,7 @@
   background-position: center;
 }
 
-.alertIcon {
+.alert-icon {
   display: flex;
   min-width: 12px;
   min-height: 12px;
@@ -54,7 +50,7 @@
   background-position: center;
 }
 
-.messageBox {
+.message-box {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -63,12 +59,12 @@
   gap: 0.125rem;
 }
 
-.messageBox .username {
+.message-box .username-text {
   align-self: center;
   color: #2f94db;
 }
 
-.infoBox {
+.info-box {
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -82,19 +78,19 @@
   gap: 0.125rem;
 }
 
-.header .username {
+.header .username-text {
   cursor: pointer;
   color: #2f94db;
 }
 
-.header:hover .username {
-  color: #226ba0;
+.header:hover .username-text {
+  text-decoration: underline;
 }
 
-.header .timestamp {
+.header .timestamp-text {
   margin-left: 0.2rem;
   color: #888;
-  font-size: 12px;
+  font-size: 0.9em;
 }
 
 .content {

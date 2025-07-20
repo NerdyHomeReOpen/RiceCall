@@ -8,6 +8,7 @@ import ContextMenuProvider from '@/providers/ContextMenu';
 import MainTabProvider from '@/providers/MainTab';
 import ThemeProvider from '@/providers/Theme';
 import LoadingProvider from '@/providers/Loading';
+import SoundPlayerProvider from '@/providers/SoundPlayer';
 import i18n, { LanguageKey } from '@/i18n';
 
 // services
@@ -26,13 +27,13 @@ const Providers = ({ children }: ProvidersProps) => {
   useEffect(() => {
     const setFont = (font: string | null) => {
       if (!font) return;
-      console.log('font', font);
-      document.body.style.fontFamily = font;
+      document.body.style.setProperty('font-family', font, 'important');
+      document.body.style.setProperty('--font-family', font, 'important');
     };
 
     const setFontSize = (fontSize: number | null) => {
       if (!fontSize) return;
-      // document.body.style.fontSize = `${fontSize}px`;
+      document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
     };
 
     ipcService.systemSettings.font.get(setFont);
@@ -46,7 +47,9 @@ const Providers = ({ children }: ProvidersProps) => {
       <SocketProvider>
         <MainTabProvider>
           <LoadingProvider>
-            <ContextMenuProvider>{children}</ContextMenuProvider>
+            <ContextMenuProvider>
+              <SoundPlayerProvider>{children}</SoundPlayerProvider>
+            </ContextMenuProvider>
           </LoadingProvider>
         </MainTabProvider>
       </SocketProvider>

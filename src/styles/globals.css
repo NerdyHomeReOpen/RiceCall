@@ -1,6 +1,6 @@
 :root {
   --main-color: #0073c6;
-  --secondary-color: #ffffff;
+  --secondary-color: #fff;
   --header-image: none;
   --background: 0.97 0.01 275;
   --foreground: 0.2 0.01 275;
@@ -9,7 +9,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --main-color: #0073c6;
-    --secondary-color: #ffffff;
+    --secondary-color: #fff;
     --background: 0.2 0.01 275;
     --foreground: 0.9 0.01 275;
   }
@@ -18,48 +18,31 @@
 * {
   border: none;
   box-sizing: border-box;
+  outline: none;
 }
 
 html,
-body,
-#__next,
-.wrapper {
-  height: 100%;
-  width: 100%;
+body {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  border-radius: 5px;
+  font-family: Arial, sans-serif;
   font-size: 13px;
+  --font-family: Arial, sans-serif;
+  overflow: hidden;
   color: var(--foreground);
   background: none;
   user-select: none;
 }
 
 body {
-  font-family: SimSun, Arial, Helvetica, sans-serif;
-  font-size: 13px;
-}
-
-.wrapper {
   border: 1px solid var(--main-color);
 }
 
-.content {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  background-color: #fff;
-  width: 100%;
-  height: 100%;
-  border-radius: 5px;
-  flex-direction: column;
-  overflow: hidden;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
+/* Scrollbar */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -80,7 +63,9 @@ body {
   background: #6d6d6d38;
 }
 
-div.resizeHandle {
+/* Resize Handle */
+
+.resize-handle {
   min-width: 3px;
   height: 100%;
   background: rgb(229 231 235);
@@ -88,12 +73,12 @@ div.resizeHandle {
   transition: background 0.1s ease-in-out;
 }
 
-div.resizeHandle:active,
-div.resizeHandle:hover {
-  background: rgb(200, 202, 206);
+.resize-handle:active,
+.resize-handle:hover {
+  background: rgb(200 202 206);
 }
 
-div.resizeHandleVertical {
+.resize-handle-vertical {
   width: 100%;
   min-height: 3px;
   background: rgb(229 231 235);
@@ -101,10 +86,12 @@ div.resizeHandleVertical {
   transition: background 0.1s ease-in-out;
 }
 
-div.resizeHandleVertical:active,
-div.resizeHandleVertical:hover {
-  background: rgb(200, 202, 206);
+.resize-handle-vertical:active,
+.resize-handle-vertical:hover {
+  background: rgb(200 202 206);
 }
+
+/* Radio & Checkbox */
 
 input[type='radio'] {
   background-image: url('../../public/ctrl/radiobox_icon.png');
@@ -116,15 +103,13 @@ input[type='checkbox'] {
 
 input[type='radio'],
 input[type='checkbox'] {
+  min-height: 20px;
+  min-width: 20px;
   background-size: inherit;
   background-position: 0 0;
   cursor: pointer;
   appearance: none;
-  height: 20px;
-  width: 20px;
   border: none;
-  padding: 0;
-  margin: 0;
 }
 
 input[type='radio']:checked,
@@ -142,20 +127,21 @@ input[type='checkbox']:checked:hover {
   background-position: -18px -18px;
 }
 
-div,
-p,
-textarea,
+/* Input & Select & Textarea */
+
 input,
+input::placeholder,
 select,
-table,
-button,
-a,
-form {
-  outline: none;
+select::placeholder,
+textarea,
+textarea::placeholder,
+button {
+  font-family: var(--font-family);
 }
 
+/* Highlight.js */
+
 .hljs span {
-  font-size: 0.875rem;
   font-family: monospace;
 }
 
@@ -163,8 +149,11 @@ form {
   line-height: 1.25rem;
 }
 
+/* Disabled */
+
 *:disabled,
 .disabled {
-  filter: grayscale(100%);
-  cursor: not-allowed;
+  color: #c5c5c5 !important;
+  filter: grayscale(100%) !important;
+  pointer-events: none !important;
 }

@@ -9,7 +9,6 @@ import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import getService from '@/services/get.service';
@@ -34,7 +33,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
   const [server, setServer] = useState<Server>(Default.server());
 
   // Variables
-  const { receiveApply: serverReceiveApply, applyNotice: serverApplyNotice } = server;
+  const { receiveApply: serverReceiveApplication, applyNotice: serverApplyNote } = server;
 
   // Handlers
   const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
@@ -65,37 +64,27 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
   }, [serverId]);
 
   return (
-    <form className={popup['popupContainer']}>
+    <form className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
-        <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={`${popup['inputBox']} ${popup['row']}`}>
+      <div className={popup['popup-body']}>
+        <div className={popup['dialog-content']}>
+          <div className={popup['input-group']}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <div className={popup['label']}>{t('is-receive-apply')}</div>
               <input
-                name="receiveApply"
+                name="receive-apply"
                 type="checkbox"
-                checked={serverReceiveApply}
-                onChange={() => {
-                  setServer((prev) => ({
-                    ...prev,
-                    receiveApply: !serverReceiveApply,
-                  }));
-                }}
+                checked={serverReceiveApplication}
+                onChange={() => setServer((prev) => ({ ...prev, receiveApply: !serverReceiveApplication }))}
               />
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('member-apply-note')}</div>
               <textarea
-                name="applyNotice"
-                value={serverApplyNotice}
+                name="apply-note"
+                value={serverApplyNote}
                 maxLength={100}
-                onChange={(e) => {
-                  setServer((prev) => ({
-                    ...prev,
-                    applyNotice: e.target.value,
-                  }));
-                }}
+                onChange={(e) => setServer((prev) => ({ ...prev, applyNote: e.target.value }))}
               />
             </div>
           </div>
@@ -103,25 +92,19 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
-        <button
+      <div className={popup['popup-footer']}>
+        <div
           className={popup['button']}
           onClick={() => {
-            handleEditServer(
-              {
-                receiveApply: !!serverReceiveApply,
-                applyNotice: serverApplyNotice,
-              },
-              serverId,
-            );
+            handleEditServer({ receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote }, serverId);
             handleClose();
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </form>
   );

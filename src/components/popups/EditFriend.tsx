@@ -8,7 +8,6 @@ import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // CSS
-import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
@@ -106,23 +105,18 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
   }, [userId, targetId]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
-        <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={`${popup['inputBox']} ${popup['row']}`}>
+      <div className={popup['popup-body']}>
+        <div className={popup['dialog-content']}>
+          <div className={popup['input-group']}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <div className={popup['label']}>{t('friend-select-group')}</div>
-              <div className={popup['selectBox']}>
+              <div className={popup['select-box']}>
                 <select
-                  className={popup['input']}
+                  name="friend-group"
                   value={friendGroupId || ''}
-                  onChange={(e) => {
-                    setFriend((prev) => ({
-                      ...prev,
-                      friendGroupId: e.target.value,
-                    }));
-                  }}
+                  onChange={(e) => setFriend((prev) => ({ ...prev, friendGroupId: e.target.value }))}
                 >
                   <option value={''}>{t('none')}</option>
                   {friendGroups.map((group) => (
@@ -138,8 +132,8 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
-        <button
+      <div className={popup['popup-footer']}>
+        <div
           className={`${popup['button']}`}
           onClick={() => {
             handleEditFriend({ friendGroupId: friendGroupId || null }, userId, targetId);
@@ -147,10 +141,10 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

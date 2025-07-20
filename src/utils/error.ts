@@ -14,15 +14,14 @@ export default class ErrorHandler {
   }
 
   show() {
-    const errorMessage = `${this.message} (${new Date().toLocaleString()})`;
-
     ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
     ipcService.popup.onSubmit('errorDialog', () => {
       if (this.handler) this.handler();
     });
     ipcService.initialData.onRequest('errorDialog', {
-      title: errorMessage,
+      message: this.message,
       submitTo: 'errorDialog',
+      timestamp: Date.now(),
     });
   }
 }

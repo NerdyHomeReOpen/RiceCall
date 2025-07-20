@@ -3,15 +3,21 @@
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  padding: 0 10px 5px 10px;
+  padding: 0 10px 5px;
+  background-color: var(--main-color);
+  background-image: var(--header-image);
+  background-repeat: no-repeat;
+  background-position: 0 -30px;
+  background-size: cover;
+  color: var(--secondary-color);
 }
 
-.userSignature {
+.user-signature {
   min-height: 2rem;
   margin-left: 23px;
 }
 
-.directOptionButtons {
+.direct-option-buttons {
   display: flex;
   justify-content: left;
   margin-left: 18px;
@@ -19,11 +25,11 @@
   -webkit-app-region: no-drag;
 }
 
-.directOptionButtons .fileShare,
-.directOptionButtons .blockUser,
-.directOptionButtons .unBlockUser,
-.directOptionButtons .inviteTempGroup,
-.directOptionButtons .report {
+.direct-option-buttons .file-share,
+.direct-option-buttons .block-user,
+.direct-option-buttons .un-block-user,
+.direct-option-buttons .invite-temp-group,
+.direct-option-buttons .report {
   content: '';
   display: inline-block;
   min-width: 30px;
@@ -33,51 +39,51 @@
   cursor: pointer;
 }
 
-.directOptionButtons .disabled {
+.direct-option-buttons .disabled {
   cursor: not-allowed;
 }
 
-.directOptionButtons .fileShare {
-  background-image: url(../../../public/im/Fileshare.png);
+.direct-option-buttons .file-share {
+  background-image: url('../../../public/im/Fileshare.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-.directOptionButtons .blockUser {
-  background-image: url(../../../public/im/BlockUser.png);
+.direct-option-buttons .block-user {
+  background-image: url('../../../public/im/BlockUser.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-.directOptionButtons .unBlockUser {
-  background-image: url(../../../public/im/UnblockUser.PNG);
+.direct-option-buttons .un-block-user {
+  background-image: url('../../../public/im/UnblockUser.PNG');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-.directOptionButtons .inviteTempGroup {
-  background-image: url(../../../public/im/InviteTempGroup.png);
+.direct-option-buttons .invite-temp-group {
+  background-image: url('../../../public/im/InviteTempGroup.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-.directOptionButtons .report {
-  background-image: url(../../../public/im/report.png);
+.direct-option-buttons .report {
+  background-image: url('../../../public/im/report.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-.bodyWrapper {
+.body-wrapper {
   height: 100%;
   width: 100%;
 }
 
-.bodyBox {
+.body-box {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -96,22 +102,22 @@
   border-right: 1px solid #e0e0e4;
 }
 
-.avatarPicture {
+.avatar-picture {
   min-width: 100px;
   min-height: 100px;
   margin: 10px;
   position: relative;
-  background-image: url(../../../public/im/IMLogo.png);
+  background-image: url('../../../public/im/IMLogo.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 }
 
-.avatarPicture.offline {
+.avatar-picture.offline {
   filter: grayscale(100%);
 }
 
-.avatarPicture::before {
+.avatar-picture::before {
   z-index: 2;
   content: '';
   position: absolute;
@@ -119,33 +125,33 @@
   left: -10px;
   min-width: 120px;
   min-height: 120px;
-  background-image: url(../../../public/im/logoframe.png);
+  background-image: url('../../../public/im/logoframe.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 }
 
-.userStateBox {
+.user-state-box {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
 }
 
-.userFriendSplit {
-  background-image: url(../../../public/mf_spliter.png);
+.user-friend-split {
+  background-image: url('../../../public/mf_spliter.png');
   background-size: cover;
   height: 15px;
   width: 2px;
-  margin: 0 10;
+  margin: 0 10px;
 }
 
-.targetBox {
+.target-box {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.mainContent {
+.main-content {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -153,29 +159,29 @@
   min-width: 0;
 }
 
-.actionArea {
+.action-area {
   height: 22px;
   width: 100%;
   display: flex;
   align-items: center;
 }
 
-.actionArea.clickable {
+.action-area.clickable {
   cursor: pointer;
 }
 
-.actionArea:after {
+.action-area::after {
   content: '';
   position: absolute;
   min-height: 22px;
   min-width: 100%;
-  background-image: url(../../../public/im/serverin_bkg.png);
+  background-image: url('../../../public/im/serverin_bkg.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
-.actionIcon {
+.action-icon {
   min-height: 12px;
   min-width: 12px;
   margin-left: 10px;
@@ -184,16 +190,16 @@
   background-position: 0 0;
 }
 
-.actionIcon.inServer {
-  background-image: url(../../../public/im/server_in.png);
+.action-icon.in-server {
+  background-image: url('../../../public/im/server_in.png');
 }
 
-.actionTitle {
+.action-title {
   margin-left: 5px;
   width: 100%;
 }
 
-.messageArea {
+.message-area {
   display: flex;
   flex: 5;
   padding: 0.75rem;
@@ -201,18 +207,18 @@
   overflow-y: auto;
 }
 
-.inputArea {
+.input-area {
   flex: 3;
   display: flex;
   flex-direction: column;
   width: 100%;
 }
 
-.inputArea .topBar {
+.input-area .top-bar {
   min-height: 30px;
   min-width: 100%;
   display: flex;
-  background-image: url(../../../public/tool_bkg.png);
+  background-image: url('../../../public/tool_bkg.png');
   background-size: 100%;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -221,13 +227,13 @@
   justify-content: space-between;
 }
 
-.inputArea .topBar .buttons {
+.input-area .top-bar .buttons {
   display: flex;
   align-items: center;
   margin-left: 5px;
 }
 
-.inputArea .topBar .buttons .button {
+.input-area .top-bar .buttons .button {
   background-position: 0 0;
   min-height: 18px;
   min-width: 18px;
@@ -235,27 +241,27 @@
   cursor: pointer;
 }
 
-.inputArea .topBar .buttons .button.font {
+.input-area .top-bar .buttons .button.font {
   filter: grayscale(100%);
   cursor: not-allowed;
   background-image: url('../../../public/FontButton.png');
 }
 
-.inputArea .topBar .buttons .button.emoji {
+.input-area .top-bar .buttons .button.emoji {
   background-image: url('../../../public/FaceButton.png');
 }
 
-.inputArea .topBar .buttons .button.screenShot {
+.input-area .top-bar .buttons .button.screen-shot {
   filter: grayscale(100%);
   cursor: not-allowed;
   background-image: url('../../../public/ScreenShot.png');
 }
 
-.inputArea .topBar .buttons .button.nudge {
+.input-area .top-bar .buttons .button.nudge {
   background-image: url('../../../public/im/Nudge.png');
 }
 
-.inputArea .topBar .historyMessage {
+.input-area .top-bar .history-message {
   filter: grayscale(100%);
   cursor: not-allowed;
   height: 100%;
@@ -265,7 +271,7 @@
   margin-right: 15px;
 }
 
-.inputArea .topBar .historyMessage:before {
+.input-area .top-bar .history-message::before {
   content: '';
   min-height: 18px;
   min-width: 18px;
@@ -280,7 +286,6 @@
   flex: 1;
   display: block;
   border: none;
-
   padding: 8px;
   resize: none;
   overflow: auto;
@@ -292,6 +297,7 @@
   100% {
     transform: translate(0, 0);
   }
+
   10%,
   30%,
   50%,
@@ -299,6 +305,7 @@
   90% {
     transform: translate(-5px, -5px);
   }
+
   20%,
   40%,
   60%,
@@ -306,6 +313,7 @@
     transform: translate(2px, 2px);
   }
 }
+
 .shake {
   animation: shake 0.4s ease-in-out;
 }

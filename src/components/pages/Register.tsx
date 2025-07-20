@@ -168,20 +168,21 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
   };
 
   return (
-    <div className={styles['loginWrapper']}>
-      <div className={styles['loginContent']}>
-        <div className={styles['appLogo']} />
-        <div className={styles['formWrapper']}>
+    <main className={styles['register']}>
+      {/* Body */}
+      <main className={styles['register-body']}>
+        <div className={styles['app-logo']} />
+        <div className={styles['form-wrapper']}>
           {isLoading && (
             <>
-              <div className={styles['loadingIndicator']}>{t('registering')}</div>
-              <div className={styles['loadingBar']} />
+              <div className={styles['loading-indicator']}>{t('registering')}</div>
+              <div className={styles['loading-bar']} />
             </>
           )}
           {!isLoading && (
             <>
-              <div className={styles['inputWrapper']}>
-                <div className={styles['inputBox']}>
+              <div className={styles['input-wrapper']}>
+                <div className={styles['input-box']}>
                   <div className={styles['label']}>{t('account')}</div>
                   <input
                     type="text"
@@ -197,13 +198,13 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                   />
                 </div>
                 {errors.account ? (
-                  <div className={styles['warning']}>{errors.account}</div>
+                  <div className={styles['warn-text']}>{errors.account}</div>
                 ) : (
-                  <div className={styles['hint']}>{t('account-cannot-change')}</div>
+                  <div className={styles['hint-text']}>{t('account-cannot-change')}</div>
                 )}
               </div>
-              <div className={styles['inputWrapper']}>
-                <div className={styles['inputBox']}>
+              <div className={styles['input-wrapper']}>
+                <div className={styles['input-box']}>
                   <div className={styles['label']}>{t('password')}</div>
                   <input
                     type="password"
@@ -219,13 +220,13 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                   />
                 </div>
                 {errors.password ? (
-                  <div className={styles['warning']}>{errors.password}</div>
+                  <div className={styles['warn-text']}>{errors.password}</div>
                 ) : (
-                  <div className={styles['hint']}>{t('password-hint')}</div>
+                  <div className={styles['hint-text']}>{t('password-hint')}</div>
                 )}
               </div>
-              <div className={styles['inputWrapper']}>
-                <div className={styles['inputBox']}>
+              <div className={styles['input-wrapper']}>
+                <div className={styles['input-box']}>
                   <div className={styles['label']}>{t('confirm-password')}</div>
                   <input
                     type="password"
@@ -241,13 +242,13 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                   />
                 </div>
                 {errors.confirmPassword ? (
-                  <div className={styles['warning']}>{errors.confirmPassword}</div>
+                  <div className={styles['warn-text']}>{errors.confirmPassword}</div>
                 ) : (
-                  <div className={styles['hint']}>{t('repeat-input-password')}</div>
+                  <div className={styles['hint-text']}>{t('repeat-input-password')}</div>
                 )}
               </div>
-              <div className={styles['inputWrapper']}>
-                <div className={styles['inputBox']}>
+              <div className={styles['input-wrapper']}>
+                <div className={styles['input-box']}>
                   <div className={styles['label']}>{t('nickname')}</div>
                   <input
                     name="username"
@@ -262,13 +263,13 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                   />
                 </div>
                 {errors.username ? (
-                  <div className={styles['warning']}>{errors.username}</div>
+                  <div className={styles['warn-text']}>{errors.username}</div>
                 ) : (
-                  <div className={styles['hint']}>{t('nickname-hint')}</div>
+                  <div className={styles['hint-text']}>{t('nickname-hint')}</div>
                 )}
               </div>
               <button
-                className={styles['button']}
+                className={styles['submit-button']}
                 onClick={handleSubmit}
                 disabled={
                   !formData.account.trim() ||
@@ -286,13 +287,15 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
             </>
           )}
         </div>
-      </div>
-      <div className={styles['loginFooter']}>
-        <div className={styles['backToLogin']} onClick={() => setSection('login')}>
+      </main>
+
+      {/* Footer */}
+      <div className={styles['register-footer']}>
+        <div className={styles['back-to-login']} onClick={() => setSection('login')}>
           {t('back-to-login')}
         </div>
       </div>
-    </div>
+    </main>
   );
 });
 

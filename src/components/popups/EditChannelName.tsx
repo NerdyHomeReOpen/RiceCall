@@ -9,7 +9,6 @@ import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -71,24 +70,19 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
   }, [channelId]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
-        <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+      <div className={popup['popup-body']}>
+        <div className={popup['dialog-content']}>
+          <div className={popup['input-group']}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('channel-name-label')}</div>
               <input
-                name="name"
+                name="channel-name"
                 type="text"
                 value={channelName}
                 maxLength={32}
-                onChange={(e) =>
-                  setChannel((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
+                onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
               />
             </div>
           </div>
@@ -96,10 +90,9 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
-        <button
-          className={popup['button']}
-          disabled={!canSubmit}
+      <div className={popup['popup-footer']}>
+        <div
+          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
             if (!canSubmit) return;
             handleEditChannel({ name: channelName }, channelId, serverId);
@@ -107,10 +100,10 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
           }}
         >
           {t('save')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

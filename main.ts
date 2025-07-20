@@ -2,7 +2,6 @@
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
-import { fileURLToPath } from 'url';
 import { io, Socket } from 'socket.io-client';
 import DiscordRPC from 'discord-rpc';
 import dotenv from 'dotenv';
@@ -29,6 +28,7 @@ type StoreSchema = {
 const store = new Store<StoreSchema>();
 
 export enum PopupType {
+  AVATAR_CROPPER = 'avatarCropper',
   USER_INFO = 'userInfo',
   USER_SETTING = 'userSetting',
   CHANNEL_SETTING = 'channelSetting',
@@ -184,6 +184,7 @@ export const PopupSize = {
   [PopupType.ABOUTUS]: { height: 750, width: 500 },
   [PopupType.APPLY_FRIEND]: { height: 320, width: 500 },
   [PopupType.APPLY_MEMBER]: { height: 320, width: 500 },
+  [PopupType.AVATAR_CROPPER]: { height: 520, width: 610 },
   [PopupType.BLOCK_MEMBER]: { height: 250, width: 400 },
   [PopupType.CHANNEL_SETTING]: { height: 520, width: 600 },
   [PopupType.CHANNEL_PASSWORD]: { height: 200, width: 370 },
@@ -218,26 +219,13 @@ export const PopupSize = {
 
 // Constants
 const DEV = process.argv.includes('--dev');
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
 const PORT = 3000;
 const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
-const FILE_PATH = fileURLToPath(import.meta.url);
-const DIR_PATH = path.dirname(FILE_PATH);
-const ROOT_PATH = DEV ? DIR_PATH : path.join(DIR_PATH, '../');
 const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
-const APP_ICON =
-  process.platform === 'win32'
-    ? path.join(ROOT_PATH, 'resources', 'icon.ico')
-    : path.join(ROOT_PATH, 'resources', 'icon.png');
+const APP_ICON = process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'icon.ico') : path.join(app.getAppPath(), 'resources', 'icon.png');
 const APP_TRAY_ICON = {
-  gray:
-    process.platform === 'win32'
-      ? path.join(ROOT_PATH, 'resources', 'tray_gray.ico')
-      : path.join(ROOT_PATH, 'resources', 'tray_gray.png'),
-  normal:
-    process.platform === 'win32'
-      ? path.join(ROOT_PATH, 'resources', 'tray.ico')
-      : path.join(ROOT_PATH, 'resources', 'tray.png'),
+  gray: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray_gray.ico') : path.join(app.getAppPath(), 'resources', 'tray_gray.png'),
+  normal: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray.ico') : path.join(app.getAppPath(), 'resources', 'tray.png'),
 };
 
 // Windows
@@ -246,7 +234,7 @@ let authWindow: BrowserWindow;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
-const websocketUrl = WS_URL;
+const websocketUrl = process.env.NEXT_PUBLIC_WS_URL;
 let socketInstance: Socket | null = null;
 
 // Discord RPC
@@ -269,7 +257,7 @@ const defaultPrecence = {
   ],
 };
 
-const appServe = serve({ directory: path.join(ROOT_PATH, 'out') });
+const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
 // Functions
 // async function checkIsHinet() {
@@ -306,8 +294,7 @@ function waitForPort(port: number) {
 }
 
 function focusWindow() {
-  const window =
-    authWindow.isDestroyed() === false ? authWindow : mainWindow.isDestroyed() === false ? mainWindow : null;
+  const window = authWindow.isDestroyed() === false ? authWindow : mainWindow.isDestroyed() === false ? mainWindow : null;
   if (window) {
     if (window.isMinimized()) window.restore();
     window.focus();
@@ -360,19 +347,23 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
   }
 
   mainWindow = new BrowserWindow({
+    title: `Raidcall v${app.getVersion()}`,
     width: 1080,
     height: 720,
     minWidth: 800,
     minHeight: 600,
-    frame: false,
-    transparent: true,
+    thickFrame: true,
+    titleBarStyle: 'hidden',
+    maximizable: true,
     resizable: true,
+    fullscreen: false,
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
-      webviewTag: true,
+      backgroundThrottling: false,
     },
   });
 
@@ -390,8 +381,16 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
     mainWindow.hide();
   });
 
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('maximize');
+  });
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('unmaximize');
+  });
+
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send(mainWindow.isMaximized() ? 'window-maximized' : 'window-unmaximized');
+    mainWindow.webContents.send(mainWindow.isMaximized() ? 'maximize' : 'unmaximize');
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -421,18 +420,21 @@ async function createAuthWindow() {
   }
 
   authWindow = new BrowserWindow({
+    title: `Raidcall v${app.getVersion()}`,
     width: 640,
     height: 480,
-    frame: false,
-    transparent: true,
+    thickFrame: true,
+    titleBarStyle: 'hidden',
+    maximizable: false,
     resizable: false,
-    hasShadow: true,
     fullscreen: false,
+    hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
-      webviewTag: true,
+      backgroundThrottling: false,
     },
   });
 
@@ -487,20 +489,23 @@ async function createPopup(type: PopupType, id: string, force = true): Promise<B
   }
 
   popups[id] = new BrowserWindow({
+    title: `Raidcall v${app.getVersion()}`,
     width: PopupSize[type].width,
     height: PopupSize[type].height,
-    modal: true,
-    frame: false,
-    transparent: true,
+    thickFrame: true,
+    titleBarStyle: 'hidden',
+    maximizable: false,
     resizable: false,
-    hasShadow: true,
     fullscreen: false,
+    hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
-      webviewTag: true,
+      backgroundThrottling: false,
     },
+    modal: true,
   });
 
   if (app.isPackaged || !DEV) {
@@ -649,26 +654,22 @@ function configureAutoUpdater() {
 
   if (DEV) {
     autoUpdater.forceDevUpdateConfig = true;
-    autoUpdater.updateConfigPath = path.join(ROOT_PATH, 'dev-app-update.yml');
+    autoUpdater.updateConfigPath = path.join(app.getAppPath(), 'dev-app-update.yml');
   }
 
   autoUpdater.on('error', (error: any) => {
     if (DEV && error.message.includes('dev-app-update.yml')) {
-      console.info('開發環境中跳過更新檢查');
+      console.info('Skip update check in development environment');
       return;
     }
-    dialog.showMessageBox({
-      type: 'error',
-      title: '更新錯誤',
-      message: '檢查更新時發生錯誤：' + error.message,
-    });
+    console.error('Cannot check for updates:', error.message);
   });
 
   autoUpdater.on('update-available', (info: any) => {
     dialog.showMessageBox({
       type: 'info',
       title: '有新版本可用',
-      message: `正在下載新版本 ${info.version} 發布於 ${info.releaseDate}，請不要關閉此視窗及進行其他操作...`,
+      message: `新版本 ${info.version} 發布於 ${new Date(info.releaseDate).toLocaleDateString()}，點擊確認後將開始下載...`,
     });
   });
 
@@ -698,8 +699,8 @@ function configureAutoUpdater() {
       });
   });
 
-  // Check update every hour
-  setInterval(checkUpdate, 60 * 60 * 1000);
+  // Check update every minute
+  setInterval(checkUpdate, 60 * 1000);
   checkUpdate();
 }
 
@@ -850,9 +851,9 @@ app.on('ready', async () => {
   });
 
   // Initial data request handlers
-  ipcMain.on('request-initial-data', (_, from) => {
+  ipcMain.on('request-initial-data', (_, to) => {
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('request-initial-data', from);
+      window.webContents.send('request-initial-data', to);
     });
   });
 
@@ -877,9 +878,9 @@ app.on('ready', async () => {
     closePopups();
   });
 
-  ipcMain.on('popup-submit', (_, to) => {
+  ipcMain.on('popup-submit', (_, to, data?: any) => {
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('popup-submit', to);
+      window.webContents.send('popup-submit', to, data ?? null);
     });
   });
 
@@ -894,13 +895,9 @@ app.on('ready', async () => {
         break;
       case 'maximize':
         window.maximize();
-        window.setResizable(false);
-        window.setMovable(false);
         break;
       case 'unmaximize':
         window.unmaximize();
-        window.setResizable(true);
-        window.setMovable(true);
         break;
       case 'close':
         window.close();
@@ -916,31 +913,50 @@ app.on('ready', async () => {
   // System settings handlers
   ipcMain.on('get-system-settings', (event) => {
     const settings = {
+      // Basic settings
       autoLaunch: isAutoLaunchEnabled(),
-      soundEffect: store.get('soundEffect') || true,
-      inputAudioDevice: store.get('audioInputDevice') || '',
-      outputAudioDevice: store.get('audioOutputDevice') || '',
-      dontShowDisclaimer: store.get('dontShowDisclaimer') || false,
+      dontShowDisclaimer: store.get('dontShowDisclaimer') ?? false,
       font: store.get('font') || '',
       fontSize: store.get('fontSize') || 13,
+      // Mix settings
+      inputAudioDevice: store.get('audioInputDevice') || '',
+      outputAudioDevice: store.get('audioOutputDevice') || '',
+      mixEffect: store.get('mixEffect') ?? false,
+      mixEffectType: store.get('mixEffectType') || '',
+      autoMixSetting: store.get('autoMixSetting') ?? false,
+      echoCancellation: store.get('echoCancellation') ?? false,
+      noiseCancellation: store.get('noiseCancellation') ?? false,
+      microphoneAmplification: store.get('microphoneAmplification') ?? false,
+      manualMixMode: store.get('manualMixMode') ?? false,
+      mixMode: store.get('mixMode') || 'all',
+      // Voice settings
+      speakingMode: store.get('speakingMode') || 'key',
+      defaultSpeakingKey: store.get('defaultSpeakingKey') || '',
+      peakingModeAutoKey: store.get('peakingModeAutoKey') ?? false,
+      // Privacy settings
+      notSaveMessageHistory: store.get('notSaveMessageHistory') ?? true,
+      // Hotkeys Settings
+      hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow') || '',
+      hotKeyScreenshot: store.get('hotKeyScreenshot') || '',
+      hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume') || '',
+      hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume') || '',
+      hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker') || '',
+      hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone') || '',
+      // SoundEffect settings
+      disableAllSoundEffect: store.get('disableAllSoundEffect') ?? false,
+      enterVoiceChannelSound: store.get('enterVoiceChannelSound') ?? true,
+      leaveVoiceChannelSound: store.get('leaveVoiceChannelSound') ?? true,
+      startSpeakingSound: store.get('startSpeakingSound') ?? true,
+      stopSpeakingSound: store.get('stopSpeakingSound') ?? true,
+      receiveDirectMessageSound: store.get('receiveDirectMessageSound') ?? true,
+      receiveChannelMessageSound: store.get('receiveChannelMessageSound') ?? true,
     };
-    event.reply('system-settings-status', settings);
+    event.reply('system-settings', settings);
   });
 
+  // Basic
   ipcMain.on('get-auto-launch', (event) => {
-    event.reply('auto-launch-status', isAutoLaunchEnabled());
-  });
-
-  ipcMain.on('get-sound-effect', (event) => {
-    event.reply('sound-effect-status', store.get('soundEffect') || true);
-  });
-
-  ipcMain.on('get-input-audio-device', (event) => {
-    event.reply('input-audio-device', store.get('audioInputDevice') || '');
-  });
-
-  ipcMain.on('get-output-audio-device', (event) => {
-    event.reply('output-audio-device', store.get('audioOutputDevice') || '');
+    event.reply('auto-launch', isAutoLaunchEnabled());
   });
 
   ipcMain.on('get-font', (event) => {
@@ -956,17 +972,138 @@ app.on('ready', async () => {
     event.reply('font-list', fonts);
   });
 
+  ipcMain.on('get-not-save-message-history', (event) => {
+    event.reply('not-save-message-history', store.get('notSaveMessageHistory') || true);
+  });
+
+  // Mix
+  ipcMain.on('get-input-audio-device', (event) => {
+    event.reply('input-audio-device', store.get('audioInputDevice') || '');
+  });
+
+  ipcMain.on('get-output-audio-device', (event) => {
+    event.reply('output-audio-device', store.get('audioOutputDevice') || '');
+  });
+
+  ipcMain.on('get-mix-effect', (event) => {
+    event.reply('mix-effect', store.get('mixEffect') ?? false);
+  });
+
+  ipcMain.on('get-mix-effect-type', (event) => {
+    event.reply('mix-effect-type', store.get('mixEffectType') || '');
+  });
+
+  ipcMain.on('get-auto-mix-setting', (event) => {
+    event.reply('auto-mix-setting', store.get('autoMixSetting') ?? false);
+  });
+
+  ipcMain.on('get-echo-cancellation', (event) => {
+    event.reply('echo-cancellation', store.get('echoCancellation') ?? false);
+  });
+
+  ipcMain.on('get-noise-cancellation', (event) => {
+    event.reply('noise-cancellation', store.get('noiseCancellation') ?? false);
+  });
+
+  ipcMain.on('get-microphone-amplification', (event) => {
+    event.reply('microphone-amplification', store.get('microphoneAmplification') ?? false);
+  });
+
+  ipcMain.on('get-manual-mix-mode', (event) => {
+    event.reply('manual-mix-mode', store.get('manualMixMode') ?? false);
+  });
+
+  ipcMain.on('get-mix-mode', (event) => {
+    event.reply('mix-mode', store.get('mixMode') || 'all');
+  });
+
+  // Voice
+  ipcMain.on('get-speaking-mode', (event) => {
+    event.reply('speaking-mode', store.get('speakingMode') || 'key');
+  });
+
+  ipcMain.on('get-default-speaking-key', (event) => {
+    event.reply('default-speaking-key', store.get('defaultSpeakingKey') || '');
+  });
+
+  ipcMain.on('get-speaking-mode-auto-key', (event) => {
+    event.reply('speaking-mode-auto-key', store.get('speakingModeAutoKey') ?? false);
+  });
+
+  // Privacy
+  ipcMain.on('get-not-save-message-history', (event) => {
+    event.reply('notSaveMessageHistory', store.get('not-save-message-history') ?? true);
+  });
+
+  // HotKey
+  ipcMain.on('get-hot-key-open-main-window', (event) => {
+    event.reply('hot-key-open-main-window', store.get('hotKeyOpenMainWindow') || '');
+  });
+
+  ipcMain.on('get-hot-key-increase-volume', (event) => {
+    event.reply('hot-key-increase-volume', store.get('hotKeyIncreaseVolume') || '');
+  });
+
+  ipcMain.on('get-hot-key-decrease-volume', (event) => {
+    event.reply('hot-key-decrease-volume', store.get('hotKeyDecreaseVolume') || '');
+  });
+
+  ipcMain.on('get-hot-key-disable-speaker', (event) => {
+    event.reply('hot-key-disable-speaker', store.get('hotKeyDisableSpeaker') || '');
+  });
+
+  ipcMain.on('get-hot-key-disable-microphone', (event) => {
+    event.reply('hot-key-disable-microphone', store.get('hotKeyDisableMicrophone') || '');
+  });
+
+  // SoundEffect
+  ipcMain.on('get-disable-all-sound-effect', (event) => {
+    event.reply('disable-all-sound-effect', store.get('disableAllSoundEffect') ?? false);
+  });
+
+  ipcMain.on('get-enter-voice-channel-sound', (event) => {
+    event.reply('enter-voice-channel-sound', store.get('enterVoiceChannelSound') ?? true);
+  });
+
+  ipcMain.on('get-leave-voice-channel-sound', (event) => {
+    event.reply('leave-voice-channel-sound', store.get('leaveVoiceChannelSound') ?? true);
+  });
+
+  ipcMain.on('get-start-speaking-sound', (event) => {
+    event.reply('start-speaking-sound', store.get('startSpeakingSound') ?? true);
+  });
+
+  ipcMain.on('get-stop-speaking-sound', (event) => {
+    event.reply('stop-speaking-sound', store.get('stopSpeakingSound') ?? true);
+  });
+
+  ipcMain.on('get-receive-direct-message-sound', (event) => {
+    event.reply('receive-direct-message-sound', store.get('receiveDirectMessageSound') ?? true);
+  });
+
+  ipcMain.on('get-receive-channel-message-sound', (event) => {
+    event.reply('receive-channel-message-sound', store.get('receiveChannelMessageSound') ?? true);
+  });
+
   ipcMain.on('set-auto-launch', (_, enable) => {
     setAutoLaunch(enable);
   });
 
-  ipcMain.on('set-sound-effect', (_, enable) => {
-    store.set('soundEffect', enable || true);
+  // Basic
+  ipcMain.on('set-font', (_, font) => {
+    store.set('font', font || 'Arial');
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('sound-effect-status', enable);
+      window.webContents.send('font', font);
     });
   });
 
+  ipcMain.on('set-font-size', (_, fontSize) => {
+    store.set('fontSize', fontSize || 13);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('font-size', fontSize);
+    });
+  });
+  // Mix
   ipcMain.on('set-input-audio-device', (_, deviceId) => {
     store.set('audioInputDevice', deviceId || '');
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -981,17 +1118,175 @@ app.on('ready', async () => {
     });
   });
 
-  ipcMain.on('set-font', (_, font) => {
-    store.set('font', font || 'Arial');
+  ipcMain.on('set-mix-effect', (_, deviceId) => {
+    store.set('mixEffect', deviceId ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('font', font);
+      window.webContents.send('mix-effect', deviceId);
     });
   });
 
-  ipcMain.on('set-font-size', (_, fontSize) => {
-    store.set('fontSize', fontSize || 13);
+  ipcMain.on('set-mix-effect-type', (_, deviceId) => {
+    store.set('mixEffectType', deviceId || '');
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('font-size', fontSize);
+      window.webContents.send('mix-effect-type', deviceId);
+    });
+  });
+
+  ipcMain.on('set-auto-mix-setting', (_, deviceId) => {
+    store.set('autoMixSetting', deviceId ?? false);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('auto-mix-setting', deviceId);
+    });
+  });
+
+  ipcMain.on('set-echo-cancellation', (_, deviceId) => {
+    store.set('echoCancellation', deviceId ?? false);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('echo-cancellation', deviceId);
+    });
+  });
+
+  ipcMain.on('set-noise-cancellation', (_, deviceId) => {
+    store.set('noiseCancellation', deviceId ?? false);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('noise-cancellation', deviceId);
+    });
+  });
+
+  ipcMain.on('set-microphone-amplification', (_, deviceId) => {
+    store.set('microphoneAmplification', deviceId ?? false);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('microphone-amplification', deviceId);
+    });
+  });
+
+  ipcMain.on('set-manual-mix-mode', (_, deviceId) => {
+    store.set('manualMixMode', deviceId ?? false);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('manual-mix-mode', deviceId);
+    });
+  });
+
+  ipcMain.on('set-mix-mode', (_, deviceId) => {
+    store.set('mixMode', deviceId || 'all');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('mix-mode', deviceId);
+    });
+  });
+
+  // Voice
+  ipcMain.on('set-speaking-mode', (_, key) => {
+    store.set('speakingMode', key || 'key');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('speaking-mode', key);
+    });
+  });
+
+  ipcMain.on('set-default-speaking-key', (_, key) => {
+    store.set('defaultSpeakingKey', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('default-speaking-key', key);
+    });
+  });
+
+  ipcMain.on('set-speaking-mode-auto-key', (_, key) => {
+    store.set('speakingModeAutoKey', key ?? false);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('speaking-mode-auto-key', key);
+    });
+  });
+
+  // Privacy
+  ipcMain.on('set-not-save-message-history', (_, enable) => {
+    store.set('notSaveMessageHistory', enable ?? true);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('not-save-message-history', enable);
+    });
+  });
+
+  // HotKey
+  ipcMain.on('set-hot-key-open-main-window', (_, key) => {
+    store.set('hotKeyOpenMainWindow', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-open-main-window', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-increase-volume', (_, key) => {
+    store.set('hotKeyIncreaseVolume', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-increase-volume', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
+    store.set('hotKeyDecreaseVolume', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-decrease-volume', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
+    store.set('hotKeyToggleSpeaker', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-toggle-speaker', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
+    store.set('hotKeyToggleMicrophone', key || '');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-toggle-microphone', key);
+    });
+  });
+
+  // SoundEffect
+  ipcMain.on('set-disable-all-sound-effect', (_, enable) => {
+    store.set('disableAllSoundEffect', enable ?? false);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('disable-all-sound-effect', enable);
+    });
+  });
+
+  ipcMain.on('set-enter-voice-channel-sound', (_, enable) => {
+    store.set('enterVoiceChannelSound', enable ?? true);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('enter-voice-channel-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-leave-voice-channel-sound', (_, enable) => {
+    store.set('leaveVoiceChannelSound', enable ?? true);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('leave-voice-channel-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-start-speaking-sound', (_, enable) => {
+    store.set('startSpeakingSound', enable ?? true);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('start-speaking-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-stop-speaking-sound', (_, enable) => {
+    store.set('stopSpeakingSound', enable ?? true);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('stop-speaking-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-receive-direct-message-sound', (_, enable) => {
+    store.set('receiveDirectMessageSound', enable ?? true);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('receive-direct-message-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-receive-channel-message-sound', (_, enable) => {
+    store.set('receiveChannelMessageSound', enable ?? true);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('receive-channel-message-sound', enable);
     });
   });
 

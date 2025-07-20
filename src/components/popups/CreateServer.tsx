@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
+import styles from '@/styles/popups/createServer.module.css';
 import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
-import createServer from '@/styles/popups/createServer.module.css';
 
 // Types
 import { User, Server, PopupType, UserServer } from '@/types';
@@ -53,17 +53,10 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   const [servers, setServers] = useState<UserServer[]>([]);
   const [server, setServer] = useState<Server>(Default.server());
   const [section, setSection] = useState<number>(0);
-  const [reloadAvatarKey, setReloadAvatarKey] = useState<number>(0);
 
   // Variables
   const { level: userLevel } = user;
-  const {
-    name: serverName,
-    type: serverType,
-    avatar: serverAvatar,
-    avatarUrl: serverAvatarUrl,
-    slogan: serverSlogan,
-  } = server;
+  const { name: serverName, type: serverType, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan } = server;
   const MAX_GROUPS = userLevel >= 16 ? 5 : userLevel >= 6 && userLevel < 16 ? 4 : 3;
   const remainingServers = MAX_GROUPS - servers.filter((s) => s.owned).length;
   const canCreate = remainingServers > 0 && serverName.trim() !== '';
@@ -85,13 +78,35 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   const handleOpenErrorDialog = (message: string) => {
     ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
     ipcService.initialData.onRequest('errorDialog', {
-      title: message,
+      message: message,
       submitTo: 'errorDialog',
     });
   };
 
   const handleClose = () => {
     ipcService.window.close();
+  };
+
+  const handleAvatarCropper = (serverId: Server['serverId'], avatarData: string) => {
+    ipcService.popup.open(PopupType.AVATAR_CROPPER, 'avatarCropper');
+    ipcService.initialData.onRequest('avatarCropper', {
+      avatarData: avatarData,
+      submitTo: 'avatarCropper',
+    });
+    ipcService.popup.onSubmit('avatarCropper', async (data) => {
+      const formData = new FormData();
+      formData.append('_type', 'server');
+      formData.append('_fileName', serverId);
+      formData.append('_file', data.imageDataUrl as string);
+      const response = await apiService.post('/upload', formData);
+      if (response) {
+        setServer((prev) => ({
+          ...prev,
+          avatar: response.avatar,
+          avatarUrl: response.avatarUrl,
+        }));
+      }
+    });
   };
 
   // Effects
@@ -120,25 +135,23 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
   return (
     <>
-      <div className={popup['popupContainer']} style={section === 0 ? {} : { display: 'none' }}>
+      <div className={popup['popup-wrapper']} style={section === 0 ? {} : { display: 'none' }}>
         {/* Tab */}
-        <div className={popup['popupTab']}>
-          <div className={`${popup['item']} ${popup['active']}`}>{t('select-server-type')}</div>
-          <div className={popup['item']}>{t('fill-info')}</div>
+        <div className={popup['popup-tabs']}>
+          <div className={`${popup['tab']} ${popup['active']}`}>{t('select-server-type')}</div>
+          <div className={popup['tab']}>{t('fill-info')}</div>
         </div>
 
         {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={`${createServer['message']}`}>
-              {`${t('remaining-server').replace('{0}', remainingServers.toString())}`}
-            </div>
-            <div className={createServer['type']}>{t('select-server-type-description')}</div>
-            <div className={createServer['buttonGroup']}>
+        <div className={popup['popup-body']}>
+          <div className={setting['content']}>
+            <div className={`${styles['message']}`}>{`${t('remaining-server').replace('{0}', remainingServers.toString())}`}</div>
+            <div className={styles['select-type-text']}>{t('select-server-type-description')}</div>
+            <div className={styles['button-group']}>
               {SERVER_TYPES.map((type) => (
                 <div
                   key={type.value}
-                  className={`${createServer['button']} ${serverType === type.value ? createServer['selected'] : ''}`}
+                  className={`${styles['button']} ${serverType === type.value ? styles['selected'] : ''}`}
                   onClick={() => {
                     setServer((prev) => ({
                       ...prev,
@@ -155,135 +168,103 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         </div>
 
         {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['popup-footer']}>
+          <div className={popup['button']} onClick={() => handleClose()}>
             {t('cancel')}
-          </button>
+          </div>
         </div>
       </div>
 
-      <div className={popup['popupContainer']} style={section === 1 ? {} : { display: 'none' }}>
+      <div className={popup['popup-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
         {/* Tab */}
-        <div className={popup['popupTab']}>
-          <div className={popup['item']}>{t('select-server-type')}</div>
-          <div className={`${popup['item']}  ${popup['active']}`}>{t('fill-info')}</div>
+        <div className={popup['popup-tabs']}>
+          <div className={popup['tab']}>{t('select-server-type')}</div>
+          <div className={`${popup['tab']}  ${popup['active']}`}>{t('fill-info')}</div>
         </div>
 
         {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['inputGroup']}>
-              <div className={createServer['avatarWrapper']}>
-                <div
-                  key={reloadAvatarKey}
-                  className={createServer['avatarPicture']}
-                  style={{
-                    backgroundImage: `url(${serverAvatarUrl}?v=${reloadAvatarKey})`,
-                  }}
-                />
-                <input
-                  name="avatar"
-                  type="file"
-                  id="avatar-upload"
-                  style={{ display: 'none' }}
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    if (file.size > 5 * 1024 * 1024) {
-                      handleOpenErrorDialog(t('imageTooLarge'));
-                      return;
-                    }
-
-                    const reader = new FileReader();
-                    reader.onloadend = async () => {
-                      const formData = new FormData();
-                      formData.append('_type', 'server');
-                      formData.append('_fileName', serverAvatar);
-                      formData.append('_file', reader.result as string);
-                      const data = await apiService.post('/upload', formData);
-                      if (data) {
-                        setServer((prev) => ({
-                          ...prev,
-                          avatar: data.avatar,
-                          avatarUrl: data.avatarUrl,
-                        }));
-                        setReloadAvatarKey((prev) => prev + 1);
-                      }
-                    };
-                    reader.readAsDataURL(file);
-                  }}
-                />
-                <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popup['button']}>
-                  {t('upload-avatar')}
-                </label>
+        <div className={popup['popup-body']}>
+          <div className={`${setting['content']} ${popup['col']}`} style={{ justifyContent: 'space-evenly' }}>
+            <div className={styles['avatar-wrapper']}>
+              <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+              <input
+                name="avatar"
+                type="file"
+                id="avatar-upload"
+                style={{ display: 'none' }}
+                accept="image/png, image/jpg, image/jpeg, image/webp"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (file.size > 5 * 1024 * 1024) {
+                    handleOpenErrorDialog(t('imageTooLarge'));
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onloadend = async () => {
+                    handleAvatarCropper(serverAvatar, reader.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }}
+              />
+              <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popup['button']}>
+                {t('upload-avatar')}
+              </label>
+            </div>
+            <div className={popup['col']}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={popup['label']} style={{ width: '100px' }}>
+                  {t('server-type')}
+                </div>
+                <input name="type" type="text" disabled value={t(serverType as keyof typeof t)} />
               </div>
-              <div className={popup['inputGroup']}>
-                <div className={createServer['inputWrapper']}>
-                  <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={createServer['label']}>{t('server-type')}</div>
-                    <input name="type" type="text" disabled value={t(serverType as keyof typeof t)} />
-                  </div>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={popup['label']} style={{ width: '100px' }}>
+                  {t('server-name')}
                 </div>
-                <div className={createServer['inputWrapper']}>
-                  <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={createServer['label']}>{t('server-name')}</div>
-                    <input
-                      name="name"
-                      type="text"
-                      value={serverName}
-                      placeholder={t('server-name-placeholder')}
-                      maxLength={32}
-                      onChange={(e) =>
-                        setServer((prev) => ({
-                          ...prev,
-                          name: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
+                <input
+                  name="server-name"
+                  type="text"
+                  value={serverName}
+                  placeholder={t('server-name-placeholder')}
+                  maxLength={32}
+                  onChange={(e) => setServer((prev) => ({ ...prev, name: e.target.value }))}
+                />
+              </div>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={popup['label']} style={{ width: '100px' }}>
+                  {t('server-slogan')}
                 </div>
-                <div className={createServer['inputWrapper']}>
-                  <div className={`${popup['inputBox']} ${popup['row']}`}>
-                    <div className={createServer['label']}>{t('server-slogan')}</div>
-                    <input
-                      name="slogan"
-                      type="text"
-                      value={serverSlogan}
-                      placeholder={t('server-slogan-placeholder')}
-                      maxLength={32}
-                      onChange={(e) =>
-                        setServer((prev) => ({
-                          ...prev,
-                          slogan: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
+                <input
+                  name="server-slogan"
+                  type="text"
+                  value={serverSlogan}
+                  placeholder={t('server-slogan-placeholder')}
+                  maxLength={32}
+                  onChange={(e) => setServer((prev) => ({ ...prev, slogan: e.target.value }))}
+                />
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button className={popup['button']} onClick={() => setSection(0)}>
+        <div className={popup['popup-footer']}>
+          <div className={popup['button']} onClick={() => setSection(0)}>
             {t('previous')}
-          </button>
-          <button
-            className={popup['button']}
-            disabled={!canCreate}
+          </div>
+          <div
+            className={`${popup['button']} ${!canCreate ? 'disabled' : ''}`}
             onClick={() => {
               handleCreateServer();
               handleClose();
             }}
           >
             {t('confirm')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
+          </div>
+          <div className={popup['button']} onClick={() => handleClose()}>
             {t('cancel')}
-          </button>
+          </div>
         </div>
       </div>
     </>

@@ -4,8 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { User, UserFriend, FriendApplication, PopupType, SocketServerEvent } from '@/types';
 
 // CSS
+import styles from '@/styles/popups/friendVerification.module.css';
 import popup from '@/styles/popup.module.css';
-import friendVerification from '@/styles/popups/friendVerification.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -61,7 +61,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
     ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
     ipcService.initialData.onRequest('alertDialog', {
-      title: message,
+      message: message,
       submitTo: 'alertDialog',
     });
     ipcService.popup.onSubmit('alertDialog', callback);
@@ -69,6 +69,9 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
 
   const handleDeleteAllFriendApplication = () => {
     if (!socket) return;
+
+    if (friendApplications.length === 0) return;
+
     handleOpenAlertDialog(t('confirm-reject-all-friend-application'), () => {
       for (const item of friendApplications) {
         const senderId = item.senderId;
@@ -148,82 +151,66 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   }, []);
 
   return (
-    <div className={popup['popupContainer']} tabIndex={0}>
-      <div className={popup['popupBody']}>
-        <div className={`${friendVerification['body']}`}>
-          <div className={friendVerification['contentHeader']}>
-            <div className={friendVerification['ProcessingStatus']}>
-              {t('unprocessed')}
-              <span className={friendVerification['ProcessingStatusCount']}>({friendApplications.length})</span>
-            </div>
-            <div
-              className={friendVerification['allCancel']}
-              onClick={() => {
-                if (friendApplications.length === 0) return;
-                handleDeleteAllFriendApplication();
-              }}
-            >
-              {t('reject-all')}
-            </div>
+    <div className={popup['popup-wrapper']} tabIndex={0}>
+      <div className={popup['popup-body']} style={{ flexDirection: 'column' }}>
+        {/* Content Header */}
+        <div className={styles['header']}>
+          <div className={styles['processing-status']}>
+            {t('unprocessed')}
+            <span className={styles['processing-status-count']}>({friendApplications.length})</span>
           </div>
-          <div className={friendVerification['contentBody']}>
-            {friendApplications.map((friend) => {
-              return (
-                <div key={friend.senderId} className={friendVerification['userInfoBox']}>
-                  <div
-                    className={friendVerification['avatarBox']}
-                    style={{ backgroundImage: `url(${friend.avatarUrl})` }}
-                  />
-                  <div className={friendVerification['userApplyContentBox']}>
-                    <div className={friendVerification['userInfo']}>
-                      <div className={friendVerification['userName']}>{friend.name}</div>
-                      <div className={friendVerification['time']} title={getFormatTimestamp(t, friend.createdAt)}>
-                        {getFormatTimeDiff(t, friend.createdAt)}
+          <div className={styles['all-cancel-text']} onClick={() => handleDeleteAllFriendApplication()}>
+            {t('reject-all')}
+          </div>
+        </div>
+
+        {/* Content Body */}
+        <div className={styles['content']}>
+          {friendApplications.map((friend) => {
+            return (
+              <div key={friend.senderId} className={styles['application']}>
+                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friend.avatarUrl})` }} />
+                <div style={{ flex: 1 }}>
+                  <div className={styles['user-info-box']}>
+                    <div className={styles['user-name-text']}>{friend.name}</div>
+                    <div className={styles['time-text']} title={getFormatTimestamp(t, friend.createdAt)}>
+                      {getFormatTimeDiff(t, friend.createdAt)}
+                    </div>
+                  </div>
+                  <div className={styles['application-content-box']}>
+                    <div className={popup['col']}>
+                      <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
+                      <div className={styles['content-text']}>
+                        {t('description')}: {friend.description}
                       </div>
                     </div>
-                    <div className={friendVerification['userApplyContent']}>
-                      <div className={friendVerification['userApplyContentText']}>
-                        <div className={friendVerification['userApplyContentRow']}>
-                          {t('request-to-add-you-as-a-friend')}
-                        </div>
-                        <div className={friendVerification['userApplyContentRow']}>
-                          {t('description')}: {friend.description}
-                        </div>
-                      </div>
-                      <div className={friendVerification['userApplyContentButtonBox']}>
-                        <div className={friendVerification['userApplyContentActionButtons']}>
-                          <button
-                            className={friendVerification['userApplyContentButton']}
-                            onClick={() => {
-                              handleOpenApplyFriend(userId, friend.senderId);
-                            }}
-                          >
-                            {t('accept')}
-                          </button>
-                          <button
-                            className={friendVerification['userApplyContentButton']}
-                            onClick={() => {
-                              handleDeleteFriendApplication(friend.senderId, friend.receiverId);
-                            }}
-                          >
-                            {t('reject')}
-                          </button>
+                    <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
+                      <div className={styles['action-buttons']}>
+                        <div
+                          className={styles['button']}
+                          onClick={() => handleOpenApplyFriend(userId, friend.senderId)}
+                        >
+                          {t('accept')}
                         </div>
                         <div
-                          className={friendVerification['directMessageButton']}
-                          onClick={() => {
-                            handleOpenDirectMessage(friend.receiverId, friend.senderId, friend.name);
-                          }}
+                          className={styles['button']}
+                          onClick={() => handleDeleteFriendApplication(friend.senderId, friend.receiverId)}
                         >
-                          <div className={friendVerification['directMessageButtonIcon']}></div>
+                          {t('reject')}
                         </div>
+                      </div>
+                      <div
+                        className={styles['direct-message-button']}
+                        onClick={() => handleOpenDirectMessage(friend.receiverId, friend.senderId, friend.name)}
+                      >
+                        <div className={styles['direct-message-icon']}></div>
                       </div>
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

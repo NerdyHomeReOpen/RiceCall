@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect, useRef } from 'react';
 
 // CSS
-import userInfoCard from '@/styles/userInfoCard.module.css';
+import styles from '@/styles/userInfoCard.module.css';
 import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
@@ -92,63 +92,40 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
   return (
     <div
       ref={cardRef}
-      className={`context-menu-container 
-          ${userInfoCard['userInfoCard']} 
-          ${userInfoCard[`vip-${memberVip}`]}
-        `}
+      className={`context-menu-container ${styles['user-info-card']} ${styles[`vip-${memberVip}`]}`}
       style={{ top: cardY, left: cardX }}
       onClick={(e) => {
         e.stopPropagation();
       }}
     >
-      <div className={userInfoCard['body']}>
+      <div className={styles['body']}>
         {/* Top Section */}
-        <div className={userInfoCard['top']}>
+        <div className={styles['top']}>
           {/* Left Avatar */}
-          <div className={userInfoCard['avatarPicture']} style={{ backgroundImage: `url(${memberAvatarUrl})` }} />
+          <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${memberAvatarUrl})` }} />
 
           {/* Right Info */}
-          <div className={userInfoCard['userInfoWrapper']}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 4,
-              }}
-            >
-              <div className={`${userInfoCard['name']} ${memberVip > 0 && vip['isVIP']}`}>{memberName}</div>
-              <div
-                className={`
-                    ${grade['grade']} 
-                    ${grade[`lv-${Math.min(56, memberLevel)}`]}
-                  `}
-              />
+          <div className={styles['user-info-wrapper']}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
+              <div className={`${styles['name-text']} ${memberVip > 0 && vip['vip-name-color']}`}>{memberName}</div>
+              <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} />
             </div>
-            <div
-              className={`
-                  ${vip['vipIconBig']} 
-                  ${vip[`vip-big-${memberVip}`]}
-                `}
-            />
+            <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
 
             {/* VIP Info Text */}
             {memberVip > 0 && (
-              <div className={userInfoCard['vipText']}>
-                {t('vip-upgrade-boost', { vipBoostMultiplier: vipBoostMultiplier.toString() })}
+              <div className={styles['vip-boost-text']}>
+                {t('vip-upgrade-boost').replace('{0}', vipBoostMultiplier.toString())}
               </div>
             )}
 
             {/* Xp Info */}
-            <div className={userInfoCard['xpWrapper']}>
-              <div className={userInfoCard['levelText']}>{`${t('level')} ${memberLevel} `}</div>
-              <div className={userInfoCard['xpBox']}>
-                <div
-                  className={userInfoCard['xpProgress']}
-                  style={{ width: `${(memberXp / memberRequiredXp) * 100}%` }}
-                />
+            <div className={styles['xp-wrapper']}>
+              <div className={styles['level-text']}>{`${t('level')} ${memberLevel} `}</div>
+              <div className={styles['xp-progress-container']}>
+                <div className={styles['xp-progress']} style={{ width: `${(memberXp / memberRequiredXp) * 100}%` }} />
               </div>
-              <div className={userInfoCard['xpText']}>
+              <div className={styles['xp-text']}>
                 <div>{memberXp}</div>
                 <div>{memberRequiredXp}</div>
               </div>
@@ -157,37 +134,34 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
         </div>
 
         {/* Bottom Section */}
-        <div className={userInfoCard['bottom']}>
+        <div className={styles['bottom']}>
           {/* Nickname Row */}
-          <div className={userInfoCard['nicknameRow']}>
-            {memberNickname && <div className={userInfoCard['nickname']}>{memberNickname}</div>}
+          <div className={styles['nickname-row']}>
+            {memberNickname && <div className={styles['nickname-text']}>{memberNickname}</div>}
           </div>
 
           {/* Info Row */}
-          <div className={userInfoCard['infoRow']}>
+          <div className={styles['info-row']}>
             {/* Permission */}
-            <div className={userInfoCard['permissionWrapper']}>
-              <div
-                className={`
-                      ${permission[memberGender]} 
-                      ${permission[`lv-${memberPermission}`]}`}
-              />
-              <div className={userInfoCard['permissionText']}>{getPermissionText(t, memberPermission)}</div>
+            <div className={styles['permission-wrapper']}>
+              <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
+              <div className={styles['permission-text']}>{getPermissionText(t, memberPermission)}</div>
             </div>
 
-            <div className={userInfoCard['saperator']} />
+            {/* Saperator */}
+            <div className={styles['saperator']} />
 
             {/* Contribution */}
-            <div className={userInfoCard['contributionBox']}>
-              <div className={userInfoCard['contributionText']}>{t('contribution')}:</div>
-              <div className={userInfoCard['contributionValue']}>{memberContributions}</div>
+            <div className={styles['contribution-wrapper']}>
+              <div className={styles['contribution-text']}>{t('contribution')}:</div>
+              <div className={styles['contribution-value']}>{memberContributions}</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Badges Section */}
-      <div className={userInfoCard['footer']}>
+      <div className={styles['footer']}>
         <BadgeListViewer badges={memberBadges} maxDisplay={13} />
       </div>
     </div>

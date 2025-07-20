@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
+import styles from '@/styles/popups/changeTheme.module.css';
 import popup from '@/styles/popup.module.css';
-import changeTheme from '@/styles/popups/changeTheme.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
 
 // Providers
-import { setThemeValue } from '@/utils/themeStorage';
 import { useContextMenu } from '@/providers/ContextMenu';
+import { useTranslation } from 'react-i18next';
+
+// Utils
+import { setThemeValue } from '@/utils/themeStorage';
 
 interface ChangeThemePopupProps {
   submitTo: string;
@@ -70,6 +73,7 @@ function getContrastColor([r, g, b]: [number, number, number]): string {
 const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   // Hooks
   const contextMenu = useContextMenu();
+  const { t } = useTranslation();
 
   // Refs
   const containerRef = useRef<HTMLFormElement>(null);
@@ -187,7 +191,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       }
     };
     img.onerror = () => {
-      console.error('載入顏色選擇器圖片時發生錯誤。');
+      console.error(`Error loading color selector image: ${imgSrc}`);
     };
   };
 
@@ -205,7 +209,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
 
   return (
     <form
-      className={popup['popupContainer']}
+      className={popup['popup-wrapper']}
       tabIndex={0}
       ref={containerRef}
       onKeyDown={(e) => {
@@ -213,47 +217,47 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
       }}
     >
       {/* Body */}
-      <div className={popup['popupBody']}>
-        <div className={changeTheme['ctWrapper']}>
-          <div className={changeTheme['ctContain']}>
-            <div className={changeTheme['themeSelector']}>
-              <div className={changeTheme['themeOptions']}>
-                <div className={changeTheme['themeSlotsBig']}>
+      <div className={popup['popup-body']}>
+        <div className={styles['ct-wrapper']}>
+          <div className={styles['ct-contain']}>
+            <div className={styles['theme-selector']}>
+              <div className={styles['theme-options']}>
+                <div className={styles['theme-slots-big']}>
                   {/* Default Themes (Big) */}
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div
                       key={i}
-                      className={changeTheme['theme']}
+                      className={styles['theme']}
                       data-theme-index={i}
                       onClick={(e) => handleSelectTheme(e)}
                       onMouseEnter={() => setHoveredThemeIndex(i)}
                       onMouseLeave={() => setHoveredThemeIndex(null)}
                     >
                       {hoveredThemeIndex === i && (
-                        <div className={changeTheme['themeDescription']}>
-                          {i === 0 && '粉紅回憶'}
-                          {i === 1 && '純真童年'}
-                          {i === 2 && '可愛貓咪'}
-                          {i === 3 && '那一年'}
+                        <div className={styles['theme-description']}>
+                          {i === 0 && t('pink-memory')}
+                          {i === 1 && t('pure-childhood')}
+                          {i === 2 && t('cute-cat')}
+                          {i === 3 && t('that-year')}
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
 
-                <div className={changeTheme['themeSlotsSmall']}>
+                <div className={styles['theme-slots-small']}>
                   {/* Default Themes (Small) */}
                   {Array.from({ length: 15 }, (_, i) => (
                     <div
                       key={i + 4}
-                      className={changeTheme['theme']}
+                      className={styles['theme']}
                       data-theme-index={i + 4}
                       onClick={(e) => handleSelectTheme(e)}
                     />
                   ))}
 
                   {/* Color Selector */}
-                  <div className={changeTheme['colorSelector']} onClick={() => setShowColorPicker(!showColorPicker)} />
+                  <div className={styles['color-selector']} onClick={() => setShowColorPicker(!showColorPicker)} />
 
                   {/* Custom Colors */}
                   {customThemes.slice(0, 7).map((_, i) => {
@@ -275,8 +279,8 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                           onContextMenu={(e) => {
                             contextMenu.showContextMenu(e.clientX, e.clientY, false, false, [
                               {
-                                id: 'remove-custom-color',
-                                label: '刪除',
+                                id: 'delete',
+                                label: t('delete'),
                                 onClick: () => handleRemoveCustom(i),
                               },
                             ]);
@@ -289,21 +293,21 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                   })}
 
                   {/* Image Selector */}
-                  <div className={changeTheme['imageSelector']} onClick={() => fileInputRef.current?.click()} />
+                  <div className={styles['image-selector']} onClick={() => fileInputRef.current?.click()} />
                   <input
                     type="file"
                     ref={fileInputRef}
                     style={{ display: 'none' }}
-                    accept="image/*"
+                    accept="image/png, image/jpg, image/jpeg, image/webp"
                     onChange={handleSaveSelectedImage}
                   />
                 </div>
 
                 {showColorPicker && (
-                  <div className={changeTheme['colorSelectorBox']}>
+                  <div className={styles['color-selector-box']}>
                     <div
                       ref={colorSelectorRef}
-                      className={changeTheme['colorSelectorImage']}
+                      className={styles['color-selector-image']}
                       onMouseDown={(e) => {
                         handleColorSelect(e);
                         setIsSelectingColor(true);
@@ -314,16 +318,16 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                       }}
                       onMouseLeave={() => setIsSelectingColor(false)}
                     />
-                    <div className={changeTheme['colorSelectorFooter']}>
+                    <div className={styles['color-selector-footer']}>
                       <div
-                        className={changeTheme['colorSelectedColor']}
+                        className={styles['color-selected-color']}
                         style={{
                           backgroundColor: `rgb(${pickedColor[0]}, ${pickedColor[1]}, ${pickedColor[2]})`,
                         }}
                       />
-                      <div className={changeTheme['colorSelectedBtn']}>
-                        <div className={changeTheme['colorSelectedSave']} onClick={() => handleSaveSelectedColor()} />
-                        <div className={changeTheme['colorSelectedCancel']} onClick={() => setShowColorPicker(false)} />
+                      <div className={styles['color-selected-btn']}>
+                        <div className={styles['color-selected-save']} onClick={() => handleSaveSelectedColor()} />
+                        <div className={styles['color-selected-cancel']} onClick={() => setShowColorPicker(false)} />
                       </div>
                     </div>
                   </div>

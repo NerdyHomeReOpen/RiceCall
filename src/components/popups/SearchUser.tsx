@@ -9,7 +9,6 @@ import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -66,15 +65,15 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   }, [socket, handleUserSearch]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
-        <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+      <div className={popup['popup-body']}>
+        <div className={popup['dialog-content']}>
+          <div className={popup['input-group']}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('please-input-friend-account')}</div>
               <input
-                name="query"
+                name="search-query"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -86,18 +85,16 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
-        <button
-          type="submit"
-          className={popup['button']}
-          disabled={!searchQuery.trim()}
+      <div className={popup['popup-footer']}>
+        <div
+          className={`${popup['button']} ${!searchQuery.trim() ? 'disabled' : ''}`}
           onClick={() => handleSearchUser(searchQuery)}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

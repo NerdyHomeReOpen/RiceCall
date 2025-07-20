@@ -17,7 +17,7 @@ import getService from '@/services/get.service';
 import apiService from '@/services/api.service';
 
 // CSS
-import setting from '@/styles/popups/editProfile.module.css';
+import styles from '@/styles/popups/userSetting.module.css';
 import grade from '@/styles/grade.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
@@ -54,7 +54,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   const [servers, setServers] = useState<UserServer[]>([]);
   const [serversView, setServersView] = useState('joined');
   const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'userSetting'>('about');
-  const [reloadAvatarKey, setReloadAvatarKey] = useState(0);
 
   // Variables
   const {
@@ -77,11 +76,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   const isSelf = targetId === userId;
   const isFriend = !!friend.targetId;
   const isProfilePrivate = false; // TODO: 隱私設定開關，等設定功能完工
-  const canSubmit =
-    userName.trim() && userGender.trim() && userCountry.trim() && userBirthYear && userBirthMonth && userBirthDay;
-  const joinedServers = servers
-    .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
-    .sort((a, b) => b.permissionLevel - a.permissionLevel);
+  const canSubmit = userName.trim() && userGender.trim() && userCountry.trim() && userBirthYear && userBirthMonth && userBirthDay;
+  const joinedServers = servers.filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7).sort((a, b) => b.permissionLevel - a.permissionLevel);
   const favoriteServers = servers
     .filter((s) => s.favorite)
     .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
@@ -113,17 +109,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
   const userAge = calculateAge(userBirthYear, userBirthMonth, userBirthDay);
 
-  const yearOptions = useMemo(
-    () => Array.from({ length: CURRENT_YEAR - 1900 + 1 }, (_, i) => CURRENT_YEAR - i),
-    [CURRENT_YEAR],
-  );
+  const yearOptions = useMemo(() => Array.from({ length: CURRENT_YEAR - 1900 + 1 }, (_, i) => CURRENT_YEAR - i), [CURRENT_YEAR]);
 
   const monthOptions = useMemo(() => Array.from({ length: 12 }, (_, i) => i + 1), []);
 
-  const dayOptions = useMemo(
-    () => Array.from({ length: new Date(userBirthYear, userBirthMonth, 0).getDate() }, (_, i) => i + 1),
-    [userBirthYear, userBirthMonth],
-  );
+  const dayOptions = useMemo(() => Array.from({ length: new Date(userBirthYear, userBirthMonth, 0).getDate() }, (_, i) => i + 1), [userBirthYear, userBirthMonth]);
 
   // Handlers
   const handleEditUser = (user: Partial<User>) => {
@@ -139,6 +129,14 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
     });
   };
 
+  const handleOpenErrorDialog = (message: string) => {
+    ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
+    ipcService.initialData.onRequest('errorDialog', {
+      message: message,
+      submitTo: 'errorDialog',
+    });
+  };
+
   const handleMinimize = () => {
     ipcService.window.minimize();
   };
@@ -148,10 +146,33 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   };
 
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-    window.localStorage.setItem(
-      'trigger-handle-server-select',
-      JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }),
-    );
+    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
+  };
+
+  const handleAvatarCropper = (userId: User['userId'], avatarData: string) => {
+    ipcService.popup.open(PopupType.AVATAR_CROPPER, 'avatarCropper');
+    ipcService.initialData.onRequest('avatarCropper', {
+      avatarData: avatarData,
+      submitTo: 'avatarCropper',
+    });
+    ipcService.popup.onSubmit('avatarCropper', async (data) => {
+      const formData = new FormData();
+      formData.append('_type', 'user');
+      formData.append('_fileName', userId);
+      formData.append('_file', data.imageDataUrl as string);
+      const response = await apiService.post('/upload', formData);
+      if (response) {
+        setUser((prev) => ({
+          ...prev,
+          avatar: response.avatar,
+          avatarUrl: response.avatarUrl,
+        }));
+        handleEditUser({
+          avatar: response.avatar,
+          avatarUrl: response.avatarUrl,
+        });
+      }
+    });
   };
 
   // Effects
@@ -201,51 +222,37 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   }, [userBirthYear, userBirthMonth, userBirthDay, CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY, isFutureDate]);
 
   const PrivateElement = (text: React.ReactNode) => {
-    return <div className={setting['userRecentVisitsPrivate']}>{text}</div>;
+    return <div className={styles['user-recent-visits-private']}>{text}</div>;
   };
 
   return (
-    <div className={`${popup['popupContainer']} ${setting['userProfile']}`}>
-      <div className={setting['profileBox']}>
+    <div className={`${popup['popup-wrapper']} ${styles['user-profile']}`}>
+      <div className={styles['profile-box']}>
         {/* Header */}
-        <div className={setting['header']}>
-          <div className={setting['windowActionButtons']}>
-            <div className={setting['minimizeBtn']} onClick={() => handleMinimize()} />
-            <div className={setting['closeBtn']} onClick={() => handleClose()} />
+        <div className={styles['header']}>
+          <div className={styles['window-action-buttons']}>
+            <div className={styles['minimize-btn']} onClick={() => handleMinimize()} />
+            <div className={styles['close-btn']} onClick={() => handleClose()} />
           </div>
 
           <div
-            className={`${setting['avatar']} ${isSelf ? setting['editable'] : ''}`}
-            style={{
-              backgroundImage: `url(${userAvatarUrl}?v=${reloadAvatarKey})`,
-            }}
+            className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`}
+            style={{ backgroundImage: `url(${userAvatarUrl})` }}
             onClick={() => {
               if (!isSelf) return;
               const fileInput = document.createElement('input');
               fileInput.type = 'file';
-              fileInput.accept = 'image/*';
+              fileInput.accept = 'image/png, image/jpg, image/jpeg, image/webp';
               fileInput.onchange = (e) => {
                 const file = (e.target as HTMLInputElement).files?.[0];
                 if (!file) return;
+                if (file.size > 5 * 1024 * 1024) {
+                  handleOpenErrorDialog(t('image-too-large'));
+                  return;
+                }
                 const reader = new FileReader();
                 reader.onloadend = async () => {
-                  const formData = new FormData();
-                  formData.append('_type', 'user');
-                  formData.append('_fileName', userId);
-                  formData.append('_file', reader.result as string);
-                  const data = await apiService.post('/upload', formData);
-                  if (data) {
-                    setUser((prev) => ({
-                      ...prev,
-                      avatar: data.avatar,
-                      avatarUrl: data.avatarUrl,
-                    }));
-                    setReloadAvatarKey((prev) => prev + 1);
-                    handleEditUser({
-                      avatar: data.avatar,
-                      avatarUrl: data.avatarUrl,
-                    });
-                  }
+                  handleAvatarCropper(userId, reader.result as string);
                 };
                 reader.readAsDataURL(file);
               };
@@ -253,40 +260,30 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             }}
           />
 
-          <div className={`${popup['row']} ${setting['noDrag']}`} style={{ gap: '2px' }}>
-            <div className={setting['userName']}>{userName}</div>
-            {userVip > 0 && <div className={`${vip['vipIcon']} ${vip[`vip-small-${userVip}`]}`} />}
+          <div className={`${popup['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
+            <div className={styles['user-name-text']}>{userName}</div>
+            {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
             <div
-              className={`
-                  ${grade['grade']} 
-                  ${grade[`lv-${Math.min(56, userLevel)}`]}
-                `}
-              title={`${t('level')}：${userLevel}，${t('xp')}：${userXP}，${t('required-xp')}：${
-                userRequiredXP - userXP
-              }`}
+              className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
+              title={`${t('level')}: ${userLevel}, ${t('xp')}:${userXP}, ${t('required-xp')}:${userRequiredXP - userXP}`}
             />
           </div>
 
-          <div
-            className={setting['userAccount']}
-            onClick={() => {
-              navigator.clipboard.writeText(userId);
-            }}
-          >
+          <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(userId)}>
             @{userName}
           </div>
 
-          <div className={setting['userContent']}>
+          <div className={styles['user-info-text']}>
             {t(userGender === 'Male' ? 'male' : 'female')} . {userAge} .{t(userCountry as keyof typeof t)}
           </div>
 
-          <div className={setting['userSignature']} dangerouslySetInnerHTML={{ __html: userSignature }} />
+          <div className={styles['user-signature']} dangerouslySetInnerHTML={{ __html: userSignature }} />
 
-          <div className={setting['tab']}>
+          <div className={styles['tabs']}>
             <div
-              className={`${setting['item']} ${setting['about']}
-                ${selectedTabId === 'userSetting' ? `${setting['selected']} ${setting['editable']}` : ''}
-                ${selectedTabId === 'about' ? setting['selected'] : ''}`}
+              className={`${styles['tab']} ${styles['about']} ${
+                selectedTabId === 'userSetting' ? `${styles['selected']} ${styles['editable']}` : ''
+              } ${selectedTabId === 'about' ? styles['selected'] : ''}`}
               onClick={() => {
                 if (selectedTabId !== 'userSetting') {
                   setSelectedTabId('about');
@@ -296,9 +293,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               {t('about-me')}
             </div>
             <div
-              className={`${setting['item']} ${setting['groups']}
-                ${selectedTabId === 'userSetting' ? setting['editable'] : ''}
-                ${selectedTabId === 'groups' ? setting['selected'] : ''}`}
+              className={`${styles['tab']} ${styles['groups']} ${selectedTabId === 'userSetting' ? styles['editable'] : ''} ${selectedTabId === 'groups' ? styles['selected'] : ''}`}
               onClick={() => {
                 if (selectedTabId !== 'userSetting') {
                   setSelectedTabId('groups');
@@ -311,14 +306,12 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
         </div>
 
         {/* Action Buttons */}
-        <div className={setting['editTabBar']} style={isSelf && selectedTabId !== 'groups' ? {} : { display: 'none' }}>
+        <div className={styles['edit-tab-bar']} style={isSelf && selectedTabId !== 'groups' ? {} : { display: 'none' }}>
           {selectedTabId === 'userSetting' ? (
             <>
-              <button
-                className={`${setting['confirmedButton']} ${setting['blueBtn']}`}
-                disabled={!canSubmit}
+              <div
+                className={`${popup['button']} ${popup['blue']} ${!canSubmit ? 'disabled' : ''}`}
                 onClick={() => {
-                  if (!canSubmit) return;
                   handleEditUser({
                     name: userName,
                     gender: userGender,
@@ -332,28 +325,28 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 }}
               >
                 {t('confirm')}
-              </button>
-              <button className={setting['button']} onClick={() => setSelectedTabId('about')}>
+              </div>
+              <div className={popup['button']} onClick={() => setSelectedTabId('about')}>
                 {t('cancel')}
-              </button>
+              </div>
             </>
           ) : (
-            <button className={setting['button']} onClick={() => setSelectedTabId('userSetting')}>
+            <div className={popup['button']} onClick={() => setSelectedTabId('userSetting')}>
               {t('edit-profile')}
-            </button>
+            </div>
           )}
         </div>
 
         {/* About */}
-        <div className={setting['body']} style={selectedTabId === 'about' ? {} : { display: 'none' }}>
+        <div className={styles['content']} style={selectedTabId === 'about' ? {} : { display: 'none' }}>
           {userSignature && (
-            <div className={setting['userAboutMeShow']}>
-              <div className={setting['userAboutMeShowText']} dangerouslySetInnerHTML={{ __html: userSignature }} />
+            <div className={styles['user-about-me-show']}>
+              <div className={styles['user-about-me-show-text']} dangerouslySetInnerHTML={{ __html: userSignature }} />
             </div>
           )}
-          <div className={setting['userProfileContent']}>
-            <div className={setting['title']}>{t('recently-join-server')}</div>
-            <div className={setting['serverItems']}>
+          <div className={styles['user-profile-content']}>
+            <div className={popup['label']}>{t('recently-join-server')}</div>
+            <div className={styles['server-list']}>
               {isProfilePrivate
                 ? PrivateElement(
                     <>
@@ -363,51 +356,39 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     </>,
                   )
                 : recentServers.length === 0
-                ? PrivateElement(t('no-recent-servers'))
-                : recentServers.map((server) => (
-                    <div
-                      key={server.serverId}
-                      className={setting['serverItem']}
-                      onClick={() => handleServerSelect(server.serverId, server.displayId)}
-                    >
-                      <div
-                        className={setting['serverAvatarPicture']}
-                        style={{
-                          backgroundImage: `url(${server.avatarUrl})`,
-                        }}
-                      />
-                      <div className={setting['serverBox']}>
-                        <div className={setting['serverName']}>{server.name}</div>
-                        <div className={setting['serverInfo']}>
-                          <div className={`${isSelf && server.ownerId === userId ? setting['isOwner'] : ''}`} />
-                          <div className={setting['id']} />
-                          <div className={setting['displayId']}>{server.displayId}</div>
+                  ? PrivateElement(t('no-recent-servers'))
+                  : recentServers.map((server) => (
+                      <div key={server.serverId} className={styles['server-card']} onClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                        <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+                        <div className={styles['server-info-box']}>
+                          <div className={styles['server-name-text']}>{server.name}</div>
+                          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                            <div className={`${isSelf && server.ownerId === userId ? styles['is-owner'] : ''}`} />
+                            <div className={styles['display-id-text']}>{server.displayId}</div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
             </div>
           </div>
-          <div className={`${setting['userProfileContent']}`}>
-            <div className={setting['title']}>{t('recently-earned-badges')}</div>
-            <div className={setting['badgeViewer']}>
+          <div className={`${styles['user-profile-content']}`}>
+            <div className={popup['label']}>{t('recently-earned-badges')}</div>
+            <div className={styles['badge-viewer']}>
               <BadgeListViewer badges={userBadges} maxDisplay={13} />
             </div>
           </div>
         </div>
 
         {/* Groups */}
-        <div className={setting['body']} style={selectedTabId === 'groups' ? {} : { display: 'none' }}>
-          <div className={setting['userProfileContent']}>
-            <div className={`${popup['inputBox']}`}>
-              <div className={`${popup['selectBox']}`}>
-                <select value={serversView} onChange={(e) => setServersView(e.target.value)}>
-                  <option value="joined">{t('joined-servers')}</option>
-                  <option value="favorite">{t('favorited-servers')}</option>
-                </select>
-              </div>
+        <div className={styles['content']} style={selectedTabId === 'groups' ? {} : { display: 'none' }}>
+          <div className={styles['user-profile-content']}>
+            <div className={popup['select-box']}>
+              <select value={serversView} onChange={(e) => setServersView(e.target.value)}>
+                <option value="joined">{t('joined-servers')}</option>
+                <option value="favorite">{t('favorited-servers')}</option>
+              </select>
             </div>
-            <div className={setting['serverItems']} style={serversView === 'joined' ? {} : { display: 'none' }}>
+            <div className={styles['server-list']} style={serversView === 'joined' ? {} : { display: 'none' }}>
               {isProfilePrivate
                 ? PrivateElement(
                     <>
@@ -417,42 +398,28 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     </>,
                   )
                 : joinedServers.length === 0
-                ? PrivateElement(t('no-joined-servers'))
-                : joinedServers.map((server) => (
-                    <div
-                      key={server.serverId}
-                      className={setting['serverItem']}
-                      onClick={() => handleServerSelect(server.serverId, server.displayId)}
-                    >
-                      <div
-                        className={setting['serverAvatarPicture']}
-                        style={{
-                          backgroundImage: `url(${server.avatarUrl})`,
-                        }}
-                      />
-                      <div className={setting['serverBox']}>
-                        <div className={setting['serverName']}>{server.name}</div>
-                        <div className={`${setting['serverInfo']} ${setting['around']}`}>
+                  ? PrivateElement(t('no-joined-servers'))
+                  : joinedServers.map((server) => (
+                      <div key={server.serverId} className={styles['server-card']} onClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                        <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+                        <div className={styles['server-info-box']}>
+                          <div className={styles['server-name-text']}>{server.name}</div>
                           <div
-                            className={`
-                                ${setting['permission']}
-                                ${permission[userGender]} 
-                                ${
-                                  server.ownerId === targetId
-                                    ? permission[`lv-6`]
-                                    : permission[`lv-${server.permissionLevel}`]
-                                }`}
-                          />
-                          <div className={setting['contributionBox']}>
-                            <div className={setting['contributionIcon']} />
-                            <div className={setting['contributionValue']}>{server.contribution}</div>
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <div className={`${permission[userGender]} ${server.ownerId === targetId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
+                            <div className={styles['contribution-value-text']}>{server.contribution}</div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
             </div>
-            <div className={setting['serverItems']} style={serversView === 'favorite' ? {} : { display: 'none' }}>
+            <div className={styles['server-list']} style={serversView === 'favorite' ? {} : { display: 'none' }}>
               {isProfilePrivate
                 ? PrivateElement(
                     <>
@@ -462,72 +429,47 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     </>,
                   )
                 : favoriteServers.length === 0
-                ? PrivateElement(t('no-favorite-servers'))
-                : favoriteServers.map((server) => (
-                    <div
-                      key={server.serverId}
-                      className={setting['serverItem']}
-                      onClick={() => handleServerSelect(server.serverId, server.displayId)}
-                    >
-                      <div
-                        className={setting['serverAvatarPicture']}
-                        style={{
-                          backgroundImage: `url(${server.avatarUrl})`,
-                        }}
-                      />
-                      <div className={setting['serverBox']}>
-                        <div className={setting['serverName']}>{server.name}</div>
-                        <div className={`${setting['serverInfo']} ${setting['around']}`}>
+                  ? PrivateElement(t('no-favorite-servers'))
+                  : favoriteServers.map((server) => (
+                      <div key={server.serverId} className={styles['server-card']} onClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                        <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+                        <div className={styles['server-info-box']}>
+                          <div className={styles['server-name-text']}>{server.name}</div>
                           <div
-                            className={`
-                              ${setting['permission']}
-                              ${permission[userGender]} 
-                              ${
-                                server.ownerId === targetId
-                                  ? permission[`lv-6`]
-                                  : permission[`lv-${server.permissionLevel}`]
-                              }`}
-                          />
-                          <div className={setting['contributionBox']}>
-                            <div className={setting['contributionIcon']} />
-                            <div className={setting['contributionValue']}>{server.contribution}</div>
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <div className={`${styles['permission']} ${permission[userGender]} ${server.ownerId === targetId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
+                            <div className={styles['contribution-box']}>
+                              <div className={styles['contribution-icon']} />
+                              <div className={styles['contribution-value-text']}>{server.contribution}</div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
             </div>
           </div>
         </div>
 
         {/* User Setting */}
-        <div className={setting['body']} style={selectedTabId === 'userSetting' ? {} : { display: 'none' }}>
-          <div className={setting['userProfileContent']}>
+        <div className={styles['content']} style={selectedTabId === 'userSetting' ? {} : { display: 'none' }}>
+          <div className={styles['user-profile-content']}>
             <div className={popup['col']}>
               <div className={popup['row']}>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('nickname')}</div>
-                  <input
-                    name="name"
-                    type="text"
-                    value={userName}
-                    maxLength={32}
-                    onChange={(e) => setUser((prev) => ({ ...prev, name: e.target.value }))}
-                  />
+                  <input name="name" type="text" value={userName} maxLength={32} onChange={(e) => setUser((prev) => ({ ...prev, name: e.target.value }))} />
                 </div>
 
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('gender')}</div>
-                  <div className={`${popup['selectBox']} ${popup['selectBoxMax']}`}>
-                    <select
-                      value={userGender}
-                      onChange={(e) =>
-                        setUser((prev) => ({
-                          ...prev,
-                          gender: e.target.value as User['gender'],
-                        }))
-                      }
-                    >
+                  <div className={popup['select-box']}>
+                    <select value={userGender} onChange={(e) => setUser((prev) => ({ ...prev, gender: e.target.value as User['gender'] }))}>
                       <option value="Male">{t('male')}</option>
                       <option value="Female">{t('female')}</option>
                     </select>
@@ -536,18 +478,10 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               </div>
 
               <div className={popup['row']}>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('country')}</div>
-                  <div className={popup['selectBox']}>
-                    <select
-                      value={userCountry}
-                      onChange={(e) =>
-                        setUser((prev) => ({
-                          ...prev,
-                          country: e.target.value,
-                        }))
-                      }
-                    >
+                  <div className={popup['select-box']}>
+                    <select value={userCountry} onChange={(e) => setUser((prev) => ({ ...prev, country: e.target.value }))}>
                       <option value="taiwan">{t('taiwan')}</option>
                       <option value="china">{t('china')}</option>
                       <option value="japan">{t('japan')}</option>
@@ -591,20 +525,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     </select>
                   </div>
                 </div>
-                <div className={`${popup['inputBox']} ${popup['col']}`}>
+                <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('birthdate')}</div>
                   <div className={popup['row']}>
-                    <div className={popup['selectBox']}>
-                      <select
-                        id="birthYear"
-                        value={userBirthYear}
-                        onChange={(e) =>
-                          setUser((prev) => ({
-                            ...prev,
-                            birthYear: Number(e.target.value),
-                          }))
-                        }
-                      >
+                    <div className={popup['select-box']}>
+                      <select id="birthYear" value={userBirthYear} onChange={(e) => setUser((prev) => ({ ...prev, birthYear: Number(e.target.value) }))}>
                         {yearOptions.map((year) => (
                           <option key={year} value={year} disabled={year > CURRENT_YEAR}>
                             {year}
@@ -612,49 +537,19 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         ))}
                       </select>
                     </div>
-                    <div className={popup['selectBox']}>
-                      <select
-                        className={popup['input']}
-                        id="birthMonth"
-                        value={userBirthMonth}
-                        onChange={(e) =>
-                          setUser((prev) => ({
-                            ...prev,
-                            birthMonth: Number(e.target.value),
-                          }))
-                        }
-                      >
+                    <div className={popup['select-box']}>
+                      <select id="birthMonth" value={userBirthMonth} onChange={(e) => setUser((prev) => ({ ...prev, birthMonth: Number(e.target.value) }))}>
                         {monthOptions.map((month) => (
-                          <option
-                            key={month}
-                            value={month}
-                            disabled={userBirthYear === CURRENT_YEAR && month > CURRENT_MONTH}
-                          >
+                          <option key={month} value={month} disabled={userBirthYear === CURRENT_YEAR && month > CURRENT_MONTH}>
                             {month.toString().padStart(2, '0')}
                           </option>
                         ))}
                       </select>
                     </div>
-                    <div className={popup['selectBox']}>
-                      <select
-                        className={popup['input']}
-                        id="birthDay"
-                        value={userBirthDay}
-                        onChange={(e) =>
-                          setUser((prev) => ({
-                            ...prev,
-                            birthDay: Number(e.target.value),
-                          }))
-                        }
-                      >
+                    <div className={popup['select-box']}>
+                      <select id="birthDay" value={userBirthDay} onChange={(e) => setUser((prev) => ({ ...prev, birthDay: Number(e.target.value) }))}>
                         {dayOptions.map((day) => (
-                          <option
-                            key={day}
-                            value={day}
-                            disabled={
-                              userBirthYear === CURRENT_YEAR && userBirthMonth === CURRENT_MONTH && day > CURRENT_DAY
-                            }
-                          >
+                          <option key={day} value={day} disabled={userBirthYear === CURRENT_YEAR && userBirthMonth === CURRENT_MONTH && day > CURRENT_DAY}>
                             {day.toString().padStart(2, '0')}
                           </option>
                         ))}
@@ -664,38 +559,25 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 </div>
               </div>
 
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('signature')}</div>
                 <div className={popup['row']}>
-                  <input
-                    name="signature"
-                    type="text"
-                    value={userSignature}
-                    onChange={(e) => {
-                      setUser((prev) => ({
-                        ...prev,
-                        signature: e.target.value,
-                      }));
-                    }}
-                  />
+                  <input name="signature" type="text" value={userSignature} onChange={(e) => setUser((prev) => ({ ...prev, signature: e.target.value }))} />
                   <div
                     ref={emojiIconRef}
-                    className={emoji['emojiIcon']}
+                    className={emoji['emoji-icon']}
                     onClick={() => {
                       if (!emojiIconRef.current) return;
                       const x = emojiIconRef.current.getBoundingClientRect().x;
                       const y = emojiIconRef.current.getBoundingClientRect().y;
                       contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
-                        setUser((prev) => ({
-                          ...prev,
-                          signature: prev.signature + emoji,
-                        }));
+                        setUser((prev) => ({ ...prev, signature: prev.signature + emoji }));
                       });
                     }}
                   />
                 </div>
               </div>
-              <div className={`${popup['inputBox']} ${popup['col']} ${popup['disabled']}`}>
+              <div className={`${popup['input-box']} ${popup['col']} ${'disabled'}`}>
                 <div className={popup['label']}>{t('about-me')}</div>
                 <textarea name="about" />
               </div>
@@ -705,12 +587,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
+      <div className={popup['popup-footer']}>
         {!isFriend && !isSelf && (
-          <div
-            className={`${setting['confirmedButton']} ${setting['greenBtn']}`}
-            onClick={() => handleOpenApplyFriend(userId, targetId)}
-          >
+          <div className={`${popup['button']} ${popup['green']}`} onClick={() => handleOpenApplyFriend(userId, targetId)}>
             {t('add-friend')}
           </div>
         )}

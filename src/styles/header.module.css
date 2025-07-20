@@ -7,45 +7,42 @@
   background-color: var(--main-color);
   background-image: var(--header-image);
   background-repeat: no-repeat;
-  background-position: 0 20%;
+  background-position: 0 0;
   background-size: cover;
   color: var(--secondary-color);
 }
 
-.popupHeader {
+.header.popup {
   flex-direction: column;
   justify-content: center;
 }
 
-.titleWrapper {
+.header.big {
+  min-height: 40px;
+  min-width: 14rem;
+  display: flex;
+}
+
+.title-wrapper {
   display: flex;
   justify-content: space-between;
   min-height: 30px;
 }
 
-.header .big {
-  min-height: 40px;
-  min-width: 14rem;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.appIcon {
-  position: absolute;
+.app-icon {
   display: inline-block;
   min-width: 60px;
   min-height: 24px;
-  vertical-align: middle;
   background-image: url('../../public/login_logo_title.png');
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: center;
   background-size: contain;
   left: 2.5rem;
 }
 
-.nameBox,
-.statusBox,
-.mainTabs,
+.name-box,
+.status-box,
+.main-tabs,
 .buttons {
   -webkit-app-region: no-drag;
   cursor: pointer;
@@ -96,6 +93,7 @@
 }
 
 .overlay {
+  position: absolute;
   min-width: 24px;
   min-height: 24px;
   background-image: url('../../public/icon_notice_overlay.png');
@@ -172,7 +170,7 @@
   cursor: pointer;
 }
 
-.overlayNew {
+.overlay.new {
   background-position: -24px 0;
 }
 
@@ -226,15 +224,14 @@
 
 /* Main Tab */
 
-.mainTabs {
+.main-tabs {
   display: flex;
   align-items: flex-end;
-  height: 43px;
   margin-right: auto;
   margin-left: 0;
 }
 
-.mainTabs .tab {
+.main-tabs .tab {
   position: relative;
   display: flex;
   align-items: center;
@@ -247,7 +244,7 @@
   padding: 0 13px;
 }
 
-.mainTabs .tab:before {
+.main-tabs .tab::before {
   content: '';
   position: absolute;
   z-index: 100;
@@ -260,7 +257,7 @@
   background-position: 0 0;
 }
 
-.mainTabs .tab::after {
+.main-tabs .tab::after {
   content: '';
   position: absolute;
   z-index: 100;
@@ -273,7 +270,7 @@
   background-position: 0 0;
 }
 
-.mainTabs .tabClose {
+.main-tabs .tab-close {
   z-index: 2;
   min-width: 12px;
   min-height: 12px;
@@ -287,15 +284,15 @@
   cursor: pointer;
 }
 
-.mainTabs .tabClose:hover {
+.main-tabs .tab-close:hover {
   background-position: -15px 0;
 }
 
-.mainTabs .tabClose:active {
+.main-tabs .tab-close:active {
   background-position: -30px 0;
 }
 
-.mainTabs .tab .tabBg {
+.main-tabs .tab .tab-bg {
   position: absolute;
   overflow: hidden;
   width: calc(100% - 20px);
@@ -304,20 +301,22 @@
   left: 10px;
 }
 
-.mainTabs .tab.selected::before {
+.main-tabs .tab.selected::before {
+  content: '';
   background-position: 0 -32px;
 }
 
-.mainTabs .tab.selected::after {
+.main-tabs .tab.selected::after {
+  content: '';
   background-position: -11px -32px;
 }
 
-.mainTabs .tab.selected .tabBg {
+.main-tabs .tab.selected .tab-bg {
   background-color: #fff;
   color: rgb(55 144 206);
 }
 
-.mainTabs .tab .tabLable {
+.main-tabs .tab .tab-lable {
   z-index: 1;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -328,18 +327,18 @@
   white-space: nowrap;
 }
 
-.mainTabs .tab.selected .tabLable {
-  color: var(--main-color, rgb(0, 115, 198));
+.main-tabs .tab.selected .tab-lable {
+  color: var(--main-color, rgb(0 115 198));
 }
 
-.mainTabs .tab.selected .tabClose {
-  color: var(--main-color, rgb(0, 115, 198));
+.main-tabs .tab.selected .tab-close {
+  color: var(--main-color, rgb(0 115 198));
 }
 
 /* Title */
 
-.titleBox,
-.titleBoxSkinIcon {
+.title-box,
+.title-box-skin-icon {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -348,7 +347,7 @@
   gap: 5px;
 }
 
-.titleBox:before {
+.title-box::before {
   content: '';
   display: inline-block;
   min-width: 18px;
@@ -359,15 +358,15 @@
   background-image: url('../../public/rc_logo_small.png');
 }
 
-.titleBoxSkinIcon::before {
+.title-box-skin-icon::before {
   background-image: url('../../public/icon_skin.png');
 }
 
-.titleBoxDirectMessageIcon::before {
+.title-box-direct-message-icon::before {
   background-image: url('../../public/im/chat.png');
 }
 
-.nameBox {
+.name-box {
   text-shadow: 0 0 4px #fff9;
   line-height: 16px;
   white-space: nowrap;
@@ -375,44 +374,44 @@
   text-overflow: ellipsis;
   max-width: 150px;
   max-height: 26px;
-  padding: 0px 2px;
-  font-size: 12px;
+  padding: 0 2px;
+  font-size: 0.9em;
   font-weight: bold;
   color: #000;
 }
 
-.nameBox:hover {
+.name-box:hover {
   color: #222;
   text-shadow: 0 0 4px #fff;
   background: #ffffff1f;
   border-radius: 3px;
 }
 
-.nameBox:active {
+.name-box:active {
   color: #222;
   text-shadow: 0 0 4px #fff;
   background: #ffffff36;
 }
 
-.statusBox {
+.status-box {
   position: relative;
   display: flex;
   padding: 2px;
   height: fit-content;
 }
 
-.statusBox:hover:not(:has(.statusDropdown:hover)) {
+.status-box:hover:not(:has(.statusDropdown:hover)) {
   text-shadow: 0 0 4px #fff;
   background: #ffffff1f;
   border-radius: 3px;
 }
 
-.statusBox:active:not(:has(.statusDropdown:active)) {
+.status-box:active:not(:has(.statusDropdown:active)) {
   text-shadow: 0 0 4px #fff;
   background: #ffffff36;
 }
 
-.statusDisplay {
+.status-display {
   display: inline-block;
   min-width: 13px;
   min-height: 13px;
@@ -421,23 +420,23 @@
   background-position: 0 0 !important;
 }
 
-.statusDisplay[datatype='online'] {
+.status-display[datatype='online'] {
   background-position: 0 0 !important;
 }
 
-.statusDisplay[datatype='dnd'] {
+.status-display[datatype='dnd'] {
   background-position: -13px 0 !important;
 }
 
-.statusDisplay[datatype='idle'] {
+.status-display[datatype='idle'] {
   background-position: -26px 0 !important;
 }
 
-.statusDisplay[datatype='gn'] {
+.status-display[datatype='gn'] {
   background-position: -39px 0 !important;
 }
 
-.statusTriangle {
+.status-triangle {
   display: inline-block;
   min-width: 8px;
   min-height: 13px;
@@ -447,15 +446,15 @@
   background-position: 0 4px;
 }
 
-.statusBox:hover:not(:has(.statusDropdown:hover)) .statusTriangle {
+.status-box:hover:not(:has(.statusDropdown:hover)) .status-triangle {
   background-position: -9px 4px;
 }
 
-.statusBox:active:not(:has(.statusDropdown:active)) .statusTriangle {
+.status-box:active:not(:has(.statusDropdown:active)) .status-triangle {
   background-position: -18px 4px;
 }
 
-.statusDropdown {
+.status-dropdown {
   position: absolute;
   display: flex;
   flex-flow: column wrap;
@@ -472,11 +471,11 @@
   padding: 3px;
 }
 
-.statusDropdown.hidden {
+.status-dropdown.hidden {
   display: none;
 }
 
-.statusDropdown .option {
+.status-dropdown .option {
   color: #333;
   display: flex;
   justify-content: center;
@@ -488,12 +487,12 @@
   padding: 0.2rem;
 }
 
-.statusDropdown .option:hover {
+.status-dropdown .option:hover {
   background-color: #0073c6;
   color: #fff;
 }
 
-.statusDropdown .option::before {
+.status-dropdown .option::before {
   content: '';
   display: inline-block;
   min-width: 13px;
@@ -503,44 +502,18 @@
   background-position: 0 0;
 }
 
-.statusDropdown .option[datatype='online']::before {
+.status-dropdown .option[datatype='online']::before {
   background-position: 0 0;
 }
 
-.statusDropdown .option[datatype='dnd']::before {
+.status-dropdown .option[datatype='dnd']::before {
   background-position: -13px 0;
 }
 
-.statusDropdown .option[datatype='idle']::before {
+.status-dropdown .option[datatype='idle']::before {
   background-position: -26px 0;
 }
 
-.statusDropdown .option[datatype='gn']::before {
+.status-dropdown .option[datatype='gn']::before {
   background-position: -39px 0;
-}
-
-/* Overlay */
-.overlay {
-    width: 24px;
-    height: 24px;
-    background: url('../../public/icon_notice_overlay.png') no-repeat center center;
-    background-position: 0 0;
-    cursor: pointer;
-    position: absolute;
-    background-size: cover;
-}
-/* 
-.overlay {
-  min-width: 24px;
-  min-height: 24px;
-  background-image: url('../../public/icon_notice_overlay.png');
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: cover;
-  display: inline-block;
-  cursor: pointer;
-} */
-
-.overlay.new {
-  background-position: -24px 0px;
 }

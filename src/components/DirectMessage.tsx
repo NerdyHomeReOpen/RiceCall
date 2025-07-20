@@ -33,10 +33,10 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   const translatedMessages = messageContents.map((content) => getTranslatedMessage(t, content));
 
   return (
-    <div className={styles['messageBox']}>
+    <div className={styles['message-box']}>
       <div className={styles['header']}>
-        <div className={styles['username']}>{senderName}</div>
-        <div className={styles['timestamp']}>{formattedTimestamp}</div>
+        <div className={styles['username-text']}>{senderName}</div>
+        <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
       </div>
       {translatedMessages.map((content, index) => (
         <MarkdownViewer key={index} markdownText={content} />

@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -68,29 +67,23 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
   }, [channelId]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
-        <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={popup['inputBox']}>
+      <div className={popup['popup-body']}>
+        <div className={popup['dialog-content']}>
+          <div className={popup['input-group']}>
+            <div className={popup['input-box']}>
               <div className={popup['label']}>{t('parent-channel')}</div>
               <div className={popup['label']}>{parentName || t('none')}</div>
             </div>
-            <div className={popup['inputBox']}>
+            <div className={popup['input-box']}>
               <div className={popup['label']}>{t('channel-name')}</div>
               <input
-                name="name"
+                name="channel-name"
                 type="text"
                 value={channelName}
                 maxLength={32}
-                onChange={(e) =>
-                  setChannel((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
-                required
+                onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
               />
             </div>
           </div>
@@ -98,20 +91,19 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
-        <button
-          className={popup['button']}
-          disabled={!canCreate}
+      <div className={popup['popup-footer']}>
+        <div
+          className={`${popup['button']} ${!canCreate ? 'disabled' : ''}`}
           onClick={() => {
             handleCreateChannel({ name: channelName, categoryId: channelId }, serverId);
             handleClose();
           }}
         >
           {t('confirm')}
-        </button>
-        <button className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

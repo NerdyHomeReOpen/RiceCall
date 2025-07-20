@@ -1,52 +1,51 @@
-.markdownContent {
+.markdown-content {
   color: #222;
-  word-break: break-word;
   user-select: text;
 }
 
-.markdownContent:has(img[alt^='[emoji']) {
+.markdown-content:has(img[alt^='[emoji']) {
   line-height: 0;
 }
 
-.markdownContent *:last-child {
+.markdown-content *:last-child {
   margin-block-end: 0;
 }
 
-.markdownContent h1 {
-  font-size: 1.75rem;
+.markdown-content h1 {
+  font-size: 1.75em;
   font-weight: bold;
   margin-block: 0.75rem;
   margin-inline: 0;
   cursor: text;
 }
 
-.markdownContent h2 {
-  font-size: 1.5rem;
+.markdown-content h2 {
+  font-size: 1.5em;
   font-weight: bold;
   margin-block: 0.625rem;
   margin-inline: 0;
   cursor: text;
 }
 
-.markdownContent h3 {
-  font-size: 1.25rem;
+.markdown-content h3 {
+  font-size: 1.25em;
   font-weight: bold;
   margin-block: 0.5rem;
   margin-inline: 0;
   cursor: text;
 }
 
-.markdownContent h4,
-.markdownContent h5,
-.markdownContent h6 {
-  font-size: 1rem;
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  font-size: 1em;
   font-weight: bold;
   margin-block: 0.5rem;
   margin-inline: 0;
   cursor: text;
 }
 
-.markdownContent p {
+.markdown-content p {
   margin-block-start: 0;
   display: block;
   align-items: center;
@@ -54,14 +53,33 @@
   white-space: pre-wrap;
 }
 
-.markdownContent span {
-  display: inline-block;
-  align-self: center;
+.markdown-content .user-tag {
+  display: inline-flex;
+  color: #226ba0;
   cursor: pointer;
   white-space: pre-wrap;
 }
 
-.markdownContent a {
+.markdown-content .user-tag:hover {
+  text-decoration: underline;
+}
+
+.markdown-content .permission-icon {
+  vertical-align: bottom;
+}
+
+.markdown-content .youtube-video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 0;
+}
+
+.markdown-content .emoji {
+  width: 19px;
+  height: 19px;
+}
+
+.markdown-content a {
   color: #2563eb;
   font-weight: 500;
   text-decoration: underline;
@@ -70,12 +88,12 @@
   cursor: pointer;
 }
 
-.markdownContent a:hover {
+.markdown-content a:hover {
   color: #1d4ed8;
 }
 
-.markdownContent ul,
-.markdownContent ol {
+.markdown-content ul,
+.markdown-content ol {
   margin-block-start: 0;
   margin-inline: 0;
   padding-inline-start: 20px;
@@ -83,12 +101,12 @@
   cursor: pointer;
 }
 
-.markdownContent li {
+.markdown-content li {
   margin-block-start: 0;
   cursor: text;
 }
 
-.markdownContent blockquote {
+.markdown-content blockquote {
   margin-block: 0;
   margin-inline: 0;
   padding: 0.125rem;
@@ -101,7 +119,7 @@
 }
 
 /* inline code */
-.markdownContent code {
+.markdown-content code {
   margin-block-start: 0;
   margin-inline: 0;
   padding: 0.125rem 0.25rem;
@@ -112,26 +130,26 @@
   align-self: baseline;
   line-height: 1.5rem;
   font-family: monospace;
-  font-size: 0.875rem;
+  font-size: 0.875em;
   font-weight: bold;
 }
 
 /* block code */
-.markdownContent pre {
+.markdown-content pre {
   position: relative;
   margin-block-start: 0;
   margin-inline: 0;
   cursor: text;
 }
 
-.markdownContent hr {
+.markdown-content hr {
   border: none;
   border-top: 1px dashed #d1d5db;
   margin-block-start: 0.5rem;
   margin-inline: 0;
 }
 
-.markdownContent table {
+.markdown-content table {
   background: #fff;
   display: flex;
   height: auto;
@@ -140,28 +158,28 @@
   overflow-y: auto;
 }
 
-.markdownContent table thead {
+.markdown-content table thead {
   display: flex;
   position: sticky;
   top: 0;
   background: #f4f4f5;
 }
 
-.markdownContent table tr {
+.markdown-content table tr {
   flex: 1;
   display: flex;
   flex-direction: row;
 }
 
-.markdownContent table tr:not(.selected):hover {
+.markdown-content table tr:not(.selected):hover {
   background: #f4f4f5;
 }
 
-.markdownContent table tr.selected {
+.markdown-content table tr.selected {
   background-color: #00000010;
 }
 
-.markdownContent table tr th {
+.markdown-content table tr th {
   height: auto;
   width: 100%;
   background: #e9ebec;
@@ -175,7 +193,7 @@
   align-items: center;
 }
 
-.markdownContent table tr td {
+.markdown-content table tr td {
   height: auto;
   width: 100%;
   border: 1px solid #ccc;
@@ -188,27 +206,27 @@
   overflow: hidden;
 }
 
-.markdownContent table tr th:last-child,
-.markdownContent table tr td:last-child {
+.markdown-content table tr th:last-child,
+.markdown-content table tr td:last-child {
   border-right: 0;
 }
 
-.markdownContent table tr:last-child td {
+.markdown-content table tr:last-child td {
   border-bottom: 0;
 }
 
-.markdownContent table tr th:hover {
+.markdown-content table tr th:hover {
   cursor: pointer;
   background: #d1d1d1;
 }
 
-.markdownContent table .p1 {
+.markdown-content table .p1 {
   white-space: pre-wrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.markdownContent img {
+.markdown-content img {
   max-width: 100%;
   margin-block-start: 0;
   margin-inline: 0;
@@ -222,13 +240,13 @@
   overflow-x: hidden;
 }
 
-.markdownContent .tableWrapper {
+.markdown-content .table-wrapper {
   background: transparent;
   max-width: 100%;
   overflow-x: auto;
 }
 
-.markdownContent .codeWrapper {
+.markdown-content .code-wrapper {
   padding: 0.5rem;
   border-radius: 4px;
   background: #00000005;
@@ -236,7 +254,7 @@
   font-family: monospace !important;
 }
 
-.settingMarkdownContainer {
+.setting-markdown-container {
   min-height: 330px;
   border: 1px solid #ddd;
   padding: 2px;
@@ -250,25 +268,25 @@
   overflow: scroll;
 }
 
-.copyButton {
+.copy-button {
   position: absolute;
   top: 0.375rem;
   right: 0.375rem;
   padding: 0.125rem;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
   font-family: monospace;
-  font-size: 0.875rem;
+  font-size: 0.875em;
   opacity: 0;
 }
 
-.copyButton:hover {
+.copy-button:hover {
   background: #f1f5f9;
 }
 
-.markdownContent pre:hover .copyButton {
+.markdown-content pre:hover .copy-button {
   opacity: 1;
 }

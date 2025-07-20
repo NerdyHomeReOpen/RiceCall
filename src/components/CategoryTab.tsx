@@ -17,7 +17,6 @@ import ChannelTab from '@/components/ChannelTab';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import Default from '@/utils/default';
 
 interface CategoryTabProps {
   category: Category;
@@ -35,20 +34,7 @@ interface CategoryTabProps {
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(
-  ({
-    category,
-    friends,
-    currentChannel,
-    currentServer,
-    serverMembers,
-    serverChannels,
-    expanded,
-    selectedItemId,
-    selectedItemType,
-    setExpanded,
-    setSelectedItemId,
-    setSelectedItemType,
-  }) => {
+  ({ category, friends, currentChannel, currentServer, serverMembers, serverChannels, expanded, selectedItemId, selectedItemType, setExpanded, setSelectedItemId, setSelectedItemType }) => {
     // Hooks
     const { t } = useTranslation();
     const socket = useSocket();
@@ -56,50 +42,21 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const findMe = useFindMeContext();
 
     // Variables
-    const {
-      channelId: categoryId,
-      name: categoryName,
-      visibility: categoryVisibility,
-      userLimit: channelUserLimit,
-    } = category;
+    const { channelId: categoryId, name: categoryName, visibility: categoryVisibility } = category;
     const { userId, serverId, permissionLevel, receptionLobbyId: serverReceptionLobbyId } = currentServer;
     const { channelId: currentChannelId } = currentChannel;
-    const categoryChannels = serverChannels
-      .filter((ch) => ch.type === 'channel')
-      .filter((ch) => ch.categoryId === categoryId);
-    const categoryLobby =
-      categoryVisibility !== 'readonly'
-        ? Default.channel({
-            ...category,
-            channelId: categoryId,
-            name: t('lobby'),
-            type: 'channel',
-            categoryId: categoryId,
-            visibility: categoryVisibility,
-            order: -1,
-          })
-        : null;
+    const categoryChannels = serverChannels.filter((ch) => ch.type === 'channel').filter((ch) => ch.categoryId === categoryId);
 
     const categoryChannelIds = new Set(categoryChannels.map((ch) => ch.channelId));
     const isAllChannelReadOnly = categoryChannels.every((channel) => channel.visibility === 'readonly');
-    const categoryMembers = serverMembers.filter(
-      (mb) => categoryChannelIds.has(mb.currentChannelId) || mb.currentChannelId === categoryId,
-    );
+    const categoryMembers = serverMembers.filter((mb) => categoryChannelIds.has(mb.currentChannelId) || mb.currentChannelId === categoryId);
     const categoryUserIds = categoryMembers.map((mb) => mb.userId);
     const userInCategory = categoryMembers.some((mb) => mb.currentChannelId === currentChannelId);
-    const channelMembers = serverMembers.filter((mb) => mb.currentChannelId === categoryId);
     const isReceptionLobby = serverReceptionLobbyId === categoryId;
     const userInChannel = currentChannelId === categoryId;
-    const needPassword = categoryVisibility === 'private' && permissionLevel < 3;
-    const canJoin =
-      !userInChannel &&
-      categoryVisibility !== 'readonly' &&
-      !(categoryVisibility === 'member' && permissionLevel < 2) &&
-      (channelUserLimit === 0 || channelUserLimit > channelMembers.length || permissionLevel > 4);
     const canManageChannel = permissionLevel > 4;
     const canMoveToChannel = canManageChannel && !userInChannel && categoryUserIds.length !== 0;
-    const canSetReceptionLobby =
-      canManageChannel && !isReceptionLobby && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
+    const canSetReceptionLobby = canManageChannel && !isReceptionLobby && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
 
     // Handlers
     const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
@@ -107,26 +64,20 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       socket.send.editServer({ serverId, server });
     };
 
-    const handleJoinChannel = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-      channelId: Channel['channelId'],
-    ) => {
+    const handleJoinChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
       if (!socket) return;
       socket.send.connectChannel({ userId, channelId, serverId });
     };
 
     const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', categoryName), () =>
-        socket.send.deleteChannel({ channelId, serverId }),
-      );
+      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', categoryName), () => socket.send.deleteChannel({ channelId, serverId }));
     };
 
     const handleOpenWarningDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', {
-        title: message,
+        message: message,
         submitTo: 'warningDialog',
       });
       ipcService.popup.onSubmit('warningDialog', callback);
@@ -140,11 +91,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       });
     };
 
-    const handleOpenCreateChannel = (
-      serverId: Server['serverId'],
-      channelId: Category['categoryId'],
-      userId: User['userId'],
-    ) => {
+    const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Category['categoryId'], userId: User['userId']) => {
       ipcService.popup.open(PopupType.CREATE_CHANNEL, 'createChannel');
       ipcService.initialData.onRequest('createChannel', {
         serverId,
@@ -161,24 +108,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       });
     };
 
-    const handleOpenChannelPassword = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-      channelId: Channel['channelId'],
-    ) => {
-      ipcService.popup.open(PopupType.CHANNEL_PASSWORD, 'channelPassword');
-      ipcService.initialData.onRequest('channelPassword', {
-        userId,
-        serverId,
-        channelId,
-      });
-    };
-
-    const handleOpenServerBroadcast = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-      channelId: Channel['channelId'],
-    ) => {
+    const handleOpenServerBroadcast = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
       ipcService.popup.open(PopupType.SERVER_BROADCAST, 'serverBroadcast');
       ipcService.initialData.onRequest('serverBroadcast', {
         userId,
@@ -233,9 +163,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         {/* Category View */}
         <div
           key={categoryId}
-          className={`${styles['channelTab']} ${
-            selectedItemId === categoryId && selectedItemType === 'category' ? styles['selected'] : ''
-          }`}
+          className={`${styles['channel-tab']} ${selectedItemId === categoryId && selectedItemType === 'category' ? styles['selected'] : ''}`}
           onClick={() => {
             if (selectedItemId === categoryId && selectedItemType === 'category') {
               setSelectedItemId(null);
@@ -245,35 +173,15 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             setSelectedItemId(categoryId);
             setSelectedItemType('category');
           }}
-          onDoubleClick={() => {
-            if (!canJoin) return;
-            if (needPassword) {
-              handleOpenChannelPassword(userId, serverId, categoryId);
-            } else {
-              handleJoinChannel(userId, serverId, categoryId);
-            }
-          }}
           draggable={permissionLevel >= 5 && categoryMembers.length !== 0}
           onDragStart={(e) => handleDragStart(e, categoryUserIds, categoryId)}
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleDrop(e, serverId, categoryId)}
           onContextMenu={(e) => {
+            e.stopPropagation();
             const x = e.clientX;
             const y = e.clientY;
             contextMenu.showContextMenu(x, y, false, false, [
-              {
-                id: 'join-channel',
-                label: t('join-channel'),
-                show: canJoin,
-                onClick: () => {
-                  if (!canJoin) return;
-                  if (needPassword) {
-                    handleOpenChannelPassword(userId, serverId, categoryId);
-                  } else {
-                    handleJoinChannel(userId, serverId, categoryId);
-                  }
-                },
-              },
               {
                 id: 'edit-channel',
                 label: t('edit-channel'),
@@ -323,8 +231,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 id: 'move-all-user-to-channel',
                 label: t('move-all-user-to-channel'),
                 show: canMoveToChannel,
-                onClick: () =>
-                  categoryUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
+                onClick: () => categoryUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
               },
               {
                 id: 'edit-channel-order',
@@ -347,33 +254,17 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           }}
         >
           <div
-            className={`
-              ${styles['tabIcon']} 
-              ${expanded[categoryId] ? styles['expanded'] : ''}
-              ${styles[categoryVisibility]}
-            `}
-            onClick={() =>
-              setExpanded((prev) => ({
-                ...prev,
-                [categoryId]: !prev[categoryId],
-              }))
-            }
+            className={`${styles['tab-icon']} ${expanded[categoryId] ? styles['expanded'] : ''} ${styles[categoryVisibility]}`}
+            onClick={() => setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }))}
           />
-          <div
-            className={`
-            ${styles['channelTabLable']}
-            ${isReceptionLobby ? styles['isReceptionLobby'] : ''}
-          `}
-          >
-            {categoryName}
-          </div>
-          {!isAllChannelReadOnly && <div className={styles['channelTabCount']}>{`(${categoryMembers.length})`}</div>}
-          {!expanded[categoryId] && userInCategory && <div className={styles['myLocationIcon']} />}
+          <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{categoryName}</div>
+          {!isAllChannelReadOnly && <div className={styles['channel-tab-count-text']}>{`(${categoryMembers.length})`}</div>}
+          {!expanded[categoryId] && userInCategory && <div className={styles['my-location-icon']} />}
         </div>
 
         {/* Expanded Sections */}
-        <div className={styles['channelList']} style={expanded[categoryId] ? {} : { display: 'none' }}>
-          {[categoryLobby, ...categoryChannels]
+        <div className={styles['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
+          {categoryChannels
             .filter((ch) => !!ch)
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
             .map((channel) => (

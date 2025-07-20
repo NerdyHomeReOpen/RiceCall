@@ -8,7 +8,6 @@ import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // CSS
-import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
@@ -75,30 +74,25 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
   }, [userId, serverId]);
 
   return (
-    <form className={popup['popupContainer']}>
+    <form className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
-        <div className={setting['body']}>
-          <div className={popup['inputGroup']}>
-            <div className={popup['inputBox']}>
+      <div className={popup['popup-body']}>
+        <div className={popup['dialog-content']}>
+          <div className={popup['input-group']}>
+            <div className={popup['input-box']}>
               <div className={popup['label']} style={{ minWidth: '2rem' }}>
                 {t('nickname')}:
               </div>
               <div className={popup['label']}>{userName}</div>
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('please-enter-the-member-nickname')}</div>
               <input
                 name="nickname"
                 type="text"
                 value={memberNickname || ''}
                 maxLength={32}
-                onChange={(e) => {
-                  setMember((prev) => ({
-                    ...prev,
-                    nickname: e.target.value,
-                  }));
-                }}
+                onChange={(e) => setMember((prev) => ({ ...prev, nickname: e.target.value }))}
               />
             </div>
           </div>
@@ -106,8 +100,8 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
-        <button
+      <div className={popup['popup-footer']}>
+        <div
           className={popup['button']}
           onClick={() => {
             handleEditMember({ nickname: memberNickname }, userId, serverId);
@@ -115,19 +109,16 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
           }}
         >
           {t('confirm')}
-        </button>
-        <button type="button" className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
-        <button
-          type="button"
-          className={`${popup['button']}`}
-          onClick={() => {
-            handleEditMember({ nickname: memberNickname }, userId, serverId);
-          }}
+        </div>
+        <div
+          className={popup['button']}
+          onClick={() => handleEditMember({ nickname: memberNickname }, userId, serverId)}
         >
           {t('set')}
-        </button>
+        </div>
       </div>
     </form>
   );

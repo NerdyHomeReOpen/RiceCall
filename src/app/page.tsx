@@ -9,20 +9,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import {
-  PopupType,
-  SocketServerEvent,
-  Server,
-  User,
-  Channel,
-  UserServer,
-  FriendGroup,
-  UserFriend,
-  ServerMember,
-  ChannelMessage,
-  PromptMessage,
-  FriendApplication,
-} from '@/types';
+import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication } from '@/types';
 
 // i18n
 import i18n, { LanguageKey } from '@/i18n';
@@ -46,14 +33,12 @@ import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
+import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
 import ipcService from '@/services/ipc.service';
 import authService from '@/services/auth.service';
 import getService from '@/services/get.service';
-
-// Components
-import { SoundEffectPlayer } from '@/components/SoundEffectPlayer';
 
 interface HeaderProps {
   user: User;
@@ -174,23 +159,23 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
   }, []);
 
   return (
-    <header className={header['header']}>
+    <header className={`${header['header']} ${header['big']}`}>
       {/* Title */}
-      <div className={`${header['titleBox']} ${header['big']}`}>
-        <div className={header['nameBox']} onClick={() => handleOpenUserSetting(userId)}>
+      <div className={header['title-box']}>
+        <div className={header['name-box']} onClick={() => handleOpenUserSetting(userId)}>
           {userName}
         </div>
         <div
-          className={header['statusBox']}
+          className={header['status-box']}
           onClick={() => {
             setShowStatusDropdown(!showStatusDropdown);
           }}
         >
-          <div className={header['statusDisplay']} datatype={userStatus} />
-          <div className={header['statusTriangle']} />
+          <div className={header['status-display']} datatype={userStatus} />
+          <div className={header['status-triangle']} />
           <div
             className={`
-                ${header['statusDropdown']}
+                ${header['status-dropdown']}
                 ${showStatusDropdown ? '' : header['hidden']}
               `}
           >
@@ -208,8 +193,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
           </div>
         </div>
       </div>
+
       {/* Main Tabs */}
-      <div className={header['mainTabs']}>
+      <div className={header['main-tabs']}>
         {MAIN_TABS.map((Tab) => {
           const TabId = Tab.id;
           const TabLable = Tab.label;
@@ -219,17 +205,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
             <div
               key={`Tabs-${TabId}`}
               data-tab-id={TabId}
-              className={`
-                  ${header['tab']}
-                  ${TabId === mainTab.selectedTabId ? header['selected'] : ''}
-                `}
+              className={`${header['tab']} ${TabId === mainTab.selectedTabId ? header['selected'] : ''}`}
               onClick={() => mainTab.setSelectedTabId(TabId as 'home' | 'friends' | 'server')}
             >
-              <div className={header['tabLable']}>{TabLable}</div>
-              <div className={header['tabBg']} />
+              <div className={header['tab-lable']}>{TabLable}</div>
+              <div className={header['tab-bg']} />
               {TabClose && (
                 <svg
-                  className={`${header['tabClose']} themeTabClose`}
+                  className={`${header['tab-close']} themeTabClose`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleLeaveServer(userId, serverId);
@@ -240,19 +223,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                   viewBox="0 0 24 24"
                 >
                   <circle cx="12" cy="12" r="12" fill="var(--main-color, rgb(55 144 206))" />
-                  <path
-                    d="M17 7L7 17M7 7l10 10"
-                    stroke="#fff"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M17 7L7 17M7 7l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </div>
           );
         })}
       </div>
+
       {/* Buttons */}
       <div className={header['buttons']}>
         <div className={header['gift']} />
@@ -285,12 +263,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                 icon: 'setting',
                 onClick: () => handleOpenSystemSetting(),
               },
-              // {
-              //   id: 'message-history',
-              //   label: lang.tr.messageHistory,
-              //   icon: 'message',
-              //   onClick: () => {},
-              // },
               {
                 id: 'change-theme',
                 label: t('change-theme'),
@@ -414,6 +386,7 @@ const RootPageComponent = () => {
   const socket = useSocket();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
+  const soundPlayer = useSoundPlayer();
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -463,14 +436,8 @@ const RootPageComponent = () => {
     });
   };
 
-  const handleFriendUpdate = (
-    userId: UserFriend['userId'],
-    targetId: UserFriend['targetId'],
-    friend: Partial<UserFriend>,
-  ) => {
-    setFriends((prev) =>
-      prev.map((item) => (item.userId === userId && item.targetId === targetId ? { ...item, ...friend } : item)),
-    );
+  const handleFriendUpdate = (userId: UserFriend['userId'], targetId: UserFriend['targetId'], friend: Partial<UserFriend>) => {
+    setFriends((prev) => prev.map((item) => (item.userId === userId && item.targetId === targetId ? { ...item, ...friend } : item)));
   };
 
   const handleFriendDelete = (userId: UserFriend['userId'], targetId: UserFriend['targetId']) => {
@@ -518,14 +485,8 @@ const RootPageComponent = () => {
     });
   };
 
-  const handleServerMemberUpdate = (
-    userId: ServerMember['userId'],
-    serverId: ServerMember['serverId'],
-    member: Partial<ServerMember>,
-  ): void => {
-    setServerMembers((prev) =>
-      prev.map((item) => (item.userId === userId && item.serverId === serverId ? { ...item, ...member } : item)),
-    );
+  const handleServerMemberUpdate = (userId: ServerMember['userId'], serverId: ServerMember['serverId'], member: Partial<ServerMember>): void => {
+    setServerMembers((prev) => prev.map((item) => (item.userId === userId && item.serverId === serverId ? { ...item, ...member } : item)));
   };
 
   const handleServerMemberDelete = (userId: ServerMember['userId'], serverId: ServerMember['serverId']): void => {
@@ -554,6 +515,10 @@ const RootPageComponent = () => {
 
   const handleActionMessage = (...actionMessages: PromptMessage[]): void => {
     setActionMessages((prev) => [...prev, ...actionMessages]);
+  };
+
+  const handlePlaySound = (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking') => {
+    soundPlayer.playSound(sound);
   };
 
   const handleOpenPopup = (popup: { type: PopupType; id: string; initialData: any; force?: boolean }) => {
@@ -629,6 +594,7 @@ const RootPageComponent = () => {
       [SocketServerEvent.CHANNEL_MESSAGE]: handleChannelMessage,
       [SocketServerEvent.ACTION_MESSAGE]: handleActionMessage,
       [SocketServerEvent.OPEN_POPUP]: handleOpenPopup,
+      [SocketServerEvent.PLAY_SOUND]: handlePlaySound,
     };
     const unsubscribe: (() => void)[] = [];
 
@@ -718,39 +684,28 @@ const RootPageComponent = () => {
 
   return (
     <WebRTCProvider>
-      <div className="wrapper">
+      <ExpandedProvider>
         <Header user={user} userServer={server} friendApplications={friendApplications} />
-        {/* Main Content */}
-        <div className="content">
-          {!socket.isConnected ? (
-            <LoadingSpinner />
-          ) : (
-            <>
-              <SoundEffectPlayer />
-              <HomePage user={user} servers={servers} display={mainTab.selectedTabId === 'home'} />
-              <FriendPage
-                user={user}
-                friends={friends}
-                friendGroups={friendGroups}
-                display={mainTab.selectedTabId === 'friends'}
-              />
-              <ExpandedProvider>
-                <ServerPage
-                  user={user}
-                  currentServer={server}
-                  currentChannel={channel}
-                  friends={friends}
-                  serverMembers={serverMembers}
-                  serverChannels={serverChannels}
-                  channelMessages={channelMessages}
-                  actionMessages={actionMessages}
-                  display={mainTab.selectedTabId === 'server'}
-                />
-              </ExpandedProvider>
-            </>
-          )}
-        </div>
-      </div>
+        {!socket.isConnected ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <HomePage user={user} servers={servers} display={mainTab.selectedTabId === 'home'} />
+            <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
+            <ServerPage
+              user={user}
+              currentServer={server}
+              currentChannel={channel}
+              friends={friends}
+              serverMembers={serverMembers}
+              serverChannels={serverChannels}
+              channelMessages={channelMessages}
+              actionMessages={actionMessages}
+              display={mainTab.selectedTabId === 'server'}
+            />
+          </>
+        )}
+      </ExpandedProvider>
     </WebRTCProvider>
   );
 };

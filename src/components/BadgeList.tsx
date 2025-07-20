@@ -21,7 +21,7 @@ const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, preferTop, max
     .slice(0, maxDisplay);
 
   return (
-    <div className={styles.badgeViewerWrapper}>
+    <div className={styles['badge-viewer-wrapper']}>
       {sortedBadges.map((badge) => (
         <BadgeItem key={badge.badgeId} badge={badge} preferTop={preferTop} />
       ))}

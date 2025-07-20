@@ -1,13 +1,15 @@
-.friendWrapper {
+.friend {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 /* Header */
 
-.friendHeader {
+.friend-header {
   display: flex;
   align-items: center;
   height: 50px;
@@ -15,13 +17,13 @@
   gap: 5px;
 }
 
-.avatarBox {
+.avatar-box {
   padding: 2px;
   margin-left: 5px;
   cursor: pointer;
 }
 
-.avatarPicture {
+.avatar-picture {
   position: relative;
   cursor: pointer;
   object-fit: cover;
@@ -33,7 +35,7 @@
   background-position: center center;
 }
 
-.avatarPicture::before {
+.avatar-picture::before {
   content: '';
   position: absolute;
   top: -1px;
@@ -47,7 +49,7 @@
   background-position: 0 0;
 }
 
-.avatarPicture::after {
+.avatar-picture::after {
   content: '';
   position: absolute;
   display: inline-block;
@@ -60,27 +62,27 @@
   background-position: 0 0 !important;
 }
 
-.avatarPicture[datatype='']::after {
+.avatar-picture[datatype='']::after {
   background-image: none;
 }
 
-.avatarPicture[datatype='online']::after {
+.avatar-picture[datatype='online']::after {
   background-position: 0 0 !important;
 }
 
-.avatarPicture[datatype='dnd']::after {
+.avatar-picture[datatype='dnd']::after {
   background-position: -13px 0 !important;
 }
 
-.avatarPicture[datatype='idle']::after {
+.avatar-picture[datatype='idle']::after {
   background-position: -26px 0 !important;
 }
 
-.avatarPicture[datatype='gn']::after {
+.avatar-picture[datatype='gn']::after {
   background-position: -39px 0 !important;
 }
 
-.baseInfoBox {
+.base-info-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -89,25 +91,17 @@
   gap: 10px;
 }
 
-.baseInfoBox .container {
+.base-info-wrapper .box {
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.baseInfoBox .container.hasServer {
+.base-info-wrapper .box.has-server {
   cursor: pointer;
 }
 
-.gradeIcon {
-  cursor: default;
-}
-
-.myBadges {
-  padding: 3;
-}
-
-.levelIcon {
+.level-icon {
   min-width: 16px;
   min-height: 16px;
   background-image: url('../../../public/im/LV.png');
@@ -116,7 +110,7 @@
   background-position: 0 0;
 }
 
-.wealthIcon {
+.wealth-icon {
   border: none;
   cursor: pointer;
   margin-left: 3rem;
@@ -127,22 +121,22 @@
   background-size: cover;
 }
 
-.wealthValue {
+.wealth-value-text {
   color: #7e7c6e;
   text-align: left;
 }
 
-.signatureBox {
+.signature-wrapper {
   display: flex;
   width: 60%;
   height: 30px;
   align-items: center;
-  border: 1px solid #ffffffff;
+  border: 1px solid #ffff;
   margin-left: 100px;
   padding: 2px 5px;
 }
 
-.signatureInput {
+.signature-input {
   z-index: 1;
   display: flex;
   flex-wrap: wrap;
@@ -153,59 +147,27 @@
   resize: none;
 }
 
-.signatureInput:empty::before {
+.signature-input:empty::before {
   content: attr(data-placeholder-text);
-  color: #000000;
+  color: #000;
   pointer-events: none;
   display: block;
 }
 
-.signatureBox:focus-within {
+.signature-wrapper:focus-within {
   border: 1px solid #dfe2e5;
   border-radius: 3px;
 }
 
-.emojiBtn {
+.emoji-btn {
   display: none;
 }
 
-/* .signatureBox:focus-within .enterButtonIconBox, */
-.signatureBox:focus-within .emojiBtn {
+.signature-wrapper:focus-within .emoji-btn {
   display: flex;
 }
-/* 
-.enterButtonIconBox {
-  border: 1px solid #d1d1d1;
-  background-color: #fbfbfb;
-  border-radius: 5px;
-  height: 18px;
-  width: 30px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin-left: 5px;
-}
 
-.enterButtonIconBox:hover {
-  background-image: linear-gradient(to bottom, #fffffa, #f4f4f4);
-  border: 1px solid #cccccc;
-}
-
-.enterButtonIconBox:active {
-  background-image: linear-gradient(to bottom, #f4f4f4, #fffffa);
-  border: 1px solid #cccccc;
-}
-
-.enterButtonIcon {
-  background-image: url('../../../public/im/btn_publish.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  height: 9px;
-  width: 22px;
-} */
-
-.badgeBox {
+.badge-box {
   display: flex;
   height: 20px;
   gap: 1px;
@@ -214,7 +176,7 @@
 
 /* Content */
 
-.friendContent {
+.friend-body {
   display: flex;
   flex: 1;
   min-height: 0;
@@ -228,7 +190,7 @@
   background-color: #f1f2f5;
 }
 
-.sidebar .navigateTabs {
+.sidebar .navigate-tabs {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
@@ -237,7 +199,7 @@
   cursor: pointer;
 }
 
-.sidebar .navigateTabs .tab {
+.sidebar .navigate-tabs .tab {
   display: flex;
   flex: 1;
   text-align: center;
@@ -250,7 +212,11 @@
   align-items: center;
 }
 
-.friendListIcon {
+.sidebar .navigate-tabs .tab.selected {
+  background-position: 0 -36px;
+}
+
+.friend-list-icon {
   min-width: 16px;
   min-height: 16px;
   background-image: url('../../../public/im/friend_list_page.png');
@@ -259,7 +225,7 @@
   background-position: 0 0;
 }
 
-.recentIcon {
+.recent-icon {
   min-width: 16px;
   min-height: 16px;
   background-image: url('../../../public/im/recently_list_page.png');
@@ -268,25 +234,22 @@
   background-position: 0 0;
 }
 
-.sidebar .navigateTabs .tab.selected {
-  background-position: 0 -36px;
-}
-
-.selected .friendListIcon,
-.selected .recentIcon {
+.selected .friend-list-icon,
+.selected .recent-icon {
   background-position: -64px 0;
 }
 
-.scrollView {
+.scroll-view {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
   min-width: 0;
+  padding: 10px;
   overflow-y: auto;
 }
 
-.searchBar {
+.search-bar {
   display: flex;
   align-items: center;
   padding: 10px;
@@ -295,18 +258,17 @@
   padding-bottom: 0;
   padding-right: 0;
   border-top: 1px solid #ddd;
-  margin-top: 2;
   background: #fff;
 }
 
-.searchBar .searchInput {
+.search-bar .search-input {
   flex: 1;
   padding: 5px;
   border: 1px solid #fff;
   width: 125px;
 }
 
-.searchBar .searchIcon {
+.search-bar .search-icon {
   min-width: 20px;
   min-height: 20px;
   background-image: url('../../../public/channel/channel_search.png');
@@ -314,11 +276,11 @@
   background-position: 0 0;
 }
 
-.searchBar:hover:not(:has(.prevIcon:hover, .nextIcon:hover)) .searchIcon {
+.search-bar:hover:not(:has(.prev-icon:hover, .next-icon:hover)) .search-icon {
   background-position: -20px 0;
 }
 
-.prevIcon {
+.prev-icon {
   min-width: 30px;
   min-height: 30px;
   background-image: url('../../../public/channel/search_pre.png');
@@ -327,7 +289,7 @@
   cursor: pointer;
 }
 
-.nextIcon {
+.next-icon {
   min-width: 30px;
   min-height: 30px;
   background-image: url('../../../public/channel/search_next.png');
@@ -336,17 +298,17 @@
   cursor: pointer;
 }
 
-.prevIcon:hover,
-.nextIcon:hover {
+.prev-icon:hover,
+.next-icon:hover {
   background-position: -29px 0;
 }
 
-.prevIcon:active,
-.nextIcon:active {
+.prev-icon:active,
+.next-icon:active {
   background-position: -58px 0;
 }
 
-.sidebarFooter {
+.sidebar-footer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -357,12 +319,12 @@
   border-bottom-left-radius: 5px;
 }
 
-.sidebarFooter .button {
+.sidebar-footer .button {
   display: flex;
   border: 1px solid #ccc;
   border-radius: 5px;
   background: #fff;
-  text-align: center;
+  text-align: left;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -370,11 +332,11 @@
   padding: 5px 20px;
 }
 
-.sidebarFooter .button:hover {
+.sidebar-footer .button:hover {
   background-color: #d1d5da5c;
 }
 
-.sidebarFooter .button[datatype='addGroup']::before {
+.sidebar-footer .button[datatype='addGroup']::before {
   content: '';
   min-height: 16px;
   min-width: 16px;
@@ -383,7 +345,7 @@
   background-repeat: no-repeat;
 }
 
-.sidebarFooter .button[datatype='addFriend']::before {
+.sidebar-footer .button[datatype='addFriend']::before {
   content: '';
   min-height: 16px;
   min-width: 16px;
@@ -392,33 +354,26 @@
   background-repeat: no-repeat;
 }
 
-.friendList {
+.friend-group-list {
   flex: 1;
-  padding: 0.75rem;
 }
 
-.friendList .tab {
-  position: sticky;
-  top: 0;
-  font-weight: bold;
+.friend-group-list .friend-group-tab {
   display: flex;
   align-items: center;
-  padding: 5px;
   border-radius: 3px;
-  font-size: 13px;
-  z-index: 999;
-  background-color: #f1f2f5;
+  padding: 5px;
 }
 
-.friendList .tab.selected {
+.friend-group-list .friend-group-tab.selected {
   background-color: #d8dadc;
 }
 
-.friendList .tab:not(.selected):hover {
+.friend-group-list .friend-group-tab:not(.selected):hover {
   background-color: #d1d5da;
 }
 
-.friendList .tab .toggleIcon {
+.friend-group-list .friend-group-tab .toggle-icon {
   content: '';
   display: inline-block;
   min-width: 14px;
@@ -430,44 +385,40 @@
   background-position: 0 0;
 }
 
-.friendList .tab .toggleIcon.expanded {
+.friend-group-list .friend-group-tab .toggle-icon.expanded {
   background-position: -14px 0;
 }
 
-.friendList .tabContent {
+.friend-group-list .friend-group-tab .tab-content {
   margin-left: 20px;
 }
 
-.friendCard {
+.friend-tab {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   position: relative;
   padding: 5px;
-  border-radius: 3px;
   gap: 5px;
+  border-radius: 3px;
 }
 
-.friendCard.selected {
+.friend-tab.selected {
   background-color: #d8dadc;
 }
 
-.friendCard:not(.selected):hover {
+.friend-tab:not(.selected):hover {
   background-color: #d1d5da5c;
 }
 
-.friendCard .name {
+.friend-tab .name-text {
   font-weight: bold;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.friendCard .name.isVIP {
-  color: #d16059 !important;
-}
-
-.friendCard .signature {
+.friend-tab .signature {
   color: #888;
   overflow: hidden;
   min-height: 18px;
@@ -477,7 +428,7 @@
   align-items: center;
 }
 
-.friendCard .serverName {
+.friend-tab .server-name-text {
   color: #3a9abe;
   white-space: nowrap;
   overflow: hidden;
@@ -486,7 +437,7 @@
   text-overflow: ellipsis;
 }
 
-.friendCard .location {
+.friend-tab .location-icon {
   content: '';
   min-height: 18px;
   min-width: 16px;
@@ -496,7 +447,7 @@
   background-position: center center;
 }
 
-.recentList {
+.recent-list {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -504,15 +455,15 @@
 
 /* Main Content */
 
-.mainContent {
+.content {
   flex: 1;
   min-width: 500px;
   height: auto;
   border-top: 2px solid #e0e0e4;
 }
 
-.mainContent .header {
-  font-size: 1rem;
+.content .header {
+  font-size: 1em;
   padding: 10px;
   background-color: #f4f6fa;
   font-weight: bold;

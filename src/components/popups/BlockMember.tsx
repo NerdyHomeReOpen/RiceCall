@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// Components
-import MarkdownViewer from '@/components/MarkdownViewer';
-
 // Types
 import { Server, User } from '@/types';
 
@@ -12,7 +9,6 @@ import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import styles from '@/styles/popups/blockMember.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -70,7 +66,6 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
       userId,
       serverId,
     });
-    socket.send.disconnectServer({ userId, serverId });
   };
 
   const handleClose = () => {
@@ -103,71 +98,59 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   }, [formatType, selectTime]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={`${popup['popupBody']}`}>
-        <div className={`${styles['content']}`}>
-          <div className={`${popup['dialogContent']} ${styles['top']}`}>
-            <div
-              className={`
-                  ${popup['dialogIcon']}
-                  ${popup['alert']}
-                `}
-            />
-            <div className={`${styles['content']}`}>
-              <div className={`${popup['label']} ${styles['label']}`}>
-                <MarkdownViewer markdownText={t('confirm-block-user').replace('{0}', userName)} />
-              </div>
-              <div className={`${popup['inputGroup']} ${popup['col']}`}>
-                <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
-                  <div className={`${popup['label']}`}>{t('block-type')}</div>
-                  <div className={`${popup['selectBox']}`}>
-                    <select value={blockType} onChange={(e) => setBlockType(e.target.value)}>
-                      {BLOCK_TYPE_OPTIONS.map((option) => (
-                        <option key={option.key} value={option.key} disabled={option.disabled}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+      <div className={popup['popup-body']}>
+        <div className={popup['dialog-content']}>
+          <div className={`${popup['dialog-icon']} ${popup['alert']}`} />
+          <div>
+            <div className={popup['label']}>{t('confirm-block-user').replace('{0}', userName)}</div>
+            <div className={popup['col']}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={popup['label']}>{t('block-type')}</div>
+                <div className={popup['select-box']}>
+                  <select value={blockType} onChange={(e) => setBlockType(e.target.value)}>
+                    {BLOCK_TYPE_OPTIONS.map((option) => (
+                      <option key={option.key} value={option.key} disabled={option.disabled}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className={`${popup['inputBox']} ${styles['inputBox']} ${popup['row']}`}>
-                  <div className={`${popup['label']}`}>{t('block-time')}</div>
-                  <div className={`${popup['selectBox']}`}>
-                    <select
-                      value={selectTime}
-                      disabled={isForeverBlock}
-                      onChange={(e) => setSelectTime(parseInt(e.target.value))}
-                    >
-                      {Array.from({ length: 60 }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className={`${popup['selectBox']}`}>
-                    <select
-                      value={formatType}
-                      disabled={isForeverBlock}
-                      onChange={(e) => setFormatType(e.target.value)}
-                    >
-                      {FORMAT_TYPE_OPTIONS.map((option) => (
-                        <option key={option.key} value={option.key}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+              </div>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={popup['label']}>{t('block-time')}</div>
+                <div className={popup['select-box']}>
+                  <select
+                    value={selectTime}
+                    disabled={isForeverBlock}
+                    onChange={(e) => setSelectTime(parseInt(e.target.value))}
+                  >
+                    {Array.from({ length: 60 }, (_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className={popup['select-box']}>
+                  <select value={formatType} disabled={isForeverBlock} onChange={(e) => setFormatType(e.target.value)}>
+                    {FORMAT_TYPE_OPTIONS.map((option) => (
+                      <option key={option.key} value={option.key}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
       {/* Footer */}
-      <div className={popup['popupFooter']}>
-        <button
+      <div className={popup['popup-footer']}>
+        <div
           className={popup['button']}
           onClick={() => {
             handleBlockMember();
@@ -175,10 +158,10 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
           }}
         >
           {t('confirm')}
-        </button>
-        <button type="button" className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

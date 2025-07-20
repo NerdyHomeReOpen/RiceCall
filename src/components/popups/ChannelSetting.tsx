@@ -102,9 +102,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
   }, [channelId, serverId]);
 
   return (
-    <div className={popup['popupContainer']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
-      <div className={popup['popupBody']}>
+      <div className={popup['popup-body']}>
         {/* Sidebar */}
         <div className={setting['left']}>
           <div className={setting['tabs']}>
@@ -117,7 +117,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
               t('channel-management'),
             ].map((title, index) => (
               <div
-                className={`${setting['item']} ${activeTabIndex === index ? setting['active'] : ''}`}
+                className={`${setting['tab']} ${activeTabIndex === index ? setting['active'] : ''}`}
                 onClick={() => setActiveTabIndex(index)}
                 key={index}
               >
@@ -131,26 +131,20 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         <div className={setting['right']} style={activeTabIndex === 0 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={popup['row']}>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('channel-name-label')}</div>
                 <input
-                  name="name"
+                  name="channel-name"
                   type="text"
-                  value={channelName}
+                  value={isLobby ? t(`${channelName}`) : channelName}
                   maxLength={32}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      name: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
                 />
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('user-limit')}</div>
                 <input
-                  name="userLimit"
+                  name="user-limit"
                   type="number"
                   value={channelUserLimit}
                   min={0}
@@ -165,20 +159,19 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 />
               </div>
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('channel-mode')}</div>
-              <div className={popup['selectBox']}>
+              <div className={popup['select-box']}>
                 <select
                   value={channelVoiceMode}
                   onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      voiceMode: e.target.value as Channel['voiceMode'],
-                    }))
+                    setChannel((prev) => ({ ...prev, voiceMode: e.target.value as Channel['voiceMode'] }))
                   }
                 >
                   <option value="free">{t('free-speech')}</option>
-                  <option value="forbidden">{t('forbid-speech')}</option>
+                  <option value="forbidden" disabled>
+                    {t('forbid-speech')}
+                  </option>
                   <option value="queue" disabled>
                     {t('queue-speech')}
                   </option>
@@ -186,45 +179,34 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
               </div>
             </div>
           </div>
-          <div className={setting['saperator']} />
+          <div className={setting['separator']} />
           <div className={popup['col']}>
             <div className={popup['label']}>{t('channel-audio-quality')}</div>
-            <div className={popup['inputGroup']}>
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+            <div className={popup['input-group']}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
-                  name="bitrate"
+                  name="bitrate-64000"
                   type="radio"
                   checked={channelBitrate === 64000}
                   onChange={() => {
-                    setChannel((prev) => ({
-                      ...prev,
-                      bitrate: 64000,
-                    }));
+                    setChannel((prev) => ({ ...prev, bitrate: 64000 }));
                   }}
                 />
-                <div>
-                  <div className={popup['label']}>{t('chat-mode')}</div>
-                  <div className={popup['hint']}>{t('chat-mode-description')}</div>
-                </div>
+                <div className={popup['label']}>{t('chat-mode')}</div>
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <div className={popup['hint-text']}>{t('chat-mode-description')}</div>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
-                  name="bitrate"
+                  name="bitrate-256000"
                   type="radio"
                   checked={channelBitrate === 256000}
                   onChange={() => {
-                    setChannel((prev) => ({
-                      ...prev,
-                      bitrate: 256000,
-                    }));
+                    setChannel((prev) => ({ ...prev, bitrate: 256000 }));
                   }}
                 />
-                <div>
-                  <div className={popup['label']}>{t('entertainment-mode')}</div>
-                  <div className={popup['hint']}>{t('entertainment-mode-description')}</div>
-                </div>
+                <div className={popup['label']}>{t('entertainment-mode')}</div>
               </div>
+              <div className={popup['hint-text']}>{t('entertainment-mode-description')}</div>
             </div>
           </div>
         </div>
@@ -232,7 +214,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         {/* Channel Announcement */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={setting['headerTextBox']}>
+            <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
               <div className={popup['label']}>{t('input-announcement')}</div>
               <div
                 className={popup['button']}
@@ -247,26 +229,21 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 {showPreview ? t('edit') : t('preview')}
               </div>
             </div>
-            <div className={`${popup['inputBox']} ${popup['col']}`}>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
               {showPreview ? (
-                <div className={markdown['settingMarkdownContainer']} style={{ minHeight: '330px' }}>
+                <div className={markdown['setting-markdown-container']} style={{ minHeight: '330px' }}>
                   <MarkdownViewer markdownText={channelAnnouncement} />
                 </div>
               ) : (
                 <textarea
-                  name="announcement"
+                  name="channel-announcement"
                   style={{ minHeight: '330px' }}
                   value={channelAnnouncement}
                   maxLength={1000}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      announcement: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => setChannel((prev) => ({ ...prev, announcement: e.target.value }))}
                 />
               )}
-              <div className={popup['label']}>{t('markdown-support')}</div>
+              <div className={setting['note-text']}>{t('markdown-support')}</div>
             </div>
           </div>
         </div>
@@ -274,111 +251,66 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         {/* Access Permissions */}
         <div className={setting['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('access-permission')}</div>
-            <div className={popup['inputGroup']}>
-              <div
-                className={`
-                    ${popup['inputBox']} 
-                    ${popup['row']} 
-                    ${isLobby ? popup['disabled'] : ''}
-                  `}
-              >
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('access-permission')}</div>
+            </div>
+            <div className={popup['input-group']}>
+              <div className={`${popup['input-box']} ${popup['row']} ${isLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
                   checked={channelVisibility === 'public'}
                   onChange={() => {
-                    setChannel((prev) => ({
-                      ...prev,
-                      visibility: 'public',
-                    }));
+                    setChannel((prev) => ({ ...prev, visibility: 'public' }));
                   }}
                 />
-                <div>
-                  <div className={popup['label']}>{t('anyone-can-access')}</div>
-                </div>
+                <div className={popup['label']}>{t('anyone-can-access')}</div>
               </div>
 
-              <div
-                className={`
-                    ${popup['inputBox']} 
-                    ${popup['row']}
-                    ${isLobby ? popup['disabled'] : ''}
-                  `}
-              >
+              <div className={`${popup['input-box']} ${popup['row']} ${isLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
                   checked={channelVisibility === 'member'}
                   onChange={() => {
-                    setChannel((prev) => ({
-                      ...prev,
-                      visibility: 'member',
-                    }));
+                    setChannel((prev) => ({ ...prev, visibility: 'member' }));
                   }}
                 />
-                <div>
-                  <div className={popup['label']}>{t('forbid-guest-access')}</div>
-                </div>
+                <div className={popup['label']}>{t('forbid-guest-access')}</div>
               </div>
 
-              <div
-                className={`
-                    ${popup['inputBox']} 
-                    ${popup['row']}
-                    ${isLobby || isReceptionLobby ? popup['disabled'] : ''}
-                  `}
-              >
+              <div className={`${popup['input-box']} ${popup['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
                   checked={channelVisibility === 'readonly'}
                   onChange={() => {
-                    setChannel((prev) => ({
-                      ...prev,
-                      visibility: 'readonly',
-                    }));
+                    setChannel((prev) => ({ ...prev, visibility: 'readonly' }));
                   }}
                 />
-                <div>
-                  <div className={popup['label']}>{t('message-only')}</div>
-                </div>
+                <div className={popup['label']}>{t('message-only')}</div>
               </div>
-
-              <div
-                className={`
-                    ${popup['inputBox']} 
-                    ${popup['row']}
-                    ${isLobby || isReceptionLobby ? popup['disabled'] : ''}
-                  `}
-              >
+              <div className={`${popup['input-box']} ${popup['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
                   checked={channelVisibility === 'private'}
                   onChange={() => {
-                    setChannel((prev) => ({
-                      ...prev,
-                      visibility: 'private',
-                    }));
+                    setChannel((prev) => ({ ...prev, visibility: 'private' }));
                   }}
                 />
                 <div className={popup['label']}>{t('require-password')}</div>
               </div>
-
               {channelVisibility === 'private' && (
-                <div className={popup['inputBox']}>
+                <div className={popup['input-box']}>
                   <input
-                    name="password"
+                    name="channel-password"
                     type="text"
                     value={channelPassword}
                     maxLength={4}
                     placeholder={t('require-password-placeholder')}
                     onChange={(e) => {
-                      setChannel((prev) => ({
-                        ...prev,
-                        password: e.target.value,
-                      }));
+                      setChannel((prev) => ({ ...prev, password: e.target.value }));
                     }}
                   />
                 </div>
@@ -390,20 +322,17 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         {/* Speaking Permissions */}
         <div className={setting['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('speaking-permission') + t('soon')}</div>
-            <div className={popup['inputGroup']}>
-              <div className={`${popup['inputBox']} ${popup['row']} ${popup['disabled']}`}>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('speaking-permission') + t('soon')}</div>
+            </div>
+            <div className={popup['input-group']}>
+              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input name="forbidGuestQueue" type="checkbox" checked={false} onChange={() => {}} />
-                <div>
-                  <div className={popup['label']}>{t('forbid-guest-queue')}</div>
-                </div>
+                <div className={popup['label']}>{t('forbid-guest-queue')}</div>
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['row']} ${popup['disabled']}`}>
+              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input name="forbidGuestVoice" type="checkbox" checked={false} onChange={() => {}} />
-                <div>
-                  <div className={popup['label']}>{t('forbid-guest-voice')}</div>
-                </div>
+                <div className={popup['label']}>{t('forbid-guest-voice')}</div>
               </div>
             </div>
           </div>
@@ -412,121 +341,118 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         {/* Text Permissions */}
         <div className={setting['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('text-permission')}</div>
-            <div className={popup['inputGroup']}>
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('text-permission')}</div>
+            </div>
+            <div className={popup['input-group']}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
-                  name="forbidText"
+                  name="forbid-text"
                   type="checkbox"
                   checked={channelForbidText}
                   onChange={(e) => {
-                    setChannel((prev) => ({
-                      ...prev,
-                      forbidText: e.target.checked,
-                    }));
+                    setChannel((prev) => ({ ...prev, forbidText: e.target.checked }));
                   }}
                 />
                 <div className={popup['label']}>{t('forbid-only-admin-text')}</div>
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
-                  name="forbidGuestText"
+                  name="forbid-guest-text"
                   type="checkbox"
                   checked={channelForbidGuestText}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      forbidGuestText: e.target.checked,
-                    }))
-                  }
+                  onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestText: e.target.checked }))}
                 />
                 <div className={popup['label']}>{t('forbid-guest-text')}</div>
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input
-                  name="forbidGuestUrl"
+                  name="forbid-guest-url"
                   type="checkbox"
                   checked={channelForbidGuestUrl}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      forbidGuestUrl: e.target.checked,
-                    }))
-                  }
+                  onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestUrl: e.target.checked }))}
                 />
                 <div className={popup['label']}>{t('forbid-guest-url')}</div>
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
-                <div className={popup['label']}>{t('guest-text-max-length')}</div>
-                <input
-                  name="guestTextMaxLength"
-                  type="number"
-                  value={channelGuestTextMaxLength}
-                  min={0}
-                  max={9999}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      guestTextMaxLength: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
-                    }))
-                  }
-                  style={{ width: '60px' }}
-                />
-                <div className={popup['label']}>{t('characters')}</div>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={popup['label']}>
+                  {t('guest-text-max-length')}
+                  <input
+                    name="guest-text-max-length"
+                    type="number"
+                    value={channelGuestTextMaxLength}
+                    min={0}
+                    max={9999}
+                    onChange={(e) =>
+                      setChannel((prev) => ({
+                        ...prev,
+                        guestTextMaxLength: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
+                      }))
+                    }
+                    style={{ width: '60px' }}
+                  />
+                  {t('characters')}
+                </div>
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
-                <div className={popup['label']}>{t('guest-text-wait-time')}</div>
-                <input
-                  name="guestTextWaitTime"
-                  type="number"
-                  value={channelGuestTextWaitTime}
-                  min={0}
-                  max={9999}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      guestTextWaitTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
-                    }))
-                  }
-                  style={{ width: '60px' }}
-                />
-                <div className={popup['label']}>{t('second')}</div>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={popup['label']}>
+                  {t('guest-text-wait-time')}
+                  <input
+                    name="guest-text-wait-time"
+                    type="number"
+                    value={channelGuestTextWaitTime}
+                    min={0}
+                    max={9999}
+                    onChange={(e) =>
+                      setChannel((prev) => ({
+                        ...prev,
+                        guestTextWaitTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
+                      }))
+                    }
+                    style={{ width: '60px' }}
+                  />
+                  {t('second')}
+                </div>
               </div>
-
-              <div className={`${popup['inputBox']} ${popup['row']}`}>
-                <div className={popup['label']}>{t('guest-text-gap-time')}</div>
-                <input
-                  name="guestTextGapTime"
-                  type="number"
-                  value={channelGuestTextGapTime}
-                  min={0}
-                  max={9999}
-                  onChange={(e) =>
-                    setChannel((prev) => ({
-                      ...prev,
-                      guestTextGapTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
-                    }))
-                  }
-                  style={{ width: '60px' }}
-                />
-                <div className={popup['label']}>{t('second')}</div>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={popup['label']}>
+                  {t('guest-text-gap-time')}
+                  <input
+                    name="guest-text-gap-time"
+                    type="number"
+                    value={channelGuestTextGapTime}
+                    min={0}
+                    max={9999}
+                    onChange={(e) =>
+                      setChannel((prev) => ({
+                        ...prev,
+                        guestTextGapTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
+                      }))
+                    }
+                    style={{ width: '60px' }}
+                  />
+                  {t('second')}
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Channel Management */}
+        <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
+          <div className={popup['col']}>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('channel-management') + t('soon')}</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className={popup['popupFooter']}>
-        <button
-          className={popup['button']}
-          disabled={!canSubmit}
+      <div className={popup['popup-footer']}>
+        <div
+          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
-            if (!canSubmit) return;
             handleEditChannel(
               {
                 name: channelName,
@@ -551,10 +477,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
           }}
         >
           {t('confirm')}
-        </button>
-        <button type="button" className={popup['button']} onClick={() => handleClose()}>
+        </div>
+        <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
-        </button>
+        </div>
       </div>
     </div>
   );

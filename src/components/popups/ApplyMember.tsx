@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
-import applyMember from '@/styles/popups/apply.module.css';
 
 // Types
 import { Server, MemberApplication, User } from '@/types';
@@ -91,104 +89,66 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
   }, [serverId, userId]);
 
   return (
-    <>
-      {/* Member Application Form */}
-      <div className={popup['popupContainer']} style={section === 0 ? {} : { display: 'none' }}>
-        {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['col']}>
-              <div className={popup['row']}>
-                <div className={applyMember['avatarWrapper']}>
-                  <div
-                    className={applyMember['avatarPicture']}
-                    style={{ backgroundImage: `url(${serverAvatarUrl})` }}
-                  />
-                </div>
-                <div className={applyMember['infoWrapper']}>
-                  <div className={applyMember['mainText']}>{serverName}</div>
-                  <div className={applyMember['subText']}>{`ID: ${serverDisplayId}`}</div>
-                </div>
-              </div>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div>{t('member-apply-note')}</div>
-                <div className={popup['hint']}>{serverApplyNotice || t('none')}</div>
-              </div>
-              <div className={applyMember['split']} />
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div>{t('member-apply-description')}</div>
-                <textarea
-                  rows={2}
-                  value={applicationDes}
-                  onChange={(e) =>
-                    setMemberApplication((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                />
-              </div>
+    <div className={popup['popup-wrapper']}>
+      {/* Body */}
+      <div className={popup['popup-body']}>
+        <div className={`${popup['content']} ${popup['col']}`}>
+          <div className={popup['row']}>
+            <div className={popup['avatar-wrapper']}>
+              <div className={popup['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+            </div>
+            <div className={popup['info-wrapper']}>
+              <div className={popup['bold-text']}>{serverName}</div>
+              <div className={popup['sub-text']}>{`ID: ${serverDisplayId}`}</div>
             </div>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button
-            type="submit"
-            className={popup['button']}
-            onClick={() => {
-              handleCreatMemberApplication({ description: applicationDes }, userId, serverId);
-              handleClose();
-            }}
-          >
-            {t('submit')}
-          </button>
-          <button type="button" className={popup['button']} onClick={() => handleClose()}>
-            {t('cancel')}
-          </button>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
+            <div className={popup['label']}>{t('member-apply-note')}</div>
+            <div className={popup['hint-text']}>{serverApplyNotice || t('none')}</div>
+          </div>
+          <div className={popup['split']} />
+          <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
+            <div className={popup['label']}>{t('member-apply-description')}</div>
+            <textarea
+              rows={2}
+              value={applicationDes}
+              onChange={(e) =>
+                setMemberApplication((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+            />
+          </div>
+          <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
+            {t('member-apply-sent')}
+          </div>
         </div>
       </div>
 
-      {/* Show Notification */}
-      <div className={popup['popupContainer']} style={section === 1 ? {} : { display: 'none' }}>
-        {/* Body */}
-        <div className={popup['popupBody']}>
-          <div className={setting['body']}>
-            <div className={popup['col']}>
-              <div className={popup['row']}>
-                <div className={applyMember['avatarWrapper']}>
-                  <div
-                    className={applyMember['avatarPicture']}
-                    style={{ backgroundImage: `url(${serverAvatarUrl})` }}
-                  />
-                </div>
-                <div className={applyMember['infoWrapper']}>
-                  <div className={applyMember['mainText']}>{serverName}</div>
-                  <div className={applyMember['subText']}>{`ID: ${serverDisplayId}`}</div>
-                </div>
-              </div>
-              <div className={`${popup['inputBox']} ${popup['col']}`}>
-                <div>{t('member-apply-note')}</div>
-                <div className={popup['hint']}>{serverApplyNotice || t('none')}</div>
-              </div>
-              <div className={applyMember['split']} />
-              <p className={popup['hint']}>{t('apply-success')}</p>
-            </div>
-          </div>
+      {/* Footer */}
+      <div className={popup['popup-footer']}>
+        <div
+          className={popup['button']}
+          style={section === 0 ? {} : { display: 'none' }}
+          onClick={() => {
+            handleCreatMemberApplication({ description: applicationDes }, userId, serverId);
+            handleClose();
+          }}
+        >
+          {t('submit')}
         </div>
-
-        {/* Footer */}
-        <div className={popup['popupFooter']}>
-          <button className={popup['button']} onClick={() => setSection(0)}>
-            {t('modify')}
-          </button>
-          <button className={popup['button']} onClick={() => handleClose()}>
-            {t('confirm')}
-          </button>
+        <div className={popup['button']} style={section === 0 ? {} : { display: 'none' }} onClick={() => handleClose()}>
+          {t('cancel')}
+        </div>
+        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => setSection(0)}>
+          {t('modify')}
+        </div>
+        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => handleClose()}>
+          {t('confirm')}
         </div>
       </div>
-    </>
+    </div>
   );
 });
 

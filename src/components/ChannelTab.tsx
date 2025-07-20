@@ -33,19 +33,7 @@ interface ChannelTabProps {
 }
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(
-  ({
-    channel,
-    friends,
-    currentChannel,
-    currentServer,
-    serverMembers,
-    expanded,
-    selectedItemId,
-    selectedItemType,
-    setExpanded,
-    setSelectedItemId,
-    setSelectedItemType,
-  }) => {
+  ({ channel, friends, currentChannel, currentServer, serverMembers, expanded, selectedItemId, selectedItemType, setExpanded, setSelectedItemId, setSelectedItemType }) => {
     // Hooks
     const { t } = useTranslation();
     const socket = useSocket();
@@ -53,20 +41,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const findMe = useFindMeContext();
 
     // Variables
-    const {
-      channelId,
-      name: channelName,
-      visibility: channelVisibility,
-      userLimit: channelUserLimit,
-      categoryId: channelCategoryId,
-    } = channel;
-    const {
-      userId,
-      serverId,
-      permissionLevel,
-      lobbyId: serverLobbyId,
-      receptionLobbyId: serverReceptionLobbyId,
-    } = currentServer;
+    const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId } = channel;
+    const { userId, serverId, permissionLevel, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = currentServer;
     const { channelId: currentChannelId } = currentChannel;
     const channelMembers = serverMembers.filter((mb) => mb.currentChannelId === channelId);
     const channelUserIds = channelMembers.map((mb) => mb.userId);
@@ -85,8 +61,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const canEdit = canManageChannel;
     const canDelete = canManageChannel && !isLobby;
     const canMoveAllUserToChannel = canManageChannel && !userInChannel && channelUserIds.length !== 0;
-    const canSetReceptionLobby =
-      canManageChannel && !isReceptionLobby && channelVisibility !== 'private' && channelVisibility !== 'readonly';
+    const canSetReceptionLobby = canManageChannel && !isReceptionLobby && channelVisibility !== 'private' && channelVisibility !== 'readonly';
 
     // Handlers
     const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
@@ -94,26 +69,20 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       socket.send.editServer({ serverId, server });
     };
 
-    const handleJoinChannel = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-      channelId: Channel['channelId'],
-    ) => {
+    const handleJoinChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
       if (!socket) return;
       socket.send.connectChannel({ userId, channelId, serverId });
     };
 
     const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', channelName), () =>
-        socket.send.deleteChannel({ channelId, serverId }),
-      );
+      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', channelName), () => socket.send.deleteChannel({ channelId, serverId }));
     };
 
     const handleOpenWarningDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', {
-        title: message,
+        message: message,
         submitTo: 'warningDialog',
       });
       ipcService.popup.onSubmit('warningDialog', callback);
@@ -127,11 +96,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       });
     };
 
-    const handleOpenCreateChannel = (
-      serverId: Server['serverId'],
-      channelId: Channel['channelId'] | null,
-      userId: User['userId'],
-    ) => {
+    const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Channel['channelId'] | null, userId: User['userId']) => {
       ipcService.popup.open(PopupType.CREATE_CHANNEL, 'createChannel');
       ipcService.initialData.onRequest('createChannel', {
         serverId,
@@ -148,11 +113,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       });
     };
 
-    const handleOpenChannelPassword = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-      channelId: Channel['channelId'],
-    ) => {
+    const handleOpenChannelPassword = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
       ipcService.popup.open(PopupType.CHANNEL_PASSWORD, 'channelPassword');
       ipcService.initialData.onRequest('channelPassword', {
         userId,
@@ -214,9 +175,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         {/* Channel View */}
         <div
           key={channelId}
-          className={`${styles['channelTab']} ${
-            selectedItemId === channelId && selectedItemType === 'channel' ? styles['selected'] : ''
-          }`}
+          className={`${styles['channel-tab']} ${selectedItemId === channelId && selectedItemType === 'channel' ? styles['selected'] : ''}`}
           onClick={() => {
             if (selectedItemId === channelId && selectedItemType === 'channel') {
               setSelectedItemId(null);
@@ -239,6 +198,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleDrop(e, serverId, channelId)}
           onContextMenu={(e) => {
+            e.stopPropagation();
             const x = e.clientX;
             const y = e.clientY;
             contextMenu.showContextMenu(x, y, false, false, [
@@ -275,8 +235,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 id: 'create-sub-channel',
                 label: t('create-sub-channel'),
                 show: canCreateSub,
-                onClick: () =>
-                  handleOpenCreateChannel(serverId, channelCategoryId ? channelCategoryId : channelId, userId),
+                onClick: () => handleOpenCreateChannel(serverId, channelCategoryId ? channelCategoryId : channelId, userId),
               },
               {
                 id: 'delete-channel',
@@ -301,8 +260,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 id: 'move-all-user-to-channel',
                 label: t('move-all-user-to-channel'),
                 show: canMoveAllUserToChannel,
-                onClick: () =>
-                  channelUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
+                onClick: () => channelUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
               },
               {
                 id: 'edit-channel-order',
@@ -325,36 +283,16 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           }}
         >
           <div
-            className={`
-              ${styles['tabIcon']} 
-              ${expanded[channelId] ? styles['expanded'] : ''} 
-              ${isLobby ? styles['lobby'] : styles[channelVisibility]} 
-            `}
-            onClick={() =>
-              setExpanded((prev) => ({
-                ...prev,
-                [channelId]: !prev[channelId],
-              }))
-            }
+            className={`${styles['tab-icon']} ${expanded[channelId] ? styles['expanded'] : ''} ${isLobby ? styles['lobby'] : styles[channelVisibility]}`}
+            onClick={() => setExpanded((prev) => ({ ...prev, [channelId]: !prev[channelId] }))}
           />
-          <div
-            className={`
-              ${styles['channelTabLable']} 
-              ${isReceptionLobby ? styles['isReceptionLobby'] : ''} 
-            `}
-          >
-            {channelName}
-          </div>
-          {channelVisibility !== 'readonly' && (
-            <div className={styles['channelTabCount']}>
-              {`(${channelMembers.length}${channelUserLimit > 0 ? `/${channelUserLimit}` : ''})`}
-            </div>
-          )}
-          {userInChannel && !expanded[channelId] && <div className={styles['myLocationIcon']} />}
+          <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{isLobby ? t(`${channelName}`) : channelName}</div>
+          {channelVisibility !== 'readonly' && <div className={styles['channel-user-count-text']}>{`(${channelMembers.length}${channelUserLimit > 0 ? `/${channelUserLimit}` : ''})`}</div>}
+          {userInChannel && !expanded[channelId] && <div className={styles['my-location-icon']} />}
         </div>
 
         {/* Expanded Sections */}
-        <div className={styles['userList']} style={expanded[channelId] ? {} : { display: 'none' }}>
+        <div className={styles['user-list']} style={expanded[channelId] ? {} : { display: 'none' }}>
           {channelMembers
             .filter((mb) => !!mb)
             .sort((a, b) => a.name.localeCompare(b.name))

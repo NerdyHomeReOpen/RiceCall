@@ -1,4 +1,12 @@
-.vipIcon {
+.vip-name-color {
+  color: #e4493e /* #d16059 */ !important;
+}
+
+.vip-name-color.clickable:hover {
+  color: #9c3028 !important;
+}
+
+.vip-icon {
   min-height: 14px;
   min-width: 14px;
   margin-right: 2px;
@@ -8,35 +16,27 @@
   background-position: 0 0;
 }
 
-.isVIP {
-  color: #e4493e /* #d16059 */ !important;
-}
-
-.isVIP.clickable:hover {
-  color: #9c3028 !important;
-}
-
-.vip-small-1 {
+.vip-icon.vip-1 {
   background-position: 0 0;
 }
 
-.vip-small-2 {
+.vip-icon.vip-2 {
   background-position: -14px 0;
 }
 
-.vip-small-3 {
+.vip-icon.vip-3 {
   background-position: -28px 0;
 }
 
-.vip-small-4 {
+.vip-icon.vip-4 {
   background-position: -42px 0;
 }
 
-.vip-small-5 {
+.vip-icon.vip-5 {
   background-position: -56px 0;
 }
 
-.vipIconBig {
+.vip-icon-big {
   min-height: 14px;
   min-width: 55px;
   margin-right: 2px;
@@ -44,22 +44,22 @@
   background-position: 0 0;
 }
 
-.vip-big-1 {
+.vip-icon-big.vip-1 {
   background-image: url('../../public/channel/icon_vip1.gif');
 }
 
-.vip-big-2 {
+.vip-icon-big.vip-2 {
   background-image: url('../../public/channel/icon_vip2.gif');
 }
 
-.vip-big-3 {
+.vip-icon-big.vip-3 {
   background-image: url('../../public/channel/icon_vip3.gif');
 }
 
-.vip-big-4 {
+.vip-icon-big.vip-4 {
   background-image: url('../../public/channel/icon_vip4.gif');
 }
 
-.vip-big-5 {
+.vip-icon-big.vip-5 {
   background-image: url('../../public/channel/icon_vip5.gif');
 }

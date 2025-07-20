@@ -1,11 +1,11 @@
 export const enum Permission {
   Guest = 1,
   Member = 2,
-  ChannelAdmin = 3,
-  ChannelManager = 4,
+  ChannelMod = 3,
+  ChannelAdmin = 4,
   ServerAdmin = 5,
   ServerOwner = 6,
-  EventStaff = 7,
+  Staff = 7,
   Official = 8,
 }
 
@@ -215,6 +215,10 @@ export type DiscordPresence = {
   }[];
 };
 
+export type speakingMode = 'key' | 'auto';
+
+export type mixMode = 'all' | 'app';
+
 export enum SocketClientEvent {
   // User
   SEARCH_USER = 'searchUser',
@@ -335,6 +339,7 @@ export enum SocketServerEvent {
 }
 
 export enum PopupType {
+  AVATAR_CROPPER = 'avatarCropper',
   USER_INFO = 'userInfo',
   USER_SETTING = 'userSetting',
   CHANNEL_SETTING = 'channelSetting',

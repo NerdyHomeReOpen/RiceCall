@@ -99,7 +99,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
       timestamp: Date.now(),
       buttons: [
         {
-          label: t('rpc:join-server'),
+          label: t('rpc:join-discord-server'),
           url: 'https://discord.gg/adCWzv6wwS',
         },
       ],
@@ -107,35 +107,35 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   }, [t, userName]);
 
   return (
-    <div className={friendPage['friendWrapper']} style={display ? {} : { display: 'none' }}>
+    <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
-      <header className={friendPage['friendHeader']}>
+      <header className={friendPage['friend-header']}>
         <div
-          className={friendPage['avatarPicture']}
+          className={friendPage['avatar-picture']}
           style={{ backgroundImage: `url(${userAvatarUrl})` }}
           datatype={''}
         />
-        <div className={friendPage['baseInfoBox']}>
-          <div className={friendPage['container']}>
-            <div className={friendPage['levelIcon']} />
+        <div className={friendPage['base-info-wrapper']}>
+          <div className={friendPage['box']}>
+            <div className={friendPage['level-icon']} />
             <div
               className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
               title={`${t('level')}: ${userLevel}, ${t('xp')}: ${userXP}, ${t('required-xp')}: ${
                 userRequiredXP - userXP
               }`}
             />
-            <div className={friendPage['wealthIcon']} />
-            <div className={friendPage['wealthValue']}>0</div>
-            {userVip > 0 && <div className={`${vip['vipIcon']} ${vip[`vip-small-${userVip}`]}`} />}
+            <div className={friendPage['wealth-icon']} />
+            <div className={friendPage['wealth-value-text']}>0</div>
+            {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
           </div>
-          <div className={`${friendPage['container']} ${friendPage['myBadges']}`}>
+          <div className={friendPage['box']}>
             <BadgeListViewer badges={userBadges} maxDisplay={5} />
           </div>
         </div>
-        <div className={`${friendPage['signatureBox']}`}>
+        <div className={friendPage['signature-wrapper']}>
           <textarea
             ref={signatureInputRef}
-            className={friendPage['signatureInput']}
+            className={friendPage['signature-input']}
             value={signatureInput}
             placeholder={t('signature-placeholder')}
             maxLength={300}
@@ -152,7 +152,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
           />
           <div
             ref={emojiIconRef}
-            className={emoji['emojiIcon']}
+            className={emoji['emoji-icon']}
             onMouseDown={(e) => {
               e.preventDefault();
               if (!emojiIconRef.current) return;
@@ -168,22 +168,22 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className={friendPage['friendContent']}>
+      {/* Body */}
+      <main className={friendPage['friend-body']}>
         {/* Left Sidebar */}
-        <div className={friendPage['sidebar']} style={{ width: `${sidebarWidth}px` }}>
+        <aside className={friendPage['sidebar']} style={{ width: `${sidebarWidth}px` }}>
           <FriendListViewer friendGroups={friendGroups} friends={friends} user={user} />
-        </div>
+        </aside>
 
         {/* Resize Handle */}
-        <div className="resizeHandle" onMouseDown={() => setIsResizing(true)} onMouseUp={() => setIsResizing(false)} />
+        <div className="resize-handle" onMouseDown={() => setIsResizing(true)} onMouseUp={() => setIsResizing(false)} />
 
         {/* Right Content */}
-        <div className={friendPage['mainContent']}>
-          <div className={friendPage['header']}>{t('friend-active')}</div>
-        </div>
+        <main className={friendPage['content']}>
+          <header className={friendPage['header']}>{t('friend-active')}</header>
+        </main>
       </main>
-    </div>
+    </main>
   );
 });
 

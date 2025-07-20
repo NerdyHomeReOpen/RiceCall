@@ -51,14 +51,14 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
     >
       {/* Loading */}
       {isLoading && (
-        <div className={homePage['loadingWrapper']}>
-          <div className={homePage['loadingBox']}>
-            <div className={homePage['loadingTitleContain']}>
+        <div className={homePage['loading-wrapper']}>
+          <div className={homePage['loading-box']}>
+            <div className={homePage['loading-title-contain']}>
               <div>{t('connecting-server')}</div>
-              <div className={homePage['loadingServerID']}>{loadingServerId}</div>
+              <div className={homePage['loading-server-id']}>{loadingServerId}</div>
             </div>
-            <div className={homePage['loadingGif']}></div>
-            <div className={homePage['loadingCloseBtn']} onClick={() => setIsLoading(false)} />
+            <div className={homePage['loading-gif']}></div>
+            <div className={homePage['loading-close-btn']} onClick={() => setIsLoading(false)} />
           </div>
         </div>
       )}

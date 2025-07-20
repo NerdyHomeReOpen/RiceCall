@@ -24,11 +24,12 @@ const Header: React.FC = React.memo(() => {
   };
 
   return (
-    <header className={header['header']}>
+    <header className={`${header['header']} ${header['big']}`}>
       {/* Title */}
-      <div className={`${header['titleBox']} ${header['big']}`}>
-        <div className={header['appIcon']} />
+      <div className={header['title-box']}>
+        <div className={header['app-icon']} />
       </div>
+
       {/* Buttons */}
       <div className={header['buttons']}>
         <div className={header['minimize']} onClick={() => handleMinimize()} />
@@ -63,12 +64,10 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="wrapper">
-      {/* Top Navigation */}
+    <>
       <Header />
-      {/* Main Content */}
-      <div className="content">{getMainContent()}</div>
-    </div>
+      {getMainContent()}
+    </>
   );
 };
 

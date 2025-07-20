@@ -3,29 +3,16 @@
   margin-bottom: 15px;
   background: #fff8dc;
   border: 1px solid #ffd700;
-  color: #666666;
-  font-size: 12px;
+  color: #666;
+  font-size: 0.9em;
 }
 
-.type {
+.select-type-text {
   font-weight: bold;
   color: #646464;
 }
 
-.label {
-  min-width: 80px;
-}
-
-.label:after {
-  content: '：';
-}
-
-.hint {
-  margin-left: 80px;
-  color: #666666;
-}
-
-.buttonGroup {
+.button-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -33,7 +20,7 @@
   padding: 30px;
 }
 
-.buttonGroup .button {
+.button-group .button {
   width: 50%;
   padding: 10px;
   border: 1px solid #e1e1e1;
@@ -43,21 +30,21 @@
   text-align: center;
 }
 
-.buttonGroup .button:hover {
-  border: 1px solid #cccccc;
+.button-group .button:hover {
+  border: 1px solid #ccc;
 }
 
-.inputGroup {
+.input-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.inputBox {
+.input-box {
   flex-direction: column;
 }
 
-.avatarWrapper {
+.avatar-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -66,7 +53,7 @@
   width: 100%;
 }
 
-.avatarPicture {
+.avatar-picture {
   position: relative;
   cursor: pointer;
   object-fit: cover;
@@ -78,7 +65,7 @@
   background-position: center center;
 }
 
-.inputWrapper {
+.input-wrapper {
   display: flex;
   flex-direction: column;
   width: 100%;

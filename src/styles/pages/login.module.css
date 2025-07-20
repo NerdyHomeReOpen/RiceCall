@@ -1,14 +1,16 @@
-.loginWrapper {
+.login {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   background: #fbfbfb;
 }
 
-.loginContent {
+.login-body {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,7 +20,7 @@
   gap: 1rem;
 }
 
-.appLogo {
+.app-logo {
   display: block;
   min-width: 226px;
   min-height: 54px;
@@ -28,7 +30,7 @@
   background-position: center;
 }
 
-.loadingBar {
+.loading-bar {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -40,14 +42,14 @@
   background-position: center;
 }
 
-.formWrapper {
+.form-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 60%;
   width: 100%;
-  gap: 0.7rem;
+  gap: 1rem;
 }
 
 .label {
@@ -56,23 +58,6 @@
   display: block;
   width: auto;
   text-align: left;
-  font-size: 12px;
-}
-
-.warning {
-  color: red;
-  font-size: 0.9rem;
-}
-
-.errorBox {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  padding: 0.25rem;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
 }
 
 .input {
@@ -88,29 +73,29 @@
   background: #fff;
 }
 
-.inputBox {
+.input-wrapper {
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 400px;
 }
 
-.loginAccountBox {
+.input-box {
   position: relative;
   display: flex;
   border: 1px solid #ccc;
-  box-shadow: inset 0.3px 0.5px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0.3px 0.5px 1px rgb(0 0 0 / 10%);
 }
 
-.loginAccountBox:hover:not(:has(input[type='password'])) {
+.input-box:hover:not(:has(input[type='password'])) {
   border-color: #929292;
 }
 
-.loginAccountBox:hover input:not([type='password']) {
+.input-box:hover input:not([type='password']) {
   background: #fff;
 }
 
-.comboArrow {
+.combo-arrow {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,15 +104,7 @@
   position: relative;
 }
 
-.loginAccountBox:hover .comboArrow {
-  background: linear-gradient(to bottom, #fff 0%, #f3f3f3 50%, #e0e0e0 100%);
-}
-
-.loginAccountBox .comboArrow:active {
-  background: linear-gradient(to bottom, #e0e0e0 0%, #f3f3f3 50%, #fff 100%);
-}
-
-.comboArrow:before {
+.combo-arrow::before {
   content: '';
   width: 2px;
   height: 20px;
@@ -137,7 +114,7 @@
   margin-right: 3px;
 }
 
-.comboArrow:after {
+.combo-arrow::after {
   content: '';
   width: 20px;
   height: 12px;
@@ -146,15 +123,23 @@
   background-position: -7px 0;
 }
 
-.loginAccountBox:hover .comboArrow:after {
+.input-box:hover .combo-arrow {
+  background: linear-gradient(to bottom, #fff 0%, #f3f3f3 50%, #e0e0e0 100%);
+}
+
+.input-box .combo-arrow:active {
+  background: linear-gradient(to bottom, #e0e0e0 0%, #f3f3f3 50%, #fff 100%);
+}
+
+.input-box:hover .combo-arrow::after {
   background-position: -33px 0;
 }
 
-.loginAccountBox .comboArrow:active:after {
+.input-box .combo-arrow:active::after {
   background-position: -59px 0;
 }
 
-.accountSelectBox {
+.account-select-box {
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -167,7 +152,7 @@
   overflow-y: auto;
 }
 
-.accountSelectOptionBox {
+.account-select-option-box {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -176,14 +161,15 @@
   width: 100%;
 }
 
-.accountSelectOptionBox:hover {
+.account-select-option-box:hover {
   background: #ececef;
 }
-.accountSelectOptionBox.selected {
+
+.account-select-option-box.selected {
   background: #dfe5ea;
 }
 
-.accountSelectCloseBtn {
+.account-select-delete-btn {
   min-height: 18px;
   min-width: 18px;
   background-image: url('../../../public/loading_close.png');
@@ -193,35 +179,35 @@
   cursor: pointer;
 }
 
-.accountSelectCloseBtn:hover {
+.account-select-delete-btn:hover {
   background-position: -18px 0;
 }
 
-.accountSelectCloseBtn:active {
+.account-select-delete-btn:active {
   background-position: -36px 0;
 }
 
-.checkWrapper {
+.check-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
   max-width: 400px;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   color: #777;
 }
 
-.checkWrapper .checkBox {
+.check-wrapper .check-box {
   display: flex;
   align-items: center;
 }
 
-.checkWrapper .check {
+.check-wrapper .check {
   appearance: none;
   cursor: pointer;
 }
 
-.checkBox .check::before {
+.check-box .check::before {
   display: block;
   content: '';
   min-height: 18px;
@@ -231,19 +217,19 @@
   background-position: 0 0;
 }
 
-.checkBox .check:checked::before {
+.check-box .check:checked::before {
   background-position: 0 -18px;
 }
 
-.checkBox .check:hover::before {
+.check-box .check:hover::before {
   background-position: -18px 0;
 }
 
-.checkBox .check:hover:checked::before {
+.check-box .check:hover:checked::before {
   background-position: -18px -18px;
 }
 
-.button {
+.submit-button {
   width: 200px;
   height: 42px;
   margin-top: 10px;
@@ -254,15 +240,15 @@
   cursor: pointer;
 }
 
-.button:hover {
+.submit-button:hover {
   background-color: #419ddd;
 }
 
-.button:active {
+.submit-button:active {
   background-color: #1680ce;
 }
 
-.button:disabled {
+.submit-button:disabled {
   background-color: #1680ce;
   opacity: 0.6;
   cursor: not-allowed;
@@ -270,7 +256,7 @@
 
 /* Footer */
 
-.loginFooter {
+.login-footer {
   width: 100%;
   padding: 10px 15px;
   background-color: #f4f4f5;
@@ -280,23 +266,23 @@
   border-top: 1px solid #e3e3e5;
 }
 
-.createAccount,
-.forgetPassword {
+.create-account,
+.forget-password {
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   color: #838383;
   display: flex;
   align-items: flex-end;
   cursor: pointer;
 }
 
-.createAccount:hover,
-.forgetPassword:hover {
+.create-account:hover,
+.forget-password:hover {
   color: #0073c6;
 }
 
-.createAccount::before,
-.forgetPassword::before {
+.create-account::before,
+.forget-password::before {
   content: '';
   min-width: 14px;
   min-height: 14px;
@@ -306,13 +292,13 @@
   vertical-align: middle;
 }
 
-.createAccount::before {
+.create-account::before {
   background-image: url('../../../public/icon_createaccount.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
-.forgetPassword::before {
+.forget-password::before {
   background-image: url('../../../public/icon_getpass.png');
   background-repeat: no-repeat;
   background-position: 0 0;

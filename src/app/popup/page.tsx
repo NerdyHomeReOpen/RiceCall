@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useEffect, useState, ReactNode, useRef } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -19,6 +19,7 @@ import ServerBroadcast from '@/components/popups/ServerBroadcast';
 import BlockMember from '@/components/popups/BlockMember';
 import ChannelSetting from '@/components/popups/ChannelSetting';
 import SystemSetting from '@/components/popups/SystemSetting';
+import AvatarCropper from '@/components/popups/AvatarCropper';
 import ChannelPassword from '@/components/popups/ChannelPassword';
 import MemberApplySetting from '@/components/popups/MemberApplySetting';
 import CreateServer from '@/components/popups/CreateServer';
@@ -35,37 +36,20 @@ import DirectMessage from '@/components/popups/DirectMessage';
 import SearchUser from '@/components/popups/SearchUser';
 import Dialog from '@/components/popups/Dialog';
 import ChangeTheme from '@/components/popups/ChangeTheme';
-import About from '@/components/popups/AboutUs';
+import About from '@/components/popups/About';
 import FriendVerification from '@/components/popups/FriendVerification';
 
 // Services
 import ipcService from '@/services/ipc.service';
 import getService from '@/services/get.service';
 
-// CSS
-import directMessageStyles from '@/styles/popups/directMessage.module.css';
-
-const directMessageHeader = (targetSignature: string) => (
-  <div className={directMessageStyles['header']}>
-    <div className={directMessageStyles['userSignature']}>{targetSignature}</div>
-    <div className={directMessageStyles['directOptionButtons']}>
-      <div className={`${directMessageStyles['fileShare']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['blockUser']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['unBlockUser']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['inviteTempGroup']} ${directMessageStyles['disabled']}`} />
-      <div className={`${directMessageStyles['report']} ${directMessageStyles['disabled']}`} />
-    </div>
-  </div>
-);
-
 interface HeaderProps {
   title: string;
   buttons: ('minimize' | 'maxsize' | 'close')[];
   titleBoxIcon?: string;
-  titleBoxContent?: ReactNode;
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon, titleBoxContent }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon }) => {
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -95,9 +79,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
   }, []);
 
   return (
-    <header className={`${header['header']} ${header['popupHeader']}`}>
-      <div className={header['titleWrapper']}>
-        <div className={`${header['titleBox']} ${titleBoxIcon}`}>
+    <header className={`${header['header']} ${header['popup']}`}>
+      <div className={header['title-wrapper']}>
+        <div className={`${header['title-box']} ${titleBoxIcon}`}>
           <div className={header['title']}>{title}</div>
         </div>
         <div className={header['buttons']}>
@@ -108,7 +92,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
           {buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}
         </div>
       </div>
-      {titleBoxContent}
     </header>
   );
 });
@@ -118,9 +101,6 @@ Header.displayName = 'Header';
 const Popup = React.memo(() => {
   // Language
   const { t } = useTranslation();
-
-  // Refs
-  const windowRef = useRef<HTMLDivElement>(null);
 
   // States
   const [id, setId] = useState<string | null>(null);
@@ -204,6 +184,11 @@ const Popup = React.memo(() => {
     }
 
     switch (type) {
+      case PopupType.AVATAR_CROPPER:
+        setHeaderTitle(t('avatar-cropper'));
+        setHeaderButtons(['close']);
+        setContent(<AvatarCropper {...popupInitialData} />);
+        break;
       case PopupType.CHANNEL_PASSWORD:
         setHeaderTitle(t('please-enter-the-channel-password'));
         setHeaderButtons(['close']);
@@ -307,7 +292,7 @@ const Popup = React.memo(() => {
       case PopupType.DIRECT_MESSAGE:
         setHeaderTitle(popupInitialData?.targetName || t('direct-message'));
         setHeaderButtons(['close', 'minimize', 'maxsize']);
-        setContent(<DirectMessage {...{ ...popupInitialData, windowRef }} />);
+        setContent(<DirectMessage {...popupInitialData} />);
         break;
       case PopupType.DIALOG_ALERT:
       case PopupType.DIALOG_ALERT2:
@@ -353,32 +338,25 @@ const Popup = React.memo(() => {
       default:
         break;
     }
-  }, [t, initialData, type, windowRef]);
+  }, [t, initialData, type]);
 
   return (
-    <div className="wrapper" ref={windowRef}>
-      {/* Top Nevigation */}
+    <>
       {(type !== PopupType.USER_INFO || headerTitle !== t('user-info')) && headerButtons.length > 0 && (
         <Header
           title={headerTitle}
           buttons={headerButtons}
           titleBoxIcon={
             type === PopupType.CHANGE_THEME
-              ? header['titleBoxSkinIcon']
+              ? header['title-box-skin-icon']
               : type === PopupType.DIRECT_MESSAGE
-              ? header['titleBoxDirectMessageIcon']
-              : undefined
-          }
-          titleBoxContent={
-            type === PopupType.DIRECT_MESSAGE && directMessageTargetSignature !== null
-              ? directMessageHeader(directMessageTargetSignature)
+              ? header['title-box-direct-message-icon']
               : undefined
           }
         />
       )}
-      {/* Main Content */}
-      <div className="content">{content}</div>
-    </div>
+      {content}
+    </>
   );
 });
 

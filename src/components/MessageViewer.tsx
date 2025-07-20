@@ -60,10 +60,10 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, user
   }, [messageGroups]);
 
   return (
-    <div className={styles['messageViewerWrapper']}>
+    <div className={styles['message-viewer-wrapper']}>
       {messageGroups.map((messageGroup, index) => {
         return (
-          <div key={index} className={styles['messageWrapper']}>
+          <div key={index} className={styles['message-wrapper']}>
             {messageGroup.type === 'general' ? (
               <ChannelMessageTab messageGroup={messageGroup} userId={userId} forbidGuestUrl={forbidGuestUrl} />
             ) : messageGroup.type === 'dm' ? (

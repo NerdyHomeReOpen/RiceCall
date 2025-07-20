@@ -2,20 +2,7 @@
 import apiService from '@/services/api.service';
 
 // Types
-import {
-  User,
-  Server,
-  Channel,
-  FriendApplication,
-  Friend,
-  MemberApplication,
-  Member,
-  DirectMessage,
-  UserFriend,
-  FriendGroup,
-  ServerMember,
-  UserServer,
-} from '@/types';
+import { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, DirectMessage, UserFriend, FriendGroup, ServerMember, UserServer } from '@/types';
 
 export const getService = {
   user: async ({ userId }: { userId: User['userId'] }): Promise<User | null> => {
@@ -68,11 +55,7 @@ export const getService = {
     return serverMembers;
   },
 
-  serverMemberApplications: async ({
-    serverId,
-  }: {
-    serverId: Server['serverId'];
-  }): Promise<MemberApplication[] | null> => {
+  serverMemberApplications: async ({ serverId }: { serverId: Server['serverId'] }): Promise<MemberApplication[] | null> => {
     const serverMemberApplications = await apiService.post('/serverMemberApplications', { serverId });
     return serverMemberApplications;
   },
@@ -82,24 +65,14 @@ export const getService = {
     return channel;
   },
 
-  friendGroup: async ({
-    friendGroupId,
-  }: {
-    friendGroupId: FriendGroup['friendGroupId'];
-  }): Promise<FriendGroup | null> => {
+  friendGroup: async ({ friendGroupId }: { friendGroupId: FriendGroup['friendGroupId'] }): Promise<FriendGroup | null> => {
     const friendGroup = await apiService.post('/friendGroup', {
       friendGroupId,
     });
     return friendGroup;
   },
 
-  friendApplication: async ({
-    senderId,
-    receiverId,
-  }: {
-    senderId: User['userId'];
-    receiverId: User['userId'];
-  }): Promise<FriendApplication | null> => {
+  friendApplication: async ({ senderId, receiverId }: { senderId: User['userId']; receiverId: User['userId'] }): Promise<FriendApplication | null> => {
     const friendApplication = await apiService.post('/friendApplication', {
       senderId,
       receiverId,
@@ -107,13 +80,7 @@ export const getService = {
     return friendApplication;
   },
 
-  friend: async ({
-    userId,
-    targetId,
-  }: {
-    userId: User['userId'];
-    targetId: User['userId'];
-  }): Promise<Friend | null> => {
+  friend: async ({ userId, targetId }: { userId: User['userId']; targetId: User['userId'] }): Promise<Friend | null> => {
     const friend = await apiService.post('/friend', {
       userId,
       targetId,
@@ -121,13 +88,7 @@ export const getService = {
     return friend;
   },
 
-  memberApplication: async ({
-    userId,
-    serverId,
-  }: {
-    userId: User['userId'];
-    serverId: Server['serverId'];
-  }): Promise<MemberApplication | null> => {
+  memberApplication: async ({ userId, serverId }: { userId: User['userId']; serverId: Server['serverId'] }): Promise<MemberApplication | null> => {
     const memberApplication = await apiService.post('/memberApplication', {
       userId,
       serverId,
@@ -135,13 +96,7 @@ export const getService = {
     return memberApplication;
   },
 
-  member: async ({
-    userId,
-    serverId,
-  }: {
-    userId: User['userId'];
-    serverId: Server['serverId'];
-  }): Promise<Member | null> => {
+  member: async ({ userId, serverId }: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Member | null> => {
     const member = await apiService.post('/member', {
       userId,
       serverId,
@@ -149,13 +104,7 @@ export const getService = {
     return member;
   },
 
-  directMessage: async ({
-    userId,
-    targetId,
-  }: {
-    userId: User['userId'];
-    targetId: User['userId'];
-  }): Promise<DirectMessage[] | null> => {
+  directMessage: async ({ userId, targetId }: { userId: User['userId']; targetId: User['userId'] }): Promise<DirectMessage[] | null> => {
     const directMessage = await apiService.post('/directMessage', {
       userId,
       targetId,

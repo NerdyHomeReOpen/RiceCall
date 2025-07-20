@@ -69,7 +69,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
     const handleOpenWarningDialog = (message: string, callback: () => void) => {
       ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', {
-        title: message,
+        message: message,
         submitTo: 'warningDialog',
       });
       ipcService.popup.onSubmit('warningDialog', callback);
@@ -87,11 +87,8 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
       <div key={friendGroupId}>
         {/* Tab View */}
         <div
-          className={`${styles['tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''}`}
-          onClick={() => {
-            setExpanded(!expanded);
-            setSelectedItemId(friendGroupId);
-          }}
+          className={`${styles['friend-group-tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''}`}
+          onClick={() => setExpanded(!expanded)}
           onContextMenu={(e) => {
             const defaultFriendGroupKeys = new Set(['stranger', 'blacklist']);
             if (defaultFriendGroupKeys.has(friendGroupId)) return;
@@ -113,9 +110,9 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
             ]);
           }}
         >
-          <div className={`${styles['toggleIcon']} ${expanded ? styles['expanded'] : ''}`} />
-          <div className={styles['tabLable']}>{friendGroupName}</div>
-          <div className={styles['tabCount']}>
+          <div className={`${styles['toggle-icon']} ${expanded ? styles['expanded'] : ''}`} />
+          <div className={styles['tab-label']}>{friendGroupName}</div>
+          <div className={styles['tab-count']}>
             {friendGroupId !== 'blocked' && friendGroupId !== 'outlander'
               ? `(${friendsOnlineCount}/${friendGroupFriends.length})`
               : `(${friendGroupFriends.length})`}
@@ -124,7 +121,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(
 
         {/* Expanded Sections */}
         <div
-          className={styles['tabContent']}
+          className={styles['tab-content']}
           style={{
             display: expanded ? 'block' : 'none',
           }}
