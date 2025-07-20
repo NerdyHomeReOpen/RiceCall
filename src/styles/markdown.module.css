@@ -53,11 +53,30 @@
   white-space: pre-wrap;
 }
 
-.markdown-content span {
-  display: inline-block;
-  align-self: center;
+.markdown-content .user-tag {
+  display: inline-flex;
+  color: #226ba0;
   cursor: pointer;
   white-space: pre-wrap;
+}
+
+.markdown-content .user-tag:hover {
+  text-decoration: underline;
+}
+
+.markdown-content .permission-icon {
+  vertical-align: bottom;
+}
+
+.markdown-content .youtube-video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 0;
+}
+
+.markdown-content .emoji {
+  width: 19px;
+  height: 19px;
 }
 
 .markdown-content a {
