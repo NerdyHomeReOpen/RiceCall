@@ -412,15 +412,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                       />
                     </div>
 
-                      <div
-                        className={`${styles['speakerButton']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`}
-                        onClick={toggleSpeakerMute}
+                      <div 
+                      className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} 
+                      onClick={toggleSpeakerMute}
                       />
                     </div>
                   )}
                 </div>
-                <div className={styles['recordModeButton']} />
-              </div>
               <div className={styles['record-mode-btn']} />
             </div>
           </div>
