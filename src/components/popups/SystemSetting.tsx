@@ -280,9 +280,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             {/* Status Setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('status-setting')}</div>
+              <div className={popup['label']}>{t('status-setting') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="status-auto-idle" type="checkbox" checked={statusAutoIdle} onChange={(e) => setStatusAutoIdle(e.target.checked)} />
                 <div className={popup['label']}>
@@ -307,9 +307,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             {/* Channel Setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('channel-setting')}</div>
+              <div className={popup['label']}>{t('channel-setting') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="channel-classic-mode" type="radio" checked={channelMode === 'classic'} onChange={() => setChannelMode('classic')} />
                 <div className={popup['label']}>{t('channel-classic-mode-label')}</div>
@@ -326,9 +326,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             {/* Close Setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('close-setting')}</div>
+              <div className={popup['label']}>{t('close-setting') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="close-to-tray" type="radio" checked={closeToTray} onChange={() => setCloseToTray(true)} />
                 <div className={popup['label']}>{t('close-to-tray-label')}</div>
@@ -408,9 +408,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             {/* Mix Setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('mix-setting')}</div>
+              <div className={popup['label']}>{t('mix-setting') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="mix-effect" type="checkbox" checked={mixEffect} onChange={(e) => setMixEffect(e.target.checked)} />
                 <div className={popup['label']}>{t('mix-effect-label')}</div>
@@ -450,9 +450,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             {/* Mix mode setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('mix-mode-setting')}</div>
+              <div className={popup['label']}>{t('mix-mode-setting') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="manual-mix-mode" type="checkbox" checked={manualMixMode} onChange={() => setManualMixMode(!manualMixMode)} />
                 <div className={popup['label']}>{t('manual-mix-mode-label')}</div>
@@ -476,9 +476,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           <div className={popup['col']}>
             {/* Default Speaking Mode */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('default-speaking-mode-label')}</div>
+              <div className={popup['label']}>{t('default-speaking-mode-label') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="default-speaking-auto" type="radio" checked={defaultSpeakingMode === 'key'} onChange={() => setDefaultSpeakingMode('key')} />
                 <div className={popup['label']}>{t('default-speaking-key-label')}</div>
@@ -520,9 +520,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           <div className={popup['col']}>
             {/* Anti-spam setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('anti-spam-setting')}</div>
+              <div className={popup['label']}>{t('anti-spam-setting') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="forbid-add-friend" type="checkbox" checked={forbidAddFriend} onChange={() => setForbidAddFriend(!forbidAddFriend)} />
                 <div className={popup['label']}>{t('forbid-add-friend-label')}</div>
@@ -543,9 +543,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             {/* Privacy setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('privacy-setting')}</div>
+              <div className={popup['label']}>{t('privacy-setting') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="share-now-group" type="checkbox" checked={shareNowGroup} onChange={() => setShareNowGroup(!shareNowGroup)} />
                 <div className={popup['label']}>{t('share-now-group-label')}</div>
@@ -566,9 +566,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             {/* Message history setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('message-history-setting')}</div>
+              <div className={popup['label']}>{t('message-history-setting') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="not-save-message-history" type="checkbox" checked={notSaveMessageHistory} onChange={() => setNotSaveMessageHistory(!notSaveMessageHistory)} />
                 <div className={popup['label']}>{t('not-save-message-history-label')}</div>
@@ -582,9 +582,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           <div className={popup['col']}>
             {/* Hot Key Settings */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('hot-key-setting')}</div>
+              <div className={popup['label']}>{t('hot-key-setting') + ' ' + t('soon')}</div>
             </div>
-            <div className={popup['input-group']}>
+            <div className={`${popup['input-group']} ${'disabled'}`}>
               <div key={'openMainWindow'} className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('hot-key-open-main-window-label')}</div>
                 <input
@@ -818,12 +818,12 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             // SoundEffect
             ipcService.systemSettings.disableAllSoundEffect.set(disableAllSoundEffect);
-            ipcService.systemSettings.enterVoiceChannelSound.set(!disableAllSoundEffect && enterVoiceChannelSound);
-            ipcService.systemSettings.leaveVoiceChannelSound.set(!disableAllSoundEffect && leaveVoiceChannelSound);
-            ipcService.systemSettings.startSpeakingSound.set(!disableAllSoundEffect && startSpeakingSound);
-            ipcService.systemSettings.stopSpeakingSound.set(!disableAllSoundEffect && stopSpeakingSound);
-            ipcService.systemSettings.receiveDirectMessageSound.set(!disableAllSoundEffect && receiveDirectMessageSound);
-            ipcService.systemSettings.receiveChannelMessageSound.set(!disableAllSoundEffect && receiveChannelMessageSound);
+            ipcService.systemSettings.enterVoiceChannelSound.set(enterVoiceChannelSound);
+            ipcService.systemSettings.leaveVoiceChannelSound.set(leaveVoiceChannelSound);
+            ipcService.systemSettings.startSpeakingSound.set(startSpeakingSound);
+            ipcService.systemSettings.stopSpeakingSound.set(stopSpeakingSound);
+            ipcService.systemSettings.receiveDirectMessageSound.set(receiveDirectMessageSound);
+            ipcService.systemSettings.receiveChannelMessageSound.set(receiveChannelMessageSound);
             handleClose();
           }}
         >

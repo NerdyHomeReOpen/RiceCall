@@ -27,7 +27,6 @@ const Providers = ({ children }: ProvidersProps) => {
   useEffect(() => {
     const setFont = (font: string | null) => {
       if (!font) return;
-      console.log('font', font);
       document.body.style.setProperty('font-family', font, 'important');
       document.body.style.setProperty('--font-family', font, 'important');
     };

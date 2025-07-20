@@ -222,19 +222,10 @@ const DEV = process.argv.includes('--dev');
 const PORT = 3000;
 const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
 const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
-const APP_ICON =
-  process.platform === 'win32'
-    ? path.join(app.getAppPath(), 'resources', 'icon.ico')
-    : path.join(app.getAppPath(), 'resources', 'icon.png');
+const APP_ICON = process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'icon.ico') : path.join(app.getAppPath(), 'resources', 'icon.png');
 const APP_TRAY_ICON = {
-  gray:
-    process.platform === 'win32'
-      ? path.join(app.getAppPath(), 'resources', 'tray_gray.ico')
-      : path.join(app.getAppPath(), 'resources', 'tray_gray.png'),
-  normal:
-    process.platform === 'win32'
-      ? path.join(app.getAppPath(), 'resources', 'tray.ico')
-      : path.join(app.getAppPath(), 'resources', 'tray.png'),
+  gray: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray_gray.ico') : path.join(app.getAppPath(), 'resources', 'tray_gray.png'),
+  normal: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray.ico') : path.join(app.getAppPath(), 'resources', 'tray.png'),
 };
 
 // Windows
@@ -303,8 +294,7 @@ function waitForPort(port: number) {
 }
 
 function focusWindow() {
-  const window =
-    authWindow.isDestroyed() === false ? authWindow : mainWindow.isDestroyed() === false ? mainWindow : null;
+  const window = authWindow.isDestroyed() === false ? authWindow : mainWindow.isDestroyed() === false ? mainWindow : null;
   if (window) {
     if (window.isMinimized()) window.restore();
     window.focus();
@@ -679,9 +669,7 @@ function configureAutoUpdater() {
     dialog.showMessageBox({
       type: 'info',
       title: '有新版本可用',
-      message: `新版本 ${info.version} 發布於 ${new Date(
-        info.releaseDate,
-      ).toLocaleDateString()}，點擊確認後將開始下載...`,
+      message: `新版本 ${info.version} 發布於 ${new Date(info.releaseDate).toLocaleDateString()}，點擊確認後將開始下載...`,
     });
   });
 

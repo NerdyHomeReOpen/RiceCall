@@ -773,6 +773,14 @@ const ipcService = {
         if (!isElectron) return;
         ipcRenderer.send('set-disable-all-sound-effect', enabled);
       },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('disable-all-sound-effect', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+        return () => ipcRenderer.removeAllListeners('disable-all-sound-effect');
+      },
     },
 
     enterVoiceChannelSound: {
