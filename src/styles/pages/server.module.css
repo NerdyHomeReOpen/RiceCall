@@ -535,6 +535,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
+  gap: 5px;
   background-image: url('../../../public/channel/mic_state_menu.png');
   background-repeat: no-repeat;
   background-size: auto;
@@ -607,6 +608,7 @@
 }
 
 .mic-sub-text {
+  margin-top: 2px;
   font-size: 0.8em;
   color: #777;
 }
