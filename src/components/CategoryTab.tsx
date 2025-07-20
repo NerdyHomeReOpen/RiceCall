@@ -34,20 +34,7 @@ interface CategoryTabProps {
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(
-  ({
-    category,
-    friends,
-    currentChannel,
-    currentServer,
-    serverMembers,
-    serverChannels,
-    expanded,
-    selectedItemId,
-    selectedItemType,
-    setExpanded,
-    setSelectedItemId,
-    setSelectedItemType,
-  }) => {
+  ({ category, friends, currentChannel, currentServer, serverMembers, serverChannels, expanded, selectedItemId, selectedItemType, setExpanded, setSelectedItemId, setSelectedItemType }) => {
     // Hooks
     const { t } = useTranslation();
     const socket = useSocket();
@@ -58,23 +45,18 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const { channelId: categoryId, name: categoryName, visibility: categoryVisibility } = category;
     const { userId, serverId, permissionLevel, receptionLobbyId: serverReceptionLobbyId } = currentServer;
     const { channelId: currentChannelId } = currentChannel;
-    const categoryChannels = serverChannels
-      .filter((ch) => ch.type === 'channel')
-      .filter((ch) => ch.categoryId === categoryId);
+    const categoryChannels = serverChannels.filter((ch) => ch.type === 'channel').filter((ch) => ch.categoryId === categoryId);
 
     const categoryChannelIds = new Set(categoryChannels.map((ch) => ch.channelId));
     const isAllChannelReadOnly = categoryChannels.every((channel) => channel.visibility === 'readonly');
-    const categoryMembers = serverMembers.filter(
-      (mb) => categoryChannelIds.has(mb.currentChannelId) || mb.currentChannelId === categoryId,
-    );
+    const categoryMembers = serverMembers.filter((mb) => categoryChannelIds.has(mb.currentChannelId) || mb.currentChannelId === categoryId);
     const categoryUserIds = categoryMembers.map((mb) => mb.userId);
     const userInCategory = categoryMembers.some((mb) => mb.currentChannelId === currentChannelId);
     const isReceptionLobby = serverReceptionLobbyId === categoryId;
     const userInChannel = currentChannelId === categoryId;
     const canManageChannel = permissionLevel > 4;
     const canMoveToChannel = canManageChannel && !userInChannel && categoryUserIds.length !== 0;
-    const canSetReceptionLobby =
-      canManageChannel && !isReceptionLobby && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
+    const canSetReceptionLobby = canManageChannel && !isReceptionLobby && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
 
     // Handlers
     const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
@@ -82,20 +64,14 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       socket.send.editServer({ serverId, server });
     };
 
-    const handleJoinChannel = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-      channelId: Channel['channelId'],
-    ) => {
+    const handleJoinChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
       if (!socket) return;
       socket.send.connectChannel({ userId, channelId, serverId });
     };
 
     const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', categoryName), () =>
-        socket.send.deleteChannel({ channelId, serverId }),
-      );
+      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', categoryName), () => socket.send.deleteChannel({ channelId, serverId }));
     };
 
     const handleOpenWarningDialog = (message: string, callback: () => void) => {
@@ -115,11 +91,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       });
     };
 
-    const handleOpenCreateChannel = (
-      serverId: Server['serverId'],
-      channelId: Category['categoryId'],
-      userId: User['userId'],
-    ) => {
+    const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Category['categoryId'], userId: User['userId']) => {
       ipcService.popup.open(PopupType.CREATE_CHANNEL, 'createChannel');
       ipcService.initialData.onRequest('createChannel', {
         serverId,
@@ -136,11 +108,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       });
     };
 
-    const handleOpenServerBroadcast = (
-      userId: User['userId'],
-      serverId: Server['serverId'],
-      channelId: Channel['channelId'],
-    ) => {
+    const handleOpenServerBroadcast = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
       ipcService.popup.open(PopupType.SERVER_BROADCAST, 'serverBroadcast');
       ipcService.initialData.onRequest('serverBroadcast', {
         userId,
@@ -195,9 +163,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         {/* Category View */}
         <div
           key={categoryId}
-          className={`${styles['channel-tab']} ${
-            selectedItemId === categoryId && selectedItemType === 'category' ? styles['selected'] : ''
-          }`}
+          className={`${styles['channel-tab']} ${selectedItemId === categoryId && selectedItemType === 'category' ? styles['selected'] : ''}`}
           onClick={() => {
             if (selectedItemId === categoryId && selectedItemType === 'category') {
               setSelectedItemId(null);
@@ -212,6 +178,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleDrop(e, serverId, categoryId)}
           onContextMenu={(e) => {
+            e.stopPropagation();
             const x = e.clientX;
             const y = e.clientY;
             contextMenu.showContextMenu(x, y, false, false, [
@@ -264,8 +231,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 id: 'move-all-user-to-channel',
                 label: t('move-all-user-to-channel'),
                 show: canMoveToChannel,
-                onClick: () =>
-                  categoryUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
+                onClick: () => categoryUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
               },
               {
                 id: 'edit-channel-order',
@@ -288,17 +254,11 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           }}
         >
           <div
-            className={`${styles['tab-icon']} ${expanded[categoryId] ? styles['expanded'] : ''} ${
-              styles[categoryVisibility]
-            }`}
+            className={`${styles['tab-icon']} ${expanded[categoryId] ? styles['expanded'] : ''} ${styles[categoryVisibility]}`}
             onClick={() => setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }))}
           />
-          <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>
-            {categoryName}
-          </div>
-          {!isAllChannelReadOnly && (
-            <div className={styles['channel-tab-count-text']}>{`(${categoryMembers.length})`}</div>
-          )}
+          <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{categoryName}</div>
+          {!isAllChannelReadOnly && <div className={styles['channel-tab-count-text']}>{`(${categoryMembers.length})`}</div>}
           {!expanded[categoryId] && userInCategory && <div className={styles['my-location-icon']} />}
         </div>
 
