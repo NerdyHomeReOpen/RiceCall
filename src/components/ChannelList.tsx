@@ -57,7 +57,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
     const [selectedItemId, setSelectedItemId] = useState<string | null>(currentChannel.channelId);
     const [selectedItemType, setSelectedItemType] = useState<string | null>('channel');
     const [memberApplicationsCount, setMemberApplicationsCount] = useState<number>(0);
-    const [reloadAvatarKey, setReloadAvatarKey] = useState(0);
 
     // Variables
     const connectStatus = 4 - Math.floor(Number(latency) / 50);
@@ -140,10 +139,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
       setMemberApplicationsCount((prev) => Math.max(prev - 1, 0));
     };
 
-    const handleServerUpdate = () => {
-      setReloadAvatarKey((prev) => prev + 1);
-    };
-
     // Effects
     useEffect(() => {
       for (const channel of serverChannels) {
@@ -180,7 +175,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
         [SocketServerEvent.SERVER_MEMBER_APPLICATIONS_SET]: handleServerMemberApplicationsSet,
         [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]: handleServerMemberApplicationAdd,
         [SocketServerEvent.SERVER_MEMBER_APPLICATION_REMOVE]: handleServerMemberApplicationRemove,
-        [SocketServerEvent.SERVER_UPDATE]: handleServerUpdate,
       };
       const unsubscribe: (() => void)[] = [];
 
@@ -205,10 +199,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(
               handleOpenServerSetting(userId, serverId);
             }}
           >
-            <div
-              className={styles['avatar-picture']}
-              style={{ backgroundImage: `url(${serverAvatarUrl}?v=${reloadAvatarKey})` }}
-            />
+            <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
           </div>
           <div className={styles['base-info-wrapper']}>
             <div className={styles['box']}>
