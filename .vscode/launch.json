@@ -1,0 +1,36 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Electron Main",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "electron",
+      "runtimeArgs": [
+        "-r",
+        "tsx",
+        "-r",
+        "dotenv/config",
+        "main.ts",
+        "--dev"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+      },
+      "linux": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron"
+      },
+      "mac": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron"
+      },
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/**/*.js"]
+    }
+  ]
+}

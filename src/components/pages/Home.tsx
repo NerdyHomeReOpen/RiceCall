@@ -9,7 +9,7 @@ import homePage from '@/styles/pages/home.module.css';
 import ServerListViewer from '@/components/ServerList';
 
 // Type
-import { PopupType, SocketServerEvent, User, UserServer } from '@/types';
+import { PopupType, RecommendedServersByCategory, SocketServerEvent, User, UserServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -19,12 +19,62 @@ import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
+import ServerCard from '../ServerCard';
 
 export interface ServerListSectionProps {
   title: string;
   servers: UserServer[];
   user: User;
 }
+
+interface RecommendedServersProps {
+  recommendedServers: RecommendedServersByCategory;
+  user: User;
+}
+
+const RecommendedServersSection: React.FC<RecommendedServersProps> = ({
+  recommendedServers,
+  user
+}) => {
+  const categories = Object.keys(recommendedServers);
+  const [activeCategory, setActiveCategory] = useState(categories[0] ?? '');
+  
+  return (
+   <div className={homePage['recommendedWrapper']}>
+      {/* Left panel: categories */}
+      <aside className={homePage['categorySidebar']}>
+        <ul className={homePage['categoryList']}>
+          {categories.map((category) => (
+            <li key={category}>
+              <button
+                onClick={() => setActiveCategory(category)}
+                className={`${homePage['categoryItem']} ${
+                  activeCategory === category ? homePage['categoryItemActive'] : ''
+                }`}
+              >
+                {category}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </aside>
+
+      {/* Right panel : servers */}      
+      <section className={homePage['serversContainer']}>
+        <h2 className={homePage['categoryTitle']}>{activeCategory}</h2>
+        {recommendedServers[activeCategory]?.length > 0 && (
+            <div className={homePage['servers']}>
+              {recommendedServers[activeCategory].map((server) => (
+                <div key={server.serverId} className={homePage['serverCardsRecommended']}>
+                  <ServerCard user={user} server={server} />
+                </div>
+              ))}
+            </div>
+        )}        
+      </section>
+  </div>
+  );
+};
 
 const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, servers }) => {
   // Hooks
@@ -74,10 +124,11 @@ const SearchResultItem: React.FC<{
 interface HomePageProps {
   user: User;
   servers: UserServer[];
+  recommendedServers: RecommendedServersByCategory;
   display: boolean;
 }
 
-const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, display }) => {
+const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, recommendedServers, display }) => {
   // Hooks
   const { t } = useTranslation();
   const socket = useSocket();
@@ -342,10 +393,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={`${homePage['navegate-tab']} ${section === 0 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(0)}>
             {t('home')}
           </div>
-          <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(1)}>
+          <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
+            {t('recommended-servers')}
+          </div>
+          <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
             {t('game')}
           </div>
-          <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="30375" onClick={() => setSection(2)}>
+          <div className={`${homePage['navegate-tab']} ${section === 3 ? homePage['active'] : ''}`} data-key="30375" onClick={() => setSection(3)}>
             {t('live')}
           </div>
         </div>
@@ -354,24 +408,35 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={homePage['navegate-tab']} data-key="30014" onClick={() => handleOpenCreateServer(userId)}>
             {t('create-servers')}
           </div>
-          <div className={homePage['navegate-tab']} data-key="60004" onClick={() => setSection(3)}>
+          <div className={homePage['navegate-tab']} data-key="60004" onClick={() => setSection(4)}>
             {t('personal-exclusive')}
           </div>
         </div>
       </header>
 
-      {/* Announcement */}
+       {/* Announcement */}
       <webview src="https://ricecall.com.tw/announcement" className={homePage['webview']} style={section === 0 ? {} : { display: 'none' }} />
 
+       {/* Recommended servers */}
+        <main
+          className={homePage['recommendedServers']}
+          style={section === 1 ? {} : { display: 'none' }}
+        >
+          <RecommendedServersSection
+            recommendedServers={recommendedServers}
+            user = {user}
+          />          
+        </main>     
+
       {/* Personal Exclusive */}
-      <main className={homePage['home-body']} style={section === 3 ? {} : { display: 'none' }}>
+      <main className={homePage['home-body']} style={section === 4 ? {} : { display: 'none' }}>
         <ServerListSection title={t('recent-servers')} servers={recentServers} user={user} />
         <ServerListSection title={t('my-servers')} servers={ownedServers} user={user} />
         <ServerListSection title={t('favorited-servers')} servers={favoriteServers} user={user} />
       </main>
 
       {/* Not Available */}
-      <main className={homePage['home-body']} style={section === 1 || section === 2 ? {} : { display: 'none' }}>
+      <main className={homePage['home-body']} style={section === 2 || section === 3 ? {} : { display: 'none' }}>
         <div>{t('not-available-page')}</div>
       </main>
     </main>
