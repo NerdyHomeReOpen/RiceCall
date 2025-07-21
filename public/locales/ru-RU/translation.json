@@ -184,7 +184,7 @@
   "language-select": "Выбор языка",
   "level": "Уровень",
   "live": "Прямой эфир",
-  "lobby": "Гостиная",
+  "channel-lobby": "Гостиная",
   "locate-me": "Найти себя",
   "login": "Войти",
   "logout": "Отключиться",
@@ -530,5 +530,5 @@
   "set-hotkey-error": "Кнопка {0} уже используется",
   "upload": "Загрузить",
   "avatar-cropper": "Изменить миниатюру",
-  "default-lobby": "Гостевой канал"
+  "lobby": "大廳"
 }
