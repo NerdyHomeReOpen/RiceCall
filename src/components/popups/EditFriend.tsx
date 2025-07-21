@@ -84,21 +84,11 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
     if (!userId || !targetId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.userFriendGroups({
-          userId: userId,
-        }),
-        getService.friend({
-          userId: userId,
-          targetId: targetId,
-        }),
-      ]).then(([friendGroups, friend]) => {
-        if (friendGroups) {
-          setFriendGroups(friendGroups);
-        }
-        if (friend) {
-          setFriend(friend);
-        }
+      getService.friend({ userId: userId, targetId: targetId }).then((friend) => {
+        if (friend) setFriend(friend);
+      });
+      getService.userFriendGroups({ userId: userId }).then((friendGroups) => {
+        if (friendGroups) setFriendGroups(friendGroups);
       });
     };
     refresh();
@@ -113,11 +103,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
             <div className={`${popup['input-box']} ${popup['row']}`}>
               <div className={popup['label']}>{t('friend-select-group')}</div>
               <div className={popup['select-box']}>
-                <select
-                  name="friend-group"
-                  value={friendGroupId || ''}
-                  onChange={(e) => setFriend((prev) => ({ ...prev, friendGroupId: e.target.value }))}
-                >
+                <select name="friend-group" value={friendGroupId || ''} onChange={(e) => setFriend((prev) => ({ ...prev, friendGroupId: e.target.value }))}>
                   <option value={''}>{t('none')}</option>
                   {friendGroups.map((group) => (
                     <option key={group.friendGroupId} value={group.friendGroupId}>

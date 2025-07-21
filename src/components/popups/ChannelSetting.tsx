@@ -64,11 +64,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
   const canSubmit = channelName.trim();
 
   // Handlers
-  const handleEditChannel = (
-    channel: Partial<Channel>,
-    channelId: Channel['channelId'],
-    serverId: Server['serverId'],
-  ) => {
+  const handleEditChannel = (channel: Partial<Channel>, channelId: Channel['channelId'], serverId: Server['serverId']) => {
     if (!socket) return;
     socket.send.editChannel({ channel, channelId, serverId });
   };
@@ -82,20 +78,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
     if (!channelId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.channel({
-          channelId: channelId,
-        }),
-        getService.server({
-          serverId: serverId,
-        }),
-      ]).then(([channel, server]) => {
-        if (channel) {
-          setChannel(channel);
-        }
-        if (server) {
-          setServer(server);
-        }
+      getService.channel({ channelId: channelId }).then((channel) => {
+        if (channel) setChannel(channel);
+      });
+      getService.server({ serverId: serverId }).then((server) => {
+        if (server) setServer(server);
       });
     };
     refresh();
@@ -108,19 +95,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         {/* Sidebar */}
         <div className={setting['left']}>
           <div className={setting['tabs']}>
-            {[
-              t('channel-info'),
-              t('channel-announcement'),
-              t('access-permission'),
-              t('speaking-permission'),
-              t('text-permission'),
-              t('channel-management'),
-            ].map((title, index) => (
-              <div
-                className={`${setting['tab']} ${activeTabIndex === index ? setting['active'] : ''}`}
-                onClick={() => setActiveTabIndex(index)}
-                key={index}
-              >
+            {[t('channel-info'), t('channel-announcement'), t('access-permission'), t('speaking-permission'), t('text-permission'), t('channel-management')].map((title, index) => (
+              <div className={`${setting['tab']} ${activeTabIndex === index ? setting['active'] : ''}`} onClick={() => setActiveTabIndex(index)} key={index}>
                 {title}
               </div>
             ))}
@@ -133,13 +109,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
             <div className={popup['row']}>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('channel-name-label')}</div>
-                <input
-                  name="channel-name"
-                  type="text"
-                  value={isLobby ? t(`${channelName}`) : channelName}
-                  maxLength={32}
-                  onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
-                />
+                <input name="channel-name" type="text" value={isLobby ? t(`${channelName}`) : channelName} maxLength={32} onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))} />
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('user-limit')}</div>
@@ -162,12 +132,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
             <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('channel-mode')}</div>
               <div className={popup['select-box']}>
-                <select
-                  value={channelVoiceMode}
-                  onChange={(e) =>
-                    setChannel((prev) => ({ ...prev, voiceMode: e.target.value as Channel['voiceMode'] }))
-                  }
-                >
+                <select value={channelVoiceMode} onChange={(e) => setChannel((prev) => ({ ...prev, voiceMode: e.target.value as Channel['voiceMode'] }))}>
                   <option value="free">{t('free-speech')}</option>
                   <option value="forbidden" disabled>
                     {t('forbid-speech')}
@@ -357,21 +322,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 <div className={popup['label']}>{t('forbid-only-admin-text')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input
-                  name="forbid-guest-text"
-                  type="checkbox"
-                  checked={channelForbidGuestText}
-                  onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestText: e.target.checked }))}
-                />
+                <input name="forbid-guest-text" type="checkbox" checked={channelForbidGuestText} onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestText: e.target.checked }))} />
                 <div className={popup['label']}>{t('forbid-guest-text')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input
-                  name="forbid-guest-url"
-                  type="checkbox"
-                  checked={channelForbidGuestUrl}
-                  onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestUrl: e.target.checked }))}
-                />
+                <input name="forbid-guest-url" type="checkbox" checked={channelForbidGuestUrl} onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestUrl: e.target.checked }))} />
                 <div className={popup['label']}>{t('forbid-guest-url')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>

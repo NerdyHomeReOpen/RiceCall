@@ -36,20 +36,11 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
   const [memberApplication, setMemberApplication] = useState<MemberApplication>(Default.memberApplication());
 
   // Variables
-  const {
-    name: serverName,
-    avatarUrl: serverAvatarUrl,
-    displayId: serverDisplayId,
-    applyNotice: serverApplyNotice,
-  } = server;
+  const { name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
   const { description: applicationDes } = memberApplication;
 
   // Handlers
-  const handleCreatMemberApplication = (
-    memberApplication: Partial<MemberApplication>,
-    userId: User['userId'],
-    serverId: Server['serverId'],
-  ) => {
+  const handleCreatMemberApplication = (memberApplication: Partial<MemberApplication>, userId: User['userId'], serverId: Server['serverId']) => {
     if (!socket) return;
     socket.send.createMemberApplication({
       memberApplication,
@@ -67,18 +58,10 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
     if (!serverId || !userId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.server({
-          serverId: serverId,
-        }),
-        getService.memberApplication({
-          userId: userId,
-          serverId: serverId,
-        }),
-      ]).then(([server, memberApplication]) => {
-        if (server) {
-          setServer(server);
-        }
+      getService.server({ serverId: serverId }).then((server) => {
+        if (server) setServer(server);
+      });
+      getService.memberApplication({ userId: userId, serverId: serverId }).then((memberApplication) => {
         if (memberApplication) {
           setSection(1);
           setMemberApplication(memberApplication);

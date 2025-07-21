@@ -180,27 +180,14 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
     if (!targetId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.user({
-          userId: targetId,
-        }),
-        getService.userServers({
-          userId: targetId,
-        }),
-        getService.friend({
-          userId: userId,
-          targetId: targetId,
-        }),
-      ]).then(([user, servers, friend]) => {
-        if (user) {
-          setUser(user);
-        }
-        if (servers) {
-          setServers(servers);
-        }
-        if (friend) {
-          setFriend(friend);
-        }
+      getService.user({ userId: targetId }).then((user) => {
+        if (user) setUser(user);
+      });
+      getService.userServers({ userId: targetId }).then((servers) => {
+        if (servers) setServers(servers);
+      });
+      getService.friend({ userId: userId, targetId: targetId }).then((friend) => {
+        if (friend) setFriend(friend);
       });
     };
     refresh();

@@ -53,14 +53,8 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
     if (!channelId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.channel({
-          channelId: channelId,
-        }),
-      ]).then(([parent]) => {
-        if (parent) {
-          setParent(parent);
-        }
+      getService.channel({ channelId: channelId }).then((parent) => {
+        if (parent) setParent(parent);
       });
     };
     refresh();
@@ -78,13 +72,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
             </div>
             <div className={popup['input-box']}>
               <div className={popup['label']}>{t('channel-name')}</div>
-              <input
-                name="channel-name"
-                type="text"
-                value={channelName}
-                maxLength={32}
-                onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
-              />
+              <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))} />
             </div>
           </div>
         </div>

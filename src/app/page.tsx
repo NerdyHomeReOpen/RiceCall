@@ -616,32 +616,17 @@ const RootPageComponent = () => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      Promise.all([
-        getService.userServers({
-          userId: userId,
-        }),
-        getService.userFriends({
-          userId: userId,
-        }),
-        getService.userFriendGroups({
-          userId: userId,
-        }),
-        getService.userFriendApplications({
-          userId: userId,
-        }),
-      ]).then(([servers, friends, friendGroups, friendApplications]) => {
-        if (servers) {
-          setServers(servers);
-        }
-        if (friends) {
-          setFriends(friends);
-        }
-        if (friendGroups) {
-          setFriendGroups(friendGroups);
-        }
-        if (friendApplications) {
-          setFriendApplications(friendApplications);
-        }
+      getService.userServers({ userId: userId }).then((servers) => {
+        if (servers) setServers(servers);
+      });
+      getService.userFriends({ userId: userId }).then((friends) => {
+        if (friends) setFriends(friends);
+      });
+      getService.userFriendGroups({ userId: userId }).then((friendGroups) => {
+        if (friendGroups) setFriendGroups(friendGroups);
+      });
+      getService.userFriendApplications({ userId: userId }).then((friendApplications) => {
+        if (friendApplications) setFriendApplications(friendApplications);
       });
     };
     refresh();

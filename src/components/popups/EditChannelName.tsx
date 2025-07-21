@@ -38,11 +38,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
   const canSubmit = channelName.trim();
 
   // Handlers
-  const handleEditChannel = (
-    channel: Partial<Channel>,
-    channelId: Channel['channelId'],
-    serverId: Server['serverId'],
-  ) => {
+  const handleEditChannel = (channel: Partial<Channel>, channelId: Channel['channelId'], serverId: Server['serverId']) => {
     if (!socket) return;
     socket.send.editChannel({ channel, channelId, serverId });
   };
@@ -56,14 +52,8 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
     if (!channelId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.channel({
-          channelId: channelId,
-        }),
-      ]).then(([channel]) => {
-        if (channel) {
-          setChannel(channel);
-        }
+      getService.channel({ channelId: channelId }).then((channel) => {
+        if (channel) setChannel(channel);
       });
     };
     refresh();
@@ -77,13 +67,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('channel-name-label')}</div>
-              <input
-                name="channel-name"
-                type="text"
-                value={channelName}
-                maxLength={32}
-                onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
-              />
+              <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))} />
             </div>
           </div>
         </div>

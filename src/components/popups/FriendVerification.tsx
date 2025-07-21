@@ -93,14 +93,8 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
     setFriendApplications((prev) => [...prev, friendApplication]);
   };
 
-  const handleFriendApplicationUpdate = (
-    senderId: User['userId'],
-    receiverId: User['userId'],
-    friendApplication: Partial<FriendApplication>,
-  ) => {
-    setFriendApplications((prev) =>
-      prev.map((item) => (item.senderId === senderId ? { ...item, ...friendApplication } : item)),
-    );
+  const handleFriendApplicationUpdate = (senderId: User['userId'], receiverId: User['userId'], friendApplication: Partial<FriendApplication>) => {
+    setFriendApplications((prev) => prev.map((item) => (item.senderId === senderId ? { ...item, ...friendApplication } : item)));
   };
 
   const handleFriendApplicationRemove = (senderId: User['userId']) => {
@@ -131,15 +125,8 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   useEffect(() => {
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.userFriendApplications({
-          userId: userId,
-        }),
-      ]).then(([userFriendApplications]) => {
-        if (userFriendApplications) {
-          const sortedApplications = handleSort('createdAt', userFriendApplications, 1);
-          setFriendApplications(sortedApplications);
-        }
+      getService.userFriendApplications({ userId: userId }).then((userFriendApplications) => {
+        if (userFriendApplications) setFriendApplications(handleSort('createdAt', userFriendApplications, 1));
       });
     };
     refresh();
@@ -186,23 +173,14 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                     </div>
                     <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
                       <div className={styles['action-buttons']}>
-                        <div
-                          className={styles['button']}
-                          onClick={() => handleOpenApplyFriend(userId, friend.senderId)}
-                        >
+                        <div className={styles['button']} onClick={() => handleOpenApplyFriend(userId, friend.senderId)}>
                           {t('accept')}
                         </div>
-                        <div
-                          className={styles['button']}
-                          onClick={() => handleDeleteFriendApplication(friend.senderId, friend.receiverId)}
-                        >
+                        <div className={styles['button']} onClick={() => handleDeleteFriendApplication(friend.senderId, friend.receiverId)}>
                           {t('reject')}
                         </div>
                       </div>
-                      <div
-                        className={styles['direct-message-button']}
-                        onClick={() => handleOpenDirectMessage(friend.receiverId, friend.senderId, friend.name)}
-                      >
+                      <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(friend.receiverId, friend.senderId, friend.name)}>
                         <div className={styles['direct-message-icon']}></div>
                       </div>
                     </div>

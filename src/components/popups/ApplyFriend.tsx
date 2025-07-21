@@ -54,11 +54,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
     setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== id));
   };
 
-  const handleCreateFriendApplication = (
-    friendApplication: Partial<FriendApplication>,
-    senderId: User['userId'],
-    receiverId: User['userId'],
-  ) => {
+  const handleCreateFriendApplication = (friendApplication: Partial<FriendApplication>, senderId: User['userId'], receiverId: User['userId']) => {
     if (!socket) return;
     socket.send.createFriendApplication({
       friendApplication,
@@ -112,32 +108,19 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
     if (!userId || !targetId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.user({
-          userId: targetId,
-        }),
-        getService.userFriendGroups({
-          userId: userId,
-        }),
-        getService.friendApplication({
-          senderId: userId,
-          receiverId: targetId,
-        }),
-        getService.friendApplication({
-          senderId: targetId,
-          receiverId: userId,
-        }),
-      ]).then(([target, friendGroups, sentFriendApplication, receivedFriendApplication]) => {
-        if (target) {
-          setTarget(target);
-        }
-        if (friendGroups) {
-          setFriendGroups(friendGroups);
-        }
+      getService.user({ userId: targetId }).then((target) => {
+        if (target) setTarget(target);
+      });
+      getService.userFriendGroups({ userId: userId }).then((friendGroups) => {
+        if (friendGroups) setFriendGroups(friendGroups);
+      });
+      getService.friendApplication({ senderId: userId, receiverId: targetId }).then((sentFriendApplication) => {
         if (sentFriendApplication) {
           setSection(1);
           setFriendApplication(sentFriendApplication);
         }
+      });
+      getService.friendApplication({ senderId: targetId, receiverId: userId }).then((receivedFriendApplication) => {
         if (receivedFriendApplication) {
           setSection(2);
           setFriendApplication(receivedFriendApplication);
@@ -183,11 +166,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
             <div className={popup['label']}>{t('friend-select-group')}</div>
             <div className={popup['row']}>
               <div className={popup['select-box']}>
-                <select
-                  className={popup['select']}
-                  value={selectedFriendGroupId || ''}
-                  onChange={(e) => setSelectedFriendGroupId(e.target.value)}
-                >
+                <select className={popup['select']} value={selectedFriendGroupId || ''} onChange={(e) => setSelectedFriendGroupId(e.target.value)}>
                   <option value={''}>{t('none')}</option>
                   {friendGroups.map((group) => (
                     <option key={group.friendGroupId} value={group.friendGroupId}>

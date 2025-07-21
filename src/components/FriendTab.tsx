@@ -85,9 +85,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
 
   const handleDeleteFriend = (userId: User['userId'], targetId: User['userId']) => {
     if (!socket) return;
-    handleOpenWarningDialog(t('confirm-delete-friend').replace('{0}', friendName), () =>
-      socket.send.deleteFriend({ userId, targetId }),
-    );
+    handleOpenWarningDialog(t('confirm-delete-friend').replace('{0}', friendName), () => socket.send.deleteFriend({ userId, targetId }));
   };
 
   const handleServerUpdate = (data: Server) => {
@@ -130,20 +128,15 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
 
   const handleBlockFriend = (userId: User['userId'], targetId: User['userId'], isBlocked: UserFriend['isBlocked']) => {
     if (!socket) return;
-    handleOpenWarningDialog(
-      t('confirmBlockFriend', { blockType: isBlocked ? t('unblock') : t('block'), userName: friendName }),
-      () => socket.send.editFriend({ friend: { isBlocked: !isBlocked }, userId, targetId }),
+    handleOpenWarningDialog(t('confirmBlockFriend', { blockType: isBlocked ? t('unblock') : t('block'), userName: friendName }), () =>
+      socket.send.editFriend({ friend: { isBlocked: !isBlocked }, userId, targetId }),
     );
   };
 
   useEffect(() => {
     if (!friendCurrentServerId) return;
     const refresh = async () => {
-      Promise.all([
-        getService.server({
-          serverId: friendCurrentServerId,
-        }),
-      ]).then(([server]) => {
+      getService.server({ serverId: friendCurrentServerId }).then((server) => {
         if (server) handleServerUpdate(server);
       });
       refreshed.current = true;
@@ -253,10 +246,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           <BadgeList badges={friendBadges} maxDisplay={5} />
         </div>
         {isFriendOnline && friendCurrentServerId ? (
-          <div
-            className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`}
-            onClick={() => handleServerSelect(userId, friendServer)}
-          >
+          <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(userId, friendServer)}>
             <div className={styles['location-icon']} />
             <div className={styles['server-name-text']}>{friendServerName}</div>
           </div>

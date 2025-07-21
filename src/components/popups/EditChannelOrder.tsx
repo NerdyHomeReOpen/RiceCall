@@ -81,11 +81,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     }
   };
 
-  const handleOpenCreateChannel = (
-    userId: User['userId'],
-    channelId: Channel['channelId'] | null,
-    serverId: Server['serverId'],
-  ) => {
+  const handleOpenCreateChannel = (userId: User['userId'], channelId: Channel['channelId'] | null, serverId: Server['serverId']) => {
     ipcService.popup.open(PopupType.CREATE_CHANNEL, 'createChannel');
     ipcService.initialData.onRequest('createChannel', {
       userId,
@@ -183,17 +179,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     if (!userId || refreshed.current) return;
     const refresh = async () => {
       refreshed.current = true;
-      Promise.all([
-        getService.serverChannels({
-          serverId,
-        }),
-      ]).then(([serverChannels]) => {
+      getService.serverChannels({ serverId }).then((serverChannels) => {
         if (serverChannels) {
           const filteredChannels = serverChannels.filter((ch) => !ch.isLobby);
           setServerChannels(filteredChannels);
-          filteredChannels.forEach((ch) => {
-            map.current[ch.channelId] = ch.order;
-          });
+          filteredChannels.forEach((ch) => (map.current[ch.channelId] = ch.order));
         }
       });
     };
@@ -210,13 +200,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, [serverChannels]);
 
   const categoryTab = (category: Category) => {
-    const {
-      channelId: categoryId,
-      name: categoryName,
-      visibility: categoryVisibility,
-      isLobby: categoryIsLobby,
-      order: categoryOrder,
-    } = category;
+    const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, isLobby: categoryIsLobby, order: categoryOrder } = category;
     const subChannels = serverChannels?.filter((ch) => ch.categoryId === categoryId);
     const isSelected = selectedChannelId === categoryId;
 
@@ -227,17 +211,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           onClick={(e) => {
             e.stopPropagation();
             setSelectedChannel(selectedChannelId === categoryId ? null : category);
-            setGroupChannels(
-              serverChannels
-                .filter((ch) => !ch.categoryId)
-                .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
-            );
+            setGroupChannels(serverChannels.filter((ch) => !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)));
           }}
         >
           <div
-            className={`${serverPage['tab-icon']} ${expanded[categoryId] ? serverPage['expanded'] : ''} ${
-              serverPage[categoryVisibility]
-            } ${categoryIsLobby ? serverPage['lobby'] : ''}`}
+            className={`${serverPage['tab-icon']} ${expanded[categoryId] ? serverPage['expanded'] : ''} ${serverPage[categoryVisibility]} ${categoryIsLobby ? serverPage['lobby'] : ''}`}
             onClick={(e) => {
               e.stopPropagation();
               setExpanded((prev) => ({
@@ -262,14 +240,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   };
 
   const channelTab = (channel: Channel) => {
-    const {
-      channelId,
-      name: channelName,
-      visibility: channelVisibility,
-      isLobby: channelIsLobby,
-      order: channelOrder,
-      categoryId: channelCategoryId,
-    } = channel;
+    const { channelId, name: channelName, visibility: channelVisibility, isLobby: channelIsLobby, order: channelOrder, categoryId: channelCategoryId } = channel;
     const isSelected = selectedChannelId === channelId;
 
     return (
@@ -279,19 +250,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         onClick={(e) => {
           e.stopPropagation();
           setSelectedChannel(selectedChannelId === channelId ? null : channel);
-          setGroupChannels(
-            serverChannels
-              .filter((ch) => ch.categoryId === channelCategoryId)
-              .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
-          );
+          setGroupChannels(serverChannels.filter((ch) => ch.categoryId === channelCategoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)));
         }}
       >
-        <div
-          className={`${serverPage['tab-icon']} ${serverPage[channelVisibility]} ${
-            channelIsLobby ? serverPage['lobby'] : ''
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        />
+        <div className={`${serverPage['tab-icon']} ${serverPage[channelVisibility]} ${channelIsLobby ? serverPage['lobby'] : ''}`} onClick={(e) => e.stopPropagation()} />
         <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
           {channelName}
           <div className={styles['channel-tab-index-text']}>{`(${channelOrder})`}</div>

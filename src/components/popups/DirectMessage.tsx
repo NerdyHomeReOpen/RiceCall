@@ -57,24 +57,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   // Variables
   const { avatarUrl: userAvatarUrl } = user;
 
-  const {
-    avatarUrl: targetAvatarUrl,
-    level: targetLevel,
-    vip: targetVip,
-    status: targetStatus,
-    currentServerId: targetCurrentServerId,
-    badges: targetBadges,
-  } = target;
+  const { avatarUrl: targetAvatarUrl, level: targetLevel, vip: targetVip, status: targetStatus, currentServerId: targetCurrentServerId, badges: targetBadges } = target;
   const isOnline = targetStatus !== 'offline';
   const isVerifiedUser = false;
   const { name: targetCurrentServerName } = targetCurrentServer;
 
   // Handlers
-  const handleSendMessage = (
-    directMessage: Partial<DirectMessage>,
-    userId: User['userId'],
-    targetId: User['userId'],
-  ) => {
+  const handleSendMessage = (directMessage: Partial<DirectMessage>, userId: User['userId'], targetId: User['userId']) => {
     if (!socket) return;
     socket.send.directMessage({ directMessage, userId, targetId });
   };
@@ -147,10 +136,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   };
 
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-    window.localStorage.setItem(
-      'trigger-handle-server-select',
-      JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }),
-    );
+    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
   };
 
   // Effects
@@ -182,27 +168,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     if (!userId || !targetId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.user({
-          userId: targetId,
-        }),
-        getService.user({
-          userId: userId,
-        }),
-        getService.friend({
-          userId: userId,
-          targetId: targetId,
-        }),
-      ]).then(([target, user, friend]) => {
-        if (target) {
-          setTarget(target);
-        }
-        if (user) {
-          setUser(user);
-        }
-        if (friend) {
-          setIsFriend(true);
-        }
+      getService.user({ userId: userId }).then((user) => {
+        if (user) setUser(user);
+      });
+      getService.user({ userId: targetId }).then((target) => {
+        if (target) setTarget(target);
+      });
+      getService.friend({ userId: userId, targetId: targetId }).then((friend) => {
+        if (friend) setIsFriend(true);
       });
     };
     refresh();
@@ -210,11 +183,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   useEffect(() => {
     if (!targetCurrentServerId) return;
-    Promise.all([
-      getService.server({
-        serverId: targetCurrentServerId,
-      }),
-    ]).then(([server]) => {
+    getService.server({ serverId: targetCurrentServerId }).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
   }, [targetCurrentServerId]);
@@ -238,16 +207,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         {/* Sidebar */}
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
-            <div
-              className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`}
-              style={{ backgroundImage: `url(${targetAvatarUrl})` }}
-            />
+            <div className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
             {targetVip > 0 && <div className={`${vip['vip-icon-big']} ${vip[`vip-${targetVip}`]}`} />}
             <div className={styles['user-state-box']}>
-              <div
-                title={`${t('level')}: ${targetLevel}`}
-                className={`${grade['grade']} ${grade[`lv-${Math.min(56, targetLevel)}`]}`}
-              />
+              <div title={`${t('level')}: ${targetLevel}`} className={`${grade['grade']} ${grade[`lv-${Math.min(56, targetLevel)}`]}`} />
               {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
               <BadgeListViewer badges={targetBadges} maxDisplay={13} />
             </div>
@@ -304,10 +267,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                   }}
                 />
                 <div className={`${styles['button']} ${styles['screen-shot']}`} />
-                <div
-                  className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`}
-                  onClick={() => handleSendShakeWindow()}
-                />
+                <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`} onClick={() => handleSendShakeWindow()} />
               </div>
               <div className={styles['buttons']}>
                 <div className={styles['history-message']}>{t('message-history')}</div>
