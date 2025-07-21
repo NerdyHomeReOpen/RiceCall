@@ -3,10 +3,6 @@
   user-select: text;
 }
 
-.markdown-content:has(img[alt^='[emoji']) {
-  line-height: 0;
-}
-
 .markdown-content *:last-child {
   margin-block-end: 0;
 }
