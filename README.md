@@ -42,17 +42,33 @@ RC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為�
 
 ## 常見問題
 
-### Q: 我卡在轉圈圈畫面怎麼辦
+### Q. 這裡是官方嗎
 
-A: 請從右上角選單 -> 登出，然後再登入一次
+A. 不是，我們是一群由熱忱組成的團隊，跟原官方無任何關係
 
-### Q: 我語音一直沒聲音
+### Q. 為什麼沒有群
 
-A: 如果你正在使用學校、公司等網路，可能會導致連線不到，請換一個網路連線，目前還沒有根除方法
+A. 目前沒有推薦語音群，無聊沒事可以去 10 或 2000000 逛逛喔
 
-### Q: 我開機自動啟動後沒有連線
+### Q. 怎麼獲得VIP
 
-A: 重新啟動應用程式再試一次
+A. 目前未開放購買，將會在正式版開放時提供管道
+
+### Q. 我要多久可以升一次等級
+
+A. 請在 [這裡](https://docs.google.com/spreadsheets/d/1cV9BghtRDgzh9QBgsSON9NoVdPoGUHsOJEJwrzxNLJk/edit?usp=sharing) 查看
+
+### Q. 轉圈圈怎麼辦
+
+A. 登出重新登入，頻繁觸發請至 #問題及建議 回報
+
+### Q. 彈出錯誤視窗怎麼辦
+
+A. 請截圖並附上觸發方式至 #問題及建議 回報
+
+### Q. 我無法登入
+
+A. 請先確定自己下載的是[最新版本](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest) ，對照版本號，若持續發生請閱讀下方
 
 ### Q: 我的問題不在以上的內容中
 
@@ -71,7 +87,7 @@ A: 請加入我們的 [Discord 官方群組](https://discord.gg/adCWzv6wwS) 或�
 RiceCall
 ├── public/                   # 靜態資源 (圖片、icons 等)
 ├── resources/                # Electron 打包相關資源
-├── src/                      # 應用程式的主要原始碼
+├── src/                      # 原始碼
 │   ├── app/                  # Next.js 頁面
 │   ├── components/           # React/Electron 元件
 │   ├── providers/            # React Providers
@@ -79,47 +95,60 @@ RiceCall
 │   ├── styles/               # CSS
 │   ├── types/                # 類型定義
 │   ├── utils/                # 功能檔案
-├── main.js                   # Electron 入口文件
+│   ├── i18n                  # i18n 文件獲取設定
 ├── .env.example              # 環境變數範例
 ├── .gitignore                # Git 忽略清單
 ├── .prettierrc               # Prettier 設定
+├── crowdin.yml               # Crowdin 設定
 ├── dev-app-update.yml        # 應用程式更新設定 (Electron auto-update)
 ├── Dockerfile                # Docker 部署設定
 ├── electron-builder.json     # Electron 打包設定
 ├── eslint.config.mjs         # ESLint 設定
 ├── LICENSE                   # 專案授權
+├── main.ts                   # Electron 入口文件
+├── next.config.ts            # Next 設定
 ├── package.json              # npm/yarn 依賴管理
-├── postcss.config.mjs        # PostCSS 設定
-├── README.md                 # 專案說明文件
+├── README.md                 # 這份文件
+├── tsconfig.electron.json    # TypeScript 設定 (用於 main.ts)
 ├── tsconfig.json             # TypeScript 設定
 ├── yarn.lock                 # Yarn 鎖定依賴版本
 ```
 
 ## 建置本地環境
 
-1. 安裝 Modules
+1. Copy .env.example to .env and fill all required option
+
+```env
+# Server Settings (All variables need to be fill)
+NEXT_PUBLIC_API_URL=http://localhost:4500 # Don't add the final /
+NEXT_PUBLIC_WS_URL=https://localhost:4500 # If your server is on the same machine, use the same url
+
+# Crowdin Settings (Optional)
+NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH= # If not provided, will use local files (./public/locales/[lang]/[ns]) instead
+```
+
+### 2. Install dependency
 
 ```bash
 yarn install
 ```
 
-2. 建立 .env 或複製 .env.example 後更名為 .env，以下為環境變數範例
-
-```env
-# Server Settings
-NEXT_PUBLIC_API_URL= 你的 API 伺服器公開網址
-NEXT_PUBLIC_WS_URL= 你的 WebSocket 伺服器公開網址
-
-# Crowdin Settings
-NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH= Crowdin 哈希碼 (取得 i18n 資源使用)
-```
-
-3. 啟動 Client
+### 3. Start dev client
 
 ```bash
-yarn electron-dev
+yarn dev
 ```
 
-客戶端即會運行於本地電腦上
+### 4. Build
 
-> http://localhost:3000
+```bash
+yarn build # For all platform
+yarn build:deb # For linux .deb file
+yarn build:dmg # For macOS .dmg file
+```
+
+### Other scripts
+
+```bash
+yarn format # Format all files with prettier
+```
