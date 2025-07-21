@@ -184,7 +184,7 @@
   "language-select": "語言選擇",
   "level": "等級",
   "live": "直播",
-  "lobby": "頻道大廳",
+  "channel-lobby": "頻道大廳",
   "locate-me": "定位我自己",
   "login": "登入",
   "logout": "登出",
@@ -530,5 +530,5 @@
   "set-hotkey-error": "按鍵 {0} 已被使用",
   "upload": "上傳",
   "avatar-cropper": "圖片裁剪",
-  "default-lobby": "大廳"
+  "lobby": "大廳"
 }
