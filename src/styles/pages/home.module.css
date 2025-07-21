@@ -292,6 +292,100 @@
   background: #f4f6fa;
 }
 
+.homeContent {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: scroll;
+  padding: 25px;
+  max-height: 100%;
+  gap: 10px;
+  background: #f4f6fa;
+}
+
+.recommendedWrapper {
+  display: flex;
+  gap: 1rem;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar de categorías */
+.categorySidebar {
+  width: 220px;
+  border-right: 1px solid #ccc;
+  padding-right: 1rem;
+  max-height: 100vh;
+  overflow-y: auto;  
+  background: #f4f6fa;
+
+}
+
+.categoryList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding: 1.5rem;
+}
+
+.categoryItem {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.categoryItem:hover {
+  background-color: #f0f0f0;
+}
+
+.categoryItemActive {
+  background-color: #3b82f6; /* azul */
+  color: white;
+  font-weight: bold;
+}
+
+.serversContainer {
+  width: 75%;
+  height: 500px;
+  overflow-y: auto;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-right: 0.5rem;
+  padding-top: 1.5rem;
+  box-sizing: border-box;
+}
+
+.serversContainer .categoryTitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0; /* Margen solo abajo para no dar altura extra */
+  color: #333;
+  flex-basis: 100%; /* Para que el título ocupe toda la fila */
+}
+
+.serversContainer .servers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem; /* espacio entre tarjetas */
+  align-items: flex-start;
+  gap: 40px;
+}
+
+/* Tarjetas individuales */
+.serversContainer .servers .serverCardsRecommended {
+  width: calc(33.333% - 1rem);
+  min-width: 250px;
+  box-sizing: border-box;
+}
+
 .server-list-title {
   font-weight: bold;
   font-size: 1.5em;

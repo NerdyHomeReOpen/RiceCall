@@ -9,7 +9,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication } from '@/types';
+import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication, RecommendedServersByCategory } from '@/types';
 
 // i18n
 import i18n, { LanguageKey } from '@/i18n';
@@ -401,6 +401,7 @@ const RootPageComponent = () => {
   // States
   const [user, setUser] = useState<User>(Default.user());
   const [servers, setServers] = useState<UserServer[]>([]);
+  const [recommendedServers, setRecommendedServers] = useState<RecommendedServersByCategory>({});
   const [friends, setFriends] = useState<UserFriend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
@@ -548,6 +549,13 @@ const RootPageComponent = () => {
 
   // Effects
   useEffect(() => {
+    getService.recommendedServers().then((recommendedServers) => {
+    if (recommendedServers) {
+      setRecommendedServers(recommendedServers);
+    }
+  });
+  }, []);
+  useEffect(() => {
     if (user.currentServerId) {
       if (mainTab.selectedTabId !== 'server') {
         mainTab.setSelectedTabId('server');
@@ -685,7 +693,7 @@ const RootPageComponent = () => {
           <LoadingSpinner />
         ) : (
           <>
-            <HomePage user={user} servers={servers} display={mainTab.selectedTabId === 'home'} />
+            <HomePage user={user} servers={servers}  recommendedServers={recommendedServers} display={mainTab.selectedTabId === 'home'} />
             <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
             <ServerPage
               user={user}
