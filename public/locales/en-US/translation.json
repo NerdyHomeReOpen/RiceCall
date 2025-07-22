@@ -184,7 +184,7 @@
   "language-select": "Language selection",
   "level": "Level",
   "live": "Live",
-  "channel-lobby": "Lobby",
+  "lobby": "Lobby",
   "locate-me": "Locate myself",
   "login": "Login",
   "logout": "Logout",
@@ -320,7 +320,7 @@
   "unknown-error": "Unknown error",
   "unknown-user": "Unknown user",
   "unmute": "Unmute this user",
-  "update-server-error": "Server update error",
+  "update-server-error": "Failed to update server",
   "upload-avatar": "Upload avatar",
   "uruguay": "Uruguay",
   "usa": "USA",
@@ -359,7 +359,7 @@
   "account-min-length": "Account must be at least 4 characters",
   "account-required": "Account is required",
   "another-device-login": "Your account is logged in somewhere else and you are forced to go offline, there may be an anomaly with your account",
-  "cannot-apply": "It is not possible to submit a member application; this server does not accept applications.",
+  "cannot-apply": "Cannot apply for membership, this server does not accept membership applications",
   "chat-mode-description": "Low latency, smooth quality (for free speech and command mode channels)",
   "chat-with-members": "Chat with {0} members",
   "confirm-delete-friend": " Are you sure you want to remove {0} from your friends?",
@@ -530,5 +530,5 @@
   "set-hotkey-error": "Button {0} is already in use",
   "upload": "Upload",
   "avatar-cropper": "Change thumbnail",
-  "lobby": "Lobby"
+  "default-lobby": "Lobby"
 }
