@@ -161,7 +161,6 @@
   "guest": "遊客",
   "help-center": "幫助中心",
   "home": "首頁",
-  "recommended-servers": "推薦伺服器",
   "id": "ID",
   "identity": "身分",
   "idle": "閒置",
@@ -185,7 +184,7 @@
   "language-select": "語言選擇",
   "level": "等級",
   "live": "直播",
-  "lobby": "頻道大廳",
+  "channel-lobby": "頻道大廳",
   "locate-me": "定位我自己",
   "login": "登入",
   "logout": "登出",
@@ -321,7 +320,7 @@
   "unknown-error": "未知錯誤",
   "unknown-user": "未知使用者",
   "unmute": "接受此人語音",
-  "update-server-error": "更新群組失敗",
+  "update-server-error": "更新語音群失敗",
   "upload-avatar": "上傳頭像",
   "uruguay": "烏拉圭",
   "usa": "美國",
@@ -360,7 +359,7 @@
   "account-min-length": "帳號至少需要 4 個字",
   "account-required": "帳號為必填",
   "another-device-login": "帳號在別處登入，您被迫下線，您的帳號可能存在異常。",
-  "cannot-apply": "無法申請會員，此群組不接受會員申請",
+  "cannot-apply": "無法申請會員，該語音群不接受會員申請",
   "chat-mode-description": "低延遲，音質流暢（適用於自由、指揮模式下的頻道語音）",
   "chat-with-members": "與 {0} 位成員聊天",
   "confirm-delete-friend": "確定要刪除好友 {0} 嗎？",
@@ -531,5 +530,5 @@
   "set-hotkey-error": "按鍵 {0} 已被使用",
   "upload": "上傳",
   "avatar-cropper": "圖片裁剪",
-  "default-lobby": "大廳"
+  "lobby": "大廳"
 }

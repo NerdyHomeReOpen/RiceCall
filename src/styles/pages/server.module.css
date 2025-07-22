@@ -423,6 +423,12 @@
   left: 0;
 }
 
+.user-audio-state.loading {
+  background-image: url('../../../public/loading.gif');
+  background-size: cover;
+  background-position: 0 0;
+}
+
 .user-audio-state.play {
   background-position: -24px 0;
 }

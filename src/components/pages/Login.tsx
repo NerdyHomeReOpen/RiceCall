@@ -5,6 +5,7 @@ import styles from '@/styles/pages/login.module.css';
 
 // Services
 import authService from '@/services/auth.service';
+import ipcService from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -109,6 +110,10 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   }, [accounts]);
 
   useEffect(() => {
+    ipcService.systemLocale.setup();
+  }, []);
+
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (!comboRef.current?.contains(e.target as Node)) setShowAccountselectBox(false);
     };
@@ -142,15 +147,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
               <div className={styles['input-wrapper']}>
                 <div className={styles['label']}>{t('account')}</div>
                 <div className={styles['input-box']} ref={comboRef}>
-                  <input
-                    type="text"
-                    name="account"
-                    value={formData.account}
-                    onChange={handleInputChange}
-                    onBlur={() => {}}
-                    placeholder={t('please-input-account')}
-                    className={styles['input']}
-                  />
+                  <input type="text" name="account" value={formData.account} onChange={handleInputChange} onBlur={() => {}} placeholder={t('please-input-account')} className={styles['input']} />
                   <div
                     className={styles['combo-arrow']}
                     onClick={(e) => {
@@ -202,36 +199,15 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
               </div>
               <div className={styles['check-wrapper']}>
                 <div className={styles['check-box']}>
-                  <input
-                    ref={rememberAccountRef}
-                    type="checkbox"
-                    name="rememberAccount"
-                    checked={formData.rememberAccount}
-                    onChange={handleInputChange}
-                    className={styles['check']}
-                    tabIndex={-1}
-                  />
+                  <input ref={rememberAccountRef} type="checkbox" name="rememberAccount" checked={formData.rememberAccount} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
                   {t('remember-account')}
                 </div>
                 <div className={styles['check-box']}>
-                  <input
-                    ref={autoLoginRef}
-                    type="checkbox"
-                    name="autoLogin"
-                    checked={formData.autoLogin}
-                    onChange={handleInputChange}
-                    className={styles['check']}
-                    tabIndex={-1}
-                  />
+                  <input ref={autoLoginRef} type="checkbox" name="autoLogin" checked={formData.autoLogin} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
                   {t('auto-login')}
                 </div>
               </div>
-              <button
-                className={styles['submit-button']}
-                onClick={handleSubmit}
-                tabIndex={-1}
-                disabled={!formData.account || !formData.password}
-              >
+              <button className={styles['submit-button']} onClick={handleSubmit} tabIndex={-1} disabled={!formData.account || !formData.password}>
                 {t('login')}
               </button>
             </>
