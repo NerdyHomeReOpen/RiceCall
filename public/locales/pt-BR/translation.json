@@ -184,7 +184,7 @@
   "language-select": "Idioma",
   "level": "Nível",
   "live": "Ao vivo",
-  "channel-lobby": "Recepção",
+  "lobby": "Recepção",
   "locate-me": "Mostrar onde estou",
   "login": "Entrar",
   "logout": "Sair",
@@ -359,7 +359,7 @@
   "account-min-length": "O nome de usuário deve ter no mínimo 4 caracteres",
   "account-required": "O nome de usuário é obrigatório",
   "another-device-login": "Seu usuário está conectado em outro lugar, você foi desconectado. Pode haver atividades suspeitas.",
-  "cannot-apply": "Este servidor não aceita pedidos para se tornar membro",
+  "cannot-apply": "O servidor não aceita pedidos para se tornar Membro",
   "chat-mode-description": "Lalência baixa, qualidade lisa (para fala livre e modo fila)",
   "chat-with-members": "Chat com {0} membros",
   "confirm-delete-friend": "Tem certeza de que quer remover {0} da sua lista de amigos?",
@@ -530,5 +530,5 @@
   "set-hotkey-error": "A tecla {0} já está em uso",
   "upload": "Enviar",
   "avatar-cropper": "Mudar imagem",
-  "lobby": "Recepção"
+  "default-lobby": "Recepção"
 }
