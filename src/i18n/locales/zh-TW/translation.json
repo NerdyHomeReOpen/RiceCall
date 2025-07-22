@@ -530,5 +530,6 @@
   "set-hotkey-error": "按鍵 {0} 已被使用",
   "upload": "上傳",
   "avatar-cropper": "圖片裁剪",
-  "lobby": "大廳"
+  "lobby": "大廳",
+  "recommended-servers": "推薦伺服器"
 }
