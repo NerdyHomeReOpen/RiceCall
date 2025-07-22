@@ -383,7 +383,7 @@
   "image-too-large": "圖片大小不能超過5MB",
   "cannot-read-image": "無法讀取圖片",
   "friend-apply-sent": "申請已送出，請等待對方回覆",
-  "member-apply-sent": "申請已送出，請等待管理員審核",
+  "member-apply-sent": "La solicitud ha sido enviada, por favor espera la aprobación del administrador",
   "markdown-support": "支援 Markdown 語法: **粗體**, *斜體*, # 標題, - 列表, ```程式碼```, [連結](https://)",
   "max-120-content": "最多只能輸入120個字元",
   "nickname-hint": "2-10位，支持中英文",
