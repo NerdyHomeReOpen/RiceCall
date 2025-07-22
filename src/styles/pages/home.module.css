@@ -461,6 +461,13 @@
   height: 1rem;
 }
 
+.server-online {
+  display: flex;
+  align-items: center;
+  color: #777;
+  height: 1rem;
+}
+
 .server-id-text.is-owner::before {
   content: '';
   display: block;
