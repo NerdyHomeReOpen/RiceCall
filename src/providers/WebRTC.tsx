@@ -87,7 +87,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const [speakStatus, setSpeakStatus] = useState<{ [id: string]: number }>({});
   const [volumePercent, setVolumePercent] = useState<number>(0);
   const [muteList, setMuteList] = useState<string[]>([]);
-  const [connectionStatus, setConnectionStatus] = useState<{ [id: string]: string }>({});
+  const [connectionStatus, setConnectionStatus] = useState<Record<string, 'new' | 'connecting' | 'connected' | 'disconnected' | 'failed' | 'closed'>>({});
 
   // Refs
   const volumePercentRef = useRef<number>(0);
@@ -543,7 +543,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     };
 
     peerConnection.oniceconnectionstatechange = () => {
-      console.info(userId, 'Connection State:', peerConnection.connectionState);
       setConnectionStatus((prev) => {
         const newState = { ...prev };
         newState[userId] = peerConnection.connectionState;
@@ -554,7 +553,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     };
 
     peerConnection.onconnectionstatechange = () => {
-      console.info(userId, 'Connection State:', peerConnection.connectionState);
       setConnectionStatus((prev) => {
         const newState = { ...prev };
         newState[userId] = peerConnection.connectionState;
@@ -565,7 +563,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     };
 
     peerConnection.onsignalingstatechange = () => {
-      console.info(userId, 'Signaling State:', peerConnection.signalingState);
       const isFailed = ['disconnected', 'failed', 'closed'].includes(peerConnection.signalingState);
       if (isFailed) removePeerConnection(userId);
     };
