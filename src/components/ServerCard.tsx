@@ -39,6 +39,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     ownerId: serverOwnerId,
     favorite: serverFavorite,
     permissionLevel: serverPermissionLevel,
+    online: serverOnline
   } = server;
 
   const { userId, currentServerId: userCurrentServerId } = user;
@@ -146,6 +147,11 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
           <div className={homePage['server-id-text']}>{serverDisplayId}</div>
         </div>
         <div className={homePage['server-slogen']}>{serverSlogan}</div>
+        {serverOnline !== undefined && serverOnline >= 0 && (
+          <div className={homePage['server-online']}>
+            {t('online')}: {serverOnline}
+          </div>
+        )}
       </div>
     </div>
   );

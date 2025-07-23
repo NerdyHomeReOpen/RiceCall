@@ -292,6 +292,83 @@
   background: #f4f6fa;
 }
 
+.recommended-servers-wrapper {
+  display: flex;
+  gap: 1rem;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.category-sidebar {
+  width: 220px;
+  border-right: 1px solid #ccc;
+  padding-right: 1rem;
+  max-height: 100vh;
+  overflow-y: auto;
+  background: #f4f6fa;
+}
+
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding: 1.5rem;
+}
+
+.category-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.category-item:hover {
+  background-color: #f0f0f0;
+}
+
+.category-item-active {
+  background-color: #3b82f6; /* azul */
+  color: white;
+  font-weight: bold;
+}
+
+.servers-container {
+  width: 75%;
+  height: 500px;
+  overflow-y: auto;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-right: 0.5rem;
+  padding-top: 1.5rem;
+  box-sizing: border-box;
+}
+
+.servers-container .category-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+  color: #333;
+  flex-basis: 100%;
+}
+
+.servers-container .servers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.servers-container .servers .server-cards-recommended {
+  width: calc(33.333% - 1rem);
+  min-width: 250px;
+  box-sizing: border-box;
+}
+
 .server-list-title {
   font-weight: bold;
   font-size: 1.5em;
@@ -361,6 +438,13 @@
 }
 
 .server-slogen {
+  display: flex;
+  align-items: center;
+  color: #777;
+  height: 1rem;
+}
+
+.server-online {
   display: flex;
   align-items: center;
   color: #777;
