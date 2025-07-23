@@ -2,7 +2,7 @@
 import apiService from '@/services/api.service';
 
 // Types
-import { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, DirectMessage, UserFriend, FriendGroup, ServerMember, UserServer, RecommendedServersByCategory } from '@/types';
+import { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, DirectMessage, UserFriend, FriendGroup, ServerMember, UserServer, RecommendedServers } from '@/types';
 
 export const getService = {
   user: async ({ userId }: { userId: User['userId'] }): Promise<User | null> => {
@@ -41,7 +41,7 @@ export const getService = {
     return server;
   },
 
-  recommendedServers: async (): Promise<RecommendedServersByCategory | null> => {
+  recommendedServers: async (): Promise<RecommendedServers | null> => {
     const servers = await apiService.post('/recommendedServers', {});
     return servers;
   },

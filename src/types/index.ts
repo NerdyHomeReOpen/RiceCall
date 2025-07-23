@@ -89,7 +89,7 @@ export type Server = {
   receptionLobbyId: string | null;
   ownerId: string;
   createdAt: number;
-  online: number;
+  // online: number;
 };
 
 export type BaseChannel = {
