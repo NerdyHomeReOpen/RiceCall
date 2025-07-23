@@ -243,12 +243,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     });
   };
 
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    console.log('admin permission');
-    console.log(member.adminChannelPermission);
-    console.log('user permission remote');
-    console.log(member.permissionLevel);
-    return;
+  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {  
     ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
     ipcService.initialData.onRequest(`directMessage-${targetId}`, {
       userId,
