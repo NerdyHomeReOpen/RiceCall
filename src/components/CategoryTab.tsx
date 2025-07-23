@@ -272,25 +272,45 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
         {/* Expanded Sections */}
         <div className={styles['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
-          {[categoryLobby, ...categoryChannels]
-            .filter((ch) => !!ch)
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map((channel) => (
-              <ChannelTab
-                key={channel.channelId}
-                channel={channel}
-                friends={friends}
-                currentChannel={currentChannel}
-                currentServer={currentServer}
-                serverMembers={serverMembers}
-                expanded={expanded}
-                setExpanded={setExpanded}
-                selectedItemId={selectedItemId}
-                selectedItemType={selectedItemType}
-                setSelectedItemId={setSelectedItemId}
-                setSelectedItemType={setSelectedItemType}
-              />
-            ))}
+          {categoryVisibility !== 'readonly'
+            ? [categoryLobby, ...categoryChannels]
+                .filter((ch) => !!ch)
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                .map((channel) => (
+                  <ChannelTab
+                    key={channel.channelId}
+                    channel={channel}
+                    friends={friends}
+                    currentChannel={currentChannel}
+                    currentServer={currentServer}
+                    serverMembers={serverMembers}
+                    expanded={expanded}
+                    setExpanded={setExpanded}
+                    selectedItemId={selectedItemId}
+                    selectedItemType={selectedItemType}
+                    setSelectedItemId={setSelectedItemId}
+                    setSelectedItemType={setSelectedItemType}
+                  />
+                ))
+            : categoryChannels
+                .filter((ch) => !!ch)
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                .map((channel) => (
+                  <ChannelTab
+                    key={channel.channelId}
+                    channel={channel}
+                    friends={friends}
+                    currentChannel={currentChannel}
+                    currentServer={currentServer}
+                    serverMembers={serverMembers}
+                    expanded={expanded}
+                    setExpanded={setExpanded}
+                    selectedItemId={selectedItemId}
+                    selectedItemType={selectedItemType}
+                    setSelectedItemId={setSelectedItemId}
+                    setSelectedItemType={setSelectedItemType}
+                  />
+                ))}
         </div>
       </>
     );
