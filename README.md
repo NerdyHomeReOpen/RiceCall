@@ -116,7 +116,7 @@ RiceCall
 
 ## 建置本地環境
 
-1. Copy .env.example to .env and fill all required option
+### 1. Copy .env.example to .env and fill all required option
 
 ```env
 # Server Settings (All variables need to be fill)
@@ -124,7 +124,7 @@ NEXT_PUBLIC_API_URL=http://localhost:4500 # Don't add the final /
 NEXT_PUBLIC_WS_URL=https://localhost:4500 # If your server is on the same machine, use the same url
 
 # Crowdin Settings (Optional)
-NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH= # If not provided, will use local files (./public/locales/[lang]/[ns]) instead
+NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH=put_your_hash_here # If not provided, will use local files (./src/i18n/locales/[lang]/[ns]) instead
 ```
 
 ### 2. Install dependency
