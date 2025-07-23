@@ -9,6 +9,7 @@ import { initReactI18next } from 'react-i18next';
 import zhTW from './locales/zh-TW/translation.json';
 import zhTW_message from './locales/zh-TW/message.json';
 import zhTW_rpc from './locales/zh-TW/rpc.json';
+import zhTW_country from './locales/zh-TW/country.json';
 
 const hash = process.env.NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH!;
 
@@ -34,7 +35,7 @@ class CrowdinBackend {
         fallbackLng: 'zh-TW',
         supportedLngs: ['zh-TW', 'zh-CN', 'en', 'ja', 'fa', 'pt-BR', 'ru', 'es-ES'],
 
-        ns: ['translation', 'rpc', 'message'],
+        ns: ['translation', 'rpc', 'message', 'country'],
         defaultNS: 'translation',
 
         interpolation: { escapeValue: false },
@@ -44,11 +45,11 @@ class CrowdinBackend {
       lng: 'zh-TW',
       fallbackLng: 'zh-TW',
 
-      ns: ['translation', 'rpc', 'message'],
+      ns: ['translation', 'rpc', 'message', 'country'],
       defaultNS: 'translation',
 
       resources: {
-        'zh-TW': { translation: zhTW, rpc: zhTW_rpc, message: zhTW_message },
+        'zh-TW': { translation: zhTW, rpc: zhTW_rpc, message: zhTW_message, country: zhTW_country },
       },
 
       interpolation: { escapeValue: false },
