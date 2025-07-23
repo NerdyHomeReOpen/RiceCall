@@ -43,7 +43,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
 
   // Refs
   const userTabRef = useRef<HTMLDivElement>(null);
-  const counterRef = useRef<NodeJS.Timeout | null>(null);
 
   // Variables
   const {
@@ -94,25 +93,21 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
 
   const handleKickServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirm-kick-user').replace('{0}', userName), () => {
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => {
       socket.send.disconnectServer({ userId, serverId });
     });
   };
 
   const handleKickChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirm-kick-user').replace('{0}', userName), () => {
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => {
       socket.send.disconnectChannel({ userId, channelId, serverId });
     });
   };
 
   const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
     if (!socket) return;
-    socket.send.editMember({
-      member,
-      userId,
-      serverId,
-    });
+    socket.send.editMember({ member, userId, serverId });
   };
 
   const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -122,60 +117,40 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
     ipcService.popup.open(PopupType.EDIT_NICKNAME, 'editNickname');
-    ipcService.initialData.onRequest('editNickname', {
-      serverId,
-      userId,
-    });
+    ipcService.initialData.onRequest('editNickname', { serverId, userId });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
     ipcService.popup.open(PopupType.APPLY_FRIEND, 'applyFriend');
-    ipcService.initialData.onRequest('applyFriend', {
-      userId,
-      targetId,
-    });
+    ipcService.initialData.onRequest('applyFriend', { userId, targetId });
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
     ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, {
-      userId,
-      targetId,
-      targetName,
-    });
+    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
     ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, {
-      userId,
-      targetId,
-    });
+    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
     ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
-    ipcService.initialData.onRequest('alertDialog', {
-      message: message,
-      submitTo: 'alertDialog',
-    });
+    ipcService.initialData.onRequest('alertDialog', { message, submitTo: 'alertDialog' });
     ipcService.popup.onSubmit('alertDialog', callback);
   };
 
   const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirm-remove-membership').replace('{0}', memberName), () => {
+    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => {
       handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId);
     });
   };
 
   const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
     ipcService.popup.open(PopupType.BLOCK_MEMBER, `blockMember-${userId}`);
-    ipcService.initialData.onRequest(`blockMember-${userId}`, {
-      userId,
-      serverId,
-      userName,
-    });
+    ipcService.initialData.onRequest(`blockMember-${userId}`, { userId, serverId, userName });
   };
 
   const handleDragStart = (e: React.DragEvent, userId: User['userId'], channelId: Channel['channelId']) => {
@@ -195,23 +170,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
       ref={userTabRef}
       key={memberUserId}
       className={`context-menu-container ${styles['user-tab']} ${selectedItemId === memberUserId && selectedItemType === 'user' ? styles['selected'] : ''}`}
-      onMouseEnter={() => {
-        if (counterRef.current) {
-          clearTimeout(counterRef.current);
-        }
-
-        counterRef.current = setTimeout(() => {
-          if (!userTabRef.current) return;
-          const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
-          const y = userTabRef.current.getBoundingClientRect().top;
-          contextMenu.showUserInfoBlock(x, y, false, member);
-        }, 1000);
-      }}
-      onMouseLeave={() => {
-        if (counterRef.current) {
-          clearTimeout(counterRef.current);
-        }
-      }}
       onClick={() => {
         if (selectedItemId === memberUserId && selectedItemType === 'user') {
           setSelectedItemId(null);
@@ -222,8 +180,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
         setSelectedItemType('user');
       }}
       onDoubleClick={() => {
-        if (isCurrentUser) return;
-        handleOpenDirectMessage(userId, memberUserId, memberName);
+        if (!userTabRef.current) return;
+        const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
+        const y = userTabRef.current.getBoundingClientRect().top;
+        contextMenu.showUserInfoBlock(x, y, false, member);
       }}
       draggable={isServerAdmin && !isCurrentUser}
       onDragStart={(e) => handleDragStart(e, memberUserId, memberCurrentChannelId)}

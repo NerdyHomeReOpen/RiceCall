@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type LanguageKey = 'en' | 'ru' | 'ja' | 'pt-BR' | 'zh-TW' | 'zh-CN';
+export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en' | 'ja' | 'fa' | 'pt-BR' | 'ru' | 'es-ES';
 
 import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
@@ -32,7 +32,7 @@ class CrowdinBackend {
       .init({
         lng: 'zh-TW',
         fallbackLng: 'zh-TW',
-        supportedLngs: ['en', 'ru', 'ja', 'pt-BR', 'zh-TW', 'zh-CN', ''],
+        supportedLngs: ['zh-TW', 'zh-CN', 'en', 'ja', 'fa', 'pt-BR', 'ru', 'es-ES'],
 
         ns: ['translation', 'rpc', 'message'],
         defaultNS: 'translation',

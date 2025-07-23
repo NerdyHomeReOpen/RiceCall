@@ -498,7 +498,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                       readOnly
                       onBlur={() => (activeInputRef.current = null)}
                     />
-                    {inputFocus === 'speakingKey' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>}
+                    {inputFocus === 'speakingKey' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error', { '0': conflicts.join(',') })}</div>}
                   </div>
                   <div className={popup['label']}>{t('speaking-mode-key-label')}</div>
                 </div>
@@ -604,7 +604,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     activeInputRef.current = null;
                   }}
                 />
-                {inputFocus === 'openMainWindow' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>}
+                {inputFocus === 'openMainWindow' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error', { '0': conflicts.join(',') })}</div>}
               </div>
               <div key={'increaseVolume'} className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('hot-key-increase-volume-label')}</div>
@@ -625,7 +625,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     activeInputRef.current = null;
                   }}
                 />
-                {inputFocus === 'increaseVolume' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>}
+                {inputFocus === 'increaseVolume' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error', { '0': conflicts.join(',') })}</div>}
               </div>
               <div key={'decreaseVolume'} className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('hot-key-decrease-volume-label')}</div>
@@ -646,7 +646,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     activeInputRef.current = null;
                   }}
                 />
-                {inputFocus === 'decreaseVolume' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>}
+                {inputFocus === 'decreaseVolume' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error', { '0': conflicts.join(',') })}</div>}
               </div>
               <div key={'toggleSpeaker'} className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('hot-key-toggle-speaker-label')}</div>
@@ -667,7 +667,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     activeInputRef.current = null;
                   }}
                 />
-                {inputFocus === 'toggleSpeaker' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>}
+                {inputFocus === 'toggleSpeaker' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error', { '0': conflicts.join(',') })}</div>}
               </div>
               <div key={'toggleMicrophone'} className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('hot-key-toggle-microphone-label')}</div>
@@ -688,7 +688,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     activeInputRef.current = null;
                   }}
                 />
-                {inputFocus === 'toggleMicrophone' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error').replace('{0}', conflicts.join(','))}</div>}
+                {inputFocus === 'toggleMicrophone' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error', { '0': conflicts.join(',') })}</div>}
               </div>
             </div>
           </div>

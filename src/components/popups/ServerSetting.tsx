@@ -170,14 +170,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
   const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirm-remove-membership').replace('{0}', userName), () => {
+    handleOpenAlertDialog(t('confirm-remove-membership', { '0': userName }), () => {
       handleEditMember({ permissionLevel: 1 }, userId, serverId);
     });
   };
 
   const handleRemoveBlockMember = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirm-unblock-user').replace('{0}', userName), () => {
+    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => {
       handleEditMember({ isBlocked: 0 }, userId, serverId);
     });
   };

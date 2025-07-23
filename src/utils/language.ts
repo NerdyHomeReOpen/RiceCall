@@ -39,9 +39,9 @@ export const getFormatTimeDiff = (t: TFunction<'translation', undefined>, timest
       const count = Math.floor(absDiff / interval.seconds);
       if (count >= 1) {
         const label = interval.label;
-        const timesAgo = t('ago');
-        const timesFuture = t('future');
-        return isFuture ? timesFuture.replace('{0}', `${count}${label}`) : timesAgo.replace('{0}', `${count}${label}`);
+        const timesAgo = t('ago', { '0': `${count}${label}` });
+        const timesFuture = t('future', { '0': `${count}${label}` });
+        return isFuture ? timesFuture : timesAgo;
       }
     }
   }
@@ -69,21 +69,4 @@ export const getFormatTimestamp = (t: TFunction<'translation', undefined>, times
     return `${t('yesterday')} ${timeString}`;
   }
   return `${messageDate.toLocaleDateString(timezoneLang)} ${timeString}`;
-};
-
-export const getTranslatedMessage = (t: TFunction<'translation', undefined>, content: string, params?: Record<string, string> | undefined) => {
-  if (content.includes(' ')) {
-    content = content
-      .split(' ')
-      .map((_) => t(_, { ns: 'message' }))
-      .join(' ');
-  } else {
-    content = t(content, { ns: 'message' });
-  }
-
-  // Replace Params
-  content = content.replace(/{(\w+)}/gm, (match, p1) => params?.[p1] ?? match);
-
-  const isPlainText = !/[#>*\-\[\]`|!_~]/.test(content);
-  return isPlainText ? content.replace(/\n/g, '<br />') : content;
 };
