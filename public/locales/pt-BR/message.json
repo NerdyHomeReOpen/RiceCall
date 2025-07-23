@@ -98,7 +98,7 @@
   "edit-member-application-failed": "Não foi possível editar os pedidos. Tente novamente mais tarde",
   "delete-member-application-failed": "Não foi possível deletar o pedido. Tente novamente mais tarde",
   "approve-member-application-failed": "Não foi possível aprovar o pedido. Tente novamente mais tarde",
-  "send-message-failed": "發送訊息失敗，請稍後再試",
-  "send-direct-message-failed": "發送私訊失敗，請稍後再試",
-  "shake-window-failed": "發送視窗震動失敗，請稍後再試"
+  "send-message-failed": "Erro ao enviar mensagem. Tente novamente mais tarde.",
+  "send-direct-message-failed": "Erro ao enviar mensagem privada. Tente novamente mais tarde.",
+  "shake-window-failed": "Erro ao enviar vibração de janela. Tente novamente mais tarde."
 }
