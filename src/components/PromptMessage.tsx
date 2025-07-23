@@ -12,9 +12,6 @@ import { useTranslation } from 'react-i18next';
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
 
-// Utils
-import { getTranslatedMessage } from '@/utils/language';
-
 interface PromptMessageProps {
   messageGroup: PromptMessage & {
     contents: string[];
@@ -29,7 +26,16 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   // Variables
   const { contents: messageContents, parameter: messageParameter } = messageGroup;
 
-  const translatedMessages = messageContents.map((content) => getTranslatedMessage(t, content, messageParameter));
+  const translatedMessages = messageContents.map((content) => {
+    if (content.includes(' ')) {
+      return content
+        .split(' ')
+        .map((_) => t(_, { ns: 'message', ...messageParameter }))
+        .join(' ');
+    } else {
+      return t(content, { ns: 'message', ...messageParameter });
+    }
+  });
 
   return (
     <>

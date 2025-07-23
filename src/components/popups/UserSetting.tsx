@@ -27,6 +27,9 @@ import emoji from '@/styles/emoji.module.css';
 // Utils
 import Default from '@/utils/default';
 
+// Country
+import { countries } from '@/country';
+
 interface UserSettingPopupProps {
   userId: User['userId'];
   targetId: User['userId'];
@@ -261,7 +264,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           </div>
 
           <div className={styles['user-info-text']}>
-            {t(userGender === 'Male' ? 'male' : 'female')} . {userAge} .{t(userCountry as keyof typeof t)}
+            {t(userGender === 'Male' ? 'male' : 'female')} . {userAge} .{t(userCountry, { ns: 'country' })}
           </div>
 
           <div className={styles['user-signature']} dangerouslySetInnerHTML={{ __html: userSignature }} />
@@ -469,46 +472,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   <div className={popup['label']}>{t('country')}</div>
                   <div className={popup['select-box']}>
                     <select value={userCountry} onChange={(e) => setUser((prev) => ({ ...prev, country: e.target.value }))}>
-                      <option value="taiwan">{t('taiwan')}</option>
-                      <option value="china">{t('china')}</option>
-                      <option value="japan">{t('japan')}</option>
-                      <option value="korea">{t('korea')}</option>
-                      <option value="usa">{t('usa')}</option>
-                      <option value="uk">{t('uk')}</option>
-                      <option value="france">{t('france')}</option>
-                      <option value="germany">{t('germany')}</option>
-                      <option value="italy">{t('italy')}</option>
-                      <option value="spain">{t('spain')}</option>
-                      <option value="portugal">{t('portugal')}</option>
-                      <option value="brazil">{t('brazil')}</option>
-                      <option value="argentina">{t('argentina')}</option>
-                      <option value="mexico">{t('mexico')}</option>
-                      <option value="colombia">{t('colombia')}</option>
-                      <option value="chile">{t('chile')}</option>
-                      <option value="peru">{t('peru')}</option>
-                      <option value="venezuela">{t('venezuela')}</option>
-                      <option value="bolivia">{t('bolivia')}</option>
-                      <option value="ecuador">{t('ecuador')}</option>
-                      <option value="paraguay">{t('paraguay')}</option>
-                      <option value="uruguay">{t('uruguay')}</option>
-                      <option value="nigeria">{t('nigeria')}</option>
-                      <option value="southAfrica">{t('southAfrica')}</option>
-                      <option value="india">{t('india')}</option>
-                      <option value="indonesia">{t('indonesia')}</option>
-                      <option value="malaysia">{t('malaysia')}</option>
-                      <option value="philippines">{t('philippines')}</option>
-                      <option value="thailand">{t('thailand')}</option>
-                      <option value="vietnam">{t('vietnam')}</option>
-                      <option value="turkey">{t('turkey')}</option>
-                      <option value="saudiArabia">{t('saudiArabia')}</option>
-                      <option value="qatar">{t('qatar')}</option>
-                      <option value="kuwait">{t('kuwait')}</option>
-                      <option value="oman">{t('oman')}</option>
-                      <option value="bahrain">{t('bahrain')}</option>
-                      <option value="algeria">{t('algeria')}</option>
-                      <option value="morocco">{t('morocco')}</option>
-                      <option value="tunisia">{t('tunisia')}</option>
-                      <option value="nigeria">{t('nigeria')}</option>
+                      {countries.map((country) => (
+                        <option key={country} value={country}>
+                          {t(country, { ns: 'country' })}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>

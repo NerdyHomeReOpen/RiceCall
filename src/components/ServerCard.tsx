@@ -39,6 +39,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     ownerId: serverOwnerId,
     favorite: serverFavorite,
     permissionLevel: serverPermissionLevel,
+    online: serverOnline
   } = server;
 
   const { userId, currentServerId: userCurrentServerId } = user;
@@ -46,11 +47,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   const canRemoveMemberShip = serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
 
   // Handles
-  const handleServerSelect = (
-    userId: User['userId'],
-    serverId: Server['serverId'],
-    serverDisplayId: Server['displayId'],
-  ) => {
+  const handleServerSelect = (userId: User['userId'], serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
     if (serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
@@ -84,7 +81,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
 
   const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirm-remove-membership').replace('{0}', memberName), () => {
+    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => {
       handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId);
     });
   };
@@ -150,6 +147,11 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
           <div className={homePage['server-id-text']}>{serverDisplayId}</div>
         </div>
         <div className={homePage['server-slogen']}>{serverSlogan}</div>
+        {serverOnline !== undefined && serverOnline >= 0 && (
+          <div className={homePage['server-online']}>
+            {t('online')}: {serverOnline}
+          </div>
+        )}
       </div>
     </div>
   );

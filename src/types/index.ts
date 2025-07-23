@@ -67,6 +67,10 @@ export type FriendApplication = User & {
   createdAt: number;
 };
 
+export type RecommendedServers = {
+  [category: string]: Server[];
+};
+
 export type Server = {
   serverId: string;
   name: string;
@@ -86,6 +90,7 @@ export type Server = {
   receptionLobbyId: string | null;
   ownerId: string;
   createdAt: number;
+  online: number;
 };
 
 export type BaseChannel = {

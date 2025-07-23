@@ -122,24 +122,27 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
     [isResizingAnnouncementArea],
   );
 
-  const handleClickOutside = useCallback((e: MouseEvent) => {
-    const micContainer = document.querySelector(`.${styles['micVolumeContainer']}`);
-    const speakerContainer = document.querySelector(`.${styles['speakerVolumeContainer']}`);
-
-    if (!micContainer?.contains(e.target as Node) && !speakerContainer?.contains(e.target as Node)) {
-      setShowMicVolume(false);
-      setShowSpeakerVolume(false);
+  const toggleSpeakerMute = () => {
+    if (webRTC.speakerVolume === 0) {
+      const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
+      webRTC.handleEditSpeakerVolume(prevVolume);
+    } else {
+      localStorage.setItem('previous-speaker-volume', webRTC.speakerVolume.toString());
+      webRTC.handleEditSpeakerVolume(0);
     }
-  }, []);
+  };
+
+  const toggleMicMute = () => {
+    if (webRTC.micVolume === 0) {
+      const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
+      webRTC.handleEditMicVolume(prevVolume);
+    } else {
+      localStorage.setItem('previous-mic-volume', webRTC.micVolume.toString());
+      webRTC.handleEditMicVolume(0);
+    }
+  };
 
   // Effects
-  useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [handleClickOutside]);
-
   useEffect(() => {
     window.addEventListener('mousemove', handleResizeSidebar);
     window.addEventListener('mouseup', () => setIsResizingSidebar(false));
@@ -186,7 +189,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
     if (serverName) {
       ipcService.discord.updatePresence({
         details: `${t('in')} ${serverName}`,
-        state: `${t('chat-with-members').replace('{0}', activeServerMembers.length.toString())}`,
+        state: `${t('chat-with-members', { '0': activeServerMembers.length.toString() })}`,
         largeImageKey: 'app_icon',
         largeImageText: 'RC Voice',
         smallImageKey: 'home_icon',
@@ -339,10 +342,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                     e.stopPropagation();
                     setShowMicVolume(true);
                   }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowMicVolume(!showMicVolume);
-                  }}
                 />
                 {showMicVolume && (
                   <div
@@ -353,18 +352,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                     }}
                   >
                     <div className={styles['slider-container']}>
-                      <input
-                        className={styles['slider']}
-                        type="range"
-                        min="0"
-                        max="200"
-                        value={webRTC.micVolume}
-                        onChange={(e) => {
-                          webRTC.handleEditMicVolume?.(parseInt(e.target.value));
-                        }}
-                      />
+                      <input className={styles['slider']} type="range" min="0" max="200" value={webRTC.micVolume} onChange={(e) => webRTC.handleEditMicVolume?.(parseInt(e.target.value))} />
                     </div>
-                    <div className={`${styles['mic-mode-btn']} ${webRTC.isMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} />
+                    <div className={`${styles['mic-mode-btn']} ${webRTC.isMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} onClick={toggleMicMute} />
                   </div>
                 )}
               </div>
@@ -374,10 +364,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                   onMouseEnter={(e) => {
                     e.stopPropagation();
                     setShowSpeakerVolume(true);
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowSpeakerVolume(!showSpeakerVolume);
                   }}
                 />
                 {showSpeakerVolume && (
@@ -389,19 +375,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                     }}
                   >
                     <div className={styles['slider-container']}>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={webRTC.speakerVolume}
-                        onChange={(e) => {
-                          webRTC.handleEditSpeakerVolume(parseInt(e.target.value));
-                        }}
-                        className={styles['slider']}
-                      />
+                      <input type="range" min="0" max="100" value={webRTC.speakerVolume} onChange={(e) => webRTC.handleEditSpeakerVolume(parseInt(e.target.value))} className={styles['slider']} />
                     </div>
 
-                    <div className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} />
+                    <div className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} onClick={toggleSpeakerMute} />
                   </div>
                 )}
               </div>

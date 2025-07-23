@@ -91,7 +91,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup['alert']}`} />
           <div>
-            <div className={popup['label']}>{t('confirm-block-user').replace('{0}', userName)}</div>
+            <div className={popup['label']}>{t('confirm-block-user', { '0': userName })}</div>
             <div className={popup['col']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>{t('block-type')}</div>
@@ -108,11 +108,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>{t('block-time')}</div>
                 <div className={popup['select-box']}>
-                  <select
-                    value={selectTime}
-                    disabled={isForeverBlock}
-                    onChange={(e) => setSelectTime(parseInt(e.target.value))}
-                  >
+                  <select value={selectTime} disabled={isForeverBlock} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
                     {Array.from({ length: 60 }, (_, i) => (
                       <option key={i + 1} value={i + 1}>
                         {i + 1}

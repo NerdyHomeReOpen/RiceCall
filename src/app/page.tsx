@@ -9,7 +9,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication, Member } from '@/types';
+import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication, Member, RecommendedServers  } from '@/types';
 
 // i18n
 import i18n, { LanguageKey } from '@/i18n';
@@ -304,6 +304,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                     onClick: () => handleLanguageChange('ja'),
                   },
                   {
+                    id: 'language-select-fa',
+                    label: 'فارسی',
+                    onClick: () => handleLanguageChange('fa'),
+                  },
+                  {
                     id: 'language-select-br',
                     label: 'Português',
                     onClick: () => handleLanguageChange('pt-BR'),
@@ -312,6 +317,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                     id: 'language-select-ru',
                     label: 'Русский',
                     onClick: () => handleLanguageChange('ru'),
+                  },
+                  {
+                    id: 'language-select-es',
+                    label: 'Español',
+                    onClick: () => handleLanguageChange('es-ES'),
                   },
                 ],
               },
@@ -391,6 +401,7 @@ const RootPageComponent = () => {
   // States
   const [user, setUser] = useState<User>(Default.user());
   const [servers, setServers] = useState<UserServer[]>([]);
+  const [recommendedServers, setRecommendedServers] = useState<RecommendedServers>({});
   const [friends, setFriends] = useState<UserFriend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
@@ -634,6 +645,10 @@ const RootPageComponent = () => {
       getService.userFriendApplications({ userId: userId }).then((friendApplications) => {
         if (friendApplications) setFriendApplications(friendApplications);
       });
+      // getService.recommendedServers().then((recommendedServers) => {
+      //   if (recommendedServers) setRecommendedServers(recommendedServers);
+      // });
+      setRecommendedServers({});
     };
     refresh();
   }, [userId]);
@@ -681,7 +696,7 @@ const RootPageComponent = () => {
           <LoadingSpinner />
         ) : (
           <>
-            <HomePage user={user} servers={servers} display={mainTab.selectedTabId === 'home'} />
+            <HomePage user={user} servers={servers} recommendedServers={recommendedServers} display={mainTab.selectedTabId === 'home'} />
             <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
             <ServerPage
               user={user}
