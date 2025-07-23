@@ -3,7 +3,7 @@
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-v0.1.13-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.1.15-green"/>
   </div>
 </div>
 
@@ -60,15 +60,15 @@ A. 請在 [這裡](https://docs.google.com/spreadsheets/d/1cV9BghtRDgzh9QBgsSON9
 
 ### Q. 轉圈圈怎麼辦
 
-A. 登出重新登入，頻繁觸發請至 #問題及建議 回報
+A. 登出重新登入，頻繁觸發請至 [Discord 官方群組](https://discord.gg/adCWzv6wwS) 或 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 回報
 
 ### Q. 彈出錯誤視窗怎麼辦
 
-A. 請截圖並附上觸發方式至 #問題及建議 回報
+A. 請截圖並附上觸發方式至 [Discord 官方群組](https://discord.gg/adCWzv6wwS) 或 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 回報
 
 ### Q. 我無法登入
 
-A. 請先確定自己下載的是[最新版本](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest) ，對照版本號，若持續發生請閱讀下方
+A. 請先確定自己下載的是[最新版本](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest) ，對照版本號，若持續發生請至 [Discord 官方群組](https://discord.gg/adCWzv6wwS) 或 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 回報
 
 ### Q: 我的問題不在以上的內容中
 
