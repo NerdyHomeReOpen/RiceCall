@@ -184,7 +184,7 @@
   "language-select": "Language selection",
   "level": "Level",
   "live": "Live",
-  "lobby": "Lobby",
+  "lobby": "頻道大廳",
   "locate-me": "Locate myself",
   "login": "Login",
   "logout": "Logout",
@@ -530,5 +530,5 @@
   "set-hotkey-error": "Button {0} is already in use",
   "upload": "Upload",
   "avatar-cropper": "Change thumbnail",
-  "default-lobby": "Lobby"
+  "default-lobby": "大廳"
 }
