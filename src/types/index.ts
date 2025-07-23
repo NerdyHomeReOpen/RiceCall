@@ -66,8 +66,8 @@ export type FriendApplication = User & {
   createdAt: number;
 };
 
-export type RecommendedServersByCategory = {
-  [categoryName: string]: UserServer[];
+export type RecommendedServers = {
+  [category: string]: Server[];
 };
 
 export type Server = {

@@ -6,10 +6,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import homePage from '@/styles/pages/home.module.css';
 
 // Components
-import ServerListViewer from '@/components/ServerList';
+import ServerList from '@/components/ServerList';
+import RecommendedServerList from '@/components/RecommendedServerList';
 
 // Type
-import { PopupType, RecommendedServersByCategory, SocketServerEvent, User, UserServer } from '@/types';
+import { PopupType, RecommendedServers, SocketServerEvent, User, UserServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -19,86 +20,6 @@ import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import ServerCard from '../ServerCard';
-
-export interface ServerListSectionProps {
-  title: string;
-  servers: UserServer[];
-  user: User;
-}
-
-interface RecommendedServersProps {
-  recommendedServers: RecommendedServersByCategory;
-  user: User;
-}
-
-const RecommendedServersSection: React.FC<RecommendedServersProps> = ({
-  recommendedServers,
-  user
-}) => {
-  const categories = Object.keys(recommendedServers);
-  const [activeCategory, setActiveCategory] = useState(categories[0] ?? '');
-  
-  return (
-   <div className={homePage['recommendedWrapper']}>
-      {/* Left panel: categories */}
-      <aside className={homePage['categorySidebar']}>
-        <ul className={homePage['categoryList']}>
-          {categories.map((category) => (
-            <li key={category}>
-              <button
-                onClick={() => setActiveCategory(category)}
-                className={`${homePage['categoryItem']} ${
-                  activeCategory === category ? homePage['categoryItemActive'] : ''
-                }`}
-              >
-                {category}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </aside>
-
-      {/* Right panel : servers */}      
-      <section className={homePage['serversContainer']}>
-        <h2 className={homePage['categoryTitle']}>{activeCategory}</h2>
-        {recommendedServers[activeCategory]?.length > 0 && (
-            <div className={homePage['servers']}>
-              {recommendedServers[activeCategory].map((server) => (
-                <div key={server.serverId} className={homePage['serverCardsRecommended']}>
-                  <ServerCard user={user} server={server} />
-                </div>
-              ))}
-            </div>
-        )}        
-      </section>
-  </div>
-  );
-};
-
-const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, servers }) => {
-  // Hooks
-  const { t } = useTranslation();
-
-  // States
-  const [expanded, setExpanded] = useState(false);
-
-  // Variables
-  const displayedServers = expanded ? servers : servers.slice(0, 6);
-  const canExpand = servers.length > 6;
-
-  return (
-    <div>
-      <div className={homePage['server-list-title']}>{title}</div>
-      <ServerListViewer user={user} servers={displayedServers} />
-      {canExpand && (
-        <div className={`${homePage['view-more-btn']} ${expanded ? homePage['more-icon'] : homePage['less-icon']}`} onClick={() => setExpanded(!expanded)}>
-          {expanded ? t('view-less') : t('view-more')}
-        </div>
-      )}
-    </div>
-  );
-};
 
 const SearchResultItem: React.FC<{
   server: UserServer;
@@ -124,7 +45,7 @@ const SearchResultItem: React.FC<{
 interface HomePageProps {
   user: User;
   servers: UserServer[];
-  recommendedServers: RecommendedServersByCategory;
+  recommendedServers: RecommendedServers;
   display: boolean;
 }
 
@@ -209,15 +130,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       return 0;
     });
 
-    const {
-      exact,
-      personal,
-      related,
-    }: {
-      exact: UserServer | null;
-      personal: UserServer[];
-      related: UserServer[];
-    } = sortedServers.reduce(
+    const { exact, personal, related }: { exact: UserServer | null; personal: UserServer[]; related: UserServer[] } = sortedServers.reduce(
       (acc, server) => {
         if (server.displayId === searchQuery) {
           acc.exact = server;
@@ -228,15 +141,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         }
         return acc;
       },
-      {
-        exact: null,
-        personal: [],
-        related: [],
-      } as {
-        exact: UserServer | null;
-        personal: UserServer[];
-        related: UserServer[];
-      },
+      { exact: null, personal: [], related: [] } as { exact: UserServer | null; personal: UserServer[]; related: UserServer[] },
     );
 
     setExactMatch(exact);
@@ -393,9 +298,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={`${homePage['navegate-tab']} ${section === 0 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(0)}>
             {t('home')}
           </div>
-          <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
+          {/* <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
             {t('recommended-servers')}
-          </div>
+          </div> */}
           <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
             {t('game')}
           </div>
@@ -414,25 +319,19 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         </div>
       </header>
 
-       {/* Announcement */}
+      {/* Announcement */}
       <webview src="https://ricecall.com.tw/announcement" className={homePage['webview']} style={section === 0 ? {} : { display: 'none' }} />
 
-       {/* Recommended servers */}
-        <main
-          className={homePage['recommendedServers']}
-          style={section === 1 ? {} : { display: 'none' }}
-        >
-          <RecommendedServersSection
-            recommendedServers={recommendedServers}
-            user = {user}
-          />          
-        </main>     
+      {/* Recommended servers */}
+      <main className={homePage['recommended-servers']} style={section === 1 ? {} : { display: 'none' }}>
+        <RecommendedServerList servers={recommendedServers} user={user} />
+      </main>
 
       {/* Personal Exclusive */}
       <main className={homePage['home-body']} style={section === 4 ? {} : { display: 'none' }}>
-        <ServerListSection title={t('recent-servers')} servers={recentServers} user={user} />
-        <ServerListSection title={t('my-servers')} servers={ownedServers} user={user} />
-        <ServerListSection title={t('favorited-servers')} servers={favoriteServers} user={user} />
+        <ServerList title={t('recent-servers')} servers={recentServers} user={user} />
+        <ServerList title={t('my-servers')} servers={ownedServers} user={user} />
+        <ServerList title={t('favorited-servers')} servers={favoriteServers} user={user} />
       </main>
 
       {/* Not Available */}
