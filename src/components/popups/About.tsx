@@ -33,6 +33,7 @@ const AboutPopup: React.FC = React.memo(() => {
   // Variables
   const titleColorClasses: Record<string, string> = {
     [t('main-developer')]: styles['main-developer'],
+    [t('fullstack-developer')]: styles['fullstack-developer'],
     [t('backend-developer')]: styles['backend-developer'],
     [t('frontend-developer')]: styles['frontend-developer'],
     [t('machine-network')]: styles['machine-network'],
@@ -55,6 +56,14 @@ const AboutPopup: React.FC = React.memo(() => {
       info: [
         { label: 'Github', value: 'yeci226' },
         { label: 'Discord', value: '283946584461410305' },
+      ],
+    },
+    {
+      title: t('fullstack-developer'),
+      contact: 'ramon96',
+      info: [
+        { label: 'Github', value: 'ramonPC96' },
+        { label: 'Discord', value: '493539043133620234' },
       ],
     },
     {

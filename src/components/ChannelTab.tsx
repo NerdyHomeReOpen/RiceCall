@@ -55,13 +55,18 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       channelVisibility !== 'readonly' &&
       !(channelVisibility === 'member' && permissionLevel < 2) &&
       (!channelUserLimit || channelUserLimit > channelMembers.length || permissionLevel > 4);
-    const canManageChannel = permissionLevel > 4;
-    const canCreate = canManageChannel && !channelCategoryId;
-    const canCreateSub = canManageChannel && !isLobby;
-    const canEdit = canManageChannel;
-    const canDelete = canManageChannel && !isLobby;
-    const canMoveAllUserToChannel = canManageChannel && !userInChannel && channelUserIds.length !== 0;
-    const canSetReceptionLobby = canManageChannel && !isReceptionLobby && channelVisibility !== 'private' && channelVisibility !== 'readonly';
+
+    const canEditChannel = permissionLevel > 2;
+    const canCreateChannel = permissionLevel > 4;
+    const canCreateSubchannel = permissionLevel > 3;
+    const canDeleteChannel = permissionLevel > 3;
+    const canBroadcastChannel = permissionLevel > 2;
+    const canMoveAllUserToChannel = permissionLevel > 4 && !userInChannel && channelUserIds.length !== 0;;
+    const canOpenChannelOrder = permissionLevel > 4;    
+    const canSetReceptionLobby =
+      permissionLevel > 4 &&
+      channelVisibility !== 'private' &&
+      channelVisibility !== 'readonly';
 
     // Handlers
     const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
@@ -197,41 +202,41 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               {
                 id: 'edit-channel',
                 label: t('edit-channel'),
-                show: canEdit,
+                show: canEditChannel,
                 onClick: () => handleOpenChannelSetting(channelId, serverId),
               },
               {
                 id: 'separator',
                 label: '',
-                show: canManageChannel,
+                show: canCreateChannel || canCreateChannel,
               },
               {
                 id: 'create-channel',
                 label: t('create-channel'),
-                show: canCreate,
+                show: canCreateChannel,
                 onClick: () => handleOpenCreateChannel(serverId, null, userId),
               },
               {
                 id: 'create-sub-channel',
                 label: t('create-sub-channel'),
-                show: canCreateSub,
+                show: canCreateSubchannel,
                 onClick: () => handleOpenCreateChannel(serverId, channelCategoryId ? channelCategoryId : channelId, userId),
               },
               {
                 id: 'delete-channel',
                 label: t('delete-channel'),
-                show: canDelete,
+                show: canDeleteChannel,
                 onClick: () => handleDeleteChannel(channelId, serverId),
               },
               {
                 id: 'separator',
                 label: '',
-                show: canManageChannel,
+                show: canBroadcastChannel || canMoveAllUserToChannel || canOpenChannelOrder,
               },
               {
                 id: 'broadcast',
                 label: t('broadcast'),
-                show: canManageChannel,
+                show: canBroadcastChannel,
                 onClick: () => {
                   handleOpenServerBroadcast(serverId, channelCategoryId ? channelCategoryId : channelId);
                 },
@@ -245,7 +250,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               {
                 id: 'edit-channel-order',
                 label: t('edit-channel-order'),
-                show: canManageChannel,
+                show: canOpenChannelOrder,
                 onClick: () => handleOpenEditChannelOrder(serverId, userId),
               },
               {

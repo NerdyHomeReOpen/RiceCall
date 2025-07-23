@@ -93,6 +93,10 @@ export enum SocketClientEvent {
   EDIT_CHANNEL = 'editChannel',
   EDIT_CHANNELS = 'editChannels',
   DELETE_CHANNEL = 'deleteChannel',
+  FORBID_USER_VOICE = 'forbidUserVoice',
+  FORBID_USER_TEXT = 'forbidUserText',
+  UNFORBID_USER_VOICE = 'unforbidUserVoice',
+  UNFORBID_USER_TEXT = 'unforbidUserText',
   // Member
   CREATE_MEMBER = 'createMember',
   EDIT_MEMBER = 'editMember',
@@ -102,6 +106,8 @@ export enum SocketClientEvent {
   EDIT_MEMBER_APPLICATION = 'editMemberApplication',
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
   APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
+  CREATE_MEMBER_INVITATION_APPLICATION = 'createMemberInvitationApplication',
+
   // Message
   CHANNEL_MESSAGE = 'channelMessage',
   ACTION_MESSAGE = 'actionMessage',
@@ -373,7 +379,7 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
     });
   } else {
     mainWindow.loadURL(`${BASE_URI}`);
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('close', (e) => {

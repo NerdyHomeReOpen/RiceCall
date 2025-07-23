@@ -144,5 +144,7 @@
   "cannot-shake-non-friend-window": "無法向非好友發送視窗震動",
   "cannot-shake-non-self-window": "無法發送非自己的視窗震動",
   "too-many-failed-attempts": "嘗試次數過多，請稍後再試",
-  "wrong-password": "密碼錯誤"
+  "wrong-password": "密碼錯誤",
+  "admin-banned-you": "管理員已將您封鎖在群組之外",
+  "blocked-for-text": "你被禁止發送簡訊"
 }

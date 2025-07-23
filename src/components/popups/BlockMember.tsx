@@ -49,23 +49,10 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const isForeverBlock = blockType !== 'timeout';
 
   // Handles
-  const handleBlockMember = () => {
-    const memberData =
-      blockType === 'timeout'
-        ? {
-            isBlocked: Date.now() + blockTime,
-          }
-        : {
-            isBlocked: -1,
-            permissionLevel: 1,
-            nickname: null,
-          };
+  const handleBlockMember = () => {  
+    const blockForever = blockType === 'block-forever' || blockType === 'blockIP';
 
-    socket.send.editMember({
-      member: memberData,
-      userId,
-      serverId,
-    });
+    socket.send.disconnectServer({ userId, serverId, blockTime, blockForever });
   };
 
   const handleClose = () => {

@@ -28,6 +28,7 @@ export type User = {
   gender: 'Male' | 'Female';
   currentChannelId: string;
   currentServerId: string;
+  currentCategoryId: string;
   lastActiveAt: number;
   createdAt: number;
   badges: Badge[];
@@ -133,7 +134,10 @@ export type Member = {
   lastJoinChannelTime: number;
   isBlocked: number; // New: Change to number
   permissionLevel: Permission;
+  adminChannelPermission: Permission;  
   createdAt: number;
+  blockText: number;
+  blockVoice: number;
 };
 
 export type MemberApplication = User & {
@@ -223,6 +227,10 @@ export enum SocketClientEvent {
   // User
   SEARCH_USER = 'searchUser',
   EDIT_USER = 'editUser',
+  FORBID_USER_VOICE = 'forbidUserVoice',
+  FORBID_USER_TEXT = 'forbidUserText',
+  UNFORBID_USER_VOICE = 'unforbidUserVoice',
+  UNFORBID_USER_TEXT = 'unforbidUserText',
   // Friend Group
   CREATE_FRIEND_GROUP = 'createFriendGroup',
   EDIT_FRIEND_GROUP = 'editFriendGroup',
@@ -260,6 +268,7 @@ export enum SocketClientEvent {
   EDIT_MEMBER_APPLICATION = 'editMemberApplication',
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
   APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
+  CREATE_MEMBER_INVITATION_APPLICATION = 'createMemberInvitationApplication',
   // Message
   CHANNEL_MESSAGE = 'channelMessage',
   ACTION_MESSAGE = 'actionMessage',

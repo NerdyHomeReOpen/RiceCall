@@ -9,7 +9,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication } from '@/types';
+import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication, Member } from '@/types';
 
 // i18n
 import i18n, { LanguageKey } from '@/i18n';
@@ -485,8 +485,14 @@ const RootPageComponent = () => {
     });
   };
 
-  const handleServerMemberUpdate = (userId: ServerMember['userId'], serverId: ServerMember['serverId'], member: Partial<ServerMember>): void => {
-    setServerMembers((prev) => prev.map((item) => (item.userId === userId && item.serverId === serverId ? { ...item, ...member } : item)));
+  const handleServerMemberUpdate = (userId: ServerMember['userId'], serverId: ServerMember['serverId'], member: Partial<ServerMember>, updatedMember: Partial<Member>): void => {
+    setServerMembers((prev) =>
+      prev.map((item) =>
+        item.userId === userId && item.serverId === serverId
+          ? { ...item, ...member, ...updatedMember }
+          : item,
+      ),
+    );
   };
 
   const handleServerMemberDelete = (userId: ServerMember['userId'], serverId: ServerMember['serverId']): void => {
