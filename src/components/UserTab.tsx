@@ -60,6 +60,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const { userId, serverId, permissionLevel: userPermission, lobbyId: serverLobbyId } = currentServer;
   const { channelId: currentChannelId } = currentChannel;
   const isCurrentUser = memberUserId === userId;
+  const isCurrentChannel = memberCurrentChannelId === currentChannelId;
   const speakingStatus = webRTC.speakStatus?.[memberUserId] || (isCurrentUser && webRTC.volumePercent) || 0;
   const isConnected = isCurrentUser || webRTC.connectionStatus?.[memberUserId] === 'connected';
   const isSpeaking = speakingStatus !== 0;
@@ -341,10 +342,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     >
       <div
         className={`${styles['user-audio-state']}
-      ${!isConnected ? styles['loading'] : ''}
+      ${!isConnected && isCurrentChannel ? styles['loading'] : ''}
       ${isConnected && isSpeaking && !isMuted ? styles['play'] : ''}
       ${isConnected && !isSpeaking && isMuted ? styles['muted'] : ''}
       ${isConnected && isMutedByUser ? styles['muted'] : ''}`}
+        title={!isConnected && isCurrentChannel ? t('voice-connecting') : ''}
       />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
