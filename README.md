@@ -3,7 +3,7 @@
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-v0.1.15-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.1.16-green"/>
   </div>
 </div>
 
@@ -90,12 +90,12 @@ RiceCall
 ├── src/                      # 原始碼
 │   ├── app/                  # Next.js 頁面
 │   ├── components/           # React/Electron 元件
+│   ├── i18n/                 # i18n 文件及初始設定
 │   ├── providers/            # React Providers
 │   ├── services/             # API 呼叫、資料處理
 │   ├── styles/               # CSS
 │   ├── types/                # 類型定義
 │   ├── utils/                # 功能檔案
-│   ├── i18n                  # i18n 文件獲取設定
 ├── .env.example              # 環境變數範例
 ├── .gitignore                # Git 忽略清單
 ├── .prettierrc               # Prettier 設定
