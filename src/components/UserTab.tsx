@@ -60,17 +60,17 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const { userId, serverId, permissionLevel: userPermission, lobbyId: serverLobbyId } = currentServer;
   const { channelId: currentChannelId } = currentChannel;
   const isCurrentUser = memberUserId === userId;
-  const isCurrentChannel = memberCurrentChannelId === currentChannelId;
+  const isSameChannel = memberCurrentChannelId === currentChannelId;
   const speakingStatus = webRTC.speakStatus?.[memberUserId] || (isCurrentUser && webRTC.volumePercent) || 0;
   const connectionStatus = webRTC.connectionStatus?.[memberUserId];
-  const isLoading = connectionStatus === 'connecting' || connectionStatus === 'failed' || connectionStatus === 'closed';
+  const isLoading = connectionStatus === 'connecting' || connectionStatus === 'failed' || connectionStatus === 'closed' || !connectionStatus;
   const isSpeaking = speakingStatus !== 0;
   const isMuted = speakingStatus === -1;
   const isMutedByUser = webRTC.muteList.includes(memberUserId);
   const isFriend = friends.some((fd) => fd.targetId === memberUserId);
+  const isServerAdmin = userPermission >= 5;
   const canApplyFriend = !isFriend && !isCurrentUser;
   const canManageMember = !isCurrentUser && userPermission > 4 && memberPermission < 6 && userPermission > memberPermission;
-  const isServerAdmin = userPermission >= 5;
   const canEditNickname = (canManageMember && memberPermission != 1) || (isCurrentUser && userPermission > 1);
   const canChangeToGuest = canManageMember && memberPermission !== 1 && userPermission > 4;
   const canChangeToMember = canManageMember && memberPermission !== 2 && (memberPermission > 1 || userPermission > 5);
@@ -82,6 +82,13 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const canBan = canManageMember;
   const canMoveToChannel = isServerAdmin && userPermission >= memberPermission && memberCurrentChannelId !== currentChannelId;
   const canRemoveMembership = isCurrentUser && userPermission > 1 && userPermission < 6;
+
+  const statusIcon = () => {
+    if (isMuted || isMutedByUser) return 'muted';
+    if (!isCurrentUser && isSameChannel && isLoading) return 'loading';
+    if (isSpeaking) return 'play';
+    return '';
+  };
 
   // Handlers
   const handleMuteUser = (userId: User['userId']) => {
@@ -341,10 +348,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
         ]);
       }}
     >
-      <div
-        className={`${styles['user-audio-state']} ${isLoading ? styles['loading'] : ''} ${!isLoading && isSpeaking && !isMuted ? styles['play'] : ''} ${!isLoading && !isSpeaking && isMuted ? styles['muted'] : ''} ${!isLoading && isMutedByUser ? styles['muted'] : ''}`}
-        title={t('connection-status', { '0': t(`connection-status-${connectionStatus}`) })}
-      />
+      <div className={`${styles['user-audio-state']} ${styles[statusIcon()]}`} title={!isCurrentUser ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>

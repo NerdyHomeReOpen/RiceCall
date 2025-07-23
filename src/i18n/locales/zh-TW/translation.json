@@ -499,6 +499,6 @@
   "connection-status-connected": "已連線",
   "connection-status-disconnected": "已斷線",
   "connection-status-failed": "連線失敗",
-  "connection-status-closed": "已關閉",
+  "connection-status-closed": "無法連線",
   "connection-status-undefined": "未知"
 }
