@@ -184,7 +184,7 @@
   "language-select": "Idioma",
   "level": "Nível",
   "live": "Ao vivo",
-  "lobby": "Recepção",
+  "lobby": "頻道大廳",
   "locate-me": "Mostrar onde estou",
   "login": "Entrar",
   "logout": "Sair",
@@ -530,5 +530,5 @@
   "set-hotkey-error": "A tecla {0} já está em uso",
   "upload": "Enviar",
   "avatar-cropper": "Mudar imagem",
-  "default-lobby": "Recepção"
+  "default-lobby": "大廳"
 }
