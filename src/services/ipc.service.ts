@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import i18n from '@/i18n';
 import { DiscordPresence, PopupType, SocketClientEvent, SocketServerEvent, speakingMode, mixMode } from '@/types';
 
 // Safe reference to electron's ipcRenderer
@@ -920,22 +919,6 @@ const ipcService = {
         });
         return () => ipcRenderer.removeAllListeners('receive-channel-message-sound');
       },
-    },
-  },
-
-  systemLocale: {
-    setup: () => {
-      if (localStorage.getItem('language')) return;
-      if (!isElectron) {
-        i18n.changeLanguage(navigator.language);
-        localStorage.setItem('language', navigator.language || 'zh-TW');
-        return;
-      }
-      ipcRenderer.send('get-system-locale');
-      ipcRenderer.once('system-locale', (_: any, locale: { primary: string; all: string[] }) => {
-        i18n.changeLanguage(locale.primary);
-        localStorage.setItem('language', locale.primary || 'zh-TW');
-      });
     },
   },
 };

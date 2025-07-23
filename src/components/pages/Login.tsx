@@ -110,10 +110,6 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   }, [accounts]);
 
   useEffect(() => {
-    ipcService.systemLocale.setup();
-  }, []);
-
-  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (!comboRef.current?.contains(e.target as Node)) setShowAccountselectBox(false);
     };
