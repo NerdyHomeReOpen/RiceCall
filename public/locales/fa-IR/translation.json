@@ -184,7 +184,7 @@
   "language-select": "انتخاب زبان",
   "level": "لول",
   "live": "زنده",
-  "lobby": "لابی",
+  "lobby": "頻道大廳",
   "locate-me": "موقعیت یابی خودم",
   "login": "ورود",
   "logout": "خروج",
@@ -530,5 +530,5 @@
   "set-hotkey-error": "کلید {0} استفاده شده است",
   "upload": "آپلود",
   "avatar-cropper": "تغییر عکس",
-  "default-lobby": "لابی"
+  "default-lobby": "大廳"
 }
