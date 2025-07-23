@@ -150,6 +150,7 @@
   "guest": "Гость",
   "help-center": "Центр поддержки",
   "home": "Главная",
+  "recommended-servers": "推薦伺服器",
   "id": "ID",
   "identity": "Идентификатор",
   "idle": "idle",
@@ -403,7 +404,7 @@
   "request-to-add-you-as-a-friend": "Заявка на добавление в друзья",
   "unprocessed": "Осталось",
   "ago": "{{0}} назад",
-  "future": "После {0}",
+  "future": "После {{0}}",
   "broadcast": "Объявление",
   "broadcast-type": "Тип объявления",
   "block-ip": "Заблокировать по IP",
@@ -492,5 +493,13 @@
   "set-hotkey-error": "Кнопка {{0}} уже используется",
   "upload": "Загрузить",
   "avatar-cropper": "Изменить миниатюру",
-  "lobby": "Гостевой канал"
+  "lobby": "Гостевой канал",
+  "connection-status": "連線狀態: {{0}}",
+  "connection-status-new": "新連線",
+  "connection-status-connecting": "連線中",
+  "connection-status-connected": "已連線",
+  "connection-status-disconnected": "已斷線",
+  "connection-status-failed": "連線失敗",
+  "connection-status-closed": "無法連線",
+  "connection-status-undefined": "未知"
 }
