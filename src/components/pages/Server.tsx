@@ -91,6 +91,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   const canChangeToForbiddenSpeech = userPermission > 4 && channelVoiceMode !== 'forbidden';
   const canChangeToForbiddenQueue = userPermission > 4 && channelVoiceMode !== 'queue';
   const canChangeToControlQueue = userPermission > 4 && channelVoiceMode !== 'forbidden';
+  const previousVolumeKey = 'previous-speaker-volume';
 
   // Handlers
   const handleSendMessage = (message: Partial<Message>, userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']): void => {
@@ -131,6 +132,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
       setShowSpeakerVolume(false);
     }
   }, []);
+
+    const toggleSpeakerMute = (e: React.MouseEvent) => {
+      if (webRTC.speakerVolume === 0) {
+        const prevVolume = parseInt(localStorage.getItem(previousVolumeKey) || '50');
+        webRTC.handleEditSpeakerVolume(prevVolume);
+      } else {
+        webRTC.handleEditSpeakerVolume(0);
+      }
+    };
 
   // Effects
   useEffect(() => {
@@ -396,15 +406,19 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                         value={webRTC.speakerVolume}
                         onChange={(e) => {
                           webRTC.handleEditSpeakerVolume(parseInt(e.target.value));
+                            localStorage.setItem(previousVolumeKey, webRTC.speakerVolume.toString());
                         }}
                         className={styles['slider']}
                       />
                     </div>
 
-                    <div className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} />
-                  </div>
-                )}
-              </div>
+                      <div 
+                      className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} 
+                      onClick={toggleSpeakerMute}
+                      />
+                    </div>
+                  )}
+                </div>
               <div className={styles['record-mode-btn']} />
             </div>
           </div>
