@@ -38,11 +38,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
   const canSubmit = groupName.trim();
 
   // Handlers
-  const handleEditFriendGroup = (
-    group: Partial<FriendGroup>,
-    friendGroupId: FriendGroup['friendGroupId'],
-    userId: User['userId'],
-  ) => {
+  const handleEditFriendGroup = (group: Partial<FriendGroup>, friendGroupId: FriendGroup['friendGroupId'], userId: User['userId']) => {
     if (!socket) return;
     socket.send.editFriendGroup({ group, friendGroupId, userId });
   };
@@ -56,14 +52,8 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
     if (!friendGroupId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.friendGroup({
-          friendGroupId: friendGroupId,
-        }),
-      ]).then(([friendGroup]) => {
-        if (friendGroup) {
-          setFriendGroup(friendGroup);
-        }
+      getService.friendGroup({ friendGroupId: friendGroupId }).then((friendGroup) => {
+        if (friendGroup) setFriendGroup(friendGroup);
       });
     };
     refresh();
@@ -77,13 +67,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
-              <input
-                name="friend-group-name"
-                type="text"
-                value={groupName}
-                maxLength={32}
-                onChange={(e) => setFriendGroup((prev) => ({ ...prev, name: e.target.value }))}
-              />
+              <input name="friend-group-name" type="text" value={groupName} maxLength={32} onChange={(e) => setFriendGroup((prev) => ({ ...prev, name: e.target.value }))} />
             </div>
           </div>
         </div>

@@ -62,6 +62,7 @@ interface WebRTCContextType {
   musicVolume: number;
   volumePercent: number;
   speakStatus: { [id: string]: number };
+  connectionStatus: { [id: string]: string };
 }
 
 const WebRTCContext = createContext<WebRTCContextType>({} as WebRTCContextType);
@@ -86,6 +87,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const [speakStatus, setSpeakStatus] = useState<{ [id: string]: number }>({});
   const [volumePercent, setVolumePercent] = useState<number>(0);
   const [muteList, setMuteList] = useState<string[]>([]);
+  const [connectionStatus, setConnectionStatus] = useState<{ [id: string]: string }>({});
 
   // Refs
   const volumePercentRef = useRef<number>(0);
@@ -532,11 +534,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
 
     const peerConnection = new RTCPeerConnection({
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-      ],
+      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun2.l.google.com:19302' }],
       iceCandidatePoolSize: 10,
     });
 
@@ -546,12 +544,22 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
     peerConnection.oniceconnectionstatechange = () => {
       console.info(userId, 'Connection State:', peerConnection.connectionState);
+      setConnectionStatus((prev) => {
+        const newState = { ...prev };
+        newState[userId] = peerConnection.connectionState;
+        return newState;
+      });
       const isFailed = ['disconnected', 'failed', 'closed'].includes(peerConnection.connectionState);
       if (isFailed) removePeerConnection(userId);
     };
 
     peerConnection.onconnectionstatechange = () => {
       console.info(userId, 'Connection State:', peerConnection.connectionState);
+      setConnectionStatus((prev) => {
+        const newState = { ...prev };
+        newState[userId] = peerConnection.connectionState;
+        return newState;
+      });
       const isFailed = ['disconnected', 'failed', 'closed'].includes(peerConnection.connectionState);
       if (isFailed) removePeerConnection(userId);
     };
@@ -762,6 +770,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         musicVolume,
         volumePercent,
         speakStatus,
+        connectionStatus,
       }}
     >
       {Object.keys(peerStreams).map((userId) => (

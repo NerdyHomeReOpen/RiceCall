@@ -170,14 +170,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
   const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirm-remove-membership').replace('{0}', userName), () => {
+    handleOpenAlertDialog(t('confirm-remove-membership', { '0': userName }), () => {
       handleEditMember({ permissionLevel: 1 }, userId, serverId);
     });
   };
 
   const handleRemoveBlockMember = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
     if (!socket) return;
-    handleOpenAlertDialog(t('confirm-unblock-user').replace('{0}', userName), () => {
+    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => {
       handleEditMember({ isBlocked: 0 }, userId, serverId);
     });
   };
@@ -312,35 +312,17 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     if (!serverId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.server({
-          serverId: serverId,
-        }),
-        getService.member({
-          serverId: serverId,
-          userId: userId,
-        }),
-        getService.serverMembers({
-          serverId: serverId,
-        }),
-        getService.serverMemberApplications({
-          serverId: serverId,
-        }),
-      ]).then(([server, member, members, applications]) => {
-        if (server) {
-          setServer(server);
-        }
-        if (member) {
-          setMember(member);
-        }
-        if (members) {
-          const sortedMembers = handleSort('permissionLevel', members, 1);
-          setServerMembers(sortedMembers);
-        }
-        if (applications) {
-          const sortedApplications = handleSort('createdAt', applications, 1);
-          setServerApplications(sortedApplications);
-        }
+      getService.server({ serverId: serverId }).then((server) => {
+        if (server) setServer(server);
+      });
+      getService.member({ serverId: serverId, userId: userId }).then((member) => {
+        if (member) setMember(member);
+      });
+      getService.serverMembers({ serverId: serverId }).then((members) => {
+        if (members) setServerMembers(handleSort('permissionLevel', members, 1));
+      });
+      getService.serverMemberApplications({ serverId: serverId }).then((applications) => {
+        if (applications) setServerApplications(handleSort('createdAt', applications, 1));
       });
     };
     refresh();

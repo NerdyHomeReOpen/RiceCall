@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import MarkdownViewer from '@/components/MarkdownViewer';
 
 // Utils
-import { getFormatTimestamp, getTranslatedMessage } from '@/utils/language';
+import { getFormatTimestamp } from '@/utils/language';
 
 interface DirectMessageProps {
   messageGroup: DirectMessage & {
@@ -26,11 +26,20 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   const { t } = useTranslation();
 
   // Variables
-  const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
+  const { name: senderName, contents: messageContents, timestamp: messageTimestamp, parameter: messageParameter } = messageGroup;
 
   const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
 
-  const translatedMessages = messageContents.map((content) => getTranslatedMessage(t, content));
+  const translatedMessages = messageContents.map((content) => {
+    if (content.includes(' ')) {
+      return content
+        .split(' ')
+        .map((_) => t(_, { ns: 'message', ...messageParameter }))
+        .join(' ');
+    } else {
+      return t(content, { ns: 'message', ...messageParameter });
+    }
+  });
 
   return (
     <div className={styles['message-box']}>

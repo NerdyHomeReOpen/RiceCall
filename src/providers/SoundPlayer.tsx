@@ -38,8 +38,6 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
       audioRef.current = null;
     }
 
-    console.log('sound', sound);
-
     if (sound === 'enterVoiceChannel' && enterVoiceChannelSoundRef.current) {
       audioRef.current = new Audio('./sounds/JoinVoiceChannel.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');

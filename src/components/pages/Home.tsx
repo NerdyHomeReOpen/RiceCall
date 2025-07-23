@@ -42,10 +42,7 @@ const ServerListSection: React.FC<ServerListSectionProps> = ({ title, user, serv
       <div className={homePage['server-list-title']}>{title}</div>
       <ServerListViewer user={user} servers={displayedServers} />
       {canExpand && (
-        <div
-          className={`${homePage['view-more-btn']} ${expanded ? homePage['more-icon'] : homePage['less-icon']}`}
-          onClick={() => setExpanded(!expanded)}
-        >
+        <div className={`${homePage['view-more-btn']} ${expanded ? homePage['more-icon'] : homePage['less-icon']}`} onClick={() => setExpanded(!expanded)}>
           {expanded ? t('view-less') : t('view-more')}
         </div>
       )}
@@ -289,19 +286,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 }
               }}
             />
-            <div
-              className={homePage['search-input-clear-btn']}
-              onClick={handleClearSearchState}
-              style={searchQuery ? {} : { display: 'none' }}
-            />
+            <div className={homePage['search-input-clear-btn']} onClick={handleClearSearchState} style={searchQuery ? {} : { display: 'none' }} />
             <div className={homePage['search-input-icon']} style={!searchQuery ? {} : { display: 'none' }} />
             <div className={homePage['search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
               {exactMatch && (
                 <>
-                  <div
-                    className={`${homePage['header-text']} ${homePage['exactMatch']}`}
-                    style={exactMatch ? {} : { display: 'none' }}
-                  >
+                  <div className={`${homePage['header-text']} ${homePage['exactMatch']}`} style={exactMatch ? {} : { display: 'none' }}>
                     {t('quick-enter-server')}
                   </div>
                   <SearchResultItem
@@ -341,10 +331,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                   ))}
                 </>
               )}
-              <div
-                className={`${homePage['item']} ${homePage['input-empty-item']}`}
-                style={!searchQuery ? {} : { display: 'none' }}
-              >
+              <div className={`${homePage['item']} ${homePage['input-empty-item']}`} style={!searchQuery ? {} : { display: 'none' }}>
                 {t('searchEmpty')}
               </div>
             </div>
@@ -352,25 +339,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         </div>
 
         <div className={homePage['mid']}>
-          <div
-            className={`${homePage['navegate-tab']} ${section === 0 ? homePage['active'] : ''}`}
-            data-key="60060"
-            onClick={() => setSection(0)}
-          >
+          <div className={`${homePage['navegate-tab']} ${section === 0 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(0)}>
             {t('home')}
           </div>
-          <div
-            className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`}
-            data-key="40007"
-            onClick={() => setSection(1)}
-          >
+          <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(1)}>
             {t('game')}
           </div>
-          <div
-            className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`}
-            data-key="30375"
-            onClick={() => setSection(2)}
-          >
+          <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="30375" onClick={() => setSection(2)}>
             {t('live')}
           </div>
         </div>
@@ -386,11 +361,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       </header>
 
       {/* Announcement */}
-      <webview
-        src="https://ricecall.com.tw/announcement"
-        className={homePage['webview']}
-        style={section === 0 ? {} : { display: 'none' }}
-      />
+      <webview src="https://ricecall.com.tw/announcement" className={homePage['webview']} style={section === 0 ? {} : { display: 'none' }} />
 
       {/* Personal Exclusive */}
       <main className={homePage['home-body']} style={section === 3 ? {} : { display: 'none' }}>

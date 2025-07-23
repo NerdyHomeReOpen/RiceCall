@@ -304,6 +304,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                     onClick: () => handleLanguageChange('ja'),
                   },
                   {
+                    id: 'language-select-fa',
+                    label: 'فارسی',
+                    onClick: () => handleLanguageChange('fa'),
+                  },
+                  {
                     id: 'language-select-br',
                     label: 'Português',
                     onClick: () => handleLanguageChange('pt-BR'),
@@ -312,6 +317,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                     id: 'language-select-ru',
                     label: 'Русский',
                     onClick: () => handleLanguageChange('ru'),
+                  },
+                  {
+                    id: 'language-select-es',
+                    label: 'Español',
+                    onClick: () => handleLanguageChange('es-ES'),
                   },
                 ],
               },
@@ -616,32 +626,17 @@ const RootPageComponent = () => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      Promise.all([
-        getService.userServers({
-          userId: userId,
-        }),
-        getService.userFriends({
-          userId: userId,
-        }),
-        getService.userFriendGroups({
-          userId: userId,
-        }),
-        getService.userFriendApplications({
-          userId: userId,
-        }),
-      ]).then(([servers, friends, friendGroups, friendApplications]) => {
-        if (servers) {
-          setServers(servers);
-        }
-        if (friends) {
-          setFriends(friends);
-        }
-        if (friendGroups) {
-          setFriendGroups(friendGroups);
-        }
-        if (friendApplications) {
-          setFriendApplications(friendApplications);
-        }
+      getService.userServers({ userId: userId }).then((servers) => {
+        if (servers) setServers(servers);
+      });
+      getService.userFriends({ userId: userId }).then((friends) => {
+        if (friends) setFriends(friends);
+      });
+      getService.userFriendGroups({ userId: userId }).then((friendGroups) => {
+        if (friendGroups) setFriendGroups(friendGroups);
+      });
+      getService.userFriendApplications({ userId: userId }).then((friendApplications) => {
+        if (friendApplications) setFriendApplications(friendApplications);
       });
     };
     refresh();

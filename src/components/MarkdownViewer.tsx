@@ -9,7 +9,7 @@ import rehypeRaw from 'rehype-raw';
 import hljs from 'highlight.js';
 
 // Components
-import { Emoji, emojis } from '@/components/emojis';
+import { emojis } from '@/components/emojis';
 
 // CSS
 import 'highlight.js/styles/github.css';
@@ -20,39 +20,39 @@ import permission from '@/styles/permission.module.css';
 import { useTranslation } from 'react-i18next';
 
 /**
- * 主處理函式
- * @param markdownText 要處理的 markdown 字串
- * @param emojis 表情符號列表
- * @param permission 權限列表
- * @returns 處理後的 HTML 字串
+ * Main processing function
+ * @param markdownText The markdown string to process
+ * @returns The processed HTML string
  */
-export function sanitizeMarkdownWithSafeTags(markdownText: string, emojis: Emoji[], permission: Record<string, string>): string {
+export function sanitizeMarkdownWithSafeTags(markdownText: string): string {
   const safeMarkdownText = typeof markdownText === 'string' ? markdownText : '';
 
+  // escape < and >
   const escaped = safeMarkdownText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+  // regex
   const emojiRegex = /\[emoji_.+?\]/g;
   const userTagRegex = /(?:<|&lt;)@(.+?)(?:>|&gt;)/g;
   const ytTagRegex = /(?:<|&lt;)YT=(.+?)(?:>|&gt;)/g;
 
   const replaced = escaped
-    // 替換 emoji
+    // replace emoji
     .replace(emojiRegex, (match: string) => {
       const emoji = emojis.find((emoji) => emoji.char === match);
       if (!emoji) return match;
       return `<img class='${markdown['emoji']}' src='${emoji.path}' alt="${emoji.char}"/>`;
     })
-    // 替換 <@name_gender_level>
+    // replace <@name_gender_level>
     .replace(userTagRegex, (_, content) => {
       const [name, gender, level] = content.split('_');
       return `<span class='${markdown['user-tag']}' alt='<@${content}>'><span class='${permission[gender || 'Male']} ${permission[`lv-${level || '1'}`]}'></span>${name || 'Unknown'}</span>`;
     })
-    // 替換 <YT=https://www.youtube.com/watch?v=dQw4w9WgXcQ>
+    // replace <YT=https://www.youtube.com/watch?v=dQw4w9WgXcQ>
     .replace(ytTagRegex, (_, content) => {
       const videoId = content.match(/v=([^&]+)/)?.[1];
-      return `<iframe class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1"></iframe>`;
+      return `<iframe class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
     })
-    // 處裡 <br> to \n
+    // replace <br> to \n
     .replace(/<br\s*\/?>/g, '\n');
 
   return replaced;
@@ -142,7 +142,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({ markdownText
     },
   };
 
-  const sanitized = sanitizeMarkdownWithSafeTags(markdownText, emojis, permission);
+  const sanitized = sanitizeMarkdownWithSafeTags(markdownText);
 
   return (
     <div className={markdown['markdown-content']}>

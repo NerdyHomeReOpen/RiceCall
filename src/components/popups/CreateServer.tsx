@@ -114,20 +114,11 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
     if (!userId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.user({
-          userId: userId,
-        }),
-        getService.userServers({
-          userId: userId,
-        }),
-      ]).then(([user, servers]) => {
-        if (user) {
-          setUser(user);
-        }
-        if (servers) {
-          setServers(servers);
-        }
+      getService.user({ userId: userId }).then((user) => {
+        if (user) setUser(user);
+      });
+      getService.userServers({ userId: userId }).then((servers) => {
+        if (servers) setServers(servers);
       });
     };
     refresh();
@@ -145,7 +136,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         {/* Body */}
         <div className={popup['popup-body']}>
           <div className={setting['content']}>
-            <div className={`${styles['message']}`}>{`${t('remaining-server').replace('{0}', remainingServers.toString())}`}</div>
+            <div className={`${styles['message']}`}>{`${t('remaining-server', { '0': remainingServers.toString() })}`}</div>
             <div className={styles['select-type-text']}>{t('select-server-type-description')}</div>
             <div className={styles['button-group']}>
               {SERVER_TYPES.map((type) => (

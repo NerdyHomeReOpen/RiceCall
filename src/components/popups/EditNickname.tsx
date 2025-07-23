@@ -53,21 +53,11 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
     if (!userId || !serverId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      Promise.all([
-        getService.user({
-          userId: userId,
-        }),
-        getService.member({
-          userId: userId,
-          serverId: serverId,
-        }),
-      ]).then(([user, member]) => {
-        if (user) {
-          setUser(user);
-        }
-        if (member) {
-          setMember(member);
-        }
+      getService.user({ userId: userId }).then((user) => {
+        if (user) setUser(user);
+      });
+      getService.member({ userId: userId, serverId: serverId }).then((member) => {
+        if (member) setMember(member);
       });
     };
     refresh();
@@ -87,13 +77,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('please-enter-the-member-nickname')}</div>
-              <input
-                name="nickname"
-                type="text"
-                value={memberNickname || ''}
-                maxLength={32}
-                onChange={(e) => setMember((prev) => ({ ...prev, nickname: e.target.value }))}
-              />
+              <input name="nickname" type="text" value={memberNickname || ''} maxLength={32} onChange={(e) => setMember((prev) => ({ ...prev, nickname: e.target.value }))} />
             </div>
           </div>
         </div>
@@ -113,10 +97,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
         </div>
-        <div
-          className={popup['button']}
-          onClick={() => handleEditMember({ nickname: memberNickname }, userId, serverId)}
-        >
+        <div className={popup['button']} onClick={() => handleEditMember({ nickname: memberNickname }, userId, serverId)}>
           {t('set')}
         </div>
       </div>

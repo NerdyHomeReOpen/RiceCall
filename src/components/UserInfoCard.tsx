@@ -113,11 +113,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
             <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
 
             {/* VIP Info Text */}
-            {memberVip > 0 && (
-              <div className={styles['vip-boost-text']}>
-                {t('vip-upgrade-boost').replace('{0}', vipBoostMultiplier.toString())}
-              </div>
-            )}
+            {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost', { '0': vipBoostMultiplier.toString() })}</div>}
 
             {/* Xp Info */}
             <div className={styles['xp-wrapper']}>
@@ -136,9 +132,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
         {/* Bottom Section */}
         <div className={styles['bottom']}>
           {/* Nickname Row */}
-          <div className={styles['nickname-row']}>
-            {memberNickname && <div className={styles['nickname-text']}>{memberNickname}</div>}
-          </div>
+          <div className={styles['nickname-row']}>{memberNickname && <div className={styles['nickname-text']}>{memberNickname}</div>}</div>
 
           {/* Info Row */}
           <div className={styles['info-row']}>
