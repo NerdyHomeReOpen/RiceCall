@@ -492,5 +492,13 @@
   "set-hotkey-error": "按鍵 {{0}} 已被使用",
   "upload": "Enviar",
   "avatar-cropper": "Mudar imagem",
-  "lobby": "大廳"
+  "lobby": "大廳",
+  "connection-status": "連線狀態: {{0}}",
+  "connection-status-new": "新連線",
+  "connection-status-connecting": "連線中",
+  "connection-status-connected": "已連線",
+  "connection-status-disconnected": "已斷線",
+  "connection-status-failed": "連線失敗",
+  "connection-status-closed": "無法連線",
+  "connection-status-undefined": "未知"
 }
