@@ -9,10 +9,12 @@ import MainTabProvider from '@/providers/MainTab';
 import ThemeProvider from '@/providers/Theme';
 import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
-import i18n, { LanguageKey } from '@/i18n';
 
 // services
 import ipcService from '@/services/ipc.service';
+
+// utilities
+import { setupLanguage } from '@/utils/language';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -20,8 +22,7 @@ interface ProvidersProps {
 
 const Providers = ({ children }: ProvidersProps) => {
   useEffect(() => {
-    const language = localStorage.getItem('language') as LanguageKey;
-    if (language) i18n.changeLanguage(language);
+    setupLanguage();
   }, []);
 
   useEffect(() => {

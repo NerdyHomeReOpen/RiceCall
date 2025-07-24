@@ -1,8 +1,10 @@
 import { TFunction } from 'i18next';
-import i18n from '@/i18n';
+import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
 
 // Types
 import { Permission } from '@/types';
+
+const FREE_IP_API_URL = process.env.NEXT_PUBLIC_FREE_IP_API_URL;
 
 export const getPermissionText = (t: TFunction<'translation', undefined>, permission: number): string => {
   const permissionMap: Record<number, string> = {
@@ -69,4 +71,25 @@ export const getFormatTimestamp = (t: TFunction<'translation', undefined>, times
     return `${t('yesterday')} ${timeString}`;
   }
   return `${messageDate.toLocaleDateString(timezoneLang)} ${timeString}`;
+};
+
+export const getLangByIp = async (): Promise<LanguageKey> => {
+  const response = await fetch(`${FREE_IP_API_URL}/json`);
+  if (!response.ok) return 'en';
+
+  const data = await response.json();
+
+  const lang: string | undefined = data.languages?.[0];
+  if (!lang) return 'en';
+
+  const match = LANGUAGES.find(({ code }) => code.includes(lang));
+  if (!match) return 'en';
+
+  return match.code;
+};
+
+export const setupLanguage = async () => {
+  const language = localStorage.getItem('language') || (await getLangByIp());
+  localStorage.setItem('language', language);
+  i18n.changeLanguage(language);
 };

@@ -1,6 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en' | 'ja' | 'fa' | 'pt-BR' | 'ru' | 'es-ES';
+export const LANGUAGES: { code: LanguageKey }[] = [
+  { code: 'zh-TW'},
+  { code: 'zh-CN'},
+  { code: 'en'},
+  { code: 'ru'},
+  { code: 'pt-BR'},
+  { code: 'ja'},
+  { code: 'es-ES'},
+  { code: 'fa' },
+];
+
 
 import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
