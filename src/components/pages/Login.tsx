@@ -5,7 +5,6 @@ import styles from '@/styles/pages/login.module.css';
 
 // Services
 import authService from '@/services/auth.service';
-import ipcService from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
