@@ -5,6 +5,13 @@ import { useSocket } from '@/providers/Socket';
 
 // Services
 import ipcService from '@/services/ipc.service';
+import { sfuService } from '@/services/sfu.service';
+import * as mediasoupClient from 'mediasoup-client';
+import { onceSfu } from '@/utils/sfuOnce.helper';
+
+let device: mediasoupClient.Device | null = null;
+let sendTransport: mediasoupClient.types.Transport | null = null;
+let recvTransport: mediasoupClient.types.Transport | null = null;
 
 // Types
 import { Data, Offer, Answer, IceCandidate, SpeakingMode } from '@/types';

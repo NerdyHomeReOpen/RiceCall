@@ -354,7 +354,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
     });
   } else {
     mainWindow.loadURL(`${BASE_URI}`);
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('close', (e) => {

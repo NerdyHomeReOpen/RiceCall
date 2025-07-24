@@ -58,7 +58,8 @@
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "socket.io-client": "^4.8.1",
-    "twemoji": "^14.0.2"
+    "twemoji": "^14.0.2",
+    "mediasoup-client": "^3.12.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
