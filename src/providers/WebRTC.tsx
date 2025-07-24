@@ -462,6 +462,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     removePeerConnection(userId);
   };
 
+  const handleDisconnectServer = async() => {
+    console.log('DISCONNECT FROM SERVER SFU');
+    cleanupAudioElements();
+    sfuService.disconnect();
+  };
+
   const handleRTCOffer = async ({ from: socketId, userId, offer }: Offer) => {
     if (!peerConnections.current[userId]) {
       console.warn(`Connection (${userId}) not found, creating`);
@@ -961,6 +967,7 @@ const createSFUPeerConnection = async (channelId: string, userId: string) => {
 
     const eventHandlers = {
       [SocketServerEvent.RTC_JOIN]: handleRTCJoin,
+      [SocketServerEvent.RTC_SHUTDOWN]: handleDisconnectServer,
       [SocketServerEvent.RTC_LEAVE]: handleRTCLeave,
       [SocketServerEvent.RTC_OFFER]: handleRTCOffer,
       [SocketServerEvent.RTC_ANSWER]: handleRTCAnswer,

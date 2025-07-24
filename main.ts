@@ -110,7 +110,7 @@ export enum SocketClientEvent {
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
-  RTC_ICE_CANDIDATE = 'RTCIceCandidate',
+  RTC_ICE_CANDIDATE = 'RTCIceCandidate',  
   // Echo
   PING = 'ping',
 }
@@ -172,6 +172,7 @@ export enum SocketServerEvent {
   RTC_ICE_CANDIDATE = 'RTCIceCandidate',
   RTC_JOIN = 'RTCJoin',
   RTC_LEAVE = 'RTCLeave',
+  RTC_SHUTDOWN = 'RTCShutdown',
   // Play Sound
   PLAY_SOUND = 'playSound',
   // Echo

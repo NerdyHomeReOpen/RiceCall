@@ -335,6 +335,7 @@ export enum SocketServerEvent {
   RTC_ICE_CANDIDATE = 'RTCIceCandidate',
   RTC_JOIN = 'RTCJoin',
   RTC_LEAVE = 'RTCLeave',
+  RTC_SHUTDOWN = 'RTCShutdown',
   // Play Sound
   PLAY_SOUND = 'playSound',
   // Echo
