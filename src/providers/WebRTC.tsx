@@ -8,10 +8,18 @@ import { SocketServerEvent } from '@/types';
 
 // Services
 import ipcService from '@/services/ipc.service';
+import { sfuService } from '@/services/sfu.service';
+import * as mediasoupClient from 'mediasoup-client';
+import { onceSfu } from '@/utils/sfuOnce.helper';
+
+let device: mediasoupClient.Device | null = null;
+let sendTransport: mediasoupClient.types.Transport | null = null;
+let recvTransport: mediasoupClient.types.Transport | null = null;
 
 type Data = {
   from: string;
   userId: string;
+  channelId: string;
 };
 
 type Offer = {
@@ -110,6 +118,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const mixGainNode = useRef<GainNode | null>(null);
   const musicGainNode = useRef<GainNode | null>(null);
   const destinationNode = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const sfuPeerConnection = useRef<RTCPeerConnection | null>(null);
+
 
   // Hooks
   const socket = useSocket();
@@ -435,12 +445,16 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     });
   };
 
-  const handleRTCJoin = async ({ from: socketId, userId }: Data) => {
-    if (peerConnections.current[userId]) removePeerConnection(userId);
-    createPeerConnection(userId, socketId);
-    const offer = await peerConnections.current[userId].createOffer();
-    await peerConnections.current[userId].setLocalDescription(offer);
-    handleSendRTCOffer(socketId, offer);
+  const handleRTCJoin = async ({ from: socketId, userId, channelId }: Data) => {
+    // if (peerConnections.current[userId]) removePeerConnection(userId);
+    // createPeerConnection(userId, socketId);
+    // const offer = await peerConnections.current[userId].createOffer();
+    // await peerConnections.current[userId].setLocalDescription(offer);
+    // handleSendRTCOffer(socketId, offer);
+    console.log('handleRTCJoin');
+     if (!sfuPeerConnection.current) {
+      createSFUPeerConnection(channelId, userId); // la función que crea y asigna sfuPeerConnection.current
+    }
   };
 
   const handleRTCLeave = async ({ userId }: Data) => {
@@ -602,6 +616,224 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       peerConnection.addTrack(processedAudioTrack, destinationNode.current.stream);
     }
   };
+
+  const consumedProducers = new Set<string>();
+let pendingProducers: string[] = [];
+let recvTransportReady = false;
+const audioElements: HTMLAudioElement[] = [];
+
+let newProducerListenerRegistered = false;
+let recvTransportCreating = false;
+
+const createSFUPeerConnection = async (channelId: string, userId: string) => {
+  console.log('createSFUPeerConnection');
+  if (typeof window === 'undefined') return;          // evita SSR
+  if (!destinationNode.current) return;
+
+  cleanupAudioElements();
+
+  // 0.  Crea o reutiliza Device
+  if (!device) {
+    const { Device } = await import('mediasoup-client');
+    device = new Device();
+  }
+
+  const localStream = destinationNode.current.stream;
+  const audioTrack = localStream.getAudioTracks()[0];
+  if (!audioTrack) return;
+
+  const clientId = userId;
+  const sendId = `${clientId}-${channelId}-send`;
+  const recvId = `${clientId}-${channelId}-recv`;
+
+  if (!sfuService.isConnected()) {
+    sfuService.connect('ws://localhost:1996');
+  }
+
+  /* ---------- SEND TRANSPORT ---------- */
+  onceSfu('createTransport', async (msg) => {
+    if (msg.sendId !== sendId) return;
+
+    if (!device!.loaded) {
+      await device!.load({ routerRtpCapabilities: msg.transportInfo.routerRtpCapabilities });
+    }
+
+    sendTransport = device!.createSendTransport(msg.transportInfo);
+
+    // Evita listeners duplicados
+    sendTransport.removeAllListeners('connect');
+    sendTransport.removeAllListeners('produce');
+
+    sendTransport.on('connect', ({ dtlsParameters }, cb) => {
+      onceSfu('connectTransportAck', () => {
+        console.log('connectTransportAck 1');
+        cb();
+      });
+      sfuService.send({
+        action: 'connectTransport',
+        transportId: sendTransport!.id,
+        dtlsParameters,
+        clientId,
+        channelId
+      });
+    });
+
+    sendTransport.on('produce', ({ kind, rtpParameters }, cb) => {
+      const prodId = `${clientId}-${channelId}-producer`;
+      onceSfu('produce', (res) => cb({ id: res.producer.id }));
+      sfuService.send({
+        action: 'produce',
+        id: prodId,
+        clientId,
+        transportId: sendTransport!.id,
+        kind,
+        rtpParameters,
+        channelId
+      });
+    });
+
+    await sendTransport.produce({ track: audioTrack });
+  });
+
+  // Pide creación del sendTransport
+  sfuService.send({ action: 'createTransport', id: sendId, clientId, channelId, direction: 'send' });
+
+  /* ---------- NEW PRODUCERS (listener único) ---------- */
+  if (!newProducerListenerRegistered) {
+    newProducerListenerRegistered = true;
+
+    sfuService.on('newProducer', ({ producerId, kind, channelId }) => {
+      if (!channelId || !producerId) return;
+      console.log('NEWPRODUCER: ', producerId);
+
+      if (!recvTransport && !recvTransportCreating) {
+        recvTransportCreating = true;
+        pendingProducers.push(producerId);
+        console.log('SIN recvTransport');
+
+        onceSfu('createTransport', async (msg) => {
+          recvTransportCreating = false; // reset flag
+          if (!device!.loaded) {
+            await device!.load({ routerRtpCapabilities: msg.transportInfo.routerRtpCapabilities });
+          }
+
+          recvTransport = device!.createRecvTransport(msg.transportInfo);
+
+          // Evita duplicados
+          recvTransport.removeAllListeners('connect');
+
+          recvTransport.on('connect', ({ dtlsParameters }, cb) => {
+            console.log('OnConnect createtransport newProducer');
+            onceSfu('connectTransportAck', () => {
+              console.log('connectTransportAck en newProducer');
+              recvTransportReady = true;
+              cb();
+            });
+            sfuService.send({
+              action: 'connectTransport',
+              transportId: recvTransport!.id,
+              dtlsParameters,
+              clientId,
+              channelId
+            });
+          });
+
+          flushPendingProducers();
+        });
+
+        console.log('createTransport SEND recv');
+        sfuService.send({ action: 'createTransport', id: recvId, clientId, channelId, direction: 'recv' });
+      } else if (recvTransportReady) {
+        console.log('Con recvTransportReady');
+        consumeProducer(producerId);
+      } else {
+        console.log('recvTransportReady: ', recvTransportReady);
+        if (recvTransportReady) {
+          flushPendingProducers();
+        } else {
+          consumeProducer(producerId);
+        }
+      }
+    });
+  }
+
+  function flushPendingProducers() {
+    console.log('flushPendingProducers');
+    while (pendingProducers.length > 0) {
+      const pId = pendingProducers.shift();
+      consumeProducer(pId!);
+    }
+  }
+
+  /* ---------- helper ---------- */
+  function consumeProducer(producerId: string) {
+    if (consumedProducers.has(producerId)) return;
+    if (!recvTransport) return;
+
+    onceSfu('consume', async (msg) => {
+      const { consumer } = msg;
+      const track = await recvTransport!.consume({
+        id: consumer.id,
+        producerId: consumer.producerId,
+        kind: consumer.kind,
+        rtpParameters: consumer.rtpParameters
+      });
+
+      if (!track || !track.track) {
+        console.warn('No se recibió track válido del consumer:', consumer);
+        return;
+      }
+
+      try {
+        await track.resume();
+      } catch (err) {
+        console.error('Error al hacer resume:', err);
+      }
+
+      const stream = new MediaStream([track.track]);
+
+      const audioEl = document.createElement('audio');
+      audioEl.autoplay = true;
+      audioEl.srcObject = stream;
+      audioEl.controls = true;
+      audioEl.muted = true;
+      document.body.appendChild(audioEl);
+      audioElements.push(audioEl);
+
+      audioEl.play().then(() => {
+        audioEl.muted = false;
+      }).catch(err => {
+        console.warn('Autoplay bloqueado:', err);
+      });
+
+      consumedProducers.add(producerId);
+      console.log('PLAY STREAM');
+    });
+
+    console.log('CONSUME SEND');
+    console.log(recvTransport.id);
+
+    sfuService.send({
+      action: 'consume',
+      id: `cons-${producerId}`,
+      clientId: clientId,
+      transportId: recvTransport.id,
+      producerId: producerId,
+      rtpCapabilities: device!.rtpCapabilities,
+      channelId: channelId
+    });
+  }
+};
+
+ function cleanupAudioElements() {
+    audioElements.forEach((el) => {
+      el.pause();
+      el.srcObject = null;
+      el.remove();
+    });
+    audioElements.length = 0;    
+    consumedProducers.clear();
+  }
 
   useEffect(() => {
     const localMicVolume = window.localStorage.getItem('mic-volume');
