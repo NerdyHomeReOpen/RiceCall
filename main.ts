@@ -1085,10 +1085,6 @@ app.on('ready', async () => {
     event.reply('receive-channel-message-sound', store.get('receiveChannelMessageSound') ?? true);
   });
 
-  ipcMain.on('get-system-locale', (event) => {
-    event.reply('system-locale', { primary: app.getLocale(), all: app.getPreferredSystemLanguages() });
-  });
-
   // Basic
   ipcMain.on('set-auto-launch', (_, enable) => {
     setAutoLaunch(enable);

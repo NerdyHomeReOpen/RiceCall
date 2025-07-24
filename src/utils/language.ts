@@ -79,7 +79,7 @@ export const getLangByIp = async (): Promise<LanguageKey> => {
 
   const data = await response.json();
 
-  let lang: string | undefined = data.languages?.[0];
+  const lang: string | undefined = data.languages?.[0];
   if (!lang) return 'en';
 
   const match = LANGUAGES.find(({ code }) => code.includes(lang));
@@ -92,4 +92,4 @@ export const setupLanguage = async () => {
   const language = localStorage.getItem('language') || (await getLangByIp());
   localStorage.setItem('language', language);
   i18n.changeLanguage(language);
-}
+};
