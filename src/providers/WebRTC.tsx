@@ -667,8 +667,8 @@ const createSFUPeerConnection = async (channelId: string, userId: string) => {
     sendTransport = device!.createSendTransport(msg.transportInfo);
 
     // Evita listeners duplicados
-    sendTransport.removeAllListeners('connect');
-    sendTransport.removeAllListeners('produce');
+    // sendTransport.removeAllListeners('connect');
+    // sendTransport.removeAllListeners('produce');
 
     sendTransport.on('connect', ({ dtlsParameters }, cb) => {
       onceSfu('connectTransportAck', () => {
@@ -727,7 +727,7 @@ const createSFUPeerConnection = async (channelId: string, userId: string) => {
           recvTransport = device!.createRecvTransport(msg.transportInfo);
 
           // Evita duplicados
-          recvTransport.removeAllListeners('connect');
+          // recvTransport.removeAllListeners('connect');
 
           recvTransport.on('connect', ({ dtlsParameters }, cb) => {
             console.log('OnConnect createtransport newProducer');
@@ -826,8 +826,7 @@ const createSFUPeerConnection = async (channelId: string, userId: string) => {
       clientId: clientId,
       transportId: transportId,
       producerId: producerId,
-      rtpCapabilities: device!.rtpCapabilities,
-      channelId: channelId
+      rtpCapabilities: device!.rtpCapabilities
     });
   }
 };
