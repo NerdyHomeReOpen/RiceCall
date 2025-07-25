@@ -12,7 +12,7 @@ import header from '@/styles/header.module.css';
 import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication, RecommendedServers } from '@/types';
 
 // i18n
-import i18n, { LanguageKey } from '@/i18n';
+import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
 
 // Pages
 import FriendPage from '@/components/pages/Friend';
@@ -282,48 +282,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
                 label: t('language-select'),
                 icon: 'submenu',
                 hasSubmenu: true,
-                submenuItems: [
-                  {
-                    id: 'language-select-tw',
-                    label: '繁體中文',
-                    onClick: () => handleLanguageChange('zh-TW'),
-                  },
-                  {
-                    id: 'language-select-cn',
-                    label: '简体中文',
-                    onClick: () => handleLanguageChange('zh-CN'),
-                  },
-                  {
-                    id: 'language-select-en',
-                    label: 'English',
-                    onClick: () => handleLanguageChange('en'),
-                  },
-                  {
-                    id: 'language-select-jp',
-                    label: '日本語',
-                    onClick: () => handleLanguageChange('ja'),
-                  },
-                  {
-                    id: 'language-select-fa',
-                    label: 'فارسی',
-                    onClick: () => handleLanguageChange('fa'),
-                  },
-                  {
-                    id: 'language-select-br',
-                    label: 'Português',
-                    onClick: () => handleLanguageChange('pt-BR'),
-                  },
-                  {
-                    id: 'language-select-ru',
-                    label: 'Русский',
-                    onClick: () => handleLanguageChange('ru'),
-                  },
-                  {
-                    id: 'language-select-es',
-                    label: 'Español',
-                    onClick: () => handleLanguageChange('es-ES'),
-                  },
-                ],
+                submenuItems: LANGUAGES.map((language) => ({
+                  id: `language-select-${language.code}`,
+                  label: language.label,
+                  onClick: () => handleLanguageChange(language.code),
+                })),
               },
               {
                 id: 'help-center',

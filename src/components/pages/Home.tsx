@@ -26,12 +26,7 @@ const SearchResultItem: React.FC<{
   onClick: () => void;
 }> = ({ server, onClick }) => (
   <div className={homePage['item']} onClick={onClick}>
-    <div
-      className={homePage['server-avatar-picture']}
-      style={{
-        backgroundImage: `url(${server.avatarUrl})`,
-      }}
-    />
+    <div className={homePage['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
     <div className={homePage['server-info-text']}>
       <div className={homePage['server-name-text']}>{server.name}</div>
       <div className={homePage['server-id-box']}>
