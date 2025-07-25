@@ -624,7 +624,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   };
 
   const consumedProducers = new Set<string>();
-let pendingProducers: string[] = [];
+let pendingProducers: { producerId: string; transportId: string }[] = [];
 let recvTransportReady = false;
 const audioElements: HTMLAudioElement[] = [];
 
@@ -708,13 +708,14 @@ const createSFUPeerConnection = async (channelId: string, userId: string) => {
   if (!newProducerListenerRegistered) {
     newProducerListenerRegistered = true;
 
-    sfuService.on('newProducer', ({ producerId, kind, channelId }) => {
+    sfuService.on('newProducer', ({ producerId, kind, channelId, transportId }) => {
       if (!channelId || !producerId) return;
       console.log('NEWPRODUCER: ', producerId);
+      console.log('TRANSPORTID:', transportId);
 
       if (!recvTransport && !recvTransportCreating) {
         recvTransportCreating = true;
-        pendingProducers.push(producerId);
+        pendingProducers.push({producerId, transportId});
         console.log('SIN recvTransport');
 
         onceSfu('createTransport', async (msg) => {
@@ -751,13 +752,13 @@ const createSFUPeerConnection = async (channelId: string, userId: string) => {
         sfuService.send({ action: 'createTransport', id: recvId, clientId, channelId, direction: 'recv' });
       } else if (recvTransportReady) {
         console.log('Con recvTransportReady');
-        consumeProducer(producerId);
+        consumeProducer(producerId, transportId);
       } else {
         console.log('recvTransportReady: ', recvTransportReady);
         if (recvTransportReady) {
           flushPendingProducers();
         } else {
-          consumeProducer(producerId);
+          consumeProducer(producerId, transportId);
         }
       }
     });
@@ -766,13 +767,13 @@ const createSFUPeerConnection = async (channelId: string, userId: string) => {
   function flushPendingProducers() {
     console.log('flushPendingProducers');
     while (pendingProducers.length > 0) {
-      const pId = pendingProducers.shift();
-      consumeProducer(pId!);
+      const producer = pendingProducers.shift();
+      consumeProducer(producer!.producerId, producer!.transportId);
     }
   }
 
   /* ---------- helper ---------- */
-  function consumeProducer(producerId: string) {
+  function consumeProducer(producerId: string, transportId: string) {
     if (consumedProducers.has(producerId)) return;
     if (!recvTransport) return;
 
@@ -817,13 +818,13 @@ const createSFUPeerConnection = async (channelId: string, userId: string) => {
     });
 
     console.log('CONSUME SEND');
-    console.log(recvTransport.id);
+    console.log(transportId);
 
     sfuService.send({
       action: 'consume',
       id: `cons-${producerId}`,
       clientId: clientId,
-      transportId: recvTransport.id,
+      transportId: transportId,
       producerId: producerId,
       rtpCapabilities: device!.rtpCapabilities,
       channelId: channelId
