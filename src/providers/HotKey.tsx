@@ -1,4 +1,4 @@
-import React, { useContext, createContext, ReactNode, useRef, useState, useEffect } from 'react';
+import React, { useContext, createContext, ReactNode, useRef, useEffect, useCallback } from 'react';
 
 // Providers
 import { useWebRTC } from '@/providers/WebRTC';
@@ -8,9 +8,7 @@ import ipcService from '@/services/ipc.service';
 
 const BASE_VOLUME = 5;
 
-type HotkeyAction = (e: KeyboardEvent) => void;
-
-const HotKeyContext = createContext<Map<string, HotkeyAction>>(new Map());
+const HotKeyContext = createContext<Map<string, () => void>>(new Map());
 
 export const useHotKey = () => {
   const context = useContext(HotKeyContext);
@@ -27,66 +25,45 @@ const HotKeyProvider = ({ children }: HotKeyProviderProps) => {
   const webRTC = useWebRTC();
 
   // Ref
-  const hotkeyMapRef = useRef<Map<string, HotkeyAction>>(new Map());
-
-  // State
-  const [hotKeys, setHotKeys] = useState<Record<string, string>>({
-    speakingKey: 'v',
-    openMainWindow: 'F1',
-    increaseVolume: 'Ctrl+m',
-    decreaseVolume: 'Shift+m',
-    toggleSpeaker: 'Alt+m',
-    toggleMicrophone: 'Alt+v',
-  });
+  const speakingKeyRef = useRef<string>('v');
+  const openMainWindowKeyRef = useRef<string>('F1');
+  const increaseVolumeKeyRef = useRef<string>('Ctrl+m');
+  const decreaseVolumeKeyRef = useRef<string>('Shift+m');
+  const toggleSpeakerKeyRef = useRef<string>('Alt+m');
+  const toggleMicrophoneKeyRef = useRef<string>('Alt+v');
 
   // Handlers
-  const updateHotkey = (index: string, key: string): void => {
-    setHotKeys((prev) => {
-      const newState = { ...prev };
-      newState[index] = key;
-      return newState;
-    });
-  };
+  const toggleSpeak = useCallback(() => {
+    console.log('[Action] toggleSpeak');
+  }, []);
 
-  const toggleSpeak = () => {};
+  const toggleMainWindows = useCallback(() => {
+    console.log('[Action] toggleMainWindows');
+  }, []);
 
-  const toggleMainWindows = () => {};
-
-  const toggleUpVolume = () => {
+  const toggleUpVolume = useCallback(() => {
     console.log('[Action] toggleUpVolume');
     const newValue = Math.min(100, webRTC.speakerVolume + BASE_VOLUME);
     webRTC.handleEditSpeakerVolume(newValue);
     console.log('[Up]', webRTC.speakerVolume, '=>', newValue);
-  };
+  }, [webRTC]);
 
-  const toggleDownVolume = () => {
+  const toggleDownVolume = useCallback(() => {
     console.log('[Action] toggleDownVolume');
     const newValue = Math.max(0, webRTC.speakerVolume - BASE_VOLUME);
     webRTC.handleEditSpeakerVolume(newValue);
     console.log('[Down]', webRTC.speakerVolume, '=>', newValue);
-  };
+  }, [webRTC]);
 
-  const toggleSpeakerMute = () => {
+  const toggleSpeakerMute = useCallback(() => {
     console.log('[Action] toggleSpeakerMute');
-    if (webRTC.speakerVolume === 0) {
-      const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
-      webRTC.handleEditSpeakerVolume(prevVolume);
-    } else {
-      localStorage.setItem('previous-speaker-volume', webRTC.speakerVolume.toString());
-      webRTC.handleEditSpeakerVolume(0);
-    }
-  };
+    webRTC.handleToggleSpeakerMute();
+  }, [webRTC]);
 
-  const toggleMicMute = () => {
+  const toggleMicMute = useCallback(() => {
     console.log('[Action] toggleMicMute');
-    if (webRTC.speakerVolume === 0) {
-      const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
-      webRTC.handleEditMicVolume(prevVolume);
-    } else {
-      localStorage.setItem('previous-mic-volume', webRTC.micVolume.toString());
-      webRTC.handleEditMicVolume(0);
-    }
-  };
+    webRTC.handleToggleMicMute();
+  }, [webRTC]);
 
   // Effects
   useEffect(() => {
@@ -99,39 +76,27 @@ const HotKeyProvider = ({ children }: HotKeyProviderProps) => {
 
     const offUpdateDefaultSpeakingKey = ipcService.systemSettings.defaultSpeakingKey.onUpdate((key) => {
       console.log('[update] speakingKey', key);
-      hotkeyMapRef.current.delete(hotKeys.speakingKey);
-      hotkeyMapRef.current.set(key, toggleSpeak);
-      updateHotkey('speakingKey', key);
+      speakingKeyRef.current = key;
     });
     const offUpdateHotKeyOpenMainWindow = ipcService.systemSettings.hotKeyOpenMainWindow.onUpdate((key) => {
       console.log('[update] openMainWindow', key);
-      hotkeyMapRef.current.delete(hotKeys.openMainWindow);
-      hotkeyMapRef.current.set(key, toggleMainWindows);
-      updateHotkey('openMainWindow', key);
+      openMainWindowKeyRef.current = key;
     });
     const offUpdateHotKeyIncreaseVolume = ipcService.systemSettings.hotKeyIncreaseVolume.onUpdate((key) => {
       console.log('[update] increaseVolume', key);
-      hotkeyMapRef.current.delete(hotKeys.increaseVolume);
-      hotkeyMapRef.current.set(key, toggleUpVolume);
-      updateHotkey('increaseVolume', key);
+      increaseVolumeKeyRef.current = key;
     });
     const offUpdateHotKeyDecreaseVolume = ipcService.systemSettings.hotKeyDecreaseVolume.onUpdate((key) => {
       console.log('[update] decreaseVolume', key);
-      hotkeyMapRef.current.delete(hotKeys.decreaseVolume);
-      hotkeyMapRef.current.set(key, toggleDownVolume);
-      updateHotkey('decreaseVolume', key);
+      decreaseVolumeKeyRef.current = key;
     });
     const offUpdateHotKeyToggleSpeaker = ipcService.systemSettings.hotKeyToggleSpeaker.onUpdate((key) => {
       console.log('[update] toggleSpeaker', key);
-      hotkeyMapRef.current.delete(hotKeys.toggleSpeaker);
-      hotkeyMapRef.current.set(key, toggleMicMute);
-      updateHotkey('toggleSpeaker', key);
+      toggleSpeakerKeyRef.current = key;
     });
     const offUpdateHotKeyToggleMicrophone = ipcService.systemSettings.hotKeyToggleMicrophone.onUpdate((key) => {
       console.log('[update] toggleMicrophone', key);
-      hotkeyMapRef.current.delete(hotKeys.toggleMicrophone);
-      hotkeyMapRef.current.set(key, toggleSpeakerMute);
-      updateHotkey('toggleMicrophone', key);
+      toggleMicrophoneKeyRef.current = key;
     });
 
     return () => {
@@ -162,19 +127,33 @@ const HotKeyProvider = ({ children }: HotKeyProviderProps) => {
       parts.push(key.length === 1 ? key.toLowerCase() : key);
       const mergeKey = parts.join('+');
 
-      const action = hotkeyMapRef.current.get(mergeKey);
-      console.log(mergeKey);
-      if (action) {
-        e.preventDefault();
-        action(e);
+      switch (mergeKey) {
+        case speakingKeyRef.current:
+          toggleSpeak();
+          break;
+        case openMainWindowKeyRef.current:
+          toggleMainWindows();
+          break;
+        case increaseVolumeKeyRef.current:
+          toggleUpVolume();
+          break;
+        case decreaseVolumeKeyRef.current:
+          toggleDownVolume();
+          break;
+        case toggleSpeakerKeyRef.current:
+          toggleSpeakerMute();
+          break;
+        case toggleMicrophoneKeyRef.current:
+          toggleMicMute();
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [toggleSpeak, toggleMainWindows, toggleUpVolume, toggleDownVolume, toggleSpeakerMute, toggleMicMute]);
 
-  return <HotKeyContext.Provider value={hotkeyMapRef.current}>{children}</HotKeyContext.Provider>;
+  return <HotKeyContext.Provider value={new Map()}>{children}</HotKeyContext.Provider>;
 };
 
 HotKeyProvider.displayName = 'HotKeyProvider';

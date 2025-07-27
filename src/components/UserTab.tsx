@@ -93,12 +93,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   // Handlers
   const handleMuteUser = (userId: User['userId']) => {
     if (!webRTC) return;
-    webRTC.handleMute(userId);
+    webRTC.handleMuteUser(userId);
   };
 
   const handleUnmuteUser = (userId: User['userId']) => {
     if (!webRTC) return;
-    webRTC.handleUnmute(userId);
+    webRTC.handleUnmuteUser(userId);
   };
 
   const handleKickServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {

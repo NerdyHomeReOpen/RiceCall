@@ -122,7 +122,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
     [isResizingAnnouncementArea],
   );
 
-  const toggleSpeakerMute = () => {
+  const handleToggleSpeakerMute = () => {
+    if (!webRTC) return;
     if (webRTC.speakerVolume === 0) {
       const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
       webRTC.handleEditSpeakerVolume(prevVolume);
@@ -132,7 +133,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
     }
   };
 
-  const toggleMicMute = () => {
+  const handleEditSpeakerVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const volume = parseInt(e.target.value);
+    webRTC.handleEditSpeakerVolume(volume);
+  };
+
+  const handleToggleMicMute = () => {
+    if (!webRTC) return;
     if (webRTC.micVolume === 0) {
       const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
       webRTC.handleEditMicVolume(prevVolume);
@@ -140,6 +147,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
       localStorage.setItem('previous-mic-volume', webRTC.micVolume.toString());
       webRTC.handleEditMicVolume(0);
     }
+  };
+
+  const handleEditMicVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!webRTC) return;
+    const volume = parseInt(e.target.value);
+    webRTC.handleEditMicVolume(volume);
+  };
+
+  const handleToggleTakeMic = () => {
+    if (!webRTC) return;
+    webRTC.handleToggleTakeMic();
   };
 
   // Effects
@@ -325,11 +343,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                 {channelVoiceMode === 'queue' ? t('queue') : channelVoiceMode === 'free' ? t('free-speech') : channelVoiceMode === 'forbidden' ? t('forbid-speech') : ''}
               </div>
             </div>
-            <div className={`${styles['mic-button']} ${webRTC.isMute ? '' : styles['active']}`} onClick={() => webRTC.handleToggleMute()}>
+            <div className={`${styles['mic-button']} ${webRTC.isMicTaken ? styles['active'] : ''}`} onClick={handleToggleTakeMic}>
               <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent / 10) - 1}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div className={styles['mic-text']}>{webRTC.isMute ? t('take-mic') : t('taken-mic')}</div>
-                <div className={styles['mic-sub-text']}>{!webRTC.isMute && webRTC.micVolume === 0 ? t('mic-muted') : ''}</div>
+                <div className={styles['mic-text']}>{webRTC.isMicTaken ? t('taken-mic') : t('take-mic')}</div>
+                <div className={styles['mic-sub-text']}>{webRTC.isMicTaken && webRTC.micVolume === 0 ? t('mic-muted') : ''}</div>
               </div>
             </div>
             <div className={styles['buttons']}>
@@ -337,7 +355,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
               <div className={styles['saperator-1']} />
               <div className={styles['mic-volume-container']}>
                 <div
-                  className={`${styles['mic-mode-btn']} ${webRTC.isMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`}
+                  className={`${styles['mic-mode-btn']} ${webRTC.isMicMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`}
                   onMouseEnter={(e) => {
                     e.stopPropagation();
                     setShowMicVolume(true);
@@ -352,9 +370,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                     }}
                   >
                     <div className={styles['slider-container']}>
-                      <input className={styles['slider']} type="range" min="0" max="200" value={webRTC.micVolume} onChange={(e) => webRTC.handleEditMicVolume?.(parseInt(e.target.value))} />
+                      <input className={styles['slider']} type="range" min="0" max="200" value={webRTC.micVolume} onChange={handleEditMicVolume} />
                     </div>
-                    <div className={`${styles['mic-mode-btn']} ${webRTC.isMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} onClick={toggleMicMute} />
+                    <div className={`${styles['mic-mode-btn']} ${webRTC.isMicMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} onClick={handleToggleMicMute} />
                   </div>
                 )}
               </div>
@@ -375,10 +393,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                     }}
                   >
                     <div className={styles['slider-container']}>
-                      <input type="range" min="0" max="100" value={webRTC.speakerVolume} onChange={(e) => webRTC.handleEditSpeakerVolume(parseInt(e.target.value))} className={styles['slider']} />
+                      <input type="range" min="0" max="100" value={webRTC.speakerVolume} onChange={handleEditSpeakerVolume} className={styles['slider']} />
                     </div>
-
-                    <div className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} onClick={toggleSpeakerMute} />
+                    <div className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} onClick={handleToggleSpeakerMute} />
                   </div>
                 )}
               </div>
