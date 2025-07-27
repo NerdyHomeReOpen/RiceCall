@@ -1048,12 +1048,12 @@ app.on('ready', async () => {
     event.reply('hot-key-decrease-volume', store.get('hotKeyDecreaseVolume') || '');
   });
 
-  ipcMain.on('get-hot-key-disable-speaker', (event) => {
-    event.reply('hot-key-disable-speaker', store.get('hotKeyDisableSpeaker') || '');
+  ipcMain.on('get-hot-key-toggle-speaker', (event) => {
+    event.reply('hot-key-toggle-speaker', store.get('hotKeyToggleSpeaker') || '');
   });
 
-  ipcMain.on('get-hot-key-disable-microphone', (event) => {
-    event.reply('hot-key-disable-microphone', store.get('hotKeyDisableMicrophone') || '');
+  ipcMain.on('get-hot-key-toggle-microphone', (event) => {
+    event.reply('hot-key-toggle-microphone', store.get('hotKeyToggleMicrophone') || '');
   });
 
   // SoundEffect

@@ -27,6 +27,7 @@ import Default from '@/utils/default';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
+import HotKeyProvider from '@/providers/HotKey';
 import ExpandedProvider from '@/providers/FindMe';
 import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
@@ -647,28 +648,30 @@ const RootPageComponent = () => {
 
   return (
     <WebRTCProvider>
-      <ExpandedProvider>
-        <Header user={user} userServer={server} friendApplications={friendApplications} />
-        {!socket.isConnected ? (
-          <LoadingSpinner />
-        ) : (
-          <>
-            <HomePage user={user} servers={servers} recommendedServers={recommendedServers} display={mainTab.selectedTabId === 'home'} />
-            <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
-            <ServerPage
-              user={user}
-              currentServer={server}
-              currentChannel={channel}
-              friends={friends}
-              serverMembers={serverMembers}
-              serverChannels={serverChannels}
-              channelMessages={channelMessages}
-              actionMessages={actionMessages}
-              display={mainTab.selectedTabId === 'server'}
-            />
-          </>
-        )}
-      </ExpandedProvider>
+      <HotKeyProvider>
+        <ExpandedProvider>
+          <Header user={user} userServer={server} friendApplications={friendApplications} />
+          {!socket.isConnected ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <HomePage user={user} servers={servers} recommendedServers={recommendedServers} display={mainTab.selectedTabId === 'home'} />
+              <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
+              <ServerPage
+                user={user}
+                currentServer={server}
+                currentChannel={channel}
+                friends={friends}
+                serverMembers={serverMembers}
+                serverChannels={serverChannels}
+                channelMessages={channelMessages}
+                actionMessages={actionMessages}
+                display={mainTab.selectedTabId === 'server'}
+              />
+            </>
+          )}
+        </ExpandedProvider>
+      </HotKeyProvider>
     </WebRTCProvider>
   );
 };
