@@ -24,11 +24,11 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [autoLaunch, setAutoLaunch] = useState<boolean>(false);
   const [autoLogin, setAutoLogin] = useState<boolean>(false);
   const [alwaysOnTop, setAlwaysOnTop] = useState<boolean>(false);
-  const [statusAutoIdle, setStatusAutoIdle] = useState<boolean>(false);
+  const [statusAutoIdle, setStatusAutoIdle] = useState<boolean>(true);
   const [statusAutoIdleMinutes, setStatusAutoIdleMinutes] = useState<number>(10);
   const [statusAutoDnd, setStatusAutoDnd] = useState<boolean>(false);
   const [channelUIMode, setChannelUIMode] = useState<'classic' | 'three-line' | 'auto'>('auto');
-  const [closeToTray, setCloseToTray] = useState<boolean>(false);
+  const [closeToTray, setCloseToTray] = useState<boolean>(true);
   const [fontSize, setFontSize] = useState<number>(13);
   const [fontFamily, setFontFamily] = useState<string>('Arial');
   const [fontList, setFontList] = useState<string[]>([]);
@@ -60,8 +60,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(false);
 
   const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>('F1');
-  const [hotKeyIncreaseVolume, setHotKeyIncreaseVolume] = useState<string>('Ctrl+m');
-  const [hotKeyDecreaseVolume, setHotKeyDecreaseVolume] = useState<string>('Shift+m');
+  const [hotKeyIncreaseVolume, setHotKeyIncreaseVolume] = useState<string>('PageUp');
+  const [hotKeyDecreaseVolume, setHotKeyDecreaseVolume] = useState<string>('PageDown');
   const [hotKeyToggleSpeaker, setHotKeyToggleSpeaker] = useState<string>('Alt+m');
   const [hotKeyToggleMicrophone, setHotKeyToggleMicrophone] = useState<string>('Alt+v');
 
@@ -90,8 +90,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
     () => ({
       speakingKey: { default: 'v', setFunc: setDefaultSpeakingKey },
       openMainWindow: { default: 'F1', setFunc: setHotKeyOpenMainWindow },
-      increaseVolume: { default: 'Ctrl+m', setFunc: setHotKeyIncreaseVolume },
-      decreaseVolume: { default: 'Shift+m', setFunc: setHotKeyDecreaseVolume },
+      increaseVolume: { default: 'PageUp', setFunc: setHotKeyIncreaseVolume },
+      decreaseVolume: { default: 'PageDown', setFunc: setHotKeyDecreaseVolume },
       toggleSpeaker: { default: 'Alt+m', setFunc: setHotKeyToggleSpeaker },
       toggleMicrophone: { default: 'Alt+v', setFunc: setHotKeyToggleMicrophone },
     }),
@@ -283,7 +283,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <input name="autoLaunch" type="checkbox" checked={autoLaunch} onChange={(e) => setAutoLaunch(e.target.checked)} />
                 <div className={popup['label']}>{t('auto-launch-label')}</div>
               </div>
-              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="alwaysOnTop" type="checkbox" checked={alwaysOnTop} onChange={(e) => setAlwaysOnTop(e.target.checked)} />
                 <div className={popup['label']}>{t('always-on-top-label')}</div>
               </div>
@@ -318,9 +318,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             {/* Channel Setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('channel-setting') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('channel-setting')}</div>
             </div>
-            <div className={`${popup['input-group']} ${'disabled'}`}>
+            <div className={`${popup['input-group']}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="channel-classic-mode" type="radio" checked={channelUIMode === 'classic'} onChange={() => setChannelUIMode('classic')} />
                 <div className={popup['label']}>{t('channel-classic-mode-label')}</div>
@@ -489,7 +489,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             <div className={popup['header']}>
               <div className={popup['label']}>{t('default-speaking-mode-label')}</div>
             </div>
-            <div className={`${popup['input-group']} ${'disabled'}`}>
+            <div className={`${popup['input-group']}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="default-speaking-auto" type="radio" checked={defaultSpeakingMode === 'key'} onChange={() => setDefaultSpeakingMode('key')} />
                 <div className={popup['label']}>{t('default-speaking-key-label')}</div>
@@ -589,9 +589,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           <div className={popup['col']}>
             {/* Hot Key Settings */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('hot-key-setting') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('hot-key-setting')}</div>
             </div>
-            <div className={`${popup['input-group']} ${'disabled'}`}>
+            <div className={`${popup['input-group']}`}>
               <div key={'openMainWindow'} className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('hot-key-open-main-window-label')}</div>
                 <input

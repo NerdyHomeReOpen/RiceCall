@@ -220,7 +220,7 @@ export type DiscordPresence = {
   }[];
 };
 
-export type speakingMode = 'key' | 'auto';
+export type speakingType = 'key' | 'auto';
 
 export type mixMode = 'all' | 'app';
 

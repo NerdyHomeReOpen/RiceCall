@@ -525,7 +525,10 @@ async function createPopup(type: PopupType, id: string, force = true): Promise<B
   popups[id].show();
   popups[id].focus();
   popups[id].setAlwaysOnTop(true);
-  popups[id].setAlwaysOnTop(false);
+  const isAlwaysOnTop = store.get('alwaysOnTop') ?? false;
+  if (!isAlwaysOnTop) {
+    popups[id].setAlwaysOnTop(false);
+  }
 
   return popups[id];
 }
@@ -1131,6 +1134,7 @@ app.on('ready', async () => {
   ipcMain.on('set-always-on-top', (_, enable) => {
     store.set('alwaysOnTop', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
+      window.setAlwaysOnTop(enable);
       window.webContents.send('always-on-top', enable);
     });
   });

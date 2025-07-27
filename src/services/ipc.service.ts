@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DiscordPresence, PopupType, SocketClientEvent, SocketServerEvent, speakingMode, mixMode, channelUIMode } from '@/types';
+import { DiscordPresence, PopupType, SocketClientEvent, SocketServerEvent, speakingType, mixMode, channelUIMode } from '@/types';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
@@ -218,7 +218,7 @@ const ipcService = {
         mixMode: mixMode;
 
         // Voice settings
-        speakingMode: speakingMode;
+        speakingMode: speakingType;
         defaultSpeakingKey: string;
 
         // Privacy settings
@@ -721,22 +721,22 @@ const ipcService = {
     // Voice settings
 
     speakingMode: {
-      get: (callback: (key: speakingMode) => void) => {
+      get: (callback: (key: speakingType) => void) => {
         if (!isElectron) return;
         ipcRenderer.send('get-speaking-mode');
-        ipcRenderer.once('speaking-mode', (_: any, key: speakingMode) => {
+        ipcRenderer.once('speaking-mode', (_: any, key: speakingType) => {
           callback(key);
         });
       },
 
-      set: (key: speakingMode) => {
+      set: (key: speakingType) => {
         if (!isElectron) return;
         ipcRenderer.send('set-speaking-mode', key);
       },
 
-      onUpdate: (callback: (key: speakingMode) => void) => {
+      onUpdate: (callback: (key: speakingType) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('speaking-mode', (_: any, key: speakingMode) => {
+        ipcRenderer.on('speaking-mode', (_: any, key: speakingType) => {
           callback(key);
         });
         return () => ipcRenderer.removeAllListeners('speaking-mode');
