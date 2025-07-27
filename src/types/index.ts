@@ -224,6 +224,8 @@ export type speakingMode = 'key' | 'auto';
 
 export type mixMode = 'all' | 'app';
 
+export type channelUIMode = 'classic' | 'three-line' | 'auto';
+
 export enum SocketClientEvent {
   // User
   SEARCH_USER = 'searchUser',

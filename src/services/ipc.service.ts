@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DiscordPresence, PopupType, SocketClientEvent, SocketServerEvent, speakingMode, mixMode } from '@/types';
+import { DiscordPresence, PopupType, SocketClientEvent, SocketServerEvent, speakingMode, mixMode, channelUIMode } from '@/types';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
@@ -188,26 +188,38 @@ const ipcService = {
     get: (
       callback: (data: {
         // Basic settings
+        autoLogin: boolean;
         autoLaunch: boolean;
-        inputAudioDevice: string;
-        outputAudioDevice: string;
+        alwaysOnTop: boolean;
+
+        statusAutoIdle: boolean;
+        statusAutoIdleMinutes: number;
+        statusAutoDnd: boolean;
+
+        channelUIMode: channelUIMode;
+        closeToTray: boolean;
+
         fontSize: number;
         font: string;
 
         // Mix settings
+        inputAudioDevice: string;
+        outputAudioDevice: string;
+
         mixEffect: boolean;
         mixEffectType: string;
+
         autoMixSetting: boolean;
         echoCancellation: boolean;
         noiseCancellation: boolean;
         microphoneAmplification: boolean;
+
         manualMixMode: boolean;
         mixMode: mixMode;
 
         // Voice settings
         speakingMode: speakingMode;
         defaultSpeakingKey: string;
-        speakingModeAutoKey: boolean;
 
         // Privacy settings
         notSaveMessageHistory: boolean;
@@ -237,6 +249,29 @@ const ipcService = {
       });
     },
 
+    autoLogin: {
+      get: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-auto-login');
+        ipcRenderer.once('auto-login', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+      },
+
+      set: (enable: boolean) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-auto-login', enable);
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('auto-login', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+        return () => ipcRenderer.removeAllListeners('auto-login');
+      },
+    },
+
     autoLaunch: {
       get: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return;
@@ -260,49 +295,141 @@ const ipcService = {
       },
     },
 
-    inputAudioDevice: {
-      get: (callback: (deviceId: string) => void) => {
+    alwaysOnTop: {
+      get: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return;
-        ipcRenderer.send('get-input-audio-device');
-        ipcRenderer.once('input-audio-device', (_: any, deviceId: string) => {
-          callback(deviceId);
+        ipcRenderer.send('get-always-on-top');
+        ipcRenderer.once('always-on-top', (_: any, enabled: boolean) => {
+          callback(enabled);
         });
       },
 
-      set: (deviceId: string) => {
+      set: (enable: boolean) => {
         if (!isElectron) return;
-        ipcRenderer.send('set-input-audio-device', deviceId);
+        ipcRenderer.send('set-always-on-top', enable);
       },
 
-      onUpdate: (callback: (deviceId: string) => void) => {
+      onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('input-audio-device', (_: any, deviceId: string) => {
-          callback(deviceId);
+        ipcRenderer.on('always-on-top', (_: any, enabled: boolean) => {
+          callback(enabled);
         });
-        return () => ipcRenderer.removeAllListeners('input-audio-device');
+        return () => ipcRenderer.removeAllListeners('always-on-top');
       },
     },
 
-    outputAudioDevice: {
-      get: (callback: (deviceId: string) => void) => {
+    statusAutoIdle: {
+      get: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return;
-        ipcRenderer.send('get-output-audio-device');
-        ipcRenderer.once('output-audio-device', (_: any, deviceId: string) => {
-          callback(deviceId);
+        ipcRenderer.send('get-status-auto-idle');
+        ipcRenderer.once('status-auto-idle', (_: any, enabled: boolean) => {
+          callback(enabled);
         });
       },
 
-      set: (deviceId: string) => {
+      set: (enable: boolean) => {
         if (!isElectron) return;
-        ipcRenderer.send('set-output-audio-device', deviceId);
+        ipcRenderer.send('set-status-auto-idle', enable);
       },
 
-      onUpdate: (callback: (deviceId: string) => void) => {
+      onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('output-audio-device', (_: any, deviceId: string) => {
-          callback(deviceId);
+        ipcRenderer.on('status-auto-idle', (_: any, enabled: boolean) => {
+          callback(enabled);
         });
-        return () => ipcRenderer.removeAllListeners('output-audio-device');
+        return () => ipcRenderer.removeAllListeners('status-auto-idle');
+      },
+    },
+
+    statusAutoIdleMinutes: {
+      get: (callback: (fontSize: number) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-status-auto-idle-minutes');
+        ipcRenderer.once('status-auto-idle-minutes', (_: any, fontSize: number) => {
+          callback(fontSize);
+        });
+      },
+
+      set: (fontSize: number) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-status-auto-idle-minutes', fontSize);
+      },
+
+      onUpdate: (callback: (fontSize: number) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('status-auto-idle-minutes', (_: any, fontSize: number) => {
+          callback(fontSize);
+        });
+        return () => ipcRenderer.removeAllListeners('status-auto-idle-minutes');
+      },
+    },
+
+    statusAutoDnd: {
+      get: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-status-auto-dnd');
+        ipcRenderer.once('status-auto-dnd', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+      },
+
+      set: (enable: boolean) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-status-auto-dnd', enable);
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('status-auto-dnd', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+        return () => ipcRenderer.removeAllListeners('status-auto-dnd');
+      },
+    },
+
+    channelUIMode: {
+      get: (callback: (key: channelUIMode) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-channel-ui-mode');
+        ipcRenderer.once('channel-ui-mode', (_: any, key: channelUIMode) => {
+          callback(key);
+        });
+      },
+
+      set: (key: channelUIMode) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-channel-ui-mode', key);
+      },
+
+      onUpdate: (callback: (key: channelUIMode) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('channel-ui-mode', (_: any, key: channelUIMode) => {
+          callback(key);
+        });
+        return () => ipcRenderer.removeAllListeners('channel-ui-mode');
+      },
+    },
+
+    closeToTray: {
+      get: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-close-to-tray');
+        ipcRenderer.once('close-to-tray', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+      },
+
+      set: (enable: boolean) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-close-to-tray', enable);
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('close-to-tray', (_: any, enabled: boolean) => {
+          callback(enabled);
+        });
+        return () => ipcRenderer.removeAllListeners('close-to-tray');
       },
     },
 
@@ -360,6 +487,52 @@ const ipcService = {
     },
 
     // Mix settings
+
+    inputAudioDevice: {
+      get: (callback: (deviceId: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-input-audio-device');
+        ipcRenderer.once('input-audio-device', (_: any, deviceId: string) => {
+          callback(deviceId);
+        });
+      },
+
+      set: (deviceId: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-input-audio-device', deviceId);
+      },
+
+      onUpdate: (callback: (deviceId: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('input-audio-device', (_: any, deviceId: string) => {
+          callback(deviceId);
+        });
+        return () => ipcRenderer.removeAllListeners('input-audio-device');
+      },
+    },
+
+    outputAudioDevice: {
+      get: (callback: (deviceId: string) => void) => {
+        if (!isElectron) return;
+        ipcRenderer.send('get-output-audio-device');
+        ipcRenderer.once('output-audio-device', (_: any, deviceId: string) => {
+          callback(deviceId);
+        });
+      },
+
+      set: (deviceId: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-output-audio-device', deviceId);
+      },
+
+      onUpdate: (callback: (deviceId: string) => void) => {
+        if (!isElectron) return () => {};
+        ipcRenderer.on('output-audio-device', (_: any, deviceId: string) => {
+          callback(deviceId);
+        });
+        return () => ipcRenderer.removeAllListeners('output-audio-device');
+      },
+    },
 
     mixEffect: {
       get: (callback: (enabled: boolean) => void) => {
@@ -590,29 +763,6 @@ const ipcService = {
           callback(key);
         });
         return () => ipcRenderer.removeAllListeners('default-speaking-key');
-      },
-    },
-
-    speakingModeAutoKey: {
-      get: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return;
-        ipcRenderer.send('get-speaking-mode-auto-key');
-        ipcRenderer.once('speaking-mode-auto-key', (_: any, enabled: boolean) => {
-          callback(enabled);
-        });
-      },
-
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-speaking-mode-auto-key', enabled);
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        ipcRenderer.on('speaking-mode-auto-key', (_: any, enabled: boolean) => {
-          callback(enabled);
-        });
-        return () => ipcRenderer.removeAllListeners('speaking-mode-auto-key');
       },
     },
 

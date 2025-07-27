@@ -27,7 +27,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [statusAutoIdle, setStatusAutoIdle] = useState<boolean>(false);
   const [statusAutoIdleMinutes, setStatusAutoIdleMinutes] = useState<number>(10);
   const [statusAutoDnd, setStatusAutoDnd] = useState<boolean>(false);
-  const [channelMode, setChannelMode] = useState<'classic' | 'three-line' | 'auto'>('auto');
+  const [channelUIMode, setChannelUIMode] = useState<'classic' | 'three-line' | 'auto'>('auto');
   const [closeToTray, setCloseToTray] = useState<boolean>(false);
   const [fontSize, setFontSize] = useState<number>(13);
   const [fontFamily, setFontFamily] = useState<string>('Arial');
@@ -48,7 +48,6 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
   const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>('key');
   const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>('v');
-  const [speakingModeAutoKey, setSpeakingModeAutoKey] = useState<boolean>(false);
 
   const [forbidAddFriend, setForbidAddFriend] = useState<boolean>(false);
   const [forbidShake, setForbidShake] = useState<boolean>(false);
@@ -186,26 +185,38 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   useEffect(() => {
     ipcService.systemSettings.get((data) => {
       // Basic settings
+      setAutoLogin(data.autoLogin);
       setAutoLaunch(data.autoLaunch);
-      setSelectedInput(data.inputAudioDevice);
-      setSelectedOutput(data.outputAudioDevice);
+      setAlwaysOnTop(data.alwaysOnTop);
+
+      setStatusAutoIdle(data.statusAutoIdle);
+      setStatusAutoIdleMinutes(data.statusAutoIdleMinutes);
+      setStatusAutoDnd(data.statusAutoDnd);
+
+      setChannelUIMode(data.channelUIMode);
+      setCloseToTray(data.closeToTray);
+
       setFontSize(data.fontSize);
       setFontFamily(data.font);
 
       // Mix Settings
+      setSelectedInput(data.inputAudioDevice);
+      setSelectedOutput(data.outputAudioDevice);
+
       setMixEffect(data.mixEffect);
       setMixEffectType(data.mixEffectType);
+
       setAutoMixSetting(data.autoMixSetting);
       setEchoCancellation(data.echoCancellation);
       setNoiseCancellation(data.noiseCancellation);
       setMicrophoneAmplification(data.microphoneAmplification);
+
       setManualMixMode(data.manualMixMode);
       setMixMode(data.mixMode);
 
       // Voice Settings
       setDefaultSpeakingMode(data.speakingMode);
       setDefaultSpeakingKey(data.defaultSpeakingKey || defaultHotKeyConfig.speakingKey.default);
-      setSpeakingModeAutoKey(data.speakingModeAutoKey);
 
       // Privacy settings
       setNotSaveMessageHistory(data.notSaveMessageHistory);
@@ -280,9 +291,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
             {/* Status Setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('status-setting') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('status-setting')}</div>
             </div>
-            <div className={`${popup['input-group']} ${'disabled'}`}>
+            <div className={`${popup['input-group']}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="status-auto-idle" type="checkbox" checked={statusAutoIdle} onChange={(e) => setStatusAutoIdle(e.target.checked)} />
                 <div className={popup['label']}>
@@ -299,9 +310,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   {t('status-auto-idle-label-2')}
                 </div>
               </div>
-              <div className={`${popup['input-box']} ${popup['row']}`}>
+              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input name="status-auto-dnd" type="checkbox" checked={statusAutoDnd} onChange={(e) => setStatusAutoDnd(e.target.checked)} />
-                <div className={popup['label']}>{t('status-auto-dnd-label')}</div>
+                <div className={popup['label']}>{t('status-auto-dnd-label') + ' ' + t('soon')}</div>
               </div>
             </div>
 
@@ -311,24 +322,24 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
             <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="channel-classic-mode" type="radio" checked={channelMode === 'classic'} onChange={() => setChannelMode('classic')} />
+                <input name="channel-classic-mode" type="radio" checked={channelUIMode === 'classic'} onChange={() => setChannelUIMode('classic')} />
                 <div className={popup['label']}>{t('channel-classic-mode-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="channel-three-line-mode" type="radio" checked={channelMode === 'three-line'} onChange={() => setChannelMode('three-line')} />
+                <input name="channel-three-line-mode" type="radio" checked={channelUIMode === 'three-line'} onChange={() => setChannelUIMode('three-line')} />
                 <div className={popup['label']}>{t('channel-three-line-mode-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="channel-auto-mode" type="radio" checked={channelMode === 'auto'} onChange={() => setChannelMode('auto')} />
+                <input name="channel-auto-mode" type="radio" checked={channelUIMode === 'auto'} onChange={() => setChannelUIMode('auto')} />
                 <div className={popup['label']}>{t('channel-auto-mode-label')}</div>
               </div>
             </div>
 
             {/* Close Setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('close-setting') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('close-setting')}</div>
             </div>
-            <div className={`${popup['input-group']} ${'disabled'}`}>
+            <div className={`${popup['input-group']}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="close-to-tray" type="radio" checked={closeToTray} onChange={() => setCloseToTray(true)} />
                 <div className={popup['label']}>{t('close-to-tray-label')}</div>
@@ -476,7 +487,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           <div className={popup['col']}>
             {/* Default Speaking Mode */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('default-speaking-mode-label') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('default-speaking-mode-label')}</div>
             </div>
             <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
@@ -506,10 +517,6 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="default-speaking-auto" type="radio" checked={defaultSpeakingMode === 'auto'} onChange={() => setDefaultSpeakingMode('auto')} />
                 <div className={popup['label']}>{t('default-speaking-auto-label')}</div>
-              </div>
-              <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="speaking-mode-auto-key" type="checkbox" checked={speakingModeAutoKey} onChange={() => setSpeakingModeAutoKey(!speakingModeAutoKey)} />
-                <div className={popup['label']}>{t('speaking-mode-auto-key-label')}</div>
               </div>
             </div>
           </div>
@@ -785,26 +792,38 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           className={popup['button']}
           onClick={() => {
             // Basic
+            ipcService.systemSettings.autoLogin.set(autoLogin);
             ipcService.systemSettings.autoLaunch.set(autoLaunch);
-            ipcService.systemSettings.inputAudioDevice.set(selectedInput);
-            ipcService.systemSettings.outputAudioDevice.set(selectedOutput);
+            ipcService.systemSettings.alwaysOnTop.set(alwaysOnTop);
+
+            ipcService.systemSettings.statusAutoIdle.set(statusAutoIdle);
+            ipcService.systemSettings.statusAutoIdleMinutes.set(statusAutoIdleMinutes);
+            ipcService.systemSettings.statusAutoDnd.set(statusAutoDnd);
+
+            ipcService.systemSettings.channelUIMode.set(channelUIMode);
+            ipcService.systemSettings.closeToTray.set(closeToTray);
+
             ipcService.systemSettings.font.set(fontFamily);
             ipcService.systemSettings.fontSize.set(fontSize);
 
             // Mix
+            ipcService.systemSettings.inputAudioDevice.set(selectedInput);
+            ipcService.systemSettings.outputAudioDevice.set(selectedOutput);
+
             ipcService.systemSettings.mixEffect.set(mixEffect);
             ipcService.systemSettings.mixEffectType.set(mixEffectType);
+
             ipcService.systemSettings.autoMixSetting.set(autoMixSetting);
             ipcService.systemSettings.echoCancellation.set(echoCancellation);
             ipcService.systemSettings.noiseCancellation.set(noiseCancellation);
             ipcService.systemSettings.microphoneAmplification.set(microphoneAmplification);
+
             ipcService.systemSettings.manualMixMode.set(manualMixMode);
             ipcService.systemSettings.mixMode.set(mixMode);
 
             // Voice
             ipcService.systemSettings.speakingMode.set(defaultSpeakingMode);
             ipcService.systemSettings.defaultSpeakingKey.set(defaultSpeakingKey);
-            ipcService.systemSettings.speakingModeAutoKey.set(speakingModeAutoKey);
 
             // Privacy
             ipcService.systemSettings.notSaveMessageHistory.set(notSaveMessageHistory);
