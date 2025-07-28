@@ -76,7 +76,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
       if (!socket) return;
-      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', channelName), () => socket.send.deleteChannel({ channelId, serverId }));
+      handleOpenWarningDialog(t('confirm-delete-channel', { '0': channelName }), () => socket.send.deleteChannel({ channelId, serverId }));
     };
 
     const handleOpenWarningDialog = (message: string, callback: () => void) => {
