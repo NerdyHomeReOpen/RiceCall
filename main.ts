@@ -103,6 +103,7 @@ export enum SocketClientEvent {
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
   APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
   // Queue
+  ADD_TO_QUEUE = 'addToQueue',
   MOVE_TO_QUEUE_POSITION = 'moveToQueuePosition',
   DELETE_FROM_QUEUE = 'deleteFromQueue',  
   // Message

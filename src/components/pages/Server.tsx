@@ -33,7 +33,7 @@ interface ServerPageProps {
   channelMessages: ChannelMessage[];
   actionMessages: PromptMessage[];
   display: boolean;
-  queueUsers: QueueUser[];
+  queueUsers: QueueUser[]
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages, actionMessages, display, queueUsers }) => {

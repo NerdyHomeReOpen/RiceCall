@@ -68,7 +68,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
   const isSpeaking = speakingStatus !== 0;
   const isMuted = speakingStatus === -1;
   const isMutedByUser = webRTC.muteList.includes(memberUserId);
-  const canManageMember = !isCurrentUser && userPermission > 2 && userPermission >= memberPermission;  
+  const canManageMember = userPermission > 2 && userPermission >= memberPermission;  
   const canMoveToSecondPosition = canManageMember && memberPosition >= 3;
   const canMoveDown = canManageMember && memberPosition > 1 && (memberPosition < totalUsersInQueue);
   const canMoveUp = canManageMember && memberPosition > 2;
@@ -201,7 +201,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
       <BadgeListViewer badges={memberBadges} maxDisplay={5} />
 
-      {memberPosition === 1 && <div className={styles['queue-seconds-remaining-box']}>{secondsRemaining}</div>}
+      {memberPosition === 1 && <div className={styles['queue-seconds-remaining-box']}>{secondsRemaining} s.</div>}
 
       {isCurrentUser && <div className={styles['my-location-icon']} />}
     </div>

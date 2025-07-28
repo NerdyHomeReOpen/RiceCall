@@ -125,6 +125,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
     setMemberApplicationsCount((prev) => Math.max(prev - 1, 0));
   };
 
+  const handleQueueParticipate = () => {
+    if (!socket) return;
+    socket.send.addToQueue({ serverId, channelId: currentChannel.channelId, targetId: userId });
+
+  };
+
   // Effects
   useEffect(() => {
     for (const channel of serverChannels) {
@@ -302,7 +308,13 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
             </div>
           </div>
           <div className={styles['saperator-2']} />
+            <div className={styles['queue-bottom-bar']}>
+            <button className={styles['queue-participate-button']} onClick={handleQueueParticipate}>
+              {t('participate')}
+            </button>
+          </div>
         </>
+        
       )}
 
       {/* Channel List Title */}

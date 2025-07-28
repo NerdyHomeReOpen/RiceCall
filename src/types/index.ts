@@ -281,6 +281,7 @@ export enum SocketClientEvent {
   DIRECT_MESSAGE = 'directMessage',
   SHAKE_WINDOW = 'shakeWindow',
   // Queue
+  ADD_TO_QUEUE = 'addToQueue',
   MOVE_TO_QUEUE_POSITION = 'moveToQueuePosition',
   DELETE_FROM_QUEUE = 'deleteFromQueue',
   // RTC

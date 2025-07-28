@@ -287,6 +287,35 @@
   height: 120px;
 }
 
+.queue-bottom-bar {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  background: #f8f9fa;
+  padding: 12px;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.queue-participate-button {
+  background-color: #0073c6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #45a047;
+  }
+}
+
+
 .channel-list {
   display: flex;
   flex-direction: column;
