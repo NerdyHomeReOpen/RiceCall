@@ -5,7 +5,7 @@ import styles from '@/styles/pages/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import { PopupType, ServerMember, Channel, Server, User, Category, UserFriend, UserServer, SocketServerEvent } from '@/types';
+import { PopupType, ServerMember, Channel, Server, User, Category, UserFriend, UserServer, SocketServerEvent, QueueUser } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,7 @@ import CategoryTab from '@/components/CategoryTab';
 
 // Services
 import ipcService from '@/services/ipc.service';
+import QueueUserTab from './QueueUserTab';
 
 interface ChannelListProps {
   currentServer: UserServer;
@@ -26,9 +27,10 @@ interface ChannelListProps {
   serverMembers: ServerMember[];
   serverChannels: (Channel | Category)[];
   friends: UserFriend[];
+  queueUsers: QueueUser[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends, queueUsers }) => {
   // Hooks
   const { t } = useTranslation();
   const socket = useSocket();
@@ -288,14 +290,15 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div className={styles['mic-queue-list']}>
             <div className={styles['user-list']}>
-              {/* {micQueueUsers.map((user) => (
-                    <UserTab
-                      key={user.id}
-                      user={user}
-                      server={server}
-                      mainUser={user}
+              {queueUsers.map((user) => (
+                    <QueueUserTab
+                      key={user.userId}
+                      queueUser={user}
+                      currentChannel={currentChannel}
+                      currentServer={currentServer}
+                      totalUsersInQueue={queueUsers.length}
                     />
-                  ))} */}
+                  ))}
             </div>
           </div>
           <div className={styles['saperator-2']} />

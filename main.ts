@@ -102,6 +102,9 @@ export enum SocketClientEvent {
   EDIT_MEMBER_APPLICATION = 'editMemberApplication',
   DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
   APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
+  // Queue
+  MOVE_TO_QUEUE_POSITION = 'moveToQueuePosition',
+  DELETE_FROM_QUEUE = 'deleteFromQueue',  
   // Message
   CHANNEL_MESSAGE = 'channelMessage',
   ACTION_MESSAGE = 'actionMessage',
@@ -161,6 +164,9 @@ export enum SocketServerEvent {
   SERVER_MEMBER_APPLICATION_UPDATE = 'serverMemberApplicationUpdate',
   SERVER_MEMBER_APPLICATION_REMOVE = 'serverMemberApplicationRemove',
   MEMBER_APPROVAL = 'memberApproval',
+  // Queue
+  QUEUE_USERS_SET = 'queueUsersSet',
+
   // Message
   CHANNEL_MESSAGE = 'channelMessage',
   ACTION_MESSAGE = 'actionMessage',
@@ -373,7 +379,7 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
     });
   } else {
     mainWindow.loadURL(`${BASE_URI}`);
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('close', (e) => {

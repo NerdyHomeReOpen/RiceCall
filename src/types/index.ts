@@ -113,6 +113,7 @@ export type BaseChannel = {
   categoryId: string | null;
   serverId: string;
   createdAt: number;
+  queueSecs: number;
 };
 
 export type Category = BaseChannel & {
@@ -186,6 +187,13 @@ export type UserServer = Server & Member & UserServerStatus;
 export type UserFriend = User & Friend;
 
 export type ServerMember = User & Member;
+
+export type QueueUser = ServerMember & {
+  queueSince: number;
+  queueUntil: number;
+  queuePosition: number;
+  queueJoined: number;
+};
 
 export type ContextMenuItem = {
   id: string;
@@ -272,6 +280,9 @@ export enum SocketClientEvent {
   ACTION_MESSAGE = 'actionMessage',
   DIRECT_MESSAGE = 'directMessage',
   SHAKE_WINDOW = 'shakeWindow',
+  // Queue
+  MOVE_TO_QUEUE_POSITION = 'moveToQueuePosition',
+  DELETE_FROM_QUEUE = 'deleteFromQueue',
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
@@ -331,6 +342,8 @@ export enum SocketServerEvent {
   ACTION_MESSAGE = 'actionMessage',
   DIRECT_MESSAGE = 'directMessage',
   SHAKE_WINDOW = 'shakeWindow',
+  // Queue
+  QUEUE_USERS_SET = 'queueUsersSet', 
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',

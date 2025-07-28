@@ -9,7 +9,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication, RecommendedServers } from '@/types';
+import { PopupType, SocketServerEvent, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication, RecommendedServers, QueueUser } from '@/types';
 
 // i18n
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
@@ -399,6 +399,7 @@ const RootPageComponent = () => {
   const [channel, setChannel] = useState<Channel>(Default.channel());
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
+  const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
 
   // Variables
   const { userId } = user;
@@ -516,6 +517,11 @@ const RootPageComponent = () => {
     setActionMessages((prev) => [...prev, ...actionMessages]);
   };
 
+  const handleQueueUsersSet = (queueUsers: QueueUser[]) => {
+    console.log(queueUsers);
+    setQueueUsers(queueUsers);
+  };
+
   const handlePlaySound = (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking') => {
     soundPlayer.playSound(sound);
   };
@@ -587,6 +593,7 @@ const RootPageComponent = () => {
       [SocketServerEvent.SERVER_MEMBER_UPDATE]: handleServerMemberUpdate,
       [SocketServerEvent.SERVER_ONLINE_MEMBER_REMOVE]: handleServerMemberDelete,
       [SocketServerEvent.SERVER_CHANNELS_SET]: handleServerChannelsSet,
+      [SocketServerEvent.QUEUE_USERS_SET]: handleQueueUsersSet,     
       [SocketServerEvent.SERVER_CHANNEL_ADD]: handleServerChannelAdd,
       [SocketServerEvent.SERVER_CHANNEL_UPDATE]: handleServerChannelUpdate,
       [SocketServerEvent.SERVER_CHANNEL_REMOVE]: handleServerChannelDelete,
@@ -690,6 +697,7 @@ const RootPageComponent = () => {
                 serverChannels={serverChannels}
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
+                queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
               />
             </>

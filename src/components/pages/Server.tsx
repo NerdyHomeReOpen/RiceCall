@@ -12,7 +12,7 @@ import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
-import { User, Server, Message, Channel, ServerMember, ChannelMessage, PromptMessage, UserServer, UserFriend } from '@/types';
+import { User, Server, Message, Channel, ServerMember, ChannelMessage, PromptMessage, UserServer, UserFriend, QueueUser } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -33,9 +33,10 @@ interface ServerPageProps {
   channelMessages: ChannelMessage[];
   actionMessages: PromptMessage[];
   display: boolean;
+  queueUsers: QueueUser[];
 }
 
-const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages, actionMessages, display }) => {
+const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages, actionMessages, display, queueUsers }) => {
   // Hooks
   const { t } = useTranslation();
   const socket = useSocket();
@@ -250,7 +251,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
       <main className={styles['server-body']}>
         {/* Left Sidebar */}
         <aside className={styles['sidebar']} style={{ width: `${sidebarWidth}px` }}>
-          <ChannelListViewer currentServer={currentServer} currentChannel={currentChannel} serverMembers={activeServerMembers} serverChannels={serverChannels} friends={friends} />
+          <ChannelListViewer currentServer={currentServer} currentChannel={currentChannel} serverMembers={activeServerMembers} serverChannels={serverChannels} friends={friends} queueUsers={queueUsers} />
         </aside>
 
         {/* Resize Handle */}
@@ -322,7 +323,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                       id: 'forbid-speech',
                       label: t('forbid-speech'),
                       show: canChangeToForbiddenSpeech,
-                      disabled: true,
                       onClick: () => {
                         handleEditChannel({ voiceMode: 'forbidden' }, channelId, serverId);
                       },
@@ -333,7 +333,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                       icon: 'submenu',
                       show: canChangeToForbiddenQueue || canChangeToControlQueue,
                       hasSubmenu: true,
-                      disabled: true,
                       onClick: () => {
                         handleEditChannel({ voiceMode: 'queue' }, channelId, serverId);
                       },
@@ -342,7 +341,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                           id: 'forbid-queue',
                           label: t('forbid-queue'),
                           show: canChangeToForbiddenQueue,
-                          disabled: true,
                           onClick: () => {
                             // handleEditChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
                           },
@@ -351,7 +349,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                           id: 'control-queue',
                           label: t('control-queue'),
                           show: canChangeToControlQueue,
-                          disabled: true,
                           onClick: () => {
                             // handleEditChannel({ queueMode: 'control' }, currentChannelId, serverId);
                           },
