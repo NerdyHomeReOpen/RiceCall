@@ -44,7 +44,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     // Variables
     const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, userLimit: categoryUserLimit } = category;
-    const { userId, serverId, permissionLevel, receptionLobbyId: serverReceptionLobbyId } = currentServer;
+    const { userId, serverId, receptionLobbyId: serverReceptionLobbyId } = currentServer;
     const { channelId: currentChannelId } = currentChannel;
     const categoryLobby = Default.channel({
       ...category,
@@ -52,6 +52,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       order: -1,
       type: 'channel',
     });
+    const contextPermissionLevel = currentServer.contextPermissionLevel?.find(p => p.channelId === categoryId)?.permissionLevel ?? 1;
+    const permissionLevel = Math.max(contextPermissionLevel, currentServer.permissionLevel);
     const categoryChannels = serverChannels.filter((ch) => ch.type === 'channel').filter((ch) => ch.categoryId === categoryId);
     const categoryChannelIds = new Set(categoryChannels.map((ch) => ch.channelId));
     const isAllChannelReadOnly = categoryChannels.every((channel) => channel.visibility === 'readonly');
@@ -65,8 +67,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       !userInChannel &&
       categoryVisibility !== 'readonly' &&
       !(categoryVisibility === 'member' && permissionLevel < 2) &&
-      (!categoryVisibility || categoryUserLimit > categoryMembers.length || permissionLevel > 4);
-    const canManageChannel = permissionLevel > 4;
+      (!categoryVisibility || categoryUserLimit > categoryMembers.length || permissionLevel > 2);
+    const canManageChannel = permissionLevel > 3;
+    const canCreate = permissionLevel > 4;
     const canMoveToChannel = canManageChannel && !userInChannel && categoryUserIds.length !== 0;
     const canSetReceptionLobby = canManageChannel && !isReceptionLobby && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
 
@@ -204,7 +207,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               {
                 id: 'create-channel',
                 label: t('create-channel'),
-                show: canManageChannel,
+                show: canCreate,
                 onClick: () => handleOpenCreateChannel(serverId, null, userId),
               },
               {

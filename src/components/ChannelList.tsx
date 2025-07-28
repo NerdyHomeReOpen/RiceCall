@@ -56,13 +56,14 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
     avatarUrl: serverAvatarUrl,
     displayId: serverDisplayId,
     receiveApply: serverReceiveApply,
-    permissionLevel: userPermission,
     favorite: isFavorite,
   } = currentServer;
   const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = currentChannel;
   const isVerifiedServer = false;
-  const canEditNickname = userPermission > 1;
-  const canApplyMember = userPermission < 2;
+  const contextPermissionLevel = currentServer.contextPermissionLevel?.find(p => p.channelId === currentChannel.channelId)?.permissionLevel ?? 1;
+  const userPermission = Math.max(contextPermissionLevel, currentServer.permissionLevel);
+  const canEditNickname = currentServer.permissionLevel > 1;
+  const canApplyMember = currentServer.permissionLevel < 2;
   const canOpenSettings = userPermission > 4;
   const canManageChannel = userPermission > 4;
 

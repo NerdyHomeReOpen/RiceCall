@@ -42,7 +42,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     // Variables
     const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId } = channel;
-    const { userId, serverId, permissionLevel, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = currentServer;
+    const { userId, serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = currentServer;
+    const contextPermissionLevel = currentServer.contextPermissionLevel?.find(p => p.channelId === channelId)?.permissionLevel ?? 1;
+    const permissionLevel = Math.max(contextPermissionLevel, currentServer.permissionLevel);
     const { channelId: currentChannelId } = currentChannel;
     const channelMembers = serverMembers.filter((mb) => mb.currentChannelId === channelId);
     const channelUserIds = channelMembers.map((mb) => mb.userId);
@@ -54,9 +56,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       !userInChannel &&
       channelVisibility !== 'readonly' &&
       !(channelVisibility === 'member' && permissionLevel < 2) &&
-      (!channelUserLimit || channelUserLimit > channelMembers.length || permissionLevel > 4);
-    const canManageChannel = permissionLevel > 4;
-    const canCreate = canManageChannel && !channelCategoryId;
+      (!channelUserLimit || channelUserLimit > channelMembers.length || permissionLevel > 2);
+    const canManageChannel = permissionLevel > 3;
+    const canChangeOrder = permissionLevel > 4;
+    const canCreate = permissionLevel > 4;
     const canCreateSub = canManageChannel && !isLobby;
     const canEdit = canManageChannel;
     const canDelete = canManageChannel && !isLobby;
@@ -245,7 +248,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               {
                 id: 'edit-channel-order',
                 label: t('edit-channel-order'),
-                show: canManageChannel,
+                show: canChangeOrder,
                 onClick: () => handleOpenEditChannelOrder(serverId, userId),
               },
               {
