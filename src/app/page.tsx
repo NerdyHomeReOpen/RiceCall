@@ -393,6 +393,7 @@ const RootPageComponent = () => {
   const [channel, setChannel] = useState<Channel>(Default.channel());
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
+  const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
 
   // Variables
   const { userId } = user;
@@ -701,6 +702,7 @@ const RootPageComponent = () => {
                 serverChannels={serverChannels}
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
+                queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
               />
             </>

@@ -19,6 +19,7 @@ import CategoryTab from '@/components/CategoryTab';
 
 // Services
 import ipcService from '@/services/ipc.service';
+import QueueUserTab from './QueueUserTab';
 
 interface ChannelListProps {
   currentServer: Server;
@@ -28,7 +29,7 @@ interface ChannelListProps {
   friends: Friend[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends, queueUsers }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -272,14 +273,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div className={styles['mic-queue-list']}>
             <div className={styles['user-list']}>
-              {/* {micQueueUsers.map((user) => (
-                    <UserTab
-                      key={user.id}
-                      user={user}
-                      server={server}
-                      mainUser={user}
-                    />
-                  ))} */}
+              {queueUsers.map((user) => (
+                <QueueUserTab key={user.userId} queueUser={user} currentChannel={currentChannel} currentServer={currentServer} totalUsersInQueue={queueUsers.length} />
+              ))}
             </div>
           </div>
           <div className={styles['saperator-2']} />
