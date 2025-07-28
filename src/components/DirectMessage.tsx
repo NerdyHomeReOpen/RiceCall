@@ -26,20 +26,8 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   const { t } = useTranslation();
 
   // Variables
-  const { name: senderName, contents: messageContents, timestamp: messageTimestamp, parameter: messageParameter } = messageGroup;
-
+  const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
   const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
-
-  const translatedMessages = messageContents.map((content) => {
-    if (content.includes(' ')) {
-      return content
-        .split(' ')
-        .map((_) => t(_, { ns: 'message', ...messageParameter }))
-        .join(' ');
-    } else {
-      return t(content, { ns: 'message', ...messageParameter });
-    }
-  });
 
   return (
     <div className={styles['message-box']}>
@@ -47,7 +35,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
         <div className={styles['username-text']}>{senderName}</div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
       </div>
-      {translatedMessages.map((content, index) => (
+      {messageContents.map((content, index) => (
         <MarkdownViewer key={index} markdownText={content} />
       ))}
     </div>
