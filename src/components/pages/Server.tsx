@@ -46,6 +46,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   const announcementAreaRef = useRef<HTMLDivElement>(null);
   const voiceModeRef = useRef<HTMLDivElement>(null);
   const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // States
   const [sidebarWidth, setSidebarWidth] = useState<number>(270);
@@ -243,6 +244,26 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
       offUpdateSpeakKey();
     };
   }, []);
+
+  useEffect(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    if (!showSpeakerVolume) {
+      setShowSpeakerVolume(true);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setShowSpeakerVolume(false);
+      timeoutRef.current = null;
+    }, 1000);
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [webRTC.speakerVolume]);
 
   return (
     <main className={styles['server']} style={display ? {} : { display: 'none' }}>
