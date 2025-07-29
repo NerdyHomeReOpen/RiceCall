@@ -105,8 +105,11 @@ export enum SocketClientEvent {
   // Queue
   ADD_TO_QUEUE = 'addToQueue',
   LEAVE_FROM_QUEUE = 'leaveFromQueue',
+  INCREASE_TIME_QUEUE = 'increaseTimeQueue',
   MOVE_TO_QUEUE_POSITION = 'moveToQueuePosition',
   DELETE_FROM_QUEUE = 'deleteFromQueue',  
+  CONTROL_QUEUE = 'controlQueue',  
+
   // Message
   CHANNEL_MESSAGE = 'channelMessage',
   ACTION_MESSAGE = 'actionMessage',
@@ -168,6 +171,8 @@ export enum SocketServerEvent {
   MEMBER_APPROVAL = 'memberApproval',
   // Queue
   QUEUE_USERS_SET = 'queueUsersSet',
+  QUEUE_CURRENT_SECS_REMAINING_SET = 'queueCurrentSecsRemainingSet',
+  QUEUE_PAUSED = 'queuePaused',
 
   // Message
   CHANNEL_MESSAGE = 'channelMessage',

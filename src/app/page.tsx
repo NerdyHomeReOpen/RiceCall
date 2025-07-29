@@ -400,6 +400,8 @@ const RootPageComponent = () => {
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
   const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
+  const [queueCurrentSecsRemaining, setQueueCurrentSecsRemaining] = useState<number>(0);
+  const [queuePaused, setQueuePaused] = useState<boolean>(false);
 
   // Variables
   const { userId } = user;
@@ -518,8 +520,15 @@ const RootPageComponent = () => {
   };
 
   const handleQueueUsersSet = (queueUsers: QueueUser[]) => {
-    console.log(queueUsers);
     setQueueUsers(queueUsers);
+  };
+
+  const handleQueueCurrentSecsRemainingSet = (queueCurrentSecsRemaining: number) => {   
+    setQueueCurrentSecsRemaining(queueCurrentSecsRemaining);
+  };
+
+  const handleQueuePaused = (paused: boolean) => {   
+    setQueuePaused(paused);
   };
 
   const handlePlaySound = (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking') => {
@@ -593,7 +602,9 @@ const RootPageComponent = () => {
       [SocketServerEvent.SERVER_MEMBER_UPDATE]: handleServerMemberUpdate,
       [SocketServerEvent.SERVER_ONLINE_MEMBER_REMOVE]: handleServerMemberDelete,
       [SocketServerEvent.SERVER_CHANNELS_SET]: handleServerChannelsSet,
-      [SocketServerEvent.QUEUE_USERS_SET]: handleQueueUsersSet,     
+      [SocketServerEvent.QUEUE_USERS_SET]: handleQueueUsersSet,
+      [SocketServerEvent.QUEUE_CURRENT_SECS_REMAINING_SET]: handleQueueCurrentSecsRemainingSet,
+      [SocketServerEvent.QUEUE_PAUSED]: handleQueuePaused,     
       [SocketServerEvent.SERVER_CHANNEL_ADD]: handleServerChannelAdd,
       [SocketServerEvent.SERVER_CHANNEL_UPDATE]: handleServerChannelUpdate,
       [SocketServerEvent.SERVER_CHANNEL_REMOVE]: handleServerChannelDelete,
@@ -698,6 +709,8 @@ const RootPageComponent = () => {
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
                 queueUsers={queueUsers}
+                queueCurrentSecsRemaining={queueCurrentSecsRemaining}
+                queuePaused={queuePaused}
                 display={mainTab.selectedTabId === 'server'}
               />
             </>

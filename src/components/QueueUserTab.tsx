@@ -26,9 +26,11 @@ interface QueueUserTabProps {
   currentChannel: Channel;
   currentServer: UserServer; 
   totalUsersInQueue: number;
+  queueCurrentSecsRemaining: number;
+  queuePaused: boolean;
 }
 
-const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, currentChannel, currentServer, totalUsersInQueue}) => {
+const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, currentChannel, currentServer, totalUsersInQueue, queueCurrentSecsRemaining, queuePaused}) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -36,7 +38,8 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
   const webRTC = useWebRTC();
 
   // States
-  const [secondsRemaining, setSecondsRemaining] = useState(currentChannel.queueSecs);
+  const [currentSecsRemaining, setCurrentSecsRemaining] = useState(queueCurrentSecsRemaining); 
+  const [paused, setPaused] = useState(queuePaused); 
 
   // Refs
   const userTabRef = useRef<HTMLDivElement>(null);
@@ -53,8 +56,6 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
     userId: memberUserId,
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
-    queueSince: memberSince,
-    queueUntil: memberUntil,
     queueJoined: memberQueueJoined,
     queuePosition: memberPosition
   } = queueUser;
@@ -69,6 +70,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
   const isMuted = speakingStatus === -1;
   const isMutedByUser = webRTC.muteList.includes(memberUserId);
   const canManageMember = userPermission > 2 && userPermission >= memberPermission;  
+  const canIncreaseTime = canManageMember && memberPosition === 1;
   const canMoveToSecondPosition = canManageMember && memberPosition >= 3;
   const canMoveDown = canManageMember && memberPosition > 1 && (memberPosition < totalUsersInQueue);
   const canMoveUp = canManageMember && memberPosition > 2;
@@ -91,10 +93,15 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
     ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
   };
 
+  const handleIncreaseTime = () => {
+    if (!socket) return;
+    socket.send.increaseTimeQueue({serverId, channelId: currentChannelId});
+  };
+
   const handleMoveDown = (targetId: User['userId']) => {
     if (!socket) return;
     socket.send.moveToQueuePosition({serverId, channelId: currentChannelId, targetId, position: memberPosition + 1});
-  };
+  };  
 
   const handleMoveUp = (targetId: User['userId']) => {
     if (!socket) return;
@@ -126,16 +133,31 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
 
   //Effects
     useEffect(() => {
-    const interval = setInterval(() => {
-         setSecondsRemaining((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
+      setCurrentSecsRemaining(queueCurrentSecsRemaining);
+    }, [queueCurrentSecsRemaining]);
 
-    return () => clearInterval(interval); // limpiar al desmontar
-    }, []);
+    useEffect(() => {
+      setPaused(queuePaused);
+    }, [queuePaused]);
+
+    useEffect(() => {
+      let interval: NodeJS.Timeout | null = null;  
+      if (!paused) {
+        interval = setInterval(() => {
+          setCurrentSecsRemaining((prev) => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+      }else{
+         setCurrentSecsRemaining(currentSecsRemaining);
+      }
+
+      return () => {
+        if (interval) clearInterval(interval);
+      };
+    }, [paused]);
 
     useEffect(() => {
         if (memberPosition === 1) {
-            setSecondsRemaining(currentChannel.queueSecs);
+            setCurrentSecsRemaining(currentSecsRemaining);
         }
     }, [memberPosition]);
 
@@ -143,7 +165,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
     <div
       ref={userTabRef}
       key={memberUserId}
-      className={`context-menu-container ${styles['user-tab']} ${styles['selected']}`}
+      className={`context-menu-container ${styles['user-tab']}`}
       onDoubleClick={() => {
         if (!userTabRef.current) return;
         const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
@@ -165,6 +187,12 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
             id: 'view-profile',
             label: t('view-profile'),
             onClick: () => handleOpenUserInfo(userId, memberUserId),
+          },
+          {
+            id: 'increase-time',
+            label: t('increase-time'),
+            show: canIncreaseTime,
+            onClick: () => handleIncreaseTime(),
           },
           {
             id: 'move-up',
@@ -201,7 +229,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
       <BadgeListViewer badges={memberBadges} maxDisplay={5} />
 
-      {memberPosition === 1 && <div className={styles['queue-seconds-remaining-box']}>{secondsRemaining} s.</div>}
+      {memberPosition === 1 && <div className={styles['queue-seconds-remaining-box']}>{currentSecsRemaining} s.</div>}
 
       {isCurrentUser && <div className={styles['my-location-icon']} />}
     </div>

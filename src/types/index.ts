@@ -189,8 +189,6 @@ export type UserFriend = User & Friend;
 export type ServerMember = User & Member;
 
 export type QueueUser = ServerMember & {
-  queueSince: number;
-  queueUntil: number;
   queuePosition: number;
   queueJoined: number;
 };
@@ -283,8 +281,11 @@ export enum SocketClientEvent {
   // Queue
   ADD_TO_QUEUE = 'addToQueue',
   LEAVE_FROM_QUEUE = 'leaveFromQueue',
+  INCREASE_TIME_QUEUE = 'increaseTimeQueue',
   MOVE_TO_QUEUE_POSITION = 'moveToQueuePosition',
   DELETE_FROM_QUEUE = 'deleteFromQueue',
+  CONTROL_QUEUE = 'controlQueue', 
+
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',
@@ -346,6 +347,9 @@ export enum SocketServerEvent {
   SHAKE_WINDOW = 'shakeWindow',
   // Queue
   QUEUE_USERS_SET = 'queueUsersSet', 
+  QUEUE_CURRENT_SECS_REMAINING_SET = 'queueCurrentSecsRemainingSet',
+  QUEUE_PAUSED = 'queuePaused',
+
   // RTC
   RTC_OFFER = 'RTCOffer',
   RTC_ANSWER = 'RTCAnswer',

@@ -33,10 +33,12 @@ interface ServerPageProps {
   channelMessages: ChannelMessage[];
   actionMessages: PromptMessage[];
   display: boolean;
-  queueUsers: QueueUser[]
+  queueUsers: QueueUser[];
+  queueCurrentSecsRemaining: number;
+  queuePaused: boolean;
 }
 
-const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages, actionMessages, display, queueUsers }) => {
+const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages, actionMessages, display, queueUsers, queueCurrentSecsRemaining, queuePaused }) => {
   // Hooks
   const { t } = useTranslation();
   const socket = useSocket();
@@ -94,7 +96,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   const canChangeToFreeSpeech = userPermission > 4 && channelVoiceMode !== 'free';
   const canChangeToForbiddenSpeech = userPermission > 4 && channelVoiceMode !== 'forbidden';
   const canChangeToForbiddenQueue = userPermission > 4 && channelVoiceMode !== 'queue';
-  const canChangeToControlQueue = userPermission > 4 && channelVoiceMode !== 'forbidden';
+  const canChangeToControlQueue = userPermission > 4 && !queuePaused;
+  const canChangeToUncontrolQueue = userPermission > 4 && queuePaused;
 
   // Handlers
   const handleSendMessage = (message: Partial<Message>, userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']): void => {
@@ -162,6 +165,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   const handleToggleTakeMic = () => {
     if (!webRTC) return;
     webRTC.handleToggleTakeMic();
+  };
+
+ const handleControlQueue = (control: boolean) => {
+    if (!socket) return;
+    socket.send.controlQueue({ serverId, channelId, control });
   };
 
   // Effects
@@ -251,7 +259,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
       <main className={styles['server-body']}>
         {/* Left Sidebar */}
         <aside className={styles['sidebar']} style={{ width: `${sidebarWidth}px` }}>
-          <ChannelListViewer currentServer={currentServer} currentChannel={currentChannel} serverMembers={activeServerMembers} serverChannels={serverChannels} friends={friends} queueUsers={queueUsers} />
+          <ChannelListViewer currentServer={currentServer} currentChannel={currentChannel} serverMembers={activeServerMembers} serverChannels={serverChannels} friends={friends} queueUsers={queueUsers} queueCurrentSecsRemaining={queueCurrentSecsRemaining} queuePaused={queuePaused} />
         </aside>
 
         {/* Resize Handle */}
@@ -323,6 +331,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                       id: 'forbid-speech',
                       label: t('forbid-speech'),
                       show: canChangeToForbiddenSpeech,
+                      disabled: true,
                       onClick: () => {
                         handleEditChannel({ voiceMode: 'forbidden' }, channelId, serverId);
                       },
@@ -331,11 +340,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                       id: 'queue-mode',
                       label: t('queue'),
                       icon: 'submenu',
-                      show: canChangeToForbiddenQueue || canChangeToControlQueue,
-                      hasSubmenu: true,
-                      onClick: () => {
-                        handleEditChannel({ voiceMode: 'queue' }, channelId, serverId);
-                      },
+                      show: canChangeToForbiddenQueue || canChangeToControlQueue || canChangeToUncontrolQueue,
+                      hasSubmenu: true,                      
                       submenuItems: [
                         {
                           id: 'forbid-queue',
@@ -350,7 +356,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                           label: t('control-queue'),
                           show: canChangeToControlQueue,
                           onClick: () => {
-                            // handleEditChannel({ queueMode: 'control' }, currentChannelId, serverId);
+                            handleControlQueue(true);
+                          },
+                        },
+                        {
+                          id: 'uncontrol-queue',
+                          label: t('uncontrol-queue'),
+                          show: canChangeToUncontrolQueue,
+                          onClick: () => {
+                            handleControlQueue(false);
                           },
                         },
                       ],

@@ -28,9 +28,11 @@ interface ChannelListProps {
   serverChannels: (Channel | Category)[];
   friends: UserFriend[];
   queueUsers: QueueUser[];
+  queueCurrentSecsRemaining: number;
+  queuePaused: boolean;
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends, queueUsers }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends, queueUsers, queueCurrentSecsRemaining, queuePaused }) => {
   // Hooks
   const { t } = useTranslation();
   const socket = useSocket();
@@ -309,6 +311,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
                       currentChannel={currentChannel}
                       currentServer={currentServer}
                       totalUsersInQueue={queueUsers.length}
+                      queueCurrentSecsRemaining={queueCurrentSecsRemaining}
+                      queuePaused={queuePaused}
                     />
                   ))}
             </div>
