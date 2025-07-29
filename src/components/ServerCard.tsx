@@ -46,6 +46,8 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
 
   // Handles
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+    if (loadingBox.isLoading) return;
+
     if (serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
@@ -53,10 +55,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
 
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(serverDisplayId);
-
-    setTimeout(() => {
-      ipcService.socket.send('connectServer', { serverId });
-    }, loadingBox.loadingTimeStamp);
+    ipcService.socket.send('connectServer', { serverId });
   };
 
   const handleFavoriteServer = (serverId: Server['serverId']) => {

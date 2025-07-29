@@ -42,11 +42,11 @@ import getService from '@/services/get.service';
 
 interface HeaderProps {
   user: User;
-  userServer: Server;
+  currentServer: Server;
   friendApplications: FriendApplication[];
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendApplications }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications }) => {
   // Hooks
   const contextMenu = useContextMenu();
   const mainTab = useMainTab();
@@ -62,7 +62,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
   const { userId, name: userName, status: userStatus } = user;
-  const { serverId, name: serverName } = userServer;
+  const { serverId, name: serverName } = currentServer;
 
   // Constants
   const MAIN_TABS = [
@@ -665,10 +665,7 @@ const RootPageComponent = () => {
     const handler = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
-
-      if (!serverDisplayId || !serverId) return;
-
-      if (loadingBox.isLoading) return;
+      if (loadingBox.isLoading || !serverDisplayId || !serverId) return;
 
       if (serverId === server.serverId) {
         mainTab.setSelectedTabId('server');
@@ -677,10 +674,7 @@ const RootPageComponent = () => {
 
       loadingBox.setIsLoading(true);
       loadingBox.setLoadingServerId(serverDisplayId);
-
-      setTimeout(() => {
-        ipcService.socket.send('connectServer', { serverId });
-      }, loadingBox.loadingTimeStamp);
+      ipcService.socket.send('connectServer', { serverId });
     };
 
     window.addEventListener('storage', handler);
@@ -691,7 +685,7 @@ const RootPageComponent = () => {
     <WebRTCProvider>
       <ActionScannerProvider>
         <ExpandedProvider>
-          <Header user={user} userServer={server} friendApplications={friendApplications} />
+          <Header user={user} currentServer={server} friendApplications={friendApplications} />
           {!socket.isConnected ? (
             <LoadingSpinner />
           ) : (

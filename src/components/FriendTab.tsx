@@ -65,18 +65,17 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   const isFriendOnline = friendStatus !== 'offline' && !friendIsBlocked;
 
   // Handlers
-  const handleServerSelect = (server: Server) => {
-    if (server.serverId === userCurrentServerId) {
+  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+    if (loadingBox.isLoading) return;
+
+    if (serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
     }
 
     loadingBox.setIsLoading(true);
-    loadingBox.setLoadingServerId(server.displayId);
-
-    setTimeout(() => {
-      ipcService.socket.send('connectServer', { serverId: server.serverId });
-    }, loadingBox.loadingTimeStamp);
+    loadingBox.setLoadingServerId(serverDisplayId);
+    ipcService.socket.send('connectServer', { serverId });
   };
 
   const handleDeleteFriend = (targetId: User['userId']) => {
@@ -227,7 +226,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           <BadgeList badges={friendBadges} maxDisplay={5} />
         </div>
         {isFriendOnline && friendCurrentServerId ? (
-          <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendServer)}>
+          <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendCurrentServerId, friendServer.displayId)}>
             <div className={styles['location-icon']} />
             <div className={styles['server-name-text']}>{friendServerName}</div>
           </div>

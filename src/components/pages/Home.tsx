@@ -57,9 +57,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   // States
   const [searchQuery, setSearchQuery] = useState('');
-  const [exactMatch, setExactMatch] = useState<UserServer | null>(null);
-  const [personalResults, setPersonalResults] = useState<UserServer[]>([]);
-  const [relatedResults, setRelatedResults] = useState<UserServer[]>([]);
+  const [exactMatch, setExactMatch] = useState<Server | null>(null);
+  const [personalResults, setPersonalResults] = useState<Server[]>([]);
+  const [relatedResults, setRelatedResults] = useState<Server[]>([]);
   const [section, setSection] = useState<number>(0);
 
   // Variables
@@ -85,18 +85,17 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   };
 
   const handleConnectServer = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+    if (loadingBox.isLoading) return;
+
     if (currentServerId == serverId) {
       mainTab.setSelectedTabId('server');
       return;
     }
 
-    handleClearSearchState();
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(serverDisplayId);
-
-    setTimeout(() => {
-      ipcService.socket.send('connectServer', { serverId });
-    }, loadingBox.loadingTimeStamp);
+    ipcService.socket.send('connectServer', { serverId });
+    handleClearSearchState();
   };
 
   const handleServerSearch = (...args: Server[]) => {
@@ -114,7 +113,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       return 0;
     });
 
-    const { exact, personal, related }: { exact: UserServer | null; personal: UserServer[]; related: UserServer[] } = sortedServers.reduce(
+    const { exact, personal, related }: { exact: Server | null; personal: Server[]; related: Server[] } = sortedServers.reduce(
       (acc, server) => {
         if (server.displayId === searchQuery) {
           acc.exact = server;
@@ -125,7 +124,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         }
         return acc;
       },
-      { exact: null, personal: [], related: [] } as { exact: UserServer | null; personal: UserServer[]; related: UserServer[] },
+      { exact: null, personal: [], related: [] } as { exact: Server | null; personal: Server[]; related: Server[] },
     );
 
     setExactMatch(exact);
@@ -269,9 +268,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={`${homePage['navegate-tab']} ${section === 0 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(0)}>
             {t('home')}
           </div>
-          {/* <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
+          <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
             {t('recommended-servers')}
-          </div> */}
+          </div>
           <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
             {t('game')}
           </div>
