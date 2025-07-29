@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -147,20 +146,19 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
 
   // Effects
   useEffect(() => {
-    const offUpdateCloseToTray = ipcService.systemSettings.closeToTray.onUpdate((enable) => {
-      isCloseToTray.current = enable;
-    });
-
-    return () => {
-      offUpdateCloseToTray();
-    };
+    const unsubscribe: (() => void)[] = [
+      ipcService.systemSettings.closeToTray.get((enable) => {
+        isCloseToTray.current = enable;
+      }),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
   useEffect(() => {
     if (!actionScanner.isKeepAlive) {
-      handleChangeStatus('idle' as User['status'], userId);
+      handleChangeStatus('idle' as User['status']);
     } else {
-      handleChangeStatus('online' as User['status'], userId);
+      handleChangeStatus('online' as User['status']);
     }
   }, [actionScanner.isKeepAlive]);
 

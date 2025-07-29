@@ -59,12 +59,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const { channelId: currentChannelId } = currentChannel;
   const isCurrentUser = memberUserId === userId;
   const isSameChannel = memberCurrentChannelId === currentChannelId;
-  const speakingStatus = webRTC.speakStatus?.[memberUserId] || (isCurrentUser && webRTC.volumePercent) || 0;
-  const connectionStatus = webRTC.connectionStatus?.[memberUserId];
+  const speakingStatus = webRTC.speakStatusList?.[memberUserId] || (isCurrentUser && webRTC.volumePercent) || 0;
+  const connectionStatus = webRTC.connectionStatusList?.[memberUserId];
   const isLoading = connectionStatus === 'connecting' || connectionStatus === 'failed' || connectionStatus === 'closed' || !connectionStatus;
   const isSpeaking = speakingStatus !== 0;
   const isMuted = speakingStatus === -1;
-  const isMutedByUser = webRTC.muteList.includes(memberUserId);
+  const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
   const isFriend = friends.some((fd) => fd.targetId === memberUserId);
   const isServerAdmin = userPermission >= 5;
   const canApplyFriend = !isFriend && !isCurrentUser;

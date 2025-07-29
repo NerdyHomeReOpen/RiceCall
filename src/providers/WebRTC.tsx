@@ -7,11 +7,12 @@ import { useSocket } from '@/providers/Socket';
 import ipcService from '@/services/ipc.service';
 
 // Types
-import { Data, Offer, Answer, IceCandidate } from '@/types';
+import { Data, Offer, Answer, IceCandidate, SpeakingMode } from '@/types';
 
 interface WebRTCContextType {
   handleMuteUser: (userId: string) => void;
   handleUnmuteUser: (userId: string) => void;
+  handleToggleSpeakKey: (enable: boolean) => void;
   handleToggleTakeMic: () => void;
   handleToggleSpeakerMute: () => void;
   handleToggleMicMute: () => void;
@@ -19,21 +20,17 @@ interface WebRTCContextType {
   handleEditMicVolume: (volume: number) => void;
   handleEditMusicVolume: (volume: number) => void;
   handleEditSpeakerVolume: (volume: number) => void;
-  handleEditInputStream: (deviceId: string) => void;
-  handleEditMusicInputStream: (audioBuffer: AudioBuffer) => void;
-  handlePressKeyToSpeak: (enable: boolean) => void;
-  muteList: string[];
+  isPressSpeakKey: boolean;
+  isMicTaken: boolean;
   isMicMute: boolean;
   isSpeakerMute: boolean;
-  isMicTaken: boolean;
-  bitrate: number;
   micVolume: number;
   speakerVolume: number;
   musicVolume: number;
   volumePercent: number;
-  speakStatus: { [id: string]: number };
-  connectionStatus: { [id: string]: string };
-  isPressKeyToSpeak: boolean;
+  mutedIds: string[];
+  speakStatusList: { [id: string]: number };
+  connectionStatusList: { [id: string]: string };
 }
 
 const WebRTCContext = createContext<WebRTCContextType>({} as WebRTCContextType);
@@ -50,20 +47,21 @@ interface WebRTCProviderProps {
 
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // States
-  const [isPressKeyToSpeak, setIsPressKeyToSpeak] = useState<boolean>(false);
+  const [isPressSpeakKey, setIsPressSpeakKey] = useState<boolean>(false);
   const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
   const [isMicMute, setIsMicMute] = useState<boolean>(false);
   const [isSpeakerMute, setIsSpeakerMute] = useState<boolean>(false);
-  const [bitrate, setBitrate] = useState<number>(64000);
   const [micVolume, setMicVolume] = useState<number>(100);
   const [musicVolume, setMusicVolume] = useState<number>(100);
   const [speakerVolume, setSpeakerVolume] = useState<number>(100);
-  const [speakStatus, setSpeakStatus] = useState<{ [id: string]: number }>({});
   const [volumePercent, setVolumePercent] = useState<number>(0);
-  const [muteList, setMuteList] = useState<string[]>([]);
-  const [connectionStatus, setConnectionStatus] = useState<Record<string, 'new' | 'connecting' | 'connected' | 'disconnected' | 'failed' | 'closed'>>({});
+  const [mutedIds, setMutedIds] = useState<string[]>([]);
+  const [speakStatusList, setSpeakStatusList] = useState<{ [id: string]: number }>({});
+  const [connectionStatusList, setConnectionStatusList] = useState<Record<string, 'new' | 'connecting' | 'connected' | 'disconnected' | 'failed' | 'closed'>>({});
 
   // Refs
+  const speakingModeRef = useRef<SpeakingMode>('key');
+  const isPressSpeakKeyRef = useRef<boolean>(false);
   const audioRefHandlersRef = useRef<Record<string, (el: HTMLAudioElement | null) => void>>({});
   const inputDeviceIdRef = useRef<string | null>(null);
   const outputDeviceIdRef = useRef<string | null>(null);
@@ -84,7 +82,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const peerDataChannelListRef = useRef<{ [id: string]: RTCDataChannel }>({});
   const audioContextRef = useRef<AudioContext | null>(null);
   const micSourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
-  const musicSourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
+  // const musicSourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const micGainNodeRef = useRef<GainNode | null>(null);
   const mixGainNodeRef = useRef<GainNode | null>(null);
   const musicGainNodeRef = useRef<GainNode | null>(null);
@@ -123,7 +121,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     delete peerAudioListRef.current[userId];
     delete audioRefHandlersRef.current[userId];
 
-    setSpeakStatus((prev) => {
+    setSpeakStatusList((prev) => {
       const newState = { ...prev };
       delete newState[userId];
       return newState;
@@ -146,7 +144,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       };
       peerConnection.onconnectionstatechange = () => {
         const state = peerConnection.connectionState;
-        setConnectionStatus((prev) => {
+        setConnectionStatusList((prev) => {
           const newState = { ...prev };
           newState[userId] = state;
           return newState;
@@ -161,7 +159,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       peerConnection.ondatachannel = (event) => {
         event.channel.onmessage = (event) => {
           const { volume } = JSON.parse(event.data);
-          setSpeakStatus((prev) => {
+          setSpeakStatusList((prev) => {
             const newState = { ...prev };
             newState[userId] = volume;
             return newState;
@@ -172,7 +170,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       peerConnectionListRef.current[userId] = peerConnection;
       peerDataChannelListRef.current[userId] = peerConnection.createDataChannel('volume');
 
-      setSpeakStatus((prev) => {
+      setSpeakStatusList((prev) => {
         const newState = { ...prev };
         newState[userId] = 0;
         return newState;
@@ -255,7 +253,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const handleEditBitrate = useCallback((bitrate?: number) => {
-    console.info('Bitrate changed to', bitrate);
     if (bitrate === bitrateRef.current) {
       console.warn(`Bitrate already set to ${bitrate}, skipping...`);
       return;
@@ -274,7 +271,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         });
       }
     });
-    setBitrate(newBitrate);
     bitrateRef.current = newBitrate;
   }, []);
 
@@ -346,6 +342,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           }
 
           localStreamRef.current = stream;
+          localStreamRef.current.getAudioTracks().forEach((track) => {
+            track.enabled = speakingModeRef.current === 'key' ? isPressSpeakKeyRef.current : micTakenRef.current;
+          });
 
           // Create nodes
           const source = audioContextRef.current.createMediaStreamSource(stream);
@@ -373,16 +372,30 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     Object.entries(peerAudioListRef.current).forEach(([key, audio]) => {
       if (key === userId) audio.muted = true;
     });
-
-    setMuteList((prev) => [...prev, userId]);
+    setMutedIds((prev) => [...prev, userId]);
   }, []);
 
   const handleUnmuteUser = useCallback((userId: string) => {
     Object.entries(peerAudioListRef.current).forEach(([key, audio]) => {
       if (key === userId) audio.muted = false;
     });
+    setMutedIds((prev) => prev.filter((id) => id !== userId));
+  }, []);
 
-    setMuteList((prev) => prev.filter((id) => id !== userId));
+  const handleToggleSpeakKey = useCallback((enable: boolean) => {
+    if (!localStreamRef.current) {
+      console.warn('No local stream');
+      return;
+    }
+    if (speakingModeRef.current !== 'key') {
+      console.warn('Not in key mode');
+      return;
+    }
+    localStreamRef.current.getAudioTracks().forEach((track) => {
+      track.enabled = micTakenRef.current ? enable : false;
+    });
+    isPressSpeakKeyRef.current = enable;
+    setIsPressSpeakKey(enable);
   }, []);
 
   const handleToggleTakeMic = useCallback(() => {
@@ -391,7 +404,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       return;
     }
     localStreamRef.current.getAudioTracks().forEach((track) => {
-      track.enabled = micTakenRef.current;
+      track.enabled = speakingModeRef.current === 'key' ? isPressSpeakKeyRef.current : micTakenRef.current;
     });
     setIsMicTaken(!micTakenRef.current);
     micTakenRef.current = !micTakenRef.current;
@@ -421,48 +434,47 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     speakerMuteRef.current = !speakerMuteRef.current;
   }, [handleEditSpeakerVolume]);
 
-  const handleEditMusicInputStream = useCallback(
-    (stream: AudioBuffer) => {
-      if (musicSourceNodeRef.current) {
-        musicSourceNodeRef.current.disconnect();
-      }
-      if (!audioContextRef.current) {
-        console.warn('No audio context');
-        return;
-      }
-      if (!musicGainNodeRef.current) {
-        console.warn('No music gain node');
-        return;
-      }
-      if (!destinationNodeRef.current) {
-        console.warn('No destination node');
-        return;
-      }
+  // const handleEditMusicInputStream = useCallback(
+  //   (stream: AudioBuffer) => {
+  //     if (musicSourceNodeRef.current) {
+  //       musicSourceNodeRef.current.disconnect();
+  //     }
+  //     if (!audioContextRef.current) {
+  //       console.warn('No audio context');
+  //       return;
+  //     }
+  //     if (!musicGainNodeRef.current) {
+  //       console.warn('No music gain node');
+  //       return;
+  //     }
+  //     if (!destinationNodeRef.current) {
+  //       console.warn('No destination node');
+  //       return;
+  //     }
 
-      // Create nodes
-      const source = audioContextRef.current.createBufferSource();
-      source.buffer = stream;
-      source.connect(musicGainNodeRef.current);
-      musicSourceNodeRef.current = source;
+  //     // Create nodes
+  //     const source = audioContextRef.current.createBufferSource();
+  //     source.buffer = stream;
+  //     source.connect(musicGainNodeRef.current);
+  //     musicSourceNodeRef.current = source;
 
-      // Update track
-      const newTrack = destinationNodeRef.current.stream.getAudioTracks()[0];
-      Object.values(peerConnectionListRef.current).forEach((connection) => {
-        const senders = connection.getSenders();
-        const audioSender = senders.find((s) => s.track?.kind === 'audio');
-        if (audioSender) {
-          audioSender.replaceTrack(newTrack).catch((error) => console.error('Error replacing audio track:', error));
-        }
-      });
+  //     // Update track
+  //     const newTrack = destinationNodeRef.current.stream.getAudioTracks()[0];
+  //     Object.values(peerConnectionListRef.current).forEach((connection) => {
+  //       const senders = connection.getSenders();
+  //       const audioSender = senders.find((s) => s.track?.kind === 'audio');
+  //       if (audioSender) {
+  //         audioSender.replaceTrack(newTrack).catch((error) => console.error('Error replacing audio track:', error));
+  //       }
+  //     });
 
-      handleEditMusicVolume();
-    },
-    [handleEditMusicVolume],
-  );
+  //     handleEditMusicVolume();
+  //   },
+  //   [handleEditMusicVolume],
+  // );
 
   const getAudioRef = useCallback(
     (userId: string) => {
-      console.log('audioRefHandlersRef', audioRefHandlersRef.current);
       if (!audioRefHandlersRef.current[userId]) {
         audioRefHandlersRef.current[userId] = (el: HTMLAudioElement | null) => {
           if (!el) {
@@ -473,7 +485,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           if (el.srcObject !== stream) el.srcObject = stream;
 
           peerAudioListRef.current[userId] = el;
-          el.muted = muteList.includes(userId);
+          el.muted = mutedIds.includes(userId);
           el.volume = (speakerMuteRef.current ? 0 : speakerVolumeRef.current) / 100;
 
           if (outputDeviceIdRef.current && 'setSinkId' in el) {
@@ -483,7 +495,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       }
       return audioRefHandlersRef.current[userId];
     },
-    [muteList],
+    [mutedIds],
   );
 
   // Effects
@@ -546,21 +558,26 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   useEffect(() => {
-    ipcService.systemSettings.inputAudioDevice.get(() => {});
-    ipcService.systemSettings.outputAudioDevice.get(() => {});
-
-    const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate((deviceId) => {
+    const changeInputAudioDevice = (deviceId: string) => {
+      console.info('[WebRTC] input device updated: ', deviceId);
       inputDeviceIdRef.current = deviceId;
       handleEditInputStream(deviceId || '');
-    });
-    const offUpdateOutput = ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
-      outputDeviceIdRef.current = deviceId;
-    });
-
-    return () => {
-      offUpdateInput();
-      offUpdateOutput();
     };
+    const changeOutputAudioDevice = (deviceId: string) => {
+      console.info('[WebRTC] output device updated: ', deviceId);
+      outputDeviceIdRef.current = deviceId;
+    };
+    const changeSpeakingMode = (mode: SpeakingMode) => {
+      console.info('[WebRTC] speaking mode updated: ', mode);
+      speakingModeRef.current = mode;
+    };
+
+    const unsubscribe: (() => void)[] = [
+      ipcService.systemSettings.inputAudioDevice.get(changeInputAudioDevice),
+      ipcService.systemSettings.outputAudioDevice.get(changeOutputAudioDevice),
+      ipcService.systemSettings.speakingMode.get(changeSpeakingMode),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleEditInputStream]);
 
   useEffect(() => {
@@ -608,30 +625,27 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   return (
     <WebRTCContext.Provider
       value={{
-        handleToggleTakeMic,
         handleMuteUser,
         handleUnmuteUser,
+        handleToggleSpeakKey,
+        handleToggleTakeMic,
         handleToggleSpeakerMute,
         handleToggleMicMute,
         handleEditBitrate,
         handleEditMicVolume,
         handleEditMusicVolume,
         handleEditSpeakerVolume,
-        handleEditInputStream,
-        handleEditMusicInputStream,
-        handlePressKeyToSpeak,
-        muteList,
+        isPressSpeakKey,
+        isMicTaken,
         isMicMute,
         isSpeakerMute,
-        isMicTaken,
-        bitrate,
         micVolume,
         speakerVolume,
         musicVolume,
         volumePercent,
-        speakStatus,
-        connectionStatus,
-        isPressKeyToSpeak,
+        mutedIds,
+        speakStatusList,
+        connectionStatusList,
       }}
     >
       {Object.keys(peerStreamListRef.current).map((userId) => (

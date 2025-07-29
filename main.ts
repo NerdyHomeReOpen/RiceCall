@@ -283,7 +283,7 @@ function isAutoLaunchEnabled(): boolean {
 }
 
 // Windows Functions
-async function createMainWindow(): Promise<BrowserWindow | null> {
+async function createMainWindow(): Promise<BrowserWindow> {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.focus();
     return mainWindow;
@@ -356,7 +356,7 @@ async function createMainWindow(): Promise<BrowserWindow | null> {
   return mainWindow;
 }
 
-async function createAuthWindow() {
+async function createAuthWindow(): Promise<BrowserWindow> {
   if (authWindow && !authWindow.isDestroyed()) {
     authWindow.focus();
     return authWindow;
@@ -513,16 +513,14 @@ function connectSocket(token: string): Socket | null {
 
     ClientToServerEventNames.forEach((event) => {
       ipcMain.on(event, (_, ...args) => {
-        console.log('socket.emit', event, ...args);
-        // console.log('socket.emit', event);
+        console.log(`${new Date().toLocaleString()} | socket.emit`, event, ...args);
         socket.emit(event, ...args);
       });
     });
 
     ServerToClientEventNames.forEach((event) => {
       socket.on(event, (...args) => {
-        console.log('socket.on', event, ...args);
-        // console.log('socket.on', event);
+        console.log(`${new Date().toLocaleString()} | socket.on`, event, ...args);
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
@@ -657,8 +655,7 @@ function configureAutoUpdater() {
 
 // Discord RPC Functions
 async function setActivity(presence: DiscordRPC.Presence) {
-  if (!rpc) return;
-  await rpc.setActivity(presence).catch((error) => {
+  await rpc?.setActivity(presence).catch((error) => {
     console.error('Cannot set activity:', error);
   });
 }
@@ -666,15 +663,11 @@ async function setActivity(presence: DiscordRPC.Presence) {
 async function configureDiscordRPC() {
   DiscordRPC.register(DISCORD_RPC_CLIENT_ID);
   rpc = new DiscordRPC.Client({ transport: 'ipc' });
-
   rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID }).catch(() => {
     console.warn('Cannot login to Discord RPC, will not show Discord status');
     return null;
   });
-
-  if (!rpc) return;
-
-  rpc.on('ready', () => {
+  rpc?.on('ready', () => {
     setActivity(defaultPrecence);
   });
 }
@@ -721,11 +714,9 @@ function setTrayIcon(isLogin: boolean) {
 
 function configureTray() {
   if (tray) tray.destroy();
-
   const trayIconPath = APP_TRAY_ICON.gray;
-
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
-
+  tray.setToolTip(`RiceCall v${app.getVersion()}`);
   tray.on('click', () => {
     if (isLogin) {
       mainWindow.show();
@@ -733,41 +724,28 @@ function configureTray() {
       authWindow.show();
     }
   });
-
-  tray.setToolTip(`RiceCall v${app.getVersion()}`);
-
   setTrayIcon(isLogin);
 }
 
 app.on('ready', async () => {
+  // Configure
   configureAutoUpdater();
   configureDiscordRPC();
   configureTray();
 
   // if (await checkIsHinet()) websocketUrl = WS_URL;
 
-  await createAuthWindow();
-  await createMainWindow();
-
   if (!store.get('dontShowDisclaimer')) {
     await createPopup('aboutus', 'aboutUs');
-
     popups['aboutUs'].setAlwaysOnTop(true);
   }
 
-  mainWindow.hide();
-  authWindow.show();
-
-  app.on('before-quit', () => {
-    if (rpc) {
-      rpc.destroy().catch((error) => {
-        console.error('Cannot destroy Discord RPC:', error);
-      });
-    }
+  await createAuthWindow().then((authWindow) => {
+    authWindow.show();
   });
 
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+  await createMainWindow().then((mainWindow) => {
+    mainWindow.hide();
   });
 
   // Auth handlers
@@ -933,7 +911,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-channel-ui-mode', (event) => {
-    event.reply('channel-ui-mode', store.get('schannelUIMode') || 'auto');
+    event.reply('channel-ui-mode', store.get('channelUIMode') || 'auto');
   });
 
   ipcMain.on('get-close-to-tray', (event) => {
@@ -1009,7 +987,7 @@ app.on('ready', async () => {
 
   // Privacy
   ipcMain.on('get-not-save-message-history', (event) => {
-    event.reply('notSaveMessageHistory', store.get('not-save-message-history') ?? true);
+    event.reply('not-save-message-history', store.get('notSaveMessageHistory') ?? true);
   });
 
   // HotKey
@@ -1063,7 +1041,6 @@ app.on('ready', async () => {
   });
 
   // Basic
-
   ipcMain.on('set-auto-login', (_, enable) => {
     store.set('autoLogin', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -1073,6 +1050,9 @@ app.on('ready', async () => {
 
   ipcMain.on('set-auto-launch', (_, enable) => {
     setAutoLaunch(enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('auto-launch', enable);
+    });
   });
 
   ipcMain.on('set-always-on-top', (_, enable) => {
@@ -1322,14 +1302,31 @@ app.on('ready', async () => {
   });
 });
 
+app.on('before-quit', () => {
+  rpc?.destroy().catch((error) => {
+    console.error('Cannot destroy Discord RPC:', error);
+  });
+});
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
 app.on('activate', async () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    await createAuthWindow();
-    await createMainWindow();
+    await createAuthWindow().then((authWindow) => {
+      authWindow.show();
+    });
 
-    mainWindow.hide();
-    authWindow.show();
+    await createMainWindow().then((mainWindow) => {
+      mainWindow.hide();
+    });
   }
+});
+
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  handleDeepLink(url);
 });
 
 app.whenReady().then(() => {
@@ -1354,11 +1351,6 @@ if (!app.requestSingleInstanceLock()) {
     }
   });
 }
-
-app.on('open-url', (event, url) => {
-  event.preventDefault();
-  handleDeepLink(url);
-});
 
 // DeepLink Handler
 async function handleDeepLink(url: string) {

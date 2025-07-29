@@ -12,7 +12,7 @@ import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
-import { User, Server, Channel, ServerMember, ChannelMessage, PromptMessage, UserServer, UserFriend } from '@/types';
+import { User, Server, Channel, ServerMember, ChannelMessage, PromptMessage, UserServer, UserFriend, SpeakingMode } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -56,7 +56,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   const [currentTime, setCurrentTime] = useState<number>(Date.now());
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
 
-  const [speakMode, setSpeakMode] = useState<'key' | 'auto'>('key');
+  const [speakMode, setSpeakMode] = useState<SpeakingMode>('key');
   const [speakHotKey, setSpeakHotKey] = useState<string>('');
 
   // Variables
@@ -224,21 +224,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   }, [t, serverName, activeServerMembers]);
 
   useEffect(() => {
-    ipcService.systemSettings.speakingMode.get(() => {});
-    ipcService.systemSettings.defaultSpeakingKey.get(() => {});
-
-    const offUpdateSpeakMode = ipcService.systemSettings.speakingMode.onUpdate((mode) => {
+    const changeSpeakingMode = (mode: SpeakingMode) => {
+      console.info('[ServerPage] speaking mode updated: ', mode);
       setSpeakMode(mode);
-    });
-
-    const offUpdateSpeakKey = ipcService.systemSettings.defaultSpeakingKey.onUpdate((key) => {
-      setSpeakHotKey(key);
-    });
-
-    return () => {
-      offUpdateSpeakMode();
-      offUpdateSpeakKey();
     };
+    const changeDefaultSpeakingKey = (key: string) => {
+      console.info('[ServerPage] default speaking key updated: ', key);
+      setSpeakHotKey(key);
+    };
+
+    const unsubscribe: (() => void)[] = [ipcService.systemSettings.speakingMode.get(changeSpeakingMode), ipcService.systemSettings.defaultSpeakingKey.get(changeDefaultSpeakingKey)];
+    return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
   useEffect(() => {
@@ -387,8 +383,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                 <div className={styles['mic-text']}>{webRTC.isMicTaken ? t('taken-mic') : t('take-mic')}</div>
                 <div className={styles['mic-sub-text']}>
                   {webRTC.isMicTaken && webRTC.micVolume === 0 && t('mic-muted')}
-                  {webRTC.isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && !webRTC.isPressKeyToSpeak && t('press-key-to-speak', { '0': speakHotKey })}
-                  {webRTC.isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && webRTC.isPressKeyToSpeak && t('speaking')}
+                  {webRTC.isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && !webRTC.isPressSpeakKey && t('press-key-to-speak', { '0': speakHotKey })}
+                  {webRTC.isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && webRTC.isPressSpeakKey && t('speaking')}
                 </div>
               </div>
             </div>

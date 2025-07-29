@@ -26,21 +26,20 @@ const Providers = ({ children }: ProvidersProps) => {
   }, []);
 
   useEffect(() => {
-    const setFont = (font: string | null) => {
+    const changeFont = (font: string | null) => {
+      console.info('[Font] font updated: ', font);
       if (!font) return;
       document.body.style.setProperty('font-family', font, 'important');
       document.body.style.setProperty('--font-family', font, 'important');
     };
-
-    const setFontSize = (fontSize: number | null) => {
+    const changeFontSize = (fontSize: number | null) => {
+      console.info('[Font] font size updated: ', fontSize);
       if (!fontSize) return;
       document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
     };
 
-    ipcService.systemSettings.font.get(setFont);
-    ipcService.systemSettings.font.onUpdate(setFont);
-    ipcService.systemSettings.fontSize.get(setFontSize);
-    ipcService.systemSettings.fontSize.onUpdate(setFontSize);
+    const unsubscribe: (() => void)[] = [ipcService.systemSettings.font.get(changeFont), ipcService.systemSettings.fontSize.get(changeFontSize)];
+    return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
   return (
