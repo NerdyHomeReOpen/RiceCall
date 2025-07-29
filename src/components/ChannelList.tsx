@@ -129,6 +129,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
 
   };
 
+  const handleQueueLeave = () => {
+    if (!socket) return;
+    socket.send.leaveFromQueue({ serverId, channelId: currentChannel.channelId });
+
+  };
+
   // Effects
   useEffect(() => {
     for (const channel of serverChannels) {
@@ -286,9 +292,21 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
           </div>
           <div className={styles['saperator-2']} />
             <div className={styles['queue-bottom-bar']}>
-            <button className={styles['queue-participate-button']} onClick={handleQueueParticipate}>
-              {t('participate')}
-            </button>
+           {queueUsers.some((u) => u.userId === userId) ? (
+              <button
+                className={styles['queue-leave-button']}
+                onClick={handleQueueLeave}
+              >
+                {t('leave-queue')}
+              </button>
+            ) : (
+              <button
+                className={styles['queue-participate-button']}
+                onClick={handleQueueParticipate}
+              >
+                {t('participate')}
+              </button>
+            )}
           </div>
         </>
         
