@@ -287,6 +287,11 @@
   height: 120px;
 }
 
+.mic-queue-list-users{
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .queue-bottom-bar {
   position: sticky;
   bottom: 0;
