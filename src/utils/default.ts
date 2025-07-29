@@ -1,4 +1,4 @@
-import { User, Channel, Server, FriendApplication, MemberApplication, ServerMember, UserServer, Member, Friend, UserFriend, FriendGroup, UserServerStatus } from '@/types';
+import { User, Channel, Server, Member, Friend, FriendGroup, FriendApplication, MemberApplication } from '@/types';
 
 const Default = {
   user: (overrides: Partial<User> = {}): User => ({
@@ -26,6 +26,61 @@ const Default = {
     ...overrides,
   }),
 
+  friend: (overrides: Partial<Friend> = {}): Friend => ({
+    ...Default.user(),
+    userId: '',
+    targetId: '',
+    isBlocked: false,
+    friendGroupId: '',
+    createdAt: 0,
+    ...overrides,
+  }),
+
+  friendGroup: (overrides: Partial<FriendGroup> = {}): FriendGroup => ({
+    friendGroupId: '',
+    userId: '',
+    name: '',
+    order: 0,
+    createdAt: 0,
+    ...overrides,
+  }),
+
+  friendApplication: (overrides: Partial<FriendApplication> = {}): FriendApplication => ({
+    ...Default.user(),
+    senderId: '',
+    receiverId: '',
+    description: '',
+    createdAt: 0,
+    ...overrides,
+  }),
+
+  server: (overrides: Partial<Server> = {}): Server => ({
+    ...Default.member(),
+    serverId: '',
+    name: '',
+    avatar: `${Date.now()}`,
+    avatarUrl: `/default/serverAvatar.webp`,
+    announcement: '',
+    applyNotice: '',
+    description: '',
+    slogan: '',
+    type: 'other',
+    visibility: 'public',
+    receiveApply: true,
+    level: 0,
+    wealth: 0,
+    displayId: '',
+    lobbyId: '',
+    receptionLobbyId: '',
+    ownerId: '',
+    createdAt: 0,
+    recent: false,
+    owned: false,
+    favorite: false,
+    timestamp: 0,
+    ...overrides,
+  }),
+
   channel: (overrides: Partial<Channel> = {}): Channel => ({
     channelId: '',
     name: '',
@@ -50,53 +105,8 @@ const Default = {
     ...overrides,
   }),
 
-  server: (overrides: Partial<Server> = {}): Server => ({
-    serverId: '',
-    name: '',
-    avatar: `${Date.now()}`,
-    avatarUrl: `/default/serverAvatar.webp`,
-    announcement: '',
-    applyNotice: '',
-    description: '',
-    slogan: '',
-    type: 'other',
-    visibility: 'public',
-    receiveApply: true,
-    level: 0,
-    wealth: 0,
-    displayId: '',
-    lobbyId: '',
-    receptionLobbyId: '',
-    ownerId: '',
-    createdAt: 0,
-    ...overrides,
-  }),
-
-  friend: (overrides: Partial<Friend> = {}): Friend => ({
-    userId: '',
-    targetId: '',
-    isBlocked: false,
-    friendGroupId: '',
-    createdAt: 0,
-    ...overrides,
-  }),
-
-  friendGroup: (overrides: Partial<FriendGroup> = {}): FriendGroup => ({
-    friendGroupId: '',
-    userId: '',
-    name: '',
-    order: 0,
-    createdAt: 0,
-    ...overrides,
-  }),
-
-  userFriend: (overrides: Partial<UserFriend> = {}): UserFriend => ({
-    ...Default.friend(),
-    ...Default.user(),
-    ...overrides,
-  }),
-
   member: (overrides: Partial<Member> = {}): Member => ({
+    ...Default.user(),
     userId: '',
     serverId: '',
     isBlocked: 0,
@@ -109,39 +119,11 @@ const Default = {
     ...overrides,
   }),
 
-  userServerStatus: (overrides: Partial<UserServerStatus> = {}): UserServerStatus => ({
-    recent: false,
-    owned: false,
-    favorite: false,
-    timestamp: 0,
-    ...overrides,
-  }),
-
-  userServer: (overrides: Partial<UserServer> = {}): UserServer => ({
-    ...Default.server(),
-    ...Default.member(),
-    ...Default.userServerStatus(),
-    ...overrides,
-  }),
-
-  serverMember: (overrides: Partial<ServerMember> = {}): ServerMember => ({
-    ...Default.user(),
-    ...Default.member(),
-    ...overrides,
-  }),
-
-  friendApplication: (overrides: Partial<FriendApplication> = {}): FriendApplication => ({
-    senderId: '',
-    receiverId: '',
-    description: '',
-    ...Default.user(),
-    ...overrides,
-  }),
-
   memberApplication: (overrides: Partial<MemberApplication> = {}): MemberApplication => ({
+    ...Default.user(),
     serverId: '',
     description: '',
-    ...Default.user(),
+    createdAt: 0,
     ...overrides,
   }),
 };

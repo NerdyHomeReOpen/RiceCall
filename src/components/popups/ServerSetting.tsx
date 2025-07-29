@@ -174,9 +174,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     ipcService.initialData.onRequest('dialogError', { message, submitTo: 'dialogError' });
   };
 
-  const handleOpenMemberApplySetting = () => {
+  const handleOpenMemberApplySetting = (userId: User['userId'], serverId: Server['serverId']) => {
     ipcService.popup.open('memberApplySetting', 'memberApplySetting');
-    ipcService.initialData.onRequest('memberApplySetting', { serverId });
+    ipcService.initialData.onRequest('memberApplySetting', { serverId, userId });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
@@ -632,7 +632,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
               <div className={popup['label']}>{`${t('applicants')} (${filteredApplications.length})`}</div>
               <div className={popup['row']}>
-                <div className={popup['button']} onClick={() => handleOpenMemberApplySetting()}>
+                <div className={popup['button']} onClick={() => handleOpenMemberApplySetting(userId, serverId)}>
                   {t('apply-setting')}
                 </div>
                 <div className={setting['search-border']}>

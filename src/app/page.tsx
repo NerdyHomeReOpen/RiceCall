@@ -387,7 +387,7 @@ const RootPageComponent = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
-  const [server, setServer] = useState<Server>(Default.userServer());
+  const [server, setServer] = useState<Server>(Default.server());
   const [serverMembers, setServerMembers] = useState<Member[]>([]);
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
   const [channel, setChannel] = useState<Channel>(Default.channel());
@@ -582,7 +582,7 @@ const RootPageComponent = () => {
   }, [user.currentChannelId, serverChannels]);
 
   useEffect(() => {
-    const server = servers.find((item) => item.serverId === user.currentServerId) || Default.userServer();
+    const server = servers.find((item) => item.serverId === user.currentServerId) || Default.server();
     setServer(server);
   }, [user.currentServerId, servers]);
 
@@ -655,7 +655,7 @@ const RootPageComponent = () => {
   useEffect(() => {
     if (!socket.isConnected) {
       setUser(Default.user());
-      setServer(Default.userServer());
+      setServer(Default.server());
       setChannel(Default.channel());
     }
     mainTab.setSelectedTabId('home');

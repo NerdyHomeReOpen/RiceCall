@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { Server } from '@/types';
+import type { Server, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -17,10 +17,11 @@ import ipcService from '@/services/ipc.service';
 import Default from '@/utils/default';
 
 interface MemberApplySettingPopupProps {
+  userId: User['userId'];
   serverId: Server['serverId'];
 }
 
-const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.memo(({ serverId }) => {
+const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.memo(({ serverId, userId }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -44,15 +45,15 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
 
   // Effects
   useEffect(() => {
-    if (!serverId || refreshRef.current) return;
+    if (!serverId || !userId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      getService.server({ serverId: serverId }).then((server) => {
+      getService.server({ userId: userId, serverId: serverId }).then((server) => {
         if (server) setServer(server);
       });
     };
     refresh();
-  }, [serverId]);
+  }, [serverId, userId]);
 
   return (
     <form className={popup['popup-wrapper']}>

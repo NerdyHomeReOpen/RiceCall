@@ -159,7 +159,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   useEffect(() => {
     if (!targetCurrentServerId) return;
-    getService.server({ serverId: targetCurrentServerId }).then((server) => {
+    getService.server({ userId: userId, serverId: targetCurrentServerId }).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
   }, [targetCurrentServerId]);

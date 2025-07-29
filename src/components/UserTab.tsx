@@ -7,7 +7,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import { ServerMember, Channel, Server, User, Member, UserFriend, UserServer } from '@/types';
+import type { Channel, Server, User, Member, Friend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -22,10 +22,10 @@ import BadgeListViewer from '@/components/BadgeList';
 import ipcService from '@/services/ipc.service';
 
 interface UserTabProps {
-  member: ServerMember;
+  member: Member;
   currentChannel: Channel;
-  currentServer: UserServer;
-  friends: UserFriend[];
+  currentServer: Server;
+  friends: Friend[];
   selectedItemId: string | null;
   selectedItemType: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
