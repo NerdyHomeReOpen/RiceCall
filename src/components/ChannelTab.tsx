@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Types
-import { ServerMember, Channel, Server, User, UserFriend, UserServer } from '@/types';
+import type { Member, Channel, Server, User, Friend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -20,9 +20,9 @@ import ipcService from '@/services/ipc.service';
 interface ChannelTabProps {
   channel: Channel;
   currentChannel: Channel;
-  currentServer: UserServer;
-  friends: UserFriend[];
-  serverMembers: ServerMember[];
+  currentServer: Server;
+  friends: Friend[];
+  serverMembers: Member[];
   expanded: Record<string, boolean>;
   selectedItemId: string | null;
   selectedItemType: string | null;
@@ -88,9 +88,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       ipcService.popup.onSubmit('warningDialog', callback);
     };
 
-    const handleOpenChannelSetting = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
+    const handleOpenChannelSetting = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
       ipcService.popup.open('channelSetting', 'channelSetting');
-      ipcService.initialData.onRequest('channelSetting', { channelId, serverId });
+      ipcService.initialData.onRequest('channelSetting', { userId, serverId, channelId });
     };
 
     const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Channel['channelId'] | null, userId: User['userId']) => {
@@ -142,10 +142,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     useEffect(() => {
       if (!findMe || !userInChannel) return;
       findMe.handleChannelExpanded.current = () => {
-        setExpanded((prev) => ({
-          ...prev,
-          [channelId]: true,
-        }));
+        setExpanded((prev) => ({ ...prev, [channelId]: true }));
       };
     }, [channelId, findMe, setExpanded, userInChannel]);
 
@@ -197,7 +194,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 id: 'edit-channel',
                 label: t('edit-channel'),
                 show: canEdit,
-                onClick: () => handleOpenChannelSetting(channelId, serverId),
+                onClick: () => handleOpenChannelSetting(userId, serverId, channelId),
               },
               {
                 id: 'separator',

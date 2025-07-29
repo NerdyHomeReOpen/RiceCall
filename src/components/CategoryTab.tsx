@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Types
-import { ServerMember, Channel, Server, User, Category, UserFriend, UserServer } from '@/types';
+import type { Member, Channel, Server, User, Category, Friend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -21,9 +21,9 @@ import Default from '@/utils/default';
 interface CategoryTabProps {
   category: Category;
   currentChannel: Channel;
-  currentServer: UserServer;
-  friends: UserFriend[];
-  serverMembers: ServerMember[];
+  currentServer: Server;
+  friends: Friend[];
+  serverMembers: Member[];
   serverChannels: (Channel | Category)[];
   expanded: Record<string, boolean>;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
@@ -95,9 +95,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       ipcService.popup.onSubmit('warningDialog', callback);
     };
 
-    const handleOpenChannelSetting = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
+    const handleOpenChannelSetting = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
       ipcService.popup.open('channelSetting', 'channelSetting');
-      ipcService.initialData.onRequest('channelSetting', { channelId, serverId });
+      ipcService.initialData.onRequest('channelSetting', { userId, serverId, channelId });
     };
 
     const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Category['categoryId'], userId: User['userId']) => {
@@ -149,10 +149,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     useEffect(() => {
       if (!findMe || !userInCategory) return;
       findMe.handleCategoryExpanded.current = () => {
-        setExpanded((prev) => ({
-          ...prev,
-          [categoryId]: true,
-        }));
+        setExpanded((prev) => ({ ...prev, [categoryId]: true }));
       };
     }, [categoryId, findMe, setExpanded, userInCategory]);
 
@@ -192,7 +189,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 id: 'edit-channel',
                 label: t('edit-channel'),
                 show: canManageChannel,
-                onClick: () => handleOpenChannelSetting(categoryId, serverId),
+                onClick: () => handleOpenChannelSetting(userId, serverId, categoryId),
               },
               {
                 id: 'separator',

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import contextMenu from '@/styles/contextMenu.module.css';
 
 // Types
-import { ContextMenuItem } from '@/types';
+import type { ContextMenuItem } from '@/types';
 
 interface ContextMenuProps {
   items: ContextMenuItem[];
@@ -15,14 +15,7 @@ interface ContextMenuProps {
   preferLeft?: boolean;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = ({
-  items,
-  onClose,
-  x = 0,
-  y = 0,
-  preferTop = false,
-  preferLeft = false,
-}) => {
+const ContextMenu: React.FC<ContextMenuProps> = ({ items, onClose, x = 0, y = 0, preferTop = false, preferLeft = false }) => {
   // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -71,11 +64,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   }, [x, y, preferLeft, preferTop]);
 
   return (
-    <div
-      ref={menuRef}
-      className={`context-menu-container ${contextMenu['context-menu']}`}
-      style={{ top: menuY, left: menuX }}
-    >
+    <div ref={menuRef} className={`context-menu-container ${contextMenu['context-menu']}`} style={{ top: menuY, left: menuX }}>
       {items
         .filter((item) => item?.show ?? true)
         .map((item, index) => {
@@ -85,9 +74,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           return (
             <div
               key={index}
-              className={`${contextMenu['option']} ${item.hasSubmenu ? contextMenu['has-submenu'] : ''} ${
-                item.disabled ? contextMenu['disabled'] : ''
-              }`}
+              className={`${contextMenu['option']} ${item.hasSubmenu ? contextMenu['has-submenu'] : ''} ${item.disabled ? contextMenu['disabled'] : ''}`}
               data-type={item.icon || ''}
               onClick={() => {
                 if (item.disabled) return;
@@ -97,16 +84,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
               onMouseEnter={(e) => {
                 if (!item.hasSubmenu || !item.submenuItems) return;
                 const rect = e.currentTarget.getBoundingClientRect();
-                setSubMenu(
-                  <ContextMenu
-                    items={item.submenuItems}
-                    onClose={onClose}
-                    x={rect.left}
-                    y={rect.top}
-                    preferTop={false}
-                    preferLeft={true}
-                  />,
-                );
+                setSubMenu(<ContextMenu items={item.submenuItems} onClose={onClose} x={rect.left} y={rect.top} preferTop={false} preferLeft={true} />);
               }}
               onMouseLeave={() => {
                 if (item.hasSubmenu) setSubMenu(null);

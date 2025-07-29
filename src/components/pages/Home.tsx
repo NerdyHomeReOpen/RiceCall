@@ -7,10 +7,10 @@ import homePage from '@/styles/pages/home.module.css';
 
 // Components
 import ServerList from '@/components/ServerList';
-import RecommendedServerList from '@/components/RecommendedServerList';
+import RecommendServerList from '@/components/RecommendServerList';
 
 // Type
-import { RecommendedServers, User, UserServer } from '@/types';
+import type { RecommendServerList as RecommendServerListType, User, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,7 @@ import { useLoading } from '@/providers/Loading';
 import ipcService from '@/services/ipc.service';
 
 const SearchResultItem: React.FC<{
-  server: UserServer;
+  server: Server;
   onClick: () => void;
 }> = ({ server, onClick }) => (
   <div className={homePage['item']} onClick={onClick}>
@@ -39,12 +39,12 @@ const SearchResultItem: React.FC<{
 
 interface HomePageProps {
   user: User;
-  servers: UserServer[];
-  recommendedServers: RecommendedServers;
+  servers: Server[];
+  recommendServerList: RecommendServerListType;
   display: boolean;
 }
 
-const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, recommendedServers, display }) => {
+const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, recommendServerList, display }) => {
   // Hooks
   const { t } = useTranslation();
   const mainTab = useMainTab();
@@ -84,7 +84,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     }, 500);
   };
 
-  const handleConnectServer = (serverId: UserServer['serverId'], serverDisplayId: UserServer['displayId']) => {
+  const handleConnectServer = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
     if (currentServerId == serverId) {
       mainTab.setSelectedTabId('server');
       return;
@@ -99,7 +99,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     }, loadingBox.loadingTimeStamp);
   };
 
-  const handleServerSearch = (...args: UserServer[]) => {
+  const handleServerSearch = (...args: Server[]) => {
     setExactMatch(null);
     setPersonalResults([]);
     setRelatedResults([]);
@@ -295,7 +295,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
       {/* Recommended servers */}
       <main className={homePage['recommended-servers']} style={section === 1 ? {} : { display: 'none' }}>
-        <RecommendedServerList servers={recommendedServers} user={user} />
+        <RecommendServerList servers={recommendServerList} user={user} />
       </main>
 
       {/* Personal Exclusive */}

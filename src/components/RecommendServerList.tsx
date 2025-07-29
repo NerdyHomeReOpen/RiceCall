@@ -4,17 +4,17 @@ import React, { useState } from 'react';
 import homePage from '@/styles/pages/home.module.css';
 
 // Types
-import { RecommendedServers, User } from '@/types';
+import type { RecommendServerList as RecommendServerListType, User } from '@/types';
 
 // Components
 // import ServerCard from '@/components/ServerCard';
 
-interface RecommendedServersListProps {
-  servers: RecommendedServers;
+interface RecommendServerListProps {
   user: User;
+  servers: RecommendServerListType;
 }
 
-const RecommendedServersList: React.FC<RecommendedServersListProps> = ({ servers }) => {
+const RecommendServerList: React.FC<RecommendServerListProps> = ({ servers }) => {
   // Variables
   const categories = Object.keys(servers);
 
@@ -51,6 +51,6 @@ const RecommendedServersList: React.FC<RecommendedServersListProps> = ({ servers
   );
 };
 
-RecommendedServersList.displayName = 'RecommendedServersList';
+RecommendServerList.displayName = 'RecommendServerList';
 
-export default RecommendedServersList;
+export default RecommendServerList;

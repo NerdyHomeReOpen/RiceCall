@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { User, UserFriend, FriendApplication } from '@/types';
+import type { User, Friend, FriendApplication } from '@/types';
 
 // CSS
 import styles from '@/styles/popups/friendVerification.module.css';
@@ -36,7 +36,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
 
   // Handlers
-  const handleSort = <T extends UserFriend | FriendApplication>(field: keyof T, array: T[], direction: 1 | -1) => {
+  const handleSort = <T extends Friend | FriendApplication>(field: keyof T, array: T[], direction: 1 | -1) => {
     const newDirection = direction === 1 ? -1 : 1;
     return [...array].sort(Sorter(field, newDirection));
   };
@@ -102,10 +102,11 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   }, [socket.isConnected]);
 
   useEffect(() => {
+    if (!userId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      getService.userFriendApplications({ userId: userId }).then((userFriendApplications) => {
-        if (userFriendApplications) setFriendApplications(handleSort('createdAt', userFriendApplications, 1));
+      getService.friendApplications({ receiverId: userId }).then((friendApplications) => {
+        if (friendApplications) setFriendApplications(handleSort('createdAt', friendApplications, 1));
       });
     };
     refresh();

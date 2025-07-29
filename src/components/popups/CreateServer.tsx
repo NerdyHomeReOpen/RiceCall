@@ -6,7 +6,7 @@ import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
 
 // Types
-import { User, Server, UserServer } from '@/types';
+import type { User, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -39,7 +39,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
   // States
   const [user, setUser] = useState<User>(Default.user());
-  const [servers, setServers] = useState<UserServer[]>([]);
+  const [servers, setServers] = useState<Server[]>([]);
   const [server, setServer] = useState<Server>(Default.server());
   const [section, setSection] = useState<number>(0);
 
@@ -57,10 +57,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
   const handleOpenErrorDialog = (message: string) => {
     ipcService.popup.open('dialogError', 'errorDialog');
-    ipcService.initialData.onRequest('errorDialog', {
-      message: message,
-      submitTo: 'errorDialog',
-    });
+    ipcService.initialData.onRequest('errorDialog', { message: message, submitTo: 'errorDialog' });
   };
 
   const handleClose = () => {
@@ -69,10 +66,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
   const handleAvatarCropper = (serverId: Server['serverId'], avatarData: string) => {
     ipcService.popup.open('avatarCropper', 'avatarCropper');
-    ipcService.initialData.onRequest('avatarCropper', {
-      avatarData: avatarData,
-      submitTo: 'avatarCropper',
-    });
+    ipcService.initialData.onRequest('avatarCropper', { avatarData: avatarData, submitTo: 'avatarCropper' });
     ipcService.popup.onSubmit('avatarCropper', async (data) => {
       const formData = new FormData();
       formData.append('_type', 'server');
@@ -97,7 +91,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
       getService.user({ userId: userId }).then((user) => {
         if (user) setUser(user);
       });
-      getService.userServers({ userId: userId }).then((servers) => {
+      getService.servers({ userId: userId }).then((servers) => {
         if (servers) setServers(servers);
       });
     };

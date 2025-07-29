@@ -6,7 +6,7 @@ import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Types
-import { User, UserFriend, Server } from '@/types';
+import type { User, Friend, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,7 @@ import BadgeList from '@/components/BadgeList';
 
 interface FriendTabProps {
   user: User;
-  friend: UserFriend;
+  friend: Friend;
   selectedItemId: string | null;
   setSelectedItemId: (id: string | null) => void;
 }
@@ -108,7 +108,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     ipcService.initialData.onRequest('editFriend', { userId, targetId });
   };
 
-  const handleBlockFriend = (targetId: User['userId'], isBlocked: UserFriend['isBlocked']) => {
+  const handleBlockFriend = (targetId: User['userId'], isBlocked: Friend['isBlocked']) => {
     handleOpenWarningDialog(t('confirmBlockFriend', { blockType: isBlocked ? t('unblock') : t('block'), userName: friendName }), () =>
       ipcService.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }),
     );
@@ -117,13 +117,13 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   useEffect(() => {
     if (!friendCurrentServerId) return;
     const refresh = async () => {
-      getService.server({ serverId: friendCurrentServerId }).then((server) => {
+      getService.server({ userId: friendUserId, serverId: friendCurrentServerId }).then((server) => {
         if (server) handleServerUpdate(server);
       });
       refreshed.current = true;
     };
     refresh();
-  }, [friendCurrentServerId]);
+  }, [friendCurrentServerId, friendUserId]);
 
   return (
     <div

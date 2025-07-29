@@ -8,7 +8,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import { PopupType, Server, User, Channel, UserServer, FriendGroup, UserFriend, ServerMember, ChannelMessage, PromptMessage, FriendApplication, RecommendedServers } from '@/types';
+import type { PopupType, Server, User, Channel, FriendGroup, ChannelMessage, PromptMessage, FriendApplication, RecommendServerList, Friend, Member } from '@/types';
 
 // i18n
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
@@ -42,7 +42,7 @@ import getService from '@/services/get.service';
 
 interface HeaderProps {
   user: User;
-  userServer: UserServer;
+  userServer: Server;
   friendApplications: FriendApplication[];
 }
 
@@ -382,13 +382,13 @@ const RootPageComponent = () => {
 
   // States
   const [user, setUser] = useState<User>(Default.user());
-  const [servers, setServers] = useState<UserServer[]>([]);
-  const [recommendedServers, setRecommendedServers] = useState<RecommendedServers>({});
-  const [friends, setFriends] = useState<UserFriend[]>([]);
+  const [servers, setServers] = useState<Server[]>([]);
+  const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
+  const [friends, setFriends] = useState<Friend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
-  const [server, setServer] = useState<UserServer>(Default.userServer());
-  const [serverMembers, setServerMembers] = useState<ServerMember[]>([]);
+  const [server, setServer] = useState<Server>(Default.userServer());
+  const [serverMembers, setServerMembers] = useState<Member[]>([]);
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
   const [channel, setChannel] = useState<Channel>(Default.channel());
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
@@ -402,11 +402,11 @@ const RootPageComponent = () => {
     setUser((prev) => ({ ...prev, ...args[0].update }));
   };
 
-  const handleServersSet = (...args: UserServer[]) => {
+  const handleServersSet = (...args: Server[]) => {
     setServers(args);
   };
 
-  const handleServerAdd = (...args: { data: UserServer }[]) => {
+  const handleServerAdd = (...args: { data: Server }[]) => {
     args.forEach((item) => {
       setServers((prev) => [...prev, item.data]);
     });
@@ -424,11 +424,11 @@ const RootPageComponent = () => {
     });
   };
 
-  const handleFriendsSet = (...args: UserFriend[]) => {
+  const handleFriendsSet = (...args: Friend[]) => {
     setFriends(args);
   };
 
-  const handleFriendAdd = (...args: { data: UserFriend }[]) => {
+  const handleFriendAdd = (...args: { data: Friend }[]) => {
     args.forEach((item) => {
       setFriends((prev) => [...prev, item.data]);
     });
@@ -480,17 +480,17 @@ const RootPageComponent = () => {
     });
   };
 
-  const handleServerMembersSet = (...args: ServerMember[]) => {
+  const handleServerMembersSet = (...args: Member[]) => {
     setServerMembers(args);
   };
 
-  const handleServerMemberAdd = (...args: { data: ServerMember }[]) => {
+  const handleServerMemberAdd = (...args: { data: Member }[]) => {
     args.forEach((item) => {
       setServerMembers((prev) => [...prev, item.data]);
     });
   };
 
-  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<ServerMember> }[]) => {
+  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
     args.forEach((item) => {
       setServerMembers((prev) => prev.map((member) => (member.userId === item.userId && member.serverId === item.serverId ? { ...member, ...item.update } : member)));
     });
@@ -633,22 +633,21 @@ const RootPageComponent = () => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      getService.userServers({ userId: userId }).then((servers) => {
+      getService.servers({ userId: userId }).then((servers) => {
         if (servers) setServers(servers);
       });
-      getService.userFriends({ userId: userId }).then((friends) => {
+      getService.friends({ userId: userId }).then((friends) => {
         if (friends) setFriends(friends);
       });
-      getService.userFriendGroups({ userId: userId }).then((friendGroups) => {
+      getService.friendGroups({ userId: userId }).then((friendGroups) => {
         if (friendGroups) setFriendGroups(friendGroups);
       });
-      getService.userFriendApplications({ userId: userId }).then((friendApplications) => {
+      getService.friendApplications({ receiverId: userId }).then((friendApplications) => {
         if (friendApplications) setFriendApplications(friendApplications);
       });
-      // getService.recommendedServers().then((recommendedServers) => {
-      //   if (recommendedServers) setRecommendedServers(recommendedServers);
-      // });
-      setRecommendedServers({});
+      getService.recommendServerList().then((recommendServerList) => {
+        if (recommendServerList) setRecommendServerList(recommendServerList);
+      });
     };
     refresh();
   }, [userId]);
@@ -697,7 +696,7 @@ const RootPageComponent = () => {
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage user={user} servers={servers} recommendedServers={recommendedServers} display={mainTab.selectedTabId === 'home'} />
+              <HomePage user={user} servers={servers} recommendServerList={recommendServerList} display={mainTab.selectedTabId === 'home'} />
               <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}

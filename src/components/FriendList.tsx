@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import styles from '@/styles/pages/friend.module.css';
 
 // Types
-import { User, FriendGroup, UserFriend } from '@/types';
+import type { User, FriendGroup, Friend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -20,8 +20,8 @@ import FriendGroupTab from '@/components/FriendGroupTab';
 
 interface FriendListProps {
   user: User;
+  friends: Friend[];
   friendGroups: FriendGroup[];
-  friends: UserFriend[];
 }
 
 const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, friends }) => {

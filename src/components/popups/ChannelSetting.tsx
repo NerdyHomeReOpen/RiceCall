@@ -6,7 +6,7 @@ import setting from '@/styles/popups/setting.module.css';
 import markdown from '@/styles/markdown.module.css';
 
 // Types
-import { Channel, Server } from '@/types';
+import type { Channel, Server, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -22,11 +22,12 @@ import Default from '@/utils/default';
 import MarkdownViewer from '@/components/MarkdownViewer';
 
 interface ChannelSettingPopupProps {
+  userId: User['userId'];
   serverId: Server['serverId'];
   channelId: Channel['channelId'];
 }
 
-const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ serverId, channelId }) => {
+const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ userId, serverId, channelId }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -75,15 +76,15 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
     if (!channelId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      getService.channel({ channelId: channelId }).then((channel) => {
+      getService.channel({ serverId: serverId, channelId: channelId }).then((channel) => {
         if (channel) setChannel(channel);
       });
-      getService.server({ serverId: serverId }).then((server) => {
+      getService.server({ userId: userId, serverId: serverId }).then((server) => {
         if (server) setServer(server);
       });
     };
     refresh();
-  }, [channelId, serverId]);
+  }, [channelId, serverId, userId]);
 
   return (
     <div className={popup['popup-wrapper']}>

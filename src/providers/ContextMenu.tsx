@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, createContext, ReactNode, useCallback } from 'react';
 
 // Types
-import { ContextMenuItem, ServerMember, Badge } from '@/types';
+import type { ContextMenuItem, Member, Badge } from '@/types';
 
 // Components
 import ContextMenu from '@/components/ContextMenu';
@@ -11,15 +11,9 @@ import EmojiPicker from '@/components/EmojiPicker';
 
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: ContextMenuItem[]) => void;
-  showUserInfoBlock: (x: number, y: number, preferTop: boolean, member: ServerMember) => void;
+  showUserInfoBlock: (x: number, y: number, preferTop: boolean, member: Member) => void;
   showBadgeInfoCard: (x: number, y: number, preferTop: boolean, preferLeft: boolean, badge: Badge) => void;
-  showEmojiPicker: (
-    x: number,
-    y: number,
-    preferTop: boolean,
-    type: 'custom' | 'unicode',
-    onEmojiSelect: (emoji: string) => void,
-  ) => void;
+  showEmojiPicker: (x: number, y: number, preferTop: boolean, type: 'custom' | 'unicode', onEmojiSelect: (emoji: string) => void) => void;
   closeContextMenu: () => void;
   closeUserInfoBlock: () => void;
   closeBadgeInfoCard: () => void;
@@ -96,16 +90,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   }, [handleKeyDown, handleClickOutside, handleMouseMove]);
 
   const showContextMenu = (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: ContextMenuItem[]) => {
-    setContextMenu(
-      <ContextMenu
-        items={items}
-        onClose={closeContextMenu}
-        x={x}
-        y={y}
-        preferTop={preferTop}
-        preferLeft={preferLeft}
-      />,
-    );
+    setContextMenu(<ContextMenu items={items} onClose={closeContextMenu} x={x} y={y} preferTop={preferTop} preferLeft={preferLeft} />);
     setIsContextMenuVisible(true);
   };
 
@@ -114,7 +99,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsContextMenuVisible(false);
   };
 
-  const showUserInfoBlock = (x: number, y: number, preferTop: boolean, member: ServerMember) => {
+  const showUserInfoBlock = (x: number, y: number, preferTop: boolean, member: Member) => {
     setUserInfo(<UserInfoCard member={member} x={x} y={y} preferTop={preferTop} />);
     setIsUserInfoVisible(true);
   };
@@ -134,13 +119,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsBadgeInfoVisible(false);
   };
 
-  const showEmojiPicker = (
-    x: number,
-    y: number,
-    preferTop: boolean,
-    type: 'custom' | 'unicode',
-    onEmojiSelect: (emoji: string) => void,
-  ) => {
+  const showEmojiPicker = (x: number, y: number, preferTop: boolean, type: 'custom' | 'unicode', onEmojiSelect: (emoji: string) => void) => {
     setEmojiPicker(<EmojiPicker type={type} onEmojiSelect={onEmojiSelect} x={x} y={y} preferTop={preferTop} />);
     setIsEmojiPickerVisible(true);
   };

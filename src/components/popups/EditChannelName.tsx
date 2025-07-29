@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { Channel, Server } from '@/types';
+import type { Channel, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -49,12 +49,12 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
     if (!channelId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      getService.channel({ channelId: channelId }).then((channel) => {
+      getService.channel({ serverId: serverId, channelId: channelId }).then((channel) => {
         if (channel) setChannel(channel);
       });
     };
     refresh();
-  }, [channelId]);
+  }, [channelId, serverId]);
 
   return (
     <div className={popup['popup-wrapper']}>

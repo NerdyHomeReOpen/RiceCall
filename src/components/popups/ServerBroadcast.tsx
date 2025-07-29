@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Types
-import { Server, Channel, PromptMessage } from '@/types';
+import type { Server, Channel, PromptMessage } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';

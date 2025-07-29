@@ -6,8 +6,7 @@ import permission from '@/styles/permission.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Types
-import { User } from '@/types';
-import type { ChannelMessage } from '@/types';
+import type { User, ChannelMessage } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';

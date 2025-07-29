@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 // Types
-import { Server, User, UserServer, Friend } from '@/types';
+import type { Server, User, Friend } from '@/types';
 
 // Components
 import BadgeListViewer from '@/components/BadgeList';
@@ -52,7 +52,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   // States
   const [user, setUser] = useState<User>(Default.user());
   const [friend, setFriend] = useState<Friend>(Default.friend());
-  const [servers, setServers] = useState<UserServer[]>([]);
+  const [servers, setServers] = useState<Server[]>([]);
   const [serversView, setServersView] = useState('joined');
   const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'userSetting'>('about');
 
@@ -177,7 +177,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
       getService.user({ userId: targetId }).then((user) => {
         if (user) setUser(user);
       });
-      getService.userServers({ userId: targetId }).then((servers) => {
+      getService.servers({ userId: targetId }).then((servers) => {
         if (servers) setServers(servers);
       });
       getService.friend({ userId: userId, targetId: targetId }).then((friend) => {

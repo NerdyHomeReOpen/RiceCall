@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 // Types
-import { Channel, Category, Server, User } from '@/types';
+import type { Channel, Category, Server, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -157,19 +157,19 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, [socket.isConnected]);
 
   useEffect(() => {
-    if (!userId || refreshed.current) return;
+    if (!serverId || refreshed.current) return;
     const refresh = async () => {
       refreshed.current = true;
-      getService.serverChannels({ serverId }).then((serverChannels) => {
-        if (serverChannels) {
-          const filteredChannels = serverChannels.filter((ch) => !ch.isLobby);
+      getService.channels({ serverId }).then((channels) => {
+        if (channels) {
+          const filteredChannels = channels.filter((ch) => !ch.isLobby);
           setServerChannels(filteredChannels);
           filteredChannels.forEach((ch) => (map.current[ch.channelId] = ch.order));
         }
       });
     };
     refresh();
-  }, [serverId, userId]);
+  }, [serverId]);
 
   useEffect(() => {
     for (const channel of serverChannels) {

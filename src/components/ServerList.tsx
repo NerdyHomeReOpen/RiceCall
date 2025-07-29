@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import homePage from '@/styles/pages/home.module.css';
 
 // Types
-import { UserServer, User } from '@/types';
+import type { Server, User } from '@/types';
 
 // Components
 import ServerCard from '@/components/ServerCard';
@@ -14,8 +14,8 @@ import { useTranslation } from 'react-i18next';
 
 interface ServerListProps {
   title: string;
-  servers: UserServer[];
   user: User;
+  servers: Server[];
 }
 
 const ServerList: React.FC<ServerListProps> = React.memo(({ title, user, servers }) => {

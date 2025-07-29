@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { FriendGroup } from '@/types';
+import type { FriendGroup, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -17,10 +17,11 @@ import getService from '@/services/get.service';
 import Default from '@/utils/default';
 
 interface EditFriendGroupPopupProps {
+  userId: User['userId'];
   friendGroupId: FriendGroup['friendGroupId'];
 }
 
-const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ friendGroupId }) => {
+const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ userId, friendGroupId }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -48,12 +49,12 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
     if (!friendGroupId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      getService.friendGroup({ friendGroupId: friendGroupId }).then((friendGroup) => {
+      getService.friendGroup({ userId: userId, friendGroupId: friendGroupId }).then((friendGroup) => {
         if (friendGroup) setFriendGroup(friendGroup);
       });
     };
     refresh();
-  }, [friendGroupId]);
+  }, [friendGroupId, userId]);
 
   return (
     <form className={popup['popup-wrapper']}>

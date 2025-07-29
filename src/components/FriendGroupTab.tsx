@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import styles from '@/styles/pages/friend.module.css';
 
 // Types
-import { User, FriendGroup, UserFriend } from '@/types';
+import type { User, FriendGroup, Friend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -18,8 +18,8 @@ import FriendTab from '@/components/FriendTab';
 
 interface FriendGroupTabProps {
   user: User;
+  friends: Friend[];
   friendGroup: FriendGroup;
-  friends: UserFriend[];
   selectedItemId: string | null;
   setSelectedItemId: (id: string | null) => void;
 }
@@ -54,9 +54,9 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
     ipcService.popup.onSubmit('warningDialog', callback);
   };
 
-  const handleOpenEditFriendGroup = (friendGroupId: FriendGroup['friendGroupId'], userId: User['userId']) => {
+  const handleOpenEditFriendGroup = (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']) => {
     ipcService.popup.open('editFriendGroup', 'editFriendGroup');
-    ipcService.initialData.onRequest('editFriendGroup', { friendGroupId, userId });
+    ipcService.initialData.onRequest('editFriendGroup', { userId, friendGroupId });
   };
 
   return (
@@ -75,7 +75,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
               id: 'edit-friend-group',
               label: t('edit-friend-group'),
               show: canManageFriendGroup,
-              onClick: () => handleOpenEditFriendGroup(friendGroupId, userId),
+              onClick: () => handleOpenEditFriendGroup(userId, friendGroupId),
             },
             {
               id: 'delete-friend-group',

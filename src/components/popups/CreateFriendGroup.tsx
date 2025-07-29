@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Types
-import { FriendGroup } from '@/types';
+import type { FriendGroup } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';

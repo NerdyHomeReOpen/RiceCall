@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { Member, User, Server } from '@/types';
+import type { Member, User, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';

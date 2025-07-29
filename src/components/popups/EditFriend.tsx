@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { User, Friend, FriendGroup } from '@/types';
+import type { User, Friend, FriendGroup } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
@@ -81,7 +81,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
       getService.friend({ userId: userId, targetId: targetId }).then((friend) => {
         if (friend) setFriend(friend);
       });
-      getService.userFriendGroups({ userId: userId }).then((friendGroups) => {
+      getService.friendGroups({ userId: userId }).then((friendGroups) => {
         if (friendGroups) setFriendGroups(friendGroups);
       });
     };

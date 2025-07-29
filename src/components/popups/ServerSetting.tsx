@@ -7,7 +7,7 @@ import permission from '@/styles/permission.module.css';
 import markdown from '@/styles/markdown.module.css';
 
 // Types
-import { MemberApplication, Server, ServerMember, Member, User } from '@/types';
+import type { MemberApplication, Server, Member, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -62,8 +62,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
   // States
   const [server, setServer] = useState<Server>(Default.server());
-  const [member, setMember] = useState<Member>(Default.member());
-  const [serverMembers, setServerMembers] = useState<ServerMember[]>([]);
+  const [serverMembers, setServerMembers] = useState<Member[]>([]);
   const [serverApplications, setServerApplications] = useState<MemberApplication[]>([]);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [sortDirection, setSortDirection] = useState<1 | -1>(-1);
@@ -87,8 +86,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     wealth: serverWealth,
     createdAt: serverCreatedAt,
     visibility: serverVisibility,
+    permissionLevel: userPermission,
   } = server;
-  const { permissionLevel: userPermission } = member;
   const canSubmit = serverName.trim();
   const filteredMembers = serverMembers.filter((member) => {
     const searchLower = searchText.toLowerCase();
@@ -104,13 +103,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   });
 
   // Handlers
-  const handleServerMemberAdd = (...args: { data: ServerMember }[]) => {
+  const handleServerMemberAdd = (...args: { data: Member }[]) => {
     args.forEach((arg) => {
       setServerMembers((prev) => [...prev, arg.data]);
     });
   };
 
-  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<ServerMember> }[]) => {
+  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
     args.forEach((arg) => {
       setServerMembers((prev) => prev.map((item) => (item.userId === arg.userId && item.serverId === arg.serverId ? { ...item, ...arg.update } : item)));
     });
@@ -228,14 +227,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     ipcService.window.close();
   };
 
-  const handleSort = <T extends ServerMember | MemberApplication>(field: keyof T, array: T[], direction: 1 | -1) => {
+  const handleSort = <T extends Member | MemberApplication>(field: keyof T, array: T[], direction: 1 | -1) => {
     const newDirection = direction === 1 ? -1 : 1;
     // setSortField(String(field)); temp: not used
     setSortDirection(newDirection);
     return [...array].sort(Sorter(field, newDirection));
   };
 
-  const handleMemberSort = (field: keyof ServerMember) => {
+  const handleMemberSort = (field: keyof Member) => {
     const sortedMembers = handleSort(field, serverMembers, sortDirection);
     setServerMembers(sortedMembers);
   };
@@ -270,16 +269,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     if (!serverId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      getService.server({ serverId: serverId }).then((server) => {
+      getService.server({ userId: userId, serverId: serverId }).then((server) => {
         if (server) setServer(server);
       });
-      getService.member({ serverId: serverId, userId: userId }).then((member) => {
-        if (member) setMember(member);
-      });
-      getService.serverMembers({ serverId: serverId }).then((members) => {
+      getService.members({ serverId: serverId }).then((members) => {
         if (members) setServerMembers(handleSort('permissionLevel', members, 1));
       });
-      getService.serverMemberApplications({ serverId: serverId }).then((applications) => {
+      getService.memberApplications({ serverId: serverId }).then((applications) => {
         if (applications) setServerApplications(handleSort('createdAt', applications, 1));
       });
     };
@@ -473,7 +469,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 <thead>
                   <tr>
                     {MEMBER_FIELDS.map((field) => (
-                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof ServerMember)}>
+                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
                         {field.name}
                       </th>
                     ))}
@@ -738,7 +734,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 <thead>
                   <tr>
                     {BLOCK_MEMBER_FIELDS.map((field) => (
-                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof ServerMember)}>
+                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
                         {field.name}
                       </th>
                     ))}

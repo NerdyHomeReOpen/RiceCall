@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Types
-import { Channel, Server } from '@/types';
+import type { Channel, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';

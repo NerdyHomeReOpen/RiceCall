@@ -5,7 +5,7 @@ import styles from '@/styles/pages/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import { ServerMember, Channel, Server, User, Category, UserFriend, UserServer, MemberApplication } from '@/types';
+import type { Member, Channel, Server, User, Category, Friend, MemberApplication } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -21,11 +21,11 @@ import CategoryTab from '@/components/CategoryTab';
 import ipcService from '@/services/ipc.service';
 
 interface ChannelListProps {
-  currentServer: UserServer;
+  currentServer: Server;
   currentChannel: Channel;
-  serverMembers: ServerMember[];
+  serverMembers: Member[];
   serverChannels: (Channel | Category)[];
-  friends: UserFriend[];
+  friends: Friend[];
 }
 
 const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends }) => {
@@ -125,10 +125,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   // Effects
   useEffect(() => {
     for (const channel of serverChannels) {
-      setExpanded((prev) => ({
-        ...prev,
-        [channel.channelId]: prev[channel.channelId] != undefined ? prev[channel.channelId] : true,
-      }));
+      setExpanded((prev) => ({ ...prev, [channel.channelId]: prev[channel.channelId] != undefined ? prev[channel.channelId] : true }));
     }
   }, [serverChannels]);
 

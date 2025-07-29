@@ -10,14 +10,14 @@ import { useMainTab } from '@/providers/MainTab';
 import { useTranslation } from 'react-i18next';
 
 // Type
-import { UserServer, User, Member, Server } from '@/types';
+import type { User, Member, Server } from '@/types';
 
 // Services
 import ipcService from '@/services/ipc.service';
 
 interface ServerCardProps {
   user: User;
-  server: UserServer;
+  server: Server;
 }
 
 const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {

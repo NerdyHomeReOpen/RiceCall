@@ -7,7 +7,7 @@ import React, { useEffect, useState, ReactNode } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import { PopupType } from '@/types';
+import type { PopupType } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';

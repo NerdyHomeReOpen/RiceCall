@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import popup from '@/styles/popup.module.css';
 
 // Types
-import { Server, MemberApplication, User } from '@/types';
+import type { Server, MemberApplication, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -51,7 +51,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
     if (!serverId || !userId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      getService.server({ serverId: serverId }).then((server) => {
+      getService.server({ userId: userId, serverId: serverId }).then((server) => {
         if (server) setServer(server);
       });
       getService.memberApplication({ userId: userId, serverId: serverId }).then((memberApplication) => {

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import popup from '@/styles/popup.module.css';
 
 // Types
-import { FriendApplication, FriendGroup, User } from '@/types';
+import type { FriendApplication, FriendGroup, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -97,16 +97,16 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
       getService.user({ userId: targetId }).then((target) => {
         if (target) setTarget(target);
       });
-      getService.userFriendGroups({ userId: userId }).then((friendGroups) => {
+      getService.friendGroups({ userId: userId }).then((friendGroups) => {
         if (friendGroups) setFriendGroups(friendGroups);
       });
-      getService.friendApplication({ senderId: userId, receiverId: targetId }).then((sentFriendApplication) => {
+      getService.friendApplication({ receiverId: userId, senderId: targetId }).then((sentFriendApplication) => {
         if (sentFriendApplication) {
           setSection(1);
           setFriendApplication(sentFriendApplication);
         }
       });
-      getService.friendApplication({ senderId: targetId, receiverId: userId }).then((receivedFriendApplication) => {
+      getService.friendApplication({ receiverId: targetId, senderId: userId }).then((receivedFriendApplication) => {
         if (receivedFriendApplication) {
           setSection(2);
           setFriendApplication(receivedFriendApplication);

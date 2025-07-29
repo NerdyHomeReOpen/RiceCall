@@ -12,7 +12,7 @@ import FriendListViewer from '@/components/FriendList';
 import BadgeListViewer from '@/components/BadgeList';
 
 // Types
-import { User, UserFriend, FriendGroup } from '@/types';
+import type { User, Friend, FriendGroup } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,7 @@ import ipcService from '@/services/ipc.service';
 
 interface FriendPageProps {
   user: User;
-  friends: UserFriend[];
+  friends: Friend[];
   friendGroups: FriendGroup[];
   display: boolean;
 }

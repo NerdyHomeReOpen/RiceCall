@@ -12,7 +12,7 @@ import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
-import { User, Server, Channel, ServerMember, ChannelMessage, PromptMessage, UserServer, UserFriend, SpeakingMode } from '@/types';
+import type { User, Server, Channel, Member, ChannelMessage, PromptMessage, SpeakingMode, Friend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -24,10 +24,10 @@ import ipcService from '@/services/ipc.service';
 
 interface ServerPageProps {
   user: User;
-  currentServer: UserServer;
-  serverMembers: ServerMember[];
+  currentServer: Server;
+  serverMembers: Member[];
   serverChannels: Channel[];
-  friends: UserFriend[];
+  friends: Friend[];
   currentChannel: Channel;
   channelMessages: ChannelMessage[];
   actionMessages: PromptMessage[];
