@@ -8,7 +8,6 @@ import { Server, MemberApplication, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -25,7 +24,6 @@ interface ApplyMemberPopupProps {
 const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, serverId }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
 
   // Refs
   const refreshRef = useRef(false);
@@ -40,13 +38,8 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
   const { description: applicationDes } = memberApplication;
 
   // Handlers
-  const handleCreatMemberApplication = (memberApplication: Partial<MemberApplication>, userId: User['userId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.createMemberApplication({
-      memberApplication,
-      userId,
-      serverId,
-    });
+  const handleCreatMemberApplication = (serverId: Server['serverId'], preset: Partial<MemberApplication>) => {
+    ipcService.socket.send('sendMemberApplication', { serverId, preset });
   };
 
   const handleClose = () => {
@@ -115,7 +108,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
           className={popup['button']}
           style={section === 0 ? {} : { display: 'none' }}
           onClick={() => {
-            handleCreatMemberApplication({ description: applicationDes }, userId, serverId);
+            handleCreatMemberApplication(serverId, { description: applicationDes });
             handleClose();
           }}
         >

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
 // Types
-import { User, Channel, Server } from '@/types';
+import { Channel, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -14,28 +13,20 @@ import popup from '@/styles/popup.module.css';
 import ipcService from '@/services/ipc.service';
 
 interface ChannelPasswordPopupProps {
-  userId: User['userId'];
   serverId: Server['serverId'];
   channelId: Channel['channelId'];
 }
 
-const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ userId, serverId, channelId }) => {
+const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ serverId, channelId }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // States
-  const [password, setPassword] = useState<string | null>(null);
+  const [password, setPassword] = useState<string>('');
 
   // Handlers
-  const handleJoinChannel = (
-    userId: User['userId'],
-    channelId: Channel['channelId'],
-    serverId: Server['serverId'],
-    password: string | null,
-  ) => {
-    if (!socket) return;
-    socket.send.connectChannel({ userId, channelId, serverId, password });
+  const handleJoinChannel = (channelId: Channel['channelId'], serverId: Server['serverId'], password: string) => {
+    ipcService.socket.send('connectChannel', { channelId, serverId, password });
   };
 
   const handleClose = () => {
@@ -55,7 +46,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
               maxLength={4}
               onChange={(e) => {
                 const value = e.target.value;
-                if (value === '') setPassword(null);
+                if (value === '') setPassword('');
                 else setPassword(value);
               }}
             />
@@ -68,7 +59,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
         <div
           className={`${popup['button']} ${password && password.length <= 4 ? '' : 'disabled'}`}
           onClick={() => {
-            handleJoinChannel(userId, channelId, serverId, password);
+            handleJoinChannel(channelId, serverId, password);
             handleClose();
           }}
         >

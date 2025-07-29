@@ -5,13 +5,12 @@ import homePage from '@/styles/pages/home.module.css';
 
 // Providers
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useSocket } from '@/providers/Socket';
 import { useLoading } from '@/providers/Loading';
 import { useMainTab } from '@/providers/MainTab';
 import { useTranslation } from 'react-i18next';
 
 // Type
-import { PopupType, UserServer, User, Member, Server } from '@/types';
+import { UserServer, User, Member, Server } from '@/types';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -24,7 +23,6 @@ interface ServerCardProps {
 const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   // Hooks
   const contextMenu = useContextMenu();
-  const socket = useSocket();
   const loadingBox = useLoading();
   const mainTab = useMainTab();
   const { t } = useTranslation();
@@ -47,7 +45,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   const canRemoveMemberShip = serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
 
   // Handles
-  const handleServerSelect = (userId: User['userId'], serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
     if (serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
@@ -57,12 +55,16 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     loadingBox.setLoadingServerId(serverDisplayId);
 
     setTimeout(() => {
-      socket.send.connectServer({ userId, serverId });
+      ipcService.socket.send('connectServer', { serverId });
     }, loadingBox.loadingTimeStamp);
   };
 
+  const handleFavoriteServer = (serverId: Server['serverId']) => {
+    ipcService.socket.send('favoriteServer', { serverId });
+  };
+
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
+    ipcService.popup.open('dialogAlert', 'alertDialog');
     ipcService.initialData.onRequest('alertDialog', {
       message: message,
       submitTo: 'alertDialog',
@@ -71,32 +73,19 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   };
 
   const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editMember({
-      member,
-      userId,
-      serverId,
-    });
+    ipcService.socket.send('editMember', { userId, serverId, update: member });
   };
 
   const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
-    if (!socket) return;
     handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => {
       handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId);
-    });
-  };
-
-  const handleFavoriteServer = (serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.favoriteServer({
-      serverId,
     });
   };
 
   return (
     <div
       className={homePage['server-card']}
-      onClick={() => handleServerSelect(userId, serverId, serverDisplayId)}
+      onClick={() => handleServerSelect(serverId, serverDisplayId)}
       onContextMenu={(e) => {
         const x = e.clientX;
         const y = e.clientY;
@@ -104,7 +93,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
           {
             id: 'join-server',
             label: t('join-server'),
-            onClick: () => handleServerSelect(userId, serverId, serverDisplayId),
+            onClick: () => handleServerSelect(serverId, serverDisplayId),
           },
           {
             id: 'view-server-info',

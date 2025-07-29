@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Member, User, Server } from '@/types';
 
 // Providers
-import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // CSS
@@ -24,7 +23,6 @@ interface EditNicknamePopupProps {
 
 const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId, serverId }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // Refs
@@ -39,9 +37,8 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
   const { name: userName } = user;
 
   // Handlers
-  const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editMember({ member, userId, serverId });
+  const handleEditMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
+    ipcService.socket.send('editMember', { userId, serverId, update });
   };
 
   const handleClose = () => {
@@ -88,7 +85,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         <div
           className={popup['button']}
           onClick={() => {
-            handleEditMember({ nickname: memberNickname }, userId, serverId);
+            handleEditMember(userId, serverId, { nickname: memberNickname });
             handleClose();
           }}
         >
@@ -97,7 +94,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         <div className={popup['button']} onClick={() => handleClose()}>
           {t('cancel')}
         </div>
-        <div className={popup['button']} onClick={() => handleEditMember({ nickname: memberNickname }, userId, serverId)}>
+        <div className={popup['button']} onClick={() => handleEditMember(userId, serverId, { nickname: memberNickname })}>
           {t('set')}
         </div>
       </div>

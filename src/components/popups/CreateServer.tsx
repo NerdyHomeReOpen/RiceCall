@@ -6,10 +6,9 @@ import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
 
 // Types
-import { User, Server, PopupType, UserServer } from '@/types';
+import { User, Server, UserServer } from '@/types';
 
 // Providers
-import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // Services
@@ -27,25 +26,15 @@ interface CreateServerPopupProps {
 const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
 
   // Refs
   const refreshRef = useRef(false);
 
   // Constant
   const SERVER_TYPES: { value: Server['type']; name: string }[] = [
-    {
-      value: 'game',
-      name: t('game'),
-    },
-    {
-      value: 'entertainment',
-      name: t('entertainment'),
-    },
-    {
-      value: 'other',
-      name: t('other'),
-    },
+    { value: 'game', name: t('game') },
+    { value: 'entertainment', name: t('entertainment') },
+    { value: 'other', name: t('other') },
   ];
 
   // States
@@ -62,21 +51,12 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   const canCreate = remainingServers > 0 && serverName.trim() !== '';
 
   // Handlers
-  const handleCreateServer = () => {
-    if (!socket) return;
-    socket.send.createServer({
-      server: {
-        name: serverName,
-        avatar: serverAvatar,
-        avatarUrl: serverAvatarUrl,
-        slogan: serverSlogan,
-        type: serverType,
-      },
-    });
+  const handleCreateServer = (preset: Partial<Server>) => {
+    ipcService.socket.send('createServer', { preset });
   };
 
   const handleOpenErrorDialog = (message: string) => {
-    ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
+    ipcService.popup.open('dialogError', 'errorDialog');
     ipcService.initialData.onRequest('errorDialog', {
       message: message,
       submitTo: 'errorDialog',
@@ -88,7 +68,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   };
 
   const handleAvatarCropper = (serverId: Server['serverId'], avatarData: string) => {
-    ipcService.popup.open(PopupType.AVATAR_CROPPER, 'avatarCropper');
+    ipcService.popup.open('avatarCropper', 'avatarCropper');
     ipcService.initialData.onRequest('avatarCropper', {
       avatarData: avatarData,
       submitTo: 'avatarCropper',
@@ -144,10 +124,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
                   key={type.value}
                   className={`${styles['button']} ${serverType === type.value ? styles['selected'] : ''}`}
                   onClick={() => {
-                    setServer((prev) => ({
-                      ...prev,
-                      type: type.value as Server['type'],
-                    }));
+                    setServer((prev) => ({ ...prev, type: type.value as Server['type'] }));
                     setSection(1);
                   }}
                 >
@@ -247,7 +224,13 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
           <div
             className={`${popup['button']} ${!canCreate ? 'disabled' : ''}`}
             onClick={() => {
-              handleCreateServer();
+              handleCreateServer({
+                name: serverName,
+                avatar: serverAvatar,
+                avatarUrl: serverAvatarUrl,
+                slogan: serverSlogan,
+                type: serverType,
+              });
               handleClose();
             }}
           >

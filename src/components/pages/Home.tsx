@@ -10,7 +10,7 @@ import ServerList from '@/components/ServerList';
 import RecommendedServerList from '@/components/RecommendedServerList';
 
 // Type
-import { PopupType, RecommendedServers, SocketServerEvent, User, UserServer } from '@/types';
+import { RecommendedServers, User, UserServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -47,9 +47,9 @@ interface HomePageProps {
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, recommendedServers, display }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
+  const socket = useSocket();
 
   // Refs
   const searchRef = useRef<HTMLDivElement>(null);
@@ -71,7 +71,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   // Handlers
   const handleSearchServer = (query: string) => {
-    if (!socket || !query.trim()) {
+    if (!query.trim()) {
       handleClearSearchState();
       return;
     }
@@ -80,22 +80,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       clearTimeout(searchTimeerRef.current);
     }
     searchTimeerRef.current = setTimeout(() => {
-      socket.send.searchServer({ query });
+      ipcService.socket.send('searchServer', { query });
     }, 500);
   };
 
   const handleConnectServer = (serverId: UserServer['serverId'], serverDisplayId: UserServer['displayId']) => {
-    if (!socket) return;
     if (currentServerId == serverId) {
       mainTab.setSelectedTabId('server');
       return;
-    }
-
-    if (currentServerId) {
-      socket.send.disconnectServer({
-        serverId: currentServerId,
-        userId: userId,
-      });
     }
 
     handleClearSearchState();
@@ -103,21 +95,18 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     loadingBox.setLoadingServerId(serverDisplayId);
 
     setTimeout(() => {
-      socket.send.connectServer({
-        serverId,
-        userId: userId,
-      });
+      ipcService.socket.send('connectServer', { serverId });
     }, loadingBox.loadingTimeStamp);
   };
 
-  const handleServerSearch = (results: UserServer[]) => {
+  const handleServerSearch = (...args: UserServer[]) => {
     setExactMatch(null);
     setPersonalResults([]);
     setRelatedResults([]);
 
-    if (!results.length) return;
+    if (!args.length) return;
 
-    const sortedServers = results.sort((a, b) => {
+    const sortedServers = args.sort((a, b) => {
       const aHasId = a.displayId.toString().includes(searchQuery);
       const bHasId = b.displayId.toString().includes(searchQuery);
       if (aHasId && !bHasId) return -1;
@@ -145,8 +134,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   };
 
   const handleOpenCreateServer = (userId: User['userId']) => {
-    ipcService.popup.open(PopupType.CREATE_SERVER, 'createServer');
-    ipcService.initialData.onRequest(PopupType.CREATE_SERVER, { userId });
+    ipcService.popup.open('createServer', 'createServer');
+    ipcService.initialData.onRequest('createServer', { userId });
   };
 
   const handleClearSearchState = () => {
@@ -174,22 +163,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, [handleClickOutside]);
 
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.SERVER_SEARCH]: handleServerSearch,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
-
-    return () => {
-      unsubscribe.forEach((unsub) => unsub());
-    };
-  }, [socket, searchQuery]);
+    const unsubscribe: (() => void)[] = [ipcService.socket.on('serverSearch', handleServerSearch)];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, [socket.isConnected]);
 
   useEffect(() => {
     const offDeepLink = ipcService.deepLink.onDeepLink(handleDeepLink);

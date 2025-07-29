@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Channel, Server } from '@/types';
 
 // Providers
-import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // CSS
@@ -24,7 +23,6 @@ interface CreateChannelPopupProps {
 
 const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ channelId, serverId }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // Refs
@@ -39,9 +37,8 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
   const { name: channelName } = channel;
   const canCreate = channelName.trim();
 
-  const handleCreateChannel = (channel: Partial<Channel>, serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.createChannel({ channel, serverId });
+  const handleCreateChannel = (serverId: Server['serverId'], preset: Partial<Channel>) => {
+    ipcService.socket.send('createChannel', { serverId, preset });
   };
 
   const handleClose = () => {
@@ -83,7 +80,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
         <div
           className={`${popup['button']} ${!canCreate ? 'disabled' : ''}`}
           onClick={() => {
-            handleCreateChannel({ name: channelName, categoryId: channelId }, serverId);
+            handleCreateChannel(serverId, { name: channelName, categoryId: channelId });
             handleClose();
           }}
         >

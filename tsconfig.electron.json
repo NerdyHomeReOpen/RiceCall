@@ -8,6 +8,6 @@
     "sourceMap": true,
     "outDir": "build"
   },
-  "include": ["main.ts"],
+  "include": ["main.ts", "types/**/*", "global.d.ts"],
   "exclude": ["node_modules"]
 }

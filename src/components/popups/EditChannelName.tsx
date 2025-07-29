@@ -5,7 +5,6 @@ import { Channel, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -24,7 +23,6 @@ interface editChannelNamePopupProps {
 
 const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ channelId, serverId }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // Refs
@@ -38,9 +36,8 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
   const canSubmit = channelName.trim();
 
   // Handlers
-  const handleEditChannel = (channel: Partial<Channel>, channelId: Channel['channelId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editChannel({ channel, channelId, serverId });
+  const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
+    ipcService.socket.send('editChannel', { serverId, channelId, update });
   };
 
   const handleClose = () => {
@@ -79,7 +76,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
           className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
             if (!canSubmit) return;
-            handleEditChannel({ name: channelName }, channelId, serverId);
+            handleEditChannel(serverId, channelId, { name: channelName });
             handleClose();
           }}
         >

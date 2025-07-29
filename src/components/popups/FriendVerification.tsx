@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { User, UserFriend, FriendApplication, PopupType, SocketServerEvent } from '@/types';
+import { User, UserFriend, FriendApplication } from '@/types';
 
 // CSS
 import styles from '@/styles/popups/friendVerification.module.css';
@@ -50,85 +50,59 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, {
-      userId,
-      targetId,
-      targetName,
-    });
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
+    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.APPLY_FRIEND, 'applyFriend');
-    ipcService.initialData.onRequest('applyFriend', {
-      userId,
-      targetId,
-    });
+    ipcService.popup.open('applyFriend', 'applyFriend');
+    ipcService.initialData.onRequest('applyFriend', { userId, targetId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
-    ipcService.initialData.onRequest('alertDialog', {
-      message: message,
-      submitTo: 'alertDialog',
-    });
+    ipcService.popup.open('dialogAlert', 'alertDialog');
+    ipcService.initialData.onRequest('alertDialog', { message: message, submitTo: 'alertDialog' });
     ipcService.popup.onSubmit('alertDialog', callback);
   };
 
-  const handleDeleteAllFriendApplication = () => {
-    if (!socket) return;
-
+  const handleRejectAllFriendApplication = () => {
     if (friendApplications.length === 0) return;
-
     handleOpenAlertDialog(t('confirm-reject-all-friend-application'), () => {
-      for (const item of friendApplications) {
-        const senderId = item.senderId;
-        const receiverId = item.receiverId;
-        socket.send.deleteFriendApplication({ senderId, receiverId });
-      }
-      setFriendApplications([]);
+      ipcService.socket.send('rejectFriendApplication', ...friendApplications.map((item) => ({ senderId: item.senderId })));
     });
   };
 
-  const handleDeleteFriendApplication = (senderId: User['userId'], receiverId: User['userId']) => {
-    setFriendApplications((prev) => {
-      return prev.filter((friend) => friend.senderId !== senderId);
+  const handleRejectFriendApplication = (senderId: User['userId']) => {
+    ipcService.socket.send('rejectFriendApplication', { senderId });
+  };
+
+  const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
+    args.forEach((arg) => {
+      setFriendApplications((prev) => [...prev, arg.data]);
     });
-    socket.send.deleteFriendApplication({ senderId, receiverId });
   };
 
-  const handleFriendApplicationAdd = (friendApplication: FriendApplication): void => {
-    setFriendApplications((prev) => [...prev, friendApplication]);
+  const handleFriendApplicationUpdate = (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
+    args.forEach((arg) => {
+      setFriendApplications((prev) => prev.map((item) => (item.senderId === arg.senderId ? { ...item, ...arg.update } : item)));
+    });
   };
 
-  const handleFriendApplicationUpdate = (senderId: User['userId'], receiverId: User['userId'], friendApplication: Partial<FriendApplication>) => {
-    setFriendApplications((prev) => prev.map((item) => (item.senderId === senderId ? { ...item, ...friendApplication } : item)));
-  };
-
-  const handleFriendApplicationRemove = (senderId: User['userId']) => {
-    setFriendApplications((prev) => prev.filter((item) => item.senderId !== senderId));
+  const handleFriendApplicationRemove = (...args: { senderId: string }[]) => {
+    args.forEach((arg) => {
+      setFriendApplications((prev) => prev.filter((item) => item.senderId !== arg.senderId));
+    });
   };
 
   // Effects
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.FRIEND_APPLICATION_ADD]: handleFriendApplicationAdd,
-      [SocketServerEvent.FRIEND_APPLICATION_UPDATE]: handleFriendApplicationUpdate,
-      [SocketServerEvent.FRIEND_APPLICATION_REMOVE]: handleFriendApplicationRemove,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
-
-    return () => {
-      unsubscribe.forEach((unsub) => unsub());
-    };
-  }, [socket]);
+    const unsubscribe: (() => void)[] = [
+      ipcService.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
+      ipcService.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
+      ipcService.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, [socket.isConnected]);
 
   useEffect(() => {
     const refresh = async () => {
@@ -154,7 +128,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
             {t('unprocessed')}
             <span className={styles['processing-status-count']}>({friendApplications.length})</span>
           </div>
-          <div className={styles['all-cancel-text']} onClick={() => handleDeleteAllFriendApplication()}>
+          <div className={styles['all-cancel-text']} onClick={() => handleRejectAllFriendApplication()}>
             {t('reject-all')}
           </div>
         </div>
@@ -184,7 +158,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                         <div className={styles['button']} onClick={() => handleOpenApplyFriend(userId, friend.senderId)}>
                           {t('accept')}
                         </div>
-                        <div className={styles['button']} onClick={() => handleDeleteFriendApplication(friend.senderId, friend.receiverId)}>
+                        <div className={styles['button']} onClick={() => handleRejectFriendApplication(friend.senderId)}>
                           {t('reject')}
                         </div>
                       </div>

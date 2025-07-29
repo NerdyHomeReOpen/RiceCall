@@ -3,45 +3,11 @@ import React, { useEffect, useRef, useState, useContext, createContext, useCallb
 // Providers
 import { useSocket } from '@/providers/Socket';
 
-// Types
-import { SocketServerEvent } from '@/types';
-
 // Services
 import ipcService from '@/services/ipc.service';
 
-type Data = {
-  from: string;
-  userId: string;
-};
-
-type Offer = {
-  from: string;
-  userId: string;
-  offer: {
-    type: RTCSdpType;
-    sdp: string;
-  };
-};
-
-type Answer = {
-  from: string;
-  userId: string;
-  answer: {
-    type: RTCSdpType;
-    sdp: string;
-  };
-};
-
-type IceCandidate = {
-  from: string;
-  userId: string;
-  candidate: {
-    candidate: string;
-    sdpMid: string | null;
-    sdpMLineIndex: number | null;
-    usernameFragment: string | null;
-  };
-};
+// Types
+import { Data, Offer, Answer, IceCandidate } from '@/types';
 
 interface WebRTCContextType {
   handleMuteUser: (userId: string) => void;
@@ -54,7 +20,6 @@ interface WebRTCContextType {
   handleEditMusicVolume: (volume: number) => void;
   handleEditSpeakerVolume: (volume: number) => void;
   handleEditInputStream: (deviceId: string) => void;
-  handleEditOutputStream: (deviceId: string) => void;
   handleEditMusicInputStream: (audioBuffer: AudioBuffer) => void;
   handlePressKeyToSpeak: (enable: boolean) => void;
   muteList: string[];
@@ -99,10 +64,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const [connectionStatus, setConnectionStatus] = useState<Record<string, 'new' | 'connecting' | 'connected' | 'disconnected' | 'failed' | 'closed'>>({});
 
   // Refs
-  const speakingMode = useRef<'key' | 'auto'>('key');
+  const audioRefHandlersRef = useRef<Record<string, (el: HTMLAudioElement | null) => void>>({});
+  const inputDeviceIdRef = useRef<string | null>(null);
+  const outputDeviceIdRef = useRef<string | null>(null);
   const volumePercentRef = useRef<number>(0);
   const volumeThresholdRef = useRef<number>(1);
-  const volumeSilenceDelayRef = useRef<number>(500);
+  // const volumeSilenceDelayRef = useRef<number>(500);
   const localStreamRef = useRef<MediaStream | null>(null);
   const bitrateRef = useRef<number>(64000);
   const micTakenRef = useRef<boolean>(false);
@@ -127,66 +94,164 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const socket = useSocket();
 
   // Handlers
-  const handlePressKeyToSpeak = useCallback((enable: boolean) => {
-    if (speakingMode.current === 'auto') return;
-    setIsPressKeyToSpeak(enable ?? false);
+  const handleSendRTCOffer = useCallback((socketId: string, offer: RTCSessionDescriptionInit) => {
+    ipcService.socket.send('RTCOffer', {
+      to: socketId,
+      offer: { type: offer.type, sdp: offer.sdp },
+    });
   }, []);
 
-  const handleToggleTakeMic = useCallback(() => {
-    if (!localStreamRef.current) {
-      console.warn('No local stream');
+  const handleSendRTCAnswer = useCallback((socketId: string, answer: RTCSessionDescriptionInit) => {
+    ipcService.socket.send('RTCAnswer', {
+      to: socketId,
+      answer: { type: answer.type, sdp: answer.sdp },
+    });
+  }, []);
+
+  const handleSendRTCIceCandidate = useCallback((socketId: string, candidate: RTCIceCandidate) => {
+    ipcService.socket.send('RTCIceCandidate', {
+      to: socketId,
+      candidate: { candidate: candidate.candidate, sdpMid: candidate.sdpMid, sdpMLineIndex: candidate.sdpMLineIndex, usernameFragment: candidate.usernameFragment },
+    });
+  }, []);
+
+  const removePeerConnection = useCallback((userId: string) => {
+    peerConnectionListRef.current[userId].close();
+    delete peerConnectionListRef.current[userId];
+    delete peerStreamListRef.current[userId];
+    delete peerDataChannelListRef.current[userId];
+    delete peerAudioListRef.current[userId];
+    delete audioRefHandlersRef.current[userId];
+
+    setSpeakStatus((prev) => {
+      const newState = { ...prev };
+      delete newState[userId];
+      return newState;
+    });
+  }, []);
+
+  const createPeerConnection = useCallback(
+    (userId: string, socketId: string) => {
+      if (!destinationNodeRef.current) {
+        console.warn('No destination node');
+        return;
+      }
+      const peerConnection = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun2.l.google.com:19302' }],
+        iceCandidatePoolSize: 10,
+      });
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) handleSendRTCIceCandidate(socketId, event.candidate);
+      };
+      peerConnection.onconnectionstatechange = () => {
+        const state = peerConnection.connectionState;
+        setConnectionStatus((prev) => {
+          const newState = { ...prev };
+          newState[userId] = state;
+          return newState;
+        });
+        if (state === 'failed' || state === 'closed') {
+          removePeerConnection(userId);
+        }
+      };
+      peerConnection.ontrack = (event) => {
+        peerStreamListRef.current[userId] = event.streams[0];
+      };
+      peerConnection.ondatachannel = (event) => {
+        event.channel.onmessage = (event) => {
+          const { volume } = JSON.parse(event.data);
+          setSpeakStatus((prev) => {
+            const newState = { ...prev };
+            newState[userId] = volume;
+            return newState;
+          });
+        };
+      };
+
+      peerConnectionListRef.current[userId] = peerConnection;
+      peerDataChannelListRef.current[userId] = peerConnection.createDataChannel('volume');
+
+      setSpeakStatus((prev) => {
+        const newState = { ...prev };
+        newState[userId] = 0;
+        return newState;
+      });
+
+      const processedAudioTrack = destinationNodeRef.current.stream.getAudioTracks()[0];
+      if (processedAudioTrack) {
+        peerConnection.addTrack(processedAudioTrack, destinationNodeRef.current.stream);
+      }
+    },
+    [removePeerConnection, handleSendRTCIceCandidate],
+  );
+
+  const handleRTCJoin = useCallback(
+    async ({ from: socketId, userId }: Data) => {
+      if (peerConnectionListRef.current[userId]) removePeerConnection(userId);
+      createPeerConnection(userId, socketId);
+      const offer = await peerConnectionListRef.current[userId].createOffer();
+      await peerConnectionListRef.current[userId].setLocalDescription(offer);
+      handleSendRTCOffer(socketId, offer);
+    },
+    [handleSendRTCOffer, createPeerConnection, removePeerConnection],
+  );
+
+  const handleRTCLeave = useCallback(
+    async ({ userId }: Data) => {
+      if (!peerConnectionListRef.current[userId]) return;
+      removePeerConnection(userId);
+    },
+    [removePeerConnection],
+  );
+
+  const handleRTCOffer = useCallback(
+    async ({ from: socketId, userId, offer }: Offer) => {
+      if (!peerConnectionListRef.current[userId]) {
+        console.warn(`Connection (${userId}) not found, creating`);
+        createPeerConnection(userId, socketId);
+      } else if (peerConnectionListRef.current[userId].signalingState === 'stable') {
+        console.warn(`Connection (${userId}) already in stable state, recreating`);
+        removePeerConnection(userId);
+        createPeerConnection(userId, socketId);
+      }
+      const offerDes = new RTCSessionDescription({
+        type: offer.type,
+        sdp: offer.sdp,
+      });
+      await peerConnectionListRef.current[userId].setRemoteDescription(offerDes);
+      const answer = await peerConnectionListRef.current[userId].createAnswer();
+      await peerConnectionListRef.current[userId].setLocalDescription(answer);
+
+      handleSendRTCAnswer(socketId, answer);
+    },
+    [handleSendRTCAnswer, createPeerConnection, removePeerConnection],
+  );
+
+  const handleRTCAnswer = useCallback(async ({ userId, answer }: Answer) => {
+    if (!peerConnectionListRef.current[userId]) {
+      console.warn(`Connection (${userId}) not found`);
+      return;
+    } else if (peerConnectionListRef.current[userId].signalingState === 'stable') {
+      console.warn(`Connection (${userId}) already in stable state, ignoring answer`);
       return;
     }
-    if (speakingMode.current === 'auto') {
-      localStreamRef.current.getAudioTracks().forEach((track) => {
-        track.enabled = !micTakenRef.current;
-      });
-    }
-
-    setIsMicTaken(!micTakenRef.current);
-    micTakenRef.current = !micTakenRef.current;
-  }, []);
-
-  const handleMuteUser = useCallback((userId: string) => {
-    Object.entries(peerAudioListRef.current).forEach(([key, audio]) => {
-      if (key === userId) audio.muted = true;
+    const answerDes = new RTCSessionDescription({
+      type: answer.type,
+      sdp: answer.sdp,
     });
-
-    setMuteList((prev) => [...prev, userId]);
+    await peerConnectionListRef.current[userId].setRemoteDescription(answerDes);
   }, []);
 
-  const handleUnmuteUser = useCallback((userId: string) => {
-    Object.entries(peerAudioListRef.current).forEach(([key, audio]) => {
-      if (key === userId) audio.muted = false;
+  const handleRTCIceCandidate = useCallback(async ({ userId, candidate }: IceCandidate) => {
+    if (!peerConnectionListRef.current[userId]) return;
+    const iceCandidate = new RTCIceCandidate({
+      candidate: candidate.candidate,
+      sdpMid: candidate.sdpMid,
+      sdpMLineIndex: candidate.sdpMLineIndex,
+      usernameFragment: candidate.usernameFragment,
     });
-
-    setMuteList((prev) => prev.filter((id) => id !== userId));
-  }, []);
-
-  const handleToggleMicMute = useCallback(() => {
-    if (micMuteRef.current) {
-      const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
-      handleEditMicVolume(prevVolume);
-    } else {
-      localStorage.setItem('previous-mic-volume', micVolume.toString());
-      handleEditMicVolume(0);
-    }
-
-    setIsMicMute(!micMuteRef.current);
-    micMuteRef.current = !micMuteRef.current;
-  }, []);
-
-  const handleToggleSpeakerMute = useCallback(() => {
-    if (speakerMuteRef.current) {
-      const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
-      handleEditSpeakerVolume(prevVolume);
-    } else {
-      localStorage.setItem('previous-speaker-volume', speakerVolume.toString());
-      handleEditSpeakerVolume(0);
-    }
-
-    setIsSpeakerMute(!speakerMuteRef.current);
-    speakerMuteRef.current = !speakerMuteRef.current;
+    await peerConnectionListRef.current[userId].addIceCandidate(iceCandidate);
   }, []);
 
   const handleEditBitrate = useCallback((bitrate?: number) => {
@@ -195,9 +260,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       console.warn(`Bitrate already set to ${bitrate}, skipping...`);
       return;
     }
-
     const newBitrate = bitrate ?? bitrateRef.current;
-
     Object.values(peerConnectionListRef.current).forEach((connection) => {
       const senders = connection.getSenders();
       for (const sender of senders) {
@@ -211,52 +274,17 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         });
       }
     });
-
     setBitrate(newBitrate);
     bitrateRef.current = newBitrate;
   }, []);
 
   const handleEditMicVolume = useCallback((volume?: number) => {
-    if (!localStreamRef.current) {
-      console.warn('No local stream');
-      return;
-    }
-    if (!audioContextRef.current) {
-      console.warn('No audio context');
-      return;
-    }
     if (!micGainNodeRef.current) {
       console.warn('No mic gain node');
       return;
     }
-    if (!micSourceNodeRef.current) {
-      console.warn('No mic source node');
-      return;
-    }
-    if (!destinationNodeRef.current) {
-      console.warn('No destination node');
-      return;
-    }
-    if (destinationNodeRef.current.stream.getAudioTracks().length === 0) {
-      console.warn('No audio tracks');
-      return;
-    }
-
-    // Set gain value
     const newVolume = volume ?? micVolumeRef.current;
-
     micGainNodeRef.current.gain.value = newVolume / 100;
-
-    // Process audio tracks
-    const processedTrack = destinationNodeRef.current.stream.getAudioTracks()[0];
-    Object.values(peerConnectionListRef.current).forEach((connection) => {
-      const senders = connection.getSenders();
-      const audioSender = senders.find((s) => s.track?.kind === 'audio');
-      if (audioSender) {
-        audioSender.replaceTrack(processedTrack).catch((error) => console.error('Error replacing audio track:', error));
-      }
-    });
-
     setMicVolume(newVolume);
     micVolumeRef.current = newVolume;
   }, []);
@@ -266,40 +294,17 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       console.warn('No music gain node');
       return;
     }
-    if (!destinationNodeRef.current) {
-      console.warn('No destination node');
-      return;
-    }
-    if (destinationNodeRef.current.stream.getAudioTracks().length === 0) {
-      console.warn('No audio tracks');
-      return;
-    }
-
     const newVolume = volume ?? musicVolumeRef.current;
-
     musicGainNodeRef.current.gain.value = newVolume / 100;
-
-    // Process audio tracks
-    const processedTrack = destinationNodeRef.current.stream.getAudioTracks()[0];
-    Object.values(peerConnectionListRef.current).forEach((connection) => {
-      const senders = connection.getSenders();
-      const audioSender = senders.find((s) => s.track?.kind === 'audio');
-      if (audioSender) {
-        audioSender.replaceTrack(processedTrack).catch((error) => console.error('Error replacing audio track:', error));
-      }
-    });
-
     setMusicVolume(newVolume);
     musicVolumeRef.current = newVolume;
   }, []);
 
   const handleEditSpeakerVolume = useCallback((volume?: number) => {
     const newVolume = volume ?? speakerVolumeRef.current;
-
     Object.values(peerAudioListRef.current).forEach((audio) => {
       audio.volume = newVolume / 100;
     });
-
     setSpeakerVolume(newVolume);
     speakerVolumeRef.current = newVolume;
   }, []);
@@ -344,11 +349,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
           // Create nodes
           const source = audioContextRef.current.createMediaStreamSource(stream);
-
-          // Connect nodes
           source.connect(micGainNodeRef.current);
-
-          // Set nodes
           micSourceNodeRef.current = source;
 
           // Update track
@@ -368,16 +369,57 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     [handleEditMicVolume],
   );
 
-  const handleEditOutputStream = useCallback(
-    (deviceId: string) => {
-      Object.values(peerAudioListRef.current).forEach((audio) => {
-        audio.setSinkId(deviceId).catch((err) => console.error('Error accessing speaker:', err));
-      });
+  const handleMuteUser = useCallback((userId: string) => {
+    Object.entries(peerAudioListRef.current).forEach(([key, audio]) => {
+      if (key === userId) audio.muted = true;
+    });
 
-      handleEditSpeakerVolume();
-    },
-    [handleEditSpeakerVolume],
-  );
+    setMuteList((prev) => [...prev, userId]);
+  }, []);
+
+  const handleUnmuteUser = useCallback((userId: string) => {
+    Object.entries(peerAudioListRef.current).forEach(([key, audio]) => {
+      if (key === userId) audio.muted = false;
+    });
+
+    setMuteList((prev) => prev.filter((id) => id !== userId));
+  }, []);
+
+  const handleToggleTakeMic = useCallback(() => {
+    if (!localStreamRef.current) {
+      console.warn('No local stream');
+      return;
+    }
+    localStreamRef.current.getAudioTracks().forEach((track) => {
+      track.enabled = micTakenRef.current;
+    });
+    setIsMicTaken(!micTakenRef.current);
+    micTakenRef.current = !micTakenRef.current;
+  }, []);
+
+  const handleToggleMicMute = useCallback(() => {
+    if (micMuteRef.current) {
+      const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
+      handleEditMicVolume(prevVolume);
+    } else {
+      localStorage.setItem('previous-mic-volume', micVolumeRef.current.toString());
+      handleEditMicVolume(0);
+    }
+    setIsMicMute(!micMuteRef.current);
+    micMuteRef.current = !micMuteRef.current;
+  }, [handleEditMicVolume]);
+
+  const handleToggleSpeakerMute = useCallback(() => {
+    if (speakerMuteRef.current) {
+      const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
+      handleEditSpeakerVolume(prevVolume);
+    } else {
+      localStorage.setItem('previous-speaker-volume', speakerVolumeRef.current.toString());
+      handleEditSpeakerVolume(0);
+    }
+    setIsSpeakerMute(!speakerMuteRef.current);
+    speakerMuteRef.current = !speakerMuteRef.current;
+  }, [handleEditSpeakerVolume]);
 
   const handleEditMusicInputStream = useCallback(
     (stream: AudioBuffer) => {
@@ -396,19 +438,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         console.warn('No destination node');
         return;
       }
-      if (destinationNodeRef.current.stream.getAudioTracks().length === 0) {
-        console.warn('No audio tracks');
-        return;
-      }
 
       // Create nodes
       const source = audioContextRef.current.createBufferSource();
       source.buffer = stream;
-
-      // Connect nodes
       source.connect(musicGainNodeRef.current);
-
-      // Set nodes
       musicSourceNodeRef.current = source;
 
       // Update track
@@ -426,233 +460,33 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     [handleEditMusicVolume],
   );
 
-  const handleSendRTCOffer = (socketId: string, offer: RTCSessionDescriptionInit) => {
-    if (!socket) return;
-    socket.send.RTCOffer({
-      to: socketId,
-      offer: {
-        type: offer.type,
-        sdp: offer.sdp,
-      },
-    });
-  };
+  const getAudioRef = useCallback(
+    (userId: string) => {
+      console.log('audioRefHandlersRef', audioRefHandlersRef.current);
+      if (!audioRefHandlersRef.current[userId]) {
+        audioRefHandlersRef.current[userId] = (el: HTMLAudioElement | null) => {
+          if (!el) {
+            delete peerAudioListRef.current[userId];
+            return;
+          }
+          const stream = peerStreamListRef.current[userId];
+          if (el.srcObject !== stream) el.srcObject = stream;
 
-  const handleSendRTCAnswer = (socketId: string, answer: RTCSessionDescriptionInit) => {
-    if (!socket) return;
-    socket.send.RTCAnswer({
-      to: socketId,
-      answer: {
-        type: answer.type,
-        sdp: answer.sdp,
-      },
-    });
-  };
+          peerAudioListRef.current[userId] = el;
+          el.muted = muteList.includes(userId);
+          el.volume = (speakerMuteRef.current ? 0 : speakerVolumeRef.current) / 100;
 
-  const handleSendRTCIceCandidate = (socketId: string, candidate: RTCIceCandidate) => {
-    if (!socket) return;
-    socket.send.RTCIceCandidate({
-      to: socketId,
-      candidate: {
-        candidate: candidate.candidate,
-        sdpMid: candidate.sdpMid,
-        sdpMLineIndex: candidate.sdpMLineIndex,
-        usernameFragment: candidate.usernameFragment,
-      },
-    });
-  };
-
-  const handleRTCJoin = async ({ from: socketId, userId }: Data) => {
-    if (peerConnectionListRef.current[userId]) removePeerConnection(userId);
-    createPeerConnection(userId, socketId);
-    const offer = await peerConnectionListRef.current[userId].createOffer();
-    await peerConnectionListRef.current[userId].setLocalDescription(offer);
-    handleSendRTCOffer(socketId, offer);
-  };
-
-  const handleRTCLeave = async ({ userId }: Data) => {
-    if (!peerConnectionListRef.current[userId]) return;
-    removePeerConnection(userId);
-  };
-
-  const handleRTCOffer = async ({ from: socketId, userId, offer }: Offer) => {
-    if (!peerConnectionListRef.current[userId]) {
-      console.warn(`Connection (${userId}) not found, creating`);
-      createPeerConnection(userId, socketId);
-    } else if (peerConnectionListRef.current[userId].signalingState === 'stable') {
-      console.warn(`Connection (${userId}) already in stable state, recreating`);
-      removePeerConnection(userId);
-      createPeerConnection(userId, socketId);
-    }
-
-    const offerDes = new RTCSessionDescription({
-      type: offer.type,
-      sdp: offer.sdp,
-    });
-
-    await peerConnectionListRef.current[userId].setRemoteDescription(offerDes);
-    const answer = await peerConnectionListRef.current[userId].createAnswer();
-    await peerConnectionListRef.current[userId].setLocalDescription(answer);
-
-    handleSendRTCAnswer(socketId, answer);
-  };
-
-  const handleRTCAnswer = async ({ userId, answer }: Answer) => {
-    if (!peerConnectionListRef.current[userId]) {
-      console.warn(`Connection (${userId}) not found`);
-      return;
-    } else if (peerConnectionListRef.current[userId].signalingState === 'stable') {
-      console.warn(`Connection (${userId}) already in stable state, ignoring answer`);
-      return;
-    }
-
-    const answerDes = new RTCSessionDescription({
-      type: answer.type,
-      sdp: answer.sdp,
-    });
-
-    await peerConnectionListRef.current[userId].setRemoteDescription(answerDes);
-  };
-
-  const handleRTCIceCandidate = async ({ userId, candidate }: IceCandidate) => {
-    if (!peerConnectionListRef.current[userId]) return;
-    const iceCandidate = new RTCIceCandidate({
-      candidate: candidate.candidate,
-      sdpMid: candidate.sdpMid,
-      sdpMLineIndex: candidate.sdpMLineIndex,
-      usernameFragment: candidate.usernameFragment,
-    });
-    await peerConnectionListRef.current[userId].addIceCandidate(iceCandidate);
-  };
-
-  const removePeerConnection = (userId: string) => {
-    if (!peerConnectionListRef.current[userId]) {
-      console.warn(`Connection (${userId}) not found`);
-      return;
-    }
-    if (!peerDataChannelListRef.current[userId]) {
-      console.warn(`Data channel (${userId}) not found`);
-      return;
-    }
-
-    peerConnectionListRef.current[userId].close();
-    delete peerConnectionListRef.current[userId];
-    delete peerAudioListRef.current[userId];
-
-    setSpeakStatus((prev) => {
-      const newState = { ...prev };
-      delete newState[userId];
-      return newState;
-    });
-  };
-
-  const createPeerConnection = (userId: string, socketId: string) => {
-    if (peerConnectionListRef.current[userId]) {
-      console.warn(`Connection (${userId}) already exists`);
-      return;
-    }
-    if (!destinationNodeRef.current) {
-      console.warn('No destination node');
-      return;
-    }
-    if (destinationNodeRef.current.stream.getAudioTracks().length === 0) {
-      console.warn('No audio tracks');
-      return;
-    }
-
-    const peerConnection = new RTCPeerConnection({
-      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun2.l.google.com:19302' }],
-      iceCandidatePoolSize: 10,
-    });
-
-    peerConnection.onicecandidate = (event) => {
-      if (event.candidate) handleSendRTCIceCandidate(socketId, event.candidate);
-    };
-
-    peerConnection.oniceconnectionstatechange = () => {
-      setConnectionStatus((prev) => {
-        const newState = { ...prev };
-        newState[userId] = peerConnection.connectionState;
-        return newState;
-      });
-      const isFailed = ['disconnected', 'failed', 'closed'].includes(peerConnection.connectionState);
-      if (isFailed) removePeerConnection(userId);
-    };
-
-    peerConnection.onconnectionstatechange = () => {
-      setConnectionStatus((prev) => {
-        const newState = { ...prev };
-        newState[userId] = peerConnection.connectionState;
-        return newState;
-      });
-      const isFailed = ['disconnected', 'failed', 'closed'].includes(peerConnection.connectionState);
-      if (isFailed) removePeerConnection(userId);
-    };
-
-    peerConnection.onsignalingstatechange = () => {
-      const isFailed = ['disconnected', 'failed', 'closed'].includes(peerConnection.signalingState);
-      if (isFailed) removePeerConnection(userId);
-    };
-
-    peerConnection.ontrack = (event) => {
-      if (!peerAudioListRef.current[userId]) {
-        peerAudioListRef.current[userId] = document.body.appendChild(document.createElement('audio'));
-        peerAudioListRef.current[userId].autoplay = true;
-        peerAudioListRef.current[userId].oncanplay = () => handleEditSpeakerVolume();
+          if (outputDeviceIdRef.current && 'setSinkId' in el) {
+            (el as HTMLAudioElement).setSinkId(outputDeviceIdRef.current).catch(() => {});
+          }
+        };
       }
-      peerAudioListRef.current[userId].srcObject = event.streams[0];
-      peerStreamListRef.current[userId] = event.streams[0];
-    };
-
-    peerConnection.ondatachannel = (event) => {
-      event.channel.onmessage = (event) => {
-        const { volume } = JSON.parse(event.data);
-        setSpeakStatus((prev) => {
-          const newState = { ...prev };
-          newState[userId] = volume;
-          return newState;
-        });
-      };
-    };
-
-    peerConnectionListRef.current[userId] = peerConnection;
-    peerDataChannelListRef.current[userId] = peerConnection.createDataChannel('volume');
-
-    setSpeakStatus((prev) => {
-      const newState = { ...prev };
-      newState[userId] = 0;
-      return newState;
-    });
-
-    const processedAudioTrack = destinationNodeRef.current.stream.getAudioTracks()[0];
-    if (processedAudioTrack) {
-      peerConnection.addTrack(processedAudioTrack, destinationNodeRef.current.stream);
-    }
-  };
+      return audioRefHandlersRef.current[userId];
+    },
+    [muteList],
+  );
 
   // Effects
-  useEffect(() => {
-    if (!localStreamRef.current) return;
-    if (speakingMode.current === 'key') {
-      localStreamRef.current.getAudioTracks().forEach((track) => {
-        track.enabled = false;
-      });
-      // console.log('[SpeakingMode] key mode');
-    } else {
-      localStreamRef.current.getAudioTracks().forEach((track) => {
-        track.enabled = micTakenRef.current;
-      });
-      // console.log('[SpeakingMode] auto mode');
-    }
-  }, [speakingMode, localStreamRef.current]);
-
-  useEffect(() => {
-    if (!localStreamRef.current) return;
-    if (speakingMode.current !== 'key') return;
-    localStreamRef.current.getAudioTracks().forEach((track) => {
-      track.enabled = isPressKeyToSpeak;
-    });
-  }, [isPressKeyToSpeak]);
-
   useEffect(() => {
     const localMicVolume = window.localStorage.getItem('mic-volume');
     const localSpeakerVolume = window.localStorage.getItem('speaker-volume');
@@ -689,7 +523,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     // Initialize analyser
     analyser.fftSize = 2048;
     const dataArray = new Uint8Array(analyser.fftSize);
-    let silenceTimer: ReturnType<typeof setTimeout> | null = null;
 
     const detectSpeaking = () => {
       if (!analyser) return;
@@ -701,20 +534,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       }
       const volume = Math.sqrt(sum / dataArray.length);
       const volumePercent = Math.floor(Math.min(1, volume / 0.5) * 100);
-      if (volumePercent > volumeThresholdRef.current) {
-        if (volumePercentRef.current !== -1) {
-          volumePercentRef.current = volumePercent;
-          setVolumePercent(volumePercent);
-          if (silenceTimer) clearTimeout(silenceTimer);
-          silenceTimer = setTimeout(() => {
-            if (volumePercentRef.current !== -1) {
-              volumePercentRef.current = 0;
-              setVolumePercent(0);
-            }
-          }, volumeSilenceDelayRef.current);
-        }
-      }
-
+      volumePercentRef.current = volumePercent;
       requestAnimationFrame(detectSpeaking);
     };
     detectSpeaking();
@@ -726,46 +546,22 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   useEffect(() => {
-    ipcService.systemSettings.speakingMode.get(() => {});
-
-    const offUpdateSpeakingMode = ipcService.systemSettings.speakingMode.onUpdate((mode) => {
-      // console.log('[update] speaking mode', mode);
-      speakingMode.current = mode;
-    });
-
-    return () => offUpdateSpeakingMode();
-  }, [speakingMode.current]);
-
-  useEffect(() => {
-    // Get input device info
-    // const getInputDeviceInfo = async (deviceId: string) => {
-    //   const devices = await navigator.mediaDevices.enumerateDevices();
-    //   const deviceInfo = devices.find((d) => d.deviceId === deviceId);
-    //   console.info('New input stream device info:', deviceInfo);
-    // };
-
-    // const getOutputDeviceInfo = async (deviceId: string) => {
-    //   const devices = await navigator.mediaDevices.enumerateDevices();
-    //   const deviceInfo = devices.find((d) => d.deviceId === deviceId);
-    //   console.info('New output stream device info:', deviceInfo);
-    // };
-
     ipcService.systemSettings.inputAudioDevice.get(() => {});
     ipcService.systemSettings.outputAudioDevice.get(() => {});
 
     const offUpdateInput = ipcService.systemSettings.inputAudioDevice.onUpdate((deviceId) => {
+      inputDeviceIdRef.current = deviceId;
       handleEditInputStream(deviceId || '');
     });
-
     const offUpdateOutput = ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
-      handleEditOutputStream(deviceId || '');
+      outputDeviceIdRef.current = deviceId;
     });
 
     return () => {
       offUpdateInput();
       offUpdateOutput();
     };
-  }, [handleEditInputStream, handleEditOutputStream]);
+  }, [handleEditInputStream]);
 
   useEffect(() => {
     window.localStorage.setItem('mic-volume', micVolume.toString());
@@ -784,34 +580,30 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [isSpeakerMute]);
 
   useEffect(() => {
-    for (const dataChannel of Object.values(peerDataChannelListRef.current)) {
-      if (dataChannel && dataChannel.readyState === 'open') {
-        dataChannel.send(JSON.stringify({ volume: volumePercent }));
+    let lastSent = -1;
+    const id = setInterval(() => {
+      const volume = volumePercentRef.current > volumeThresholdRef.current ? volumePercentRef.current : 0;
+      if (volume !== lastSent) {
+        for (const dataChannel of Object.values(peerDataChannelListRef.current)) {
+          if (dataChannel && dataChannel.readyState === 'open') dataChannel.send(JSON.stringify({ volume }));
+        }
+        setVolumePercent(volume);
+        lastSent = volume;
       }
-    }
-  }, [volumePercent]);
+    }, 66);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.RTC_JOIN]: handleRTCJoin,
-      [SocketServerEvent.RTC_LEAVE]: handleRTCLeave,
-      [SocketServerEvent.RTC_OFFER]: handleRTCOffer,
-      [SocketServerEvent.RTC_ANSWER]: handleRTCAnswer,
-      [SocketServerEvent.RTC_ICE_CANDIDATE]: handleRTCIceCandidate,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
-
-    return () => {
-      unsubscribe.forEach((unsub) => unsub());
-    };
-  }, [socket]);
+    const unsubscribe: (() => void)[] = [
+      ipcService.socket.on('RTCJoin', handleRTCJoin),
+      ipcService.socket.on('RTCLeave', handleRTCLeave),
+      ipcService.socket.on('RTCOffer', handleRTCOffer),
+      ipcService.socket.on('RTCAnswer', handleRTCAnswer),
+      ipcService.socket.on('RTCIceCandidate', handleRTCIceCandidate),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, [socket.isConnected, handleRTCJoin, handleRTCLeave, handleRTCOffer, handleRTCAnswer, handleRTCIceCandidate]);
 
   return (
     <WebRTCContext.Provider
@@ -826,7 +618,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         handleEditMusicVolume,
         handleEditSpeakerVolume,
         handleEditInputStream,
-        handleEditOutputStream,
         handleEditMusicInputStream,
         handlePressKeyToSpeak,
         muteList,
@@ -844,15 +635,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       }}
     >
       {Object.keys(peerStreamListRef.current).map((userId) => (
-        <audio
-          key={userId}
-          ref={(el) => {
-            if (el) el.srcObject = peerStreamListRef.current[userId];
-          }}
-          autoPlay
-          controls
-          style={{ display: 'none' }}
-        />
+        <audio key={userId} ref={getAudioRef(userId)} autoPlay controls style={{ display: 'none' }} />
       ))}
       {children}
     </WebRTCContext.Provider>

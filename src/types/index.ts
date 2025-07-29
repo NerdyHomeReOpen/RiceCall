@@ -1,13 +1,6 @@
-export const enum Permission {
-  Guest = 1,
-  Member = 2,
-  ChannelMod = 3,
-  ChannelAdmin = 4,
-  ServerAdmin = 5,
-  ServerOwner = 6,
-  Staff = 7,
-  Official = 8,
-}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+export type Permission = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export type User = {
   userId: string;
@@ -149,6 +142,13 @@ export type MemberApplication = User & {
   createdAt: number;
 };
 
+export type MemberInvitation = Server & {
+  senderId: string;
+  receiverId: string;
+  description: string;
+  createdAt: number;
+};
+
 export type Message = {
   // Change name to BaseMessage
   parameter: Record<string, string>;
@@ -220,161 +220,209 @@ export type DiscordPresence = {
   }[];
 };
 
-export type speakingType = 'key' | 'auto';
+export type SpeakingMode = 'key' | 'auto';
 
-export type mixMode = 'all' | 'app';
+export type MixMode = 'all' | 'app';
 
-export type channelUIMode = 'classic' | 'three-line' | 'auto';
+export type PopupType =
+  | 'avatarCropper'
+  | 'userInfo'
+  | 'userSetting'
+  | 'channelSetting'
+  | 'channelPassword'
+  | 'serverSetting'
+  | 'serverBroadcast'
+  | 'blockMember'
+  | 'systemSetting'
+  | 'memberApplySetting'
+  | 'createServer'
+  | 'createChannel'
+  | 'createFriendGroup'
+  | 'editChannelOrder'
+  | 'editChannelName'
+  | 'editNickname'
+  | 'editFriendGroup'
+  | 'editFriend'
+  | 'applyMember'
+  | 'applyFriend'
+  | 'searchUser'
+  | 'directMessage'
+  | 'dialogAlert'
+  | 'dialogAlert2'
+  | 'dialogSuccess'
+  | 'dialogWarning'
+  | 'dialogError'
+  | 'dialogInfo'
+  | 'changeTheme'
+  | 'aboutus'
+  | 'friendVerification';
 
-export enum SocketClientEvent {
+export type ClientToServerEvents = {
   // User
-  SEARCH_USER = 'searchUser',
-  EDIT_USER = 'editUser',
+  searchUser: (...args: { query: string }[]) => void;
+  editUser: (...args: { update: Partial<User> }[]) => void;
   // Friend Group
-  CREATE_FRIEND_GROUP = 'createFriendGroup',
-  EDIT_FRIEND_GROUP = 'editFriendGroup',
-  DELETE_FRIEND_GROUP = 'deleteFriendGroup',
+  createFriendGroup: (...args: { preset: Partial<FriendGroup> }[]) => void;
+  editFriendGroup: (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => void;
+  deleteFriendGroup: (...args: { friendGroupId: string }[]) => void;
   // Friend
-  CREATE_FRIEND = 'createFriend',
-  EDIT_FRIEND = 'editFriend',
-  DELETE_FRIEND = 'deleteFriend',
+  editFriend: (...args: { targetId: string; update: Partial<Friend> }[]) => void;
+  deleteFriend: (...args: { targetId: string }[]) => void;
   // Friend Application
-  CREATE_FRIEND_APPLICATION = 'createFriendApplication',
-  EDIT_FRIEND_APPLICATION = 'editFriendApplication',
-  DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
-  APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
+  sendFriendApplication: (...args: { receiverId: string; preset: Partial<FriendApplication> }[]) => void;
+  editFriendApplication: (...args: { receiverId: string; update: Partial<FriendApplication> }[]) => void;
+  deleteFriendApplication: (...args: { receiverId: string }[]) => void;
+  approveFriendApplication: (...args: { senderId: string }[]) => void;
+  rejectFriendApplication: (...args: { senderId: string }[]) => void;
   // Server
-  FAVORITE_SERVER = 'favoriteServer',
-  SEARCH_SERVER = 'searchServer',
-  CONNECT_SERVER = 'connectServer',
-  DISCONNECT_SERVER = 'disconnectServer',
-  CREATE_SERVER = 'createServer',
-  EDIT_SERVER = 'editServer',
-  DELETE_SERVER = 'deleteServer',
+  favoriteServer: (...args: { serverId: string }[]) => void;
+  searchServer: (...args: { query: string }[]) => void;
+  connectServer: (...args: { serverId: string }[]) => void;
+  disconnectServer: (...args: { serverId: string }[]) => void;
+  kickFromServer: (...args: { userId: string; serverId: string }[]) => void;
+  createServer: (...args: { preset: Partial<Server> }[]) => void;
+  editServer: (...args: { serverId: string; update: Partial<Server> }[]) => void;
+  deleteServer: (...args: { serverId: string }[]) => void;
   // Channel
-  CONNECT_CHANNEL = 'connectChannel',
-  DISCONNECT_CHANNEL = 'disconnectChannel',
-  CREATE_CHANNEL = 'createChannel',
-  EDIT_CHANNEL = 'editChannel',
-  EDIT_CHANNELS = 'editChannels',
-  DELETE_CHANNEL = 'deleteChannel',
+  connectChannel: (...args: { serverId: string; channelId: string; password?: string }[]) => void;
+  moveToChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
+  disconnectChannel: (...args: { serverId: string; channelId: string }[]) => void;
+  kickFromChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
+  kickToLobbyChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
+  createChannel: (...args: { serverId: string; preset: Partial<Channel> }[]) => void;
+  editChannel: (...args: { serverId: string; channelId: string; update: Partial<Channel> }[]) => void;
+  deleteChannel: (...args: { serverId: string; channelId: string }[]) => void;
   // Member
-  CREATE_MEMBER = 'createMember',
-  EDIT_MEMBER = 'editMember',
-  DELETE_MEMBER = 'deleteMember',
+  editMember: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
+  deleteMember: (...args: { userId: string; serverId: string }[]) => void;
   // Member Application
-  CREATE_MEMBER_APPLICATION = 'createMemberApplication',
-  EDIT_MEMBER_APPLICATION = 'editMemberApplication',
-  DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
-  APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
+  sendMemberApplication: (...args: { serverId: string; preset: Partial<MemberApplication> }[]) => void;
+  editMemberApplication: (...args: { serverId: string; update: Partial<MemberApplication> }[]) => void;
+  deleteMemberApplication: (...args: { serverId: string }[]) => void;
+  approveMemberApplication: (...args: { userId: string; serverId: string }[]) => void;
+  rejectMemberApplication: (...args: { userId: string; serverId: string }[]) => void;
+  // Member Invitation
+  sendMemberInvitation: (...args: { receiverId: string; serverId: string; preset: Partial<MemberInvitation> }[]) => void;
+  editMemberInvitation: (...args: { receiverId: string; serverId: string; update: Partial<MemberInvitation> }[]) => void;
+  deleteMemberInvitation: (...args: { receiverId: string; serverId: string }[]) => void;
+  acceptMemberInvitation: (...args: { serverId: string }[]) => void;
+  rejectMemberInvitation: (...args: { serverId: string }[]) => void;
   // Message
-  CHANNEL_MESSAGE = 'channelMessage',
-  ACTION_MESSAGE = 'actionMessage',
-  DIRECT_MESSAGE = 'directMessage',
-  SHAKE_WINDOW = 'shakeWindow',
+  channelMessage: (...args: { serverId: string; channelId: string; preset: Partial<ChannelMessage> }[]) => void;
+  actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;
+  directMessage: (...args: { targetId: string; preset: Partial<DirectMessage> }[]) => void;
+  shakeWindow: (...args: { targetId: string }[]) => void;
   // RTC
-  RTC_OFFER = 'RTCOffer',
-  RTC_ANSWER = 'RTCAnswer',
-  RTC_ICE_CANDIDATE = 'RTCIceCandidate',
+  RTCOffer: (...args: { to: string; offer: { type: RTCSdpType; sdp?: string } }[]) => void;
+  RTCAnswer: (...args: { to: string; answer: { type: RTCSdpType; sdp?: string } }[]) => void;
+  RTCIceCandidate: (...args: { to: string; candidate: { candidate: string; sdpMid: string | null; sdpMLineIndex: number | null; usernameFragment: string | null } }[]) => void;
   // Echo
-  PING = 'ping',
-}
-
-export enum SocketServerEvent {
-  // Notification
-  NOTIFICATION = 'notification', // not used yet
-  // User
-  USER_SEARCH = 'userSearch',
-  USER_UPDATE = 'userUpdate',
-  // Friend Group
-  FRIEND_GROUPS_SET = 'friendGroupsSet',
-  FRIEND_GROUP_ADD = 'friendGroupAdd',
-  FRIEND_GROUP_UPDATE = 'friendGroupUpdate',
-  FRIEND_GROUP_REMOVE = 'friendGroupRemove',
-  // Friend
-  FRIENDS_SET = 'friendsSet',
-  FRIEND_ADD = 'friendAdd',
-  FRIEND_UPDATE = 'friendUpdate',
-  FRIEND_REMOVE = 'friendRemove',
-  // Friend Application
-  FRIEND_APPLICATIONS_SET = 'friendApplicationsSet',
-  FRIEND_APPLICATION_ADD = 'friendApplicationAdd',
-  FRIEND_APPLICATION_UPDATE = 'friendApplicationUpdate',
-  FRIEND_APPLICATION_REMOVE = 'friendApplicationRemove',
-  // Server
-  SERVER_SEARCH = 'serverSearch',
-  SERVERS_SET = 'serversSet',
-  SERVER_ADD = 'serverAdd',
-  SERVER_UPDATE = 'serverUpdate',
-  SERVER_REMOVE = 'serverRemove',
-  // Channel
-  SERVER_CHANNELS_SET = 'serverChannelsSet',
-  SERVER_CHANNEL_ADD = 'serverChannelAdd',
-  SERVER_CHANNEL_UPDATE = 'serverChannelUpdate',
-  SERVER_CHANNEL_REMOVE = 'serverChannelRemove',
-  // Member
-  SERVER_MEMBERS_SET = 'serverMembersSet',
-  SERVER_MEMBER_ADD = 'serverMemberAdd',
-  SERVER_MEMBER_UPDATE = 'serverMemberUpdate',
-  SERVER_MEMBER_REMOVE = 'serverMemberRemove',
-  SERVER_ONLINE_MEMBERS_SET = 'serverOnlineMembersSet',
-  SERVER_ONLINE_MEMBER_ADD = 'serverOnlineMemberAdd',
-  SERVER_ONLINE_MEMBER_REMOVE = 'serverOnlineMemberRemove',
-  // Member Application
-  SERVER_MEMBER_APPLICATIONS_SET = 'serverMemberApplicationsSet',
-  SERVER_MEMBER_APPLICATION_ADD = 'serverMemberApplicationAdd',
-  SERVER_MEMBER_APPLICATION_UPDATE = 'serverMemberApplicationUpdate',
-  SERVER_MEMBER_APPLICATION_REMOVE = 'serverMemberApplicationRemove',
-  MEMBER_APPROVAL = 'memberApproval',
-  // Message
-  CHANNEL_MESSAGE = 'channelMessage',
-  ACTION_MESSAGE = 'actionMessage',
-  DIRECT_MESSAGE = 'directMessage',
-  SHAKE_WINDOW = 'shakeWindow',
-  // RTC
-  RTC_OFFER = 'RTCOffer',
-  RTC_ANSWER = 'RTCAnswer',
-  RTC_ICE_CANDIDATE = 'RTCIceCandidate',
-  RTC_JOIN = 'RTCJoin',
-  RTC_LEAVE = 'RTCLeave',
-  // Play Sound
-  PLAY_SOUND = 'playSound',
-  // Echo
-  PONG = 'pong',
+  ping: () => void;
   // Popup
-  OPEN_POPUP = 'openPopup',
-}
+  openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
+};
 
-export enum PopupType {
-  AVATAR_CROPPER = 'avatarCropper',
-  USER_INFO = 'userInfo',
-  USER_SETTING = 'userSetting',
-  CHANNEL_SETTING = 'channelSetting',
-  CHANNEL_PASSWORD = 'channelPassword',
-  SERVER_SETTING = 'serverSetting',
-  SERVER_BROADCAST = 'serverBroadcast',
-  BLOCK_MEMBER = 'blockMember',
-  SYSTEM_SETTING = 'systemSetting',
-  MEMBER_APPLY_SETTING = 'memberApplySetting',
-  CREATE_SERVER = 'createServer',
-  CREATE_CHANNEL = 'createChannel',
-  CREATE_FRIENDGROUP = 'createFriendGroup',
-  EDIT_CHANNEL_ORDER = 'editChannelOrder',
-  EDIT_CHANNEL_NAME = 'editChannelName',
-  EDIT_NICKNAME = 'editNickname',
-  EDIT_FRIENDGROUP = 'editFriendGroup',
-  EDIT_FRIEND = 'editFriend',
-  APPLY_MEMBER = 'applyMember',
-  APPLY_FRIEND = 'applyFriend',
-  SEARCH_USER = 'searchUser',
-  DIRECT_MESSAGE = 'directMessage',
-  DIALOG_ALERT = 'dialogAlert',
-  DIALOG_ALERT2 = 'dialogAlert2',
-  DIALOG_SUCCESS = 'dialogSuccess',
-  DIALOG_WARNING = 'dialogWarning',
-  DIALOG_ERROR = 'dialogError',
-  DIALOG_INFO = 'dialogInfo',
-  CHANGE_THEME = 'changeTheme',
-  ABOUTUS = 'aboutus',
-  FRIEND_VERIFICATION = 'friendVerification',
-}
+export type ServerToClientEvents = {
+  // Notification
+  notification: (...args: { message: string }[]) => void; // not used yet
+  // User
+  userSearch: (...args: User[]) => void;
+  userUpdate: (...args: { update: Partial<User> }[]) => void;
+  // Friend Group
+  friendGroupsSet: (...args: FriendGroup[]) => void;
+  friendGroupAdd: (...args: { data: FriendGroup }[]) => void;
+  friendGroupUpdate: (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => void;
+  friendGroupRemove: (...args: { friendGroupId: string }[]) => void;
+  // Friend
+  friendsSet: (...args: UserFriend[]) => void;
+  friendAdd: (...args: { data: UserFriend }[]) => void;
+  friendUpdate: (...args: { targetId: string; update: Partial<Friend> }[]) => void;
+  friendRemove: (...args: { targetId: string }[]) => void;
+  // Friend Application
+  friendApplicationsSet: (...args: FriendApplication[]) => void;
+  friendApplicationAdd: (...args: { data: FriendApplication }[]) => void;
+  friendApplicationUpdate: (...args: { senderId: string; update: Partial<FriendApplication> }[]) => void;
+  friendApplicationRemove: (...args: { senderId: string }[]) => void;
+  // Server
+  serverSearch: (...args: UserServer[]) => void;
+  serversSet: (...args: UserServer[]) => void;
+  serverAdd: (...args: { data: UserServer }[]) => void;
+  serverUpdate: (...args: { serverId: string; update: Partial<Server> }[]) => void;
+  serverRemove: (...args: { serverId: string }[]) => void;
+  // Channel
+  serverChannelsSet: (...args: Channel[]) => void;
+  serverChannelAdd: (...args: { data: Channel }[]) => void;
+  serverChannelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
+  serverChannelRemove: (...args: { channelId: string }[]) => void;
+  // Member
+  serverMembersSet: (...args: ServerMember[]) => void;
+  serverMemberAdd: (...args: { data: ServerMember }[]) => void;
+  serverMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<ServerMember> }[]) => void;
+  serverMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
+  serverOnlineMembersSet: (...args: ServerMember[]) => void;
+  serverOnlineMemberAdd: (...args: { data: ServerMember }[]) => void;
+  serverOnlineMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
+  // Member Application
+  serverMemberApplicationsSet: (...args: MemberApplication[]) => void;
+  serverMemberApplicationAdd: (...args: { data: MemberApplication }[]) => void;
+  serverMemberApplicationUpdate: (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => void;
+  serverMemberApplicationRemove: (...args: { userId: string; serverId: string }[]) => void;
+  // Message
+  channelMessage: (...args: ChannelMessage[]) => void;
+  actionMessage: (...args: PromptMessage[]) => void;
+  directMessage: (...args: DirectMessage[]) => void;
+  shakeWindow: (senderId: string) => void;
+  // RTC
+  RTCOffer: (...args: { from: string; userId: string; offer: { type: RTCSdpType; sdp: string } }[]) => void;
+  RTCAnswer: (...args: { from: string; userId: string; answer: { type: RTCSdpType; sdp: string } }[]) => void;
+  RTCIceCandidate: (...args: { from: string; userId: string; candidate: { candidate: string; sdpMid: string | null; sdpMLineIndex: number | null; usernameFragment: string | null } }[]) => void;
+  RTCJoin: (...args: { from: string; userId: string }[]) => void;
+  RTCLeave: (...args: { from: string; userId: string }[]) => void;
+  // Play Sound
+  playSound: (...args: { sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking' }[]) => void;
+  // Echo
+  pong: () => void;
+  // Popup
+  openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
+  // Socket
+  connect: () => void;
+  disconnect: () => void;
+  reconnect: (attemptNumbers: number) => void;
+  error: (message: string) => void;
+  connect_error: (error: any) => void;
+  reconnect_error: (error: any) => void;
+};
+
+export type Data = {
+  from: string;
+  userId: string;
+};
+
+export type Offer = {
+  from: string;
+  userId: string;
+  offer: {
+    type: RTCSdpType;
+    sdp: string;
+  };
+};
+
+export type Answer = {
+  from: string;
+  userId: string;
+  answer: {
+    type: RTCSdpType;
+    sdp: string;
+  };
+};
+
+export type IceCandidate = {
+  from: string;
+  userId: string;
+  candidate: {
+    candidate: string;
+    sdpMid: string | null;
+    sdpMLineIndex: number | null;
+    usernameFragment: string | null;
+  };
+};

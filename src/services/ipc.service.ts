@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DiscordPresence, PopupType, SocketClientEvent, SocketServerEvent, speakingType, mixMode, channelUIMode } from '@/types';
+import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents } from '@/types';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
@@ -29,13 +29,13 @@ const ipcService = {
   },
 
   socket: {
-    send: (event: SocketClientEvent, ...args: any[]) => {
+    send: <T extends keyof ClientToServerEvents>(event: T, ...args: Parameters<ClientToServerEvents[T]>) => {
       if (!isElectron) return;
       ipcRenderer.send(event, ...args);
     },
-    on: (event: SocketServerEvent | 'connect' | 'reconnect' | 'disconnect' | 'connect_error' | 'reconnect_error' | 'error', callback: (...args: any[]) => void) => {
+    on: <T extends keyof ServerToClientEvents>(event: T, callback: (...args: Parameters<ServerToClientEvents[T]>) => ReturnType<ServerToClientEvents[T]>) => {
       if (!isElectron) return () => {};
-      ipcRenderer.on(event, (_: any, ...args: any[]) => callback(...args));
+      ipcRenderer.on(event, (_: any, ...args: Parameters<ServerToClientEvents[T]>) => callback(...args));
       return () => ipcRenderer.removeAllListeners(event);
     },
   },
@@ -215,10 +215,10 @@ const ipcService = {
         microphoneAmplification: boolean;
 
         manualMixMode: boolean;
-        mixMode: mixMode;
+        mixMode: MixMode;
 
         // Voice settings
-        speakingMode: speakingType;
+        speakingMode: SpeakingMode;
         defaultSpeakingKey: string;
 
         // Privacy settings
@@ -696,22 +696,22 @@ const ipcService = {
     },
 
     mixMode: {
-      get: (callback: (key: mixMode) => void) => {
+      get: (callback: (key: MixMode) => void) => {
         if (!isElectron) return;
         ipcRenderer.send('get-mix-mode');
-        ipcRenderer.once('mix-mode', (_: any, key: mixMode) => {
+        ipcRenderer.once('mix-mode', (_: any, key: MixMode) => {
           callback(key);
         });
       },
 
-      set: (key: mixMode) => {
+      set: (key: MixMode) => {
         if (!isElectron) return;
         ipcRenderer.send('set-mix-mode', key);
       },
 
-      onUpdate: (callback: (key: mixMode) => void) => {
+      onUpdate: (callback: (key: MixMode) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('mix-mode', (_: any, key: mixMode) => {
+        ipcRenderer.on('mix-mode', (_: any, key: MixMode) => {
           callback(key);
         });
         return () => ipcRenderer.removeAllListeners('mix-mode');
@@ -721,22 +721,22 @@ const ipcService = {
     // Voice settings
 
     speakingMode: {
-      get: (callback: (key: speakingType) => void) => {
+      get: (callback: (key: SpeakingMode) => void) => {
         if (!isElectron) return;
         ipcRenderer.send('get-speaking-mode');
-        ipcRenderer.once('speaking-mode', (_: any, key: speakingType) => {
+        ipcRenderer.once('speaking-mode', (_: any, key: SpeakingMode) => {
           callback(key);
         });
       },
 
-      set: (key: speakingType) => {
+      set: (key: SpeakingMode) => {
         if (!isElectron) return;
         ipcRenderer.send('set-speaking-mode', key);
       },
 
-      onUpdate: (callback: (key: speakingType) => void) => {
+      onUpdate: (callback: (key: SpeakingMode) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('speaking-mode', (_: any, key: speakingType) => {
+        ipcRenderer.on('speaking-mode', (_: any, key: SpeakingMode) => {
           callback(key);
         });
         return () => ipcRenderer.removeAllListeners('speaking-mode');

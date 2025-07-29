@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
 // Types
-import { Server, Channel, Message } from '@/types';
+import { Server, Channel, PromptMessage } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -21,7 +20,6 @@ interface ServerBroadcastPopupProps {
 const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ serverId, channelId }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
 
   // States
   const [channelType, setChannelType] = useState<string>('current');
@@ -33,12 +31,8 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   const canSend = broadcastContent.trim();
 
   // Handlers
-  const handleBroadcastServer = (
-    message: Partial<Message>,
-    serverId: Server['serverId'],
-    channelId: Channel['channelId'] | null,
-  ) => {
-    socket.send.actionMessage({ message, serverId, channelId });
+  const handleBroadcastServer = (serverId: Server['serverId'], channelId: Channel['channelId'] | undefined, preset: Partial<PromptMessage>) => {
+    ipcService.socket.send('actionMessage', { serverId, channelId, preset });
   };
 
   const handleClose = () => {
@@ -123,11 +117,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
         <div
           className={`${popup['button']} ${!canSend ? 'disabled' : ''}`}
           onClick={() => {
-            handleBroadcastServer(
-              { type: 'alert', content: broadcastContent },
-              serverId,
-              channelType === 'current' ? channelId : null,
-            );
+            handleBroadcastServer(serverId, channelType === 'current' ? channelId : undefined, { type: 'alert', content: broadcastContent });
             handleClose();
           }}
         >

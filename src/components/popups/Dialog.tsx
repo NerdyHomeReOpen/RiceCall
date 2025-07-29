@@ -21,12 +21,13 @@ enum DIALOG_ICON {
 
 interface DialogPopupProps {
   iconType: keyof typeof DIALOG_ICON;
-  message: React.ReactNode | string;
+  message: string;
+  parameter?: Record<string, string>;
   submitTo: string;
   timestamp?: number;
 }
 
-const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, submitTo, timestamp }) => {
+const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter, submitTo, timestamp }) => {
   // Hooks
   const { t } = useTranslation();
   const loadingBox = useLoading();
@@ -35,7 +36,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, submitTo, 
   const containerRef = useRef<HTMLFormElement>(null);
 
   // Variables
-  const formatedMessage = typeof message === 'string' ? t(message) : message;
+  const formatedMessage = t(message, parameter);
 
   // Handlers
   const handleSubmit = () => {

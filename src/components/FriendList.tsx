@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import styles from '@/styles/pages/friend.module.css';
 
 // Types
-import { PopupType, User, FriendGroup, UserFriend } from '@/types';
+import { User, FriendGroup, UserFriend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -61,33 +61,23 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
 
   // Handlers
   const handleOpenSearchUser = (userId: User['userId']) => {
-    ipcService.popup.open(PopupType.SEARCH_USER, 'searchUser');
-    ipcService.initialData.onRequest('searchUser', {
-      userId,
-    });
+    ipcService.popup.open('searchUser', 'searchUser');
+    ipcService.initialData.onRequest('searchUser', { userId });
   };
 
   const handleOpenCreateFriendGroup = () => {
-    ipcService.popup.open(PopupType.CREATE_FRIENDGROUP, 'createFriendGroup');
-    ipcService.initialData.onRequest('createFriendGroup', {
-      userId,
-    });
+    ipcService.popup.open('createFriendGroup', 'createFriendGroup');
+    ipcService.initialData.onRequest('createFriendGroup', { userId });
   };
 
   return (
     <>
       {/* Navigation Tabs */}
       <div className={styles['navigate-tabs']} ref={viewerRef}>
-        <div
-          className={`${styles['tab']} ${selectedTabId == 0 ? styles['selected'] : ''}`}
-          onClick={() => setSelectedTabId(0)}
-        >
+        <div className={`${styles['tab']} ${selectedTabId == 0 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(0)}>
           <div className={styles['friend-list-icon']} />
         </div>
-        <div
-          className={`${styles['tab']} ${selectedTabId == 1 ? styles['selected'] : ''}`}
-          onClick={() => setSelectedTabId(1)}
-        >
+        <div className={`${styles['tab']} ${selectedTabId == 1 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(1)}>
           <div className={styles['recent-icon']} />
         </div>
       </div>
@@ -95,14 +85,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
       {/* Search Bar */}
       <div className={styles['search-bar']}>
         <div className={styles['search-icon']} />
-        <input
-          name="query"
-          type="text"
-          className={styles['search-input']}
-          placeholder={t('search-friend-placeholder')}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+        <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
         <div className={styles['prev-icon']} />
         <div className={styles['next-icon']} />
       </div>
@@ -114,14 +97,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
           {[defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup]
             .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
             .map((friendGroup) => (
-              <FriendGroupTab
-                key={friendGroup.friendGroupId}
-                friendGroup={friendGroup}
-                friends={filteredFriends}
-                user={user}
-                selectedItemId={selectedItemId}
-                setSelectedItemId={setSelectedItemId}
-              />
+              <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={filteredFriends} user={user} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
             ))}
         </div>
       </div>

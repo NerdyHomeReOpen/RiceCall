@@ -10,7 +10,6 @@ import { Channel, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -30,7 +29,6 @@ interface ChannelSettingPopupProps {
 const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ serverId, channelId }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
 
   // Refs
   const refreshRef = useRef(false);
@@ -64,9 +62,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
   const canSubmit = channelName.trim();
 
   // Handlers
-  const handleEditChannel = (channel: Partial<Channel>, channelId: Channel['channelId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editChannel({ channel, channelId, serverId });
+  const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
+    ipcService.socket.send('editChannel', { serverId, channelId, update });
   };
 
   const handleClose = () => {
@@ -408,26 +405,22 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
         <div
           className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
-            handleEditChannel(
-              {
-                name: channelName,
-                announcement: channelAnnouncement,
-                password: channelPassword,
-                order: channelOrder,
-                userLimit: channelUserLimit,
-                guestTextMaxLength: channelGuestTextMaxLength,
-                guestTextWaitTime: channelGuestTextWaitTime,
-                guestTextGapTime: channelGuestTextGapTime,
-                bitrate: channelBitrate,
-                forbidText: !!channelForbidText,
-                forbidGuestText: !!channelForbidGuestText,
-                forbidGuestUrl: !!channelForbidGuestUrl,
-                visibility: channelVisibility,
-                voiceMode: channelVoiceMode,
-              },
-              channelId,
-              serverId,
-            );
+            handleEditChannel(serverId, channelId, {
+              name: channelName,
+              announcement: channelAnnouncement,
+              password: channelPassword,
+              order: channelOrder,
+              userLimit: channelUserLimit,
+              guestTextMaxLength: channelGuestTextMaxLength,
+              guestTextWaitTime: channelGuestTextWaitTime,
+              guestTextGapTime: channelGuestTextGapTime,
+              bitrate: channelBitrate,
+              forbidText: !!channelForbidText,
+              forbidGuestText: !!channelForbidGuestText,
+              forbidGuestUrl: !!channelForbidGuestUrl,
+              visibility: channelVisibility,
+              voiceMode: channelVoiceMode,
+            });
             handleClose();
           }}
         >

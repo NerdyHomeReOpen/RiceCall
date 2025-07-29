@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import popup from '@/styles/popup.module.css';
 
 // Types
-import { FriendApplication, FriendGroup, PopupType, SocketServerEvent, User } from '@/types';
+import { FriendApplication, FriendGroup, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -42,41 +42,35 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
   const { description: applicationDesc } = friendApplication;
 
   // Handlers
-  const handleFriendGroupAdd = (data: FriendGroup) => {
-    setFriendGroups((prev) => [...prev, data]);
-  };
-
-  const handleFriendGroupUpdate = (id: FriendGroup['friendGroupId'], data: Partial<FriendGroup>) => {
-    setFriendGroups((prev) => prev.map((item) => (item.friendGroupId === id ? { ...item, ...data } : item)));
-  };
-
-  const handleFriendGroupRemove = (id: FriendGroup['friendGroupId']) => {
-    setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== id));
-  };
-
-  const handleCreateFriendApplication = (friendApplication: Partial<FriendApplication>, senderId: User['userId'], receiverId: User['userId']) => {
-    if (!socket) return;
-    socket.send.createFriendApplication({
-      friendApplication,
-      senderId,
-      receiverId,
+  const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
+    args.forEach((arg) => {
+      setFriendGroups((prev) => [...prev, arg.data]);
     });
   };
 
-  const handleApproveFriendApplication = (senderId: User['userId'], receiverId: User['userId']) => {
-    if (!socket) return;
-    socket.send.approveFriendApplication({
-      senderId,
-      receiverId,
+  const handleFriendGroupUpdate = (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
+    args.forEach((arg) => {
+      setFriendGroups((prev) => prev.map((item) => (item.friendGroupId === arg.friendGroupId ? { ...item, ...arg.update } : item)));
     });
+  };
+
+  const handleFriendGroupRemove = (...args: { friendGroupId: string }[]) => {
+    args.forEach((arg) => {
+      setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== arg.friendGroupId));
+    });
+  };
+
+  const handleCreateFriendApplication = (receiverId: User['userId'], preset: Partial<FriendApplication>) => {
+    ipcService.socket.send('sendFriendApplication', { receiverId, preset });
+  };
+
+  const handleApproveFriendApplication = (senderId: User['userId']) => {
+    ipcService.socket.send('approveFriendApplication', { senderId });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, {
-      userId,
-      targetId,
-    });
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
+    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleClose = () => {
@@ -85,24 +79,16 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
 
   // Effects
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.FRIEND_GROUP_ADD]: handleFriendGroupAdd,
-      [SocketServerEvent.FRIEND_GROUP_UPDATE]: handleFriendGroupUpdate,
-      [SocketServerEvent.FRIEND_GROUP_REMOVE]: handleFriendGroupRemove,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
+    const unsubscribe: (() => void)[] = [
+      ipcService.socket.on('friendGroupAdd', handleFriendGroupAdd),
+      ipcService.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
+      ipcService.socket.on('friendGroupRemove', handleFriendGroupRemove),
+    ];
 
     return () => {
       unsubscribe.forEach((unsub) => unsub());
     };
-  }, [socket]);
+  }, [socket.isConnected]);
 
   useEffect(() => {
     if (!userId || !targetId || refreshRef.current) return;
@@ -148,16 +134,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
           <div className={popup['split']} />
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
             <div className={popup['label']}>{t('friend-note')}</div>
-            <textarea
-              rows={2}
-              value={applicationDesc}
-              onChange={(e) =>
-                setFriendApplication((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-            />
+            <textarea rows={2} value={applicationDesc} onChange={(e) => setFriendApplication((prev) => ({ ...prev, description: e.target.value }))} />
           </div>
           <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
             {t('friend-apply-sent')}
@@ -187,7 +164,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
           className={popup['button']}
           style={section === 0 ? {} : { display: 'none' }}
           onClick={() => {
-            handleCreateFriendApplication({ description: applicationDesc }, userId, targetId);
+            handleCreateFriendApplication(targetId, { description: applicationDesc });
             handleClose();
           }}
         >
@@ -206,7 +183,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
           className={popup['button']}
           style={section === 2 ? {} : { display: 'none' }}
           onClick={() => {
-            handleApproveFriendApplication(targetId, userId);
+            handleApproveFriendApplication(targetId);
             handleClose();
           }}
         >

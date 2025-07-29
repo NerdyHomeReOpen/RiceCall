@@ -4,11 +4,10 @@ import React, { useEffect } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Types
-import { PopupType, ServerMember, Channel, Server, User, UserFriend, UserServer } from '@/types';
+import { ServerMember, Channel, Server, User, UserFriend, UserServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
 
@@ -36,7 +35,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
   ({ channel, friends, currentChannel, currentServer, serverMembers, expanded, selectedItemId, selectedItemType, setExpanded, setSelectedItemId, setSelectedItemType }) => {
     // Hooks
     const { t } = useTranslation();
-    const socket = useSocket();
     const contextMenu = useContextMenu();
     const findMe = useFindMeContext();
 
@@ -64,49 +62,54 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const canSetReceptionLobby = canManageChannel && !isReceptionLobby && channelVisibility !== 'private' && channelVisibility !== 'readonly';
 
     // Handlers
-    const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
-      if (!socket) return;
-      socket.send.editServer({ serverId, server });
+    const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
+      ipcService.socket.send('editServer', { serverId, update });
     };
 
-    const handleJoinChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      if (!socket) return;
-      socket.send.connectChannel({ userId, channelId, serverId });
+    const handleJoinChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+      ipcService.socket.send('connectChannel', { serverId, channelId });
     };
 
-    const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
-      if (!socket) return;
-      handleOpenWarningDialog(t('confirm-delete-channel', { '0': channelName }), () => socket.send.deleteChannel({ channelId, serverId }));
+    const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+      ipcService.socket.send('moveToChannel', { userId, serverId, channelId });
+    };
+
+    const handleMoveAllToChannel = (userIds: User['userId'][], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+      ipcService.socket.send('moveToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId })));
+    };
+
+    const handleDeleteChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+      handleOpenWarningDialog(t('confirm-delete-channel', { '0': channelName }), () => ipcService.socket.send('deleteChannel', { serverId, channelId }));
     };
 
     const handleOpenWarningDialog = (message: string, callback: () => void) => {
-      ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
+      ipcService.popup.open('dialogWarning', 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', { message, submitTo: 'warningDialog' });
       ipcService.popup.onSubmit('warningDialog', callback);
     };
 
     const handleOpenChannelSetting = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
-      ipcService.popup.open(PopupType.CHANNEL_SETTING, 'channelSetting');
+      ipcService.popup.open('channelSetting', 'channelSetting');
       ipcService.initialData.onRequest('channelSetting', { channelId, serverId });
     };
 
     const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Channel['channelId'] | null, userId: User['userId']) => {
-      ipcService.popup.open(PopupType.CREATE_CHANNEL, 'createChannel');
+      ipcService.popup.open('createChannel', 'createChannel');
       ipcService.initialData.onRequest('createChannel', { serverId, channelId, userId });
     };
 
     const handleOpenEditChannelOrder = (serverId: Server['serverId'], userId: User['userId']) => {
-      ipcService.popup.open(PopupType.EDIT_CHANNEL_ORDER, 'editChannelOrder');
+      ipcService.popup.open('editChannelOrder', 'editChannelOrder');
       ipcService.initialData.onRequest('editChannelOrder', { serverId, userId });
     };
 
     const handleOpenChannelPassword = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipcService.popup.open(PopupType.CHANNEL_PASSWORD, 'channelPassword');
+      ipcService.popup.open('channelPassword', 'channelPassword');
       ipcService.initialData.onRequest('channelPassword', { userId, serverId, channelId });
     };
 
     const handleOpenServerBroadcast = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipcService.popup.open(PopupType.SERVER_BROADCAST, 'serverBroadcast');
+      ipcService.popup.open('serverBroadcast', 'serverBroadcast');
       ipcService.initialData.onRequest('serverBroadcast', { serverId, channelId });
     };
 
@@ -118,7 +121,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     const handleDrop = (e: React.DragEvent, serverId: Server['serverId'], channelId: Channel['channelId']) => {
       e.preventDefault();
-      if (!socket) return;
       const moveType = e.dataTransfer.getData('type');
       const currentChannelId = e.dataTransfer.getData('currentChannelId');
       if (!moveType || !currentChannelId || currentChannelId === channelId) return;
@@ -127,14 +129,11 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         case 'moveUser':
           const targetUserId = e.dataTransfer.getData('userId');
           if (!targetUserId) return;
-          handleJoinChannel(targetUserId, serverId, channelId);
+          handleMoveToChannel(targetUserId, serverId, channelId);
           break;
         case 'moveChannelUser':
           const targetUserIds = e.dataTransfer.getData('userIds').split(',');
-          for (const targetUserId of targetUserIds) {
-            if (!targetUserId) return;
-            handleJoinChannel(targetUserId, serverId, channelId);
-          }
+          handleMoveAllToChannel(targetUserIds, serverId, channelId);
           break;
       }
     };
@@ -170,7 +169,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             if (needPassword) {
               handleOpenChannelPassword(userId, serverId, channelId);
             } else {
-              handleJoinChannel(userId, serverId, channelId);
+              handleJoinChannel(serverId, channelId);
             }
           }}
           draggable={permissionLevel >= 5 && channelMembers.length !== 0}
@@ -190,7 +189,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                   if (needPassword) {
                     handleOpenChannelPassword(userId, serverId, channelId);
                   } else {
-                    handleJoinChannel(userId, serverId, channelId);
+                    handleJoinChannel(serverId, channelId);
                   }
                 },
               },
@@ -221,7 +220,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 id: 'delete-channel',
                 label: t('delete-channel'),
                 show: canDelete,
-                onClick: () => handleDeleteChannel(channelId, serverId),
+                onClick: () => handleDeleteChannel(serverId, channelId),
               },
               {
                 id: 'separator',
@@ -240,7 +239,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 id: 'move-all-user-to-channel',
                 label: t('move-all-user-to-channel'),
                 show: canMoveAllUserToChannel,
-                onClick: () => channelUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
+                onClick: () => handleMoveAllToChannel(channelUserIds, serverId, currentChannelId),
               },
               {
                 id: 'edit-channel-order',
@@ -257,7 +256,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 id: 'set-reception-lobby',
                 label: t('set-reception-lobby'),
                 show: canSetReceptionLobby,
-                onClick: () => handleEditServer({ receptionLobbyId: channelId }, serverId),
+                onClick: () => handleEditServer(serverId, { receptionLobbyId: channelId }),
               },
             ]);
           }}
