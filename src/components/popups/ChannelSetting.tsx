@@ -153,13 +153,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   type="number"
                   value={channelQueueSecs}
                   max={1000}
-                  min={5}
+                  min={1}
                  onChange={(e) =>
                   setChannel((prev) => {
                     const value = +e.target.value;
                     if (Number.isNaN(value)) return prev;
                     if (value > 1000) return { ...prev, queueSecs: 1000 };
-                    if (value < 5) return { ...prev, queueSecs: 5 };
+                    if (value < 1) return { ...prev, queueSecs: 1 };
                     return { ...prev, queueSecs: value };
                   })
                 }

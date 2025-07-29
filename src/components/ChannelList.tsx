@@ -303,7 +303,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div className={styles['mic-queue-list']}>
-            <div className={styles['user-list']}>
+            <div className={styles['mic-queue-list-users']}>
               {queueUsers.map((user) => (
                     <QueueUserTab
                       key={user.userId}
