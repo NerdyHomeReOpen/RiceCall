@@ -1,9 +1,6 @@
 // Services
 import ipcService from '@/services/ipc.service';
 
-// Types
-import { PopupType } from '@/types';
-
 export default class ErrorHandler {
   message: string;
   handler?: () => void;
@@ -14,7 +11,7 @@ export default class ErrorHandler {
   }
 
   show() {
-    ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
+    ipcService.popup.open('dialogError', 'errorDialog');
     ipcService.popup.onSubmit('errorDialog', () => {
       if (this.handler) this.handler();
     });

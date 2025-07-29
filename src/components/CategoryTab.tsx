@@ -4,11 +4,10 @@ import React, { useEffect } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Types
-import { PopupType, ServerMember, Channel, Server, User, Category, UserFriend, UserServer } from '@/types';
+import { ServerMember, Channel, Server, User, Category, UserFriend, UserServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
 
@@ -38,7 +37,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
   ({ category, friends, currentChannel, currentServer, serverMembers, serverChannels, expanded, selectedItemId, selectedItemType, setExpanded, setSelectedItemId, setSelectedItemType }) => {
     // Hooks
     const { t } = useTranslation();
-    const socket = useSocket();
     const contextMenu = useContextMenu();
     const findMe = useFindMeContext();
 
@@ -71,49 +69,54 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const canSetReceptionLobby = canManageChannel && !isReceptionLobby && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
 
     // Handlers
-    const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
-      if (!socket) return;
-      socket.send.editServer({ serverId, server });
+    const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
+      ipcService.socket.send('editServer', { serverId, update });
     };
 
     const handleJoinChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      if (!socket) return;
-      socket.send.connectChannel({ userId, channelId, serverId });
+      ipcService.socket.send('connectChannel', { serverId, channelId });
     };
 
-    const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
-      if (!socket) return;
-      handleOpenWarningDialog(t('confirm-delete-channel').replace('{0}', categoryName), () => socket.send.deleteChannel({ channelId, serverId }));
+    const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+      ipcService.socket.send('moveToChannel', { userId, serverId, channelId });
+    };
+
+    const handleMoveAllToChannel = (userIds: User['userId'][], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+      ipcService.socket.send('moveToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId })));
+    };
+
+    const handleDeleteChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+      handleOpenWarningDialog(t('confirm-delete-channel', { '0': categoryName }), () => ipcService.socket.send('deleteChannel', { serverId, channelId }));
     };
 
     const handleOpenWarningDialog = (message: string, callback: () => void) => {
-      ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
+      ipcService.popup.open('dialogWarning', 'warningDialog');
       ipcService.initialData.onRequest('warningDialog', { message, submitTo: 'warningDialog' });
       ipcService.popup.onSubmit('warningDialog', callback);
     };
 
     const handleOpenChannelSetting = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
-      ipcService.popup.open(PopupType.CHANNEL_SETTING, 'channelSetting');
+      ipcService.popup.open('channelSetting', 'channelSetting');
       ipcService.initialData.onRequest('channelSetting', { channelId, serverId });
     };
 
     const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Category['categoryId'], userId: User['userId']) => {
-      ipcService.popup.open(PopupType.CREATE_CHANNEL, 'createChannel');
+      ipcService.popup.open('createChannel', 'createChannel');
       ipcService.initialData.onRequest('createChannel', { serverId, channelId, userId });
     };
 
     const handleOpenChangeChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
-      ipcService.popup.open(PopupType.EDIT_CHANNEL_ORDER, 'editChannelOrder');
+      ipcService.popup.open('editChannelOrder', 'editChannelOrder');
       ipcService.initialData.onRequest('editChannelOrder', { serverId, userId });
     };
 
     const handleOpenServerBroadcast = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipcService.popup.open(PopupType.SERVER_BROADCAST, 'serverBroadcast');
+      ipcService.popup.open('serverBroadcast', 'serverBroadcast');
       ipcService.initialData.onRequest('serverBroadcast', { userId, serverId, channelId });
     };
 
     const handleOpenChannelPassword = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipcService.popup.open(PopupType.CHANNEL_PASSWORD, 'channelPassword');
+      ipcService.popup.open('channelPassword', 'channelPassword');
       ipcService.initialData.onRequest('channelPassword', { userId, serverId, channelId });
     };
 
@@ -125,7 +128,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     const handleDrop = (e: React.DragEvent, serverId: Server['serverId'], channelId: Channel['channelId']) => {
       e.preventDefault();
-      if (!socket) return;
       const moveType = e.dataTransfer.getData('type');
       const currentChannelId = e.dataTransfer.getData('currentChannelId');
       if (!moveType || !currentChannelId || currentChannelId === channelId) return;
@@ -134,14 +136,11 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         case 'moveUser':
           const targetUserId = e.dataTransfer.getData('userId');
           if (!targetUserId) return;
-          handleJoinChannel(targetUserId, serverId, channelId);
+          handleMoveToChannel(targetUserId, serverId, channelId);
           break;
         case 'moveChannelUser':
           const targetUserIds = e.dataTransfer.getData('userIds').split(',');
-          for (const targetUserId of targetUserIds) {
-            if (!targetUserId) return;
-            handleJoinChannel(targetUserId, serverId, channelId);
-          }
+          handleMoveAllToChannel(targetUserIds, serverId, channelId);
           break;
       }
     };
@@ -149,7 +148,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     // Effect
     useEffect(() => {
       if (!findMe || !userInCategory) return;
-
       findMe.handleCategoryExpanded.current = () => {
         setExpanded((prev) => ({
           ...prev,
@@ -219,7 +217,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 show: canManageChannel,
                 onClick: () => {
                   if (!categoryName) return;
-                  handleDeleteChannel(categoryId, serverId);
+                  handleDeleteChannel(serverId, categoryId);
                 },
               },
               {
@@ -256,7 +254,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 id: 'set-reception-lobby',
                 label: t('set-reception-lobby'),
                 show: canSetReceptionLobby,
-                onClick: () => handleEditServer({ receptionLobbyId: categoryId }, serverId),
+                onClick: () => handleEditServer(serverId, { receptionLobbyId: categoryId }),
               },
             ]);
           }}

@@ -1,4 +1,4 @@
-import { User, Channel, Server, FriendApplication, MemberApplication, ServerMember, Permission, UserServer, Member, Friend, UserFriend, FriendGroup, UserServerStatus } from '@/types';
+import { User, Channel, Server, FriendApplication, MemberApplication, ServerMember, UserServer, Member, Friend, UserFriend, FriendGroup, UserServerStatus } from '@/types';
 
 const Default = {
   user: (overrides: Partial<User> = {}): User => ({
@@ -104,7 +104,7 @@ const Default = {
     contribution: 0,
     lastMessageTime: 0,
     lastJoinChannelTime: 0,
-    permissionLevel: Permission.Guest,
+    permissionLevel: 1,
     createdAt: 0,
     ...overrides,
   }),

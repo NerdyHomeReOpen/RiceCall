@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { FriendGroup, User } from '@/types';
+import { FriendGroup } from '@/types';
 
 // Providers
-import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // CSS
@@ -18,13 +17,11 @@ import getService from '@/services/get.service';
 import Default from '@/utils/default';
 
 interface EditFriendGroupPopupProps {
-  userId: User['userId'];
   friendGroupId: FriendGroup['friendGroupId'];
 }
 
-const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ userId, friendGroupId }) => {
+const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ friendGroupId }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // Refs
@@ -38,9 +35,8 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
   const canSubmit = groupName.trim();
 
   // Handlers
-  const handleEditFriendGroup = (group: Partial<FriendGroup>, friendGroupId: FriendGroup['friendGroupId'], userId: User['userId']) => {
-    if (!socket) return;
-    socket.send.editFriendGroup({ group, friendGroupId, userId });
+  const handleEditFriendGroup = (friendGroupId: FriendGroup['friendGroupId'], update: Partial<FriendGroup>) => {
+    ipcService.socket.send('editFriendGroup', { friendGroupId, update });
   };
 
   const handleClose = () => {
@@ -79,7 +75,7 @@ const EditFriendGroupPopup: React.FC<EditFriendGroupPopupProps> = React.memo(({ 
           className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
             if (!canSubmit) return;
-            handleEditFriendGroup({ name: groupName, order: groupOrder }, friendGroupId, userId);
+            handleEditFriendGroup(friendGroupId, { name: groupName, order: groupOrder });
             handleClose();
           }}
         >

@@ -5,13 +5,13 @@ import styles from '@/styles/pages/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import { PopupType, ServerMember, Channel, Server, User, Category, UserFriend, UserServer, SocketServerEvent } from '@/types';
+import { ServerMember, Channel, Server, User, Category, UserFriend, UserServer, MemberApplication } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
+import { useSocket } from '@/providers/Socket';
 
 // Components
 import ChannelTab from '@/components/ChannelTab';
@@ -31,9 +31,9 @@ interface ChannelListProps {
 const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
   const contextMenu = useContextMenu();
   const findMe = useFindMeContext();
+  const socket = useSocket();
 
   // Refs
   const viewerRef = useRef<HTMLDivElement>(null);
@@ -68,17 +68,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
 
   // Handlers
   const handleFavoriteServer = (serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.favoriteServer({ serverId });
+    ipcService.socket.send('favoriteServer', { serverId });
   };
 
   const handleOpenAlertDialog = (message: string) => {
-    ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
+    ipcService.popup.open('dialogAlert', 'alertDialog');
     ipcService.initialData.onRequest('alertDialog', { message: message });
   };
 
   const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open(PopupType.SERVER_SETTING, 'serverSetting');
+    ipcService.popup.open('serverSetting', 'serverSetting');
     ipcService.initialData.onRequest('serverSetting', { serverId, userId });
   };
 
@@ -87,22 +86,22 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
       handleOpenAlertDialog(t('cannot-apply'));
       return;
     }
-    ipcService.popup.open(PopupType.APPLY_MEMBER, 'applyMember');
+    ipcService.popup.open('applyMember', 'applyMember');
     ipcService.initialData.onRequest('applyMember', { serverId, userId });
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open(PopupType.EDIT_NICKNAME, 'editNickname');
+    ipcService.popup.open('editNickname', 'editNickname');
     ipcService.initialData.onRequest('editNickname', { serverId, userId });
   };
 
   const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Category['categoryId'], userId: User['userId']) => {
-    ipcService.popup.open(PopupType.CREATE_CHANNEL, 'createChannel');
+    ipcService.popup.open('createChannel', 'createChannel');
     ipcService.initialData.onRequest('createChannel', { serverId, channelId, userId });
   };
 
   const handleOpenChangeChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open(PopupType.EDIT_CHANNEL_ORDER, 'editChannelOrder');
+    ipcService.popup.open('editChannelOrder', 'editChannelOrder');
     ipcService.initialData.onRequest('editChannelOrder', { serverId, userId });
   };
 
@@ -111,8 +110,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
     findMe.findMe();
   };
 
-  const handleServerMemberApplicationsSet = (data: { count: number }) => {
-    setMemberApplicationsCount(data.count);
+  const handleServerMemberApplicationsSet = (...args: MemberApplication[]) => {
+    setMemberApplicationsCount(args.length);
   };
 
   const handleServerMemberApplicationAdd = () => {
@@ -134,15 +133,14 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   }, [serverChannels]);
 
   useEffect(() => {
-    if (!socket) return;
     let start = Date.now();
     let end = Date.now();
-    socket.send.ping('ping');
+    ipcService.socket.send('ping');
     const measure = setInterval(() => {
       start = Date.now();
-      socket.send.ping('ping');
+      ipcService.socket.send('ping');
     }, 10000);
-    const clearPong = socket.on.pong(() => {
+    const clearPong = ipcService.socket.on('pong', () => {
       end = Date.now();
       setLatency((end - start).toFixed(0));
     });
@@ -150,27 +148,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
       clearInterval(measure);
       clearPong();
     };
-  }, [socket]);
+  }, []);
 
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.SERVER_MEMBER_APPLICATIONS_SET]: handleServerMemberApplicationsSet,
-      [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]: handleServerMemberApplicationAdd,
-      [SocketServerEvent.SERVER_MEMBER_APPLICATION_REMOVE]: handleServerMemberApplicationRemove,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
-
-    return () => {
-      unsubscribe.forEach((unsub) => unsub());
-    };
-  }, [socket]);
+    const unsubscribe: (() => void)[] = [
+      ipcService.socket.on('serverMemberApplicationsSet', handleServerMemberApplicationsSet),
+      ipcService.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
+      ipcService.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, [socket.isConnected]);
 
   return (
     <>

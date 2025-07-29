@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { User, Friend, FriendGroup, SocketServerEvent } from '@/types';
+import { User, Friend, FriendGroup } from '@/types';
 
 // Providers
 import { useSocket } from '@/providers/Socket';
@@ -42,43 +42,37 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
     ipcService.window.close();
   };
 
-  const handleFriendGroupAdd = (data: FriendGroup) => {
-    setFriendGroups((prev) => [...prev, data]);
+  const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
+    args.forEach((arg) => {
+      setFriendGroups((prev) => [...prev, arg.data]);
+    });
   };
 
-  const handleFriendGroupUpdate = (id: FriendGroup['friendGroupId'], data: Partial<FriendGroup>) => {
-    setFriendGroups((prev) => prev.map((item) => (item.friendGroupId === id ? { ...item, ...data } : item)));
+  const handleFriendGroupUpdate = (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
+    args.forEach((arg) => {
+      setFriendGroups((prev) => prev.map((item) => (item.friendGroupId === arg.friendGroupId ? { ...item, ...arg.update } : item)));
+    });
   };
 
-  const handleFriendGroupRemove = (id: FriendGroup['friendGroupId']) => {
-    setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== id));
+  const handleFriendGroupRemove = (...args: { friendGroupId: string }[]) => {
+    args.forEach((arg) => {
+      setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== arg.friendGroupId));
+    });
   };
 
-  const handleEditFriend = (friend: Partial<Friend>, userId: User['userId'], targetId: User['userId']) => {
-    if (!socket) return;
-    socket.send.editFriend({ friend, userId, targetId });
+  const handleEditFriend = (targetId: User['userId'], update: Partial<Friend>) => {
+    ipcService.socket.send('editFriend', { targetId, update });
   };
 
   // Effects
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.FRIEND_GROUP_ADD]: handleFriendGroupAdd,
-      [SocketServerEvent.FRIEND_GROUP_UPDATE]: handleFriendGroupUpdate,
-      [SocketServerEvent.FRIEND_GROUP_REMOVE]: handleFriendGroupRemove,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
-
-    return () => {
-      unsubscribe.forEach((unsub) => unsub());
-    };
-  }, [socket]);
+    const unsubscribe: (() => void)[] = [
+      ipcService.socket.on('friendGroupAdd', handleFriendGroupAdd),
+      ipcService.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
+      ipcService.socket.on('friendGroupRemove', handleFriendGroupRemove),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, [socket.isConnected]);
 
   useEffect(() => {
     if (!userId || !targetId || refreshRef.current) return;
@@ -122,7 +116,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
         <div
           className={`${popup['button']}`}
           onClick={() => {
-            handleEditFriend({ friendGroupId: friendGroupId || null }, userId, targetId);
+            handleEditFriend(targetId, { friendGroupId: friendGroupId || null });
             handleClose();
           }}
         >

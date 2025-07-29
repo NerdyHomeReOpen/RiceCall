@@ -7,12 +7,12 @@ import permission from '@/styles/permission.module.css';
 import markdown from '@/styles/markdown.module.css';
 
 // Types
-import { MemberApplication, Server, PopupType, ServerMember, Member, User, SocketServerEvent } from '@/types';
+import { MemberApplication, Server, ServerMember, Member, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
+import { useSocket } from '@/providers/Socket';
 
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
@@ -35,8 +35,8 @@ interface ServerSettingPopupProps {
 const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serverId, userId }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
   const contextMenu = useContextMenu();
+  const socket = useSocket();
 
   // Constants
   const MEMBER_FIELDS = [
@@ -104,169 +104,110 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   });
 
   // Handlers
-  const handleServerMemberAdd = (member: ServerMember): void => {
-    setServerMembers((prev) => [...prev, member]);
+  const handleServerMemberAdd = (...args: { data: ServerMember }[]) => {
+    args.forEach((arg) => {
+      setServerMembers((prev) => [...prev, arg.data]);
+    });
   };
 
-  const handleServerMemberUpdate = (userId: ServerMember['userId'], serverId: ServerMember['serverId'], member: Partial<ServerMember>): void => {
-    setServerMembers((prev) => prev.map((item) => (item.userId === userId && item.serverId === serverId ? { ...item, ...member } : item)));
+  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<ServerMember> }[]) => {
+    args.forEach((arg) => {
+      setServerMembers((prev) => prev.map((item) => (item.userId === arg.userId && item.serverId === arg.serverId ? { ...item, ...arg.update } : item)));
+    });
   };
 
-  const handleServerMemberRemove = (userId: ServerMember['userId'], serverId: ServerMember['serverId']): void => {
-    setServerMembers((prev) => prev.filter((item) => !(item.userId === userId && item.serverId === serverId)));
+  const handleServerMemberRemove = (...args: { userId: string; serverId: string }[]) => {
+    args.forEach((arg) => {
+      setServerMembers((prev) => prev.filter((item) => !(item.userId === arg.userId && item.serverId === arg.serverId)));
+    });
   };
 
-  const handleServerMemberApplicationAdd = (application: MemberApplication) => {
-    setServerApplications((prev) => [...prev, application]);
+  const handleServerMemberApplicationAdd = (...args: { data: MemberApplication }[]) => {
+    args.forEach((arg) => {
+      setServerApplications((prev) => [...prev, arg.data]);
+    });
   };
 
-  const handleServerMemberApplicationUpdate = (userId: User['userId'], serverId: Server['serverId'], application: Partial<MemberApplication>) => {
-    setServerApplications((prev) => prev.map((item) => (item.serverId === serverId && item.userId === userId ? { ...item, ...application } : item)));
+  const handleServerMemberApplicationUpdate = (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => {
+    args.forEach((arg) => {
+      setServerApplications((prev) => prev.map((item) => (item.serverId === arg.serverId && item.userId === arg.userId ? { ...item, ...arg.update } : item)));
+    });
   };
 
-  const handleServerMemberApplicationRemove = (userId: User['userId'], serverId: Server['serverId']) => {
-    setServerApplications((prev) => prev.filter((item) => !(item.userId === userId && item.serverId === serverId)));
+  const handleServerMemberApplicationRemove = (...args: { userId: string; serverId: string }[]) => {
+    args.forEach((arg) => {
+      setServerApplications((prev) => prev.filter((item) => !(item.userId === arg.userId && item.serverId === arg.serverId)));
+    });
   };
 
-  const handleMemberApproval = (userId: User['userId'], serverId: Server['serverId']) => {
-    setServerApplications((prev) => prev.filter((item) => !(item.userId === userId && item.serverId === serverId)));
+  const handleApproveMemberApplication = (userId: User['userId'], serverId: Server['serverId']) => {
+    ipcService.socket.send('approveMemberApplication', { userId, serverId });
   };
 
-  const handleApproveMemberApplication = (userId: User['userId'], serverId: Server['serverId'], member?: Partial<Member>) => {
-    if (!socket) return;
-    socket.send.approveMemberApplication({ userId, serverId, member });
-  };
-
-  const handleDeleteMemberApplication = (userId: User['userId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.deleteMemberApplication({ userId, serverId });
-  };
-
-  const handleSort = <T extends ServerMember | MemberApplication>(field: keyof T, array: T[], direction: 1 | -1) => {
-    const newDirection = direction === 1 ? -1 : 1;
-    // setSortField(String(field)); temp: not used
-    setSortDirection(newDirection);
-    return [...array].sort(Sorter(field, newDirection));
+  const handleRejectMemberApplication = (userId: User['userId'], serverId: Server['serverId']) => {
+    ipcService.socket.send('rejectMemberApplication', { userId, serverId });
   };
 
   const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editServer({ server, serverId });
+    ipcService.socket.send('editServer', { serverId, update: server });
   };
 
   const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editMember({ member, userId, serverId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
-    ipcService.initialData.onRequest('alertDialog', {
-      message: message,
-      submitTo: 'alertDialog',
-    });
-    ipcService.popup.onSubmit('alertDialog', callback);
+    ipcService.socket.send('editMember', { userId, serverId, update: member });
   };
 
   const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    if (!socket) return;
-    handleOpenAlertDialog(t('confirm-remove-membership', { '0': userName }), () => {
-      handleEditMember({ permissionLevel: 1 }, userId, serverId);
-    });
+    handleOpenAlertDialog(t('confirm-remove-membership', { '0': userName }), () => handleEditMember({ permissionLevel: 1 }, userId, serverId));
   };
 
   const handleRemoveBlockMember = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => {
-      handleEditMember({ isBlocked: 0 }, userId, serverId);
-    });
+    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => handleEditMember({ isBlocked: 0 }, userId, serverId));
   };
 
-  const handleOpenMemberApplySetting = () => {
-    ipcService.popup.open(PopupType.MEMBER_APPLY_SETTING, 'memberApplySetting');
-    ipcService.initialData.onRequest('memberApplySetting', {
-      serverId,
-    });
-  };
-
-  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.APPLY_FRIEND, 'applyFriend');
-    ipcService.initialData.onRequest('applyFriend', {
-      userId,
-      targetId,
-    });
-  };
-
-  const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open(PopupType.EDIT_NICKNAME, 'editNickname');
-    ipcService.initialData.onRequest('editNickname', {
-      serverId,
-      userId,
-    });
-  };
-
-  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    ipcService.popup.open(PopupType.BLOCK_MEMBER, `blockMember-${userId}`);
-    ipcService.initialData.onRequest(`blockMember-${userId}`, {
-      userId,
-      serverId,
-      userName,
-    });
-  };
-
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, {
-      userId,
-      targetId,
-      targetName,
-    });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, {
-      userId,
-      targetId,
-    });
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open('dialogAlert', 'dialogAlert');
+    ipcService.initialData.onRequest('dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipcService.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleOpenErrorDialog = (message: string) => {
-    ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
-    ipcService.initialData.onRequest('errorDialog', {
-      message: message,
-      submitTo: 'errorDialog',
-    });
+    ipcService.popup.open('dialogError', 'dialogError');
+    ipcService.initialData.onRequest('dialogError', { message, submitTo: 'dialogError' });
   };
 
-  const handleMemberSort = (field: keyof ServerMember) => {
-    const sortedMembers = handleSort(field, serverMembers, sortDirection);
-    setServerMembers(sortedMembers);
+  const handleOpenMemberApplySetting = () => {
+    ipcService.popup.open('memberApplySetting', 'memberApplySetting');
+    ipcService.initialData.onRequest('memberApplySetting', { serverId });
   };
 
-  const handleApplicationSort = (field: keyof MemberApplication) => {
-    const sortedApplications = handleSort(field, serverApplications, sortDirection);
-    setServerApplications(sortedApplications);
+  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
+    ipcService.popup.open('applyFriend', 'applyFriend');
+    ipcService.initialData.onRequest('applyFriend', { userId, targetId });
   };
 
-  const handleClose = () => {
-    ipcService.window.close();
+  const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
+    ipcService.popup.open('editNickname', 'editNickname');
+    ipcService.initialData.onRequest('editNickname', { serverId, userId });
   };
 
-  const setSelectedRowIdAndType = useCallback(
-    (id: string | null, type: string | null) => {
-      setSelectedRowId(id);
-      setSelectedRowType(type);
-    },
-    [setSelectedRowId, setSelectedRowType],
-  );
+  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
+    ipcService.popup.open('blockMember', `blockMember-${userId}`);
+    ipcService.initialData.onRequest(`blockMember-${userId}`, { userId, serverId, userName });
+  };
+
+  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
+    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
+  };
+
+  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
+    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
+  };
 
   const handleAvatarCropper = (avatarData: string) => {
-    ipcService.popup.open(PopupType.AVATAR_CROPPER, 'avatarCropper');
-    ipcService.initialData.onRequest('avatarCropper', {
-      avatarData: avatarData,
-      submitTo: 'avatarCropper',
-    });
+    ipcService.popup.open('avatarCropper', 'avatarCropper');
+    ipcService.initialData.onRequest('avatarCropper', { avatarData, submitTo: 'avatarCropper' });
     ipcService.popup.onSubmit('avatarCropper', async (data) => {
       const formData = new FormData();
       formData.append('_type', 'server');
@@ -283,30 +224,47 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     });
   };
 
+  const handleClose = () => {
+    ipcService.window.close();
+  };
+
+  const handleSort = <T extends ServerMember | MemberApplication>(field: keyof T, array: T[], direction: 1 | -1) => {
+    const newDirection = direction === 1 ? -1 : 1;
+    // setSortField(String(field)); temp: not used
+    setSortDirection(newDirection);
+    return [...array].sort(Sorter(field, newDirection));
+  };
+
+  const handleMemberSort = (field: keyof ServerMember) => {
+    const sortedMembers = handleSort(field, serverMembers, sortDirection);
+    setServerMembers(sortedMembers);
+  };
+
+  const handleApplicationSort = (field: keyof MemberApplication) => {
+    const sortedApplications = handleSort(field, serverApplications, sortDirection);
+    setServerApplications(sortedApplications);
+  };
+
+  const setSelectedRowIdAndType = useCallback(
+    (id: string | null, type: string | null) => {
+      setSelectedRowId(id);
+      setSelectedRowType(type);
+    },
+    [setSelectedRowId, setSelectedRowType],
+  );
+
   // Effects
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.SERVER_MEMBER_ADD]: handleServerMemberAdd,
-      [SocketServerEvent.SERVER_MEMBER_UPDATE]: handleServerMemberUpdate,
-      [SocketServerEvent.SERVER_MEMBER_REMOVE]: handleServerMemberRemove,
-      [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]: handleServerMemberApplicationAdd,
-      [SocketServerEvent.SERVER_MEMBER_APPLICATION_UPDATE]: handleServerMemberApplicationUpdate,
-      [SocketServerEvent.SERVER_MEMBER_APPLICATION_REMOVE]: handleServerMemberApplicationRemove,
-      [SocketServerEvent.MEMBER_APPROVAL]: handleMemberApproval,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
-
-    return () => {
-      unsubscribe.forEach((unsub) => unsub());
-    };
-  }, [socket]);
+    const unsubscribe: (() => void)[] = [
+      ipcService.socket.on('serverMemberAdd', handleServerMemberAdd),
+      ipcService.socket.on('serverMemberUpdate', handleServerMemberUpdate),
+      ipcService.socket.on('serverMemberRemove', handleServerMemberRemove),
+      ipcService.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
+      ipcService.socket.on('serverMemberApplicationUpdate', handleServerMemberApplicationUpdate),
+      ipcService.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, [socket.isConnected]);
 
   useEffect(() => {
     if (!serverId || refreshRef.current) return;
@@ -731,7 +689,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                               label: t('accept-application'),
                               show: canAccept,
                               onClick: () => {
-                                handleApproveMemberApplication(applicationUserId, serverId, { permissionLevel: 2 });
+                                handleApproveMemberApplication(applicationUserId, serverId);
                               },
                             },
                             {
@@ -739,7 +697,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                               label: t('deny-application'),
                               show: canDeny,
                               onClick: () => {
-                                handleDeleteMemberApplication(applicationUserId, serverId);
+                                handleRejectMemberApplication(applicationUserId, serverId);
                               },
                             },
                           ]);

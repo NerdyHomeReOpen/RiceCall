@@ -6,16 +6,16 @@ import { Permission } from '@/types';
 
 const FREE_IP_API_URL = process.env.NEXT_PUBLIC_FREE_IP_API_URL;
 
-export const getPermissionText = (t: TFunction<'translation', undefined>, permission: number): string => {
-  const permissionMap: Record<number, string> = {
-    [Permission.Guest]: t('guest'), // 1
-    [Permission.Member]: t('member'), // 2
-    [Permission.ChannelMod]: t('channel-mod'), // 3
-    [Permission.ChannelAdmin]: t('channel-admin'), // 4
-    [Permission.ServerAdmin]: t('server-admin'), // 5
-    [Permission.ServerOwner]: t('server-owner'), // 6
-    [Permission.Staff]: t('staff'), // 7
-    [Permission.Official]: t('official'), // 8
+export const getPermissionText = (t: TFunction<'translation', undefined>, permission: Permission): string => {
+  const permissionMap: Record<Permission, string> = {
+    1: t('guest'),
+    2: t('member'),
+    3: t('channel-mod'),
+    4: t('channel-admin'),
+    5: t('server-admin'),
+    6: t('server-owner'),
+    7: t('staff'),
+    8: t('official'),
   };
   return permissionMap[permission] || t('unknown-user');
 };

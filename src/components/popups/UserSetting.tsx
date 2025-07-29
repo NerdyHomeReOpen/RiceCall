@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 // Types
-import { Server, User, UserServer, PopupType, Friend } from '@/types';
+import { Server, User, UserServer, Friend } from '@/types';
 
 // Components
 import BadgeListViewer from '@/components/BadgeList';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
@@ -37,7 +36,6 @@ interface UserSettingPopupProps {
 
 const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, targetId }) => {
   // Props
-  const socket = useSocket();
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
 
@@ -119,41 +117,22 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   const dayOptions = useMemo(() => Array.from({ length: new Date(userBirthYear, userBirthMonth, 0).getDate() }, (_, i) => i + 1), [userBirthYear, userBirthMonth]);
 
   // Handlers
-  const handleEditUser = (user: Partial<User>) => {
-    if (!socket) return;
-    socket.send.editUser({ user, userId });
+  const handleEditUser = (update: Partial<User>) => {
+    ipcService.socket.send('editUser', { update });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.APPLY_FRIEND, 'applyFriend');
-    ipcService.initialData.onRequest('applyFriend', {
-      userId,
-      targetId,
-    });
+    ipcService.popup.open('applyFriend', 'applyFriend');
+    ipcService.initialData.onRequest('applyFriend', { userId, targetId });
   };
 
   const handleOpenErrorDialog = (message: string) => {
-    ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
-    ipcService.initialData.onRequest('errorDialog', {
-      message: message,
-      submitTo: 'errorDialog',
-    });
-  };
-
-  const handleMinimize = () => {
-    ipcService.window.minimize();
-  };
-
-  const handleClose = () => {
-    ipcService.window.close();
-  };
-
-  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
+    ipcService.popup.open('dialogError', 'errorDialog');
+    ipcService.initialData.onRequest('errorDialog', { message: message, submitTo: 'errorDialog' });
   };
 
   const handleAvatarCropper = (userId: User['userId'], avatarData: string) => {
-    ipcService.popup.open(PopupType.AVATAR_CROPPER, 'avatarCropper');
+    ipcService.popup.open('avatarCropper', 'avatarCropper');
     ipcService.initialData.onRequest('avatarCropper', {
       avatarData: avatarData,
       submitTo: 'avatarCropper',
@@ -176,6 +155,18 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
         });
       }
     });
+  };
+
+  const handleMinimize = () => {
+    ipcService.window.minimize();
+  };
+
+  const handleClose = () => {
+    ipcService.window.close();
+  };
+
+  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
   };
 
   // Effects

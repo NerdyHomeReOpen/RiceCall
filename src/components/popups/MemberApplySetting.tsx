@@ -5,7 +5,6 @@ import { Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -23,7 +22,6 @@ interface MemberApplySettingPopupProps {
 
 const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.memo(({ serverId }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // Refs
@@ -36,9 +34,8 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
   const { receiveApply: serverReceiveApplication, applyNotice: serverApplyNote } = server;
 
   // Handlers
-  const handleEditServer = (server: Partial<Server>, serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editServer({ server, serverId });
+  const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
+    ipcService.socket.send('editServer', { serverId, update });
   };
 
   const handleClose = () => {
@@ -80,7 +77,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
         <div
           className={popup['button']}
           onClick={() => {
-            handleEditServer({ receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote }, serverId);
+            handleEditServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
             handleClose();
           }}
         >

@@ -6,12 +6,11 @@ import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Types
-import { PopupType, User, UserFriend, Server } from '@/types';
+import { User, UserFriend, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useSocket } from '@/providers/Socket';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
@@ -39,9 +38,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   const mainTab = useMainTab();
   const loadingBox = useLoading();
 
-  // Socket
-  const socket = useSocket();
-
   // Refs
   const refreshed = useRef(false);
 
@@ -49,7 +45,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   const [friendServer, setFriendServer] = useState<Server>(Default.server());
 
   // Variables
-  const { userId, currentServerId: userCurrentServerId } = user;
+  const { currentServerId: userCurrentServerId } = user;
   const {
     userId: friendUserId,
     targetId: friendTargetId,
@@ -69,7 +65,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   const isFriendOnline = friendStatus !== 'offline' && !friendIsBlocked;
 
   // Handlers
-  const handleServerSelect = (userId: User['userId'], server: Server) => {
+  const handleServerSelect = (server: Server) => {
     if (server.serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
@@ -79,13 +75,12 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     loadingBox.setLoadingServerId(server.displayId);
 
     setTimeout(() => {
-      socket.send.connectServer({ userId, serverId: server.serverId });
+      ipcService.socket.send('connectServer', { serverId: server.serverId });
     }, loadingBox.loadingTimeStamp);
   };
 
-  const handleDeleteFriend = (userId: User['userId'], targetId: User['userId']) => {
-    if (!socket) return;
-    handleOpenWarningDialog(t('confirm-delete-friend').replace('{0}', friendName), () => socket.send.deleteFriend({ userId, targetId }));
+  const handleDeleteFriend = (targetId: User['userId']) => {
+    handleOpenWarningDialog(t('confirm-delete-friend', { '0': friendName }), () => ipcService.socket.send('deleteFriend', { targetId }));
   };
 
   const handleServerUpdate = (data: Server) => {
@@ -93,43 +88,29 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   };
 
   const handleOpenWarningDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open(PopupType.DIALOG_WARNING, 'warningDialog');
-    ipcService.initialData.onRequest('warningDialog', {
-      message: message,
-      submitTo: 'warningDialog',
-    });
+    ipcService.popup.open('dialogWarning', 'warningDialog');
+    ipcService.initialData.onRequest('warningDialog', { message: message, submitTo: 'warningDialog' });
     ipcService.popup.onSubmit('warningDialog', callback);
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, {
-      userId,
-      targetId,
-      targetName,
-    });
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
+    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, {
-      userId,
-      targetId,
-    });
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
+    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenEditFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.EDIT_FRIEND, 'editFriend');
-    ipcService.initialData.onRequest('editFriend', {
-      userId,
-      targetId,
-    });
+    ipcService.popup.open('editFriend', 'editFriend');
+    ipcService.initialData.onRequest('editFriend', { userId, targetId });
   };
 
-  const handleBlockFriend = (userId: User['userId'], targetId: User['userId'], isBlocked: UserFriend['isBlocked']) => {
-    if (!socket) return;
+  const handleBlockFriend = (targetId: User['userId'], isBlocked: UserFriend['isBlocked']) => {
     handleOpenWarningDialog(t('confirmBlockFriend', { blockType: isBlocked ? t('unblock') : t('block'), userName: friendName }), () =>
-      socket.send.editFriend({ friend: { isBlocked: !isBlocked }, userId, targetId }),
+      ipcService.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }),
     );
   };
 
@@ -221,13 +202,13 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             id: 'set-block',
             label: friendIsBlocked ? t('unblock') : t('block'),
             show: !isCurrentUser,
-            onClick: () => handleBlockFriend(friendUserId, friendTargetId, friendIsBlocked),
+            onClick: () => handleBlockFriend(friendTargetId, friendIsBlocked),
           },
           {
             id: 'delete-friend',
             label: t('delete-friend'),
             show: !isCurrentUser,
-            onClick: () => handleDeleteFriend(friendUserId, friendTargetId),
+            onClick: () => handleDeleteFriend(friendTargetId),
           },
         ]);
       }}
@@ -246,7 +227,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           <BadgeList badges={friendBadges} maxDisplay={5} />
         </div>
         {isFriendOnline && friendCurrentServerId ? (
-          <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(userId, friendServer)}>
+          <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendServer)}>
             <div className={styles['location-icon']} />
             <div className={styles['server-name-text']}>{friendServerName}</div>
           </div>

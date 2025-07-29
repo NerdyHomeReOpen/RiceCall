@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 // Types
-import { Server, User } from '@/types';
+import { Member, Server, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -22,7 +21,6 @@ interface BlockMemberPopupProps {
 const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, serverId, userName }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
 
   // States
   const [blockType, setBlockType] = useState<string>('timeout');
@@ -49,23 +47,8 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const isForeverBlock = blockType !== 'timeout';
 
   // Handles
-  const handleBlockMember = () => {
-    const memberData =
-      blockType === 'timeout'
-        ? {
-            isBlocked: Date.now() + blockTime,
-          }
-        : {
-            isBlocked: -1,
-            permissionLevel: 1,
-            nickname: null,
-          };
-
-    socket.send.editMember({
-      member: memberData,
-      userId,
-      serverId,
-    });
+  const handleBlockMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
+    ipcService.socket.send('editMember', { userId, serverId, update });
   };
 
   const handleClose = () => {
@@ -143,13 +126,12 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
           </div>
         </div>
       </div>
-
-      {/* Footer */}
+      ;{/* Footer */}
       <div className={popup['popup-footer']}>
         <div
           className={popup['button']}
           onClick={() => {
-            handleBlockMember();
+            handleBlockMember(userId, serverId, blockType === 'timeout' ? { isBlocked: Date.now() + blockTime } : { isBlocked: -1, permissionLevel: 1, nickname: null });
             handleClose();
           }}
         >

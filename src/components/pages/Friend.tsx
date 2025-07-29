@@ -16,7 +16,6 @@ import { User, UserFriend, FriendGroup } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
@@ -32,7 +31,6 @@ interface FriendPageProps {
 const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, friends, friendGroups, display }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
   const contextMenu = useContextMenu();
 
   // Refs
@@ -46,23 +44,12 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   const [signatureInput, setSignatureInput] = useState<string>('');
 
   // Variables
-  const {
-    userId,
-    name: userName,
-    signature: userSignature,
-    avatarUrl: userAvatarUrl,
-    xp: userXP,
-    requiredXp: userRequiredXP,
-    level: userLevel,
-    vip: userVip,
-    badges: userBadges,
-  } = user;
+  const { name: userName, signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
 
   // Handlers
-  const handleChangeSignature = (signature: User['signature'], userId: User['userId']) => {
-    if (!socket) return;
+  const handleChangeSignature = (signature: User['signature']) => {
     if (signature === userSignature) return;
-    socket.send.editUser({ user: { signature }, userId });
+    ipcService.socket.send('editUser', { update: { signature } });
   };
 
   const handleResize = useCallback(
@@ -110,19 +97,13 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
     <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
       <header className={friendPage['friend-header']}>
-        <div
-          className={friendPage['avatar-picture']}
-          style={{ backgroundImage: `url(${userAvatarUrl})` }}
-          datatype={''}
-        />
+        <div className={friendPage['avatar-picture']} style={{ backgroundImage: `url(${userAvatarUrl})` }} datatype={''} />
         <div className={friendPage['base-info-wrapper']}>
           <div className={friendPage['box']}>
             <div className={friendPage['level-icon']} />
             <div
               className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
-              title={`${t('level')}: ${userLevel}, ${t('xp')}: ${userXP}, ${t('required-xp')}: ${
-                userRequiredXP - userXP
-              }`}
+              title={`${t('level')}: ${userLevel}, ${t('xp')}: ${userXP}, ${t('required-xp')}: ${userRequiredXP - userXP}`}
             />
             <div className={friendPage['wealth-icon']} />
             <div className={friendPage['wealth-value-text']}>0</div>
@@ -141,7 +122,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             maxLength={300}
             onChange={(e) => setSignatureInput(e.target.value)}
             onBlur={() => {
-              handleChangeSignature(signatureInput, userId);
+              handleChangeSignature(signatureInput);
             }}
             onKeyDown={(e) => {
               if (isComposing) return;
@@ -157,8 +138,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
               e.preventDefault();
               if (!emojiIconRef.current) return;
               const x = emojiIconRef.current.getBoundingClientRect().x;
-              const y =
-                emojiIconRef.current.getBoundingClientRect().y + emojiIconRef.current.getBoundingClientRect().height;
+              const y = emojiIconRef.current.getBoundingClientRect().y + emojiIconRef.current.getBoundingClientRect().height;
               contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
                 setSignatureInput((prev) => prev + emoji);
                 if (signatureInputRef.current) signatureInputRef.current.focus();

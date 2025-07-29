@@ -6,7 +6,7 @@ import permission from '@/styles/permission.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Types
-import { User, PopupType } from '@/types';
+import { User } from '@/types';
 import type { ChannelMessage } from '@/types';
 
 // Providers
@@ -36,36 +36,19 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   const { t } = useTranslation();
 
   // Variables
-  const {
-    userId: senderUserId,
-    name: senderName,
-    vip: senderVip,
-    gender: senderGender,
-    permissionLevel: senderPermissionLevel,
-    contents: messageContents,
-    timestamp: messageTimestamp,
-  } = messageGroup;
-
+  const { userId: senderUserId, name: senderName, vip: senderVip, gender: senderGender, permissionLevel: senderPermissionLevel, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
   const isCurrentUser = senderUserId === userId;
-
   const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
 
   // handles
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, {
-      userId,
-      targetId,
-      targetName,
-    });
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
+    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, {
-      userId,
-      targetId,
-    });
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
+    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
   };
 
   return (

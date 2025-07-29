@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 // Types
-import { PopupType, Channel, Category, Server, User, SocketServerEvent } from '@/types';
+import { Channel, Category, Server, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -26,8 +26,8 @@ interface EditChannelOrderPopupProps {
 
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ userId, serverId }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
+  const socket = useSocket();
 
   // Refs
   const refreshed = useRef(false);
@@ -56,54 +56,46 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const canAdd = !isLobby && !selectedChannel?.categoryId;
 
   // Handlers
-  const handleServerChannelAdd = (data: Channel): void => {
-    setServerChannels((prev) => [...prev, data]);
+  const handleServerChannelAdd = (...args: { data: Channel }[]) => {
+    args.forEach((arg) => {
+      setServerChannels((prev) => [...prev, arg.data]);
+    });
   };
 
-  const handleServerChannelUpdate = (id: Channel['channelId'], data: Partial<Channel>): void => {
-    setServerChannels((prev) => prev.map((item) => (item.channelId === id ? { ...item, ...data } : item)));
+  const handleServerChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
+    args.forEach((arg) => {
+      setServerChannels((prev) => prev.map((item) => (item.channelId === arg.channelId ? { ...item, ...arg.update } : item)));
+    });
   };
 
-  const handleServerChannelRemove = (id: Channel['channelId']): void => {
-    setServerChannels((prev) => prev.filter((item) => item.channelId !== id));
+  const handleServerChannelRemove = (...args: { channelId: string }[]) => {
+    args.forEach((arg) => {
+      setServerChannels((prev) => prev.filter((item) => item.channelId !== arg.channelId));
+    });
   };
 
-  const handleEditChannels = (channels: Partial<Channel>[], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editChannels({ channels, serverId });
+  const handleEditChannels = (serverId: Server['serverId'], updates: Partial<Channel>[]) => {
+    ipcService.socket.send('editChannel', ...updates.map((update) => ({ serverId, channelId: update.channelId!, update })));
   };
 
   const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.deleteChannel({ channelId, serverId });
-    if (selectedChannel?.channelId === channelId) {
-      setSelectedChannel(null);
-    }
+    ipcService.socket.send('deleteChannel', { serverId, channelId });
+    if (selectedChannel?.channelId === channelId) setSelectedChannel(null);
   };
 
   const handleOpenCreateChannel = (userId: User['userId'], channelId: Channel['channelId'] | null, serverId: Server['serverId']) => {
-    ipcService.popup.open(PopupType.CREATE_CHANNEL, 'createChannel');
-    ipcService.initialData.onRequest('createChannel', {
-      userId,
-      serverId,
-      channelId,
-    });
+    ipcService.popup.open('createChannel', 'createChannel');
+    ipcService.initialData.onRequest('createChannel', { userId, serverId, channelId });
   };
 
   const handleOpenEditChannelName = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.popup.open(PopupType.EDIT_CHANNEL_NAME, 'editChannelName');
-    ipcService.initialData.onRequest('editChannelName', {
-      serverId,
-      channelId,
-    });
+    ipcService.popup.open('editChannelName', 'editChannelName');
+    ipcService.initialData.onRequest('editChannelName', { serverId, channelId });
   };
 
   const handleOpenWarningDialog = (message: string) => {
-    ipcService.popup.open(PopupType.DIALOG_WARNING, 'deleteChannel');
-    ipcService.initialData.onRequest('deleteChannel', {
-      message: message,
-      submitTo: 'deleteChannel',
-    });
+    ipcService.popup.open('dialogWarning', 'deleteChannel');
+    ipcService.initialData.onRequest('deleteChannel', { message: message, submitTo: 'deleteChannel' });
     ipcService.popup.onSubmit('deleteChannel', () => {
       if (!selectedChannel) return;
       handleDeleteChannel(selectedChannel.channelId, serverId);
@@ -156,24 +148,13 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   // Effects
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.SERVER_CHANNEL_ADD]: handleServerChannelAdd,
-      [SocketServerEvent.SERVER_CHANNEL_UPDATE]: handleServerChannelUpdate,
-      [SocketServerEvent.SERVER_CHANNEL_REMOVE]: handleServerChannelRemove,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
-
-    return () => {
-      unsubscribe.forEach((unsub) => unsub());
-    };
-  }, [socket]);
+    const unsubscribe: (() => void)[] = [
+      ipcService.socket.on('serverChannelAdd', handleServerChannelAdd),
+      ipcService.socket.on('serverChannelUpdate', handleServerChannelUpdate),
+      ipcService.socket.on('serverChannelRemove', handleServerChannelRemove),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, [socket.isConnected]);
 
   useEffect(() => {
     if (!userId || refreshed.current) return;
@@ -358,25 +339,17 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
               .filter((ch) => !ch.categoryId)
               .forEach((ch, index) => {
                 if (ch.order !== index || ch.order !== map.current[ch.channelId]) {
-                  editedChannels.push({
-                    order: index,
-                    channelId: ch.channelId,
-                  });
+                  editedChannels.push({ order: index, channelId: ch.channelId });
                 }
                 serverChannels
                   .filter((sch) => sch.categoryId === ch.channelId)
                   .forEach((sch, sindex) => {
                     if (sch.order !== sindex || sch.order !== map.current[sch.channelId]) {
-                      editedChannels.push({
-                        order: sindex,
-                        channelId: sch.channelId,
-                      });
+                      editedChannels.push({ order: sindex, channelId: sch.channelId });
                     }
                   });
               });
-            if (editedChannels.length > 0) {
-              handleEditChannels(editedChannels, serverId);
-            }
+            if (editedChannels.length > 0) handleEditChannels(serverId, editedChannels);
             handleClose();
           }}
         >

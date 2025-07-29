@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import { User, DirectMessage, SocketServerEvent, Server, PromptMessage } from '@/types';
+import { User, DirectMessage, Server, PromptMessage } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -63,27 +63,17 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const { name: targetCurrentServerName } = targetCurrentServer;
 
   // Handlers
-  const handleSendMessage = (directMessage: Partial<DirectMessage>, userId: User['userId'], targetId: User['userId']) => {
-    if (!socket) return;
-    socket.send.directMessage({ directMessage, userId, targetId });
+  const handleSendMessage = (targetId: User['userId'], preset: Partial<DirectMessage>) => {
+    ipcService.socket.send('directMessage', { targetId, preset });
   };
 
   const handleSendShakeWindow = () => {
-    if (!socket || cooldown > 0) return;
+    if (cooldown > 0) return;
 
     if (isFriend) {
-      socket.send.shakeWindow({ userId, targetId });
+      ipcService.socket.send('shakeWindow', { targetId });
     } else {
-      setDirectMessages((prev) => [
-        ...prev,
-        {
-          type: 'warn',
-          content: `<span style='color: #038792'>${t('non-friend-warning-message')}</span>`,
-          timestamp: Date.now(),
-          parameter: {},
-          contentMetadata: {},
-        },
-      ]);
+      setDirectMessages((prev) => [...prev, { type: 'warn', content: t('non-friend-warning-message'), timestamp: Date.now(), parameter: {}, contentMetadata: {} }]);
     }
 
     setCooldown(SHAKE_COOLDOWN);
@@ -94,9 +84,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, SHAKE_COOLDOWN - elapsed);
 
-      if (remaining === 0) {
-        clearInterval(timer);
-      }
+      if (remaining === 0) clearInterval(timer);
 
       setCooldown(remaining);
     }, 100);
@@ -104,16 +92,17 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     return () => clearInterval(timer);
   };
 
-  const handleDirectMessage = (data: DirectMessage) => {
-    if (!data) return;
-    // !! THIS IS IMPORTANT !!
-    const user1Id = userId.localeCompare(targetId) < 0 ? userId : targetId;
-    const user2Id = userId.localeCompare(targetId) < 0 ? targetId : userId;
+  const handleDirectMessage = (...args: DirectMessage[]) => {
+    args.forEach((item) => {
+      if (!item) return;
+      // !! THIS IS IMPORTANT !!
+      const user1Id = userId.localeCompare(targetId) < 0 ? userId : targetId;
+      const user2Id = userId.localeCompare(targetId) < 0 ? targetId : userId;
 
-    // check if the message array is between the current users
-    const isCurrentMessage = data.user1Id === user1Id && data.user2Id === user2Id;
-
-    if (isCurrentMessage) setDirectMessages((prev) => [...prev, data]);
+      // Check if the message array is in the current conversation
+      const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
+      if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
+    });
   };
 
   const handleShakeWindow = (duration = 500) => {
@@ -147,22 +136,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, []);
 
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.DIRECT_MESSAGE]: handleDirectMessage,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
-
-    return () => {
-      unsubscribe.forEach((unsub) => unsub());
-    };
-  }, [socket]);
+    const unsubscribe: (() => void)[] = [ipcService.socket.on('directMessage', handleDirectMessage)];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, [socket.isConnected]);
 
   useEffect(() => {
     if (!userId || !targetId || refreshRef.current) return;
@@ -239,7 +215,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-notice')}</div>}
             </div>
           )}
-          {isVerifiedUser && ( // TODO: 官方相關人員徽章
+          {isVerifiedUser && ( // TODO: Official badge
             <div className={styles['action-area']}>
               <div className={`${styles['action-icon']} ${''}`} />
               <div className={styles['action-title']}>{''}</div>
@@ -292,7 +268,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 if (!messageInput.trim()) return;
                 if (messageInput.length > 2000) return;
                 if (isComposing) return;
-                handleSendMessage({ type: 'dm', content: messageInput }, userId, targetId);
+                handleSendMessage(targetId, { type: 'dm', content: messageInput });
                 setMessageInput('');
               }}
               onCompositionStart={() => setIsComposing(true)}

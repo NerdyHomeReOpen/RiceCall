@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
 // Types
-import { FriendGroup, User } from '@/types';
+import { FriendGroup } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -16,13 +15,8 @@ import ipcService from '@/services/ipc.service';
 // Utils
 import Default from '@/utils/default';
 
-interface CreateFriendGroupPopupProps {
-  userId: User['userId'];
-}
-
-const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo(({ userId }) => {
+const CreateFriendGroupPopup: React.FC = React.memo(() => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // States
@@ -33,9 +27,8 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
   const canCreate = groupName.trim();
 
   // Handlers
-  const handleCreateFriendGroup = (group: Partial<FriendGroup>, userId: User['userId']) => {
-    if (!socket) return;
-    socket.send.createFriendGroup({ group, userId });
+  const handleCreateFriendGroup = (preset: Partial<FriendGroup>) => {
+    ipcService.socket.send('createFriendGroup', { preset });
   };
 
   const handleClose = () => {
@@ -49,13 +42,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
         <div className={popup['dialog-content']}>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
-            <input
-              name="friend-group-name"
-              type="text"
-              value={groupName}
-              maxLength={32}
-              onChange={(e) => setFriendGroup((prev) => ({ ...prev, name: e.target.value }))}
-            />
+            <input name="friend-group-name" type="text" value={groupName} maxLength={32} onChange={(e) => setFriendGroup((prev) => ({ ...prev, name: e.target.value }))} />
           </div>
         </div>
       </div>
@@ -65,7 +52,7 @@ const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo
         <div
           className={`${popup['button']} ${!canCreate ? 'disabled' : ''}`}
           onClick={() => {
-            handleCreateFriendGroup({ name: groupName, order: groupOrder }, userId);
+            handleCreateFriendGroup({ name: groupName, order: groupOrder });
             handleClose();
           }}
         >

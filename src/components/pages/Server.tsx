@@ -12,11 +12,10 @@ import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
-import { User, Server, Message, Channel, ServerMember, ChannelMessage, PromptMessage, UserServer, UserFriend } from '@/types';
+import { User, Server, Channel, ServerMember, ChannelMessage, PromptMessage, UserServer, UserFriend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -38,7 +37,6 @@ interface ServerPageProps {
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages, actionMessages, display }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
   const webRTC = useWebRTC();
   const contextMenu = useContextMenu();
 
@@ -93,14 +91,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   const canChangeToControlQueue = userPermission > 4 && channelVoiceMode !== 'forbidden';
 
   // Handlers
-  const handleSendMessage = (message: Partial<Message>, userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']): void => {
-    if (!socket) return;
-    socket.send.channelMessage({ message, channelId, serverId, userId });
+  const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
+    ipcService.socket.send('channelMessage', { serverId, channelId, preset });
   };
 
-  const handleEditChannel = (channel: Partial<Channel>, channelId: Channel['channelId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editChannel({ channel, channelId, serverId });
+  const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
+    ipcService.socket.send('editChannel', { serverId, channelId, update });
   };
 
   const handleResizeSidebar = useCallback(
@@ -259,7 +255,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
             </div>
             <MessageInputBox
               onSendMessage={(msg) => {
-                handleSendMessage({ type: 'general', content: msg }, userId, serverId, channelId);
+                handleSendMessage(serverId, channelId, { type: 'general', content: msg });
               }}
               disabled={isForbidByGuestText || isForbidByGuestTextGap || isForbidByGuestTextWait || isForbidByChatMode}
               placeholder={
@@ -294,7 +290,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                       label: t('free-speech'),
                       show: canChangeToFreeSpeech,
                       onClick: () => {
-                        handleEditChannel({ voiceMode: 'free' }, channelId, serverId);
+                        handleEditChannel(serverId, channelId, { voiceMode: 'free' });
                       },
                     },
                     {
@@ -303,7 +299,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                       show: canChangeToForbiddenSpeech,
                       disabled: true,
                       onClick: () => {
-                        handleEditChannel({ voiceMode: 'forbidden' }, channelId, serverId);
+                        handleEditChannel(serverId, channelId, { voiceMode: 'forbidden' });
                       },
                     },
                     {
@@ -314,7 +310,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
                       hasSubmenu: true,
                       disabled: true,
                       onClick: () => {
-                        handleEditChannel({ voiceMode: 'queue' }, channelId, serverId);
+                        handleEditChannel(serverId, channelId, { voiceMode: 'queue' });
                       },
                       submenuItems: [
                         {

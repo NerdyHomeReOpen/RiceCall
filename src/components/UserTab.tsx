@@ -7,11 +7,10 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import { PopupType, ServerMember, Channel, Server, User, Member, UserFriend, UserServer } from '@/types';
+import { ServerMember, Channel, Server, User, Member, UserFriend, UserServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
 import { useWebRTC } from '@/providers/WebRTC';
@@ -37,7 +36,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
-  const socket = useSocket();
   const webRTC = useWebRTC();
   const findMe = useFindMeContext();
 
@@ -101,65 +99,54 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     webRTC.handleUnmuteUser(userId);
   };
 
-  const handleKickServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    if (!socket) return;
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => {
-      socket.send.disconnectServer({ userId, serverId });
-    });
+  const handleKickFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('kickFromServer', { userId, serverId }));
   };
 
   const handleKickChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
-    if (!socket) return;
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => {
-      socket.send.disconnectChannel({ userId, channelId, serverId });
-    });
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('kickToLobbyChannel', { userId, serverId, channelId }));
+  };
+
+  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId));
   };
 
   const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editMember({ member, userId, serverId });
+    ipcService.socket.send('editMember', { userId, serverId, update: member });
   };
 
   const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    if (!socket) return;
-    socket.send.connectChannel({ userId, serverId, channelId });
+    ipcService.socket.send('moveToChannel', { userId, serverId, channelId });
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open(PopupType.EDIT_NICKNAME, 'editNickname');
+    ipcService.popup.open('editNickname', 'editNickname');
     ipcService.initialData.onRequest('editNickname', { serverId, userId });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.APPLY_FRIEND, 'applyFriend');
+    ipcService.popup.open('applyFriend', 'applyFriend');
     ipcService.initialData.onRequest('applyFriend', { userId, targetId });
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
     ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
     ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
+    ipcService.popup.open('dialogAlert', 'alertDialog');
     ipcService.initialData.onRequest('alertDialog', { message, submitTo: 'alertDialog' });
     ipcService.popup.onSubmit('alertDialog', callback);
   };
 
-  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
-    if (!socket) return;
-    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => {
-      handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId);
-    });
-  };
-
   const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    ipcService.popup.open(PopupType.BLOCK_MEMBER, `blockMember-${userId}`);
+    ipcService.popup.open('blockMember', `blockMember-${userId}`);
     ipcService.initialData.onRequest(`blockMember-${userId}`, { userId, serverId, userName });
   };
 
@@ -273,7 +260,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
             label: t('kick-server'),
             show: canKickServer,
             onClick: () => {
-              handleKickServer(memberUserId, serverId, memberNickname || memberName);
+              handleKickFromServer(memberUserId, serverId, memberNickname || memberName);
             },
           },
           {
