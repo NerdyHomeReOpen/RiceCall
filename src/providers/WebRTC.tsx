@@ -56,6 +56,7 @@ interface WebRTCContextType {
   handleEditInputStream: (deviceId: string) => void;
   handleEditOutputStream: (deviceId: string) => void;
   handleEditMusicInputStream: (audioBuffer: AudioBuffer) => void;
+  handlePressKeyToSpeak: (enable: boolean) => void;
   muteList: string[];
   isMicMute: boolean;
   isSpeakerMute: boolean;
@@ -67,6 +68,7 @@ interface WebRTCContextType {
   volumePercent: number;
   speakStatus: { [id: string]: number };
   connectionStatus: { [id: string]: string };
+  isPressKeyToSpeak: boolean;
 }
 
 const WebRTCContext = createContext<WebRTCContextType>({} as WebRTCContextType);
@@ -83,6 +85,7 @@ interface WebRTCProviderProps {
 
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // States
+  const [isPressKeyToSpeak, setIsPressKeyToSpeak] = useState<boolean>(false);
   const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
   const [isMicMute, setIsMicMute] = useState<boolean>(false);
   const [isSpeakerMute, setIsSpeakerMute] = useState<boolean>(false);
@@ -96,6 +99,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const [connectionStatus, setConnectionStatus] = useState<Record<string, 'new' | 'connecting' | 'connected' | 'disconnected' | 'failed' | 'closed'>>({});
 
   // Refs
+  const speakingMode = useRef<'key' | 'auto'>('key');
   const volumePercentRef = useRef<number>(0);
   const volumeThresholdRef = useRef<number>(1);
   const volumeSilenceDelayRef = useRef<number>(500);
@@ -123,15 +127,21 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const socket = useSocket();
 
   // Handlers
+  const handlePressKeyToSpeak = useCallback((enable: boolean) => {
+    if (speakingMode.current === 'auto') return;
+    setIsPressKeyToSpeak(enable ?? false);
+  }, []);
+
   const handleToggleTakeMic = useCallback(() => {
     if (!localStreamRef.current) {
       console.warn('No local stream');
       return;
     }
-
-    localStreamRef.current.getAudioTracks().forEach((track) => {
-      track.enabled = !micTakenRef.current;
-    });
+    if (speakingMode.current === 'auto') {
+      localStreamRef.current.getAudioTracks().forEach((track) => {
+        track.enabled = !micTakenRef.current;
+      });
+    }
 
     setIsMicTaken(!micTakenRef.current);
     micTakenRef.current = !micTakenRef.current;
@@ -619,6 +629,30 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
   };
 
+  // Effects
+  useEffect(() => {
+    if (!localStreamRef.current) return;
+    if (speakingMode.current === 'key') {
+      localStreamRef.current.getAudioTracks().forEach((track) => {
+        track.enabled = false;
+      });
+      // console.log('[SpeakingMode] key mode');
+    } else {
+      localStreamRef.current.getAudioTracks().forEach((track) => {
+        track.enabled = micTakenRef.current;
+      });
+      // console.log('[SpeakingMode] auto mode');
+    }
+  }, [speakingMode, localStreamRef.current]);
+
+  useEffect(() => {
+    if (!localStreamRef.current) return;
+    if (speakingMode.current !== 'key') return;
+    localStreamRef.current.getAudioTracks().forEach((track) => {
+      track.enabled = isPressKeyToSpeak;
+    });
+  }, [isPressKeyToSpeak]);
+
   useEffect(() => {
     const localMicVolume = window.localStorage.getItem('mic-volume');
     const localSpeakerVolume = window.localStorage.getItem('speaker-volume');
@@ -690,6 +724,17 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       if (localStreamRef.current) localStreamRef.current.getTracks().forEach((track) => track.stop());
     };
   }, []);
+
+  useEffect(() => {
+    ipcService.systemSettings.speakingMode.get(() => {});
+
+    const offUpdateSpeakingMode = ipcService.systemSettings.speakingMode.onUpdate((mode) => {
+      // console.log('[update] speaking mode', mode);
+      speakingMode.current = mode;
+    });
+
+    return () => offUpdateSpeakingMode();
+  }, [speakingMode.current]);
 
   useEffect(() => {
     // Get input device info
@@ -783,6 +828,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         handleEditInputStream,
         handleEditOutputStream,
         handleEditMusicInputStream,
+        handlePressKeyToSpeak,
         muteList,
         isMicMute,
         isSpeakerMute,
@@ -794,6 +840,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         volumePercent,
         speakStatus,
         connectionStatus,
+        isPressKeyToSpeak,
       }}
     >
       {Object.keys(peerStreamListRef.current).map((userId) => (

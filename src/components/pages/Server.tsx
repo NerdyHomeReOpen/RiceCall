@@ -46,6 +46,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   const announcementAreaRef = useRef<HTMLDivElement>(null);
   const voiceModeRef = useRef<HTMLDivElement>(null);
   const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // States
   const [sidebarWidth, setSidebarWidth] = useState<number>(270);
@@ -56,6 +57,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   const [showSpeakerVolume, setShowSpeakerVolume] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(Date.now());
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
+
+  const [speakMode, setSpeakMode] = useState<'key' | 'auto'>('key');
+  const [speakHotKey, setSpeakHotKey] = useState<string>('');
 
   // Variables
   const { userId } = user;
@@ -223,6 +227,44 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
     }
   }, [t, serverName, activeServerMembers]);
 
+  useEffect(() => {
+    ipcService.systemSettings.speakingMode.get(() => {});
+    ipcService.systemSettings.defaultSpeakingKey.get(() => {});
+
+    const offUpdateSpeakMode = ipcService.systemSettings.speakingMode.onUpdate((mode) => {
+      setSpeakMode(mode);
+    });
+
+    const offUpdateSpeakKey = ipcService.systemSettings.defaultSpeakingKey.onUpdate((key) => {
+      setSpeakHotKey(key);
+    });
+
+    return () => {
+      offUpdateSpeakMode();
+      offUpdateSpeakKey();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    if (!showSpeakerVolume) {
+      setShowSpeakerVolume(true);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setShowSpeakerVolume(false);
+      timeoutRef.current = null;
+    }, 1000);
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [webRTC.speakerVolume]);
+
   return (
     <main className={styles['server']} style={display ? {} : { display: 'none' }}>
       {/* Body */}
@@ -347,7 +389,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
               <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent / 10) - 1}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className={styles['mic-text']}>{webRTC.isMicTaken ? t('taken-mic') : t('take-mic')}</div>
-                <div className={styles['mic-sub-text']}>{webRTC.isMicTaken && webRTC.micVolume === 0 ? t('mic-muted') : ''}</div>
+                <div className={styles['mic-sub-text']}>
+                  {webRTC.isMicTaken && webRTC.micVolume === 0 && t('mic-muted')}
+                  {webRTC.isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && !webRTC.isPressKeyToSpeak && t('press-key-to-speak', { '0': speakHotKey })}
+                  {webRTC.isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && webRTC.isPressKeyToSpeak && t('speaking')}
+                </div>
               </div>
             </div>
             <div className={styles['buttons']}>

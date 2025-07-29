@@ -85,7 +85,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
 
   const handleDeleteFriend = (userId: User['userId'], targetId: User['userId']) => {
     if (!socket) return;
-    handleOpenWarningDialog(t('confirm-delete-friend').replace('{0}', friendName), () => socket.send.deleteFriend({ userId, targetId }));
+    handleOpenWarningDialog(t('confirm-delete-friend', { '0': friendName }), () => socket.send.deleteFriend({ userId, targetId }));
   };
 
   const handleServerUpdate = (data: Server) => {
@@ -128,9 +128,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
 
   const handleBlockFriend = (userId: User['userId'], targetId: User['userId'], isBlocked: UserFriend['isBlocked']) => {
     if (!socket) return;
-    handleOpenWarningDialog(t('confirmBlockFriend', { blockType: isBlocked ? t('unblock') : t('block'), userName: friendName }), () =>
-      socket.send.editFriend({ friend: { isBlocked: !isBlocked }, userId, targetId }),
-    );
+    handleOpenWarningDialog(t(`confirm-${isBlocked ? 'unblock' : 'block'}-user`, { '0': friendName }), () => socket.send.editFriend({ friend: { isBlocked: !isBlocked }, userId, targetId }));
   };
 
   useEffect(() => {

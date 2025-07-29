@@ -27,7 +27,7 @@ import Default from '@/utils/default';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
-import HotKeyProvider from '@/providers/HotKey';
+import ActionScannerProvider, { useActionScanner } from '@/providers/ActionScanner';
 import ExpandedProvider from '@/providers/FindMe';
 import { useTranslation } from 'react-i18next';
 import { useSocket } from '@/providers/Socket';
@@ -53,9 +53,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
   const contextMenu = useContextMenu();
   const mainTab = useMainTab();
   const { t } = useTranslation();
+  const actionScanner = useActionScanner();
 
   // Refs
   const menuRef = useRef<HTMLDivElement>(null);
+  const isCloseToTray = useRef<boolean>(true);
 
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -130,7 +132,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    if (isCloseToTray.current) {
+      ipcService.window.close();
+    } else {
+      ipcService.exit();
+    }
   };
 
   const handleLanguageChange = (language: LanguageKey) => {
@@ -144,6 +150,24 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, userServer, friendAppl
   };
 
   // Effects
+  useEffect(() => {
+    const offUpdateCloseToTray = ipcService.systemSettings.closeToTray.onUpdate((enable) => {
+      isCloseToTray.current = enable;
+    });
+
+    return () => {
+      offUpdateCloseToTray();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!actionScanner.isKeepAlive) {
+      handleChangeStatus('idle' as User['status'], userId);
+    } else {
+      handleChangeStatus('online' as User['status'], userId);
+    }
+  }, [actionScanner.isKeepAlive]);
+
   useEffect(() => {
     const offMaximize = ipcService.window.onMaximize(() => {
       setIsFullscreen(true);
@@ -648,7 +672,7 @@ const RootPageComponent = () => {
 
   return (
     <WebRTCProvider>
-      <HotKeyProvider>
+      <ActionScannerProvider>
         <ExpandedProvider>
           <Header user={user} userServer={server} friendApplications={friendApplications} />
           {!socket.isConnected ? (
@@ -671,7 +695,7 @@ const RootPageComponent = () => {
             </>
           )}
         </ExpandedProvider>
-      </HotKeyProvider>
+      </ActionScannerProvider>
     </WebRTCProvider>
   );
 };

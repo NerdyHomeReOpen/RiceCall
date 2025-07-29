@@ -220,9 +220,11 @@ export type DiscordPresence = {
   }[];
 };
 
-export type speakingMode = 'key' | 'auto';
+export type speakingType = 'key' | 'auto';
 
 export type mixMode = 'all' | 'app';
+
+export type channelUIMode = 'classic' | 'three-line' | 'auto';
 
 export enum SocketClientEvent {
   // User

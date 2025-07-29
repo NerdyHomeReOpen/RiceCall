@@ -288,7 +288,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           className={`${styles['delete-channel-btn']} ${!canDelete ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            handleOpenWarningDialog(t('warningDeleteChannel', { '0': selectedChannel?.name ?? '' }));
+            handleOpenWarningDialog(t('confirm-delete-channel', { '0': selectedChannel?.name ?? '' }));
           }}
         >
           {t('delete')}

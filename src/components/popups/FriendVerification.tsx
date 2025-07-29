@@ -41,6 +41,14 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
     return [...array].sort(Sorter(field, newDirection));
   };
 
+  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
+    ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
+    ipcService.initialData.onRequest(`userInfo-${targetId}`, {
+      userId,
+      targetId,
+    });
+  };
+
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
     ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
     ipcService.initialData.onRequest(`directMessage-${targetId}`, {
@@ -156,7 +164,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
           {friendApplications.map((friend) => {
             return (
               <div key={friend.senderId} className={styles['application']}>
-                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friend.avatarUrl})` }} />
+                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friend.avatarUrl})` }} onClick={() => handleOpenUserInfo(friend.receiverId, friend.senderId)} />
                 <div style={{ flex: 1 }}>
                   <div className={styles['user-info-box']}>
                     <div className={styles['user-name-text']}>{friend.name}</div>
