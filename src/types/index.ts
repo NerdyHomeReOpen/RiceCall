@@ -224,6 +224,8 @@ export type SpeakingMode = 'key' | 'auto';
 
 export type MixMode = 'all' | 'app';
 
+export type ChannelUIMode = 'classic' | 'three-line' | 'auto';
+
 export type PopupType =
   | 'avatarCropper'
   | 'userInfo'

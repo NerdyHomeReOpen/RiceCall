@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents } from '@/types';
+import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode } from '@/types';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
@@ -196,7 +196,7 @@ const ipcService = {
         statusAutoIdleMinutes: number;
         statusAutoDnd: boolean;
 
-        channelUIMode: channelUIMode;
+        channelUIMode: ChannelUIMode;
         closeToTray: boolean;
 
         fontSize: number;
@@ -388,22 +388,22 @@ const ipcService = {
     },
 
     channelUIMode: {
-      get: (callback: (key: channelUIMode) => void) => {
+      get: (callback: (key: ChannelUIMode) => void) => {
         if (!isElectron) return;
         ipcRenderer.send('get-channel-ui-mode');
-        ipcRenderer.once('channel-ui-mode', (_: any, key: channelUIMode) => {
+        ipcRenderer.once('channel-ui-mode', (_: any, key: ChannelUIMode) => {
           callback(key);
         });
       },
 
-      set: (key: channelUIMode) => {
+      set: (key: ChannelUIMode) => {
         if (!isElectron) return;
         ipcRenderer.send('set-channel-ui-mode', key);
       },
 
-      onUpdate: (callback: (key: channelUIMode) => void) => {
+      onUpdate: (callback: (key: ChannelUIMode) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('channel-ui-mode', (_: any, key: channelUIMode) => {
+        ipcRenderer.on('channel-ui-mode', (_: any, key: ChannelUIMode) => {
           callback(key);
         });
         return () => ipcRenderer.removeAllListeners('channel-ui-mode');
