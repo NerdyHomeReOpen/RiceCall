@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -33,7 +33,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
   const imageInfo = useRef({ drawX: 0, drawY: 0, drawWidth: 0, drawHeight: 0 });
 
   // Handlers
-  const draw = () => {
+  const draw = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
@@ -68,7 +68,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
 
       previewCtx.drawImage(imgRef.current, sx, sy, sSize, sSize, 0, 0, previewSize, previewSize);
     }
-  };
+  }, [cropBox]);
 
   const handleCrop = async () => {
     const canvas = previewRef.current;
@@ -156,11 +156,11 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
       setCropBox({ x: cropX, y: cropY, size: maxCropSize });
       draw();
     };
-  }, []);
+  }, [draw, avatarData]);
 
   useEffect(() => {
     draw();
-  }, [cropBox]);
+  }, [cropBox, draw]);
 
   return (
     <>

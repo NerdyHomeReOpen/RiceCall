@@ -42,11 +42,8 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, {
-      userId,
-      targetId,
-    });
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
+    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
