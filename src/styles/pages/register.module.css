@@ -7,7 +7,7 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
-  background-image: url('../../../public/dialog_body_bg.png');
+  background-image: url('/dialog_body_bg.png');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -19,7 +19,7 @@
   align-items: center;
   width: 256px;
   height: 12px;
-  background-image: url('../../../public/icon_loading.gif');
+  background-image: url('/icon_loading.gif');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -147,7 +147,7 @@
   min-height: 14px;
   margin-right: 5px;
   vertical-align: middle;
-  /* background-image: url('../../../public/icon_back.png'); */
+  /* background-image: url('/icon_back.png'); */
   background-repeat: no-repeat;
   background-position: 0 0;
 }

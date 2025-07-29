@@ -21,7 +21,7 @@
   min-width: 100%;
   display: block;
   margin: 3px 0;
-  background-image: url('../../public/ctrl/menu_spliter.png');
+  background-image: url('/ctrl/menu_spliter.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
@@ -50,48 +50,48 @@
 }
 
 .context-menu .option[data-type='setting']::before {
-  background-image: url('../../public/set.png');
+  background-image: url('/set.png');
 }
 
 .context-menu .option[data-type='message']::before {
-  background-image: url('../../public/message.png');
+  background-image: url('/message.png');
 }
 
 .context-menu .option[data-type='skin']::before {
-  background-image: url('../../public/skin.png');
+  background-image: url('/skin.png');
 }
 
 .context-menu .option[data-type='exit']::before {
-  background-image: url('../../public/exit.png');
+  background-image: url('/exit.png');
 }
 
 .context-menu .option[data-type='submenu']::before {
-  background-image: url('../../public/ctrl/icon_submenu.png');
+  background-image: url('/ctrl/icon_submenu.png');
   transform: rotate(180deg);
 }
 
 .context-menu .option[data-type='memberManagement']::before {
-  background-image: url('../../public/channel/icon_membermgr.png');
+  background-image: url('/channel/icon_membermgr.png');
 }
 
 .context-menu .option[data-type='memberapply']::before {
-  background-image: url('../../public/channel/icon_memberapply.png');
+  background-image: url('/channel/icon_memberapply.png');
 }
 
 .context-menu .option[data-type='editGroupcard']::before {
-  background-image: url('../../public/channel/icon_editGroupcard.png');
+  background-image: url('/channel/icon_editGroupcard.png');
 }
 
 .context-menu .option[data-type='locateme']::before {
-  background-image: url('../../public/channel/icon_locateme.png');
+  background-image: url('/channel/icon_locateme.png');
 }
 
 .context-menu .option[data-type='uncollect']::before {
-  background-image: url('../../public/channel/icon_uncollect.png');
+  background-image: url('/channel/icon_uncollect.png');
 }
 
 .context-menu .option[data-type='collect']::before {
-  background-image: url('../../public/channel/icon_collect.png');
+  background-image: url('/channel/icon_collect.png');
 }
 
 .context-menu .option:hover {

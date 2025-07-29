@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-image: url('../../public/dialog_body_bg.png');
+  background-image: url('/dialog_body_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -339,7 +339,7 @@
   height: 2rem;
   width: 25px;
   z-index: 1;
-  background-image: url('../../public/channel/spliter.png');
+  background-image: url('/channel/spliter.png');
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
@@ -352,7 +352,7 @@
   right: 0;
   width: 26px;
   height: 12px;
-  background-image: url('../../public/login_combobox_triangle.png');
+  background-image: url('/login_combobox_triangle.png');
   background-repeat: no-repeat;
   background-size: cover;
   pointer-events: none;
@@ -384,34 +384,34 @@
   display: inline-block;
   width: 36px;
   height: 36px;
-  background-image: url('../../public/pic_alert.png');
+  background-image: url('/pic_alert.png');
   background-repeat: no-repeat;
   background-size: contain;
   min-width: 36px;
 }
 
 .dialog-icon.alert {
-  background-image: url('../../public/pic_alert.png');
+  background-image: url('/pic_alert.png');
 }
 
 .dialog-icon.alert2 {
-  background-image: url('../../public/pic_alert2.png');
+  background-image: url('/pic_alert2.png');
 }
 
 .dialog-icon.error {
-  background-image: url('../../public/pic_error.png');
+  background-image: url('/pic_error.png');
 }
 
 .dialog-icon.warning {
-  background-image: url('../../public/pic_warning.png');
+  background-image: url('/pic_warning.png');
 }
 
 .dialog-icon.info {
-  background-image: url('../../public/pic_information.png');
+  background-image: url('/pic_information.png');
 }
 
 .dialog-icon.success {
-  background-image: url('../../public/pic_ok.png');
+  background-image: url('/pic_ok.png');
 }
 
 /* Layout Styles */
@@ -443,7 +443,7 @@
   object-fit: cover;
   min-width: 50px;
   min-height: 50px;
-  background-image: url('../../public/logo_server_def.png');
+  background-image: url('/logo_server_def.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -457,7 +457,7 @@
   z-index: 99;
   min-width: 52px;
   min-height: 52px;
-  background-image: url('../../public/channel/server_logo_border.png');
+  background-image: url('/channel/server_logo_border.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -480,7 +480,7 @@
 .sound-effect-preview {
   min-height: 17px;
   min-width: 17px;
-  background-image: url('../../public/playback.png');
+  background-image: url('/playback.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0;

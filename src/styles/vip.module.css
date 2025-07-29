@@ -10,7 +10,7 @@
   min-height: 14px;
   min-width: 14px;
   margin-right: 2px;
-  background-image: url('../../public/channel/vip_icons.png');
+  background-image: url('/channel/vip_icons.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -45,21 +45,21 @@
 }
 
 .vip-icon-big.vip-1 {
-  background-image: url('../../public/channel/icon_vip1.gif');
+  background-image: url('/channel/icon_vip1.gif');
 }
 
 .vip-icon-big.vip-2 {
-  background-image: url('../../public/channel/icon_vip2.gif');
+  background-image: url('/channel/icon_vip2.gif');
 }
 
 .vip-icon-big.vip-3 {
-  background-image: url('../../public/channel/icon_vip3.gif');
+  background-image: url('/channel/icon_vip3.gif');
 }
 
 .vip-icon-big.vip-4 {
-  background-image: url('../../public/channel/icon_vip4.gif');
+  background-image: url('/channel/icon_vip4.gif');
 }
 
 .vip-icon-big.vip-5 {
-  background-image: url('../../public/channel/icon_vip5.gif');
+  background-image: url('/channel/icon_vip5.gif');
 }
