@@ -25,12 +25,12 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(new Image());
+  const imageInfoRef = useRef({ drawX: 0, drawY: 0, drawWidth: 0, drawHeight: 0 });
+  const startPosRef = useRef({ x: 0, y: 0 });
 
   // State
   const [cropBox, setCropBox] = useState({ x: 100, y: 100, size: INITIAL_CROP_SIZE });
   const [draggingBox, setDraggingBox] = useState(false);
-  const startPos = useRef({ x: 0, y: 0 });
-  const imageInfo = useRef({ drawX: 0, drawY: 0, drawWidth: 0, drawHeight: 0 });
 
   // Handlers
   const draw = useCallback(() => {
@@ -39,7 +39,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
     if (!canvas || !ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const { drawX, drawY, drawWidth, drawHeight } = imageInfo.current;
+    const { drawX, drawY, drawWidth, drawHeight } = imageInfoRef.current;
     ctx.drawImage(imgRef.current, drawX, drawY, drawWidth, drawHeight);
 
     const { x: cropX, y: cropY, size } = cropBox;
@@ -85,7 +85,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
     const { x: bx, y: by, size } = cropBox;
     if (x >= bx && x <= bx + size && y >= by && y <= by + size) {
       setDraggingBox(true);
-      startPos.current = { x, y };
+      startPosRef.current = { x, y };
     }
   };
 
@@ -96,17 +96,19 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
     const rect = canvasRef.current!.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const dx = x - startPos.current.x;
-    const dy = y - startPos.current.y;
+    const dx = x - startPosRef.current.x;
+    const dy = y - startPosRef.current.y;
     const size = cropBox.size;
-    const { drawX, drawY, drawWidth, drawHeight } = imageInfo.current;
+    const { drawX, drawY, drawWidth, drawHeight } = imageInfoRef.current;
 
     const newX = Math.min(Math.max(drawX, cropBox.x + dx), drawX + drawWidth - size);
     const newY = Math.min(Math.max(drawY, cropBox.y + dy), drawY + drawHeight - size);
 
     setCropBox({ ...cropBox, x: newX, y: newY });
-    startPos.current = { x, y };
+    startPosRef.current = { x, y };
   };
+
+  const handleMouseLeave = () => setDraggingBox(false);
 
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     const rect = canvasRef.current!.getBoundingClientRect();
@@ -116,7 +118,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
 
     const delta = e.deltaY < 0 ? -10 : 10;
     const newSize = cropBox.size + delta;
-    const { drawX, drawY, drawWidth, drawHeight } = imageInfo.current;
+    const { drawX, drawY, drawWidth, drawHeight } = imageInfoRef.current;
 
     const maxSize = Math.min(drawWidth, drawHeight);
     const clampedSize = Math.min(maxSize, Math.max(MIN_CROP_SIZE, newSize));
@@ -148,15 +150,14 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
       const drawHeight = imgRef.current.height * scale;
       const drawX = (canvas.width - drawWidth) / 2;
       const drawY = (canvas.height - drawHeight) / 2;
-      imageInfo.current = { drawX, drawY, drawWidth, drawHeight };
+      imageInfoRef.current = { drawX, drawY, drawWidth, drawHeight };
       const borderSize = 20;
       const maxCropSize = Math.max(borderSize, Math.min(drawWidth, drawHeight) - borderSize);
       const cropX = drawX + (drawWidth - maxCropSize) / 2;
       const cropY = drawY + (drawHeight - maxCropSize) / 2;
       setCropBox({ x: cropX, y: cropY, size: maxCropSize });
-      draw();
     };
-  }, [draw, avatarData]);
+  }, [avatarData]);
 
   useEffect(() => {
     draw();
@@ -176,6 +177,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseLeave}
               onWheel={handleWheel}
             />
             <div className={popup['col']}>
