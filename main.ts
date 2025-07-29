@@ -10,7 +10,38 @@ import Store from 'electron-store';
 import ElectronUpdater from 'electron-updater';
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 
-import { PopupType } from './types';
+type PopupType =
+  | 'avatarCropper'
+  | 'userInfo'
+  | 'userSetting'
+  | 'channelSetting'
+  | 'channelPassword'
+  | 'serverSetting'
+  | 'serverBroadcast'
+  | 'blockMember'
+  | 'systemSetting'
+  | 'memberApplySetting'
+  | 'createServer'
+  | 'createChannel'
+  | 'createFriendGroup'
+  | 'editChannelOrder'
+  | 'editChannelName'
+  | 'editNickname'
+  | 'editFriendGroup'
+  | 'editFriend'
+  | 'applyMember'
+  | 'applyFriend'
+  | 'searchUser'
+  | 'directMessage'
+  | 'dialogAlert'
+  | 'dialogAlert2'
+  | 'dialogSuccess'
+  | 'dialogWarning'
+  | 'dialogError'
+  | 'dialogInfo'
+  | 'changeTheme'
+  | 'aboutus'
+  | 'friendVerification';
 
 dotenv.config();
 
