@@ -29,7 +29,7 @@ interface ChannelListProps {
   friends: Friend[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends, queueUsers }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends, queueUsers, queueCurrentSecsRemaining, queuePaused }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -126,13 +126,11 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   const handleQueueParticipate = () => {
     if (!socket) return;
     socket.send.addToQueue({ serverId, channelId: currentChannel.channelId, targetId: userId });
-
   };
 
   const handleQueueLeave = () => {
     if (!socket) return;
     socket.send.leaveFromQueue({ serverId, channelId: currentChannel.channelId });
-
   };
 
   // Effects
@@ -291,25 +289,18 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
             </div>
           </div>
           <div className={styles['saperator-2']} />
-            <div className={styles['queue-bottom-bar']}>
-           {queueUsers.some((u) => u.userId === userId) ? (
-              <button
-                className={styles['queue-leave-button']}
-                onClick={handleQueueLeave}
-              >
+          <div className={styles['queue-bottom-bar']}>
+            {queueUsers.some((u) => u.userId === userId) ? (
+              <button className={styles['queue-leave-button']} onClick={handleQueueLeave}>
                 {t('leave-queue')}
               </button>
             ) : (
-              <button
-                className={styles['queue-participate-button']}
-                onClick={handleQueueParticipate}
-              >
+              <button className={styles['queue-participate-button']} onClick={handleQueueParticipate}>
                 {t('participate')}
               </button>
             )}
           </div>
         </>
-        
       )}
 
       {/* Channel List Title */}
