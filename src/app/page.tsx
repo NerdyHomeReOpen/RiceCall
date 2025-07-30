@@ -536,9 +536,9 @@ const RootPageComponent = () => {
     });
   };
 
-  const handlePlaySound = (...args: { sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking' }[]) => {
+  const handlePlaySound = (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
     args.forEach((item) => {
-      soundPlayer.playSound(item.sound);
+      soundPlayer.playSound(item);
     });
   };
 

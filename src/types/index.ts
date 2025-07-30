@@ -270,7 +270,7 @@ export type ServerToClientEvents = {
   RTCJoin: (...args: { from: string; userId: string }[]) => void;
   RTCLeave: (...args: { from: string; userId: string }[]) => void;
   // Play Sound
-  playSound: (...args: { sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking' }[]) => void;
+  playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Echo
   pong: () => void;
   // Popup
