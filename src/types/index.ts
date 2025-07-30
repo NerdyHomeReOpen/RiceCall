@@ -138,6 +138,7 @@ export type Member = {
   lastJoinChannelTime: number;
   isBlocked: number; // New: Change to number
   permissionLevel: Permission;
+  serverPermissionLevel: Permission;
   contextPermissionLevel: { channelId: string, permissionLevel: Permission }[];
   createdAt: number;
 };

@@ -56,9 +56,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     userId: memberUserId,
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
+    serverPermissionLevel: memberServerPermissionLevel
   } = member;
-  const { userId, serverId, permissionLevel: userPermission, lobbyId: serverLobbyId } = currentServer;
+  const { userId, serverId, lobbyId: serverLobbyId } = currentServer;
   const { channelId: currentChannelId } = currentChannel;
+  const userContextPermissionLevel = currentServer.contextPermissionLevel?.find(p => p.channelId === currentChannelId)?.permissionLevel;
+  const userPermission = userContextPermissionLevel ?? currentServer.permissionLevel;
   const isCurrentUser = memberUserId === userId;
   const isSameChannel = memberCurrentChannelId === currentChannelId;
   const speakingStatus = webRTC.speakStatus?.[memberUserId] || (isCurrentUser && webRTC.volumePercent) || 0;
@@ -74,15 +77,16 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const canEditNickname = (canManageMember && memberPermission != 1) || (isCurrentUser && userPermission > 1);
   const canChangeToGuest = canManageMember && memberPermission !== 1 && userPermission > 4;
   const canChangeToMember = canManageMember && memberPermission !== 2 && (memberPermission > 1 || userPermission > 5);
-  const canChangeToChannelAdmin = canManageMember && memberPermission !== 3 && memberPermission > 1 && userPermission > 3;
-  const canChangeToCategoryAdmin = canManageMember && memberPermission !== 4 && memberPermission > 1 && userPermission > 4;
+  const canChangeToChannelAdmin = canManageMember && [2, 4].includes(memberPermission) && userPermission > 3 && memberServerPermissionLevel < 3;
+  const canChangeToCategoryAdmin = canManageMember && [2, 3].includes(memberPermission) && userPermission > 4 && memberServerPermissionLevel < 3;
   const canChangeToAdmin = canManageMember && memberPermission !== 5 && memberPermission > 1 && userPermission > 5;
   const canKickServer = canManageMember && memberCurrentServerId === serverId;
   const canKickChannel = canManageMember && memberCurrentChannelId !== serverLobbyId;
   const canBan = canManageMember;
   const canMoveToChannel = isServerAdmin && userPermission >= memberPermission && memberCurrentChannelId !== currentChannelId;
   const canRemoveMembership = isCurrentUser && userPermission > 1 && userPermission < 6;
-
+  const canDeleteChannelAdmin = canManageMember && memberPermission === 3 && memberServerPermissionLevel < 3;
+  const canDeleteCategoryAdmin = canManageMember && memberPermission === 4 && memberServerPermissionLevel < 3;
   const statusIcon = () => {
     if (isMuted || isMutedByUser) return 'muted';
     if (!isCurrentUser && isSameChannel && isLoading) return 'loading';
@@ -115,9 +119,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     });
   };
 
-  const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
+  const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId'], channelId?: Channel['channelId']) => {
     if (!socket) return;
-    socket.send.editMember({ member, userId, serverId });
+    socket.send.editMember({ member, userId, serverId, channelId });
   };
 
   const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -329,13 +333,25 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
                 id: 'set-channel-mod',
                 label: t('set-channel-mod'),
                 show: canChangeToChannelAdmin,
-                onClick: () => handleEditMember({ permissionLevel: 3 }, memberUserId, serverId),
+                onClick: () => handleEditMember({ permissionLevel: 3 }, memberUserId, serverId, memberCurrentChannelId),
+              },
+              {
+                id: 'set-channel-mod',
+                label: t('delete-channel-mod'),
+                show: canDeleteChannelAdmin,
+                onClick: () => handleEditMember({ permissionLevel: 2 }, memberUserId, serverId, memberCurrentChannelId),
               },
               {
                 id: 'set-channel-admin',
                 label: t('set-channel-admin'),
                 show: canChangeToCategoryAdmin,
-                onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId),
+                onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId, memberCurrentChannelId),
+              },
+              {
+                id: 'set-channel-admin',
+                label: t('delete-channel-admin'),
+                show: canDeleteCategoryAdmin,
+                onClick: () => handleEditMember({ permissionLevel: 2 }, memberUserId, serverId, memberCurrentChannelId),
               },
               {
                 id: 'set-server-admin',
