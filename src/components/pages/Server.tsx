@@ -204,36 +204,25 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
   }, []);
 
   useEffect(() => {
-    if (serverName) {
-      ipcService.discord.updatePresence({
-        details: `${t('in')} ${serverName}`,
-        state: `${t('chat-with-members', { '0': activeServerMembers.length.toString() })}`,
-        largeImageKey: 'app_icon',
-        largeImageText: 'RC Voice',
-        smallImageKey: 'home_icon',
-        smallImageText: t('rpc:viewing-server-page'),
-        timestamp: Date.now(),
-        buttons: [
-          {
-            label: t('rpc:join-discord-server'),
-            url: 'https://discord.gg/adCWzv6wwS',
-          },
-        ],
-      });
-    }
+    ipcService.discord.updatePresence({
+      details: `${t('in')} ${serverName}`,
+      state: `${t('chat-with-members', { '0': activeServerMembers.length.toString() })}`,
+      largeImageKey: 'app_icon',
+      largeImageText: 'RC Voice',
+      smallImageKey: 'home_icon',
+      smallImageText: t('rpc:viewing-server-page'),
+      timestamp: Date.now(),
+      buttons: [
+        {
+          label: t('rpc:join-discord-server'),
+          url: 'https://discord.gg/adCWzv6wwS',
+        },
+      ],
+    });
   }, [t, serverName, activeServerMembers]);
 
   useEffect(() => {
-    const changeSpeakingMode = (mode: SpeakingMode) => {
-      console.info('[ServerPage] speaking mode updated: ', mode);
-      setSpeakMode(mode);
-    };
-    const changeDefaultSpeakingKey = (key: string) => {
-      console.info('[ServerPage] default speaking key updated: ', key);
-      setSpeakHotKey(key);
-    };
-
-    const unsubscribe: (() => void)[] = [ipcService.systemSettings.speakingMode.get(changeSpeakingMode), ipcService.systemSettings.defaultSpeakingKey.get(changeDefaultSpeakingKey)];
+    const unsubscribe: (() => void)[] = [ipcService.systemSettings.speakingMode.get(setSpeakMode), ipcService.systemSettings.defaultSpeakingKey.get(setSpeakHotKey)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
