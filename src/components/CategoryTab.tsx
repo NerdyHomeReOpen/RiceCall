@@ -53,7 +53,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       type: 'channel',
     });
     const contextPermissionLevel = currentServer.contextPermissionLevel?.find(p => p.channelId === categoryId)?.permissionLevel;
-    const permissionLevel = contextPermissionLevel ?? currentServer.permissionLevel;
+    const permissionLevel = contextPermissionLevel ?? currentServer.serverPermissionLevel;
     const categoryChannels = serverChannels.filter((ch) => ch.type === 'channel').filter((ch) => ch.categoryId === categoryId);
     const categoryChannelIds = new Set(categoryChannels.map((ch) => ch.channelId));
     const isAllChannelReadOnly = categoryChannels.every((channel) => channel.visibility === 'readonly');

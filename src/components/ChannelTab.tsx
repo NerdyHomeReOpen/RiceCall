@@ -44,10 +44,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId } = channel;
     const { userId, serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = currentServer;
     const contextPermissionLevel = currentServer.contextPermissionLevel?.find(p => p.channelId === channelId)?.permissionLevel;
-    const permissionLevel = contextPermissionLevel ?? currentServer.permissionLevel;
+    const permissionLevel = contextPermissionLevel ?? currentServer.serverPermissionLevel;
     const { channelId: currentChannelId } = currentChannel;
     const channelMembers = serverMembers.filter((mb) => mb.currentChannelId === channelId);
-    const member = serverMembers.filter((mb) => mb.userId === userId);
     const channelUserIds = channelMembers.map((mb) => mb.userId);
     const userInChannel = currentChannelId === channelId;
     const isReceptionLobby = serverReceptionLobbyId === channelId;

@@ -93,7 +93,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     if (isSpeaking) return 'play';
     return '';
   };
-  console.log(currentServer)
 
   // Handlers
   const handleMuteUser = (userId: User['userId']) => {
