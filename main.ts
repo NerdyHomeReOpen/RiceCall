@@ -107,9 +107,6 @@ const ClientToServerEventNames = [
   'actionMessage',
   'directMessage',
   'shakeWindow',
-  'RTCOffer',
-  'RTCAnswer',
-  'RTCIceCandidate',
   'ping',
 ];
 
@@ -149,16 +146,12 @@ export const ServerToClientEventNames = [
   'serverMemberApplicationAdd',
   'serverMemberApplicationUpdate',
   'serverMemberApplicationRemove',
-  'memberApproval',
+  'channelConnected',
+  'channelDisconnected',
   'channelMessage',
   'actionMessage',
   'directMessage',
   'shakeWindow',
-  'RTCOffer',
-  'RTCAnswer',
-  'RTCIceCandidate',
-  'RTCJoin',
-  'RTCLeave',
   'playSound',
   'pong',
   'openPopup',
@@ -529,9 +522,7 @@ function connectSocket(token: string): Socket | null {
     reconnectionDelayMax: 20000,
     timeout: 10000,
     autoConnect: false,
-    query: {
-      token: token,
-    },
+    query: { token: token },
   });
 
   socket.on('connect', () => {
