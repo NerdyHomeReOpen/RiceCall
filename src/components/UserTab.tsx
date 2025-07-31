@@ -59,8 +59,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const { channelId: currentChannelId } = currentChannel;
   const isCurrentUser = memberUserId === userId;
   const isSameChannel = memberCurrentChannelId === currentChannelId;
-  const speakingStatus = webRTC.remoteUserStatusList?.[memberUserId]?.volume || (isCurrentUser && webRTC.volumePercent) || 0;
-  const connectionStatus = webRTC.remoteUserStatusList?.[memberUserId]?.status || 'connecting';
+  const speakingStatus = webRTC.volumePercent?.[memberUserId];
+  const connectionStatus = webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
   const isLoading = connectionStatus === 'connecting' || !connectionStatus;
   const isSpeaking = speakingStatus !== 0;
   const isMuted = speakingStatus === -1;

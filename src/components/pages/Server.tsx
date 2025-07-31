@@ -367,7 +367,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
               </div>
             </div>
             <div className={`${styles['mic-button']} ${webRTC.isMicTaken ? styles['active'] : ''}`} onClick={handleToggleTakeMic}>
-              <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent / 10) - 1}`] : ''}`} />
+              <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className={styles['mic-text']}>{webRTC.isMicTaken ? t('taken-mic') : t('take-mic')}</div>
                 <div className={styles['mic-sub-text']}>
