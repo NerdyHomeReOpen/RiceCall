@@ -56,7 +56,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     userId: memberUserId,
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
-    serverPermissionLevel: memberServerPermissionLevel
+    serverPermissionLevel: memberServerPermission
   } = member;
   const { userId, serverId, lobbyId: serverLobbyId } = currentServer;
   const { channelId: currentChannelId } = currentChannel;
@@ -77,22 +77,23 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const canEditNickname = (canManageMember && memberPermission != 1) || (isCurrentUser && userPermission > 1);
   const canChangeToGuest = canManageMember && memberPermission !== 1 && userPermission > 4;
   const canChangeToMember = canManageMember && memberPermission !== 2 && (memberPermission > 1 || userPermission > 5);
-  const canChangeToChannelAdmin = canManageMember && [2, 4].includes(memberPermission) && userPermission > 3 && memberServerPermissionLevel < 3;
-  const canChangeToCategoryAdmin = canManageMember && [2, 3].includes(memberPermission) && userPermission > 4 && memberServerPermissionLevel < 3;
+  const canChangeToChannelAdmin = canManageMember && [2, 4].includes(memberPermission) && userPermission > 3 && memberServerPermission < 3;
+  const canChangeToCategoryAdmin = canManageMember && [2, 3].includes(memberPermission) && userPermission > 4 && memberServerPermission < 3;
   const canChangeToAdmin = canManageMember && memberPermission !== 5 && memberPermission > 1 && userPermission > 5;
   const canKickServer = canManageMember && memberCurrentServerId === serverId;
   const canKickChannel = canManageMember && memberCurrentChannelId !== serverLobbyId;
   const canBan = canManageMember;
   const canMoveToChannel = isServerAdmin && userPermission >= memberPermission && memberCurrentChannelId !== currentChannelId;
   const canRemoveMembership = isCurrentUser && userPermission > 1 && userPermission < 6;
-  const canDeleteChannelAdmin = canManageMember && memberPermission === 3 && memberServerPermissionLevel < 3;
-  const canDeleteCategoryAdmin = canManageMember && memberPermission === 4 && memberServerPermissionLevel < 3;
+  const canDeleteChannelAdmin = canManageMember && memberPermission === 3 && memberServerPermission < 3;
+  const canDeleteCategoryAdmin = canManageMember && memberPermission === 4 && memberServerPermission < 3;
   const statusIcon = () => {
     if (isMuted || isMutedByUser) return 'muted';
     if (!isCurrentUser && isSameChannel && isLoading) return 'loading';
     if (isSpeaking) return 'play';
     return '';
   };
+  console.log(currentServer)
 
   // Handlers
   const handleMuteUser = (userId: User['userId']) => {
