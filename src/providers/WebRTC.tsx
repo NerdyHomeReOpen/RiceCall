@@ -326,12 +326,13 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       console.warn('No mic stream');
       return;
     }
+    const newMicTaken = !micTakenRef.current;
     micStreamRef.current.getAudioTracks().forEach((track) => {
-      track.enabled = speakingModeRef.current === 'key' ? isPressSpeakKeyRef.current : micTakenRef.current;
+      track.enabled = newMicTaken ? (speakingModeRef.current === 'key' ? isPressSpeakKeyRef.current : true) : false;
     });
-    setIsMicTaken(!micTakenRef.current);
-    micTakenRef.current = !micTakenRef.current;
-    window.localStorage.setItem('is-mic-taken', micTakenRef.current.toString());
+    setIsMicTaken(newMicTaken);
+    micTakenRef.current = newMicTaken;
+    window.localStorage.setItem('is-mic-taken', newMicTaken.toString());
   }, []);
 
   const handleToggleMicMute = useCallback(() => {
@@ -342,9 +343,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       localStorage.setItem('previous-mic-volume', micVolumeRef.current.toString());
       handleEditMicVolume(0);
     }
-    setIsMicMute(!micMuteRef.current);
-    micMuteRef.current = !micMuteRef.current;
-    window.localStorage.setItem('is-mic-mute', micMuteRef.current.toString());
+    const newMicMute = !micMuteRef.current;
+    setIsMicMute(newMicMute);
+    micMuteRef.current = newMicMute;
+    window.localStorage.setItem('is-mic-mute', newMicMute.toString());
   }, [handleEditMicVolume]);
 
   const handleToggleSpeakerMute = useCallback(() => {
@@ -355,9 +357,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       localStorage.setItem('previous-speaker-volume', speakerVolumeRef.current.toString());
       handleEditSpeakerVolume(0);
     }
-    setIsSpeakerMute(!speakerMuteRef.current);
-    speakerMuteRef.current = !speakerMuteRef.current;
-    window.localStorage.setItem('is-speaker-mute', speakerMuteRef.current.toString());
+    const newSpeakerMute = !speakerMuteRef.current;
+    setIsSpeakerMute(newSpeakerMute);
+    speakerMuteRef.current = newSpeakerMute;
+    window.localStorage.setItem('is-speaker-mute', newSpeakerMute.toString());
   }, [handleEditSpeakerVolume]);
 
   const emitAck = useCallback(<T, R>(event: string, payload: T): Promise<R> => {
