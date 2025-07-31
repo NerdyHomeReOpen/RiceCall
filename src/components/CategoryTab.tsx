@@ -73,8 +73,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       ipcService.socket.send('editServer', { serverId, update });
     };
 
-    const handleJoinChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipcService.socket.send('connectChannel', { serverId, channelId });
+    const handleJoinChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], password?: string) => {
+      ipcService.socket.send('connectChannel', { serverId, channelId, password });
     };
 
     const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -115,9 +115,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       ipcService.initialData.onRequest('serverBroadcast', { userId, serverId, channelId });
     };
 
-    const handleOpenChannelPassword = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    const handleOpenChannelPassword = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
       ipcService.popup.open('channelPassword', 'channelPassword');
-      ipcService.initialData.onRequest('channelPassword', { userId, serverId, channelId });
+      ipcService.initialData.onRequest('channelPassword', { submitTo: 'channelPassword' });
+      ipcService.popup.onSubmit('channelPassword', (password) => {
+        handleJoinChannel(serverId, channelId, password);
+      });
     };
 
     const handleDragStart = (e: React.DragEvent, userIds: User['userId'][], currentChannelId: Channel['channelId']) => {
@@ -171,9 +174,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           onDoubleClick={() => {
             if (!canJoin) return;
             if (needPassword) {
-              handleOpenChannelPassword(userId, serverId, categoryId);
+              handleOpenChannelPassword(serverId, categoryId);
             } else {
-              handleJoinChannel(userId, serverId, categoryId);
+              handleJoinChannel(serverId, categoryId);
             }
           }}
           draggable={permissionLevel >= 5 && categoryMembers.length !== 0}
@@ -234,7 +237,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                 id: 'move-all-user-to-channel',
                 label: t('move-all-user-to-channel'),
                 show: canMoveToChannel,
-                onClick: () => categoryUserIds.forEach((userId) => handleJoinChannel(userId, serverId, currentChannelId)),
+                onClick: () => handleMoveAllToChannel(categoryUserIds, serverId, categoryId),
               },
               {
                 id: 'edit-channel-order',

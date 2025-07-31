@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as mediasoupClient from 'mediasoup-client';
+
 import {
   table_badges,
   table_channels,
@@ -203,10 +205,6 @@ export type ClientToServerEvents = {
   actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;
   directMessage: (...args: { targetId: string; preset: Partial<DirectMessage> }[]) => void;
   shakeWindow: (...args: { targetId: string }[]) => void;
-  // RTC
-  RTCOffer: (...args: { to: string; offer: { type: RTCSdpType; sdp?: string } }[]) => void;
-  RTCAnswer: (...args: { to: string; answer: { type: RTCSdpType; sdp?: string } }[]) => void;
-  RTCIceCandidate: (...args: { to: string; candidate: { candidate: string; sdpMid: string | null; sdpMLineIndex: number | null; usernameFragment: string | null } }[]) => void;
   // Echo
   ping: () => void;
   // Popup
@@ -263,12 +261,6 @@ export type ServerToClientEvents = {
   actionMessage: (...args: PromptMessage[]) => void;
   directMessage: (...args: DirectMessage[]) => void;
   shakeWindow: (senderId: string) => void;
-  // RTC
-  RTCOffer: (...args: { from: string; userId: string; offer: { type: RTCSdpType; sdp: string } }[]) => void;
-  RTCAnswer: (...args: { from: string; userId: string; answer: { type: RTCSdpType; sdp: string } }[]) => void;
-  RTCIceCandidate: (...args: { from: string; userId: string; candidate: { candidate: string; sdpMid: string | null; sdpMLineIndex: number | null; usernameFragment: string | null } }[]) => void;
-  RTCJoin: (...args: { from: string; userId: string }[]) => void;
-  RTCLeave: (...args: { from: string; userId: string }[]) => void;
   // Play Sound
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Echo
@@ -282,38 +274,70 @@ export type ServerToClientEvents = {
   error: (message: string) => void;
   connect_error: (error: any) => void;
   reconnect_error: (error: any) => void;
+
+  // SFU
+  channelConnected: (...args: { channelId: string }[]) => void;
+  channelDisconnected: (...args: { channelId: string }[]) => void;
 };
 
-export type Data = {
-  from: string;
-  userId: string;
+export type ACK<T = any> =
+  | {
+      ok: true;
+      data: T;
+    }
+  | {
+      ok: false;
+      error: string;
+    };
+
+export type TransportReturnType = {
+  id: string;
+  iceParameters: any;
+  iceCandidates: any;
+  dtlsParameters: any;
+  routerRtpCapabilities: any;
+  producers?: ProducerReturnType[];
 };
 
-export type Offer = {
-  from: string;
+export type ProducerReturnType = {
+  id: string;
   userId: string;
-  offer: {
-    type: RTCSdpType;
-    sdp: string;
-  };
+  kind: mediasoupClient.types.MediaKind;
 };
 
-export type Answer = {
-  from: string;
+export type ConsumerReturnType = {
+  id: string;
   userId: string;
-  answer: {
-    type: RTCSdpType;
-    sdp: string;
-  };
+  producerId: string;
+  kind: mediasoupClient.types.MediaKind;
+  rtpParameters: any;
 };
 
-export type IceCandidate = {
-  from: string;
-  userId: string;
-  candidate: {
-    candidate: string;
-    sdpMid: string | null;
-    sdpMLineIndex: number | null;
-    usernameFragment: string | null;
-  };
+export type SFUJoinParams = {
+  channelId: string;
+};
+
+export type SFULeaveParams = {
+  channelId: string;
+};
+
+export type SFUConnectTransportParams = {
+  transportId: string;
+  dtlsParameters: any;
+};
+
+export type SFUCreateTransportParams = {
+  direction: 'send' | 'recv';
+};
+
+export type SFUProduceParams = {
+  kind: mediasoupClient.types.MediaKind;
+  transportId: string;
+  rtpParameters: any;
+};
+
+export type SFUConsumeParams = {
+  transportId: string;
+  producerId: string;
+  rtpCapabilities: any;
 };

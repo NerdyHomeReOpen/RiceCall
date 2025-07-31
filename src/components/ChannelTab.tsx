@@ -66,8 +66,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       ipcService.socket.send('editServer', { serverId, update });
     };
 
-    const handleJoinChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipcService.socket.send('connectChannel', { serverId, channelId });
+    const handleJoinChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], password?: string) => {
+      ipcService.socket.send('connectChannel', { serverId, channelId, password });
     };
 
     const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -103,9 +103,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       ipcService.initialData.onRequest('editChannelOrder', { serverId, userId });
     };
 
-    const handleOpenChannelPassword = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    const handleOpenChannelPassword = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
       ipcService.popup.open('channelPassword', 'channelPassword');
-      ipcService.initialData.onRequest('channelPassword', { userId, serverId, channelId });
+      ipcService.initialData.onRequest('channelPassword', { submitTo: 'channelPassword' });
+      ipcService.popup.onSubmit('channelPassword', (password) => {
+        handleJoinChannel(serverId, channelId, password);
+      });
     };
 
     const handleOpenServerBroadcast = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -164,7 +167,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           onDoubleClick={() => {
             if (!canJoin) return;
             if (needPassword) {
-              handleOpenChannelPassword(userId, serverId, channelId);
+              handleOpenChannelPassword(serverId, channelId);
             } else {
               handleJoinChannel(serverId, channelId);
             }
@@ -184,7 +187,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 show: canJoin,
                 onClick: () => {
                   if (needPassword) {
-                    handleOpenChannelPassword(userId, serverId, channelId);
+                    handleOpenChannelPassword(serverId, channelId);
                   } else {
                     handleJoinChannel(serverId, channelId);
                   }
@@ -228,9 +231,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
                 id: 'broadcast',
                 label: t('broadcast'),
                 show: canManageChannel,
-                onClick: () => {
-                  handleOpenServerBroadcast(serverId, channelCategoryId ? channelCategoryId : channelId);
-                },
+                onClick: () => handleOpenServerBroadcast(serverId, channelCategoryId ? channelCategoryId : channelId),
               },
               {
                 id: 'move-all-user-to-channel',

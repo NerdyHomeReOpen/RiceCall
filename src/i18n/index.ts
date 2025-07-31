@@ -21,7 +21,7 @@ import zhTW_message from './locales/zh-TW/message.json';
 import zhTW_rpc from './locales/zh-TW/rpc.json';
 import zhTW_country from './locales/zh-TW/country.json';
 
-const hash = process.env.NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH!;
+const hash = process.env.NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH || '';
 
 /** OTA backend */
 class CrowdinBackend {

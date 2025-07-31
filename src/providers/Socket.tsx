@@ -37,30 +37,28 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
   // Handlers
   const handleConnect = useCallback(() => {
-    console.info('Socket connected');
+    console.info('[Socket] connected');
     ipcService.popup.close('errorDialog');
     setIsConnected(true);
   }, []);
 
   const handleDisconnect = useCallback(() => {
-    console.info('Socket disconnected');
-    ipcService.popup.closeAll();
+    console.info('[Socket] disconnected');
     setIsConnected(false);
   }, []);
 
   const handleReconnect = useCallback((attemptNumber: number) => {
-    console.info('Socket reconnecting, attempt number:', attemptNumber);
-    ipcService.popup.close('errorDialog');
+    console.info('[Socket] reconnecting, attempt number:', attemptNumber);
   }, []);
 
   const handleError = useCallback((message: string) => {
-    console.error('Socket error:', message);
+    console.error('[Socket] error:', message);
     new ErrorHandler(new Error(message)).show();
   }, []);
 
   const handleConnectError = useCallback(
     (error: any) => {
-      console.error('Socket connect error:', error);
+      console.error('[Socket] connect error:', error);
       new ErrorHandler(new Error(t('connection-failed-message')), () => ipcService.auth.logout()).show();
     },
     [t],
@@ -68,7 +66,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
   const handleReconnectError = useCallback(
     (error: any) => {
-      console.error('Socket reconnect error:', error);
+      console.error('[Socket] reconnect error:', error);
       new ErrorHandler(new Error(t('reconnection-failed-message')), () => ipcService.auth.logout()).show();
     },
     [t],

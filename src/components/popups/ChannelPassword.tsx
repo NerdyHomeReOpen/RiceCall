@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 
-// Types
-import type { Channel, Server } from '@/types';
-
 // Providers
 import { useTranslation } from 'react-i18next';
 
@@ -13,11 +10,10 @@ import popup from '@/styles/popup.module.css';
 import ipcService from '@/services/ipc.service';
 
 interface ChannelPasswordPopupProps {
-  serverId: Server['serverId'];
-  channelId: Channel['channelId'];
+  submitTo: 'channelPassword';
 }
 
-const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ serverId, channelId }) => {
+const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ submitTo }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -25,8 +21,8 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
   const [password, setPassword] = useState<string>('');
 
   // Handlers
-  const handleJoinChannel = (channelId: Channel['channelId'], serverId: Server['serverId'], password: string) => {
-    ipcService.socket.send('connectChannel', { channelId, serverId, password });
+  const handleSubmit = () => {
+    ipcService.popup.submit(submitTo, password);
   };
 
   const handleClose = () => {
@@ -59,7 +55,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
         <div
           className={`${popup['button']} ${password && password.length <= 4 ? '' : 'disabled'}`}
           onClick={() => {
-            handleJoinChannel(channelId, serverId, password);
+            handleSubmit();
             handleClose();
           }}
         >

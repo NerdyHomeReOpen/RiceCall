@@ -682,7 +682,7 @@ const RootPageComponent = () => {
   }, [user, mainTab, loadingBox.isLoading]);
 
   return (
-    <WebRTCProvider>
+    <WebRTCProvider userId={userId}>
       <ActionScannerProvider>
         <ExpandedProvider>
           <Header user={user} currentServer={server} friendApplications={friendApplications} />
