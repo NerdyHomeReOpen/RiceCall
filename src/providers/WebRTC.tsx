@@ -95,10 +95,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   // Speaker
   const speakerMuteRef = useRef<boolean>(false);
   const speakerVolumeRef = useRef<number>(100);
-  const speakerSourceNodeRef = useRef<{ [userId: string]: MediaStreamAudioSourceNode }>({});
-  const speakerGainNodeRef = useRef<{ [userId: string]: GainNode }>({});
-  const outputDestinationNodeRef = useRef<MediaStreamAudioDestinationNode | null>(null);
-  const speakerRef = useRef<HTMLAudioElement | null>(null);
+  const speakerStreamListRef = useRef<{ [id: string]: MediaStream }>({}); // userId -> stream
+  const speakerAudioListRef = useRef<{ [id: string]: HTMLAudioElement }>({}); // userId -> audio
+  const speakerAudioRefHandlersRef = useRef<Record<string, (el: HTMLAudioElement | null) => void>>({}); // userId -> (el: HTMLAudioElement | null) => void
 
   // Device
   const inputDeviceIdRef = useRef<string | null>(null);
@@ -119,10 +118,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const sendTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
   const recvTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
   const consumersRef = useRef<{ [producerId: string]: mediasoupClient.types.Consumer }>({}); // producerId -> consumer
-
-  // const streamListRef = useRef<{ [id: string]: MediaStream }>({}); // userId -> stream
-  // const audioListRef = useRef<{ [id: string]: HTMLAudioElement }>({}); // userId -> audio
-  // const audioRefHandlersRef = useRef<Record<string, (el: HTMLAudioElement | null) => void>>({}); // userId -> (el: HTMLAudioElement | null) => void
 
   const handleEditBitrate = useCallback((bitrate?: number) => {
     if (bitrate === bitrateRef.current) {
@@ -169,12 +164,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   }, []);
 
   const handleEditSpeakerVolume = useCallback((volume?: number) => {
-    if (!speakerRef.current) {
-      console.warn('No speaker ref');
-      return;
-    }
     const newVolume = volume ?? speakerVolumeRef.current;
-    speakerRef.current.volume = newVolume / 100;
+    Object.values(speakerAudioListRef.current).forEach((audio) => {
+      audio.volume = newVolume / 100;
+    });
     setSpeakerVolume(newVolume);
     speakerVolumeRef.current = newVolume;
   }, []);
@@ -219,12 +212,12 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   );
 
   const handleMuteUser = useCallback((userId: string) => {
-    speakerGainNodeRef.current[userId].gain.value = 0;
+    speakerAudioListRef.current[userId].muted = true;
     setMutedIds((prev) => [...prev, userId]);
   }, []);
 
   const handleUnmuteUser = useCallback((userId: string) => {
-    speakerGainNodeRef.current[userId].gain.value = 1;
+    speakerAudioListRef.current[userId].muted = false;
     setMutedIds((prev) => prev.filter((id) => id !== userId));
   }, []);
 
@@ -317,36 +310,11 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         console.warn('No audio context');
         return;
       }
-      if (!outputDestinationNodeRef.current) {
-        console.warn('No output destination node');
-        return;
-      }
 
-      // Create nodes
-      const source = audioContextRef.current.createMediaStreamSource(stream);
-      const gain = audioContextRef.current.createGain();
-
-      // Connect nodes
-      source.connect(gain);
-      gain.connect(outputDestinationNodeRef.current);
-
-      speakerSourceNodeRef.current[userId] = source;
-      speakerGainNodeRef.current[userId] = gain;
-      consumersRef.current[producerId] = consumer;
+      speakerStreamListRef.current[userId] = stream;
       setRemoteUserStatusList((prev) => ({ ...prev, [userId]: { status: 'connected', volume: 0 } }));
       console.info('[WebRTC] Consumed producer: ', producerId);
       console.info('[WebRTC] UserId: ', userId);
-
-      if (audioContextRef.current && speakerGainNodeRef.current[userId]) {
-        const osc = audioContextRef.current.createOscillator();
-        osc.frequency.value = 440;
-        osc.connect(speakerGainNodeRef.current[userId]);
-        osc.start();
-        setInterval(() => {
-          osc.stop();
-          osc.disconnect();
-        }, 1500);
-      }
     },
     [emitAck],
   );
@@ -358,8 +326,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     const userId = consumer.appData.userId as string;
     consumer.close();
     delete consumersRef.current[producerId];
-    delete speakerSourceNodeRef.current[userId];
-    delete speakerGainNodeRef.current[userId];
+    delete speakerStreamListRef.current[userId];
+    delete speakerAudioListRef.current[userId];
+    delete speakerAudioRefHandlersRef.current[userId];
     setRemoteUserStatusList((prev) => ({ ...prev, [userId]: { status: 'disconnected', volume: 0 } }));
     console.info('[WebRTC] Unconsumed producer: ', producerId);
     console.info('[WebRTC] UserId: ', userId);
@@ -369,7 +338,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     const transport = await emitAck<SFUCreateTransportParams, TransportReturnType>('SFUCreateTransport', { direction: 'send' });
 
     if (!deviceRef.current.loaded) await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
-    console.log(transport.iceCandidates);
+
     sendTransportRef.current = deviceRef.current.createSendTransport(transport);
     console.log('[WebRTC] SendTransport created:', sendTransportRef.current);
     sendTransportRef.current.on('connect', ({ dtlsParameters }, cb, eb) => {
@@ -392,37 +361,19 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       console.log('[WebRTC] SendTransport connection state =', s);
     });
 
-    // console.log('[WebRTC] Producing mic track:', track);
-    // await sendTransportRef.current.produce({ track });
-
-    // 使用已經連接到 Audio Context 的軌道
     const track = inputDestinationNodeRef.current?.stream.getAudioTracks()[0];
     if (!track) {
       console.warn('[WebRTC] No mic track yet, skip produce');
       return;
     }
-
-    console.log('[WebRTC] Using processed audio track:', {
-      id: track.id,
-      enabled: track.enabled,
-      muted: track.muted,
-      readyState: track.readyState,
-    });
-
-    // 創建 Producer
-    const producer = await sendTransportRef.current.produce({ track });
-    console.log('[WebRTC] Producer created:', {
-      id: producer.id,
-      kind: producer.kind,
-      track: producer.track,
-    });
+    await sendTransportRef.current.produce({ track, encodings: [{ maxBitrate: 128000 }] });
   }, [emitAck]);
 
   const setupRecv = useCallback(async () => {
     const transport = await emitAck<SFUCreateTransportParams, TransportReturnType>('SFUCreateTransport', { direction: 'recv' });
 
     if (!deviceRef.current.loaded) await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
-    console.log(transport.iceCandidates);
+
     recvTransportRef.current = deviceRef.current.createRecvTransport(transport);
     recvTransportRef.current.on('connect', ({ dtlsParameters }, cb, eb) => {
       emitAck('SFUConnectTransport', { transportId: recvTransportRef.current!.id, dtlsParameters })
@@ -457,17 +408,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
       await setupRecv();
       await setupSend();
-
-      if (audioContextRef.current && micGainNodeRef.current) {
-        const osc = audioContextRef.current.createOscillator();
-        osc.frequency.value = 440;
-        osc.connect(micGainNodeRef.current);
-        osc.start();
-        setInterval(() => {
-          osc.stop();
-          osc.disconnect();
-        }, 1500);
-      }
     },
     [emitAck, setupSend, setupRecv],
   );
@@ -513,43 +453,43 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     [unconsumeOne],
   );
 
-  // const getAudioRef = useCallback(
-  //   (userId: string) => {
-  //     if (!audioRefHandlersRef.current[userId]) {
-  //       audioRefHandlersRef.current[userId] = (el: HTMLAudioElement | null) => {
-  //         if (!el) {
-  //           delete audioListRef.current[userId];
-  //           return;
-  //         }
-  //         const stream = streamListRef.current[userId];
-  //         if (el.srcObject !== stream) {
-  //           el.srcObject = stream;
-  //           console.log('[WebRTC] Set audio srcObject for user:', userId, 'stream:', stream);
-  //         }
+  const getAudioRef = useCallback(
+    (userId: string) => {
+      if (!speakerAudioRefHandlersRef.current[userId]) {
+        speakerAudioRefHandlersRef.current[userId] = (el: HTMLAudioElement | null) => {
+          if (!el) {
+            delete speakerAudioListRef.current[userId];
+            return;
+          }
+          const stream = speakerStreamListRef.current[userId];
+          if (el.srcObject !== stream) {
+            el.srcObject = stream;
+            console.log('[WebRTC] Set audio srcObject for user:', userId, 'stream:', stream);
+          }
 
-  //         audioListRef.current[userId] = el;
-  //         el.muted = mutedIds.includes(userId);
-  //         el.volume = (speakerMuteRef.current ? 0 : speakerVolumeRef.current) / 100;
-  //         el.controls = false;
-  //         el.autoplay = true;
+          speakerAudioListRef.current[userId] = el;
+          el.muted = mutedIds.includes(userId);
+          el.volume = (speakerMuteRef.current ? 0 : speakerVolumeRef.current) / 100;
+          el.controls = false;
+          el.autoplay = true;
 
-  //         el.onerror = (e) => {
-  //           console.error('[WebRTC] Audio error for user:', userId, e);
-  //         };
+          el.onerror = (e) => {
+            console.error('[WebRTC] Audio error for user:', userId, e);
+          };
 
-  //         el.onloadedmetadata = () => {
-  //           console.log('[WebRTC] Audio loaded metadata for user:', userId);
-  //         };
+          el.onloadedmetadata = () => {
+            console.log('[WebRTC] Audio loaded metadata for user:', userId);
+          };
 
-  //         if (outputDeviceIdRef.current && 'setSinkId' in el) {
-  //           (el as HTMLAudioElement).setSinkId(outputDeviceIdRef.current).catch(() => {});
-  //         }
-  //       };
-  //     }
-  //     return audioRefHandlersRef.current[userId];
-  //   },
-  //   [mutedIds],
-  // );
+          if (outputDeviceIdRef.current && 'setSinkId' in el) {
+            (el as HTMLAudioElement).setSinkId(outputDeviceIdRef.current).catch(() => {});
+          }
+        };
+      }
+      return speakerAudioRefHandlersRef.current[userId];
+    },
+    [mutedIds],
+  );
 
   // Effects
 
@@ -620,7 +560,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     const mixGain = audioCtx.createGain();
     const analyser = audioCtx.createAnalyser();
     const inputDestination = audioCtx.createMediaStreamDestination();
-    const outputDestination = audioCtx.createMediaStreamDestination();
 
     // Connect nodes
     micGain.connect(analyser);
@@ -632,16 +571,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     micGainNodeRef.current = micGain;
     mixGainNodeRef.current = mixGain;
     inputDestinationNodeRef.current = inputDestination;
-    outputDestinationNodeRef.current = outputDestination;
-
-    // Set audio ref
-    speakerRef.current = document.createElement('audio');
-    speakerRef.current.srcObject = outputDestination.stream;
-    speakerRef.current.volume = (speakerMuteRef.current ? 0 : speakerVolumeRef.current) / 100;
-    speakerRef.current.controls = false;
-    speakerRef.current.autoplay = true;
-    speakerRef.current.style.display = 'none';
-    document.body.appendChild(speakerRef.current);
 
     // Initialize analyser
     analyser.fftSize = 2048;
@@ -766,10 +695,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         remoteUserStatusList,
       }}
     >
-      {/* {Object.keys(remoteUserStatusList).map((userId) => (
+      {Object.keys(remoteUserStatusList).map((userId) => (
         <audio key={userId} ref={getAudioRef(userId)} autoPlay style={{ display: 'none' }} />
       ))}
-      <audio key={userId} ref={audioRef} autoPlay style={{ display: 'none' }} /> */}
       {children}
     </WebRTCContext.Provider>
   );
