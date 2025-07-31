@@ -61,6 +61,9 @@ interface WebRTCProviderProps {
 }
 
 const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
+  // Constants
+  const SPEAKING_VOLUME_THRESHOLD = 2;
+
   // States
   const [isPressSpeakKey, setIsPressSpeakKey] = useState<boolean>(false);
   const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
@@ -136,8 +139,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       });
 
       speakerStreamListRef.current[userId] = stream;
+      if (speakerSourceListRef.current[userId]) speakerSourceListRef.current[userId].disconnect();
       speakerSourceListRef.current[userId] = audioContextRef.current.createMediaStreamSource(stream);
       if (!speakerGainNodeListRef.current[userId]) speakerGainNodeListRef.current[userId] = audioContextRef.current.createGain();
+      // speakerGainNodeListRef.current[userId].gain.value =
       if (!speakerAnalyserListRef.current[userId]) speakerAnalyserListRef.current[userId] = audioContextRef.current.createAnalyser();
 
       speakerSourceListRef.current[userId].connect(speakerGainNodeListRef.current[userId]);
@@ -158,7 +163,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
           sum += v * v;
         }
         const volume = Math.sqrt(sum / dataArray.length);
-        const volumePercent = Math.floor(Math.min(1, volume / 0.5) * 100);
+        let volumePercent = Math.min(1, volume / 0.5) * 100;
+        if (volumePercent < SPEAKING_VOLUME_THRESHOLD) volumePercent = 0;
         setVolumePercent((prev) => ({ ...prev, [userId]: volumePercent }));
         requestAnimationFrame(detectSpeaking);
       };
@@ -191,8 +197,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       });
 
       micStreamRef.current = stream;
+      if (micSourceRef.current) micSourceRef.current.disconnect();
       micSourceRef.current = audioContextRef.current.createMediaStreamSource(stream);
       if (!micGainNodeRef.current) micGainNodeRef.current = audioContextRef.current.createGain();
+      micGainNodeRef.current.gain.value = micVolumeRef.current / 10;
       if (!micAnalyserRef.current) micAnalyserRef.current = audioContextRef.current.createAnalyser();
 
       micSourceRef.current.connect(micGainNodeRef.current);
@@ -212,7 +220,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
           sum += v * v;
         }
         const volume = Math.sqrt(sum / dataArray.length);
-        const volumePercent = Math.floor(Math.min(1, volume / 0.5) * 100);
+        let volumePercent = Math.min(1, volume / 0.5) * 100;
+        if (volumePercent < SPEAKING_VOLUME_THRESHOLD) volumePercent = 0;
         setVolumePercent((prev) => ({ ...prev, [userId]: volumePercent }));
         requestAnimationFrame(detectSpeaking);
       };
@@ -232,9 +241,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       return;
     }
     const newVolume = volume;
-    micGainNodeRef.current.gain.value = newVolume / 100;
+    micGainNodeRef.current.gain.value = newVolume / 10;
     setMicVolume(newVolume);
     micVolumeRef.current = newVolume;
+    window.localStorage.setItem('mic-volume', newVolume.toString());
   }, []);
 
   const handleEditMixVolume = useCallback((volume: number) => {
@@ -246,6 +256,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     mixGainNodeRef.current.gain.value = newVolume / 100;
     setMixVolume(newVolume);
     mixVolumeRef.current = newVolume;
+    window.localStorage.setItem('mix-volume', newVolume.toString());
   }, []);
 
   const handleEditSpeakerVolume = useCallback((volume: number) => {
@@ -257,6 +268,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     speakerRef.current.volume = newVolume / 100;
     setSpeakerVolume(newVolume);
     speakerVolumeRef.current = newVolume;
+    window.localStorage.setItem('speaker-volume', newVolume.toString());
   }, []);
 
   const handleEditInputStream = useCallback(
@@ -267,6 +279,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: false,
+            sampleRate: 256000,
             ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
           },
         })
@@ -318,6 +331,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     });
     setIsMicTaken(!micTakenRef.current);
     micTakenRef.current = !micTakenRef.current;
+    window.localStorage.setItem('is-mic-taken', micTakenRef.current.toString());
   }, []);
 
   const handleToggleMicMute = useCallback(() => {
@@ -330,6 +344,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     }
     setIsMicMute(!micMuteRef.current);
     micMuteRef.current = !micMuteRef.current;
+    window.localStorage.setItem('is-mic-mute', micMuteRef.current.toString());
   }, [handleEditMicVolume]);
 
   const handleToggleSpeakerMute = useCallback(() => {
@@ -342,6 +357,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     }
     setIsSpeakerMute(!speakerMuteRef.current);
     speakerMuteRef.current = !speakerMuteRef.current;
+    window.localStorage.setItem('is-speaker-mute', speakerMuteRef.current.toString());
   }, [handleEditSpeakerVolume]);
 
   const emitAck = useCallback(<T, R>(event: string, payload: T): Promise<R> => {
@@ -427,7 +443,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       return;
     }
 
-    const producer = await sendTransportRef.current.produce({ track, encodings: [{ maxBitrate: 128000 }], stopTracks: false });
+    const producer = await sendTransportRef.current.produce({ track, encodings: [{ maxBitrate: 256000 }], stopTracks: false });
     producer.on('transportclose', () => {
       console.log('[WebRTC] Producer transport closed');
       producer.close();
@@ -580,13 +596,17 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   useEffect(() => {
     const localMicVolume = window.localStorage.getItem('mic-volume');
     const localSpeakerVolume = window.localStorage.getItem('speaker-volume');
-    const localMicMute = window.localStorage.getItem('is-mic-mute');
-    const localSpeakerMute = window.localStorage.getItem('is-speaker-mute');
+    const localIsMicTaken = window.localStorage.getItem('is-mic-taken');
+    const localIsMicMute = window.localStorage.getItem('is-mic-mute');
+    const localIsSpeakerMute = window.localStorage.getItem('is-speaker-mute');
+    const localMutedIds = window.localStorage.getItem('muted-ids');
 
     setMicVolume(localMicVolume !== null ? parseInt(localMicVolume) : 100);
     setSpeakerVolume(localSpeakerVolume !== null ? parseInt(localSpeakerVolume) : 100);
-    setIsMicMute(localMicMute !== null ? localMicMute === 'true' : false);
-    setIsSpeakerMute(localSpeakerMute !== null ? localSpeakerMute === 'true' : false);
+    setIsMicTaken(localIsMicTaken !== null ? localIsMicTaken === 'true' : false);
+    setIsMicMute(localIsMicMute !== null ? localIsMicMute === 'true' : false);
+    setIsSpeakerMute(localIsSpeakerMute !== null ? localIsSpeakerMute === 'true' : false);
+    setMutedIds(localMutedIds !== null ? localMutedIds.split(',') : []);
   }, []);
 
   useEffect(() => {
@@ -603,7 +623,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     outputDestinationNodeRef.current = outputDestination;
   }, []);
 
-  useEffect(() => {}, [speakerVolume, isSpeakerMute]);
+  useEffect(() => {
+    window.localStorage.setItem('muted-ids', mutedIds.join(','));
+  }, [mutedIds]);
 
   useEffect(() => {
     const changeInputAudioDevice = (deviceId: string) => {
@@ -632,22 +654,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     const unsubscribe: (() => void)[] = [ipcService.socket.on('channelConnected', handleJoinSFUChannel), ipcService.socket.on('channelDisconnected', handleLeaveSFUChannel)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleJoinSFUChannel, handleLeaveSFUChannel]);
-
-  useEffect(() => {
-    window.localStorage.setItem('mic-volume', micVolume.toString());
-  }, [micVolume]);
-
-  useEffect(() => {
-    window.localStorage.setItem('speaker-volume', speakerVolume.toString());
-  }, [speakerVolume]);
-
-  useEffect(() => {
-    window.localStorage.setItem('is-mic-mute', isMicMute.toString());
-  }, [isMicMute]);
-
-  useEffect(() => {
-    window.localStorage.setItem('is-speaker-mute', isSpeakerMute.toString());
-  }, [isSpeakerMute]);
 
   return (
     <WebRTCContext.Provider
