@@ -181,7 +181,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <div className={popup['label']}>{t('input-announcement')}</div>              
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
-               <Editor />  
+               <Editor content={channelAnnouncement} />  
             </div>
           </div>
         </div>

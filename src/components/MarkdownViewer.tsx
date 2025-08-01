@@ -27,15 +27,13 @@ import { useTranslation } from 'react-i18next';
 export function sanitizeMarkdownWithSafeTags(markdownText: string): string {
   const safeMarkdownText = typeof markdownText === 'string' ? markdownText : '';
 
-  // escape < and >
-  const escaped = safeMarkdownText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
   // regex
   const emojiRegex = /\[emoji_.+?\]/g;
-  const userTagRegex = /(?:<|&lt;)@(.+?)(?:>|&gt;)/g;
-  const ytTagRegex = /(?:<|&lt;)YT=(.+?)(?:>|&gt;)/g;
+  const userTagRegex = /<@(.+?)>/g;
+  const ytTagRegex = /<YT=(.+?)>/g;
 
-  const replaced = escaped
+  // reemplazos personalizados
+  const replaced = safeMarkdownText
     // replace emoji
     .replace(emojiRegex, (match: string) => {
       const emoji = emojis.find((emoji) => emoji.char === match);
@@ -50,13 +48,13 @@ export function sanitizeMarkdownWithSafeTags(markdownText: string): string {
     // replace <YT=https://www.youtube.com/watch?v=dQw4w9WgXcQ>
     .replace(ytTagRegex, (_, content) => {
       const videoId = content.match(/v=([^&]+)/)?.[1];
+      if (!videoId) return '';
       return `<iframe class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
-    })
-    // replace <br> to \n
-    .replace(/<br\s*\/?>/g, '\n');
+    });
 
   return replaced;
 }
+
 
 interface MarkdownViewerProps {
   markdownText: string;

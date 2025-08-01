@@ -7,7 +7,11 @@ import FontSize from '@tiptap/extension-font-size';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { t } from 'i18next';
 
-export default function Editor() {
+interface EditorProps {
+  content?: string;
+}
+
+export default function Editor({ content = '' }: EditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -17,8 +21,8 @@ export default function Editor() {
         types: ['textStyle'],
       }),
     ],
-    immediatelyRender: false,
-    content: '',
+    immediatelyRender: true,
+    content: content,
   });  
 
   if (!editor) return;
