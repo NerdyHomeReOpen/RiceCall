@@ -26,6 +26,7 @@ import getService from '@/services/get.service';
 import Default from '@/utils/default';
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
+import Editor from '../Editor';
 
 interface ServerSettingPopupProps {
   serverId: Server['serverId'];
@@ -68,7 +69,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const [sortDirection, setSortDirection] = useState<1 | -1>(-1);
   // const [sortField, setSortField] = useState<string>('permissionLevel'); temp: not used
   const [searchText, setSearchText] = useState('');
-  const [showPreview, setShowPreview] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [selectedRowType, setSelectedRowType] = useState<string | null>(null);
 
@@ -421,25 +421,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
-              <div className={popup['label']}>{t('input-announcement')}</div>
-              <div className={popup['button']} onClick={() => setShowPreview(!showPreview)}>
-                {showPreview ? t('edit') : t('preview')}
-              </div>
+              <div className={popup['label']}>{t('input-announcement')}</div>              
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
-              {showPreview ? (
-                <div className={markdown['setting-markdown-container']} style={{ minHeight: '330px' }}>
-                  <MarkdownViewer markdownText={serverAnnouncement} />
-                </div>
-              ) : (
-                <textarea
-                  name="announcement"
-                  style={{ minHeight: '330px' }}
-                  value={serverAnnouncement}
-                  maxLength={1000}
-                  onChange={(e) => setServer((prev) => ({ ...prev, announcement: e.target.value }))}
-                />
-              )}
+               <Editor />  
               <div className={setting['note-text']}>{t('markdown-support')}</div>
             </div>
           </div>

@@ -20,6 +20,7 @@ import Default from '@/utils/default';
 
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
+import Editor from '../Editor';
 
 interface ChannelSettingPopupProps {
   userId: User['userId'];
@@ -36,7 +37,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   // States
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-  const [showPreview, setShowPreview] = useState<boolean>(false);
   const [channel, setChannel] = useState<Channel>(Default.channel());
   const [server, setServer] = useState<Server>(Default.server());
 
@@ -178,35 +178,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
-              <div className={popup['label']}>{t('input-announcement')}</div>
-              <div
-                className={popup['button']}
-                onClick={async () => {
-                  if (showPreview) {
-                    setShowPreview(false);
-                  } else {
-                    setShowPreview(true);
-                  }
-                }}
-              >
-                {showPreview ? t('edit') : t('preview')}
-              </div>
+              <div className={popup['label']}>{t('input-announcement')}</div>              
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
-              {showPreview ? (
-                <div className={markdown['setting-markdown-container']} style={{ minHeight: '330px' }}>
-                  <MarkdownViewer markdownText={channelAnnouncement} />
-                </div>
-              ) : (
-                <textarea
-                  name="channel-announcement"
-                  style={{ minHeight: '330px' }}
-                  value={channelAnnouncement}
-                  maxLength={1000}
-                  onChange={(e) => setChannel((prev) => ({ ...prev, announcement: e.target.value }))}
-                />
-              )}
-              <div className={setting['note-text']}>{t('markdown-support')}</div>
+               <Editor />  
             </div>
           </div>
         </div>
