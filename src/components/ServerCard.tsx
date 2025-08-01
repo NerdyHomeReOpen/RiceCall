@@ -53,6 +53,12 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
       return;
     }
 
+    if (server.isBlocked !== 0) {
+      if (server.isBlocked > Date.now()) handleTemporaryBlockedMember(new Date(server.isBlocked).toLocaleString());
+      if (server.isBlocked === -1) handlePermanentBlockedMember();
+      return;
+    }
+
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(serverDisplayId);
 
@@ -83,6 +89,19 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     if (!socket) return;
     handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => {
       handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId);
+    });
+  };
+
+    
+  const handleTemporaryBlockedMember = (date: string) => {
+    if (!socket) return;
+    handleOpenAlertDialog(t('blocked-member-to', { '0': date }), () => {
+    });
+  };
+
+  const handlePermanentBlockedMember = () => {
+    if (!socket) return;
+    handleOpenAlertDialog(t('blocked-member'), () => {
     });
   };
 
