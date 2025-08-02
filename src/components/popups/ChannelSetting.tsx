@@ -31,7 +31,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const { t } = useTranslation();
 
   // Refs
-  const refreshRef = useRef(false);
+  const refreshRef = useRef(false);  
 
   // States
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
@@ -60,6 +60,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const isReceptionLobby = serverReceptionLobbyId === channelId;
   const canSubmit = channelName.trim();
 
+  // States
+  const [linkInput, setLinkInput] = useState('');
+  const [hasManualLink, setHasManualLink] = useState(false);
+  const [editorContent, setEditorContent] = useState(''); // local editor content
+
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
     ipcService.socket.send('editChannel', { serverId, channelId, update });
@@ -83,6 +88,24 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     };
     refresh();
   }, [channelId, serverId, userId]);
+
+  useEffect(() => {
+    if (!hasManualLink) {
+      setEditorContent(channelAnnouncement); // sincroniza si no hay link
+    }
+  }, [channelAnnouncement, hasManualLink]);
+
+  useEffect(() => {
+    if (channelAnnouncement.startsWith('http://www.youtube') || channelAnnouncement.startsWith('https://www.youtube')) {
+      setLinkInput(channelAnnouncement);
+      setHasManualLink(true);
+      setEditorContent('');
+    } else {
+      setLinkInput('');
+      setHasManualLink(false);
+      setEditorContent(channelAnnouncement);
+    }
+  }, [channelAnnouncement]); 
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -179,10 +202,47 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <div className={popup['label']}>{t('input-announcement')}</div>              
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
-               <Editor content={channelAnnouncement} 
-                onChange={(newContent) =>
-                  setChannel((prev) => ({ ...prev, announcement: newContent }))
-              }/>  
+            <Editor
+                content={editorContent}
+                onChange={(newContent) => {
+                  setEditorContent(newContent);
+                  if (!hasManualLink) {
+                    setChannel((prev) => ({
+                      ...prev,
+                      announcement: newContent,
+                    }));
+                  }
+                }}
+            />
+            <input
+                type="text"
+                placeholder={t('youtube-link')}
+                value={linkInput}
+                onChange={(e) => {
+                  const url = e.target.value.trim();
+                  setLinkInput(e.target.value);
+
+                  if (url.startsWith('http://www.youtube') || url.startsWith('https://www.youtube')) {
+                    setHasManualLink(true);
+                    setChannel((prev) => ({
+                      ...prev,
+                      announcement: url,
+                    }));
+                  } else {
+                    setHasManualLink(false);
+                    // No actualices el estado aquí para no borrar el anuncio con texto,
+                    // simplemente dejas que el editor controle el contenido
+                  }
+                }}
+                style={{
+                  marginTop: '12px',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                }}
+              />
             </div>
           </div>
         </div>

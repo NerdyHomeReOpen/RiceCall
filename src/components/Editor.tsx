@@ -151,7 +151,7 @@ export default function Editor({ content = '', onChange }: EditorProps) {
         editor={editor}
         style={{
           border: '1px solid #ccc',
-          height: 280,
+          height: 240,
           padding: 10,
           backgroundColor: 'white',
           overflowY: 'auto',

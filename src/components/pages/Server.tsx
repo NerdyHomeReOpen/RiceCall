@@ -6,10 +6,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
 import MessageViewer from '@/components/MessageViewer';
 import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
+import AnnouncementRenderer from '@/components/AnnouncementRenderer';
 
 // Types
 import type { User, Server, Channel, Member, ChannelMessage, PromptMessage, SpeakingMode, Friend } from '@/types';
@@ -259,7 +259,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, curre
         <main className={styles['content']}>
           {/* Announcement Area */}
           <div ref={announcementAreaRef} className={styles['announcement-area']} style={{ height: `${announcementAreaHeight}px` }}>
-            <MarkdownViewer markdownText={announcement} />
+             <AnnouncementRenderer announcement={announcement} />
           </div>
 
           {/* Resize Handle */}
