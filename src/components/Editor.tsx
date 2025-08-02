@@ -6,12 +6,14 @@ import Color from '@tiptap/extension-color';
 import FontSize from '@tiptap/extension-font-size';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { t } from 'i18next';
+import { useEffect } from 'react';
 
 interface EditorProps {
   content?: string;
+  onChange?: (html: string) => void;
 }
 
-export default function Editor({ content = '' }: EditorProps) {
+export default function Editor({ content = '', onChange }: EditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -37,6 +39,21 @@ export default function Editor({ content = '' }: EditorProps) {
   const setColor = (color: string) => {
     editor?.chain().focus().setColor(color).run();
   };
+
+  useEffect(() => {
+    if (editor && content) {
+      editor.commands.setContent(content);
+    }
+  }, [editor, content]);
+
+   useEffect(() => {
+    if (!editor || !onChange) return;
+
+    editor.on('update', () => {
+      const html = editor.getHTML();
+      onChange(html);
+    });
+  }, [editor, onChange]);
 
  return (
     <div>

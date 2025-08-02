@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 // CSS
 import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
-import markdown from '@/styles/markdown.module.css';
 
 // Types
 import type { Channel, Server, User } from '@/types';
@@ -19,7 +18,6 @@ import getService from '@/services/get.service';
 import Default from '@/utils/default';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
 import Editor from '../Editor';
 
 interface ChannelSettingPopupProps {
@@ -181,7 +179,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <div className={popup['label']}>{t('input-announcement')}</div>              
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
-               <Editor content={channelAnnouncement} />  
+               <Editor content={channelAnnouncement} 
+                onChange={(newContent) =>
+                  setChannel((prev) => ({ ...prev, announcement: newContent }))
+              }/>  
             </div>
           </div>
         </div>

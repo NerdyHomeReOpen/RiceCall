@@ -424,7 +424,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
               <div className={popup['label']}>{t('input-announcement')}</div>              
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
-               <Editor />  
+                <Editor content={serverAnnouncement} 
+                  onChange={(newContent) =>
+                  setServer((prev) => ({ ...prev, announcement: newContent }))
+                 }/>  
               <div className={setting['note-text']}>{t('markdown-support')}</div>
             </div>
           </div>
