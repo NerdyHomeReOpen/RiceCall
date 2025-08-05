@@ -8,7 +8,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import type { PopupType, Server, User, Channel, FriendGroup, ChannelMessage, PromptMessage, FriendApplication, RecommendServerList, Friend, Member } from '@/types';
+import type { PopupType, Server, User, Channel, FriendGroup, ChannelMessage, PromptMessage, FriendApplication, RecommendServerList, Friend, Member, QueueMember } from '@/types';
 
 // i18n
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
@@ -393,6 +393,7 @@ const RootPageComponent = () => {
   const [channel, setChannel] = useState<Channel>(Default.channel());
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
+  const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
 
   // Variables
   const { userId } = user;
@@ -536,6 +537,10 @@ const RootPageComponent = () => {
     });
   };
 
+  const handleQueueMembersSet = (...args: QueueMember[]) => {
+    setQueueMembers(args);
+  };
+
   const handlePlaySound = (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
     args.forEach((item) => {
       soundPlayer.playSound(item);
@@ -615,6 +620,7 @@ const RootPageComponent = () => {
       ipcService.socket.on('actionMessage', handleActionMessage),
       ipcService.socket.on('openPopup', handleOpenPopup),
       ipcService.socket.on('playSound', handlePlaySound),
+      ipcService.socket.on('queueMembersSet', handleQueueMembersSet),
       // ipcService.socket.on('connect', handleConnect),
       // ipcService.socket.on('reconnect', handleReconnect),
       // ipcService.socket.on('disconnect', handleDisconnect),
@@ -701,6 +707,7 @@ const RootPageComponent = () => {
                 serverChannels={serverChannels}
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
+                queueMembers={queueMembers}
                 display={mainTab.selectedTabId === 'server'}
               />
             </>

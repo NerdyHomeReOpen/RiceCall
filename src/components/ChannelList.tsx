@@ -5,7 +5,7 @@ import styles from '@/styles/pages/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import type { Member, Channel, Server, User, Category, Friend, MemberApplication } from '@/types';
+import type { Member, Channel, Server, User, Category, Friend, MemberApplication, QueueMember } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ import { useSocket } from '@/providers/Socket';
 // Components
 import ChannelTab from '@/components/ChannelTab';
 import CategoryTab from '@/components/CategoryTab';
+import QueueMemberTab from '@/components/QueueMemberTab';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -24,11 +25,12 @@ interface ChannelListProps {
   currentServer: Server;
   currentChannel: Channel;
   serverMembers: Member[];
+  queueMembers: QueueMember[];
   serverChannels: (Channel | Category)[];
   friends: Friend[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends, queueMembers }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -271,15 +273,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div className={styles['mic-queue-list']}>
-            <div className={styles['user-list']}>
-              {/* {micQueueUsers.map((user) => (
-                    <UserTab
-                      key={user.id}
-                      user={user}
-                      server={server}
-                      mainUser={user}
-                    />
-                  ))} */}
+            <div className={styles['mic-queue-list-users']}>
+              {queueMembers.map((member) => (
+                <QueueMemberTab key={member.userId} queueMember={member} currentChannel={currentChannel} currentServer={currentServer} />
+              ))}
             </div>
           </div>
           <div className={styles['saperator-2']} />

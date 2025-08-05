@@ -49,6 +49,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     password: channelPassword,
     userLimit: channelUserLimit,
     voiceMode: channelVoiceMode,
+    // queueSecs: channelQueueSecs,
     order: channelOrder,
     forbidText: channelForbidText,
     forbidGuestText: channelForbidGuestText,
@@ -127,19 +128,40 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 />
               </div>
             </div>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('channel-mode')}</div>
-              <div className={popup['select-box']}>
-                <select value={channelVoiceMode} onChange={(e) => setChannel((prev) => ({ ...prev, voiceMode: e.target.value as Channel['voiceMode'] }))}>
-                  <option value="free">{t('free-speech')}</option>
-                  <option value="forbidden" disabled>
-                    {t('forbid-speech')}
-                  </option>
-                  <option value="queue" disabled>
-                    {t('queue-speech')}
-                  </option>
-                </select>
+            <div className={popup['row']}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('channel-mode')}</div>
+                <div className={popup['select-box']}>
+                  <select value={channelVoiceMode} onChange={(e) => setChannel((prev) => ({ ...prev, voiceMode: e.target.value as Channel['voiceMode'] }))}>
+                    <option value="free">{t('free-speech')}</option>
+                    <option value="forbidden" disabled>
+                      {t('forbid-speech')}
+                    </option>
+                    <option value="queue">{t('queue-speech')}</option>
+                  </select>
+                </div>
               </div>
+              {/* {channelVoiceMode === 'queue' && (
+                <div className={`${popup['input-box']} ${popup['col']}`}>
+                  <div className={popup['label']}>{t('queue-secs')}</div>
+                  <input
+                    name="queue-secs"
+                    type="number"
+                    value={channelQueueSecs}
+                    max={1000}
+                    min={5}
+                    onChange={(e) =>
+                      setChannel((prev) => {
+                        const value = +e.target.value;
+                        if (Number.isNaN(value)) return prev;
+                        if (value > 1000) return { ...prev, queueSecs: 1000 };
+                        if (value < 5) return { ...prev, queueSecs: 5 };
+                        return { ...prev, queueSecs: value };
+                      })
+                    }
+                  />
+                </div>
+              )} */}
             </div>
           </div>
           <div className={setting['separator']} />

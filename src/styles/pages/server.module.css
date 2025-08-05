@@ -208,11 +208,10 @@
 .saperator-2 {
   display: block;
   min-height: 6px;
-  min-width: 100%;
   margin: 0.5rem 0;
   background-image: url('/channel/chn_tree_split.png');
   background-repeat: no-repeat;
-  background-position: 0 0;
+  background-position: 50% 0;
 }
 
 .section-title-text {
@@ -285,6 +284,40 @@
   display: flex;
   flex-direction: column;
   height: 120px;
+}
+
+.mic-queue-list-users {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.queue-bottom-bar {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  background: #f8f9fa;
+  padding: 12px;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.queue-participate-button,
+.queue-leave-button {
+  background-color: #0073c6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #45a047;
+  }
 }
 
 .channel-list {
@@ -439,6 +472,31 @@
 
 .user-audio-state.notext {
   background-position: 0 0;
+}
+
+.queue-position {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #777;
+}
+
+.queue-seconds-remaining-box {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-left: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  position: absolute;
+  right: 2rem;
 }
 
 .my-location-icon {
