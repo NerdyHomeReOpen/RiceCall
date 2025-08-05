@@ -4,7 +4,7 @@
   "voice-set-to-forbid-speech": "Este canal foi configurado para permitir a fala somente de administradores",
   "voice-set-to-queue": "Este canal foi configurado para permitir a fala na ordem da fila. Clique em \"Pegar microfone\" e aguarde sua vez",
   "voice-change-to-free-speech": "Este canal foi configurado para permitir a fala de qualquer usuário",
-  "voice-change-to-forbid-speech": "Este canal foi configurado para permitir a fala somente de administradores",
+  "voice-change-to-forbid-speech": "該頻道語音已被設為僅管理員發言",
   "voice-change-to-queue": "Este canal foi configurado para permitir a fala na ordem da fila. Clique em \"Pegar microfone\" e aguarde sua vez",
   "text-change-to-forbid-speech": "Este canal foi configurado para permitir mensagens somente de administradores",
   "text-change-to-free-speech": "Este canal foi configurado para permitir mensagens de qualquer usuário",
