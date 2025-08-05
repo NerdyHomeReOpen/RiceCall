@@ -4,7 +4,7 @@
   "voice-set-to-forbid-speech": "Bu kanal yalnızca yönetici erişimine ayarlandı",
   "voice-set-to-queue": "Bu kanal mikrofonların konuşmasını bekleyecek şekilde ayarlandı. Lütfen konuşma sıranızın gelmesini beklemek için \"Mikrofonu alın ve konuşun\" butonuna tıklayın.",
   "voice-change-to-free-speech": "Kanal sesi serbest konuşma olarak ayarlandı",
-  "voice-change-to-forbid-speech": "Kanal sesi yalnızca yöneticiye ayarlandı",
+  "voice-change-to-forbid-speech": "該頻道語音已被設為僅管理員發言",
   "voice-change-to-queue": "Kanal, mikrofonun konuşmasını bekleyecek şekilde ayarlandı, lütfen \"Mikrofonu alıp konuş\"a tıklayın ve konuşmacının konuşmasını bekleyin",
   "text-change-to-forbid-speech": "Bu kanalın sohbet odası yalnızca yöneticilere ayarlandı",
   "text-change-to-free-speech": "Bu kanalın sohbet odası özgür konuşmaya ayarlandı",
