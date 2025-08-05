@@ -112,6 +112,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       ipcService.socket.send('leaveQueue', { serverId, channelId: currentChannel.channelId });
     };
 
+    const handleControlQueue = () => {
+      ipcService.socket.send('controlQueue', { serverId, channelId: currentChannel.channelId });
+    };
+
     const handleResizeSidebar = useCallback(
       (e: MouseEvent) => {
         if (!isResizingSidebar) return;
@@ -310,7 +314,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       {
                         id: 'free-speech',
                         label: t('free-speech'),
-                        show: canChangeToFreeSpeech,
+                        disabled: !canChangeToFreeSpeech,
                         onClick: () => {
                           handleEditChannel(serverId, channelId, { voiceMode: 'free' });
                         },
@@ -318,7 +322,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       {
                         id: 'forbid-speech',
                         label: t('forbid-speech'),
-                        show: canChangeToForbiddenSpeech,
+                        disabled: !canChangeToForbiddenSpeech,
                         onClick: () => {
                           handleEditChannel(serverId, channelId, { voiceMode: 'forbidden' });
                         },
@@ -327,7 +331,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         id: 'queue-mode',
                         label: t('queue'),
                         icon: 'submenu',
-                        show: canChangeToForbiddenQueue || canChangeToControlQueue,
+                        disabled: !canChangeToForbiddenQueue && !canChangeToControlQueue,
                         hasSubmenu: true,
                         onClick: () => {
                           handleEditChannel(serverId, channelId, { voiceMode: 'queue' });
@@ -336,17 +340,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                           {
                             id: 'forbid-queue',
                             label: t('forbid-queue'),
-                            show: canChangeToForbiddenQueue,
+                            disabled: !canChangeToForbiddenQueue,
                             onClick: () => {
-                              // handleEditChannel({ queueMode: 'forbidden' }, currentChannelId, serverId);
+                              // handleEditChannel(serverId, channelId, { voiceMode: 'forbidden' });
                             },
                           },
                           {
                             id: 'control-queue',
                             label: t('control-queue'),
-                            show: canChangeToControlQueue,
+                            disabled: !canChangeToControlQueue,
                             onClick: () => {
-                              // handleEditChannel({ queueMode: 'control' }, currentChannelId, serverId);
+                              handleControlQueue();
                             },
                           },
                         ],
