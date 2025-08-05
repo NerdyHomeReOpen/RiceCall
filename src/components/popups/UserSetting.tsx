@@ -59,10 +59,11 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   // Variables
   const {
     name: userName,
-    // avatar: userAvatar,
+    id: userDisplayId,
     avatarUrl: userAvatarUrl,
     gender: userGender,
     signature: userSignature,
+    about: userAbout,
     level: userLevel,
     xp: userXP,
     requiredXp: userRequiredXP,
@@ -76,7 +77,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   } = user;
   const isSelf = targetId === userId;
   const isFriend = !!friend.targetId;
-  const isProfilePrivate = false; // TODO: 隱私設定開關，等設定功能完工
+  const isProfilePrivate = false; // TODO: Need to add privacy setting
   const canSubmit = userName.trim() && userGender.trim() && userCountry.trim() && userBirthYear && userBirthMonth && userBirthDay;
   const joinedServers = servers.filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7).sort((a, b) => b.permissionLevel - a.permissionLevel);
   const favoriteServers = servers
@@ -111,9 +112,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   const userAge = calculateAge(userBirthYear, userBirthMonth, userBirthDay);
 
   const yearOptions = useMemo(() => Array.from({ length: CURRENT_YEAR - 1900 + 1 }, (_, i) => CURRENT_YEAR - i), [CURRENT_YEAR]);
-
   const monthOptions = useMemo(() => Array.from({ length: 12 }, (_, i) => i + 1), []);
-
   const dayOptions = useMemo(() => Array.from({ length: new Date(userBirthYear, userBirthMonth, 0).getDate() }, (_, i) => i + 1), [userBirthYear, userBirthMonth]);
 
   // Handlers
@@ -233,7 +232,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 }
                 const reader = new FileReader();
                 reader.onloadend = async () => {
-                  handleAvatarCropper(userId, reader.result as string);
+                  handleAvatarCropper(targetId, reader.result as string);
                 };
                 reader.readAsDataURL(file);
               };
@@ -249,15 +248,12 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               title={`${t('level')}: ${userLevel}, ${t('xp')}:${userXP}, ${t('required-xp')}:${userRequiredXP - userXP}`}
             />
           </div>
-
-          <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(userId)}>
-            @{userName}
+          <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
+            @{userDisplayId}
           </div>
-
           <div className={styles['user-info-text']}>
             {t(userGender === 'Male' ? 'male' : 'female')} . {userAge} .{t(userCountry, { ns: 'country' })}
           </div>
-
           <div className={styles['user-signature']} dangerouslySetInnerHTML={{ __html: userSignature }} />
 
           <div className={styles['tabs']}>
@@ -265,21 +261,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               className={`${styles['tab']} ${styles['about']} ${
                 selectedTabId === 'userSetting' ? `${styles['selected']} ${styles['editable']}` : ''
               } ${selectedTabId === 'about' ? styles['selected'] : ''}`}
-              onClick={() => {
-                if (selectedTabId !== 'userSetting') {
-                  setSelectedTabId('about');
-                }
-              }}
+              onClick={() => setSelectedTabId('about')}
             >
               {t('about-me')}
             </div>
             <div
               className={`${styles['tab']} ${styles['groups']} ${selectedTabId === 'userSetting' ? styles['editable'] : ''} ${selectedTabId === 'groups' ? styles['selected'] : ''}`}
-              onClick={() => {
-                if (selectedTabId !== 'userSetting') {
-                  setSelectedTabId('groups');
-                }
-              }}
+              onClick={() => setSelectedTabId('groups')}
             >
               {t('servers')}
             </div>
@@ -301,6 +289,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     birthMonth: userBirthMonth,
                     birthDay: userBirthDay,
                     signature: userSignature,
+                    about: userAbout,
                   });
                   setSelectedTabId('about');
                 }}
@@ -344,7 +333,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
                           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                            <div className={`${isSelf && server.ownerId === userId ? styles['is-owner'] : ''}`} />
+                            <div className={`${isSelf && server.ownerId === targetId ? styles['is-owner'] : ''}`} />
                             <div className={styles['display-id-text']}>{server.displayId}</div>
                           </div>
                         </div>
@@ -523,9 +512,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   />
                 </div>
               </div>
-              <div className={`${popup['input-box']} ${popup['col']} ${'disabled'}`}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('about-me')}</div>
-                <textarea name="about" />
+                <textarea name="about" value={userAbout} onChange={(e) => setUser((prev) => ({ ...prev, about: e.target.value }))} />
               </div>
             </div>
           </div>

@@ -76,6 +76,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       bitrate: channelBitrate,
       voiceMode: channelVoiceMode,
       forbidText: channelForbidText,
+      forbidQueue: channelForbidQueue,
       forbidGuestText: channelForbidGuestText,
       guestTextMaxLength: channelGuestTextMaxLength,
       guestTextWaitTime: channelGuestTextWaitTime,
@@ -90,10 +91,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const isForbidByGuestTextGap = channelGuestTextGapTime && leftGapTime > 0 && userPermission === 1;
     const isForbidByGuestTextWait = channelGuestTextWaitTime && leftWaitTime > 0 && userPermission === 1;
     const textMaxLength = userPermission === 1 ? channelGuestTextMaxLength : 9999;
-    const canChangeToFreeSpeech = userPermission > 4 && channelVoiceMode !== 'free';
-    const canChangeToForbiddenSpeech = userPermission > 4 && channelVoiceMode !== 'forbidden';
-    const canChangeToForbiddenQueue = userPermission > 4 && channelVoiceMode !== 'queue';
-    const canChangeToControlQueue = userPermission > 4 && channelVoiceMode !== 'forbidden';
+    const canChangeToFree = userPermission > 4 && channelVoiceMode !== 'free';
+    const canChangeToAdmin = userPermission > 4 && channelVoiceMode !== 'admin';
+    const canChangeToQueue = userPermission > 4 && channelVoiceMode !== 'queue';
 
     // Handlers
     const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
@@ -314,41 +314,43 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       {
                         id: 'free-speech',
                         label: t('free-speech'),
-                        disabled: !canChangeToFreeSpeech,
+                        icon: !canChangeToFree ? 'checked' : '',
+                        disabled: !canChangeToFree,
                         onClick: () => {
                           handleEditChannel(serverId, channelId, { voiceMode: 'free' });
                         },
                       },
                       {
-                        id: 'forbid-speech',
-                        label: t('forbid-speech'),
-                        disabled: !canChangeToForbiddenSpeech,
+                        id: 'admin-speech',
+                        label: t('admin-speech'),
+                        icon: !canChangeToAdmin ? 'checked' : '',
+                        disabled: !canChangeToAdmin,
                         onClick: () => {
-                          handleEditChannel(serverId, channelId, { voiceMode: 'forbidden' });
+                          handleEditChannel(serverId, channelId, { voiceMode: 'admin' });
                         },
                       },
                       {
-                        id: 'queue-mode',
-                        label: t('queue'),
+                        id: 'queue-speech',
+                        label: t('queue-speech'),
                         icon: 'submenu',
-                        disabled: !canChangeToForbiddenQueue && !canChangeToControlQueue,
+                        disabled: !canChangeToQueue,
                         hasSubmenu: true,
                         onClick: () => {
                           handleEditChannel(serverId, channelId, { voiceMode: 'queue' });
                         },
                         submenuItems: [
                           {
-                            id: 'forbid-queue',
+                            id: 'forbid-guest-queue',
                             label: t('forbid-queue'),
-                            disabled: !canChangeToForbiddenQueue,
+                            disabled: channelVoiceMode !== 'queue' || channelForbidQueue,
                             onClick: () => {
-                              // handleEditChannel(serverId, channelId, { voiceMode: 'forbidden' });
+                              handleEditChannel(serverId, channelId, { forbidQueue: true });
                             },
                           },
                           {
                             id: 'control-queue',
                             label: t('control-queue'),
-                            disabled: !canChangeToControlQueue,
+                            disabled: channelVoiceMode !== 'queue',
                             onClick: () => {
                               handleControlQueue();
                             },
@@ -358,7 +360,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     ]);
                   }}
                 >
-                  {channelVoiceMode === 'queue' ? t('queue') : channelVoiceMode === 'free' ? t('free-speech') : channelVoiceMode === 'forbidden' ? t('forbid-speech') : ''}
+                  {channelVoiceMode === 'queue' ? t('queue-speech') : channelVoiceMode === 'free' ? t('free-speech') : channelVoiceMode === 'admin' ? t('admin-speech') : ''}
                 </div>
               </div>
               <div className={`${styles['mic-button']} ${isMicTaken ? styles['active'] : ''}`} onClick={isMicTaken ? handleLeaveQueue : handleJoinQueue}>

@@ -1,9 +1,12 @@
 export type table_users = {
   userId: string;
   name: string;
+  id: string; // New: Display ID (for search user)
   avatar: string;
   avatarUrl: string;
+  email: string; // New: Email
   signature: string;
+  about: string; // New: About
   country: string;
   level: number;
   vip: number;
@@ -24,10 +27,7 @@ export type table_users = {
 export type table_badges = {
   badgeId: string;
   name: string;
-  rare: string;
   description: string;
-  order: number;
-  createdAt: number;
 };
 
 export type table_friend_groups = {
@@ -98,11 +98,14 @@ export type table_channels = {
   guestTextMaxLength: number;
   isLobby: boolean;
   forbidText: boolean;
+  forbidQueue: boolean; // New: Forbid Queue
   forbidGuestText: boolean;
+  forbidGuestVoice: boolean; // New: Forbid Guest Voice
+  forbidGuestQueue: boolean; // New: Forbid Guest Queue (Will change name to forbidQueue)
   forbidGuestUrl: boolean;
   type: 'category' | 'channel';
   visibility: 'public' | 'member' | 'private' | 'readonly';
-  voiceMode: 'free' | 'queue' | 'forbidden';
+  voiceMode: 'free' | 'admin' | 'queue';
   categoryId: string | null;
   serverId: string;
   createdAt: number;
@@ -115,7 +118,7 @@ export type table_members = {
   contribution: number;
   lastMessageTime: number;
   lastJoinChannelTime: number;
-  isBlocked: number; // New: Change to number
+  isBlocked: number; // New: Change to number (Will change name to blocked_to)
   permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
   createdAt: number;
 };

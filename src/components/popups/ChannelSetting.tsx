@@ -49,10 +49,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     password: channelPassword,
     userLimit: channelUserLimit,
     voiceMode: channelVoiceMode,
-    // queueSecs: channelQueueSecs,
     order: channelOrder,
     forbidText: channelForbidText,
     forbidGuestText: channelForbidGuestText,
+    forbidGuestVoice: channelForbidGuestVoice,
+    forbidGuestQueue: channelForbidGuestQueue,
     forbidGuestUrl: channelForbidGuestUrl,
     guestTextMaxLength: channelGuestTextMaxLength,
     guestTextWaitTime: channelGuestTextWaitTime,
@@ -134,34 +135,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <div className={popup['select-box']}>
                   <select value={channelVoiceMode} onChange={(e) => setChannel((prev) => ({ ...prev, voiceMode: e.target.value as Channel['voiceMode'] }))}>
                     <option value="free">{t('free-speech')}</option>
-                    <option value="forbidden" disabled>
-                      {t('forbid-speech')}
-                    </option>
+                    <option value="admin">{t('admin-speech')}</option>
                     <option value="queue">{t('queue-speech')}</option>
                   </select>
                 </div>
               </div>
-              {/* {channelVoiceMode === 'queue' && (
-                <div className={`${popup['input-box']} ${popup['col']}`}>
-                  <div className={popup['label']}>{t('queue-secs')}</div>
-                  <input
-                    name="queue-secs"
-                    type="number"
-                    value={channelQueueSecs}
-                    max={1000}
-                    min={5}
-                    onChange={(e) =>
-                      setChannel((prev) => {
-                        const value = +e.target.value;
-                        if (Number.isNaN(value)) return prev;
-                        if (value > 1000) return { ...prev, queueSecs: 1000 };
-                        if (value < 5) return { ...prev, queueSecs: 5 };
-                        return { ...prev, queueSecs: value };
-                      })
-                    }
-                  />
-                </div>
-              )} */}
             </div>
           </div>
           <div className={setting['separator']} />
@@ -308,15 +286,15 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         <div className={setting['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('speaking-permission') + t('soon')}</div>
+              <div className={popup['label']}>{t('speaking-permission')}</div>
             </div>
             <div className={popup['input-group']}>
-              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
-                <input name="forbidGuestQueue" type="checkbox" checked={false} onChange={() => {}} />
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <input name="forbidGuestQueue" type="checkbox" checked={channelForbidGuestQueue} onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestQueue: e.target.checked }))} />
                 <div className={popup['label']}>{t('forbid-guest-queue')}</div>
               </div>
-              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
-                <input name="forbidGuestVoice" type="checkbox" checked={false} onChange={() => {}} />
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <input name="forbidGuestVoice" type="checkbox" checked={channelForbidGuestVoice} onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestVoice: e.target.checked }))} />
                 <div className={popup['label']}>{t('forbid-guest-voice')}</div>
               </div>
             </div>
@@ -440,6 +418,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               bitrate: channelBitrate,
               forbidText: !!channelForbidText,
               forbidGuestText: !!channelForbidGuestText,
+              forbidGuestVoice: !!channelForbidGuestVoice,
+              forbidGuestQueue: !!channelForbidGuestQueue,
               forbidGuestUrl: !!channelForbidGuestUrl,
               visibility: channelVisibility,
               voiceMode: channelVoiceMode,
