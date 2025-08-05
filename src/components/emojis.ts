@@ -36,7 +36,7 @@ const customEmojis: Emoji[] = [
   { id: 24, char: '[emoji_25]', alt: '崩潰', path: '/smiles/25.gif' },
   { id: 25, char: '[emoji_26]', alt: '鄙視你', path: '/smiles/26.gif' },
   { id: 26, char: '[emoji_27]', alt: '開心', path: '/smiles/27.gif' },
-  { id: 27, char: '[emoji_28]', alt: '暈', path: '/smiles/28.gif' },
+  // { id: 27, char: '[emoji_28]', alt: '暈', path: '/smiles/28.gif' },
   { id: 28, char: '[emoji_29]', alt: '挖鼻孔', path: '/smiles/29.gif' },
   { id: 29, char: '[emoji_30]', alt: '撒嬌', path: '/smiles/30.gif' },
   { id: 30, char: '[emoji_31]', alt: '鼓掌', path: '/smiles/31.gif' },
@@ -71,14 +71,16 @@ const customEmojis: Emoji[] = [
   { id: 59, char: '[emoji_60]', alt: '帶血的刀', path: '/smiles/60.gif' },
 ];
 
-const unicodeEmojis: Emoji[] = emojiData.map((emoji, index) => {
-  const code = twemoji.convert.toCodePoint(emoji.char);
-  return {
-    id: index + customEmojis.length,
-    char: `[emoji_${code}]`,
-    alt: emoji.name,
-    path: `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png`,
-  };
-});
+const unicodeEmojis: Emoji[] = emojiData
+  .filter((e) => e.codes.length <= 5)
+  .map((emoji, index) => {
+    const code = twemoji.convert.toCodePoint(emoji.char);
+    return {
+      id: index + customEmojis.length,
+      char: `[emoji_${code}]`,
+      alt: emoji.name,
+      path: `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png`,
+    };
+  });
 
 export const emojis = [...customEmojis, ...unicodeEmojis];
