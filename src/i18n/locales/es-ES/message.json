@@ -4,7 +4,7 @@
   "voice-set-to-forbid-speech": "Este canal ha sido configurado para que solo los administradores puedan hablar",
   "voice-set-to-queue": "Este canal está configurado para hablar por turno. Haz clic en \"Solicitar turno\" para hablar",
   "voice-change-to-free-speech": "El canal de voz ha sido configurado para hablar libremente",
-  "voice-change-to-forbid-speech": "El canal de voz ha sido configurado para que solo los administradores puedan hablar",
+  "voice-change-to-forbid-speech": "該頻道語音已被設為僅管理員發言",
   "voice-change-to-queue": "El canal de voz ha sido cambiado a modo por turno. Haz clic en \"Solicitar turno\" para hablar",
   "text-change-to-forbid-speech": "El chat de este canal ha sido configurado para que solo los administradores puedan hablar",
   "text-change-to-free-speech": "El chat del canal ha sido configurado como de libre expresión",
