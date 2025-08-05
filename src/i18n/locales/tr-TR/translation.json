@@ -501,5 +501,9 @@
   "connection-status-disconnected": "Bağlantısı kesildi",
   "connection-status-failed": "Bağlantı başarısız oldu",
   "connection-status-closed": "Bağlanılamadı",
-  "connection-status-undefined": "bilinmeyen"
+  "connection-status-undefined": "bilinmeyen",
+  "admin-increased-time-to-first-queue": "管理員 {operator} 增加了佇列中第一個使用者的時間。",
+  "admin-changed-position-user-queue": "管理員 {operator} 更改了 {member} 的佇列位置",
+  "admin-deleted-user-from-queue": "管理員 {operator} 已從佇列中刪除 {member}",
+  "admin-controlled-queue": "管理員 {0} 已暫停佇列"
 }
