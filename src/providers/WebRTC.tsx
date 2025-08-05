@@ -79,6 +79,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const audioContextRef = useRef<AudioContext | null>(null);
 
   // Mic
+  const micTakenRef = useRef<boolean>(false);
   const micMuteRef = useRef<boolean>(false);
   const micVolumeRef = useRef<number>(100);
   const micStreamRef = useRef<MediaStream | null>(null);
@@ -311,6 +312,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     micStreamRef.current.getAudioTracks().forEach((track) => {
       track.enabled = speakingModeRef.current !== 'key';
     });
+    micTakenRef.current = true;
   }, []);
 
   const handleUnTakeMic = useCallback(() => {
@@ -321,6 +323,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     micStreamRef.current.getAudioTracks().forEach((track) => {
       track.enabled = false;
     });
+    micTakenRef.current = false;
   }, []);
 
   const handleToggleSpeakKey = useCallback((enable: boolean) => {
@@ -333,7 +336,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       return;
     }
     micStreamRef.current.getAudioTracks().forEach((track) => {
-      track.enabled = enable;
+      track.enabled = micTakenRef.current && enable;
     });
     setIsPressSpeakKey(enable);
     isPressSpeakKeyRef.current = enable;
