@@ -46,7 +46,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const announcementAreaRef = useRef<HTMLDivElement>(null);
     const voiceModeRef = useRef<HTMLDivElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
-    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // States
     const [sidebarWidth, setSidebarWidth] = useState<number>(270);
@@ -57,7 +56,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [showSpeakerVolume, setShowSpeakerVolume] = useState(false);
     const [currentTime, setCurrentTime] = useState<number>(Date.now());
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
-
+    const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
     const [speakMode, setSpeakMode] = useState<SpeakingMode>('key');
     const [speakHotKey, setSpeakHotKey] = useState<string>('');
 
@@ -162,11 +161,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       webRTC.handleEditMicVolume(volume);
     };
 
-    const handleToggleTakeMic = () => {
-      if (!webRTC) return;
-      webRTC.handleToggleTakeMic();
-    };
-
     // Effects
     useEffect(() => {
       window.addEventListener('mousemove', handleResizeSidebar);
@@ -211,6 +205,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, []);
 
     useEffect(() => {
+      const newMicTaken = queueMembers.filter((m) => m.position === 0).some((m) => m.userId === userId);
+      setIsMicTaken(newMicTaken);
+      if (newMicTaken) webRTC.handleTakeMic();
+      else webRTC.handleUnTakeMic();
+    }, [queueMembers]);
+
+    useEffect(() => {
       ipcService.discord.updatePresence({
         details: `${t('in')} ${serverName}`,
         state: `${t('chat-with-members', { '0': activeServerMembers.length.toString() })}`,
@@ -232,26 +233,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       const unsubscribe: (() => void)[] = [ipcService.systemSettings.speakingMode.get(setSpeakMode), ipcService.systemSettings.defaultSpeakingKey.get(setSpeakHotKey)];
       return () => unsubscribe.forEach((unsub) => unsub());
     }, []);
-
-    useEffect(() => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      if (!showSpeakerVolume) {
-        setShowSpeakerVolume(true);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        setShowSpeakerVolume(false);
-        timeoutRef.current = null;
-      }, 1000);
-      return () => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-      };
-    }, [webRTC.speakerVolume]);
 
     return (
       <main className={styles['server']} style={display ? {} : { display: 'none' }}>
@@ -376,21 +357,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   {channelVoiceMode === 'queue' ? t('queue') : channelVoiceMode === 'free' ? t('free-speech') : channelVoiceMode === 'forbidden' ? t('forbid-speech') : ''}
                 </div>
               </div>
-              <div
-                className={`${styles['mic-button']} ${webRTC.isMicTaken ? styles['active'] : ''}`}
-                onClick={() => {
-                  if (webRTC.isMicTaken) handleLeaveQueue();
-                  else handleJoinQueue();
-                  handleToggleTakeMic();
-                }}
-              >
+              <div className={`${styles['mic-button']} ${isMicTaken ? styles['active'] : ''}`} onClick={isMicTaken ? handleLeaveQueue : handleJoinQueue}>
                 <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div className={styles['mic-text']}>{webRTC.isMicTaken ? t('taken-mic') : t('take-mic')}</div>
+                  <div className={styles['mic-text']}>{isMicTaken ? t('taken-mic') : t('take-mic')}</div>
                   <div className={styles['mic-sub-text']}>
-                    {webRTC.isMicTaken && webRTC.micVolume === 0 && t('mic-muted')}
-                    {webRTC.isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && !webRTC.isPressSpeakKey && t('press-key-to-speak', { '0': speakHotKey })}
-                    {webRTC.isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && webRTC.isPressSpeakKey && t('speaking')}
+                    {isMicTaken && webRTC.micVolume === 0 && t('mic-muted')}
+                    {isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && !webRTC.isPressSpeakKey && t('press-key-to-speak', { '0': speakHotKey })}
+                    {isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && webRTC.isPressSpeakKey && t('speaking')}
                   </div>
                 </div>
               </div>
