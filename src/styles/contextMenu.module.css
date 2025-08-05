@@ -70,6 +70,10 @@
   transform: rotate(180deg);
 }
 
+.context-menu .option[data-type='checked']::before {
+  background-image: url('/ctrl/icon_menu_checked.png');
+}
+
 .context-menu .option[data-type='memberManagement']::before {
   background-image: url('/channel/icon_membermgr.png');
 }

@@ -91,9 +91,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const isForbidByGuestTextGap = channelGuestTextGapTime && leftGapTime > 0 && userPermission === 1;
     const isForbidByGuestTextWait = channelGuestTextWaitTime && leftWaitTime > 0 && userPermission === 1;
     const textMaxLength = userPermission === 1 ? channelGuestTextMaxLength : 9999;
-    const canChangeToFree = userPermission > 4 && channelVoiceMode !== 'free';
-    const canChangeToAdmin = userPermission > 4 && channelVoiceMode !== 'admin';
-    const canChangeToQueue = userPermission > 4 && channelVoiceMode !== 'queue';
 
     // Handlers
     const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
@@ -314,8 +311,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       {
                         id: 'free-speech',
                         label: t('free-speech'),
-                        icon: !canChangeToFree ? 'checked' : '',
-                        disabled: !canChangeToFree,
+                        icon: channelVoiceMode === 'free' ? 'checked' : '',
                         onClick: () => {
                           handleEditChannel(serverId, channelId, { voiceMode: 'free' });
                         },
@@ -323,8 +319,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       {
                         id: 'admin-speech',
                         label: t('admin-speech'),
-                        icon: !canChangeToAdmin ? 'checked' : '',
-                        disabled: !canChangeToAdmin,
+                        icon: channelVoiceMode === 'admin' ? 'checked' : '',
                         onClick: () => {
                           handleEditChannel(serverId, channelId, { voiceMode: 'admin' });
                         },
@@ -332,9 +327,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       {
                         id: 'queue-speech',
                         label: t('queue-speech'),
-                        icon: 'submenu',
-                        disabled: !canChangeToQueue,
-                        hasSubmenu: true,
+                        icon: channelVoiceMode === 'queue' ? 'submenu' : '',
+                        hasSubmenu: channelVoiceMode === 'queue',
                         onClick: () => {
                           handleEditChannel(serverId, channelId, { voiceMode: 'queue' });
                         },
@@ -342,9 +336,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                           {
                             id: 'forbid-guest-queue',
                             label: t('forbid-queue'),
-                            disabled: channelVoiceMode !== 'queue' || channelForbidQueue,
+                            icon: channelForbidQueue ? 'checked' : '',
+                            disabled: channelVoiceMode !== 'queue',
                             onClick: () => {
-                              handleEditChannel(serverId, channelId, { forbidQueue: true });
+                              handleEditChannel(serverId, channelId, { forbidQueue: !channelForbidQueue });
                             },
                           },
                           {
