@@ -41,8 +41,8 @@ export const getFormatTimeDiff = (t: TFunction<'translation', undefined>, timest
       const count = Math.floor(absDiff / interval.seconds);
       if (count >= 1) {
         const label = interval.label;
-        const timesAgo = t('ago', { '0': `${count}${label}` });
-        const timesFuture = t('future', { '0': `${count}${label}` });
+        const timesAgo = `${count}${label} ${t('ago')}`;
+        const timesFuture = `${count}${label} ${t('future')}`;
         return isFuture ? timesFuture : timesAgo;
       }
     }
