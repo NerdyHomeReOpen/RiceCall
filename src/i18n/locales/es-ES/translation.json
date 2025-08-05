@@ -304,7 +304,7 @@
   "text-change-to-forbid-guest-text": "此頻道被設定為禁止遊客發送文字訊息",
   "text-change-to-allow-text": "Este canal ha sido configurado para permitir que los visitantes envíen mensajes de texto",
   "text-change-to-allow-url": "Este canal ha sido configurado para permitir que los visitantes envíen mensajes de texto que contengan URLs",
-  "text-change-to-forbid-speech": "El chat de este canal ha sido configurado para que solo los administradores puedan hablar",
+  "text-change-to-forbid-speech": "該頻道聊天室已被設為僅管理員發言",
   "text-change-to-forbid-text": "Este canal ha sido configurado para prohibir que los visitantes envíen mensajes de texto",
   "text-change-to-forbid-url": "Este canal ha sido configurado para prohibir que los visitantes envíen mensajes de texto que contengan",
   "text-change-to-free-speech": "El chat del canal ha sido configurado como de libre expresión",
