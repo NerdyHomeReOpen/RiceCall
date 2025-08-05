@@ -62,7 +62,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const speakingStatus = webRTC.volumePercent?.[memberUserId];
   const connectionStatus = webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
   const isLoading = connectionStatus === 'connecting' || !connectionStatus;
-  const isSpeaking = speakingStatus !== 0;
+  const isSpeaking = !!speakingStatus;
   const isMuted = speakingStatus === -1;
   const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
   const isFriend = friends.some((fd) => fd.targetId === memberUserId);
@@ -108,7 +108,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   };
 
   const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId));
+    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => ipcService.socket.send('editMember', { userId, serverId, update: { permissionLevel: 1, nickname: null } }));
   };
 
   const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
@@ -117,6 +117,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
 
   const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
     ipcService.socket.send('moveToChannel', { userId, serverId, channelId });
+  };
+
+  const handleAddToQueue = (userId: User['userId']) => {
+    ipcService.socket.send('addToQueue', { userId, serverId, channelId: currentChannelId });
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -189,6 +193,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
         const x = e.clientX;
         const y = e.clientY;
         contextMenu.showContextMenu(x, y, false, false, [
+          {
+            id: 'add-to-queue',
+            label: t('add-to-queue'),
+            show: !isCurrentUser && canManageMember,
+            onClick: () => handleAddToQueue(memberUserId),
+          },
           {
             id: 'direct-message',
             label: t('direct-message'),

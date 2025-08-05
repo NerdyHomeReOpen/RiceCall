@@ -56,7 +56,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
   const speakingStatus = webRTC.volumePercent?.[memberUserId];
   const connectionStatus = webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
   const isLoading = connectionStatus === 'connecting' || !connectionStatus;
-  const isSpeaking = speakingStatus !== 0;
+  const isSpeaking = !!speakingStatus;
   const isMuted = speakingStatus === -1;
   const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
   const canManageMember = userPermission > 2 && userPermission >= memberPermission;
