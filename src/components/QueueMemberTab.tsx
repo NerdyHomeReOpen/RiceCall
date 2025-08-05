@@ -172,15 +172,13 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
       }}
     >
       <div className={`${styles['user-audio-state']} ${styles[statusIcon()]}`} title={!isCurrentUser ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
-      <div className={styles['queue-position']}>{memberPosition}.</div>
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
       <BadgeListViewer badges={memberBadges} maxDisplay={5} />
 
-      {memberPosition === 1 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime} s.</div>}
-
+      {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}
       {isCurrentUser && <div className={styles['my-location-icon']} />}
     </div>
   );

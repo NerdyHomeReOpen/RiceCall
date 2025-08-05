@@ -482,21 +482,16 @@
 }
 
 .queue-seconds-remaining-box {
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
-  color: #856404;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 0.85rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  margin-left: 6px;
+  font-size: 13px;
+  background: #fffed3;
+  border: 1px solid #f9ce7d;
+  border-radius: 3px;
+  padding-right: 3px;
+  padding-left: 3px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 20px;
-  position: absolute;
-  right: 2rem;
+  color: #777777;
+  margin-left: auto;
 }
 
 .my-location-icon {
