@@ -60,10 +60,6 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
   const isMuted = speakingStatus === -1;
   const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
   const canManageMember = userPermission > 2 && userPermission >= memberPermission;
-  const canIncreaseTime = canManageMember && memberPosition === 1;
-  const canMoveToSecondPosition = canManageMember && memberPosition >= 3;
-  const canMoveDown = canManageMember && memberPosition > 1;
-  const canMoveUp = canManageMember && memberPosition > 2;
 
   const statusIcon = () => {
     if (isMuted || isMutedByUser) return 'muted';
@@ -73,36 +69,22 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
   };
 
   // Handlers
-  const handleIncreaseTime = () => {
-    ipcService.socket.send('increaseQueueTime', { serverId, channelId: currentChannelId, userId: memberUserId, time: 10 });
+  const handleIncreaseQueueTime = () => {
+    ipcService.socket.send('increaseQueueTime', { serverId, channelId: currentChannelId, userId: memberUserId });
   };
 
-  const handleMoveDown = (userId: User['userId']) => {
+  const handleMoveDownQueue = (userId: User['userId']) => {
     ipcService.socket.send('moveQueuePosition', { serverId, channelId: currentChannelId, userId, position: memberPosition + 1 });
   };
 
-  const handleMoveUp = (userId: User['userId']) => {
+  const handleMoveUpQueue = (userId: User['userId']) => {
     ipcService.socket.send('moveQueuePosition', { serverId, channelId: currentChannelId, userId, position: memberPosition - 1 });
   };
 
-  const handleMoveSecondPosition = (userId: User['userId']) => {
-    ipcService.socket.send('moveQueuePosition', { serverId, channelId: currentChannelId, userId, position: 2 });
-  };
-
-  const handleRemoveFromQueueConfirm = (userId: User['userId']) => {
+  const handleRemoveFromQueue = (userId: User['userId']) => {
     handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberName }), () => {
       ipcService.socket.send('removeFromQueue', { serverId, channelId: currentChannelId, userId });
     });
-  };
-
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
@@ -128,45 +110,28 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
         const y = e.clientY;
         contextMenu.showContextMenu(x, y, false, false, [
           {
-            id: 'direct-message',
-            label: t('direct-message'),
-            show: !isCurrentUser,
-            onClick: () => handleOpenDirectMessage(userId, memberUserId, memberName),
-          },
-          {
-            id: 'view-profile',
-            label: t('view-profile'),
-            onClick: () => handleOpenUserInfo(userId, memberUserId),
-          },
-          {
-            id: 'increase-time',
-            label: t('increase-time'),
-            show: canIncreaseTime,
-            onClick: () => handleIncreaseTime(),
-          },
-          {
-            id: 'move-up',
-            label: t('move-up'),
-            show: canMoveUp,
-            onClick: () => handleMoveUp(memberUserId),
-          },
-          {
-            id: 'move-down',
-            label: t('move-down'),
-            show: canMoveDown,
-            onClick: () => handleMoveDown(memberUserId),
-          },
-          {
-            id: 'move-to-second-position',
-            label: t('move-to-second-position'),
-            show: canMoveToSecondPosition,
-            onClick: () => handleMoveSecondPosition(memberUserId),
-          },
-          {
-            id: 'delete-from-queue',
-            label: t('delete-from-queue'),
+            id: 'increase-queue-time',
+            label: t('increase-queue-time'),
             show: canManageMember,
-            onClick: () => handleRemoveFromQueueConfirm(memberUserId),
+            onClick: () => handleIncreaseQueueTime(),
+          },
+          {
+            id: 'move-up-queue',
+            label: t('move-up-queue'),
+            show: canManageMember,
+            onClick: () => handleMoveUpQueue(memberUserId),
+          },
+          {
+            id: 'move-down-queue',
+            label: t('move-down-queue'),
+            show: canManageMember,
+            onClick: () => handleMoveDownQueue(memberUserId),
+          },
+          {
+            id: 'remove-from-queue',
+            label: t('remove-from-queue'),
+            show: canManageMember,
+            onClick: () => handleRemoveFromQueue(memberUserId),
           },
         ]);
       }}

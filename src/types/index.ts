@@ -195,7 +195,7 @@ export type ClientToServerEvents = {
   addToQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
   leaveQueue: (...args: { serverId: string; channelId: string }[]) => void;
   removeFromQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
-  increaseQueueTime: (...args: { serverId: string; channelId: string; userId: string; time: number }[]) => void;
+  increaseQueueTime: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
   moveQueuePosition: (...args: { serverId: string; channelId: string; userId: string; position: number }[]) => void;
   controlQueue: (...args: { serverId: string; channelId: string; control: boolean }[]) => void;
   // Member
