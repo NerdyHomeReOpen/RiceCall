@@ -11,7 +11,7 @@ import MarkdownViewer from './MarkdownViewer';
   }
 
 export default function AnnouncementRenderer({ announcement }: { announcement: string }) {
-  if (isYouTubeUrl(announcement)) {
+  if (announcement && isYouTubeUrl(announcement)) {
     const videoId = getYouTubeVideoId(announcement);
     if (!videoId) {
       // No pudo extraer videoId, muestra el texto normal

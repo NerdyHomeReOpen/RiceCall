@@ -71,6 +71,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const [searchText, setSearchText] = useState('');
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [selectedRowType, setSelectedRowType] = useState<string | null>(null);
+  const [linkInput, setLinkInput] = useState('');
+  const [hasManualLink, setHasManualLink] = useState(false);
+  const [editorContent, setEditorContent] = useState(''); // local editor content
 
   // Variables
   const {
@@ -311,6 +314,24 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     };
   }, [setSelectedRowIdAndType]);
 
+   useEffect(() => {
+      if (!hasManualLink) {
+        setEditorContent(serverAnnouncement); // sincroniza si no hay link
+      }
+    }, [serverAnnouncement, hasManualLink]);
+  
+    useEffect(() => {
+      if (serverAnnouncement.startsWith('http://www.youtube') || serverAnnouncement.startsWith('https://www.youtube')) {
+        setLinkInput(serverAnnouncement);
+        setHasManualLink(true);
+        setEditorContent('');
+      } else {
+        setLinkInput('');
+        setHasManualLink(false);
+        setEditorContent(serverAnnouncement);
+      }
+    }, [serverAnnouncement]); 
+
   return (
     <div className={popup['popup-wrapper']} ref={popupRef}>
       {/* Body */}
@@ -428,7 +449,35 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   onChange={(newContent) =>
                   setServer((prev) => ({ ...prev, announcement: newContent }))
                  }/>  
-              <div className={setting['note-text']}>{t('markdown-support')}</div>
+                 <input
+                type="text"
+                placeholder={t('youtube-link')}
+                value={linkInput}
+                onChange={(e) => {
+                  const url = e.target.value.trim();
+                  setLinkInput(e.target.value);
+
+                  if (url.startsWith('http://www.youtube') || url.startsWith('https://www.youtube')) {
+                    setHasManualLink(true);
+                    setServer((prev) => ({
+                      ...prev,
+                      announcement: url,
+                    }));
+                  } else {
+                    setHasManualLink(false);
+                    // No actualices el estado aquí para no borrar el anuncio con texto,
+                    // simplemente dejas que el editor controle el contenido
+                  }
+                }}
+                style={{
+                  marginTop: '12px',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                }}
+              />
             </div>
           </div>
         </div>
