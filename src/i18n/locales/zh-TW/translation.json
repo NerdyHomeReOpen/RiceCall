@@ -181,7 +181,6 @@
   "forbid-only-admin-text": "此頻道被設定為只允許管理員發送文字訊息",
   "forbid-queue": "禁止排麥",
   "forbid-shake-label": "禁止接受震動訊息",
-  "forbid-speech": "限制發言",
   "forbid-stranger-message-label": "拒絕陌生訊息",
   "forbid-text": "禁止文字",
   "forbid-voice": "禁止此人語音",

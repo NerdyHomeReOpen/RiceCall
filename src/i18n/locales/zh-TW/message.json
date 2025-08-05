@@ -48,6 +48,7 @@
   "invalid-account-or-password": "帳號或密碼錯誤",
   "invalid-file": "無效的檔案",
   "invalid-file-type": "不支援的檔案類型",
+  "invalid-token": "無效的 Token，請重新登入",
   "kick-member-from-server": "【{{target}}】被管理員【{{operator}}】踢出頻道",
   "kicked-from-server": "您已被踢出群組",
   "login-error": "發生錯誤，請重新登入",
@@ -99,10 +100,7 @@
   "upgrade-self-to-member": "您已加入成為本群會員。",
   "upgrade-self-to-server-admin": "您已被提升為本群的管理員。",
   "upload-image-failed": "上傳圖片失敗，請稍後再試",
-  "voice-change-to-forbidden": "該頻道語音已被設為僅管理員發言",
+  "voice-change-to-admin": "該頻道語音已被設為僅管理員發言",
   "voice-change-to-free": "該頻道語音已被設為自由發言",
-  "voice-change-to-queue": "頻道被設為排麥才能發言，請點擊\"拿麥發言\"等候發言",
-  "voice-set-to-forbidden": "此頻道已被設為僅限管理員發言",
-  "voice-set-to-free": "此頻道已被設為自由發言",
-  "voice-set-to-queue": "此頻道已被設為排麥才能發言，請點擊\"拿麥發言\"等候發言"
+  "voice-change-to-queue": "頻道被設為排麥才能發言，請點擊\"拿麥發言\"等候發言"
 }
