@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -7,11 +7,10 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import { PopupType, Channel, User, UserServer, QueueUser } from '@/types';
+import { User, QueueMember, Channel, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useWebRTC } from '@/providers/WebRTC';
 
@@ -21,25 +20,17 @@ import BadgeListViewer from '@/components/BadgeList';
 // Services
 import ipcService from '@/services/ipc.service';
 
-interface QueueUserTabProps {
-  queueUser: QueueUser;
+interface QueueMemberTabProps {
+  queueMember: QueueMember;
   currentChannel: Channel;
-  currentServer: UserServer; 
-  totalUsersInQueue: number;
-  queueCurrentSecsRemaining: number;
-  queuePaused: boolean;
+  currentServer: Server;
 }
 
-const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, currentChannel, currentServer, totalUsersInQueue, queueCurrentSecsRemaining, queuePaused}) => {
+const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember, currentChannel, currentServer }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
-  const socket = useSocket();
   const webRTC = useWebRTC();
-
-  // States
-  const [currentSecsRemaining, setCurrentSecsRemaining] = useState(queueCurrentSecsRemaining); 
-  const [paused, setPaused] = useState(queuePaused); 
 
   // Refs
   const userTabRef = useRef<HTMLDivElement>(null);
@@ -55,24 +46,23 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
     vip: memberVip,
     userId: memberUserId,
     currentChannelId: memberCurrentChannelId,
-    currentServerId: memberCurrentServerId,
-    queueJoined: memberQueueJoined,
-    queuePosition: memberPosition
-  } = queueUser;
-  const { userId, serverId, permissionLevel: userPermission, lobbyId: serverLobbyId } = currentServer;
+    position: memberPosition,
+    leftTime: memberLeftTime,
+  } = queueMember;
+  const { userId, serverId, permissionLevel: userPermission } = currentServer;
   const { channelId: currentChannelId } = currentChannel;
   const isCurrentUser = memberUserId === userId;
   const isSameChannel = memberCurrentChannelId === currentChannelId;
-  const speakingStatus = webRTC.speakStatus?.[memberUserId] || (isCurrentUser && webRTC.volumePercent) || 0;
-  const connectionStatus = webRTC.connectionStatus?.[memberUserId];
-  const isLoading = connectionStatus === 'connecting' || connectionStatus === 'failed' || connectionStatus === 'closed' || !connectionStatus;
+  const speakingStatus = webRTC.volumePercent?.[memberUserId];
+  const connectionStatus = webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
+  const isLoading = connectionStatus === 'connecting' || !connectionStatus;
   const isSpeaking = speakingStatus !== 0;
   const isMuted = speakingStatus === -1;
-  const isMutedByUser = webRTC.muteList.includes(memberUserId);
-  const canManageMember = userPermission > 2 && userPermission >= memberPermission;  
+  const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
+  const canManageMember = userPermission > 2 && userPermission >= memberPermission;
   const canIncreaseTime = canManageMember && memberPosition === 1;
   const canMoveToSecondPosition = canManageMember && memberPosition >= 3;
-  const canMoveDown = canManageMember && memberPosition > 1 && (memberPosition < totalUsersInQueue);
+  const canMoveDown = canManageMember && memberPosition > 1;
   const canMoveUp = canManageMember && memberPosition > 2;
 
   const statusIcon = () => {
@@ -82,84 +72,44 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
     return '';
   };
 
-  // Handlers 
+  // Handlers
+  const handleIncreaseTime = () => {
+    ipcService.socket.send('increaseQueueTime', { serverId, channelId: currentChannelId, userId: memberUserId, time: 10 });
+  };
+
+  const handleMoveDown = (userId: User['userId']) => {
+    ipcService.socket.send('moveQueuePosition', { serverId, channelId: currentChannelId, userId, position: memberPosition + 1 });
+  };
+
+  const handleMoveUp = (userId: User['userId']) => {
+    ipcService.socket.send('moveQueuePosition', { serverId, channelId: currentChannelId, userId, position: memberPosition - 1 });
+  };
+
+  const handleMoveSecondPosition = (userId: User['userId']) => {
+    ipcService.socket.send('moveQueuePosition', { serverId, channelId: currentChannelId, userId, position: 2 });
+  };
+
+  const handleRemoveFromQueueConfirm = (userId: User['userId']) => {
+    handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberName }), () => {
+      ipcService.socket.send('removeFromQueue', { serverId, channelId: currentChannelId, userId });
+    });
+  };
+
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open(PopupType.DIRECT_MESSAGE, `directMessage-${targetId}`);
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
     ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open(PopupType.USER_INFO, `userInfo-${targetId}`);
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
     ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
   };
 
-  const handleIncreaseTime = () => {
-    if (!socket) return;
-    socket.send.increaseTimeQueue({serverId, channelId: currentChannelId});
-  };
-
-  const handleMoveDown = (targetId: User['userId']) => {
-    if (!socket) return;
-    socket.send.moveToQueuePosition({serverId, channelId: currentChannelId, targetId, position: memberPosition + 1});
-  };  
-
-  const handleMoveUp = (targetId: User['userId']) => {
-    if (!socket) return;
-    socket.send.moveToQueuePosition({serverId, channelId: currentChannelId, targetId, position: memberPosition - 1});
-  };
-
-  const handleMoveSecondPosition = (targetId: User['userId']) => {
-    if (!socket) return;
-    socket.send.moveToQueuePosition({serverId, channelId: currentChannelId,  targetId, position: 2});
-  };
-
-  const handleDeleteFromQueueConfirm = (targetId: User['userId']) => {
-      handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberName }), () => {
-        handleDeleteFromQueue(targetId);
-      });   
-  };
-
-  const handleDeleteFromQueue = (targetId: User['userId']) => {
-      if (!socket) return;
-      socket.send.deleteFromQueue({serverId, channelId: currentChannelId, targetId});
-  };
-
-
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
+    ipcService.popup.open('dialogAlert', 'alertDialog');
     ipcService.initialData.onRequest('alertDialog', { message, submitTo: 'alertDialog' });
     ipcService.popup.onSubmit('alertDialog', callback);
-  };  
-
-  //Effects
-    useEffect(() => {
-      setCurrentSecsRemaining(queueCurrentSecsRemaining);
-    }, [queueCurrentSecsRemaining]);
-
-    useEffect(() => {
-      setPaused(queuePaused);
-    }, [queuePaused]);
-
-    useEffect(() => {
-      let interval: NodeJS.Timeout | null = null;  
-      if (!paused) {
-        interval = setInterval(() => {
-          setCurrentSecsRemaining((prev) => (prev > 0 ? prev - 1 : 0));
-        }, 1000);
-      }else{
-         setCurrentSecsRemaining(currentSecsRemaining);
-      }
-
-      return () => {
-        if (interval) clearInterval(interval);
-      };
-    }, [paused]);
-
-    useEffect(() => {
-        if (memberPosition === 1) {
-            setCurrentSecsRemaining(currentSecsRemaining);
-        }
-    }, [memberPosition]);
+  };
 
   return (
     <div
@@ -170,7 +120,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
         if (!userTabRef.current) return;
         const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
         const y = userTabRef.current.getBoundingClientRect().top;
-        contextMenu.showUserInfoBlock(x, y, false, queueUser);
+        contextMenu.showUserInfoBlock(x, y, false, queueMember);
       }}
       onContextMenu={(e) => {
         e.stopPropagation();
@@ -200,7 +150,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
             show: canMoveUp,
             onClick: () => handleMoveUp(memberUserId),
           },
-           {
+          {
             id: 'move-down',
             label: t('move-down'),
             show: canMoveDown,
@@ -216,11 +166,11 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
             id: 'delete-from-queue',
             label: t('delete-from-queue'),
             show: canManageMember,
-            onClick: () => handleDeleteFromQueueConfirm(memberUserId),
-          }
+            onClick: () => handleRemoveFromQueueConfirm(memberUserId),
+          },
         ]);
       }}
-    >      
+    >
       <div className={`${styles['user-audio-state']} ${styles[statusIcon()]}`} title={!isCurrentUser ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
       <div className={styles['queue-position']}>{memberPosition}.</div>
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
@@ -229,13 +179,13 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, curre
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
       <BadgeListViewer badges={memberBadges} maxDisplay={5} />
 
-      {memberPosition === 1 && <div className={styles['queue-seconds-remaining-box']}>{currentSecsRemaining} s.</div>}
+      {memberPosition === 1 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime} s.</div>}
 
       {isCurrentUser && <div className={styles['my-location-icon']} />}
     </div>
   );
 });
 
-QueueUserTab.displayName = 'QueueUserTab';
+QueueMemberTab.displayName = 'QueueMemberTab';
 
-export default QueueUserTab;
+export default QueueMemberTab;

@@ -66,7 +66,6 @@ const ClientToServerEventNames = [
   'createFriendGroup',
   'editFriendGroup',
   'deleteFriendGroup',
-  'createFriend',
   'editFriend',
   'deleteFriend',
   'sendFriendApplication',
@@ -90,7 +89,13 @@ const ClientToServerEventNames = [
   'createChannel',
   'editChannel',
   'deleteChannel',
-  'createMember',
+  'joinQueue',
+  'addToQueue',
+  'leaveQueue',
+  'removeFromQueue',
+  'increaseQueueTime',
+  'moveQueuePosition',
+  'controlQueue',
   'editMember',
   'deleteMember',
   'sendMemberApplication',
@@ -135,6 +140,7 @@ export const ServerToClientEventNames = [
   'serverChannelAdd',
   'serverChannelUpdate',
   'serverChannelRemove',
+  'queueMembersSet',
   'serverMembersSet',
   'serverMemberAdd',
   'serverMemberUpdate',
@@ -677,9 +683,9 @@ function configureAutoUpdater() {
 
 // Discord RPC Functions
 async function setActivity(presence: DiscordRPC.Presence) {
-  await rpc?.setActivity(presence).catch((error) => {
-    console.error('Cannot set activity:', error);
-  });
+  // await rpc?.setActivity(presence).catch((error) => {
+  //   console.error('Cannot set activity:', error);
+  // });
 }
 
 async function configureDiscordRPC() {

@@ -208,11 +208,10 @@
 .saperator-2 {
   display: block;
   min-height: 6px;
-  min-width: 100%;
   margin: 0.5rem 0;
   background-image: url('/channel/chn_tree_split.png');
   background-repeat: no-repeat;
-  background-position: 0 0;
+  background-position: 50% 0;
 }
 
 .section-title-text {
@@ -287,7 +286,7 @@
   height: 120px;
 }
 
-.mic-queue-list-users{
+.mic-queue-list-users {
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -320,7 +319,6 @@
     background-color: #45a047;
   }
 }
-
 
 .channel-list {
   display: flex;
@@ -476,7 +474,7 @@
   background-position: 0 0;
 }
 
-.queue-position{
+.queue-position {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

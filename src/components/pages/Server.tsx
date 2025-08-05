@@ -12,7 +12,7 @@ import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
-import type { User, Server, Channel, Member, ChannelMessage, PromptMessage, SpeakingMode, Friend } from '@/types';
+import type { User, Server, Channel, Member, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueMember } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -27,18 +27,16 @@ interface ServerPageProps {
   currentServer: Server;
   serverMembers: Member[];
   serverChannels: Channel[];
+  queueMembers: QueueMember[];
   friends: Friend[];
   currentChannel: Channel;
   channelMessages: ChannelMessage[];
   actionMessages: PromptMessage[];
   display: boolean;
-  queueUsers: QueueUser[];
-  queueCurrentSecsRemaining: number;
-  queuePaused: boolean;
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
-  ({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages, actionMessages, display, queueUsers }) => {
+  ({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages, actionMessages, display, queueMembers }) => {
     // Hooks
     const { t } = useTranslation();
     const webRTC = useWebRTC();
@@ -105,6 +103,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
       ipcService.socket.send('editChannel', { serverId, channelId, update });
+    };
+
+    const handleJoinQueue = () => {
+      ipcService.socket.send('addToQueue', { serverId, channelId: currentChannel.channelId, userId });
+    };
+
+    const handleLeaveQueue = () => {
+      ipcService.socket.send('leaveQueue', { serverId, channelId: currentChannel.channelId });
     };
 
     const handleResizeSidebar = useCallback(
@@ -259,7 +265,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               serverMembers={activeServerMembers}
               serverChannels={serverChannels}
               friends={friends}
-              queueUsers={queueUsers}
+              queueMembers={queueMembers}
             />
           </aside>
 
@@ -370,7 +376,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   {channelVoiceMode === 'queue' ? t('queue') : channelVoiceMode === 'free' ? t('free-speech') : channelVoiceMode === 'forbidden' ? t('forbid-speech') : ''}
                 </div>
               </div>
-              <div className={`${styles['mic-button']} ${webRTC.isMicTaken ? styles['active'] : ''}`} onClick={handleToggleTakeMic}>
+              <div
+                className={`${styles['mic-button']} ${webRTC.isMicTaken ? styles['active'] : ''}`}
+                onClick={() => {
+                  if (webRTC.isMicTaken) handleLeaveQueue();
+                  else handleJoinQueue();
+                  handleToggleTakeMic();
+                }}
+              >
                 <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <div className={styles['mic-text']}>{webRTC.isMicTaken ? t('taken-mic') : t('take-mic')}</div>

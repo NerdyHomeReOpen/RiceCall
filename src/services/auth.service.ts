@@ -50,7 +50,7 @@ export const authService = {
   autoLogin: async () => {
     const token = localStorage.getItem('token');
     if (!token) return false;
-    const res = await apiService.post('/verifyToken', { token });
+    const res = await apiService.post('/token/verify', { token });
     if (!res?.token) return false;
     ipcService.auth.login(res.token);
     return true;

@@ -49,7 +49,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     password: channelPassword,
     userLimit: channelUserLimit,
     voiceMode: channelVoiceMode,
-    queueSecs: channelQueueSecs,
+    // queueSecs: channelQueueSecs,
     order: channelOrder,
     forbidText: channelForbidText,
     forbidGuestText: channelForbidGuestText,
@@ -141,7 +141,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   </select>
                 </div>
               </div>
-              {channelVoiceMode === 'queue' && (
+              {/* {channelVoiceMode === 'queue' && (
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('queue-secs')}</div>
                   <input
@@ -161,7 +161,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     }
                   />
                 </div>
-              )}
+              )} */}
             </div>
           </div>
           <div className={setting['separator']} />

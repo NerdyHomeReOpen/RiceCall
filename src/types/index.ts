@@ -54,6 +54,11 @@ export type MemberApplication = table_member_applications & User;
 
 export type MemberInvitation = table_member_invitations & User;
 
+export type QueueMember = Member & {
+  position: number;
+  leftTime: number;
+};
+
 export type Message = {
   parameter: Record<string, string>;
   contentMetadata: Record<string, string>;
@@ -185,6 +190,14 @@ export type ClientToServerEvents = {
   createChannel: (...args: { serverId: string; preset: Partial<table_channels> }[]) => void;
   editChannel: (...args: { serverId: string; channelId: string; update: Partial<table_channels> }[]) => void;
   deleteChannel: (...args: { serverId: string; channelId: string }[]) => void;
+  // Queue
+  joinQueue: (...args: { serverId: string; channelId: string }[]) => void;
+  addToQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
+  leaveQueue: (...args: { serverId: string; channelId: string }[]) => void;
+  removeFromQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
+  increaseQueueTime: (...args: { serverId: string; channelId: string; userId: string; time: number }[]) => void;
+  moveQueuePosition: (...args: { serverId: string; channelId: string; userId: string; position: number }[]) => void;
+  controlQueue: (...args: { serverId: string; channelId: string; control: boolean }[]) => void;
   // Member
   editMember: (...args: { userId: string; serverId: string; update: Partial<table_members> }[]) => void;
   deleteMember: (...args: { userId: string; serverId: string }[]) => void;
@@ -243,6 +256,8 @@ export type ServerToClientEvents = {
   serverChannelAdd: (...args: { data: Channel }[]) => void;
   serverChannelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
   serverChannelRemove: (...args: { channelId: string }[]) => void;
+  // Queue
+  queueMembersSet: (...args: QueueMember[]) => void;
   // Member
   serverMembersSet: (...args: Member[]) => void;
   serverMemberAdd: (...args: { data: Member }[]) => void;
