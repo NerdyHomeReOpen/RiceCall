@@ -311,7 +311,7 @@
   "text-change-to-gap-time": "Ziyaretçiler tarafından gönderilen her kısa mesaj arasındaki zaman aralığı şu şekilde değiştirildi: {{0}} saniye",
   "text-change-to-max-length": "Ziyaretçiler tarafından gönderilen kısa mesajların maksimum uzunluğu şu şekilde değiştirildi: {{0}}",
   "text-change-to-wait-time": "Ziyaretçilerin kısa mesaj göndermesi için izin verilen bekleme süresi şu şekilde değiştirildi: {{0}} saniye",
-  "voice-change-to-forbid-speech": "Kanal sesi yalnızca yöneticiye ayarlandı",
+  "voice-change-to-forbid-speech": "該頻道語音已被設為僅管理員發言",
   "voice-change-to-free-speech": "Kanal sesi serbest konuşma olarak ayarlandı",
   "voice-change-to-queue": "Kanal, mikrofonun konuşmasını bekleyecek şekilde ayarlandı, lütfen \"Mikrofonu alıp konuş\"a tıklayın ve konuşmacının konuşmasını bekleyin",
   "voice-change-to-control-queue": "Mikrofon düzenleme modu mikrofon kontrolüne değiştirildi",
