@@ -4,7 +4,7 @@
   "voice-set-to-forbid-speech": "This channel has been set to administrator mode.",
   "voice-set-to-queue": "The channel is set to queue mode. Click \"Queue\" to wait for the performance.",
   "voice-change-to-free-speech": "The channel voice has been set to free speech",
-  "voice-change-to-forbid-speech": "The channel voice has been set to admin-only speech",
+  "voice-change-to-forbid-speech": "該頻道語音已被設為僅管理員發言",
   "voice-change-to-queue": "The channel voice has been set to queue, please click \"Take mic\" to wait for speech",
   "text-change-to-forbid-speech": "The channel chat has been set to admin-only speech",
   "text-change-to-free-speech": "The channel chat has been set to free speech",
