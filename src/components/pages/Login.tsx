@@ -110,14 +110,11 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
   }, [accounts]);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const onPointerDown = (e: MouseEvent) => {
       if (!comboRef.current?.contains(e.target as Node)) setShowAccountselectBox(false);
     };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);
 
   return (

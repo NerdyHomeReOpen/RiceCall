@@ -24,7 +24,7 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
 
   // Variables
   const { name: groupName, order: groupOrder } = friendGroup;
-  const canCreate = groupName.trim();
+  const canSubmit = groupName.trim();
 
   // Handlers
   const handleCreateFriendGroup = (preset: Partial<FriendGroup>) => {
@@ -50,7 +50,7 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
       {/* Footer */}
       <div className={popup['popup-footer']}>
         <div
-          className={`${popup['button']} ${!canCreate ? 'disabled' : ''}`}
+          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
             handleCreateFriendGroup({ name: groupName, order: groupOrder });
             handleClose();
@@ -58,7 +58,7 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

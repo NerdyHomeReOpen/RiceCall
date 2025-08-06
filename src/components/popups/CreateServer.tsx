@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 // CSS
 import styles from '@/styles/popups/createServer.module.css';
@@ -30,25 +30,30 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   // Refs
   const refreshRef = useRef(false);
 
-  // Constant
-  const SERVER_TYPES: { value: Server['type']; name: string }[] = [
-    { value: 'game', name: t('game') },
-    { value: 'entertainment', name: t('entertainment') },
-    { value: 'other', name: t('other') },
-  ];
-
   // States
   const [user, setUser] = useState<User>(Default.user());
   const [servers, setServers] = useState<Server[]>([]);
   const [server, setServer] = useState<Server>(Default.server());
   const [section, setSection] = useState<number>(0);
 
+  // Memos
+  const SERVER_TYPES = useMemo(
+    () => [
+      { value: 'game', name: t('game') },
+      { value: 'entertainment', name: t('entertainment') },
+      { value: 'other', name: t('other') },
+    ],
+    [t],
+  );
+  const MAX_GROUPS = useMemo(() => {
+    const { level } = user;
+    return level >= 16 ? 5 : level >= 6 && level < 16 ? 4 : 3;
+  }, [user]);
+
   // Variables
-  const { level: userLevel } = user;
   const { name: serverName, type: serverType, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan } = server;
-  const MAX_GROUPS = userLevel >= 16 ? 5 : userLevel >= 6 && userLevel < 16 ? 4 : 3;
   const remainingServers = MAX_GROUPS - servers.filter((s) => s.owned).length;
-  const canCreate = remainingServers > 0 && serverName.trim() !== '';
+  const canSubmit = remainingServers > 0 && serverName.trim();
 
   // Handlers
   const handleCreateServer = (preset: Partial<Server>) => {
@@ -66,17 +71,18 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   const handleAvatarCropper = (serverId: Server['serverId'], avatarData: string) => {
     ipcService.popup.open('avatarCropper', 'avatarCropper', { avatarData: avatarData, submitTo: 'avatarCropper' });
     ipcService.popup.onSubmit('avatarCropper', async (data) => {
+      if (data.imageDataUrl.length > 5 * 1024 * 1024) {
+        handleOpenErrorDialog(t('image-too-large', { '0': '5MB' }));
+        return;
+      }
+
       const formData = new FormData();
       formData.append('_type', 'server');
       formData.append('_fileName', serverId);
       formData.append('_file', data.imageDataUrl as string);
       const response = await apiService.post('/upload', formData);
       if (response) {
-        setServer((prev) => ({
-          ...prev,
-          avatar: response.avatar,
-          avatarUrl: response.avatarUrl,
-        }));
+        setServer((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
       }
     });
   };
@@ -108,7 +114,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         {/* Body */}
         <div className={popup['popup-body']}>
           <div className={setting['content']}>
-            <div className={`${styles['message']}`}>{`${t('remaining-server', { '0': remainingServers.toString() })}`}</div>
+            <div className={`${styles['message']}`}>{t('remaining-server', { '0': remainingServers.toString() })}</div>
             <div className={styles['select-type-text']}>{t('select-server-type-description')}</div>
             <div className={styles['button-group']}>
               {SERVER_TYPES.map((type) => (
@@ -129,7 +135,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
 
         {/* Footer */}
         <div className={popup['popup-footer']}>
-          <div className={popup['button']} onClick={() => handleClose()}>
+          <div className={popup['button']} onClick={handleClose}>
             {t('cancel')}
           </div>
         </div>
@@ -156,14 +162,8 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
-                  if (file.size > 5 * 1024 * 1024) {
-                    handleOpenErrorDialog(t('imageTooLarge'));
-                    return;
-                  }
                   const reader = new FileReader();
-                  reader.onloadend = async () => {
-                    handleAvatarCropper(serverAvatar, reader.result as string);
-                  };
+                  reader.onloadend = () => handleAvatarCropper(serverAvatar, reader.result as string);
                   reader.readAsDataURL(file);
                 }}
               />
@@ -214,7 +214,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
             {t('previous')}
           </div>
           <div
-            className={`${popup['button']} ${!canCreate ? 'disabled' : ''}`}
+            className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
             onClick={() => {
               handleCreateServer({
                 name: serverName,
@@ -228,7 +228,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
           >
             {t('confirm')}
           </div>
-          <div className={popup['button']} onClick={() => handleClose()}>
+          <div className={popup['button']} onClick={handleClose}>
             {t('cancel')}
           </div>
         </div>

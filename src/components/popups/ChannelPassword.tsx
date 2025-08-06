@@ -36,16 +36,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
         <div className={popup['dialog-content']}>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('please-enter-the-channel-password')}</div>
-            <input
-              type="text"
-              value={password || ''}
-              maxLength={4}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '') setPassword('');
-                else setPassword(value);
-              }}
-            />
+            <input type="text" value={password} maxLength={4} onChange={(e) => setPassword(e.target.value)} />
           </div>
         </div>
       </div>
@@ -53,7 +44,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
       {/* Footer */}
       <div className={popup['popup-footer']}>
         <div
-          className={`${popup['button']} ${password && password.length <= 4 ? '' : 'disabled'}`}
+          className={popup['button']}
           onClick={() => {
             handleSubmit();
             handleClose();
@@ -61,7 +52,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

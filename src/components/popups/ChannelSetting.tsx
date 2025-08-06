@@ -37,8 +37,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   // States
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [channel, setChannel] = useState<Channel>(Default.channel());
   const [server, setServer] = useState<Server>(Default.server());
+  const [channel, setChannel] = useState<Channel>(Default.channel());
 
   // Variables
   const { lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
@@ -179,16 +179,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
           <div className={popup['col']}>
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
               <div className={popup['label']}>{t('input-announcement')}</div>
-              <div
-                className={popup['button']}
-                onClick={async () => {
-                  if (showPreview) {
-                    setShowPreview(false);
-                  } else {
-                    setShowPreview(true);
-                  }
-                }}
-              >
+              <div className={popup['button']} onClick={() => setShowPreview((prev) => !prev)}>
                 {showPreview ? t('edit') : t('preview')}
               </div>
             </div>
@@ -309,14 +300,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
             </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input
-                  name="forbid-text"
-                  type="checkbox"
-                  checked={channelForbidText}
-                  onChange={(e) => {
-                    setChannel((prev) => ({ ...prev, forbidText: e.target.checked }));
-                  }}
-                />
+                <input name="forbid-text" type="checkbox" checked={channelForbidText} onChange={(e) => setChannel((prev) => ({ ...prev, forbidText: e.target.checked }))} />
                 <div className={popup['label']}>{t('forbid-only-admin-text')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
@@ -336,12 +320,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     value={channelGuestTextMaxLength}
                     min={0}
                     max={9999}
-                    onChange={(e) =>
-                      setChannel((prev) => ({
-                        ...prev,
-                        guestTextMaxLength: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
-                      }))
-                    }
+                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextMaxLength: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
                   />
                   {t('characters')}
@@ -356,12 +335,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     value={channelGuestTextWaitTime}
                     min={0}
                     max={9999}
-                    onChange={(e) =>
-                      setChannel((prev) => ({
-                        ...prev,
-                        guestTextWaitTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
-                      }))
-                    }
+                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextWaitTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
                   />
                   {t('second')}
@@ -376,12 +350,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     value={channelGuestTextGapTime}
                     min={0}
                     max={9999}
-                    onChange={(e) =>
-                      setChannel((prev) => ({
-                        ...prev,
-                        guestTextGapTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)),
-                      }))
-                    }
+                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextGapTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
                   />
                   {t('second')}
@@ -429,7 +398,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

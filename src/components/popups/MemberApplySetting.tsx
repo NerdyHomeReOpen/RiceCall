@@ -56,7 +56,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
   }, [serverId, userId]);
 
   return (
-    <form className={popup['popup-wrapper']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
@@ -84,11 +84,11 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>
-    </form>
+    </div>
   );
 });
 

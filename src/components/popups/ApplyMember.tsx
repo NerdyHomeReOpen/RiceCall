@@ -17,8 +17,8 @@ import Default from '@/utils/default';
 import getService from '@/services/get.service';
 
 interface ApplyMemberPopupProps {
-  serverId: Server['serverId'];
   userId: User['userId'];
+  serverId: Server['serverId'];
 }
 
 const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, serverId }) => {
@@ -28,7 +28,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
   // Refs
   const refreshRef = useRef(false);
 
-  // State
+  // States
   const [section, setSection] = useState<number>(0);
   const [server, setServer] = useState<Server>(Default.server());
   const [memberApplication, setMemberApplication] = useState<MemberApplication>(Default.memberApplication());
@@ -38,7 +38,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
   const { description: applicationDes } = memberApplication;
 
   // Handlers
-  const handleCreatMemberApplication = (serverId: Server['serverId'], preset: Partial<MemberApplication>) => {
+  const handleSendMemberApplication = (serverId: Server['serverId'], preset: Partial<MemberApplication>) => {
     ipcService.socket.send('sendMemberApplication', { serverId, preset });
   };
 
@@ -108,19 +108,19 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
           className={popup['button']}
           style={section === 0 ? {} : { display: 'none' }}
           onClick={() => {
-            handleCreatMemberApplication(serverId, { description: applicationDes });
+            handleSendMemberApplication(serverId, { description: applicationDes });
             handleClose();
           }}
         >
           {t('submit')}
         </div>
-        <div className={popup['button']} style={section === 0 ? {} : { display: 'none' }} onClick={() => handleClose()}>
+        <div className={popup['button']} style={section === 0 ? {} : { display: 'none' }} onClick={handleClose}>
           {t('cancel')}
         </div>
         <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => setSection(0)}>
           {t('modify')}
         </div>
-        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => handleClose()}>
+        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={handleClose}>
           {t('confirm')}
         </div>
       </div>

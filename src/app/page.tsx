@@ -369,11 +369,13 @@ const RootPageComponent = () => {
   }, []);
 
   const handleServerUpdate = useCallback((...args: { serverId: string; update: Partial<Server> }[]) => {
-    setServers((prev) => prev.map((s) => (args.some((i) => i.serverId === s.serverId) ? { ...s, ...args.find((i) => i.serverId === s.serverId)?.update } : s)));
+    const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
+    setServers((prev) => prev.map((s) => (update.has(`${s.serverId}`) ? { ...s, ...update.get(`${s.serverId}`) } : s)));
   }, []);
 
   const handleServerRemove = useCallback((...args: { serverId: string }[]) => {
-    setServers((prev) => prev.filter((s) => !args.some((i) => i.serverId === s.serverId)));
+    const remove = new Set(args.map((i) => `${i.serverId}`));
+    setServers((prev) => prev.filter((s) => !remove.has(`${s.serverId}`)));
   }, []);
 
   const handleFriendsSet = useCallback((...args: Friend[]) => {
@@ -385,11 +387,13 @@ const RootPageComponent = () => {
   }, []);
 
   const handleFriendUpdate = useCallback((...args: { targetId: string; update: Partial<Friend> }[]) => {
-    setFriends((prev) => prev.map((f) => (args.some((i) => i.targetId === f.targetId) ? { ...f, ...args.find((i) => i.targetId === f.targetId)?.update } : f)));
+    const update = new Map(args.map((i) => [`${i.targetId}`, i.update] as const));
+    setFriends((prev) => prev.map((f) => (update.has(`${f.targetId}`) ? { ...f, ...update.get(`${f.targetId}`) } : f)));
   }, []);
 
   const handleFriendDelete = useCallback((...args: { targetId: string }[]) => {
-    setFriends((prev) => prev.filter((f) => !args.some((i) => i.targetId === f.targetId)));
+    const remove = new Set(args.map((i) => `${i.targetId}`));
+    setFriends((prev) => prev.filter((f) => !remove.has(`${f.targetId}`)));
   }, []);
 
   const handleFriendGroupsSet = useCallback((...args: FriendGroup[]) => {
@@ -401,11 +405,13 @@ const RootPageComponent = () => {
   }, []);
 
   const handleFriendGroupUpdate = useCallback((...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
-    setFriendGroups((prev) => prev.map((fg) => (args.some((i) => i.friendGroupId === fg.friendGroupId) ? { ...fg, ...args.find((i) => i.friendGroupId === fg.friendGroupId)?.update } : fg)));
+    const update = new Map(args.map((i) => [`${i.friendGroupId}`, i.update] as const));
+    setFriendGroups((prev) => prev.map((fg) => (update.has(`${fg.friendGroupId}`) ? { ...fg, ...update.get(`${fg.friendGroupId}`) } : fg)));
   }, []);
 
   const handleFriendGroupDelete = useCallback((...args: { friendGroupId: string }[]) => {
-    setFriendGroups((prev) => prev.filter((fg) => !args.some((i) => i.friendGroupId === fg.friendGroupId)));
+    const remove = new Set(args.map((i) => `${i.friendGroupId}`));
+    setFriendGroups((prev) => prev.filter((fg) => !remove.has(`${fg.friendGroupId}`)));
   }, []);
 
   const handleFriendApplicationAdd = useCallback((...args: { data: FriendApplication }[]) => {
@@ -425,13 +431,13 @@ const RootPageComponent = () => {
   }, []);
 
   const handleServerMemberUpdate = useCallback((...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
-    setServerMembers((prev) =>
-      prev.map((m) => (args.some((i) => i.userId === m.userId && i.serverId === m.serverId) ? { ...m, ...args.find((i) => i.userId === m.userId && i.serverId === m.serverId)?.update } : m)),
-    );
+    const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
+    setServerMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
   }, []);
 
   const handleServerMemberDelete = useCallback((...args: { userId: string; serverId: string }[]) => {
-    setServerMembers((prev) => prev.filter((m) => !args.some((i) => i.userId === m.userId && i.serverId === m.serverId)));
+    const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
+    setServerMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   }, []);
 
   const handleServerChannelsSet = useCallback((...args: Channel[]) => {
@@ -443,11 +449,13 @@ const RootPageComponent = () => {
   }, []);
 
   const handleServerChannelUpdate = useCallback((...args: { channelId: string; update: Partial<Channel> }[]) => {
-    setServerChannels((prev) => prev.map((c) => (args.some((i) => i.channelId === c.channelId) ? { ...c, ...args.find((i) => i.channelId === c.channelId)?.update } : c)));
+    const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
+    setServerChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
   }, []);
 
   const handleServerChannelDelete = useCallback((...args: { channelId: string }[]) => {
-    setServerChannels((prev) => prev.filter((c) => !args.some((i) => i.channelId === c.channelId)));
+    const remove = new Set(args.map((i) => `${i.channelId}`));
+    setServerChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
   }, []);
 
   const handleChannelMessage = useCallback((...args: ChannelMessage[]) => {
@@ -517,7 +525,6 @@ const RootPageComponent = () => {
       loadingBoxRef.current.setLoadingServerId(serverDisplayId);
       ipcService.socket.send('connectServer', { serverId });
     };
-
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
   }, [server.serverId, user.currentServerId]);

@@ -35,7 +35,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
   // Variables
   const { name: parentName } = parent;
   const { name: channelName } = channel;
-  const canCreate = channelName.trim();
+  const canSubmit = channelName.trim();
 
   const handleCreateChannel = (serverId: Server['serverId'], preset: Partial<Channel>) => {
     ipcService.socket.send('createChannel', { serverId, preset });
@@ -78,7 +78,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
       {/* Footer */}
       <div className={popup['popup-footer']}>
         <div
-          className={`${popup['button']} ${!canCreate ? 'disabled' : ''}`}
+          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
             handleCreateChannel(serverId, { name: channelName, categoryId: channelId });
             handleClose();
@@ -86,7 +86,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ chan
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

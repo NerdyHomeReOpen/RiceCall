@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, createContext, ReactNode, useCallback } from 'react';
+import React, { useEffect, useContext, createContext, ReactNode } from 'react';
 
 // Types
 import type { ContextMenuItem, Member, Badge } from '@/types';
@@ -48,47 +48,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [emojiPicker, setEmojiPicker] = React.useState<ReactNode | null>(null);
 
   // Handlers
-  const handleClickOutside = useCallback(
-    (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
-      if (isContextMenuVisible) closeContextMenu();
-      if (isBadgeInfoVisible) closeBadgeInfoCard();
-      if (isEmojiPickerVisible) closeEmojiPicker();
-    },
-    [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible],
-  );
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
-      if (isUserInfoVisible) closeUserInfoBlock();
-    },
-    [isUserInfoVisible],
-  );
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      if (isContextMenuVisible) closeContextMenu();
-      if (isBadgeInfoVisible) closeBadgeInfoCard();
-      if (isEmojiPickerVisible) closeEmojiPicker();
-    },
-    [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible],
-  );
-
-  // Effects
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('mousemove', handleMouseMove);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [handleKeyDown, handleClickOutside, handleMouseMove]);
-
   const showContextMenu = (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: ContextMenuItem[]) => {
     setContextMenu(<ContextMenu items={items} onClose={closeContextMenu} x={x} y={y} preferTop={preferTop} preferLeft={preferLeft} />);
     setIsContextMenuVisible(true);
@@ -128,6 +87,26 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setEmojiPicker(null);
     setIsEmojiPickerVisible(false);
   };
+
+  // Effects
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
+      if (isUserInfoVisible) closeUserInfoBlock();
+    };
+    const onPointerDown = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
+      if (isContextMenuVisible) closeContextMenu();
+      if (isBadgeInfoVisible) closeBadgeInfoCard();
+      if (isEmojiPickerVisible) closeEmojiPicker();
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('mousemove', onMouseMove);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('mousemove', onMouseMove);
+    };
+  }, [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible, isUserInfoVisible]);
 
   return (
     <ContextMenuContext.Provider

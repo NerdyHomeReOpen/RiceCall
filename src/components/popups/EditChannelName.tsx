@@ -16,12 +16,12 @@ import getService from '@/services/get.service';
 // Utils
 import Default from '@/utils/default';
 
-interface editChannelNamePopupProps {
-  channelId: Channel['channelId'];
+interface EditChannelNamePopupProps {
   serverId: Server['serverId'];
+  channelId: Channel['channelId'];
 }
 
-const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ channelId, serverId }) => {
+const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ serverId, channelId }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -82,7 +82,7 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
         >
           {t('save')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>
@@ -90,6 +90,6 @@ const editChannelNamePopup: React.FC<editChannelNamePopupProps> = React.memo(({ 
   );
 });
 
-editChannelNamePopup.displayName = 'editChannelNamePopup';
+EditChannelNamePopup.displayName = 'EditChannelNamePopup';
 
-export default editChannelNamePopup;
+export default EditChannelNamePopup;

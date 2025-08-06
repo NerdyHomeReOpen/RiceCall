@@ -131,7 +131,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
       activeInputRef.current = null;
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       const current = activeInputRef.current;
       if (!current || e.isComposing) return;
 
@@ -177,9 +177,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         closeDelection();
       }
     };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, [hotKeys, setHotKey]);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 
 // Types
 import type { Member, Server, User } from '@/types';
@@ -26,27 +26,68 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const [blockType, setBlockType] = useState<string>('timeout');
   const [formatType, setFormatType] = useState<string>('hours');
   const [selectTime, setSelectTime] = useState<number>(1);
-  const [blockTime, setBlockTime] = useState<number>(0);
 
-  // Constants
-  const BLOCK_TYPE_OPTIONS = [
-    { key: 'timeout', label: t('timeout'), disabled: false },
-    { key: 'block-forever', label: t('block-forever'), disabled: false },
-    { key: 'blockIP', label: t('block-ip'), disabled: true },
-  ];
+  // Memos
+  const BLOCK_TYPE_OPTIONS = useMemo(
+    () => [
+      { key: 'timeout', label: t('timeout'), disabled: false },
+      { key: 'block-forever', label: t('block-forever'), disabled: false },
+      { key: 'blockIP', label: t('block-ip'), disabled: true },
+    ],
+    [t],
+  );
+  const FORMAT_TYPE_OPTIONS = useMemo(
+    () => [
+      { key: 'seconds', label: t('second') },
+      { key: 'minutes', label: t('minute') },
+      { key: 'hours', label: t('hour') },
+      { key: 'days', label: t('day') },
+      { key: 'month', label: t('month') },
+      { key: 'years', label: t('year') },
+    ],
+    [t],
+  );
+  const LENGTH_OPTIONS = useMemo(() => {
+    switch (formatType) {
+      case 'seconds':
+        return Array.from({ length: 60 }, (_, i) => i + 1);
+      case 'minutes':
+        return Array.from({ length: 60 }, (_, i) => i + 1);
+      case 'hours':
+        return Array.from({ length: 24 }, (_, i) => i + 1);
+      case 'days':
+        return Array.from({ length: 30 }, (_, i) => i + 1);
+      case 'month':
+        return Array.from({ length: 12 }, (_, i) => i + 1);
+      case 'years':
+        return Array.from({ length: 100 }, (_, i) => i + 1);
+      default:
+        return [];
+    }
+  }, [formatType]);
+  const BLOCK_TIME = useMemo(() => {
+    switch (formatType) {
+      case 'seconds':
+        return 1000 * selectTime;
+      case 'minutes':
+        return 1000 * 60 * selectTime;
+      case 'hours':
+        return 1000 * 60 * 60 * selectTime;
+      case 'days':
+        return 1000 * 60 * 60 * 24 * selectTime;
+      case 'month':
+        return 1000 * 60 * 60 * 24 * 30 * selectTime;
+      case 'years':
+        return 1000 * 60 * 60 * 24 * 30 * 12 * selectTime;
+      default:
+        return 1000;
+    }
+  }, [formatType, selectTime]);
 
-  const FORMAT_TYPE_OPTIONS = [
-    { key: 'seconds', label: t('second') },
-    { key: 'minutes', label: t('minute') },
-    { key: 'hours', label: t('hour') },
-    { key: 'days', label: t('day') },
-    { key: 'month', label: t('month') },
-    { key: 'years', label: t('year') },
-  ];
-
+  // Variables
   const isForeverBlock = blockType !== 'timeout';
 
-  // Handles
+  // Handlers
   const handleBlockMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
     ipcService.socket.send('editMember', { userId, serverId, update });
   };
@@ -54,31 +95,6 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const handleClose = () => {
     ipcService.window.close();
   };
-
-  useEffect(() => {
-    switch (formatType) {
-      case 'seconds':
-        setBlockTime(1000 * selectTime);
-        break;
-      case 'minutes':
-        setBlockTime(1000 * 60 * selectTime);
-        break;
-      case 'hours':
-        setBlockTime(1000 * 60 * 60 * selectTime);
-        break;
-      case 'days':
-        setBlockTime(1000 * 60 * 60 * 24 * selectTime);
-        break;
-      case 'month':
-        setBlockTime(1000 * 60 * 60 * 24 * 30 * selectTime);
-        break;
-      case 'years':
-        setBlockTime(1000 * 60 * 60 * 24 * 30 * 12 * selectTime);
-        break;
-      default:
-        setBlockTime(1000);
-    }
-  }, [formatType, selectTime]);
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -105,9 +121,9 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
                 <div className={popup['label']}>{t('block-time')}</div>
                 <div className={popup['select-box']}>
                   <select value={selectTime} disabled={isForeverBlock} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
-                    {Array.from({ length: 60 }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1}
+                    {LENGTH_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
                       </option>
                     ))}
                   </select>
@@ -131,13 +147,13 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
         <div
           className={popup['button']}
           onClick={() => {
-            handleBlockMember(userId, serverId, blockType === 'timeout' ? { isBlocked: Date.now() + blockTime } : { isBlocked: -1, permissionLevel: 1, nickname: null });
+            handleBlockMember(userId, serverId, blockType === 'timeout' ? { isBlocked: Date.now() + BLOCK_TIME } : { isBlocked: -1, permissionLevel: 1, nickname: null });
             handleClose();
           }}
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

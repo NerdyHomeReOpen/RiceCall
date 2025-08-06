@@ -91,7 +91,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
         <div className={popup['button']} onClick={() => handleEditMember(userId, serverId, { nickname: memberNickname })}>

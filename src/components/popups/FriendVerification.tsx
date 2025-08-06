@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // Types
-import type { User, Friend, FriendApplication } from '@/types';
+import type { User, FriendApplication } from '@/types';
 
 // CSS
 import styles from '@/styles/popups/friendVerification.module.css';
@@ -13,10 +13,8 @@ import getService from '@/services/get.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // Utils
-import Sorter from '@/utils/sorter';
 import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
 interface FriendVerificationPopupProps {
@@ -26,19 +24,23 @@ interface FriendVerificationPopupProps {
 const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.memo(({ userId }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
 
   // Refs
   const refreshRef = useRef(false);
-  const containerRef = useRef<HTMLFormElement>(null);
 
   // State
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
 
   // Handlers
-  const handleSort = <T extends Friend | FriendApplication>(field: keyof T, array: T[], direction: 1 | -1) => {
-    const newDirection = direction === 1 ? -1 : 1;
-    return [...array].sort(Sorter(field, newDirection));
+  const handleRejectFriendApplication = (senderId: User['userId']) => {
+    ipcService.socket.send('rejectFriendApplication', { senderId });
+  };
+
+  const handleRejectAllFriendApplication = () => {
+    if (friendApplications.length === 0) return;
+    handleOpenAlertDialog(t('confirm-reject-all-friend-application'), () => {
+      ipcService.socket.send('rejectFriendApplication', ...friendApplications.map((item) => ({ senderId: item.senderId })));
+    });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
@@ -58,33 +60,18 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
     ipcService.popup.onSubmit('alertDialog', callback);
   };
 
-  const handleRejectAllFriendApplication = () => {
-    if (friendApplications.length === 0) return;
-    handleOpenAlertDialog(t('confirm-reject-all-friend-application'), () => {
-      ipcService.socket.send('rejectFriendApplication', ...friendApplications.map((item) => ({ senderId: item.senderId })));
-    });
-  };
-
-  const handleRejectFriendApplication = (senderId: User['userId']) => {
-    ipcService.socket.send('rejectFriendApplication', { senderId });
-  };
-
   const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
-    args.forEach((arg) => {
-      setFriendApplications((prev) => [...prev, arg.data]);
-    });
+    setFriendApplications((prev) => [...prev, ...args.map((i) => i.data)]);
   };
 
   const handleFriendApplicationUpdate = (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
-    args.forEach((arg) => {
-      setFriendApplications((prev) => prev.map((item) => (item.senderId === arg.senderId ? { ...item, ...arg.update } : item)));
-    });
+    const update = new Map(args.map((i) => [`${i.senderId}`, i.update] as const));
+    setFriendApplications((prev) => prev.map((a) => (update.has(`${a.senderId}`) ? { ...a, ...update.get(`${a.senderId}`) } : a)));
   };
 
   const handleFriendApplicationRemove = (...args: { senderId: string }[]) => {
-    args.forEach((arg) => {
-      setFriendApplications((prev) => prev.filter((item) => item.senderId !== arg.senderId));
-    });
+    const remove = new Set(args.map((i) => `${i.senderId}`));
+    setFriendApplications((prev) => prev.filter((a) => !remove.has(`${a.senderId}`)));
   };
 
   // Effects
@@ -95,23 +82,18 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
       ipcService.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected]);
+  }, []);
 
   useEffect(() => {
     if (!userId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
       getService.friendApplications({ receiverId: userId }).then((friendApplications) => {
-        if (friendApplications) setFriendApplications(handleSort('createdAt', friendApplications, 1));
+        if (friendApplications) setFriendApplications(friendApplications);
       });
     };
     refresh();
   }, [userId]);
-
-  // Effects
-  useEffect(() => {
-    containerRef.current?.focus();
-  }, []);
 
   return (
     <div className={popup['popup-wrapper']} tabIndex={0}>
@@ -122,7 +104,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
             {t('unprocessed')}
             <span className={styles['processing-status-count']}>({friendApplications.length})</span>
           </div>
-          <div className={styles['all-cancel-text']} onClick={() => handleRejectAllFriendApplication()}>
+          <div className={styles['all-cancel-text']} onClick={handleRejectAllFriendApplication}>
             {t('reject-all')}
           </div>
         </div>
@@ -157,7 +139,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                         </div>
                       </div>
                       <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(friend.receiverId, friend.senderId, friend.name)}>
-                        <div className={styles['direct-message-icon']}></div>
+                        <div className={styles['direct-message-icon']} />
                       </div>
                     </div>
                   </div>

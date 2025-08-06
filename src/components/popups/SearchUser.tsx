@@ -26,8 +26,12 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Handlers
-  const handleSearchUser = (searchQuery: string) => {
-    ipcService.socket.send('searchUser', { query: searchQuery });
+  const handleSearchUser = (query: string) => {
+    ipcService.socket.send('searchUser', { query });
+  };
+
+  const handleClose = () => {
+    ipcService.window.close();
   };
 
   const handleUserSearch = useCallback(
@@ -39,10 +43,6 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
     },
     [userId],
   );
-
-  const handleClose = () => {
-    ipcService.window.close();
-  };
 
   // Effects
   useEffect(() => {
@@ -69,7 +69,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         <div className={`${popup['button']} ${!searchQuery.trim() ? 'disabled' : ''}`} onClick={() => handleSearchUser(searchQuery)}>
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

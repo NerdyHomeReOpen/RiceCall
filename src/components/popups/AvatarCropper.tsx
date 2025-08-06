@@ -28,7 +28,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
   const imageInfoRef = useRef({ drawX: 0, drawY: 0, drawWidth: 0, drawHeight: 0 });
   const startPosRef = useRef({ x: 0, y: 0 });
 
-  // State
+  // States
   const [cropBox, setCropBox] = useState({ x: 100, y: 100, size: INITIAL_CROP_SIZE });
   const [draggingBox, setDraggingBox] = useState(false);
 
@@ -208,10 +208,10 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
 
         {/* Footer */}
         <div className={popup['popup-footer']}>
-          <div className={`${popup['button']}`} onClick={() => handleCrop()}>
+          <div className={`${popup['button']}`} onClick={handleCrop}>
             {t('upload')}
           </div>
-          <div className={popup['button']} onClick={() => handleClose()}>
+          <div className={popup['button']} onClick={handleClose}>
             {t('close')}
           </div>
         </div>

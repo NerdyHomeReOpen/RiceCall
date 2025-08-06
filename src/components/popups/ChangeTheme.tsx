@@ -15,23 +15,19 @@ import { useTranslation } from 'react-i18next';
 import { setThemeValue } from '@/utils/themeStorage';
 import { getDominantColor, getContrastColor, getVisibleColor, toRGBString, type RGB } from '@/utils/color';
 
-interface ChangeThemePopupProps {
-  submitTo: string;
-}
-
 interface Theme {
   headerImage: string;
   mainColor: string;
   secondaryColor: string;
 }
 
-const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
+const ChangeThemePopup: React.FC = React.memo(() => {
   // Hooks
   const contextMenu = useContextMenu();
   const { t } = useTranslation();
 
   // Refs
-  const containerRef = useRef<HTMLFormElement>(null);
+  const isSelectingColorRef = useRef<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const colorSelectorRef = useRef<HTMLDivElement>(null);
 
@@ -40,18 +36,8 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
   const [pickedColor, setPickedColor] = useState<RGB>({ r: 0, g: 0, b: 0 });
   const [customThemes, setCustomThemes] = useState<Theme[]>(Array.from({ length: 7 }));
-  const [isSelectingColor, setIsSelectingColor] = useState<boolean>(false);
 
   // Handlers
-  const handleSubmit = () => {
-    ipcService.popup.submit(submitTo);
-    handleClose();
-  };
-
-  const handleClose = () => {
-    ipcService.window.close();
-  };
-
   const handleSelectTheme = (event: React.MouseEvent<HTMLDivElement>) => {
     const clickedElement = event.currentTarget;
     const computedStyle = window.getComputedStyle(clickedElement as Element);
@@ -88,8 +74,6 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   };
 
   const handleSaveSelectedColor = () => {
-    if (!pickedColor) return;
-
     const headerImage = () => {
       const canvas = document.createElement('canvas');
       canvas.width = 20;
@@ -119,16 +103,14 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   };
 
   const handleRemoveCustom = (index: number) => {
-    if (index !== null) {
-      const newThemes = customThemes;
-      newThemes[index] = undefined as unknown as Theme;
-      setCustomThemes(newThemes);
-      localStorage.setItem('custom-themes', JSON.stringify(newThemes));
-    }
+    const newThemes = customThemes;
+    newThemes[index] = undefined as unknown as Theme;
+    setCustomThemes(newThemes);
+    localStorage.setItem('custom-themes', JSON.stringify(newThemes));
   };
 
   const handleColorSelect = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!colorSelectorRef.current) return;
+    if (!colorSelectorRef.current || !isSelectingColorRef.current) return;
     const rect = colorSelectorRef.current.getBoundingClientRect();
     const offsetX = event.clientX - rect.left;
     const offsetY = event.clientY - rect.top;
@@ -157,25 +139,30 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
 
   // Effects
   useEffect(() => {
-    containerRef.current?.focus();
-
     const localTheme = localStorage.getItem('custom-themes');
 
-    if (localTheme) {
-      const themes = JSON.parse(localTheme);
-      setCustomThemes(themes);
-    }
+    setCustomThemes(localTheme ? JSON.parse(localTheme) : Array.from({ length: 7 }));
+  }, []);
+
+  useEffect(() => {
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.target === colorSelectorRef.current) {
+        isSelectingColorRef.current = true;
+      }
+    };
+    const onPointerUp = () => {
+      isSelectingColorRef.current = false;
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('pointerup', onPointerUp);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('pointerup', onPointerUp);
+    };
   }, []);
 
   return (
-    <form
-      className={popup['popup-wrapper']}
-      tabIndex={0}
-      ref={containerRef}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') handleSubmit();
-      }}
-    >
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={styles['ct-wrapper']}>
@@ -189,7 +176,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                       key={i}
                       className={styles['theme']}
                       data-theme-index={i}
-                      onClick={(e) => handleSelectTheme(e)}
+                      onClick={handleSelectTheme}
                       onMouseEnter={() => setHoveredThemeIndex(i)}
                       onMouseLeave={() => setHoveredThemeIndex(null)}
                     >
@@ -208,11 +195,11 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                 <div className={styles['theme-slots-small']}>
                   {/* Default Themes (Small) */}
                   {Array.from({ length: 15 }, (_, i) => (
-                    <div key={i + 4} className={styles['theme']} data-theme-index={i + 4} onClick={(e) => handleSelectTheme(e)} />
+                    <div key={i + 4} className={styles['theme']} data-theme-index={i + 4} onClick={handleSelectTheme} />
                   ))}
 
                   {/* Color Selector */}
-                  <div className={styles['color-selector']} onClick={() => setShowColorPicker(!showColorPicker)} />
+                  <div className={styles['color-selector']} onClick={() => setShowColorPicker((prev) => !prev)} />
 
                   {/* Custom Colors */}
                   {customThemes.slice(0, 7).map((_, i) => {
@@ -230,7 +217,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
                               '--header-image': customTheme.headerImage,
                             } as React.CSSProperties
                           }
-                          onClick={(e) => handleSelectTheme(e)}
+                          onClick={handleSelectTheme}
                           onContextMenu={(e) => {
                             contextMenu.showContextMenu(e.clientX, e.clientY, false, false, [
                               {
@@ -268,23 +255,11 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
 
                 {showColorPicker && (
                   <div className={styles['color-selector-box']}>
-                    <div
-                      ref={colorSelectorRef}
-                      className={styles['color-selector-image']}
-                      onMouseDown={(e) => {
-                        handleColorSelect(e);
-                        setIsSelectingColor(true);
-                      }}
-                      onMouseUp={() => setIsSelectingColor(false)}
-                      onMouseMove={(e) => {
-                        if (isSelectingColor) handleColorSelect(e);
-                      }}
-                      onMouseLeave={() => setIsSelectingColor(false)}
-                    />
+                    <div ref={colorSelectorRef} className={styles['color-selector-image']} onMouseDown={handleColorSelect} onMouseMove={handleColorSelect} />
                     <div className={styles['color-selector-footer']}>
                       <div className={styles['color-selected-color']} style={{ backgroundColor: toRGBString(pickedColor) }} />
                       <div className={styles['color-selected-btn']}>
-                        <div className={styles['color-selected-save']} onClick={() => handleSaveSelectedColor()} />
+                        <div className={styles['color-selected-save']} onClick={handleSaveSelectedColor} />
                         <div className={styles['color-selected-cancel']} onClick={() => setShowColorPicker(false)} />
                       </div>
                     </div>
@@ -295,9 +270,9 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
           </div>
         </div>
       </div>
-    </form>
+    </div>
   );
-};
+});
 
 ChangeThemePopup.displayName = 'ChangeThemePopup';
 

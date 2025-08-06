@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 // Types
 import type { Server, Channel, PromptMessage } from '@/types';
@@ -22,12 +22,14 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   const { t } = useTranslation();
 
   // States
-  const [channelType, setChannelType] = useState<string>('current');
-  const [sendType, setSendType] = useState<string>('text');
+  const [sendType, setSendType] = useState<'text' | 'voice'>('text');
+  const [broadcastType, setBroadcastType] = useState<'channel' | 'server'>('channel');
   const [broadcastContent, setBroadcastContent] = useState<string>('');
 
+  // Memos
+  const MAX_LENGTH = useMemo(() => 300, []);
+
   // Variables
-  const maxLength = 300;
   const canSend = broadcastContent.trim();
 
   // Handlers
@@ -47,66 +49,30 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
           <div className={popup['row']}>
             <div className={popup['label']}>{t('receive-channel')}</div>
             <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
-              <input
-                name="channelType"
-                type="radio"
-                checked={channelType === 'current'}
-                onChange={() => {
-                  setChannelType('current');
-                }}
-              />
+              <input name="channelType" type="radio" checked={broadcastType === 'channel'} onChange={() => setBroadcastType('channel')} />
               <div className={popup['label']}>{t('current-channel')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
-              <input
-                name="channelType"
-                type="radio"
-                checked={channelType === 'all'}
-                onChange={() => {
-                  setChannelType('all');
-                }}
-              />
+              <input name="channelType" type="radio" checked={broadcastType === 'server'} onChange={() => setBroadcastType('server')} />
               <div className={popup['label']}>{t('all-channel')}</div>
             </div>
           </div>
           <div className={popup['row']}>
             <div className={popup['label']}>{t('broadcast-type')}</div>
             <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
-              <input
-                name="sendType"
-                type="radio"
-                checked={sendType === 'text'}
-                onChange={() => {
-                  setSendType('text');
-                }}
-              />
+              <input name="sendType" type="radio" checked={sendType === 'text'} onChange={() => setSendType('text')} />
               <div className={popup['label']}>{t('text-broadcast')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`} style={{ width: 'fit-content' }}>
-              <input
-                name="sendType"
-                type="radio"
-                checked={sendType === 'voice'}
-                onChange={() => {
-                  setSendType('voice');
-                }}
-              />
+              <input name="sendType" type="radio" checked={sendType === 'voice'} onChange={() => setSendType('voice')} />
               <div className={popup['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
             </div>
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('broadcast-content')}</div>
-            <textarea
-              name="content"
-              maxLength={300}
-              placeholder={t('markdown-support')}
-              style={{ minHeight: '90px' }}
-              onChange={(e) => {
-                setBroadcastContent(e.target.value);
-              }}
-            />
+            <textarea name="content" maxLength={MAX_LENGTH} placeholder={t('markdown-support')} style={{ minHeight: '90px' }} onChange={(e) => setBroadcastContent(e.target.value)} />
             <div className={popup['hint-text']}>
-              {broadcastContent.length}/{maxLength}
+              {broadcastContent.length}/{MAX_LENGTH}
             </div>
           </div>
         </div>
@@ -117,13 +83,13 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
         <div
           className={`${popup['button']} ${!canSend ? 'disabled' : ''}`}
           onClick={() => {
-            handleBroadcastServer(serverId, channelType === 'current' ? channelId : undefined, { type: 'alert', content: broadcastContent });
+            handleBroadcastServer(serverId, broadcastType === 'channel' ? channelId : undefined, { type: 'alert', content: broadcastContent });
             handleClose();
           }}
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

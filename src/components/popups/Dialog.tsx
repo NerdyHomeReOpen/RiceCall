@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -8,7 +8,6 @@ import ipcService from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useLoading } from '@/providers/Loading';
 
 enum DIALOG_ICON {
   ALERT = 'alert',
@@ -30,13 +29,9 @@ interface DialogPopupProps {
 const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter, submitTo, timestamp }) => {
   // Hooks
   const { t } = useTranslation();
-  const loadingBox = useLoading();
-
-  // Refs
-  const containerRef = useRef<HTMLFormElement>(null);
 
   // Variables
-  const formatedMessage = t(message, parameter);
+  const formattedMessage = t(message, parameter);
 
   // Handlers
   const handleSubmit = () => {
@@ -48,38 +43,22 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
     ipcService.window.close();
   };
 
-  // Effects
-  useEffect(() => {
-    containerRef.current?.focus();
-
-    if (loadingBox.isLoading) {
-      window.localStorage.setItem(
-        'trigger-handle-server-select',
-        JSON.stringify({
-          serverDisplayId: '',
-          serverId: '',
-          timestamp: Date.now(),
-        }),
-      );
-    }
-  }, [loadingBox.isLoading]);
-
   return (
     <div className={popup['popup-wrapper']} tabIndex={0}>
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup[DIALOG_ICON[iconType]]}`} />
-          {formatedMessage} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
+          {formattedMessage} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
         </div>
       </div>
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div className={popup['button']} onClick={() => handleSubmit()}>
+        <div className={popup['button']} onClick={handleSubmit}>
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

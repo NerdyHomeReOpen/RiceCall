@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { User, Friend, FriendGroup } from '@/types';
 
 // Providers
-import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // CSS
@@ -24,7 +23,6 @@ interface EditFriendPopupProps {
 
 const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, targetId }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // Refs
@@ -38,30 +36,26 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
   const { friendGroupId } = friend;
 
   // Handlers
+  const handleEditFriend = (targetId: User['userId'], update: Partial<Friend>) => {
+    ipcService.socket.send('editFriend', { targetId, update });
+  };
+
   const handleClose = () => {
     ipcService.window.close();
   };
 
   const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
-    args.forEach((arg) => {
-      setFriendGroups((prev) => [...prev, arg.data]);
-    });
+    setFriendGroups((prev) => [...prev, ...args.map((i) => i.data)]);
   };
 
   const handleFriendGroupUpdate = (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
-    args.forEach((arg) => {
-      setFriendGroups((prev) => prev.map((item) => (item.friendGroupId === arg.friendGroupId ? { ...item, ...arg.update } : item)));
-    });
+    const update = new Map(args.map((i) => [`${i.friendGroupId}`, i.update] as const));
+    setFriendGroups((prev) => prev.map((fg) => (update.has(`${fg.friendGroupId}`) ? { ...fg, ...update.get(`${fg.friendGroupId}`) } : fg)));
   };
 
   const handleFriendGroupRemove = (...args: { friendGroupId: string }[]) => {
-    args.forEach((arg) => {
-      setFriendGroups((prev) => prev.filter((item) => item.friendGroupId !== arg.friendGroupId));
-    });
-  };
-
-  const handleEditFriend = (targetId: User['userId'], update: Partial<Friend>) => {
-    ipcService.socket.send('editFriend', { targetId, update });
+    const remove = new Set(args.map((i) => `${i.friendGroupId}`));
+    setFriendGroups((prev) => prev.filter((fg) => !remove.has(`${fg.friendGroupId}`)));
   };
 
   // Effects
@@ -72,7 +66,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
       ipcService.socket.on('friendGroupRemove', handleFriendGroupRemove),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected]);
+  }, []);
 
   useEffect(() => {
     if (!userId || !targetId || refreshRef.current) return;
@@ -114,7 +108,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
       {/* Footer */}
       <div className={popup['popup-footer']}>
         <div
-          className={`${popup['button']}`}
+          className={popup['button']}
           onClick={() => {
             handleEditFriend(targetId, { friendGroupId: friendGroupId || null });
             handleClose();
@@ -122,7 +116,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>
