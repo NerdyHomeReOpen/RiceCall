@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 // CSS
 import friendPage from '@/styles/pages/friend.module.css';
@@ -34,14 +34,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   const contextMenu = useContextMenu();
 
   // Refs
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const isResizingSidebarRef = useRef<boolean>(false);
   const signatureInputRef = useRef<HTMLTextAreaElement>(null);
+  const isComposingRef = useRef<boolean>(false);
   const emojiIconRef = useRef<HTMLDivElement>(null);
-
-  // States
-  const [isComposing, setIsComposing] = useState<boolean>(false);
-  const [sidebarWidth, setSidebarWidth] = useState<number>(270);
-  const [isResizing, setIsResizing] = useState<boolean>(false);
-  const [signatureInput, setSignatureInput] = useState<string>('');
 
   // Variables
   const { name: userName, signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
@@ -52,29 +49,19 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
     ipcService.socket.send('editUser', { update: { signature } });
   };
 
-  const handleResize = useCallback(
-    (e: MouseEvent) => {
-      if (!isResizing) return;
-      const newWidth = e.clientX;
-      setSidebarWidth(newWidth);
-    },
-    [isResizing],
-  );
+  const onSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    isResizingSidebarRef.current = true;
+  };
+
+  const onSidebarHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isResizingSidebarRef.current || !sidebarRef.current) return;
+    sidebarRef.current.style.width = `${e.clientX}px`;
+  };
+
+  const onSidebarHandleUp = () => (isResizingSidebarRef.current = false);
 
   // Effects
-  useEffect(() => {
-    window.addEventListener('mousemove', handleResize);
-    window.addEventListener('mouseup', () => setIsResizing(false));
-    return () => {
-      window.removeEventListener('mousemove', handleResize);
-      window.removeEventListener('mouseup', () => setIsResizing(false));
-    };
-  }, [handleResize]);
-
-  useEffect(() => {
-    setSignatureInput(userSignature);
-  }, [userSignature]);
-
   useEffect(() => {
     ipcService.discord.updatePresence({
       details: t('rpc:friend-page'),
@@ -117,19 +104,16 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
           <textarea
             ref={signatureInputRef}
             className={friendPage['signature-input']}
-            value={signatureInput}
+            defaultValue={userSignature}
             placeholder={t('signature-placeholder')}
             maxLength={300}
-            onChange={(e) => setSignatureInput(e.target.value)}
-            onBlur={() => {
-              handleChangeSignature(signatureInput);
-            }}
+            onBlur={(e) => handleChangeSignature(e.target.value)}
             onKeyDown={(e) => {
-              if (isComposing) return;
-              if (e.key === 'Enter') signatureInputRef.current?.blur();
+              if (isComposingRef.current || !signatureInputRef.current) return;
+              if (e.key === 'Enter') signatureInputRef.current.blur();
             }}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={() => setIsComposing(false)}
+            onCompositionStart={() => (isComposingRef.current = true)}
+            onCompositionEnd={() => (isComposingRef.current = false)}
           />
           <div
             ref={emojiIconRef}
@@ -140,8 +124,9 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
               const x = emojiIconRef.current.getBoundingClientRect().x;
               const y = emojiIconRef.current.getBoundingClientRect().y + emojiIconRef.current.getBoundingClientRect().height;
               contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
-                setSignatureInput((prev) => prev + emoji);
-                if (signatureInputRef.current) signatureInputRef.current.focus();
+                if (!signatureInputRef.current) return;
+                signatureInputRef.current.value += emoji;
+                signatureInputRef.current.focus();
               });
             }}
           />
@@ -151,12 +136,12 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
       {/* Body */}
       <main className={friendPage['friend-body']}>
         {/* Left Sidebar */}
-        <aside className={friendPage['sidebar']} style={{ width: `${sidebarWidth}px` }}>
+        <aside ref={sidebarRef} className={friendPage['sidebar']}>
           <FriendListViewer friendGroups={friendGroups} friends={friends} user={user} />
         </aside>
 
         {/* Resize Handle */}
-        <div className="resize-handle" onMouseDown={() => setIsResizing(true)} onMouseUp={() => setIsResizing(false)} />
+        <div className="resize-handle" onPointerDown={onSidebarHandleDown} onPointerMove={onSidebarHandleMove} onPointerUp={onSidebarHandleUp} />
 
         {/* Right Content */}
         <main className={friendPage['content']}>
