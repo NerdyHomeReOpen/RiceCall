@@ -45,7 +45,7 @@ export function sanitizeMarkdownWithSafeTags(markdownText: string): string {
     // replace <@name_gender_level>
     .replace(userTagRegex, (_, content) => {
       const [name, gender, level] = content.split('_');
-      return `<span class='${markdown['user-tag']}' alt='<@${content}>'><span class='${permission[gender || 'Male']} ${permission[`lv-${level || '1'}`]}'></span>${name || 'Unknown'}</span>`;
+      return `<span class='${markdown['user-icon']} ${permission[gender || 'Male']} ${permission[`lv-${level || '1'}`]}'></span><span class='${markdown['user-tag']}' alt='<@${content}>'>${name || 'Unknown'}</span>`;
     })
     // replace <YT=https://www.youtube.com/watch?v=dQw4w9WgXcQ>
     .replace(ytTagRegex, (_, content) => {

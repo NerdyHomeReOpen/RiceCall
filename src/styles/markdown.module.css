@@ -50,7 +50,7 @@
 }
 
 .markdown-content .user-tag {
-  display: inline-flex;
+  display: inline-block;
   color: #226ba0;
   cursor: pointer;
   white-space: pre-wrap;
@@ -60,7 +60,8 @@
   text-decoration: underline;
 }
 
-.markdown-content .permission-icon {
+.markdown-content .user-icon {
+  display: inline-block;
   vertical-align: bottom;
 }
 
