@@ -41,7 +41,6 @@ import FriendVerification from '@/components/popups/FriendVerification';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import getService from '@/services/get.service';
 
 interface HeaderProps {
   title: string;
@@ -101,31 +100,22 @@ const Popup = React.memo(() => {
   const { t } = useTranslation();
 
   // States
-  const [id, setId] = useState<string | null>(null);
   const [type, setType] = useState<PopupType | null>(null);
   const [headerTitle, setHeaderTitle] = useState<string>('');
   const [headerButtons, setHeaderButtons] = useState<('minimize' | 'maxsize' | 'close')[]>([]);
   const [content, setContent] = useState<ReactNode | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
-  const [directMessageTargetSignature, setDirectMessageTargetSignature] = useState<string | null>(null);
+
+  ipcService.initialData.on((data) => setInitialData(data));
 
   // Effects
   useEffect(() => {
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
       const type = params.get('type') as PopupType;
-      const id = params.get('id') as string;
       setType(type || null);
-      setId(id || null);
     }
   }, []);
-
-  useEffect(() => {
-    if (!id) return;
-    ipcService.initialData.request(id, (data) => {
-      setInitialData(data);
-    });
-  }, [id]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -138,36 +128,6 @@ const Popup = React.memo(() => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
-  useEffect(() => {
-    const currentTargetId = initialData?.targetId;
-    if (type === 'directMessage' && currentTargetId) {
-      let isActive = true;
-      setDirectMessageTargetSignature(null);
-
-      getService
-        .user({ userId: currentTargetId })
-        .then((targetUser) => {
-          if (isActive) {
-            setDirectMessageTargetSignature(targetUser?.signature || '');
-          }
-        })
-        .catch((error) => {
-          if (isActive) {
-            console.error('Failed to fetch target user for DM header:', error);
-            setDirectMessageTargetSignature('');
-          }
-        });
-      return () => {
-        isActive = false;
-      };
-    } else if (type !== 'directMessage') {
-      if (directMessageTargetSignature !== null) {
-        setDirectMessageTargetSignature(null);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, initialData?.targetId]);
 
   useEffect(() => {
     const popupInitialData = initialData;

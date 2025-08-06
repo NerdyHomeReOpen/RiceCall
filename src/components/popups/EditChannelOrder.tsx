@@ -84,18 +84,15 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   };
 
   const handleOpenCreateChannel = (userId: User['userId'], channelId: Channel['channelId'] | null, serverId: Server['serverId']) => {
-    ipcService.popup.open('createChannel', 'createChannel');
-    ipcService.initialData.onRequest('createChannel', { userId, serverId, channelId });
+    ipcService.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
   };
 
   const handleOpenEditChannelName = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.popup.open('editChannelName', 'editChannelName');
-    ipcService.initialData.onRequest('editChannelName', { serverId, channelId });
+    ipcService.popup.open('editChannelName', 'editChannelName', { serverId, channelId });
   };
 
   const handleOpenWarningDialog = (message: string) => {
-    ipcService.popup.open('dialogWarning', 'deleteChannel');
-    ipcService.initialData.onRequest('deleteChannel', { message: message, submitTo: 'deleteChannel' });
+    ipcService.popup.open('dialogWarning', 'deleteChannel', { message, submitTo: 'deleteChannel' });
     ipcService.popup.onSubmit('deleteChannel', () => {
       if (!selectedChannel) return;
       handleDeleteChannel(selectedChannel.channelId, serverId);

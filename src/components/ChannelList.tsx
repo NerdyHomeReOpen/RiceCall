@@ -74,13 +74,11 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   };
 
   const handleOpenAlertDialog = (message: string) => {
-    ipcService.popup.open('dialogAlert', 'alertDialog');
-    ipcService.initialData.onRequest('alertDialog', { message: message });
+    ipcService.popup.open('dialogAlert', 'alertDialog', { message: message });
   };
 
   const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open('serverSetting', 'serverSetting');
-    ipcService.initialData.onRequest('serverSetting', { serverId, userId });
+    ipcService.popup.open('serverSetting', 'serverSetting', { serverId, userId });
   };
 
   const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -88,23 +86,19 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
       handleOpenAlertDialog(t('cannot-apply'));
       return;
     }
-    ipcService.popup.open('applyMember', 'applyMember');
-    ipcService.initialData.onRequest('applyMember', { serverId, userId });
+    ipcService.popup.open('applyMember', 'applyMember', { serverId, userId });
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open('editNickname', 'editNickname');
-    ipcService.initialData.onRequest('editNickname', { serverId, userId });
+    ipcService.popup.open('editNickname', 'editNickname', { serverId, userId });
   };
 
   const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Category['categoryId'], userId: User['userId']) => {
-    ipcService.popup.open('createChannel', 'createChannel');
-    ipcService.initialData.onRequest('createChannel', { serverId, channelId, userId });
+    ipcService.popup.open('createChannel', 'createChannel', { serverId, channelId, userId });
   };
 
   const handleOpenChangeChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open('editChannelOrder', 'editChannelOrder');
-    ipcService.initialData.onRequest('editChannelOrder', { serverId, userId });
+    ipcService.popup.open('editChannelOrder', 'editChannelOrder', { serverId, userId });
   };
 
   const handleLocateUser = () => {

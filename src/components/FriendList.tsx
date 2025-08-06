@@ -61,13 +61,11 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
 
   // Handlers
   const handleOpenSearchUser = (userId: User['userId']) => {
-    ipcService.popup.open('searchUser', 'searchUser');
-    ipcService.initialData.onRequest('searchUser', { userId });
+    ipcService.popup.open('searchUser', 'searchUser', { userId });
   };
 
   const handleOpenCreateFriendGroup = () => {
-    ipcService.popup.open('createFriendGroup', 'createFriendGroup');
-    ipcService.initialData.onRequest('createFriendGroup', {});
+    ipcService.popup.open('createFriendGroup', 'createFriendGroup', {});
   };
 
   return (

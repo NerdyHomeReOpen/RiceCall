@@ -42,23 +42,19 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('applyFriend', 'applyFriend');
-    ipcService.initialData.onRequest('applyFriend', { userId, targetId });
+    ipcService.popup.open('applyFriend', 'applyFriend', { userId, targetId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'alertDialog');
-    ipcService.initialData.onRequest('alertDialog', { message: message, submitTo: 'alertDialog' });
+    ipcService.popup.open('dialogAlert', 'alertDialog', { message, submitTo: 'alertDialog' });
     ipcService.popup.onSubmit('alertDialog', callback);
   };
 

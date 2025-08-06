@@ -65,8 +65,7 @@ const ChangeThemePopup: React.FC<ChangeThemePopupProps> = ({ submitTo }) => {
   };
 
   const handleAvatarCropper = (avatarData: string) => {
-    ipcService.popup.open('avatarCropper', 'avatarCropper');
-    ipcService.initialData.onRequest('avatarCropper', { avatarData: avatarData, submitTo: 'avatarCropper' });
+    ipcService.popup.open('avatarCropper', 'avatarCropper', { avatarData: avatarData, submitTo: 'avatarCropper' });
     ipcService.popup.onSubmit('avatarCropper', async (data) => {
       const base64String = data.imageDataUrl as string;
       const dominantColor = await getDominantColor(base64String);

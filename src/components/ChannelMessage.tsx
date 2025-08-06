@@ -41,13 +41,11 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
 
   // handles
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
   return (

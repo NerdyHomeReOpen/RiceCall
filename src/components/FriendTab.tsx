@@ -87,24 +87,20 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   };
 
   const handleOpenWarningDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogWarning', 'warningDialog');
-    ipcService.initialData.onRequest('warningDialog', { message: message, submitTo: 'warningDialog' });
+    ipcService.popup.open('dialogWarning', 'warningDialog', { message: message, submitTo: 'warningDialog' });
     ipcService.popup.onSubmit('warningDialog', callback);
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenEditFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('editFriend', 'editFriend');
-    ipcService.initialData.onRequest('editFriend', { userId, targetId });
+    ipcService.popup.open('editFriend', 'editFriend', { userId, targetId });
   };
 
   const handleBlockFriend = (targetId: User['userId'], isBlocked: Friend['isBlocked']) => {

@@ -87,23 +87,19 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   const handleOpenUserSetting = (userId: User['userId']) => {
-    ipcService.popup.open('userInfo', 'userSetting');
-    ipcService.initialData.onRequest('userSetting', { userId, targetId: userId });
+    ipcService.popup.open('userInfo', 'userSetting', { userId, targetId: userId });
   };
 
   const handleOpenSystemSetting = () => {
-    ipcService.popup.open('systemSetting', 'systemSetting');
-    ipcService.initialData.onRequest('systemSetting', {});
+    ipcService.popup.open('systemSetting', 'systemSetting', {});
   };
 
   const handleOpenAboutUs = () => {
-    ipcService.popup.open('aboutus', 'aboutUs');
-    ipcService.initialData.onRequest('aboutUs', {});
+    ipcService.popup.open('aboutus', 'aboutUs', {});
   };
 
   const handleOpenChangeTheme = () => {
-    ipcService.popup.open('changeTheme', 'changeTheme');
-    ipcService.initialData.onRequest('changeTheme', {});
+    ipcService.popup.open('changeTheme', 'changeTheme', {});
   };
 
   const handleLogout = () => {
@@ -140,8 +136,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   const handleOpenFriendVerification = () => {
-    ipcService.popup.open('friendVerification', 'friendVerification');
-    ipcService.initialData.onRequest('friendVerification', { userId });
+    ipcService.popup.open('friendVerification', 'friendVerification', { userId });
   };
 
   // Effects
@@ -551,8 +546,7 @@ const RootPageComponent = () => {
     args.forEach((item) => {
       loadingBox.setIsLoading(false);
       loadingBox.setLoadingServerId('');
-      ipcService.popup.open(item.type, item.id, item.force);
-      ipcService.initialData.onRequest(item.id, item.initialData);
+      ipcService.popup.open(item.type, item.id, item.initialData, item.force);
       ipcService.popup.onSubmit(item.id, () => {
         switch (item.id) {
           case 'logout':

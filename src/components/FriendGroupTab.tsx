@@ -49,14 +49,12 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
   };
 
   const handleOpenWarningDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogWarning', 'warningDialog');
-    ipcService.initialData.onRequest('warningDialog', { message: message, submitTo: 'warningDialog' });
+    ipcService.popup.open('dialogWarning', 'warningDialog', { message: message, submitTo: 'warningDialog' });
     ipcService.popup.onSubmit('warningDialog', callback);
   };
 
   const handleOpenEditFriendGroup = (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']) => {
-    ipcService.popup.open('editFriendGroup', 'editFriendGroup');
-    ipcService.initialData.onRequest('editFriendGroup', { userId, friendGroupId });
+    ipcService.popup.open('editFriendGroup', 'editFriendGroup', { userId, friendGroupId });
   };
 
   return (

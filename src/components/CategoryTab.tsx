@@ -90,34 +90,28 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     };
 
     const handleOpenWarningDialog = (message: string, callback: () => void) => {
-      ipcService.popup.open('dialogWarning', 'warningDialog');
-      ipcService.initialData.onRequest('warningDialog', { message, submitTo: 'warningDialog' });
+      ipcService.popup.open('dialogWarning', 'warningDialog', { message, submitTo: 'warningDialog' });
       ipcService.popup.onSubmit('warningDialog', callback);
     };
 
     const handleOpenChannelSetting = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipcService.popup.open('channelSetting', 'channelSetting');
-      ipcService.initialData.onRequest('channelSetting', { userId, serverId, channelId });
+      ipcService.popup.open('channelSetting', 'channelSetting', { userId, serverId, channelId });
     };
 
     const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Category['categoryId'], userId: User['userId']) => {
-      ipcService.popup.open('createChannel', 'createChannel');
-      ipcService.initialData.onRequest('createChannel', { serverId, channelId, userId });
+      ipcService.popup.open('createChannel', 'createChannel', { serverId, channelId, userId });
     };
 
     const handleOpenChangeChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
-      ipcService.popup.open('editChannelOrder', 'editChannelOrder');
-      ipcService.initialData.onRequest('editChannelOrder', { serverId, userId });
+      ipcService.popup.open('editChannelOrder', 'editChannelOrder', { serverId, userId });
     };
 
     const handleOpenServerBroadcast = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipcService.popup.open('serverBroadcast', 'serverBroadcast');
-      ipcService.initialData.onRequest('serverBroadcast', { userId, serverId, channelId });
+      ipcService.popup.open('serverBroadcast', 'serverBroadcast', { userId, serverId, channelId });
     };
 
     const handleOpenChannelPassword = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipcService.popup.open('channelPassword', 'channelPassword');
-      ipcService.initialData.onRequest('channelPassword', { submitTo: 'channelPassword' });
+      ipcService.popup.open('channelPassword', 'channelPassword', { submitTo: 'channelPassword' });
       ipcService.popup.onSubmit('channelPassword', (password) => {
         handleJoinChannel(serverId, channelId, password);
       });

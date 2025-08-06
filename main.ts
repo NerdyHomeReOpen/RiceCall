@@ -214,7 +214,7 @@ let authWindow: BrowserWindow;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
-const websocketUrl = process.env.NEXT_PUBLIC_WS_URL;
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
 let socketInstance: Socket | null = null;
 
 // Discord RPC
@@ -445,7 +445,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
   return authWindow;
 }
 
-async function createPopup(type: PopupType, id: string, force = true): Promise<BrowserWindow | null> {
+async function createPopup(type: PopupType, id: string, data: any, force = true): Promise<BrowserWindow> {
   // If force is true, destroy the popup
   if (force) {
     if (popups[id] && !popups[id].isDestroyed()) {
@@ -497,6 +497,16 @@ async function createPopup(type: PopupType, id: string, force = true): Promise<B
     // popups[id].webContents.openDevTools();
   }
 
+  popups[id].on('close', (e) => {
+    e.preventDefault();
+    popups[id].destroy();
+    delete popups[id];
+  });
+
+  popups[id].webContents.once('did-finish-load', () => {
+    popups[id].webContents.send('initial-data', data);
+  });
+
   popups[id].webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
@@ -521,7 +531,7 @@ function connectSocket(token: string): Socket | null {
     socketInstance = disconnectSocket();
   }
 
-  const socket = io(websocketUrl, {
+  const socket = io(WS_URL, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 1000,
@@ -547,11 +557,16 @@ function connectSocket(token: string): Socket | null {
     });
 
     ServerToClientEventNames.forEach((event) => {
-      socket.on(event, (...args) => {
+      socket.on(event, async (...args) => {
         console.log(`${new Date().toLocaleString()} | socket.on`, event, ...args);
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
+        if (event === 'shakeWindow' || event === 'directMessage') {
+          const { user1Id, user2Id, targetId, name: targetName } = args[0];
+          const userId = user1Id === targetId ? user2Id : user1Id;
+          createPopup('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName, event, message: args[0] }, false);
+        }
       });
     });
 
@@ -683,9 +698,10 @@ function configureAutoUpdater() {
 
 // Discord RPC Functions
 async function setActivity(presence: DiscordRPC.Presence) {
-  // await rpc?.setActivity(presence).catch((error) => {
-  //   console.error('Cannot set activity:', error);
-  // });
+  return;
+  await rpc?.setActivity(presence).catch((error) => {
+    console.error('Cannot set activity:', error);
+  });
 }
 
 async function configureDiscordRPC() {
@@ -764,7 +780,7 @@ app.on('ready', async () => {
   // if (await checkIsHinet()) websocketUrl = WS_URL;
 
   if (!store.get('dontShowDisclaimer')) {
-    await createPopup('aboutus', 'aboutUs');
+    await createPopup('aboutus', 'aboutUs', null);
     popups['aboutUs'].setAlwaysOnTop(true);
   }
 
@@ -803,22 +819,9 @@ app.on('ready', async () => {
     app.exit();
   });
 
-  // Initial data request handlers
-  ipcMain.on('request-initial-data', (_, to) => {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('request-initial-data', to);
-    });
-  });
-
-  ipcMain.on('response-initial-data', (_, to, data) => {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('response-initial-data', to, data);
-    });
-  });
-
   // Popup handlers
-  ipcMain.on('open-popup', (_, type, id, force = true) => {
-    createPopup(type, id, force);
+  ipcMain.on('open-popup', (_, type, id, data, force = true) => {
+    createPopup(type, id, data, force);
   });
 
   ipcMain.on('close-popup', (_, id) => {

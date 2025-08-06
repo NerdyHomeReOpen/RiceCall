@@ -121,21 +121,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('applyFriend', 'applyFriend');
-    ipcService.initialData.onRequest('applyFriend', { userId, targetId });
+    ipcService.popup.open('applyFriend', 'applyFriend', { userId, targetId });
   };
 
   const handleOpenErrorDialog = (message: string) => {
-    ipcService.popup.open('dialogError', 'errorDialog');
-    ipcService.initialData.onRequest('errorDialog', { message: message, submitTo: 'errorDialog' });
+    ipcService.popup.open('dialogError', 'errorDialog', { message, submitTo: 'errorDialog' });
   };
 
   const handleAvatarCropper = (userId: User['userId'], avatarData: string) => {
-    ipcService.popup.open('avatarCropper', 'avatarCropper');
-    ipcService.initialData.onRequest('avatarCropper', {
-      avatarData: avatarData,
-      submitTo: 'avatarCropper',
-    });
+    ipcService.popup.open('avatarCropper', 'avatarCropper', { avatarData, submitTo: 'avatarCropper' });
     ipcService.popup.onSubmit('avatarCropper', async (data) => {
       const formData = new FormData();
       formData.append('_type', 'user');

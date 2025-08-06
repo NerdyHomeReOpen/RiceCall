@@ -35,8 +35,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
       // TODO: Need to handle while already friend
       const result = args[0];
       if (!result) return;
-      ipcService.popup.open('applyFriend', 'applyFriend');
-      ipcService.initialData.onRequest('applyFriend', { userId: userId, targetId: result.userId }, () => handleClose());
+      ipcService.popup.open('applyFriend', 'applyFriend', { userId, targetId: result.userId });
     },
     [userId],
   );

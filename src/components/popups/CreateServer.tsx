@@ -56,8 +56,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   };
 
   const handleOpenErrorDialog = (message: string) => {
-    ipcService.popup.open('dialogError', 'errorDialog');
-    ipcService.initialData.onRequest('errorDialog', { message: message, submitTo: 'errorDialog' });
+    ipcService.popup.open('dialogError', 'errorDialog', { message, submitTo: 'errorDialog' });
   };
 
   const handleClose = () => {
@@ -65,8 +64,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
   };
 
   const handleAvatarCropper = (serverId: Server['serverId'], avatarData: string) => {
-    ipcService.popup.open('avatarCropper', 'avatarCropper');
-    ipcService.initialData.onRequest('avatarCropper', { avatarData: avatarData, submitTo: 'avatarCropper' });
+    ipcService.popup.open('avatarCropper', 'avatarCropper', { avatarData: avatarData, submitTo: 'avatarCropper' });
     ipcService.popup.onSubmit('avatarCropper', async (data) => {
       const formData = new FormData();
       formData.append('_type', 'server');

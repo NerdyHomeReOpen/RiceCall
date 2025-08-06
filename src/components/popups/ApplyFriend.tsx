@@ -69,13 +69,11 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenCreateFriendGroup = () => {
-    ipcService.popup.open('createFriendGroup', 'createFriendGroup');
-    ipcService.initialData.onRequest('createFriendGroup', {});
+    ipcService.popup.open('createFriendGroup', 'createFriendGroup', {});
   };
 
   const handleClose = () => {

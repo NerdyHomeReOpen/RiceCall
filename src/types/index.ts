@@ -79,7 +79,7 @@ export type DirectMessage = Message &
     user2Id: string;
   };
 
-export type PromptMessage = Message & {
+export type PromptMessage = (DirectMessage | ChannelMessage | Message) & {
   type: 'alert' | 'info' | 'warn' | 'event';
 };
 
@@ -275,7 +275,7 @@ export type ServerToClientEvents = {
   channelMessage: (...args: ChannelMessage[]) => void;
   actionMessage: (...args: PromptMessage[]) => void;
   directMessage: (...args: DirectMessage[]) => void;
-  shakeWindow: (senderId: string) => void;
+  shakeWindow: (...args: DirectMessage[]) => void;
   // Play Sound
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Echo

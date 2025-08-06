@@ -63,11 +63,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'alertDialog');
-    ipcService.initialData.onRequest('alertDialog', {
-      message: message,
-      submitTo: 'alertDialog',
-    });
+    ipcService.popup.open('dialogAlert', 'alertDialog', { message, submitTo: 'alertDialog' });
     ipcService.popup.onSubmit('alertDialog', callback);
   };
 

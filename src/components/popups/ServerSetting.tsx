@@ -164,49 +164,40 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'dialogAlert');
-    ipcService.initialData.onRequest('dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
     ipcService.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleOpenErrorDialog = (message: string) => {
-    ipcService.popup.open('dialogError', 'dialogError');
-    ipcService.initialData.onRequest('dialogError', { message, submitTo: 'dialogError' });
+    ipcService.popup.open('dialogError', 'dialogError', { message, submitTo: 'dialogError' });
   };
 
   const handleOpenMemberApplySetting = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open('memberApplySetting', 'memberApplySetting');
-    ipcService.initialData.onRequest('memberApplySetting', { serverId, userId });
+    ipcService.popup.open('memberApplySetting', 'memberApplySetting', { serverId, userId });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('applyFriend', 'applyFriend');
-    ipcService.initialData.onRequest('applyFriend', { userId, targetId });
+    ipcService.popup.open('applyFriend', 'applyFriend', { userId, targetId });
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open('editNickname', 'editNickname');
-    ipcService.initialData.onRequest('editNickname', { serverId, userId });
+    ipcService.popup.open('editNickname', 'editNickname', { serverId, userId });
   };
 
   const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    ipcService.popup.open('blockMember', `blockMember-${userId}`);
-    ipcService.initialData.onRequest(`blockMember-${userId}`, { userId, serverId, userName });
+    ipcService.popup.open('blockMember', `blockMember-${userId}`, { userId, serverId, userName });
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open('directMessage', `directMessage-${targetId}`);
-    ipcService.initialData.onRequest(`directMessage-${targetId}`, { userId, targetId, targetName });
+    ipcService.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`);
-    ipcService.initialData.onRequest(`userInfo-${targetId}`, { userId, targetId });
+    ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleAvatarCropper = (avatarData: string) => {
-    ipcService.popup.open('avatarCropper', 'avatarCropper');
-    ipcService.initialData.onRequest('avatarCropper', { avatarData, submitTo: 'avatarCropper' });
+    ipcService.popup.open('avatarCropper', 'avatarCropper', { avatarData, submitTo: 'avatarCropper' });
     ipcService.popup.onSubmit('avatarCropper', async (data) => {
       const formData = new FormData();
       formData.append('_type', 'server');

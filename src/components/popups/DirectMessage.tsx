@@ -29,11 +29,13 @@ import grade from '@/styles/grade.module.css';
 interface DirectMessagePopupProps {
   userId: User['userId'];
   targetId: User['userId'];
+  event: 'directMessage' | 'shakeWindow';
+  message: DirectMessage;
 }
 
 const SHAKE_COOLDOWN = 3000;
 
-const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId }) => {
+const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, event, message }) => {
   // Hooks
   const { t } = useTranslation();
   const socket = useSocket();
@@ -67,28 +69,24 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     ipcService.socket.send('directMessage', { targetId, preset });
   };
 
+  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
+  };
+
   const handleSendShakeWindow = () => {
     if (cooldown > 0) return;
-
-    if (isFriend) {
-      ipcService.socket.send('shakeWindow', { targetId });
-    } else {
-      setDirectMessages((prev) => [...prev, { type: 'warn', content: t('non-friend-warning-message'), timestamp: Date.now(), parameter: {}, contentMetadata: {} }]);
-    }
-
+    if (isFriend) ipcService.socket.send('shakeWindow', { targetId });
+    else setDirectMessages((prev) => [...prev, { type: 'warn', content: t('non-friend-warning-message'), timestamp: Date.now(), parameter: {}, contentMetadata: {} }]);
     setCooldown(SHAKE_COOLDOWN);
 
     // debounce
-    const startTime = Date.now();
+    const start = Date.now();
     const timer = setInterval(() => {
-      const elapsed = Date.now() - startTime;
+      const elapsed = Date.now() - start;
       const remaining = Math.max(0, SHAKE_COOLDOWN - elapsed);
-
       if (remaining === 0) clearInterval(timer);
-
       setCooldown(remaining);
     }, 100);
-
     return () => clearInterval(timer);
   };
 
@@ -98,45 +96,46 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       // !! THIS IS IMPORTANT !!
       const user1Id = userId.localeCompare(targetId) < 0 ? userId : targetId;
       const user2Id = userId.localeCompare(targetId) < 0 ? targetId : userId;
-
       // Check if the message array is in the current conversation
       const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
       if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
     });
   };
 
-  const handleShakeWindow = (duration = 500) => {
-    const start = performance.now();
+  const handleShakeWindow = (...args: DirectMessage[]) => {
+    args.forEach((item) => {
+      if (!item) return;
+      // !! THIS IS IMPORTANT !!
+      const user1Id = userId.localeCompare(targetId) < 0 ? userId : targetId;
+      const user2Id = userId.localeCompare(targetId) < 0 ? targetId : userId;
+      // Check if the message array is in the current conversation
+      const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
+      if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
+    });
 
+    const start = performance.now();
     const shake = (time: number) => {
       const elapsed = time - start;
-      if (elapsed > duration) {
+      if (elapsed > 500) {
         document.body.style.transform = 'translate(0, 0)';
         return;
       }
-
       const x = Math.round((Math.random() - 0.5) * 10);
       const y = Math.round((Math.random() - 0.5) * 10);
       document.body.style.transform = `translate(${x}px, ${y}px)`;
-
       requestAnimationFrame(shake);
     };
     requestAnimationFrame(shake);
   };
 
-  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
-  };
-
   // Effects
   useEffect(() => {
-    const offShakeWindow = ipcService.window.onShakeWindow(() => handleShakeWindow());
-
-    return () => offShakeWindow();
+    if (event === 'shakeWindow') handleShakeWindow(message);
+    if (event === 'directMessage') handleDirectMessage(message);
   }, []);
 
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [ipcService.socket.on('directMessage', handleDirectMessage)];
+    const unsubscribe: (() => void)[] = [ipcService.socket.on('directMessage', handleDirectMessage), ipcService.socket.on('shakeWindow', handleShakeWindow)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [socket.isConnected]);
 

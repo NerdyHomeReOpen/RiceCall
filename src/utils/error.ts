@@ -11,14 +11,13 @@ export default class ErrorHandler {
   }
 
   show() {
-    ipcService.popup.open('dialogError', 'errorDialog');
-    ipcService.popup.onSubmit('errorDialog', () => {
-      if (this.handler) this.handler();
-    });
-    ipcService.initialData.onRequest('errorDialog', {
+    ipcService.popup.open('dialogError', 'errorDialog', {
       message: this.message,
       submitTo: 'errorDialog',
       timestamp: Date.now(),
+    });
+    ipcService.popup.onSubmit('errorDialog', () => {
+      if (this.handler) this.handler();
     });
   }
 }

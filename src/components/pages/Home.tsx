@@ -133,8 +133,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   };
 
   const handleOpenCreateServer = (userId: User['userId']) => {
-    ipcService.popup.open('createServer', 'createServer');
-    ipcService.initialData.onRequest('createServer', { userId });
+    ipcService.popup.open('createServer', 'createServer', { userId });
   };
 
   const handleClearSearchState = () => {
