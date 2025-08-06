@@ -29,7 +29,7 @@ function MessageInputBoxGuard({
   channelGuestTextGapTime,
   channelGuestTextWaitTime,
   channelGuestTextMaxLength,
-  onSendMessage,
+  onSend,
 }: {
   userPermission: number;
   userLastJoinChannelTime: number;
@@ -38,7 +38,7 @@ function MessageInputBoxGuard({
   channelGuestTextGapTime: number;
   channelGuestTextWaitTime: number;
   channelGuestTextMaxLength: number;
-  onSendMessage: (msg: string) => void;
+  onSend: (msg: string) => void;
 }) {
   // Hooks
   const { t } = useTranslation();
@@ -72,7 +72,7 @@ function MessageInputBoxGuard({
           ? `${t('guest-text-wait-time')} ${leftWaitTime} ${t('seconds')}`
           : t('input-message');
 
-  return <MessageInputBox disabled={disabled} maxLength={maxLength} placeholder={placeholder} onSendMessage={onSendMessage} />;
+  return <MessageInputBox disabled={disabled} maxLength={maxLength} placeholder={placeholder} onSend={onSend} />;
 }
 
 interface ServerPageProps {
@@ -288,9 +288,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 </div>
               </div>
               <MessageInputBoxGuard
-                onSendMessage={(msg) => {
-                  handleSendMessage(serverId, channelId, { type: 'general', content: msg });
-                }}
+                onSend={(msg) => handleSendMessage(serverId, channelId, { type: 'general', content: msg })}
                 userPermission={userPermission}
                 userLastJoinChannelTime={userLastJoinChannelTime}
                 userLastMessageTime={userLastMessageTime}

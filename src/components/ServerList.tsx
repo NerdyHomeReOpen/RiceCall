@@ -38,7 +38,7 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, user, servers
         ))}
       </div>
       {canExpand && (
-        <div className={`${homePage['view-more-btn']} ${expanded ? homePage['more-icon'] : homePage['less-icon']}`} onClick={() => setExpanded(!expanded)}>
+        <div className={`${homePage['view-more-btn']} ${expanded ? homePage['more-icon'] : homePage['less-icon']}`} onClick={() => setExpanded((prev) => !prev)}>
           {expanded ? t('view-less') : t('view-more')}
         </div>
       )}

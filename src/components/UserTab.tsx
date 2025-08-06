@@ -27,12 +27,10 @@ interface UserTabProps {
   currentServer: Server;
   friends: Friend[];
   selectedItemId: string | null;
-  selectedItemType: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedItemType: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentChannel, currentServer, selectedItemId, selectedItemType, setSelectedItemId, setSelectedItemType }) => {
+const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentChannel, currentServer, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -96,20 +94,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     webRTC.unmuteUser(userId);
   };
 
-  const handleKickFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('kickFromServer', { userId, serverId }));
-  };
-
-  const handleKickChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('kickToLobbyChannel', { userId, serverId, channelId }));
-  };
-
-  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => ipcService.socket.send('editMember', { userId, serverId, update: { permissionLevel: 1, nickname: null } }));
-  };
-
-  const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.socket.send('editMember', { userId, serverId, update: member });
+  const handleEditMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
+    ipcService.socket.send('editMember', { userId, serverId, update });
   };
 
   const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -122,6 +108,18 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
 
   const handleAddToQueue = (userId: User['userId']) => {
     ipcService.socket.send('addToQueue', { userId, serverId, channelId: currentChannelId });
+  };
+
+  const handleKickFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('kickFromServer', { userId, serverId }));
+  };
+
+  const handleKickToLobbyChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('kickToLobbyChannel', { userId, serverId, channelId }));
+  };
+
+  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => handleEditMember(userId, serverId, { permissionLevel: 1, nickname: null }));
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -140,13 +138,13 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
+  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
+    ipcService.popup.open('blockMember', `blockMember-${userId}`, { userId, serverId, userName });
+  };
+
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
     ipcService.popup.open('dialogAlert', 'alertDialog', { message, submitTo: 'alertDialog' });
     ipcService.popup.onSubmit('alertDialog', callback);
-  };
-
-  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    ipcService.popup.open('blockMember', `blockMember-${userId}`, { userId, serverId, userName });
   };
 
   const handleDragStart = (e: React.DragEvent, userId: User['userId'], channelId: Channel['channelId']) => {
@@ -165,15 +163,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     <div
       ref={userTabRef}
       key={memberUserId}
-      className={`context-menu-container ${styles['user-tab']} ${selectedItemId === memberUserId && selectedItemType === 'user' ? styles['selected'] : ''}`}
+      className={`context-menu-container ${styles['user-tab']} ${selectedItemId === `user-${memberUserId}` ? styles['selected'] : ''}`}
       onClick={() => {
-        if (selectedItemId === memberUserId && selectedItemType === 'user') {
-          setSelectedItemId(null);
-          setSelectedItemType(null);
-          return;
-        }
-        setSelectedItemId(memberUserId);
-        setSelectedItemType('user');
+        if (selectedItemId === `user-${memberUserId}`) setSelectedItemId(null);
+        else setSelectedItemId(`user-${memberUserId}`);
       }}
       onDoubleClick={() => {
         if (!userTabRef.current) return;
@@ -264,7 +257,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
             label: t('kick-channel'),
             show: canKickChannel,
             onClick: () => {
-              handleKickChannel(memberUserId, memberCurrentChannelId, serverId, memberNickname || memberName);
+              handleKickToLobbyChannel(memberUserId, memberCurrentChannelId, serverId, memberNickname || memberName);
             },
           },
           {
@@ -322,25 +315,25 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
                 id: 'set-member',
                 label: t('set-member'),
                 show: canChangeToMember,
-                onClick: () => handleEditMember({ permissionLevel: 2 }, memberUserId, serverId),
+                onClick: () => handleEditMember(memberUserId, serverId, { permissionLevel: 2 }),
               },
               {
                 id: 'set-channel-mod',
                 label: t('set-channel-mod'),
                 show: canChangeToChannelAdmin,
-                onClick: () => handleEditMember({ permissionLevel: 3 }, memberUserId, serverId),
+                onClick: () => handleEditMember(memberUserId, serverId, { permissionLevel: 3 }),
               },
               {
                 id: 'set-channel-admin',
                 label: t('set-channel-admin'),
                 show: canChangeToCategoryAdmin,
-                onClick: () => handleEditMember({ permissionLevel: 4 }, memberUserId, serverId),
+                onClick: () => handleEditMember(memberUserId, serverId, { permissionLevel: 4 }),
               },
               {
                 id: 'set-server-admin',
                 label: t('set-server-admin'),
                 show: canChangeToAdmin,
-                onClick: () => handleEditMember({ permissionLevel: 5 }, memberUserId, serverId),
+                onClick: () => handleEditMember(memberUserId, serverId, { permissionLevel: 5 }),
               },
             ],
           },

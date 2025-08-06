@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 // CSS
 import homePage from '@/styles/pages/home.module.css';
@@ -15,19 +15,19 @@ interface RecommendServerListProps {
 }
 
 const RecommendServerList: React.FC<RecommendServerListProps> = ({ servers }) => {
-  // Variables
-  const categories = Object.keys(servers);
-
   // States
-  const [activeCategory, setActiveCategory] = useState(categories[0] ?? '');
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+
+  // Variables
+  const categories = useMemo(() => Object.keys(servers), [servers]);
 
   return (
     <div className={homePage['recommended-servers-wrapper']}>
       <aside className={homePage['category-sidebar']}>
         <ul className={homePage['category-list']}>
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <li key={category}>
-              <button onClick={() => setActiveCategory(category)} className={`${homePage['category-item']} ${activeCategory === category ? homePage['category-item-active'] : ''}`}>
+              <button onClick={() => setActiveCategoryIndex(index)} className={`${homePage['category-item']} ${activeCategoryIndex === index ? homePage['category-item-active'] : ''}`}>
                 {category}
               </button>
             </li>
@@ -36,10 +36,10 @@ const RecommendServerList: React.FC<RecommendServerListProps> = ({ servers }) =>
       </aside>
 
       <section className={homePage['servers-container']}>
-        <h2 className={homePage['category-title']}>{activeCategory}</h2>
-        {servers[activeCategory]?.length > 0 && (
+        <h2 className={homePage['category-title']}>{categories[activeCategoryIndex]}</h2>
+        {servers[categories[activeCategoryIndex]]?.length > 0 && (
           <div className={homePage['servers']}>
-            {servers[activeCategory].map((server) => (
+            {servers[categories[activeCategoryIndex]].map((server) => (
               <div key={server.serverId} className={homePage['server-cards-recommended']}>
                 {/* <ServerCard user={user} server={server} /> */}
               </div>

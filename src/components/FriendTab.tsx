@@ -78,17 +78,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     ipcService.socket.send('connectServer', { serverId });
   };
 
+  const handleBlockFriend = (targetId: User['userId'], isBlocked: Friend['isBlocked']) => {
+    handleOpenWarningDialog(t('confirmBlockFriend', { blockType: isBlocked ? t('unblock') : t('block'), userName: friendName }), () =>
+      ipcService.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }),
+    );
+  };
+
   const handleDeleteFriend = (targetId: User['userId']) => {
     handleOpenWarningDialog(t('confirm-delete-friend', { '0': friendName }), () => ipcService.socket.send('deleteFriend', { targetId }));
-  };
-
-  const handleServerUpdate = (data: Server) => {
-    setFriendServer(data);
-  };
-
-  const handleOpenWarningDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogWarning', 'warningDialog', { message: message, submitTo: 'warningDialog' });
-    ipcService.popup.onSubmit('warningDialog', callback);
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
@@ -103,17 +100,16 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     ipcService.popup.open('editFriend', 'editFriend', { userId, targetId });
   };
 
-  const handleBlockFriend = (targetId: User['userId'], isBlocked: Friend['isBlocked']) => {
-    handleOpenWarningDialog(t('confirmBlockFriend', { blockType: isBlocked ? t('unblock') : t('block'), userName: friendName }), () =>
-      ipcService.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }),
-    );
+  const handleOpenWarningDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open('dialogWarning', 'warningDialog', { message: message, submitTo: 'warningDialog' });
+    ipcService.popup.onSubmit('warningDialog', callback);
   };
 
   useEffect(() => {
     if (!friendCurrentServerId) return;
     const refresh = async () => {
       getService.server({ userId: friendUserId, serverId: friendCurrentServerId }).then((server) => {
-        if (server) handleServerUpdate(server);
+        if (server) setFriendServer(server);
       });
       refreshed.current = true;
     };

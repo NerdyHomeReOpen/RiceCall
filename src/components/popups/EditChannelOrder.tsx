@@ -210,10 +210,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             className={`${serverPage['tab-icon']} ${expanded[categoryId] ? serverPage['expanded'] : ''} ${serverPage[categoryVisibility]} ${categoryIsLobby ? serverPage['lobby'] : ''}`}
             onClick={(e) => {
               e.stopPropagation();
-              setExpanded((prev) => ({
-                ...prev,
-                [categoryId]: !prev[categoryId],
-              }));
+              setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }));
             }}
           />
           <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
@@ -221,7 +218,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
             <div className={styles['channel-tab-index-text']}>{`(${categoryOrder})`}</div>
           </div>
         </div>
-        <div className={serverPage['channel-list']} style={{ display: expanded[categoryId] ? 'block' : 'none' }}>
+        <div className={serverPage['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
           {subChannels
             .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
             .filter((ch) => ch.type === 'channel')

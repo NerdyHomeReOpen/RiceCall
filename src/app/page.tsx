@@ -7,7 +7,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import header from '@/styles/header.module.css';
 
 // Types
-import type { PopupType, Server, User, Channel, FriendGroup, ChannelMessage, PromptMessage, FriendApplication, ServerInvitation, RecommendServerList, Friend, Member, QueueMember } from '@/types';
+import type { PopupType, Server, User, Channel, FriendGroup, ChannelMessage, PromptMessage, FriendApplication, MemberInvitation, RecommendServerList, Friend, Member, QueueMember } from '@/types';
 
 // i18n
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
@@ -43,11 +43,11 @@ interface HeaderProps {
   user: User;
   currentServer: Server;
   friendApplications: FriendApplication[];
-  serverInvitations: ServerInvitation[];
+  memberInvitations: MemberInvitation[];
   systemNotify: string[];
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, serverInvitations, systemNotify }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, memberInvitations, systemNotify }) => {
   // Hooks
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   const { serverId, name: serverName } = currentServer;
 
   // Variables
-  const hasNotify = friendApplications.length !== 0 || serverInvitations.length !== 0 || systemNotify.length !== 0;
+  const hasNotify = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotify.length !== 0;
 
   // Constants
   const MAIN_TABS = [
@@ -240,15 +240,15 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
                 label: `好友驗證 (${friendApplications.length})`,
                 icon: 'notify',
                 show: friendApplications.length > 0,
-                content: friendApplications.map((f) => f.avatarUrl),
+                content: friendApplications.map((fa) => fa.avatarUrl),
                 onClick: () => handleOpenFriendVerification(),
               },
               {
                 id: 'system-setting',
-                label: `語音群邀請 (${serverInvitations.length})`,
+                label: `語音群邀請 (${memberInvitations.length})`,
                 icon: 'notify',
-                show: serverInvitations.length > 0,
-                content: serverInvitations.map((s) => s.avatarUrl),
+                show: memberInvitations.length > 0,
+                content: memberInvitations.map((mi) => mi.avatarUrl),
                 onClick: () => {},
               },
               {
@@ -382,7 +382,7 @@ const RootPageComponent = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
-  const [serverInvitations, setServerInvitations] = useState<ServerInvitation[]>([]);
+  const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
   const [systemNotify, setSystemNotify] = useState<string[]>([]);
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
   const [serverMembers, setServerMembers] = useState<Member[]>([]);
@@ -661,7 +661,7 @@ const RootPageComponent = () => {
     <WebRTCProvider userId={userId}>
       <ActionScannerProvider>
         <ExpandedProvider>
-          <Header user={user} currentServer={server} friendApplications={friendApplications} serverInvitations={serverInvitations} systemNotify={systemNotify} />
+          <Header user={user} currentServer={server} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
           {!socket.isConnected ? (
             <LoadingSpinner />
           ) : (

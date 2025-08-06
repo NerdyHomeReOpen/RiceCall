@@ -17,90 +17,82 @@ interface BadgeInfoCardProps {
   preferLeft?: boolean;
 }
 
-const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(
-  ({ x = 0, y = 0, preferTop = false, preferLeft = false, badge }) => {
-    // Refs
-    const cardRef = useRef<HTMLDivElement>(null);
+const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x = 0, y = 0, preferTop = false, preferLeft = false, badge }) => {
+  // Refs
+  const cardRef = useRef<HTMLDivElement>(null);
 
-    // Hooks
-    const { t } = useTranslation();
+  // Hooks
+  const { t } = useTranslation();
 
-    // State
-    const [cardX, setCardX] = useState(0);
-    const [cardY, setCardY] = useState(0);
+  // State
+  const [cardX, setCardX] = useState(0);
+  const [cardY, setCardY] = useState(0);
 
-    // Variables
-    const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
+  // Variables
+  const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
 
-    // Effect
-    useEffect(() => {
-      const positionCard = () => {
-        if (!cardRef.current) return;
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
+  // Effect
+  useEffect(() => {
+    if (!cardRef.current) return;
 
-        let newPosX = x;
-        let newPosY = y;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
 
-        const cardWidth = cardRef.current.offsetWidth;
-        const cardHeight = cardRef.current.offsetHeight;
-        const marginEdge = 10;
+    let newPosX = x;
+    let newPosY = y;
 
-        if (cardWidth === 0 || cardHeight === 0) {
-          return;
-        }
+    const cardWidth = cardRef.current.offsetWidth;
+    const cardHeight = cardRef.current.offsetHeight;
+    const marginEdge = 10;
 
-        if (preferTop) {
-          newPosY -= cardHeight;
-        }
+    if (cardWidth === 0 || cardHeight === 0) {
+      return;
+    }
 
-        if (preferLeft) {
-          newPosX -= cardWidth;
-        }
+    if (preferTop) {
+      newPosY -= cardHeight;
+    }
 
-        if (newPosX + cardWidth + marginEdge > windowWidth) {
-          newPosX = windowWidth - cardWidth - marginEdge;
-        }
-        if (newPosX < marginEdge) {
-          newPosX = marginEdge;
-        }
-        if (newPosY + cardHeight + marginEdge > windowHeight) {
-          newPosY = windowHeight - cardHeight - marginEdge;
-        }
-        if (newPosY < marginEdge) {
-          newPosY = marginEdge;
-        }
+    if (preferLeft) {
+      newPosX -= cardWidth;
+    }
 
-        setCardX(x);
-        setCardY(y);
-      };
-      requestAnimationFrame(positionCard);
-    }, [x, y, preferTop, preferLeft]);
+    if (newPosX + cardWidth + marginEdge > windowWidth) {
+      newPosX = windowWidth - cardWidth - marginEdge;
+    }
+    if (newPosX < marginEdge) {
+      newPosX = marginEdge;
+    }
+    if (newPosY + cardHeight + marginEdge > windowHeight) {
+      newPosY = windowHeight - cardHeight - marginEdge;
+    }
+    if (newPosY < marginEdge) {
+      newPosY = marginEdge;
+    }
 
-    return (
-      <div
-        ref={cardRef}
-        className={`context-menu-container ${styles['badge-info-card']}`}
-        style={{ top: cardY, left: cardX }}
-      >
-        <div className={styles['badge-info-wrapper']}>
-          <div className={styles['badge-avatar-box']}>
-            <div className={styles['badge-image']} style={{ backgroundImage: `url(${badgeUrl})` }} />
-            <div className={styles['badge-rarity-text']}>{`[${badge.rare}]`}</div>
-          </div>
-          <div className={styles['badge-description-box']}>
-            <div className={styles['badge-name']}>{badge.name}</div>
-            <div className={styles['badge-description']}>{badge.description}</div>
-          </div>
+    setCardX(newPosX);
+    setCardY(newPosY);
+  }, [x, y, preferTop, preferLeft]);
+
+  return (
+    <div ref={cardRef} className={`context-menu-container ${styles['badge-info-card']}`} style={{ top: cardY, left: cardX }}>
+      <div className={styles['badge-info-wrapper']}>
+        <div className={styles['badge-avatar-box']}>
+          <div className={styles['badge-image']} style={{ backgroundImage: `url(${badgeUrl})` }} />
+          {/* <div className={styles['badge-rarity-text']}>{`[${badge.rare}]`}</div> */}
         </div>
-        <div className={styles['badge-show-time-box']}>
-          <div>{t('show-to')}:</div>
-          <div>1970-01-01</div>
+        <div className={styles['badge-description-box']}>
+          <div className={styles['badge-name']}>{badge.name}</div>
+          <div className={styles['badge-description']}>{badge.description}</div>
         </div>
       </div>
-    );
-  },
-);
+      <div className={styles['badge-show-time-box']}>
+        <div>{t('show-to')}:</div>
+        <div>1970-01-01</div>
+      </div>
+    </div>
+  );
+});
 
 BadgeInfoCard.displayName = 'BadgeInfoCard';
 

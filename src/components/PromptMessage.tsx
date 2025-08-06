@@ -25,16 +25,13 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
 
   // Variables
   const { contents: messageContents, parameter: messageParameter } = messageGroup;
-
   const translatedMessages = messageContents.map((content) => {
-    if (content.includes(' ')) {
+    if (content.includes(' '))
       return content
         .split(' ')
         .map((_) => t(_, { ns: 'message', ...messageParameter }))
         .join(' ');
-    } else {
-      return t(content, { ns: 'message', ...messageParameter });
-    }
+    else return t(content, { ns: 'message', ...messageParameter });
   });
 
   return (

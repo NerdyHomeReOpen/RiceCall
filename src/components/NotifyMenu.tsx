@@ -22,7 +22,6 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, hasNotify, onClose, x = 
   const menuRef = useRef<HTMLDivElement>(null);
 
   // State
-  const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
 

@@ -116,6 +116,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       if (isContextMenuVisible) closeContextMenu();
       if (isBadgeInfoVisible) closeBadgeInfoCard();
       if (isEmojiPickerVisible) closeEmojiPicker();
+      if (isNotifyMenuVisible) closeNotifyMenu();
     };
     document.addEventListener('pointerdown', onPointerDown);
     document.addEventListener('mousemove', onMouseMove);
@@ -123,7 +124,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('mousemove', onMouseMove);
     };
-  }, [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible, isUserInfoVisible]);
+  }, [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible, isUserInfoVisible, isNotifyMenuVisible]);
 
   return (
     <ContextMenuContext.Provider

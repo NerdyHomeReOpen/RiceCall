@@ -147,6 +147,7 @@ export type table_user_server = {
 export type table_user_badges = {
   userId: string;
   badgeId: string;
+  order: number;
   showTo: number;
   obtainedAt: number;
 };

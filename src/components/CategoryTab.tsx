@@ -28,13 +28,11 @@ interface CategoryTabProps {
   expanded: Record<string, boolean>;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   selectedItemId: string | null;
-  selectedItemType: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedItemType: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(
-  ({ category, friends, currentChannel, currentServer, serverMembers, serverChannels, expanded, selectedItemId, selectedItemType, setExpanded, setSelectedItemId, setSelectedItemType }) => {
+  ({ category, friends, currentChannel, currentServer, serverMembers, serverChannels, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
     // Hooks
     const { t } = useTranslation();
     const contextMenu = useContextMenu();
@@ -73,7 +71,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       ipcService.socket.send('editServer', { serverId, update });
     };
 
-    const handleJoinChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], password?: string) => {
+    const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], password?: string) => {
       ipcService.socket.send('connectChannel', { serverId, channelId, password });
     };
 
@@ -113,7 +111,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const handleOpenChannelPassword = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
       ipcService.popup.open('channelPassword', 'channelPassword', { submitTo: 'channelPassword' });
       ipcService.popup.onSubmit('channelPassword', (password) => {
-        handleJoinChannel(serverId, channelId, password);
+        handleConnectChannel(serverId, channelId, password);
       });
     };
 
@@ -127,7 +125,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       e.preventDefault();
       const moveType = e.dataTransfer.getData('type');
       const currentChannelId = e.dataTransfer.getData('currentChannelId');
-      if (!moveType || !currentChannelId || currentChannelId === channelId) return;
+      if (!moveType || !currentChannelId || currentChannelId === channelId || categoryVisibility === 'readonly') return;
 
       switch (moveType) {
         case 'moveUser':
@@ -155,22 +153,17 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         {/* Category View */}
         <div
           key={categoryId}
-          className={`${styles['channel-tab']} ${selectedItemId === categoryId && selectedItemType === 'category' ? styles['selected'] : ''}`}
+          className={`${styles['channel-tab']} ${selectedItemId === `category-${categoryId}` ? styles['selected'] : ''}`}
           onClick={() => {
-            if (selectedItemId === categoryId && selectedItemType === 'category') {
-              setSelectedItemId(null);
-              setSelectedItemType(null);
-              return;
-            }
-            setSelectedItemId(categoryId);
-            setSelectedItemType('category');
+            if (selectedItemId === `category-${categoryId}`) setSelectedItemId(null);
+            else setSelectedItemId(`category-${categoryId}`);
           }}
           onDoubleClick={() => {
             if (!canJoin) return;
             if (needPassword) {
               handleOpenChannelPassword(serverId, categoryId);
             } else {
-              handleJoinChannel(serverId, categoryId);
+              handleConnectChannel(serverId, categoryId);
             }
           }}
           draggable={permissionLevel >= 5 && categoryMembers.length !== 0}
@@ -279,9 +272,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                     expanded={expanded}
                     setExpanded={setExpanded}
                     selectedItemId={selectedItemId}
-                    selectedItemType={selectedItemType}
                     setSelectedItemId={setSelectedItemId}
-                    setSelectedItemType={setSelectedItemType}
                   />
                 ))
             : categoryChannels
@@ -298,9 +289,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
                     expanded={expanded}
                     setExpanded={setExpanded}
                     selectedItemId={selectedItemId}
-                    selectedItemType={selectedItemType}
                     setSelectedItemId={setSelectedItemId}
-                    setSelectedItemType={setSelectedItemType}
                   />
                 ))}
         </div>

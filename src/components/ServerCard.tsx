@@ -62,19 +62,17 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     ipcService.socket.send('favoriteServer', { serverId });
   };
 
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'alertDialog', { message, submitTo: 'alertDialog' });
-    ipcService.popup.onSubmit('alertDialog', callback);
-  };
-
   const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
     ipcService.socket.send('editMember', { userId, serverId, update: member });
   };
 
   const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => {
-      handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId);
-    });
+    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId));
+  };
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open('dialogAlert', 'alertDialog', { message, submitTo: 'alertDialog' });
+    ipcService.popup.onSubmit('alertDialog', callback);
   };
 
   return (

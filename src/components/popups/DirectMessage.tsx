@@ -56,6 +56,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   // Memos
   const SHAKE_COOLDOWN = useMemo(() => 3, []);
+  const MAX_LENGTH = useMemo(() => 2000, []);
 
   // Variables
   const { avatarUrl: userAvatarUrl } = user;
@@ -259,6 +260,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               ref={textareaRef}
               className={styles['input']}
               value={messageInput}
+              maxLength={MAX_LENGTH}
               onChange={(e) => {
                 e.preventDefault();
                 setMessageInput(e.target.value);
@@ -272,14 +274,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 if (e.key !== 'Enter') return;
                 else e.preventDefault();
                 if (!messageInput.trim()) return;
-                if (messageInput.length > 2000) return;
+                if (messageInput.length > MAX_LENGTH) return;
                 if (isComposingRef.current) return;
                 handleSendMessage(targetId, { type: 'dm', content: messageInput });
                 setMessageInput('');
               }}
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={() => (isComposingRef.current = false)}
-              maxLength={2000}
             />
           </div>
         </div>

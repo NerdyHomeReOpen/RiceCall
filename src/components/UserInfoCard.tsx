@@ -36,6 +36,22 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
+  // Variables
+  const {
+    name: memberName,
+    avatarUrl: memberAvatarUrl,
+    gender: memberGender,
+    level: memberLevel,
+    xp: memberXp,
+    requiredXp: memberRequiredXp,
+    badges: memberBadges,
+    permissionLevel: memberPermission,
+    contribution: memberContributions,
+    nickname: memberNickname,
+    vip: memberVip,
+  } = member;
+  const vipBoostMultiplier = Math.min(2, 1 + memberVip * 0.2);
+
   // Effect
   useLayoutEffect(() => {
     if (!cardRef.current) return;
@@ -73,21 +89,6 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
     setCardX(newPosX);
     setCardY(newPosY);
   }, [x, y, preferTop]);
-
-  const {
-    name: memberName,
-    avatarUrl: memberAvatarUrl,
-    gender: memberGender,
-    level: memberLevel,
-    xp: memberXp,
-    requiredXp: memberRequiredXp,
-    badges: memberBadges,
-    permissionLevel: memberPermission,
-    contribution: memberContributions,
-    nickname: memberNickname,
-    vip: memberVip,
-  } = member;
-  const vipBoostMultiplier = Math.min(2, 1 + memberVip * 0.2);
 
   return (
     <div

@@ -24,9 +24,11 @@ interface QueueMemberTabProps {
   queueMember: QueueMember;
   currentChannel: Channel;
   currentServer: Server;
+  selectedItemId: string | null;
+  setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember, currentChannel, currentServer }) => {
+const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember, currentChannel, currentServer, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -96,7 +98,11 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
     <div
       ref={userTabRef}
       key={memberUserId}
-      className={`context-menu-container ${styles['user-tab']}`}
+      className={`context-menu-container ${styles['user-tab']} ${selectedItemId === `queue-${memberUserId}` ? styles['selected'] : ''}`}
+      onClick={() => {
+        if (selectedItemId === `queue-${memberUserId}`) setSelectedItemId(null);
+        else setSelectedItemId(`queue-${memberUserId}`);
+      }}
       onDoubleClick={() => {
         if (!userTabRef.current) return;
         const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
@@ -141,7 +147,6 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
       <BadgeListViewer badges={memberBadges} maxDisplay={5} />
-
       {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}
       {isCurrentUser && <div className={styles['my-location-icon']} />}
     </div>

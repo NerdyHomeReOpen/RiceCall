@@ -48,13 +48,13 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
     handleOpenWarningDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipcService.socket.send('deleteFriendGroup', { friendGroupId }));
   };
 
+  const handleOpenEditFriendGroup = (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']) => {
+    ipcService.popup.open('editFriendGroup', 'editFriendGroup', { userId, friendGroupId });
+  };
+
   const handleOpenWarningDialog = (message: string, callback: () => void) => {
     ipcService.popup.open('dialogWarning', 'warningDialog', { message: message, submitTo: 'warningDialog' });
     ipcService.popup.onSubmit('warningDialog', callback);
-  };
-
-  const handleOpenEditFriendGroup = (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']) => {
-    ipcService.popup.open('editFriendGroup', 'editFriendGroup', { userId, friendGroupId });
   };
 
   return (
@@ -62,7 +62,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
       {/* Tab View */}
       <div
         className={`${styles['friend-group-tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''}`}
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => setExpanded((prev) => !prev)}
         onContextMenu={(e) => {
           const defaultFriendGroupKeys = new Set(['stranger', 'blacklist']);
           if (defaultFriendGroupKeys.has(friendGroupId)) return;
@@ -92,7 +92,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
       </div>
 
       {/* Expanded Sections */}
-      <div className={styles['tab-content']} style={{ display: expanded ? 'block' : 'none' }}>
+      <div className={styles['tab-content']} style={expanded ? {} : { display: 'none' }}>
         {friendGroupFriends.map((friend) => (
           <FriendTab user={user} key={friend.targetId} friend={friend} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
         ))}

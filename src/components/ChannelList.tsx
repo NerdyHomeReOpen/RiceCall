@@ -42,11 +42,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   const settingButtonRef = useRef<HTMLDivElement>(null);
 
   // States
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [view, setView] = useState<'all' | 'current'>('all');
+  const [viewType, setViewType] = useState<'all' | 'current'>('all');
   const [latency, setLatency] = useState<string>('0');
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(currentChannel.channelId);
-  const [selectedItemType, setSelectedItemType] = useState<string | null>('channel');
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [memberApplicationsCount, setMemberApplicationsCount] = useState<number>(0);
 
   // Variables
@@ -102,7 +101,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   };
 
   const handleLocateUser = () => {
-    if (!findMe) return;
     findMe.findMe();
   };
 
@@ -269,7 +267,14 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
           <div className={styles['mic-queue-list']}>
             <div className={styles['mic-queue-list-users']}>
               {queueMembers.map((member) => (
-                <QueueMemberTab key={member.userId} queueMember={member} currentChannel={currentChannel} currentServer={currentServer} />
+                <QueueMemberTab
+                  key={member.userId}
+                  queueMember={member}
+                  currentChannel={currentChannel}
+                  currentServer={currentServer}
+                  selectedItemId={selectedItemId}
+                  setSelectedItemId={setSelectedItemId}
+                />
               ))}
             </div>
           </div>
@@ -278,7 +283,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
       )}
 
       {/* Channel List Title */}
-      <div className={styles['section-title-text']}>{view === 'current' ? t('current-channel') : t('all-channel')}</div>
+      <div className={styles['section-title-text']}>{viewType === 'current' ? t('current-channel') : t('all-channel')}</div>
 
       {/* Channel List */}
       <div
@@ -308,7 +313,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
         }}
       >
         <div className={styles['channel-list']}>
-          {view === 'current' ? (
+          {viewType === 'current' ? (
             <ChannelTab
               key={currentChannelId}
               channel={currentChannel}
@@ -318,10 +323,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
               serverMembers={serverMembers}
               expanded={{ [currentChannelId]: true }}
               selectedItemId={selectedItemId}
-              selectedItemType={selectedItemType}
               setExpanded={() => {}}
               setSelectedItemId={setSelectedItemId}
-              setSelectedItemType={setSelectedItemType}
             />
           ) : (
             serverChannels
@@ -339,10 +342,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
                     serverChannels={serverChannels}
                     expanded={expanded}
                     selectedItemId={selectedItemId}
-                    selectedItemType={selectedItemType}
                     setExpanded={setExpanded}
                     setSelectedItemId={setSelectedItemId}
-                    setSelectedItemType={setSelectedItemType}
                   />
                 ) : (
                   <ChannelTab
@@ -354,10 +355,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
                     serverMembers={serverMembers}
                     expanded={expanded}
                     selectedItemId={selectedItemId}
-                    selectedItemType={selectedItemType}
                     setExpanded={setExpanded}
                     setSelectedItemId={setSelectedItemId}
-                    setSelectedItemType={setSelectedItemType}
                   />
                 ),
               )
@@ -367,10 +366,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
 
       {/* Footer */}
       <div className={styles['sidebar-footer']}>
-        <div className={`${styles['navegate-tab']} ${view === 'current' ? styles['active'] : ''}`} onClick={() => setView('current')}>
+        <div className={`${styles['navegate-tab']} ${viewType === 'current' ? styles['active'] : ''}`} onClick={() => setViewType('current')}>
           {t('current-channel')}
         </div>
-        <div className={`${styles['navegate-tab']} ${view === 'all' ? styles['active'] : ''}`} onClick={() => setView('all')}>
+        <div className={`${styles['navegate-tab']} ${viewType === 'all' ? styles['active'] : ''}`} onClick={() => setViewType('all')}>
           {t('all-channel')}
         </div>
       </div>
