@@ -243,6 +243,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     micGainNodeRef.current.gain.value = newVolume / 10;
     setMicVolume(newVolume);
     micVolumeRef.current = newVolume;
+    micMuteRef.current = newVolume === 0;
     window.localStorage.setItem('mic-volume', newVolume.toString());
   }, []);
 
@@ -267,6 +268,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     speakerRef.current.volume = newVolume / 100;
     setSpeakerVolume(newVolume);
     speakerVolumeRef.current = newVolume;
+    speakerMuteRef.current = newVolume === 0;
     window.localStorage.setItem('speaker-volume', newVolume.toString());
   }, []);
 

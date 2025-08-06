@@ -837,7 +837,7 @@
   position: absolute;
   bottom: -3px;
   left: -3px;
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
@@ -847,6 +847,11 @@
   border-radius: 6px;
   box-shadow: 0 4px 10px rgb(0 0 0 / 20%);
   background: rgb(255 255 255 / 90%);
+}
+
+.mic-volume-container:hover .volume-slider,
+.speaker-volume-container:hover .volume-slider {
+  display: flex;
 }
 
 .slider-container {
