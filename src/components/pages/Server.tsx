@@ -366,9 +366,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <div className={styles['mic-text']}>{isMicTaken ? t('taken-mic') : t('take-mic')}</div>
                   <div className={styles['mic-sub-text']}>
-                    {isMicTaken && webRTC.micVolume === 0 && t('mic-muted')}
-                    {isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && !webRTC.isPressSpeakKey && t('press-key-to-speak', { '0': speakHotKey })}
-                    {isMicTaken && webRTC.micVolume !== 0 && speakMode === 'key' && webRTC.isPressSpeakKey && t('speaking')}
+                    {isMicTaken
+                      ? speakMode === 'key'
+                        ? webRTC.isPressSpeakKey
+                          ? webRTC.micVolume === 0
+                            ? t('mic-muted')
+                            : t('speaking')
+                          : t('press-key-to-speak', { '0': speakHotKey })
+                        : webRTC.micVolume === 0
+                          ? t('mic-muted')
+                          : t('speaking')
+                      : ''}
                   </div>
                 </div>
               </div>
