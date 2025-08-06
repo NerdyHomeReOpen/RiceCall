@@ -67,7 +67,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
 
   const handleOpenCreateFriendGroup = () => {
     ipcService.popup.open('createFriendGroup', 'createFriendGroup');
-    ipcService.initialData.onRequest('createFriendGroup', { userId });
+    ipcService.initialData.onRequest('createFriendGroup', {});
   };
 
   return (
