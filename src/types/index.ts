@@ -28,6 +28,8 @@ export type FriendGroup = table_friend_groups;
 
 export type Friend = table_friends & User;
 
+export type ServerInvitation = table_servers;
+
 export type FriendApplication = table_friend_applications & User;
 
 export type RecommendServerList = {
@@ -90,6 +92,18 @@ export type ContextMenuItem = {
   disabled?: boolean;
   hasSubmenu?: boolean;
   submenuItems?: ContextMenuItem[];
+  icon?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  onClick?: () => void;
+};
+
+export type NotifyMenuItem = {
+  id: string;
+  label: string;
+  show?: boolean;
+  disabled?: boolean;
+  content: string[];
   icon?: string;
   className?: string;
   style?: React.CSSProperties;
