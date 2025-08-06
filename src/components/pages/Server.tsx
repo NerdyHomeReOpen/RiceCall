@@ -23,20 +23,20 @@ import ipcService from '@/services/ipc.service';
 
 function MessageInputBoxGuard({
   userPermission,
-  channelGuestTextGapTime,
-  channelGuestTextWaitTime,
   userLastJoinChannelTime,
   userLastMessageTime,
-  isForbidByChatMode,
+  channelForbidText,
+  channelGuestTextGapTime,
+  channelGuestTextWaitTime,
   channelGuestTextMaxLength,
   onSendMessage,
 }: {
   userPermission: number;
-  channelGuestTextGapTime: number;
-  channelGuestTextWaitTime: number;
   userLastJoinChannelTime: number;
   userLastMessageTime: number;
-  isForbidByChatMode: boolean;
+  channelForbidText: boolean;
+  channelGuestTextGapTime: number;
+  channelGuestTextWaitTime: number;
   channelGuestTextMaxLength: number;
   onSendMessage: (msg: string) => void;
 }) {
@@ -56,6 +56,7 @@ function MessageInputBoxGuard({
   const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - userLastMessageTime) / 1000) : 0;
 
   const isGuest = userPermission === 1;
+  const isForbidByChatMode = channelForbidText && userPermission < 3;
   const isForbidByGuestText = isGuest && isForbidByChatMode;
   const isForbidByGuestTextGap = isGuest && leftGapTime > 0;
   const isForbidByGuestTextWait = isGuest && leftWaitTime > 0;
@@ -100,7 +101,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const sidebarRef = useRef<HTMLDivElement>(null);
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
-    const voiceModeRef = useRef<HTMLDivElement>(null);
+    const voiceModeMenuRef = useRef<HTMLDivElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
     const isMicTakenRef = useRef<boolean>(false);
 
@@ -132,7 +133,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       guestTextMaxLength: channelGuestTextMaxLength,
     } = currentChannel;
     const announcement = channelAnnouncement || serverAnnouncement;
-    const isForbidByChatMode = channelForbidText && userPermission < 3;
 
     // Handlers
     const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
@@ -171,29 +171,29 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       webRTC.changeMicVolume(parseInt(e.target.value));
     };
 
-    const onSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
       e.currentTarget.setPointerCapture(e.pointerId);
       isResizingSidebarRef.current = true;
     };
 
-    const onSidebarHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const handleSidebarHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
       if (!isResizingSidebarRef.current || !sidebarRef.current) return;
       sidebarRef.current.style.width = `${e.clientX}px`;
     };
 
-    const onSidebarHandleUp = () => (isResizingSidebarRef.current = false);
+    const handleSidebarHandleUp = () => (isResizingSidebarRef.current = false);
 
-    const onAnnAreaHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const handleAnnAreaHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
       e.currentTarget.setPointerCapture(e.pointerId);
       isResizingAnnAreaRef.current = true;
     };
 
-    const onAnnAreaHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const handleAnnAreaHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
       if (!isResizingAnnAreaRef.current || !annAreaRef.current) return;
       annAreaRef.current.style.height = `${e.clientY - annAreaRef.current.offsetTop}px`;
     };
 
-    const onAnnAreaHandleUp = () => (isResizingAnnAreaRef.current = false);
+    const handleAnnAreaHandleUp = () => (isResizingAnnAreaRef.current = false);
 
     // Effects
     useEffect(() => {
@@ -263,7 +263,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           </aside>
 
           {/* Resize Handle */}
-          <div className="resize-handle" onPointerDown={onSidebarHandleDown} onPointerMove={onSidebarHandleMove} onPointerUp={onSidebarHandleUp} />
+          <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} onPointerUp={handleSidebarHandleUp} />
 
           {/* Right Content */}
           <main className={styles['content']}>
@@ -273,7 +273,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             </div>
 
             {/* Resize Handle */}
-            <div className="resize-handle-vertical" onPointerDown={onAnnAreaHandleDown} onPointerMove={onAnnAreaHandleMove} onPointerUp={onAnnAreaHandleUp} />
+            <div className="resize-handle-vertical" onPointerDown={handleAnnAreaHandleDown} onPointerMove={handleAnnAreaHandleMove} onPointerUp={handleAnnAreaHandleUp} />
 
             {/* Message Area */}
             <div className={styles['message-area']}>
@@ -292,12 +292,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   handleSendMessage(serverId, channelId, { type: 'general', content: msg });
                 }}
                 userPermission={userPermission}
-                channelGuestTextGapTime={channelGuestTextGapTime}
-                channelGuestTextWaitTime={channelGuestTextWaitTime}
                 userLastJoinChannelTime={userLastJoinChannelTime}
                 userLastMessageTime={userLastMessageTime}
-                isForbidByChatMode={isForbidByChatMode}
+                channelGuestTextGapTime={channelGuestTextGapTime}
+                channelGuestTextWaitTime={channelGuestTextWaitTime}
                 channelGuestTextMaxLength={channelGuestTextMaxLength}
+                channelForbidText={channelForbidText}
               />
             </div>
 
@@ -305,13 +305,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             <div className={styles['button-area']}>
               <div className={styles['buttons']}>
                 <div
-                  ref={voiceModeRef}
+                  ref={voiceModeMenuRef}
                   className={styles['voice-mode-dropdown']}
                   style={userPermission >= 3 ? {} : { display: 'none' }}
                   onClick={() => {
-                    if (!voiceModeRef.current) return;
-                    const x = voiceModeRef.current.getBoundingClientRect().left;
-                    const y = voiceModeRef.current.getBoundingClientRect().top;
+                    if (!voiceModeMenuRef.current) return;
+                    const x = voiceModeMenuRef.current.getBoundingClientRect().left;
+                    const y = voiceModeMenuRef.current.getBoundingClientRect().top;
                     contextMenu.showContextMenu(x, y, true, false, [
                       {
                         id: 'free-speech',

@@ -49,17 +49,17 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
     ipcService.socket.send('editUser', { update: { signature } });
   };
 
-  const onSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+  const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isResizingSidebarRef.current = true;
   };
 
-  const onSidebarHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  const handleSidebarHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isResizingSidebarRef.current || !sidebarRef.current) return;
     sidebarRef.current.style.width = `${e.clientX}px`;
   };
 
-  const onSidebarHandleUp = () => (isResizingSidebarRef.current = false);
+  const handleSidebarHandleUp = () => (isResizingSidebarRef.current = false);
 
   // Effects
   useEffect(() => {
@@ -141,7 +141,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         </aside>
 
         {/* Resize Handle */}
-        <div className="resize-handle" onPointerDown={onSidebarHandleDown} onPointerMove={onSidebarHandleMove} onPointerUp={onSidebarHandleUp} />
+        <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} onPointerUp={handleSidebarHandleUp} />
 
         {/* Right Content */}
         <main className={friendPage['content']}>

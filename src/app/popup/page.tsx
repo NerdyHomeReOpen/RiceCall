@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -96,10 +96,81 @@ const Popup = React.memo(() => {
 
   // States
   const [type, setType] = useState<PopupType | null>(null);
-  const [headerTitle, setHeaderTitle] = useState<string>('');
-  const [headerButtons, setHeaderButtons] = useState<('minimize' | 'maxsize' | 'close')[]>([]);
-  const [content, setContent] = useState<ReactNode | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
+
+  // Memos
+  const { title, buttons, node, hideHeader } = useMemo<{ title: string; buttons: ('close' | 'minimize' | 'maxsize')[]; node: React.ReactNode | null; hideHeader: boolean }>(() => {
+    if (!type) return { title: '', buttons: [], node: null, hideHeader: true };
+
+    const needData = !['systemSetting', 'changeTheme', 'aboutus'].includes(type);
+    if (needData && !initialData) return { title: '', buttons: [], node: null, hideHeader: true };
+
+    switch (type) {
+      case 'aboutus':
+        return { title: t('about-ricecall'), buttons: ['close'], node: <About {...initialData} />, hideHeader: false };
+      case 'applyMember':
+        return { title: t('apply-member'), buttons: ['close'], node: <ApplyMember {...initialData} />, hideHeader: false };
+      case 'applyFriend':
+        return { title: t('apply-friend'), buttons: ['close'], node: <ApplyFriend {...initialData} />, hideHeader: false };
+      case 'avatarCropper':
+        return { title: t('avatar-cropper'), buttons: ['close'], node: <AvatarCropper {...initialData} />, hideHeader: false };
+      case 'blockMember':
+        return { title: t('block'), buttons: ['close'], node: <BlockMember {...initialData} />, hideHeader: false };
+      case 'changeTheme':
+        return { title: t('change-theme'), buttons: ['close'], node: <ChangeTheme {...initialData} />, hideHeader: false };
+      case 'channelPassword':
+        return { title: t('please-enter-the-channel-password'), buttons: ['close'], node: <ChannelPassword {...initialData} />, hideHeader: false };
+      case 'channelSetting':
+        return { title: t('edit-channel'), buttons: ['close'], node: <ChannelSetting {...initialData} />, hideHeader: false };
+      case 'createServer':
+        return { title: t('create-server'), buttons: ['close'], node: <CreateServer {...initialData} />, hideHeader: false };
+      case 'createChannel':
+        return { title: t('create-channel'), buttons: ['close'], node: <CreateChannel {...initialData} />, hideHeader: false };
+      case 'createFriendGroup':
+        return { title: t('create-friend-group'), buttons: ['close'], node: <CreateFriendGroup {...initialData} />, hideHeader: false };
+      case 'dialogAlert':
+      case 'dialogAlert2':
+        return { title: t('dialog-alert'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'ALERT' }} />, hideHeader: false };
+      case 'dialogSuccess':
+        return { title: t('dialog-success'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'SUCCESS' }} />, hideHeader: false };
+      case 'dialogWarning':
+        return { title: t('dialog-warning'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'WARNING' }} />, hideHeader: false };
+      case 'dialogError':
+        return { title: t('dialog-error'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'ERROR' }} />, hideHeader: false };
+      case 'dialogInfo':
+        return { title: t('dialog-info'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'INFO' }} />, hideHeader: false };
+      case 'directMessage':
+        return { title: initialData?.targetName || t('direct-message'), buttons: ['close', 'minimize', 'maxsize'], node: <DirectMessage {...initialData} />, hideHeader: false };
+      case 'editChannelOrder':
+        return { title: t('edit-channel-order'), buttons: ['close'], node: <EditChannelOrder {...initialData} />, hideHeader: false };
+      case 'editChannelName':
+        return { title: t('edit-channel-name'), buttons: ['close'], node: <EditChannelName {...initialData} />, hideHeader: false };
+      case 'editFriendGroup':
+        return { title: t('edit-friend-group'), buttons: ['close'], node: <EditFriendGroup {...initialData} />, hideHeader: false };
+      case 'editFriend':
+        return { title: t('edit-friend'), buttons: ['close'], node: <EditFriend {...initialData} />, hideHeader: false };
+      case 'editNickname':
+        return { title: t('edit-member-card'), buttons: ['close'], node: <EditNickname {...initialData} />, hideHeader: false };
+      case 'friendVerification':
+        return { title: t('friend-verification'), buttons: ['close'], node: <FriendVerification {...initialData} />, hideHeader: false };
+      case 'memberApplySetting':
+        return { title: t('member-apply-setting'), buttons: ['close'], node: <MemberApplySetting {...initialData} />, hideHeader: false };
+      case 'searchUser':
+        return { title: t('add-friend'), buttons: ['close'], node: <SearchUser {...initialData} />, hideHeader: false };
+      case 'serverBroadcast':
+        return { title: t('server-broadcast'), buttons: ['close'], node: <ServerBroadcast {...initialData} />, hideHeader: false };
+      case 'serverSetting':
+        return { title: t('edit-server'), buttons: ['close'], node: <ServerSetting {...initialData} />, hideHeader: false };
+      case 'systemSetting':
+        return { title: t('system-setting'), buttons: ['close'], node: <SystemSetting {...initialData} />, hideHeader: false };
+      case 'userInfo':
+        return { title: t('user-info'), buttons: [], node: <UserSetting {...initialData} />, hideHeader: true };
+      case 'userSetting':
+        return { title: t('edit-user'), buttons: ['close'], node: <UserSetting {...initialData} />, hideHeader: false };
+      default:
+        return { title: '', buttons: [], node: null, hideHeader: true };
+    }
+  }, [type, initialData, t]);
 
   // Effects
   useEffect(() => {
@@ -119,184 +190,20 @@ const Popup = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const popupInitialData = initialData;
-
-    if (type !== 'systemSetting' && type !== 'changeTheme' && type !== 'aboutus' && !popupInitialData) {
-      return;
-    }
-
-    switch (type) {
-      case 'avatarCropper':
-        setHeaderTitle(t('avatar-cropper'));
-        setHeaderButtons(['close']);
-        setContent(<AvatarCropper {...popupInitialData} />);
-        break;
-      case 'channelPassword':
-        setHeaderTitle(t('please-enter-the-channel-password'));
-        setHeaderButtons(['close']);
-        setContent(<ChannelPassword {...popupInitialData} />);
-        break;
-      case 'userInfo':
-        setHeaderTitle(t('user-info'));
-        setHeaderButtons(['close']);
-        setContent(<UserSetting {...popupInitialData} />);
-        break;
-      case 'userSetting':
-        setHeaderTitle(t('edit-user'));
-        setHeaderButtons(['close']);
-        setContent(<UserSetting {...popupInitialData} />);
-        break;
-      case 'serverSetting':
-        setHeaderTitle(t('edit-server'));
-        setHeaderButtons(['close']);
-        setContent(<ServerSetting {...popupInitialData} />);
-        break;
-      case 'serverBroadcast':
-        setHeaderTitle(t('server-broadcast'));
-        setHeaderButtons(['close']);
-        setContent(<ServerBroadcast {...popupInitialData} />);
-        break;
-      case 'blockMember':
-        setHeaderTitle(t('block'));
-        setHeaderButtons(['close']);
-        setContent(<BlockMember {...popupInitialData} />);
-        break;
-      case 'channelSetting':
-        setHeaderTitle(t('edit-channel'));
-        setHeaderButtons(['close']);
-        setContent(<ChannelSetting {...popupInitialData} />);
-        break;
-      case 'memberApplySetting':
-        setHeaderTitle(t('member-apply-setting'));
-        setHeaderButtons(['close']);
-        setContent(<MemberApplySetting {...popupInitialData} />);
-        break;
-      case 'systemSetting':
-        setHeaderTitle(t('system-setting'));
-        setHeaderButtons(['close']);
-        setContent(<SystemSetting {...popupInitialData} />);
-        break;
-      case 'createServer':
-        setHeaderTitle(t('create-server'));
-        setHeaderButtons(['close']);
-        setContent(<CreateServer {...popupInitialData} />);
-        break;
-      case 'createChannel':
-        setHeaderTitle(t('create-channel'));
-        setHeaderButtons(['close']);
-        setContent(<CreateChannel {...popupInitialData} />);
-        break;
-      case 'createFriendGroup':
-        setHeaderTitle(t('create-friend-group'));
-        setHeaderButtons(['close']);
-        setContent(<CreateFriendGroup {...popupInitialData} />);
-        break;
-      case 'editChannelOrder':
-        setHeaderTitle(t('edit-channel-order'));
-        setHeaderButtons(['close']);
-        setContent(<EditChannelOrder {...popupInitialData} />);
-        break;
-      case 'editChannelName':
-        setHeaderTitle(t('edit-channel-name'));
-        setHeaderButtons(['close']);
-        setContent(<EditChannelName {...popupInitialData} />);
-        break;
-      case 'editNickname':
-        setHeaderTitle(t('edit-member-card'));
-        setHeaderButtons(['close']);
-        setContent(<EditNickname {...popupInitialData} />);
-        break;
-      case 'editFriendGroup':
-        setHeaderTitle(t('edit-friend-group'));
-        setHeaderButtons(['close']);
-        setContent(<EditFriendGroup {...popupInitialData} />);
-        break;
-      case 'editFriend':
-        setHeaderTitle(t('edit-friend'));
-        setHeaderButtons(['close']);
-        setContent(<EditFriend {...popupInitialData} />);
-        break;
-      case 'applyMember':
-        setHeaderTitle(t('apply-member'));
-        setHeaderButtons(['close']);
-        setContent(<ApplyMember {...popupInitialData} />);
-        break;
-      case 'applyFriend':
-        setHeaderTitle(t('apply-friend'));
-        setHeaderButtons(['close']);
-        setContent(<ApplyFriend {...popupInitialData} />);
-        break;
-      case 'searchUser':
-        setHeaderTitle(t('add-friend'));
-        setHeaderButtons(['close']);
-        setContent(<SearchUser {...popupInitialData} />);
-        break;
-      case 'directMessage':
-        setHeaderTitle(popupInitialData?.targetName || t('direct-message'));
-        setHeaderButtons(['close', 'minimize', 'maxsize']);
-        setContent(<DirectMessage {...popupInitialData} />);
-        break;
-      case 'dialogAlert':
-      case 'dialogAlert2':
-        setHeaderTitle(t('dialog-alert'));
-        setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...popupInitialData, iconType: 'ALERT' }} />);
-        break;
-      case 'dialogSuccess':
-        setHeaderTitle(t('dialog-success'));
-        setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...popupInitialData, iconType: 'SUCCESS' }} />);
-        break;
-      case 'dialogWarning':
-        setHeaderTitle(t('dialog-warning'));
-        setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...popupInitialData, iconType: 'WARNING' }} />);
-        break;
-      case 'dialogError':
-        setHeaderTitle(t('dialog-error'));
-        setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...popupInitialData, iconType: 'ERROR' }} />);
-        break;
-      case 'dialogInfo':
-        setHeaderTitle(t('dialog-info'));
-        setHeaderButtons(['close']);
-        setContent(<Dialog {...{ ...popupInitialData, iconType: 'INFO' }} />);
-        break;
-      case 'changeTheme':
-        setHeaderTitle(t('change-theme'));
-        setHeaderButtons(['close']);
-        setContent(<ChangeTheme {...popupInitialData} />);
-        break;
-      case 'aboutus':
-        setHeaderTitle(t('about-ricecall'));
-        setHeaderButtons(['close']);
-        setContent(<About {...popupInitialData} />);
-        break;
-      case 'friendVerification':
-        setHeaderTitle(t('friend-verification'));
-        setHeaderButtons(['close']);
-        setContent(<FriendVerification {...popupInitialData} />);
-        break;
-      default:
-        break;
-    }
-  }, [t, initialData, type]);
-
-  useEffect(() => {
     const unsubscribe = [ipcService.initialData.on((data) => setInitialData(data))];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
   return (
     <>
-      {(type !== 'userInfo' || headerTitle !== t('user-info')) && headerButtons.length > 0 && (
+      {!hideHeader && (
         <Header
-          title={headerTitle}
-          buttons={headerButtons}
+          title={title}
+          buttons={buttons}
           titleBoxIcon={type === 'changeTheme' ? header['title-box-skin-icon'] : type === 'directMessage' ? header['title-box-direct-message-icon'] : undefined}
         />
       )}
-      {content}
+      {node}
     </>
   );
 });
