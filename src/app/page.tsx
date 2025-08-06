@@ -7,7 +7,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import header from '@/styles/header.module.css';
 
 // Types
-import type { PopupType, Server, User, Channel, FriendGroup, ChannelMessage, PromptMessage, FriendApplication, RecommendServerList, Friend, Member, QueueMember } from '@/types';
+import type { PopupType, Server, User, Channel, FriendGroup, ChannelMessage, PromptMessage, FriendApplication, ServerInvitation, RecommendServerList, Friend, Member, QueueMember } from '@/types';
 
 // i18n
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
@@ -43,9 +43,11 @@ interface HeaderProps {
   user: User;
   currentServer: Server;
   friendApplications: FriendApplication[];
+  serverInvitations: ServerInvitation[];
+  systemNotify: string[];
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, serverInvitations, systemNotify }) => {
   // Hooks
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
@@ -54,6 +56,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
 
   // Refs
   const menuRef = useRef<HTMLDivElement>(null);
+  const notifyMenuRef = useRef<HTMLDivElement>(null);
   const isCloseToTray = useRef<boolean>(true);
 
   // States
@@ -62,6 +65,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
 
   const { userId, name: userName, status: userStatus } = user;
   const { serverId, name: serverName } = currentServer;
+
+  // Variables
+  const hasNotify = friendApplications.length !== 0 || serverInvitations.length !== 0 || systemNotify.length !== 0;
 
   // Constants
   const MAIN_TABS = [
@@ -221,8 +227,42 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       <div className={header['buttons']}>
         <div className={header['gift']} />
         <div className={header['game']} />
-        <div className={header['notice']} onClick={handleOpenFriendVerification}>
-          <div className={` ${header['overlay']} ${friendApplications.length > 0 ? header['new'] : ''} `} />
+        <div
+          ref={notifyMenuRef}
+          className={header['notice']}
+          onClick={() => {
+            if (!notifyMenuRef.current) return;
+            const x = notifyMenuRef.current.getBoundingClientRect().left - 70;
+            const y = notifyMenuRef.current.getBoundingClientRect().bottom + 10;
+            contextMenu.showNotifyMenu(x, y, false, false, hasNotify, [
+              {
+                id: 'friend-applications',
+                label: `好友驗證 (${friendApplications.length})`,
+                icon: 'notify',
+                show: friendApplications.length > 0,
+                content: friendApplications.map((f) => f.avatarUrl),
+                onClick: () => handleOpenFriendVerification(),
+              },
+              {
+                id: 'system-setting',
+                label: `語音群邀請 (${serverInvitations.length})`,
+                icon: 'notify',
+                show: serverInvitations.length > 0,
+                content: serverInvitations.map((s) => s.avatarUrl),
+                onClick: () => {},
+              },
+              {
+                id: 'system-setting',
+                label: `系統通知 (${systemNotify.length})`,
+                icon: 'notify',
+                show: systemNotify.length > 0,
+                content: systemNotify,
+                onClick: () => {},
+              },
+            ]);
+          }}
+        >
+          <div className={`${header['overlay']} ${hasNotify && header['new']}`} />
         </div>
         <div className={header['spliter']} />
         <div
@@ -342,6 +382,8 @@ const RootPageComponent = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
+  const [serverInvitations, setServerInvitations] = useState<ServerInvitation[]>([]);
+  const [systemNotify, setSystemNotify] = useState<string[]>([]);
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
   const [serverMembers, setServerMembers] = useState<Member[]>([]);
   const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
@@ -612,7 +654,7 @@ const RootPageComponent = () => {
     <WebRTCProvider userId={userId}>
       <ActionScannerProvider>
         <ExpandedProvider>
-          <Header user={user} currentServer={server} friendApplications={friendApplications} />
+          <Header user={user} currentServer={server} friendApplications={friendApplications} serverInvitations={serverInvitations} systemNotify={systemNotify} />
           {!socket.isConnected ? (
             <LoadingSpinner />
           ) : (
