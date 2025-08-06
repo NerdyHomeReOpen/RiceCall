@@ -77,7 +77,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const canChangeToAdmin = canManageMember && memberPermission !== 5 && memberPermission > 1 && userPermission > 5;
   const canKickServer = canManageMember && memberCurrentServerId === serverId;
   const canKickChannel = canManageMember && memberCurrentChannelId !== serverLobbyId;
-  const canBan = canManageMember;
   const canMoveToChannel = isServerAdmin && userPermission >= memberPermission && memberCurrentChannelId !== currentChannelId;
   const canRemoveMembership = isCurrentUser && userPermission > 1 && userPermission < 6;
 
@@ -90,12 +89,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
 
   // Handlers
   const handleMuteUser = (userId: User['userId']) => {
-    if (!webRTC) return;
     webRTC.handleMuteUser(userId);
   };
 
   const handleUnmuteUser = (userId: User['userId']) => {
-    if (!webRTC) return;
     webRTC.handleUnmuteUser(userId);
   };
 
@@ -113,6 +110,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
 
   const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
     ipcService.socket.send('editMember', { userId, serverId, update: member });
+  };
+
+  const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    ipcService.socket.send('connectChannel', { serverId, channelId });
   };
 
   const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -194,9 +195,15 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
         const y = e.clientY;
         contextMenu.showContextMenu(x, y, false, false, [
           {
+            id: 'join-user-channel',
+            label: t('join-user-channel'),
+            show: !isCurrentUser && !isSameChannel,
+            onClick: () => handleConnectChannel(serverId, memberCurrentChannelId),
+          },
+          {
             id: 'add-to-queue',
             label: t('add-to-queue'),
-            show: !isCurrentUser && canManageMember,
+            show: !isCurrentUser && canManageMember && isSameChannel,
             onClick: () => handleAddToQueue(memberUserId),
           },
           {
@@ -219,6 +226,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
           {
             id: 'set-mute',
             label: isMutedByUser ? t('unmute') : t('mute'),
+            show: !isCurrentUser,
             onClick: () => (isMutedByUser ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
           },
           {
@@ -276,7 +284,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
           {
             id: 'block',
             label: t('block'),
-            show: canBan,
+            show: canManageMember,
             onClick: () => {
               handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
             },
