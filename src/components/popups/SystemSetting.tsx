@@ -6,6 +6,7 @@ import popup from '@/styles/popup.module.css';
 
 // Providers
 import { useTranslation } from 'react-i18next';
+import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -13,6 +14,7 @@ import ipcService from '@/services/ipc.service';
 const SystemSettingPopup: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
+  const soundPlayer = useSoundPlayer();
 
   // Refs
   const activeInputRef = useRef<string | null>(null);
@@ -103,7 +105,11 @@ const SystemSettingPopup: React.FC = React.memo(() => {
     ipcService.window.close();
   };
 
-  const setHotKey = useCallback(
+  const handlePlaySound = (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
+    args.forEach((s) => soundPlayer.playSound(s, true));
+  };
+
+  const handleSetHotKey = useCallback(
     (key: string, value: string | null) => {
       const target = defaultHotKeyConfig[key as keyof typeof defaultHotKeyConfig];
       const targetValue = value ? value : target.default;
@@ -145,7 +151,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
       // reset to default
       if (e.key === 'Escape') {
-        setHotKey(current, null);
+        handleSetHotKey(current, null);
         closeDelection();
         return;
       }
@@ -173,13 +179,13 @@ const SystemSettingPopup: React.FC = React.memo(() => {
       if (usedBy.length > 0) {
         setConflicts(usedBy);
       } else {
-        setHotKey(current, mergeKey);
+        handleSetHotKey(current, mergeKey);
         closeDelection();
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [hotKeys, setHotKey]);
+  }, [hotKeys, handleSetHotKey]);
 
   useEffect(() => {
     ipcService.systemSettings.get((data) => {
@@ -249,7 +255,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
       setInputDevices(inputs);
       setOutputDevices(outputs);
     });
-  }, [defaultHotKeyConfig, setHotKey]);
+  }, [defaultHotKeyConfig, handleSetHotKey]);
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -726,7 +732,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     <tr>
                       <td>{t('enter-voice-channel-status-label')}</td>
                       <td>
-                        <div className={popup['sound-effect-preview']} />
+                        <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('enterVoiceChannel')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setEnterVoiceChannelSound(!enterVoiceChannelSound)}>
                         {!enterVoiceChannelSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
@@ -735,7 +741,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     <tr>
                       <td>{t('leave-voice-channel-status-label')}</td>
                       <td>
-                        <div className={popup['sound-effect-preview']} />
+                        <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('leaveVoiceChannel')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setLeaveVoiceChannelSound(!leaveVoiceChannelSound)}>
                         {!leaveVoiceChannelSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
@@ -744,7 +750,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     <tr>
                       <td>{t('start-speaking-status-label')}</td>
                       <td>
-                        <div className={popup['sound-effect-preview']} />
+                        <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('startSpeaking')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setStartSpeakingSound(!startSpeakingSound)}>
                         {!startSpeakingSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
@@ -753,7 +759,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     <tr>
                       <td>{t('stop-speaking-status-label')}</td>
                       <td>
-                        <div className={popup['sound-effect-preview']} />
+                        <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('stopSpeaking')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setStopSpeakingSound(!stopSpeakingSound)}>
                         {!stopSpeakingSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
@@ -762,7 +768,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     <tr>
                       <td>{t('receive-direct-message-status-label')}</td>
                       <td>
-                        <div className={popup['sound-effect-preview']} />
+                        <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('receiveDirectMessage')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setReceiveDirectMessageSound(!receiveDirectMessageSound)}>
                         {!receiveDirectMessageSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
@@ -771,7 +777,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     <tr>
                       <td>{t('receive-channel-message-status-label')}</td>
                       <td>
-                        <div className={popup['sound-effect-preview']} />
+                        <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('receiveChannelMessage')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setReceiveChannelMessageSound(!receiveChannelMessageSound)}>
                         {!receiveChannelMessageSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}

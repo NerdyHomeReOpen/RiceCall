@@ -4,7 +4,7 @@ import { createContext, ReactNode, useContext, useEffect, useRef } from 'react';
 import ipcService from '@/services/ipc.service';
 
 interface SoundPlayerContextType {
-  playSound: (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking') => void;
+  playSound: (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => void;
 }
 
 const SoundPlayerContext = createContext<SoundPlayerContextType | null>(null);
@@ -31,45 +31,53 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
   const receiveChannelMessageSoundRef = useRef(false);
   const outputDeviceIdRef = useRef<string | null>(null);
 
-  const handlePlaySound = (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking') => {
-    if (disableAllSoundEffectRef.current) return;
+  const playSound = (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => {
+    console.info('[SoundPlayer] play sound: ', sound, force);
+
+    if (disableAllSoundEffectRef.current && !force) return;
 
     if (audioRef.current) {
       audioRef.current = null;
     }
 
-    if (sound === 'enterVoiceChannel' && enterVoiceChannelSoundRef.current) {
+    if (sound === 'enterVoiceChannel') {
+      if (!enterVoiceChannelSoundRef.current && !force) return;
       audioRef.current = new Audio('./sounds/JoinVoiceChannel.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'leaveVoiceChannel' && leaveVoiceChannelSoundRef.current) {
+    if (sound === 'leaveVoiceChannel') {
+      if (!leaveVoiceChannelSoundRef.current && !force) return;
       audioRef.current = new Audio('./sounds/LeaveVoiceChannel.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'receiveChannelMessage' && receiveChannelMessageSoundRef.current) {
+    if (sound === 'receiveChannelMessage') {
+      if (!receiveChannelMessageSoundRef.current && !force) return;
       audioRef.current = new Audio('./sounds/ReceiveChannelMsg.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'receiveDirectMessage' && receiveDirectMessageSoundRef.current) {
+    if (sound === 'receiveDirectMessage') {
+      if (!receiveDirectMessageSoundRef.current && !force) return;
       audioRef.current = new Audio('./sounds/ReceiveDirectMsg.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'startSpeaking' && startSpeakingSoundRef.current) {
-      audioRef.current = new Audio('./sounds/StartSpeaking.wav');
+    if (sound === 'startSpeaking') {
+      if (!startSpeakingSoundRef.current && !force) return;
+      audioRef.current = new Audio('./sounds/MicKeyDown.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'stopSpeaking' && stopSpeakingSoundRef.current) {
-      audioRef.current = new Audio('./sounds/StopSpeaking.wav');
+    if (sound === 'stopSpeaking') {
+      if (!stopSpeakingSoundRef.current && !force) return;
+      audioRef.current = new Audio('./sounds/MicKeyUp.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
@@ -124,7 +132,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
-  return <SoundPlayerContext.Provider value={{ playSound: handlePlaySound }}>{children}</SoundPlayerContext.Provider>;
+  return <SoundPlayerContext.Provider value={{ playSound }}>{children}</SoundPlayerContext.Provider>;
 };
 
 SoundPlayerProvider.displayName = 'SoundPlayerProvider';

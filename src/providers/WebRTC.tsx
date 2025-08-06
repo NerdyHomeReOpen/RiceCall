@@ -20,6 +20,9 @@ import {
   ACK,
 } from '@/types';
 
+// Providers
+import { useSoundPlayer } from '@/providers/SoundPlayer';
+
 const sfuUrl = process.env.NEXT_PUBLIC_SFU_URL || 'http://localhost:4501';
 
 interface WebRTCContextType {
@@ -61,6 +64,9 @@ interface WebRTCProviderProps {
 }
 
 const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
+  // Providers
+  const soundPlayer = useSoundPlayer();
+
   // Constants
   const SPEAKING_VOLUME_THRESHOLD = 2;
 
@@ -297,6 +303,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       console.warn('Not in key mode');
       return;
     }
+    soundPlayer.playSound(enable ? 'startSpeaking' : 'stopSpeaking');
     micStreamRef.current!.getAudioTracks().forEach((track) => {
       track.enabled = micTakenRef.current && enable;
     });
