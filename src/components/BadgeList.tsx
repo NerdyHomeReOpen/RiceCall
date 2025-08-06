@@ -16,9 +16,8 @@ interface BadgeListProps {
 }
 
 const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, preferTop, maxDisplay = 21 }) => {
-  const sortedBadges = [...badges]
-    .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
-    .slice(0, maxDisplay);
+  // Variables
+  const sortedBadges = [...badges].sort((a, b) => a.order - b.order).slice(0, maxDisplay);
 
   return (
     <div className={styles['badge-viewer-wrapper']}>
