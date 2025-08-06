@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 
+// Types
+import type { ChannelUIMode } from '@/types';
+
 // CSS
 import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
@@ -29,7 +32,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [statusAutoIdle, setStatusAutoIdle] = useState<boolean>(true);
   const [statusAutoIdleMinutes, setStatusAutoIdleMinutes] = useState<number>(10);
   const [statusAutoDnd, setStatusAutoDnd] = useState<boolean>(false);
-  const [channelUIMode, setChannelUIMode] = useState<'classic' | 'three-line' | 'auto'>('auto');
+  const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('classic');
   const [closeToTray, setCloseToTray] = useState<boolean>(true);
   const [fontSize, setFontSize] = useState<number>(13);
   const [fontFamily, setFontFamily] = useState<string>('Arial');
@@ -334,7 +337,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <input name="channel-three-line-mode" type="radio" checked={channelUIMode === 'three-line'} onChange={() => setChannelUIMode('three-line')} />
                 <div className={popup['label']}>{t('channel-three-line-mode-label')}</div>
               </div>
-              <div className={`${popup['input-box']} ${popup['row']}`}>
+              <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input name="channel-auto-mode" type="radio" checked={channelUIMode === 'auto'} onChange={() => setChannelUIMode('auto')} />
                 <div className={popup['label']}>{t('channel-auto-mode-label')}</div>
               </div>

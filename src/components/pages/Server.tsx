@@ -11,7 +11,7 @@ import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
-import type { User, Server, Channel, Member, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueMember } from '@/types';
+import type { User, Server, Channel, Member, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueMember, ChannelUIMode } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -110,6 +110,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
     const [speakMode, setSpeakMode] = useState<SpeakingMode>('key');
     const [speakHotKey, setSpeakHotKey] = useState<string>('');
+    const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
 
     // Variables
     const { userId } = user;
@@ -190,7 +191,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     const handleAnnAreaHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
       if (!isResizingAnnAreaRef.current || !annAreaRef.current) return;
-      annAreaRef.current.style.height = `${e.clientY - annAreaRef.current.offsetTop}px`;
+      if (channelUIMode === 'classic') {
+        annAreaRef.current.style.height = `${e.clientY - annAreaRef.current.offsetTop}px`;
+      } else if (channelUIMode === 'three-line') {
+        annAreaRef.current.style.width = `${e.clientX - annAreaRef.current.offsetLeft}px`;
+      }
     };
 
     const handleAnnAreaHandleUp = () => (isResizingAnnAreaRef.current = false);
@@ -224,6 +229,16 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [queueMembers, userId, webRTC]);
 
     useEffect(() => {
+      if (channelUIMode === 'classic') {
+        annAreaRef.current!.style.minWidth = '100%';
+        annAreaRef.current!.style.minHeight = '60px';
+      } else if (channelUIMode === 'three-line') {
+        annAreaRef.current!.style.minHeight = '100%';
+        annAreaRef.current!.style.minWidth = '200px';
+      }
+    }, [channelUIMode]);
+
+    useEffect(() => {
       ipcService.discord.updatePresence({
         details: `${t('in')} ${serverName}`,
         state: `${t('chat-with-members', { '0': serverMembers.length.toString() })}`,
@@ -242,7 +257,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [t, serverName, serverMembers]);
 
     useEffect(() => {
-      const unsubscribe = [ipcService.systemSettings.speakingMode.get(setSpeakMode), ipcService.systemSettings.defaultSpeakingKey.get(setSpeakHotKey)];
+      const unsubscribe = [
+        ipcService.systemSettings.speakingMode.get(setSpeakMode),
+        ipcService.systemSettings.defaultSpeakingKey.get(setSpeakHotKey),
+        ipcService.systemSettings.channelUIMode.get(setChannelUIMode),
+      ];
       return () => unsubscribe.forEach((unsub) => unsub());
     }, []);
 
@@ -267,36 +286,50 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
           {/* Right Content */}
           <main className={styles['content']}>
-            {/* Announcement Area */}
-            <div ref={annAreaRef} className={styles['announcement-area']}>
-              <MarkdownViewer markdownText={announcement} />
-            </div>
-
-            {/* Resize Handle */}
-            <div className="resize-handle-vertical" onPointerDown={handleAnnAreaHandleDown} onPointerMove={handleAnnAreaHandleMove} onPointerUp={handleAnnAreaHandleUp} />
-
             {/* Message Area */}
-            <div className={styles['message-area']}>
-              <MessageViewer messages={channelMessages} userId={userId} />
-            </div>
+            <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
+              {/* Announcement Area */}
+              <div ref={annAreaRef} className={styles['announcement-area']}>
+                <MarkdownViewer markdownText={announcement} />
+              </div>
 
-            {/* Input Area */}
-            <div className={styles['input-area']}>
-              <div className={styles['broadcast-area']} style={{ display: showActionMessage ? 'flex' : 'none' }}>
-                <div className={styles['broadcast-content']}>
-                  <MessageViewer messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} userId={userId} />
+              {/* Resize Handle */}
+              <div
+                className="resize-handle-vertical"
+                style={channelUIMode === 'classic' ? {} : { display: 'none' }}
+                onPointerDown={handleAnnAreaHandleDown}
+                onPointerMove={handleAnnAreaHandleMove}
+                onPointerUp={handleAnnAreaHandleUp}
+              />
+              <div
+                className="resize-handle"
+                style={channelUIMode === 'three-line' ? {} : { display: 'none' }}
+                onPointerDown={handleAnnAreaHandleDown}
+                onPointerMove={handleAnnAreaHandleMove}
+                onPointerUp={handleAnnAreaHandleUp}
+              />
+
+              {/* Message Area */}
+              <div className={styles['message-area']}>
+                <MessageViewer messages={channelMessages} userId={userId} />
+                <div className={styles['input-area']}>
+                  <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
+                    <div className={styles['broadcast-content']}>
+                      <MessageViewer messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} userId={userId} />
+                    </div>
+                  </div>
+                  <MessageInputBoxGuard
+                    onSend={(msg) => handleSendMessage(serverId, channelId, { type: 'general', content: msg })}
+                    userPermission={userPermission}
+                    userLastJoinChannelTime={userLastJoinChannelTime}
+                    userLastMessageTime={userLastMessageTime}
+                    channelGuestTextGapTime={channelGuestTextGapTime}
+                    channelGuestTextWaitTime={channelGuestTextWaitTime}
+                    channelGuestTextMaxLength={channelGuestTextMaxLength}
+                    channelForbidText={channelForbidText}
+                  />
                 </div>
               </div>
-              <MessageInputBoxGuard
-                onSend={(msg) => handleSendMessage(serverId, channelId, { type: 'general', content: msg })}
-                userPermission={userPermission}
-                userLastJoinChannelTime={userLastJoinChannelTime}
-                userLastMessageTime={userLastMessageTime}
-                channelGuestTextGapTime={channelGuestTextGapTime}
-                channelGuestTextWaitTime={channelGuestTextWaitTime}
-                channelGuestTextMaxLength={channelGuestTextMaxLength}
-                channelForbidText={channelForbidText}
-              />
             </div>
 
             {/* Button Area */}

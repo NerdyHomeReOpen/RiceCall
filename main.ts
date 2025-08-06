@@ -1116,7 +1116,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-channel-ui-mode', (_, mode) => {
-    store.set('channel-ui-mode', mode || 'auto');
+    store.set('channelUIMode', mode || 'classic');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('channel-ui-mode', mode);
     });

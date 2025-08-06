@@ -507,6 +507,21 @@
 
 /* Content */
 
+.content-layout {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content-layout.classic {
+  flex-direction: column !important;
+}
+
+.content-layout.three-line {
+  flex-direction: row !important;
+}
+
 .content {
   display: flex;
   flex: 1;
@@ -519,30 +534,32 @@
   overflow-y: auto;
   padding: 0.75rem;
   min-height: 60px;
+  min-width: 200px;
 }
 
 .message-area {
-  display: flex;
   flex: 5;
-  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  min-width: 260px;
   padding: 0.75rem;
   overflow-y: auto;
 }
 
 .broadcast-area {
   position: absolute;
-  right: 0;
   left: 0;
-  bottom: 6rem;
-  display: flex;
+  bottom: calc(100% + 0.75rem);
+  width: 100%;
   min-height: 25px;
+  display: flex;
   align-items: center;
-  background-color: #fefee4;
   justify-content: center;
+  padding: 1px 5px;
   border: solid 1.5px #f9c55d;
   border-radius: 2px;
-  margin: 0 0.75rem;
-  padding: 1px 5px;
+  background-color: #fefee4;
 }
 
 .broadcast-area .broadcast-content {
@@ -567,8 +584,7 @@
 .input-area {
   position: relative;
   display: flex;
-  min-height: 80px;
-  padding: 0.75rem;
+  min-height: 60px;
 }
 
 .button-area {
