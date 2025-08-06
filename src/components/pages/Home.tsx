@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import dynamic from 'next/dynamic';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 // CSS
 import homePage from '@/styles/pages/home.module.css';
@@ -52,11 +51,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const socket = useSocket();
 
   // Refs
+  const canSearchRef = useRef<boolean>(true);
   const searchRef = useRef<HTMLDivElement>(null);
-  const searchTimeerRef = useRef<NodeJS.Timeout | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchQueryRef = useRef<string>('');
+  const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // States
-  const [searchQuery, setSearchQuery] = useState('');
   const [exactMatch, setExactMatch] = useState<Server | null>(null);
   const [personalResults, setPersonalResults] = useState<Server[]>([]);
   const [relatedResults, setRelatedResults] = useState<Server[]>([]);
@@ -64,106 +65,119 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   // Variables
   const { userId, name: userName, currentServerId } = user;
-  const hasResults = exactMatch || personalResults.length > 0 || relatedResults.length > 0;
-  const recentServers = servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp);
-  const favoriteServers = servers.filter((s) => s.favorite);
-  const ownedServers = servers.filter((s) => s.permissionLevel > 1);
+  const hasResults = !!exactMatch || !!personalResults.length || !!relatedResults.length;
+  const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
+  const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
+  const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
 
   // Handlers
-  const handleSearchServer = (query: string) => {
-    if (!query.trim()) {
-      handleClearSearchState();
-      return;
-    }
-    setSearchQuery(query);
-    if (searchTimeerRef.current) {
-      clearTimeout(searchTimeerRef.current);
-    }
-    searchTimeerRef.current = setTimeout(() => {
-      ipcService.socket.send('searchServer', { query });
+  const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value.trim();
+    if (!query || !canSearchRef.current) return;
+
+    ipcService.socket.send('searchServer', { query });
+    searchQueryRef.current = query;
+    canSearchRef.current = false;
+
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      canSearchRef.current = true;
     }, 500);
   };
 
-  const handleConnectServer = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-    if (loadingBox.isLoading) return;
-
-    if (currentServerId == serverId) {
-      mainTab.setSelectedTabId('server');
-      return;
-    }
-
-    loadingBox.setIsLoading(true);
-    loadingBox.setLoadingServerId(serverDisplayId);
-    ipcService.socket.send('connectServer', { serverId });
-    handleClearSearchState();
-  };
-
-  const handleServerSearch = (...args: Server[]) => {
-    setExactMatch(null);
-    setPersonalResults([]);
-    setRelatedResults([]);
-
-    if (!args.length) return;
-
-    const sortedServers = args.sort((a, b) => {
-      const aHasId = a.displayId.toString().includes(searchQuery);
-      const bHasId = b.displayId.toString().includes(searchQuery);
-      if (aHasId && !bHasId) return -1;
-      if (!aHasId && bHasId) return 1;
-      return 0;
-    });
-
-    const { exact, personal, related }: { exact: Server | null; personal: Server[]; related: Server[] } = sortedServers.reduce(
-      (acc, server) => {
-        if (server.displayId === searchQuery) {
-          acc.exact = server;
-        } else if (servers.some((s) => s.serverId === server.serverId)) {
-          acc.personal.push(server);
-        } else {
-          acc.related.push(server);
-        }
-        return acc;
-      },
-      { exact: null, personal: [], related: [] } as { exact: Server | null; personal: Server[]; related: Server[] },
-    );
-
-    setExactMatch(exact);
-    setPersonalResults(personal);
-    setRelatedResults(related);
-  };
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+        searchTimerRef.current = null;
+      }
+    };
+  }, []);
 
   const handleOpenCreateServer = (userId: User['userId']) => {
     ipcService.popup.open('createServer', 'createServer', { userId });
   };
 
   const handleClearSearchState = () => {
-    setSearchQuery('');
+    if (searchInputRef.current) searchInputRef.current.value = '';
     setExactMatch(null);
     setPersonalResults([]);
     setRelatedResults([]);
   };
 
-  const handleDeepLink = (serverId: string) => {
-    if (!userId) return;
-    handleConnectServer(userId, serverId);
-  };
+  const handleConnectServer = useCallback(
+    (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+      if (loadingBox.isLoading) return;
 
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-      handleClearSearchState();
-    }
-  }, []);
+      if (currentServerId == serverId) {
+        mainTab.setSelectedTabId('server');
+        return;
+      }
+
+      loadingBox.setIsLoading(true);
+      loadingBox.setLoadingServerId(serverDisplayId);
+      ipcService.socket.send('connectServer', { serverId });
+
+      setExactMatch(null);
+      setPersonalResults([]);
+      setRelatedResults([]);
+    },
+    [currentServerId, mainTab, loadingBox],
+  );
+
+  const handleServerSearch = useCallback(
+    (...args: Server[]) => {
+      const q = searchQueryRef.current;
+
+      setExactMatch(null);
+      setPersonalResults([]);
+      setRelatedResults([]);
+
+      if (!args.length) return;
+
+      const sorted = [...args].sort((a, b) => {
+        const aHasId = a.displayId.toString().includes(q);
+        const bHasId = b.displayId.toString().includes(q);
+        return aHasId === bHasId ? 0 : aHasId ? -1 : 1;
+      });
+
+      const { exact, personal, related } = sorted.reduce(
+        (acc, s) => {
+          if (s.displayId.toString() === q) acc.exact = s;
+          else if (servers.some((ps) => ps.serverId === s.serverId)) acc.personal.push(s);
+          else acc.related.push(s);
+          return acc;
+        },
+        { exact: null as Server | null, personal: [] as Server[], related: [] as Server[] },
+      );
+
+      setExactMatch(exact);
+      setPersonalResults(personal);
+      setRelatedResults(related);
+    },
+    [servers],
+  );
+
+  const handleDeepLink = useCallback(
+    (serverId: string) => {
+      if (!userId) return;
+      handleConnectServer(serverId, userId);
+    },
+    [userId, handleConnectServer],
+  );
 
   // Effects
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [handleClickOutside]);
-
-  useEffect(() => {
-    const unsubscribe: (() => void)[] = [ipcService.socket.on('serverSearch', handleServerSearch)];
-    return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected]);
+    const onPointerDown = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setExactMatch(null);
+        setPersonalResults([]);
+        setRelatedResults([]);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, []);
 
   useEffect(() => {
     const offDeepLink = ipcService.deepLink.onDeepLink(handleDeepLink);
@@ -188,6 +202,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     });
   }, [t, userName]);
 
+  useEffect(() => {
+    const unsubscribe: (() => void)[] = [ipcService.socket.on('serverSearch', handleServerSearch)];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, [socket.isConnected, handleServerSearch]);
+
   return (
     <main className={homePage['home']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
@@ -197,22 +216,18 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={homePage['forward-btn']} />
           <div className={homePage['search-bar']} ref={searchRef}>
             <input
+              ref={searchInputRef}
               placeholder={t('search-server-placeholder')}
               className={homePage['search-input']}
-              value={searchQuery}
-              onChange={(e) => {
-                const value = e.target.value;
-                setSearchQuery(value);
-                handleSearchServer(value);
-              }}
+              onFocus={handleSearchServer}
+              onChange={handleSearchServer}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && exactMatch) {
-                  handleConnectServer(exactMatch.serverId, exactMatch.displayId);
-                }
+                if (e.key !== 'Enter' || !exactMatch) return;
+                handleConnectServer(exactMatch.serverId, exactMatch.displayId);
               }}
             />
-            <div className={homePage['search-input-clear-btn']} onClick={handleClearSearchState} style={searchQuery ? {} : { display: 'none' }} />
-            <div className={homePage['search-input-icon']} style={!searchQuery ? {} : { display: 'none' }} />
+            <div className={homePage['search-input-clear-btn']} onClick={handleClearSearchState} style={searchInputRef.current?.value ? {} : { display: 'none' }} />
+            <div className={homePage['search-input-icon']} style={!searchInputRef.current?.value ? {} : { display: 'none' }} />
             <div className={homePage['search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
               {exactMatch && (
                 <>
@@ -256,7 +271,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                   ))}
                 </>
               )}
-              <div className={`${homePage['item']} ${homePage['input-empty-item']}`} style={!searchQuery ? {} : { display: 'none' }}>
+              <div className={`${homePage['item']} ${homePage['input-empty-item']}`} style={!searchQueryRef.current ? {} : { display: 'none' }}>
                 {t('searchEmpty')}
               </div>
             </div>
