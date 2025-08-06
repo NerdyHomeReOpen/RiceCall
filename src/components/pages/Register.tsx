@@ -59,10 +59,11 @@ function validateCheckPassword(value: string, check: string, t: TFunction): stri
 }
 
 interface RegisterPageProps {
+  display: boolean;
   setSection: (section: 'login' | 'register') => void;
 }
 
-const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) => {
+const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSection }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -168,7 +169,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
   };
 
   return (
-    <main className={styles['register']}>
+    <main className={styles['register']} style={display ? {} : { display: 'none' }}>
       {/* Body */}
       <main className={styles['register-body']}>
         <div className={styles['app-logo']} />
@@ -197,11 +198,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                     }}
                   />
                 </div>
-                {errors.account ? (
-                  <div className={styles['warn-text']}>{errors.account}</div>
-                ) : (
-                  <div className={styles['hint-text']}>{t('account-cannot-change')}</div>
-                )}
+                {errors.account ? <div className={styles['warn-text']}>{errors.account}</div> : <div className={styles['hint-text']}>{t('account-cannot-change')}</div>}
               </div>
               <div className={styles['input-wrapper']}>
                 <div className={styles['input-box']}>
@@ -219,11 +216,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                     }}
                   />
                 </div>
-                {errors.password ? (
-                  <div className={styles['warn-text']}>{errors.password}</div>
-                ) : (
-                  <div className={styles['hint-text']}>{t('password-hint')}</div>
-                )}
+                {errors.password ? <div className={styles['warn-text']}>{errors.password}</div> : <div className={styles['hint-text']}>{t('password-hint')}</div>}
               </div>
               <div className={styles['input-wrapper']}>
                 <div className={styles['input-box']}>
@@ -241,11 +234,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                     }}
                   />
                 </div>
-                {errors.confirmPassword ? (
-                  <div className={styles['warn-text']}>{errors.confirmPassword}</div>
-                ) : (
-                  <div className={styles['hint-text']}>{t('repeat-input-password')}</div>
-                )}
+                {errors.confirmPassword ? <div className={styles['warn-text']}>{errors.confirmPassword}</div> : <div className={styles['hint-text']}>{t('repeat-input-password')}</div>}
               </div>
               <div className={styles['input-wrapper']}>
                 <div className={styles['input-box']}>
@@ -262,11 +251,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ setSection }) =>
                     }}
                   />
                 </div>
-                {errors.username ? (
-                  <div className={styles['warn-text']}>{errors.username}</div>
-                ) : (
-                  <div className={styles['hint-text']}>{t('nickname-hint')}</div>
-                )}
+                {errors.username ? <div className={styles['warn-text']}>{errors.username}</div> : <div className={styles['hint-text']}>{t('nickname-hint')}</div>}
               </div>
               <button
                 className={styles['submit-button']}

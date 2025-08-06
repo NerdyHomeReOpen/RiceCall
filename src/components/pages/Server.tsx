@@ -95,6 +95,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const contextMenu = useContextMenu();
 
     // Refs
+    const webRTCRef = useRef(webRTC);
     const isResizingSidebarRef = useRef<boolean>(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
     const isResizingAnnAreaRef = useRef<boolean>(false);
@@ -155,19 +156,19 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     };
 
     const handleToggleSpeakerMute = () => {
-      webRTC.handleToggleSpeakerMute();
+      webRTC.toggleSpeakerMute();
     };
 
     const handleEditSpeakerVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-      webRTC.handleEditSpeakerVolume(parseInt(e.target.value));
+      webRTC.changeSpeakerVolume(parseInt(e.target.value));
     };
 
     const handleToggleMicMute = () => {
-      webRTC.handleToggleMicMute();
+      webRTC.toggleMicMute();
     };
 
     const handleEditMicVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-      webRTC.handleEditMicVolume(parseInt(e.target.value));
+      webRTC.changeMicVolume(parseInt(e.target.value));
     };
 
     const onSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -196,9 +197,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     // Effects
     useEffect(() => {
-      if (!webRTC || !channelBitrate) return;
-      webRTC.handleEditBitrate(channelBitrate);
-    }, [channelBitrate, webRTC]); // Please ignore this warning
+      webRTCRef.current.changeBitrate(channelBitrate);
+    }, [channelBitrate]);
 
     useEffect(() => {
       if (actionMessages.length === 0) return;
@@ -218,8 +218,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       setIsMicTaken(newMicTaken);
       if (newMicTaken !== isMicTakenRef.current) {
         isMicTakenRef.current = newMicTaken;
-        if (newMicTaken) webRTC.handleTakeMic();
-        else webRTC.handleUnTakeMic();
+        if (newMicTaken) webRTC.takeMic();
+        else webRTC.untakeMic();
       }
     }, [queueMembers, userId, webRTC]);
 
@@ -242,7 +242,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [t, serverName, serverMembers]);
 
     useEffect(() => {
-      const unsubscribe: (() => void)[] = [ipcService.systemSettings.speakingMode.get(setSpeakMode), ipcService.systemSettings.defaultSpeakingKey.get(setSpeakHotKey)];
+      const unsubscribe = [ipcService.systemSettings.speakingMode.get(setSpeakMode), ipcService.systemSettings.defaultSpeakingKey.get(setSpeakHotKey)];
       return () => unsubscribe.forEach((unsub) => unsub());
     }, []);
 

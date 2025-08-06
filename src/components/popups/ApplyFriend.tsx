@@ -82,7 +82,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
 
   // Effects
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.socket.on('friendGroupAdd', handleFriendGroupAdd),
       ipcService.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
       ipcService.socket.on('friendGroupRemove', handleFriendGroupRemove),

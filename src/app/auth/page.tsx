@@ -54,19 +54,11 @@ const Auth: React.FC = () => {
     autoLogin();
   }, []);
 
-  const getMainContent = () => {
-    switch (section) {
-      case 'login':
-        return <LoginPage setSection={setSection} />;
-      case 'register':
-        return <RegisterPage setSection={setSection} />;
-    }
-  };
-
   return (
     <>
       <Header />
-      {getMainContent()}
+      <LoginPage display={section === 'login'} setSection={setSection} />
+      <RegisterPage display={section === 'register'} setSection={setSection} />
     </>
   );
 };

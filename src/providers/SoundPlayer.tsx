@@ -111,7 +111,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
       receiveChannelMessageSoundRef.current = enabled;
     };
 
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.systemSettings.outputAudioDevice.get(changeOutputAudioDevice),
       ipcService.systemSettings.disableAllSoundEffect.get(changeDisableAllSoundEffect),
       ipcService.systemSettings.enterVoiceChannelSound.get(changeEnterVoiceChannelSound),

@@ -245,7 +245,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
   // Effects
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.socket.on('serverMemberAdd', handleServerMemberAdd),
       ipcService.socket.on('serverMemberUpdate', handleServerMemberUpdate),
       ipcService.socket.on('serverMemberRemove', handleServerMemberRemove),

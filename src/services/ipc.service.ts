@@ -88,8 +88,9 @@ const ipcService = {
 
   initialData: {
     on: (callback: (data: any) => void) => {
-      if (!isElectron) return;
+      if (!isElectron) return () => {};
       ipcRenderer.once('initial-data', (_: any, data: any) => callback(data));
+      return () => ipcRenderer.removeAllListeners('initial-data');
     },
   },
 
@@ -115,12 +116,13 @@ const ipcService = {
     },
 
     onSubmit: (host: string, callback: (data: any) => void) => {
-      if (!isElectron) return;
+      if (!isElectron) return () => {};
       ipcRenderer.on('popup-submit', (_: any, from: string, data?: any) => {
         if (from != host) return;
         callback(data);
         ipcRenderer.removeAllListeners('popup-submit');
       });
+      return () => ipcRenderer.removeAllListeners('popup-submit');
     },
   },
 

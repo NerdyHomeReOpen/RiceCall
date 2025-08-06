@@ -66,7 +66,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
 
   // Effects
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.socket.on('friendGroupAdd', handleFriendGroupAdd),
       ipcService.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
       ipcService.socket.on('friendGroupRemove', handleFriendGroupRemove),

@@ -144,7 +144,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   }, []);
 
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.socket.on('serverMemberApplicationsSet', handleServerMemberApplicationsSet),
       ipcService.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
       ipcService.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),

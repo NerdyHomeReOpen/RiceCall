@@ -74,7 +74,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
   // Effects
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.socket.on('connect', handleConnect),
       ipcService.socket.on('reconnect', handleReconnect),
       ipcService.socket.on('disconnect', handleDisconnect),

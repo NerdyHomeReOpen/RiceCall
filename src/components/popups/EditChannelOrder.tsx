@@ -145,7 +145,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   // Effects
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.socket.on('serverChannelAdd', handleServerChannelAdd),
       ipcService.socket.on('serverChannelUpdate', handleServerChannelUpdate),
       ipcService.socket.on('serverChannelRemove', handleServerChannelRemove),

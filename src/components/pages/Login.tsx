@@ -17,10 +17,11 @@ interface FormDatas {
 }
 
 interface LoginPageProps {
+  display: boolean;
   setSection: (section: 'login' | 'register') => void;
 }
 
-const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
+const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -120,7 +121,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   }, []);
 
   return (
-    <main className={styles['login']}>
+    <main className={styles['login']} style={display ? {} : { display: 'none' }}>
       {/* Body */}
       <main className={styles['login-body']}>
         <div className={styles['app-logo']} />

@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -48,10 +47,10 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications }) => {
   // Hooks
-  const contextMenu = useContextMenu();
   const mainTab = useMainTab();
-  const { t } = useTranslation();
+  const contextMenu = useContextMenu();
   const actionScanner = useActionScanner();
+  const { t } = useTranslation();
 
   // Refs
   const menuRef = useRef<HTMLDivElement>(null);
@@ -111,11 +110,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   const handleFullscreen = () => {
-    if (isFullscreen) {
-      ipcService.window.unmaximize();
-    } else {
-      ipcService.window.maximize();
-    }
+    if (isFullscreen) ipcService.window.unmaximize();
+    else ipcService.window.maximize();
   };
 
   const handleMinimize = () => {
@@ -123,11 +119,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   const handleClose = () => {
-    if (isCloseToTray.current) {
-      ipcService.window.close();
-    } else {
-      ipcService.exit();
-    }
+    if (isCloseToTray.current) ipcService.window.close();
+    else ipcService.exit();
   };
 
   const handleLanguageChange = (language: LanguageKey) => {
@@ -141,35 +134,19 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
 
   // Effects
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [
-      ipcService.systemSettings.closeToTray.get((enable) => {
-        isCloseToTray.current = enable;
-      }),
+    const next = actionScanner.isKeepAlive ? 'online' : 'idle';
+    if (user.status !== next) {
+      ipcService.socket.send('editUser', { update: { status: next } });
+    }
+  }, [actionScanner.isKeepAlive, user.status]);
+
+  useEffect(() => {
+    const unsubscribe = [
+      ipcService.systemSettings.closeToTray.get((enable) => (isCloseToTray.current = enable)),
+      ipcService.window.onUnmaximize(() => setIsFullscreen(false)),
+      ipcService.window.onMaximize(() => setIsFullscreen(true)),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, []);
-
-  useEffect(() => {
-    if (!actionScanner.isKeepAlive) {
-      handleChangeStatus('idle' as User['status']);
-    } else {
-      handleChangeStatus('online' as User['status']);
-    }
-  }, [actionScanner.isKeepAlive]);
-
-  useEffect(() => {
-    const offMaximize = ipcService.window.onMaximize(() => {
-      setIsFullscreen(true);
-    });
-
-    const offUnmaximize = ipcService.window.onUnmaximize(() => {
-      setIsFullscreen(false);
-    });
-
-    return () => {
-      offMaximize();
-      offUnmaximize();
-    };
   }, []);
 
   return (
@@ -182,17 +159,12 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
         <div
           className={header['status-box']}
           onClick={() => {
-            setShowStatusDropdown(!showStatusDropdown);
+            setShowStatusDropdown((prev) => !prev);
           }}
         >
           <div className={header['status-display']} datatype={userStatus} />
           <div className={header['status-triangle']} />
-          <div
-            className={`
-                ${header['status-dropdown']}
-                ${showStatusDropdown ? '' : header['hidden']}
-              `}
-          >
+          <div className={`${header['status-dropdown']} ${showStatusDropdown ? '' : header['hidden']}`}>
             {STATUS_OPTIONS.map((option) => (
               <div
                 key={option.status}
@@ -249,18 +221,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       <div className={header['buttons']}>
         <div className={header['gift']} />
         <div className={header['game']} />
-        <div
-          className={header['notice']}
-          onClick={() => {
-            handleOpenFriendVerification();
-          }}
-        >
-          <div
-            className={`
-              ${header['overlay']}
-              ${friendApplications.length > 0 ? header['new'] : ''}
-            `}
-          />
+        <div className={header['notice']} onClick={handleOpenFriendVerification}>
+          <div className={` ${header['overlay']} ${friendApplications.length > 0 ? header['new'] : ''} `} />
         </div>
         <div className={header['spliter']} />
         <div
@@ -275,21 +237,19 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
                 id: 'system-setting',
                 label: t('system-setting'),
                 icon: 'setting',
-                onClick: () => handleOpenSystemSetting(),
+                onClick: handleOpenSystemSetting,
               },
               {
                 id: 'change-theme',
                 label: t('change-theme'),
                 icon: 'skin',
-                onClick: () => handleOpenChangeTheme(),
+                onClick: handleOpenChangeTheme,
               },
               {
                 id: 'feedback',
                 label: t('feedback'),
                 icon: 'feedback',
-                onClick: () => {
-                  window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank');
-                },
+                onClick: () => window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank'),
               },
               {
                 id: 'language-select',
@@ -311,35 +271,27 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
                   {
                     id: 'faq',
                     label: t('faq'),
-                    onClick: () => {
-                      window.open('https://ricecall.com.tw/faq', '_blank');
-                    },
+                    onClick: () => window.open('https://ricecall.com.tw/faq', '_blank'),
                   },
                   {
                     id: 'agreement',
                     label: t('agreement'),
-                    onClick: () => {
-                      window.open('https://ricecall.com.tw/agreement', '_blank');
-                    },
+                    onClick: () => window.open('https://ricecall.com.tw/agreement', '_blank'),
                   },
                   {
                     id: 'specification',
                     label: t('specification'),
-                    onClick: () => {
-                      window.open('https://ricecall.com.tw/specification', '_blank');
-                    },
+                    onClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
                   },
                   {
                     id: 'contact-us',
                     label: t('contact-us'),
-                    onClick: () => {
-                      window.open('https://ricecall.com.tw/contactus', '_blank');
-                    },
+                    onClick: () => window.open('https://ricecall.com.tw/contactus', '_blank'),
                   },
                   {
                     id: 'about-us',
                     label: t('about-ricecall'),
-                    onClick: () => handleOpenAboutUs(),
+                    onClick: handleOpenAboutUs,
                   },
                 ],
               },
@@ -347,20 +299,20 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
                 id: 'logout',
                 label: t('logout'),
                 icon: 'logout',
-                onClick: () => handleLogout(),
+                onClick: handleLogout,
               },
               {
                 id: 'exit',
                 label: t('exit'),
                 icon: 'exit',
-                onClick: () => handleExit(),
+                onClick: handleExit,
               },
             ]);
           }}
         />
-        <div className={header['minimize']} onClick={() => handleMinimize()} />
-        <div className={isFullscreen ? header['restore'] : header['maxsize']} onClick={() => handleFullscreen()} />
-        <div className={header['close']} onClick={() => handleClose()} />
+        <div className={header['minimize']} onClick={handleMinimize} />
+        <div className={isFullscreen ? header['restore'] : header['maxsize']} onClick={handleFullscreen} />
+        <div className={header['close']} onClick={handleClose} />
       </div>
     </header>
   );
@@ -375,6 +327,14 @@ const RootPageComponent = () => {
   const soundPlayer = useSoundPlayer();
   const socket = useSocket();
 
+  // Refs
+  const mainTabRef = useRef(mainTab);
+  const selectedTabRef = useRef(mainTab.selectedTabId);
+  const loadingBoxRef = useRef(loadingBox);
+  const popupOffSubmitRef = useRef<(() => void) | null>(null);
+
+  selectedTabRef.current = mainTab.selectedTabId;
+
   // States
   const [user, setUser] = useState<User>(Default.user());
   const [servers, setServers] = useState<Server[]>([]);
@@ -382,211 +342,210 @@ const RootPageComponent = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
-  const [server, setServer] = useState<Server>(Default.server());
-  const [serverMembers, setServerMembers] = useState<Member[]>([]);
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
-  const [channel, setChannel] = useState<Channel>(Default.channel());
+  const [serverMembers, setServerMembers] = useState<Member[]>([]);
+  const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
-  const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
+
+  // Memos
+  const server = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
+  const channel = useMemo(() => serverChannels.find((item) => item.channelId === user.currentChannelId) || Default.channel(), [serverChannels, user.currentChannelId]);
 
   // Variables
   const { userId } = user;
 
   // Handlers
-  const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
+  const handleUserUpdate = useCallback((...args: { update: Partial<User> }[]) => {
     setUser((prev) => ({ ...prev, ...args[0].update }));
-  };
+  }, []);
 
-  const handleServersSet = (...args: Server[]) => {
+  const handleServersSet = useCallback((...args: Server[]) => {
     setServers(args);
-  };
+  }, []);
 
-  const handleServerAdd = (...args: { data: Server }[]) => {
-    args.forEach((item) => {
-      setServers((prev) => [...prev, item.data]);
-    });
-  };
+  const handleServerAdd = useCallback((...args: { data: Server }[]) => {
+    setServers((prev) => [...prev, ...args.map((i) => i.data)]);
+  }, []);
 
-  const handleServerUpdate = (...args: { serverId: string; update: Partial<Server> }[]) => {
-    args.forEach((item) => {
-      setServers((prev) => prev.map((server) => (server.serverId === item.serverId ? { ...server, ...item.update } : server)));
-    });
-  };
+  const handleServerUpdate = useCallback((...args: { serverId: string; update: Partial<Server> }[]) => {
+    setServers((prev) => prev.map((s) => (args.some((i) => i.serverId === s.serverId) ? { ...s, ...args.find((i) => i.serverId === s.serverId)?.update } : s)));
+  }, []);
 
-  const handleServerRemove = (...args: { serverId: string }[]) => {
-    args.forEach((item) => {
-      setServers((prev) => prev.filter((server) => server.serverId !== item.serverId));
-    });
-  };
+  const handleServerRemove = useCallback((...args: { serverId: string }[]) => {
+    setServers((prev) => prev.filter((s) => !args.some((i) => i.serverId === s.serverId)));
+  }, []);
 
-  const handleFriendsSet = (...args: Friend[]) => {
+  const handleFriendsSet = useCallback((...args: Friend[]) => {
     setFriends(args);
-  };
+  }, []);
 
-  const handleFriendAdd = (...args: { data: Friend }[]) => {
-    args.forEach((item) => {
-      setFriends((prev) => [...prev, item.data]);
-    });
-  };
+  const handleFriendAdd = useCallback((...args: { data: Friend }[]) => {
+    setFriends((prev) => [...prev, ...args.map((i) => i.data)]);
+  }, []);
 
-  const handleFriendUpdate = (...args: { targetId: string; update: Partial<Friend> }[]) => {
-    args.forEach((item) => {
-      setFriends((prev) => prev.map((friend) => (friend.targetId === item.targetId ? { ...friend, ...item.update } : friend)));
-    });
-  };
+  const handleFriendUpdate = useCallback((...args: { targetId: string; update: Partial<Friend> }[]) => {
+    setFriends((prev) => prev.map((f) => (args.some((i) => i.targetId === f.targetId) ? { ...f, ...args.find((i) => i.targetId === f.targetId)?.update } : f)));
+  }, []);
 
-  const handleFriendDelete = (...args: { targetId: string }[]) => {
-    args.forEach((item) => {
-      setFriends((prev) => prev.filter((friend) => friend.targetId !== item.targetId));
-    });
-  };
+  const handleFriendDelete = useCallback((...args: { targetId: string }[]) => {
+    setFriends((prev) => prev.filter((f) => !args.some((i) => i.targetId === f.targetId)));
+  }, []);
 
-  const handleFriendGroupsSet = (...args: FriendGroup[]) => {
+  const handleFriendGroupsSet = useCallback((...args: FriendGroup[]) => {
     setFriendGroups(args);
-  };
+  }, []);
 
-  const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
-    args.forEach((item) => {
-      setFriendGroups((prev) => [...prev, item.data]);
-    });
-  };
+  const handleFriendGroupAdd = useCallback((...args: { data: FriendGroup }[]) => {
+    setFriendGroups((prev) => [...prev, ...args.map((i) => i.data)]);
+  }, []);
 
-  const handleFriendGroupUpdate = (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
-    args.forEach((item) => {
-      setFriendGroups((prev) => prev.map((friendGroup) => (friendGroup.friendGroupId === item.friendGroupId ? { ...friendGroup, ...item.update } : friendGroup)));
-    });
-  };
+  const handleFriendGroupUpdate = useCallback((...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
+    setFriendGroups((prev) => prev.map((fg) => (args.some((i) => i.friendGroupId === fg.friendGroupId) ? { ...fg, ...args.find((i) => i.friendGroupId === fg.friendGroupId)?.update } : fg)));
+  }, []);
 
-  const handleFriendGroupDelete = (...args: { friendGroupId: string }[]) => {
-    args.forEach((item) => {
-      setFriendGroups((prev) => prev.filter((friendGroup) => friendGroup.friendGroupId !== item.friendGroupId));
-    });
-  };
+  const handleFriendGroupDelete = useCallback((...args: { friendGroupId: string }[]) => {
+    setFriendGroups((prev) => prev.filter((fg) => !args.some((i) => i.friendGroupId === fg.friendGroupId)));
+  }, []);
 
-  const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
-    args.forEach((item) => {
-      setFriendApplications((prev) => [...prev, item.data]);
-    });
-  };
+  const handleFriendApplicationAdd = useCallback((...args: { data: FriendApplication }[]) => {
+    setFriendApplications((prev) => [...prev, ...args.map((i) => i.data)]);
+  }, []);
 
-  const handleFriendApplicationRemove = (...args: { senderId: string }[]) => {
-    args.forEach((item) => {
-      setFriendApplications((prev) => prev.filter((friendApplication) => friendApplication.senderId !== item.senderId));
-    });
-  };
+  const handleFriendApplicationRemove = useCallback((...args: { senderId: string }[]) => {
+    setFriendApplications((prev) => prev.filter((fa) => !args.some((i) => i.senderId === fa.senderId)));
+  }, []);
 
-  const handleServerMembersSet = (...args: Member[]) => {
+  const handleServerMembersSet = useCallback((...args: Member[]) => {
     setServerMembers(args);
-  };
+  }, []);
 
-  const handleServerMemberAdd = (...args: { data: Member }[]) => {
-    args.forEach((item) => {
-      setServerMembers((prev) => [...prev, item.data]);
-    });
-  };
+  const handleServerMemberAdd = useCallback((...args: { data: Member }[]) => {
+    setServerMembers((prev) => [...prev, ...args.map((i) => i.data)]);
+  }, []);
 
-  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
-    args.forEach((item) => {
-      setServerMembers((prev) => prev.map((member) => (member.userId === item.userId && member.serverId === item.serverId ? { ...member, ...item.update } : member)));
-    });
-  };
+  const handleServerMemberUpdate = useCallback((...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
+    setServerMembers((prev) =>
+      prev.map((m) => (args.some((i) => i.userId === m.userId && i.serverId === m.serverId) ? { ...m, ...args.find((i) => i.userId === m.userId && i.serverId === m.serverId)?.update } : m)),
+    );
+  }, []);
 
-  const handleServerMemberDelete = (...args: { userId: string; serverId: string }[]) => {
-    args.forEach((item) => {
-      setServerMembers((prev) => prev.filter((member) => !(member.userId === item.userId && member.serverId === item.serverId)));
-    });
-  };
+  const handleServerMemberDelete = useCallback((...args: { userId: string; serverId: string }[]) => {
+    setServerMembers((prev) => prev.filter((m) => !args.some((i) => i.userId === m.userId && i.serverId === m.serverId)));
+  }, []);
 
-  const handleServerChannelsSet = (...args: Channel[]) => {
+  const handleServerChannelsSet = useCallback((...args: Channel[]) => {
     setServerChannels(args);
-  };
+  }, []);
 
-  const handleServerChannelAdd = (...args: { data: Channel }[]) => {
-    args.forEach((item) => {
-      setServerChannels((prev) => [...prev, item.data]);
-    });
-  };
+  const handleServerChannelAdd = useCallback((...args: { data: Channel }[]) => {
+    setServerChannels((prev) => [...prev, ...args.map((i) => i.data)]);
+  }, []);
 
-  const handleServerChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
-    args.forEach((item) => {
-      setServerChannels((prev) => prev.map((channel) => (channel.channelId === item.channelId ? { ...channel, ...item.update } : channel)));
-    });
-  };
+  const handleServerChannelUpdate = useCallback((...args: { channelId: string; update: Partial<Channel> }[]) => {
+    setServerChannels((prev) => prev.map((c) => (args.some((i) => i.channelId === c.channelId) ? { ...c, ...args.find((i) => i.channelId === c.channelId)?.update } : c)));
+  }, []);
 
-  const handleServerChannelDelete = (...args: { channelId: string }[]) => {
-    args.forEach((item) => {
-      setServerChannels((prev) => prev.filter((channel) => channel.channelId !== item.channelId));
-    });
-  };
+  const handleServerChannelDelete = useCallback((...args: { channelId: string }[]) => {
+    setServerChannels((prev) => prev.filter((c) => !args.some((i) => i.channelId === c.channelId)));
+  }, []);
 
-  const handleChannelMessage = (...args: ChannelMessage[]) => {
-    args.forEach((item) => {
-      setChannelMessages((prev) => [...prev, item]);
-    });
-  };
+  const handleChannelMessage = useCallback((...args: ChannelMessage[]) => {
+    setChannelMessages((prev) => [...prev, ...args]);
+  }, []);
 
-  const handleActionMessage = (...args: PromptMessage[]) => {
-    args.forEach((item) => {
-      setActionMessages((prev) => [...prev, item]);
-    });
-  };
+  const handleActionMessage = useCallback((...args: PromptMessage[]) => {
+    setActionMessages((prev) => [...prev, ...args]);
+  }, []);
 
-  const handleQueueMembersSet = (...args: QueueMember[]) => {
+  const handleQueueMembersSet = useCallback((...args: QueueMember[]) => {
     setQueueMembers(args);
-  };
+  }, []);
 
-  const handlePlaySound = (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
-    args.forEach((item) => {
-      soundPlayer.playSound(item);
-    });
-  };
+  const handlePlaySound = useCallback(
+    (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
+      args.forEach((s) => soundPlayer.playSound(s));
+    },
+    [soundPlayer],
+  );
 
-  const handleOpenPopup = (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => {
-    args.forEach((item) => {
-      loadingBox.setIsLoading(false);
-      loadingBox.setLoadingServerId('');
-      ipcService.popup.open(item.type, item.id, item.initialData, item.force);
-      ipcService.popup.onSubmit(item.id, () => {
-        switch (item.id) {
-          case 'logout':
-            ipcService.auth.logout();
-            break;
-        }
+  const handleOpenPopup = useCallback(
+    (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => {
+      args.forEach((p) => {
+        loadingBox.setIsLoading(false);
+        loadingBox.setLoadingServerId('');
+        ipcService.popup.open(p.type, p.id, p.initialData, p.force);
+        popupOffSubmitRef.current?.();
+        popupOffSubmitRef.current = ipcService.popup.onSubmit(p.id, () => {
+          if (p.id === 'logout') ipcService.auth.logout();
+        });
       });
-    });
-  };
+    },
+    [loadingBox],
+  );
 
   // Effects
   useEffect(() => {
     if (user.currentServerId) {
-      if (mainTab.selectedTabId !== 'server') {
-        mainTab.setSelectedTabId('server');
+      if (selectedTabRef.current !== 'server') {
+        mainTabRef.current.setSelectedTabId('server');
       }
     } else {
-      if (mainTab.selectedTabId === 'server') {
-        mainTab.setSelectedTabId('home');
+      if (selectedTabRef.current === 'server') {
+        mainTabRef.current.setSelectedTabId('home');
       }
     }
     setActionMessages([]);
     setChannelMessages([]);
 
-    loadingBox.setIsLoading(false);
-    loadingBox.setLoadingServerId('');
+    loadingBoxRef.current.setIsLoading(false);
+    loadingBoxRef.current.setLoadingServerId('');
   }, [user.currentServerId]);
 
   useEffect(() => {
-    const channel = serverChannels.find((item) => item.channelId === user.currentChannelId) || Default.channel();
-    setChannel(channel);
-  }, [user.currentChannelId, serverChannels]);
+    const onStorage = ({ key, newValue }: StorageEvent) => {
+      if (key !== 'trigger-handle-server-select' || !newValue) return;
+      const { serverDisplayId, serverId } = JSON.parse(newValue);
+      if (loadingBoxRef.current.isLoading || !serverDisplayId || !serverId) return;
+
+      if (serverId === server.serverId) {
+        mainTabRef.current.setSelectedTabId('server');
+        return;
+      }
+
+      loadingBoxRef.current.setIsLoading(true);
+      loadingBoxRef.current.setLoadingServerId(serverDisplayId);
+      ipcService.socket.send('connectServer', { serverId });
+    };
+
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [server.serverId, user.currentServerId]);
 
   useEffect(() => {
-    const server = servers.find((item) => item.serverId === user.currentServerId) || Default.server();
-    setServer(server);
-  }, [user.currentServerId, servers]);
+    if (!userId) return;
+    const refresh = async () => {
+      getService.servers({ userId: userId }).then((servers) => {
+        if (servers) setServers(servers);
+      });
+      getService.friends({ userId: userId }).then((friends) => {
+        if (friends) setFriends(friends);
+      });
+      getService.friendGroups({ userId: userId }).then((friendGroups) => {
+        if (friendGroups) setFriendGroups(friendGroups);
+      });
+      getService.friendApplications({ receiverId: userId }).then((friendApplications) => {
+        if (friendApplications) setFriendApplications(friendApplications);
+      });
+      getService.recommendServerList().then((recommendServerList) => {
+        if (recommendServerList) setRecommendServerList(recommendServerList);
+      });
+    };
+    refresh();
+  }, [userId]);
 
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.socket.on('userUpdate', handleUserUpdate),
       ipcService.socket.on('serversSet', handleServersSet),
       ipcService.socket.on('serverAdd', handleServerAdd),
@@ -615,71 +574,39 @@ const RootPageComponent = () => {
       ipcService.socket.on('openPopup', handleOpenPopup),
       ipcService.socket.on('playSound', handlePlaySound),
       ipcService.socket.on('queueMembersSet', handleQueueMembersSet),
-      // ipcService.socket.on('connect', handleConnect),
-      // ipcService.socket.on('reconnect', handleReconnect),
-      // ipcService.socket.on('disconnect', handleDisconnect),
-      // ipcService.socket.on('error', handleError),
-      // ipcService.socket.on('connect_error', handleConnectError),
-      // ipcService.socket.on('reconnect_error', handleReconnectError),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected]);
-
-  useEffect(() => {
-    loadingBox.setIsLoading(false);
-    loadingBox.setLoadingServerId('');
-  }, [socket.isConnected]);
-
-  useEffect(() => {
-    if (!userId) return;
-    const refresh = async () => {
-      getService.servers({ userId: userId }).then((servers) => {
-        if (servers) setServers(servers);
-      });
-      getService.friends({ userId: userId }).then((friends) => {
-        if (friends) setFriends(friends);
-      });
-      getService.friendGroups({ userId: userId }).then((friendGroups) => {
-        if (friendGroups) setFriendGroups(friendGroups);
-      });
-      getService.friendApplications({ receiverId: userId }).then((friendApplications) => {
-        if (friendApplications) setFriendApplications(friendApplications);
-      });
-      getService.recommendServerList().then((recommendServerList) => {
-        if (recommendServerList) setRecommendServerList(recommendServerList);
-      });
-    };
-    refresh();
-  }, [userId]);
-
-  useEffect(() => {
-    if (!socket.isConnected) {
-      setUser(Default.user());
-      setServer(Default.server());
-      setChannel(Default.channel());
-    }
-    mainTab.setSelectedTabId('home');
-  }, [socket.isConnected]);
-
-  useEffect(() => {
-    const handler = ({ key, newValue }: StorageEvent) => {
-      if (key !== 'trigger-handle-server-select' || !newValue) return;
-      const { serverDisplayId, serverId } = JSON.parse(newValue);
-      if (loadingBox.isLoading || !serverDisplayId || !serverId) return;
-
-      if (serverId === server.serverId) {
-        mainTab.setSelectedTabId('server');
-        return;
-      }
-
-      loadingBox.setIsLoading(true);
-      loadingBox.setLoadingServerId(serverDisplayId);
-      ipcService.socket.send('connectServer', { serverId });
-    };
-
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
-  }, [user, mainTab, loadingBox.isLoading]);
+  }, [
+    socket.isConnected,
+    handleUserUpdate,
+    handleServersSet,
+    handleServerAdd,
+    handleServerUpdate,
+    handleServerRemove,
+    handleFriendsSet,
+    handleFriendAdd,
+    handleFriendUpdate,
+    handleFriendDelete,
+    handleFriendGroupsSet,
+    handleFriendGroupAdd,
+    handleFriendGroupUpdate,
+    handleFriendGroupDelete,
+    handleFriendApplicationAdd,
+    handleFriendApplicationRemove,
+    handleServerMembersSet,
+    handleServerMemberAdd,
+    handleServerMemberUpdate,
+    handleServerMemberDelete,
+    handleServerChannelsSet,
+    handleServerChannelAdd,
+    handleServerChannelUpdate,
+    handleServerChannelDelete,
+    handleChannelMessage,
+    handleActionMessage,
+    handleOpenPopup,
+    handlePlaySound,
+    handleQueueMembersSet,
+  ]);
 
   return (
     <WebRTCProvider userId={userId}>

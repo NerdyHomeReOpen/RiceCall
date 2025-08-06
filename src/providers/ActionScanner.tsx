@@ -37,18 +37,39 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const decreaseVolumeKeyRef = useRef<string>('Shift+m');
   const toggleSpeakerKeyRef = useRef<string>('Alt+m');
   const toggleMicrophoneKeyRef = useRef<string>('Alt+v');
+  const lastActiveRef = useRef<number>(Date.now());
+  const speakingActiveRef = useRef(false);
 
   // States
   const [isKeepAlive, setIsKeepAlive] = useState<boolean>(true);
-  const [keepAliveTime, setKeepAliveTime] = useState<number>(Date.now());
 
   // Handlers
+  const buildKey = (e: KeyboardEvent) => {
+    const parts: string[] = [];
+    if (e.ctrlKey) parts.push('Ctrl');
+    if (e.shiftKey) parts.push('Shift');
+    if (e.altKey) parts.push('Alt');
+    if (e.metaKey) parts.push('Cmd');
+
+    let key = e.key;
+    if (key === ' ') key = 'Space';
+    if (/^f\d+$/i.test(key)) key = key.toUpperCase();
+    if (key === 'Meta') key = 'Cmd';
+
+    parts.push(key.length === 1 ? key.toLowerCase() : key);
+    return parts.join('+');
+  };
+
   const startSpeak = useCallback(() => {
-    webRTC.handleToggleSpeakKey(true);
+    if (speakingActiveRef.current) return;
+    speakingActiveRef.current = true;
+    webRTC.toggleSpeakKey(true);
   }, [webRTC]);
 
   const stopSpeak = useCallback(() => {
-    webRTC.handleToggleSpeakKey(false);
+    if (!speakingActiveRef.current) return;
+    speakingActiveRef.current = false;
+    webRTC.toggleSpeakKey(false);
   }, [webRTC]);
 
   const toggleMainWindows = useCallback(() => {
@@ -57,20 +78,20 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   const toggleUpVolume = useCallback(() => {
     const newValue = Math.min(100, webRTC.speakerVolume + BASE_VOLUME);
-    webRTC.handleEditSpeakerVolume(newValue);
+    webRTC.changeSpeakerVolume(newValue);
   }, [webRTC]);
 
   const toggleDownVolume = useCallback(() => {
     const newValue = Math.max(0, webRTC.speakerVolume - BASE_VOLUME);
-    webRTC.handleEditSpeakerVolume(newValue);
+    webRTC.changeSpeakerVolume(newValue);
   }, [webRTC]);
 
   const toggleSpeakerMute = useCallback(() => {
-    webRTC.handleToggleSpeakerMute();
+    webRTC.toggleSpeakerMute();
   }, [webRTC]);
 
   const toggleMicMute = useCallback(() => {
-    webRTC.handleToggleMicMute();
+    webRTC.toggleMicMute();
   }, [webRTC]);
 
   // Effects
@@ -78,12 +99,11 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
     const changeStatusAutoIdle = (enable: boolean) => {
       console.info('[ActionScanner] status auto idle updated: ', enable);
       idleCheck.current = enable;
-      setKeepAliveTime(Date.now());
+      lastActiveRef.current = Date.now();
     };
     const changeStatusAutoIdleMinutes = (value: number) => {
       console.info('[ActionScanner] status auto idle minutes updated: ', value);
       idleMinutes.current = value;
-      setKeepAliveTime(Date.now());
     };
     const changeDefaultSpeakingKey = (key: string) => {
       console.info('[ActionScanner] default speaking key updated: ', key);
@@ -110,7 +130,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
       toggleMicrophoneKeyRef.current = key;
     };
 
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.systemSettings.statusAutoIdle.get(changeStatusAutoIdle),
       ipcService.systemSettings.statusAutoIdleMinutes.get(changeStatusAutoIdleMinutes),
       ipcService.systemSettings.defaultSpeakingKey.get(changeDefaultSpeakingKey),
@@ -124,54 +144,48 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   }, []);
 
   useEffect(() => {
-    if (!idleCheck.current || !isKeepAlive) return;
-    const timer = setInterval(() => {
+    if (!idleCheck.current) return;
+    const id = setInterval(() => {
       const now = Date.now();
-      if (now - keepAliveTime >= idleMinutes.current * 60 * 1000) {
+      if (isKeepAlive && now - lastActiveRef.current >= idleMinutes.current * 60_000) {
         setIsKeepAlive(false);
       }
     }, 1000);
-    return () => clearInterval(timer);
-  }, [keepAliveTime, idleCheck, isKeepAlive]);
+    return () => clearInterval(id);
+  }, [isKeepAlive]);
 
   useEffect(() => {
+    let ticking = false;
+
     const updateActivity = () => {
-      setIsKeepAlive(true);
-      setKeepAliveTime(Date.now());
-    };
-
-    const events = ['click', 'mousemove', 'mousedown', 'keydown', 'scroll'];
-
-    for (const event of events) {
-      window.addEventListener(event, updateActivity);
-    }
-
-    return () => {
-      for (const event of events) {
-        window.removeEventListener(event, updateActivity);
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          lastActiveRef.current = Date.now();
+          if (!isKeepAlive) setIsKeepAlive(true);
+          ticking = false;
+        });
       }
     };
-  }, []);
+
+    const events: Array<[keyof WindowEventMap, AddEventListenerOptions?]> = [
+      ['click', { passive: true }],
+      ['mousemove', { passive: true }],
+      ['mousedown', { passive: true }],
+      ['keydown'],
+      ['scroll', { passive: true }],
+    ];
+
+    events.forEach(([e, opt]) => window.addEventListener(e, updateActivity, opt));
+    return () => events.forEach(([e, opt]) => window.removeEventListener(e, updateActivity, opt));
+  }, [isKeepAlive]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if (new Set(['Shift', 'Control', 'Alt', 'Meta']).has(e.key)) return;
-
-      const parts = [];
-      if (e.ctrlKey) parts.push('Ctrl');
-      if (e.shiftKey) parts.push('Shift');
-      if (e.altKey) parts.push('Alt');
-
-      let key = e.key;
-
-      if (key === ' ') key = 'Space';
-      if (key === 'Meta') key = 'Cmd';
-      if (/^f\d+$/i.test(key)) key = key.toUpperCase();
-
-      parts.push(key.length === 1 ? key.toLowerCase() : key);
-      const mergeKey = parts.join('+');
-
-      switch (mergeKey) {
+      if (e.repeat) return;
+      const mk = buildKey(e);
+      switch (mk) {
         case speakingKeyRef.current:
           startSpeak();
           break;
@@ -193,35 +207,31 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
       }
     };
 
-    const handleKeyUp = (e: KeyboardEvent) => {
+    const onKeyUp = (e: KeyboardEvent) => {
       if (new Set(['Shift', 'Control', 'Alt', 'Meta']).has(e.key)) return;
-
-      const parts = [];
-      if (e.ctrlKey) parts.push('Ctrl');
-      if (e.shiftKey) parts.push('Shift');
-      if (e.altKey) parts.push('Alt');
-
-      let key = e.key;
-
-      if (key === ' ') key = 'Space';
-      if (key === 'Meta') key = 'Cmd';
-      if (/^f\d+$/i.test(key)) key = key.toUpperCase();
-
-      parts.push(key.length === 1 ? key.toLowerCase() : key);
-      const mergeKey = parts.join('+');
-
-      switch (mergeKey) {
+      const mk = buildKey(e);
+      switch (mk) {
         case speakingKeyRef.current:
           stopSpeak();
           break;
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    // TODO: Use system event instead of window event
+    const onBlur = () => stopSpeak();
+    const onVisibility = () => {
+      if (document.hidden) stopSpeak();
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', onBlur);
+    document.addEventListener('visibilitychange', onVisibility);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', onBlur);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [startSpeak, stopSpeak, toggleMainWindows, toggleUpVolume, toggleDownVolume, toggleSpeakerMute, toggleMicMute]);
 

@@ -85,15 +85,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     }, 500);
   };
 
-  useEffect(() => {
-    return () => {
-      if (searchTimerRef.current) {
-        clearTimeout(searchTimerRef.current);
-        searchTimerRef.current = null;
-      }
-    };
-  }, []);
-
   const handleOpenCreateServer = (userId: User['userId']) => {
     ipcService.popup.open('createServer', 'createServer', { userId });
   };
@@ -180,9 +171,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, []);
 
   useEffect(() => {
-    const offDeepLink = ipcService.deepLink.onDeepLink(handleDeepLink);
-    return () => offDeepLink();
-  }, [handleDeepLink]);
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+        searchTimerRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     ipcService.discord.updatePresence({
@@ -203,9 +198,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, [t, userName]);
 
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [ipcService.socket.on('serverSearch', handleServerSearch)];
+    const unsubscribe = [ipcService.socket.on('serverSearch', handleServerSearch), ipcService.deepLink.onDeepLink(handleDeepLink)];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected, handleServerSearch]);
+  }, [socket.isConnected, handleServerSearch, handleDeepLink]);
 
   return (
     <main className={homePage['home']} style={display ? {} : { display: 'none' }}>
@@ -234,26 +229,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                   <div className={`${homePage['header-text']} ${homePage['exactMatch']}`} style={exactMatch ? {} : { display: 'none' }}>
                     {t('quick-enter-server')}
                   </div>
-                  <SearchResultItem
-                    key={exactMatch.serverId}
-                    server={exactMatch}
-                    onClick={() => {
-                      handleConnectServer(exactMatch.serverId, exactMatch.displayId);
-                    }}
-                  />
+                  <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => handleConnectServer(exactMatch.serverId, exactMatch.displayId)} />
                 </>
               )}
               {personalResults.length > 0 && (
                 <>
                   <div className={homePage['header-text']}>{t('personal-exclusive')}</div>
                   {personalResults.map((server) => (
-                    <SearchResultItem
-                      key={server.serverId}
-                      server={server}
-                      onClick={() => {
-                        handleConnectServer(server.serverId, server.displayId);
-                      }}
-                    />
+                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleConnectServer(server.serverId, server.displayId)} />
                   ))}
                 </>
               )}
@@ -261,13 +244,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 <>
                   <div className={homePage['header-text']}>{t('related-search')}</div>
                   {relatedResults.map((server) => (
-                    <SearchResultItem
-                      key={server.serverId}
-                      server={server}
-                      onClick={() => {
-                        handleConnectServer(server.serverId, server.displayId);
-                      }}
-                    />
+                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleConnectServer(server.serverId, server.displayId)} />
                   ))}
                 </>
               )}

@@ -54,27 +54,22 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
 
   // Handlers
   const handleFullscreen = () => {
-    if (isFullscreen) {
-      ipcService.window.unmaximize();
-    } else {
-      ipcService.window.maximize();
-    }
+    if (isFullscreen) ipcService.window.unmaximize();
+    else ipcService.window.maximize();
   };
+
   const handleMinimize = () => {
     ipcService.window.minimize();
   };
+
   const handleClose = () => {
     ipcService.window.close();
   };
 
   // Effects
   useEffect(() => {
-    const offMaximize = ipcService.window.onMaximize(() => setIsFullscreen(true));
-    const offUnmaximize = ipcService.window.onUnmaximize(() => setIsFullscreen(false));
-    return () => {
-      offMaximize();
-      offUnmaximize();
-    };
+    const unsubscribe = [ipcService.window.onUnmaximize(() => setIsFullscreen(false)), ipcService.window.onMaximize(() => setIsFullscreen(true))];
+    return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
   return (
@@ -106,8 +101,6 @@ const Popup = React.memo(() => {
   const [content, setContent] = useState<ReactNode | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
 
-  ipcService.initialData.on((data) => setInitialData(data));
-
   // Effects
   useEffect(() => {
     if (window.location.search) {
@@ -118,15 +111,11 @@ const Popup = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        ipcService.window.close();
-      }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') ipcService.window.close();
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
   useEffect(() => {
@@ -292,6 +281,11 @@ const Popup = React.memo(() => {
         break;
     }
   }, [t, initialData, type]);
+
+  useEffect(() => {
+    const unsubscribe = [ipcService.initialData.on((data) => setInitialData(data))];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, []);
 
   return (
     <>

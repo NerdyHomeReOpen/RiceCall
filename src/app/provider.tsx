@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 // Providers
 import SocketProvider from '@/providers/Socket';
@@ -21,26 +21,29 @@ interface ProvidersProps {
 }
 
 const Providers = ({ children }: ProvidersProps) => {
+  // Handlers
+  const handleEditFont = useCallback((font: string | null) => {
+    console.info('[Font] font updated: ', font);
+    if (!font) return;
+    document.body.style.setProperty('font-family', font, 'important');
+    document.body.style.setProperty('--font-family', font, 'important');
+  }, []);
+
+  const handleEditFontSize = useCallback((fontSize: number | null) => {
+    console.info('[Font] font size updated: ', fontSize);
+    if (!fontSize) return;
+    document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
+  }, []);
+
+  // Effects
   useEffect(() => {
     setupLanguage();
   }, []);
 
   useEffect(() => {
-    const changeFont = (font: string | null) => {
-      console.info('[Font] font updated: ', font);
-      if (!font) return;
-      document.body.style.setProperty('font-family', font, 'important');
-      document.body.style.setProperty('--font-family', font, 'important');
-    };
-    const changeFontSize = (fontSize: number | null) => {
-      console.info('[Font] font size updated: ', fontSize);
-      if (!fontSize) return;
-      document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
-    };
-
-    const unsubscribe: (() => void)[] = [ipcService.systemSettings.font.get(changeFont), ipcService.systemSettings.fontSize.get(changeFontSize)];
+    const unsubscribe = [ipcService.systemSettings.font.get(handleEditFont), ipcService.systemSettings.fontSize.get(handleEditFontSize)];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, []);
+  }, [handleEditFont, handleEditFontSize]);
 
   return (
     <ThemeProvider>

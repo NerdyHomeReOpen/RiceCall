@@ -135,7 +135,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, []);
 
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [ipcService.socket.on('directMessage', handleDirectMessage), ipcService.socket.on('shakeWindow', handleShakeWindow)];
+    const unsubscribe = [ipcService.socket.on('directMessage', handleDirectMessage), ipcService.socket.on('shakeWindow', handleShakeWindow)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [socket.isConnected]);
 

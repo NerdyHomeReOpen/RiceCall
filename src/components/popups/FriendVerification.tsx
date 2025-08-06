@@ -89,7 +89,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
 
   // Effects
   useEffect(() => {
-    const unsubscribe: (() => void)[] = [
+    const unsubscribe = [
       ipcService.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
       ipcService.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
       ipcService.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
