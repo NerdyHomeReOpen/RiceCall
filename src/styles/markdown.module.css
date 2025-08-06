@@ -62,7 +62,7 @@
 
 .markdown-content .user-icon {
   display: inline-block;
-  vertical-align: bottom;
+  vertical-align: text-bottom;
 }
 
 .markdown-content .youtube-video {
