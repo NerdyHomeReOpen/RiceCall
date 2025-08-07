@@ -234,29 +234,43 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
             if (!notifyMenuRef.current) return;
             const x = notifyMenuRef.current.getBoundingClientRect().left - 70;
             const y = notifyMenuRef.current.getBoundingClientRect().bottom + 10;
-            contextMenu.showNotifyMenu(x, y, false, false, hasNotify, [
+            contextMenu.showNotifyMenu(x, y, false, false, [
+              {
+                id: 'no-unread-notify',
+                label: `無未讀消息`, // TODO: t('no-unread-notify'),
+                show: !hasNotify,
+                className: 'readonly',
+              },
               {
                 id: 'friend-applications',
-                label: `好友驗證 (${friendApplications.length})`,
+                label: `好友驗證`, // TODO: t('friend-applications'),
                 icon: 'notify',
-                show: friendApplications.length > 0,
-                content: friendApplications.map((fa) => fa.avatarUrl),
+                show: friendApplications.length !== 0,
+                contentType: 'image',
+                showContentLength: true,
+                showContent: true,
+                contents: friendApplications.map((fa) => fa.avatarUrl),
                 onClick: () => handleOpenFriendVerification(),
               },
               {
-                id: 'system-setting',
-                label: `語音群邀請 (${memberInvitations.length})`,
+                id: 'member-invitations',
+                label: `語音群邀請`, // TODO: t('member-invitations'),
                 icon: 'notify',
-                show: memberInvitations.length > 0,
-                content: memberInvitations.map((mi) => mi.avatarUrl),
+                show: memberInvitations.length !== 0,
+                contentType: 'image',
+                showContentLength: true,
+                showContent: true,
+                contents: memberInvitations.map((mi) => mi.avatarUrl),
                 onClick: () => {},
               },
               {
-                id: 'system-setting',
-                label: `系統通知 (${systemNotify.length})`,
+                id: 'system-notify',
+                label: `系統通知`, // TODO: t('system-notify'),
                 icon: 'notify',
-                show: systemNotify.length > 0,
-                content: systemNotify,
+                show: systemNotify.length !== 0,
+                showContentLength: true,
+                showContent: false,
+                contents: memberInvitations.map((mi) => mi.avatarUrl),
                 onClick: () => {},
               },
             ]);

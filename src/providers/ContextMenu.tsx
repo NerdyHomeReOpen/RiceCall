@@ -12,7 +12,7 @@ import EmojiPicker from '@/components/EmojiPicker';
 
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: ContextMenuItem[]) => void;
-  showNotifyMenu: (x: number, y: number, preferTop: boolean, preferLeft: boolean, hasNotify: boolean, items: NotifyMenuItem[]) => void;
+  showNotifyMenu: (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: NotifyMenuItem[]) => void;
   showUserInfoBlock: (x: number, y: number, preferTop: boolean, member: Member) => void;
   showBadgeInfoCard: (x: number, y: number, preferTop: boolean, preferLeft: boolean, badge: Badge) => void;
   showEmojiPicker: (x: number, y: number, preferTop: boolean, type: 'custom' | 'unicode', onEmojiSelect: (emoji: string) => void) => void;
@@ -65,8 +65,8 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsContextMenuVisible(false);
   };
 
-  const showNotifyMenu = (x: number, y: number, preferTop: boolean, preferLeft: boolean, hasNotify: boolean, items: ContextMenuItem[]) => {
-    setNotifyMenu(<NotifyMenu items={items} hasNotify={hasNotify} onClose={closeNotifyMenu} x={x} y={y} preferTop={preferTop} preferLeft={preferLeft} />);
+  const showNotifyMenu = (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: ContextMenuItem[]) => {
+    setNotifyMenu(<NotifyMenu items={items} onClose={closeNotifyMenu} x={x} y={y} preferTop={preferTop} preferLeft={preferLeft} />);
     setIsNotifyMenuVisible(true);
   };
 

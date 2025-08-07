@@ -5,11 +5,10 @@ import styles from '@/styles/notifyMenu.module.css';
 import contextMenu from '@/styles/contextMenu.module.css';
 
 // Types
-import type { ContextMenuItem } from '@/types';
+import type { NotifyMenuItem } from '@/types';
 
 interface NotifyMenuProps {
-  items: ContextMenuItem[];
-  hasNotify: boolean;
+  items: NotifyMenuItem[];
   onClose: () => void;
   x?: number;
   y?: number;
@@ -17,7 +16,7 @@ interface NotifyMenuProps {
   preferLeft?: boolean;
 }
 
-const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, hasNotify, onClose, x = 0, y = 0, preferTop = false, preferLeft = false }) => {
+const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, preferTop = false, preferLeft = false }) => {
   // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -66,26 +65,37 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, hasNotify, onClose, x = 
 
   return (
     <div ref={menuRef} className={`context-menu-container ${styles['notify-menu']}`} style={{ top: menuY, left: menuX }}>
-      {!hasNotify && <div className={styles['option']}>無未讀消息</div>}
-      {hasNotify &&
-        items
-          .filter((item) => item?.show ?? true)
-          .map((item, index) => {
-            return (
-              <div
-                key={index}
-                className={`${styles['option']} ${item.disabled ? contextMenu['disabled'] : ''}`}
-                data-type={item.icon || ''}
-                onClick={() => {
-                  if (item.disabled) return;
-                  item.onClick?.();
-                  onClose();
-                }}
-              >
-                {item.label}
+      {items
+        .filter((item) => item?.show ?? true)
+        .map((item, index) => {
+          return (
+            <div
+              key={index}
+              className={`${styles['option']} ${item.className && styles[item.className]} ${item.disabled ? contextMenu['disabled'] : ''}`}
+              data-type={item.icon || ''}
+              onClick={() => {
+                if (item.disabled) return;
+                item.onClick?.();
+                onClose();
+              }}
+            >
+              {item.showContentLength ? `${item.label} (${item.contents ? item.contents.length : 0})` : item.label}
+              <div className={`${styles['contents']}`}>
+                {item.showContent &&
+                  item.contents &&
+                  item.contents.slice(0, 3).map((content) => {
+                    switch (item.contentType) {
+                      case 'image':
+                        return <img src={content} />;
+                      default:
+                        return content;
+                    }
+                  })}
+                {item.showContent && item.contents && item.contents.length > 3 && <span>..{item.contents.length - 3}</span>}
               </div>
-            );
-          })}
+            </div>
+          );
+        })}
     </div>
   );
 };

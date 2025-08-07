@@ -101,7 +101,10 @@ export type NotifyMenuItem = {
   label: string;
   show?: boolean;
   disabled?: boolean;
-  content: string[];
+  showContentLength?: boolean;
+  showContent?: boolean;
+  contentType?: string;
+  contents?: string[];
   icon?: string;
   className?: string;
   style?: React.CSSProperties;

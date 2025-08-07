@@ -16,10 +16,12 @@
 .notify-menu .option {
   position: relative;
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
   font-size: 12px;
+  font-weight: bold;
   padding: 2px 15px;
   color: #333;
 }
@@ -28,14 +30,39 @@
   position: absolute;
   content: '';
   left: 0px;
-  min-width: 12px;
-  min-height: 12px;
+  top: 3px;
+  min-width: 13px;
+  min-height: 13px;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
   align-self: center;
 }
 
+.notify-menu .option:not(.readonly):hover {
+  background-color: #d8dadc;
+  cursor: pointer;
+}
+
 .notify-menu .option[data-type='notify']::before {
   background-image: url('/icon_notice_friend.png');
+}
+
+.notify-menu .option .contents {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+
+.notify-menu .option .contents img {
+  background-size: cover;
+  max-width: 20px;
+  max-height: 20px;
+  margin: 5px 2px;
+  border: solid 1px #666666;
+}
+
+.notify-menu .option .contents span {
+  margin: 5px 0;
 }
