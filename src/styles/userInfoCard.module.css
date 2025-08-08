@@ -171,6 +171,7 @@
 
 .contribution-wrapper {
   display: flex;
+  align-items: center;
 }
 
 .contribution-value {
