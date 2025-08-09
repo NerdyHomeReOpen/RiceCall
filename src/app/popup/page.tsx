@@ -102,9 +102,6 @@ const Popup = React.memo(() => {
   const { title, buttons, node, hideHeader } = useMemo<{ title: string; buttons: ('close' | 'minimize' | 'maxsize')[]; node: React.ReactNode | null; hideHeader: boolean }>(() => {
     if (!type) return { title: '', buttons: [], node: null, hideHeader: true };
 
-    const needData = !['systemSetting', 'changeTheme', 'aboutus'].includes(type);
-    if (needData && !initialData) return { title: '', buttons: [], node: null, hideHeader: true };
-
     switch (type) {
       case 'aboutus':
         return { title: t('about-ricecall'), buttons: ['close'], node: <About {...initialData} />, hideHeader: false };

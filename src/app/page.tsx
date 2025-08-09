@@ -91,8 +91,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     ipcService.socket.send('editUser', { update: { status } });
   };
 
-  const handleOpenUserSetting = (userId: User['userId']) => {
-    ipcService.popup.open('userInfo', 'userSetting', { userId, targetId: userId });
+  const handleOpenUserInfo = (userId: User['userId']) => {
+    ipcService.popup.open('userInfo', `userInfo-${userId}`, { userId, targetId: userId });
   };
 
   const handleOpenSystemSetting = () => {
@@ -159,7 +159,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     <header className={`${header['header']} ${header['big']}`}>
       {/* Title */}
       <div className={header['title-box']}>
-        <div className={header['name-box']} onClick={() => handleOpenUserSetting(userId)}>
+        <div className={header['name-box']} onClick={() => handleOpenUserInfo(userId)}>
           {userName}
         </div>
         <div

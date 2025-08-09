@@ -378,11 +378,6 @@ async function createMainWindow(): Promise<BrowserWindow> {
     return { action: 'deny' };
   });
 
-  mainWindow.show();
-  mainWindow.focus();
-  mainWindow.setAlwaysOnTop(true);
-  mainWindow.setAlwaysOnTop(false);
-
   return mainWindow;
 }
 
@@ -436,11 +431,6 @@ async function createAuthWindow(): Promise<BrowserWindow> {
     shell.openExternal(url);
     return { action: 'deny' };
   });
-
-  authWindow.show();
-  authWindow.focus();
-  authWindow.setAlwaysOnTop(true);
-  authWindow.setAlwaysOnTop(false);
 
   return authWindow;
 }
@@ -504,21 +494,16 @@ async function createPopup(type: PopupType, id: string, data: any, force = true)
   });
 
   popups[id].webContents.once('did-finish-load', () => {
-    popups[id].webContents.send('initial-data', data);
+    popups[id].show();
+    popups[id].focus();
+    popups[id].setAlwaysOnTop(true);
+    setTimeout(() => popups[id].webContents.send('initial-data', data), 200);
   });
 
   popups[id].webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
   });
-
-  popups[id].show();
-  popups[id].focus();
-  popups[id].setAlwaysOnTop(true);
-  const isAlwaysOnTop = store.get('alwaysOnTop') ?? false;
-  if (!isAlwaysOnTop) {
-    popups[id].setAlwaysOnTop(false);
-  }
 
   return popups[id];
 }
@@ -784,13 +769,8 @@ app.on('ready', async () => {
     popups['aboutUs'].setAlwaysOnTop(true);
   }
 
-  await createAuthWindow().then((authWindow) => {
-    authWindow.show();
-  });
-
-  await createMainWindow().then((mainWindow) => {
-    mainWindow.hide();
-  });
+  createAuthWindow().then((authWindow) => authWindow.show());
+  createMainWindow().then((mainWindow) => mainWindow.hide());
 
   // Auth handlers
   ipcMain.on('login', (_, token) => {
@@ -821,7 +801,7 @@ app.on('ready', async () => {
 
   // Popup handlers
   ipcMain.on('open-popup', (_, type, id, data, force = true) => {
-    createPopup(type, id, data, force);
+    createPopup(type, id, data, force).then((popup) => popup.show());
   });
 
   ipcMain.on('close-popup', (_, id) => {
