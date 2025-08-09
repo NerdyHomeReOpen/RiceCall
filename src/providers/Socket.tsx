@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -32,45 +32,42 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
   // Hooks
   const { t } = useTranslation();
 
+  // Refs
+  const tRef = useRef(t);
+
   // States
   const [isConnected, setIsConnected] = useState(false);
 
   // Handlers
-  const handleConnect = useCallback(() => {
+  const handleConnect = () => {
     console.info('[Socket] connected');
     ipcService.popup.close('errorDialog');
     setIsConnected(true);
-  }, []);
+  };
 
-  const handleDisconnect = useCallback(() => {
+  const handleDisconnect = () => {
     console.info('[Socket] disconnected');
     setIsConnected(false);
-  }, []);
+  };
 
-  const handleReconnect = useCallback((attemptNumber: number) => {
+  const handleReconnect = (attemptNumber: number) => {
     console.info('[Socket] reconnecting, attempt number:', attemptNumber);
-  }, []);
+  };
 
-  const handleError = useCallback((message: string) => {
+  const handleError = (message: string) => {
     console.error('[Socket] error:', message);
     new ErrorHandler(new Error(message)).show();
-  }, []);
+  };
 
-  const handleConnectError = useCallback(
-    (error: any) => {
-      console.error('[Socket] connect error:', error);
-      new ErrorHandler(new Error(t('connection-failed-message')), () => ipcService.auth.logout()).show();
-    },
-    [t],
-  );
+  const handleConnectError = (error: any) => {
+    console.error('[Socket] connect error:', error);
+    new ErrorHandler(new Error(tRef.current('connection-failed-message')), () => ipcService.auth.logout()).show();
+  };
 
-  const handleReconnectError = useCallback(
-    (error: any) => {
-      console.error('[Socket] reconnect error:', error);
-      new ErrorHandler(new Error(t('reconnection-failed-message')), () => ipcService.auth.logout()).show();
-    },
-    [t],
-  );
+  const handleReconnectError = (error: any) => {
+    console.error('[Socket] reconnect error:', error);
+    new ErrorHandler(new Error(tRef.current('reconnection-failed-message')), () => ipcService.auth.logout()).show();
+  };
 
   // Effects
   useEffect(() => {
@@ -83,7 +80,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
       ipcService.socket.on('reconnect_error', handleReconnectError),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleConnect, handleReconnect, handleDisconnect, handleError, handleConnectError, handleReconnectError]);
+  }, []);
 
   return <SocketContext.Provider value={{ isConnected }}>{children}</SocketContext.Provider>;
 };

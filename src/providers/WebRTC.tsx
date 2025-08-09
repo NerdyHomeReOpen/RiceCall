@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useContext, createContext, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useContext, createContext, useCallback, useMemo } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import { io, Socket } from 'socket.io-client';
 
@@ -67,8 +67,50 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   // Providers
   const soundPlayer = useSoundPlayer();
 
-  // Constants
-  const SPEAKING_VOLUME_THRESHOLD = 2;
+  // Refs
+  const rafIdMapRef = useRef<{ [userId: string]: number }>({}); // userId -> rAF id
+  const volumePercentRef = useRef<{ [userId: string]: number }>({});
+  const lastRefreshRef = useRef<number>(0);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
+  const speakerRef = useRef<HTMLAudioElement | null>(null);
+  const soundPlayerRef = useRef(soundPlayer);
+  // Mic
+  const micTakenRef = useRef<boolean>(false);
+  const micMuteRef = useRef<boolean>(false);
+  const micVolumeRef = useRef<number>(100);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const micSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const micGainNodeRef = useRef<GainNode | null>(null);
+  const micAnalyserRef = useRef<AnalyserNode | null>(null);
+  const inputDestinationNodeRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  // Mix
+  const mixVolumeRef = useRef<number>(100);
+  const mixGainNodeRef = useRef<GainNode | null>(null);
+  // Speaker
+  const speakerMuteRef = useRef<boolean>(false);
+  const speakerVolumeRef = useRef<number>(100);
+  const speakerStreamListRef = useRef<{ [id: string]: MediaStream }>({}); // userId -> stream
+  const speakerSourceListRef = useRef<{ [id: string]: MediaStreamAudioSourceNode }>({}); // userId -> source
+  const speakerGainNodeListRef = useRef<{ [id: string]: GainNode }>({}); // userId -> gain
+  const speakerAnalyserListRef = useRef<{ [id: string]: AnalyserNode }>({}); // userId -> analyser
+  const outputDestinationNodeRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  // Speaking Mode
+  const speakingModeRef = useRef<SpeakingMode>('key');
+  const isPressSpeakKeyRef = useRef<boolean>(false);
+  // Bitrate
+  const bitrateRef = useRef<number>(64000);
+  // Mute
+  const muteIdsRef = useRef<string[]>([]);
+  // SFU
+  const socketRef = useRef<Socket | null>(null);
+  const deviceRef = useRef<mediasoupClient.Device>(new mediasoupClient.Device());
+  const sendTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
+  const recvTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
+  const consumersRef = useRef<{ [producerId: string]: mediasoupClient.types.Consumer }>({}); // producerId -> consumer
+
+  // Memos
+  const SPEAKING_VOLUME_THRESHOLD = useMemo(() => 2, []);
 
   // States
   const [isPressSpeakKey, setIsPressSpeakKey] = useState<boolean>(false);
@@ -81,100 +123,55 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const [volumePercent, setVolumePercent] = useState<{ [userId: string]: number }>({});
   const [remoteUserStatusList, setRemoteUserStatusList] = useState<{ [userId: string]: RemoteUserStatus }>({}); // userId -> status
 
-  // Refs
-  const rafIdMapRef = useRef<{ [userId: string]: number }>({}); // userId -> rAF id
-  const volumePercentRef = useRef<{ [userId: string]: number }>({});
-  const lastRefreshRef = useRef<number>(0);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
-  const speakerRef = useRef<HTMLAudioElement | null>(null);
+  const initSpeakerAudio = useCallback(
+    (userId: string, stream: MediaStream) => {
+      // Disable tracks
+      stream.getAudioTracks().forEach((track) => {
+        track.enabled = !muteIdsRef.current.includes(userId);
+      });
 
-  // Mic
-  const micTakenRef = useRef<boolean>(false);
-  const micMuteRef = useRef<boolean>(false);
-  const micVolumeRef = useRef<number>(100);
-  const micStreamRef = useRef<MediaStream | null>(null);
-  const micSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
-  const micGainNodeRef = useRef<GainNode | null>(null);
-  const micAnalyserRef = useRef<AnalyserNode | null>(null);
-  const inputDestinationNodeRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+      // Create nodes
+      speakerStreamListRef.current[userId] = stream;
+      if (speakerSourceListRef.current[userId]) speakerSourceListRef.current[userId].disconnect();
+      speakerSourceListRef.current[userId] = audioContextRef.current!.createMediaStreamSource(stream);
+      if (!speakerGainNodeListRef.current[userId]) speakerGainNodeListRef.current[userId] = audioContextRef.current!.createGain();
+      // speakerGainNodeListRef.current[userId].gain.value =
+      if (!speakerAnalyserListRef.current[userId]) speakerAnalyserListRef.current[userId] = audioContextRef.current!.createAnalyser();
 
-  // Mix
-  const mixVolumeRef = useRef<number>(100);
-  const mixGainNodeRef = useRef<GainNode | null>(null);
+      // Connect nodes
+      speakerSourceListRef.current[userId].connect(speakerGainNodeListRef.current[userId]);
+      speakerGainNodeListRef.current[userId].connect(speakerAnalyserListRef.current[userId]);
+      speakerGainNodeListRef.current[userId].gain.value = 1;
+      speakerAnalyserListRef.current[userId].connect(outputDestinationNodeRef.current!);
 
-  // Speaker
-  const speakerMuteRef = useRef<boolean>(false);
-  const speakerVolumeRef = useRef<number>(100);
-  const speakerStreamListRef = useRef<{ [id: string]: MediaStream }>({}); // userId -> stream
-  const speakerSourceListRef = useRef<{ [id: string]: MediaStreamAudioSourceNode }>({}); // userId -> source
-  const speakerGainNodeListRef = useRef<{ [id: string]: GainNode }>({}); // userId -> gain
-  const speakerAnalyserListRef = useRef<{ [id: string]: AnalyserNode }>({}); // userId -> analyser
-  const outputDestinationNodeRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+      // Initialize analyser
+      speakerAnalyserListRef.current[userId].fftSize = 2048;
+      const dataArray = new Uint8Array(speakerAnalyserListRef.current[userId].fftSize);
 
-  // Speaking Mode
-  const speakingModeRef = useRef<SpeakingMode>('key');
-  const isPressSpeakKeyRef = useRef<boolean>(false);
+      const detectSpeaking = () => {
+        if (!speakerAnalyserListRef.current[userId]) return;
+        speakerAnalyserListRef.current[userId].getByteTimeDomainData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          const v = (dataArray[i] - 128) / 128;
+          sum += v * v;
+        }
+        const volume = Math.sqrt(sum / dataArray.length);
+        const volumePercent = Math.min(1, volume / 0.5) * 100;
+        volumePercentRef.current[userId] = volumePercent > SPEAKING_VOLUME_THRESHOLD ? volumePercent : 0;
 
-  // Bitrate
-  const bitrateRef = useRef<number>(64000);
+        const now = performance.now();
+        if (now - lastRefreshRef.current >= 80) {
+          lastRefreshRef.current = now;
+          setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
+        }
 
-  // Mute
-  const muteIdsRef = useRef<string[]>([]);
-
-  // SFU
-  const socketRef = useRef<Socket | null>(null);
-  const deviceRef = useRef<mediasoupClient.Device>(new mediasoupClient.Device());
-  const sendTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
-  const recvTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
-  const consumersRef = useRef<{ [producerId: string]: mediasoupClient.types.Consumer }>({}); // producerId -> consumer
-
-  const initSpeakerAudio = useCallback((userId: string, stream: MediaStream) => {
-    // Disable tracks
-    stream.getAudioTracks().forEach((track) => {
-      track.enabled = !muteIdsRef.current.includes(userId);
-    });
-
-    // Create nodes
-    speakerStreamListRef.current[userId] = stream;
-    if (speakerSourceListRef.current[userId]) speakerSourceListRef.current[userId].disconnect();
-    speakerSourceListRef.current[userId] = audioContextRef.current!.createMediaStreamSource(stream);
-    if (!speakerGainNodeListRef.current[userId]) speakerGainNodeListRef.current[userId] = audioContextRef.current!.createGain();
-    // speakerGainNodeListRef.current[userId].gain.value =
-    if (!speakerAnalyserListRef.current[userId]) speakerAnalyserListRef.current[userId] = audioContextRef.current!.createAnalyser();
-
-    // Connect nodes
-    speakerSourceListRef.current[userId].connect(speakerGainNodeListRef.current[userId]);
-    speakerGainNodeListRef.current[userId].connect(speakerAnalyserListRef.current[userId]);
-    speakerGainNodeListRef.current[userId].gain.value = 1;
-    speakerAnalyserListRef.current[userId].connect(outputDestinationNodeRef.current!);
-
-    // Initialize analyser
-    speakerAnalyserListRef.current[userId].fftSize = 2048;
-    const dataArray = new Uint8Array(speakerAnalyserListRef.current[userId].fftSize);
-
-    const detectSpeaking = () => {
-      if (!speakerAnalyserListRef.current[userId]) return;
-      speakerAnalyserListRef.current[userId].getByteTimeDomainData(dataArray);
-      let sum = 0;
-      for (let i = 0; i < dataArray.length; i++) {
-        const v = (dataArray[i] - 128) / 128;
-        sum += v * v;
-      }
-      const volume = Math.sqrt(sum / dataArray.length);
-      const volumePercent = Math.min(1, volume / 0.5) * 100;
-      volumePercentRef.current[userId] = volumePercent > SPEAKING_VOLUME_THRESHOLD ? volumePercent : 0;
-
-      const now = performance.now();
-      if (now - lastRefreshRef.current >= 80) {
-        lastRefreshRef.current = now;
-        setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
-      }
-
-      rafIdMapRef.current[userId] = requestAnimationFrame(detectSpeaking);
-    };
-    detectSpeaking();
-  }, []);
+        rafIdMapRef.current[userId] = requestAnimationFrame(detectSpeaking);
+      };
+      detectSpeaking();
+    },
+    [SPEAKING_VOLUME_THRESHOLD],
+  );
 
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
@@ -228,7 +225,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       };
       detectSpeaking();
     },
-    [userId],
+    [userId, SPEAKING_VOLUME_THRESHOLD],
   );
 
   const changeBitrate = useCallback((bitrate: number) => {
@@ -303,7 +300,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       console.warn('Not in key mode');
       return;
     }
-    soundPlayer.playSound(enable ? 'startSpeaking' : 'stopSpeaking');
+    soundPlayerRef.current.playSound(enable ? 'startSpeaking' : 'stopSpeaking');
     micStreamRef.current!.getAudioTracks().forEach((track) => {
       track.enabled = micTakenRef.current && enable;
     });
@@ -563,9 +560,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     [initMicAudio],
   );
 
-  const handleEditSpeakingMode = useCallback((mode: SpeakingMode) => {
+  const handleEditSpeakingMode = (mode: SpeakingMode) => {
     speakingModeRef.current = mode;
-  }, []);
+  };
 
   // Effects
   useEffect(() => {
@@ -648,7 +645,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       ipcService.socket.on('channelDisconnected', handleLeaveSFUChannel),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleEditInputDevice, handleEditOutputDevice, handleEditSpeakingMode, handleJoinSFUChannel, handleLeaveSFUChannel]);
+  }, [handleEditInputDevice, handleEditOutputDevice, handleJoinSFUChannel, handleLeaveSFUChannel]);
 
   return (
     <WebRTCContext.Provider

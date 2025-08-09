@@ -5,7 +5,6 @@ import type { User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -19,7 +18,6 @@ interface SearchUserPopupProps {
 
 const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // States
@@ -48,7 +46,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   useEffect(() => {
     const unsubscribe = [ipcService.socket.on('userSearch', handleUserSearch)];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected, handleUserSearch]);
+  }, [handleUserSearch]);
 
   return (
     <div className={popup['popup-wrapper']}>

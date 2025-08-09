@@ -286,6 +286,11 @@ export type ServerToClientEvents = {
   serverMemberApplicationAdd: (...args: { data: MemberApplication }[]) => void;
   serverMemberApplicationUpdate: (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => void;
   serverMemberApplicationRemove: (...args: { userId: string; serverId: string }[]) => void;
+  // Member Invitation
+  memberInvitationsSet: (...args: MemberInvitation[]) => void;
+  memberInvitationAdd: (...args: { data: MemberInvitation }[]) => void;
+  memberInvitationUpdate: (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => void;
+  memberInvitationRemove: (...args: { serverId: string }[]) => void;
   // Message
   channelMessage: (...args: ChannelMessage[]) => void;
   actionMessage: (...args: PromptMessage[]) => void;

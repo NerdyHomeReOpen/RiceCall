@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -385,6 +385,7 @@ const RootPageComponent = () => {
   const mainTabRef = useRef(mainTab);
   const selectedTabRef = useRef(mainTab.selectedTabId);
   const loadingBoxRef = useRef(loadingBox);
+  const soundPlayerRef = useRef(soundPlayer);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
 
   selectedTabRef.current = mainTab.selectedTabId;
@@ -412,141 +413,154 @@ const RootPageComponent = () => {
   const { userId } = user;
 
   // Handlers
-  const handleUserUpdate = useCallback((...args: { update: Partial<User> }[]) => {
+  const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
     setUser((prev) => ({ ...prev, ...args[0].update }));
-  }, []);
+  };
 
-  const handleServersSet = useCallback((...args: Server[]) => {
+  const handleServersSet = (...args: Server[]) => {
     setServers(args);
-  }, []);
+  };
 
-  const handleServerAdd = useCallback((...args: { data: Server }[]) => {
+  const handleServerAdd = (...args: { data: Server }[]) => {
     setServers((prev) => [...prev, ...args.map((i) => i.data)]);
-  }, []);
+  };
 
-  const handleServerUpdate = useCallback((...args: { serverId: string; update: Partial<Server> }[]) => {
+  const handleServerUpdate = (...args: { serverId: string; update: Partial<Server> }[]) => {
     const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
     setServers((prev) => prev.map((s) => (update.has(`${s.serverId}`) ? { ...s, ...update.get(`${s.serverId}`) } : s)));
-  }, []);
+  };
 
-  const handleServerRemove = useCallback((...args: { serverId: string }[]) => {
+  const handleServerRemove = (...args: { serverId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.serverId}`));
     setServers((prev) => prev.filter((s) => !remove.has(`${s.serverId}`)));
-  }, []);
+  };
 
-  const handleFriendsSet = useCallback((...args: Friend[]) => {
+  const handleFriendsSet = (...args: Friend[]) => {
     setFriends(args);
-  }, []);
+  };
 
-  const handleFriendAdd = useCallback((...args: { data: Friend }[]) => {
+  const handleFriendAdd = (...args: { data: Friend }[]) => {
     setFriends((prev) => [...prev, ...args.map((i) => i.data)]);
-  }, []);
+  };
 
-  const handleFriendUpdate = useCallback((...args: { targetId: string; update: Partial<Friend> }[]) => {
+  const handleFriendUpdate = (...args: { targetId: string; update: Partial<Friend> }[]) => {
     const update = new Map(args.map((i) => [`${i.targetId}`, i.update] as const));
     setFriends((prev) => prev.map((f) => (update.has(`${f.targetId}`) ? { ...f, ...update.get(`${f.targetId}`) } : f)));
-  }, []);
+  };
 
-  const handleFriendDelete = useCallback((...args: { targetId: string }[]) => {
+  const handleFriendDelete = (...args: { targetId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.targetId}`));
     setFriends((prev) => prev.filter((f) => !remove.has(`${f.targetId}`)));
-  }, []);
+  };
 
-  const handleFriendGroupsSet = useCallback((...args: FriendGroup[]) => {
+  const handleFriendGroupsSet = (...args: FriendGroup[]) => {
     setFriendGroups(args);
-  }, []);
+  };
 
-  const handleFriendGroupAdd = useCallback((...args: { data: FriendGroup }[]) => {
+  const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
     setFriendGroups((prev) => [...prev, ...args.map((i) => i.data)]);
-  }, []);
+  };
 
-  const handleFriendGroupUpdate = useCallback((...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
+  const handleFriendGroupUpdate = (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
     const update = new Map(args.map((i) => [`${i.friendGroupId}`, i.update] as const));
     setFriendGroups((prev) => prev.map((fg) => (update.has(`${fg.friendGroupId}`) ? { ...fg, ...update.get(`${fg.friendGroupId}`) } : fg)));
-  }, []);
+  };
 
-  const handleFriendGroupDelete = useCallback((...args: { friendGroupId: string }[]) => {
+  const handleFriendGroupDelete = (...args: { friendGroupId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.friendGroupId}`));
     setFriendGroups((prev) => prev.filter((fg) => !remove.has(`${fg.friendGroupId}`)));
-  }, []);
+  };
 
-  const handleFriendApplicationAdd = useCallback((...args: { data: FriendApplication }[]) => {
+  const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
     setFriendApplications((prev) => [...prev, ...args.map((i) => i.data)]);
-  }, []);
+  };
 
-  const handleFriendApplicationRemove = useCallback((...args: { senderId: string }[]) => {
+  const handleFriendApplicationUpdate = (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
+    const update = new Map(args.map((i) => [`${i.senderId}`, i.update] as const));
+    setFriendApplications((prev) => prev.map((a) => (update.has(`${a.senderId}`) ? { ...a, ...update.get(`${a.senderId}`) } : a)));
+  };
+
+  const handleFriendApplicationRemove = (...args: { senderId: string }[]) => {
     setFriendApplications((prev) => prev.filter((fa) => !args.some((i) => i.senderId === fa.senderId)));
-  }, []);
+  };
 
-  const handleServerMembersSet = useCallback((...args: Member[]) => {
+  const handleServerMembersSet = (...args: Member[]) => {
     setServerMembers(args);
-  }, []);
+  };
 
-  const handleServerMemberAdd = useCallback((...args: { data: Member }[]) => {
+  const handleServerMemberAdd = (...args: { data: Member }[]) => {
     setServerMembers((prev) => [...prev, ...args.map((i) => i.data)]);
-  }, []);
+  };
 
-  const handleServerMemberUpdate = useCallback((...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
+  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
     const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
     setServerMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
-  }, []);
+  };
 
-  const handleServerMemberDelete = useCallback((...args: { userId: string; serverId: string }[]) => {
+  const handleServerMemberDelete = (...args: { userId: string; serverId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
     setServerMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
-  }, []);
+  };
 
-  const handleServerChannelsSet = useCallback((...args: Channel[]) => {
+  const handleServerChannelsSet = (...args: Channel[]) => {
     setServerChannels(args);
-  }, []);
+  };
 
-  const handleServerChannelAdd = useCallback((...args: { data: Channel }[]) => {
+  const handleServerChannelAdd = (...args: { data: Channel }[]) => {
     setServerChannels((prev) => [...prev, ...args.map((i) => i.data)]);
-  }, []);
+  };
 
-  const handleServerChannelUpdate = useCallback((...args: { channelId: string; update: Partial<Channel> }[]) => {
+  const handleServerChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
     const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
     setServerChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
-  }, []);
+  };
 
-  const handleServerChannelDelete = useCallback((...args: { channelId: string }[]) => {
+  const handleServerChannelDelete = (...args: { channelId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.channelId}`));
     setServerChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
-  }, []);
+  };
 
-  const handleChannelMessage = useCallback((...args: ChannelMessage[]) => {
+  const handleMemberInvitationAdd = (...args: { data: MemberInvitation }[]) => {
+    setMemberInvitations((prev) => [...prev, ...args.map((i) => i.data)]);
+  };
+
+  const handleMemberInvitationUpdate = (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => {
+    const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
+    setMemberInvitations((prev) => prev.map((mi) => (update.has(`${mi.serverId}`) ? { ...mi, ...update.get(`${mi.serverId}`) } : mi)));
+  };
+
+  const handleMemberInvitationRemove = (...args: { serverId: string }[]) => {
+    const remove = new Set(args.map((i) => i.serverId));
+    setMemberInvitations((prev) => prev.filter((mi) => !remove.has(mi.serverId)));
+  };
+
+  const handleChannelMessage = (...args: ChannelMessage[]) => {
     setChannelMessages((prev) => [...prev, ...args]);
-  }, []);
+  };
 
-  const handleActionMessage = useCallback((...args: PromptMessage[]) => {
+  const handleActionMessage = (...args: PromptMessage[]) => {
     setActionMessages((prev) => [...prev, ...args]);
-  }, []);
+  };
 
-  const handleQueueMembersSet = useCallback((...args: QueueMember[]) => {
+  const handleQueueMembersSet = (...args: QueueMember[]) => {
     setQueueMembers(args);
-  }, []);
+  };
 
-  const handlePlaySound = useCallback(
-    (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
-      args.forEach((s) => soundPlayer.playSound(s));
-    },
-    [soundPlayer],
-  );
+  const handlePlaySound = (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
+    args.forEach((s) => soundPlayerRef.current.playSound(s));
+  };
 
-  const handleOpenPopup = useCallback(
-    (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => {
-      args.forEach((p) => {
-        loadingBox.setIsLoading(false);
-        loadingBox.setLoadingServerId('');
-        ipcService.popup.open(p.type, p.id, p.initialData, p.force);
-        popupOffSubmitRef.current?.();
-        popupOffSubmitRef.current = ipcService.popup.onSubmit(p.id, () => {
-          if (p.id === 'logout') ipcService.auth.logout();
-        });
+  const handleOpenPopup = (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => {
+    args.forEach((p) => {
+      loadingBoxRef.current.setIsLoading(false);
+      loadingBoxRef.current.setLoadingServerId('');
+      ipcService.popup.open(p.type, p.id, p.initialData, p.force);
+      popupOffSubmitRef.current?.();
+      popupOffSubmitRef.current = ipcService.popup.onSubmit(p.id, () => {
+        if (p.id === 'logout') ipcService.auth.logout();
       });
-    },
-    [loadingBox],
-  );
+    });
+  };
 
   // Effects
   useEffect(() => {
@@ -600,9 +614,13 @@ const RootPageComponent = () => {
       getService.friendApplications({ receiverId: userId }).then((friendApplications) => {
         if (friendApplications) setFriendApplications(friendApplications);
       });
+      getService.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
+        if (memberInvitations) setMemberInvitations(memberInvitations);
+      });
       getService.recommendServerList().then((recommendServerList) => {
         if (recommendServerList) setRecommendServerList(recommendServerList);
       });
+      setSystemNotify([]);
     };
     refresh();
   }, [userId]);
@@ -623,6 +641,7 @@ const RootPageComponent = () => {
       ipcService.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
       ipcService.socket.on('friendGroupRemove', handleFriendGroupDelete),
       ipcService.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
+      ipcService.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
       ipcService.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
       ipcService.socket.on('serverOnlineMembersSet', handleServerMembersSet),
       ipcService.socket.on('serverOnlineMemberAdd', handleServerMemberAdd),
@@ -632,6 +651,9 @@ const RootPageComponent = () => {
       ipcService.socket.on('serverChannelAdd', handleServerChannelAdd),
       ipcService.socket.on('serverChannelUpdate', handleServerChannelUpdate),
       ipcService.socket.on('serverChannelRemove', handleServerChannelDelete),
+      ipcService.socket.on('memberInvitationAdd', handleMemberInvitationAdd),
+      ipcService.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
+      ipcService.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
       ipcService.socket.on('channelMessage', handleChannelMessage),
       ipcService.socket.on('actionMessage', handleActionMessage),
       ipcService.socket.on('openPopup', handleOpenPopup),
@@ -639,37 +661,7 @@ const RootPageComponent = () => {
       ipcService.socket.on('queueMembersSet', handleQueueMembersSet),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [
-    socket.isConnected,
-    handleUserUpdate,
-    handleServersSet,
-    handleServerAdd,
-    handleServerUpdate,
-    handleServerRemove,
-    handleFriendsSet,
-    handleFriendAdd,
-    handleFriendUpdate,
-    handleFriendDelete,
-    handleFriendGroupsSet,
-    handleFriendGroupAdd,
-    handleFriendGroupUpdate,
-    handleFriendGroupDelete,
-    handleFriendApplicationAdd,
-    handleFriendApplicationRemove,
-    handleServerMembersSet,
-    handleServerMemberAdd,
-    handleServerMemberUpdate,
-    handleServerMemberDelete,
-    handleServerChannelsSet,
-    handleServerChannelAdd,
-    handleServerChannelUpdate,
-    handleServerChannelDelete,
-    handleChannelMessage,
-    handleActionMessage,
-    handleOpenPopup,
-    handlePlaySound,
-    handleQueueMembersSet,
-  ]);
+  }, []);
 
   return (
     <WebRTCProvider userId={userId}>

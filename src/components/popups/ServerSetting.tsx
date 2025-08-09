@@ -12,7 +12,6 @@ import type { MemberApplication, Server, Member, User } from '@/types';
 // Providers
 import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useSocket } from '@/providers/Socket';
 
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
@@ -36,7 +35,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
-  const socket = useSocket();
 
   // Refs
   const refreshRef = useRef(false);
@@ -239,18 +237,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
   // Effects
   useEffect(() => {
-    const unsubscribe = [
-      ipcService.socket.on('serverMemberAdd', handleServerMemberAdd),
-      ipcService.socket.on('serverMemberUpdate', handleServerMemberUpdate),
-      ipcService.socket.on('serverMemberRemove', handleServerMemberRemove),
-      ipcService.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
-      ipcService.socket.on('serverMemberApplicationUpdate', handleServerMemberApplicationUpdate),
-      ipcService.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
-    ];
-    return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected]);
-
-  useEffect(() => {
     if (!serverId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
@@ -266,6 +252,18 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     };
     refresh();
   }, [serverId, userId]);
+
+  useEffect(() => {
+    const unsubscribe = [
+      ipcService.socket.on('serverMemberAdd', handleServerMemberAdd),
+      ipcService.socket.on('serverMemberUpdate', handleServerMemberUpdate),
+      ipcService.socket.on('serverMemberRemove', handleServerMemberRemove),
+      ipcService.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
+      ipcService.socket.on('serverMemberApplicationUpdate', handleServerMemberApplicationUpdate),
+      ipcService.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, []);
 
   return (
     <div className={popup['popup-wrapper']}>

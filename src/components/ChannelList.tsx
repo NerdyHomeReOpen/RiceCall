@@ -11,7 +11,6 @@ import type { Member, Channel, Server, User, Category, Friend, MemberApplication
 import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
-import { useSocket } from '@/providers/Socket';
 
 // Components
 import ChannelTab from '@/components/ChannelTab';
@@ -35,7 +34,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const findMe = useFindMeContext();
-  const socket = useSocket();
 
   // Refs
   const viewerRef = useRef<HTMLDivElement>(null);
@@ -146,7 +144,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
       ipcService.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected]);
+  }, []);
 
   return (
     <>

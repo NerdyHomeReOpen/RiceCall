@@ -96,54 +96,6 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   // Effects
   useEffect(() => {
-    const changeStatusAutoIdle = (enable: boolean) => {
-      console.info('[ActionScanner] status auto idle updated: ', enable);
-      idleCheck.current = enable;
-      lastActiveRef.current = Date.now();
-    };
-    const changeStatusAutoIdleMinutes = (value: number) => {
-      console.info('[ActionScanner] status auto idle minutes updated: ', value);
-      idleMinutes.current = value;
-    };
-    const changeDefaultSpeakingKey = (key: string) => {
-      console.info('[ActionScanner] default speaking key updated: ', key);
-      speakingKeyRef.current = key;
-    };
-    const changeHotKeyOpenMainWindow = (key: string) => {
-      console.info('[ActionScanner] hot key open main window updated: ', key);
-      openMainWindowKeyRef.current = key;
-    };
-    const changeHotKeyIncreaseVolume = (key: string) => {
-      console.info('[ActionScanner] hot key increase volume updated: ', key);
-      increaseVolumeKeyRef.current = key;
-    };
-    const changeHotKeyDecreaseVolume = (key: string) => {
-      console.info('[ActionScanner] hot key decrease volume updated: ', key);
-      decreaseVolumeKeyRef.current = key;
-    };
-    const changeHotKeyToggleSpeaker = (key: string) => {
-      console.info('[ActionScanner] hot key toggle speaker updated: ', key);
-      toggleSpeakerKeyRef.current = key;
-    };
-    const changeHotKeyToggleMicrophone = (key: string) => {
-      console.info('[ActionScanner] hot key toggle microphone updated: ', key);
-      toggleMicrophoneKeyRef.current = key;
-    };
-
-    const unsubscribe = [
-      ipcService.systemSettings.statusAutoIdle.get(changeStatusAutoIdle),
-      ipcService.systemSettings.statusAutoIdleMinutes.get(changeStatusAutoIdleMinutes),
-      ipcService.systemSettings.defaultSpeakingKey.get(changeDefaultSpeakingKey),
-      ipcService.systemSettings.hotKeyOpenMainWindow.get(changeHotKeyOpenMainWindow),
-      ipcService.systemSettings.hotKeyIncreaseVolume.get(changeHotKeyIncreaseVolume),
-      ipcService.systemSettings.hotKeyDecreaseVolume.get(changeHotKeyDecreaseVolume),
-      ipcService.systemSettings.hotKeyToggleSpeaker.get(changeHotKeyToggleSpeaker),
-      ipcService.systemSettings.hotKeyToggleMicrophone.get(changeHotKeyToggleMicrophone),
-    ];
-    return () => unsubscribe.forEach((unsub) => unsub());
-  }, []);
-
-  useEffect(() => {
     if (!idleCheck.current) return;
     const id = setInterval(() => {
       const now = Date.now();
@@ -234,6 +186,54 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
       document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [startSpeak, stopSpeak, toggleMainWindows, toggleUpVolume, toggleDownVolume, toggleSpeakerMute, toggleMicMute]);
+
+  useEffect(() => {
+    const changeStatusAutoIdle = (enable: boolean) => {
+      console.info('[ActionScanner] status auto idle updated: ', enable);
+      idleCheck.current = enable;
+      lastActiveRef.current = Date.now();
+    };
+    const changeStatusAutoIdleMinutes = (value: number) => {
+      console.info('[ActionScanner] status auto idle minutes updated: ', value);
+      idleMinutes.current = value;
+    };
+    const changeDefaultSpeakingKey = (key: string) => {
+      console.info('[ActionScanner] default speaking key updated: ', key);
+      speakingKeyRef.current = key;
+    };
+    const changeHotKeyOpenMainWindow = (key: string) => {
+      console.info('[ActionScanner] hot key open main window updated: ', key);
+      openMainWindowKeyRef.current = key;
+    };
+    const changeHotKeyIncreaseVolume = (key: string) => {
+      console.info('[ActionScanner] hot key increase volume updated: ', key);
+      increaseVolumeKeyRef.current = key;
+    };
+    const changeHotKeyDecreaseVolume = (key: string) => {
+      console.info('[ActionScanner] hot key decrease volume updated: ', key);
+      decreaseVolumeKeyRef.current = key;
+    };
+    const changeHotKeyToggleSpeaker = (key: string) => {
+      console.info('[ActionScanner] hot key toggle speaker updated: ', key);
+      toggleSpeakerKeyRef.current = key;
+    };
+    const changeHotKeyToggleMicrophone = (key: string) => {
+      console.info('[ActionScanner] hot key toggle microphone updated: ', key);
+      toggleMicrophoneKeyRef.current = key;
+    };
+
+    const unsubscribe = [
+      ipcService.systemSettings.statusAutoIdle.get(changeStatusAutoIdle),
+      ipcService.systemSettings.statusAutoIdleMinutes.get(changeStatusAutoIdleMinutes),
+      ipcService.systemSettings.defaultSpeakingKey.get(changeDefaultSpeakingKey),
+      ipcService.systemSettings.hotKeyOpenMainWindow.get(changeHotKeyOpenMainWindow),
+      ipcService.systemSettings.hotKeyIncreaseVolume.get(changeHotKeyIncreaseVolume),
+      ipcService.systemSettings.hotKeyDecreaseVolume.get(changeHotKeyDecreaseVolume),
+      ipcService.systemSettings.hotKeyToggleSpeaker.get(changeHotKeyToggleSpeaker),
+      ipcService.systemSettings.hotKeyToggleMicrophone.get(changeHotKeyToggleMicrophone),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, []);
 
   return <ActionScannerContext.Provider value={{ isKeepAlive }}>{children}</ActionScannerContext.Provider>;
 };

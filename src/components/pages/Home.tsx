@@ -13,7 +13,6 @@ import type { RecommendServerList as RecommendServerListType, User, Server } fro
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
@@ -48,7 +47,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const { t } = useTranslation();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
-  const socket = useSocket();
 
   // Refs
   const canSearchRef = useRef<boolean>(true);
@@ -200,7 +198,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   useEffect(() => {
     const unsubscribe = [ipcService.socket.on('serverSearch', handleServerSearch), ipcService.deepLink.onDeepLink(handleDeepLink)];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected, handleServerSearch, handleDeepLink]);
+  }, [handleServerSearch, handleDeepLink]);
 
   return (
     <main className={homePage['home']} style={display ? {} : { display: 'none' }}>

@@ -5,7 +5,6 @@ import { User, DirectMessage, Server, PromptMessage } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Components
@@ -35,7 +34,6 @@ interface DirectMessagePopupProps {
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, event, message }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
   const contextMenu = useContextMenu();
 
   // Refs
@@ -169,7 +167,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   useEffect(() => {
     const unsubscribe = [ipcService.socket.on('directMessage', handleDirectMessage), ipcService.socket.on('shakeWindow', handleShakeWindow)];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [socket.isConnected, handleDirectMessage, handleShakeWindow]);
+  }, [handleDirectMessage, handleShakeWindow]);
 
   return (
     <div className={popup['popup-wrapper']}>

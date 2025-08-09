@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
@@ -86,7 +87,7 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, p
                   item.contents.slice(0, 3).map((content) => {
                     switch (item.contentType) {
                       case 'image':
-                        return <img src={content} />;
+                        return <img src={content} alt={content} />;
                       default:
                         return content;
                     }
