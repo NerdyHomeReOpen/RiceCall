@@ -232,10 +232,10 @@ export enum SocketClientEvent {
   // User
   SEARCH_USER = 'searchUser',
   EDIT_USER = 'editUser',
-  FORBID_USER_VOICE = 'forbidUserVoice',
-  FORBID_USER_TEXT = 'forbidUserText',
-  UNFORBID_USER_VOICE = 'unforbidUserVoice',
-  UNFORBID_USER_TEXT = 'unforbidUserText',
+  FORBID_MEMBER_VOICE = 'forbidMemberVoice',
+  FORBID_MEMBER_TEXT = 'forbidMemberText',
+  UNFORBID_MEMBER_VOICE = 'unforbidMemberVoice',
+  UNFORBID_MEMBER_TEXT = 'unforbidMemberText',
   // Friend Group
   CREATE_FRIEND_GROUP = 'createFriendGroup',
   EDIT_FRIEND_GROUP = 'editFriendGroup',

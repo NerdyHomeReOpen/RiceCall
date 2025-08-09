@@ -191,40 +191,40 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     socket.send.connectChannel({ userId, serverId, channelId });
   };
 
-   const handleForbidUserVoice = (
+   const handleForbidMemberVoice = (
       userId: User['userId'],
       serverId: Server['serverId'],
       channelId: Channel['channelId'],
     ) => {
       if (!socket) return;
-      socket.send.forbidUserVoice({ userId, serverId, channelId });
+      socket.send.forbidMemberVoice({ userId, serverId, channelId });
     };
 
-    const handleUnforbidUserVoice = (
+    const handleUnforbidMemberVoice = (
       userId: User['userId'],
       serverId: Server['serverId'],
       channelId: Channel['channelId'],
     ) => {
       if (!socket) return;
-      socket.send.unforbidUserVoice({ userId, serverId, channelId });
+      socket.send.unforbidMemberVoice({ userId, serverId, channelId });
     };
 
-    const handleForbidUserText = (
+    const handleForbidMemberText = (
       userId: User['userId'],
       serverId: Server['serverId'],
       channelId: Channel['channelId'],
     ) => {
       if (!socket) return;
-      socket.send.forbidUserText({ userId, serverId, channelId });
+      socket.send.forbidMemberText({ userId, serverId, channelId });
     };
 
-    const handleUnforbidUserText = (
+    const handleUnforbidMemberText = (
       userId: User['userId'],
       serverId: Server['serverId'],
       channelId: Channel['channelId'],
     ) => {
       if (!socket) return;
-      socket.send.unforbidUserText({ userId, serverId, channelId });
+      socket.send.unforbidMemberText({ userId, serverId, channelId });
     };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -410,28 +410,28 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
             label: t('forbid-voice'),
             show: canManageMember && canForbidVoice,
             onClick: () => 
-              handleForbidUserVoice(memberUserId, serverId, member.currentChannelId),
+              handleForbidMemberVoice(memberUserId, serverId, member.currentChannelId),
           },
           {
             id: 'unforbid-voice',
             label: t('unforbid-voice'),
             show: canManageMember && canUnforbidVoice,
             onClick: () => 
-              handleUnforbidUserVoice(memberUserId, serverId, member.currentChannelId),
+              handleUnforbidMemberVoice(memberUserId, serverId, member.currentChannelId),
           },          
           {
             id: 'forbid-text',
             label: t('forbid-text'),
             show: canManageMember && canForbidText,
             onClick: () => 
-              handleForbidUserText(memberUserId, serverId, member.currentChannelId),
+              handleForbidMemberText(memberUserId, serverId, member.currentChannelId),
           },
           {
             id: 'unforbid-text',
             label: t('unforbid-text'),
             show: canManageMember && canUnforbidText,
             onClick: () => 
-              handleUnforbidUserText(memberUserId, serverId, member.currentChannelId),
+              handleUnforbidMemberText(memberUserId, serverId, member.currentChannelId),
           },
           {
             id: 'kick-channel',
