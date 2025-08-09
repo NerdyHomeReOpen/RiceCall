@@ -41,8 +41,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const findMe = useFindMeContext();
 
     // Variables
-    const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId } = channel;
-    const { userId, serverId, permissionLevel, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = currentServer;
+    const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId, permissionLevel } = channel;
+    const { userId, serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = currentServer;
     const { channelId: currentChannelId } = currentChannel;
     const channelMembers = serverMembers.filter((mb) => mb.currentChannelId === channelId);
     const channelUserIds = channelMembers.map((mb) => mb.userId);
@@ -90,7 +90,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       ipcService.popup.onSubmit('warningDialog', callback);
     };
 
-    const handleOpenChannelSetting = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
+    const handleOpenChannelSetting = (channelId: Channel['channelId'], serverId: Server['serverId']) => {     
       ipcService.popup.open(PopupType.CHANNEL_SETTING, 'channelSetting');
       ipcService.initialData.onRequest('channelSetting', { channelId, serverId });
     };

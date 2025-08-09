@@ -115,6 +115,7 @@ export type BaseChannel = {
   categoryId: string | null;
   serverId: string;
   createdAt: number;
+  permissionLevel: number;
 };
 
 export type Category = BaseChannel & {

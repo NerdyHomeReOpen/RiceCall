@@ -43,8 +43,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const findMe = useFindMeContext();
 
     // Variables
-    const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, userLimit: categoryUserLimit } = category;
-    const { userId, serverId, permissionLevel, receptionLobbyId: serverReceptionLobbyId } = currentServer;
+    const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, userLimit: categoryUserLimit, permissionLevel } = category;
+    const { userId, serverId, receptionLobbyId: serverReceptionLobbyId } = currentServer;
     const { channelId: currentChannelId } = currentChannel;
     const categoryLobby = Default.channel({
       ...category,
