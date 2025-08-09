@@ -156,7 +156,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const handleKickChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
     if (!socket) return;
     handleOpenAlertDialog(t('confirm-kick-user').replace('{0}', userName), () => {
-      socket.send.disconnectChannel({ userId, channelId, serverId });
+      socket.send.disconnectChannel({ userId, channelId, serverId, kickChannel: true });
     });
   };
 
