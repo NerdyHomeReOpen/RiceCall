@@ -84,12 +84,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     };
 
     const handleDeleteChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      handleOpenWarningDialog(t('confirm-delete-channel', { '0': categoryName }), () => ipcService.socket.send('deleteChannel', { serverId, channelId }));
-    };
-
-    const handleOpenWarningDialog = (message: string, callback: () => void) => {
-      ipcService.popup.open('dialogWarning', 'warningDialog', { message, submitTo: 'warningDialog' });
-      ipcService.popup.onSubmit('warningDialog', callback);
+      handleOpenAlertDialog(t('confirm-delete-channel', { '0': categoryName }), () => ipcService.socket.send('deleteChannel', { serverId, channelId }));
     };
 
     const handleOpenChannelSetting = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -110,9 +105,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     const handleOpenChannelPassword = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
       ipcService.popup.open('channelPassword', 'channelPassword', { submitTo: 'channelPassword' });
-      ipcService.popup.onSubmit('channelPassword', (password) => {
-        handleConnectChannel(serverId, channelId, password);
-      });
+      ipcService.popup.onSubmit('channelPassword', (password) => handleConnectChannel(serverId, channelId, password));
+    };
+
+    const handleOpenAlertDialog = (message: string, callback: () => void) => {
+      ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+      ipcService.popup.onSubmit('dialogAlert', callback);
     };
 
     const handleDragStart = (e: React.DragEvent, userIds: User['userId'][], currentChannelId: Channel['channelId']) => {

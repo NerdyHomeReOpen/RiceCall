@@ -140,15 +140,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => handleEditMember(userId, serverId, { isBlocked: 0 }));
   };
 
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipcService.popup.onSubmit('dialogAlert', callback);
-  };
-
-  const handleOpenErrorDialog = (message: string) => {
-    ipcService.popup.open('dialogError', 'dialogError', { message, submitTo: 'dialogError' });
-  };
-
   const handleOpenMemberApplySetting = (userId: User['userId'], serverId: Server['serverId']) => {
     ipcService.popup.open('memberApplySetting', 'memberApplySetting', { serverId, userId });
   };
@@ -190,6 +181,15 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         setServer((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
       }
     });
+  };
+
+  const handleOpenErrorDialog = (message: string) => {
+    ipcService.popup.open('dialogError', 'dialogError', { message, submitTo: 'dialogError' });
+  };
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipcService.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleClose = () => {

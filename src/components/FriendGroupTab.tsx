@@ -45,16 +45,16 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
 
   // Handlers
   const handleDeleteFriendGroup = (friendGroupId: FriendGroup['friendGroupId']) => {
-    handleOpenWarningDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipcService.socket.send('deleteFriendGroup', { friendGroupId }));
+    handleOpenAlertDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipcService.socket.send('deleteFriendGroup', { friendGroupId }));
   };
 
   const handleOpenEditFriendGroup = (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']) => {
     ipcService.popup.open('editFriendGroup', 'editFriendGroup', { userId, friendGroupId });
   };
 
-  const handleOpenWarningDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogWarning', 'warningDialog', { message: message, submitTo: 'warningDialog' });
-    ipcService.popup.onSubmit('warningDialog', callback);
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open('dialogAlert', 'dialogAlert', { message: message, submitTo: 'dialogAlert' });
+    ipcService.popup.onSubmit('dialogAlert', callback);
   };
 
   return (

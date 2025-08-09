@@ -80,8 +80,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   };
 
   const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
-    ipcService.socket.send('deleteChannel', { serverId, channelId });
-    setSelectedChannel(null);
+    handleOpenAlertDialog(t('confirm-delete-channel', { '0': selectedChannel?.name ?? '' }), () => {
+      ipcService.socket.send('deleteChannel', { serverId, channelId });
+      setSelectedChannel(null);
+    });
   };
 
   const handleOpenCreateChannel = (userId: User['userId'], channelId: Channel['channelId'] | null, serverId: Server['serverId']) => {
@@ -92,9 +94,9 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     ipcService.popup.open('editChannelName', 'editChannelName', { serverId, channelId });
   };
 
-  const handleOpenWarningDialog = (message: string) => {
-    ipcService.popup.open('dialogWarning', 'deleteChannel', { message, submitTo: 'deleteChannel' });
-    ipcService.popup.onSubmit('deleteChannel', () => handleDeleteChannel(selectedChannel!.channelId, serverId));
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipcService.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleClose = () => {
@@ -277,7 +279,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           className={`${styles['delete-channel-btn']} ${!canDelete ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            handleOpenWarningDialog(t('confirm-delete-channel', { '0': selectedChannel?.name ?? '' }));
+            handleDeleteChannel(selectedChannel!.channelId, serverId);
           }}
         >
           {t('delete')}

@@ -72,20 +72,13 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
     ipcService.socket.send('favoriteServer', { serverId });
   };
 
-  const handleOpenAlertDialog = (message: string) => {
-    ipcService.popup.open('dialogAlert', 'alertDialog', { message: message });
-  };
-
   const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
     ipcService.popup.open('serverSetting', 'serverSetting', { serverId, userId });
   };
 
   const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
-    if (!serverReceiveApply) {
-      handleOpenAlertDialog(t('cannot-apply'));
-      return;
-    }
-    ipcService.popup.open('applyMember', 'applyMember', { serverId, userId });
+    if (!serverReceiveApply) handleOpenAlertDialog(t('cannot-apply'), () => {});
+    else ipcService.popup.open('applyMember', 'applyMember', { serverId, userId });
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -98,6 +91,11 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
 
   const handleOpenChangeChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
     ipcService.popup.open('editChannelOrder', 'editChannelOrder', { serverId, userId });
+  };
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipcService.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleLocateUser = () => {

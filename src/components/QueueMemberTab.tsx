@@ -90,8 +90,8 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'alertDialog', { message, submitTo: 'alertDialog' });
-    ipcService.popup.onSubmit('alertDialog', callback);
+    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipcService.popup.onSubmit('dialogAlert', callback);
   };
 
   return (

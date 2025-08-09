@@ -79,13 +79,11 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   };
 
   const handleBlockFriend = (targetId: User['userId'], isBlocked: Friend['isBlocked']) => {
-    handleOpenWarningDialog(t('confirmBlockFriend', { blockType: isBlocked ? t('unblock') : t('block'), userName: friendName }), () =>
-      ipcService.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }),
-    );
+    handleOpenAlertDialog(t(`confirm-${isBlocked ? 'unblock' : 'block'}-friend`, { '0': friendName }), () => ipcService.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }));
   };
 
   const handleDeleteFriend = (targetId: User['userId']) => {
-    handleOpenWarningDialog(t('confirm-delete-friend', { '0': friendName }), () => ipcService.socket.send('deleteFriend', { targetId }));
+    handleOpenAlertDialog(t('confirm-delete-friend', { '0': friendName }), () => ipcService.socket.send('deleteFriend', { targetId }));
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
@@ -100,9 +98,9 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     ipcService.popup.open('editFriend', 'editFriend', { userId, targetId });
   };
 
-  const handleOpenWarningDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogWarning', 'warningDialog', { message: message, submitTo: 'warningDialog' });
-    ipcService.popup.onSubmit('warningDialog', callback);
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open('dialogAlert', 'dialogAlert', { message: message, submitTo: 'dialogAlert' });
+    ipcService.popup.onSubmit('dialogAlert', callback);
   };
 
   useEffect(() => {
