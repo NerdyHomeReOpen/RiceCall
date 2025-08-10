@@ -20,9 +20,13 @@ export default function AnnouncementRenderer({ announcement }: { announcement: s
 
     return (
       <iframe
-        width="560"
-        height="315"
-        src={`https://www.youtube.com/embed/${videoId}`}
+        style={{
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '98%',
+        }}
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
         title="YouTube video player"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -31,6 +35,6 @@ export default function AnnouncementRenderer({ announcement }: { announcement: s
     );
   }
 
-  // Si no es link youtube, mostrar markdown normal
+  // If not youtube link
   return <MarkdownViewer markdownText={announcement} />;
 }
