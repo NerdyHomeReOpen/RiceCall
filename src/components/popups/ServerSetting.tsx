@@ -320,17 +320,25 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
       }
     }, [serverAnnouncement, hasManualLink]);
   
-    useEffect(() => {
-      if (serverAnnouncement.startsWith('http://www.youtube') || serverAnnouncement.startsWith('https://www.youtube')) {
-        setLinkInput(serverAnnouncement);
-        setHasManualLink(true);
-        setEditorContent('');
-      } else {
-        setLinkInput('');
-        setHasManualLink(false);
-        setEditorContent(serverAnnouncement);
-      }
-    }, [serverAnnouncement]); 
+   useEffect(() => {
+    const isYouTube =
+      serverAnnouncement?.startsWith('http://www.youtube') ||
+      serverAnnouncement?.startsWith('https://www.youtube');
+
+    const isTwitch =      
+      serverAnnouncement?.startsWith('http://www.twitch.tv') ||
+      serverAnnouncement?.startsWith('https://www.twitch.tv');
+
+    if (isYouTube || isTwitch) {
+      setLinkInput(serverAnnouncement);
+      setHasManualLink(true);
+      setEditorContent('');
+    } else {
+      setLinkInput('');
+      setHasManualLink(false);
+      setEditorContent(serverAnnouncement);
+    }
+  }, [serverAnnouncement]);
 
   return (
     <div className={popup['popup-wrapper']} ref={popupRef}>
@@ -445,39 +453,53 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
               <div className={popup['label']}>{t('input-announcement')}</div>              
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
-                <Editor content={serverAnnouncement} 
-                  onChange={(newContent) =>
-                  setServer((prev) => ({ ...prev, announcement: newContent }))
-                 }/>  
+                  <Editor
+                    content={editorContent}
+                    onChange={(newContent) => {
+                      setEditorContent(newContent);
+                      if (!hasManualLink) {
+                        setServer((prev) => ({
+                          ...prev,
+                          announcement: newContent,
+                        }));
+                      }
+                    }}
+                  />
                  <input
-                type="text"
-                placeholder={t('youtube-link')}
-                value={linkInput}
-                onChange={(e) => {
-                  const url = e.target.value.trim();
-                  setLinkInput(e.target.value);
+                    type="text"
+                    placeholder={t('video-link')}
+                    value={linkInput}
+                    onChange={(e) => {
+                      const url = e.target.value.trim();
+                      setLinkInput(e.target.value);
 
-                  if (url.startsWith('http://www.youtube') || url.startsWith('https://www.youtube')) {
-                    setHasManualLink(true);
-                    setServer((prev) => ({
-                      ...prev,
-                      announcement: url,
-                    }));
-                  } else {
-                    setHasManualLink(false);
-                    // No actualices el estado aquí para no borrar el anuncio con texto,
-                    // simplemente dejas que el editor controle el contenido
-                  }
-                }}
-                style={{
-                  marginTop: '12px',
-                  padding: '8px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  width: '100%',
-                  boxSizing: 'border-box',
-                }}
-              />
+                      const isYouTube =
+                        url.startsWith('http://www.youtube') ||
+                        url.startsWith('https://www.youtube');
+
+                      const isTwitch =
+                        url.startsWith('http://www.twitch.tv') ||
+                        url.startsWith('https://www.twitch.tv');
+
+                      if (isYouTube || isTwitch) {
+                        setHasManualLink(true);
+                        setServer((prev) => ({
+                          ...prev,
+                          announcement: url,
+                        }));
+                      } else {
+                        setHasManualLink(false);                   
+                      }
+                    }}
+                    style={{
+                      marginTop: '12px',
+                      padding: '8px',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      width: '100%',
+                      boxSizing: 'border-box',
+                    }}
+                  />
             </div>
           </div>
         </div>

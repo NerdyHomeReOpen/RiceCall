@@ -96,7 +96,15 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   }, [channelAnnouncement, hasManualLink]);
 
   useEffect(() => {
-    if (channelAnnouncement.startsWith('http://www.youtube') || channelAnnouncement.startsWith('https://www.youtube')) {
+    const isYouTube =
+      channelAnnouncement.startsWith('http://www.youtube') ||
+      channelAnnouncement.startsWith('https://www.youtube');
+
+    const isTwitch =
+      channelAnnouncement.startsWith('http://www.twitch.tv') ||
+      channelAnnouncement.startsWith('https://www.twitch.tv');
+
+    if (isYouTube || isTwitch) {
       setLinkInput(channelAnnouncement);
       setHasManualLink(true);
       setEditorContent('');
@@ -105,7 +113,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
       setHasManualLink(false);
       setEditorContent(channelAnnouncement);
     }
-  }, [channelAnnouncement]); 
+  }, [channelAnnouncement]);
+
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -214,35 +223,41 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   }
                 }}
             />
-            <input
-                type="text"
-                placeholder={t('youtube-link')}
-                value={linkInput}
-                onChange={(e) => {
-                  const url = e.target.value.trim();
-                  setLinkInput(e.target.value);
+           <input
+              type="text"
+              placeholder={t('video-link')}
+              value={linkInput}
+              onChange={(e) => {
+                const url = e.target.value.trim();
+                setLinkInput(e.target.value);
 
-                  if (url.startsWith('http://www.youtube') || url.startsWith('https://www.youtube')) {
-                    setHasManualLink(true);
-                    setChannel((prev) => ({
-                      ...prev,
-                      announcement: url,
-                    }));
-                  } else {
-                    setHasManualLink(false);
-                    // No actualices el estado aquí para no borrar el anuncio con texto,
-                    // simplemente dejas que el editor controle el contenido
-                  }
-                }}
-                style={{
-                  marginTop: '12px',
-                  padding: '8px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  width: '100%',
-                  boxSizing: 'border-box',
-                }}
-              />
+                const isYouTube =
+                  url.startsWith('http://www.youtube') ||
+                  url.startsWith('https://www.youtube');
+
+                const isTwitch =
+                  url.startsWith('http://www.twitch.tv') ||
+                  url.startsWith('https://www.twitch.tv');
+
+                if (isYouTube || isTwitch) {
+                  setHasManualLink(true);
+                  setChannel((prev) => ({
+                    ...prev,
+                    announcement: url,
+                  }));
+                } else {
+                  setHasManualLink(false);
+                }
+              }}
+              style={{
+                marginTop: '12px',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            />
             </div>
           </div>
         </div>
