@@ -326,11 +326,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
               {/* Message Area */}
               <div className={styles['message-area']}>
-                <MessageViewer messages={channelMessages} userId={userId} onClear={handleClearChannelMessages} onClearChannelMessagesForUsers={handleClearChannelMessagesForUsers} />
+                <MessageViewer messages={channelMessages} userId={userId} userPermission={userPermission} onClear={handleClearChannelMessages} onClearChannelMessagesForUsers={handleClearChannelMessagesForUsers} />
                 <div className={styles['input-area']}>
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <div className={styles['broadcast-content']}>
-                      <MessageViewer messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} userId={userId} />
+                      <MessageViewer messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} userId={userId} userPermission={userPermission}/>
                     </div>
                   </div>
                   <MessageInputBoxGuard

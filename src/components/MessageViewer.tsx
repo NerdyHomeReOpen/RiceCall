@@ -18,12 +18,13 @@ type MessageGroup = (DirectMessage & { contents: string[] }) | (ChannelMessage &
 interface MessageViewerProps {
   messages: (DirectMessage | ChannelMessage | PromptMessage)[];
   userId: User['userId'];
+  userPermission: number;
   forbidGuestUrl?: boolean;
   onClear?: () => void;
   onClearChannelMessagesForUsers?: () => void;
 }
 
-const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, userId, forbidGuestUrl = false, onClear, onClearChannelMessagesForUsers }) => {
+const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, userId, userPermission, forbidGuestUrl = false, onClear, onClearChannelMessagesForUsers }) => {
   const contextMenu = useContextMenu();
   const { t } = useTranslation();
 
@@ -90,7 +91,7 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, user
                 {
                   id: 'clear-all-messages-for-users',
                   label: t('clear-all-messages-for-users'),
-                  show: messageGroup.type === 'general',
+                  show: userPermission > 3 && messageGroup.type === 'general',
                   onClick: () => handleClearChannelMessagesForUsers(),
                 }             
               ]);
