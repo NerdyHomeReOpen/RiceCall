@@ -6,8 +6,7 @@ export const enum Permission {
   ServerAdmin = 5,
   ServerOwner = 6,
   Staff = 7,
-  Developer = 8,
-  Official = 9  
+  Official = 8
 }
 
 export type User = {
