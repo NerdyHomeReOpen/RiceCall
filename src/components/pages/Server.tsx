@@ -86,10 +86,11 @@ interface ServerPageProps {
   channelMessages: ChannelMessage[];
   actionMessages: PromptMessage[];
   display: boolean;
+  onClearChannelsMessages?: () => void;
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
-  ({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages, actionMessages, display, queueMembers }) => {
+  ({ user, currentServer, serverMembers, serverChannels, friends, currentChannel, channelMessages: initialChannelMessages, actionMessages, display, queueMembers, onClearChannelsMessages }) => {
     // Hooks
     const { t } = useTranslation();
     const webRTC = useWebRTC();
@@ -111,6 +112,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [speakMode, setSpeakMode] = useState<SpeakingMode>('key');
     const [speakHotKey, setSpeakHotKey] = useState<string>('');
     const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
+    const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>(initialChannelMessages);
 
     // Variables
     const { userId } = user;
@@ -134,6 +136,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       guestTextMaxLength: channelGuestTextMaxLength,
     } = currentChannel;
     const announcement = channelAnnouncement || serverAnnouncement;
+
 
     // Handlers
     const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
@@ -200,7 +203,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     const handleAnnAreaHandleUp = () => (isResizingAnnAreaRef.current = false);
 
+    const handleClearChannelMessages = () => {
+       if (onClearChannelsMessages) onClearChannelsMessages();
+    };  
+
     // Effects
+    useEffect(() => {
+      setChannelMessages(initialChannelMessages);
+    }, [initialChannelMessages]);
+
     useEffect(() => {
       webRTCRef.current.changeBitrate(channelBitrate);
     }, [channelBitrate]);
@@ -311,7 +322,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
               {/* Message Area */}
               <div className={styles['message-area']}>
-                <MessageViewer messages={channelMessages} userId={userId} />
+                <MessageViewer messages={channelMessages} userId={userId} onClear={handleClearChannelMessages} />
                 <div className={styles['input-area']}>
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <div className={styles['broadcast-content']}>

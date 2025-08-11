@@ -562,6 +562,10 @@ const RootPageComponent = () => {
     });
   };
 
+  const handleClearChannelMessages = () => {
+    setChannelMessages([]);
+  };
+
   // Effects
   useEffect(() => {
     if (user.currentServerId) {
@@ -685,6 +689,7 @@ const RootPageComponent = () => {
                 actionMessages={actionMessages}
                 queueMembers={queueMembers}
                 display={mainTab.selectedTabId === 'server'}
+                onClearChannelsMessages={handleClearChannelMessages}
               />
             </>
           )}

@@ -124,6 +124,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     [userId, targetId],
   );
 
+  const handleClearDMMessages = () => {
+    setDirectMessages([]);
+  };  
+
   // Effects
   useEffect(() => {
     if (event === 'shakeWindow') handleShakeWindow(message);
@@ -227,7 +231,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
           )}
           <div className={styles['message-area']}>
-            <MessageViewer messages={directMessages} userId={userId} />
+            <MessageViewer messages={directMessages} userId={userId} onClear={handleClearDMMessages} />
           </div>
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>

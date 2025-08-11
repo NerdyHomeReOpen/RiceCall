@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
@@ -10,6 +10,8 @@ import type { User, ChannelMessage, DirectMessage, PromptMessage } from '@/types
 import DirectMessageTab from '@/components/DirectMessage';
 import ChannelMessageTab from '@/components/ChannelMessage';
 import PromptMessageTab from '@/components/PromptMessage';
+import { useContextMenu } from '@/providers/ContextMenu';
+import { useTranslation } from 'react-i18next';
 
 type MessageGroup = (DirectMessage & { contents: string[] }) | (ChannelMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
 
@@ -17,9 +19,13 @@ interface MessageViewerProps {
   messages: (DirectMessage | ChannelMessage | PromptMessage)[];
   userId: User['userId'];
   forbidGuestUrl?: boolean;
+  onClear?: () => void;
 }
 
-const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, userId, forbidGuestUrl = false }) => {
+const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, userId, forbidGuestUrl = false, onClear }) => {
+  const contextMenu = useContextMenu();
+  const { t } = useTranslation();
+
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -55,8 +61,25 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, user
     });
   }, [messageGroups]);
 
+  // Handlers
+  const handleClearMessages = () => {
+    if (onClear) onClear();
+  };
+
   return (
-    <div className={styles['message-viewer-wrapper']}>
+    <div className={styles['message-viewer-wrapper']}  
+          onContextMenu={(e) => {
+              const x = e.clientX;
+              const y = e.clientY;
+              contextMenu.showContextMenu(x, y, false, false, [
+                {
+                  id: 'clear-all',
+                  label: t('clear-all'),
+                  show: true,
+                  onClick: () => handleClearMessages(),
+                }                
+              ]);
+            }}>
       {messageGroups.map((messageGroup, index) => {
         return (
           <div key={index} className={styles['message-wrapper']}>
