@@ -113,6 +113,7 @@ const ClientToServerEventNames = [
   'directMessage',
   'shakeWindow',
   'ping',
+  'clearChannelMessagesForUsers'
 ];
 
 export const ServerToClientEventNames = [
@@ -161,6 +162,7 @@ export const ServerToClientEventNames = [
   'playSound',
   'pong',
   'openPopup',
+  'clearChannelMessagesForUsers'
 ];
 
 export const PopupSize: Record<PopupType, { height: number; width: number }> = {

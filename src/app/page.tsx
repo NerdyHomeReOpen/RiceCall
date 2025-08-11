@@ -538,6 +538,10 @@ const RootPageComponent = () => {
     setChannelMessages((prev) => [...prev, ...args]);
   };
 
+  const handleClearChannelMessagesForUsers = () => {    
+    handleClearChannelMessages();
+  };
+
   const handleActionMessage = (...args: PromptMessage[]) => {
     setActionMessages((prev) => [...prev, ...args]);
   };
@@ -659,6 +663,7 @@ const RootPageComponent = () => {
       ipcService.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
       ipcService.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
       ipcService.socket.on('channelMessage', handleChannelMessage),
+      ipcService.socket.on('clearChannelMessagesForUsers', handleClearChannelMessagesForUsers),
       ipcService.socket.on('actionMessage', handleActionMessage),
       ipcService.socket.on('openPopup', handleOpenPopup),
       ipcService.socket.on('playSound', handlePlaySound),

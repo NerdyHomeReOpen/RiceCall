@@ -20,9 +20,10 @@ interface MessageViewerProps {
   userId: User['userId'];
   forbidGuestUrl?: boolean;
   onClear?: () => void;
+  onClearChannelMessagesForUsers?: () => void;
 }
 
-const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, userId, forbidGuestUrl = false, onClear }) => {
+const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, userId, forbidGuestUrl = false, onClear, onClearChannelMessagesForUsers }) => {
   const contextMenu = useContextMenu();
   const { t } = useTranslation();
 
@@ -66,8 +67,16 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, user
     if (onClear) onClear();
   };
 
+  const handleClearChannelMessagesForUsers = () => {
+    if (onClearChannelMessagesForUsers) onClearChannelMessagesForUsers();
+  };
+
   return (
     <div className={styles['message-viewer-wrapper']}  
+          >
+      {messageGroups.map((messageGroup, index) => {
+        return (
+          <div key={index} className={styles['message-wrapper']}
           onContextMenu={(e) => {
               const x = e.clientX;
               const y = e.clientY;
@@ -75,14 +84,17 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, user
                 {
                   id: 'clear-all',
                   label: t('clear-all'),
-                  show: true,
+                  show: messageGroup.type === 'general' || messageGroup.type === 'dm',
                   onClick: () => handleClearMessages(),
-                }                
+                },
+                {
+                  id: 'clear-all-messages-for-users',
+                  label: t('clear-all-messages-for-users'),
+                  show: messageGroup.type === 'general',
+                  onClick: () => handleClearChannelMessagesForUsers(),
+                }             
               ]);
             }}>
-      {messageGroups.map((messageGroup, index) => {
-        return (
-          <div key={index} className={styles['message-wrapper']}>
             {messageGroup.type === 'general' ? (
               <ChannelMessageTab messageGroup={messageGroup} userId={userId} forbidGuestUrl={forbidGuestUrl} />
             ) : messageGroup.type === 'dm' ? (

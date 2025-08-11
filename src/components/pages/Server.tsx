@@ -207,6 +207,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
        if (onClearChannelsMessages) onClearChannelsMessages();
     };  
 
+    const handleClearChannelMessagesForUsers = () =>{
+      ipcService.socket.send('clearChannelMessagesForUsers', { serverId, channelId });
+    };
+
     // Effects
     useEffect(() => {
       setChannelMessages(initialChannelMessages);
@@ -322,7 +326,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
               {/* Message Area */}
               <div className={styles['message-area']}>
-                <MessageViewer messages={channelMessages} userId={userId} onClear={handleClearChannelMessages} />
+                <MessageViewer messages={channelMessages} userId={userId} onClear={handleClearChannelMessages} onClearChannelMessagesForUsers={handleClearChannelMessagesForUsers} />
                 <div className={styles['input-area']}>
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <div className={styles['broadcast-content']}>
