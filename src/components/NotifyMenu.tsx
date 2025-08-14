@@ -70,17 +70,19 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, p
         .filter((item) => item?.show ?? true)
         .map((item, index) => {
           return (
-            <div
-              key={index}
-              className={`${styles['option']} ${item.className && styles[item.className]} ${item.disabled ? contextMenu['disabled'] : ''}`}
-              data-type={item.icon || ''}
-              onClick={() => {
-                if (item.disabled) return;
-                item.onClick?.();
-                onClose();
-              }}
-            >
-              {item.showContentLength ? `${item.label} (${item.contents ? item.contents.length : 0})` : item.label}
+            <>
+              <div
+                key={index}
+                className={`${styles['option']} ${item.className && styles[item.className]} ${item.disabled ? contextMenu['disabled'] : ''}`}
+                data-type={item.icon || ''}
+                onClick={() => {
+                  if (item.disabled) return;
+                  item.onClick?.();
+                  onClose();
+                }}
+              >
+                {item.showContentLength ? `${item.label} (${item.contents ? item.contents.length : 0})` : item.label}
+              </div>
               <div className={`${styles['contents']}`}>
                 {item.showContent &&
                   item.contents &&
@@ -94,7 +96,7 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, p
                   })}
                 {item.showContent && item.contents && item.contents.length > 3 && <span>..({item.contents.length - 3})</span>}
               </div>
-            </div>
+            </>
           );
         })}
     </div>

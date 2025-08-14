@@ -3,12 +3,12 @@
   position: fixed;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  min-width: 150px;
+  justify-content: space-around;
+  min-width: 200px;
+  padding: 2px;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 5px;
-  padding: 2px;
   box-shadow: 0 1px 1px #00000080;
   overflow: hidden;
 }
@@ -20,23 +20,23 @@
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 2px 15px;
+  padding: 6px 30px;
+  gap: 6px;
   color: #333;
+  border-radius: 3px;
 }
 
 .notify-menu .option::before {
   position: absolute;
   content: '';
-  left: 0px;
-  top: 3px;
-  min-width: 13px;
-  min-height: 13px;
-  background-size: cover;
+  left: 6px;
+  min-width: 16px;
+  min-height: 16px;
+  background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
   align-self: center;
+  margin-right: 5px;
 }
 
 .notify-menu .option:not(.readonly):hover {
@@ -48,21 +48,22 @@
   background-image: url('/icon_notice_friend.png');
 }
 
-.notify-menu .option .contents {
+.notify-menu .contents {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  align-items: flex-end;
+  align-items: center;
+  width: 100%;
+  padding: 3px 30px;
 }
 
-.notify-menu .option .contents img {
+.notify-menu img {
   background-size: cover;
-  max-width: 20px;
-  max-height: 20px;
-  margin: 5px 2px;
+  max-width: 32px;
+  max-height: 32px;
   border: solid 1px #999999;
 }
 
-.notify-menu .option .contents span {
+.notify-menu span {
   margin: 5px 0;
 }
