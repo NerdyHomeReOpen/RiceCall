@@ -61,7 +61,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       !userInChannel &&
       categoryVisibility !== 'readonly' &&
       !(categoryVisibility === 'member' && permissionLevel < 2) &&
-      (!categoryVisibility || categoryUserLimit > categoryMembers.length || permissionLevel > 4);
+      (!categoryUserLimit || categoryUserLimit > categoryMembers.length || permissionLevel > 4);
     const canManageChannel = permissionLevel > 4;
     const canMoveToChannel = canManageChannel && !userInChannel && categoryUserIds.length !== 0;
     const canSetReceptionLobby = canManageChannel && !isReceptionLobby && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
