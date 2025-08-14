@@ -471,5 +471,9 @@
   "wealth": "財富值",
   "xp": "積分",
   "year": "年",
-  "yesterday": "昨天"
+  "yesterday": "昨天",
+  "channel-forbid-text-message": "該頻道僅限管理員發送文字訊息",
+  "channel-forbid-guest-text-message": "該頻道禁止遊客發送文字訊息",
+  "channel-guest-text-gap-time-message": "{{0}} 秒後可以發送文字訊息",
+  "channel-guest-text-wait-time-message": "{{0}} 秒後可以發送文字訊息"
 }
