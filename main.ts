@@ -21,6 +21,7 @@ type PopupType =
   | 'blockMember'
   | 'systemSetting'
   | 'memberApplySetting'
+  | 'memberInvitation'
   | 'createServer'
   | 'createChannel'
   | 'createFriendGroup'
@@ -41,7 +42,8 @@ type PopupType =
   | 'dialogInfo'
   | 'changeTheme'
   | 'aboutus'
-  | 'friendVerification';
+  | 'friendVerification'
+  | 'memberVerification';
 
 dotenv.config();
 
@@ -152,6 +154,9 @@ export const ServerToClientEventNames = [
   'serverMemberApplicationAdd',
   'serverMemberApplicationUpdate',
   'serverMemberApplicationRemove',
+  'memberInvitationAdd',
+  'memberInvitationUpdate',
+  'memberInvitationRemove',
   'channelConnected',
   'channelDisconnected',
   'channelMessage',
@@ -188,7 +193,9 @@ export const PopupSize: Record<PopupType, { height: number; width: number }> = {
   editFriendGroup: { height: 200, width: 370 },
   editFriend: { height: 200, width: 370 },
   friendVerification: { height: 550, width: 500 },
+  memberVerification: { height: 550, width: 500 },
   memberApplySetting: { height: 250, width: 370 },
+  memberInvitation: { height: 320, width: 500 },
   searchUser: { height: 200, width: 370 },
   serverSetting: { height: 520, width: 600 },
   serverBroadcast: { height: 300, width: 450 },

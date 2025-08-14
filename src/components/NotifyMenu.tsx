@@ -92,7 +92,7 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, p
                         return content;
                     }
                   })}
-                {item.showContent && item.contents && item.contents.length > 3 && <span>..{item.contents.length - 3}</span>}
+                {item.showContent && item.contents && item.contents.length > 3 && <span>..({item.contents.length - 3})</span>}
               </div>
             </div>
           );

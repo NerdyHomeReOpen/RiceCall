@@ -138,7 +138,16 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     ipcService.popup.open('friendVerification', 'friendVerification', { userId });
   };
 
+  const handleOpenMemberInvitation = () => {
+    ipcService.popup.open('memberVerification', 'memberVerification', { userId });
+  };
+
   // Effects
+  useEffect(() => {
+    console.log(memberInvitations);
+    console.log(friendApplications);
+  }, [memberInvitations, friendApplications]);
+
   useEffect(() => {
     const next = actionScanner.isKeepAlive ? 'online' : 'idle';
     if (user.status !== next) {
@@ -261,7 +270,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
                 showContentLength: true,
                 showContent: true,
                 contents: memberInvitations.map((mi) => mi.avatarUrl),
-                onClick: () => {},
+                onClick: () => handleOpenMemberInvitation(),
               },
               {
                 id: 'system-notify',

@@ -89,6 +89,11 @@ export const getService = {
     const memberInvitations = await apiService.post('/memberInvitations', { receiverId });
     return memberInvitations;
   },
+
+  memberInvitation: async ({ receiverId, serverId }: { receiverId: User['userId']; serverId: Server['serverId'] }): Promise<MemberInvitation | null> => {
+    const memberInvitations = await apiService.post('/memberInvitation', { receiverId, serverId });
+    return memberInvitations;
+  },
 };
 
 export default getService;

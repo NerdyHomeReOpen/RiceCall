@@ -148,6 +148,7 @@ export type PopupType =
   | 'blockMember'
   | 'systemSetting'
   | 'memberApplySetting'
+  | 'memberInvitation'
   | 'createServer'
   | 'createChannel'
   | 'createFriendGroup'
@@ -168,7 +169,8 @@ export type PopupType =
   | 'dialogInfo'
   | 'changeTheme'
   | 'aboutus'
-  | 'friendVerification';
+  | 'friendVerification'
+  | 'memberVerification';
 
 export type ClientToServerEvents = {
   // User

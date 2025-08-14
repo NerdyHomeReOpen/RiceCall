@@ -1,4 +1,4 @@
-import { User, Channel, Server, Member, Friend, FriendGroup, FriendApplication, MemberApplication } from '@/types';
+import { User, Channel, Server, Member, Friend, FriendGroup, FriendApplication, MemberApplication, MemberInvitation } from '@/types';
 
 const Default = {
   user: (overrides: Partial<User> = {}): User => ({
@@ -127,6 +127,15 @@ const Default = {
 
   memberApplication: (overrides: Partial<MemberApplication> = {}): MemberApplication => ({
     ...Default.user(),
+    serverId: '',
+    description: '',
+    createdAt: 0,
+    ...overrides,
+  }),
+
+  memberInvitation: (overrides: Partial<MemberInvitation> = {}): MemberInvitation => ({
+    ...Default.user(),
+    receiverId: '',
     serverId: '',
     description: '',
     createdAt: 0,

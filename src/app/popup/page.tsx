@@ -22,6 +22,7 @@ import SystemSetting from '@/components/popups/SystemSetting';
 import AvatarCropper from '@/components/popups/AvatarCropper';
 import ChannelPassword from '@/components/popups/ChannelPassword';
 import MemberApplySetting from '@/components/popups/MemberApplySetting';
+import MemberInvitation from '@/components/popups/MemberInvitation';
 import CreateServer from '@/components/popups/CreateServer';
 import CreateChannel from '@/components/popups/CreateChannel';
 import CreateFriendGroup from '@/components/popups/CreateFriendGroup';
@@ -38,6 +39,7 @@ import Dialog from '@/components/popups/Dialog';
 import ChangeTheme from '@/components/popups/ChangeTheme';
 import About from '@/components/popups/About';
 import FriendVerification from '@/components/popups/FriendVerification';
+import MemberVerification from '@/components/popups/MemberVerification';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -150,8 +152,12 @@ const Popup = React.memo(() => {
         return { title: t('edit-member-card'), buttons: ['close'], node: <EditNickname {...initialData} />, hideHeader: false };
       case 'friendVerification':
         return { title: t('friend-verification'), buttons: ['close'], node: <FriendVerification {...initialData} />, hideHeader: false };
+      case 'memberVerification':
+        return { title: t('member-verification'), buttons: ['close'], node: <MemberVerification {...initialData} />, hideHeader: false };
       case 'memberApplySetting':
         return { title: t('member-apply-setting'), buttons: ['close'], node: <MemberApplySetting {...initialData} />, hideHeader: false };
+      case 'memberInvitation':
+        return { title: t('member-invitation'), buttons: ['close'], node: <MemberInvitation {...initialData} />, hideHeader: false };
       case 'searchUser':
         return { title: t('add-friend'), buttons: ['close'], node: <SearchUser {...initialData} />, hideHeader: false };
       case 'serverBroadcast':

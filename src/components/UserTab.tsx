@@ -142,6 +142,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
     ipcService.popup.open('blockMember', `blockMember-${userId}`, { userId, serverId, userName });
   };
 
+  const handleSendMemberInvitation = (userId: User['userId'], serverId: Server['serverId']) => {
+    ipcService.popup.open('memberInvitation', `memberInvitation-${userId}`, { userId, serverId });
+  };
+
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
     ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
     ipcService.popup.onSubmit('dialogAlert', callback);
@@ -293,9 +297,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
             id: 'send-member-application',
             label: t('send-member-application'),
             show: canManageMember && memberPermission === 1,
-            disabled: true,
             onClick: () => {
-              /* sendMemberApplication() */
+              handleSendMemberInvitation(memberUserId, serverId);
             },
           },
           {
