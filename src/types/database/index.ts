@@ -1,7 +1,7 @@
 export type table_users = {
   userId: string;
   name: string;
-  id: string; // New: Display ID (for search user)
+  displayId: string; // New: Display ID (for search user)
   avatar: string;
   avatarUrl: string;
   email: string; // New: Email
