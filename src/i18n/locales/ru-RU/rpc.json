@@ -1,9 +1,10 @@
 {
+  "chat-with-members": "Чат с {{0}} участниками",
   "friend-page": "Список друзей",
-  "viewing-friend-page": "Просмотр списка друзей",
   "home-page": "Главная",
-  "viewing-home-page": "Просмотр главной страницы",
   "join-discord-server": "加入我們的Discord伺服器",
   "server-page": "Сервер",
-  "user": "Пользователь:"
+  "user": "Пользователь:",
+  "viewing-friend-page": "Просмотр списка друзей",
+  "viewing-home-page": "Просмотр главной страницы"
 }
