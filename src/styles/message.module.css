@@ -16,8 +16,11 @@
 
 .info-icon {
   display: flex;
+  width: 12px;
   min-width: 12px;
+  height: 12px;
   min-height: 12px;
+  margin: 3px 0;
   background-image: url('/channel/NT_NOTIFY.png');
   background-repeat: no-repeat;
   background-position: center;
@@ -25,8 +28,11 @@
 
 .event-icon {
   display: flex;
+  width: 12px;
   min-width: 12px;
+  height: 12px;
   min-height: 12px;
+  margin: 3px 0;
   background-image: url('/channel/NT_NOTIFY.png');
   background-repeat: no-repeat;
   background-position: center;
@@ -34,8 +40,11 @@
 
 .warn-icon {
   display: flex;
+  width: 12px;
   min-width: 12px;
+  height: 12px;
   min-height: 12px;
+  margin: 3px 0;
   background-image: url('/channel/NT_WARNING.png');
   background-repeat: no-repeat;
   background-position: center;
@@ -43,8 +52,11 @@
 
 .alert-icon {
   display: flex;
+  width: 12px;
   min-width: 12px;
+  height: 12px;
   min-height: 12px;
+  margin: 3px 0;
   background-image: url('/channel/NT_ANNOUNCEMENT.png');
   background-repeat: no-repeat;
   background-position: center;

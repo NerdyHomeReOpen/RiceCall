@@ -36,10 +36,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
 
   return (
     <>
-      <div className={styles['header']}>
-        <div className={styles[`${messageType}-icon`]} />
-      </div>
-
+      <div className={styles[`${messageType}-icon`]} />
       <div className={styles['message-box']}>
         {translatedMessages.map((content, index) => (
           <MarkdownViewer key={index} markdownText={content} />
