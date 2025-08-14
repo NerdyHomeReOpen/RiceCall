@@ -131,7 +131,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
         >
           {isLoading && (
             <>
-              <div className={styles['loading-indicator']}>{t('on-login')}</div>
+              <div className={styles['loading-indicator']}>{`${t('logining')}...`}</div>
               <div className={styles['loading-bar']} />
             </>
           )}

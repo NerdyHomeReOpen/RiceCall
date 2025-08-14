@@ -115,7 +115,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={`${popup['content']} ${popup['col']}`}>
-          <div className={popup['label']}>{t('friend-label')}</div>
+          <div className={popup['label']}>{t('apply-friend-label')}</div>
           <div className={popup['row']} onClick={() => handleOpenUserInfo(userId, targetId)}>
             <div className={popup['avatar-wrapper']}>
               <div className={popup['avatar-picture']} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
@@ -127,16 +127,16 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
           </div>
           <div className={popup['split']} />
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
-            <div className={popup['label']}>{t('friend-note')}</div>
+            <div className={popup['label']}>{t('note')}</div>
             <textarea rows={2} value={applicationDesc} onChange={(e) => setFriendApplication((prev) => ({ ...prev, description: e.target.value }))} />
           </div>
           <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
-            {t('friend-apply-sent')}
+            {t('friend-application-sent')}
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 2 ? {} : { display: 'none' }}>
-            <div className={popup['label']}>{t('friend-select-group')}</div>
+            <div className={popup['label']}>{t('select-friend-group')}</div>
             <div className={popup['row']}>
-              <div className={popup['select-box']}>
+              <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
                 <select className={popup['select']} value={selectedFriendGroupId || ''} onChange={(e) => setSelectedFriendGroupId(e.target.value)}>
                   <option value={''}>{t('none')}</option>
                   {friendGroups.map((group) => (
@@ -147,7 +147,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
                 </select>
               </div>
               <div className={popup['link-text']} onClick={handleOpenCreateFriendGroup}>
-                {t('friend-add-group')}
+                {t('create-friend-group')}
               </div>
             </div>
           </div>
@@ -164,7 +164,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
             handleClose();
           }}
         >
-          {t('send-request')}
+          {t('submit')}
         </div>
         <div className={popup['button']} style={section === 0 ? {} : { display: 'none' }} onClick={handleClose}>
           {t('cancel')}

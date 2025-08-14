@@ -108,7 +108,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
           <div className={popup['col']}>
             <div className={popup['row']}>
               <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('channel-name-label')}</div>
+                <div className={popup['label']}>{t('channel-name')}</div>
                 <input name="channel-name" type="text" value={isLobby ? t(`${channelName}`) : channelName} maxLength={32} onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))} />
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -197,7 +197,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   onChange={(e) => setChannel((prev) => ({ ...prev, announcement: e.target.value }))}
                 />
               )}
-              <div className={setting['note-text']}>{t('markdown-support')}</div>
+              <div className={setting['note-text']}>{t('markdown-support-description')}</div>
             </div>
           </div>
         </div>
@@ -218,7 +218,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     setChannel((prev) => ({ ...prev, visibility: 'public' }));
                   }}
                 />
-                <div className={popup['label']}>{t('anyone-can-access')}</div>
+                <div className={popup['label']}>{t('anyone-can-access-label')}</div>
               </div>
 
               <div className={`${popup['input-box']} ${popup['row']} ${isLobby ? 'disabled' : ''}`}>
@@ -230,7 +230,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     setChannel((prev) => ({ ...prev, visibility: 'member' }));
                   }}
                 />
-                <div className={popup['label']}>{t('forbid-guest-access')}</div>
+                <div className={popup['label']}>{t('forbid-guest-access-label')}</div>
               </div>
 
               <div className={`${popup['input-box']} ${popup['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
@@ -242,7 +242,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     setChannel((prev) => ({ ...prev, visibility: 'readonly' }));
                   }}
                 />
-                <div className={popup['label']}>{t('message-only')}</div>
+                <div className={popup['label']}>{t('message-only-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
                 <input
@@ -253,7 +253,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     setChannel((prev) => ({ ...prev, visibility: 'private' }));
                   }}
                 />
-                <div className={popup['label']}>{t('require-password')}</div>
+                <div className={popup['label']}>{t('require-password-label')}</div>
               </div>
               {channelVisibility === 'private' && (
                 <div className={popup['input-box']}>
@@ -282,11 +282,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="forbidGuestQueue" type="checkbox" checked={channelForbidGuestQueue} onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestQueue: e.target.checked }))} />
-                <div className={popup['label']}>{t('forbid-guest-queue')}</div>
+                <div className={popup['label']}>{t('forbid-guest-queue-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="forbidGuestVoice" type="checkbox" checked={channelForbidGuestVoice} onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestVoice: e.target.checked }))} />
-                <div className={popup['label']}>{t('forbid-guest-voice')}</div>
+                <div className={popup['label']}>{t('forbid-guest-voice-label')}</div>
               </div>
             </div>
           </div>
@@ -301,19 +301,19 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="forbid-text" type="checkbox" checked={channelForbidText} onChange={(e) => setChannel((prev) => ({ ...prev, forbidText: e.target.checked }))} />
-                <div className={popup['label']}>{t('forbid-only-admin-text')}</div>
+                <div className={popup['label']}>{t('forbid-only-admin-text-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="forbid-guest-text" type="checkbox" checked={channelForbidGuestText} onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestText: e.target.checked }))} />
-                <div className={popup['label']}>{t('forbid-guest-text')}</div>
+                <div className={popup['label']}>{t('forbid-guest-text-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="forbid-guest-url" type="checkbox" checked={channelForbidGuestUrl} onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestUrl: e.target.checked }))} />
-                <div className={popup['label']}>{t('forbid-guest-url')}</div>
+                <div className={popup['label']}>{t('forbid-guest-url-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>
-                  {t('guest-text-max-length')}
+                  {t('guest-text-max-length-label')}
                   <input
                     name="guest-text-max-length"
                     type="number"
@@ -328,7 +328,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>
-                  {t('guest-text-wait-time')}
+                  {t('guest-text-wait-time-label')}
                   <input
                     name="guest-text-wait-time"
                     type="number"
@@ -343,7 +343,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>
-                  {t('guest-text-gap-time')}
+                  {t('guest-text-gap-time-label')}
                   <input
                     name="guest-text-gap-time"
                     type="number"

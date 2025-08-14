@@ -176,7 +176,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
         <div className={styles['form-wrapper']}>
           {isLoading && (
             <>
-              <div className={styles['loading-indicator']}>{t('registering')}</div>
+              <div className={styles['loading-indicator']}>{`${t('registering')}...`}</div>
               <div className={styles['loading-bar']} />
             </>
           )}
@@ -198,7 +198,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
                     }}
                   />
                 </div>
-                {errors.account ? <div className={styles['warn-text']}>{errors.account}</div> : <div className={styles['hint-text']}>{t('account-cannot-change')}</div>}
+                {errors.account ? <div className={styles['warn-text']}>{errors.account}</div> : <div className={styles['hint-text']}>{t('account-hint')}</div>}
               </div>
               <div className={styles['input-wrapper']}>
                 <div className={styles['input-box']}>
@@ -234,7 +234,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
                     }}
                   />
                 </div>
-                {errors.confirmPassword ? <div className={styles['warn-text']}>{errors.confirmPassword}</div> : <div className={styles['hint-text']}>{t('repeat-input-password')}</div>}
+                {errors.confirmPassword ? <div className={styles['warn-text']}>{errors.confirmPassword}</div> : <div className={styles['hint-text']}>{t('repeat-password-hint')}</div>}
               </div>
               <div className={styles['input-wrapper']}>
                 <div className={styles['input-box']}>

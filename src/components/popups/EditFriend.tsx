@@ -89,7 +89,7 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
         <div className={popup['dialog-content']}>
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <div className={popup['label']}>{t('friend-select-group')}</div>
+              <div className={popup['label']}>{t('select-friend-group')}</div>
               <div className={popup['select-box']}>
                 <select name="friend-group" value={friendGroupId || ''} onChange={(e) => setFriend((prev) => ({ ...prev, friendGroupId: e.target.value }))}>
                   <option value={''}>{t('none')}</option>

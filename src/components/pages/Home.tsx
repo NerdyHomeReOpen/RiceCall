@@ -270,7 +270,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
         <div className={homePage['right']}>
           <div className={homePage['navegate-tab']} data-key="30014" onClick={() => handleOpenCreateServer(userId)}>
-            {t('create-servers')}
+            {t('create-server')}
           </div>
           <div className={homePage['navegate-tab']} data-key="60004" onClick={() => setSection(4)}>
             {t('personal-exclusive')}

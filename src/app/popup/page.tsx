@@ -13,33 +13,33 @@ import type { PopupType } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // Components
-import UserSetting from '@/components/popups/UserSetting';
-import ServerSetting from '@/components/popups/ServerSetting';
-import ServerBroadcast from '@/components/popups/ServerBroadcast';
-import BlockMember from '@/components/popups/BlockMember';
-import ChannelSetting from '@/components/popups/ChannelSetting';
-import SystemSetting from '@/components/popups/SystemSetting';
+import About from '@/components/popups/About';
+import ApplyFriend from '@/components/popups/ApplyFriend';
+import ApplyMember from '@/components/popups/ApplyMember';
 import AvatarCropper from '@/components/popups/AvatarCropper';
+import BlockMember from '@/components/popups/BlockMember';
+import ChangeTheme from '@/components/popups/ChangeTheme';
 import ChannelPassword from '@/components/popups/ChannelPassword';
-import MemberApplySetting from '@/components/popups/MemberApplySetting';
-import MemberInvitation from '@/components/popups/MemberInvitation';
-import CreateServer from '@/components/popups/CreateServer';
+import ChannelSetting from '@/components/popups/ChannelSetting';
 import CreateChannel from '@/components/popups/CreateChannel';
 import CreateFriendGroup from '@/components/popups/CreateFriendGroup';
+import CreateServer from '@/components/popups/CreateServer';
+import Dialog from '@/components/popups/Dialog';
+import DirectMessage from '@/components/popups/DirectMessage';
 import EditChannelName from '@/components/popups/EditChannelName';
 import EditChannelOrder from '@/components/popups/EditChannelOrder';
 import EditNickname from '@/components/popups/EditNickname';
 import EditFriendGroup from '@/components/popups/EditFriendGroup';
 import EditFriend from '@/components/popups/EditFriend';
-import ApplyFriend from '@/components/popups/ApplyFriend';
-import ApplyMember from '@/components/popups/ApplyMember';
-import DirectMessage from '@/components/popups/DirectMessage';
-import SearchUser from '@/components/popups/SearchUser';
-import Dialog from '@/components/popups/Dialog';
-import ChangeTheme from '@/components/popups/ChangeTheme';
-import About from '@/components/popups/About';
 import FriendVerification from '@/components/popups/FriendVerification';
-import MemberVerification from '@/components/popups/MemberVerification';
+import MemberInvitation from '@/components/popups/MemberInvitation';
+import MemberApplySetting from '@/components/popups/MemberApplySetting';
+import InviteMember from '@/components/popups/InviteMember';
+import SearchUser from '@/components/popups/SearchUser';
+import ServerSetting from '@/components/popups/ServerSetting';
+import ServerBroadcast from '@/components/popups/ServerBroadcast';
+import SystemSetting from '@/components/popups/SystemSetting';
+import UserSetting from '@/components/popups/UserSetting';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -129,15 +129,15 @@ const Popup = React.memo(() => {
         return { title: t('create-friend-group'), buttons: ['close'], node: <CreateFriendGroup {...initialData} />, hideHeader: false };
       case 'dialogAlert':
       case 'dialogAlert2':
-        return { title: t('dialog-alert'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'ALERT' }} />, hideHeader: false };
+        return { title: t('alert'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'ALERT' }} />, hideHeader: false };
       case 'dialogSuccess':
-        return { title: t('dialog-success'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'SUCCESS' }} />, hideHeader: false };
+        return { title: t('success'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'SUCCESS' }} />, hideHeader: false };
       case 'dialogWarning':
-        return { title: t('dialog-warning'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'WARNING' }} />, hideHeader: false };
+        return { title: t('warning'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'WARNING' }} />, hideHeader: false };
       case 'dialogError':
-        return { title: t('dialog-error'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'ERROR' }} />, hideHeader: false };
+        return { title: t('error'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'ERROR' }} />, hideHeader: false };
       case 'dialogInfo':
-        return { title: t('dialog-info'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'INFO' }} />, hideHeader: false };
+        return { title: t('info'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'INFO' }} />, hideHeader: false };
       case 'directMessage':
         return { title: initialData?.targetName || t('direct-message'), buttons: ['close', 'minimize', 'maxsize'], node: <DirectMessage {...initialData} />, hideHeader: false };
       case 'editChannelOrder':
@@ -149,11 +149,11 @@ const Popup = React.memo(() => {
       case 'editFriend':
         return { title: t('edit-friend'), buttons: ['close'], node: <EditFriend {...initialData} />, hideHeader: false };
       case 'editNickname':
-        return { title: t('edit-member-card'), buttons: ['close'], node: <EditNickname {...initialData} />, hideHeader: false };
+        return { title: t('edit-nickname'), buttons: ['close'], node: <EditNickname {...initialData} />, hideHeader: false };
       case 'friendVerification':
         return { title: t('friend-verification'), buttons: ['close'], node: <FriendVerification {...initialData} />, hideHeader: false };
-      case 'memberVerification':
-        return { title: t('member-verification'), buttons: ['close'], node: <MemberVerification {...initialData} />, hideHeader: false };
+      case 'inviteMember':
+        return { title: t('invite-member'), buttons: ['close'], node: <InviteMember {...initialData} />, hideHeader: false };
       case 'memberApplySetting':
         return { title: t('member-apply-setting'), buttons: ['close'], node: <MemberApplySetting {...initialData} />, hideHeader: false };
       case 'memberInvitation':
@@ -163,13 +163,13 @@ const Popup = React.memo(() => {
       case 'serverBroadcast':
         return { title: t('server-broadcast'), buttons: ['close'], node: <ServerBroadcast {...initialData} />, hideHeader: false };
       case 'serverSetting':
-        return { title: t('edit-server'), buttons: ['close'], node: <ServerSetting {...initialData} />, hideHeader: false };
+        return { title: t('server-setting'), buttons: ['close'], node: <ServerSetting {...initialData} />, hideHeader: false };
       case 'systemSetting':
         return { title: t('system-setting'), buttons: ['close'], node: <SystemSetting {...initialData} />, hideHeader: false };
       case 'userInfo':
-        return { title: t('user-info'), buttons: [], node: <UserSetting {...initialData} />, hideHeader: true };
+        return { title: t('user-info'), buttons: ['close'], node: <UserSetting {...initialData} />, hideHeader: true };
       case 'userSetting':
-        return { title: t('edit-user'), buttons: ['close'], node: <UserSetting {...initialData} />, hideHeader: false };
+        return { title: t('user-setting'), buttons: ['close'], node: <UserSetting {...initialData} />, hideHeader: false };
       default:
         return { title: '', buttons: [], node: null, hideHeader: true };
     }

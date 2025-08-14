@@ -115,7 +115,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ userId
         <div className={popup['popup-body']}>
           <div className={setting['content']}>
             <div className={`${styles['message']}`}>{t('remaining-server', { '0': remainingServers.toString() })}</div>
-            <div className={styles['select-type-text']}>{t('select-server-type-description')}</div>
+            <div className={styles['select-type-text']}>{t('please-select-server-type')}</div>
             <div className={styles['button-group']}>
               {SERVER_TYPES.map((type) => (
                 <div

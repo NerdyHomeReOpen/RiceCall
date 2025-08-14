@@ -174,8 +174,20 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             const y = e.clientY;
             contextMenu.showContextMenu(x, y, false, false, [
               {
-                id: 'edit-channel',
-                label: t('edit-channel'),
+                id: 'join-channel',
+                label: t('join-channel'),
+                show: canJoin,
+                onClick: () => {
+                  if (needPassword) {
+                    handleOpenChannelPassword(serverId, categoryId);
+                  } else {
+                    handleConnectChannel(serverId, categoryId);
+                  }
+                },
+              },
+              {
+                id: 'view-or-edit',
+                label: t('view-or-edit'),
                 show: canManageChannel,
                 onClick: () => handleOpenChannelSetting(userId, serverId, categoryId),
               },

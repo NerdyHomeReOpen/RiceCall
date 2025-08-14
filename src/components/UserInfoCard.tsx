@@ -114,7 +114,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
             <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
 
             {/* VIP Info Text */}
-            {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost', { '0': vipBoostMultiplier.toString() })}</div>}
+            {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoostMultiplier.toString() })}</div>}
 
             {/* Xp Info */}
             <div className={styles['xp-wrapper']}>

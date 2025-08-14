@@ -1,135 +1,143 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// CSS
-import popup from '@/styles/popup.module.css';
-
 // Types
-import type { FriendApplication, FriendGroup, User, Server, MemberInvitation } from '@/types';
+import type { User, Server, MemberInvitation } from '@/types';
 
-// Providers
-import { useTranslation } from 'react-i18next';
+// CSS
+import styles from '@/styles/popups/friendVerification.module.css';
+import popup from '@/styles/popup.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
 import getService from '@/services/get.service';
 
+// Providers
+import { useTranslation } from 'react-i18next';
+
 // Utils
-import Default from '@/utils/default';
+import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
 interface MemberInvitationPopupProps {
   userId: User['userId'];
-  serverId: Server['serverId'];
 }
 
-const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo(({ userId, serverId }) => {
+const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo(({ userId }) => {
   // Hooks
   const { t } = useTranslation();
 
   // Refs
   const refreshRef = useRef(false);
 
-  // States
-  const [section, setSection] = useState<number>(0);
-  const [server, setServer] = useState<Server>(Default.server());
-  const [user, setUser] = useState<User>(Default.user());
-  const [memberInvitation, setMemberInvitation] = useState<MemberInvitation>(Default.memberInvitation());
-
-  // Variables
-  const { name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
-  const { name: targetName, avatarUrl: targetAvatarUrl } = user;
-  const { description: applicationDesc } = memberInvitation;
+  // State
+  const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
 
   // Handlers
-  const handleSendMemberInvitation = (userId: User['userId'], serverId: Server['serverId'], preset: Partial<MemberInvitation>) => {
-    ipcService.socket.send('sendMemberInvitation', { receiverId: userId, serverId, preset });
+  const handleRejectAllFriendApplication = () => {
+    if (memberInvitations.length === 0) return;
+    handleOpenAlertDialog(t('confirm-reject-all-member-invitation'), () => {
+      ipcService.socket.send('rejectMemberInvitation', ...memberInvitations.map((item) => ({ serverId: item.serverId })));
+    });
   };
 
-  const handleClose = () => {
-    ipcService.window.close();
+  const handleAcceptMemberInvitation = (serverId: Server['serverId']) => {
+    ipcService.socket.send('acceptMemberInvitation', { serverId });
+  };
+
+  const handleRejectMemberInvitation = (serverId: Server['serverId']) => {
+    ipcService.socket.send('rejectMemberInvitation', { serverId });
+  };
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipcService.popup.onSubmit('dialogAlert', callback);
+  };
+
+  const handleMemberInvitationAdd = (...args: { data: MemberInvitation }[]) => {
+    setMemberInvitations((prev) => [...prev, ...args.map((i) => i.data)]);
+  };
+
+  const handleMemberInvitationUpdate = (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => {
+    const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
+    setMemberInvitations((prev) => prev.map((mi) => (update.has(`${mi.serverId}`) ? { ...mi, ...update.get(`${mi.serverId}`) } : mi)));
+  };
+
+  const handleMemberInvitationRemove = (...args: { serverId: string }[]) => {
+    const remove = new Set(args.map((i) => i.serverId));
+    setMemberInvitations((prev) => prev.filter((mi) => !remove.has(mi.serverId)));
   };
 
   // Effects
   useEffect(() => {
+    const unsubscribe = [
+      ipcService.socket.on('memberInvitationAdd', handleMemberInvitationAdd),
+      ipcService.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
+      ipcService.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, []);
+
+  useEffect(() => {
     if (!userId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      getService.user({ userId: userId }).then((target) => {
-        if (target) setUser(target);
-      });
-
-      getService.memberInvitation({ receiverId: userId, serverId }).then((sentMemberInvitation) => {
-        if (sentMemberInvitation) {
-          if (sentMemberInvitation.userId === userId) {
-            setSection(2);
-          } else {
-            setSection(1);
-          }
-          setMemberInvitation(sentMemberInvitation);
-        }
+      getService.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
+        if (memberInvitations) setMemberInvitations(memberInvitations);
       });
     };
     refresh();
   }, [userId]);
 
   return (
-    <div className={popup['popup-wrapper']}>
-      {/* Body */}
-      <div className={popup['popup-body']}>
-        <div className={`${popup['content']} ${popup['col']}`}>
-          <div className={popup['label']}>{t('sent-member-invitation-for')}</div>
-          <div className={popup['row']}>
-            <div className={popup['avatar-wrapper']}>
-              <div className={popup['avatar-picture']} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
-            </div>
-            <div className={popup['info-wrapper']}>
-              <div className={popup['bold-text']}>{targetName}</div>
-              <div className={popup['sub-text']}>{targetName}</div>
-            </div>
+    <div className={popup['popup-wrapper']} tabIndex={0}>
+      <div className={popup['popup-body']} style={{ flexDirection: 'column' }}>
+        {/* Content Header */}
+        <div className={styles['header']}>
+          <div className={styles['processing-status']}>
+            {t('unprocessed')}
+            <span className={styles['processing-status-count']}>({memberInvitations.length})</span>
           </div>
-          <div className={popup['split']} />
-          <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
-            <div className={popup['label']}>{t('friend-note')}</div>
-            <textarea rows={2} value={applicationDesc} onChange={(e) => setMemberInvitation((prev) => ({ ...prev, description: e.target.value }))} />
-          </div>
-          <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
-            {t('friend-apply-sent')}
+          <div className={styles['all-cancel-text']} onClick={handleRejectAllFriendApplication}>
+            {t('reject-all')}
           </div>
         </div>
-      </div>
 
-      {/* Footer */}
-      <div className={popup['popup-footer']}>
-        <div
-          className={popup['button']}
-          style={section === 0 ? {} : { display: 'none' }}
-          onClick={() => {
-            handleSendMemberInvitation(userId, serverId, { description: applicationDesc });
-            handleClose();
-          }}
-        >
-          {t('send-request')}
-        </div>
-        <div className={popup['button']} style={section === 0 ? {} : { display: 'none' }} onClick={handleClose}>
-          {t('cancel')}
-        </div>
-        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => setSection(0)}>
-          {t('modify')}
-        </div>
-        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={handleClose}>
-          {t('confirm')}
-        </div>
-        <div
-          className={popup['button']}
-          style={section === 2 ? {} : { display: 'none' }}
-          onClick={() => {
-            // handleApproveFriendApplication(targetId);
-            handleClose();
-          }}
-        >
-          {t('add')}
-        </div>
-        <div className={popup['button']} style={section === 2 ? {} : { display: 'none' }} onClick={handleClose}>
-          {t('cancel')}
+        {/* Content Body */}
+        <div className={styles['content']}>
+          {memberInvitations.map((mi) => {
+            return (
+              <div key={mi.serverId} className={styles['application']}>
+                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${mi.avatarUrl})` }} />
+                <div style={{ flex: 1 }}>
+                  <div className={styles['user-info-box']}>
+                    <div className={styles['user-name-text']}>
+                      {mi.name} ({/* TODO: displayId */})
+                    </div>
+                    <div className={styles['time-text']} title={getFormatTimestamp(t, mi.createdAt)}>
+                      {getFormatTimeDiff(t, mi.createdAt)}
+                    </div>
+                  </div>
+                  <div className={styles['application-content-box']}>
+                    <div className={popup['col']}>
+                      <div className={styles['content-text']}>{t('invite-you-to-be-member')}</div>
+                      <div className={styles['content-text']}>
+                        {t('note')}: {mi.description}
+                      </div>
+                    </div>
+                    <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
+                      <div className={styles['action-buttons']}>
+                        <div className={styles['button']} onClick={() => handleAcceptMemberInvitation(mi.serverId)}>
+                          {t('accept')}
+                        </div>
+                        <div className={styles['button']} onClick={() => handleRejectMemberInvitation(mi.serverId)}>
+                          {t('reject')}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

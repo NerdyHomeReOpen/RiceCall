@@ -309,7 +309,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             </div>
           )}
           <div className={styles['user-profile-content']}>
-            <div className={popup['label']}>{t('recently-join-server')}</div>
+            <div className={popup['label']}>{t('recent-servers')}</div>
             <div className={styles['server-list']}>
               {isProfilePrivate
                 ? PrivateElement(
@@ -336,7 +336,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             </div>
           </div>
           <div className={`${styles['user-profile-content']}`}>
-            <div className={popup['label']}>{t('recently-earned-badges')}</div>
+            <div className={popup['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
               <BadgeListViewer badges={userBadges} maxDisplay={13} />
             </div>

@@ -354,7 +354,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 </div>
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('group-link')}</div>
+                <div className={popup['label']}>{t('server-link')}</div>
                 <input name="link" type="text" value={`https://ricecall.com.tw/join?sid=${serverDisplayId}`} readOnly />
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -404,7 +404,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   name="search-query"
                   type="search"
                   className={setting['search-input']}
-                  placeholder={t('search-member-placeholder')}
+                  placeholder={t('search-placeholder')}
                   value={searchText}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
                 />
@@ -590,7 +590,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                     name="search-query"
                     type="search"
                     className={setting['search-input']}
-                    placeholder={t('search-member-placeholder')}
+                    placeholder={t('search-placeholder')}
                     value={searchText}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
                   />
@@ -675,7 +675,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   name="search-query"
                   type="search"
                   className={setting['search-input']}
-                  placeholder={t('search-member-placeholder')}
+                  placeholder={t('search-placeholder')}
                   value={searchText}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
                 />

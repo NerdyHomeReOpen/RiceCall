@@ -15,7 +15,7 @@ export const getPermissionText = (t: TFunction<'translation', undefined>, permis
     5: t('server-admin'),
     6: t('server-owner'),
     7: t('staff'),
-    8: t('official'),
+    8: t('super-admin'),
   };
   return permissionMap[permission] || t('unknown-user');
 };

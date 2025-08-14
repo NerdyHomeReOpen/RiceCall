@@ -216,8 +216,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
           )}
           {(!isFriend || !isOnline) && (
             <div className={styles['action-area']}>
-              {!isFriend && <div className={styles['action-title']}>{t('non-friend-notice')}</div>}
-              {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-notice')}</div>}
+              {!isFriend && <div className={styles['action-title']}>{t('non-friend-message')}</div>}
+              {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
             </div>
           )}
           {isVerifiedUser && ( // TODO: Official badge

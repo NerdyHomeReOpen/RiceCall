@@ -53,7 +53,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, friends, cu
   const canManageChannel = permissionLevel > 4;
   const canCreate = canManageChannel && !channelCategoryId;
   const canCreateSub = canManageChannel && !isLobby;
-  const canEdit = canManageChannel;
   const canDelete = canManageChannel && !isLobby;
   const canMoveAllUserToChannel = canManageChannel && !userInChannel && channelUserIds.length !== 0;
   const canSetReceptionLobby = canManageChannel && !isReceptionLobby && channelVisibility !== 'private' && channelVisibility !== 'readonly';
@@ -178,9 +177,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, friends, cu
               },
             },
             {
-              id: 'edit-channel',
-              label: t('edit-channel'),
-              show: canEdit,
+              id: 'view-or-edit',
+              label: t('view-or-edit'),
+              show: canManageChannel,
               onClick: () => handleOpenChannelSetting(userId, serverId, channelId),
             },
             {

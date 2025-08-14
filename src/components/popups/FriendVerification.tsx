@@ -126,7 +126,7 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                     <div className={popup['col']}>
                       <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
                       <div className={styles['content-text']}>
-                        {t('description')}: {friend.description}
+                        {t('note')}: {friend.description}
                       </div>
                     </div>
                     <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>

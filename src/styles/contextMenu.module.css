@@ -78,7 +78,7 @@
   background-image: url('/channel/icon_membermgr.png');
 }
 
-.context-menu .option[data-type='memberapply']::before {
+.context-menu .option[data-type='applyMember']::before {
   background-image: url('/channel/icon_memberapply.png');
 }
 

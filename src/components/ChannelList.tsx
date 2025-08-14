@@ -75,7 +75,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   };
 
   const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
-    if (!serverReceiveApply) handleOpenAlertDialog(t('cannot-apply'), () => {});
+    if (!serverReceiveApply) handleOpenAlertDialog(t('cannot-apply-member'), () => {});
     else ipcService.popup.open('applyMember', 'applyMember', { serverId, userId });
   };
 
@@ -184,10 +184,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
                   const y = settingButtonRef.current.getBoundingClientRect().top + settingButtonRef.current.getBoundingClientRect().height;
                   contextMenu.showContextMenu(x, y, false, false, [
                     {
-                      id: 'invitation',
-                      label: t('invitation'),
+                      id: 'apply-member',
+                      label: t('apply-member'),
                       show: canApplyMember,
-                      icon: 'memberapply',
+                      icon: 'applyMember',
                       onClick: () => handleOpenApplyMember(userId, serverId),
                     },
                     {
@@ -204,7 +204,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
                     },
                     {
                       id: 'edit-nickname',
-                      label: t('edit-member-card'),
+                      label: t('edit-nickname'),
                       icon: 'editGroupcard',
                       show: canEditNickname,
                       onClick: () => handleOpenEditNickname(userId, serverId),

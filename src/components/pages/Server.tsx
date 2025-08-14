@@ -70,7 +70,7 @@ function MessageInputBoxGuard({
         ? `${t('guest-text-gap-time')} ${leftGapTime} ${t('seconds')}`
         : isForbidByGuestTextWait
           ? `${t('guest-text-wait-time')} ${leftWaitTime} ${t('seconds')}`
-          : t('input-message');
+          : `${t('input-message')}...`;
 
   return <MessageInputBox disabled={disabled} maxLength={maxLength} placeholder={placeholder} onSend={onSend} />;
 }
@@ -241,7 +241,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     useEffect(() => {
       ipcService.discord.updatePresence({
         details: `${t('in')} ${serverName}`,
-        state: `${t('chat-with-members', { '0': serverMembers.length.toString() })}`,
+        state: `${t('rpc:chat-with-members', { '0': serverMembers.length.toString() })}`,
         largeImageKey: 'app_icon',
         largeImageText: 'RC Voice',
         smallImageKey: 'home_icon',
@@ -397,7 +397,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               <div className={`${styles['mic-button']} ${isMicTaken ? styles['active'] : ''}`} onClick={isMicTaken ? handleLeaveQueue : handleJoinQueue}>
                 <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div className={styles['mic-text']}>{isMicTaken ? t('taken-mic') : t('take-mic')}</div>
+                  <div className={styles['mic-text']}>{isMicTaken ? t('mic-taken') : t('take-mic')}</div>
                   <div className={styles['mic-sub-text']}>
                     {isMicTaken
                       ? speakMode === 'key'

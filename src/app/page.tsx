@@ -139,7 +139,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   const handleOpenMemberInvitation = () => {
-    ipcService.popup.open('memberVerification', 'memberVerification', { userId });
+    ipcService.popup.open('memberInvitation', 'memberInvitation', { userId });
   };
 
   // Effects

@@ -58,10 +58,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [forbidShake, setForbidShake] = useState<boolean>(false);
   const [forbidInviteGroup, setForbidInviteGroup] = useState<boolean>(false);
   const [forbidStrangerMessage, setForbidStrangerMessage] = useState<boolean>(false);
-  const [shareNowGroup, setShareNowGroup] = useState<boolean>(false);
-  const [shareRecentGroup, setShareRecentGroup] = useState<boolean>(false);
-  const [shareJoinedGroup, setShareJoinedGroup] = useState<boolean>(false);
-  const [shareFavoriteGroup, setShareFavoriteGroup] = useState<boolean>(false);
+  const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(false);
+  const [shareRecentServer, setShareRecentServer] = useState<boolean>(false);
+  const [shareJoinedServer, setShareJoinedServer] = useState<boolean>(false);
+  const [shareFavoriteServer, setShareFavoriteServer] = useState<boolean>(false);
   const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(false);
 
   const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>('F1');
@@ -331,15 +331,15 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             <div className={`${popup['input-group']}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="channel-classic-mode" type="radio" checked={channelUIMode === 'classic'} onChange={() => setChannelUIMode('classic')} />
-                <div className={popup['label']}>{t('channel-classic-mode-label')}</div>
+                <div className={popup['label']}>{t('channel-ui-mode-classic-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="channel-three-line-mode" type="radio" checked={channelUIMode === 'three-line'} onChange={() => setChannelUIMode('three-line')} />
-                <div className={popup['label']}>{t('channel-three-line-mode-label')}</div>
+                <div className={popup['label']}>{t('channel-ui-mode-three-line-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`}>
                 <input name="channel-auto-mode" type="radio" checked={channelUIMode === 'auto'} onChange={() => setChannelUIMode('auto')} />
-                <div className={popup['label']}>{t('channel-auto-mode-label')}</div>
+                <div className={popup['label']}>{t('channel-ui-mode-auto-label')}</div>
               </div>
             </div>
 
@@ -394,7 +394,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('input-device-label')}</div>
+                <div className={popup['label']}>{t('input-device')}</div>
                 <div className={popup['select-box']} style={{ maxWidth: '300px', minWidth: '0' }}>
                   <select value={selectedInput} onChange={(e) => setSelectedInput(e.target.value)}>
                     <option value="">
@@ -409,7 +409,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 </div>
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('output-device-label')}</div>
+                <div className={popup['label']}>{t('output-device')}</div>
                 <div className={popup['select-box']} style={{ maxWidth: '300px', minWidth: '0' }}>
                   <select value={selectedOutput} onChange={(e) => setSelectedOutput(e.target.value)}>
                     <option value="">
@@ -444,12 +444,12 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 </div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="auto-mix-setting" type="radio" checked={autoMixSetting} onChange={() => setAutoMixSetting(true)} />
-                <div className={popup['label']}>{t('auto-mix-setting-label')}</div>
+                <input name="mix-setting-auto" type="radio" checked={autoMixSetting} onChange={() => setAutoMixSetting(true)} />
+                <div className={popup['label']}>{t('mix-setting-auto-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="manual-mix-setting" type="radio" checked={!autoMixSetting} onChange={() => setAutoMixSetting(false)} />
-                <div className={popup['label']}>{t('manual-mix-setting-label')}</div>
+                <input name="mix-setting-manual" type="radio" checked={!autoMixSetting} onChange={() => setAutoMixSetting(false)} />
+                <div className={popup['label']}>{t('mix-setting-manual-label')}</div>
               </div>
               <div className={popup['input-group']}>
                 <div className={`${popup['input-box']} ${popup['row']} ${autoMixSetting && 'disabled'}`}>
@@ -495,12 +495,12 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           <div className={popup['col']}>
             {/* Default Speaking Mode */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('default-speaking-mode-label')}</div>
+              <div className={popup['label']}>{t('default-speaking-mode')}</div>
             </div>
             <div className={`${popup['input-group']}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="default-speaking-auto" type="radio" checked={defaultSpeakingMode === 'key'} onChange={() => setDefaultSpeakingMode('key')} />
-                <div className={popup['label']}>{t('default-speaking-key-label')}</div>
+                <div className={popup['label']}>{t('default-speaking-mode-key-label')}</div>
               </div>
               {defaultSpeakingMode == 'key' && (
                 <div className={popup['input-group']}>
@@ -519,12 +519,12 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                     />
                     {inputFocus === 'speakingKey' && conflicts.length > 0 && <div className={popup['error']}>{t('set-hotkey-error', { '0': conflicts.join(',') })}</div>}
                   </div>
-                  <div className={popup['label']}>{t('speaking-mode-key-label')}</div>
+                  <div className={popup['label']}>{t('setting-speaking-key-description')}</div>
                 </div>
               )}
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="default-speaking-auto" type="radio" checked={defaultSpeakingMode === 'auto'} onChange={() => setDefaultSpeakingMode('auto')} />
-                <div className={popup['label']}>{t('default-speaking-auto-label')}</div>
+                <div className={popup['label']}>{t('default-speaking-mode-auto-label')}</div>
               </div>
             </div>
           </div>
@@ -562,20 +562,20 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
             <div className={`${popup['input-group']} ${'disabled'}`}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="share-now-group" type="checkbox" checked={shareNowGroup} onChange={() => setShareNowGroup(!shareNowGroup)} />
-                <div className={popup['label']}>{t('share-now-group-label')}</div>
+                <input name="share-current-server" type="checkbox" checked={shareCurrentServer} onChange={() => setShareCurrentServer(!shareCurrentServer)} />
+                <div className={popup['label']}>{t('share-current-server-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="share-recent-group" type="checkbox" checked={shareRecentGroup} onChange={() => setShareRecentGroup(!shareRecentGroup)} />
-                <div className={popup['label']}>{t('share-recent-group-label')}</div>
+                <input name="share-recent-server" type="checkbox" checked={shareRecentServer} onChange={() => setShareRecentServer(!shareRecentServer)} />
+                <div className={popup['label']}>{t('share-recent-server-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="share-joined-group" type="checkbox" checked={shareJoinedGroup} onChange={() => setShareJoinedGroup(!shareJoinedGroup)} />
-                <div className={popup['label']}>{t('share-joined-group-label')}</div>
+                <input name="share-joined-server" type="checkbox" checked={shareJoinedServer} onChange={() => setShareJoinedServer(!shareJoinedServer)} />
+                <div className={popup['label']}>{t('share-joined-server-label')}</div>
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
-                <input name="share-favorite-group" type="checkbox" checked={shareFavoriteGroup} onChange={() => setShareFavoriteGroup(!shareFavoriteGroup)} />
-                <div className={popup['label']}>{t('share-favorite-group-label')}</div>
+                <input name="share-favorite-server" type="checkbox" checked={shareFavoriteServer} onChange={() => setShareFavoriteServer(!shareFavoriteServer)} />
+                <div className={popup['label']}>{t('share-favorite-server-label')}</div>
               </div>
             </div>
 
@@ -733,57 +733,57 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   </thead>
                   <tbody className={setting['tableContainer']}>
                     <tr>
-                      <td>{t('enter-voice-channel-status-label')}</td>
+                      <td>{t('enter-channel-sound-label')}</td>
                       <td>
                         <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('enterVoiceChannel')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setEnterVoiceChannelSound(!enterVoiceChannelSound)}>
-                        {!enterVoiceChannelSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
+                        {!enterVoiceChannelSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                       </td>
                     </tr>
                     <tr>
-                      <td>{t('leave-voice-channel-status-label')}</td>
+                      <td>{t('leave-channel-sound-label')}</td>
                       <td>
                         <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('leaveVoiceChannel')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setLeaveVoiceChannelSound(!leaveVoiceChannelSound)}>
-                        {!leaveVoiceChannelSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
+                        {!leaveVoiceChannelSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                       </td>
                     </tr>
                     <tr>
-                      <td>{t('start-speaking-status-label')}</td>
+                      <td>{t('start-speaking-sound-label')}</td>
                       <td>
                         <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('startSpeaking')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setStartSpeakingSound(!startSpeakingSound)}>
-                        {!startSpeakingSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
+                        {!startSpeakingSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                       </td>
                     </tr>
                     <tr>
-                      <td>{t('stop-speaking-status-label')}</td>
+                      <td>{t('stop-speaking-sound-label')}</td>
                       <td>
                         <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('stopSpeaking')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setStopSpeakingSound(!stopSpeakingSound)}>
-                        {!stopSpeakingSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
+                        {!stopSpeakingSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                       </td>
                     </tr>
                     <tr>
-                      <td>{t('receive-direct-message-status-label')}</td>
+                      <td>{t('receive-direct-message-sound-label')}</td>
                       <td>
                         <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('receiveDirectMessage')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setReceiveDirectMessageSound(!receiveDirectMessageSound)}>
-                        {!receiveDirectMessageSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
+                        {!receiveDirectMessageSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                       </td>
                     </tr>
                     <tr>
-                      <td>{t('receive-channel-message-status-label')}</td>
+                      <td>{t('receive-channel-message-sound-label')}</td>
                       <td>
                         <div className={popup['sound-effect-preview']} onClick={() => handlePlaySound('receiveChannelMessage')} />
                       </td>
                       <td className={popup['sound-effect-enable']} onClick={() => setReceiveChannelMessageSound(!receiveChannelMessageSound)}>
-                        {!receiveChannelMessageSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable-sound-effect-label')}</div> : <div>{t('enable-sound-effect-label')}</div>}
+                        {!receiveChannelMessageSound || disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                       </td>
                     </tr>
                   </tbody>
