@@ -116,8 +116,8 @@ export type table_members = {
   serverId: string;
   nickname: string | null;
   contribution: number;
-  lastMessageTime: number;
-  lastJoinChannelTime: number;
+  // lastMessageTime: number; // Remove: Not used
+  // lastJoinChannelTime: number; // Remove: Not used
   isBlocked: number; // New: Change to number (Will change name to blocked_to)
   permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
   createdAt: number;

@@ -4,7 +4,7 @@ const Default = {
   user: (overrides: Partial<User> = {}): User => ({
     userId: '',
     name: '',
-    id: '',
+    displayId: '',
     avatar: `${Date.now()}`,
     avatarUrl: `/default/userAvatar.webp`,
     email: '',
@@ -118,8 +118,6 @@ const Default = {
     isBlocked: 0,
     nickname: null,
     contribution: 0,
-    lastMessageTime: 0,
-    lastJoinChannelTime: 0,
     permissionLevel: 1,
     createdAt: 0,
     ...overrides,

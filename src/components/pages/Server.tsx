@@ -22,9 +22,9 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import ipcService from '@/services/ipc.service';
 
 function MessageInputBoxGuard({
+  lastJoinChannelTime,
+  lastMessageTime,
   userPermission,
-  userLastJoinChannelTime,
-  userLastMessageTime,
   channelForbidText,
   channelForbidGuestText,
   channelGuestTextGapTime,
@@ -32,9 +32,9 @@ function MessageInputBoxGuard({
   channelGuestTextMaxLength,
   onSend,
 }: {
+  lastJoinChannelTime: number;
+  lastMessageTime: number;
   userPermission: number;
-  userLastJoinChannelTime: number;
-  userLastMessageTime: number;
   channelForbidText: boolean;
   channelForbidGuestText: boolean;
   channelGuestTextGapTime: number;
@@ -54,8 +54,8 @@ function MessageInputBoxGuard({
     return () => clearInterval(id);
   }, []);
 
-  const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - userLastJoinChannelTime) / 1000) : 0;
-  const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - userLastMessageTime) / 1000) : 0;
+  const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
+  const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastMessageTime) / 1000) : 0;
 
   const isGuest = userPermission === 1;
   const isAdmin = userPermission >= 3;
@@ -112,17 +112,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [speakMode, setSpeakMode] = useState<SpeakingMode>('key');
     const [speakHotKey, setSpeakHotKey] = useState<string>('');
     const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
+    const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
+    const [lastMessageTime, setLastMessageTime] = useState<number>(0);
 
     // Variables
     const { userId } = user;
-    const {
-      serverId,
-      name: serverName,
-      announcement: serverAnnouncement,
-      permissionLevel: userPermission,
-      lastJoinChannelTime: userLastJoinChannelTime,
-      lastMessageTime: userLastMessageTime,
-    } = currentServer;
+    const { serverId, name: serverName, announcement: serverAnnouncement, permissionLevel: userPermission } = currentServer;
     const {
       channelId,
       announcement: channelAnnouncement,
@@ -140,6 +135,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     // Handlers
     const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
       ipcService.socket.send('channelMessage', { serverId, channelId, preset });
+      setLastMessageTime(Date.now());
     };
 
     const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
@@ -229,6 +225,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         else webRTC.untakeMic();
       }
     }, [queueMembers, userId, webRTC]);
+
+    useEffect(() => {
+      if (channelId) setLastJoinChannelTime(Date.now());
+    }, [channelId]);
 
     useEffect(() => {
       if (channelUIMode === 'classic') {
@@ -326,15 +326,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     </div>
                   </div>
                   <MessageInputBoxGuard
-                    onSend={(msg) => handleSendMessage(serverId, channelId, { type: 'general', content: msg })}
+                    lastJoinChannelTime={lastJoinChannelTime}
+                    lastMessageTime={lastMessageTime}
                     userPermission={userPermission}
-                    userLastJoinChannelTime={userLastJoinChannelTime}
-                    userLastMessageTime={userLastMessageTime}
                     channelForbidText={channelForbidText}
                     channelForbidGuestText={channelForbidGuestText}
                     channelGuestTextGapTime={channelGuestTextGapTime}
                     channelGuestTextWaitTime={channelGuestTextWaitTime}
                     channelGuestTextMaxLength={channelGuestTextMaxLength}
+                    onSend={(msg) => handleSendMessage(serverId, channelId, { type: 'general', content: msg })}
                   />
                 </div>
               </div>
