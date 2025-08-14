@@ -429,7 +429,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   <div className={popup['label']}>{t('nickname')}</div>
                   <input name="name" type="text" value={userName} maxLength={32} onChange={(e) => setUser((prev) => ({ ...prev, name: e.target.value }))} />
                 </div>
-
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('gender')}</div>
                   <div className={popup['select-box']}>
@@ -454,6 +453,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     </select>
                   </div>
                 </div>
+                <div style={{ width: '100%' }}>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('birthdate')}</div>
                   <div className={popup['row']}>
@@ -483,6 +483,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                           </option>
                         ))}
                       </select>
+                      </div>
                     </div>
                   </div>
                 </div>

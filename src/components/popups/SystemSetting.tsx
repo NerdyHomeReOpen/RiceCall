@@ -395,8 +395,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('input-device-label')}</div>
-                <div className={popup['select-box']}>
-                  <select value={selectedInput} onChange={(e) => setSelectedInput(e.target.value)} style={{ maxWidth: '300px' }}>
+                <div className={popup['select-box']} style={{ maxWidth: '300px', minWidth: '0' }}>
+                  <select value={selectedInput} onChange={(e) => setSelectedInput(e.target.value)}>
                     <option value="">
                       {t('default-microphone')} ({inputDevices[0]?.label || t('unknown-device')})
                     </option>
@@ -410,8 +410,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('output-device-label')}</div>
-                <div className={popup['select-box']}>
-                  <select value={selectedOutput} onChange={(e) => setSelectedOutput(e.target.value)} style={{ maxWidth: '300px' }}>
+                <div className={popup['select-box']} style={{ maxWidth: '300px', minWidth: '0' }}>
+                  <select value={selectedOutput} onChange={(e) => setSelectedOutput(e.target.value)}>
                     <option value="">
                       {t('default-speaker')} ({outputDevices[0]?.label || t('unknown-device')})
                     </option>
@@ -433,8 +433,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <input name="mix-effect" type="checkbox" checked={mixEffect} onChange={(e) => setMixEffect(e.target.checked)} />
                 <div className={popup['label']}>{t('mix-effect-label')}</div>
-                <div className={popup['select-box']}>
-                  <select name="mix-mode" value={mixEffectType} onChange={(e) => setMixEffectType(e.target.value)} style={{ maxWidth: '250px' }}>
+                <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
+                  <select name="mix-mode" value={mixEffectType} onChange={(e) => setMixEffectType(e.target.value)}>
                     <option value="">{t('mix-mode-classic')}</option>
                     <option value="">{t('mix-mode-cave')}</option>
                     <option value="">{t('mix-mode-alley')}</option>
