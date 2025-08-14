@@ -38,6 +38,15 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   const { userId: senderUserId, name: senderName, vip: senderVip, gender: senderGender, permissionLevel: senderPermissionLevel, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
   const isCurrentUser = senderUserId === userId;
   const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
+  const formattedMessageContents = messageContents.map((content) => {
+    return content
+      .split(' ')
+      .map((msg) => {
+        if (msg === 'guest-send-an-external-link') return t('guest-send-an-external-link');
+        return msg;
+      })
+      .join(' ');
+  });
 
   // handles
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
@@ -79,7 +88,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
           </div>
           <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
         </div>
-        {messageContents.map((content, index) => (
+        {formattedMessageContents.map((content, index) => (
           <MarkdownViewer key={index} markdownText={content} forbidGuestUrl={forbidGuestUrl} />
         ))}
       </div>

@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -26,6 +26,7 @@ function MessageInputBoxGuard({
   userLastJoinChannelTime,
   userLastMessageTime,
   channelForbidText,
+  channelForbidGuestText,
   channelGuestTextGapTime,
   channelGuestTextWaitTime,
   channelGuestTextMaxLength,
@@ -35,6 +36,7 @@ function MessageInputBoxGuard({
   userLastJoinChannelTime: number;
   userLastMessageTime: number;
   channelForbidText: boolean;
+  channelForbidGuestText: boolean;
   channelGuestTextGapTime: number;
   channelGuestTextWaitTime: number;
   channelGuestTextMaxLength: number;
@@ -56,21 +58,20 @@ function MessageInputBoxGuard({
   const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - userLastMessageTime) / 1000) : 0;
 
   const isGuest = userPermission === 1;
-  const isForbidByChatMode = channelForbidText && userPermission < 3;
-  const isForbidByGuestText = isGuest && isForbidByChatMode;
-  const isForbidByGuestTextGap = isGuest && leftGapTime > 0;
-  const isForbidByGuestTextWait = isGuest && leftWaitTime > 0;
-  const disabled = isForbidByChatMode || isForbidByGuestText || isForbidByGuestTextGap || isForbidByGuestTextWait;
+  const isAdmin = userPermission >= 3;
+  const isForbidByForbidText = !isAdmin && channelForbidText;
+  const isForbidByForbidGuestText = isGuest && channelForbidGuestText;
+  const isForbidByForbidGuestTextGap = isGuest && leftGapTime > 0;
+  const isForbidByForbidGuestTextWait = isGuest && leftWaitTime > 0;
+  const disabled = isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
   const maxLength = isGuest ? channelGuestTextMaxLength : 9999;
-  const placeholder = isForbidByChatMode
-    ? t('forbid-only-admin-text')
-    : isForbidByGuestText
-      ? t('forbid-guest-text')
-      : isForbidByGuestTextGap
-        ? `${t('guest-text-gap-time')} ${leftGapTime} ${t('seconds')}`
-        : isForbidByGuestTextWait
-          ? `${t('guest-text-wait-time')} ${leftWaitTime} ${t('seconds')}`
-          : `${t('input-message')}...`;
+  const placeholder = useMemo(() => {
+    if (isForbidByForbidText) return t('channel-forbid-text-message');
+    if (isForbidByForbidGuestText) return t('channel-forbid-guest-text-message');
+    if (isForbidByForbidGuestTextGap) return t('channel-guest-text-gap-time-message', { '0': leftGapTime.toString() });
+    if (isForbidByForbidGuestTextWait) return t('channel-guest-text-wait-time-message', { '0': leftWaitTime.toString() });
+    return `${t('input-message')}...`;
+  }, [t, isForbidByForbidText, isForbidByForbidGuestText, isForbidByForbidGuestTextGap, isForbidByForbidGuestTextWait, leftGapTime, leftWaitTime]);
 
   return <MessageInputBox disabled={disabled} maxLength={maxLength} placeholder={placeholder} onSend={onSend} />;
 }
@@ -129,6 +130,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       voiceMode: channelVoiceMode,
       forbidText: channelForbidText,
       forbidQueue: channelForbidQueue,
+      forbidGuestText: channelForbidGuestText,
       guestTextGapTime: channelGuestTextGapTime,
       guestTextWaitTime: channelGuestTextWaitTime,
       guestTextMaxLength: channelGuestTextMaxLength,
@@ -309,9 +311,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 onPointerUp={handleAnnAreaHandleUp}
               />
 
-              {/* Message Area */}
-              <div className={styles['message-area']}>
-                <MessageViewer messages={channelMessages} userId={userId} />
+              {/* Bottom Area */}
+              <div className={styles['bottom-area']}>
+                {/* Message Area */}
+                <div className={styles['message-area']}>
+                  <MessageViewer messages={channelMessages} userId={userId} />
+                </div>
+
+                {/* Broadcast Area */}
                 <div className={styles['input-area']}>
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <div className={styles['broadcast-content']}>
@@ -323,10 +330,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     userPermission={userPermission}
                     userLastJoinChannelTime={userLastJoinChannelTime}
                     userLastMessageTime={userLastMessageTime}
+                    channelForbidText={channelForbidText}
+                    channelForbidGuestText={channelForbidGuestText}
                     channelGuestTextGapTime={channelGuestTextGapTime}
                     channelGuestTextWaitTime={channelGuestTextWaitTime}
                     channelGuestTextMaxLength={channelGuestTextMaxLength}
-                    channelForbidText={channelForbidText}
                   />
                 </div>
               </div>
