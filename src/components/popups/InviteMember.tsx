@@ -109,6 +109,12 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ userId
         <div className={popup['button']} style={section === 0 ? {} : { display: 'none' }} onClick={handleClose}>
           {t('cancel')}
         </div>
+        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => setSection(0)}>
+          {t('modify')}
+        </div>
+        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={handleClose}>
+          {t('cancel')}
+        </div>
       </div>
     </div>
   );
