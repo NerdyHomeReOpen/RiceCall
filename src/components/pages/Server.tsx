@@ -54,8 +54,8 @@ function MessageInputBoxGuard({
     return () => clearInterval(id);
   }, []);
 
-  const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
-  const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastMessageTime) / 1000) : 0;
+  const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;
+  const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
 
   const isGuest = userPermission === 1;
   const isAdmin = userPermission >= 3;
@@ -227,7 +227,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [queueMembers, userId, webRTC]);
 
     useEffect(() => {
-      if (channelId) setLastJoinChannelTime(Date.now());
+      if (channelId) {
+        setLastJoinChannelTime(Date.now());
+        setLastMessageTime(0);
+      }
     }, [channelId]);
 
     useEffect(() => {
