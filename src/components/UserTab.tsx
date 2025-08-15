@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
