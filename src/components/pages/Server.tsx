@@ -22,7 +22,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { isMember, isChannelAdmin, isCategoryAdmin, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
+import { isMember, isChannelAdmin } from '@/utils/permission';
 
 function MessageInputBoxGuard({
   lastJoinChannelTime,
