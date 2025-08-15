@@ -119,7 +119,7 @@ export type table_members = {
   // lastMessageTime: number; // Remove: Not used
   // lastJoinChannelTime: number; // Remove: Not used
   isBlocked: number; // New: Change to number (Will change name to blocked_to)
-  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  // permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
   createdAt: number;
 };
 
@@ -137,7 +137,7 @@ export type table_member_invitations = {
   createdAt: number;
 };
 
-export type table_user_server = {
+export type table_user_servers = {
   recent: boolean;
   owned: boolean;
   favorite: boolean;
@@ -150,4 +150,21 @@ export type table_user_badges = {
   order: number;
   showTo: number;
   obtainedAt: number;
+};
+
+export type table_global_permissions = {
+  userId: string;
+  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+};
+
+export type table_server_permissions = {
+  userId: string;
+  serverId: string;
+  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+};
+
+export type table_channel_permissions = {
+  userId: string;
+  channelId: string;
+  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 };

@@ -41,13 +41,13 @@ import getService from '@/services/get.service';
 
 interface HeaderProps {
   user: User;
-  currentServer: Server;
+  server: Server;
   friendApplications: FriendApplication[];
   memberInvitations: MemberInvitation[];
   systemNotify: string[];
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, memberInvitations, systemNotify }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplications, memberInvitations, systemNotify }) => {
   // Hooks
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
@@ -64,7 +64,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
   const { userId, name: userName, status: userStatus } = user;
-  const { serverId, name: serverName } = currentServer;
+  const { serverId, name: serverName } = server;
 
   // Variables
   const hasNotify = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotify.length !== 0;
@@ -676,7 +676,7 @@ const RootPageComponent = () => {
     <WebRTCProvider userId={userId}>
       <ActionScannerProvider>
         <ExpandedProvider>
-          <Header user={user} currentServer={server} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
+          <Header user={user} server={server} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
           {!socket.isConnected ? (
             <LoadingSpinner />
           ) : (
@@ -685,9 +685,9 @@ const RootPageComponent = () => {
               <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}
-                currentServer={server}
-                currentChannel={channel}
                 friends={friends}
+                server={server}
+                channel={channel}
                 serverMembers={serverMembers}
                 serverChannels={serverChannels}
                 channelMessages={channelMessages}

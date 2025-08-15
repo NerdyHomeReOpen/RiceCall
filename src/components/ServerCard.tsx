@@ -10,7 +10,7 @@ import { useMainTab } from '@/providers/MainTab';
 import { useTranslation } from 'react-i18next';
 
 // Type
-import type { User, Member, Server } from '@/types';
+import type { User, Server } from '@/types';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -42,7 +42,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
 
   const { userId, currentServerId: userCurrentServerId } = user;
   const isOwner = serverOwnerId === userId;
-  const canRemoveMemberShip = serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
+  const canTerminateSelfMembership = serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
 
   // Handles
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
@@ -62,12 +62,8 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     ipcService.socket.send('favoriteServer', { serverId });
   };
 
-  const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.socket.send('editMember', { userId, serverId, update: member });
-  };
-
-  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-remove-membership', { '0': memberName }), () => handleEditMember({ permissionLevel: 1, nickname: null }, userId, serverId));
+  const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': memberName }), () => ipcService.socket.send('terminateMember', { userId, serverId }));
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
@@ -104,11 +100,11 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
             },
           },
           {
-            id: 'remove-self-membership',
-            label: t('remove-self-membership'),
-            show: canRemoveMemberShip,
+            id: 'terminate-self-membership',
+            label: t('terminate-self-membership'),
+            show: canTerminateSelfMembership,
             onClick: () => {
-              handleRemoveMembership(userId, serverId, t('self'));
+              handleTerminateMember(userId, serverId, t('self'));
             },
           },
         ]);

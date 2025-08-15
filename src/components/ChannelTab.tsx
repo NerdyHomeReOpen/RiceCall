@@ -21,30 +21,31 @@ import ipcService from '@/services/ipc.service';
 import { isMember, isChannelAdmin, isServerAdmin } from '@/utils/permission';
 
 interface ChannelTabProps {
-  channel: Channel;
-  currentChannel: Channel;
-  currentServer: Server;
+  user: User;
   friends: Friend[];
+  server: Server;
   serverMembers: Member[];
+  channel: Channel;
   expanded: Record<string, boolean>;
   selectedItemId: string | null;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, friends, currentChannel, currentServer, serverMembers, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, server, serverMembers, channel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const findMe = useFindMeContext();
 
   // Variables
-  const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId } = channel;
-  const { userId, serverId, permissionLevel, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = currentServer;
-  const { channelId: currentChannelId } = currentChannel;
+  const { userId, permissionLevel: globalPermissionLevel, currentChannelId: userCurrentChannelId } = user;
+  const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel } = channel;
+  const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
+  const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
   const channelMembers = serverMembers.filter((mb) => mb.currentChannelId === channelId);
   const channelUserIds = channelMembers.map((mb) => mb.userId);
-  const userInChannel = currentChannelId === channelId;
+  const userInChannel = userCurrentChannelId === channelId;
   const isReceptionLobby = serverReceptionLobbyId === channelId;
   const isLobby = serverLobbyId === channelId;
   const needPassword = channelVisibility === 'private' && !isChannelAdmin(permissionLevel);
@@ -85,8 +86,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, friends, cu
     ipcService.popup.open('channelSetting', 'channelSetting', { userId, serverId, channelId });
   };
 
-  const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Channel['channelId'] | null, userId: User['userId']) => {
-    ipcService.popup.open('createChannel', 'createChannel', { serverId, channelId, userId });
+  const handleOpenCreateChannel = (serverId: Server['serverId'], categoryId: Channel['categoryId'], categoryName: Channel['name']) => {
+    ipcService.popup.open('createChannel', 'createChannel', { serverId, categoryId, categoryName });
   };
 
   const handleOpenEditChannelOrder = (serverId: Server['serverId'], userId: User['userId']) => {
@@ -223,7 +224,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, friends, cu
               id: 'move-all-user-to-channel',
               label: t('move-all-user-to-channel'),
               show: canMoveAllUserToChannel,
-              onClick: () => handleMoveAllToChannel(channelUserIds, serverId, currentChannelId),
+              onClick: () => handleMoveAllToChannel(channelUserIds, serverId, userCurrentChannelId),
             },
             {
               id: 'edit-channel-order',
@@ -260,15 +261,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, friends, cu
           .filter((mb) => !!mb)
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((member) => (
-            <UserTab
-              key={member.userId}
-              member={member}
-              friends={friends}
-              currentChannel={currentChannel}
-              currentServer={currentServer}
-              selectedItemId={selectedItemId}
-              setSelectedItemId={setSelectedItemId}
-            />
+            <UserTab key={member.userId} user={user} friends={friends} channel={channel} server={server} member={member} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
           ))}
       </div>
     </>

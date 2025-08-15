@@ -19,8 +19,8 @@ import getService from '@/services/get.service';
 import Default from '@/utils/default';
 
 interface EditChannelOrderPopupProps {
-  userId: string;
-  serverId: string;
+  userId: User['userId'];
+  serverId: Server['serverId'];
 }
 
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ userId, serverId }) => {
@@ -86,12 +86,12 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     });
   };
 
-  const handleOpenCreateChannel = (userId: User['userId'], channelId: Channel['channelId'] | null, serverId: Server['serverId']) => {
-    ipcService.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
+  const handleOpenCreateChannel = (serverId: Server['serverId'], categoryId: Category['categoryId'], categoryName: Category['name']) => {
+    ipcService.popup.open('createChannel', 'createChannel', { serverId, categoryId, categoryName });
   };
 
   const handleOpenEditChannelName = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.popup.open('editChannelName', 'editChannelName', { serverId, channelId });
+    ipcService.popup.open('editChannelName', 'editChannelName', { serverId, channelId, channelName: selectedChannel?.name ?? '' });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
@@ -170,10 +170,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, [serverChannels]);
 
   useEffect(() => {
-    if (!serverId || refreshed.current) return;
+    if (!serverId || !userId || refreshed.current) return;
     const refresh = async () => {
       refreshed.current = true;
-      getService.channels({ serverId }).then((channels) => {
+      getService.channels({ userId, serverId }).then((channels) => {
         if (channels) {
           const filteredChannels = channels.filter((ch) => !ch.isLobby);
           setServerChannels(filteredChannels);
@@ -182,7 +182,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
       });
     };
     refresh();
-  }, [serverId]);
+  }, [serverId, userId]);
 
   useEffect(() => {
     const unsubscribe = [
@@ -261,7 +261,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           className={`${styles['add-channel-btn']} ${!canAdd ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            handleOpenCreateChannel(userId, selectedChannelId || null, serverId);
+            handleOpenCreateChannel(serverId, selectedChannelId ?? null, selectedChannel?.name ?? '');
           }}
         >
           {t('create')}

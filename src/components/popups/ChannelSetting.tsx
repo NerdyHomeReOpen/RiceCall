@@ -78,7 +78,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     if (!channelId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
-      getService.channel({ serverId: serverId, channelId: channelId }).then((channel) => {
+      getService.channel({ userId: userId, serverId: serverId, channelId: channelId }).then((channel) => {
         if (channel) setChannel(channel);
       });
       getService.server({ userId: userId, serverId: serverId }).then((server) => {

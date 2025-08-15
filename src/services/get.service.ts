@@ -55,23 +55,23 @@ export const getService = {
     return recommendServerList;
   },
 
-  channel: async ({ serverId, channelId }: { serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Channel | null> => {
-    const channel = await apiService.post('/channel', { serverId, channelId });
+  channel: async ({ userId, serverId, channelId }: { userId: User['userId']; serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Channel | null> => {
+    const channel = await apiService.post('/channel', { userId, serverId, channelId });
     return channel;
   },
 
-  channels: async ({ serverId }: { serverId: Server['serverId'] }): Promise<Channel[] | []> => {
-    const channels = await apiService.post('/channels', { serverId });
+  channels: async ({ userId, serverId }: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Channel[] | []> => {
+    const channels = await apiService.post('/channels', { userId, serverId });
     return channels;
   },
 
-  member: async ({ serverId, userId }: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Member | null> => {
-    const member = await apiService.post('/member', { userId, serverId });
+  member: async ({ serverId, userId, channelId }: { userId: User['userId']; serverId: Server['serverId']; channelId?: Channel['channelId'] }): Promise<Member | null> => {
+    const member = await apiService.post('/member', { userId, serverId, channelId });
     return member;
   },
 
-  members: async ({ serverId }: { serverId: Server['serverId'] }): Promise<Member[] | []> => {
-    const members = await apiService.post('/members', { serverId });
+  members: async ({ serverId, channelId }: { serverId: Server['serverId']; channelId?: Channel['channelId'] }): Promise<Member[] | []> => {
+    const members = await apiService.post('/members', { serverId, channelId });
     return members;
   },
 

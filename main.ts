@@ -100,6 +100,7 @@ const ClientToServerEventNames = [
   'controlQueue',
   'editMember',
   'deleteMember',
+  'terminateMember',
   'sendMemberApplication',
   'editMemberApplication',
   'deleteMemberApplication',
@@ -115,6 +116,8 @@ const ClientToServerEventNames = [
   'directMessage',
   'shakeWindow',
   'ping',
+  'editServerPermission',
+  'editChannelPermission',
 ];
 
 export const ServerToClientEventNames = [

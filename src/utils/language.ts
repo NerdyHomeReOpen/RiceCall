@@ -1,13 +1,10 @@
 import { TFunction } from 'i18next';
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
 
-// Types
-import { Permission } from '@/types';
-
 const FREE_IP_API_URL = process.env.NEXT_PUBLIC_FREE_IP_API_URL;
 
-export const getPermissionText = (t: TFunction<'translation', undefined>, permission: Permission): string => {
-  const permissionMap: Record<Permission, string> = {
+export const getPermissionText = (t: TFunction<'translation', undefined>, permission: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8): string => {
+  const permissionMap: Record<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8, string> = {
     1: t('guest'),
     2: t('member'),
     3: t('channel-mod'),

@@ -24,15 +24,16 @@ import ipcService from '@/services/ipc.service';
 import { isMember, isServerAdmin } from '@/utils/permission';
 
 interface ChannelListProps {
-  currentServer: Server;
-  currentChannel: Channel;
-  serverMembers: Member[];
-  queueMembers: QueueMember[];
-  serverChannels: (Channel | Category)[];
+  user: User;
   friends: Friend[];
+  server: Server;
+  serverMembers: Member[];
+  serverChannels: (Channel | Category)[];
+  channel: Channel;
+  queueMembers: QueueMember[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends, queueMembers }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverMembers, serverChannels, channel, queueMembers }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -51,22 +52,15 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
 
   // Variables
   const connectStatus = 4 - Math.floor(Number(latency) / 50);
-  const {
-    userId,
-    serverId,
-    name: serverName,
-    avatarUrl: serverAvatarUrl,
-    displayId: serverDisplayId,
-    receiveApply: serverReceiveApply,
-    permissionLevel: userPermission,
-    favorite: isFavorite,
-  } = currentServer;
-  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = currentChannel;
+  const { userId, permissionLevel: globalPermissionLevel } = user;
+  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, receiveApply: serverReceiveApply, permissionLevel: serverPermissionLevel, favorite: isFavorite } = server;
+  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby, permissionLevel: currentChannelPermissionLevel } = channel;
+  const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel);
   const isVerifiedServer = false;
-  const canEditNickname = isMember(userPermission);
-  const canApplyMember = !isMember(userPermission);
-  const canOpenSettings = isServerAdmin(userPermission);
-  const canManageChannel = isServerAdmin(userPermission);
+  const canEditNickname = isMember(permissionLevel);
+  const canApplyMember = !isMember(permissionLevel);
+  const canOpenSettings = isServerAdmin(permissionLevel);
+  const canManageChannel = isServerAdmin(permissionLevel);
 
   // Handlers
   const handleFavoriteServer = (serverId: Server['serverId']) => {
@@ -86,8 +80,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
     ipcService.popup.open('editNickname', 'editNickname', { serverId, userId });
   };
 
-  const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Category['categoryId'], userId: User['userId']) => {
-    ipcService.popup.open('createChannel', 'createChannel', { serverId, channelId, userId });
+  const handleOpenCreateChannel = (serverId: Server['serverId'], categoryId: Category['categoryId'], categoryName: Category['name']) => {
+    ipcService.popup.open('createChannel', 'createChannel', { serverId, categoryId, categoryName });
   };
 
   const handleOpenChangeChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -266,14 +260,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
           <div className={styles['mic-queue-list']}>
             <div className={styles['mic-queue-list-users']}>
               {queueMembers.map((member) => (
-                <QueueMemberTab
-                  key={member.userId}
-                  queueMember={member}
-                  currentChannel={currentChannel}
-                  currentServer={currentServer}
-                  selectedItemId={selectedItemId}
-                  setSelectedItemId={setSelectedItemId}
-                />
+                <QueueMemberTab key={member.userId} user={user} queueMember={member} server={server} channel={channel} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
               ))}
             </div>
           </div>
@@ -295,7 +282,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
               id: 'create-channel',
               label: t('create-channel'),
               show: canManageChannel,
-              onClick: () => handleOpenCreateChannel(serverId, null, userId),
+              onClick: () => handleOpenCreateChannel(serverId, null, ''),
             },
             {
               id: 'separator',
@@ -315,11 +302,11 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
           {viewType === 'current' ? (
             <ChannelTab
               key={currentChannelId}
-              channel={currentChannel}
+              user={user}
               friends={friends}
-              currentChannel={currentChannel}
-              currentServer={currentServer}
+              server={server}
               serverMembers={serverMembers}
+              channel={channel}
               expanded={{ [currentChannelId]: true }}
               selectedItemId={selectedItemId}
               setExpanded={() => {}}
@@ -333,12 +320,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
                 item.type === 'category' ? (
                   <CategoryTab
                     key={item.channelId}
-                    category={item as Category}
+                    user={user}
                     friends={friends}
-                    currentChannel={currentChannel}
-                    currentServer={currentServer}
+                    server={server}
                     serverMembers={serverMembers}
                     serverChannels={serverChannels}
+                    category={item as Category}
                     expanded={expanded}
                     selectedItemId={selectedItemId}
                     setExpanded={setExpanded}
@@ -347,11 +334,11 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
                 ) : (
                   <ChannelTab
                     key={item.channelId}
-                    channel={item as Channel}
+                    user={user}
                     friends={friends}
-                    currentChannel={currentChannel}
-                    currentServer={currentServer}
+                    server={server}
                     serverMembers={serverMembers}
+                    channel={item as Channel}
                     expanded={expanded}
                     selectedItemId={selectedItemId}
                     setExpanded={setExpanded}

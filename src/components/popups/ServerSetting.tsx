@@ -131,8 +131,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     ipcService.socket.send('editMember', { userId, serverId, update });
   };
 
-  const handleRemoveMembership = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-remove-membership', { '0': userName }), () => handleEditMember(userId, serverId, { permissionLevel: 1 }));
+  const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipcService.socket.send('terminateMember', { userId, serverId }));
   };
 
   const handleRemoveBlockMember = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
@@ -436,7 +436,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                     const isCurrentUser = memberUserId === userId;
                     const canManageMember = !isCurrentUser && isServerAdmin(userPermission) && !isStaff(memberPermission) && userPermission > memberPermission;
                     const canEditNickname = canManageMember || (isCurrentUser && isMember(userPermission));
-                    const canChangeToGuest = canManageMember && isMember(memberPermission);
+                    const canTerminateMember = canManageMember && isMember(memberPermission);
                     const canChangeToMember = canManageMember && isMember(memberPermission) && !isMember(memberPermission, false);
                     const canChangeToChannelAdmin = canManageMember && isMember(memberPermission) && !isChannelAdmin(memberPermission);
                     const canChangeToCategoryAdmin = canManageMember && isMember(memberPermission) && !isCategoryAdmin(memberPermission);
@@ -500,10 +500,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                               hasSubmenu: true,
                               submenuItems: [
                                 {
-                                  id: 'set-guest',
-                                  label: t('set-guest'),
-                                  show: canChangeToGuest,
-                                  onClick: () => handleRemoveMembership(memberUserId, serverId, memberNickname || memberName),
+                                  id: 'terminate-member',
+                                  label: t('terminate-member'),
+                                  show: canTerminateMember,
+                                  onClick: () => handleTerminateMember(memberUserId, serverId, memberNickname || memberName),
                                 },
                                 {
                                   id: 'set-member',

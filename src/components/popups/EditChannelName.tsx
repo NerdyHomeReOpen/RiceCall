@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 // Types
 import type { Channel, Server } from '@/types';
@@ -11,28 +11,18 @@ import popup from '@/styles/popup.module.css';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import getService from '@/services/get.service';
-
-// Utils
-import Default from '@/utils/default';
 
 interface EditChannelNamePopupProps {
   serverId: Server['serverId'];
   channelId: Channel['channelId'];
+  channelName: Channel['name'];
 }
 
-const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ serverId, channelId }) => {
+const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ serverId, channelId, channelName }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Refs
-  const refreshRef = useRef(false);
-
-  // States
-  const [channel, setChannel] = useState<Channel>(Default.channel());
-
   // Variables
-  const { name: channelName } = channel;
   const canSubmit = channelName.trim();
 
   // Handlers
@@ -44,18 +34,6 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
     ipcService.window.close();
   };
 
-  // Effects
-  useEffect(() => {
-    if (!channelId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.channel({ serverId: serverId, channelId: channelId }).then((channel) => {
-        if (channel) setChannel(channel);
-      });
-    };
-    refresh();
-  }, [channelId, serverId]);
-
   return (
     <div className={popup['popup-wrapper']}>
       {/* Body */}
@@ -64,7 +42,7 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('channel-name-label')}</div>
-              <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))} />
+              <input name="channel-name" type="text" value={channelName} maxLength={32} />
             </div>
           </div>
         </div>

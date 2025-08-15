@@ -12,15 +12,20 @@ import {
   table_member_applications,
   table_member_invitations,
   table_users,
-  table_user_server,
+  table_user_servers,
   table_user_badges,
+  table_server_permissions,
+  table_channel_permissions,
 } from '@/types/database';
 
-export type Permission = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-
-export type User = table_users & {
-  badges: Badge[];
+export type Permission = {
+  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 };
+
+export type User = table_users &
+  Permission & {
+    badges: Badge[];
+  };
 
 export type Badge = table_badges & table_user_badges;
 
@@ -34,21 +39,23 @@ export type RecommendServerList = {
   [category: string]: RecommendServer[];
 };
 
-export type Server = table_members & table_servers & table_user_server;
+export type Server = table_servers & table_user_servers & table_members & Permission;
 
 export type RecommendServer = table_servers & {
   online: number;
 };
 
-export type Category = table_channels & {
-  type: 'category';
-};
+export type Category = table_channels &
+  Permission & {
+    type: 'category';
+  };
 
-export type Channel = table_channels & {
-  type: 'channel';
-};
+export type Channel = table_channels &
+  Permission & {
+    type: 'channel';
+  };
 
-export type Member = table_members & User;
+export type Member = table_members & Permission & User;
 
 export type MemberApplication = table_member_applications & User;
 
@@ -218,6 +225,7 @@ export type ClientToServerEvents = {
   // Member
   editMember: (...args: { userId: string; serverId: string; update: Partial<table_members> }[]) => void;
   deleteMember: (...args: { userId: string; serverId: string }[]) => void;
+  terminateMember: (...args: { userId: string; serverId: string }[]) => void;
   // Member Application
   sendMemberApplication: (...args: { serverId: string; preset: Partial<table_member_applications> }[]) => void;
   editMemberApplication: (...args: { serverId: string; update: Partial<table_member_applications> }[]) => void;
@@ -230,6 +238,9 @@ export type ClientToServerEvents = {
   deleteMemberInvitation: (...args: { receiverId: string; serverId: string }[]) => void;
   acceptMemberInvitation: (...args: { serverId: string }[]) => void;
   rejectMemberInvitation: (...args: { serverId: string }[]) => void;
+  // Permission
+  editServerPermission: (...args: { userId: string; serverId: string; update: Partial<table_server_permissions> }[]) => void;
+  editChannelPermission: (...args: { userId: string; serverId: string; channelId: string; update: Partial<table_channel_permissions> }[]) => void;
   // Message
   channelMessage: (...args: { serverId: string; channelId: string; preset: Partial<ChannelMessage> }[]) => void;
   actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;

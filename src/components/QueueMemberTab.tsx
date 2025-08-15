@@ -24,14 +24,15 @@ import ipcService from '@/services/ipc.service';
 import { isMember } from '@/utils/permission';
 
 interface QueueMemberTabProps {
+  user: User;
+  server: Server;
+  channel: Channel;
   queueMember: QueueMember;
-  currentChannel: Channel;
-  currentServer: Server;
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember, currentChannel, currentServer, selectedItemId, setSelectedItemId }) => {
+const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server, channel, queueMember, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -54,17 +55,19 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
     position: memberPosition,
     leftTime: memberLeftTime,
   } = queueMember;
-  const { userId, serverId, permissionLevel: userPermission } = currentServer;
-  const { channelId: currentChannelId } = currentChannel;
+  const { userId, permissionLevel: globalPermission } = user;
+  const { serverId, permissionLevel: serverPermission } = server;
+  const { channelId, permissionLevel: channelPermission } = channel;
+  const permissionLevel = Math.max(globalPermission, serverPermission, channelPermission);
   const isCurrentUser = memberUserId === userId;
-  const isSameChannel = memberCurrentChannelId === currentChannelId;
+  const isSameChannel = memberCurrentChannelId === channelId;
   const speakingStatus = webRTC.volumePercent?.[memberUserId];
   const connectionStatus = webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
   const isLoading = connectionStatus === 'connecting' || !connectionStatus;
   const isSpeaking = !!speakingStatus;
   const isMuted = speakingStatus === -1;
   const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
-  const canManageMember = isMember(userPermission) && userPermission >= memberPermission;
+  const canManageMember = isMember(permissionLevel) && permissionLevel >= memberPermission;
 
   const statusIcon = () => {
     if (isMuted || isMutedByUser) return 'muted';
@@ -75,20 +78,20 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
 
   // Handlers
   const handleIncreaseQueueTime = () => {
-    ipcService.socket.send('increaseQueueTime', { serverId, channelId: currentChannelId, userId: memberUserId });
+    ipcService.socket.send('increaseQueueTime', { serverId, channelId, userId: memberUserId });
   };
 
-  const handleMoveDownQueue = (userId: User['userId']) => {
-    ipcService.socket.send('moveQueuePosition', { serverId, channelId: currentChannelId, userId, position: memberPosition + 1 });
+  const handleMoveDownQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], position: number) => {
+    ipcService.socket.send('moveQueuePosition', { serverId, channelId, userId, position });
   };
 
-  const handleMoveUpQueue = (userId: User['userId']) => {
-    ipcService.socket.send('moveQueuePosition', { serverId, channelId: currentChannelId, userId, position: memberPosition - 1 });
+  const handleMoveUpQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], position: number) => {
+    ipcService.socket.send('moveQueuePosition', { serverId, channelId, userId, position });
   };
 
-  const handleRemoveFromQueue = (userId: User['userId']) => {
+  const handleRemoveFromQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
     handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberName }), () => {
-      ipcService.socket.send('removeFromQueue', { serverId, channelId: currentChannelId, userId });
+      ipcService.socket.send('removeFromQueue', { serverId, channelId, userId });
     });
   };
 
@@ -127,19 +130,19 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
             id: 'move-up-queue',
             label: t('move-up-queue'),
             show: canManageMember,
-            onClick: () => handleMoveUpQueue(memberUserId),
+            onClick: () => handleMoveUpQueue(memberUserId, serverId, channelId, memberPosition - 1),
           },
           {
             id: 'move-down-queue',
             label: t('move-down-queue'),
             show: canManageMember,
-            onClick: () => handleMoveDownQueue(memberUserId),
+            onClick: () => handleMoveDownQueue(memberUserId, serverId, channelId, memberPosition + 1),
           },
           {
             id: 'remove-from-queue',
             label: t('remove-from-queue'),
             show: canManageMember,
-            onClick: () => handleRemoveFromQueue(memberUserId),
+            onClick: () => handleRemoveFromQueue(memberUserId, serverId, channelId),
           },
         ]);
       }}
