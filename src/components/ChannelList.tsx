@@ -20,6 +20,9 @@ import QueueMemberTab from '@/components/QueueMemberTab';
 // Services
 import ipcService from '@/services/ipc.service';
 
+// Utils
+import { isMember, isServerAdmin } from '@/utils/permission';
+
 interface ChannelListProps {
   currentServer: Server;
   currentChannel: Channel;
@@ -60,10 +63,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
   } = currentServer;
   const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = currentChannel;
   const isVerifiedServer = false;
-  const canEditNickname = userPermission > 1;
-  const canApplyMember = userPermission < 2;
-  const canOpenSettings = userPermission > 4;
-  const canManageChannel = userPermission > 4;
+  const canEditNickname = isMember(userPermission);
+  const canApplyMember = !isMember(userPermission);
+  const canOpenSettings = isServerAdmin(userPermission);
+  const canManageChannel = isServerAdmin(userPermission);
 
   // Handlers
   const handleFavoriteServer = (serverId: Server['serverId']) => {

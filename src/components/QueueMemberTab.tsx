@@ -20,6 +20,9 @@ import BadgeListViewer from '@/components/BadgeList';
 // Services
 import ipcService from '@/services/ipc.service';
 
+// Utils
+import { isMember } from '@/utils/permission';
+
 interface QueueMemberTabProps {
   queueMember: QueueMember;
   currentChannel: Channel;
@@ -61,7 +64,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ queueMember,
   const isSpeaking = !!speakingStatus;
   const isMuted = speakingStatus === -1;
   const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
-  const canManageMember = userPermission > 2 && userPermission >= memberPermission;
+  const canManageMember = isMember(userPermission) && userPermission >= memberPermission;
 
   const statusIcon = () => {
     if (isMuted || isMutedByUser) return 'muted';
