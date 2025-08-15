@@ -233,7 +233,7 @@
   "remove-admin": "Снять администратора сервера",
   "remove-channel-mod": "Снять модератора канала",
   "remove-channel-admin": "Снять администратора канала",
-  "remove-self-membership": "Снять статус участника",
+  "remove-self-membership": "解除會員關係",
   "rename-friend-group": "Переименовать",
   "repeat-input-password": "重複輸入密碼",
   "save": "Сохранить",
