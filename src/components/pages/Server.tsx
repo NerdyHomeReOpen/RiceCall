@@ -21,6 +21,9 @@ import { useContextMenu } from '@/providers/ContextMenu';
 // Services
 import ipcService from '@/services/ipc.service';
 
+// Utils
+import { isMember, isChannelAdmin, isCategoryAdmin, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
+
 function MessageInputBoxGuard({
   lastJoinChannelTime,
   lastMessageTime,
@@ -57,14 +60,12 @@ function MessageInputBoxGuard({
   const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;
   const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
 
-  const isGuest = userPermission === 1;
-  const isAdmin = userPermission >= 3;
-  const isForbidByForbidText = !isAdmin && channelForbidText;
-  const isForbidByForbidGuestText = isGuest && channelForbidGuestText;
-  const isForbidByForbidGuestTextGap = isGuest && leftGapTime > 0;
-  const isForbidByForbidGuestTextWait = isGuest && leftWaitTime > 0;
+  const isForbidByForbidText = !isChannelAdmin(userPermission) && channelForbidText;
+  const isForbidByForbidGuestText = !isMember(userPermission) && channelForbidGuestText;
+  const isForbidByForbidGuestTextGap = !isMember(userPermission) && leftGapTime > 0;
+  const isForbidByForbidGuestTextWait = !isMember(userPermission) && leftWaitTime > 0;
   const disabled = isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
-  const maxLength = isGuest ? channelGuestTextMaxLength : 9999;
+  const maxLength = !isMember(userPermission) ? channelGuestTextMaxLength : 9999;
   const placeholder = useMemo(() => {
     if (isForbidByForbidText) return t('channel-forbid-text-message');
     if (isForbidByForbidGuestText) return t('channel-forbid-guest-text-message');
@@ -349,7 +350,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 <div
                   ref={voiceModeMenuRef}
                   className={styles['voice-mode-dropdown']}
-                  style={userPermission >= 3 ? {} : { display: 'none' }}
+                  style={isChannelAdmin(userPermission) ? {} : { display: 'none' }}
                   onClick={() => {
                     if (!voiceModeMenuRef.current) return;
                     const x = voiceModeMenuRef.current.getBoundingClientRect().left;

@@ -17,6 +17,9 @@ import UserTab from '@/components/UserTab';
 // Services
 import ipcService from '@/services/ipc.service';
 
+// Utils
+import { isMember, isChannelAdmin, isServerAdmin } from '@/utils/permission';
+
 interface ChannelTabProps {
   channel: Channel;
   currentChannel: Channel;
@@ -44,13 +47,13 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, friends, cu
   const userInChannel = currentChannelId === channelId;
   const isReceptionLobby = serverReceptionLobbyId === channelId;
   const isLobby = serverLobbyId === channelId;
-  const needPassword = channelVisibility === 'private' && permissionLevel < 3;
+  const needPassword = channelVisibility === 'private' && !isChannelAdmin(permissionLevel);
   const canJoin =
     !userInChannel &&
     channelVisibility !== 'readonly' &&
-    !(channelVisibility === 'member' && permissionLevel < 2) &&
-    (!channelUserLimit || channelUserLimit > channelMembers.length || permissionLevel > 4);
-  const canManageChannel = permissionLevel > 4;
+    !(channelVisibility === 'member' && !isMember(permissionLevel)) &&
+    (!channelUserLimit || channelUserLimit > channelMembers.length || isServerAdmin(permissionLevel));
+  const canManageChannel = isServerAdmin(permissionLevel);
   const canCreate = canManageChannel && !channelCategoryId;
   const canCreateSub = canManageChannel && !isLobby;
   const canDelete = canManageChannel && !isLobby;

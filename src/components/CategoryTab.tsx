@@ -18,6 +18,9 @@ import ChannelTab from '@/components/ChannelTab';
 import ipcService from '@/services/ipc.service';
 import Default from '@/utils/default';
 
+// Utils
+import { isMember, isChannelAdmin, isServerAdmin } from '@/utils/permission';
+
 interface CategoryTabProps {
   category: Category;
   currentChannel: Channel;
@@ -56,13 +59,13 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const userInCategory = categoryMembers.some((mb) => mb.currentChannelId === currentChannelId);
     const userInChannel = currentChannelId === categoryId;
     const isReceptionLobby = serverReceptionLobbyId === categoryId;
-    const needPassword = categoryVisibility === 'private' && permissionLevel < 3;
+    const needPassword = categoryVisibility === 'private' && !isChannelAdmin(permissionLevel);
     const canJoin =
       !userInChannel &&
       categoryVisibility !== 'readonly' &&
-      !(categoryVisibility === 'member' && permissionLevel < 2) &&
-      (!categoryUserLimit || categoryUserLimit > categoryMembers.length || permissionLevel > 4);
-    const canManageChannel = permissionLevel > 4;
+      !(categoryVisibility === 'member' && !isMember(permissionLevel)) &&
+      (!categoryUserLimit || categoryUserLimit > categoryMembers.length || isServerAdmin(permissionLevel));
+    const canManageChannel = isServerAdmin(permissionLevel);
     const canMoveToChannel = canManageChannel && !userInChannel && categoryUserIds.length !== 0;
     const canSetReceptionLobby = canManageChannel && !isReceptionLobby && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
 

@@ -25,6 +25,7 @@ import getService from '@/services/get.service';
 import Default from '@/utils/default';
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
+import { isMember, isChannelAdmin, isCategoryAdmin, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
 
 interface ServerSettingPopupProps {
   serverId: Server['serverId'];
@@ -433,13 +434,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                       createdAt: memberJoinDate,
                     } = member;
                     const isCurrentUser = memberUserId === userId;
-                    const canManageMember = !isCurrentUser && userPermission > 4 && userPermission > memberPermission;
-                    const canEditNickname = canManageMember || (isCurrentUser && userPermission > 1);
-                    const canChangeToGuest = canManageMember && memberPermission !== 1 && userPermission > 4;
-                    const canChangeToMember = canManageMember && memberPermission !== 2 && (memberPermission > 1 || userPermission > 5);
-                    const canChangeToChannelAdmin = canManageMember && memberPermission !== 3 && memberPermission > 1 && userPermission > 3;
-                    const canChangeToCategoryAdmin = canManageMember && memberPermission !== 4 && memberPermission > 1 && userPermission > 4;
-                    const canChangeToAdmin = canManageMember && memberPermission !== 5 && memberPermission > 1 && userPermission > 5;
+                    const canManageMember = !isCurrentUser && isServerAdmin(userPermission) && !isStaff(memberPermission) && userPermission > memberPermission;
+                    const canEditNickname = canManageMember || (isCurrentUser && isMember(userPermission));
+                    const canChangeToGuest = canManageMember && isMember(memberPermission);
+                    const canChangeToMember = canManageMember && isMember(memberPermission) && !isMember(memberPermission, false);
+                    const canChangeToChannelAdmin = canManageMember && isMember(memberPermission) && !isChannelAdmin(memberPermission);
+                    const canChangeToCategoryAdmin = canManageMember && isMember(memberPermission) && !isCategoryAdmin(memberPermission);
+                    const canChangeToAdmin = canManageMember && isMember(memberPermission) && !isServerAdmin(memberPermission) && isServerOwner(userPermission);
 
                     return (
                       <tr
@@ -612,8 +613,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   {filteredApplications.map((application) => {
                     const { userId: applicationUserId, name: applicationName, description: applicationDescription, createdAt: applicationCreatedAt } = application;
                     const isCurrentUser = applicationUserId === userId;
-                    const canAccept = !isCurrentUser && userPermission > 4;
-                    const canDeny = !isCurrentUser && userPermission > 4;
+                    const canAccept = !isCurrentUser && isServerAdmin(userPermission);
+                    const canDeny = !isCurrentUser && isServerAdmin(userPermission);
                     return (
                       <tr
                         key={applicationUserId}

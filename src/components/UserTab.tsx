@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { use, useEffect, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -20,6 +20,9 @@ import BadgeListViewer from '@/components/BadgeList';
 
 // Services
 import ipcService from '@/services/ipc.service';
+
+// Utils
+import { isMember, isChannelAdmin, isCategoryAdmin, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
 
 interface UserTabProps {
   member: Member;
@@ -55,6 +58,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   } = member;
   const { userId, serverId, permissionLevel: userPermission, lobbyId: serverLobbyId } = currentServer;
   const { channelId: currentChannelId } = currentChannel;
+
   const isCurrentUser = memberUserId === userId;
   const isSameChannel = memberCurrentChannelId === currentChannelId;
   const speakingStatus = webRTC.volumePercent?.[memberUserId];
@@ -64,19 +68,21 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
   const isMuted = speakingStatus === -1;
   const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
   const isFriend = friends.some((fd) => fd.targetId === memberUserId);
-  const isServerAdmin = userPermission >= 5;
-  const canApplyFriend = !isFriend && !isCurrentUser;
-  const canManageMember = !isCurrentUser && userPermission > 4 && memberPermission < 6 && userPermission > memberPermission;
-  const canEditNickname = (canManageMember && memberPermission != 1) || (isCurrentUser && userPermission > 1);
-  const canChangeToGuest = canManageMember && memberPermission !== 1 && userPermission > 4;
-  const canChangeToMember = canManageMember && memberPermission !== 2 && (memberPermission > 1 || userPermission > 5);
-  const canChangeToChannelAdmin = canManageMember && memberPermission !== 3 && memberPermission > 1 && userPermission > 3;
-  const canChangeToCategoryAdmin = canManageMember && memberPermission !== 4 && memberPermission > 1 && userPermission > 4;
-  const canChangeToAdmin = canManageMember && memberPermission !== 5 && memberPermission > 1 && userPermission > 5;
+
+  const canManageMember = !isCurrentUser && isServerAdmin(userPermission) && !isStaff(memberPermission) && userPermission > memberPermission;
+  const canChangeToGuest = canManageMember && isMember(memberPermission);
+  const canChangeToMember = canManageMember && isMember(memberPermission) && !isMember(memberPermission, false);
+  const canChangeToChannelAdmin = canManageMember && isMember(memberPermission) && !isChannelAdmin(memberPermission) && isCategoryAdmin(userPermission);
+  const canChangeToCategoryAdmin = canManageMember && isMember(memberPermission) && !isCategoryAdmin(memberPermission) && isServerAdmin(userPermission);
+  const canChangeToAdmin = canManageMember && isMember(memberPermission) && !isServerAdmin(memberPermission) && isServerOwner(userPermission);
+
   const canKickServer = canManageMember && memberCurrentServerId === serverId;
   const canKickChannel = canManageMember && memberCurrentChannelId !== serverLobbyId;
-  const canMoveToChannel = isServerAdmin && userPermission >= memberPermission && memberCurrentChannelId !== currentChannelId;
-  const canRemoveMembership = isCurrentUser && userPermission > 1 && userPermission < 6;
+  const canMoveToChannel = isServerAdmin(userPermission) && !isServerOwner(memberPermission) && memberCurrentChannelId !== currentChannelId;
+
+  const canEditNickname = (canManageMember && isMember(memberPermission)) || (isCurrentUser && isMember(userPermission));
+  const canRemoveMembership = isCurrentUser && isMember(userPermission) && !isServerOwner(userPermission);
+  const canApplyFriend = !isFriend && !isCurrentUser;
 
   const statusIcon = () => {
     if (isMuted || isMutedByUser) return 'muted';
@@ -178,7 +184,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, friends, currentCh
         const y = userTabRef.current.getBoundingClientRect().top;
         contextMenu.showUserInfoBlock(x, y, false, member);
       }}
-      draggable={isServerAdmin && !isCurrentUser}
+      draggable={userPermission >= memberPermission && !isCurrentUser}
       onDragStart={(e) => handleDragStart(e, memberUserId, memberCurrentChannelId)}
       onContextMenu={(e) => {
         e.stopPropagation();
