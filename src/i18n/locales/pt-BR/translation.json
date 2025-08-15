@@ -233,7 +233,7 @@
   "remove-admin": "Remover permissão de administrador",
   "remove-channel-mod": "Remover moderador do canal",
   "remove-channel-admin": "Remover permissão de Moderador",
-  "remove-self-membership": "Remover cargo de Membro",
+  "remove-self-membership": "解除會員關係",
   "rename-friend-group": "Renomear grupo",
   "repeat-input-password": "重複輸入密碼",
   "save": "Salvar",
