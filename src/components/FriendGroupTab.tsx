@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/friend.module.css';
@@ -35,13 +35,19 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
   // Variables
   const { userId } = user;
   const { friendGroupId, name: friendGroupName } = friendGroup;
-  const friendGroupFriends = !friendGroupId
-    ? friends.filter((fd) => !fd.friendGroupId && !fd.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)) // Default
-    : friendGroupId === 'blacklist'
-      ? friends.filter((fd) => fd.isBlocked) // Blacklist
-      : friends.filter((fd) => fd.friendGroupId === friendGroupId && !fd.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Other
-  const friendsOnlineCount = friendGroupFriends.filter((fd) => fd.status !== 'offline').length;
-  const canManageFriendGroup = !['', 'blocked', 'outlander'].includes(friendGroupId);
+
+  // Memos
+  const friendGroupFriends = useMemo(() => {
+    return !friendGroupId
+      ? friends.filter((fd) => !fd.friendGroupId && !fd.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)) // Default
+      : friendGroupId === 'blacklist'
+        ? friends.filter((fd) => fd.isBlocked) // Blacklist
+        : friends.filter((fd) => fd.friendGroupId === friendGroupId && !fd.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Other
+  }, [friendGroupId, friends]);
+
+  const friendsOnlineCount = useMemo(() => {
+    return friendGroupFriends.filter((fd) => fd.status !== 'offline').length;
+  }, [friendGroupFriends]);
 
   // Handlers
   const handleDeleteFriendGroup = (friendGroupId: FriendGroup['friendGroupId']) => {
@@ -64,21 +70,19 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
         className={`${styles['friend-group-tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''}`}
         onClick={() => setExpanded((prev) => !prev)}
         onContextMenu={(e) => {
-          const defaultFriendGroupKeys = new Set(['stranger', 'blacklist']);
-          if (defaultFriendGroupKeys.has(friendGroupId)) return;
           const x = e.clientX;
           const y = e.clientY;
           contextMenu.showContextMenu(x, y, false, false, [
             {
               id: 'edit-friend-group',
               label: t('edit-friend-group'),
-              show: canManageFriendGroup,
+              show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
               onClick: () => handleOpenEditFriendGroup(userId, friendGroupId),
             },
             {
               id: 'delete-friend-group',
               label: t('delete-friend-group'),
-              show: canManageFriendGroup,
+              show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
               onClick: () => handleDeleteFriendGroup(friendGroupId),
             },
           ]);

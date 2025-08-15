@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/friend.module.css';
@@ -60,9 +60,11 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     currentServerId: friendCurrentServerId,
   } = friend;
   const { name: friendServerName } = friendServer;
-  const isCurrentUser = friendTargetId === friendUserId;
-  const canManageFriend = !isCurrentUser && !friendIsBlocked;
-  const isFriendOnline = friendStatus !== 'offline' && !friendIsBlocked;
+
+  // Memos
+  const isUser = useMemo(() => {
+    return friendUserId === user.userId;
+  }, [friendUserId, user.userId]);
 
   // Handlers
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
@@ -119,6 +121,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
       key={friendTargetId}
       className={`${styles['friend-tab']} ${selectedItemId === `${friendTargetId}` ? styles['selected'] : ''}`}
       onClick={() => setSelectedItemId(friendTargetId)}
+      onDoubleClick={() => handleOpenDirectMessage(friendUserId, friendTargetId, friendName)}
       onContextMenu={(e) => {
         const x = e.clientX;
         const y = e.clientY;
@@ -126,45 +129,43 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           {
             id: 'direct-message',
             label: t('direct-message'),
-            show: !isCurrentUser,
+            show: !isUser,
             onClick: () => handleOpenDirectMessage(friendUserId, friendTargetId, friendName),
           },
           {
             id: 'separator',
             label: '',
-            show: !isCurrentUser,
+            show: !isUser,
           },
           {
             id: 'view-profile',
             label: t('view-profile'),
-            show: !isCurrentUser,
+            show: !isUser,
             onClick: () => handleOpenUserInfo(friendUserId, friendTargetId),
           },
           {
             id: 'edit-note',
             label: t('edit-note'),
-            show: canManageFriend,
+            show: !isUser && !friendIsBlocked,
             disabled: true,
             onClick: () => {
-              /* handleFriendNote() */
+              /* TODO: handleFriendNote() */
             },
           },
           {
             id: 'separator',
             label: '',
-            show: !isCurrentUser,
           },
           {
             id: 'permission-setting',
             label: t('permission-setting'),
-            show: canManageFriend && !friendIsBlocked,
+            show: !isUser && !friendIsBlocked,
             icon: 'submenu',
             hasSubmenu: true,
             submenuItems: [
               {
                 id: 'set-hide-or-show-online-to-friend',
                 label: t('hide-online-to-friend'),
-                show: canManageFriend && !friendIsBlocked,
                 disabled: true,
                 onClick: () => {
                   /* TODO: handlePrivateFriend() */
@@ -173,7 +174,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
               {
                 id: 'set-notify-friend-online',
                 label: t('notify-friend-online'),
-                show: canManageFriend && !friendIsBlocked,
                 disabled: true,
                 onClick: () => {
                   /* TODO: handleNotifyFriendOnline() */
@@ -184,29 +184,28 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           {
             id: 'edit-friend-group',
             label: t('edit-friend-group'),
-            show: canManageFriend && !friendIsBlocked,
+            show: !isUser && !friendIsBlocked,
             onClick: () => handleOpenEditFriend(friendUserId, friendTargetId),
           },
           {
             id: 'set-block',
             label: friendIsBlocked ? t('unblock') : t('block'),
-            show: !isCurrentUser,
+            show: !isUser,
             onClick: () => handleBlockFriend(friendTargetId, friendIsBlocked),
           },
           {
             id: 'delete-friend',
             label: t('delete-friend'),
-            show: !isCurrentUser,
+            show: !isUser,
             onClick: () => handleDeleteFriend(friendTargetId),
           },
         ]);
       }}
-      onDoubleClick={() => handleOpenDirectMessage(friendUserId, friendTargetId, friendName)}
     >
       <div
         className={styles['avatar-picture']}
-        style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: !isFriendOnline ? 'grayscale(100%)' : '' }}
-        datatype={isFriendOnline && friendStatus !== 'online' ? friendStatus : ''}
+        style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: friendStatus === 'offline' ? 'grayscale(100%)' : '' }}
+        datatype={friendStatus !== 'online' ? friendStatus : ''}
       />
       <div className={styles['base-info-wrapper']}>
         <div className={styles['box']}>
@@ -215,7 +214,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, friendLevel)}`]}`} />
           <BadgeList badges={friendBadges} maxDisplay={5} />
         </div>
-        {isFriendOnline && friendCurrentServerId ? (
+        {friendStatus !== 'offline' && friendCurrentServerId ? (
           <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendCurrentServerId, friendServer.displayId)}>
             <div className={styles['location-icon']} />
             <div className={styles['server-name-text']}>{friendServerName}</div>

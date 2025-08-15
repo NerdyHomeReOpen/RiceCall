@@ -25,11 +25,11 @@ import getService from '@/services/get.service';
 import Default from '@/utils/default';
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
-import { isMember, isChannelAdmin, isCategoryAdmin, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
+import { isMember, isServerAdmin } from '@/utils/permission';
 
 interface ServerSettingPopupProps {
-  serverId: Server['serverId'];
   userId: User['userId'];
+  serverId: Server['serverId'];
 }
 
 const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serverId, userId }) => {
@@ -41,6 +41,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const refreshRef = useRef(false);
 
   // States
+  const [user, setUser] = useState<User>(Default.user());
   const [server, setServer] = useState<Server>(Default.server());
   const [serverMembers, setServerMembers] = useState<Member[]>([]);
   const [memberApplications, setMemberApplications] = useState<MemberApplication[]>([]);
@@ -51,6 +52,24 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const [showPreview, setShowPreview] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [selectedRowType, setSelectedRowType] = useState<string | null>(null);
+
+  // Variables
+  const { permissionLevel: globalPermission } = user;
+  const {
+    name: serverName,
+    avatar: serverAvatar,
+    avatarUrl: serverAvatarUrl,
+    announcement: serverAnnouncement,
+    description: serverDescription,
+    type: serverType,
+    displayId: serverDisplayId,
+    slogan: serverSlogan,
+    level: serverLevel,
+    wealth: serverWealth,
+    createdAt: serverCreatedAt,
+    visibility: serverVisibility,
+    permissionLevel: serverPermission,
+  } = server;
 
   // Memos
   const MEMBER_FIELDS = useMemo(
@@ -77,42 +96,44 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     ],
     [t],
   );
+
+  const permissionLevel = useMemo(() => {
+    return Math.max(globalPermission, serverPermission);
+  }, [globalPermission, serverPermission]);
+
   const filteredMembers = useMemo(() => {
     const searchLower = searchText.toLowerCase();
     const list = serverMembers.filter((m) => m.permissionLevel > 1 && (m.nickname?.toLowerCase().includes(searchLower) || m.name.toLowerCase().includes(searchLower)));
     return list.sort(Sorter(sortField as keyof Member, sortDirection));
   }, [serverMembers, searchText, sortField, sortDirection]);
+
   const filteredBlockMembers = useMemo(() => {
     const searchLower = searchText.toLowerCase();
     const list = serverMembers.filter((m) => (m.isBlocked === -1 || m.isBlocked > Date.now()) && (m.nickname?.toLowerCase().includes(searchLower) || m.name.toLowerCase().includes(searchLower)));
     return list.sort(Sorter(sortField as keyof Member, sortDirection));
   }, [serverMembers, searchText, sortField, sortDirection]);
+
   const filteredApplications = useMemo(() => {
     const searchLower = searchText.toLowerCase();
     const list = memberApplications.filter((a) => a.name.toLowerCase().includes(searchLower) || a.description.toLowerCase().includes(searchLower));
     return list.sort(Sorter(sortField as keyof MemberApplication, sortDirection));
   }, [memberApplications, searchText, sortField, sortDirection]);
 
-  // Variables
-  const {
-    name: serverName,
-    avatar: serverAvatar,
-    avatarUrl: serverAvatarUrl,
-    announcement: serverAnnouncement,
-    description: serverDescription,
-    type: serverType,
-    displayId: serverDisplayId,
-    slogan: serverSlogan,
-    level: serverLevel,
-    wealth: serverWealth,
-    createdAt: serverCreatedAt,
-    visibility: serverVisibility,
-    permissionLevel: userPermission,
-  } = server;
-  const totalMembers = serverMembers.length;
-  const totalApplications = memberApplications.length;
-  const totalBlockMembers = serverMembers.filter((m) => m.isBlocked === -1 || m.isBlocked > Date.now()).length;
-  const canSubmit = serverName.trim();
+  const totalMembers = useMemo(() => {
+    return serverMembers.filter((m) => m.permissionLevel > 1).length;
+  }, [serverMembers]);
+
+  const totalApplications = useMemo(() => {
+    return memberApplications.length;
+  }, [memberApplications]);
+
+  const totalBlockMembers = useMemo(() => {
+    return serverMembers.filter((m) => m.isBlocked === -1 || m.isBlocked > Date.now()).length;
+  }, [serverMembers]);
+
+  const canSubmit = useMemo(() => {
+    return serverName.trim();
+  }, [serverName]);
 
   // Handlers
   const handleApproveMemberApplication = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -129,6 +150,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
   const handleEditMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
     ipcService.socket.send('editMember', { userId, serverId, update });
+  };
+
+  const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
+    ipcService.socket.send('editServerPermission', { userId, serverId, update });
   };
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
@@ -237,11 +262,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     if (!serverId || refreshRef.current) return;
     const refresh = async () => {
       refreshRef.current = true;
+      getService.user({ userId: userId }).then((user) => {
+        if (user) setUser(user);
+      });
       getService.server({ userId: userId, serverId: serverId }).then((server) => {
         if (server) setServer(server);
       });
-      getService.members({ serverId: serverId }).then((members) => {
-        if (members) setServerMembers(members);
+      getService.serverMembers({ serverId: serverId }).then((serverMembers) => {
+        if (serverMembers) setServerMembers(serverMembers);
       });
       getService.memberApplications({ serverId: serverId }).then((applications) => {
         if (applications) setMemberApplications(applications);
@@ -429,15 +457,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                       contribution: memberContribution,
                       createdAt: memberJoinDate,
                     } = member;
-                    const isCurrentUser = memberUserId === userId;
-                    const canManageMember = !isCurrentUser && isServerAdmin(userPermission) && !isStaff(memberPermission) && userPermission > memberPermission;
-                    const canEditNickname = canManageMember || (isCurrentUser && isMember(userPermission));
-                    const canTerminateMember = canManageMember && isMember(memberPermission);
-                    const canChangeToMember = canManageMember && isMember(memberPermission) && !isMember(memberPermission, false);
-                    const canChangeToChannelAdmin = canManageMember && isMember(memberPermission) && !isChannelAdmin(memberPermission);
-                    const canChangeToCategoryAdmin = canManageMember && isMember(memberPermission) && !isCategoryAdmin(memberPermission);
-                    const canChangeToAdmin = canManageMember && isMember(memberPermission) && !isServerAdmin(memberPermission) && isServerOwner(userPermission);
-
+                    const isUser = memberUserId === userId;
+                    const isSuperior = permissionLevel > memberPermission;
                     return (
                       <tr
                         key={memberUserId}
@@ -447,77 +468,90 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                           setSelectedRowType('member');
                         }}
                         onContextMenu={(e) => {
-                          const isCurrentUser = memberUserId === userId;
                           const x = e.clientX;
                           const y = e.clientY;
                           contextMenu.showContextMenu(x, y, false, false, [
                             {
                               id: 'direct-message',
                               label: t('direct-message'),
-                              show: !isCurrentUser,
+                              show: !isUser,
                               onClick: () => handleOpenDirectMessage(userId, memberUserId, memberName),
                             },
                             {
                               id: 'view-profile',
                               label: t('view-profile'),
-                              show: !isCurrentUser,
                               onClick: () => handleOpenUserInfo(userId, memberUserId),
                             },
+                            // {
+                            //   id: 'add-friend',
+                            //   label: t('add-friend'),
+                            //   show: !isUser && !isFriend,
+                            //   onClick: () => handleOpenApplyFriend(userId, memberUserId),
+                            // },
                             {
                               id: 'edit-nickname',
                               label: t('edit-nickname'),
-                              show: canEditNickname,
+                              show: isMember(permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
                               onClick: () => handleOpenEditNickname(memberUserId, serverId),
                             },
                             {
                               id: 'separator',
                               label: '',
-                              show: canManageMember,
+                            },
+                            {
+                              id: 'separator',
+                              label: '',
+                            },
+                            {
+                              id: 'forbid-voice',
+                              label: t('forbid-voice'),
+                              show: !isUser && isMember(permissionLevel) && isSuperior,
+                              disabled: true,
+                              onClick: () => {},
+                            },
+                            {
+                              id: 'forbid-text',
+                              label: t('forbid-text'),
+                              show: !isUser && isMember(permissionLevel) && isSuperior,
+                              disabled: true,
+                              onClick: () => {},
                             },
                             {
                               id: 'block',
                               label: t('block'),
-                              show: canManageMember,
+                              show: !isUser && isMember(permissionLevel) && isSuperior,
                               onClick: () => {
                                 handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
                               },
                             },
                             {
+                              id: 'separator',
+                              label: '',
+                            },
+                            {
                               id: 'member-management',
                               label: t('member-management'),
-                              show: canManageMember,
+                              show: !isUser && isMember(memberPermission) && isSuperior,
                               icon: 'submenu',
                               hasSubmenu: true,
                               submenuItems: [
                                 {
                                   id: 'terminate-member',
                                   label: t('terminate-member'),
-                                  show: canTerminateMember,
-                                  onClick: () => handleTerminateMember(memberUserId, serverId, memberNickname || memberName),
+                                  show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission),
+                                  onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
                                 },
                                 {
                                   id: 'set-member',
                                   label: t('set-member'),
-                                  show: canChangeToMember,
-                                  onClick: () => handleEditMember(memberUserId, serverId, { permissionLevel: 2 }),
-                                },
-                                {
-                                  id: 'set-channel-mod',
-                                  label: t('set-channel-mod'),
-                                  show: canChangeToChannelAdmin,
-                                  onClick: () => handleEditMember(memberUserId, serverId, { permissionLevel: 3 }),
-                                },
-                                {
-                                  id: 'set-channel-admin',
-                                  label: t('set-channel-admin'),
-                                  show: canChangeToCategoryAdmin,
-                                  onClick: () => handleEditMember(memberUserId, serverId, { permissionLevel: 4 }),
+                                  show: !isUser && isMember(memberPermission) && isSuperior && !isMember(memberPermission, false),
+                                  onClick: () => handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 }),
                                 },
                                 {
                                   id: 'set-server-admin',
                                   label: t('set-server-admin'),
-                                  show: canChangeToAdmin,
-                                  onClick: () => handleEditMember(memberUserId, serverId, { permissionLevel: 5 }),
+                                  show: !isUser && isMember(memberPermission) && isSuperior && !isServerAdmin(memberPermission, false),
+                                  onClick: () => handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
                                 },
                               ],
                             },
@@ -602,9 +636,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 <tbody className={setting['table-container']}>
                   {filteredApplications.map((application) => {
                     const { userId: applicationUserId, name: applicationName, description: applicationDescription, createdAt: applicationCreatedAt } = application;
-                    const isCurrentUser = applicationUserId === userId;
-                    const canAccept = !isCurrentUser && isServerAdmin(userPermission);
-                    const canDeny = !isCurrentUser && isServerAdmin(userPermission);
+                    const isUser = applicationUserId === userId;
                     return (
                       <tr
                         key={applicationUserId}
@@ -620,13 +652,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                             {
                               id: 'view-profile',
                               label: t('view-profile'),
-                              show: !isCurrentUser,
+                              show: !isUser,
                               onClick: () => handleOpenUserInfo(userId, applicationUserId),
                             },
                             {
                               id: 'accept-application',
                               label: t('accept-application'),
-                              show: canAccept,
+                              show: !isUser && isServerAdmin(permissionLevel),
                               onClick: () => {
                                 handleApproveMemberApplication(applicationUserId, serverId);
                               },
@@ -634,7 +666,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                             {
                               id: 'deny-application',
                               label: t('deny-application'),
-                              show: canDeny,
+                              show: !isUser && isServerAdmin(permissionLevel),
                               onClick: () => {
                                 handleRejectMemberApplication(applicationUserId, serverId);
                               },

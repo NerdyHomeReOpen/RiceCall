@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
@@ -36,7 +36,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
 
   // Variables
   const { userId: senderUserId, name: senderName, vip: senderVip, gender: senderGender, permissionLevel: senderPermissionLevel, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
-  const isCurrentUser = senderUserId === userId;
   const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
   const formattedMessageContents = messageContents.map((content) => {
     return content
@@ -47,6 +46,11 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       })
       .join(' ');
   });
+
+  // Memos
+  const isUser = useMemo(() => {
+    return senderUserId === userId;
+  }, [senderUserId, userId]);
 
   // handles
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
@@ -73,7 +77,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
                 {
                   id: 'direct-message',
                   label: t('direct-message'),
-                  show: !isCurrentUser,
+                  show: !isUser,
                   onClick: () => handleOpenDirectMessage(userId, senderUserId, senderName),
                 },
                 {

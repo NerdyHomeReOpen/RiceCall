@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -18,7 +18,7 @@ import UserTab from '@/components/UserTab';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { isMember, isChannelAdmin, isServerAdmin } from '@/utils/permission';
+import { isMember, isServerAdmin, isChannelMod, isChannelAdmin } from '@/utils/permission';
 
 interface ChannelTabProps {
   user: User;
@@ -42,32 +42,43 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
   const { userId, permissionLevel: globalPermissionLevel, currentChannelId: userCurrentChannelId } = user;
   const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel } = channel;
   const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
-  const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
-  const channelMembers = serverMembers.filter((mb) => mb.currentChannelId === channelId);
-  const channelUserIds = channelMembers.map((mb) => mb.userId);
-  const userInChannel = userCurrentChannelId === channelId;
-  const isReceptionLobby = serverReceptionLobbyId === channelId;
-  const isLobby = serverLobbyId === channelId;
-  const needPassword = channelVisibility === 'private' && !isChannelAdmin(permissionLevel);
-  const canJoin =
-    !userInChannel &&
-    channelVisibility !== 'readonly' &&
-    !(channelVisibility === 'member' && !isMember(permissionLevel)) &&
-    (!channelUserLimit || channelUserLimit > channelMembers.length || isServerAdmin(permissionLevel));
-  const canManageChannel = isServerAdmin(permissionLevel);
-  const canCreate = canManageChannel && !channelCategoryId;
-  const canCreateSub = canManageChannel && !isLobby;
-  const canDelete = canManageChannel && !isLobby;
-  const canMoveAllUserToChannel = canManageChannel && !userInChannel && channelUserIds.length !== 0;
-  const canSetReceptionLobby = canManageChannel && !isReceptionLobby && channelVisibility !== 'private' && channelVisibility !== 'readonly';
+
+  // Memos
+  const permissionLevel = useMemo(() => {
+    return Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
+  }, [globalPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
+  const channelMembers = useMemo(() => {
+    return serverMembers.filter((mb) => mb.currentChannelId === channelId);
+  }, [serverMembers, channelId]);
+  const channelUserIds = useMemo(() => {
+    return channelMembers.map((mb) => mb.userId);
+  }, [channelMembers]);
+  const userInChannel = useMemo(() => {
+    return userCurrentChannelId === channelId;
+  }, [userCurrentChannelId, channelId]);
+  const isLobby = useMemo(() => {
+    return serverLobbyId === channelId;
+  }, [serverLobbyId, channelId]);
+  const isReceptionLobby = useMemo(() => {
+    return serverReceptionLobbyId === channelId;
+  }, [serverReceptionLobbyId, channelId]);
+  const canJoin = useMemo(() => {
+    return (
+      !userInChannel &&
+      channelVisibility !== 'readonly' &&
+      !(!isMember(permissionLevel) && channelVisibility === 'member') &&
+      (isServerAdmin(permissionLevel) || !channelUserLimit || channelUserLimit > channelMembers.length)
+    );
+  }, [userInChannel, channelVisibility, permissionLevel, channelUserLimit, channelMembers]);
 
   // Handlers
   const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
     ipcService.socket.send('editServer', { serverId, update });
   };
 
-  const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], password?: string) => {
-    ipcService.socket.send('connectChannel', { serverId, channelId, password });
+  const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    if (!isChannelMod(permissionLevel) && channelVisibility === 'private') handleOpenChannelPassword(serverId, channelId);
+    ipcService.socket.send('connectChannel', { serverId, channelId });
   };
 
   const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -100,7 +111,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
 
   const handleOpenChannelPassword = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
     ipcService.popup.open('channelPassword', 'channelPassword', { submitTo: 'channelPassword' });
-    ipcService.popup.onSubmit('channelPassword', (password) => handleConnectChannel(serverId, channelId, password));
+    ipcService.popup.onSubmit('channelPassword', (password) => ipcService.socket.send('connectChannel', { serverId, channelId, password }));
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
@@ -153,16 +164,15 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
         }}
         onDoubleClick={() => {
           if (!canJoin) return;
-          if (needPassword) {
-            handleOpenChannelPassword(serverId, channelId);
-          } else {
-            handleConnectChannel(serverId, channelId);
-          }
+          handleConnectChannel(serverId, channelId);
         }}
-        draggable={permissionLevel >= 5 && channelMembers.length !== 0}
+        draggable={isChannelMod(permissionLevel) && channelMembers.length > 0}
         onDragStart={(e) => handleDragStart(e, channelUserIds, channelId)}
         onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => handleDrop(e, serverId, channelId)}
+        onDrop={(e) => {
+          if (channelVisibility === 'readonly') return;
+          handleDrop(e, serverId, channelId);
+        }}
         onContextMenu={(e) => {
           e.stopPropagation();
           const x = e.clientX;
@@ -172,75 +182,66 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
               id: 'join-channel',
               label: t('join-channel'),
               show: canJoin,
-              onClick: () => {
-                if (needPassword) {
-                  handleOpenChannelPassword(serverId, channelId);
-                } else {
-                  handleConnectChannel(serverId, channelId);
-                }
-              },
+              onClick: () => handleConnectChannel(serverId, channelId),
             },
             {
               id: 'view-or-edit',
               label: t('view-or-edit'),
-              show: canManageChannel,
+              show: isChannelMod(permissionLevel),
               onClick: () => handleOpenChannelSetting(userId, serverId, channelId),
             },
             {
               id: 'separator',
               label: '',
-              show: canManageChannel,
             },
             {
               id: 'create-channel',
               label: t('create-channel'),
-              show: canCreate,
+              show: isServerAdmin(permissionLevel),
               onClick: () => handleOpenCreateChannel(serverId, null, userId),
             },
             {
               id: 'create-sub-channel',
               label: t('create-sub-channel'),
-              show: canCreateSub,
+              show: isChannelAdmin(permissionLevel),
               onClick: () => handleOpenCreateChannel(serverId, channelCategoryId ? channelCategoryId : channelId, userId),
             },
             {
               id: 'delete-channel',
               label: t('delete-channel'),
-              show: canDelete,
+              show: isServerAdmin(permissionLevel) && !isLobby,
               onClick: () => handleDeleteChannel(serverId, channelId),
             },
             {
               id: 'separator',
               label: '',
-              show: canManageChannel,
             },
             {
               id: 'broadcast',
               label: t('broadcast'),
-              show: canManageChannel,
+              show: isChannelMod(permissionLevel),
               onClick: () => handleOpenServerBroadcast(serverId, channelCategoryId ? channelCategoryId : channelId),
             },
             {
               id: 'move-all-user-to-channel',
               label: t('move-all-user-to-channel'),
-              show: canMoveAllUserToChannel,
+              show: isChannelMod(permissionLevel) && channelUserIds.length > 0,
               onClick: () => handleMoveAllToChannel(channelUserIds, serverId, userCurrentChannelId),
             },
             {
               id: 'edit-channel-order',
               label: t('edit-channel-order'),
-              show: canManageChannel,
+              show: isServerAdmin(permissionLevel),
               onClick: () => handleOpenEditChannelOrder(serverId, userId),
             },
             {
               id: 'separator',
               label: '',
-              show: canSetReceptionLobby,
             },
             {
               id: 'set-reception-lobby',
               label: t('set-reception-lobby'),
-              show: canSetReceptionLobby,
+              show: isServerAdmin(permissionLevel) && serverReceptionLobbyId !== channelId && channelVisibility !== 'private' && channelVisibility !== 'readonly',
               onClick: () => handleEditServer(serverId, { receptionLobbyId: channelId }),
             },
           ]);

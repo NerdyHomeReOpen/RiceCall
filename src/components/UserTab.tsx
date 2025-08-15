@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -22,7 +22,7 @@ import BadgeListViewer from '@/components/BadgeList';
 import ipcService from '@/services/ipc.service';
 
 // Utils
-import { isMember, isChannelAdmin, isCategoryAdmin, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
+import { isMember, isServerAdmin, isServerOwner, isChannelMod, isChannelAdmin } from '@/utils/permission';
 
 interface UserTabProps {
   user: User;
@@ -60,39 +60,46 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   } = member;
   const { channelId, permissionLevel: channelPermission, voiceMode: channelVoiceMode } = channel;
   const { serverId, permissionLevel: serverPermission, lobbyId: serverLobbyId } = server;
-  const permissionLevel = Math.max(globalPermission, serverPermission, channelPermission);
-  const isCurrentUser = memberUserId === userId;
-  const isSameChannel = memberCurrentChannelId === userCurrentChannelId;
-  const speakingStatus = webRTC.volumePercent?.[memberUserId];
-  const connectionStatus = webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
-  const isLoading = connectionStatus === 'connecting' || !connectionStatus;
-  const isSpeaking = !!speakingStatus;
-  const isMuted = speakingStatus === -1;
-  const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
-  const isFriend = friends.some((fd) => fd.targetId === memberUserId);
 
-  const canManageMember = !isCurrentUser && isServerAdmin(permissionLevel) && !isStaff(memberPermission) && permissionLevel > memberPermission;
-  const canTerminateMember = canManageMember && isMember(memberPermission);
-  const canChangeToMember = canManageMember && isMember(memberPermission) && !isMember(memberPermission, false);
-  const canChangeToChannelAdmin = canManageMember && isMember(memberPermission) && !isChannelAdmin(memberPermission) && isCategoryAdmin(permissionLevel);
-  const canChangeToCategoryAdmin = canManageMember && isMember(memberPermission) && !isCategoryAdmin(memberPermission) && isServerAdmin(permissionLevel);
-  const canChangeToAdmin = canManageMember && isMember(memberPermission) && !isServerAdmin(memberPermission) && isServerOwner(permissionLevel);
+  // Memos
+  const permissionLevel = useMemo(() => {
+    return Math.max(globalPermission, serverPermission, channelPermission);
+  }, [globalPermission, serverPermission, channelPermission]);
 
-  const canKickServer = canManageMember && memberCurrentServerId === serverId;
-  const canKickChannel = canManageMember && memberCurrentChannelId !== serverLobbyId;
-  const canMoveToChannel = isServerAdmin(permissionLevel) && !isServerOwner(memberPermission) && memberCurrentChannelId !== channelId;
+  const isUser = useMemo(() => {
+    return memberUserId === userId;
+  }, [memberUserId, userId]);
 
-  const canEditNickname = (canManageMember && isMember(memberPermission)) || (isCurrentUser && isMember(permissionLevel));
-  const canTerminateSelfMembership = isCurrentUser && isMember(permissionLevel) && !isServerOwner(permissionLevel);
-  const canApplyFriend = !isFriend && !isCurrentUser;
-  const canAddToQueue = !isCurrentUser && canManageMember && isSameChannel && channelVoiceMode === 'queue';
+  const isSameChannel = useMemo(() => {
+    return memberCurrentChannelId === userCurrentChannelId;
+  }, [memberCurrentChannelId, userCurrentChannelId]);
 
-  const statusIcon = () => {
-    if (isMuted || isMutedByUser) return 'muted';
-    if (!isCurrentUser && isSameChannel && isLoading) return 'loading';
+  const connectionStatus = useMemo(() => {
+    return webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
+  }, [memberUserId, webRTC.remoteUserStatusList]);
+
+  const isSpeaking = useMemo(() => {
+    return !!webRTC.volumePercent?.[memberUserId];
+  }, [memberUserId, webRTC.volumePercent]);
+
+  const isMuted = useMemo(() => {
+    return webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId);
+  }, [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
+
+  const isFriend = useMemo(() => {
+    return friends.some((fd) => fd.targetId === memberUserId);
+  }, [friends, memberUserId]);
+
+  const isSuperior = useMemo(() => {
+    return permissionLevel > memberPermission;
+  }, [permissionLevel, memberPermission]);
+
+  const statusIcon = useMemo(() => {
+    if (isMuted) return 'muted';
+    if (!isUser && isSameChannel && connectionStatus !== 'connected') return 'loading';
     if (isSpeaking) return 'play';
     return '';
-  };
+  }, [isUser, isSameChannel, isMuted, isSpeaking, connectionStatus]);
 
   // Handlers
   const handleMuteUser = (userId: User['userId']) => {
@@ -172,9 +179,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
 
   // Effect
   useEffect(() => {
-    if (!findMe || !isCurrentUser) return;
+    if (!findMe || !isUser) return;
     findMe.userTabRef.current = userTabRef.current;
-  }, [findMe, isCurrentUser]);
+  }, [findMe, isUser]);
 
   return (
     <div
@@ -191,7 +198,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         const y = userTabRef.current.getBoundingClientRect().top;
         contextMenu.showUserInfoBlock(x, y, false, member);
       }}
-      draggable={permissionLevel >= memberPermission && !isCurrentUser}
+      draggable={!isUser && isChannelMod(permissionLevel) && isSuperior}
       onDragStart={(e) => handleDragStart(e, memberUserId, channelId)}
       onContextMenu={(e) => {
         e.stopPropagation();
@@ -201,19 +208,19 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'join-user-channel',
             label: t('join-user-channel'),
-            show: !isCurrentUser && !isSameChannel,
+            show: !isUser && !isSameChannel,
             onClick: () => handleConnectChannel(serverId, channelId),
           },
           {
             id: 'add-to-queue',
             label: t('add-to-queue'),
-            show: canAddToQueue,
+            show: !isUser && isMember(permissionLevel) && isSuperior && isSameChannel && channelVoiceMode === 'queue',
             onClick: () => handleAddToQueue(memberUserId, serverId, channelId),
           },
           {
             id: 'direct-message',
             label: t('direct-message'),
-            show: !isCurrentUser,
+            show: !isUser,
             onClick: () => handleOpenDirectMessage(userId, memberUserId, memberName),
           },
           {
@@ -224,55 +231,53 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'add-friend',
             label: t('add-friend'),
-            show: canApplyFriend,
+            show: !isUser && !isFriend,
             onClick: () => handleOpenApplyFriend(userId, memberUserId),
           },
           {
             id: 'set-mute',
-            label: isMutedByUser ? t('unmute') : t('mute'),
-            show: !isCurrentUser,
-            onClick: () => (isMutedByUser ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
+            label: isMuted ? t('unmute') : t('mute'),
+            show: !isUser,
+            onClick: () => (isMuted ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
           },
           {
             id: 'edit-nickname',
             label: t('edit-nickname'),
-            show: canEditNickname,
+            show: isMember(permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
             onClick: () => handleOpenEditNickname(memberUserId, serverId),
           },
           {
             id: 'separator',
             label: '',
-            show: canMoveToChannel,
           },
           {
             id: 'move-to-channel',
             label: t('move-to-channel'),
-            show: canMoveToChannel,
+            show: !isUser && isChannelMod(permissionLevel) && !isSameChannel && isSuperior,
             onClick: () => handleMoveToChannel(memberUserId, serverId, userCurrentChannelId),
           },
           {
             id: 'separator',
             label: '',
-            show: canManageMember,
           },
           {
             id: 'forbid-voice',
             label: t('forbid-voice'),
-            show: canManageMember,
+            show: !isUser && isMember(permissionLevel) && isSuperior,
             disabled: true,
             onClick: () => {},
           },
           {
             id: 'forbid-text',
             label: t('forbid-text'),
-            show: canManageMember,
+            show: !isUser && isMember(permissionLevel) && isSuperior,
             disabled: true,
             onClick: () => {},
           },
           {
             id: 'kick-channel',
             label: t('kick-channel'),
-            show: canKickChannel,
+            show: !isUser && isChannelMod(permissionLevel) && isSuperior && memberCurrentChannelId !== serverLobbyId,
             onClick: () => {
               handleKickToLobbyChannel(memberUserId, channelId, serverId, memberNickname || memberName);
             },
@@ -280,7 +285,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'kick-server',
             label: t('kick-server'),
-            show: canKickServer,
+            show: !isUser && isServerAdmin(permissionLevel) && isSuperior && memberCurrentServerId === serverId,
             onClick: () => {
               handleKickFromServer(memberUserId, serverId, memberNickname || memberName);
             },
@@ -288,7 +293,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'block',
             label: t('block'),
-            show: canManageMember,
+            show: !isUser && isMember(permissionLevel) && isSuperior,
             onClick: () => {
               handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
             },
@@ -296,12 +301,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'separator',
             label: '',
-            show: canManageMember || canTerminateMember,
           },
           {
             id: 'terminate-self-membership',
             label: t('terminate-self-membership'),
-            show: canTerminateSelfMembership,
+            show: isUser && isMember(permissionLevel) && !isServerOwner(permissionLevel),
             onClick: () => {
               handleTerminateMember(userId, serverId, t('self'));
             },
@@ -309,7 +313,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'invite-to-be-member',
             label: t('invite-to-be-member'),
-            show: canManageMember && memberPermission === 1,
+            show: !isUser && isServerAdmin(permissionLevel),
             onClick: () => {
               handleSendMemberInvitation(memberUserId, serverId);
             },
@@ -317,38 +321,38 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'member-management',
             label: t('member-management'),
-            show: canManageMember && memberPermission > 1,
+            show: !isUser && isMember(memberPermission) && isSuperior,
             icon: 'submenu',
             hasSubmenu: true,
             submenuItems: [
               {
                 id: 'terminate-member',
                 label: t('terminate-member'),
-                show: canTerminateMember,
+                show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission),
                 onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
               },
               {
                 id: 'set-member',
                 label: t('set-member'),
-                show: canChangeToMember,
+                show: !isUser && isMember(memberPermission) && isSuperior && !isMember(memberPermission, false),
                 onClick: () => handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 }),
               },
               {
                 id: 'set-channel-mod',
                 label: t('set-channel-mod'),
-                show: canChangeToChannelAdmin,
+                show: !isUser && isMember(memberPermission) && isSuperior && !isChannelMod(memberPermission, false),
                 onClick: () => handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 3 }),
               },
               {
                 id: 'set-channel-admin',
                 label: t('set-channel-admin'),
-                show: canChangeToCategoryAdmin,
+                show: !isUser && isMember(memberPermission) && isSuperior && !isChannelAdmin(memberPermission, false),
                 onClick: () => handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 4 }),
               },
               {
                 id: 'set-server-admin',
                 label: t('set-server-admin'),
-                show: canChangeToAdmin,
+                show: !isUser && isMember(memberPermission) && isSuperior && !isServerAdmin(memberPermission, false),
                 onClick: () => handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
               },
             ],
@@ -356,13 +360,13 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         ]);
       }}
     >
-      <div className={`${styles['user-audio-state']} ${styles[statusIcon()]}`} title={!isCurrentUser ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
+      <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} title={!isUser ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
       <BadgeListViewer badges={memberBadges} maxDisplay={5} />
-      {isCurrentUser && <div className={styles['my-location-icon']} />}
+      {isUser && <div className={styles['my-location-icon']} />}
     </div>
   );
 });

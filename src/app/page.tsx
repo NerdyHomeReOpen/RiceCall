@@ -63,24 +63,43 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
+  // Variables
   const { userId, name: userName, status: userStatus } = user;
   const { serverId, name: serverName } = server;
 
-  // Variables
-  const hasNotify = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotify.length !== 0;
+  // Memos
+  const hasNotify = useMemo(() => {
+    return friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotify.length !== 0;
+  }, [friendApplications, memberInvitations, systemNotify]);
 
-  // Constants
-  const MAIN_TABS = [
-    { id: 'home', label: t('home') },
-    { id: 'friends', label: t('friends') },
-    { id: 'server', label: serverName },
-  ];
-  const STATUS_OPTIONS = [
-    { status: 'online', label: t('online') },
-    { status: 'dnd', label: t('dnd') },
-    { status: 'idle', label: t('idle') },
-    { status: 'gn', label: t('gn') },
-  ];
+  const hasFriendApplication = useMemo(() => {
+    return friendApplications.length !== 0;
+  }, [friendApplications]);
+
+  const hasMemberInvitation = useMemo(() => {
+    return memberInvitations.length !== 0;
+  }, [memberInvitations]);
+
+  const hasSystemNotify = useMemo(() => {
+    return systemNotify.length !== 0;
+  }, [systemNotify]);
+
+  const mainTabs = useMemo(() => {
+    return [
+      { id: 'home', label: t('home') },
+      { id: 'friends', label: t('friends') },
+      { id: 'server', label: serverName },
+    ];
+  }, [t, serverName]);
+
+  const statusOptions = useMemo(() => {
+    return [
+      { status: 'online', label: t('online') },
+      { status: 'dnd', label: t('dnd') },
+      { status: 'idle', label: t('idle') },
+      { status: 'gn', label: t('gn') },
+    ];
+  }, [t]);
 
   // Handlers
   const handleLeaveServer = (serverId: Server['serverId']) => {
@@ -180,7 +199,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
           <div className={header['status-display']} datatype={userStatus} />
           <div className={header['status-triangle']} />
           <div className={`${header['status-dropdown']} ${showStatusDropdown ? '' : header['hidden']}`}>
-            {STATUS_OPTIONS.map((option) => (
+            {statusOptions.map((option) => (
               <div
                 key={option.status}
                 className={header['option']}
@@ -197,7 +216,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
 
       {/* Main Tabs */}
       <div className={header['main-tabs']}>
-        {MAIN_TABS.map((Tab) => {
+        {mainTabs.map((Tab) => {
           const TabId = Tab.id;
           const TabLable = Tab.label;
           const TabClose = TabId === 'server';
@@ -254,7 +273,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                 id: 'friend-applications',
                 label: `好友驗證`, // TODO: t('friend-applications'),
                 icon: 'notify',
-                show: friendApplications.length !== 0,
+                show: hasFriendApplication,
                 contentType: 'image',
                 showContentLength: true,
                 showContent: true,
@@ -265,7 +284,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                 id: 'member-invitations',
                 label: `語音群邀請`, // TODO: t('member-invitations'),
                 icon: 'notify',
-                show: memberInvitations.length !== 0,
+                show: hasMemberInvitation,
                 contentType: 'image',
                 showContentLength: true,
                 showContent: true,
@@ -276,7 +295,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                 id: 'system-notify',
                 label: `系統通知`, // TODO: t('system-notify'),
                 icon: 'notify',
-                show: systemNotify.length !== 0,
+                show: hasSystemNotify,
                 showContentLength: true,
                 showContent: false,
                 contents: memberInvitations.map((mi) => mi.avatarUrl),
@@ -414,12 +433,17 @@ const RootPageComponent = () => {
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
 
-  // Memos
-  const server = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
-  const channel = useMemo(() => serverChannels.find((item) => item.channelId === user.currentChannelId) || Default.channel(), [serverChannels, user.currentChannelId]);
-
   // Variables
   const { userId } = user;
+
+  // Memos
+  const server = useMemo(() => {
+    return servers.find((item) => item.serverId === user.currentServerId) || Default.server();
+  }, [servers, user.currentServerId]);
+
+  const channel = useMemo(() => {
+    return serverChannels.find((item) => item.channelId === user.currentChannelId) || Default.channel();
+  }, [serverChannels, user.currentChannelId]);
 
   // Handlers
   const handleUserUpdate = (...args: { update: Partial<User> }[]) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -51,16 +51,20 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const [memberApplicationsCount, setMemberApplicationsCount] = useState<number>(0);
 
   // Variables
-  const connectStatus = 4 - Math.floor(Number(latency) / 50);
   const { userId, permissionLevel: globalPermissionLevel } = user;
   const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, receiveApply: serverReceiveApply, permissionLevel: serverPermissionLevel, favorite: isFavorite } = server;
-  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby, permissionLevel: currentChannelPermissionLevel } = channel;
-  const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel);
-  const isVerifiedServer = false;
-  const canEditNickname = isMember(permissionLevel);
-  const canApplyMember = !isMember(permissionLevel);
-  const canOpenSettings = isServerAdmin(permissionLevel);
-  const canManageChannel = isServerAdmin(permissionLevel);
+  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = channel;
+
+  // Memos
+  const connectStatus = useMemo(() => {
+    return 4 - Math.floor(Number(latency) / 50);
+  }, [latency]);
+
+  const permissionLevel = useMemo(() => {
+    return Math.max(globalPermissionLevel, serverPermissionLevel);
+  }, [globalPermissionLevel, serverPermissionLevel]);
+
+  const isVerifiedServer = useMemo(() => false, []); // TODO: implement
 
   // Handlers
   const handleFavoriteServer = (serverId: Server['serverId']) => {
@@ -150,7 +154,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
         <div
           className={styles['avatar-box']}
           onClick={() => {
-            if (!canOpenSettings) return;
+            if (!isServerAdmin(permissionLevel)) return;
             handleOpenServerSetting(userId, serverId);
           }}
         >
@@ -183,27 +187,26 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                     {
                       id: 'apply-member',
                       label: t('apply-member'),
-                      show: canApplyMember,
+                      show: !isMember(permissionLevel),
                       icon: 'applyMember',
                       onClick: () => handleOpenApplyMember(userId, serverId),
                     },
                     {
                       id: 'member-management',
                       label: t('member-management'),
-                      show: canOpenSettings,
+                      show: isServerAdmin(permissionLevel),
                       icon: 'memberManagement',
                       onClick: () => handleOpenServerSetting(userId, serverId),
                     },
                     {
                       id: 'separator',
-                      show: canOpenSettings || canApplyMember,
                       label: '',
                     },
                     {
                       id: 'edit-nickname',
                       label: t('edit-nickname'),
                       icon: 'editGroupcard',
-                      show: canEditNickname,
+                      show: isMember(permissionLevel),
                       onClick: () => handleOpenEditNickname(userId, serverId),
                     },
                     {
@@ -233,12 +236,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                   ]);
                 }}
               >
-                <div
-                  className={`
-                      ${header['overlay']}
-                      ${canOpenSettings && memberApplicationsCount > 0 ? header['new'] : ''}
-                    `}
-                />
+                <div className={`${header['overlay']} ${isServerAdmin(permissionLevel) && memberApplicationsCount > 0 ? header['new'] : ''}`} />
               </div>
             </div>
           </div>
@@ -281,18 +279,17 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
             {
               id: 'create-channel',
               label: t('create-channel'),
-              show: canManageChannel,
+              show: isServerAdmin(permissionLevel),
               onClick: () => handleOpenCreateChannel(serverId, null, ''),
             },
             {
               id: 'separator',
               label: '',
-              show: canManageChannel,
             },
             {
               id: 'edit-channel-order',
               label: t('edit-channel-order'),
-              show: canManageChannel,
+              show: isServerAdmin(permissionLevel),
               onClick: () => handleOpenChangeChannelOrder(userId, serverId),
             },
           ]);

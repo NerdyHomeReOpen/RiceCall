@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -19,9 +19,6 @@ import BadgeListViewer from '@/components/BadgeList';
 
 // Services
 import ipcService from '@/services/ipc.service';
-
-// Utils
-import { isMember } from '@/utils/permission';
 
 interface QueueMemberTabProps {
   user: User;
@@ -58,23 +55,42 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
   const { userId, permissionLevel: globalPermission } = user;
   const { serverId, permissionLevel: serverPermission } = server;
   const { channelId, permissionLevel: channelPermission } = channel;
-  const permissionLevel = Math.max(globalPermission, serverPermission, channelPermission);
-  const isCurrentUser = memberUserId === userId;
-  const isSameChannel = memberCurrentChannelId === channelId;
-  const speakingStatus = webRTC.volumePercent?.[memberUserId];
-  const connectionStatus = webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
-  const isLoading = connectionStatus === 'connecting' || !connectionStatus;
-  const isSpeaking = !!speakingStatus;
-  const isMuted = speakingStatus === -1;
-  const isMutedByUser = webRTC.mutedIds.includes(memberUserId);
-  const canManageMember = isMember(permissionLevel) && permissionLevel >= memberPermission;
 
-  const statusIcon = () => {
-    if (isMuted || isMutedByUser) return 'muted';
-    if (!isCurrentUser && isSameChannel && isLoading) return 'loading';
+  // Memos
+  const permissionLevel = useMemo(() => {
+    return Math.max(globalPermission, serverPermission, channelPermission);
+  }, [globalPermission, serverPermission, channelPermission]);
+
+  const isUser = useMemo(() => {
+    return memberUserId === userId;
+  }, [memberUserId, userId]);
+
+  const isSameChannel = useMemo(() => {
+    return memberCurrentChannelId === channelId;
+  }, [memberCurrentChannelId, channelId]);
+
+  const connectionStatus = useMemo(() => {
+    return webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
+  }, [memberUserId, webRTC.remoteUserStatusList]);
+
+  const isSpeaking = useMemo(() => {
+    return !!webRTC.volumePercent?.[memberUserId];
+  }, [memberUserId, webRTC.volumePercent]);
+
+  const isMuted = useMemo(() => {
+    return webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId);
+  }, [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
+
+  const isSuperior = useMemo(() => {
+    return permissionLevel > memberPermission;
+  }, [permissionLevel, memberPermission]);
+
+  const statusIcon = useMemo(() => {
+    if (isMuted) return 'muted';
+    if (!isUser && isSameChannel && connectionStatus !== 'connected') return 'loading';
     if (isSpeaking) return 'play';
     return '';
-  };
+  }, [isUser, isSameChannel, isMuted, isSpeaking, connectionStatus]);
 
   // Handlers
   const handleIncreaseQueueTime = () => {
@@ -123,38 +139,38 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
           {
             id: 'increase-queue-time',
             label: t('increase-queue-time'),
-            show: canManageMember,
+            show: isSuperior,
             onClick: () => handleIncreaseQueueTime(),
           },
           {
             id: 'move-up-queue',
             label: t('move-up-queue'),
-            show: canManageMember,
+            show: isSuperior,
             onClick: () => handleMoveUpQueue(memberUserId, serverId, channelId, memberPosition - 1),
           },
           {
             id: 'move-down-queue',
             label: t('move-down-queue'),
-            show: canManageMember,
+            show: isSuperior,
             onClick: () => handleMoveDownQueue(memberUserId, serverId, channelId, memberPosition + 1),
           },
           {
             id: 'remove-from-queue',
             label: t('remove-from-queue'),
-            show: canManageMember,
+            show: isSuperior,
             onClick: () => handleRemoveFromQueue(memberUserId, serverId, channelId),
           },
         ]);
       }}
     >
-      <div className={`${styles['user-audio-state']} ${styles[statusIcon()]}`} title={!isCurrentUser ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
+      <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} title={memberUserId !== userId ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
       <BadgeListViewer badges={memberBadges} maxDisplay={5} />
       {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}
-      {isCurrentUser && <div className={styles['my-location-icon']} />}
+      {isUser && <div className={styles['my-location-icon']} />}
     </div>
   );
 });

@@ -50,6 +50,11 @@ export const getService = {
     return servers;
   },
 
+  serverMembers: async ({ serverId }: { serverId: Server['serverId'] }): Promise<Member[] | []> => {
+    const serverMembers = await apiService.post('/serverMembers', { serverId });
+    return serverMembers;
+  },
+
   recommendServerList: async (): Promise<RecommendServerList | null> => {
     const recommendServerList = await apiService.post('/recommendServerList', {});
     return recommendServerList;
@@ -68,11 +73,6 @@ export const getService = {
   member: async ({ serverId, userId, channelId }: { userId: User['userId']; serverId: Server['serverId']; channelId?: Channel['channelId'] }): Promise<Member | null> => {
     const member = await apiService.post('/member', { userId, serverId, channelId });
     return member;
-  },
-
-  members: async ({ serverId, channelId }: { serverId: Server['serverId']; channelId?: Channel['channelId'] }): Promise<Member[] | []> => {
-    const members = await apiService.post('/members', { serverId, channelId });
-    return members;
   },
 
   memberApplication: async ({ userId, serverId }: { userId: User['userId']; serverId: Server['serverId'] }): Promise<MemberApplication | null> => {
