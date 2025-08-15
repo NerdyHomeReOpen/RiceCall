@@ -131,7 +131,7 @@
 .label {
   display: inline-block;
   min-height: 2rem;
-  width: max-content;
+  min-width: max-content;
   padding: 5px 5px 5px 0;
   white-space: normal;
   word-break: break-word;
