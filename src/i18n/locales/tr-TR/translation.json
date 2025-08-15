@@ -233,7 +233,7 @@
   "remove-admin": "Grup yöneticisini kaldır",
   "remove-channel-mod": "İkincil kanal yöneticilerini kaldırın",
   "remove-channel-admin": "Kanal moderatörlerini kaldır",
-  "remove-self-membership": "Üyeliğin İptali",
+  "remove-self-membership": "解除會員關係",
   "rename-friend-group": "Grubu Yeniden Adlandır",
   "repeat-input-password": "重複輸入密碼",
   "save": "kale",
