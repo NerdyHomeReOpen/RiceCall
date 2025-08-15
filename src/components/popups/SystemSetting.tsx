@@ -395,7 +395,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             <div className={popup['input-group']}>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('input-device')}</div>
-                <div className={popup['select-box']} style={{ maxWidth: '300px', minWidth: '0' }}>
+                <div className={popup['select-box']} style={{ width: '100%', minWidth: '0' }}>
                   <select value={selectedInput} onChange={(e) => setSelectedInput(e.target.value)}>
                     <option value="">
                       {t('default-microphone')} ({inputDevices[0]?.label || t('unknown-device')})
@@ -410,7 +410,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('output-device')}</div>
-                <div className={popup['select-box']} style={{ maxWidth: '300px', minWidth: '0' }}>
+                <div className={popup['select-box']} style={{ width: '100%', minWidth: '0' }}>
                   <select value={selectedOutput} onChange={(e) => setSelectedOutput(e.target.value)}>
                     <option value="">
                       {t('default-speaker')} ({outputDevices[0]?.label || t('unknown-device')})

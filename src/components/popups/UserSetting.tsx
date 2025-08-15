@@ -431,7 +431,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 </div>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('gender')}</div>
-                  <div className={popup['select-box']}>
+                  <div className={popup['select-box']} style={{ width: '100%' }}>
                     <select value={userGender} onChange={(e) => setUser((prev) => ({ ...prev, gender: e.target.value as User['gender'] }))}>
                       <option value="Male">{t('male')}</option>
                       <option value="Female">{t('female')}</option>
@@ -443,7 +443,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               <div className={popup['row']}>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('country')}</div>
-                  <div className={popup['select-box']}>
+                  <div className={popup['select-box']} style={{ width: '100%' }}>
                     <select value={userCountry} onChange={(e) => setUser((prev) => ({ ...prev, country: e.target.value }))}>
                       {countries.map((country) => (
                         <option key={country} value={country}>
@@ -457,7 +457,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   <div className={`${popup['input-box']} ${popup['col']}`}>
                     <div className={popup['label']}>{t('birthdate')}</div>
                     <div className={popup['row']}>
-                      <div className={popup['select-box']}>
+                      <div className={popup['select-box']} style={{ width: '100%' }}>
                         <select id="birthYear" value={userBirthYear} onChange={(e) => setUser((prev) => ({ ...prev, birthYear: Number(e.target.value) }))}>
                           {yearOptions.map((year) => (
                             <option key={year} value={year} disabled={year > CURRENT_YEAR}>
@@ -466,7 +466,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                           ))}
                         </select>
                       </div>
-                      <div className={popup['select-box']}>
+                      <div className={popup['select-box']} style={{ width: '100%' }}>
                         <select id="birthMonth" value={userBirthMonth} onChange={(e) => setUser((prev) => ({ ...prev, birthMonth: Number(e.target.value) }))}>
                           {monthOptions.map((month) => (
                             <option key={month} value={month} disabled={userBirthYear === CURRENT_YEAR && month > CURRENT_MONTH}>
@@ -475,7 +475,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                           ))}
                         </select>
                       </div>
-                      <div className={popup['select-box']}>
+                      <div className={popup['select-box']} style={{ width: '100%' }}>
                         <select id="birthDay" value={userBirthDay} onChange={(e) => setUser((prev) => ({ ...prev, birthDay: Number(e.target.value) }))}>
                           {dayOptions.map((day) => (
                             <option key={day} value={day} disabled={userBirthYear === CURRENT_YEAR && userBirthMonth === CURRENT_MONTH && day > CURRENT_DAY}>
