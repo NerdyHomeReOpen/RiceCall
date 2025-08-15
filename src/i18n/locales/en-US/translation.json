@@ -233,7 +233,7 @@
   "remove-admin": "Remove as server admin",
   "remove-channel-mod": "Remove channel moderator",
   "remove-channel-admin": "Remove as channel moderator",
-  "remove-self-membership": "Remove member status",
+  "remove-self-membership": "解除會員關係",
   "rename-friend-group": "Rename group",
   "repeat-input-password": "重複輸入密碼",
   "save": "Save",
