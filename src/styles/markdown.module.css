@@ -47,6 +47,7 @@
   align-items: center;
   cursor: text;
   white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .markdown-content .user-tag {
