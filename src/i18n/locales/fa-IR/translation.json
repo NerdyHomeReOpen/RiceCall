@@ -233,7 +233,7 @@
   "remove-admin": "پاک کردن ادمین سرور",
   "remove-channel-mod": "پاک کردن مدیر چنل",
   "remove-channel-admin": "پاک کردن ادمین چنل",
-  "remove-self-membership": "پاک کردن وضعیت عضو",
+  "remove-self-membership": "解除會員關係",
   "rename-friend-group": "تغییر نام گروه",
   "repeat-input-password": "重複輸入密碼",
   "save": "ذخیره کردن",
