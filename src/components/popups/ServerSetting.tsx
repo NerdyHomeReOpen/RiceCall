@@ -143,10 +143,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     ipcService.popup.open('memberApplySetting', 'memberApplySetting', { serverId, userId });
   };
 
-  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('applyFriend', 'applyFriend', { userId, targetId });
-  };
-
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
     ipcService.popup.open('editNickname', 'editNickname', { serverId, userId });
   };
@@ -466,12 +462,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                               label: t('view-profile'),
                               show: !isCurrentUser,
                               onClick: () => handleOpenUserInfo(userId, memberUserId),
-                            },
-                            {
-                              id: 'add-friend',
-                              label: t('add-friend'),
-                              show: !isCurrentUser,
-                              onClick: () => handleOpenApplyFriend(userId, memberUserId),
                             },
                             {
                               id: 'edit-nickname',
