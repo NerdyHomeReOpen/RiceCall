@@ -193,8 +193,7 @@ const Popup = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = [ipcService.initialData.on((data) => setInitialData(data))];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    ipcService.initialData.get((data) => setInitialData(data));
   }, []);
 
   return (

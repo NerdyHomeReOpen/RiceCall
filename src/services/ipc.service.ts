@@ -87,10 +87,9 @@ const ipcService = {
   },
 
   initialData: {
-    on: (callback: (data: any) => void) => {
+    get: (callback: (data: any) => void) => {
       if (!isElectron) return () => {};
-      ipcRenderer.once('initial-data', (_: any, data: any) => callback(data));
-      return () => ipcRenderer.removeAllListeners('initial-data');
+      ipcRenderer.invoke(`get-initial-data`).then((data: any) => callback(data));
     },
   },
 

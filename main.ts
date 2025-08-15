@@ -494,6 +494,9 @@ async function createPopup(type: PopupType, id: string, data: any, force = true)
     // popups[id].webContents.openDevTools();
   }
 
+  ipcMain.removeAllListeners('get-initial-data');
+  ipcMain.handleOnce('get-initial-data', () => data);
+
   popups[id].on('close', (e) => {
     e.preventDefault();
     popups[id].destroy();
@@ -504,7 +507,6 @@ async function createPopup(type: PopupType, id: string, data: any, force = true)
     popups[id].show();
     popups[id].focus();
     popups[id].setAlwaysOnTop(true);
-    setTimeout(() => popups[id].webContents.send('initial-data', data), 200);
   });
 
   popups[id].webContents.setWindowOpenHandler(({ url }) => {
