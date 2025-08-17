@@ -17,6 +17,7 @@ import MarkdownViewer from '@/components/MarkdownViewer';
 
 // Services
 import ipcService from '@/services/ipc.service';
+import { staff } from '../staff';
 
 const AboutPopup: React.FC = React.memo(() => {
   // Hooks
@@ -48,117 +49,6 @@ const AboutPopup: React.FC = React.memo(() => {
     [t],
   );
   const CURRENT_YEAR = useMemo(() => new Date().getFullYear(), []);
-  const TEAM_MEMBERS = useMemo(
-    () => [
-      {
-        title: t('developer'),
-        contact: 'JoshHuang9508',
-        info: [
-          { label: 'Github', value: 'JoshHuang9508' },
-          { label: 'Discord', value: '614396443016560649' },
-        ],
-      },
-      {
-        title: t('developer'),
-        contact: 'yeci226',
-        info: [
-          { label: 'Github', value: 'yeci226' },
-          { label: 'Discord', value: '283946584461410305' },
-        ],
-      },     
-      {
-        title: t('developer'),
-        contact: 'yuusukealmal',
-        info: [
-          { label: 'Github', value: 'yuusukealmal' },
-          { label: 'Discord', value: '878830839822176287' },
-        ],
-      },
-      {
-        title: t('developer'),
-        contact: 'cablate',
-        info: [
-          { label: 'Github', value: 'cablate' },
-          { label: 'Discord', value: '337525692356886538' },
-        ],
-      },
-      {
-        title: t('developer'),
-        contact: 'cstrikeasia',
-        info: [
-          { label: 'Github', value: 'cstrikeasia' },
-          { label: 'Discord', value: '789742073036144640' },
-        ],
-      },
-      {
-        title: t('developer'),
-        contact: 'Ramon96',
-        info: [
-          { label: 'Github', value: 'ramonPC96' },
-          { label: 'Discord', value: '493539043133620234' },
-        ],
-      },
-      {
-        title: t('developer'),
-        contact: 'Hockpond',
-        info: [
-          { label: 'Github', value: 'hockpond' },
-          { label: 'Discord', value: '174274660874059776' },
-        ],
-      },
-      {
-        title: t('machine-network'),
-        contact: 'Cooookie16',
-        info: [
-          { label: 'Github', value: 'Cooookie16' },
-          { label: 'Discord', value: '370537724362620930' },
-        ],
-      },
-      {
-        title: t('machine-network'),
-        contact: 'yayacat',
-        info: [
-          { label: 'Github', value: 'yayacat' },
-          { label: 'Discord', value: '107918754251325440' },
-        ],
-      },
-      {
-        title: t('machine-network'),
-        contact: 'codingbear',
-        info: [
-          { label: 'Github', value: 'mcg25035' },
-          { label: 'Discord', value: '492908862647697409' },
-        ],
-      },
-      {
-        title: t('technical-support'),
-        contact: 'orlys',
-        info: [
-          { label: 'Github', value: 'Orlys' },
-          { label: 'Discord', value: '385825577698983937' },
-        ],
-      },
-      {
-        title: t('technical-support'),
-        contact: '5026',
-        info: [
-          { label: 'Github', value: 'SN-Koarashi' },
-          { label: 'Discord', value: '198418020329062400' },
-        ],
-      },
-      {
-        title: t('customer-service'),
-        contact: 'lingyu1121',
-        info: [{ label: 'Discord', value: '371580417096155137' }],
-      },
-      {
-        title: t('customer-service'),
-        contact: 'goujuanji_',
-        info: [{ label: 'Discord', value: '415152218690420736' }],
-      },
-    ],
-    [t],
-  );
 
   return (
     <div className={`${popup['popup-wrapper']}`}>
@@ -186,32 +76,41 @@ const AboutPopup: React.FC = React.memo(() => {
 
           <div className={styles['team-members']}>
             <p>{t('team-members')}:</p>
-            {TEAM_MEMBERS.map((member, index) => {
-              const githubInfo = member.info.find((item) => item.label === 'Github' && item.value);
-              const discordInfo = member.info.find((item) => item.label === 'Discord' && item.value);
-              return (
-                <React.Fragment key={member.contact + index}>
-                  <div className={styles['team-member-card']}>
-                    <div className={styles['name-wrapper']}>
-                      <span className={`${styles['developer-title']} ${TITLE_COLOR_CLASSES[member.title]}`}>{member.title}</span>
-                      <span>{member.contact}</span>
+           {staff.map((member) => {
+            const githubInfo = member.github;
+            const discordInfo = member.discord;
+            return (
+              <div key={member.id} className={styles['team-member-card']}>
+                <div className={styles['name-wrapper']}>
+                  <span className={`${styles['developer-title']} ${TITLE_COLOR_CLASSES[t(member.title)]}`}>
+                    {t(member.title)}
+                  </span>
+                  <span>{member.contact}</span>
+                </div>
+                <div className={styles['icon-wrapper']}>
+                  {githubInfo && (
+                    <div
+                      className={styles['github-icon-link']}
+                      title="GitHub"
+                      onClick={() => ipcService.window.openExternal(`https://github.com/${githubInfo}`)}
+                    >
+                      <FaGithub size={20} />
                     </div>
-                    <div className={styles['icon-wrapper']}>
-                      {githubInfo && (
-                        <div className={styles['github-icon-link']} title="GitHub" onClick={() => ipcService.window.openExternal(`https://github.com/${githubInfo.value}`)}>
-                          <FaGithub size={20} />
-                        </div>
-                      )}
-                      {discordInfo && (
-                        <div className={styles['discord-icon-link']} title="Discord" onClick={() => ipcService.window.openExternal(`http://discordapp.com/users/${discordInfo.value}`)}>
-                          <FaDiscord size={20} />
-                        </div>
-                      )}
+                  )}
+                  {discordInfo && (
+                    <div
+                      className={styles['discord-icon-link']}
+                      title="Discord"
+                      onClick={() => ipcService.window.openExternal(`http://discordapp.com/users/${discordInfo}`)}
+                    >
+                      <FaDiscord size={20} />
                     </div>
-                  </div>
-                </React.Fragment>
-              );
-            })}
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
           </div>
         </div>
       </div>
