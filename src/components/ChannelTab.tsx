@@ -198,13 +198,13 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
               id: 'create-channel',
               label: t('create-channel'),
               show: isServerAdmin(permissionLevel),
-              onClick: () => handleOpenCreateChannel(serverId, null, userId),
+              onClick: () => handleOpenCreateChannel(serverId, null, t(channelName)),
             },
             {
               id: 'create-sub-channel',
               label: t('create-sub-channel'),
-              show: isChannelAdmin(permissionLevel),
-              onClick: () => handleOpenCreateChannel(serverId, channelCategoryId ? channelCategoryId : channelId, userId),
+              show: isChannelAdmin(permissionLevel) && !isLobby,
+              onClick: () => handleOpenCreateChannel(serverId, channelCategoryId ? channelCategoryId : channelId, t(channelName)),
             },
             {
               id: 'delete-channel',

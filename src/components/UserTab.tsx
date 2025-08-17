@@ -58,7 +58,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
   } = member;
-  const { channelId, permissionLevel: channelPermission, voiceMode: channelVoiceMode } = channel;
+  const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermission, voiceMode: channelVoiceMode } = channel;
   const { serverId, permissionLevel: serverPermission, lobbyId: serverLobbyId } = server;
 
   // Memos
@@ -313,7 +313,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'invite-to-be-member',
             label: t('invite-to-be-member'),
-            show: !isUser && isServerAdmin(permissionLevel),
+            show: !isUser && !isMember(memberPermission) && isServerAdmin(permissionLevel),
             onClick: () => {
               handleSendMemberInvitation(memberUserId, serverId);
             },
@@ -335,19 +335,27 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
                 id: 'set-member',
                 label: t('set-member'),
                 show: !isUser && isMember(memberPermission) && isSuperior && !isMember(memberPermission, false),
-                onClick: () => handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 }),
+                onClick: () => {
+                  if (isServerAdmin(memberPermission, false)) {
+                    handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 });
+                  }
+                  if (isChannelAdmin(memberPermission) && channelCategoryId) {
+                    handleEditChannelPermission(memberUserId, serverId, channelCategoryId, { permissionLevel: 2 });
+                  }
+                  handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 2 });
+                },
               },
               {
                 id: 'set-channel-mod',
                 label: t('set-channel-mod'),
-                show: !isUser && isMember(memberPermission) && isSuperior && !isChannelMod(memberPermission, false),
+                show: !isUser && channelCategoryId !== null && isMember(memberPermission) && isSuperior && !isChannelMod(memberPermission),
                 onClick: () => handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 3 }),
               },
               {
                 id: 'set-channel-admin',
                 label: t('set-channel-admin'),
                 show: !isUser && isMember(memberPermission) && isSuperior && !isChannelAdmin(memberPermission, false),
-                onClick: () => handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 4 }),
+                onClick: () => handleEditChannelPermission(memberUserId, serverId, channelCategoryId ? channelCategoryId : channelId, { permissionLevel: 4 }),
               },
               {
                 id: 'set-server-admin',
