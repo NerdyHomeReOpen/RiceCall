@@ -76,41 +76,40 @@ const AboutPopup: React.FC = React.memo(() => {
 
           <div className={styles['team-members']}>
             <p>{t('team-members')}:</p>
-           {staff.map((member) => {
-            const githubInfo = member.github;
-            const discordInfo = member.discord;
-            return (
-              <div key={member.id} className={styles['team-member-card']}>
-                <div className={styles['name-wrapper']}>
-                  <span className={`${styles['developer-title']} ${TITLE_COLOR_CLASSES[t(member.title)]}`}>
-                    {t(member.title)}
-                  </span>
-                  <span>{member.contact}</span>
-                </div>
-                <div className={styles['icon-wrapper']}>
-                  {githubInfo && (
-                    <div
-                      className={styles['github-icon-link']}
-                      title="GitHub"
-                      onClick={() => ipcService.window.openExternal(`https://github.com/${githubInfo}`)}
-                    >
-                      <FaGithub size={20} />
+              {staff.map((member) => {
+                const githubInfo = member.github;
+                const discordInfo = member.discord;
+                return (
+                  <div key={member.id} className={styles['team-member-card']}>
+                    <div className={styles['name-wrapper']}>
+                      <span className={`${styles['developer-title']} ${TITLE_COLOR_CLASSES[t(member.title)]}`}>
+                        {t(member.title)}
+                      </span>
+                      <span>{member.contact}</span>
                     </div>
-                  )}
-                  {discordInfo && (
-                    <div
-                      className={styles['discord-icon-link']}
-                      title="Discord"
-                      onClick={() => ipcService.window.openExternal(`http://discordapp.com/users/${discordInfo}`)}
-                    >
-                      <FaDiscord size={20} />
+                    <div className={styles['icon-wrapper']}>
+                      {githubInfo && (
+                        <div
+                          className={styles['github-icon-link']}
+                          title="GitHub"
+                          onClick={() => ipcService.window.openExternal(`https://github.com/${githubInfo}`)}
+                        >
+                          <FaGithub size={20} />
+                        </div>
+                      )}
+                      {discordInfo && (
+                        <div
+                          className={styles['discord-icon-link']}
+                          title="Discord"
+                          onClick={() => ipcService.window.openExternal(`http://discordapp.com/users/${discordInfo}`)}
+                        >
+                          <FaDiscord size={20} />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-
+                  </div>
+                );
+              })}
           </div>
         </div>
       </div>

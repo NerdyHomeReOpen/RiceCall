@@ -1,5 +1,3 @@
-// src/data/staff.ts
-
 export interface Staff {
   id: number;
   title: string;
