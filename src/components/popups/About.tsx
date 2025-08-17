@@ -37,10 +37,10 @@ const AboutPopup: React.FC = React.memo(() => {
   // Memos
   const TITLE_COLOR_CLASSES: Record<string, string> = useMemo(
     () => ({
-      [t('main-developer')]: styles['main-developer'],
-      [t('ack-developer')]: styles['fullstack-developer'],
-      [t('backend-developer')]: styles['backend-developer'],
-      [t('frontend-developer')]: styles['frontend-developer'],
+      [t('developer')]: styles['developer'],
+      [t('developer')]: styles['developer'],
+      [t('developer')]: styles['developer'],
+      [t('developer')]: styles['developer'],
       [t('machine-network')]: styles['machine-network'],
       [t('technical-support')]: styles['technical-support'],
       [t('customer-service')]: styles['customer-service'],
@@ -51,7 +51,7 @@ const AboutPopup: React.FC = React.memo(() => {
   const TEAM_MEMBERS = useMemo(
     () => [
       {
-        title: t('main-developer'),
+        title: t('developer'),
         contact: 'JoshHuang9508',
         info: [
           { label: 'Github', value: 'JoshHuang9508' },
@@ -59,23 +59,15 @@ const AboutPopup: React.FC = React.memo(() => {
         ],
       },
       {
-        title: t('main-developer'),
+        title: t('developer'),
         contact: 'yeci226',
         info: [
           { label: 'Github', value: 'yeci226' },
           { label: 'Discord', value: '283946584461410305' },
         ],
-      },
+      },     
       {
-        title: t('fullstack-developer'),
-        contact: 'ramon96',
-        info: [
-          { label: 'Github', value: 'ramonPC96' },
-          { label: 'Discord', value: '493539043133620234' },
-        ],
-      },
-      {
-        title: t('backend-developer'),
+        title: t('developer'),
         contact: 'yuusukealmal',
         info: [
           { label: 'Github', value: 'yuusukealmal' },
@@ -83,7 +75,7 @@ const AboutPopup: React.FC = React.memo(() => {
         ],
       },
       {
-        title: t('frontend-developer'),
+        title: t('developer'),
         contact: 'cablate',
         info: [
           { label: 'Github', value: 'cablate' },
@@ -91,11 +83,27 @@ const AboutPopup: React.FC = React.memo(() => {
         ],
       },
       {
-        title: t('frontend-developer'),
+        title: t('developer'),
         contact: 'cstrikeasia',
         info: [
           { label: 'Github', value: 'cstrikeasia' },
           { label: 'Discord', value: '789742073036144640' },
+        ],
+      },
+      {
+        title: t('developer'),
+        contact: 'Ramon96',
+        info: [
+          { label: 'Github', value: 'ramonPC96' },
+          { label: 'Discord', value: '493539043133620234' },
+        ],
+      },
+      {
+        title: t('developer'),
+        contact: 'Hockpond',
+        info: [
+          { label: 'Github', value: 'hockpond' },
+          { label: 'Discord', value: '174274660874059776' },
         ],
       },
       {

@@ -117,20 +117,8 @@
   color: #7289da;
 }
 
-.main-developer {
+.developer {
   background-color: rgb(216 63 63 / 80%);
-}
-
-.fullstack-developer {
-  background-color: rgb(72 72 92 / 80%);
-}
-
-.backend-developer {
-  background-color: rgb(63 136 216 / 80%);
-}
-
-.frontend-developer {
-  background-color: rgb(136 63 216 / 80%);
 }
 
 .machine-network {
