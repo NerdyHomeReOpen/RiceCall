@@ -2,10 +2,10 @@
 
 export interface Staff {
   id: number;
-  title: string;    // clave de traducción (developer, machine-network, etc.)
-  contact: string;  // alias o nombre
-  github?: string;  // usuario GitHub (opcional)
-  discord?: string; // ID de Discord (opcional)
+  title: string;
+  contact: string;
+  github?: string;
+  discord?: string;
 }
 
 export const staff: Staff[] = [
