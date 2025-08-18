@@ -324,7 +324,21 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   >
                     U̲
                   </button>
-                  
+                  <button type="button" onClick={() => setShowColorPicker(!showColorPicker)} title="Color de texto">
+                    <Palette size={18} />
+                  </button>
+                  {showColorPicker && (
+                    <div style={{ position: "absolute", zIndex: 10 }}>
+                      <SketchPicker
+                        color={selectedColor}
+                        onChange={(color: any) => setSelectedColor(color.hex)}
+                        onChangeComplete={(color: any) => {
+                          applyFormat("color", color.hex);
+                          setShowColorPicker(false);
+                        }}
+                      />
+                    </div>
+                  )}                  
                   <button
                     type="button"
                     onClick={() => applyFormat('emoji')}
@@ -342,22 +356,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     onClick={() => applyFormat('yt')}
                   >
                     ▶ YT
-                  </button>
-                  <button type="button" onClick={() => setShowColorPicker(!showColorPicker)} title="Color de texto">
-                    <Palette size={18} />
-                  </button>
-                  {showColorPicker && (
-                    <div style={{ position: "absolute", zIndex: 10 }}>
-                      <SketchPicker
-                        color={selectedColor}
-                        onChange={(color: any) => setSelectedColor(color.hex)}
-                        onChangeComplete={(color: any) => {
-                          applyFormat("color", color.hex);
-                          setShowColorPicker(false);
-                        }}
-                      />
-                    </div>
-                  )}
+                  </button>                 
                  <button
                     type="button"
                     onClick={() => setShowLinkInput((prev) => !prev)}
