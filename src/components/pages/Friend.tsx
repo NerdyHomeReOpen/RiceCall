@@ -8,8 +8,8 @@ import vip from '@/styles/vip.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Components
-import FriendListViewer from '@/components/FriendList';
-import BadgeListViewer from '@/components/BadgeList';
+import FriendList from '@/components/FriendList';
+import BadgeList from '@/components/BadgeList';
 
 // Types
 import type { User, Friend, FriendGroup } from '@/types';
@@ -97,7 +97,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
           </div>
           <div className={friendPage['box']}>
-            <BadgeListViewer badges={userBadges} maxDisplay={5} />
+            <BadgeList badges={JSON.parse(userBadges)} maxDisplay={5} />
           </div>
         </div>
         <div className={friendPage['signature-wrapper']}>
@@ -137,7 +137,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
       <main className={friendPage['friend-body']}>
         {/* Left Sidebar */}
         <aside ref={sidebarRef} className={friendPage['sidebar']}>
-          <FriendListViewer friendGroups={friendGroups} friends={friends} user={user} />
+          <FriendList friendGroups={friendGroups} friends={friends} user={user} />
         </aside>
 
         {/* Resize Handle */}

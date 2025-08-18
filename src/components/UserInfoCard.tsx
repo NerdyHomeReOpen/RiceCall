@@ -7,7 +7,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Components
-import BadgeListViewer from '@/components/BadgeList';
+import BadgeList from '@/components/BadgeList';
 
 // Types
 import type { OnlineMember } from '@/types';
@@ -157,7 +157,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
 
       {/* Badges Section */}
       <div className={styles['footer']}>
-        <BadgeListViewer badges={memberBadges} maxDisplay={13} />
+        <BadgeList badges={JSON.parse(memberBadges)} maxDisplay={13} />
       </div>
     </div>
   );

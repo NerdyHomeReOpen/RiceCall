@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import type { Server, User, Friend } from '@/types';
 
 // Components
-import BadgeListViewer from '@/components/BadgeList';
+import BadgeList from '@/components/BadgeList';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -338,7 +338,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           <div className={`${styles['user-profile-content']}`}>
             <div className={popup['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
-              <BadgeListViewer badges={userBadges} maxDisplay={13} />
+              <BadgeList badges={JSON.parse(userBadges)} maxDisplay={13} />
             </div>
           </div>
         </div>

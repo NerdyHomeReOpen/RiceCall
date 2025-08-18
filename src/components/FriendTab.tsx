@@ -212,7 +212,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           {friendVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
           <div className={`${styles['name-text']} ${friendVip > 0 ? vip['vip-name-color'] : ''}`}>{friendName}</div>
           <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, friendLevel)}`]}`} />
-          <BadgeList badges={friendBadges} maxDisplay={5} />
+          <BadgeList badges={JSON.parse(friendBadges)} maxDisplay={5} />
         </div>
         {friendStatus !== 'offline' && friendCurrentServerId ? (
           <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendCurrentServerId, friendServer.displayId)}>

@@ -27,7 +27,7 @@ export type BlockedUser = {
 };
 
 export type BadgeList = {
-  badges: Badge[];
+  badges: string;
 };
 
 export type User = table_users & Permission & BadgeList;

@@ -26,7 +26,7 @@ const Default = {
     currentServerId: '',
     lastActiveAt: 0,
     createdAt: 0,
-    badges: [],
+    badges: '[]',
     ...overrides,
   }),
 

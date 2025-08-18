@@ -9,7 +9,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 // Components
 import MessageViewer from '@/components/MessageViewer';
-import BadgeListViewer from '@/components/BadgeList';
+import BadgeList from '@/components/BadgeList';
 
 // Services
 import getService from '@/services/get.service';
@@ -193,7 +193,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div className={styles['user-state-box']}>
               <div title={`${t('level')}: ${targetLevel}`} className={`${grade['grade']} ${grade[`lv-${Math.min(56, targetLevel)}`]}`} />
               {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
-              <BadgeListViewer badges={targetBadges} maxDisplay={13} />
+              <BadgeList badges={JSON.parse(targetBadges)} maxDisplay={13} />
             </div>
           </div>
           <div className={styles['user-box']}>

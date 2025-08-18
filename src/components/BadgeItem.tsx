@@ -22,9 +22,7 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, preferTop = fal
   const contextMenu = useContextMenu();
   const badgeRef = React.useRef<HTMLDivElement>(null);
 
-  const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
-
-  if (failedImageCache.has(badgeUrl)) {
+  if (failedImageCache.has(badge.iconUrl)) {
     // Fallback Badge
     return <div className={styles['badge-big-image']} />;
   }
@@ -32,16 +30,14 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, preferTop = fal
   return (
     <div
       ref={badgeRef}
+      className="context-menu-container"
       onMouseEnter={(e) => {
         const x = e.clientX;
         const y = e.clientY;
         contextMenu.showBadgeInfoCard(x, y, preferTop, false, badge);
       }}
-      onMouseLeave={() => {
-        contextMenu.closeBadgeInfoCard();
-      }}
     >
-      <div className={styles['badge-image']} style={{ backgroundImage: `url(${badgeUrl})` }} />
+      <div className={styles['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
     </div>
   );
 });

@@ -28,9 +28,6 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x = 0, y = 0, 
   const [cardX, setCardX] = useState(0);
   const [cardY, setCardY] = useState(0);
 
-  // Variables
-  const badgeUrl = `/badge/${badge.badgeId.trim()}.png`;
-
   // Effect
   useEffect(() => {
     if (!cardRef.current) return;
@@ -78,7 +75,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x = 0, y = 0, 
     <div ref={cardRef} className={`context-menu-container ${styles['badge-info-card']}`} style={{ top: cardY, left: cardX }}>
       <div className={styles['badge-info-wrapper']}>
         <div className={styles['badge-avatar-box']}>
-          <div className={styles['badge-image']} style={{ backgroundImage: `url(${badgeUrl})` }} />
+          <div className={styles['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
           {/* <div className={styles['badge-rarity-text']}>{`[${badge.rare}]`}</div> */}
         </div>
         <div className={styles['badge-description-box']}>

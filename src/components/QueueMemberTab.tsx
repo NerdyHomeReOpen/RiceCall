@@ -15,7 +15,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useWebRTC } from '@/providers/WebRTC';
 
 // Components
-import BadgeListViewer from '@/components/BadgeList';
+import BadgeList from '@/components/BadgeList';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -168,7 +168,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
-      <BadgeListViewer badges={memberBadges} maxDisplay={5} />
+      <BadgeList badges={JSON.parse(memberBadges)} maxDisplay={5} />
       {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}
       {isUser && <div className={styles['my-location-icon']} />}
     </div>

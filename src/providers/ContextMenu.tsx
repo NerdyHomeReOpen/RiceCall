@@ -110,6 +110,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const onMouseMove = (e: MouseEvent) => {
       if ((e.target as HTMLElement).closest('.context-menu-container')) return;
       if (isUserInfoVisible) closeUserInfoBlock();
+      if (isBadgeInfoVisible) closeBadgeInfoCard();
     };
     const onPointerDown = (e: MouseEvent) => {
       if ((e.target as HTMLElement).closest('.context-menu-container')) return;
