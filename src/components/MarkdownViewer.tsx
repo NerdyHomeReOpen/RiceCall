@@ -74,7 +74,14 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({ markdownText
   const [isCopied, setIsCopied] = useState(false);
 
   const components: Components = {
-    div: ({ node, ...props }: any) => <div {...props} />,
+   div: ({ node, className, ...props }: any) => {
+  let style = {};
+  if (className?.includes('align-left')) style = { textAlign: 'left' };
+  if (className?.includes('align-center')) style = { textAlign: 'center' };
+  if (className?.includes('align-right')) style = { textAlign: 'right' };
+  return <div className={className} style={style} {...props} />;
+},
+
     span: ({ node, ...props }: any) => <span {...props} />,
     h1: ({ node, ...props }: any) => <h1 {...props} />,
     h2: ({ node, ...props }: any) => <h2 {...props} />,

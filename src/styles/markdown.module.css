@@ -288,22 +288,3 @@
 .markdown-content pre:hover .copy-button {
   opacity: 1;
 }
-
-.markdown-content .align-left,
-.markdown-content .align-center,
-.markdown-content .align-right {
-  display: block;     /* se asegura que se comporte como bloque */
-  width: 100%;        /* ocupa todo el ancho disponible */
-}
-
-.markdown-content .align-left {
-  text-align: left;
-}
-
-.markdown-content .align-center {
-  text-align: center;
-}
-
-.markdown-content .align-right {
-  text-align: right;
-}
