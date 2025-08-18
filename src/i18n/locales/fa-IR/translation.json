@@ -90,6 +90,7 @@
   "confirm-delete-friend-group": "آیا مطمئن هستید که می‌خواهید {{0}} گروه را حذف کنید؟",
   "confirm-kick-user": "مطمئنی می‌خوای {{0}} رو کیک کنی؟",
   "confirm-password": "تایید کردن رمز عبور",
+  "confirm-remove-from-queue": "確定要將 {{0}} 從麥序中移除嗎？",
   "confirm-reject-all-friend-application": "آیا مطمئن هستید که می‌خواهید همه درخواست‌های دوستی را رد کنید؟",
   "confirm-reject-all-member-invitation": "確定拒絕所有會員邀請嗎？",
   "confirm-terminate-membership": "確定要解除 {{0}} 的會員身份嗎？",
