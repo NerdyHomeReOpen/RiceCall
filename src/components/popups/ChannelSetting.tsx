@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { SketchPicker } from 'react-color';
+import { Palette } from 'lucide-react';
+
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -20,9 +23,6 @@ import Default from '@/utils/default';
 
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
-
-import { SketchPicker } from 'react-color';
-import { Palette } from 'lucide-react';
 
 interface ChannelSettingPopupProps {
   userId: User['userId'];
