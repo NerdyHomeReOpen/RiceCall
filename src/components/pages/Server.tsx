@@ -144,15 +144,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     ipcService.socket.send('editChannel', { serverId, channelId, update });
   };
 
-  const handleJoinQueue = () => {
-    ipcService.socket.send('addToQueue', { serverId, channelId, userId });
+  const handleJoinQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    ipcService.socket.send('joinQueue', { serverId, channelId });
   };
 
-  const handleLeaveQueue = () => {
+  const handleLeaveQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
     ipcService.socket.send('leaveQueue', { serverId, channelId });
   };
 
-  const handleControlQueue = () => {
+  const handleControlQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
     ipcService.socket.send('controlQueue', { serverId, channelId });
   };
 
@@ -389,7 +389,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                           label: t('control-queue'),
                           disabled: channelVoiceMode !== 'queue',
                           onClick: () => {
-                            handleControlQueue();
+                            handleControlQueue(serverId, channelId);
                           },
                         },
                       ],
@@ -400,7 +400,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                 {channelVoiceMode === 'queue' ? t('queue-speech') : channelVoiceMode === 'free' ? t('free-speech') : channelVoiceMode === 'admin' ? t('admin-speech') : ''}
               </div>
             </div>
-            <div className={`${styles['mic-button']} ${isMicTaken ? styles['active'] : ''}`} onClick={isMicTaken ? handleLeaveQueue : handleJoinQueue}>
+            <div
+              className={`${styles['mic-button']} ${isMicTaken ? styles['active'] : ''}`}
+              onClick={isMicTaken ? () => handleLeaveQueue(serverId, channelId) : () => handleJoinQueue(serverId, channelId)}
+            >
               <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className={styles['mic-text']}>{isMicTaken ? t('mic-taken') : t('take-mic')}</div>

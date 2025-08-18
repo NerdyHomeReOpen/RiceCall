@@ -45,7 +45,7 @@ export type table_channels = {
   forbidQueue: boolean; // New: Forbid Queue
   forbidGuestText: boolean;
   forbidGuestVoice: boolean; // New: Forbid Guest Voice
-  forbidGuestQueue: boolean; // New: Forbid Guest Queue (Will change name to forbidQueue)
+  forbidGuestQueue: boolean; // New: Forbid Guest Queue
   forbidGuestUrl: boolean;
   type: 'category' | 'channel';
   visibility: 'public' | 'member' | 'private' | 'readonly';
