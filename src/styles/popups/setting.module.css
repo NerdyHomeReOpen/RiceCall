@@ -177,8 +177,8 @@
 
 .toolbar {
   display: flex;
-  flex-wrap: wrap; /* permite que los botones se muevan a la siguiente línea */
-  gap: 8px; /* opcional, espacio entre botones */
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 8px;
   padding: 4px 0;
   border-bottom: 1px solid var(--border-color, #e0e0e0);
@@ -209,4 +209,12 @@
 .toolbar button:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(100, 150, 250, 0.3);
+}
+
+.toolbar select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
 }

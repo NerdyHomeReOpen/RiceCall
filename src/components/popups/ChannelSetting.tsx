@@ -44,6 +44,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [channel, setChannel] = useState<Channel>(Default.channel());
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [selectedColor, setSelectedColor] = useState("#000000");
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
 
   // Variables
   const { lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
@@ -78,7 +80,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     ipcService.window.close();
   };
 
-  const applyFormat = (type: 'bold' | 'italic' | 'underline' |'emoji' | 'user' | 'yt' | 'align-left' | 'align-center' | 'align-right' | 'color',   value?: string) => {
+  const applyFormat = (type: 'bold' | 'italic' | 'underline' |'emoji' | 'user' | 'yt' 
+    | 'align-left' | 'align-center' | 'align-right' | 'color' | 'font-family' | 'font-size' | 'link',   value?: string) => {
     const textarea = document.getElementById('channel-announcement-textarea') as HTMLTextAreaElement;
     if (!textarea) return;
 
@@ -118,7 +121,17 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
       case "color":
         formatted = `<span style="color:${value}">${selectedText}</span>`;
         break;
-        default:
+      case 'font-family':
+        formatted = `<span style="font-family:${value}">${selectedText}</span>`;
+        break;
+      case 'font-size':
+        formatted = `<span style="font-size:${value}">${selectedText}</span>`;
+        break;
+      case 'link':
+        if (!value) return;
+        formatted = `<a href="${value}" target="_blank" rel="noopener noreferrer">${selectedText}</a>`;
+        break;
+      default:
         formatted = selectedText;
     }
 
@@ -249,7 +262,50 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
             {!showPreview && (
               <>
                 {/* Toolbar */}
-                <div className={setting['toolbar']}>
+                <div className={setting['toolbar']}>                                
+                  <select
+                    onChange={(e) => applyFormat('font-family', e.target.value)}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>{t('font')}</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Georgia">Georgia</option>
+                  </select>
+                  <select
+                    onChange={(e) => applyFormat('font-size', e.target.value)}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>{t('font-size')}</option>
+                    <option value="10px">8px</option>
+                    <option value="10px">10px</option>
+                    <option value="12px">12px</option>
+                    <option value="14px">14px</option>
+                    <option value="16px">16px</option>
+                    <option value="18px">18px</option>
+                    <option value="20px">20px</option>
+                    <option value="24px">24px</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('align-left')}
+                  >
+                    ⯇
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('align-center')}
+                  >
+                    ≡
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('align-right')}
+                  >
+                    ▶
+                  </button> 
                   <button
                     type="button"
                     onClick={() => applyFormat('bold')}
@@ -287,24 +343,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   >
                     ▶ YT
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('align-left')}
-                  >
-                    ⯇
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('align-center')}
-                  >
-                    ≡
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('align-right')}
-                  >
-                    ▶
-                  </button>
                   <button type="button" onClick={() => setShowColorPicker(!showColorPicker)} title="Color de texto">
                     <Palette size={18} />
                   </button>
@@ -320,7 +358,36 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                       />
                     </div>
                   )}
-
+                 <button
+                    type="button"
+                    onClick={() => setShowLinkInput((prev) => !prev)}
+                    title={t('insert-link')}
+                  >
+                    🌍
+                  </button>
+                  {showLinkInput && (
+                    <div style={{ position: "absolute", zIndex: 20, background: "white", padding: "8px", borderRadius: "6px", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>
+                      <input
+                        type="text"
+                        placeholder="https://example.com"
+                        value={linkUrl}
+                        onChange={(e) => setLinkUrl(e.target.value)}
+                        style={{ marginRight: "6px", padding: "4px" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (linkUrl.trim()) {
+                            applyFormat("link", linkUrl.trim());
+                          }
+                          setShowLinkInput(false);
+                          setLinkUrl("");
+                        }}
+                      >
+                        {t('insert')}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </>
             )}
