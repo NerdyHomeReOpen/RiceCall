@@ -1,12 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { SketchPicker } from 'react-color';
-import { Palette } from 'lucide-react';
-
 
 // CSS
 import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
-import markdown from '@/styles/markdown.module.css';
 
 // Types
 import type { Channel, Server, User } from '@/types';
@@ -22,7 +18,7 @@ import getService from '@/services/get.service';
 import Default from '@/utils/default';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
+import AnnouncementEditor from '../AnnouncementEditor';
 
 interface ChannelSettingPopupProps {
   userId: User['userId'];
@@ -42,10 +38,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const [server, setServer] = useState<Server>(Default.server());
   const [channel, setChannel] = useState<Channel>(Default.channel());
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("#000000");
-  const [showLinkInput, setShowLinkInput] = useState(false);
-  const [linkUrl, setLinkUrl] = useState("");
 
   // Variables
   const { lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
@@ -79,74 +71,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const handleClose = () => {
     ipcService.window.close();
   };
-
-  const applyFormat = (type: 'bold' | 'italic' | 'underline' |'emoji' | 'user' | 'yt' 
-    | 'align-left' | 'align-center' | 'align-right' | 'color' | 'font-family' | 'font-size' | 'link',   value?: string) => {
-    const textarea = document.getElementById('channel-announcement-textarea') as HTMLTextAreaElement;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = channelAnnouncement.substring(start, end) || t('your-text-here');
-
-    let formatted = '';
-    switch (type) {
-      case 'bold':
-        formatted = `**${selectedText}**`;
-        break;
-      case 'italic':
-        formatted = `*${selectedText}*`;
-        break;
-      case 'emoji':
-        formatted = `[emoji_${selectedText}]`;
-        break;
-      case 'underline':
-        formatted = `<u>${selectedText}</u>`;
-        break;
-      case 'user':
-        formatted = `<@${selectedText}_Male_1>`;
-        break;
-      case 'yt':
-        formatted = `<YT=https://www.youtube.com/watch?v=${selectedText}>`;
-        break;
-      case 'align-left':
-        formatted = `<div class="align-left">${selectedText}</div>`;
-        break;
-      case 'align-center':
-        formatted = `<div class="align-center">${selectedText}</div>`;
-        break;
-      case 'align-right':
-        formatted = `<div class="align-right">${selectedText}</div>`;
-        break;
-      case "color":
-        formatted = `<span style="color:${value}">${selectedText}</span>`;
-        break;
-      case 'font-family':
-        formatted = `<span style="font-family:${value}">${selectedText}</span>`;
-        break;
-      case 'font-size':
-        formatted = `<span style="font-size:${value}">${selectedText}</span>`;
-        break;
-      case 'link':
-        if (!value) return;
-        formatted = `<a href="${value}" target="_blank" rel="noopener noreferrer">${selectedText}</a>`;
-        break;
-      default:
-        formatted = selectedText;
-    }
-
-    const newText =
-      channelAnnouncement.substring(0, start) + formatted + channelAnnouncement.substring(end);
-
-    setChannel((prev) => ({ ...prev, announcement: newText }));
-
-    setTimeout(() => {
-      textarea.focus();
-      textarea.selectionStart = start;
-      textarea.selectionEnd = start + formatted.length;
-    }, 0);
-  };
-
 
   // Effects
   useEffect(() => {
@@ -252,162 +176,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         {/* Channel Announcement */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
-              <div className={popup['label']}>{t('input-announcement')}</div>
-              <div className={popup['button']} onClick={() => setShowPreview((prev) => !prev)}>
-                {showPreview ? t('edit') : t('preview')}
-              </div>
-            </div>
-
-            {!showPreview && (
-              <>
-                {/* Toolbar */}
-                <div className={setting['toolbar']}>                                
-                  <select
-                    onChange={(e) => applyFormat('font-family', e.target.value)}
-                    defaultValue=""
-                  >
-                    <option value="" disabled>{t('font')}</option>
-                    <option value="Arial">Arial</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Courier New">Courier New</option>
-                    <option value="Verdana">Verdana</option>
-                    <option value="Georgia">Georgia</option>
-                  </select>
-                  <select
-                    onChange={(e) => applyFormat('font-size', e.target.value)}
-                    defaultValue=""
-                  >
-                    <option value="" disabled>{t('font-size')}</option>
-                    <option value="10px">8px</option>
-                    <option value="10px">10px</option>
-                    <option value="12px">12px</option>
-                    <option value="14px">14px</option>
-                    <option value="16px">16px</option>
-                    <option value="18px">18px</option>
-                    <option value="20px">20px</option>
-                    <option value="24px">24px</option>
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('align-left')}
-                  >
-                    ⯇
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('align-center')}
-                  >
-                    ≡
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('align-right')}
-                  >
-                    ▶
-                  </button> 
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('bold')}
-                  >
-                    B
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('italic')}
-                  >
-                    I
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('underline')}
-                  >
-                    U̲
-                  </button>
-                  <button type="button" onClick={() => setShowColorPicker(!showColorPicker)} title="Color de texto">
-                    <Palette size={18} />
-                  </button>
-                  {showColorPicker && (
-                    <div style={{ position: "absolute", zIndex: 10 }}>
-                      <SketchPicker
-                        color={selectedColor}
-                        onChange={(color: any) => setSelectedColor(color.hex)}
-                        onChangeComplete={(color: any) => {
-                          applyFormat("color", color.hex);
-                          setShowColorPicker(false);
-                        }}
-                      />
-                    </div>
-                  )}                  
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('emoji')}
-                  >
-                    😊
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('user')}
-                  >
-                    @User
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormat('yt')}
-                  >
-                    ▶ YT
-                  </button>                 
-                 <button
-                    type="button"
-                    onClick={() => setShowLinkInput((prev) => !prev)}
-                    title={t('insert-link')}
-                  >
-                    🌍
-                  </button>
-                  {showLinkInput && (
-                    <div style={{ position: "absolute", zIndex: 20, background: "white", padding: "8px", borderRadius: "6px", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>
-                      <input
-                        type="text"
-                        placeholder="https://example.com"
-                        value={linkUrl}
-                        onChange={(e) => setLinkUrl(e.target.value)}
-                        style={{ marginRight: "6px", padding: "4px" }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (linkUrl.trim()) {
-                            applyFormat("link", linkUrl.trim());
-                          }
-                          setShowLinkInput(false);
-                          setLinkUrl("");
-                        }}
-                      >
-                        {t('insert')}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              {showPreview ? (
-                <div className={markdown['setting-markdown-container']} style={{ minHeight: '330px' }}>
-                  <MarkdownViewer markdownText={channelAnnouncement} />
-                </div>
-              ) : (
-                <textarea
-                  id="channel-announcement-textarea"
-                  name="channel-announcement"
-                  style={{ minHeight: '330px' }}
-                  value={channelAnnouncement}
-                  maxLength={1000}
-                  onChange={(e) => setChannel((prev) => ({ ...prev, announcement: e.target.value }))}
-                />
-              )}
-              <div className={setting['note-text']}>{t('markdown-support-description')}</div>
-            </div>
+           <AnnouncementEditor
+                  announcement={channelAnnouncement}
+                  onChange={(value) => setChannel(prev => ({ ...prev, announcement: value }))}
+            />
           </div>
         </div>
 
