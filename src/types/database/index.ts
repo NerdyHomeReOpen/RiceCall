@@ -8,6 +8,7 @@ export type table_badges = {
   badgeId: string;
   name: string;
   description: string;
+  iconUrl: string;
 };
 
 export type table_channel_blocked_users = {

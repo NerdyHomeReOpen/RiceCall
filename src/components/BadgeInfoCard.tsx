@@ -25,8 +25,8 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x = 0, y = 0, 
   const { t } = useTranslation();
 
   // State
-  const [cardX, setCardX] = useState(0);
-  const [cardY, setCardY] = useState(0);
+  const [cardX, setCardX] = useState(x);
+  const [cardY, setCardY] = useState(y);
 
   // Effect
   useEffect(() => {
