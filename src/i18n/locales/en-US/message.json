@@ -37,7 +37,7 @@
   "timeout-member-from-server": "[{{target}}] was removed from the group by the administrator [{{operator}}]",
   "timeout-member-from-channel": "You were kicked out by the administrator [{{operator}}] from the channel [{{channel}}]",
   "timeout-self-from-channel": "The administrator [{{operator}}] in the channel [{{channel}}] has deleted you for {{time}} minutes",
-  "block-member-from-server": "[{{target}}] blocked by the administrator [{{operator}}]",
+  "block-member-from-server": "【{{target}}】被管理員【{{operator}}】封鎖",
   "kick-member-from-server": "[{{target}}] was removed from the channel by the administrator [{{operator}}]",
   "kicked-from-server": "You were kicked off the server",
   "server-limit-reached": "The server cannot be created, the allowed limit is exceeded",
