@@ -7,7 +7,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import type { Channel, Server, User, Member, Friend, Permission } from '@/types';
+import type { Channel, Server, User, OnlineMember, Friend, Permission } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -29,7 +29,7 @@ interface UserTabProps {
   friends: Friend[];
   server: Server;
   channel: Channel;
-  member: Member;
+  member: OnlineMember;
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
@@ -130,12 +130,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     ipcService.socket.send('addToQueue', { userId, serverId, channelId });
   };
 
-  const handleKickFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('kickFromServer', { userId, serverId }));
+  const handleBlockFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('blockFromServer', { userId, serverId }));
   };
 
-  const handleKickToLobbyChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('kickToLobbyChannel', { userId, serverId, channelId }));
+  const handleBlockFromChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('blockFromChannel', { userId, serverId, channelId }));
   };
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
@@ -162,7 +162,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     ipcService.popup.open('blockMember', `blockMember-${userId}`, { userId, serverId, userName });
   };
 
-  const handleSendMemberInvitation = (userId: User['userId'], serverId: Server['serverId']) => {
+  const handleOpenInviteMember = (userId: User['userId'], serverId: Server['serverId']) => {
     ipcService.popup.open('inviteMember', `inviteMember-${userId}`, { userId, serverId });
   };
 
@@ -278,25 +278,19 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             id: 'kick-channel',
             label: t('kick-channel'),
             show: !isUser && isChannelMod(permissionLevel) && isSuperior && memberCurrentChannelId !== serverLobbyId,
-            onClick: () => {
-              handleKickToLobbyChannel(memberUserId, channelId, serverId, memberNickname || memberName);
-            },
+            onClick: () => handleBlockFromChannel(memberUserId, channelId, serverId, memberNickname || memberName),
           },
           {
             id: 'kick-server',
             label: t('kick-server'),
             show: !isUser && isServerAdmin(permissionLevel) && isSuperior && memberCurrentServerId === serverId,
-            onClick: () => {
-              handleKickFromServer(memberUserId, serverId, memberNickname || memberName);
-            },
+            onClick: () => handleBlockFromServer(memberUserId, serverId, memberNickname || memberName),
           },
           {
-            id: 'block',
-            label: t('block'),
+            id: 'ban',
+            label: t('ban'),
             show: !isUser && isMember(permissionLevel) && isSuperior,
-            onClick: () => {
-              handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName);
-            },
+            onClick: () => handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName),
           },
           {
             id: 'separator',
@@ -306,17 +300,13 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             id: 'terminate-self-membership',
             label: t('terminate-self-membership'),
             show: isUser && isMember(permissionLevel) && !isServerOwner(permissionLevel),
-            onClick: () => {
-              handleTerminateMember(userId, serverId, t('self'));
-            },
+            onClick: () => handleTerminateMember(userId, serverId, t('self')),
           },
           {
             id: 'invite-to-be-member',
             label: t('invite-to-be-member'),
             show: !isUser && !isMember(memberPermission) && isServerAdmin(permissionLevel),
-            onClick: () => {
-              handleSendMemberInvitation(memberUserId, serverId);
-            },
+            onClick: () => handleOpenInviteMember(memberUserId, serverId),
           },
           {
             id: 'member-management',

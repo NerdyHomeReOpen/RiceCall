@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 
 // Types
-import type { Member, Server, User } from '@/types';
+import type { Server, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -23,16 +23,16 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const { t } = useTranslation();
 
   // States
-  const [blockType, setBlockType] = useState<string>('timeout');
+  const [blockType, setBlockType] = useState<'block' | 'ban' | 'banIP'>('block');
   const [formatType, setFormatType] = useState<string>('hours');
   const [selectTime, setSelectTime] = useState<number>(1);
 
   // Memos
   const BLOCK_TYPE_OPTIONS = useMemo(
     () => [
-      { key: 'timeout', label: t('timeout'), disabled: false },
-      { key: 'block-forever', label: t('block-forever'), disabled: false },
-      { key: 'blockIP', label: t('block-ip'), disabled: true },
+      { key: 'block', label: t('block'), disabled: false },
+      { key: 'ban', label: t('ban'), disabled: false },
+      { key: 'banIP', label: t('block-ip'), disabled: true },
     ],
     [t],
   );
@@ -85,11 +85,11 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   }, [formatType, selectTime]);
 
   // Variables
-  const isForeverBlock = blockType !== 'timeout';
+  const isBlock = blockType === 'block';
 
   // Handlers
-  const handleBlockMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
-    ipcService.socket.send('editMember', { userId, serverId, update });
+  const handleBlockFromServer = (userId: User['userId'], serverId: Server['serverId'], blockUntil: number) => {
+    ipcService.socket.send('blockFromServer', { userId, serverId, blockUntil });
   };
 
   const handleClose = () => {
@@ -108,7 +108,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>{t('block-type')}</div>
                 <div className={popup['select-box']}>
-                  <select value={blockType} onChange={(e) => setBlockType(e.target.value)}>
+                  <select value={blockType} onChange={(e) => setBlockType(e.target.value as 'block' | 'ban' | 'banIP')}>
                     {BLOCK_TYPE_OPTIONS.map((option) => (
                       <option key={option.key} value={option.key} disabled={option.disabled}>
                         {option.label}
@@ -120,7 +120,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>{t('block-time')}</div>
                 <div className={popup['select-box']}>
-                  <select value={selectTime} disabled={isForeverBlock} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
+                  <select value={selectTime} disabled={!isBlock} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
                     {LENGTH_OPTIONS.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -129,7 +129,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
                   </select>
                 </div>
                 <div className={popup['select-box']}>
-                  <select value={formatType} disabled={isForeverBlock} onChange={(e) => setFormatType(e.target.value)}>
+                  <select value={formatType} disabled={!isBlock} onChange={(e) => setFormatType(e.target.value)}>
                     {FORMAT_TYPE_OPTIONS.map((option) => (
                       <option key={option.key} value={option.key}>
                         {option.label}
@@ -147,7 +147,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
         <div
           className={popup['button']}
           onClick={() => {
-            handleBlockMember(userId, serverId, blockType === 'timeout' ? { isBlocked: Date.now() + BLOCK_TIME } : { isBlocked: -1, permissionLevel: 1, nickname: null });
+            handleBlockFromServer(userId, serverId, blockType === 'block' ? Date.now() + BLOCK_TIME : -1);
             handleClose();
           }}
         >

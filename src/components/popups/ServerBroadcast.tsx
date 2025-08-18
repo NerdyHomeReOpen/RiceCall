@@ -70,7 +70,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('broadcast-content')}</div>
-            <textarea name="content" maxLength={MAX_LENGTH} placeholder={t('markdown-support')} style={{ minHeight: '90px' }} onChange={(e) => setBroadcastContent(e.target.value)} />
+            <textarea name="content" maxLength={MAX_LENGTH} placeholder={t('markdown-support-description')} style={{ minHeight: '90px' }} onChange={(e) => setBroadcastContent(e.target.value)} />
             <div className={popup['hint-text']}>
               {broadcastContent.length}/{MAX_LENGTH}
             </div>

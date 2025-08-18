@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Types
-import type { Member, Channel, Server, User, Category, Friend } from '@/types';
+import type { OnlineMember, Channel, Server, User, Category, Friend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,7 @@ interface CategoryTabProps {
   user: User;
   friends: Friend[];
   server: Server;
-  serverMembers: Member[];
+  serverOnlineMembers: OnlineMember[];
   serverChannels: (Channel | Category)[];
   category: Category;
   expanded: Record<string, boolean>;
@@ -34,7 +34,7 @@ interface CategoryTabProps {
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, server, serverMembers, serverChannels, category, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, server, serverOnlineMembers, serverChannels, category, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -66,8 +66,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
   }, [categoryChannels]);
 
   const categoryMembers = useMemo(() => {
-    return serverMembers.filter((mb) => categoryChannelIds.has(mb.currentChannelId) || mb.currentChannelId === categoryId);
-  }, [serverMembers, categoryChannelIds, categoryId]);
+    return serverOnlineMembers.filter((mb) => categoryChannelIds.has(mb.currentChannelId) || mb.currentChannelId === categoryId);
+  }, [serverOnlineMembers, categoryChannelIds, categoryId]);
 
   const categoryMemberUserIds = useMemo(() => {
     return categoryMembers.map((mb) => mb.userId);
@@ -294,7 +294,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
                   friends={friends}
                   channel={channel}
                   server={server}
-                  serverMembers={serverMembers}
+                  serverOnlineMembers={serverOnlineMembers}
                   expanded={expanded}
                   setExpanded={setExpanded}
                   selectedItemId={selectedItemId}
@@ -311,7 +311,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
                   friends={friends}
                   channel={channel}
                   server={server}
-                  serverMembers={serverMembers}
+                  serverOnlineMembers={serverOnlineMembers}
                   expanded={expanded}
                   setExpanded={setExpanded}
                   selectedItemId={selectedItemId}

@@ -29,6 +29,7 @@ const ipcService = {
     },
     on: <T extends keyof ServerToClientEvents>(event: T, callback: (...args: Parameters<ServerToClientEvents[T]>) => ReturnType<ServerToClientEvents[T]>) => {
       if (!isElectron) return () => {};
+      ipcRenderer.removeAllListeners(event);
       ipcRenderer.on(event, (_: any, ...args: Parameters<ServerToClientEvents[T]>) => callback(...args));
       return () => ipcRenderer.removeAllListeners(event);
     },
@@ -37,6 +38,7 @@ const ipcService = {
   deepLink: {
     onDeepLink: (callback: (serverId: string) => void) => {
       if (!isElectron) return () => {};
+      ipcRenderer.removeAllListeners('deepLink');
       ipcRenderer.on('deepLink', (_: any, serverId: string) => callback(serverId));
       return () => ipcRenderer.removeAllListeners('deepLink');
     },
@@ -75,12 +77,14 @@ const ipcService = {
 
     onMaximize: (callback: () => void) => {
       if (!isElectron) return () => {};
+      ipcRenderer.removeAllListeners('maximize');
       ipcRenderer.on('maximize', callback);
       return () => ipcRenderer.removeAllListeners('maximize');
     },
 
     onUnmaximize: (callback: () => void) => {
       if (!isElectron) return () => {};
+      ipcRenderer.removeAllListeners('unmaximize');
       ipcRenderer.on('unmaximize', callback);
       return () => ipcRenderer.removeAllListeners('unmaximize');
     },
@@ -116,6 +120,7 @@ const ipcService = {
 
     onSubmit: (host: string, callback: (data: any) => void) => {
       if (!isElectron) return () => {};
+      ipcRenderer.removeAllListeners('popup-submit');
       ipcRenderer.on('popup-submit', (_: any, from: string, data?: any) => {
         if (from != host) return;
         callback(data);

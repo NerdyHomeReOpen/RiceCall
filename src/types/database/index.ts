@@ -1,27 +1,7 @@
-export type table_users = {
+export type table_accounts = {
+  account: string;
+  password: string;
   userId: string;
-  name: string;
-  displayId: string; // New: Display ID (for search user)
-  avatar: string;
-  avatarUrl: string;
-  email: string; // New: Email
-  signature: string;
-  about: string; // New: About
-  country: string;
-  level: number;
-  vip: number;
-  vxp: number; // New: VIP Experience Points
-  xp: number;
-  requiredXp: number;
-  birthYear: number;
-  birthMonth: number;
-  birthDay: number;
-  status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
-  gender: 'Male' | 'Female';
-  currentChannelId: string;
-  currentServerId: string;
-  lastActiveAt: number;
-  createdAt: number;
 };
 
 export type table_badges = {
@@ -30,59 +10,23 @@ export type table_badges = {
   description: string;
 };
 
-export type table_friend_groups = {
-  friendGroupId: string;
-  name: string;
-  order: number;
+export type table_channel_blocked_users = {
   userId: string;
-  createdAt: number;
+  channelId: string;
+  blockedUntil: number;
 };
 
-export type table_friends = {
+export type table_channel_muted_users = {
   userId: string;
-  targetId: string;
-  isBlocked: boolean;
-  friendGroupId: string | null;
-  createdAt: number;
+  channelId: string;
+  mutedTextUntil: number;
+  mutedVoiceUntil: number;
 };
 
-export type table_friend_applications = {
-  senderId: string;
-  receiverId: string;
-  description: string;
-  createdAt: number;
-};
-
-export type table_recommend_servers = {
-  categoryId: string;
-  serverId: string;
-};
-
-export type table_recommend_server_categories = {
-  categoryId: string;
-  name: string;
-  order: number;
-};
-
-export type table_servers = {
-  serverId: string;
-  name: string;
-  avatar: string;
-  avatarUrl: string;
-  announcement: string;
-  applyNotice: string;
-  description: string;
-  displayId: string;
-  slogan: string;
-  level: number;
-  wealth: number;
-  receiveApply: boolean;
-  type: 'game' | 'entertainment' | 'other';
-  visibility: 'public' | 'private' | 'invisible';
-  lobbyId: string;
-  receptionLobbyId: string | null;
-  ownerId: string;
-  createdAt: number;
+export type table_channel_permissions = {
+  userId: string;
+  channelId: string;
+  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 };
 
 export type table_channels = {
@@ -111,16 +55,38 @@ export type table_channels = {
   createdAt: number;
 };
 
-export type table_members = {
+export type table_codes = {
   userId: string;
-  serverId: string;
-  nickname: string | null;
-  contribution: number;
-  // lastMessageTime: number; // Remove: Not used
-  // lastJoinChannelTime: number; // Remove: Not used
-  isBlocked: number; // New: Change to number (Will change name to blocked_to)
-  // permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  code: string;
   createdAt: number;
+};
+
+export type table_friend_applications = {
+  senderId: string;
+  receiverId: string;
+  description: string;
+  createdAt: number;
+};
+
+export type table_friend_groups = {
+  friendGroupId: string;
+  name: string;
+  order: number;
+  userId: string;
+  createdAt: number;
+};
+
+export type table_friends = {
+  userId: string;
+  targetId: string;
+  isBlocked: boolean;
+  friendGroupId: string | null;
+  createdAt: number;
+};
+
+export type table_global_permissions = {
+  userId: string;
+  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 };
 
 export type table_member_applications = {
@@ -137,11 +103,72 @@ export type table_member_invitations = {
   createdAt: number;
 };
 
-export type table_user_servers = {
-  recent: boolean;
-  owned: boolean;
-  favorite: boolean;
-  timestamp: number;
+export type table_members = {
+  userId: string;
+  serverId: string;
+  nickname: string | null;
+  contribution: number;
+  // lastMessageTime: number; // Remove: change to frontend calculate
+  // lastJoinChannelTime: number; // Remove: change to frontend calculate
+  // isBlocked: number; // Remove: Change to table_server_blocked_users and table_channel_blocked_users
+  // permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // Remove: change to table_server_permissions and table_channel_permissions
+  createdAt: number;
+};
+
+export type table_recommend_server_categories = {
+  categoryId: string;
+  name: string;
+  order: number;
+};
+
+export type table_recommend_servers = {
+  categoryId: string;
+  serverId: string;
+};
+
+export type table_reset_password_requests = {
+  userId: string;
+  code: string;
+  createdAt: number;
+};
+
+export type table_server_blocked_users = {
+  userId: string;
+  serverId: string;
+  blockedUntil: number;
+};
+
+export type table_server_permissions = {
+  userId: string;
+  serverId: string;
+  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+};
+
+export type table_servers = {
+  serverId: string;
+  name: string;
+  avatar: string;
+  avatarUrl: string;
+  announcement: string;
+  applyNotice: string;
+  description: string;
+  displayId: string;
+  slogan: string;
+  level: number;
+  wealth: number;
+  receiveApply: boolean;
+  type: 'game' | 'entertainment' | 'other';
+  visibility: 'public' | 'private' | 'invisible';
+  lobbyId: string;
+  receptionLobbyId: string | null;
+  ownerId: string;
+  createdAt: number;
+};
+
+export type table_tokens = {
+  userId: string;
+  token: string;
+  createdAt: number;
 };
 
 export type table_user_badges = {
@@ -152,19 +179,41 @@ export type table_user_badges = {
   obtainedAt: number;
 };
 
-export type table_global_permissions = {
-  userId: string;
-  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type table_user_servers = {
+  recent: boolean;
+  owned: boolean;
+  favorite: boolean;
+  timestamp: number;
 };
 
-export type table_server_permissions = {
+export type table_user_vips = {
   userId: string;
-  serverId: string;
-  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  vip: number;
+  createdAt: number;
 };
 
-export type table_channel_permissions = {
+export type table_users = {
   userId: string;
-  channelId: string;
-  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  name: string;
+  displayId: string; // New: Display ID (for search user)
+  avatar: string;
+  avatarUrl: string;
+  email: string; // New: Email
+  signature: string;
+  about: string; // New: About
+  country: string;
+  level: number;
+  vip: number;
+  vxp: number; // New: VIP Experience Points
+  xp: number;
+  requiredXp: number;
+  birthYear: number;
+  birthMonth: number;
+  birthDay: number;
+  status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
+  gender: 'Male' | 'Female';
+  currentChannelId: string;
+  currentServerId: string;
+  lastActiveAt: number;
+  createdAt: number;
 };

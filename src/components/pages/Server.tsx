@@ -11,7 +11,7 @@ import ChannelListViewer from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
-import type { User, Server, Channel, Member, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueMember, ChannelUIMode } from '@/types';
+import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueMember, ChannelUIMode } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -81,7 +81,7 @@ interface ServerPageProps {
   user: User;
   friends: Friend[];
   server: Server;
-  serverMembers: Member[];
+  serverOnlineMembers: OnlineMember[];
   serverChannels: Channel[];
   queueMembers: QueueMember[];
   channel: Channel;
@@ -90,7 +90,7 @@ interface ServerPageProps {
   display: boolean;
 }
 
-const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, friends, server, serverMembers, serverChannels, channel, channelMessages, actionMessages, display, queueMembers }) => {
+const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, friends, server, serverOnlineMembers, serverChannels, channel, channelMessages, actionMessages, display, queueMembers }) => {
   // Hooks
   const { t } = useTranslation();
   const webRTC = useWebRTC();
@@ -248,7 +248,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   useEffect(() => {
     ipcService.discord.updatePresence({
       details: `${t('in')} ${serverName}`,
-      state: `${t('rpc:chat-with-members', { '0': serverMembers.length.toString() })}`,
+      state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
       largeImageKey: 'app_icon',
       largeImageText: 'RC Voice',
       smallImageKey: 'home_icon',
@@ -261,7 +261,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
         },
       ],
     });
-  }, [t, serverName, serverMembers]);
+  }, [t, serverName, serverOnlineMembers]);
 
   useEffect(() => {
     const unsubscribe = [
@@ -278,7 +278,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
       <main className={styles['server-body']}>
         {/* Left Sidebar */}
         <aside ref={sidebarRef} className={styles['sidebar']}>
-          <ChannelListViewer user={user} friends={friends} server={server} serverMembers={serverMembers} serverChannels={serverChannels} channel={channel} queueMembers={queueMembers} />
+          <ChannelListViewer user={user} friends={friends} server={server} serverOnlineMembers={serverOnlineMembers} serverChannels={serverChannels} channel={channel} queueMembers={queueMembers} />
         </aside>
 
         {/* Resize Handle */}

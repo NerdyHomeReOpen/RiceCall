@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, createContext, ReactNode } from 'react';
 
 // Types
-import type { ContextMenuItem, NotifyMenuItem, Member, Badge } from '@/types';
+import type { ContextMenuItem, NotifyMenuItem, OnlineMember, Badge } from '@/types';
 
 // Components
 import ContextMenu from '@/components/ContextMenu';
@@ -13,7 +13,7 @@ import EmojiPicker from '@/components/EmojiPicker';
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: ContextMenuItem[]) => void;
   showNotifyMenu: (x: number, y: number, preferTop: boolean, preferLeft: boolean, items: NotifyMenuItem[]) => void;
-  showUserInfoBlock: (x: number, y: number, preferTop: boolean, member: Member) => void;
+  showUserInfoBlock: (x: number, y: number, preferTop: boolean, member: OnlineMember) => void;
   showBadgeInfoCard: (x: number, y: number, preferTop: boolean, preferLeft: boolean, badge: Badge) => void;
   showEmojiPicker: (x: number, y: number, preferTop: boolean, type: 'custom' | 'unicode', onEmojiSelect: (emoji: string) => void) => void;
   closeContextMenu: () => void;
@@ -75,7 +75,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsNotifyMenuVisible(false);
   };
 
-  const showUserInfoBlock = (x: number, y: number, preferTop: boolean, member: Member) => {
+  const showUserInfoBlock = (x: number, y: number, preferTop: boolean, member: OnlineMember) => {
     setUserInfo(<UserInfoCard member={member} x={x} y={y} preferTop={preferTop} />);
     setIsUserInfoVisible(true);
   };

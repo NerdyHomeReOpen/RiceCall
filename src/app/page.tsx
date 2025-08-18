@@ -7,7 +7,21 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import header from '@/styles/header.module.css';
 
 // Types
-import type { PopupType, Server, User, Channel, FriendGroup, ChannelMessage, PromptMessage, FriendApplication, MemberInvitation, RecommendServerList, Friend, Member, QueueMember } from '@/types';
+import type {
+  PopupType,
+  Server,
+  User,
+  Channel,
+  FriendGroup,
+  ChannelMessage,
+  PromptMessage,
+  FriendApplication,
+  MemberInvitation,
+  RecommendServerList,
+  Friend,
+  OnlineMember,
+  QueueMember,
+} from '@/types';
 
 // i18n
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
@@ -428,7 +442,7 @@ const RootPageComponent = () => {
   const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
   const [systemNotify, setSystemNotify] = useState<string[]>([]);
   const [serverChannels, setServerChannels] = useState<Channel[]>([]);
-  const [serverMembers, setServerMembers] = useState<Member[]>([]);
+  const [serverOnlineMembers, setServerOnlineMembers] = useState<OnlineMember[]>([]);
   const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
@@ -517,22 +531,22 @@ const RootPageComponent = () => {
     setFriendApplications((prev) => prev.filter((fa) => !args.some((i) => i.senderId === fa.senderId)));
   };
 
-  const handleServerMembersSet = (...args: Member[]) => {
-    setServerMembers(args);
+  const handleServerOnlineMembersSet = (...args: OnlineMember[]) => {
+    setServerOnlineMembers(args);
   };
 
-  const handleServerMemberAdd = (...args: { data: Member }[]) => {
-    setServerMembers((prev) => [...prev, ...args.map((i) => i.data)]);
+  const handleServerOnlineMemberAdd = (...args: { data: OnlineMember }[]) => {
+    setServerOnlineMembers((prev) => [...prev, ...args.map((i) => i.data)]);
   };
 
-  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
+  const handleServerOnlineMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
     const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
-    setServerMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
+    setServerOnlineMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
   };
 
-  const handleServerMemberDelete = (...args: { userId: string; serverId: string }[]) => {
+  const handleServerOnlineMemberRemove = (...args: { userId: string; serverId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
-    setServerMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
+    setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   };
 
   const handleServerChannelsSet = (...args: Channel[]) => {
@@ -676,10 +690,10 @@ const RootPageComponent = () => {
       ipcService.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
       ipcService.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
       ipcService.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
-      ipcService.socket.on('serverOnlineMembersSet', handleServerMembersSet),
-      ipcService.socket.on('serverOnlineMemberAdd', handleServerMemberAdd),
-      ipcService.socket.on('serverMemberUpdate', handleServerMemberUpdate),
-      ipcService.socket.on('serverOnlineMemberRemove', handleServerMemberDelete),
+      ipcService.socket.on('serverOnlineMembersSet', handleServerOnlineMembersSet),
+      ipcService.socket.on('serverOnlineMemberAdd', handleServerOnlineMemberAdd),
+      ipcService.socket.on('serverOnlineMemberUpdate', handleServerOnlineMemberUpdate),
+      ipcService.socket.on('serverOnlineMemberRemove', handleServerOnlineMemberRemove),
       ipcService.socket.on('serverChannelsSet', handleServerChannelsSet),
       ipcService.socket.on('serverChannelAdd', handleServerChannelAdd),
       ipcService.socket.on('serverChannelUpdate', handleServerChannelUpdate),
@@ -712,7 +726,7 @@ const RootPageComponent = () => {
                 friends={friends}
                 server={server}
                 channel={channel}
-                serverMembers={serverMembers}
+                serverOnlineMembers={serverOnlineMembers}
                 serverChannels={serverChannels}
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}

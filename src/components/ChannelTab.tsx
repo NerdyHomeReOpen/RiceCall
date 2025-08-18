@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Types
-import type { Member, Channel, Server, User, Friend } from '@/types';
+import type { OnlineMember, Channel, Server, User, Friend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -24,7 +24,7 @@ interface ChannelTabProps {
   user: User;
   friends: Friend[];
   server: Server;
-  serverMembers: Member[];
+  serverOnlineMembers: OnlineMember[];
   channel: Channel;
   expanded: Record<string, boolean>;
   selectedItemId: string | null;
@@ -32,7 +32,7 @@ interface ChannelTabProps {
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, server, serverMembers, channel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -47,21 +47,27 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
   const permissionLevel = useMemo(() => {
     return Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
   }, [globalPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
+
   const channelMembers = useMemo(() => {
-    return serverMembers.filter((mb) => mb.currentChannelId === channelId);
-  }, [serverMembers, channelId]);
+    return serverOnlineMembers.filter((mb) => mb.currentChannelId === channelId);
+  }, [serverOnlineMembers, channelId]);
+
   const channelUserIds = useMemo(() => {
     return channelMembers.map((mb) => mb.userId);
   }, [channelMembers]);
+
   const userInChannel = useMemo(() => {
     return userCurrentChannelId === channelId;
   }, [userCurrentChannelId, channelId]);
+
   const isLobby = useMemo(() => {
     return serverLobbyId === channelId;
   }, [serverLobbyId, channelId]);
+
   const isReceptionLobby = useMemo(() => {
     return serverReceptionLobbyId === channelId;
   }, [serverReceptionLobbyId, channelId]);
+
   const canJoin = useMemo(() => {
     return (
       !userInChannel &&

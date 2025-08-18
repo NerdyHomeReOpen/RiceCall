@@ -109,7 +109,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
   const filteredBlockMembers = useMemo(() => {
     const searchLower = searchText.toLowerCase();
-    const list = serverMembers.filter((m) => (m.isBlocked === -1 || m.isBlocked > Date.now()) && (m.nickname?.toLowerCase().includes(searchLower) || m.name.toLowerCase().includes(searchLower)));
+    const list = serverMembers.filter((m) => (m.blockedUntil === -1 || m.blockedUntil > Date.now()) && (m.nickname?.toLowerCase().includes(searchLower) || m.name.toLowerCase().includes(searchLower)));
     return list.sort(Sorter(sortField as keyof Member, sortDirection));
   }, [serverMembers, searchText, sortField, sortDirection]);
 
@@ -128,7 +128,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   }, [memberApplications]);
 
   const totalBlockMembers = useMemo(() => {
-    return serverMembers.filter((m) => m.isBlocked === -1 || m.isBlocked > Date.now()).length;
+    return serverMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now()).length;
   }, [serverMembers]);
 
   const canSubmit = useMemo(() => {
@@ -148,10 +148,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     ipcService.socket.send('editServer', { serverId, update });
   };
 
-  const handleEditMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
-    ipcService.socket.send('editMember', { userId, serverId, update });
-  };
-
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
     ipcService.socket.send('editServerPermission', { userId, serverId, update });
   };
@@ -160,8 +156,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipcService.socket.send('terminateMember', { userId, serverId }));
   };
 
-  const handleRemoveBlockMember = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
-    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => handleEditMember(userId, serverId, { isBlocked: 0 }));
+  const handleUnblockFromServer = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
+    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipcService.socket.send('unblockFromServer', { userId, serverId }));
   };
 
   const handleOpenMemberApplySetting = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -413,7 +409,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                   onChange={(e) => setServer((prev) => ({ ...prev, announcement: e.target.value }))}
                 />
               )}
-              <div className={setting['note-text']}>{t('markdown-support')}</div>
+              <div className={setting['note-text']}>{t('markdown-support-description')}</div>
             </div>
           </div>
         </div>
@@ -717,7 +713,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                 </thead>
                 <tbody className={setting['table-container']}>
                   {filteredBlockMembers.map((member) => {
-                    const { userId: memberUserId, nickname: memberNickname, name: memberName, isBlocked: memberIsBlocked } = member;
+                    const { userId: memberUserId, nickname: memberNickname, name: memberName, blockedUntil: memberBlockedUntil } = member;
                     return (
                       <tr
                         key={memberUserId}
@@ -734,15 +730,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                               id: 'unblock',
                               label: t('unblock'),
                               show: true,
-                              onClick: () => {
-                                handleRemoveBlockMember(memberUserId, memberName, serverId);
-                              },
+                              onClick: () => handleUnblockFromServer(memberUserId, memberName, serverId),
                             },
                           ]);
                         }}
                       >
                         <td>{memberNickname || memberName}</td>
-                        <td>{memberIsBlocked === -1 ? t('permanent') : new Date(memberIsBlocked).toISOString().slice(0, 10)}</td>
+                        <td>{memberBlockedUntil === -1 ? t('permanent') : new Date(memberBlockedUntil).toISOString().slice(0, 10)}</td>
                       </tr>
                     );
                   })}

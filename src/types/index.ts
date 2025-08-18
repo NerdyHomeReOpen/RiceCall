@@ -22,24 +22,29 @@ export type Permission = {
   permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 };
 
-export type User = table_users &
-  Permission & {
-    badges: Badge[];
-  };
+export type BlockedUser = {
+  blockedUntil: number;
+};
+
+export type BadgeList = {
+  badges: Badge[];
+};
+
+export type User = table_users & Permission & BadgeList;
 
 export type Badge = table_badges & table_user_badges;
 
+export type Friend = table_friends & table_users & BadgeList;
+
 export type FriendGroup = table_friend_groups;
 
-export type Friend = table_friends & User;
-
 export type FriendApplication = table_friend_applications & User;
+
+export type Server = table_servers & table_user_servers & table_members & Permission;
 
 export type RecommendServerList = {
   [category: string]: RecommendServer[];
 };
-
-export type Server = table_servers & table_user_servers & table_members & Permission;
 
 export type RecommendServer = table_servers & {
   online: number;
@@ -55,16 +60,18 @@ export type Channel = table_channels &
     type: 'channel';
   };
 
-export type Member = table_members & Permission & User;
+export type OnlineMember = table_members & table_users & Permission & BadgeList;
 
-export type MemberApplication = table_member_applications & User;
-
-export type MemberInvitation = table_member_invitations & User;
-
-export type QueueMember = Member & {
+export type QueueMember = OnlineMember & {
   position: number;
   leftTime: number;
 };
+
+export type Member = table_members & table_users & Permission & BlockedUser;
+
+export type MemberApplication = table_member_applications & table_users;
+
+export type MemberInvitation = table_member_invitations & table_users;
 
 export type Message = {
   parameter: Record<string, string>;
@@ -156,13 +163,13 @@ export type PopupType =
   | 'createChannel'
   | 'createFriendGroup'
   | 'createServer'
-  | 'directMessage'
   | 'dialogAlert'
   | 'dialogAlert2'
   | 'dialogError'
-  | 'dialogSuccess'
   | 'dialogInfo'
+  | 'dialogSuccess'
   | 'dialogWarning'
+  | 'directMessage'
   | 'editChannelName'
   | 'editChannelOrder'
   | 'editFriend'
@@ -170,26 +177,26 @@ export type PopupType =
   | 'editNickname'
   | 'friendVerification'
   | 'inviteMember'
-  | 'memberInvitation'
   | 'memberApplySetting'
+  | 'memberInvitation'
   | 'searchUser'
-  | 'serverSetting'
   | 'serverBroadcast'
+  | 'serverSetting'
   | 'systemSetting'
-  | 'userSetting'
-  | 'userInfo';
+  | 'userInfo'
+  | 'userSetting';
 
 export type ClientToServerEvents = {
   // User
   searchUser: (...args: { query: string }[]) => void;
   editUser: (...args: { update: Partial<table_users> }[]) => void;
+  // Friend
+  editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
+  deleteFriend: (...args: { targetId: string }[]) => void;
   // Friend Group
   createFriendGroup: (...args: { preset: Partial<table_friend_groups> }[]) => void;
   editFriendGroup: (...args: { friendGroupId: string; update: Partial<table_friend_groups> }[]) => void;
   deleteFriendGroup: (...args: { friendGroupId: string }[]) => void;
-  // Friend
-  editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
-  deleteFriend: (...args: { targetId: string }[]) => void;
   // Friend Application
   sendFriendApplication: (...args: { receiverId: string; preset: Partial<table_friend_applications> }[]) => void;
   editFriendApplication: (...args: { receiverId: string; update: Partial<table_friend_applications> }[]) => void;
@@ -201,7 +208,8 @@ export type ClientToServerEvents = {
   searchServer: (...args: { query: string }[]) => void;
   connectServer: (...args: { serverId: string }[]) => void;
   disconnectServer: (...args: { serverId: string }[]) => void;
-  kickFromServer: (...args: { userId: string; serverId: string }[]) => void;
+  blockFromServer: (...args: { userId: string; serverId: string; blockUntil?: number }[]) => void;
+  unblockFromServer: (...args: { userId: string; serverId: string }[]) => void;
   createServer: (...args: { preset: Partial<table_servers> }[]) => void;
   editServer: (...args: { serverId: string; update: Partial<table_servers> }[]) => void;
   deleteServer: (...args: { serverId: string }[]) => void;
@@ -209,8 +217,8 @@ export type ClientToServerEvents = {
   connectChannel: (...args: { serverId: string; channelId: string; password?: string }[]) => void;
   moveToChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
   disconnectChannel: (...args: { serverId: string; channelId: string }[]) => void;
-  kickFromChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
-  kickToLobbyChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
+  blockFromChannel: (...args: { userId: string; serverId: string; channelId: string; blockUntil?: number }[]) => void;
+  unblockFromChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
   createChannel: (...args: { serverId: string; preset: Partial<table_channels> }[]) => void;
   editChannel: (...args: { serverId: string; channelId: string; update: Partial<table_channels> }[]) => void;
   deleteChannel: (...args: { serverId: string; channelId: string }[]) => void;
@@ -253,6 +261,13 @@ export type ClientToServerEvents = {
 };
 
 export type ServerToClientEvents = {
+  // Socket
+  connect: () => void;
+  disconnect: () => void;
+  reconnect: (attemptNumbers: number) => void;
+  error: (message: string) => void;
+  connect_error: (error: any) => void;
+  reconnect_error: (error: any) => void;
   // Notification
   notification: (...args: { message: string }[]) => void; // not used yet
   // User
@@ -284,6 +299,9 @@ export type ServerToClientEvents = {
   serverChannelAdd: (...args: { data: Channel }[]) => void;
   serverChannelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
   serverChannelRemove: (...args: { channelId: string }[]) => void;
+  // SFU
+  channelConnected: (...args: { channelId: string }[]) => void;
+  channelDisconnected: (...args: { channelId: string }[]) => void;
   // Queue
   queueMembersSet: (...args: QueueMember[]) => void;
   // Member
@@ -291,8 +309,9 @@ export type ServerToClientEvents = {
   serverMemberAdd: (...args: { data: Member }[]) => void;
   serverMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
   serverMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
-  serverOnlineMembersSet: (...args: Member[]) => void;
-  serverOnlineMemberAdd: (...args: { data: Member }[]) => void;
+  serverOnlineMembersSet: (...args: OnlineMember[]) => void;
+  serverOnlineMemberAdd: (...args: { data: OnlineMember }[]) => void;
+  serverOnlineMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => void;
   serverOnlineMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
   // Member Application
   serverMemberApplicationsSet: (...args: MemberApplication[]) => void;
@@ -315,28 +334,9 @@ export type ServerToClientEvents = {
   pong: () => void;
   // Popup
   openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
-  // Socket
-  connect: () => void;
-  disconnect: () => void;
-  reconnect: (attemptNumbers: number) => void;
-  error: (message: string) => void;
-  connect_error: (error: any) => void;
-  reconnect_error: (error: any) => void;
-
-  // SFU
-  channelConnected: (...args: { channelId: string }[]) => void;
-  channelDisconnected: (...args: { channelId: string }[]) => void;
 };
 
-export type ACK<T = any> =
-  | {
-      ok: true;
-      data: T;
-    }
-  | {
-      ok: false;
-      error: string;
-    };
+export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
 
 export type TransportReturnType = {
   id: string;

@@ -5,7 +5,7 @@ import styles from '@/styles/pages/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import type { Member, Channel, Server, User, Category, Friend, MemberApplication, QueueMember } from '@/types';
+import type { OnlineMember, Channel, Server, User, Category, Friend, MemberApplication, QueueMember } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -27,13 +27,13 @@ interface ChannelListProps {
   user: User;
   friends: Friend[];
   server: Server;
-  serverMembers: Member[];
+  serverOnlineMembers: OnlineMember[];
   serverChannels: (Channel | Category)[];
   channel: Channel;
   queueMembers: QueueMember[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverMembers, serverChannels, channel, queueMembers }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, serverChannels, channel, queueMembers }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -167,7 +167,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
           </div>
           <div className={styles['box']}>
             <div className={styles['id-text']}>{serverDisplayId}</div>
-            <div className={styles['member-text']}>{serverMembers.length}</div>
+            <div className={styles['member-text']}>{serverOnlineMembers.length}</div>
             <div className={styles['options']}>
               <div
                 className={styles['invitation-icon']}
@@ -255,12 +255,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
       {currentChannelVoiceMode === 'queue' && (
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
-          <div className={styles['mic-queue-list']}>
-            <div className={styles['mic-queue-list-users']}>
-              {queueMembers.map((member) => (
-                <QueueMemberTab key={member.userId} user={user} queueMember={member} server={server} channel={channel} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
-              ))}
-            </div>
+          <div className={styles['queue-list']}>
+            {queueMembers.map((member) => (
+              <QueueMemberTab key={member.userId} user={user} queueMember={member} server={server} channel={channel} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+            ))}
           </div>
           <div className={styles['saperator-2']} />
         </>
@@ -302,7 +300,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
               user={user}
               friends={friends}
               server={server}
-              serverMembers={serverMembers}
+              serverOnlineMembers={serverOnlineMembers}
               channel={channel}
               expanded={{ [currentChannelId]: true }}
               selectedItemId={selectedItemId}
@@ -320,7 +318,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                     user={user}
                     friends={friends}
                     server={server}
-                    serverMembers={serverMembers}
+                    serverOnlineMembers={serverOnlineMembers}
                     serverChannels={serverChannels}
                     category={item as Category}
                     expanded={expanded}
@@ -334,7 +332,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                     user={user}
                     friends={friends}
                     server={server}
-                    serverMembers={serverMembers}
+                    serverOnlineMembers={serverOnlineMembers}
                     channel={item as Channel}
                     expanded={expanded}
                     selectedItemId={selectedItemId}

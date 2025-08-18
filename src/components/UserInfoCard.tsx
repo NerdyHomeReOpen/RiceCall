@@ -10,7 +10,7 @@ import permission from '@/styles/permission.module.css';
 import BadgeListViewer from '@/components/BadgeList';
 
 // Types
-import type { Member } from '@/types';
+import type { OnlineMember } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { getPermissionText } from '@/utils/language';
 
 interface UserInfoCardProps {
-  member: Member;
+  member: OnlineMember;
   x?: number;
   y?: number;
   preferTop?: boolean;
