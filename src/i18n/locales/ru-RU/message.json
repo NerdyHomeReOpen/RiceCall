@@ -37,7 +37,7 @@
   "timeout-member-from-server": "[{{target}}] удален(а) из группы администратором [{{operator}}]",
   "timeout-member-from-channel": "Вы были выгнаны администратором [{{operator}}] из канала [{{channel}}]",
   "timeout-self-from-channel": "Администратор [{{operator}}] в канале [{{channel}}] удалил вас на {{time}} минут",
-  "block-member-from-server": "[{{target}}] заблокирован администратором [{{operator}}]",
+  "block-member-from-server": "【{{target}}】被管理員【{{operator}}】封鎖",
   "kick-member-from-server": "[{{target}}] удален(а) с канала администратором [{{operator}}]",
   "kicked-from-server": "Вас выгнали с сервера",
   "server-limit-reached": "Не удается создать сервер, превышен допустимый лимит",
