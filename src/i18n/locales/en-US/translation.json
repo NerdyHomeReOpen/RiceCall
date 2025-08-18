@@ -90,6 +90,7 @@
   "confirm-delete-friend-group": "Are you sure you want to delete group: {{0}}?",
   "confirm-kick-user": "Are you sure you want to kick {{0}} out?",
   "confirm-password": "Confirm password",
+  "confirm-remove-from-queue": "確定要將 {{0}} 從麥序中移除嗎？",
   "confirm-reject-all-friend-application": "Are you sure you want to reject all friend requests?",
   "confirm-reject-all-member-invitation": "確定拒絕所有會員邀請嗎？",
   "confirm-terminate-membership": "確定要解除 {{0}} 的會員身份嗎？",
