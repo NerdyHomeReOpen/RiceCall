@@ -90,6 +90,7 @@
   "confirm-delete-friend-group": "{{0}} grubunu silmek istediğinizden emin misiniz?",
   "confirm-kick-user": "{{0}} adlı kişiyi gerçekten atmak istiyor musunuz?",
   "confirm-password": "Şifreyi Onayla",
+  "confirm-remove-from-queue": "確定要將 {{0}} 從麥序中移除嗎？",
   "confirm-reject-all-friend-application": "Tüm arkadaşlık isteklerini reddetmek istediğinizden emin misiniz?",
   "confirm-reject-all-member-invitation": "確定拒絕所有會員邀請嗎？",
   "confirm-terminate-membership": "確定要解除 {{0}} 的會員身份嗎？",
