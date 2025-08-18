@@ -174,3 +174,38 @@
   padding: 5px;
   border: 0;
 }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.toolbar button {
+  background: var(--button-bg, #f5f5f5);
+  border: 1px solid var(--button-border, #d0d0d0);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-color, #333);
+  transition: all 0.2s ease;
+}
+
+.toolbar button:hover {
+  background: var(--button-hover-bg, #e8e8e8);
+  border-color: var(--button-border-hover, #b0b0b0);
+}
+
+.toolbar button:active {
+  background: var(--button-active-bg, #ddd);
+  transform: scale(0.96);
+}
+
+.toolbar button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(100, 150, 250, 0.3);
+}

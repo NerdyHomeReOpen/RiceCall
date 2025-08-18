@@ -47,11 +47,12 @@ export function sanitizeMarkdownWithSafeTags(markdownText: string): string {
       const [name, gender, level] = content.split('_');
       return `<span class='${markdown['user-icon']} ${permission[gender || 'Male']} ${permission[`lv-${level || '1'}`]}'></span><span class='${markdown['user-tag']}' alt='<@${content}>'>${name || 'Unknown'}</span>`;
     })
-    // replace <YT=https://www.youtube.com/watch?v=dQw4w9WgXcQ>
+    // replace <YT=...>
     .replace(ytTagRegex, (_, content) => {
       const videoId = content.match(/v=([^&]+)/)?.[1];
       return `<iframe class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
     })
+    .replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/g, '<u>$1</u>')
     // replace <br> to \n
     .replace(/<br\s*\/?>/g, '\n');
 

@@ -73,6 +73,51 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     ipcService.window.close();
   };
 
+  const applyFormat = (type: 'bold' | 'italic' | 'underline' |'emoji' | 'user' | 'yt') => {
+    const textarea = document.getElementById('channel-announcement-textarea') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = channelAnnouncement.substring(start, end) || t('your-text-here');
+
+    let formatted = '';
+    switch (type) {
+      case 'bold':
+        formatted = `**${selectedText}**`;
+        break;
+      case 'italic':
+        formatted = `*${selectedText}*`;
+        break;
+      case 'emoji':
+        formatted = `[emoji_${selectedText}]`;
+        break;
+      case 'underline':
+        formatted = `<u>${selectedText}</u>`;
+        break;
+      case 'user':
+        formatted = `<@${selectedText}_Male_1>`;
+        break;
+      case 'yt':
+        formatted = `<YT=https://www.youtube.com/watch?v=${selectedText}>`;
+        break;
+      default:
+        formatted = selectedText;
+    }
+
+    const newText =
+      channelAnnouncement.substring(0, start) + formatted + channelAnnouncement.substring(end);
+
+    setChannel((prev) => ({ ...prev, announcement: newText }));
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.selectionStart = start;
+      textarea.selectionEnd = start + formatted.length;
+    }, 0);
+  };
+
+
   // Effects
   useEffect(() => {
     if (!channelId || refreshRef.current) return;
@@ -183,6 +228,52 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 {showPreview ? t('edit') : t('preview')}
               </div>
             </div>
+
+            {!showPreview && (
+              <>
+                {/* Toolbar */}
+                <div className={setting['toolbar']}>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('bold')}
+                  >
+                    B
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('italic')}
+                  >
+                    I
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('underline')}
+                  >
+                    U̲
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('emoji')}
+                  >
+                    😊
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('user')}
+                  >
+                    @User
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('yt')}
+                  >
+                    ▶ YT
+                  </button>
+                </div>
+              </>
+            )}
+
             <div className={`${popup['input-box']} ${popup['col']}`}>
               {showPreview ? (
                 <div className={markdown['setting-markdown-container']} style={{ minHeight: '330px' }}>
@@ -190,6 +281,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 </div>
               ) : (
                 <textarea
+                  id="channel-announcement-textarea"
                   name="channel-announcement"
                   style={{ minHeight: '330px' }}
                   value={channelAnnouncement}
@@ -201,6 +293,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
             </div>
           </div>
         </div>
+
 
         {/* Access Permissions */}
         <div className={setting['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
