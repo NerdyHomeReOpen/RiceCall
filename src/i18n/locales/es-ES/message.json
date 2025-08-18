@@ -37,7 +37,7 @@
   "timeout-member-from-server": "【{{target}}】fue expulsado del grupo por el administrador 【{{operator}}】",
   "timeout-member-from-channel": "Has sido expulsado del canal 【{{channel}}】 por el administrador 【{{operator}}】",
   "timeout-self-from-channel": "Has sido expulsado del canal 【{{channel}}】 por el administrador 【{{operator}}】 por {{time}} minutos",
-  "block-member-from-server": "【{{target}}】fue bloqueado por el administrador【{{operator}}】",
+  "block-member-from-server": "【{{target}}】被管理員【{{operator}}】封鎖",
   "kick-member-from-server": "【{{target}}】fue expulsado del canal por el administrador 【{{operator}}】",
   "kicked-from-server": "Te han expulsado del grupo",
   "server-limit-reached": "No se puede crear el grupo. Se ha superado el número máximo de grupos que se pueden crear",
