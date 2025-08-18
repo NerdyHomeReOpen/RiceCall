@@ -21,10 +21,6 @@
   flex: 1;
   min-height: 0;
   min-width: 0;
-  overflow-y: hidden;
-}
-
-.scroll-view:hover {
   overflow-y: auto;
 }
 
@@ -280,44 +276,12 @@
   text-overflow: ellipsis;
 }
 
-.mic-queue-list {
+.queue-list {
   display: flex;
   flex-direction: column;
   height: 120px;
-}
-
-.mic-queue-list-users {
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-.queue-bottom-bar {
-  position: sticky;
-  bottom: 0;
-  width: 100%;
-  background: #f8f9fa;
-  padding: 12px;
-  border-top: 1px solid #dee2e6;
-  display: flex;
-  justify-content: center;
-  z-index: 10;
-}
-
-.queue-participate-button,
-.queue-leave-button {
-  background-color: #0073c6;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #45a047;
-  }
 }
 
 .channel-list {
