@@ -25,39 +25,40 @@ import { useTranslation } from 'react-i18next';
  * @returns The processed HTML string
  */
 export function sanitizeMarkdownWithSafeTags(markdownText: string): string {
-  const safeMarkdownText = typeof markdownText === 'string' ? markdownText : '';
+  if (typeof markdownText !== 'string') return '';
 
-  // escape < and >
-  const escaped = safeMarkdownText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  // regex
+  // Regex para tus formatos
   const emojiRegex = /\[emoji_.+?\]/g;
   const userTagRegex = /(?:<|&lt;)@(.+?)(?:>|&gt;)/g;
   const ytTagRegex = /(?:<|&lt;)YT=(.+?)(?:>|&gt;)/g;
 
-  const replaced = escaped
-    // replace emoji
-    .replace(emojiRegex, (match: string) => {
-      const emoji = emojis.find((emoji) => emoji.char === match);
+  let replaced = markdownText
+    // emoji
+    .replace(emojiRegex, (match) => {
+      const emoji = emojis.find(e => e.char === match);
       if (!emoji) return match;
       return `<img class='${markdown['emoji']}' src='${emoji.path}' alt="${emoji.char}"/>`;
     })
-    // replace <@name_gender_level>
+    // usuario
     .replace(userTagRegex, (_, content) => {
       const [name, gender, level] = content.split('_');
       return `<span class='${markdown['user-icon']} ${permission[gender || 'Male']} ${permission[`lv-${level || '1'}`]}'></span><span class='${markdown['user-tag']}' alt='<@${content}>'>${name || 'Unknown'}</span>`;
     })
-    // replace <YT=...>
+    // YouTube
     .replace(ytTagRegex, (_, content) => {
       const videoId = content.match(/v=([^&]+)/)?.[1];
-      return `<iframe class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+      return `<iframe class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
     })
-    .replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/g, '<u>$1</u>')
-    // replace <br> to \n
-    .replace(/<br\s*\/?>/g, '\n');
+    // underline
+    .replace(/<u>(.*?)<\/u>/g, '<u>$1</u>')
+    // alineaciones
+    .replace(/<div class="align-left">(.*?)<\/div>/gs, '<div class="align-left">$1</div>')
+    .replace(/<div class="align-center">(.*?)<\/div>/gs, '<div class="align-center">$1</div>')
+    .replace(/<div class="align-right">(.*?)<\/div>/gs, '<div class="align-right">$1</div>');
 
   return replaced;
 }
+
 
 interface MarkdownViewerProps {
   markdownText: string;

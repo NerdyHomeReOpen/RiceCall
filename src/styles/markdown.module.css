@@ -288,3 +288,15 @@
 .markdown-content pre:hover .copy-button {
   opacity: 1;
 }
+
+.markdown-content .align-left {
+  text-align: left;
+}
+
+.markdown-content .align-center {
+  text-align: center;
+}
+
+.markdown-content .align-right {
+  text-align: right;
+}

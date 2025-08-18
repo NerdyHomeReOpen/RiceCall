@@ -21,6 +21,9 @@ import Default from '@/utils/default';
 // Components
 import MarkdownViewer from '@/components/MarkdownViewer';
 
+import { SketchPicker } from 'react-color';
+import { Palette } from 'lucide-react';
+
 interface ChannelSettingPopupProps {
   userId: User['userId'];
   serverId: Server['serverId'];
@@ -39,6 +42,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const [server, setServer] = useState<Server>(Default.server());
   const [channel, setChannel] = useState<Channel>(Default.channel());
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [selectedColor, setSelectedColor] = useState("#000000");
 
   // Variables
   const { lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
@@ -73,7 +78,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     ipcService.window.close();
   };
 
-  const applyFormat = (type: 'bold' | 'italic' | 'underline' |'emoji' | 'user' | 'yt') => {
+  const applyFormat = (type: 'bold' | 'italic' | 'underline' |'emoji' | 'user' | 'yt' | 'align-left' | 'align-center' | 'align-right' | 'color',   value?: string) => {
     const textarea = document.getElementById('channel-announcement-textarea') as HTMLTextAreaElement;
     if (!textarea) return;
 
@@ -101,7 +106,19 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
       case 'yt':
         formatted = `<YT=https://www.youtube.com/watch?v=${selectedText}>`;
         break;
-      default:
+      case 'align-left':
+        formatted = `<div class="align-left">${selectedText}</div>`;
+        break;
+      case 'align-center':
+        formatted = `<div class="align-center">${selectedText}</div>`;
+        break;
+      case 'align-right':
+        formatted = `<div class="align-right">${selectedText}</div>`;
+        break;
+      case "color":
+        formatted = `<span style="color:${value}">${selectedText}</span>`;
+        break;
+        default:
         formatted = selectedText;
     }
 
@@ -270,6 +287,40 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   >
                     ▶ YT
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('align-left')}
+                  >
+                    ⯇
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('align-center')}
+                  >
+                    ≡
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('align-right')}
+                  >
+                    ▶
+                  </button>
+                  <button type="button" onClick={() => setShowColorPicker(!showColorPicker)} title="Color de texto">
+                    <Palette size={18} />
+                  </button>
+                  {showColorPicker && (
+                    <div style={{ position: "absolute", zIndex: 10 }}>
+                      <SketchPicker
+                        color={selectedColor}
+                        onChange={(color: any) => setSelectedColor(color.hex)}
+                        onChangeComplete={(color: any) => {
+                          applyFormat("color", color.hex);
+                          setShowColorPicker(false);
+                        }}
+                      />
+                    </div>
+                  )}
+
                 </div>
               </>
             )}
