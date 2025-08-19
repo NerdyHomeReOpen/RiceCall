@@ -934,7 +934,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-channel-ui-mode', (event) => {
-    event.reply('channel-ui-mode', store.get('channelUIMode') || 'auto');
+    event.reply('channel-ui-mode', store.get('channelUIMode') || 'classic');
   });
 
   ipcMain.on('get-close-to-tray', (event) => {
