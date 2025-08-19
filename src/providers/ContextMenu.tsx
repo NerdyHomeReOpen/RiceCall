@@ -108,16 +108,20 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   // Effects
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
-      if (isUserInfoVisible) closeUserInfoBlock();
-      if (isBadgeInfoVisible) closeBadgeInfoCard();
+      if (!(e.target as HTMLElement).closest('.user-info-card-container')) {
+        if (isUserInfoVisible) closeUserInfoBlock();
+      }
+      if (!(e.target as HTMLElement).closest('.badge-info-card-container')) {
+        if (isBadgeInfoVisible) closeBadgeInfoCard();
+      }
     };
     const onPointerDown = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest('.context-menu-container')) return;
-      if (isContextMenuVisible) closeContextMenu();
-      if (isBadgeInfoVisible) closeBadgeInfoCard();
-      if (isEmojiPickerVisible) closeEmojiPicker();
-      if (isNotifyMenuVisible) closeNotifyMenu();
+      if (!(e.target as HTMLElement).closest('.context-menu-container')) {
+        if (isContextMenuVisible) closeContextMenu();
+        if (isBadgeInfoVisible) closeBadgeInfoCard();
+        if (isEmojiPickerVisible) closeEmojiPicker();
+        if (isNotifyMenuVisible) closeNotifyMenu();
+      }
     };
     document.addEventListener('pointerdown', onPointerDown);
     document.addEventListener('mousemove', onMouseMove);

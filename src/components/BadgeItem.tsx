@@ -30,7 +30,7 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, preferTop = fal
   return (
     <div
       ref={badgeRef}
-      className="context-menu-container"
+      className="badge-info-card-container"
       onClick={(e) => {
         if (!badgeRef.current) return;
         const x = badgeRef.current.getBoundingClientRect().left;

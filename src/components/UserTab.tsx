@@ -187,7 +187,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     <div
       ref={userTabRef}
       key={memberUserId}
-      className={`context-menu-container ${styles['user-tab']} ${selectedItemId === `user-${memberUserId}` ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `user-${memberUserId}` ? styles['selected'] : ''}`}
       onClick={() => {
         if (selectedItemId === `user-${memberUserId}`) setSelectedItemId(null);
         else setSelectedItemId(`user-${memberUserId}`);

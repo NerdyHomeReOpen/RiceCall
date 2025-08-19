@@ -72,7 +72,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x = 0, y = 0, 
   }, [x, y, preferTop, preferLeft]);
 
   return (
-    <div ref={cardRef} className={`context-menu-container ${styles['badge-info-card']}`} style={{ top: cardY, left: cardX }}>
+    <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['badge-info-card']}`} style={{ top: cardY, left: cardX }}>
       <div className={styles['badge-info-wrapper']}>
         <div className={styles['badge-avatar-box']}>
           <div className={styles['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />

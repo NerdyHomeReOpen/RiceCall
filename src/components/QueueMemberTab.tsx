@@ -120,7 +120,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
     <div
       ref={userTabRef}
       key={memberUserId}
-      className={`context-menu-container ${styles['user-tab']} ${selectedItemId === `queue-${memberUserId}` ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `queue-${memberUserId}` ? styles['selected'] : ''}`}
       onClick={() => {
         if (selectedItemId === `queue-${memberUserId}`) setSelectedItemId(null);
         else setSelectedItemId(`queue-${memberUserId}`);
