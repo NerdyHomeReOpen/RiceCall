@@ -347,6 +347,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
     maximizable: true,
     resizable: true,
     fullscreen: false,
+    fullscreenable: true,
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
@@ -355,6 +356,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
       contextIsolation: false,
       backgroundThrottling: false,
     },
+    trafficLightPosition: { x: -100, y: -100 },
   });
 
   if (app.isPackaged || !DEV) {
@@ -413,6 +415,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
     maximizable: false,
     resizable: false,
     fullscreen: false,
+    fullscreenable: false,
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
@@ -421,6 +424,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
       contextIsolation: false,
       backgroundThrottling: false,
     },
+    trafficLightPosition: { x: -100, y: -100 },
   });
 
   if (app.isPackaged || !DEV) {
@@ -477,6 +481,7 @@ async function createPopup(type: PopupType, id: string, data: any, force = true)
     maximizable: false,
     resizable: false,
     fullscreen: false,
+    fullscreenable: false,
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
@@ -486,6 +491,7 @@ async function createPopup(type: PopupType, id: string, data: any, force = true)
       backgroundThrottling: false,
     },
     modal: true,
+    trafficLightPosition: { x: -100, y: -100 },
   });
 
   if (app.isPackaged || !DEV) {
@@ -842,10 +848,18 @@ app.on('ready', async () => {
         window.minimize();
         break;
       case 'maximize':
-        window.maximize();
+        if (process.platform === 'darwin') {
+          window.setFullScreen(true);
+        } else {
+          window.maximize();
+        }
         break;
       case 'unmaximize':
-        window.unmaximize();
+        if (process.platform === 'darwin') {
+          window.setFullScreen(false);
+        } else {
+          window.unmaximize();
+        }
         break;
       case 'close':
         window.close();
