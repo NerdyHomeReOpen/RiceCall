@@ -194,7 +194,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
       }}
       onDoubleClick={() => {
         if (!userTabRef.current) return;
-        const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
+        const x = userTabRef.current.getBoundingClientRect().right;
         const y = userTabRef.current.getBoundingClientRect().top;
         contextMenu.showUserInfoBlock(x, y, false, member);
       }}

@@ -127,7 +127,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
       }}
       onDoubleClick={() => {
         if (!userTabRef.current) return;
-        const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
+        const x = userTabRef.current.getBoundingClientRect().right;
         const y = userTabRef.current.getBoundingClientRect().top;
         contextMenu.showUserInfoBlock(x, y, false, queueMember);
       }}
@@ -139,25 +139,25 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
           {
             id: 'increase-queue-time',
             label: t('increase-queue-time'),
-            show: isSuperior,
+            show: isUser || isSuperior,
             onClick: () => handleIncreaseQueueTime(),
           },
           {
             id: 'move-up-queue',
             label: t('move-up-queue'),
-            show: isSuperior,
+            show: isUser || isSuperior,
             onClick: () => handleMoveUpQueue(memberUserId, serverId, channelId, memberPosition - 1),
           },
           {
             id: 'move-down-queue',
             label: t('move-down-queue'),
-            show: isSuperior,
+            show: isUser || isSuperior,
             onClick: () => handleMoveDownQueue(memberUserId, serverId, channelId, memberPosition + 1),
           },
           {
             id: 'remove-from-queue',
             label: t('remove-from-queue'),
-            show: isSuperior,
+            show: isUser || isSuperior,
             onClick: () => handleRemoveFromQueue(memberUserId, serverId, channelId),
           },
         ]);

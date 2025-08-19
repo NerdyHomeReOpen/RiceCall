@@ -498,8 +498,8 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     className={emoji['emoji-icon']}
                     onClick={() => {
                       if (!emojiIconRef.current) return;
-                      const x = emojiIconRef.current.getBoundingClientRect().x;
-                      const y = emojiIconRef.current.getBoundingClientRect().y;
+                      const x = emojiIconRef.current.getBoundingClientRect().left;
+                      const y = emojiIconRef.current.getBoundingClientRect().top;
                       contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
                         setUser((prev) => ({ ...prev, signature: prev.signature + emoji }));
                       });

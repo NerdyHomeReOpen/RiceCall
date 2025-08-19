@@ -32,8 +32,9 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, preferTop = fal
       ref={badgeRef}
       className="context-menu-container"
       onClick={(e) => {
-        const x = e.clientX;
-        const y = e.clientY;
+        if (!badgeRef.current) return;
+        const x = badgeRef.current.getBoundingClientRect().left;
+        const y = badgeRef.current.getBoundingClientRect().bottom;
         contextMenu.showBadgeInfoCard(x, y, preferTop, false, badge);
       }}
     >

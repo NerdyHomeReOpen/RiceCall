@@ -121,8 +121,8 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             onMouseDown={(e) => {
               e.preventDefault();
               if (!emojiIconRef.current) return;
-              const x = emojiIconRef.current.getBoundingClientRect().x;
-              const y = emojiIconRef.current.getBoundingClientRect().y + emojiIconRef.current.getBoundingClientRect().height;
+              const x = emojiIconRef.current.getBoundingClientRect().left;
+              const y = emojiIconRef.current.getBoundingClientRect().bottom;
               contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
                 if (!signatureInputRef.current) return;
                 signatureInputRef.current.value += emoji;

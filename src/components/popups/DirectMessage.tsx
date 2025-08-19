@@ -239,8 +239,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                   onMouseDown={(e) => {
                     e.preventDefault();
                     if (!emojiIconRef.current) return;
-                    const x = emojiIconRef.current.getBoundingClientRect().x;
-                    const y = emojiIconRef.current.getBoundingClientRect().y;
+                    const x = emojiIconRef.current.getBoundingClientRect().left;
+                    const y = emojiIconRef.current.getBoundingClientRect().top;
                     contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
                       setMessageInput((prev) => prev + emoji);
                       if (textareaRef.current) textareaRef.current.focus();

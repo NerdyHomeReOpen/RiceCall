@@ -182,7 +182,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                 onClick={() => {
                   if (!settingButtonRef.current) return;
                   const x = settingButtonRef.current.getBoundingClientRect().left;
-                  const y = settingButtonRef.current.getBoundingClientRect().top + settingButtonRef.current.getBoundingClientRect().height;
+                  const y = settingButtonRef.current.getBoundingClientRect().bottom;
                   contextMenu.showContextMenu(x, y, false, false, [
                     {
                       id: 'apply-member',
