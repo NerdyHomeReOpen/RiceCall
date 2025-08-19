@@ -62,11 +62,11 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
         <div className={popup['dialog-content']}>
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <div className={popup['label']}>{t('is-receive-member-apply')}</div>
+              <div className={popup['label']}>{t('is-receive-member-apply-label')}</div>
               <input name="receive-apply" type="checkbox" checked={serverReceiveApplication} onChange={() => setServer((prev) => ({ ...prev, receiveApply: !serverReceiveApplication }))} />
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('member-apply-note')}</div>
+              <div className={popup['label']}>{t('apply-member-note')}</div>
               <textarea name="apply-note" value={serverApplyNote} maxLength={100} onChange={(e) => setServer((prev) => ({ ...prev, applyNote: e.target.value }))} />
             </div>
           </div>
