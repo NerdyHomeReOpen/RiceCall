@@ -17,7 +17,9 @@ import MarkdownViewer from '@/components/MarkdownViewer';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import { staff } from '../staff';
+
+// Data
+import { staff } from '@/staff';
 
 const AboutPopup: React.FC = React.memo(() => {
   // Hooks

@@ -8,9 +8,6 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import hljs from 'highlight.js';
 
-// Components
-import { emojis } from '@/components/emojis';
-
 // CSS
 import 'highlight.js/styles/github.css';
 import markdown from '@/styles/markdown.module.css';
@@ -18,6 +15,9 @@ import permission from '@/styles/permission.module.css';
 
 // Providers
 import { useTranslation } from 'react-i18next';
+
+// Data
+import { emojis } from '@/emojis';
 
 /**
  * Main processing function
