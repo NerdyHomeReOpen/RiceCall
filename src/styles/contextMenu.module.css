@@ -46,7 +46,6 @@
   background-repeat: no-repeat;
   background-position: center center;
   align-self: center;
-  margin-right: 5px;
 }
 
 .context-menu .option[data-type='setting']::before {
@@ -65,9 +64,15 @@
   background-image: url('/exit.png');
 }
 
-.context-menu .option[data-type='submenu']::before {
+.context-menu .option[data-type='submenu-left']::before {
   background-image: url('/ctrl/icon_submenu.png');
   transform: rotate(180deg);
+}
+
+.context-menu .option[data-type='submenu']::before {
+  background-image: url('/ctrl/icon_submenu.png');
+  left: unset;
+  right: 6px;
 }
 
 .context-menu .option[data-type='checked']::before {

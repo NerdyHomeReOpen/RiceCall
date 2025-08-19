@@ -106,9 +106,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, direction, items, onClo
               }}
               onMouseEnter={(e) => {
                 if (!item.hasSubmenu || !item.submenuItems) return;
-                const x = e.currentTarget.getBoundingClientRect().left;
-                const y = e.currentTarget.getBoundingClientRect().top;
-                setSubMenu(<ContextMenu items={item.submenuItems} onClose={onClose} x={x} y={y} direction="left-bottom" />);
+                const x = direction === 'left-top' || direction === 'left-bottom' ? e.currentTarget.getBoundingClientRect().left : e.currentTarget.getBoundingClientRect().right;
+                const y = direction === 'left-top' || direction === 'right-top' ? e.currentTarget.getBoundingClientRect().bottom : e.currentTarget.getBoundingClientRect().top;
+                setSubMenu(<ContextMenu items={item.submenuItems} onClose={onClose} x={x} y={y} direction={direction} />);
               }}
               onMouseLeave={() => {
                 if (item.hasSubmenu) setSubMenu(null);

@@ -326,9 +326,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
           className={header['menu']}
           onClick={() => {
             if (!menuRef.current) return;
-            const x = menuRef.current.getBoundingClientRect().left;
+            const x = menuRef.current.getBoundingClientRect().right + 50;
             const y = menuRef.current.getBoundingClientRect().bottom;
-            contextMenu.showContextMenu(x, y, 'right-bottom', [
+            contextMenu.showContextMenu(x, y, 'left-bottom', [
               {
                 id: 'system-setting',
                 label: t('system-setting'),
@@ -350,7 +350,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
               {
                 id: 'language-select',
                 label: t('language-select'),
-                icon: 'submenu',
+                icon: 'submenu-left',
                 hasSubmenu: true,
                 submenuItems: LANGUAGES.map((language) => ({
                   id: `language-select-${language.code}`,
@@ -361,7 +361,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
               {
                 id: 'help-center',
                 label: t('help-center'),
-                icon: 'submenu',
+                icon: 'submenu-left',
                 hasSubmenu: true,
                 submenuItems: [
                   {
