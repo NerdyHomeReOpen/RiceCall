@@ -9,19 +9,19 @@ import contextMenu from '@/styles/contextMenu.module.css';
 import type { NotifyMenuItem } from '@/types';
 
 interface NotifyMenuProps {
+  x: number;
+  y: number;
+  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   items: NotifyMenuItem[];
   onClose: () => void;
-  x?: number;
-  y?: number;
-  preferTop?: boolean;
-  preferLeft?: boolean;
 }
 
-const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, preferTop = false, preferLeft = false }) => {
+const NotifyMenu: React.FC<NotifyMenuProps> = ({ x, y, direction, items, onClose }) => {
   // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
   // State
+  const [display, setDisplay] = useState(false);
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
 
@@ -39,11 +39,10 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, p
     const menuWidth = menuRef.current.offsetWidth;
     const menuHeight = menuRef.current.offsetHeight;
 
-    if (preferTop) {
+    if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= menuHeight;
     }
-
-    if (preferLeft) {
+    if (direction === 'left-top' || direction === 'left-bottom') {
       newPosX -= menuWidth;
     }
 
@@ -62,10 +61,11 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, p
 
     setMenuX(newPosX);
     setMenuY(newPosY);
-  }, [x, y, preferLeft, preferTop]);
+    setDisplay(true);
+  }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${styles['notify-menu']}`} style={{ top: menuY, left: menuX }}>
+    <div ref={menuRef} className={`context-menu-container ${styles['notify-menu']}`} style={display ? { top: menuY, left: menuX } : { opacity: 0 }}>
       {items
         .filter((item) => item?.show ?? true)
         .map((item, index) => {
@@ -82,10 +82,9 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, p
               >
                 {item.showContentLength ? `${item.label} (${item.contents ? item.contents.length : 0})` : item.label}
               </div>
-              <div className={`${styles['contents']}`}>
-                {item.showContent &&
-                  item.contents &&
-                  item.contents.slice(0, 3).map((content) => {
+              {item.showContent && item.contents && (
+                <div className={styles['contents']}>
+                  {item.contents.slice(0, 3).map((content) => {
                     switch (item.contentType) {
                       case 'image':
                         return <img src={content} alt={content} />;
@@ -93,8 +92,9 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ items, onClose, x = 0, y = 0, p
                         return content;
                     }
                   })}
-                {item.showContent && item.contents && item.contents.length > 3 && <span>..({item.contents.length - 3})</span>}
-              </div>
+                  {item.contents.length > 3 && <span>..({item.contents.length - 3})</span>}
+                </div>
+              )}
             </div>
           );
         })}

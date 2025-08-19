@@ -193,7 +193,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div className={styles['user-state-box']}>
               <div title={`${t('level')}: ${targetLevel}`} className={`${grade['grade']} ${grade[`lv-${Math.min(56, targetLevel)}`]}`} />
               {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
-              <BadgeList badges={JSON.parse(targetBadges)} maxDisplay={13} />
+              <BadgeList badges={JSON.parse(targetBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} />
             </div>
           </div>
           <div className={styles['user-box']}>
@@ -241,7 +241,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                     if (!emojiIconRef.current) return;
                     const x = emojiIconRef.current.getBoundingClientRect().left;
                     const y = emojiIconRef.current.getBoundingClientRect().top;
-                    contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
+                    contextMenu.showEmojiPicker(x, y, 'right-top', (emoji) => {
                       setMessageInput((prev) => prev + emoji);
                       if (textareaRef.current) textareaRef.current.focus();
                     });

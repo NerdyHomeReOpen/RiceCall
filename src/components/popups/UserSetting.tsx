@@ -338,7 +338,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           <div className={`${styles['user-profile-content']}`}>
             <div className={popup['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
-              <BadgeList badges={JSON.parse(userBadges)} maxDisplay={13} />
+              <BadgeList badges={JSON.parse(userBadges)} position="left-top" direction="right-top" maxDisplay={13} />
             </div>
           </div>
         </div>
@@ -500,7 +500,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                       if (!emojiIconRef.current) return;
                       const x = emojiIconRef.current.getBoundingClientRect().left;
                       const y = emojiIconRef.current.getBoundingClientRect().top;
-                      contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
+                      contextMenu.showEmojiPicker(x, y, 'left-top', (emoji) => {
                         setUser((prev) => ({ ...prev, signature: prev.signature + emoji }));
                       });
                     }}

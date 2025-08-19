@@ -129,13 +129,13 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
         if (!userTabRef.current) return;
         const x = userTabRef.current.getBoundingClientRect().right;
         const y = userTabRef.current.getBoundingClientRect().top;
-        contextMenu.showUserInfoBlock(x, y, false, queueMember);
+        contextMenu.showUserInfoBlock(x, y, 'right-bottom', queueMember);
       }}
       onContextMenu={(e) => {
         e.stopPropagation();
         const x = e.clientX;
         const y = e.clientY;
-        contextMenu.showContextMenu(x, y, false, false, [
+        contextMenu.showContextMenu(x, y, 'right-bottom', [
           {
             id: 'increase-queue-time',
             label: t('increase-queue-time'),
@@ -168,7 +168,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
-      <BadgeList badges={JSON.parse(memberBadges)} maxDisplay={5} />
+      <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}
       {isUser && <div className={styles['my-location-icon']} />}
     </div>

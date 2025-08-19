@@ -97,7 +97,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
           </div>
           <div className={friendPage['box']}>
-            <BadgeList badges={JSON.parse(userBadges)} maxDisplay={5} />
+            <BadgeList badges={JSON.parse(userBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
           </div>
         </div>
         <div className={friendPage['signature-wrapper']}>
@@ -123,7 +123,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
               if (!emojiIconRef.current) return;
               const x = emojiIconRef.current.getBoundingClientRect().left;
               const y = emojiIconRef.current.getBoundingClientRect().bottom;
-              contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
+              contextMenu.showEmojiPicker(x, y, 'right-bottom', (emoji) => {
                 if (!signatureInputRef.current) return;
                 signatureInputRef.current.value += emoji;
                 signatureInputRef.current.focus();

@@ -347,9 +347,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                 style={isChannelAdmin(permissionLevel) ? {} : { display: 'none' }}
                 onClick={() => {
                   if (!voiceModeMenuRef.current) return;
-                  const x = voiceModeMenuRef.current.getBoundingClientRect().left;
+                  const x = voiceModeMenuRef.current.getBoundingClientRect().right;
                   const y = voiceModeMenuRef.current.getBoundingClientRect().top;
-                  contextMenu.showContextMenu(x, y, true, false, [
+                  contextMenu.showContextMenu(x, y, 'left-top', [
                     {
                       id: 'free-speech',
                       label: t('free-speech'),

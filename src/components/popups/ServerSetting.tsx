@@ -466,7 +466,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                         onContextMenu={(e) => {
                           const x = e.clientX;
                           const y = e.clientY;
-                          contextMenu.showContextMenu(x, y, false, false, [
+                          contextMenu.showContextMenu(x, y, 'right-bottom', [
                             {
                               id: 'direct-message',
                               label: t('direct-message'),
@@ -644,7 +644,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                         onContextMenu={(e) => {
                           const x = e.clientX;
                           const y = e.clientY;
-                          contextMenu.showContextMenu(x, y, false, false, [
+                          contextMenu.showContextMenu(x, y, 'right-bottom', [
                             {
                               id: 'view-profile',
                               label: t('view-profile'),
@@ -725,7 +725,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                         onContextMenu={(e) => {
                           const x = e.clientX;
                           const y = e.clientY;
-                          contextMenu.showContextMenu(x, y, false, false, [
+                          contextMenu.showContextMenu(x, y, 'right-bottom', [
                             {
                               id: 'unblock',
                               label: t('unblock'),

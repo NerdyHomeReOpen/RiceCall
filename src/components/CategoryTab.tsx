@@ -200,7 +200,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
           e.stopPropagation();
           const x = e.clientX;
           const y = e.clientY;
-          contextMenu.showContextMenu(x, y, false, false, [
+          contextMenu.showContextMenu(x, y, 'right-bottom', [
             {
               id: 'join-channel',
               label: t('join-channel'),

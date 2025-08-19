@@ -14,10 +14,11 @@ const failedImageCache = new Set<string>();
 
 interface BadgeItemProps {
   badge: Badge;
-  preferTop?: boolean;
+  position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
+  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
 }
 
-const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, preferTop = false }) => {
+const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direction }) => {
   // Hooks
   const contextMenu = useContextMenu();
   const badgeRef = React.useRef<HTMLDivElement>(null);
@@ -33,9 +34,9 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, preferTop = fal
       className="badge-info-card-container"
       onClick={(e) => {
         if (!badgeRef.current) return;
-        const x = badgeRef.current.getBoundingClientRect().left;
-        const y = badgeRef.current.getBoundingClientRect().bottom;
-        contextMenu.showBadgeInfoCard(x, y, preferTop, false, badge);
+        const x = position === 'left-top' || position === 'left-bottom' ? badgeRef.current.getBoundingClientRect().left : badgeRef.current.getBoundingClientRect().right;
+        const y = position === 'left-top' || position === 'right-top' ? badgeRef.current.getBoundingClientRect().top : badgeRef.current.getBoundingClientRect().bottom;
+        contextMenu.showBadgeInfoCard(x, y, direction, badge);
       }}
     >
       <div className={styles['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />

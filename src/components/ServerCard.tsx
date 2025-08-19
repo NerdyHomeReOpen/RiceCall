@@ -78,7 +78,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
       onContextMenu={(e) => {
         const x = e.clientX;
         const y = e.clientY;
-        contextMenu.showContextMenu(x, y, false, false, [
+        contextMenu.showContextMenu(x, y, 'right-bottom', [
           {
             id: 'join-server',
             label: t('join-server'),

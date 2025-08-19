@@ -73,7 +73,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
             onContextMenu={(e) => {
               const x = e.clientX;
               const y = e.clientY;
-              contextMenu.showContextMenu(x, y, false, false, [
+              contextMenu.showContextMenu(x, y, 'right-bottom', [
                 {
                   id: 'direct-message',
                   label: t('direct-message'),

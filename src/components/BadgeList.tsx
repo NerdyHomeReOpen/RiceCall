@@ -11,18 +11,19 @@ import BadgeItem from '@/components/BadgeItem';
 
 interface BadgeListProps {
   badges: Badge[];
+  position?: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
+  direction?: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   maxDisplay?: number;
-  preferTop?: boolean;
 }
 
-const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, preferTop, maxDisplay = 21 }) => {
+const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'left-top', direction = 'right-bottom', maxDisplay = 21 }) => {
   // Variables
   const sortedBadges = [...badges].sort((a, b) => a.order - b.order).slice(0, maxDisplay);
 
   return (
     <div className={styles['badge-viewer-wrapper']}>
       {sortedBadges.map((badge) => (
-        <BadgeItem key={badge.badgeId} badge={badge} preferTop={preferTop} />
+        <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
       ))}
     </div>
   );

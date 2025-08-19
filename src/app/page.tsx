@@ -274,9 +274,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
           className={header['notice']}
           onClick={() => {
             if (!notifyMenuRef.current) return;
-            const x = notifyMenuRef.current.getBoundingClientRect().left - 70;
-            const y = notifyMenuRef.current.getBoundingClientRect().bottom + 10;
-            contextMenu.showNotifyMenu(x, y, false, false, [
+            const x = notifyMenuRef.current.getBoundingClientRect().left;
+            const y = notifyMenuRef.current.getBoundingClientRect().bottom;
+            contextMenu.showNotifyMenu(x, y, 'right-bottom', [
               {
                 id: 'no-unread-notify',
                 label: `無未讀消息`, // TODO: t('no-unread-notify'),
@@ -327,8 +327,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
           onClick={() => {
             if (!menuRef.current) return;
             const x = menuRef.current.getBoundingClientRect().left;
-            const y = menuRef.current.getBoundingClientRect().top + menuRef.current.getBoundingClientRect().height;
-            contextMenu.showContextMenu(x, y, false, false, [
+            const y = menuRef.current.getBoundingClientRect().bottom;
+            contextMenu.showContextMenu(x, y, 'right-bottom', [
               {
                 id: 'system-setting',
                 label: t('system-setting'),

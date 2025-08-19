@@ -196,7 +196,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         if (!userTabRef.current) return;
         const x = userTabRef.current.getBoundingClientRect().right;
         const y = userTabRef.current.getBoundingClientRect().top;
-        contextMenu.showUserInfoBlock(x, y, false, member);
+        contextMenu.showUserInfoBlock(x, y, 'right-bottom', member);
       }}
       draggable={!isUser && isChannelMod(permissionLevel) && isSuperior}
       onDragStart={(e) => handleDragStart(e, memberUserId, channelId)}
@@ -204,7 +204,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         e.stopPropagation();
         const x = e.clientX;
         const y = e.clientY;
-        contextMenu.showContextMenu(x, y, false, false, [
+        contextMenu.showContextMenu(x, y, 'right-bottom', [
           {
             id: 'join-user-channel',
             label: t('join-user-channel'),
@@ -363,7 +363,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
-      <BadgeList badges={JSON.parse(memberBadges)} maxDisplay={5} />
+      <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isUser && <div className={styles['my-location-icon']} />}
     </div>
   );

@@ -45,7 +45,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
           if (!emojiIconRef.current) return;
           const x = emojiIconRef.current.getBoundingClientRect().left;
           const y = emojiIconRef.current.getBoundingClientRect().top;
-          contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
+          contextMenu.showEmojiPicker(x, y, 'right-top', (emoji) => {
             setMessageInput((prev) => prev + emoji);
             if (textareaRef.current) textareaRef.current.focus();
           });

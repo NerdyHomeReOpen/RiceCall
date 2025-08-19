@@ -72,7 +72,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
         onContextMenu={(e) => {
           const x = e.clientX;
           const y = e.clientY;
-          contextMenu.showContextMenu(x, y, false, false, [
+          contextMenu.showContextMenu(x, y, 'right-bottom', [
             {
               id: 'edit-friend-group',
               label: t('edit-friend-group'),

@@ -10,14 +10,13 @@ import type { Badge } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 interface BadgeInfoCardProps {
+  x: number;
+  y: number;
+  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   badge: Badge;
-  x?: number;
-  y?: number;
-  preferTop?: boolean;
-  preferLeft?: boolean;
 }
 
-const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x = 0, y = 0, preferTop = false, preferLeft = false, badge }) => {
+const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, direction, badge }) => {
   // Refs
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -25,6 +24,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x = 0, y = 0, 
   const { t } = useTranslation();
 
   // State
+  const [display, setDisplay] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
@@ -34,23 +34,22 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x = 0, y = 0, 
 
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
+    const marginEdge = 10;
 
     let newPosX = x;
     let newPosY = y;
 
     const cardWidth = cardRef.current.offsetWidth;
     const cardHeight = cardRef.current.offsetHeight;
-    const marginEdge = 10;
 
     if (cardWidth === 0 || cardHeight === 0) {
       return;
     }
 
-    if (preferTop) {
+    if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= cardHeight;
     }
-
-    if (preferLeft) {
+    if (direction === 'left-top' || direction === 'left-bottom') {
       newPosX -= cardWidth;
     }
 
@@ -69,10 +68,11 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x = 0, y = 0, 
 
     setCardX(newPosX);
     setCardY(newPosY);
-  }, [x, y, preferTop, preferLeft]);
+    setDisplay(true);
+  }, [x, y, direction]);
 
   return (
-    <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['badge-info-card']}`} style={{ top: cardY, left: cardX }}>
+    <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['badge-info-card']}`} style={display ? { top: cardY, left: cardX } : { opacity: 0 }}>
       <div className={styles['badge-info-wrapper']}>
         <div className={styles['badge-avatar-box']}>
           <div className={styles['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
