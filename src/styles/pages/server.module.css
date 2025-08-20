@@ -28,6 +28,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  width: 280px;
   min-width: 280px;
   background-color: #f1f2f5;
 }
@@ -215,23 +216,6 @@
 .section-title-text {
   color: #a8a8a8;
   padding: 5px 10px;
-}
-
-.current-channel-ping {
-  z-index: 999;
-  position: absolute;
-  left: 0;
-  top: 20px;
-  display: flex;
-  align-items: center;
-  height: 20px;
-  padding-right: 3px;
-  padding-left: 3px;
-  background: #fff;
-  border: 1px solid #777;
-  border-radius: 3px;
-  color: #777;
-  opacity: 0;
 }
 
 .current-channel-box {

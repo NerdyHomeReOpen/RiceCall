@@ -1,7 +1,7 @@
 import React from 'react';
 
 // CSS
-import styles from '@/styles/badge.module.css';
+import badgeStyle from '@/styles/badge.module.css';
 
 // Types
 import type { Badge } from '@/types';
@@ -21,7 +21,7 @@ const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'le
   const sortedBadges = [...badges].sort((a, b) => a.order - b.order).slice(0, maxDisplay);
 
   return (
-    <div className={styles['badge-viewer-wrapper']}>
+    <div className={badgeStyle['badge-viewer-wrapper']}>
       {sortedBadges.map((badge) => (
         <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
       ))}

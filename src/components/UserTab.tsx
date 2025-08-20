@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
-import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
@@ -17,6 +16,7 @@ import { useWebRTC } from '@/providers/WebRTC';
 
 // Components
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -52,6 +52,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     permissionLevel: memberPermission,
     nickname: memberNickname,
     level: memberLevel,
+    xp: memberXp,
+    requiredXp: memberRequiredXp,
     gender: memberGender,
     badges: memberBadges,
     vip: memberVip,
@@ -362,7 +364,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
-      <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
+      <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
       <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isUser && <div className={styles['my-location-icon']} />}
     </div>

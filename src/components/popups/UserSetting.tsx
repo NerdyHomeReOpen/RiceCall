@@ -5,6 +5,7 @@ import type { Server, User, Friend } from '@/types';
 
 // Components
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -17,7 +18,6 @@ import apiService from '@/services/api.service';
 
 // CSS
 import styles from '@/styles/popups/userSetting.module.css';
-import grade from '@/styles/grade.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
@@ -237,10 +237,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           <div className={`${popup['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
             <div className={styles['user-name-text']}>{userName}</div>
             {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
-            <div
-              className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
-              title={`${t('level')}: ${userLevel}, ${t('xp')}:${userXP}, ${t('required-xp')}:${userRequiredXP - userXP}`}
-            />
+            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} />
           </div>
           <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
             @{userDisplayId}
@@ -368,14 +365,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                            }}
-                          >
+                          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div className={`${permission[userGender]} ${server.ownerId === targetId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-value-text']}>{server.contribution}</div>
                           </div>
@@ -399,14 +389,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                            }}
-                          >
+                          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div className={`${styles['permission']} ${permission[userGender]} ${server.ownerId === targetId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-box']}>
                               <div className={styles['contribution-icon']} />

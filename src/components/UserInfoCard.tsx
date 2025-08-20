@@ -2,12 +2,12 @@ import React, { useState, useLayoutEffect, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/userInfoCard.module.css';
-import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Components
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 // Types
 import type { OnlineMember } from '@/types';
@@ -109,7 +109,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
           <div className={styles['user-info-wrapper']}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
               <div className={`${styles['name-text']} ${memberVip > 0 && vip['vip-name-color']}`}>{memberName}</div>
-              <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} />
+              <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
             </div>
             <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
 

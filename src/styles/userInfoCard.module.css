@@ -113,6 +113,10 @@
 }
 
 .nickname-text {
+  white-space: nowrap;
+  line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #1e667c;
 }
 

@@ -159,3 +159,32 @@ button {
   filter: grayscale(100%) !important;
   pointer-events: none !important;
 }
+
+/* Hover Text */
+.has-hover-text {
+  position: relative;
+  cursor: pointer;
+  &:hover {
+    .hover-text {
+      opacity: 1;
+    }
+  }
+}
+
+.hover-text {
+  z-index: 999;
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  padding-right: 3px;
+  padding-left: 3px;
+  background: #fff;
+  border: 1px solid #777;
+  border-radius: 3px;
+  white-space: nowrap;
+  color: #777;
+  opacity: 0;
+}

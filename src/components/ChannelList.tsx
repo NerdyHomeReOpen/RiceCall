@@ -245,8 +245,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
 
       {/* Current Channel */}
       <div className={styles['current-channel-box']}>
-        <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]}`}>
-          <div className={`${styles['current-channel-ping']}`}>{`${latency}ms`}</div>
+        <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]} has-hover-text`}>
+          <div className={'hover-text'}>{`${latency}ms`}</div>
         </div>
         <div className={styles['current-channel-text']}>{currentChannelIsLobby ? t(`${currentChannelName}`) : currentChannelName}</div>
       </div>

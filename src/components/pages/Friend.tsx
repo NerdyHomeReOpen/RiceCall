@@ -3,13 +3,13 @@ import React, { useEffect, useRef } from 'react';
 
 // CSS
 import friendPage from '@/styles/pages/friend.module.css';
-import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Components
 import FriendList from '@/components/FriendList';
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 // Types
 import type { User, Friend, FriendGroup } from '@/types';
@@ -88,10 +88,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         <div className={friendPage['base-info-wrapper']}>
           <div className={friendPage['box']}>
             <div className={friendPage['level-icon']} />
-            <div
-              className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
-              title={`${t('level')}: ${userLevel}, ${t('xp')}: ${userXP}, ${t('required-xp')}: ${userRequiredXP - userXP}`}
-            />
+            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} />
             <div className={friendPage['wealth-icon']} />
             <div className={friendPage['wealth-value-text']}>0</div>
             {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}

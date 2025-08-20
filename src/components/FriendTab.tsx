@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/friend.module.css';
-import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Types
@@ -23,6 +22,7 @@ import Default from '@/utils/default';
 
 // Components
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 interface FriendTabProps {
   user: User;
@@ -53,6 +53,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     signature: friendSignature,
     vip: friendVip,
     level: friendLevel,
+    xp: friendXp,
+    requiredXp: friendRequiredXp,
     badges: friendBadges,
     status: friendStatus,
     isBlocked: friendIsBlocked,
@@ -214,7 +216,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
         <div className={styles['box']}>
           {friendVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
           <div className={`${styles['name-text']} ${friendVip > 0 ? vip['vip-name-color'] : ''}`}>{friendName}</div>
-          <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, friendLevel)}`]}`} />
+          <LevelIcon level={friendLevel} xp={friendXp} requiredXp={friendRequiredXp} />
           <BadgeList badges={JSON.parse(friendBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
         {friendStatus !== 'offline' && friendCurrentServerId ? (

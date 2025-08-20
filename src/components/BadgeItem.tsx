@@ -1,7 +1,7 @@
 import React from 'react';
 
 // CSS
-import styles from '@/styles/badge.module.css';
+import badgeStyle from '@/styles/badge.module.css';
 
 // Types
 import type { Badge } from '@/types';
@@ -25,21 +25,21 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direc
 
   if (failedImageCache.has(badge.iconUrl)) {
     // Fallback Badge
-    return <div className={styles['badge-big-image']} />;
+    return <div className={badgeStyle['badge-big-image']} />;
   }
 
   return (
     <div
       ref={badgeRef}
       className="badge-info-card-container"
-      onClick={(e) => {
+      onClick={() => {
         if (!badgeRef.current) return;
         const x = position === 'left-top' || position === 'left-bottom' ? badgeRef.current.getBoundingClientRect().left : badgeRef.current.getBoundingClientRect().right;
         const y = position === 'left-top' || position === 'right-top' ? badgeRef.current.getBoundingClientRect().top : badgeRef.current.getBoundingClientRect().bottom;
         contextMenu.showBadgeInfoCard(x, y, direction, badge);
       }}
     >
-      <div className={styles['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
+      <div className={badgeStyle['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
     </div>
   );
 });
