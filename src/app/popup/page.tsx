@@ -114,7 +114,7 @@ const Popup = React.memo(() => {
       case 'avatarCropper':
         return { title: t('avatar-cropper'), buttons: ['close'], node: <AvatarCropper {...initialData} />, hideHeader: false };
       case 'blockMember':
-        return { title: t('ban'), buttons: ['close'], node: <BlockMember {...initialData} />, hideHeader: false };
+        return { title: t('block'), buttons: ['close'], node: <BlockMember {...initialData} />, hideHeader: false };
       case 'changeTheme':
         return { title: t('change-theme'), buttons: ['close'], node: <ChangeTheme {...initialData} />, hideHeader: false };
       case 'channelPassword':

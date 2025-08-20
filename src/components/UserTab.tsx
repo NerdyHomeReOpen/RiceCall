@@ -287,8 +287,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             onClick: () => handleBlockFromServer(memberUserId, serverId, memberNickname || memberName),
           },
           {
-            id: 'ban',
-            label: t('ban'),
+            id: 'block',
+            label: t('block'),
             show: !isUser && isMember(permissionLevel) && isSuperior,
             onClick: () => handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName),
           },

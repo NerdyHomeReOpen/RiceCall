@@ -262,8 +262,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <textarea
               ref={textareaRef}
               rows={2}
-              placeholder={t('message-input-box')}
+              placeholder={`${t('input-message')}...`}
               maxLength={MAX_LENGTH}
+              className={styles['input']}
               onKeyDown={(e) => {
                 const value = textareaRef.current?.value;
                 if (e.shiftKey) return;

@@ -82,7 +82,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   };
 
   const handleBlockFriend = (targetId: User['userId'], isBlocked: Friend['isBlocked']) => {
-    handleOpenAlertDialog(t(`confirm-${isBlocked ? 'unblock' : 'block'}-friend`, { '0': friendName }), () => ipcService.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }));
+    handleOpenAlertDialog(t(`confirm-${isBlocked ? 'unblock' : 'block'}-user`, { '0': friendName }), () => ipcService.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }));
   };
 
   const handleDeleteFriend = (targetId: User['userId']) => {
@@ -193,8 +193,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             onClick: () => handleOpenEditFriend(userId, targetId),
           },
           {
-            id: 'set-block',
-            label: friendIsBlocked ? t('unban') : t('ban'),
+            id: 'block',
+            label: friendIsBlocked ? t('unblock') : t('block'),
             show: !isUser,
             onClick: () => handleBlockFriend(targetId, friendIsBlocked),
           },

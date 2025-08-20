@@ -23,16 +23,16 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const { t } = useTranslation();
 
   // States
-  const [blockType, setBlockType] = useState<'block' | 'ban' | 'banIP'>('block');
+  const [blockType, setBlockType] = useState<'block-temporary' | 'block-permanent' | 'blockIP'>('block-temporary');
   const [formatType, setFormatType] = useState<string>('hours');
   const [selectTime, setSelectTime] = useState<number>(1);
 
   // Memos
   const BLOCK_TYPE_OPTIONS = useMemo(
     () => [
-      { key: 'block', label: t('block'), disabled: false },
-      { key: 'ban', label: t('ban'), disabled: false },
-      { key: 'banIP', label: t('block-ip'), disabled: true },
+      { key: 'block-temporary', label: t('block-temporary'), disabled: false },
+      { key: 'block-permanent', label: t('block-permanent'), disabled: false },
+      { key: 'blockIP', label: t('block-ip'), disabled: true },
     ],
     [t],
   );
@@ -85,7 +85,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   }, [formatType, selectTime]);
 
   // Variables
-  const isBlock = blockType === 'block';
+  const isBlock = blockType === 'block-temporary';
 
   // Handlers
   const handleBlockFromServer = (userId: User['userId'], serverId: Server['serverId'], blockUntil: number) => {
@@ -108,7 +108,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>{t('block-type')}</div>
                 <div className={popup['select-box']}>
-                  <select value={blockType} onChange={(e) => setBlockType(e.target.value as 'block' | 'ban' | 'banIP')}>
+                  <select value={blockType} onChange={(e) => setBlockType(e.target.value as 'block-temporary' | 'block-permanent' | 'blockIP')}>
                     {BLOCK_TYPE_OPTIONS.map((option) => (
                       <option key={option.key} value={option.key} disabled={option.disabled}>
                         {option.label}
@@ -147,7 +147,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
         <div
           className={popup['button']}
           onClick={() => {
-            handleBlockFromServer(userId, serverId, blockType === 'block' ? Date.now() + BLOCK_TIME : -1);
+            handleBlockFromServer(userId, serverId, blockType === 'block-temporary' ? Date.now() + BLOCK_TIME : -1);
             handleClose();
           }}
         >
