@@ -45,10 +45,9 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   const [friendServer, setFriendServer] = useState<Server>(Default.server());
 
   // Variables
-  const { currentServerId: userCurrentServerId } = user;
+  const { userId, currentServerId: userCurrentServerId } = user;
   const {
-    userId: friendUserId,
-    targetId: friendTargetId,
+    targetId,
     name: friendName,
     avatarUrl: friendAvatarUrl,
     signature: friendSignature,
@@ -63,8 +62,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
 
   // Memos
   const isUser = useMemo(() => {
-    return friendUserId === user.userId;
-  }, [friendUserId, user.userId]);
+    return targetId === userId;
+  }, [targetId, userId]);
 
   // Handlers
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
@@ -108,20 +107,23 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   useEffect(() => {
     if (!friendCurrentServerId) return;
     const refresh = async () => {
-      getService.server({ userId: friendUserId, serverId: friendCurrentServerId }).then((server) => {
+      getService.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
         if (server) setFriendServer(server);
       });
       refreshed.current = true;
     };
     refresh();
-  }, [friendCurrentServerId, friendUserId]);
+  }, [friendCurrentServerId, targetId]);
 
   return (
     <div
-      key={friendTargetId}
-      className={`${styles['friend-tab']} ${selectedItemId === `${friendTargetId}` ? styles['selected'] : ''}`}
-      onClick={() => setSelectedItemId(friendTargetId)}
-      onDoubleClick={() => handleOpenDirectMessage(friendUserId, friendTargetId, friendName)}
+      key={targetId}
+      className={`${styles['friend-tab']} ${selectedItemId === targetId ? styles['selected'] : ''}`}
+      onClick={() => {
+        if (selectedItemId === targetId) setSelectedItemId(null);
+        else setSelectedItemId(targetId);
+      }}
+      onDoubleClick={() => handleOpenDirectMessage(targetId, targetId, friendName)}
       onContextMenu={(e) => {
         const x = e.clientX;
         const y = e.clientY;
@@ -130,7 +132,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             id: 'direct-message',
             label: t('direct-message'),
             show: !isUser,
-            onClick: () => handleOpenDirectMessage(friendUserId, friendTargetId, friendName),
+            onClick: () => handleOpenDirectMessage(userId, targetId, friendName),
           },
           {
             id: 'separator',
@@ -141,7 +143,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             id: 'view-profile',
             label: t('view-profile'),
             show: !isUser,
-            onClick: () => handleOpenUserInfo(friendUserId, friendTargetId),
+            onClick: () => handleOpenUserInfo(userId, targetId),
           },
           {
             id: 'edit-note',
@@ -161,6 +163,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             label: t('permission-setting'),
             show: !isUser && !friendIsBlocked,
             icon: 'submenu',
+            disabled: true,
             hasSubmenu: true,
             submenuItems: [
               {
@@ -185,19 +188,19 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             id: 'edit-friend-group',
             label: t('edit-friend-group'),
             show: !isUser && !friendIsBlocked,
-            onClick: () => handleOpenEditFriend(friendUserId, friendTargetId),
+            onClick: () => handleOpenEditFriend(userId, targetId),
           },
           {
             id: 'set-block',
-            label: friendIsBlocked ? t('unblock') : t('block'),
+            label: friendIsBlocked ? t('unban') : t('ban'),
             show: !isUser,
-            onClick: () => handleBlockFriend(friendTargetId, friendIsBlocked),
+            onClick: () => handleBlockFriend(targetId, friendIsBlocked),
           },
           {
             id: 'delete-friend',
             label: t('delete-friend'),
             show: !isUser,
-            onClick: () => handleDeleteFriend(friendTargetId),
+            onClick: () => handleDeleteFriend(targetId),
           },
         ]);
       }}

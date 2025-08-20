@@ -50,8 +50,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const [sortField, setSortField] = useState<string>('permissionLevel');
   const [searchText, setSearchText] = useState('');
   const [showPreview, setShowPreview] = useState(false);
-  const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
-  const [selectedRowType, setSelectedRowType] = useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string>('');
 
   // Variables
   const { permissionLevel: globalPermission } = user;
@@ -458,10 +457,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                     return (
                       <tr
                         key={memberUserId}
-                        className={`${selectedRowId === memberUserId && selectedRowType === 'member' ? popup['selected'] : ''}`}
+                        className={`${selectedItemId === `member-${memberUserId}` ? popup['selected'] : ''}`}
                         onClick={() => {
-                          setSelectedRowId(memberUserId);
-                          setSelectedRowType('member');
+                          if (selectedItemId === `member-${memberUserId}`) setSelectedItemId('');
+                          else setSelectedItemId(`member-${memberUserId}`);
                         }}
                         onContextMenu={(e) => {
                           const x = e.clientX;
@@ -636,10 +635,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                     return (
                       <tr
                         key={applicationUserId}
-                        className={`${selectedRowId === applicationUserId && selectedRowType === 'application' ? popup['selected'] : ''}`}
+                        className={`${selectedItemId === `application-${applicationUserId}` ? popup['selected'] : ''}`}
                         onClick={() => {
-                          setSelectedRowId(applicationUserId);
-                          setSelectedRowType('application');
+                          if (selectedItemId === `application-${applicationUserId}`) setSelectedItemId('');
+                          else setSelectedItemId(`application-${applicationUserId}`);
                         }}
                         onContextMenu={(e) => {
                           const x = e.clientX;
@@ -717,10 +716,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                     return (
                       <tr
                         key={memberUserId}
-                        className={`${selectedRowId === memberUserId && selectedRowType === 'blockedMember' ? popup['selected'] : ''}`}
+                        className={`${selectedItemId === `blocked-${memberUserId}` ? popup['selected'] : ''}`}
                         onClick={() => {
-                          setSelectedRowId(memberUserId);
-                          setSelectedRowType('blockedMember');
+                          if (selectedItemId === `blocked-${memberUserId}`) setSelectedItemId('');
+                          else setSelectedItemId(`blocked-${memberUserId}`);
                         }}
                         onContextMenu={(e) => {
                           const x = e.clientX;

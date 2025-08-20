@@ -847,7 +847,6 @@
   height: 120px;
   width: 4px;
   margin: 10px;
-  background: #bbb;
   border-radius: 2px;
 }
 
@@ -855,7 +854,7 @@
   appearance: none;
   position: absolute;
   top: calc(50% - 4px);
-  left: -60px;
+  left: -58px;
   width: 120px;
   height: 4px;
   background: #bbb;

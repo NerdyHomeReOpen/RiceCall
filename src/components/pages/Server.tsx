@@ -24,17 +24,7 @@ import ipcService from '@/services/ipc.service';
 // Utils
 import { isMember, isChannelAdmin } from '@/utils/permission';
 
-function MessageInputBoxGuard({
-  lastJoinChannelTime,
-  lastMessageTime,
-  permissionLevel,
-  channelForbidText,
-  channelForbidGuestText,
-  channelGuestTextGapTime,
-  channelGuestTextWaitTime,
-  channelGuestTextMaxLength,
-  onSend,
-}: {
+interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
   lastMessageTime: number;
   permissionLevel: number;
@@ -44,38 +34,100 @@ function MessageInputBoxGuard({
   channelGuestTextWaitTime: number;
   channelGuestTextMaxLength: number;
   onSend: (msg: string) => void;
-}) {
-  // Hooks
-  const { t } = useTranslation();
-
-  // States
-  const [now, setNow] = useState(Date.now());
-
-  // Effects
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;
-  const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
-
-  const isForbidByForbidText = !isChannelAdmin(permissionLevel) && channelForbidText;
-  const isForbidByForbidGuestText = !isMember(permissionLevel) && channelForbidGuestText;
-  const isForbidByForbidGuestTextGap = !isMember(permissionLevel) && leftGapTime > 0;
-  const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
-  const disabled = isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
-  const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 9999;
-  const placeholder = useMemo(() => {
-    if (isForbidByForbidText) return t('channel-forbid-text-message');
-    if (isForbidByForbidGuestText) return t('channel-forbid-guest-text-message');
-    if (isForbidByForbidGuestTextGap) return t('channel-guest-text-gap-time-message', { '0': leftGapTime.toString() });
-    if (isForbidByForbidGuestTextWait) return t('channel-guest-text-wait-time-message', { '0': leftWaitTime.toString() });
-    return `${t('input-message')}...`;
-  }, [t, isForbidByForbidText, isForbidByForbidGuestText, isForbidByForbidGuestTextGap, isForbidByForbidGuestTextWait, leftGapTime, leftWaitTime]);
-
-  return <MessageInputBox disabled={disabled} maxLength={maxLength} placeholder={placeholder} onSend={onSend} />;
 }
+
+const MessageInputBoxGuard = React.memo(
+  ({
+    lastJoinChannelTime,
+    lastMessageTime,
+    permissionLevel,
+    channelForbidText,
+    channelForbidGuestText,
+    channelGuestTextGapTime,
+    channelGuestTextWaitTime,
+    channelGuestTextMaxLength,
+    onSend,
+  }: MessageInputBoxGuardProps) => {
+    // Hooks
+    const { t } = useTranslation();
+
+    // States
+    const [now, setNow] = useState(Date.now());
+
+    // Effects
+    useEffect(() => {
+      const id = setInterval(() => setNow(Date.now()), 1000);
+      return () => clearInterval(id);
+    }, []);
+
+    const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;
+    const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
+
+    const isForbidByForbidText = !isChannelAdmin(permissionLevel) && channelForbidText;
+    const isForbidByForbidGuestText = !isMember(permissionLevel) && channelForbidGuestText;
+    const isForbidByForbidGuestTextGap = !isMember(permissionLevel) && leftGapTime > 0;
+    const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
+    const disabled = isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
+    const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 9999;
+    const placeholder = useMemo(() => {
+      if (isForbidByForbidText) return t('channel-forbid-text-message');
+      if (isForbidByForbidGuestText) return t('channel-forbid-guest-text-message');
+      if (isForbidByForbidGuestTextGap) return t('channel-guest-text-gap-time-message', { '0': leftGapTime.toString() });
+      if (isForbidByForbidGuestTextWait) return t('channel-guest-text-wait-time-message', { '0': leftWaitTime.toString() });
+      return `${t('input-message')}...`;
+    }, [t, isForbidByForbidText, isForbidByForbidGuestText, isForbidByForbidGuestTextGap, isForbidByForbidGuestTextWait, leftGapTime, leftWaitTime]);
+
+    return <MessageInputBox disabled={disabled} maxLength={maxLength} placeholder={placeholder} onSend={onSend} />;
+  },
+);
+
+MessageInputBoxGuard.displayName = 'MessageInputBoxGuard';
+
+interface VolumeSliderProps {
+  value: number;
+  muted: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onToggleMute: () => void;
+  railCls: string;
+  btnCls: string;
+}
+
+const VolumeSlider = React.memo(
+  function VolumeSlider({ value, muted, onChange, onToggleMute, railCls, btnCls }: VolumeSliderProps) {
+    // Refs
+    const sliderRef = useRef<HTMLInputElement>(null);
+    const btnIsHoverRef = useRef<boolean>(false);
+
+    return (
+      <div className={railCls}>
+        <div className={styles['slider-container']}>
+          <input ref={sliderRef} type="range" min="0" max="100" value={value} onChange={onChange} className={styles['slider']} />
+        </div>
+        <div
+          className={`${btnCls} ${muted ? styles['muted'] : styles['active']}`}
+          onClick={onToggleMute}
+          onMouseEnter={() => (btnIsHoverRef.current = true)}
+          onMouseLeave={() => (btnIsHoverRef.current = false)}
+          onWheel={(e) => {
+            if (!btnIsHoverRef.current) return;
+            const newValue = parseInt(sliderRef.current!.value);
+            if (e.deltaY > 0) {
+              sliderRef.current!.value = (newValue - 4).toString();
+            } else {
+              sliderRef.current!.value = (newValue + 4).toString();
+            }
+            onChange({ target: sliderRef.current! } as React.ChangeEvent<HTMLInputElement>);
+          }}
+        />
+      </div>
+    );
+  },
+  (prev, next) =>
+    prev.value === next.value && // 比較關鍵 prop
+    prev.muted === next.muted,
+);
+
+VolumeSlider.displayName = 'VolumeSlider';
 
 interface ServerPageProps {
   user: User;
@@ -425,21 +477,25 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               <div className={styles['saperator-1']} />
               <div className={styles['mic-volume-container']}>
                 <div className={`${styles['mic-mode-btn']} ${webRTC.isMicMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} />
-                <div className={styles['volume-slider']}>
-                  <div className={styles['slider-container']}>
-                    <input className={styles['slider']} type="range" min="0" max="100" value={webRTC.micVolume} onChange={handleEditMicVolume} />
-                  </div>
-                  <div className={`${styles['mic-mode-btn']} ${webRTC.isMicMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} onClick={handleToggleMicMute} />
-                </div>
+                <VolumeSlider
+                  value={webRTC.micVolume}
+                  muted={webRTC.isMicMute || webRTC.micVolume === 0}
+                  onChange={handleEditMicVolume}
+                  onToggleMute={handleToggleMicMute}
+                  railCls={styles['volume-slider']}
+                  btnCls={styles['mic-mode-btn']}
+                />
               </div>
               <div className={styles['speaker-volume-container']}>
                 <div className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} />
-                <div className={styles['volume-slider']}>
-                  <div className={styles['slider-container']}>
-                    <input type="range" min="0" max="100" value={webRTC.speakerVolume} onChange={handleEditSpeakerVolume} className={styles['slider']} />
-                  </div>
-                  <div className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} onClick={handleToggleSpeakerMute} />
-                </div>
+                <VolumeSlider
+                  value={webRTC.speakerVolume}
+                  muted={webRTC.isSpeakerMute || webRTC.speakerVolume === 0}
+                  onChange={handleEditSpeakerVolume}
+                  onToggleMute={handleToggleSpeakerMute}
+                  railCls={styles['volume-slider']}
+                  btnCls={styles['speaker-btn']}
+                />
               </div>
               <div className={styles['record-mode-btn']} />
             </div>

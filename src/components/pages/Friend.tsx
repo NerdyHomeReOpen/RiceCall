@@ -105,8 +105,8 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             ref={signatureInputRef}
             className={friendPage['signature-input']}
             defaultValue={userSignature}
+            maxLength={100}
             placeholder={t('signature-placeholder')}
-            maxLength={300}
             onBlur={(e) => handleChangeSignature(e.target.value)}
             onKeyDown={(e) => {
               if (isComposingRef.current || !signatureInputRef.current) return;

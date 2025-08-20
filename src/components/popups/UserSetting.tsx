@@ -303,9 +303,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
         {/* About */}
         <div className={styles['content']} style={selectedTabId === 'about' ? {} : { display: 'none' }}>
-          {userSignature && (
-            <div className={styles['user-about-me-show']}>
-              <div className={styles['user-about-me-show-text']} dangerouslySetInnerHTML={{ __html: userSignature }} />
+          {userAbout && (
+            <div className={styles['user-about-me']}>
+              <div className={styles['user-about-me-text']}>{userAbout}</div>
             </div>
           )}
           <div className={styles['user-profile-content']}>
@@ -492,7 +492,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('signature')}</div>
                 <div className={popup['row']}>
-                  <input name="signature" type="text" value={userSignature} onChange={(e) => setUser((prev) => ({ ...prev, signature: e.target.value }))} />
+                  <input name="signature" type="text" defaultValue={userSignature} maxLength={100} onChange={(e) => setUser((prev) => ({ ...prev, signature: e.target.value }))} />
                   <div
                     ref={emojiIconRef}
                     className={emoji['emoji-icon']}
@@ -509,7 +509,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('about-me')}</div>
-                <textarea name="about" value={userAbout} onChange={(e) => setUser((prev) => ({ ...prev, about: e.target.value }))} />
+                <textarea name="about" defaultValue={userAbout} maxLength={200} onChange={(e) => setUser((prev) => ({ ...prev, about: e.target.value }))} />
               </div>
             </div>
           </div>
