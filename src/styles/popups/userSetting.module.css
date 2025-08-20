@@ -56,13 +56,13 @@
 .user-about-me-show::before {
   background-image: url('/card/bg_left_quote.png');
   background-repeat: no-repeat;
-  margin-bottom: 6rem;
+  align-self: flex-start;
 }
 
 .user-about-me-show::after {
   background-image: url('/card/bg_right_quote.png');
   background-repeat: no-repeat;
-  margin-top: 6rem;
+  align-self: flex-end;
 }
 
 .user-about-me-show-text {
@@ -208,8 +208,6 @@
 
 .user-signature {
   color: #fff;
-  width: 30rem;
-  font-size: 0.95em;
   overflow-y: scroll;
   text-align: center;
   display: flex;
@@ -325,7 +323,7 @@
   display: flex;
   align-items: center;
   font-size: 1em;
-  line-height: 1rem;
+  line-height: 1em;
   color: rgb(95 95 95);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -336,7 +334,7 @@
   display: flex;
   align-items: center;
   color: #777;
-  min-width: 2.5rem;
+  min-width: 30px;
 }
 
 .contribution-value-text::before {
@@ -393,7 +391,7 @@
 
 .badge-viewer {
   display: flex;
-  gap: 0.25rem;
+  gap: 5px;
   height: 30px;
   align-items: center;
   border: 1px solid #d7d7d7;

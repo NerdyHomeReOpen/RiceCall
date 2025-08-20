@@ -319,9 +319,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               {/* Broadcast Area */}
               <div className={styles['input-area']}>
                 <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
-                  <div className={styles['broadcast-content']}>
-                    <MessageViewer messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} userId={userId} />
-                  </div>
+                  <MessageViewer messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} userId={userId} />
                 </div>
                 <MessageInputBoxGuard
                   lastJoinChannelTime={lastJoinChannelTime}

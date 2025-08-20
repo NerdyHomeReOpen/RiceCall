@@ -19,7 +19,6 @@
 
 .header.big {
   min-height: 40px;
-  min-width: 14rem;
   display: flex;
 }
 
@@ -37,7 +36,6 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  left: 2.5rem;
 }
 
 .name-box,
@@ -55,8 +53,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.5rem;
-  margin-right: 0.5rem;
+  margin-right: 10px;
+  gap: 5px;
 }
 
 .gift {
@@ -460,7 +458,7 @@
   flex-flow: column wrap;
   justify-content: space-between;
   align-items: center;
-  top: 1.4rem;
+  top: 20px;
   width: fit-content;
   height: fit-content;
   background-color: #fff;
@@ -484,7 +482,7 @@
   box-sizing: unset;
   width: 13px;
   height: 13px;
-  padding: 0.2rem;
+  padding: 2px;
 }
 
 .status-dropdown .option:hover {

@@ -71,7 +71,7 @@
   align-items: center;
   justify-content: flex-end;
   border-width: 1px;
-  border-radius: 0.375rem;
+  border-radius: 5px;
   padding-left: 20px;
 }
 

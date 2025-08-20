@@ -111,7 +111,7 @@
 
 .wealth-icon {
   border: none;
-  margin-left: 3rem;
+  margin-left: 3px;
   min-width: 16px;
   min-height: 16px;
   background-image: url('/silver_pea.png');
