@@ -233,7 +233,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = ({ announcement, s
               className={setting['button']}
               onClick={(e) => {
                 e.preventDefault();
-                const videoId = linkUrl.trim().split('v=')[1];
+                const videoId = linkUrl.trim().split('v=')[1].split('&')[0];
                 if (videoId && videoId.match(/^[\w-]+$/)) {
                   editor?.chain().insertYouTube(videoId).focus().run();
                 }
