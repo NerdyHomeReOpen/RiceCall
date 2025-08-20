@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 // CSS
 import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
-import markdown from '@/styles/markdown.module.css';
 
 // Types
 import type { Channel, Server, User } from '@/types';
@@ -19,7 +18,7 @@ import getService from '@/services/get.service';
 import Default from '@/utils/default';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
+import AnnouncementEditor from '../AnnouncementEditor';
 
 interface ChannelSettingPopupProps {
   userId: User['userId'];
@@ -177,28 +176,15 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         {/* Channel Announcement */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
+            {/* Header */}
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
               <div className={popup['label']}>{t('input-announcement')}</div>
               <div className={popup['button']} onClick={() => setShowPreview((prev) => !prev)}>
                 {showPreview ? t('edit') : t('preview')}
               </div>
             </div>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              {showPreview ? (
-                <div className={markdown['setting-markdown-container']} style={{ minHeight: '330px' }}>
-                  <MarkdownViewer markdownText={channelAnnouncement} />
-                </div>
-              ) : (
-                <textarea
-                  name="channel-announcement"
-                  style={{ minHeight: '330px' }}
-                  value={channelAnnouncement}
-                  maxLength={1000}
-                  onChange={(e) => setChannel((prev) => ({ ...prev, announcement: e.target.value }))}
-                />
-              )}
-              <div className={setting['note-text']}>{t('markdown-support-description')}</div>
-            </div>
+
+            <AnnouncementEditor announcement={channelAnnouncement} showPreview={showPreview} onChange={(value) => setChannel((prev) => ({ ...prev, announcement: value }))} />
           </div>
         </div>
 

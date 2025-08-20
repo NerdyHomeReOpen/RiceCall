@@ -50,33 +50,6 @@
   word-break: break-all;
 }
 
-.markdown-content .user-tag {
-  display: inline-block;
-  color: #226ba0;
-  cursor: pointer;
-  white-space: pre-wrap;
-}
-
-.markdown-content .user-tag:hover {
-  text-decoration: underline;
-}
-
-.markdown-content .user-icon {
-  display: inline-block;
-  vertical-align: text-bottom;
-}
-
-.markdown-content .youtube-video {
-  width: 100%;
-  aspect-ratio: 16/9;
-  border: 0;
-}
-
-.markdown-content .emoji {
-  width: 19px;
-  height: 19px;
-}
-
 .markdown-content a {
   color: #2563eb;
   font-weight: 500;
@@ -253,17 +226,15 @@
 }
 
 .setting-markdown-container {
-  min-height: 330px;
-  border: 1px solid #ddd;
-  padding: 2px;
-  background: #fff;
   position: relative;
   display: inline-block;
+  height: 100%;
   width: 100%;
-  height: 4rem;
+  padding: 2px;
+  background: #fff;
+  border: 1px solid #ddd;
   resize: none;
-  max-height: 330px;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .copy-button {
@@ -287,4 +258,31 @@
 
 .markdown-content pre:hover .copy-button {
   opacity: 1;
+}
+
+.user-name {
+  display: inline-block;
+  color: #226ba0;
+  cursor: pointer;
+  white-space: pre-wrap;
+}
+
+.user-name:hover {
+  text-decoration: underline;
+}
+
+.user-icon {
+  display: inline-block;
+  vertical-align: text-bottom;
+}
+
+.youtube-video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 0;
+}
+
+.emoji {
+  width: 19px;
+  height: 19px;
 }

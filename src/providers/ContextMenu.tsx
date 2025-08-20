@@ -9,23 +9,27 @@ import NotifyMenu from '@/components/NotifyMenu';
 import UserInfoCard from '@/components/UserInfoCard';
 import BadgeInfoCard from '@/components/BadgeInfoCard';
 import EmojiPicker from '@/components/EmojiPicker';
+import ColorPicker from '@/components/ColorPicker';
 
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => void;
   showNotifyMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotifyMenuItem[]) => void;
   showUserInfoBlock: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: OnlineMember) => void;
   showBadgeInfoCard: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Badge) => void;
-  showEmojiPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onEmojiSelect: (emoji: string) => void) => void;
+  showEmojiPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onEmojiSelect: (code: string, full: string) => void) => void;
+  showColorPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => void;
   closeContextMenu: () => void;
   closeNotifyMenu: () => void;
   closeUserInfoBlock: () => void;
   closeBadgeInfoCard: () => void;
   closeEmojiPicker: () => void;
+  closeColorPicker: () => void;
   isContextMenuVisible: boolean;
   isNotifyMenuVisible: boolean;
   isUserInfoVisible: boolean;
   isBadgeInfoVisible: boolean;
   isEmojiPickerVisible: boolean;
+  isColorPickerVisible: boolean;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
@@ -47,12 +51,14 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [isUserInfoVisible, setIsUserInfoVisible] = React.useState(false);
   const [isBadgeInfoVisible, setIsBadgeInfoVisible] = React.useState(false);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = React.useState(false);
+  const [isColorPickerVisible, setIsColorPickerVisible] = React.useState(false);
 
   const [contextMenu, setContextMenu] = React.useState<ReactNode | null>(null);
   const [notifyMenu, setNotifyMenu] = React.useState<ReactNode | null>(null);
   const [userInfo, setUserInfo] = React.useState<ReactNode | null>(null);
   const [badgeInfo, setBadgeInfo] = React.useState<ReactNode | null>(null);
   const [emojiPicker, setEmojiPicker] = React.useState<ReactNode | null>(null);
+  const [colorPicker, setColorPicker] = React.useState<ReactNode | null>(null);
 
   // Handlers
   const showContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => {
@@ -95,7 +101,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsBadgeInfoVisible(false);
   };
 
-  const showEmojiPicker = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onEmojiSelect: (emoji: string) => void) => {
+  const showEmojiPicker = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onEmojiSelect: (code: string, full: string) => void) => {
     setEmojiPicker(<EmojiPicker onEmojiSelect={onEmojiSelect} x={x} y={y} direction={direction} />);
     setIsEmojiPickerVisible(true);
   };
@@ -103,6 +109,16 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const closeEmojiPicker = () => {
     setEmojiPicker(null);
     setIsEmojiPickerVisible(false);
+  };
+
+  const showColorPicker = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => {
+    setColorPicker(<ColorPicker onColorSelect={onColorSelect} x={x} y={y} direction={direction} />);
+    setIsColorPickerVisible(true);
+  };
+
+  const closeColorPicker = () => {
+    setColorPicker(null);
+    setIsColorPickerVisible(false);
   };
 
   // Effects
@@ -121,6 +137,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         if (isBadgeInfoVisible) closeBadgeInfoCard();
         if (isEmojiPickerVisible) closeEmojiPicker();
         if (isNotifyMenuVisible) closeNotifyMenu();
+        if (isColorPickerVisible) closeColorPicker();
       }
     };
     document.addEventListener('pointerdown', onPointerDown);
@@ -129,7 +146,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('mousemove', onMouseMove);
     };
-  }, [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible, isUserInfoVisible, isNotifyMenuVisible]);
+  }, [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible, isUserInfoVisible, isNotifyMenuVisible, isColorPickerVisible]);
 
   return (
     <ContextMenuContext.Provider
@@ -139,16 +156,19 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         showUserInfoBlock,
         showBadgeInfoCard,
         showEmojiPicker,
+        showColorPicker,
         closeContextMenu,
         closeNotifyMenu,
         closeUserInfoBlock,
         closeBadgeInfoCard,
         closeEmojiPicker,
+        closeColorPicker,
         isContextMenuVisible,
         isNotifyMenuVisible,
         isUserInfoVisible,
         isBadgeInfoVisible,
         isEmojiPickerVisible,
+        isColorPickerVisible,
       }}
     >
       {isContextMenuVisible && contextMenu}
@@ -156,6 +176,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       {isUserInfoVisible && userInfo}
       {badgeInfo && badgeInfo}
       {isEmojiPickerVisible && emojiPicker}
+      {isColorPickerVisible && colorPicker}
       {children}
     </ContextMenuContext.Provider>
   );

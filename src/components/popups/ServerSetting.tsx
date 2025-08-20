@@ -4,7 +4,6 @@ import React, { ChangeEvent, useEffect, useRef, useState, useMemo } from 'react'
 import setting from '@/styles/popups/setting.module.css';
 import popup from '@/styles/popup.module.css';
 import permission from '@/styles/permission.module.css';
-import markdown from '@/styles/markdown.module.css';
 
 // Types
 import type { MemberApplication, Server, Member, User } from '@/types';
@@ -12,9 +11,6 @@ import type { MemberApplication, Server, Member, User } from '@/types';
 // Providers
 import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
-
-// Components
-import MarkdownViewer from '@/components/MarkdownViewer';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -26,6 +22,9 @@ import Default from '@/utils/default';
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin } from '@/utils/permission';
+
+//Components
+import AnnouncementEditor from '../AnnouncementEditor';
 
 interface ServerSettingPopupProps {
   userId: User['userId'];
@@ -388,28 +387,15 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         {/* Announcement */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
+            {/* Header */}
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
               <div className={popup['label']}>{t('input-announcement')}</div>
               <div className={popup['button']} onClick={() => setShowPreview((prev) => !prev)}>
                 {showPreview ? t('edit') : t('preview')}
               </div>
             </div>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              {showPreview ? (
-                <div className={markdown['setting-markdown-container']} style={{ minHeight: '330px' }}>
-                  <MarkdownViewer markdownText={serverAnnouncement} />
-                </div>
-              ) : (
-                <textarea
-                  name="announcement"
-                  style={{ minHeight: '330px' }}
-                  value={serverAnnouncement}
-                  maxLength={1000}
-                  onChange={(e) => setServer((prev) => ({ ...prev, announcement: e.target.value }))}
-                />
-              )}
-              <div className={setting['note-text']}>{t('markdown-support-description')}</div>
-            </div>
+
+            <AnnouncementEditor announcement={serverAnnouncement} showPreview={showPreview} onChange={(value) => setServer((prev) => ({ ...prev, announcement: value }))} />
           </div>
         </div>
 
