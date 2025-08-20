@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -34,9 +34,6 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const webRTC = useWebRTC();
-
-  // Refs
-  const userTabRef = useRef<HTMLDivElement>(null);
 
   // Variables
   const {
@@ -120,17 +117,14 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
 
   return (
     <div
-      ref={userTabRef}
-      key={memberUserId}
       className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `queue-${memberUserId}` ? styles['selected'] : ''}`}
       onClick={() => {
         if (selectedItemId === `queue-${memberUserId}`) setSelectedItemId(null);
         else setSelectedItemId(`queue-${memberUserId}`);
       }}
-      onDoubleClick={() => {
-        if (!userTabRef.current) return;
-        const x = userTabRef.current.getBoundingClientRect().right;
-        const y = userTabRef.current.getBoundingClientRect().top;
+      onDoubleClick={(e) => {
+        const x = e.currentTarget.getBoundingClientRect().right;
+        const y = e.currentTarget.getBoundingClientRect().top;
         contextMenu.showUserInfoBlock(x, y, 'right-bottom', queueMember);
       }}
       onContextMenu={(e) => {

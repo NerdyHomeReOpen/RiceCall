@@ -154,7 +154,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isResizingAnnAreaRef = useRef<boolean>(false);
   const annAreaRef = useRef<HTMLDivElement>(null);
-  const voiceModeMenuRef = useRef<HTMLDivElement>(null);
   const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
   const isMicTakenRef = useRef<boolean>(false);
 
@@ -392,13 +391,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
           <div className={styles['button-area']}>
             <div className={styles['buttons']}>
               <div
-                ref={voiceModeMenuRef}
                 className={styles['voice-mode-dropdown']}
                 style={isChannelAdmin(permissionLevel) ? {} : { display: 'none' }}
-                onClick={() => {
-                  if (!voiceModeMenuRef.current) return;
-                  const x = voiceModeMenuRef.current.getBoundingClientRect().left;
-                  const y = voiceModeMenuRef.current.getBoundingClientRect().top;
+                onClick={(e) => {
+                  const x = e.currentTarget.getBoundingClientRect().left;
+                  const y = e.currentTarget.getBoundingClientRect().top;
                   contextMenu.showContextMenu(x, y, 'right-top', [
                     {
                       id: 'free-speech',

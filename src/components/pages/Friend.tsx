@@ -38,7 +38,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   const isResizingSidebarRef = useRef<boolean>(false);
   const signatureInputRef = useRef<HTMLTextAreaElement>(null);
   const isComposingRef = useRef<boolean>(false);
-  const emojiIconRef = useRef<HTMLDivElement>(null);
 
   // Variables
   const { name: userName, signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
@@ -113,13 +112,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             onCompositionEnd={() => (isComposingRef.current = false)}
           />
           <div
-            ref={emojiIconRef}
             className={emoji['emoji-icon']}
             onMouseDown={(e) => {
               e.preventDefault();
-              if (!emojiIconRef.current) return;
-              const x = emojiIconRef.current.getBoundingClientRect().left;
-              const y = emojiIconRef.current.getBoundingClientRect().bottom;
+              const x = e.currentTarget.getBoundingClientRect().left;
+              const y = e.currentTarget.getBoundingClientRect().bottom;
               contextMenu.showEmojiPicker(x, y, 'right-bottom', (emoji) => {
                 if (!signatureInputRef.current) return;
                 signatureInputRef.current.value += emoji;

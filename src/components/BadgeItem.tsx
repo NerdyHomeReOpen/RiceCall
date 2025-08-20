@@ -21,7 +21,6 @@ interface BadgeItemProps {
 const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direction }) => {
   // Hooks
   const contextMenu = useContextMenu();
-  const badgeRef = React.useRef<HTMLDivElement>(null);
 
   if (failedImageCache.has(badge.iconUrl)) {
     // Fallback Badge
@@ -30,12 +29,10 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direc
 
   return (
     <div
-      ref={badgeRef}
       className="badge-info-card-container"
-      onClick={() => {
-        if (!badgeRef.current) return;
-        const x = position === 'left-top' || position === 'left-bottom' ? badgeRef.current.getBoundingClientRect().left : badgeRef.current.getBoundingClientRect().right;
-        const y = position === 'left-top' || position === 'right-top' ? badgeRef.current.getBoundingClientRect().top : badgeRef.current.getBoundingClientRect().bottom;
+      onClick={(e) => {
+        const x = position === 'left-top' || position === 'left-bottom' ? e.currentTarget.getBoundingClientRect().left : e.currentTarget.getBoundingClientRect().right;
+        const y = position === 'left-top' || position === 'right-top' ? e.currentTarget.getBoundingClientRect().top : e.currentTarget.getBoundingClientRect().bottom;
         contextMenu.showBadgeInfoCard(x, y, direction, badge);
       }}
     >

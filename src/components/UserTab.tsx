@@ -188,16 +188,14 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   return (
     <div
       ref={userTabRef}
-      key={memberUserId}
       className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `user-${memberUserId}` ? styles['selected'] : ''}`}
       onClick={() => {
         if (selectedItemId === `user-${memberUserId}`) setSelectedItemId(null);
         else setSelectedItemId(`user-${memberUserId}`);
       }}
-      onDoubleClick={() => {
-        if (!userTabRef.current) return;
-        const x = userTabRef.current.getBoundingClientRect().right;
-        const y = userTabRef.current.getBoundingClientRect().top;
+      onDoubleClick={(e) => {
+        const x = e.currentTarget.getBoundingClientRect().right;
+        const y = e.currentTarget.getBoundingClientRect().top;
         contextMenu.showUserInfoBlock(x, y, 'right-bottom', member);
       }}
       draggable={!isUser && isChannelMod(permissionLevel) && isSuperior}

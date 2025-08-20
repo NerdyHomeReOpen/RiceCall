@@ -40,7 +40,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const isComposingRef = useRef<boolean>(false);
   const cooldownRef = useRef<number>(0);
   const refreshRef = useRef(false);
-  const emojiIconRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // States
@@ -243,13 +242,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               <div className={styles['buttons']}>
                 <div className={`${styles['button']} ${styles['font']}`} />
                 <div
-                  ref={emojiIconRef}
                   className={`${styles['button']} ${styles['emoji']}`}
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    if (!emojiIconRef.current) return;
-                    const x = emojiIconRef.current.getBoundingClientRect().left;
-                    const y = emojiIconRef.current.getBoundingClientRect().top;
+                    const x = e.currentTarget.getBoundingClientRect().left;
+                    const y = e.currentTarget.getBoundingClientRect().top;
                     contextMenu.showEmojiPicker(x, y, 'right-top', (emoji) => {
                       setMessageInput((prev) => prev + emoji);
                       if (textareaRef.current) textareaRef.current.focus();

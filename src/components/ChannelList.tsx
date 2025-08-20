@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -38,10 +38,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const findMe = useFindMeContext();
-
-  // Refs
-  const viewerRef = useRef<HTMLDivElement>(null);
-  const settingButtonRef = useRef<HTMLDivElement>(null);
 
   // States
   const [viewType, setViewType] = useState<'all' | 'current'>('all');
@@ -150,7 +146,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   return (
     <>
       {/* Header */}
-      <div className={styles['sidebar-header']} ref={viewerRef}>
+      <div className={styles['sidebar-header']}>
         <div
           className={styles['avatar-box']}
           onClick={() => {
@@ -177,12 +173,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
               />
               <div className={styles['saperator-1']} />
               <div
-                ref={settingButtonRef}
                 className={styles['setting-icon']}
-                onClick={() => {
-                  if (!settingButtonRef.current) return;
-                  const x = settingButtonRef.current.getBoundingClientRect().left;
-                  const y = settingButtonRef.current.getBoundingClientRect().bottom;
+                onClick={(e) => {
+                  const x = e.currentTarget.getBoundingClientRect().left;
+                  const y = e.currentTarget.getBoundingClientRect().bottom;
                   contextMenu.showContextMenu(x, y, 'right-bottom', [
                     {
                       id: 'apply-member',
