@@ -10,6 +10,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 // Components
 import MessageViewer from '@/components/MessageViewer';
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 // Services
 import getService from '@/services/get.service';
@@ -22,7 +23,6 @@ import Default from '@/utils/default';
 import styles from '@/styles/popups/directMessage.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
-import grade from '@/styles/grade.module.css';
 
 interface DirectMessagePopupProps {
   userId: User['userId'];
@@ -40,7 +40,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const isComposingRef = useRef<boolean>(false);
   const cooldownRef = useRef<number>(0);
   const refreshRef = useRef(false);
-  const emojiIconRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // States
@@ -58,7 +57,16 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   // Variables
   const { avatarUrl: userAvatarUrl } = user;
-  const { avatarUrl: targetAvatarUrl, level: targetLevel, vip: targetVip, status: targetStatus, currentServerId: targetCurrentServerId, badges: targetBadges } = target;
+  const {
+    avatarUrl: targetAvatarUrl,
+    level: targetLevel,
+    xp: targetXp,
+    requiredXp: targetRequiredXp,
+    vip: targetVip,
+    status: targetStatus,
+    currentServerId: targetCurrentServerId,
+    badges: targetBadges,
+  } = target;
   const { name: targetCurrentServerName } = targetCurrentServer;
   const isOnline = targetStatus !== 'offline';
   const isVerifiedUser = false; // TODO: Remove this after implementing
@@ -191,9 +199,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
             {targetVip > 0 && <div className={`${vip['vip-icon-big']} ${vip[`vip-${targetVip}`]}`} />}
             <div className={styles['user-state-box']}>
-              <div title={`${t('level')}: ${targetLevel}`} className={`${grade['grade']} ${grade[`lv-${Math.min(56, targetLevel)}`]}`} />
+              <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} />
               {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
-              <BadgeList badges={JSON.parse(targetBadges)} maxDisplay={13} />
+              <BadgeList badges={JSON.parse(targetBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} />
             </div>
           </div>
           <div className={styles['user-box']}>
@@ -234,14 +242,12 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               <div className={styles['buttons']}>
                 <div className={`${styles['button']} ${styles['font']}`} />
                 <div
-                  ref={emojiIconRef}
                   className={`${styles['button']} ${styles['emoji']}`}
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    if (!emojiIconRef.current) return;
-                    const x = emojiIconRef.current.getBoundingClientRect().x;
-                    const y = emojiIconRef.current.getBoundingClientRect().y;
-                    contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
+                    const x = e.currentTarget.getBoundingClientRect().left;
+                    const y = e.currentTarget.getBoundingClientRect().top;
+                    contextMenu.showEmojiPicker(x, y, 'right-top', (emoji) => {
                       setMessageInput((prev) => prev + emoji);
                       if (textareaRef.current) textareaRef.current.focus();
                     });

@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/friend.module.css';
-import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Types
@@ -23,6 +22,7 @@ import Default from '@/utils/default';
 
 // Components
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 interface FriendTabProps {
   user: User;
@@ -45,15 +45,16 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   const [friendServer, setFriendServer] = useState<Server>(Default.server());
 
   // Variables
-  const { currentServerId: userCurrentServerId } = user;
+  const { userId, currentServerId: userCurrentServerId } = user;
   const {
-    userId: friendUserId,
-    targetId: friendTargetId,
+    targetId,
     name: friendName,
     avatarUrl: friendAvatarUrl,
     signature: friendSignature,
     vip: friendVip,
     level: friendLevel,
+    xp: friendXp,
+    requiredXp: friendRequiredXp,
     badges: friendBadges,
     status: friendStatus,
     isBlocked: friendIsBlocked,
@@ -63,8 +64,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
 
   // Memos
   const isUser = useMemo(() => {
-    return friendUserId === user.userId;
-  }, [friendUserId, user.userId]);
+    return targetId === userId;
+  }, [targetId, userId]);
 
   // Handlers
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
@@ -108,29 +109,32 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   useEffect(() => {
     if (!friendCurrentServerId) return;
     const refresh = async () => {
-      getService.server({ userId: friendUserId, serverId: friendCurrentServerId }).then((server) => {
+      getService.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
         if (server) setFriendServer(server);
       });
       refreshed.current = true;
     };
     refresh();
-  }, [friendCurrentServerId, friendUserId]);
+  }, [friendCurrentServerId, targetId]);
 
   return (
     <div
-      key={friendTargetId}
-      className={`${styles['friend-tab']} ${selectedItemId === `${friendTargetId}` ? styles['selected'] : ''}`}
-      onClick={() => setSelectedItemId(friendTargetId)}
-      onDoubleClick={() => handleOpenDirectMessage(friendUserId, friendTargetId, friendName)}
+      key={targetId}
+      className={`${styles['friend-tab']} ${selectedItemId === targetId ? styles['selected'] : ''}`}
+      onClick={() => {
+        if (selectedItemId === targetId) setSelectedItemId(null);
+        else setSelectedItemId(targetId);
+      }}
+      onDoubleClick={() => handleOpenDirectMessage(targetId, targetId, friendName)}
       onContextMenu={(e) => {
         const x = e.clientX;
         const y = e.clientY;
-        contextMenu.showContextMenu(x, y, false, false, [
+        contextMenu.showContextMenu(x, y, 'right-bottom', [
           {
             id: 'direct-message',
             label: t('direct-message'),
             show: !isUser,
-            onClick: () => handleOpenDirectMessage(friendUserId, friendTargetId, friendName),
+            onClick: () => handleOpenDirectMessage(userId, targetId, friendName),
           },
           {
             id: 'separator',
@@ -141,7 +145,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             id: 'view-profile',
             label: t('view-profile'),
             show: !isUser,
-            onClick: () => handleOpenUserInfo(friendUserId, friendTargetId),
+            onClick: () => handleOpenUserInfo(userId, targetId),
           },
           {
             id: 'edit-note',
@@ -161,6 +165,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             label: t('permission-setting'),
             show: !isUser && !friendIsBlocked,
             icon: 'submenu',
+            disabled: true,
             hasSubmenu: true,
             submenuItems: [
               {
@@ -185,19 +190,19 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             id: 'edit-friend-group',
             label: t('edit-friend-group'),
             show: !isUser && !friendIsBlocked,
-            onClick: () => handleOpenEditFriend(friendUserId, friendTargetId),
+            onClick: () => handleOpenEditFriend(userId, targetId),
           },
           {
             id: 'set-block',
-            label: friendIsBlocked ? t('unblock') : t('block'),
+            label: friendIsBlocked ? t('unban') : t('ban'),
             show: !isUser,
-            onClick: () => handleBlockFriend(friendTargetId, friendIsBlocked),
+            onClick: () => handleBlockFriend(targetId, friendIsBlocked),
           },
           {
             id: 'delete-friend',
             label: t('delete-friend'),
             show: !isUser,
-            onClick: () => handleDeleteFriend(friendTargetId),
+            onClick: () => handleDeleteFriend(targetId),
           },
         ]);
       }}
@@ -211,8 +216,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
         <div className={styles['box']}>
           {friendVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
           <div className={`${styles['name-text']} ${friendVip > 0 ? vip['vip-name-color'] : ''}`}>{friendName}</div>
-          <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, friendLevel)}`]}`} />
-          <BadgeList badges={JSON.parse(friendBadges)} maxDisplay={5} />
+          <LevelIcon level={friendLevel} xp={friendXp} requiredXp={friendRequiredXp} />
+          <BadgeList badges={JSON.parse(friendBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
         {friendStatus !== 'offline' && friendCurrentServerId ? (
           <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendCurrentServerId, friendServer.displayId)}>

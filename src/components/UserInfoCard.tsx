@@ -2,12 +2,12 @@ import React, { useState, useLayoutEffect, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/userInfoCard.module.css';
-import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Components
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 // Types
 import type { OnlineMember } from '@/types';
@@ -19,13 +19,13 @@ import { useTranslation } from 'react-i18next';
 import { getPermissionText } from '@/utils/language';
 
 interface UserInfoCardProps {
+  x: number;
+  y: number;
+  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   member: OnlineMember;
-  x?: number;
-  y?: number;
-  preferTop?: boolean;
 }
 
-const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y = 0, preferTop = false }) => {
+const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction, member }) => {
   // Refs
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -33,6 +33,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
   const { t } = useTranslation();
 
   // State
+  const [display, setDisplay] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
@@ -55,6 +56,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
   // Effect
   useLayoutEffect(() => {
     if (!cardRef.current) return;
+
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     const marginEdge = 10;
@@ -65,12 +67,11 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
     const cardWidth = cardRef.current.offsetWidth;
     const cardHeight = cardRef.current.offsetHeight;
 
-    if (cardWidth === 0 || cardHeight === 0) {
-      return;
-    }
-
-    if (preferTop) {
+    if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= cardHeight;
+    }
+    if (direction === 'left-top' || direction === 'left-bottom') {
+      newPosX -= cardWidth;
     }
 
     if (newPosX + cardWidth + marginEdge > windowWidth) {
@@ -88,16 +89,15 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
 
     setCardX(newPosX);
     setCardY(newPosY);
-  }, [x, y, preferTop]);
+    setDisplay(true);
+  }, [x, y, direction]);
 
   return (
     <div
       ref={cardRef}
-      className={`context-menu-container ${styles['user-info-card']} ${styles[`vip-${memberVip}`]}`}
-      style={{ top: cardY, left: cardX }}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
+      className={`user-info-card-container ${styles['user-info-card']} ${styles[`vip-${memberVip}`]}`}
+      style={display ? { top: cardY, left: cardX } : { opacity: 0 }}
+      onClick={(e) => e.stopPropagation()}
     >
       <div className={styles['body']}>
         {/* Top Section */}
@@ -109,7 +109,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
           <div className={styles['user-info-wrapper']}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
               <div className={`${styles['name-text']} ${memberVip > 0 && vip['vip-name-color']}`}>{memberName}</div>
-              <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} />
+              <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
             </div>
             <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
 
@@ -157,7 +157,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ member, x = 0, y
 
       {/* Badges Section */}
       <div className={styles['footer']}>
-        <BadgeList badges={JSON.parse(memberBadges)} maxDisplay={13} />
+        <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} />
       </div>
     </div>
   );

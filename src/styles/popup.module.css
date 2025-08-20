@@ -130,7 +130,7 @@
 
 .label {
   display: inline-block;
-  min-height: 2rem;
+  min-height: 2em;
   min-width: max-content;
   padding: 5px 5px 5px 0;
   white-space: normal;
@@ -173,7 +173,6 @@
   color: #2563eb;
   font-weight: 500;
   text-decoration: underline;
-  text-underline-offset: 0.125rem;
   white-space: pre-wrap;
   cursor: pointer;
 }
@@ -214,7 +213,7 @@
   position: relative;
   display: inline-block;
   width: 100%;
-  height: 2rem;
+  height: 2em;
 }
 
 .input-box table {
@@ -272,6 +271,7 @@
   border-left: 0;
   padding: 5px;
   overflow: hidden;
+  word-break: break-all;
 }
 
 .input-box table tr td .name {
@@ -307,7 +307,7 @@
   position: relative;
   display: inline-block;
   width: 100%;
-  height: 4rem;
+  height: 4em;
   resize: none;
 }
 
@@ -327,7 +327,7 @@
   position: relative;
   display: flex;
   width: 100%;
-  height: 2rem;
+  height: 2em;
   appearance: none;
   text-decoration: none;
 }
@@ -337,7 +337,7 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  height: 2rem;
+  height: 2em;
   width: 25px;
   z-index: 1;
   background-image: url('/channel/spliter.png');
@@ -380,7 +380,7 @@
 /* Dialog Styles */
 
 .dialog-icon {
-  margin-right: 1rem;
+  margin-right: 10px;
   content: '';
   display: inline-block;
   width: 36px;

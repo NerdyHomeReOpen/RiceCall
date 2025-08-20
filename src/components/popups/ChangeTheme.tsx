@@ -219,7 +219,9 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                           }
                           onClick={handleSelectTheme}
                           onContextMenu={(e) => {
-                            contextMenu.showContextMenu(e.clientX, e.clientY, false, false, [
+                            const x = e.clientX;
+                            const y = e.clientY;
+                            contextMenu.showContextMenu(x, y, 'right-bottom', [
                               {
                                 id: 'delete',
                                 label: t('delete'),

@@ -45,7 +45,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
 }
 
 .user-name-text {
@@ -58,8 +57,8 @@
 
 .avatar-picture {
   cursor: pointer;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 45px;
+  height: 45px;
   background-image: url('/im/SecretaryLogo.png');
   background-size: cover;
   background-position: center;
@@ -75,15 +74,14 @@
   height: 80px;
   border: 1px solid #d8d8d8;
   background-color: #f6f6f6;
-  border-radius: 0.1rem;
-  padding: 0.5rem;
+  padding: 2px;
 }
 
 .content-text {
   display: flex;
-  flex-flow: column wrap;
   color: #5e5e5e;
-  max-width: 21.5rem;
+  word-break: break-all;
+  overflow-y: auto;
 }
 
 .action-buttons {
@@ -95,6 +93,7 @@
 .action-buttons {
   display: flex;
   cursor: pointer;
+  min-width: max-content;
 }
 
 .action-buttons .button {

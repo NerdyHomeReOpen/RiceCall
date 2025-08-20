@@ -111,8 +111,8 @@
   width: 280px;
   height: 145px;
   border: 1px solid #000;
-  left: 8rem;
-  top: 7rem;
+  left: 100px;
+  top: 100px;
   background-color: #fff;
   padding: 5px;
 }
@@ -136,8 +136,8 @@
 
 .color-selected-color {
   background: #000;
-  height: 2rem;
-  width: 6rem;
+  height: 25px;
+  width: 60px;
 }
 
 .color-selected-btn {

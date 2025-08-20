@@ -3,13 +3,13 @@ import React, { useEffect, useRef } from 'react';
 
 // CSS
 import friendPage from '@/styles/pages/friend.module.css';
-import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Components
 import FriendList from '@/components/FriendList';
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 // Types
 import type { User, Friend, FriendGroup } from '@/types';
@@ -38,7 +38,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   const isResizingSidebarRef = useRef<boolean>(false);
   const signatureInputRef = useRef<HTMLTextAreaElement>(null);
   const isComposingRef = useRef<boolean>(false);
-  const emojiIconRef = useRef<HTMLDivElement>(null);
 
   // Variables
   const { name: userName, signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
@@ -88,16 +87,13 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         <div className={friendPage['base-info-wrapper']}>
           <div className={friendPage['box']}>
             <div className={friendPage['level-icon']} />
-            <div
-              className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
-              title={`${t('level')}: ${userLevel}, ${t('xp')}: ${userXP}, ${t('required-xp')}: ${userRequiredXP - userXP}`}
-            />
+            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} />
             <div className={friendPage['wealth-icon']} />
             <div className={friendPage['wealth-value-text']}>0</div>
             {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
           </div>
           <div className={friendPage['box']}>
-            <BadgeList badges={JSON.parse(userBadges)} maxDisplay={5} />
+            <BadgeList badges={JSON.parse(userBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
           </div>
         </div>
         <div className={friendPage['signature-wrapper']}>
@@ -105,8 +101,8 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             ref={signatureInputRef}
             className={friendPage['signature-input']}
             defaultValue={userSignature}
+            maxLength={100}
             placeholder={t('signature-placeholder')}
-            maxLength={300}
             onBlur={(e) => handleChangeSignature(e.target.value)}
             onKeyDown={(e) => {
               if (isComposingRef.current || !signatureInputRef.current) return;
@@ -116,14 +112,12 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             onCompositionEnd={() => (isComposingRef.current = false)}
           />
           <div
-            ref={emojiIconRef}
             className={emoji['emoji-icon']}
             onMouseDown={(e) => {
               e.preventDefault();
-              if (!emojiIconRef.current) return;
-              const x = emojiIconRef.current.getBoundingClientRect().x;
-              const y = emojiIconRef.current.getBoundingClientRect().y + emojiIconRef.current.getBoundingClientRect().height;
-              contextMenu.showEmojiPicker(x, y, false, 'unicode', (emoji) => {
+              const x = e.currentTarget.getBoundingClientRect().left;
+              const y = e.currentTarget.getBoundingClientRect().bottom;
+              contextMenu.showEmojiPicker(x, y, 'right-bottom', (emoji) => {
                 if (!signatureInputRef.current) return;
                 signatureInputRef.current.value += emoji;
                 signatureInputRef.current.focus();

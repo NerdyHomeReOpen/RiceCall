@@ -183,7 +183,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
           e.stopPropagation();
           const x = e.clientX;
           const y = e.clientY;
-          contextMenu.showContextMenu(x, y, false, false, [
+          contextMenu.showContextMenu(x, y, 'right-bottom', [
             {
               id: 'join-channel',
               label: t('join-channel'),

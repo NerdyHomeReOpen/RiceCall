@@ -1,8 +1,7 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
-import grade from '@/styles/grade.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
@@ -16,6 +15,7 @@ import { useWebRTC } from '@/providers/WebRTC';
 
 // Components
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -35,15 +35,14 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
   const contextMenu = useContextMenu();
   const webRTC = useWebRTC();
 
-  // Refs
-  const userTabRef = useRef<HTMLDivElement>(null);
-
   // Variables
   const {
     name: memberName,
     permissionLevel: memberPermission,
     nickname: memberNickname,
     level: memberLevel,
+    xp: memberXp,
+    requiredXp: memberRequiredXp,
     gender: memberGender,
     badges: memberBadges,
     vip: memberVip,
@@ -118,46 +117,43 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
 
   return (
     <div
-      ref={userTabRef}
-      key={memberUserId}
-      className={`context-menu-container ${styles['user-tab']} ${selectedItemId === `queue-${memberUserId}` ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `queue-${memberUserId}` ? styles['selected'] : ''}`}
       onClick={() => {
         if (selectedItemId === `queue-${memberUserId}`) setSelectedItemId(null);
         else setSelectedItemId(`queue-${memberUserId}`);
       }}
-      onDoubleClick={() => {
-        if (!userTabRef.current) return;
-        const x = userTabRef.current.getBoundingClientRect().left + userTabRef.current.getBoundingClientRect().width;
-        const y = userTabRef.current.getBoundingClientRect().top;
-        contextMenu.showUserInfoBlock(x, y, false, queueMember);
+      onDoubleClick={(e) => {
+        const x = e.currentTarget.getBoundingClientRect().right;
+        const y = e.currentTarget.getBoundingClientRect().top;
+        contextMenu.showUserInfoBlock(x, y, 'right-bottom', queueMember);
       }}
       onContextMenu={(e) => {
         e.stopPropagation();
         const x = e.clientX;
         const y = e.clientY;
-        contextMenu.showContextMenu(x, y, false, false, [
+        contextMenu.showContextMenu(x, y, 'right-bottom', [
           {
             id: 'increase-queue-time',
             label: t('increase-queue-time'),
-            show: isSuperior,
+            show: isUser || isSuperior,
             onClick: () => handleIncreaseQueueTime(),
           },
           {
             id: 'move-up-queue',
             label: t('move-up-queue'),
-            show: isSuperior,
+            show: isUser || isSuperior,
             onClick: () => handleMoveUpQueue(memberUserId, serverId, channelId, memberPosition - 1),
           },
           {
             id: 'move-down-queue',
             label: t('move-down-queue'),
-            show: isSuperior,
+            show: isUser || isSuperior,
             onClick: () => handleMoveDownQueue(memberUserId, serverId, channelId, memberPosition + 1),
           },
           {
             id: 'remove-from-queue',
             label: t('remove-from-queue'),
-            show: isSuperior,
+            show: isUser || isSuperior,
             onClick: () => handleRemoveFromQueue(memberUserId, serverId, channelId),
           },
         ]);
@@ -167,8 +163,8 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
-      <div className={`${grade['grade']} ${grade[`lv-${Math.min(56, memberLevel)}`]}`} style={{ cursor: 'default' }} />
-      <BadgeList badges={JSON.parse(memberBadges)} maxDisplay={5} />
+      <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
+      <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}
       {isUser && <div className={styles['my-location-icon']} />}
     </div>

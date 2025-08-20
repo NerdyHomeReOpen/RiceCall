@@ -25,7 +25,6 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
 
   // Refs
   const isComposingRef = useRef<boolean>(false);
-  const emojiIconRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // States
@@ -38,14 +37,12 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   return (
     <div className={`${messageInputBox['messageinput-box']} ${isWarning ? messageInputBox['warning'] : ''} ${isDisabled ? messageInputBox['disabled'] : ''}`}>
       <div
-        ref={emojiIconRef}
         className={emoji['emoji-icon']}
         onMouseDown={(e) => {
           e.preventDefault();
-          if (!emojiIconRef.current) return;
-          const x = emojiIconRef.current.getBoundingClientRect().x;
-          const y = emojiIconRef.current.getBoundingClientRect().y;
-          contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
+          const x = e.currentTarget.getBoundingClientRect().left;
+          const y = e.currentTarget.getBoundingClientRect().top;
+          contextMenu.showEmojiPicker(x, y, 'right-top', (emoji) => {
             setMessageInput((prev) => prev + emoji);
             if (textareaRef.current) textareaRef.current.focus();
           });

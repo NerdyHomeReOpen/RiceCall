@@ -69,8 +69,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   const { t } = useTranslation();
 
   // Refs
-  const menuRef = useRef<HTMLDivElement>(null);
-  const notifyMenuRef = useRef<HTMLDivElement>(null);
   const isCloseToTray = useRef<boolean>(true);
 
   // States
@@ -270,13 +268,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
         <div className={header['gift']} />
         <div className={header['game']} />
         <div
-          ref={notifyMenuRef}
           className={header['notice']}
-          onClick={() => {
-            if (!notifyMenuRef.current) return;
-            const x = notifyMenuRef.current.getBoundingClientRect().left - 70;
-            const y = notifyMenuRef.current.getBoundingClientRect().bottom + 10;
-            contextMenu.showNotifyMenu(x, y, false, false, [
+          onClick={(e) => {
+            const x = e.currentTarget.getBoundingClientRect().left;
+            const y = e.currentTarget.getBoundingClientRect().bottom;
+            contextMenu.showNotifyMenu(x, y, 'right-bottom', [
               {
                 id: 'no-unread-notify',
                 label: `無未讀消息`, // TODO: t('no-unread-notify'),
@@ -322,13 +318,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
         </div>
         <div className={header['spliter']} />
         <div
-          ref={menuRef}
           className={header['menu']}
-          onClick={() => {
-            if (!menuRef.current) return;
-            const x = menuRef.current.getBoundingClientRect().left;
-            const y = menuRef.current.getBoundingClientRect().top + menuRef.current.getBoundingClientRect().height;
-            contextMenu.showContextMenu(x, y, false, false, [
+          onClick={(e) => {
+            const x = e.currentTarget.getBoundingClientRect().right + 50;
+            const y = e.currentTarget.getBoundingClientRect().bottom;
+            contextMenu.showContextMenu(x, y, 'left-bottom', [
               {
                 id: 'system-setting',
                 label: t('system-setting'),
@@ -350,7 +344,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
               {
                 id: 'language-select',
                 label: t('language-select'),
-                icon: 'submenu',
+                icon: 'submenu-left',
                 hasSubmenu: true,
                 submenuItems: LANGUAGES.map((language) => ({
                   id: `language-select-${language.code}`,
@@ -361,7 +355,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
               {
                 id: 'help-center',
                 label: t('help-center'),
-                icon: 'submenu',
+                icon: 'submenu-left',
                 hasSubmenu: true,
                 submenuItems: [
                   {

@@ -5,6 +5,7 @@ import type { Server, User, Friend } from '@/types';
 
 // Components
 import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -17,7 +18,6 @@ import apiService from '@/services/api.service';
 
 // CSS
 import styles from '@/styles/popups/userSetting.module.css';
-import grade from '@/styles/grade.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
@@ -41,7 +41,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
   // Refs
   const refreshRef = useRef(false);
-  const emojiIconRef = useRef<HTMLDivElement>(null);
 
   // Constants
   const TODAY = useMemo(() => new Date(), []);
@@ -237,10 +236,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           <div className={`${popup['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
             <div className={styles['user-name-text']}>{userName}</div>
             {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
-            <div
-              className={`${grade['grade']} ${grade[`lv-${Math.min(56, userLevel)}`]}`}
-              title={`${t('level')}: ${userLevel}, ${t('xp')}:${userXP}, ${t('required-xp')}:${userRequiredXP - userXP}`}
-            />
+            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} />
           </div>
           <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
             @{userDisplayId}
@@ -303,9 +299,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
         {/* About */}
         <div className={styles['content']} style={selectedTabId === 'about' ? {} : { display: 'none' }}>
-          {userSignature && (
-            <div className={styles['user-about-me-show']}>
-              <div className={styles['user-about-me-show-text']} dangerouslySetInnerHTML={{ __html: userSignature }} />
+          {userAbout && (
+            <div className={styles['user-about-me']}>
+              <div className={styles['user-about-me-text']}>{userAbout}</div>
             </div>
           )}
           <div className={styles['user-profile-content']}>
@@ -338,7 +334,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           <div className={`${styles['user-profile-content']}`}>
             <div className={popup['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
-              <BadgeList badges={JSON.parse(userBadges)} maxDisplay={13} />
+              <BadgeList badges={JSON.parse(userBadges)} position="left-top" direction="right-top" maxDisplay={13} />
             </div>
           </div>
         </div>
@@ -368,14 +364,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                            }}
-                          >
+                          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div className={`${permission[userGender]} ${server.ownerId === targetId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-value-text']}>{server.contribution}</div>
                           </div>
@@ -399,14 +388,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                            }}
-                          >
+                          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div className={`${styles['permission']} ${permission[userGender]} ${server.ownerId === targetId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-box']}>
                               <div className={styles['contribution-icon']} />
@@ -492,15 +474,13 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('signature')}</div>
                 <div className={popup['row']}>
-                  <input name="signature" type="text" value={userSignature} onChange={(e) => setUser((prev) => ({ ...prev, signature: e.target.value }))} />
+                  <input name="signature" type="text" defaultValue={userSignature} maxLength={100} onChange={(e) => setUser((prev) => ({ ...prev, signature: e.target.value }))} />
                   <div
-                    ref={emojiIconRef}
                     className={emoji['emoji-icon']}
-                    onClick={() => {
-                      if (!emojiIconRef.current) return;
-                      const x = emojiIconRef.current.getBoundingClientRect().x;
-                      const y = emojiIconRef.current.getBoundingClientRect().y;
-                      contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
+                    onClick={(e) => {
+                      const x = e.currentTarget.getBoundingClientRect().left;
+                      const y = e.currentTarget.getBoundingClientRect().top;
+                      contextMenu.showEmojiPicker(x, y, 'left-top', (emoji) => {
                         setUser((prev) => ({ ...prev, signature: prev.signature + emoji }));
                       });
                     }}
@@ -509,7 +489,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('about-me')}</div>
-                <textarea name="about" value={userAbout} onChange={(e) => setUser((prev) => ({ ...prev, about: e.target.value }))} />
+                <textarea name="about" defaultValue={userAbout} maxLength={200} onChange={(e) => setUser((prev) => ({ ...prev, about: e.target.value }))} />
               </div>
             </div>
           </div>

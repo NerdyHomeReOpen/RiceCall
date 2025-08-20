@@ -113,6 +113,10 @@
 }
 
 .nickname-text {
+  white-space: nowrap;
+  line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #1e667c;
 }
 
@@ -196,7 +200,7 @@
 
 .xp-progress {
   background-color: #f6b03b;
-  border-radius: 0.125rem;
+  border-radius: 2px;
   height: 100%;
 }
 

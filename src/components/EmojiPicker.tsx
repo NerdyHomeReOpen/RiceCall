@@ -3,25 +3,24 @@ import React, { useEffect, useRef, useState } from 'react';
 // CSS
 import emoji from '@/styles/emoji.module.css';
 
-// Components
-import { emojis, Emoji } from './emojis';
+// Data
+import { emojis } from '@/emojis';
 
 interface EmojiPickerProps {
+  x: number;
+  y: number;
+  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   onEmojiSelect: (emoji: string) => void;
-  type: 'custom' | 'unicode';
-  x?: number;
-  y?: number;
-  preferTop?: boolean;
 }
 
-const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ onEmojiSelect, x = 0, y = 0, preferTop = false }) => {
+const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ x, y, direction, onEmojiSelect }) => {
   // Refs
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   // States
+  const [display, setDisplay] = useState(false);
   const [pickerX, setPickerX] = useState<number>(x);
   const [pickerY, setPickerY] = useState<number>(y);
-
   // Effects
   useEffect(() => {
     if (!emojiPickerRef.current) return;
@@ -36,12 +35,11 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ onEmojiSelect, x =
     const pickerWidth = emojiPickerRef.current.offsetWidth;
     const pickerHeight = emojiPickerRef.current.offsetHeight;
 
-    if (pickerWidth === 0 || pickerHeight === 0) {
-      return;
-    }
-
-    if (preferTop) {
+    if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= pickerHeight;
+    }
+    if (direction === 'left-top' || direction === 'left-bottom') {
+      newPosX -= pickerWidth;
     }
 
     if (newPosX + pickerWidth + marginEdge > windowWidth) {
@@ -59,22 +57,12 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ onEmojiSelect, x =
 
     setPickerX(newPosX);
     setPickerY(newPosY);
-  }, [x, y, preferTop]);
+    setDisplay(true);
+  }, [x, y, direction]);
 
   return (
-    <div
-      ref={emojiPickerRef}
-      className={`context-menu-container ${emoji['emoji-grid']}`}
-      style={{
-        left: pickerX,
-        top: pickerY,
-      }}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-    >
-      {emojis.map((e: Emoji) => (
+    <div ref={emojiPickerRef} className={`context-menu-container ${emoji['emoji-grid']}`} style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }} onMouseDown={(e) => e.stopPropagation()}>
+      {emojis.map((e) => (
         <div
           key={e.id}
           className={emoji['emoji']}
