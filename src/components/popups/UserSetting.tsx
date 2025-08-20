@@ -331,8 +331,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                       </div>
                     ))}
             </div>
-          </div>
-          <div className={`${styles['user-profile-content']}`}>
             <div className={popup['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
               <BadgeList badges={JSON.parse(userBadges)} position="left-top" direction="right-top" maxDisplay={13} />
