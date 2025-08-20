@@ -47,7 +47,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const [target, setTarget] = useState<User>(Default.user());
   const [targetCurrentServer, setTargetCurrentServer] = useState<Server>(Default.server());
   const [directMessages, setDirectMessages] = useState<(DirectMessage | PromptMessage)[]>([]);
-  const [messageInput, setMessageInput] = useState<string>('');
   const [isFriend, setIsFriend] = useState<boolean>(false);
   const [cooldown, setCooldown] = useState<number>(0);
 
@@ -247,9 +246,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                     e.preventDefault();
                     const x = e.currentTarget.getBoundingClientRect().left;
                     const y = e.currentTarget.getBoundingClientRect().top;
-                    contextMenu.showEmojiPicker(x, y, 'right-top', (emoji) => {
-                      setMessageInput((prev) => prev + emoji);
-                      if (textareaRef.current) textareaRef.current.focus();
+                    contextMenu.showEmojiPicker(x, y, 'right-top', (_, full) => {
+                      textareaRef.current?.focus();
+                      document.execCommand('insertText', false, full);
                     });
                   }}
                 />
@@ -262,29 +261,23 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
             <textarea
               ref={textareaRef}
-              className={styles['input']}
-              value={messageInput}
+              rows={2}
+              placeholder={t('message-input-box')}
               maxLength={MAX_LENGTH}
-              onChange={(e) => {
-                e.preventDefault();
-                setMessageInput(e.target.value);
-              }}
-              onPaste={(e) => {
-                e.preventDefault();
-                setMessageInput((prev) => prev + e.clipboardData.getData('text'));
-              }}
               onKeyDown={(e) => {
+                const value = textareaRef.current?.value;
                 if (e.shiftKey) return;
                 if (e.key !== 'Enter') return;
                 else e.preventDefault();
-                if (!messageInput.trim()) return;
-                if (messageInput.length > MAX_LENGTH) return;
+                if (!value) return;
+                if (value.length > MAX_LENGTH) return;
                 if (isComposingRef.current) return;
-                handleSendMessage(targetId, { type: 'dm', content: messageInput });
-                setMessageInput('');
+                textareaRef.current!.value = '';
+                handleSendMessage(targetId, { type: 'dm', content: value });
               }}
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={() => (isComposingRef.current = false)}
+              aria-label={t('message-input-box')}
             />
           </div>
         </div>

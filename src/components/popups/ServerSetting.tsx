@@ -387,10 +387,15 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
         {/* Announcement */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-             <AnnouncementEditor
-                  announcement={serverAnnouncement}
-                  onChange={(value) => setServer(prev => ({ ...prev, announcement: value }))}
-            />
+            {/* Header */}
+            <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
+              <div className={popup['label']}>{t('input-announcement')}</div>
+              <div className={popup['button']} onClick={() => setShowPreview((prev) => !prev)}>
+                {showPreview ? t('edit') : t('preview')}
+              </div>
+            </div>
+
+            <AnnouncementEditor announcement={serverAnnouncement} showPreview={showPreview} onChange={(value) => setServer((prev) => ({ ...prev, announcement: value }))} />
           </div>
         </div>
 

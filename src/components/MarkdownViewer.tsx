@@ -11,62 +11,19 @@ import hljs from 'highlight.js';
 // CSS
 import 'highlight.js/styles/github.css';
 import markdown from '@/styles/markdown.module.css';
-import permission from '@/styles/permission.module.css';
 
 // Providers
 import { useTranslation } from 'react-i18next';
 
-// Data
-import { emojis } from '@/emojis';
-
-/**
- * Main processing function
- * @param markdownText The markdown string to process
- * @returns The processed HTML string
- */
-export function sanitizeMarkdownWithSafeTags(markdownText: string): string {
-  if (typeof markdownText !== 'string') return '';
-
-  // Regex para tus formatos
-  const emojiRegex = /\[emoji_.+?\]/g;
-  const userTagRegex = /(?:<|&lt;)@(.+?)(?:>|&gt;)/g;
-  const ytTagRegex = /(?:<|&lt;)YT=(.+?)(?:>|&gt;)/g;
-
-  let replaced = markdownText
-    // emoji
-    .replace(emojiRegex, (match) => {
-      const emoji = emojis.find(e => e.char === match);
-      if (!emoji) return match;
-      return `<img class='${markdown['emoji']}' src='${emoji.path}' alt="${emoji.char}"/>`;
-    })
-    // usuario
-    .replace(userTagRegex, (_, content) => {
-      const [name, gender, level] = content.split('_');
-      return `<span class='${markdown['user-icon']} ${permission[gender || 'Male']} ${permission[`lv-${level || '1'}`]}'></span><span class='${markdown['user-tag']}' alt='<@${content}>'>${name || 'Unknown'}</span>`;
-    })
-    // YouTube
-    .replace(ytTagRegex, (_, content) => {
-      const videoId = content.match(/v=([^&]+)/)?.[1];
-      return `<iframe class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
-    })
-    // underline
-    .replace(/<u>(.*?)<\/u>/g, '<u>$1</u>')
-    // alineaciones
-    .replace(/<div class="align-left">(.*?)<\/div>/gs, '<div class="align-left">$1</div>')
-    .replace(/<div class="align-center">(.*?)<\/div>/gs, '<div class="align-center">$1</div>')
-    .replace(/<div class="align-right">(.*?)<\/div>/gs, '<div class="align-right">$1</div>');
-
-  return replaced;
-}
-
+// Utils
+import { fromTags } from '@/utils/tagConverter';
 
 interface MarkdownViewerProps {
   markdownText: string;
-  isGuest?: boolean;
-  forbidGuestUrl?: boolean;
+  escapeHtml?: boolean;
 }
 
-const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({ markdownText, isGuest = false, forbidGuestUrl = false }) => {
+const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({ markdownText, escapeHtml = true }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -74,14 +31,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({ markdownText
   const [isCopied, setIsCopied] = useState(false);
 
   const components: Components = {
-   div: ({ node, className, ...props }: any) => {
-  let style = {};
-  if (className?.includes('align-left')) style = { textAlign: 'left' };
-  if (className?.includes('align-center')) style = { textAlign: 'center' };
-  if (className?.includes('align-right')) style = { textAlign: 'right' };
-  return <div className={className} style={style} {...props} />;
-},
-
+    div: ({ node, className, ...props }: any) => <div className={className} {...props} />,
     span: ({ node, ...props }: any) => <span {...props} />,
     h1: ({ node, ...props }: any) => <h1 {...props} />,
     h2: ({ node, ...props }: any) => <h2 {...props} />,
@@ -91,10 +41,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({ markdownText
     ol: ({ node, ...props }: any) => <ol {...props} />,
     li: ({ node, ...props }: any) => <li {...props} />,
     blockquote: ({ node, ...props }: any) => <blockquote {...props} />,
-    a: ({ node, href, ...props }: any) => {
-      if (isGuest && forbidGuestUrl) return <span {...props} />;
-      return <a target="_blank" href={href} {...props} />;
-    },
+    a: ({ node, href, ...props }: any) => <a target="_blank" href={href} {...props} />,
     table: ({ node, ...props }: any) => <table className={markdown['table-wrapper']} {...props} />,
     th: ({ node, ...props }: any) => <th {...props} />,
     td: ({ node, ...props }: any) => <td {...props} />,
@@ -151,7 +98,11 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({ markdownText
     },
   };
 
-  const sanitized = sanitizeMarkdownWithSafeTags(markdownText);
+  if (escapeHtml) {
+    markdownText = markdownText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  const sanitized = fromTags(markdownText);
 
   return (
     <div className={markdown['markdown-content']}>

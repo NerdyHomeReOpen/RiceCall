@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 // CSS
 import messageInputBox from '@/styles/messageInputBox.module.css';
@@ -13,12 +13,11 @@ import emoji from '@/styles/emoji.module.css';
 interface MessageInputBoxProps {
   onSend?: (message: string) => void;
   disabled?: boolean;
-  warning?: boolean;
   placeholder?: string;
   maxLength?: number;
 }
 
-const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, disabled = false, warning = false, placeholder = '', maxLength = 2000 }) => {
+const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, disabled = false, placeholder = '', maxLength = 2000 }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -27,24 +26,20 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   const isComposingRef = useRef<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // States
-  const [messageInput, setMessageInput] = useState<string>('');
-
   // Variables
   const isDisabled = disabled;
-  const isWarning = warning || messageInput.length >= maxLength;
 
   return (
-    <div className={`${messageInputBox['messageinput-box']} ${isWarning ? messageInputBox['warning'] : ''} ${isDisabled ? messageInputBox['disabled'] : ''}`}>
+    <div className={`${messageInputBox['messageinput-box']} ${isDisabled ? messageInputBox['disabled'] : ''}`}>
       <div
         className={emoji['emoji-icon']}
         onMouseDown={(e) => {
           e.preventDefault();
           const x = e.currentTarget.getBoundingClientRect().left;
           const y = e.currentTarget.getBoundingClientRect().top;
-          contextMenu.showEmojiPicker(x, y, 'right-top', (emoji) => {
-            setMessageInput((prev) => prev + emoji);
-            if (textareaRef.current) textareaRef.current.focus();
+          contextMenu.showEmojiPicker(x, y, 'right-top', (_, full) => {
+            textareaRef.current?.focus();
+            document.execCommand('insertText', false, full);
           });
         }}
       />
@@ -53,30 +48,28 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
         ref={textareaRef}
         rows={2}
         placeholder={placeholder}
-        value={messageInput}
         maxLength={maxLength}
-        onChange={(e) => {
+        onChange={() => {
           if (isDisabled) return;
-          setMessageInput(e.target.value);
         }}
         onKeyDown={(e) => {
+          const value = textareaRef.current?.value;
           if (e.shiftKey) return;
           if (e.key !== 'Enter') return;
           else e.preventDefault();
-          if (!messageInput.trim()) return;
-          if (messageInput.length > maxLength) return;
+          if (!value) return;
+          if (value.length > maxLength) return;
           if (isComposingRef.current) return;
           if (isDisabled) return;
-          if (isWarning) return;
-          onSend?.(messageInput);
-          setMessageInput('');
+          textareaRef.current!.value = '';
+          onSend?.(value);
         }}
         onCompositionStart={() => (isComposingRef.current = true)}
         onCompositionEnd={() => (isComposingRef.current = false)}
         aria-label={t('message-input-box')}
       />
       <div className={messageInputBox['message-input-length-text']}>
-        {messageInput.length}/{maxLength}
+        {textareaRef.current?.value.length}/{maxLength}
       </div>
     </div>
   );

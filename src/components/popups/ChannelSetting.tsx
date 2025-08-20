@@ -176,13 +176,17 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         {/* Channel Announcement */}
         <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-           <AnnouncementEditor
-                  announcement={channelAnnouncement}
-                  onChange={(value) => setChannel(prev => ({ ...prev, announcement: value }))}
-            />
+            {/* Header */}
+            <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
+              <div className={popup['label']}>{t('input-announcement')}</div>
+              <div className={popup['button']} onClick={() => setShowPreview((prev) => !prev)}>
+                {showPreview ? t('edit') : t('preview')}
+              </div>
+            </div>
+
+            <AnnouncementEditor announcement={channelAnnouncement} showPreview={showPreview} onChange={(value) => setChannel((prev) => ({ ...prev, announcement: value }))} />
           </div>
         </div>
-
 
         {/* Access Permissions */}
         <div className={setting['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>

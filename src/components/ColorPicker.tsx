@@ -1,29 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { SketchPicker } from 'react-color';
 
 // CSS
-import emoji from '@/styles/emoji.module.css';
+import colorStyles from '@/styles/color.module.css';
 
-// Data
-import { emojis } from '@/emojis';
-
-interface EmojiPickerProps {
+interface ColorPickerProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
-  onEmojiSelect: (code: string, full: string) => void;
+  onColorSelect: (color: string) => void;
 }
 
-const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ x, y, direction, onEmojiSelect }) => {
+const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, onColorSelect }) => {
   // Refs
-  const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
 
   // States
   const [display, setDisplay] = useState(false);
   const [pickerX, setPickerX] = useState<number>(x);
   const [pickerY, setPickerY] = useState<number>(y);
+  const [color, setColor] = useState<string>('#FFFFFF');
+
   // Effects
   useEffect(() => {
-    if (!emojiPickerRef.current) return;
+    if (!colorPickerRef.current) return;
 
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
@@ -32,8 +32,8 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ x, y, direction, o
     let newPosX = x;
     let newPosY = y;
 
-    const pickerWidth = emojiPickerRef.current.offsetWidth;
-    const pickerHeight = emojiPickerRef.current.offsetHeight;
+    const pickerWidth = colorPickerRef.current.offsetWidth;
+    const pickerHeight = colorPickerRef.current.offsetHeight;
 
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= pickerHeight;
@@ -61,23 +61,17 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ x, y, direction, o
   }, [x, y, direction]);
 
   return (
-    <div ref={emojiPickerRef} className={`context-menu-container ${emoji['emoji-grid']}`} style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }} onMouseDown={(e) => e.stopPropagation()}>
-      {emojis.map((e) => (
-        <div
-          key={e.code}
-          className={emoji['emoji']}
-          style={{
-            backgroundImage: `url(${e.path})`,
-          }}
-          onClick={() => {
-            onEmojiSelect?.(e.code, `[emoji=${e.code}]`);
-          }}
-        />
-      ))}
+    <div
+      ref={colorPickerRef}
+      className={`context-menu-container ${colorStyles['color-picker']}`}
+      style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
+      <SketchPicker disableAlpha={true} color={color} onChange={(color) => setColor(color.hex)} onChangeComplete={(color) => onColorSelect(color.hex)} />
     </div>
   );
 });
 
-EmojiPicker.displayName = 'EmojiPicker';
+ColorPicker.displayName = 'ColorPicker';
 
-export default EmojiPicker;
+export default ColorPicker;

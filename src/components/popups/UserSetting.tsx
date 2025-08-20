@@ -41,6 +41,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
   // Refs
   const refreshRef = useRef(false);
+  const signatureInputRef = useRef<HTMLInputElement>(null);
 
   // Constants
   const TODAY = useMemo(() => new Date(), []);
@@ -474,14 +475,22 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('signature')}</div>
                 <div className={popup['row']}>
-                  <input name="signature" type="text" defaultValue={userSignature} maxLength={100} onChange={(e) => setUser((prev) => ({ ...prev, signature: e.target.value }))} />
+                  <input
+                    ref={signatureInputRef}
+                    name="signature"
+                    type="text"
+                    defaultValue={userSignature}
+                    maxLength={100}
+                    onChange={(e) => setUser((prev) => ({ ...prev, signature: e.target.value }))}
+                  />
                   <div
                     className={emoji['emoji-icon']}
                     onClick={(e) => {
                       const x = e.currentTarget.getBoundingClientRect().left;
                       const y = e.currentTarget.getBoundingClientRect().top;
-                      contextMenu.showEmojiPicker(x, y, 'left-top', (emoji) => {
-                        setUser((prev) => ({ ...prev, signature: prev.signature + emoji }));
+                      contextMenu.showEmojiPicker(x, y, 'left-top', (_, full) => {
+                        signatureInputRef.current?.focus();
+                        document.execCommand('insertText', false, full);
                       });
                     }}
                   />
