@@ -492,7 +492,7 @@
   "receive-channel-message-status-label": "收到頻道訊息",
   "set-hotkey-error": "Button {{0}} is already in use",
   "upload": "Upload",
-  "avatar-cropper": "Change thumbnail",
+  "avatar-cropper": "圖片裁剪",
   "lobby": "Guest channel",
   "connection-status": "Connection status: {{0}}",
   "connection-status-new": "New сonnection",
