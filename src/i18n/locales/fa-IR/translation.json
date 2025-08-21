@@ -459,6 +459,7 @@
   "user-info": "مشخصات کاربر",
   "user-limit": "محدودیت کاربر",
   "user-setting": "使用者設定",
+  "user-not-found": "用戶不存在",
   "username-invalid-format": "نام نمایشی فقط می‌تواند شامل زبان های چینی، انگلیسی و اعداد باشد",
   "username-max-length": "حداکثر طول نام نمایشی ۳۲ کاراکتر است",
   "username-min-length": "نام نمایشی باید حداقل ۱ کاراکتر باشد",
