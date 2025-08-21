@@ -459,6 +459,7 @@
   "user-info": "個人檔案",
   "user-limit": "人數上限(人)",
   "user-setting": "使用者設定",
+  "user-not-found": "用戶不存在",
   "username-invalid-format": "顯示名稱只能使用中英文和數字",
   "username-max-length": "顯示名稱最多 32 個字",
   "username-min-length": "顯示名稱至少需要 1 個字",
