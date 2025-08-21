@@ -459,6 +459,7 @@
   "user-info": "User Info",
   "user-limit": "User Limit",
   "user-setting": "使用者設定",
+  "user-not-found": "用戶不存在",
   "username-invalid-format": "Display name can only contain English, numbers, and Chinese",
   "username-max-length": "Display name cannot exceed 32 characters",
   "username-min-length": "Display name must be at least 1 character",
