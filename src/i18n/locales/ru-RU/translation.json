@@ -459,6 +459,7 @@
   "user-info": "Профиль",
   "user-limit": "Пользовательский лимит (чел.)",
   "user-setting": "使用者設定",
+  "user-not-found": "用戶不存在",
   "username-invalid-format": "В имени используются запрещенные символы",
   "username-max-length": "Имя может содержать не более 32 символов",
   "username-min-length": "Имя должно содержать не менее 1 символа",
