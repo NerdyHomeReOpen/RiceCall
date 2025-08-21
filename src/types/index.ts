@@ -177,7 +177,7 @@ export type PopupType =
   | 'editNickname'
   | 'friendVerification'
   | 'inviteMember'
-  | 'memberApplySetting'
+  | 'memberApplicationSetting'
   | 'memberInvitation'
   | 'searchUser'
   | 'serverBroadcast'

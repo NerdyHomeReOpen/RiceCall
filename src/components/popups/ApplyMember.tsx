@@ -97,7 +97,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, 
             />
           </div>
           <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
-            {t('apply-member-sent')}
+            {t('member-application-sent')}
           </div>
         </div>
       </div>

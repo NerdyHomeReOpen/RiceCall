@@ -158,8 +158,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipcService.socket.send('unblockFromServer', { userId, serverId }));
   };
 
-  const handleOpenMemberApplySetting = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open('memberApplySetting', 'memberApplySetting', { serverId, userId });
+  const handleOpenMemberApplicationSetting = (userId: User['userId'], serverId: Server['serverId']) => {
+    ipcService.popup.open('memberApplicationSetting', 'memberApplicationSetting', { serverId, userId });
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -587,7 +587,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
               <div className={popup['label']}>{`${t('applicants')} (${totalApplications})`}</div>
               <div className={popup['row']}>
-                <div className={popup['button']} onClick={() => handleOpenMemberApplySetting(userId, serverId)}>
+                <div className={popup['button']} onClick={() => handleOpenMemberApplicationSetting(userId, serverId)}>
                   {t('apply-setting')}
                 </div>
                 <div className={setting['search-border']}>

@@ -36,7 +36,7 @@ type PopupType =
   | 'editNickname'
   | 'friendVerification'
   | 'inviteMember'
-  | 'memberApplySetting'
+  | 'memberApplicationSetting'
   | 'memberInvitation'
   | 'searchUser'
   | 'serverBroadcast'
@@ -197,7 +197,7 @@ export const PopupSize: Record<PopupType, { height: number; width: number }> = {
   editFriend: { height: 200, width: 370 },
   friendVerification: { height: 550, width: 500 },
   inviteMember: { height: 320, width: 500 },
-  memberApplySetting: { height: 250, width: 370 },
+  memberApplicationSetting: { height: 250, width: 370 },
   memberInvitation: { height: 550, width: 500 },
   searchUser: { height: 200, width: 370 },
   serverSetting: { height: 520, width: 600 },

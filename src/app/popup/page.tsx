@@ -32,8 +32,8 @@ import EditNickname from '@/components/popups/EditNickname';
 import EditFriendGroup from '@/components/popups/EditFriendGroup';
 import EditFriend from '@/components/popups/EditFriend';
 import FriendVerification from '@/components/popups/FriendVerification';
+import MemberApplicationSetting from '@/components/popups/MemberApplicationSetting';
 import MemberInvitation from '@/components/popups/MemberInvitation';
-import MemberApplySetting from '@/components/popups/MemberApplySetting';
 import InviteMember from '@/components/popups/InviteMember';
 import SearchUser from '@/components/popups/SearchUser';
 import ServerSetting from '@/components/popups/ServerSetting';
@@ -154,8 +154,8 @@ const Popup = React.memo(() => {
         return { title: t('friend-verification'), buttons: ['close'], node: <FriendVerification {...initialData} />, hideHeader: false };
       case 'inviteMember':
         return { title: t('invite-member'), buttons: ['close'], node: <InviteMember {...initialData} />, hideHeader: false };
-      case 'memberApplySetting':
-        return { title: t('member-apply-setting'), buttons: ['close'], node: <MemberApplySetting {...initialData} />, hideHeader: false };
+      case 'memberApplicationSetting':
+        return { title: t('member-application-setting'), buttons: ['close'], node: <MemberApplicationSetting {...initialData} />, hideHeader: false };
       case 'memberInvitation':
         return { title: t('member-invitation'), buttons: ['close'], node: <MemberInvitation {...initialData} />, hideHeader: false };
       case 'searchUser':

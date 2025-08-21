@@ -16,12 +16,12 @@ import ipcService from '@/services/ipc.service';
 // Utils
 import Default from '@/utils/default';
 
-interface MemberApplySettingPopupProps {
+interface MemberApplicationSettingPopupProps {
   userId: User['userId'];
   serverId: Server['serverId'];
 }
 
-const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.memo(({ serverId, userId }) => {
+const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ serverId, userId }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -62,7 +62,7 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
         <div className={popup['dialog-content']}>
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <div className={popup['label']}>{t('is-receive-member-apply-label')}</div>
+              <div className={popup['label']}>{t('is-receive-member-application-label')}</div>
               <input name="receive-apply" type="checkbox" checked={serverReceiveApplication} onChange={() => setServer((prev) => ({ ...prev, receiveApply: !serverReceiveApplication }))} />
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -92,6 +92,6 @@ const MemberApplySettingPopup: React.FC<MemberApplySettingPopupProps> = React.me
   );
 });
 
-MemberApplySettingPopup.displayName = 'MemberApplySettingPopup';
+MemberApplicationSettingPopup.displayName = 'MemberApplicationSettingPopup';
 
-export default MemberApplySettingPopup;
+export default MemberApplicationSettingPopup;
