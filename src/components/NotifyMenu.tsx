@@ -16,7 +16,7 @@ interface NotifyMenuProps {
   onClose: () => void;
 }
 
-const NotifyMenu: React.FC<NotifyMenuProps> = ({ x, y, direction, items, onClose }) => {
+const NotifyMenu: React.FC<NotifyMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
   // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -28,16 +28,11 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ x, y, direction, items, onClose
   // Effect
   useEffect(() => {
     if (!menuRef.current) return;
-
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
+    const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
-
     let newPosX = x;
     let newPosY = y;
-
-    const menuWidth = menuRef.current.offsetWidth;
-    const menuHeight = menuRef.current.offsetHeight;
 
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= menuHeight;
@@ -100,7 +95,7 @@ const NotifyMenu: React.FC<NotifyMenuProps> = ({ x, y, direction, items, onClose
         })}
     </div>
   );
-};
+});
 
 NotifyMenu.displayName = 'NotifyMenu';
 

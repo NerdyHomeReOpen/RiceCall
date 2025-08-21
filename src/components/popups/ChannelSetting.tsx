@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -11,37 +11,31 @@ import type { Channel, Server, User } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import ipcService from '@/services/ipc.service';
-import getService from '@/services/get.service';
-
-// Utils
-import Default from '@/utils/default';
+import ipc from '@/services/ipc.service';
 
 // Components
 import AnnouncementEditor from '../AnnouncementEditor';
 
 interface ChannelSettingPopupProps {
-  userId: User['userId'];
-  serverId: Server['serverId'];
-  channelId: Channel['channelId'];
+  user: User;
+  server: Server;
+  channel: Channel;
 }
 
-const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ userId, serverId, channelId }) => {
+const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ user, server, channel: channelData }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Refs
-  const refreshRef = useRef(false);
-
   // States
+  const [channel, setChannel] = useState<Channel>(channelData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [server, setServer] = useState<Server>(Default.server());
-  const [channel, setChannel] = useState<Channel>(Default.channel());
 
-  // Variables
-  const { lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
+  // Destructuring
+  const { permissionLevel: userPermissionLevel } = user;
+  const { serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId, permissionLevel: serverPermissionLevel } = server;
   const {
+    channelId,
     name: channelName,
     announcement: channelAnnouncement,
     visibility: channelVisibility,
@@ -59,33 +53,22 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     guestTextGapTime: channelGuestTextGapTime,
     bitrate: channelBitrate,
   } = channel;
-  const isLobby = serverLobbyId === channelId;
-  const isReceptionLobby = serverReceptionLobbyId === channelId;
-  const canSubmit = channelName.trim();
+
+  // Memos
+  const permissionLevel = useMemo(() => Math.max(userPermissionLevel, serverPermissionLevel), [userPermissionLevel, serverPermissionLevel]);
+  console.log(permissionLevel);
+  const isLobby = useMemo(() => serverLobbyId === channelId, [serverLobbyId, channelId]);
+  const isReceptionLobby = useMemo(() => serverReceptionLobbyId === channelId, [serverReceptionLobbyId, channelId]);
+  const canSubmit = useMemo(() => channelName.trim(), [channelName]);
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
-    ipcService.socket.send('editChannel', { serverId, channelId, update });
+    ipc.socket.send('editChannel', { serverId, channelId, update });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
-
-  // Effects
-  useEffect(() => {
-    if (!channelId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.channel({ userId: userId, serverId: serverId, channelId: channelId }).then((channel) => {
-        if (channel) setChannel(channel);
-      });
-      getService.server({ userId: userId, serverId: serverId }).then((server) => {
-        if (server) setServer(server);
-      });
-    };
-    refresh();
-  }, [channelId, serverId, userId]);
 
   return (
     <div className={popup['popup-wrapper']}>

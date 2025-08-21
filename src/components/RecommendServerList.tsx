@@ -14,11 +14,11 @@ interface RecommendServerListProps {
   servers: RecommendServerListType;
 }
 
-const RecommendServerList: React.FC<RecommendServerListProps> = ({ servers }) => {
+const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ servers }) => {
   // States
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
 
-  // Variables
+  // Memos
   const categories = useMemo(() => Object.keys(servers), [servers]);
 
   return (
@@ -49,7 +49,7 @@ const RecommendServerList: React.FC<RecommendServerListProps> = ({ servers }) =>
       </section>
     </div>
   );
-};
+});
 
 RecommendServerList.displayName = 'RecommendServerList';
 

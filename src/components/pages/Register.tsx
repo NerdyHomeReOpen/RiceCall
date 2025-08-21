@@ -10,7 +10,7 @@ import styles from '@/styles/pages/register.module.css';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import authService from '@/services/auth.service';
+import auth from '@/services/auth.service';
 
 interface FormErrors {
   general?: string;
@@ -164,7 +164,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
       return;
     }
     setIsLoading(true);
-    if (await authService.register(formData)) setSection('login');
+    if (await auth.register(formData)) setSection('login');
     setIsLoading(false);
   };
 

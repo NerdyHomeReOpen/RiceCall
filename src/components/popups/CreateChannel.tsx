@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 // Types
 import type { Channel, Server } from '@/types';
@@ -10,30 +10,37 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
+
+// Utils
+import Default from '@/utils/default';
 
 interface CreateChannelPopupProps {
   serverId: Server['serverId'];
-  categoryId: Channel['channelId'] | null;
-  categoryName: Channel['name'];
+  parent: Channel | null;
 }
 
-const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serverId, categoryId, categoryName }) => {
+const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serverId, parent: parentData }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [channelName, setChannelName] = useState<Channel['name']>('');
+  const [channel, setChannel] = useState<Channel>(Default.channel());
 
-  // Variables
-  const canSubmit = channelName.trim();
+  // Destructuring
+  const { name: channelName } = channel;
+  const { channelId: parentChannelId, name: parentChannelName } = parentData || {};
 
+  // Memos
+  const canSubmit = useMemo(() => channelName.trim(), [channelName]);
+
+  // Handlers
   const handleCreateChannel = (serverId: Server['serverId'], preset: Partial<Channel>) => {
-    ipcService.socket.send('createChannel', { serverId, preset });
+    ipc.socket.send('createChannel', { serverId, preset });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (
@@ -44,11 +51,11 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
           <div className={popup['input-group']}>
             <div className={popup['input-box']}>
               <div className={popup['label']}>{t('parent-channel')}</div>
-              <div className={popup['label']}>{categoryName || t('none')}</div>
+              <div className={popup['label']}>{parentChannelName || t('none')}</div>
             </div>
             <div className={popup['input-box']}>
               <div className={popup['label']}>{t('channel-name')}</div>
-              <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannelName(e.target.value)} />
+              <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel({ ...channel, name: e.target.value })} />
             </div>
           </div>
         </div>
@@ -59,7 +66,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
         <div
           className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
-            handleCreateChannel(serverId, { name: channelName, categoryId });
+            handleCreateChannel(serverId, { name: channelName, categoryId: parentChannelId || null });
             handleClose();
           }}
         >

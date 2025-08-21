@@ -3,7 +3,7 @@ import * as mediasoupClient from 'mediasoup-client';
 import { io, Socket } from 'socket.io-client';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Types
 import {
@@ -638,11 +638,11 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const unsubscribe = [
-      ipcService.systemSettings.inputAudioDevice.get(handleEditInputDevice),
-      ipcService.systemSettings.outputAudioDevice.get(handleEditOutputDevice),
-      ipcService.systemSettings.speakingMode.get(handleEditSpeakingMode),
-      ipcService.socket.on('channelConnected', handleJoinSFUChannel),
-      ipcService.socket.on('channelDisconnected', handleLeaveSFUChannel),
+      ipc.systemSettings.inputAudioDevice.get(handleEditInputDevice),
+      ipc.systemSettings.outputAudioDevice.get(handleEditOutputDevice),
+      ipc.systemSettings.speakingMode.get(handleEditSpeakingMode),
+      ipc.socket.on('channelConnected', handleJoinSFUChannel),
+      ipc.socket.on('channelDisconnected', handleLeaveSFUChannel),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleEditInputDevice, handleEditOutputDevice, handleJoinSFUChannel, handleLeaveSFUChannel]);

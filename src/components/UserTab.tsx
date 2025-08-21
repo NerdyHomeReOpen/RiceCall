@@ -19,7 +19,7 @@ import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import { isMember, isServerAdmin, isServerOwner, isChannelMod, isChannelAdmin } from '@/utils/permission';
@@ -44,7 +44,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   // Refs
   const userTabRef = useRef<HTMLDivElement>(null);
 
-  // Variables
+  // Destructuring
   const { userId, permissionLevel: globalPermission, currentChannelId: userCurrentChannelId } = user;
   const {
     userId: memberUserId,
@@ -57,8 +57,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     gender: memberGender,
     badges: memberBadges,
     vip: memberVip,
-    isTextMuted: isMemberTextMuted,
-    isVoiceMuted: isMemberVoiceMuted,
+    isTextMuted: memberIsTextMuted,
+    isVoiceMuted: memberIsVoiceMuted,
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
   } = member;
@@ -66,49 +66,22 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   const { serverId, permissionLevel: serverPermission, lobbyId: serverLobbyId } = server;
 
   // Memos
-  const permissionLevel = useMemo(() => {
-    return Math.max(globalPermission, serverPermission, channelPermission);
-  }, [globalPermission, serverPermission, channelPermission]);
-
-  const connectionStatus = useMemo(() => {
-    return webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
-  }, [memberUserId, webRTC.remoteUserStatusList]);
-
-  const isUser = useMemo(() => {
-    return memberUserId === userId;
-  }, [memberUserId, userId]);
-
-  const isSameChannel = useMemo(() => {
-    return memberCurrentChannelId === userCurrentChannelId;
-  }, [memberCurrentChannelId, userCurrentChannelId]);
-
-  const isConnecting = useMemo(() => {
-    return webRTC.remoteUserStatusList?.[memberUserId] === 'connecting';
-  }, [memberUserId, webRTC.remoteUserStatusList]);
-
-  const isSpeaking = useMemo(() => {
-    return !!webRTC.volumePercent?.[memberUserId];
-  }, [memberUserId, webRTC.volumePercent]);
-
-  const isVoiceMuted = useMemo(() => {
-    return webRTC.mutedIds.includes(memberUserId);
-  }, [memberUserId, webRTC.mutedIds]);
-
-  const isFriend = useMemo(() => {
-    return friends.some((fd) => fd.targetId === memberUserId);
-  }, [friends, memberUserId]);
-
-  const isSuperior = useMemo(() => {
-    return permissionLevel > memberPermission;
-  }, [permissionLevel, memberPermission]);
-
+  const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermission, channelPermission), [globalPermission, serverPermission, channelPermission]);
+  const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId] || 'connecting', [memberUserId, webRTC.remoteUserStatusList]);
+  const isUser = useMemo(() => memberUserId === userId, [memberUserId, userId]);
+  const isSameChannel = useMemo(() => memberCurrentChannelId === userCurrentChannelId, [memberCurrentChannelId, userCurrentChannelId]);
+  const isConnecting = useMemo(() => connectionStatus === 'connecting', [connectionStatus]);
+  const isSpeaking = useMemo(() => !!webRTC.volumePercent?.[memberUserId], [memberUserId, webRTC.volumePercent]);
+  const isVoiceMuted = useMemo(() => webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds]);
+  const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId), [friends, memberUserId]);
+  const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
   const statusIcon = useMemo(() => {
-    if (isVoiceMuted || isMemberVoiceMuted) return 'muted';
+    if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
     if (!isUser && isSameChannel && isConnecting) return 'loading';
     if (isSpeaking) return 'play';
-    if (isMemberTextMuted) return 'no-text';
+    if (memberIsTextMuted) return 'no-text';
     return '';
-  }, [isUser, isSameChannel, isVoiceMuted, isMemberVoiceMuted, isSpeaking, isMemberTextMuted, isConnecting]);
+  }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted]);
 
   // Handlers
   const handleMuteUser = (userId: User['userId']) => {
@@ -120,72 +93,72 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Permission>) => {
-    ipcService.socket.send('editServerPermission', { userId, serverId, update });
+    ipc.socket.send('editServerPermission', { userId, serverId, update });
   };
 
   const handleEditChannelPermission = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Permission>) => {
-    ipcService.socket.send('editChannelPermission', { userId, serverId, channelId, update });
+    ipc.socket.send('editChannelPermission', { userId, serverId, channelId, update });
   };
 
   const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('connectChannel', { serverId, channelId });
+    ipc.socket.send('connectChannel', { serverId, channelId });
   };
 
   const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('moveUserToChannel', { userId, serverId, channelId });
+    ipc.socket.send('moveUserToChannel', { userId, serverId, channelId });
   };
 
   const handleAddUserToQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('addUserToQueue', { userId, serverId, channelId });
+    ipc.socket.send('addUserToQueue', { userId, serverId, channelId });
   };
 
   const handleMuteUserTextInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isTextMuted: boolean) => {
-    ipcService.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted } });
+    ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted } });
   };
 
   const handleMuteUserVoiceInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isVoiceMuted: boolean) => {
-    ipcService.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted } });
+    ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted } });
   };
 
   const handleBlockUserFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('blockUserFromServer', { userId, serverId }));
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipc.socket.send('blockUserFromServer', { userId, serverId }));
   };
 
   const handleBlockUserFromChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('blockUserFromChannel', { userId, serverId, channelId }));
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipc.socket.send('blockUserFromChannel', { userId, serverId, channelId }));
   };
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipcService.socket.send('terminateMember', { userId, serverId }));
+    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open('editNickname', 'editNickname', { serverId, userId });
+    ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
   };
 
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName });
+  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
+    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
-  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    ipcService.popup.open('blockMember', `blockMember-${userId}`, { userId, serverId, userName });
+  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId']) => {
+    ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
   };
 
   const handleOpenInviteMember = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open('inviteMember', `inviteMember-${userId}`, { userId, serverId });
+    ipc.popup.open('inviteMember', `inviteMember`, { userId, serverId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipcService.popup.onSubmit('dialogAlert', callback);
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleDragStart = (e: React.DragEvent, userId: User['userId'], channelId: Channel['channelId']) => {
@@ -194,7 +167,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     e.dataTransfer.setData('currentChannelId', channelId);
   };
 
-  // Effect
+  // Effects
   useEffect(() => {
     if (!findMe || !isUser) return;
     findMe.userTabRef.current = userTabRef.current;
@@ -236,7 +209,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             id: 'direct-message',
             label: t('direct-message'),
             show: !isUser,
-            onClick: () => handleOpenDirectMessage(userId, memberUserId, memberName),
+            onClick: () => handleOpenDirectMessage(userId, memberUserId),
           },
           {
             id: 'view-profile',
@@ -277,15 +250,15 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           },
           {
             id: 'forbid-voice',
-            label: isMemberVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
+            label: memberIsVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
             show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-            onClick: () => handleMuteUserVoiceInChannel(memberUserId, serverId, channelId, !isMemberVoiceMuted),
+            onClick: () => handleMuteUserVoiceInChannel(memberUserId, serverId, channelId, !memberIsVoiceMuted),
           },
           {
             id: 'forbid-text',
-            label: isMemberTextMuted ? t('unforbid-text') : t('forbid-text'),
+            label: memberIsTextMuted ? t('unforbid-text') : t('forbid-text'),
             show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-            onClick: () => handleMuteUserTextInChannel(memberUserId, serverId, channelId, !isMemberTextMuted),
+            onClick: () => handleMuteUserTextInChannel(memberUserId, serverId, channelId, !memberIsTextMuted),
           },
           {
             id: 'kick-channel',
@@ -303,7 +276,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             id: 'block',
             label: t('block'),
             show: !isUser && isMember(permissionLevel) && isSuperior,
-            onClick: () => handleOpenBlockMember(memberUserId, serverId, memberNickname || memberName),
+            onClick: () => handleOpenBlockMember(memberUserId, serverId),
           },
           {
             id: 'separator',

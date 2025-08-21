@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 // CSS
 import styles from '@/styles/pages/friend.module.css';
@@ -10,7 +10,7 @@ import type { User, FriendGroup, Friend } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -33,30 +33,32 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   const [selectedTabId, setSelectedTabId] = useState<number>(0);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
-  // Variables
+  // Destructuring
   const { userId } = user;
-  const filteredFriends = friends.filter((fd) => fd.name.includes(searchQuery));
-  const defaultFriendGroup: FriendGroup = Default.friendGroup({ name: t('my-friends'), order: 0, userId });
-  const strangerFriendGroup: FriendGroup = Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000, userId });
-  const blacklistFriendGroup: FriendGroup = Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001, userId });
+
+  // Memos
+  const filteredFriends = useMemo(() => friends.filter((f) => f.name.includes(searchQuery)), [friends, searchQuery]);
+  const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: 0, userId }), [t, userId]);
+  const strangerFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000, userId }), [t, userId]);
+  const blacklistFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001, userId }), [t, userId]);
 
   // Handlers
   const handleOpenSearchUser = (userId: User['userId']) => {
-    ipcService.popup.open('searchUser', 'searchUser', { userId });
+    ipc.popup.open('searchUser', 'searchUser', { userId });
   };
 
   const handleOpenCreateFriendGroup = () => {
-    ipcService.popup.open('createFriendGroup', 'createFriendGroup', {});
+    ipc.popup.open('createFriendGroup', 'createFriendGroup', {});
   };
 
   return (
     <>
       {/* Navigation Tabs */}
       <div className={styles['navigate-tabs']}>
-        <div className={`${styles['tab']} ${selectedTabId == 0 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(0)}>
+        <div className={`${styles['tab']} ${selectedTabId === 0 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(0)}>
           <div className={styles['friend-list-icon']} />
         </div>
-        <div className={`${styles['tab']} ${selectedTabId == 1 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(1)}>
+        <div className={`${styles['tab']} ${selectedTabId === 1 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(1)}>
           <div className={styles['recent-icon']} />
         </div>
       </div>
@@ -70,7 +72,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
       </div>
 
       {/* Friend List */}
-      <div className={styles['scroll-view']} style={selectedTabId == 0 ? {} : { display: 'none' }}>
+      <div className={styles['scroll-view']} style={selectedTabId === 0 ? {} : { display: 'none' }}>
         {/* Friend Groups */}
         <div className={styles['friend-group-list']}>
           {[defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup]

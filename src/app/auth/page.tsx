@@ -10,17 +10,17 @@ import LoginPage from '@/components/pages/Login';
 import RegisterPage from '@/components/pages/Register';
 
 // Services
-import ipcService from '@/services/ipc.service';
-import authService from '@/services/auth.service';
+import ipc from '@/services/ipc.service';
+import auth from '@/services/auth.service';
 
 const Header: React.FC = React.memo(() => {
   // Handlers
   const handleMinimize = () => {
-    ipcService.window.minimize();
+    ipc.window.minimize();
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (
@@ -49,7 +49,7 @@ const Auth: React.FC = () => {
   useEffect(() => {
     const autoLogin = async () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      await authService.autoLogin();
+      await auth.autoLogin();
     };
     autoLogin();
   }, []);

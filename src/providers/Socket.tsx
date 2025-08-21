@@ -4,7 +4,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import ErrorHandler from '@/utils/error';
@@ -41,7 +41,7 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
   // Handlers
   const handleConnect = () => {
     console.info('[Socket] connected');
-    ipcService.popup.close('errorDialog');
+    ipc.popup.close('errorDialog');
     setIsConnected(true);
   };
 
@@ -61,23 +61,23 @@ const SocketProvider = ({ children }: SocketProviderProps) => {
 
   const handleConnectError = (error: any) => {
     console.error('[Socket] connect error:', error);
-    new ErrorHandler(new Error(tRef.current('connection-failed-message')), () => ipcService.auth.logout()).show();
+    new ErrorHandler(new Error(tRef.current('connection-failed-message')), () => ipc.auth.logout()).show();
   };
 
   const handleReconnectError = (error: any) => {
     console.error('[Socket] reconnect error:', error);
-    new ErrorHandler(new Error(tRef.current('reconnection-failed-message')), () => ipcService.auth.logout()).show();
+    new ErrorHandler(new Error(tRef.current('reconnection-failed-message')), () => ipc.auth.logout()).show();
   };
 
   // Effects
   useEffect(() => {
     const unsubscribe = [
-      ipcService.socket.on('connect', handleConnect),
-      ipcService.socket.on('reconnect', handleReconnect),
-      ipcService.socket.on('disconnect', handleDisconnect),
-      ipcService.socket.on('error', handleError),
-      ipcService.socket.on('connect_error', handleConnectError),
-      ipcService.socket.on('reconnect_error', handleReconnectError),
+      ipc.socket.on('connect', handleConnect),
+      ipc.socket.on('reconnect', handleReconnect),
+      ipc.socket.on('disconnect', handleDisconnect),
+      ipc.socket.on('error', handleError),
+      ipc.socket.on('connect_error', handleConnectError),
+      ipc.socket.on('reconnect_error', handleReconnectError),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);

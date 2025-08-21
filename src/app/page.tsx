@@ -49,9 +49,9 @@ import { useLoading } from '@/providers/Loading';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
-import ipcService from '@/services/ipc.service';
-import authService from '@/services/auth.service';
-import getService from '@/services/get.service';
+import ipc from '@/services/ipc.service';
+import auth from '@/services/auth.service';
+import data from '@/services/data.service';
 
 interface HeaderProps {
   user: User;
@@ -115,49 +115,49 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
 
   // Handlers
   const handleLeaveServer = (serverId: Server['serverId']) => {
-    ipcService.socket.send('disconnectServer', { serverId });
+    ipc.socket.send('disconnectServer', { serverId });
   };
 
   const handleChangeStatus = (status: User['status']) => {
-    ipcService.socket.send('editUser', { update: { status } });
+    ipc.socket.send('editUser', { update: { status } });
   };
 
-  const handleOpenUserInfo = (userId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${userId}`, { userId, targetId: userId });
+  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenSystemSetting = () => {
-    ipcService.popup.open('systemSetting', 'systemSetting', {});
+    ipc.popup.open('systemSetting', 'systemSetting', {});
   };
 
   const handleOpenAboutUs = () => {
-    ipcService.popup.open('aboutus', 'aboutUs', {});
+    ipc.popup.open('aboutus', 'aboutUs', {});
   };
 
   const handleOpenChangeTheme = () => {
-    ipcService.popup.open('changeTheme', 'changeTheme', {});
+    ipc.popup.open('changeTheme', 'changeTheme', {});
   };
 
   const handleLogout = () => {
-    authService.logout();
+    auth.logout();
   };
 
   const handleExit = () => {
-    ipcService.exit();
+    ipc.exit();
   };
 
   const handleFullscreen = () => {
-    if (isFullscreen) ipcService.window.unmaximize();
-    else ipcService.window.maximize();
+    if (isFullscreen) ipc.window.unmaximize();
+    else ipc.window.maximize();
   };
 
   const handleMinimize = () => {
-    ipcService.window.minimize();
+    ipc.window.minimize();
   };
 
   const handleClose = () => {
-    if (isCloseToTray.current) ipcService.window.close();
-    else ipcService.exit();
+    if (isCloseToTray.current) ipc.window.close();
+    else ipc.exit();
   };
 
   const handleLanguageChange = (language: LanguageKey) => {
@@ -165,32 +165,27 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
     localStorage.setItem('language', language);
   };
 
-  const handleOpenFriendVerification = () => {
-    ipcService.popup.open('friendVerification', 'friendVerification', { userId });
+  const handleOpenFriendVerification = (userId: User['userId']) => {
+    ipc.popup.open('friendVerification', 'friendVerification', { userId });
   };
 
-  const handleOpenMemberInvitation = () => {
-    ipcService.popup.open('memberInvitation', 'memberInvitation', { userId });
+  const handleOpenMemberInvitation = (userId: User['userId']) => {
+    ipc.popup.open('memberInvitation', 'memberInvitation', { userId });
   };
 
   // Effects
   useEffect(() => {
-    console.log(memberInvitations);
-    console.log(friendApplications);
-  }, [memberInvitations, friendApplications]);
-
-  useEffect(() => {
     const next = actionScanner.isKeepAlive ? 'online' : 'idle';
     if (user.status !== next) {
-      ipcService.socket.send('editUser', { update: { status: next } });
+      ipc.socket.send('editUser', { update: { status: next } });
     }
   }, [actionScanner.isKeepAlive, user.status]);
 
   useEffect(() => {
     const unsubscribe = [
-      ipcService.systemSettings.closeToTray.get((enable) => (isCloseToTray.current = enable)),
-      ipcService.window.onUnmaximize(() => setIsFullscreen(false)),
-      ipcService.window.onMaximize(() => setIsFullscreen(true)),
+      ipc.systemSettings.closeToTray.get((enable) => (isCloseToTray.current = enable)),
+      ipc.window.onUnmaximize(() => setIsFullscreen(false)),
+      ipc.window.onMaximize(() => setIsFullscreen(true)),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
@@ -199,7 +194,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
     <header className={`${header['header']} ${header['big']}`}>
       {/* Title */}
       <div className={header['title-box']}>
-        <div className={header['name-box']} onClick={() => handleOpenUserInfo(userId)}>
+        <div className={header['name-box']} onClick={() => handleOpenUserInfo(userId, userId)}>
           {userName}
         </div>
         <div
@@ -288,7 +283,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                 showContentLength: true,
                 showContent: true,
                 contents: friendApplications.map((fa) => fa.avatarUrl),
-                onClick: () => handleOpenFriendVerification(),
+                onClick: () => handleOpenFriendVerification(userId),
               },
               {
                 id: 'member-invitations',
@@ -299,7 +294,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                 showContentLength: true,
                 showContent: true,
                 contents: memberInvitations.map((mi) => mi.avatarUrl),
-                onClick: () => handleOpenMemberInvitation(),
+                onClick: () => handleOpenMemberInvitation(userId),
               },
               {
                 id: 'system-notify',
@@ -595,10 +590,10 @@ const RootPageComponent = () => {
     args.forEach((p) => {
       loadingBoxRef.current.setIsLoading(false);
       loadingBoxRef.current.setLoadingServerId('');
-      ipcService.popup.open(p.type, p.id, p.initialData, p.force);
+      ipc.popup.open(p.type, p.id, p.initialData, p.force);
       popupOffSubmitRef.current?.();
-      popupOffSubmitRef.current = ipcService.popup.onSubmit(p.id, () => {
-        if (p.id === 'logout') ipcService.auth.logout();
+      popupOffSubmitRef.current = ipc.popup.onSubmit(p.id, () => {
+        if (p.id === 'logout') ipc.auth.logout();
       });
     });
   };
@@ -634,7 +629,7 @@ const RootPageComponent = () => {
 
       loadingBoxRef.current.setIsLoading(true);
       loadingBoxRef.current.setLoadingServerId(serverDisplayId);
-      ipcService.socket.send('connectServer', { serverId });
+      ipc.socket.send('connectServer', { serverId });
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
@@ -643,22 +638,22 @@ const RootPageComponent = () => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      getService.servers({ userId: userId }).then((servers) => {
+      data.servers({ userId: userId }).then((servers) => {
         if (servers) setServers(servers);
       });
-      getService.friends({ userId: userId }).then((friends) => {
+      data.friends({ userId: userId }).then((friends) => {
         if (friends) setFriends(friends);
       });
-      getService.friendGroups({ userId: userId }).then((friendGroups) => {
+      data.friendGroups({ userId: userId }).then((friendGroups) => {
         if (friendGroups) setFriendGroups(friendGroups);
       });
-      getService.friendApplications({ receiverId: userId }).then((friendApplications) => {
+      data.friendApplications({ receiverId: userId }).then((friendApplications) => {
         if (friendApplications) setFriendApplications(friendApplications);
       });
-      getService.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
+      data.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
         if (memberInvitations) setMemberInvitations(memberInvitations);
       });
-      getService.recommendServerList().then((recommendServerList) => {
+      data.recommendServerList().then((recommendServerList) => {
         if (recommendServerList) setRecommendServerList(recommendServerList);
       });
       setSystemNotify([]);
@@ -668,38 +663,38 @@ const RootPageComponent = () => {
 
   useEffect(() => {
     const unsubscribe = [
-      ipcService.socket.on('userUpdate', handleUserUpdate),
-      ipcService.socket.on('serversSet', handleServersSet),
-      ipcService.socket.on('serverAdd', handleServerAdd),
-      ipcService.socket.on('serverUpdate', handleServerUpdate),
-      ipcService.socket.on('serverRemove', handleServerRemove),
-      ipcService.socket.on('friendsSet', handleFriendsSet),
-      ipcService.socket.on('friendAdd', handleFriendAdd),
-      ipcService.socket.on('friendUpdate', handleFriendUpdate),
-      ipcService.socket.on('friendRemove', handleFriendDelete),
-      ipcService.socket.on('friendGroupsSet', handleFriendGroupsSet),
-      ipcService.socket.on('friendGroupAdd', handleFriendGroupAdd),
-      ipcService.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
-      ipcService.socket.on('friendGroupRemove', handleFriendGroupDelete),
-      ipcService.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
-      ipcService.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
-      ipcService.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
-      ipcService.socket.on('serverOnlineMembersSet', handleServerOnlineMembersSet),
-      ipcService.socket.on('serverOnlineMemberAdd', handleServerOnlineMemberAdd),
-      ipcService.socket.on('serverOnlineMemberUpdate', handleServerOnlineMemberUpdate),
-      ipcService.socket.on('serverOnlineMemberRemove', handleServerOnlineMemberRemove),
-      ipcService.socket.on('serverChannelsSet', handleServerChannelsSet),
-      ipcService.socket.on('serverChannelAdd', handleServerChannelAdd),
-      ipcService.socket.on('serverChannelUpdate', handleServerChannelUpdate),
-      ipcService.socket.on('serverChannelRemove', handleServerChannelDelete),
-      ipcService.socket.on('memberInvitationAdd', handleMemberInvitationAdd),
-      ipcService.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
-      ipcService.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
-      ipcService.socket.on('channelMessage', handleChannelMessage),
-      ipcService.socket.on('actionMessage', handleActionMessage),
-      ipcService.socket.on('openPopup', handleOpenPopup),
-      ipcService.socket.on('playSound', handlePlaySound),
-      ipcService.socket.on('queueMembersSet', handleQueueMembersSet),
+      ipc.socket.on('userUpdate', handleUserUpdate),
+      ipc.socket.on('serversSet', handleServersSet),
+      ipc.socket.on('serverAdd', handleServerAdd),
+      ipc.socket.on('serverUpdate', handleServerUpdate),
+      ipc.socket.on('serverRemove', handleServerRemove),
+      ipc.socket.on('friendsSet', handleFriendsSet),
+      ipc.socket.on('friendAdd', handleFriendAdd),
+      ipc.socket.on('friendUpdate', handleFriendUpdate),
+      ipc.socket.on('friendRemove', handleFriendDelete),
+      ipc.socket.on('friendGroupsSet', handleFriendGroupsSet),
+      ipc.socket.on('friendGroupAdd', handleFriendGroupAdd),
+      ipc.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
+      ipc.socket.on('friendGroupRemove', handleFriendGroupDelete),
+      ipc.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
+      ipc.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
+      ipc.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
+      ipc.socket.on('serverOnlineMembersSet', handleServerOnlineMembersSet),
+      ipc.socket.on('serverOnlineMemberAdd', handleServerOnlineMemberAdd),
+      ipc.socket.on('serverOnlineMemberUpdate', handleServerOnlineMemberUpdate),
+      ipc.socket.on('serverOnlineMemberRemove', handleServerOnlineMemberRemove),
+      ipc.socket.on('serverChannelsSet', handleServerChannelsSet),
+      ipc.socket.on('serverChannelAdd', handleServerChannelAdd),
+      ipc.socket.on('serverChannelUpdate', handleServerChannelUpdate),
+      ipc.socket.on('serverChannelRemove', handleServerChannelDelete),
+      ipc.socket.on('memberInvitationAdd', handleMemberInvitationAdd),
+      ipc.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
+      ipc.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
+      ipc.socket.on('channelMessage', handleChannelMessage),
+      ipc.socket.on('actionMessage', handleActionMessage),
+      ipc.socket.on('openPopup', handleOpenPopup),
+      ipc.socket.on('playSound', handlePlaySound),
+      ipc.socket.on('queueMembersSet', handleQueueMembersSet),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -98,11 +98,11 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     },
   };
 
-  if (escapeHtml) {
-    markdownText = markdownText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
-  const sanitized = fromTags(markdownText);
+  // Memos
+  const sanitized = useMemo(() => {
+    if (escapeHtml) return fromTags(markdownText.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+    else return fromTags(markdownText);
+  }, [markdownText, escapeHtml]);
 
   return (
     <div className={markdown['markdown-content']}>

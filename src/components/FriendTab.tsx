@@ -14,8 +14,8 @@ import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
 // Services
-import ipcService from '@/services/ipc.service';
-import getService from '@/services/get.service';
+import ipc from '@/services/ipc.service';
+import data from '@/services/data.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -44,7 +44,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   // States
   const [friendServer, setFriendServer] = useState<Server>(Default.server());
 
-  // Variables
+  // Destructuring
   const { userId, currentServerId: userCurrentServerId } = user;
   const {
     targetId,
@@ -63,58 +63,52 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   const { name: friendServerName } = friendServer;
 
   // Memos
-  const isUser = useMemo(() => {
-    return targetId === userId;
-  }, [targetId, userId]);
+  const isUser = useMemo(() => targetId === userId, [targetId, userId]);
 
   // Handlers
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
     if (loadingBox.isLoading) return;
-
     if (serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
     }
-
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(serverDisplayId);
-    ipcService.socket.send('connectServer', { serverId });
+    ipc.socket.send('connectServer', { serverId });
   };
 
   const handleBlockFriend = (targetId: User['userId'], isBlocked: Friend['isBlocked']) => {
-    handleOpenAlertDialog(t(`confirm-${isBlocked ? 'unblock' : 'block'}-user`, { '0': friendName }), () => ipcService.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }));
+    handleOpenAlertDialog(t(`confirm-${isBlocked ? 'unblock' : 'block'}-user`, { '0': friendName }), () => ipc.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }));
   };
 
   const handleDeleteFriend = (targetId: User['userId']) => {
-    handleOpenAlertDialog(t('confirm-delete-friend', { '0': friendName }), () => ipcService.socket.send('deleteFriend', { targetId }));
+    handleOpenAlertDialog(t('confirm-delete-friend', { '0': friendName }), () => ipc.socket.send('deleteFriend', { targetId }));
   };
 
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName });
+  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
+    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleOpenEditFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('editFriend', 'editFriend', { userId, targetId });
+    ipc.popup.open('editFriend', 'editFriend', { userId, targetId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'dialogAlert', { message: message, submitTo: 'dialogAlert' });
-    ipcService.popup.onSubmit('dialogAlert', callback);
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
+  // Effects
   useEffect(() => {
-    if (!friendCurrentServerId) return;
-    const refresh = async () => {
-      getService.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
-        if (server) setFriendServer(server);
-      });
-      refreshed.current = true;
-    };
-    refresh();
+    if (refreshed.current || !targetId || !friendCurrentServerId) return;
+    data.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
+      if (server) setFriendServer(server);
+    });
+    refreshed.current = true;
   }, [friendCurrentServerId, targetId]);
 
   return (
@@ -125,7 +119,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
         if (selectedItemId === targetId) setSelectedItemId(null);
         else setSelectedItemId(targetId);
       }}
-      onDoubleClick={() => handleOpenDirectMessage(targetId, targetId, friendName)}
+      onDoubleClick={() => handleOpenDirectMessage(targetId, targetId)}
       onContextMenu={(e) => {
         const x = e.clientX;
         const y = e.clientY;
@@ -134,7 +128,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             id: 'direct-message',
             label: t('direct-message'),
             show: !isUser,
-            onClick: () => handleOpenDirectMessage(userId, targetId, friendName),
+            onClick: () => handleOpenDirectMessage(userId, targetId),
           },
           {
             id: 'separator',

@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import MarkdownContent from '@/components/MarkdownContent';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Data
 import { staff } from '@/staff';
@@ -30,11 +30,11 @@ const AboutPopup: React.FC = React.memo(() => {
 
   // Handlers
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   const handleDontShowNextTime = () => {
-    ipcService.systemSettings.disclaimer.dontShowNextTime();
+    ipc.systemSettings.disclaimer.dontShowNextTime();
   };
 
   // Memos
@@ -63,13 +63,13 @@ const AboutPopup: React.FC = React.memo(() => {
             <div className={styles['app-version-text']}>RiceCall v{version}</div>
             <div className={styles['copyright-text']}>COPYRIGHT @ {CURRENT_YEAR} RiceCall.com ,ALL RIGHTS RESERVED.</div>
             <div className={popup['row']} style={{ alignSelf: 'center' }}>
-              <div className={popup['link-text']} onClick={() => ipcService.window.openExternal('https://discord.com/invite/adCWzv6wwS')}>
+              <div className={popup['link-text']} onClick={() => ipc.window.openExternal('https://discord.com/invite/adCWzv6wwS')}>
                 {t('get-help')}
               </div>
-              <div className={popup['link-text']} onClick={() => ipcService.window.openExternal('https://github.com/NerdyHomeReOpen/RiceCall')}>
+              <div className={popup['link-text']} onClick={() => ipc.window.openExternal('https://github.com/NerdyHomeReOpen/RiceCall')}>
                 {t('project-repo')}
               </div>
-              <div className={popup['link-text']} onClick={() => ipcService.window.openExternal('http://ricecall.com.tw')}>
+              <div className={popup['link-text']} onClick={() => ipc.window.openExternal('http://ricecall.com.tw')}>
                 {t('official-website')}
               </div>
             </div>
@@ -89,12 +89,12 @@ const AboutPopup: React.FC = React.memo(() => {
                   </div>
                   <div className={styles['icon-wrapper']}>
                     {githubInfo && (
-                      <div className={styles['github-icon-link']} title="GitHub" onClick={() => ipcService.window.openExternal(`https://github.com/${githubInfo}`)}>
+                      <div className={styles['github-icon-link']} title="GitHub" onClick={() => ipc.window.openExternal(`https://github.com/${githubInfo}`)}>
                         <FaGithub size={20} />
                       </div>
                     )}
                     {discordInfo && (
-                      <div className={styles['discord-icon-link']} title="Discord" onClick={() => ipcService.window.openExternal(`http://discordapp.com/users/${discordInfo}`)}>
+                      <div className={styles['discord-icon-link']} title="Discord" onClick={() => ipc.window.openExternal(`http://discordapp.com/users/${discordInfo}`)}>
                         <FaDiscord size={20} />
                       </div>
                     )}

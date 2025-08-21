@@ -4,7 +4,7 @@ import React from 'react';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -35,12 +35,12 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
 
   // Handlers
   const handleSubmit = () => {
-    ipcService.popup.submit(submitTo);
+    ipc.popup.submit(submitTo);
     handleClose();
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (

@@ -50,16 +50,11 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, direction, items, onClo
   // Effect
   useEffect(() => {
     if (!menuRef.current) return;
-
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
+    const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
-
     let newPosX = x;
     let newPosY = y;
-
-    const menuWidth = menuRef.current.offsetWidth;
-    const menuHeight = menuRef.current.offsetHeight;
 
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= menuHeight;
@@ -106,8 +101,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, direction, items, onClo
               }}
               onMouseEnter={(e) => {
                 if (!item.hasSubmenu || !item.submenuItems) return;
-                const x = direction === 'left-top' || direction === 'left-bottom' ? e.currentTarget.getBoundingClientRect().left : e.currentTarget.getBoundingClientRect().right;
-                const y = direction === 'left-top' || direction === 'right-top' ? e.currentTarget.getBoundingClientRect().bottom : e.currentTarget.getBoundingClientRect().top;
+                const { left, right, bottom, top } = e.currentTarget.getBoundingClientRect();
+                const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
+                const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
                 setSubMenu(<ContextMenu items={item.submenuItems} onClose={onClose} x={x} y={y} direction={direction} />);
               }}
               onMouseLeave={() => {

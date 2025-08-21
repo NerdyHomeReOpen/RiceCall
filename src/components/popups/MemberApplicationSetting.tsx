@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 // Types
-import type { Server, User } from '@/types';
+import type { Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -10,50 +10,30 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import getService from '@/services/get.service';
-import ipcService from '@/services/ipc.service';
-
-// Utils
-import Default from '@/utils/default';
+import ipc from '@/services/ipc.service';
 
 interface MemberApplicationSettingPopupProps {
-  userId: User['userId'];
-  serverId: Server['serverId'];
+  server: Server;
 }
 
-const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ serverId, userId }) => {
+const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ server: serverData }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Refs
-  const refreshRef = useRef(false);
-
   // States
-  const [server, setServer] = useState<Server>(Default.server());
+  const [server, setServer] = useState<Server>(serverData);
 
-  // Variables
-  const { receiveApply: serverReceiveApplication, applyNotice: serverApplyNote } = server;
+  // Destructuring
+  const { serverId, receiveApply: serverReceiveApplication, applyNotice: serverApplyNote } = server;
 
   // Handlers
   const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
-    ipcService.socket.send('editServer', { serverId, update });
+    ipc.socket.send('editServer', { serverId, update });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
-
-  // Effects
-  useEffect(() => {
-    if (!serverId || !userId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.server({ userId: userId, serverId: serverId }).then((server) => {
-        if (server) setServer(server);
-      });
-    };
-    refresh();
-  }, [serverId, userId]);
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -67,7 +47,7 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('apply-member-note')}</div>
-              <textarea name="apply-note" value={serverApplyNote} maxLength={100} onChange={(e) => setServer((prev) => ({ ...prev, applyNote: e.target.value }))} />
+              <textarea name="apply-note" value={serverApplyNote} maxLength={100} onChange={(e) => setServer((prev) => ({ ...prev, applyNotice: e.target.value }))} />
             </div>
           </div>
         </div>

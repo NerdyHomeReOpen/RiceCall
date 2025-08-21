@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface FriendPageProps {
   user: User;
@@ -45,7 +45,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   // Handlers
   const handleChangeSignature = (signature: User['signature']) => {
     if (signature === userSignature) return;
-    ipcService.socket.send('editUser', { update: { signature } });
+    ipc.socket.send('editUser', { update: { signature } });
   };
 
   const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -62,7 +62,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
 
   // Effects
   useEffect(() => {
-    ipcService.discord.updatePresence({
+    ipc.discord.updatePresence({
       details: t('rpc:friend-page'),
       state: `${t('rpc:user')} ${userName}`,
       largeImageKey: 'app_icon',

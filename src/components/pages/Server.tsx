@@ -19,7 +19,7 @@ import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import { isMember, isChannelAdmin } from '@/utils/permission';
@@ -192,24 +192,24 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   // Handlers
   const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
-    ipcService.socket.send('channelMessage', { serverId, channelId, preset });
+    ipc.socket.send('channelMessage', { serverId, channelId, preset });
     setLastMessageTime(Date.now());
   };
 
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
-    ipcService.socket.send('editChannel', { serverId, channelId, update });
+    ipc.socket.send('editChannel', { serverId, channelId, update });
   };
 
   const handleJoinQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('joinQueue', { serverId, channelId });
+    ipc.socket.send('joinQueue', { serverId, channelId });
   };
 
   const handleLeaveQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('leaveQueue', { serverId, channelId });
+    ipc.socket.send('leaveQueue', { serverId, channelId });
   };
 
   const handleControlQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('controlQueue', { serverId, channelId });
+    ipc.socket.send('controlQueue', { serverId, channelId });
   };
 
   const handleToggleSpeakerMute = () => {
@@ -302,7 +302,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   }, [channelUIMode]);
 
   useEffect(() => {
-    ipcService.discord.updatePresence({
+    ipc.discord.updatePresence({
       details: `${t('in')} ${serverName}`,
       state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
       largeImageKey: 'app_icon',
@@ -320,11 +320,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   }, [t, serverName, serverOnlineMembers]);
 
   useEffect(() => {
-    const unsubscribe = [
-      ipcService.systemSettings.speakingMode.get(setSpeakMode),
-      ipcService.systemSettings.defaultSpeakingKey.get(setSpeakHotKey),
-      ipcService.systemSettings.channelUIMode.get(setChannelUIMode),
-    ];
+    const unsubscribe = [ipc.systemSettings.speakingMode.get(setSpeakMode), ipc.systemSettings.defaultSpeakingKey.get(setSpeakHotKey), ipc.systemSettings.channelUIMode.get(setChannelUIMode)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 

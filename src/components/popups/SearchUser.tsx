@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface SearchUserPopupProps {
   userId: User['userId'];
@@ -26,22 +26,26 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
 
   // Handlers
   const handleSearchUser = (query: string) => {
-    ipcService.socket.send('searchUser', { query });
+    ipc.socket.send('searchUser', { query });
+  };
+
+  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   const handleUserSearch = useCallback(
     (...args: User[]) => {
       // TODO: Need to handle while already friend
-      const result = args[0];
-      if (!result) {
+      if (!args.length) {
         setIsNotFound(true);
         return;
       }
-      ipcService.popup.open('applyFriend', 'applyFriend', { userId, targetId: result.userId });
+      const { userId: targetId } = args[0];
+      handleOpenApplyFriend(userId, targetId);
       handleClose();
     },
     [userId],
@@ -53,7 +57,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   }, [searchQuery]);
 
   useEffect(() => {
-    const unsubscribe = [ipcService.socket.on('userSearch', handleUserSearch)];
+    const unsubscribe = [ipc.socket.on('userSearch', handleUserSearch)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleUserSearch]);
 

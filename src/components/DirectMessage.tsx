@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
@@ -25,9 +25,11 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   // Hooks
   const { t } = useTranslation();
 
-  // Variables
+  // Destructuring
   const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
-  const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
+
+  // Memos
+  const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
 
   return (
     <div className={styles['message-box']}>

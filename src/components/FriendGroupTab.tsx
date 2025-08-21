@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Components
 import FriendTab from '@/components/FriendTab';
@@ -32,35 +32,32 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
   // States
   const [expanded, setExpanded] = useState<boolean>(true);
 
-  // Variables
+  // Destructuring
   const { userId } = user;
   const { friendGroupId, name: friendGroupName } = friendGroup;
 
   // Memos
   const friendGroupFriends = useMemo(() => {
     return !friendGroupId
-      ? friends.filter((fd) => !fd.friendGroupId && !fd.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)) // Default
+      ? friends.filter((f) => !f.friendGroupId && !f.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)) // Default
       : friendGroupId === 'blacklist'
-        ? friends.filter((fd) => fd.isBlocked) // Blacklist
-        : friends.filter((fd) => fd.friendGroupId === friendGroupId && !fd.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Other
+        ? friends.filter((f) => f.isBlocked) // Blacklist
+        : friends.filter((f) => f.friendGroupId === friendGroupId && !f.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Other
   }, [friendGroupId, friends]);
-
-  const friendsOnlineCount = useMemo(() => {
-    return friendGroupFriends.filter((fd) => fd.status !== 'offline').length;
-  }, [friendGroupFriends]);
+  const friendsOnlineCount = useMemo(() => friendGroupFriends.filter((f) => f.status !== 'offline').length, [friendGroupFriends]);
 
   // Handlers
   const handleDeleteFriendGroup = (friendGroupId: FriendGroup['friendGroupId']) => {
-    handleOpenAlertDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipcService.socket.send('deleteFriendGroup', { friendGroupId }));
+    handleOpenAlertDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipc.socket.send('deleteFriendGroup', { friendGroupId }));
   };
 
-  const handleOpenEditFriendGroup = (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']) => {
-    ipcService.popup.open('editFriendGroup', 'editFriendGroup', { userId, friendGroupId });
+  const handleOpenEditFriendGroupName = (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']) => {
+    ipc.popup.open('editFriendGroupName', 'editFriendGroupName', { userId, friendGroupId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'dialogAlert', { message: message, submitTo: 'dialogAlert' });
-    ipcService.popup.onSubmit('dialogAlert', callback);
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   return (
@@ -74,10 +71,10 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
           const y = e.clientY;
           contextMenu.showContextMenu(x, y, 'right-bottom', [
             {
-              id: 'edit-friend-group',
-              label: t('edit-friend-group'),
+              id: 'edit-friend-group-name',
+              label: t('edit-friend-group-name'),
               show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
-              onClick: () => handleOpenEditFriendGroup(userId, friendGroupId),
+              onClick: () => handleOpenEditFriendGroupName(userId, friendGroupId),
             },
             {
               id: 'delete-friend-group',

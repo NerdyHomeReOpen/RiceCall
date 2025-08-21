@@ -11,7 +11,7 @@ import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 
 // services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // utilities
 import { setupLanguage } from '@/utils/language';
@@ -41,7 +41,7 @@ const Providers = ({ children }: ProvidersProps) => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = [ipcService.systemSettings.font.get(handleEditFont), ipcService.systemSettings.fontSize.get(handleEditFontSize)];
+    const unsubscribe = [ipc.systemSettings.font.get(handleEditFont), ipc.systemSettings.fontSize.get(handleEditFontSize)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleEditFont, handleEditFontSize]);
 

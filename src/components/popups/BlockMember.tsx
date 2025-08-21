@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 
 // Types
-import type { Server, User } from '@/types';
+import type { Member, Server, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -10,15 +10,14 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface BlockMemberPopupProps {
-  userId: User['userId'];
   serverId: Server['serverId'];
-  userName: User['name'];
+  member: Member;
 }
 
-const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, serverId, userName }) => {
+const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId, member }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -26,6 +25,9 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const [blockType, setBlockType] = useState<'block-temporary' | 'block-permanent' | 'blockIP'>('block-temporary');
   const [formatType, setFormatType] = useState<string>('hours');
   const [selectTime, setSelectTime] = useState<number>(1);
+
+  // Destructuring
+  const { userId, name: memberName, nickname: memberNickname } = member;
 
   // Memos
   const BLOCK_TYPE_OPTIONS = useMemo(
@@ -89,11 +91,11 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
 
   // Handlers
   const handleBlockUserFromServer = (userId: User['userId'], serverId: Server['serverId'], blockUntil: number) => {
-    ipcService.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
+    ipc.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (
@@ -103,7 +105,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup['alert']}`} />
           <div>
-            <div className={popup['label']}>{t('confirm-block-user', { '0': userName })}</div>
+            <div className={popup['label']}>{t('confirm-block-user', { '0': memberNickname || memberName })}</div>
             <div className={popup['col']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>{t('block-type')}</div>

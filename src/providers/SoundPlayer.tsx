@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useRef } from 'react';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface SoundPlayerContextType {
   playSound: (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => void;
@@ -120,14 +120,14 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
     };
 
     const unsubscribe = [
-      ipcService.systemSettings.outputAudioDevice.get(changeOutputAudioDevice),
-      ipcService.systemSettings.disableAllSoundEffect.get(changeDisableAllSoundEffect),
-      ipcService.systemSettings.enterVoiceChannelSound.get(changeEnterVoiceChannelSound),
-      ipcService.systemSettings.leaveVoiceChannelSound.get(changeLeaveVoiceChannelSound),
-      ipcService.systemSettings.startSpeakingSound.get(changeStartSpeakingSound),
-      ipcService.systemSettings.stopSpeakingSound.get(changeStopSpeakingSound),
-      ipcService.systemSettings.receiveDirectMessageSound.get(changeReceiveDirectMessageSound),
-      ipcService.systemSettings.receiveChannelMessageSound.get(changeReceiveChannelMessageSound),
+      ipc.systemSettings.outputAudioDevice.get(changeOutputAudioDevice),
+      ipc.systemSettings.disableAllSoundEffect.get(changeDisableAllSoundEffect),
+      ipc.systemSettings.enterVoiceChannelSound.get(changeEnterVoiceChannelSound),
+      ipc.systemSettings.leaveVoiceChannelSound.get(changeLeaveVoiceChannelSound),
+      ipc.systemSettings.startSpeakingSound.get(changeStartSpeakingSound),
+      ipc.systemSettings.stopSpeakingSound.get(changeStopSpeakingSound),
+      ipc.systemSettings.receiveDirectMessageSound.get(changeReceiveDirectMessageSound),
+      ipc.systemSettings.receiveChannelMessageSound.get(changeReceiveChannelMessageSound),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);

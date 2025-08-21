@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
@@ -23,16 +23,20 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   // Hooks
   const { t } = useTranslation();
 
-  // Variables
+  // Destructuring
   const { contents: messageContents, parameter: messageParameter } = messageGroup;
-  const translatedMessages = messageContents.map((content) => {
-    if (content.includes(' '))
-      return content
-        .split(' ')
-        .map((_) => t(_, { ns: 'message', ...messageParameter }))
-        .join(' ');
-    else return t(content, { ns: 'message', ...messageParameter });
-  });
+
+  // Memos
+  const translatedMessages = useMemo(
+    () =>
+      messageContents.map((content) =>
+        content
+          .split(' ')
+          .map((_) => t(_, { ns: 'message', ...messageParameter }))
+          .join(' '),
+      ),
+    [messageContents, messageParameter, t],
+  );
 
   return (
     <>

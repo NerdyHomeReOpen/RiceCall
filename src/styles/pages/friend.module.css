@@ -84,10 +84,9 @@
 .base-info-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   overflow: hidden;
   height: 100%;
-  gap: 10px;
 }
 
 .base-info-wrapper .box {

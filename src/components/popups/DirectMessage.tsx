@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 // Types
-import { User, DirectMessage, Server, PromptMessage } from '@/types';
+import { User, DirectMessage, Server, PromptMessage, Friend } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -13,11 +13,8 @@ import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
 // Services
-import getService from '@/services/get.service';
-import ipcService from '@/services/ipc.service';
-
-// Utils
-import Default from '@/utils/default';
+import ipc from '@/services/ipc.service';
+import data from '@/services/data.service';
 
 // CSS
 import styles from '@/styles/popups/directMessage.module.css';
@@ -27,11 +24,14 @@ import vip from '@/styles/vip.module.css';
 interface DirectMessagePopupProps {
   userId: User['userId'];
   targetId: User['userId'];
+  user: User;
+  friend: Friend | null;
+  target: User;
   event: 'directMessage' | 'shakeWindow';
   message: DirectMessage;
 }
 
-const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, event, message }) => {
+const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, user, friend, target, event, message }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -39,22 +39,18 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   // Refs
   const isComposingRef = useRef<boolean>(false);
   const cooldownRef = useRef<number>(0);
-  const refreshRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // States
-  const [user, setUser] = useState<User>(Default.user());
-  const [target, setTarget] = useState<User>(Default.user());
-  const [targetCurrentServer, setTargetCurrentServer] = useState<Server>(Default.server());
+  const [targetCurrentServer, setTargetCurrentServer] = useState<Server | null>(null);
   const [directMessages, setDirectMessages] = useState<(DirectMessage | PromptMessage)[]>([]);
-  const [isFriend, setIsFriend] = useState<boolean>(false);
   const [cooldown, setCooldown] = useState<number>(0);
 
   // Memos
   const SHAKE_COOLDOWN = useMemo(() => 3, []);
   const MAX_LENGTH = useMemo(() => 2000, []);
 
-  // Variables
+  // Destructuring
   const { avatarUrl: userAvatarUrl } = user;
   const {
     avatarUrl: targetAvatarUrl,
@@ -66,18 +62,21 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     currentServerId: targetCurrentServerId,
     badges: targetBadges,
   } = target;
-  const { name: targetCurrentServerName } = targetCurrentServer;
-  const isOnline = targetStatus !== 'offline';
-  const isVerifiedUser = false; // TODO: Remove this after implementing
+  const { name: targetCurrentServerName } = targetCurrentServer || {};
+
+  // Memos
+  const isFriend = useMemo(() => !!friend, [friend]);
+  const isOnline = useMemo(() => targetStatus !== 'offline', [targetStatus]);
+  const isVerifiedUser = useMemo(() => false, []); // TODO: Remove this after implementing
 
   // Handlers
   const handleSendMessage = (targetId: User['userId'], preset: Partial<DirectMessage>) => {
-    ipcService.socket.send('directMessage', { targetId, preset });
+    ipc.socket.send('directMessage', { targetId, preset });
   };
 
   const handleSendShakeWindow = () => {
     if (cooldown > 0) return;
-    if (isFriend) ipcService.socket.send('shakeWindow', { targetId });
+    if (isFriend) ipc.socket.send('shakeWindow', { targetId });
     else setDirectMessages((prev) => [...prev, { type: 'warn', content: t('non-friend-warning-message'), timestamp: Date.now(), parameter: {}, contentMetadata: {} }]);
     setCooldown(SHAKE_COOLDOWN);
     cooldownRef.current = SHAKE_COOLDOWN;
@@ -148,31 +147,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, []);
 
   useEffect(() => {
-    if (!userId || !targetId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.user({ userId: userId }).then((user) => {
-        if (user) setUser(user);
-      });
-      getService.user({ userId: targetId }).then((target) => {
-        if (target) setTarget(target);
-      });
-      getService.friend({ userId: userId, targetId: targetId }).then((friend) => {
-        if (friend) setIsFriend(true);
-      });
-    };
-    refresh();
-  }, [userId, targetId]);
-
-  useEffect(() => {
     if (!targetId || !targetCurrentServerId) return;
-    getService.server({ userId: targetId, serverId: targetCurrentServerId }).then((server) => {
+    data.server({ userId: targetId, serverId: targetCurrentServerId }).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
   }, [targetId, targetCurrentServerId]);
 
   useEffect(() => {
-    const unsubscribe = [ipcService.socket.on('directMessage', handleDirectMessage), ipcService.socket.on('shakeWindow', handleShakeWindow)];
+    const unsubscribe = [ipc.socket.on('directMessage', handleDirectMessage), ipc.socket.on('shakeWindow', handleShakeWindow)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleDirectMessage, handleShakeWindow]);
 
@@ -214,6 +196,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div
               className={`${styles['action-area']} ${styles['clickable']}`}
               onClick={() => {
+                if (!targetCurrentServer) return;
                 handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId);
               }}
             >

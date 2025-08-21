@@ -4,7 +4,7 @@ import React, { useContext, createContext, ReactNode, useRef, useEffect, useCall
 import { useWebRTC } from '@/providers/WebRTC';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 const BASE_VOLUME = 5;
 
@@ -223,14 +223,14 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
     };
 
     const unsubscribe = [
-      ipcService.systemSettings.statusAutoIdle.get(changeStatusAutoIdle),
-      ipcService.systemSettings.statusAutoIdleMinutes.get(changeStatusAutoIdleMinutes),
-      ipcService.systemSettings.defaultSpeakingKey.get(changeDefaultSpeakingKey),
-      ipcService.systemSettings.hotKeyOpenMainWindow.get(changeHotKeyOpenMainWindow),
-      ipcService.systemSettings.hotKeyIncreaseVolume.get(changeHotKeyIncreaseVolume),
-      ipcService.systemSettings.hotKeyDecreaseVolume.get(changeHotKeyDecreaseVolume),
-      ipcService.systemSettings.hotKeyToggleSpeaker.get(changeHotKeyToggleSpeaker),
-      ipcService.systemSettings.hotKeyToggleMicrophone.get(changeHotKeyToggleMicrophone),
+      ipc.systemSettings.statusAutoIdle.get(changeStatusAutoIdle),
+      ipc.systemSettings.statusAutoIdleMinutes.get(changeStatusAutoIdleMinutes),
+      ipc.systemSettings.defaultSpeakingKey.get(changeDefaultSpeakingKey),
+      ipc.systemSettings.hotKeyOpenMainWindow.get(changeHotKeyOpenMainWindow),
+      ipc.systemSettings.hotKeyIncreaseVolume.get(changeHotKeyIncreaseVolume),
+      ipc.systemSettings.hotKeyDecreaseVolume.get(changeHotKeyDecreaseVolume),
+      ipc.systemSettings.hotKeyToggleSpeaker.get(changeHotKeyToggleSpeaker),
+      ipc.systemSettings.hotKeyToggleMicrophone.get(changeHotKeyToggleMicrophone),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);

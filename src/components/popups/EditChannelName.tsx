@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 
 // Types
 import type { Channel, Server } from '@/types';
@@ -10,28 +10,34 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface EditChannelNamePopupProps {
   serverId: Server['serverId'];
   channelId: Channel['channelId'];
-  channelName: Channel['name'];
+  channel: Channel;
 }
 
-const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ serverId, channelId, channelName }) => {
+const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ serverId, channelId, channel: channelData }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Variables
-  const canSubmit = channelName.trim();
+  // States
+  const [channel, setChannel] = useState<Channel>(channelData);
+
+  // Destructuring
+  const { name: channelName } = channel;
+
+  // Memos
+  const canSubmit = useMemo(() => channel.name.trim(), [channel.name]);
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
-    ipcService.socket.send('editChannel', { serverId, channelId, update });
+    ipc.socket.send('editChannel', { serverId, channelId, update });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (
@@ -42,7 +48,7 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
           <div className={popup['input-group']}>
             <div className={`${popup['input-box']} ${popup['col']}`}>
               <div className={popup['label']}>{t('channel-name-label')}</div>
-              <input name="channel-name" type="text" value={channelName} maxLength={32} />
+              <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))} />
             </div>
           </div>
         </div>

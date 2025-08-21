@@ -13,7 +13,10 @@ import { useTranslation } from 'react-i18next';
 import type { User, Server } from '@/types';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
+
+// Utils
+import { isMember, isServerOwner } from '@/utils/permission';
 
 interface ServerCardProps {
   user: User;
@@ -27,48 +30,37 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   const mainTab = useMainTab();
   const { t } = useTranslation();
 
-  // Variables
-  const {
-    serverId,
-    name: serverName,
-    avatarUrl: serverAvatarUrl,
-    displayId: serverDisplayId,
-    slogan: serverSlogan,
-    ownerId: serverOwnerId,
-    favorite: serverFavorite,
-    permissionLevel: serverPermissionLevel,
-    // online: serverOnline
-  } = server;
-
+  // Destructuring
+  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, slogan: serverSlogan, favorite: serverFavorite, permissionLevel: serverPermissionLevel } = server;
   const { userId, currentServerId: userCurrentServerId } = user;
-  const isOwner = serverOwnerId === userId;
-  const canTerminateSelfMembership = serverPermissionLevel > 1 && serverPermissionLevel < 6 && !isOwner;
 
   // Handles
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
     if (loadingBox.isLoading) return;
-
     if (serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
     }
-
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(serverDisplayId);
-    ipcService.socket.send('connectServer', { serverId });
+    ipc.socket.send('connectServer', { serverId });
   };
 
   const handleFavoriteServer = (serverId: Server['serverId']) => {
-    ipcService.socket.send('favoriteServer', { serverId });
+    ipc.socket.send('favoriteServer', { serverId });
   };
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': memberName }), () => ipcService.socket.send('terminateMember', { userId, serverId }));
+    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': memberName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
+  };
+
+  const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
+    ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipcService.popup.onSubmit('dialogAlert', callback);
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   return (
@@ -88,24 +80,18 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
             id: 'view-server-info',
             label: t('view-server-info'),
             disabled: true,
-            onClick: () => {
-              /* TODO: handleOpenServerSetting(userId, serverId); */
-            },
+            onClick: () => handleOpenServerSetting(userId, serverId),
           },
           {
             id: 'set-favorite',
             label: !serverFavorite ? t('favorite') : t('unfavorite'),
-            onClick: () => {
-              handleFavoriteServer(serverId);
-            },
+            onClick: () => handleFavoriteServer(serverId),
           },
           {
             id: 'terminate-self-membership',
             label: t('terminate-self-membership'),
-            show: canTerminateSelfMembership,
-            onClick: () => {
-              handleTerminateMember(userId, serverId, t('self'));
-            },
+            show: isMember(serverPermissionLevel) && !isServerOwner(serverPermissionLevel),
+            onClick: () => handleTerminateMember(userId, serverId, t('self')),
           },
         ]);
       }}
@@ -114,14 +100,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
       <div className={homePage['server-info-text']}>
         <div className={homePage['server-name-text']}>{serverName}</div>
         <div className={homePage['server-id-box']}>
-          <div
-            className={`
-                ${homePage['server-id-text']} 
-                ${isOwner ? homePage['is-owner'] : ''}
-              `}
-          >
-            ID:
-          </div>
+          <div className={`${homePage['server-id-text']} ${isServerOwner(serverPermissionLevel) ? homePage['is-owner'] : ''}`}>ID:</div>
           <div className={homePage['server-id-text']}>{serverDisplayId}</div>
         </div>
         <div className={homePage['server-slogen']}>{serverSlogan}</div>

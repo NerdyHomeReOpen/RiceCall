@@ -33,6 +33,7 @@ interface AnnouncementEditorProps {
 }
 
 const AnnouncementEditor: React.FC<AnnouncementEditorProps> = ({ announcement, showPreview = false, onChange }) => {
+  // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const editor = useEditor({
@@ -66,10 +67,9 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = ({ announcement, s
 
   // Effects
   useEffect(() => {
-    if (!isSetContentRef.current) {
-      editor?.commands.setContent(fromTags(announcement), { emitUpdate: false });
-      isSetContentRef.current = !!announcement;
-    }
+    if (isSetContentRef.current) return;
+    editor?.commands.setContent(fromTags(announcement), { emitUpdate: false });
+    isSetContentRef.current = !!announcement;
   }, [editor, announcement]);
 
   useEffect(() => {

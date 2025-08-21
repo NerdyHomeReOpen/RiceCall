@@ -17,7 +17,7 @@ import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 const SearchResultItem: React.FC<{
   server: Server;
@@ -73,7 +73,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     const query = e.target.value.trim();
     if (!query || !canSearchRef.current) return;
 
-    ipcService.socket.send('searchServer', { query });
+    ipc.socket.send('searchServer', { query });
     searchQueryRef.current = query;
     canSearchRef.current = false;
 
@@ -84,7 +84,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   };
 
   const handleOpenCreateServer = (userId: User['userId']) => {
-    ipcService.popup.open('createServer', 'createServer', { userId });
+    ipc.popup.open('createServer', 'createServer', { userId });
   };
 
   const handleClearSearchState = () => {
@@ -97,15 +97,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const handleConnectServer = useCallback(
     (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
       if (loadingBox.isLoading) return;
-
       if (currentServerId == serverId) {
         mainTab.setSelectedTabId('server');
         return;
       }
-
       loadingBox.setIsLoading(true);
       loadingBox.setLoadingServerId(serverDisplayId);
-      ipcService.socket.send('connectServer', { serverId });
+      ipc.socket.send('connectServer', { serverId });
 
       setExactMatch(null);
       setPersonalResults([]);
@@ -178,7 +176,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, []);
 
   useEffect(() => {
-    ipcService.discord.updatePresence({
+    ipc.discord.updatePresence({
       details: t('rpc:home-page'),
       state: `${t('rpc:user')} ${userName}`,
       largeImageKey: 'app_icon',
@@ -196,7 +194,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, [t, userName]);
 
   useEffect(() => {
-    const unsubscribe = [ipcService.socket.on('serverSearch', handleServerSearch), ipcService.deepLink.onDeepLink(handleDeepLink)];
+    const unsubscribe = [ipc.socket.on('serverSearch', handleServerSearch), ipc.deepLink.onDeepLink(handleDeepLink)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleServerSearch, handleDeepLink]);
 

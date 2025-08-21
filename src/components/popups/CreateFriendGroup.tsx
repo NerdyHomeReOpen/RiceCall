@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 // Types
 import type { FriendGroup } from '@/types';
@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import Default from '@/utils/default';
@@ -22,17 +22,19 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
   // States
   const [friendGroup, setFriendGroup] = useState<FriendGroup>(Default.friendGroup());
 
-  // Variables
-  const { name: groupName, order: groupOrder } = friendGroup;
-  const canSubmit = groupName.trim();
+  // Destructuring
+  const { name: groupName } = friendGroup;
+
+  // Memos
+  const canSubmit = useMemo(() => groupName.trim(), [groupName]);
 
   // Handlers
   const handleCreateFriendGroup = (preset: Partial<FriendGroup>) => {
-    ipcService.socket.send('createFriendGroup', { preset });
+    ipc.socket.send('createFriendGroup', { preset });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (
@@ -52,7 +54,7 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
         <div
           className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
-            handleCreateFriendGroup({ name: groupName, order: groupOrder });
+            handleCreateFriendGroup({ name: groupName });
             handleClose();
           }}
         >

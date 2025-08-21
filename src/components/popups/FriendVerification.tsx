@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Types
 import type { User, FriendApplication } from '@/types';
@@ -8,8 +8,7 @@ import styles from '@/styles/popups/friendVerification.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
-import getService from '@/services/get.service';
+import ipc from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -19,45 +18,43 @@ import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
 interface FriendVerificationPopupProps {
   userId: User['userId'];
+  friendApplications: FriendApplication[];
 }
 
-const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.memo(({ userId }) => {
+const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.memo(({ userId, friendApplications: friendApplicationsData }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Refs
-  const refreshRef = useRef(false);
-
-  // State
-  const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
+  // States
+  const [friendApplications, setFriendApplications] = useState<FriendApplication[]>(friendApplicationsData);
 
   // Handlers
   const handleRejectFriendApplication = (senderId: User['userId']) => {
-    ipcService.socket.send('rejectFriendApplication', { senderId });
+    ipc.socket.send('rejectFriendApplication', { senderId });
   };
 
   const handleRejectAllFriendApplication = () => {
     if (friendApplications.length === 0) return;
     handleOpenAlertDialog(t('confirm-reject-all-friend-application'), () => {
-      ipcService.socket.send('rejectFriendApplication', ...friendApplications.map((item) => ({ senderId: item.senderId })));
+      ipc.socket.send('rejectFriendApplication', ...friendApplications.map((item) => ({ senderId: item.senderId })));
     });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
+    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName });
+  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipcService.popup.onSubmit('dialogAlert', callback);
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
@@ -77,23 +74,12 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   // Effects
   useEffect(() => {
     const unsubscribe = [
-      ipcService.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
-      ipcService.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
-      ipcService.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
+      ipc.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
+      ipc.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
+      ipc.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
-
-  useEffect(() => {
-    if (!userId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.friendApplications({ receiverId: userId }).then((friendApplications) => {
-        if (friendApplications) setFriendApplications(friendApplications);
-      });
-    };
-    refresh();
-  }, [userId]);
 
   return (
     <div className={popup['popup-wrapper']} tabIndex={0}>
@@ -111,34 +97,35 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
 
         {/* Content Body */}
         <div className={styles['content']}>
-          {friendApplications.map((friend) => {
+          {friendApplications.map((friendApplication) => {
+            const { senderId: applicationSenderId, name: applicationName, avatarUrl: applicationAvatarUrl, createdAt: applicationCreatedAt, description: applicationDescription } = friendApplication;
             return (
-              <div key={friend.senderId} className={styles['application']}>
-                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friend.avatarUrl})` }} onClick={() => handleOpenUserInfo(friend.receiverId, friend.senderId)} />
+              <div key={applicationSenderId} className={styles['application']}>
+                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${applicationAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, applicationSenderId)} />
                 <div style={{ flex: 1 }}>
                   <div className={styles['user-info-box']}>
-                    <div className={styles['user-name-text']}>{friend.name}</div>
-                    <div className={styles['time-text']} title={getFormatTimestamp(t, friend.createdAt)}>
-                      {getFormatTimeDiff(t, friend.createdAt)}
+                    <div className={styles['user-name-text']}>{applicationName}</div>
+                    <div className={styles['time-text']} title={getFormatTimestamp(t, applicationCreatedAt)}>
+                      {getFormatTimeDiff(t, applicationCreatedAt)}
                     </div>
                   </div>
                   <div className={styles['application-content-box']}>
                     <div className={popup['col']}>
                       <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
                       <div className={styles['content-text']}>
-                        {t('note')}: {friend.description}
+                        {t('note')}: {applicationDescription}
                       </div>
                     </div>
                     <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
                       <div className={styles['action-buttons']}>
-                        <div className={styles['button']} onClick={() => handleOpenApplyFriend(userId, friend.senderId)}>
+                        <div className={styles['button']} onClick={() => handleOpenApplyFriend(userId, applicationSenderId)}>
                           {t('accept')}
                         </div>
-                        <div className={styles['button']} onClick={() => handleRejectFriendApplication(friend.senderId)}>
+                        <div className={styles['button']} onClick={() => handleRejectFriendApplication(applicationSenderId)}>
                           {t('reject')}
                         </div>
                       </div>
-                      <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(friend.receiverId, friend.senderId, friend.name)}>
+                      <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(userId, applicationSenderId)}>
                         <div className={styles['direct-message-icon']} />
                       </div>
                     </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Types
 import type { User, Friend, FriendGroup } from '@/types';
@@ -10,38 +10,31 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import getService from '@/services/get.service';
-import ipcService from '@/services/ipc.service';
-
-// Utils
-import Default from '@/utils/default';
+import ipc from '@/services/ipc.service';
 
 interface EditFriendPopupProps {
-  userId: User['userId'];
-  targetId: User['userId'];
+  friend: Friend;
+  friendGroups: FriendGroup[];
 }
 
-const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, targetId }) => {
+const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ friend: friendData, friendGroups: friendGroupsData }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Refs
-  const refreshRef = useRef(false);
-
   // States
-  const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
-  const [friend, setFriend] = useState<Friend>(Default.friend());
+  const [friend, setFriend] = useState<Friend>(friendData);
+  const [friendGroups, setFriendGroups] = useState<FriendGroup[]>(friendGroupsData);
 
   // Variables
-  const { friendGroupId } = friend;
+  const { targetId, friendGroupId } = friend;
 
   // Handlers
   const handleEditFriend = (targetId: User['userId'], update: Partial<Friend>) => {
-    ipcService.socket.send('editFriend', { targetId, update });
+    ipc.socket.send('editFriend', { targetId, update });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
@@ -61,26 +54,12 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ userId, ta
   // Effects
   useEffect(() => {
     const unsubscribe = [
-      ipcService.socket.on('friendGroupAdd', handleFriendGroupAdd),
-      ipcService.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
-      ipcService.socket.on('friendGroupRemove', handleFriendGroupRemove),
+      ipc.socket.on('friendGroupAdd', handleFriendGroupAdd),
+      ipc.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
+      ipc.socket.on('friendGroupRemove', handleFriendGroupRemove),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
-
-  useEffect(() => {
-    if (!userId || !targetId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.friend({ userId: userId, targetId: targetId }).then((friend) => {
-        if (friend) setFriend(friend);
-      });
-      getService.friendGroups({ userId: userId }).then((friendGroups) => {
-        if (friendGroups) setFriendGroups(friendGroups);
-      });
-    };
-    refresh();
-  }, [userId, targetId]);
 
   return (
     <div className={popup['popup-wrapper']}>

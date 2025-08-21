@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -11,62 +11,36 @@ import { useTranslation } from 'react-i18next';
 
 // Services
 import ipcService from '@/services/ipc.service';
-import getService from '@/services/get.service';
 
 // Utils
 import Default from '@/utils/default';
 
 interface InviteMemberPopupProps {
-  userId: User['userId'];
   serverId: Server['serverId'];
+  target: User;
+  memberInvitation: MemberInvitation | null;
 }
 
-const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ userId, serverId }) => {
+const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ serverId, target, memberInvitation: memberInvitationData }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Refs
-  const refreshRef = useRef(false);
-
   // States
-  const [section, setSection] = useState<number>(0);
-  const [user, setUser] = useState<User>(Default.user());
-  const [memberInvitation, setMemberInvitation] = useState<MemberInvitation>(Default.memberInvitation());
+  const [memberInvitation, setMemberInvitation] = useState<MemberInvitation>(memberInvitationData || Default.memberInvitation());
+  const [section, setSection] = useState<number>(memberInvitationData ? 1 : 0);
 
-  // Variables
-  const { name: targetName, avatarUrl: targetAvatarUrl } = user;
+  // Destructuring
+  const { userId: targetId, name: targetName, avatarUrl: targetAvatarUrl, displayId: targetDisplayId } = target;
   const { description: applicationDesc } = memberInvitation;
 
   // Handlers
-  const handleSendMemberInvitation = (userId: User['userId'], serverId: Server['serverId'], preset: Partial<MemberInvitation>) => {
-    ipcService.socket.send('sendMemberInvitation', { receiverId: userId, serverId, preset });
+  const handleSendMemberInvitation = (receiverId: User['userId'], serverId: Server['serverId'], preset: Partial<MemberInvitation>) => {
+    ipcService.socket.send('sendMemberInvitation', { receiverId, serverId, preset });
   };
 
   const handleClose = () => {
     ipcService.window.close();
   };
-
-  // Effects
-  useEffect(() => {
-    if (!userId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.user({ userId: userId }).then((target) => {
-        if (target) setUser(target);
-      });
-      getService.memberInvitation({ receiverId: userId, serverId }).then((sentMemberInvitation) => {
-        if (sentMemberInvitation) {
-          if (sentMemberInvitation.userId === userId) {
-            setSection(2);
-          } else {
-            setSection(1);
-          }
-          setMemberInvitation(sentMemberInvitation);
-        }
-      });
-    };
-    refresh();
-  }, [userId, serverId]);
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -80,7 +54,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ userId
             </div>
             <div className={popup['info-wrapper']}>
               <div className={popup['bold-text']}>{targetName}</div>
-              <div className={popup['sub-text']}>{targetName}</div>
+              <div className={popup['sub-text']}>{targetDisplayId}</div>
             </div>
           </div>
           <div className={popup['split']} />
@@ -100,7 +74,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ userId
           className={popup['button']}
           style={section === 0 ? {} : { display: 'none' }}
           onClick={() => {
-            handleSendMemberInvitation(userId, serverId, { description: applicationDesc });
+            handleSendMemberInvitation(targetId, serverId, { description: applicationDesc });
             handleClose();
           }}
         >

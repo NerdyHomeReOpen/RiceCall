@@ -16,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import About from '@/components/popups/About';
 import ApplyFriend from '@/components/popups/ApplyFriend';
 import ApplyMember from '@/components/popups/ApplyMember';
-import AvatarCropper from '@/components/popups/AvatarCropper';
 import BlockMember from '@/components/popups/BlockMember';
 import ChangeTheme from '@/components/popups/ChangeTheme';
 import ChannelPassword from '@/components/popups/ChannelPassword';
@@ -29,20 +28,21 @@ import DirectMessage from '@/components/popups/DirectMessage';
 import EditChannelName from '@/components/popups/EditChannelName';
 import EditChannelOrder from '@/components/popups/EditChannelOrder';
 import EditNickname from '@/components/popups/EditNickname';
-import EditFriendGroup from '@/components/popups/EditFriendGroup';
+import EditFriendGroupName from '@/components/popups/EditFriendGroupName';
 import EditFriend from '@/components/popups/EditFriend';
 import FriendVerification from '@/components/popups/FriendVerification';
 import MemberApplicationSetting from '@/components/popups/MemberApplicationSetting';
 import MemberInvitation from '@/components/popups/MemberInvitation';
+import ImageCropper from '@/components/popups/ImageCropper';
 import InviteMember from '@/components/popups/InviteMember';
 import SearchUser from '@/components/popups/SearchUser';
 import ServerSetting from '@/components/popups/ServerSetting';
 import ServerBroadcast from '@/components/popups/ServerBroadcast';
 import SystemSetting from '@/components/popups/SystemSetting';
-import UserSetting from '@/components/popups/UserSetting';
+import UserInfo from '@/components/popups/UserInfo';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface HeaderProps {
   title: string;
@@ -56,21 +56,21 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
 
   // Handlers
   const handleFullscreen = () => {
-    if (isFullscreen) ipcService.window.unmaximize();
-    else ipcService.window.maximize();
+    if (isFullscreen) ipc.window.unmaximize();
+    else ipc.window.maximize();
   };
 
   const handleMinimize = () => {
-    ipcService.window.minimize();
+    ipc.window.minimize();
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   // Effects
   useEffect(() => {
-    const unsubscribe = [ipcService.window.onUnmaximize(() => setIsFullscreen(false)), ipcService.window.onMaximize(() => setIsFullscreen(true))];
+    const unsubscribe = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
@@ -102,7 +102,7 @@ const Popup = React.memo(() => {
 
   // Memos
   const { title, buttons, node, hideHeader } = useMemo<{ title: string; buttons: ('close' | 'minimize' | 'maxsize')[]; node: React.ReactNode | null; hideHeader: boolean }>(() => {
-    if (!type) return { title: '', buttons: [], node: null, hideHeader: true };
+    if (!type || !initialData) return { title: '', buttons: [], node: null, hideHeader: true };
 
     switch (type) {
       case 'aboutus':
@@ -111,8 +111,8 @@ const Popup = React.memo(() => {
         return { title: t('apply-member'), buttons: ['close'], node: <ApplyMember {...initialData} />, hideHeader: false };
       case 'applyFriend':
         return { title: t('apply-friend'), buttons: ['close'], node: <ApplyFriend {...initialData} />, hideHeader: false };
-      case 'avatarCropper':
-        return { title: t('avatar-cropper'), buttons: ['close'], node: <AvatarCropper {...initialData} />, hideHeader: false };
+      case 'imageCropper':
+        return { title: t('image-cropper'), buttons: ['close'], node: <ImageCropper {...initialData} />, hideHeader: false };
       case 'blockMember':
         return { title: t('block'), buttons: ['close'], node: <BlockMember {...initialData} />, hideHeader: false };
       case 'changeTheme':
@@ -144,8 +144,8 @@ const Popup = React.memo(() => {
         return { title: t('edit-channel-order'), buttons: ['close'], node: <EditChannelOrder {...initialData} />, hideHeader: false };
       case 'editChannelName':
         return { title: t('edit-channel-name'), buttons: ['close'], node: <EditChannelName {...initialData} />, hideHeader: false };
-      case 'editFriendGroup':
-        return { title: t('edit-friend-group'), buttons: ['close'], node: <EditFriendGroup {...initialData} />, hideHeader: false };
+      case 'editFriendGroupName':
+        return { title: t('edit-friend-group'), buttons: ['close'], node: <EditFriendGroupName {...initialData} />, hideHeader: false };
       case 'editFriend':
         return { title: t('edit-friend'), buttons: ['close'], node: <EditFriend {...initialData} />, hideHeader: false };
       case 'editNickname':
@@ -167,9 +167,7 @@ const Popup = React.memo(() => {
       case 'systemSetting':
         return { title: t('system-setting'), buttons: ['close'], node: <SystemSetting {...initialData} />, hideHeader: false };
       case 'userInfo':
-        return { title: t('user-info'), buttons: ['close'], node: <UserSetting {...initialData} />, hideHeader: true };
-      case 'userSetting':
-        return { title: t('user-setting'), buttons: ['close'], node: <UserSetting {...initialData} />, hideHeader: false };
+        return { title: t('user-info'), buttons: ['close'], node: <UserInfo {...initialData} />, hideHeader: true };
       default:
         return { title: '', buttons: [], node: null, hideHeader: true };
     }
@@ -186,14 +184,14 @@ const Popup = React.memo(() => {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') ipcService.window.close();
+      if (event.key === 'Escape') ipc.window.close();
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
   useEffect(() => {
-    ipcService.initialData.get((data) => setInitialData(data));
+    ipc.initialData.get((data) => setInitialData(data));
   }, []);
 
   return (

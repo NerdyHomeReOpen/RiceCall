@@ -24,16 +24,11 @@ const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, o
   // Effects
   useEffect(() => {
     if (!colorPickerRef.current) return;
-
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+    const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = colorPickerRef.current;
+    const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
-
     let newPosX = x;
     let newPosY = y;
-
-    const pickerWidth = colorPickerRef.current.offsetWidth;
-    const pickerHeight = colorPickerRef.current.offsetHeight;
 
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= pickerHeight;

@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef } from 'react';
+import React, { useState, useLayoutEffect, useRef, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/userInfoCard.module.css';
@@ -26,18 +26,18 @@ interface UserInfoCardProps {
 }
 
 const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction, member }) => {
+  // Hooks
+  const { t } = useTranslation();
+
   // Refs
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Language
-  const { t } = useTranslation();
-
-  // State
+  // States
   const [display, setDisplay] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
-  // Variables
+  // Destructuring
   const {
     name: memberName,
     avatarUrl: memberAvatarUrl,
@@ -51,21 +51,18 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
     nickname: memberNickname,
     vip: memberVip,
   } = member;
-  const vipBoostMultiplier = Math.min(2, 1 + memberVip * 0.2);
 
-  // Effect
+  // Memos
+  const vipBoost = useMemo(() => Math.min(2, 1 + memberVip * 0.2), [memberVip]);
+
+  // Effects
   useLayoutEffect(() => {
     if (!cardRef.current) return;
-
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+    const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardRef.current;
+    const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
-
     let newPosX = x;
     let newPosY = y;
-
-    const cardWidth = cardRef.current.offsetWidth;
-    const cardHeight = cardRef.current.offsetHeight;
 
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= cardHeight;
@@ -114,7 +111,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
             <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
 
             {/* VIP Info Text */}
-            {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoostMultiplier.toString() })}</div>}
+            {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
 
             {/* Xp Info */}
             <div className={styles['xp-wrapper']}>

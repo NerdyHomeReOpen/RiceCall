@@ -1,68 +1,45 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
 
 // Types
-import type { Server, MemberApplication, User } from '@/types';
+import type { Server, MemberApplication } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import Default from '@/utils/default';
-import getService from '@/services/get.service';
 
 interface ApplyMemberPopupProps {
-  userId: User['userId'];
-  serverId: Server['serverId'];
+  server: Server;
+  memberApplication: MemberApplication | null;
 }
 
-const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ userId, serverId }) => {
+const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, memberApplication: memberApplicationData }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Refs
-  const refreshRef = useRef(false);
-
   // States
-  const [section, setSection] = useState<number>(0);
-  const [server, setServer] = useState<Server>(Default.server());
-  const [memberApplication, setMemberApplication] = useState<MemberApplication>(Default.memberApplication());
+  const [section, setSection] = useState<number>(memberApplicationData ? 1 : 0);
+  const [memberApplication, setMemberApplication] = useState<MemberApplication>(memberApplicationData || Default.memberApplication());
 
   // Variables
-  const { name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
+  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
   const { description: applicationDes } = memberApplication;
 
   // Handlers
   const handleSendMemberApplication = (serverId: Server['serverId'], preset: Partial<MemberApplication>) => {
-    ipcService.socket.send('sendMemberApplication', { serverId, preset });
+    ipc.socket.send('sendMemberApplication', { serverId, preset });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
-
-  // UseEffect
-  useEffect(() => {
-    if (!serverId || !userId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.server({ userId: userId, serverId: serverId }).then((server) => {
-        if (server) setServer(server);
-      });
-      getService.memberApplication({ userId: userId, serverId: serverId }).then((memberApplication) => {
-        if (memberApplication) {
-          setSection(1);
-          setMemberApplication(memberApplication);
-        }
-      });
-    };
-    refresh();
-  }, [serverId, userId]);
 
   return (
     <div className={popup['popup-wrapper']}>

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from '@/styles/pages/login.module.css';
 
 // Services
-import authService from '@/services/auth.service';
+import auth from '@/services/auth.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -79,7 +79,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
   const handleSubmit = async () => {
     if (!formData.account || !formData.password) return;
     setIsLoading(true);
-    if (await authService.login(formData)) {
+    if (await auth.login(formData)) {
       if (formData.rememberAccount && !accounts.includes(formData.account)) {
         setAccounts([...accounts, formData.account]);
         localStorage.setItem('login-account', formData.account);

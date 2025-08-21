@@ -23,28 +23,19 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
   // Hooks
   const { t } = useTranslation();
 
-  // State
+  // States
   const [display, setDisplay] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
-  // Effect
+  // Effects
   useEffect(() => {
     if (!cardRef.current) return;
-
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+    const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardRef.current;
+    const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
-
     let newPosX = x;
     let newPosY = y;
-
-    const cardWidth = cardRef.current.offsetWidth;
-    const cardHeight = cardRef.current.offsetHeight;
-
-    if (cardWidth === 0 || cardHeight === 0) {
-      return;
-    }
 
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= cardHeight;

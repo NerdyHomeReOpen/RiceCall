@@ -5,7 +5,7 @@ import styles from '@/styles/popups/changeTheme.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Providers
 import { useContextMenu } from '@/providers/ContextMenu';
@@ -15,11 +15,11 @@ import { useTranslation } from 'react-i18next';
 import { setThemeValue } from '@/utils/themeStorage';
 import { getDominantColor, getContrastColor, getVisibleColor, toRGBString, type RGB } from '@/utils/color';
 
-interface Theme {
+type Theme = {
   headerImage: string;
   mainColor: string;
   secondaryColor: string;
-}
+};
 
 const ChangeThemePopup: React.FC = React.memo(() => {
   // Hooks
@@ -50,9 +50,9 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     setThemeValue('theme-header-image', headerImage);
   };
 
-  const handleAvatarCropper = (avatarData: string) => {
-    ipcService.popup.open('avatarCropper', 'avatarCropper', { avatarData: avatarData, submitTo: 'avatarCropper' });
-    ipcService.popup.onSubmit('avatarCropper', async (data) => {
+  const handleOpenImageCropper = (imageData: string) => {
+    ipc.popup.open('imageCropper', 'imageCropper', { imageData, submitTo: 'imageCropper' });
+    ipc.popup.onSubmit('imageCropper', async (data) => {
       const base64String = data.imageDataUrl as string;
       const dominantColor = await getDominantColor(base64String);
       const visibleColor = getVisibleColor(dominantColor);
@@ -248,7 +248,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       if (!file) return;
                       const reader = new FileReader();
                       reader.onloadend = async () => {
-                        handleAvatarCropper(reader.result as string);
+                        handleOpenImageCropper(reader.result as string);
                       };
                       reader.readAsDataURL(file);
                     }}

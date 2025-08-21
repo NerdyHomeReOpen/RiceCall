@@ -16,7 +16,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import MarkdownContent from '@/components/MarkdownContent';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import { getFormatTimestamp } from '@/utils/language';
@@ -31,31 +31,30 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   const contextMenu = useContextMenu();
   const { t } = useTranslation();
 
-  // Variables
+  // Destructuring
   const { userId: senderUserId, name: senderName, vip: senderVip, gender: senderGender, permissionLevel: senderPermissionLevel, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
-  const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
-  const formattedMessageContents = messageContents.map((content) => {
-    return content
-      .split(' ')
-      .map((msg) => {
-        if (msg === 'guest-send-an-external-link') return t('guest-send-an-external-link');
-        return msg;
-      })
-      .join(' ');
-  });
 
   // Memos
-  const isUser = useMemo(() => {
-    return senderUserId === userId;
-  }, [senderUserId, userId]);
+  const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
+  const formattedMessageContents = useMemo(
+    () =>
+      messageContents.map((content) => {
+        return content
+          .split(' ')
+          .map((msg) => (msg === 'guest-send-an-external-link' ? t('guest-send-an-external-link') : msg))
+          .join(' ');
+      }),
+    [messageContents, t],
+  );
+  const isUser = useMemo(() => senderUserId === userId, [senderUserId, userId]);
 
   // handles
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId'], targetName: User['name']) => {
-    ipcService.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName });
+  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
   };
 
   const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
+    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
   return (
@@ -68,14 +67,13 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
             className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`}
             onClick={() => handleOpenUserInfo(userId, senderUserId)}
             onContextMenu={(e) => {
-              const x = e.clientX;
-              const y = e.clientY;
+              const { clientX: x, clientY: y } = e;
               contextMenu.showContextMenu(x, y, 'right-bottom', [
                 {
                   id: 'direct-message',
                   label: t('direct-message'),
                   show: !isUser,
-                  onClick: () => handleOpenDirectMessage(userId, senderUserId, senderName),
+                  onClick: () => handleOpenDirectMessage(userId, senderUserId),
                 },
                 {
                   id: 'view-profile',

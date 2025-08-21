@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 // Types
-import type { Server, User, Friend } from '@/types';
+import type { Friend, Server, User } from '@/types';
 
 // Components
 import BadgeList from '@/components/BadgeList';
@@ -12,9 +12,8 @@ import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
-import ipcService from '@/services/ipc.service';
-import getService from '@/services/get.service';
-import apiService from '@/services/api.service';
+import ipc from '@/services/ipc.service';
+import api from '@/services/api.service';
 
 // CSS
 import styles from '@/styles/popups/userSetting.module.css';
@@ -24,70 +23,131 @@ import permission from '@/styles/permission.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Utils
-import Default from '@/utils/default';
+import { isMember, isStaff } from '@/utils/permission';
 
 // Country
 import { countries } from '@/country';
 
-interface UserSettingPopupProps {
-  userId: User['userId'];
-  targetId: User['userId'];
+interface UserInfoPopupProps {
+  user: User;
+  friend: Friend | null;
+  target: User;
+  targetServers: Server[];
 }
 
-const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, targetId }) => {
-  // Props
+const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ user, friend, target: targetData, targetServers }) => {
+  // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
 
   // Refs
-  const refreshRef = useRef(false);
   const signatureInputRef = useRef<HTMLInputElement>(null);
 
-  // Constants
-  const TODAY = useMemo(() => new Date(), []);
-  const CURRENT_YEAR = TODAY.getFullYear();
-  const CURRENT_MONTH = TODAY.getMonth() + 1;
-  const CURRENT_DAY = TODAY.getDate();
-
   // States
-  const [user, setUser] = useState<User>(Default.user());
-  const [friend, setFriend] = useState<Friend>(Default.friend());
-  const [servers, setServers] = useState<Server[]>([]);
+  const [target, setTarget] = useState(targetData);
   const [serversView, setServersView] = useState('joined');
   const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'userSetting'>('about');
 
-  // Variables
+  // Destructuring
+  const { userId } = user;
   const {
-    name: userName,
-    displayId: userDisplayId,
-    avatarUrl: userAvatarUrl,
-    gender: userGender,
-    signature: userSignature,
-    about: userAbout,
-    level: userLevel,
-    xp: userXP,
-    requiredXp: userRequiredXP,
-    vip: userVip,
-    birthYear: userBirthYear,
-    birthMonth: userBirthMonth,
-    birthDay: userBirthDay,
-    country: userCountry,
-    badges: userBadges,
-    currentServerId: userCurrentServerId,
-  } = user;
-  const isSelf = targetId === userId;
-  const isFriend = !!friend.targetId;
-  const isProfilePrivate = false; // TODO: Need to add privacy setting
-  const canSubmit = userName.trim() && userGender.trim() && userCountry.trim() && userBirthYear && userBirthMonth && userBirthDay;
-  const joinedServers = servers.filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7).sort((a, b) => b.permissionLevel - a.permissionLevel);
-  const favoriteServers = servers
-    .filter((s) => s.favorite)
-    .filter((s) => s.permissionLevel > 1 && s.permissionLevel < 7)
-    .sort((a, b) => b.permissionLevel - a.permissionLevel);
-  const recentServers = servers
-    .filter((s) => s.recent)
-    .sort((a, b) => b.timestamp - a.timestamp)
-    .slice(0, 4);
+    userId: targetId,
+    name: targetName,
+    displayId: targetDisplayId,
+    avatarUrl: targetAvatarUrl,
+    gender: targetGender,
+    signature: targetSignature,
+    about: targetAbout,
+    level: targetLevel,
+    xp: targetXP,
+    requiredXp: targetRequiredXp,
+    vip: targetVip,
+    birthYear: targetBirthYear,
+    birthMonth: targetBirthMonth,
+    birthDay: targetBirthDay,
+    country: targetCountry,
+    badges: targetBadges,
+  } = target;
+
+  // Memos
+  const { CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY } = useMemo(() => {
+    const today = new Date();
+    return { CURRENT_YEAR: today.getFullYear(), CURRENT_MONTH: today.getMonth() + 1, CURRENT_DAY: today.getDate() };
+  }, []);
+  const yearOptions = useMemo(() => Array.from({ length: CURRENT_YEAR - 1900 + 1 }, (_, i) => CURRENT_YEAR - i), [CURRENT_YEAR]);
+  const monthOptions = useMemo(() => Array.from({ length: 12 }, (_, i) => i + 1), []);
+  const dayOptions = useMemo(() => Array.from({ length: new Date(targetBirthYear, targetBirthMonth, 0).getDate() }, (_, i) => i + 1), [targetBirthYear, targetBirthMonth]);
+  const userAge = useMemo(() => {
+    const birthDate = new Date(targetBirthYear, targetBirthMonth - 1, targetBirthDay);
+    let age = CURRENT_YEAR - birthDate.getFullYear();
+    const monthDiff = CURRENT_MONTH - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && CURRENT_DAY < birthDate.getDate())) age--;
+    return age;
+  }, [targetBirthYear, targetBirthMonth, targetBirthDay, CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY]);
+  const joinedServers = useMemo(() => targetServers.filter((s) => isMember(s.permissionLevel) && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel), [targetServers]);
+  const favoriteServers = useMemo(
+    () => targetServers.filter((s) => s.favorite && isMember(s.permissionLevel) && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel),
+    [targetServers],
+  );
+  const recentServers = useMemo(
+    () =>
+      targetServers
+        .filter((s) => s.recent)
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, 4),
+    [targetServers],
+  );
+  const isProfilePrivate = useMemo(() => false, []); // TODO: implement privacy setting
+  const isSelf = useMemo(() => userId === targetId, [userId, targetId]);
+  const isFriend = useMemo(() => friend?.userId === targetId, [friend, targetId]);
+  const canSubmit = useMemo(
+    () => targetName.trim() && targetGender.trim() && targetCountry.trim() && targetBirthYear && targetBirthMonth && targetBirthDay,
+    [targetName, targetGender, targetCountry, targetBirthYear, targetBirthMonth, targetBirthDay],
+  );
+
+  // Handlers
+  const handleEditUser = (update: Partial<User>) => {
+    ipc.socket.send('editUser', { update });
+  };
+
+  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+  };
+
+  const handleOpenErrorDialog = (message: string) => {
+    ipc.popup.open('dialogError', 'errorDialog', { message, submitTo: 'errorDialog' });
+  };
+
+  const handleOpenImageCropper = (userId: User['userId'], imageData: string) => {
+    ipc.popup.open('imageCropper', 'imageCropper', { imageData, submitTo: 'imageCropper' });
+    ipc.popup.onSubmit('imageCropper', async (data) => {
+      if (data.imageDataUrl.length > 5 * 1024 * 1024) {
+        handleOpenErrorDialog(t('image-too-large', { '0': '5MB' }));
+        return;
+      }
+      const formData = new FormData();
+      formData.append('_type', 'user');
+      formData.append('_fileName', userId);
+      formData.append('_file', data.imageDataUrl as string);
+      const response = await api.post('/upload', formData);
+      if (response) {
+        setTarget((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
+        handleEditUser({ avatar: response.avatar, avatarUrl: response.avatarUrl });
+      }
+    });
+  };
+
+  const handleMinimize = () => {
+    ipc.window.minimize();
+  };
+
+  const handleClose = () => {
+    ipc.window.close();
+  };
+
+  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
+  };
 
   const isFutureDate = useCallback(
     (year: number, month: number, day: number) => {
@@ -99,101 +159,15 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
     [CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY],
   );
 
-  const calculateAge = (birthYear: number, birthMonth: number, birthDay: number) => {
-    const birthDate = new Date(birthYear, birthMonth - 1, birthDay);
-    let age = CURRENT_YEAR - birthDate.getFullYear();
-    const monthDiff = CURRENT_MONTH - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && CURRENT_DAY < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
-  const userAge = calculateAge(userBirthYear, userBirthMonth, userBirthDay);
-
-  const yearOptions = useMemo(() => Array.from({ length: CURRENT_YEAR - 1900 + 1 }, (_, i) => CURRENT_YEAR - i), [CURRENT_YEAR]);
-  const monthOptions = useMemo(() => Array.from({ length: 12 }, (_, i) => i + 1), []);
-  const dayOptions = useMemo(() => Array.from({ length: new Date(userBirthYear, userBirthMonth, 0).getDate() }, (_, i) => i + 1), [userBirthYear, userBirthMonth]);
-
-  // Handlers
-  const handleEditUser = (update: Partial<User>) => {
-    ipcService.socket.send('editUser', { update });
-  };
-
-  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipcService.popup.open('applyFriend', 'applyFriend', { userId, targetId });
-  };
-
-  const handleOpenErrorDialog = (message: string) => {
-    ipcService.popup.open('dialogError', 'errorDialog', { message, submitTo: 'errorDialog' });
-  };
-
-  const handleAvatarCropper = (userId: User['userId'], avatarData: string) => {
-    ipcService.popup.open('avatarCropper', 'avatarCropper', { avatarData, submitTo: 'avatarCropper' });
-    ipcService.popup.onSubmit('avatarCropper', async (data) => {
-      const formData = new FormData();
-      formData.append('_type', 'user');
-      formData.append('_fileName', userId);
-      formData.append('_file', data.imageDataUrl as string);
-      const response = await apiService.post('/upload', formData);
-      if (response) {
-        setUser((prev) => ({
-          ...prev,
-          avatar: response.avatar,
-          avatarUrl: response.avatarUrl,
-        }));
-        handleEditUser({
-          avatar: response.avatar,
-          avatarUrl: response.avatarUrl,
-        });
-      }
-    });
-  };
-
-  const handleMinimize = () => {
-    ipcService.window.minimize();
-  };
-
-  const handleClose = () => {
-    ipcService.window.close();
-  };
-
-  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
-  };
-
-  // Effects
   useEffect(() => {
-    if (!targetId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.user({ userId: targetId }).then((user) => {
-        if (user) setUser(user);
-      });
-      getService.servers({ userId: targetId }).then((servers) => {
-        if (servers) setServers(servers);
-      });
-      getService.friend({ userId: userId, targetId: targetId }).then((friend) => {
-        if (friend) setFriend(friend);
-      });
-    };
-    refresh();
-  }, [userId, targetId, userCurrentServerId]);
-
-  useEffect(() => {
-    const daysInMonth = new Date(userBirthYear, userBirthMonth, 0).getDate();
-    if (userBirthDay > daysInMonth) {
-      setUser((prev) => ({ ...prev, birthDay: daysInMonth }));
+    const daysInMonth = new Date(targetBirthYear, targetBirthMonth, 0).getDate();
+    if (targetBirthDay > daysInMonth) {
+      setTarget((prev) => ({ ...prev, birthDay: daysInMonth }));
     }
-    if (isFutureDate(userBirthYear, userBirthMonth, userBirthDay)) {
-      setUser((prev) => ({
-        ...prev,
-        birthYear: CURRENT_YEAR,
-        birthMonth: CURRENT_MONTH,
-        birthDay: CURRENT_DAY,
-      }));
+    if (isFutureDate(targetBirthYear, targetBirthMonth, targetBirthDay)) {
+      setTarget((prev) => ({ ...prev, birthYear: CURRENT_YEAR, birthMonth: CURRENT_MONTH, birthDay: CURRENT_DAY }));
     }
-  }, [userBirthYear, userBirthMonth, userBirthDay, CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY, isFutureDate]);
+  }, [targetBirthYear, targetBirthMonth, targetBirthDay, CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY, isFutureDate]);
 
   const PrivateElement = (text: React.ReactNode) => {
     return <div className={styles['user-recent-visits-private']}>{text}</div>;
@@ -211,7 +185,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
           <div
             className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`}
-            style={{ backgroundImage: `url(${userAvatarUrl})` }}
+            style={{ backgroundImage: `url(${targetAvatarUrl})` }}
             onClick={() => {
               if (!isSelf) return;
               const fileInput = document.createElement('input');
@@ -225,9 +199,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                   return;
                 }
                 const reader = new FileReader();
-                reader.onloadend = async () => {
-                  handleAvatarCropper(targetId, reader.result as string);
-                };
+                reader.onloadend = async () => handleOpenImageCropper(userId, reader.result as string);
                 reader.readAsDataURL(file);
               };
               fileInput.click();
@@ -235,17 +207,17 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
           />
 
           <div className={`${popup['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
-            <div className={styles['user-name-text']}>{userName}</div>
-            {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
-            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} />
+            <div className={styles['user-name-text']}>{targetName}</div>
+            {targetVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${targetVip}`]}`} />}
+            <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} />
           </div>
-          <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
-            @{userDisplayId}
+          <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(userId)}>
+            @{targetDisplayId}
           </div>
           <div className={styles['user-info-text']}>
-            {t(userGender === 'Male' ? 'male' : 'female')} . {userAge} .{t(userCountry, { ns: 'country' })}
+            {t(targetGender === 'Male' ? 'male' : 'female')} . {userAge} .{t(targetCountry, { ns: 'country' })}
           </div>
-          <div className={styles['user-signature']} dangerouslySetInnerHTML={{ __html: userSignature }} />
+          <div className={styles['user-signature']} dangerouslySetInnerHTML={{ __html: targetSignature }} />
 
           <div className={styles['tabs']}>
             <div
@@ -273,14 +245,14 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 className={`${popup['button']} ${popup['blue']} ${!canSubmit ? 'disabled' : ''}`}
                 onClick={() => {
                   handleEditUser({
-                    name: userName,
-                    gender: userGender,
-                    country: userCountry,
-                    birthYear: userBirthYear,
-                    birthMonth: userBirthMonth,
-                    birthDay: userBirthDay,
-                    signature: userSignature,
-                    about: userAbout,
+                    name: targetName,
+                    gender: targetGender,
+                    country: targetCountry,
+                    birthYear: targetBirthYear,
+                    birthMonth: targetBirthMonth,
+                    birthDay: targetBirthDay,
+                    signature: targetSignature,
+                    about: targetAbout,
                   });
                   setSelectedTabId('about');
                 }}
@@ -300,9 +272,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
 
         {/* About */}
         <div className={styles['content']} style={selectedTabId === 'about' ? {} : { display: 'none' }}>
-          {userAbout && (
+          {targetAbout && (
             <div className={styles['user-about-me']}>
-              <div className={styles['user-about-me-text']}>{userAbout}</div>
+              <div className={styles['user-about-me-text']}>{targetAbout}</div>
             </div>
           )}
           <div className={styles['user-profile-content']}>
@@ -324,7 +296,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
                           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                            <div className={`${isSelf && server.ownerId === targetId ? styles['is-owner'] : ''}`} />
+                            <div className={`${isSelf && server.ownerId === userId ? styles['is-owner'] : ''}`} />
                             <div className={styles['display-id-text']}>{server.displayId}</div>
                           </div>
                         </div>
@@ -333,7 +305,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
             </div>
             <div className={popup['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
-              <BadgeList badges={JSON.parse(userBadges)} position="left-top" direction="right-top" maxDisplay={13} />
+              <BadgeList badges={JSON.parse(targetBadges)} position="left-top" direction="right-top" maxDisplay={13} />
             </div>
           </div>
         </div>
@@ -364,7 +336,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
                           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div className={`${permission[userGender]} ${server.ownerId === targetId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
+                            <div className={`${permission[targetGender]} ${server.ownerId === userId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-value-text']}>{server.contribution}</div>
                           </div>
                         </div>
@@ -388,7 +360,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
                           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div className={`${styles['permission']} ${permission[userGender]} ${server.ownerId === targetId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
+                            <div className={`${styles['permission']} ${permission[targetGender]} ${server.ownerId === userId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-box']}>
                               <div className={styles['contribution-icon']} />
                               <div className={styles['contribution-value-text']}>{server.contribution}</div>
@@ -408,12 +380,12 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               <div className={popup['row']}>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('nickname')}</div>
-                  <input name="name" type="text" value={userName} maxLength={32} onChange={(e) => setUser((prev) => ({ ...prev, name: e.target.value }))} />
+                  <input name="name" type="text" value={targetName} maxLength={32} onChange={(e) => setTarget((prev) => ({ ...prev, name: e.target.value }))} />
                 </div>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('gender')}</div>
                   <div className={popup['select-box']} style={{ width: '100%' }}>
-                    <select value={userGender} onChange={(e) => setUser((prev) => ({ ...prev, gender: e.target.value as User['gender'] }))}>
+                    <select value={targetGender} onChange={(e) => setTarget((prev) => ({ ...prev, gender: e.target.value as User['gender'] }))}>
                       <option value="Male">{t('male')}</option>
                       <option value="Female">{t('female')}</option>
                     </select>
@@ -425,7 +397,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('country')}</div>
                   <div className={popup['select-box']} style={{ width: '100%' }}>
-                    <select value={userCountry} onChange={(e) => setUser((prev) => ({ ...prev, country: e.target.value }))}>
+                    <select value={targetCountry} onChange={(e) => setTarget((prev) => ({ ...prev, country: e.target.value }))}>
                       {countries.map((country) => (
                         <option key={country} value={country}>
                           {t(country, { ns: 'country' })}
@@ -439,7 +411,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     <div className={popup['label']}>{t('birthdate')}</div>
                     <div className={popup['row']}>
                       <div className={popup['select-box']} style={{ width: '100%' }}>
-                        <select id="birthYear" value={userBirthYear} onChange={(e) => setUser((prev) => ({ ...prev, birthYear: Number(e.target.value) }))}>
+                        <select id="birthYear" value={targetBirthYear} onChange={(e) => setTarget((prev) => ({ ...prev, birthYear: Number(e.target.value) }))}>
                           {yearOptions.map((year) => (
                             <option key={year} value={year} disabled={year > CURRENT_YEAR}>
                               {year}
@@ -448,18 +420,18 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                         </select>
                       </div>
                       <div className={popup['select-box']} style={{ width: '100%' }}>
-                        <select id="birthMonth" value={userBirthMonth} onChange={(e) => setUser((prev) => ({ ...prev, birthMonth: Number(e.target.value) }))}>
+                        <select id="birthMonth" value={targetBirthMonth} onChange={(e) => setTarget((prev) => ({ ...prev, birthMonth: Number(e.target.value) }))}>
                           {monthOptions.map((month) => (
-                            <option key={month} value={month} disabled={userBirthYear === CURRENT_YEAR && month > CURRENT_MONTH}>
+                            <option key={month} value={month} disabled={targetBirthYear === CURRENT_YEAR && month > CURRENT_MONTH}>
                               {month.toString().padStart(2, '0')}
                             </option>
                           ))}
                         </select>
                       </div>
                       <div className={popup['select-box']} style={{ width: '100%' }}>
-                        <select id="birthDay" value={userBirthDay} onChange={(e) => setUser((prev) => ({ ...prev, birthDay: Number(e.target.value) }))}>
+                        <select id="birthDay" value={targetBirthDay} onChange={(e) => setTarget((prev) => ({ ...prev, birthDay: Number(e.target.value) }))}>
                           {dayOptions.map((day) => (
-                            <option key={day} value={day} disabled={userBirthYear === CURRENT_YEAR && userBirthMonth === CURRENT_MONTH && day > CURRENT_DAY}>
+                            <option key={day} value={day} disabled={targetBirthYear === CURRENT_YEAR && targetBirthMonth === CURRENT_MONTH && day > CURRENT_DAY}>
                               {day.toString().padStart(2, '0')}
                             </option>
                           ))}
@@ -477,9 +449,9 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
                     ref={signatureInputRef}
                     name="signature"
                     type="text"
-                    defaultValue={userSignature}
+                    defaultValue={targetSignature}
                     maxLength={100}
-                    onChange={(e) => setUser((prev) => ({ ...prev, signature: e.target.value }))}
+                    onChange={(e) => setTarget((prev) => ({ ...prev, signature: e.target.value }))}
                   />
                   <div
                     className={emoji['emoji-icon']}
@@ -496,7 +468,7 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('about-me')}</div>
-                <textarea name="about" defaultValue={userAbout} maxLength={200} onChange={(e) => setUser((prev) => ({ ...prev, about: e.target.value }))} />
+                <textarea name="about" defaultValue={targetAbout} maxLength={200} onChange={(e) => setTarget((prev) => ({ ...prev, about: e.target.value }))} />
               </div>
             </div>
           </div>
@@ -518,6 +490,6 @@ const UserSettingPopup: React.FC<UserSettingPopupProps> = React.memo(({ userId, 
   );
 });
 
-UserSettingPopup.displayName = 'UserSettingPopup';
+UserInfoPopup.displayName = 'UserInfoPopup';
 
-export default UserSettingPopup;
+export default UserInfoPopup;

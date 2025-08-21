@@ -14,7 +14,6 @@ type PopupType =
   | 'aboutus'
   | 'applyFriend'
   | 'applyMember'
-  | 'avatarCropper'
   | 'blockMember'
   | 'changeTheme'
   | 'channelPassword'
@@ -32,9 +31,10 @@ type PopupType =
   | 'editChannelName'
   | 'editChannelOrder'
   | 'editFriend'
-  | 'editFriendGroup'
+  | 'editFriendGroupName'
   | 'editNickname'
   | 'friendVerification'
+  | 'imageCropper'
   | 'inviteMember'
   | 'memberApplicationSetting'
   | 'memberInvitation'
@@ -175,7 +175,6 @@ export const PopupSize: Record<PopupType, { height: number; width: number }> = {
   aboutus: { height: 750, width: 500 },
   applyFriend: { height: 320, width: 500 },
   applyMember: { height: 320, width: 500 },
-  avatarCropper: { height: 520, width: 610 },
   blockMember: { height: 250, width: 400 },
   channelSetting: { height: 520, width: 600 },
   channelPassword: { height: 200, width: 370 },
@@ -193,9 +192,10 @@ export const PopupSize: Record<PopupType, { height: number; width: number }> = {
   editChannelOrder: { height: 550, width: 500 },
   editChannelName: { height: 200, width: 370 },
   editNickname: { height: 200, width: 370 },
-  editFriendGroup: { height: 200, width: 370 },
+  editFriendGroupName: { height: 200, width: 370 },
   editFriend: { height: 200, width: 370 },
   friendVerification: { height: 550, width: 500 },
+  imageCropper: { height: 520, width: 610 },
   inviteMember: { height: 320, width: 500 },
   memberApplicationSetting: { height: 250, width: 370 },
   memberInvitation: { height: 550, width: 500 },
@@ -565,6 +565,7 @@ function connectSocket(token: string): Socket | null {
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
+        // Handle special events
         if (event === 'shakeWindow' || event === 'directMessage') {
           const { user1Id, user2Id, targetId, name: targetName } = args[0];
           const userId = user1Id === targetId ? user2Id : user1Id;

@@ -21,19 +21,15 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ x, y, direction, o
   const [display, setDisplay] = useState(false);
   const [pickerX, setPickerX] = useState<number>(x);
   const [pickerY, setPickerY] = useState<number>(y);
+
   // Effects
   useEffect(() => {
     if (!emojiPickerRef.current) return;
-
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+    const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = emojiPickerRef.current;
+    const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
-
     let newPosX = x;
     let newPosY = y;
-
-    const pickerWidth = emojiPickerRef.current.offsetWidth;
-    const pickerHeight = emojiPickerRef.current.offsetHeight;
 
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= pickerHeight;

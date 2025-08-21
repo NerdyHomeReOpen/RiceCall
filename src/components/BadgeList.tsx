@@ -17,14 +17,14 @@ interface BadgeListProps {
 }
 
 const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'left-top', direction = 'right-bottom', maxDisplay = 21 }) => {
-  // Variables
-  const sortedBadges = [...badges].sort((a, b) => a.order - b.order).slice(0, maxDisplay);
-
   return (
     <div className={badgeStyle['badge-viewer-wrapper']}>
-      {sortedBadges.map((badge) => (
-        <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
-      ))}
+      {badges
+        .slice(0, maxDisplay)
+        .sort((a, b) => a.order - b.order)
+        .map((badge) => (
+          <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
+        ))}
     </div>
   );
 });

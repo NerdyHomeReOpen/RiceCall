@@ -7,10 +7,10 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface ChannelPasswordPopupProps {
-  submitTo: 'channelPassword';
+  submitTo: string;
 }
 
 const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ submitTo }) => {
@@ -22,11 +22,11 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
 
   // Handlers
   const handleSubmit = () => {
-    ipcService.popup.submit(submitTo, password);
+    ipc.popup.submit(submitTo, password);
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (

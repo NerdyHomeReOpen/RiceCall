@@ -18,7 +18,7 @@ import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface QueueMemberTabProps {
   user: User;
@@ -35,7 +35,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
   const contextMenu = useContextMenu();
   const webRTC = useWebRTC();
 
-  // Variables
+  // Destructuring
   const {
     name: memberName,
     permissionLevel: memberPermission,
@@ -56,63 +56,43 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
   const { channelId, permissionLevel: channelPermission } = channel;
 
   // Memos
-  const permissionLevel = useMemo(() => {
-    return Math.max(globalPermission, serverPermission, channelPermission);
-  }, [globalPermission, serverPermission, channelPermission]);
-
-  const isUser = useMemo(() => {
-    return memberUserId === userId;
-  }, [memberUserId, userId]);
-
-  const isSameChannel = useMemo(() => {
-    return memberCurrentChannelId === channelId;
-  }, [memberCurrentChannelId, channelId]);
-
-  const connectionStatus = useMemo(() => {
-    return webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
-  }, [memberUserId, webRTC.remoteUserStatusList]);
-
-  const isSpeaking = useMemo(() => {
-    return !!webRTC.volumePercent?.[memberUserId];
-  }, [memberUserId, webRTC.volumePercent]);
-
-  const isMuted = useMemo(() => {
-    return webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId);
-  }, [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
-
-  const isSuperior = useMemo(() => {
-    return permissionLevel > memberPermission;
-  }, [permissionLevel, memberPermission]);
-
+  const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermission, channelPermission), [globalPermission, serverPermission, channelPermission]);
+  const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId] || 'connecting', [memberUserId, webRTC.remoteUserStatusList]);
+  const isUser = useMemo(() => memberUserId === userId, [memberUserId, userId]);
+  const isSameChannel = useMemo(() => memberCurrentChannelId === channelId, [memberCurrentChannelId, channelId]);
+  const isConnecting = useMemo(() => connectionStatus === 'connecting', [connectionStatus]);
+  const isSpeaking = useMemo(() => !!webRTC.volumePercent?.[memberUserId], [memberUserId, webRTC.volumePercent]);
+  const isVoiceMuted = useMemo(() => webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
+  const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
   const statusIcon = useMemo(() => {
-    if (isMuted) return 'muted';
-    if (!isUser && isSameChannel && connectionStatus !== 'connected') return 'loading';
+    if (isVoiceMuted) return 'muted';
+    if (!isUser && isSameChannel && isConnecting) return 'loading';
     if (isSpeaking) return 'play';
     return '';
-  }, [isUser, isSameChannel, isMuted, isSpeaking, connectionStatus]);
+  }, [isUser, isSameChannel, isVoiceMuted, isSpeaking, isConnecting]);
 
   // Handlers
   const handleIncreaseUserQueueTime = () => {
-    ipcService.socket.send('increaseUserQueueTime', { serverId, channelId, userId: memberUserId });
+    ipc.socket.send('increaseUserQueueTime', { serverId, channelId, userId: memberUserId });
   };
 
   const handleMoveUserQueuePositionDown = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], position: number) => {
-    ipcService.socket.send('moveUserQueuePosition', { serverId, channelId, userId, position });
+    ipc.socket.send('moveUserQueuePosition', { serverId, channelId, userId, position });
   };
 
   const handleMoveUserQueuePositionUp = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], position: number) => {
-    ipcService.socket.send('moveUserQueuePosition', { serverId, channelId, userId, position });
+    ipc.socket.send('moveUserQueuePosition', { serverId, channelId, userId, position });
   };
 
   const handleRemoveUserFromQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
     handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberName }), () => {
-      ipcService.socket.send('removeUserFromQueue', { serverId, channelId, userId });
+      ipc.socket.send('removeUserFromQueue', { serverId, channelId, userId });
     });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipcService.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipcService.popup.onSubmit('dialogAlert', callback);
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   return (

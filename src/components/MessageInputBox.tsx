@@ -26,11 +26,8 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   const isComposingRef = useRef<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Variables
-  const isDisabled = disabled;
-
   return (
-    <div className={`${messageInputBox['messageinput-box']} ${isDisabled ? messageInputBox['disabled'] : ''}`}>
+    <div className={`${messageInputBox['messageinput-box']} ${disabled ? messageInputBox['disabled'] : ''}`}>
       <div
         className={emoji['emoji-icon']}
         onMouseDown={(e) => {
@@ -50,7 +47,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
         placeholder={placeholder}
         maxLength={maxLength}
         onChange={() => {
-          if (isDisabled) return;
+          if (disabled) return;
         }}
         onKeyDown={(e) => {
           const value = textareaRef.current?.value;
@@ -60,7 +57,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
           if (!value) return;
           if (value.length > maxLength) return;
           if (isComposingRef.current) return;
-          if (isDisabled) return;
+          if (disabled) return;
           textareaRef.current!.value = '';
           onSend?.(value);
         }}

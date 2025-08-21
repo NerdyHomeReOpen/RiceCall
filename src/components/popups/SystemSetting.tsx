@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 const SystemSettingPopup: React.FC = React.memo(() => {
   // Hooks
@@ -90,7 +90,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
     toggleMicrophone: hotKeyToggleMicrophone,
   });
 
-  // Variables
+  // Memos
   const defaultHotKeyConfig = useMemo(
     () => ({
       speakingKey: { default: 'v', setFunc: setDefaultSpeakingKey },
@@ -105,7 +105,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
   // Handlers
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   const handlePlaySound = (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
@@ -191,7 +191,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   }, [hotKeys, handleSetHotKey]);
 
   useEffect(() => {
-    ipcService.systemSettings.get((data) => {
+    ipc.systemSettings.get((data) => {
       // Basic settings
       setAutoLogin(data.autoLogin);
       setAutoLaunch(data.autoLaunch);
@@ -246,7 +246,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
       setReceiveChannelMessageSound(data.receiveChannelMessageSound);
     });
 
-    ipcService.fontList.get((fonts) => {
+    ipc.fontList.get((fonts) => {
       setFontList(fonts);
     });
 
@@ -800,57 +800,57 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           className={popup['button']}
           onClick={() => {
             // Basic
-            ipcService.systemSettings.autoLogin.set(autoLogin);
-            ipcService.systemSettings.autoLaunch.set(autoLaunch);
-            ipcService.systemSettings.alwaysOnTop.set(alwaysOnTop);
+            ipc.systemSettings.autoLogin.set(autoLogin);
+            ipc.systemSettings.autoLaunch.set(autoLaunch);
+            ipc.systemSettings.alwaysOnTop.set(alwaysOnTop);
 
-            ipcService.systemSettings.statusAutoIdle.set(statusAutoIdle);
-            ipcService.systemSettings.statusAutoIdleMinutes.set(statusAutoIdleMinutes);
-            ipcService.systemSettings.statusAutoDnd.set(statusAutoDnd);
+            ipc.systemSettings.statusAutoIdle.set(statusAutoIdle);
+            ipc.systemSettings.statusAutoIdleMinutes.set(statusAutoIdleMinutes);
+            ipc.systemSettings.statusAutoDnd.set(statusAutoDnd);
 
-            ipcService.systemSettings.channelUIMode.set(channelUIMode);
-            ipcService.systemSettings.closeToTray.set(closeToTray);
+            ipc.systemSettings.channelUIMode.set(channelUIMode);
+            ipc.systemSettings.closeToTray.set(closeToTray);
 
-            ipcService.systemSettings.font.set(fontFamily);
-            ipcService.systemSettings.fontSize.set(fontSize);
+            ipc.systemSettings.font.set(fontFamily);
+            ipc.systemSettings.fontSize.set(fontSize);
 
             // Mix
-            ipcService.systemSettings.inputAudioDevice.set(selectedInput);
-            ipcService.systemSettings.outputAudioDevice.set(selectedOutput);
+            ipc.systemSettings.inputAudioDevice.set(selectedInput);
+            ipc.systemSettings.outputAudioDevice.set(selectedOutput);
 
-            ipcService.systemSettings.mixEffect.set(mixEffect);
-            ipcService.systemSettings.mixEffectType.set(mixEffectType);
+            ipc.systemSettings.mixEffect.set(mixEffect);
+            ipc.systemSettings.mixEffectType.set(mixEffectType);
 
-            ipcService.systemSettings.autoMixSetting.set(autoMixSetting);
-            ipcService.systemSettings.echoCancellation.set(echoCancellation);
-            ipcService.systemSettings.noiseCancellation.set(noiseCancellation);
-            ipcService.systemSettings.microphoneAmplification.set(microphoneAmplification);
+            ipc.systemSettings.autoMixSetting.set(autoMixSetting);
+            ipc.systemSettings.echoCancellation.set(echoCancellation);
+            ipc.systemSettings.noiseCancellation.set(noiseCancellation);
+            ipc.systemSettings.microphoneAmplification.set(microphoneAmplification);
 
-            ipcService.systemSettings.manualMixMode.set(manualMixMode);
-            ipcService.systemSettings.mixMode.set(mixMode);
+            ipc.systemSettings.manualMixMode.set(manualMixMode);
+            ipc.systemSettings.mixMode.set(mixMode);
 
             // Voice
-            ipcService.systemSettings.speakingMode.set(defaultSpeakingMode);
-            ipcService.systemSettings.defaultSpeakingKey.set(defaultSpeakingKey);
+            ipc.systemSettings.speakingMode.set(defaultSpeakingMode);
+            ipc.systemSettings.defaultSpeakingKey.set(defaultSpeakingKey);
 
             // Privacy
-            ipcService.systemSettings.notSaveMessageHistory.set(notSaveMessageHistory);
+            ipc.systemSettings.notSaveMessageHistory.set(notSaveMessageHistory);
 
             // Hotkeys
-            ipcService.systemSettings.hotKeyOpenMainWindow.set(hotKeyOpenMainWindow);
-            ipcService.systemSettings.hotKeyIncreaseVolume.set(hotKeyIncreaseVolume);
-            ipcService.systemSettings.hotKeyDecreaseVolume.set(hotKeyDecreaseVolume);
-            ipcService.systemSettings.hotKeyToggleSpeaker.set(hotKeyToggleSpeaker);
-            ipcService.systemSettings.hotKeyToggleMicrophone.set(hotKeyToggleMicrophone);
+            ipc.systemSettings.hotKeyOpenMainWindow.set(hotKeyOpenMainWindow);
+            ipc.systemSettings.hotKeyIncreaseVolume.set(hotKeyIncreaseVolume);
+            ipc.systemSettings.hotKeyDecreaseVolume.set(hotKeyDecreaseVolume);
+            ipc.systemSettings.hotKeyToggleSpeaker.set(hotKeyToggleSpeaker);
+            ipc.systemSettings.hotKeyToggleMicrophone.set(hotKeyToggleMicrophone);
 
             // SoundEffect
-            ipcService.systemSettings.disableAllSoundEffect.set(disableAllSoundEffect);
-            ipcService.systemSettings.enterVoiceChannelSound.set(enterVoiceChannelSound);
-            ipcService.systemSettings.leaveVoiceChannelSound.set(leaveVoiceChannelSound);
-            ipcService.systemSettings.startSpeakingSound.set(startSpeakingSound);
-            ipcService.systemSettings.stopSpeakingSound.set(stopSpeakingSound);
-            ipcService.systemSettings.receiveDirectMessageSound.set(receiveDirectMessageSound);
-            ipcService.systemSettings.receiveChannelMessageSound.set(receiveChannelMessageSound);
+            ipc.systemSettings.disableAllSoundEffect.set(disableAllSoundEffect);
+            ipc.systemSettings.enterVoiceChannelSound.set(enterVoiceChannelSound);
+            ipc.systemSettings.leaveVoiceChannelSound.set(leaveVoiceChannelSound);
+            ipc.systemSettings.startSpeakingSound.set(startSpeakingSound);
+            ipc.systemSettings.stopSpeakingSound.set(stopSpeakingSound);
+            ipc.systemSettings.receiveDirectMessageSound.set(receiveDirectMessageSound);
+            ipc.systemSettings.receiveChannelMessageSound.set(receiveChannelMessageSound);
             handleClose();
           }}
         >

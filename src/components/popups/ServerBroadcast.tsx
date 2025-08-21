@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface ServerBroadcastPopupProps {
   serverId: Server['serverId'];
@@ -28,17 +28,19 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
 
   // Memos
   const MAX_LENGTH = useMemo(() => 300, []);
-
-  // Variables
-  const canSend = broadcastContent.trim();
+  const canSend = useMemo(() => broadcastContent.trim() && broadcastContent.length <= MAX_LENGTH, [broadcastContent, MAX_LENGTH]);
 
   // Handlers
-  const handleBroadcastServer = (serverId: Server['serverId'], channelId: Channel['channelId'] | undefined, preset: Partial<PromptMessage>) => {
-    ipcService.socket.send('actionMessage', { serverId, channelId, preset });
+  const handleBroadcastChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<PromptMessage>) => {
+    ipc.socket.send('actionMessage', { serverId, channelId, preset });
+  };
+
+  const handleBroadcastServer = (serverId: Server['serverId'], preset: Partial<PromptMessage>) => {
+    ipc.socket.send('actionMessage', { serverId, preset });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (
@@ -70,7 +72,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('broadcast-content')}</div>
-            <textarea name="content" maxLength={MAX_LENGTH} placeholder={t('markdown-support-description')} style={{ minHeight: '90px' }} onChange={(e) => setBroadcastContent(e.target.value)} />
+            <textarea name="content" maxLength={MAX_LENGTH} style={{ minHeight: '90px' }} onChange={(e) => setBroadcastContent(e.target.value)} />
             <div className={popup['hint-text']}>
               {broadcastContent.length}/{MAX_LENGTH}
             </div>
@@ -83,7 +85,11 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
         <div
           className={`${popup['button']} ${!canSend ? 'disabled' : ''}`}
           onClick={() => {
-            handleBroadcastServer(serverId, broadcastType === 'channel' ? channelId : undefined, { type: 'alert', content: broadcastContent });
+            if (broadcastType === 'channel') {
+              handleBroadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
+            } else {
+              handleBroadcastServer(serverId, { type: 'alert', content: broadcastContent });
+            }
             handleClose();
           }}
         >

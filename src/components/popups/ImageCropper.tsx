@@ -7,17 +7,17 @@ import popup from '@/styles/popup.module.css';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
-interface AvatarCropperPopupProps {
-  avatarData: string;
+interface ImageCropperPopupProps {
+  imageData: string;
   submitTo: string;
 }
 
 const INITIAL_CROP_SIZE = 200;
 const MIN_CROP_SIZE = 100;
 
-const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avatarData, submitTo }) => {
+const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ imageData, submitTo }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -74,7 +74,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
     const canvas = previewRef.current;
     const dataUrl = canvas?.toDataURL('image/png');
     if (!dataUrl) return;
-    ipcService.popup.submit(submitTo, { imageDataUrl: dataUrl });
+    ipc.popup.submit(submitTo, { imageDataUrl: dataUrl });
     handleClose();
   };
 
@@ -136,12 +136,12 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   // Effects
   useEffect(() => {
-    imgRef.current.src = avatarData;
+    imgRef.current.src = imageData;
     imgRef.current.onload = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -157,7 +157,7 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
       const cropY = drawY + (drawHeight - maxCropSize) / 2;
       setCropBox({ x: cropX, y: cropY, size: maxCropSize });
     };
-  }, [avatarData]);
+  }, [imageData]);
 
   useEffect(() => {
     draw();
@@ -220,6 +220,6 @@ const AvatarCropperPopup: React.FC<AvatarCropperPopupProps> = React.memo(({ avat
   );
 });
 
-AvatarCropperPopup.displayName = 'AvatarCropperPopup';
+ImageCropperPopup.displayName = 'ImageCropperPopup';
 
-export default AvatarCropperPopup;
+export default ImageCropperPopup;
