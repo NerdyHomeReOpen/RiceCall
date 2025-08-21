@@ -61,7 +61,7 @@ export type Channel = table_channels &
     type: 'channel';
   };
 
-export type OnlineMember = table_members & table_users & Permission & BadgeList;
+export type OnlineMember = table_members & table_users & table_channel_muted_users & Permission & BadgeList;
 
 export type QueueMember = OnlineMember & {
   position: number;

@@ -57,6 +57,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     gender: memberGender,
     badges: memberBadges,
     vip: memberVip,
+    isTextMuted: isMemberTextMuted,
+    isVoiceMuted: isMemberVoiceMuted,
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
   } = member;
@@ -68,6 +70,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     return Math.max(globalPermission, serverPermission, channelPermission);
   }, [globalPermission, serverPermission, channelPermission]);
 
+  const connectionStatus = useMemo(() => {
+    return webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
+  }, [memberUserId, webRTC.remoteUserStatusList]);
+
   const isUser = useMemo(() => {
     return memberUserId === userId;
   }, [memberUserId, userId]);
@@ -76,17 +82,17 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     return memberCurrentChannelId === userCurrentChannelId;
   }, [memberCurrentChannelId, userCurrentChannelId]);
 
-  const connectionStatus = useMemo(() => {
-    return webRTC.remoteUserStatusList?.[memberUserId] || 'connecting';
+  const isConnecting = useMemo(() => {
+    return webRTC.remoteUserStatusList?.[memberUserId] === 'connecting';
   }, [memberUserId, webRTC.remoteUserStatusList]);
 
   const isSpeaking = useMemo(() => {
     return !!webRTC.volumePercent?.[memberUserId];
   }, [memberUserId, webRTC.volumePercent]);
 
-  const isMuted = useMemo(() => {
-    return webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId);
-  }, [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
+  const isVoiceMuted = useMemo(() => {
+    return webRTC.mutedIds.includes(memberUserId);
+  }, [memberUserId, webRTC.mutedIds]);
 
   const isFriend = useMemo(() => {
     return friends.some((fd) => fd.targetId === memberUserId);
@@ -97,11 +103,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   }, [permissionLevel, memberPermission]);
 
   const statusIcon = useMemo(() => {
-    if (isMuted) return 'muted';
-    if (!isUser && isSameChannel && connectionStatus !== 'connected') return 'loading';
+    if (isVoiceMuted || isMemberVoiceMuted) return 'muted';
+    if (!isUser && isSameChannel && isConnecting) return 'loading';
     if (isSpeaking) return 'play';
+    if (isMemberTextMuted) return 'no-text';
     return '';
-  }, [isUser, isSameChannel, isMuted, isSpeaking, connectionStatus]);
+  }, [isUser, isSameChannel, isVoiceMuted, isMemberVoiceMuted, isSpeaking, isMemberTextMuted, isConnecting]);
 
   // Handlers
   const handleMuteUser = (userId: User['userId']) => {
@@ -132,12 +139,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     ipcService.socket.send('addUserToQueue', { userId, serverId, channelId });
   };
 
-  const handleMuteUserTextInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted: true } });
+  const handleMuteUserTextInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isTextMuted: boolean) => {
+    ipcService.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted } });
   };
 
-  const handleMuteUserVoiceInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted: true } });
+  const handleMuteUserVoiceInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isVoiceMuted: boolean) => {
+    ipcService.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted } });
   };
 
   const handleBlockUserFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
@@ -244,9 +251,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           },
           {
             id: 'set-mute',
-            label: isMuted ? t('unmute') : t('mute'),
+            label: isVoiceMuted ? t('unmute') : t('mute'),
             show: !isUser,
-            onClick: () => (isMuted ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
+            onClick: () => (isVoiceMuted ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
           },
           {
             id: 'edit-nickname',
@@ -270,15 +277,15 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           },
           {
             id: 'forbid-voice',
-            label: t('forbid-voice'),
+            label: isMemberVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
             show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-            onClick: () => handleMuteUserTextInChannel(memberUserId, serverId, channelId),
+            onClick: () => handleMuteUserVoiceInChannel(memberUserId, serverId, channelId, !isMemberVoiceMuted),
           },
           {
             id: 'forbid-text',
-            label: t('forbid-text'),
+            label: isMemberTextMuted ? t('unforbid-text') : t('forbid-text'),
             show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-            onClick: () => handleMuteUserVoiceInChannel(memberUserId, serverId, channelId),
+            onClick: () => handleMuteUserTextInChannel(memberUserId, serverId, channelId, !isMemberTextMuted),
           },
           {
             id: 'kick-channel',
