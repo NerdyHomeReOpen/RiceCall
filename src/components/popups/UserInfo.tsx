@@ -29,13 +29,14 @@ import { isMember, isStaff } from '@/utils/permission';
 import { countries } from '@/country';
 
 interface UserInfoPopupProps {
-  user: User;
+  userId: User['userId'];
+  targetId: User['userId'];
   friend: Friend | null;
   target: User;
   targetServers: Server[];
 }
 
-const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ user, friend, target: targetData, targetServers }) => {
+const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, targetId, friend, target: targetData, targetServers }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -49,9 +50,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ user, friend, 
   const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'userSetting'>('about');
 
   // Destructuring
-  const { userId } = user;
   const {
-    userId: targetId,
     name: targetName,
     displayId: targetDisplayId,
     avatarUrl: targetAvatarUrl,
@@ -211,7 +210,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ user, friend, 
             {targetVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${targetVip}`]}`} />}
             <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} />
           </div>
-          <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(userId)}>
+          <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
             @{targetDisplayId}
           </div>
           <div className={styles['user-info-text']}>

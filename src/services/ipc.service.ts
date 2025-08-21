@@ -198,8 +198,8 @@ const ipcService = {
         );
       } else if (type === 'userInfo') {
         const { userId, targetId } = initialData;
-        Promise.all([data.user({ userId }), data.friend({ userId, targetId }), data.user({ userId: targetId }), data.servers({ userId: targetId })]).then(([user, friend, target, targetServers]) => {
-          ipcRenderer.send('open-popup', type, id, { userId, targetId, user, friend, target, targetServers }, force);
+        Promise.all([data.friend({ userId, targetId }), data.user({ userId: targetId }), data.servers({ userId: targetId })]).then(([friend, target, targetServers]) => {
+          ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, target, targetServers }, force);
         });
       } else {
         ipcRenderer.send('open-popup', type, id, initialData, force);
