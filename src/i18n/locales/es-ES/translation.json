@@ -61,6 +61,7 @@
   "channel-admin": "Administrador del canal",
   "channel-announcement": "Anuncio del canal",
   "channel-audio-quality": "Calidad de audio del canal",
+  "text-was-muted-in-channel-message": "你已被禁止發送文字訊息",
   "channel-forbid-guest-text-message": "該頻道禁止遊客發送文字訊息",
   "channel-forbid-text-message": "該頻道僅限管理員發送文字訊息",
   "channel-guest-text-gap-time-message": "{{0}} 秒後可以發送文字訊息",
