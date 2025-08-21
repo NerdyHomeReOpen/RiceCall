@@ -85,7 +85,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
 
   const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
     if (!isChannelMod(permissionLevel) && isPrivateChannel) handleOpenChannelPassword(serverId, channelId);
-    ipc.socket.send('connectChannel', { serverId, channelId });
+    else ipc.socket.send('connectChannel', { serverId, channelId });
   };
 
   const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
