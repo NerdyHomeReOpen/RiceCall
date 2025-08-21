@@ -459,6 +459,7 @@
   "user-info": "Perfil personal",
   "user-limit": "Límite de personas (personas)",
   "user-setting": "使用者設定",
+  "user-not-found": "用戶不存在",
   "username-invalid-format": "El nombre visible solo puede contener caracteres chinos, ingleses y números",
   "username-max-length": "El nombre visible puede tener hasta 32 caracteres como máximo",
   "username-min-length": "El nombre visible debe tener al menos 1 carácter",
