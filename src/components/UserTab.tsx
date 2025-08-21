@@ -124,20 +124,28 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     ipcService.socket.send('connectChannel', { serverId, channelId });
   };
 
-  const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('moveToChannel', { userId, serverId, channelId });
+  const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    ipcService.socket.send('moveUserToChannel', { userId, serverId, channelId });
   };
 
-  const handleAddToQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('addToQueue', { userId, serverId, channelId });
+  const handleAddUserToQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    ipcService.socket.send('addUserToQueue', { userId, serverId, channelId });
   };
 
-  const handleBlockFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('blockFromServer', { userId, serverId }));
+  const handleMuteUserTextInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    ipcService.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted: true } });
   };
 
-  const handleBlockFromChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('blockFromChannel', { userId, serverId, channelId }));
+  const handleMuteUserVoiceInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    ipcService.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted: true } });
+  };
+
+  const handleBlockUserFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('blockUserFromServer', { userId, serverId }));
+  };
+
+  const handleBlockUserFromChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipcService.socket.send('blockUserFromChannel', { userId, serverId, channelId }));
   };
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
@@ -215,7 +223,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             id: 'add-to-queue',
             label: t('add-to-queue'),
             show: !isUser && isMember(permissionLevel) && isSuperior && isSameChannel && channelVoiceMode === 'queue',
-            onClick: () => handleAddToQueue(memberUserId, serverId, channelId),
+            onClick: () => handleAddUserToQueue(memberUserId, serverId, channelId),
           },
           {
             id: 'direct-message',
@@ -254,7 +262,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             id: 'move-to-channel',
             label: t('move-to-channel'),
             show: !isUser && isChannelMod(permissionLevel) && !isSameChannel && isSuperior,
-            onClick: () => handleMoveToChannel(memberUserId, serverId, userCurrentChannelId),
+            onClick: () => handleMoveUserToChannel(memberUserId, serverId, userCurrentChannelId),
           },
           {
             id: 'separator',
@@ -263,28 +271,26 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'forbid-voice',
             label: t('forbid-voice'),
-            show: !isUser && isMember(permissionLevel) && isSuperior,
-            disabled: true,
-            onClick: () => {},
+            show: !isUser && isChannelMod(permissionLevel) && isSuperior,
+            onClick: () => handleMuteUserTextInChannel(memberUserId, serverId, channelId),
           },
           {
             id: 'forbid-text',
             label: t('forbid-text'),
-            show: !isUser && isMember(permissionLevel) && isSuperior,
-            disabled: true,
-            onClick: () => {},
+            show: !isUser && isChannelMod(permissionLevel) && isSuperior,
+            onClick: () => handleMuteUserVoiceInChannel(memberUserId, serverId, channelId),
           },
           {
             id: 'kick-channel',
             label: t('kick-channel'),
             show: !isUser && isChannelMod(permissionLevel) && isSuperior && memberCurrentChannelId !== serverLobbyId,
-            onClick: () => handleBlockFromChannel(memberUserId, channelId, serverId, memberNickname || memberName),
+            onClick: () => handleBlockUserFromChannel(memberUserId, channelId, serverId, memberNickname || memberName),
           },
           {
             id: 'kick-server',
             label: t('kick-server'),
             show: !isUser && isServerAdmin(permissionLevel) && isSuperior && memberCurrentServerId === serverId,
-            onClick: () => handleBlockFromServer(memberUserId, serverId, memberNickname || memberName),
+            onClick: () => handleBlockUserFromServer(memberUserId, serverId, memberNickname || memberName),
           },
           {
             id: 'block',

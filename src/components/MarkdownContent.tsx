@@ -18,12 +18,12 @@ import { useTranslation } from 'react-i18next';
 // Utils
 import { fromTags } from '@/utils/tagConverter';
 
-interface MarkdownViewerProps {
+interface MarkdownContentProps {
   markdownText: string;
   escapeHtml?: boolean;
 }
 
-const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({ markdownText, escapeHtml = true }) => {
+const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText, escapeHtml = true }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -113,6 +113,6 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({ markdownText
   );
 });
 
-MarkdownViewer.displayName = 'MarkdownViewer';
+MarkdownContent.displayName = 'MarkdownContent';
 
-export default MarkdownViewer;
+export default MarkdownContent;

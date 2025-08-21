@@ -91,12 +91,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
     ipcService.socket.send('connectChannel', { serverId, channelId });
   };
 
-  const handleMoveToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('moveToChannel', { userId, serverId, channelId });
+  const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    ipcService.socket.send('moveUserToChannel', { userId, serverId, channelId });
   };
 
-  const handleMoveAllToChannel = (userIds: User['userId'][], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipcService.socket.send('moveToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId })));
+  const handleMoveAllUsersToChannel = (userIds: User['userId'][], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    ipcService.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId })));
   };
 
   const handleDeleteChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -145,11 +145,11 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
       case 'moveUser':
         const targetUserId = e.dataTransfer.getData('userId');
         if (!targetUserId) return;
-        handleMoveToChannel(targetUserId, serverId, channelId);
+        handleMoveUserToChannel(targetUserId, serverId, channelId);
         break;
       case 'moveChannelUser':
         const targetUserIds = e.dataTransfer.getData('userIds').split(',');
-        handleMoveAllToChannel(targetUserIds, serverId, channelId);
+        handleMoveAllUsersToChannel(targetUserIds, serverId, channelId);
         break;
     }
   };
@@ -236,7 +236,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
               id: 'move-all-user-to-channel',
               label: t('move-all-user-to-channel'),
               show: !isSameChannel && isChannelMod(permissionLevel) && channelUserIds.length > 0,
-              onClick: () => handleMoveAllToChannel(channelUserIds, serverId, userCurrentChannelId),
+              onClick: () => handleMoveAllUsersToChannel(channelUserIds, serverId, userCurrentChannelId),
             },
             {
               id: 'edit-channel-order',

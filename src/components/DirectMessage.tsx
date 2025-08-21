@@ -10,7 +10,7 @@ import type { DirectMessage } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownContent from '@/components/MarkdownContent';
 
 // Utils
 import { getFormatTimestamp } from '@/utils/language';
@@ -36,7 +36,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
       </div>
       {messageContents.map((content, index) => (
-        <MarkdownViewer key={index} markdownText={content} />
+        <MarkdownContent key={index} markdownText={content} />
       ))}
     </div>
   );

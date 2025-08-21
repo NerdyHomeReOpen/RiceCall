@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownContent from '@/components/MarkdownContent';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -22,14 +22,11 @@ import ipcService from '@/services/ipc.service';
 import { getFormatTimestamp } from '@/utils/language';
 
 interface ChannelMessageProps {
-  messageGroup: ChannelMessage & {
-    contents: string[];
-  };
+  messageGroup: ChannelMessage & { contents: string[] };
   userId: User['userId'];
-  forbidGuestUrl?: boolean;
 }
 
-const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup, userId, forbidGuestUrl = false }) => {
+const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup, userId }) => {
   // Hooks
   const contextMenu = useContextMenu();
   const { t } = useTranslation();
@@ -93,7 +90,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
           <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
         </div>
         {formattedMessageContents.map((content, index) => (
-          <MarkdownViewer key={index} markdownText={content} forbidGuestUrl={forbidGuestUrl} />
+          <MarkdownContent key={index} markdownText={content} />
         ))}
       </div>
     </>

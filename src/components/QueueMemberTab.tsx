@@ -92,21 +92,21 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
   }, [isUser, isSameChannel, isMuted, isSpeaking, connectionStatus]);
 
   // Handlers
-  const handleIncreaseQueueTime = () => {
-    ipcService.socket.send('increaseQueueTime', { serverId, channelId, userId: memberUserId });
+  const handleIncreaseUserQueueTime = () => {
+    ipcService.socket.send('increaseUserQueueTime', { serverId, channelId, userId: memberUserId });
   };
 
-  const handleMoveDownQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], position: number) => {
-    ipcService.socket.send('moveQueuePosition', { serverId, channelId, userId, position });
+  const handleMoveUserQueuePositionDown = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], position: number) => {
+    ipcService.socket.send('moveUserQueuePosition', { serverId, channelId, userId, position });
   };
 
-  const handleMoveUpQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], position: number) => {
-    ipcService.socket.send('moveQueuePosition', { serverId, channelId, userId, position });
+  const handleMoveUserQueuePositionUp = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], position: number) => {
+    ipcService.socket.send('moveUserQueuePosition', { serverId, channelId, userId, position });
   };
 
-  const handleRemoveFromQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+  const handleRemoveUserFromQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
     handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberName }), () => {
-      ipcService.socket.send('removeFromQueue', { serverId, channelId, userId });
+      ipcService.socket.send('removeUserFromQueue', { serverId, channelId, userId });
     });
   };
 
@@ -136,25 +136,25 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
             id: 'increase-queue-time',
             label: t('increase-queue-time'),
             show: isUser || isSuperior,
-            onClick: () => handleIncreaseQueueTime(),
+            onClick: () => handleIncreaseUserQueueTime(),
           },
           {
             id: 'move-up-queue',
             label: t('move-up-queue'),
             show: isUser || isSuperior,
-            onClick: () => handleMoveUpQueue(memberUserId, serverId, channelId, memberPosition - 1),
+            onClick: () => handleMoveUserQueuePositionUp(memberUserId, serverId, channelId, memberPosition - 1),
           },
           {
             id: 'move-down-queue',
             label: t('move-down-queue'),
             show: isUser || isSuperior,
-            onClick: () => handleMoveDownQueue(memberUserId, serverId, channelId, memberPosition + 1),
+            onClick: () => handleMoveUserQueuePositionDown(memberUserId, serverId, channelId, memberPosition + 1),
           },
           {
             id: 'remove-from-queue',
             label: t('remove-from-queue'),
             show: isUser || isSuperior,
-            onClick: () => handleRemoveFromQueue(memberUserId, serverId, channelId),
+            onClick: () => handleRemoveUserFromQueue(memberUserId, serverId, channelId),
           },
         ]);
       }}

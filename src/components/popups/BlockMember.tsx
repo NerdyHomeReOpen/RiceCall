@@ -88,8 +88,8 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
   const isBlock = blockType === 'block-temporary';
 
   // Handlers
-  const handleBlockFromServer = (userId: User['userId'], serverId: Server['serverId'], blockUntil: number) => {
-    ipcService.socket.send('blockFromServer', { userId, serverId, blockUntil });
+  const handleBlockUserFromServer = (userId: User['userId'], serverId: Server['serverId'], blockUntil: number) => {
+    ipcService.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
   };
 
   const handleClose = () => {
@@ -147,7 +147,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ userId, 
         <div
           className={popup['button']}
           onClick={() => {
-            handleBlockFromServer(userId, serverId, blockType === 'block-temporary' ? Date.now() + BLOCK_TIME : -1);
+            handleBlockUserFromServer(userId, serverId, blockType === 'block-temporary' ? Date.now() + BLOCK_TIME : -1);
             handleClose();
           }}
         >

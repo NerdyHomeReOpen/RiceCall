@@ -16,6 +16,7 @@ import {
   table_user_badges,
   table_server_permissions,
   table_channel_permissions,
+  table_channel_muted_users,
 } from '@/types/database';
 
 export type Permission = {
@@ -190,49 +191,28 @@ export type ClientToServerEvents = {
   // User
   searchUser: (...args: { query: string }[]) => void;
   editUser: (...args: { update: Partial<table_users> }[]) => void;
-  // Friend
-  editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
-  deleteFriend: (...args: { targetId: string }[]) => void;
-  // Friend Group
-  createFriendGroup: (...args: { preset: Partial<table_friend_groups> }[]) => void;
-  editFriendGroup: (...args: { friendGroupId: string; update: Partial<table_friend_groups> }[]) => void;
-  deleteFriendGroup: (...args: { friendGroupId: string }[]) => void;
-  // Friend Application
-  sendFriendApplication: (...args: { receiverId: string; preset: Partial<table_friend_applications> }[]) => void;
-  editFriendApplication: (...args: { receiverId: string; update: Partial<table_friend_applications> }[]) => void;
-  deleteFriendApplication: (...args: { receiverId: string }[]) => void;
-  approveFriendApplication: (...args: { senderId: string }[]) => void;
-  rejectFriendApplication: (...args: { senderId: string }[]) => void;
   // Server
   favoriteServer: (...args: { serverId: string }[]) => void;
   searchServer: (...args: { query: string }[]) => void;
   connectServer: (...args: { serverId: string }[]) => void;
   disconnectServer: (...args: { serverId: string }[]) => void;
-  blockFromServer: (...args: { userId: string; serverId: string; blockUntil?: number }[]) => void;
-  unblockFromServer: (...args: { userId: string; serverId: string }[]) => void;
+  blockUserFromServer: (...args: { userId: string; serverId: string; blockUntil?: number }[]) => void;
+  unblockUserFromServer: (...args: { userId: string; serverId: string }[]) => void;
   createServer: (...args: { preset: Partial<table_servers> }[]) => void;
   editServer: (...args: { serverId: string; update: Partial<table_servers> }[]) => void;
   deleteServer: (...args: { serverId: string }[]) => void;
   // Channel
   connectChannel: (...args: { serverId: string; channelId: string; password?: string }[]) => void;
-  moveToChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
+  moveUserToChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
   disconnectChannel: (...args: { serverId: string; channelId: string }[]) => void;
-  blockFromChannel: (...args: { userId: string; serverId: string; channelId: string; blockUntil?: number }[]) => void;
-  unblockFromChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
+  blockUserFromChannel: (...args: { userId: string; serverId: string; channelId: string; blockUntil?: number }[]) => void;
+  unblockUserFromChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
   createChannel: (...args: { serverId: string; preset: Partial<table_channels> }[]) => void;
   editChannel: (...args: { serverId: string; channelId: string; update: Partial<table_channels> }[]) => void;
   deleteChannel: (...args: { serverId: string; channelId: string }[]) => void;
-  // Queue
-  joinQueue: (...args: { serverId: string; channelId: string }[]) => void;
-  addToQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
-  leaveQueue: (...args: { serverId: string; channelId: string }[]) => void;
-  removeFromQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
-  increaseQueueTime: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
-  moveQueuePosition: (...args: { serverId: string; channelId: string; userId: string; position: number }[]) => void;
-  controlQueue: (...args: { serverId: string; channelId: string }[]) => void;
+  muteUserInChannel: (...args: { userId: string; serverId: string; channelId: string; mute: Partial<table_channel_muted_users> }[]) => void;
   // Member
   editMember: (...args: { userId: string; serverId: string; update: Partial<table_members> }[]) => void;
-  deleteMember: (...args: { userId: string; serverId: string }[]) => void;
   terminateMember: (...args: { userId: string; serverId: string }[]) => void;
   // Member Application
   sendMemberApplication: (...args: { serverId: string; preset: Partial<table_member_applications> }[]) => void;
@@ -246,6 +226,27 @@ export type ClientToServerEvents = {
   deleteMemberInvitation: (...args: { receiverId: string; serverId: string }[]) => void;
   acceptMemberInvitation: (...args: { serverId: string }[]) => void;
   rejectMemberInvitation: (...args: { serverId: string }[]) => void;
+  // Friend
+  editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
+  deleteFriend: (...args: { targetId: string }[]) => void;
+  // Friend Group
+  createFriendGroup: (...args: { preset: Partial<table_friend_groups> }[]) => void;
+  editFriendGroup: (...args: { friendGroupId: string; update: Partial<table_friend_groups> }[]) => void;
+  deleteFriendGroup: (...args: { friendGroupId: string }[]) => void;
+  // Friend Application
+  sendFriendApplication: (...args: { receiverId: string; preset: Partial<table_friend_applications> }[]) => void;
+  editFriendApplication: (...args: { receiverId: string; update: Partial<table_friend_applications> }[]) => void;
+  deleteFriendApplication: (...args: { receiverId: string }[]) => void;
+  approveFriendApplication: (...args: { senderId: string }[]) => void;
+  rejectFriendApplication: (...args: { senderId: string }[]) => void;
+  // Queue
+  joinQueue: (...args: { serverId: string; channelId: string }[]) => void;
+  addUserToQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
+  leaveQueue: (...args: { serverId: string; channelId: string }[]) => void;
+  removeUserFromQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
+  increaseUserQueueTime: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
+  moveUserQueuePosition: (...args: { serverId: string; channelId: string; userId: string; position: number }[]) => void;
+  controlQueue: (...args: { serverId: string; channelId: string }[]) => void;
   // Permission
   editServerPermission: (...args: { userId: string; serverId: string; update: Partial<table_server_permissions> }[]) => void;
   editChannelPermission: (...args: { userId: string; serverId: string; channelId: string; update: Partial<table_channel_permissions> }[]) => void;

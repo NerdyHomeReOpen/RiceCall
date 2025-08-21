@@ -154,8 +154,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
     handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipcService.socket.send('terminateMember', { userId, serverId }));
   };
 
-  const handleUnblockFromServer = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
-    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipcService.socket.send('unblockFromServer', { userId, serverId }));
+  const handleUnblockUserFromServer = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
+    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipcService.socket.send('unblockUserFromServer', { userId, serverId }));
   };
 
   const handleOpenMemberApplicationSetting = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -715,7 +715,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                               id: 'unblock',
                               label: t('unblock'),
                               show: true,
-                              onClick: () => handleUnblockFromServer(memberUserId, memberName, serverId),
+                              onClick: () => handleUnblockUserFromServer(memberUserId, memberName, serverId),
                             },
                           ]);
                         }}

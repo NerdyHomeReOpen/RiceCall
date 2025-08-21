@@ -13,7 +13,7 @@ import popup from '@/styles/popup.module.css';
 import { useTranslation } from 'react-i18next';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownContent from '@/components/MarkdownContent';
 
 // Services
 import ipcService from '@/services/ipc.service';
@@ -73,7 +73,7 @@ const AboutPopup: React.FC = React.memo(() => {
                 {t('official-website')}
               </div>
             </div>
-            <MarkdownViewer markdownText={t('readme')} />
+            <MarkdownContent markdownText={t('readme')} />
           </div>
 
           <div className={styles['team-members']}>

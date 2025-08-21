@@ -20,8 +20,8 @@ export type table_channel_blocked_users = {
 export type table_channel_muted_users = {
   userId: string;
   channelId: string;
-  mutedTextUntil: number;
-  mutedVoiceUntil: number;
+  isTextMuted: boolean;
+  isVoiceMuted: boolean;
 };
 
 export type table_channel_permissions = {

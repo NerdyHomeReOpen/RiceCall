@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Components
-import MessageViewer from '@/components/MessageViewer';
+import MessageContent from '@/components/MessageContent';
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
@@ -234,7 +234,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
           )}
           <div className={styles['message-area']}>
-            <MessageViewer messages={directMessages} userId={userId} />
+            <MessageContent messages={directMessages} userId={userId} />
           </div>
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>

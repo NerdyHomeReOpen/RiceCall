@@ -13,13 +13,12 @@ import PromptMessageTab from '@/components/PromptMessage';
 
 type MessageGroup = (DirectMessage & { contents: string[] }) | (ChannelMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
 
-interface MessageViewerProps {
+interface MessageContentProps {
   messages: (DirectMessage | ChannelMessage | PromptMessage)[];
   userId: User['userId'];
-  forbidGuestUrl?: boolean;
 }
 
-const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, userId, forbidGuestUrl = false }) => {
+const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages, userId }) => {
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +60,7 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, user
         return (
           <div key={index} className={styles['message-wrapper']}>
             {messageGroup.type === 'general' ? (
-              <ChannelMessageTab messageGroup={messageGroup} userId={userId} forbidGuestUrl={forbidGuestUrl} />
+              <ChannelMessageTab messageGroup={messageGroup} userId={userId} />
             ) : messageGroup.type === 'dm' ? (
               <DirectMessageTab messageGroup={messageGroup} />
             ) : (
@@ -75,6 +74,6 @@ const MessageViewer: React.FC<MessageViewerProps> = React.memo(({ messages, user
   );
 });
 
-MessageViewer.displayName = 'MessageViewer';
+MessageContent.displayName = 'MessageContent';
 
-export default MessageViewer;
+export default MessageContent;

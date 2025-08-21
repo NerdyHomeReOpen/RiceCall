@@ -10,7 +10,7 @@ import type { PromptMessage } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownContent from '@/components/MarkdownContent';
 
 interface PromptMessageProps {
   messageGroup: PromptMessage & {
@@ -39,7 +39,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
       <div className={styles[`${messageType}-icon`]} />
       <div className={styles['message-box']}>
         {translatedMessages.map((content, index) => (
-          <MarkdownViewer key={index} markdownText={content} />
+          <MarkdownContent key={index} markdownText={content} />
         ))}
       </div>
     </>

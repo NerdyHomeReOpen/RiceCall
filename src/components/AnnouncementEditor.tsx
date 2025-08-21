@@ -17,7 +17,7 @@ import setting from '@/styles/popups/setting.module.css';
 import markdown from '@/styles/markdown.module.css';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownContent from '@/components/MarkdownContent';
 
 // Providers
 import { useContextMenu } from '@/providers/ContextMenu';
@@ -250,7 +250,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = ({ announcement, s
         </div>
       ) : (
         <div className={markdown['setting-markdown-container']} style={{ height: '380px' }}>
-          <MarkdownViewer markdownText={announcement} escapeHtml={false} />
+          <MarkdownContent markdownText={announcement} escapeHtml={false} />
         </div>
       )}
     </div>

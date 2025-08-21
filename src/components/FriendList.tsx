@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 // CSS
 import styles from '@/styles/pages/friend.module.css';
@@ -27,7 +27,6 @@ interface FriendListProps {
 const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, friends }) => {
   // Hooks
   const { t } = useTranslation();
-  const viewerRef = useRef<HTMLDivElement>(null);
 
   // States
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -53,7 +52,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   return (
     <>
       {/* Navigation Tabs */}
-      <div className={styles['navigate-tabs']} ref={viewerRef}>
+      <div className={styles['navigate-tabs']}>
         <div className={`${styles['tab']} ${selectedTabId == 0 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(0)}>
           <div className={styles['friend-list-icon']} />
         </div>

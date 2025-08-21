@@ -5,9 +5,9 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import styles from '@/styles/pages/server.module.css';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
-import MessageViewer from '@/components/MessageViewer';
-import ChannelListViewer from '@/components/ChannelList';
+import MarkdownContent from '@/components/MarkdownContent';
+import MessageContent from '@/components/MessageContent';
+import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
@@ -329,7 +329,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
       <main className={styles['server-body']}>
         {/* Left Sidebar */}
         <aside ref={sidebarRef} className={styles['sidebar']}>
-          <ChannelListViewer user={user} friends={friends} server={server} serverOnlineMembers={serverOnlineMembers} serverChannels={serverChannels} channel={channel} queueMembers={queueMembers} />
+          <ChannelList user={user} friends={friends} server={server} serverOnlineMembers={serverOnlineMembers} serverChannels={serverChannels} channel={channel} queueMembers={queueMembers} />
         </aside>
 
         {/* Resize Handle */}
@@ -341,7 +341,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
           <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
             {/* Announcement Area */}
             <div ref={annAreaRef} className={styles['announcement-area']}>
-              <MarkdownViewer markdownText={announcement} escapeHtml={false} />
+              <MarkdownContent markdownText={announcement} escapeHtml={false} />
             </div>
 
             {/* Resize Handle */}
@@ -364,13 +364,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             <div className={styles['bottom-area']}>
               {/* Message Area */}
               <div className={styles['message-area']}>
-                <MessageViewer messages={channelMessages} userId={userId} />
+                <MessageContent messages={channelMessages} userId={userId} />
               </div>
 
               {/* Broadcast Area */}
               <div className={styles['input-area']}>
                 <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
-                  <MessageViewer messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} userId={userId} />
+                  <MessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} userId={userId} />
                 </div>
                 <MessageInputBoxGuard
                   lastJoinChannelTime={lastJoinChannelTime}
