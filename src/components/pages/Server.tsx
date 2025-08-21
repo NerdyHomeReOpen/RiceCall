@@ -33,6 +33,7 @@ interface MessageInputBoxGuardProps {
   channelGuestTextGapTime: number;
   channelGuestTextWaitTime: number;
   channelGuestTextMaxLength: number;
+  channelIsTextMuted: boolean;
   onSend: (msg: string) => void;
 }
 
@@ -46,6 +47,7 @@ const MessageInputBoxGuard = React.memo(
     channelGuestTextGapTime,
     channelGuestTextWaitTime,
     channelGuestTextMaxLength,
+    channelIsTextMuted,
     onSend,
   }: MessageInputBoxGuardProps) => {
     // Hooks
@@ -63,19 +65,21 @@ const MessageInputBoxGuard = React.memo(
     const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;
     const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
 
+    const isForbidByMutedText = channelIsTextMuted;
     const isForbidByForbidText = !isChannelAdmin(permissionLevel) && channelForbidText;
     const isForbidByForbidGuestText = !isMember(permissionLevel) && channelForbidGuestText;
     const isForbidByForbidGuestTextGap = !isMember(permissionLevel) && leftGapTime > 0;
     const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
-    const disabled = isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
+    const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
     const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 9999;
     const placeholder = useMemo(() => {
+      if (isForbidByMutedText) return t('text-was-muted-in-channel-message');
       if (isForbidByForbidText) return t('channel-forbid-text-message');
       if (isForbidByForbidGuestText) return t('channel-forbid-guest-text-message');
       if (isForbidByForbidGuestTextGap) return t('channel-guest-text-gap-time-message', { '0': leftGapTime.toString() });
       if (isForbidByForbidGuestTextWait) return t('channel-guest-text-wait-time-message', { '0': leftWaitTime.toString() });
       return `${t('input-message')}...`;
-    }, [t, isForbidByForbidText, isForbidByForbidGuestText, isForbidByForbidGuestTextGap, isForbidByForbidGuestTextWait, leftGapTime, leftWaitTime]);
+    }, [t, isForbidByMutedText, isForbidByForbidText, isForbidByForbidGuestText, isForbidByForbidGuestTextGap, isForbidByForbidGuestTextWait, leftGapTime, leftWaitTime]);
 
     return <MessageInputBox disabled={disabled} maxLength={maxLength} placeholder={placeholder} onSend={onSend} />;
   },
@@ -181,6 +185,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     guestTextWaitTime: channelGuestTextWaitTime,
     guestTextMaxLength: channelGuestTextMaxLength,
     permissionLevel: channelPermissionLevel,
+    isTextMuted: channelIsTextMuted,
   } = channel;
   const announcement = channelAnnouncement || serverAnnouncement;
   const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
@@ -381,6 +386,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                   channelGuestTextGapTime={channelGuestTextGapTime}
                   channelGuestTextWaitTime={channelGuestTextWaitTime}
                   channelGuestTextMaxLength={channelGuestTextMaxLength}
+                  channelIsTextMuted={channelIsTextMuted}
                   onSend={(msg) => handleSendMessage(serverId, channelId, { type: 'general', content: msg })}
                 />
               </div>

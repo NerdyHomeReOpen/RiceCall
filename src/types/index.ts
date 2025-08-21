@@ -17,14 +17,11 @@ import {
   table_server_permissions,
   table_channel_permissions,
   table_channel_muted_users,
+  table_server_blocked_users,
 } from '@/types/database';
 
 export type Permission = {
   permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-};
-
-export type BlockedUser = {
-  blockedUntil: number;
 };
 
 export type BadgeList = {
@@ -39,7 +36,7 @@ export type Friend = table_friends & table_users & BadgeList;
 
 export type FriendGroup = table_friend_groups;
 
-export type FriendApplication = table_friend_applications & User;
+export type FriendApplication = table_friend_applications & table_users;
 
 export type Server = table_servers & table_user_servers & table_members & Permission;
 
@@ -52,11 +49,13 @@ export type RecommendServer = table_servers & {
 };
 
 export type Category = table_channels &
+  table_channel_muted_users &
   Permission & {
     type: 'category';
   };
 
 export type Channel = table_channels &
+  table_channel_muted_users &
   Permission & {
     type: 'channel';
   };
@@ -68,7 +67,7 @@ export type QueueMember = OnlineMember & {
   leftTime: number;
 };
 
-export type Member = table_members & table_users & Permission & BlockedUser;
+export type Member = table_members & table_users & table_server_blocked_users & Permission;
 
 export type MemberApplication = table_member_applications & table_users;
 
@@ -83,7 +82,7 @@ export type Message = {
 };
 
 export type ChannelMessage = Message &
-  Member & {
+  OnlineMember & {
     type: 'general';
   };
 
