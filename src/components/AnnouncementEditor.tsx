@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
@@ -38,13 +38,10 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = ({ announcement, s
   const contextMenu = useContextMenu();
   const editor = useEditor({
     extensions: [StarterKit, TextStyle, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), FontSize, FontFamily, EmojiNode, YouTubeNode, UserName, UserIcon],
-    content: '',
+    content: fromTags(announcement),
     onUpdate: ({ editor }) => onChange(toTags(editor.getHTML())),
     immediatelyRender: false,
   });
-
-  // Refs
-  const isSetContentRef = useRef(false);
 
   // States
   const [isBold, setIsBold] = useState(false);
@@ -66,12 +63,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = ({ announcement, s
   }, [editor]);
 
   // Effects
-  useEffect(() => {
-    if (isSetContentRef.current) return;
-    editor?.commands.setContent(fromTags(announcement), { emitUpdate: false });
-    isSetContentRef.current = !!announcement;
-  }, [editor, announcement]);
-
   useEffect(() => {
     editor?.on('selectionUpdate', syncStyles);
   }, [editor, syncStyles]);
