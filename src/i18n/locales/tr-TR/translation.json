@@ -459,6 +459,7 @@
   "user-info": "Kişisel Profil",
   "user-limit": "Maksimum kişi sayısı (kişi)",
   "user-setting": "使用者設定",
+  "user-not-found": "用戶不存在",
   "username-invalid-format": "Görüntülenen ad yalnızca Çince, İngilizce ve sayılar kullanabilir",
   "username-max-length": "Görünen adın maksimum uzunluğu 32 karakterdir",
   "username-min-length": "Görüntülenen ad en az 1 karakter olmalıdır",
