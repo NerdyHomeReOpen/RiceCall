@@ -492,7 +492,7 @@
   "receive-channel-message-status-label": "收到頻道訊息",
   "set-hotkey-error": "La tecla {{0}} ya está en uso",
   "upload": "Subir",
-  "avatar-cropper": "Recortar imagen",
+  "avatar-cropper": "圖片裁剪",
   "lobby": "Vestíbulo",
   "connection-status": "Estado de conexión: {{0}}",
   "connection-status-new": "Nueva conexión",
