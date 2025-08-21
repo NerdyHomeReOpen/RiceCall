@@ -68,6 +68,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
     return serverReceptionLobbyId === channelId;
   }, [serverReceptionLobbyId, channelId]);
 
+  const isSameChannel = useMemo(() => {
+    return userCurrentChannelId === channelId;
+  }, [userCurrentChannelId, channelId]);
+
   const canJoin = useMemo(() => {
     return (
       !userInChannel &&
@@ -204,7 +208,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
               id: 'create-channel',
               label: t('create-channel'),
               show: isServerAdmin(permissionLevel),
-              onClick: () => handleOpenCreateChannel(serverId, null, t(channelName)),
+              onClick: () => handleOpenCreateChannel(serverId, null, ''),
             },
             {
               id: 'create-sub-channel',
@@ -231,7 +235,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
             {
               id: 'move-all-user-to-channel',
               label: t('move-all-user-to-channel'),
-              show: isChannelMod(permissionLevel) && channelUserIds.length > 0,
+              show: !isSameChannel && isChannelMod(permissionLevel) && channelUserIds.length > 0,
               onClick: () => handleMoveAllToChannel(channelUserIds, serverId, userCurrentChannelId),
             },
             {

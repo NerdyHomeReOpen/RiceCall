@@ -81,6 +81,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
     return categoryChannels.every((channel) => channel.visibility === 'readonly');
   }, [categoryChannels]);
 
+  const isSameChannel = useMemo(() => {
+    return userCurrentChannelId === categoryId;
+  }, [userCurrentChannelId, categoryId]);
+
   const canSetReceptionLobby = useMemo(() => {
     return isServerAdmin(permissionLevel) && serverReceptionLobbyId !== categoryId && categoryVisibility !== 'private' && categoryVisibility !== 'readonly';
   }, [permissionLevel, serverReceptionLobbyId, categoryId, categoryVisibility]);
@@ -250,7 +254,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
             {
               id: 'move-all-user-to-channel',
               label: t('move-all-user-to-channel'),
-              show: isChannelMod(permissionLevel) && categoryMemberUserIds.length !== 0,
+              show: !isSameChannel && isChannelMod(permissionLevel) && categoryMemberUserIds.length !== 0,
               onClick: () => handleMoveAllToChannel(categoryMemberUserIds, serverId, categoryId),
             },
             {
