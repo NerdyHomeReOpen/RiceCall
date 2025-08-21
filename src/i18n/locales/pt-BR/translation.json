@@ -459,6 +459,7 @@
   "user-info": "Informações do usuário",
   "user-limit": "Limite de usuários",
   "user-setting": "使用者設定",
+  "user-not-found": "用戶不存在",
   "username-invalid-format": "O apelido só pode conter caracteres em inglês, chinês e números",
   "username-max-length": "O tamanho máximo do apelido é de 32 caracteres",
   "username-min-length": "O tamanho mínimo do apelido é de 1 caractere",
