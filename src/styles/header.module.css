@@ -226,7 +226,7 @@
   display: flex;
   align-items: flex-end;
   margin-right: auto;
-  margin-left: 0;
+  margin-left: 5%;
 }
 
 .main-tabs .tab {
