@@ -59,9 +59,10 @@ const Default = {
   }),
 
   server: (overrides: Partial<Server> = {}): Server => ({
-    ...Default.member(),
     serverId: '',
+    userId: '',
     name: '',
+    nickname: null,
     avatar: `${Date.now()}`,
     avatarUrl: `/default/serverAvatar.webp`,
     announcement: '',
@@ -71,6 +72,8 @@ const Default = {
     type: 'other',
     visibility: 'public',
     receiveApply: true,
+    permissionLevel: 1,
+    contribution: 0,
     level: 0,
     wealth: 0,
     displayId: '',
@@ -87,6 +90,7 @@ const Default = {
 
   channel: (overrides: Partial<Channel> = {}): Channel => ({
     channelId: '',
+    userId: '',
     name: '',
     announcement: '',
     type: 'channel',
@@ -94,6 +98,8 @@ const Default = {
     password: '',
     voiceMode: 'free',
     isLobby: false,
+    isTextMuted: false,
+    isVoiceMuted: false,
     forbidText: false,
     forbidQueue: false,
     forbidGuestText: false,
