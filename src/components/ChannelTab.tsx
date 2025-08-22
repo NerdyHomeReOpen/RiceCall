@@ -59,6 +59,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
     () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
     [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
   );
+  const filteredChannelMembers = useMemo(() => channelMembers.filter((mb) => !!mb).sort((a, b) => (a.nickname || a.name).localeCompare(b.nickname || b.name)), [channelMembers]);
 
   // Handlers
   const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
@@ -247,12 +248,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
 
       {/* Expanded Sections */}
       <div className={styles['user-list']} style={expanded[channelId] ? {} : { display: 'none' }}>
-        {channelMembers
-          .filter((mb) => !!mb)
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((member) => (
-            <UserTab key={member.userId} user={user} friends={friends} channel={channel} server={server} member={member} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
-          ))}
+        {filteredChannelMembers.map((member) => (
+          <UserTab key={member.userId} user={user} friends={friends} channel={channel} server={server} member={member} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+        ))}
       </div>
     </>
   );

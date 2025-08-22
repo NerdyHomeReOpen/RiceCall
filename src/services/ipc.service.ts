@@ -102,7 +102,6 @@ const ipcService = {
 
   popup: {
     open: (type: PopupType, id: string, initialData: any, force?: boolean) => {
-      console.log(type, id, initialData, force);
       if (!isElectron) return;
       if (type === 'applyMember') {
         const { userId, serverId } = initialData;

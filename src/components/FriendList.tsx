@@ -41,6 +41,10 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: 0, userId }), [t, userId]);
   const strangerFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000, userId }), [t, userId]);
   const blacklistFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001, userId }), [t, userId]);
+  const filteredFriendGroups = useMemo(
+    () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
+    [defaultFriendGroup, friendGroups, strangerFriendGroup, blacklistFriendGroup],
+  );
 
   // Handlers
   const handleOpenSearchUser = (userId: User['userId']) => {
@@ -75,11 +79,9 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
       <div className={styles['scroll-view']} style={selectedTabId === 0 ? {} : { display: 'none' }}>
         {/* Friend Groups */}
         <div className={styles['friend-group-list']}>
-          {[defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup]
-            .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
-            .map((friendGroup) => (
-              <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={filteredFriends} user={user} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
-            ))}
+          {filteredFriendGroups.map((friendGroup) => (
+            <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={filteredFriends} user={user} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+          ))}
         </div>
       </div>
 

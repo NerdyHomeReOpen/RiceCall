@@ -19,10 +19,12 @@ import { useLoading } from '@/providers/Loading';
 // Services
 import ipc from '@/services/ipc.service';
 
-const SearchResultItem: React.FC<{
+interface SearchResultItemProps {
   server: Server;
   onClick: () => void;
-}> = ({ server, onClick }) => (
+}
+
+const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, onClick }) => (
   <div className={homePage['item']} onClick={onClick}>
     <div className={homePage['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
     <div className={homePage['server-info-text']}>
@@ -33,7 +35,9 @@ const SearchResultItem: React.FC<{
       </div>
     </div>
   </div>
-);
+));
+
+SearchResultItem.displayName = 'SearchResultItem';
 
 interface HomePageProps {
   user: User;

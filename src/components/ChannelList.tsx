@@ -54,6 +54,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
   const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
+  const filteredServerChannels = useMemo(
+    () => serverChannels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
+    [serverChannels],
+  );
   const isVerifiedServer = useMemo(() => false, []); // TODO: implement
 
   // Handlers
@@ -295,39 +299,36 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
               setSelectedItemId={setSelectedItemId}
             />
           ) : (
-            serverChannels
-              .filter((ch) => !!ch && !ch.categoryId)
-              .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
-              .map((item) =>
-                item.type === 'category' ? (
-                  <CategoryTab
-                    key={item.channelId}
-                    user={user}
-                    friends={friends}
-                    server={server}
-                    serverOnlineMembers={serverOnlineMembers}
-                    serverChannels={serverChannels}
-                    category={item as Category}
-                    expanded={expanded}
-                    selectedItemId={selectedItemId}
-                    setExpanded={setExpanded}
-                    setSelectedItemId={setSelectedItemId}
-                  />
-                ) : (
-                  <ChannelTab
-                    key={item.channelId}
-                    user={user}
-                    friends={friends}
-                    server={server}
-                    serverOnlineMembers={serverOnlineMembers}
-                    channel={item as Channel}
-                    expanded={expanded}
-                    selectedItemId={selectedItemId}
-                    setExpanded={setExpanded}
-                    setSelectedItemId={setSelectedItemId}
-                  />
-                ),
-              )
+            filteredServerChannels.map((item) =>
+              item.type === 'category' ? (
+                <CategoryTab
+                  key={item.channelId}
+                  user={user}
+                  friends={friends}
+                  server={server}
+                  serverOnlineMembers={serverOnlineMembers}
+                  serverChannels={serverChannels}
+                  category={item as Category}
+                  expanded={expanded}
+                  selectedItemId={selectedItemId}
+                  setExpanded={setExpanded}
+                  setSelectedItemId={setSelectedItemId}
+                />
+              ) : (
+                <ChannelTab
+                  key={item.channelId}
+                  user={user}
+                  friends={friends}
+                  server={server}
+                  serverOnlineMembers={serverOnlineMembers}
+                  channel={item as Channel}
+                  expanded={expanded}
+                  selectedItemId={selectedItemId}
+                  setExpanded={setExpanded}
+                  setSelectedItemId={setSelectedItemId}
+                />
+              ),
+            )
           )}
         </div>
       </div>

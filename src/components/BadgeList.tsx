@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
 import badgeStyle from '@/styles/badge.module.css';
@@ -17,14 +17,14 @@ interface BadgeListProps {
 }
 
 const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'left-top', direction = 'right-bottom', maxDisplay = 21 }) => {
+  // Memos
+  const filteredBadges = useMemo(() => badges.slice(0, maxDisplay).sort((a, b) => a.order - b.order), [badges, maxDisplay]);
+
   return (
     <div className={badgeStyle['badge-viewer-wrapper']}>
-      {badges
-        .slice(0, maxDisplay)
-        .sort((a, b) => a.order - b.order)
-        .map((badge) => (
-          <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
-        ))}
+      {filteredBadges.map((badge) => (
+        <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
+      ))}
     </div>
   );
 });

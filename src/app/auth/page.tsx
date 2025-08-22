@@ -41,7 +41,7 @@ const Header: React.FC = React.memo(() => {
 
 Header.displayName = 'Header';
 
-const Auth: React.FC = () => {
+const Auth: React.FC = React.memo(() => {
   // States
   const [section, setSection] = useState<'register' | 'login'>('login');
 
@@ -61,7 +61,7 @@ const Auth: React.FC = () => {
       <RegisterPage display={section === 'register'} setSection={setSection} />
     </>
   );
-};
+});
 
 Auth.displayName = 'Auth';
 

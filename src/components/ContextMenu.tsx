@@ -37,7 +37,7 @@ interface ContextMenuProps {
   onClose: () => void;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, direction, items, onClose }) => {
+const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
   // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -117,7 +117,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, direction, items, onClo
         })}
     </div>
   );
-};
+});
 
 ContextMenu.displayName = 'ContextMenu';
 

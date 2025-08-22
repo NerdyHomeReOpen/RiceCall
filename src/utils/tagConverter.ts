@@ -35,7 +35,7 @@ export const fromTags = (raw: string) =>
     })
     // YouTube
     .replace(ytRegex, (_, videoId) => {
-      return `<iframe data-youtube='${videoId}' class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen="true"></iframe>`;
+      return `<iframe data-youtube='${videoId}' class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen="false"></iframe>`;
     });
 
 export const toTags = (html: string) => {

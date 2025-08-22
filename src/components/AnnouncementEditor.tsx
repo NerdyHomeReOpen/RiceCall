@@ -32,7 +32,7 @@ interface AnnouncementEditorProps {
   onChange: (value: string) => void;
 }
 
-const AnnouncementEditor: React.FC<AnnouncementEditorProps> = ({ announcement, showPreview = false, onChange }) => {
+const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ announcement, showPreview = false, onChange }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -246,6 +246,8 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = ({ announcement, s
       )}
     </div>
   );
-};
+});
+
+AnnouncementEditor.displayName = 'AnnouncementEditor';
 
 export default AnnouncementEditor;
