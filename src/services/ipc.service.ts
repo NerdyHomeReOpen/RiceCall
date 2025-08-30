@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode } from '@/types';
+import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode, ACK } from '@/types';
 
 // Services
 import data from '@/services/data.service';
@@ -35,6 +35,15 @@ const ipcService = {
       ipcRenderer.removeAllListeners(event);
       ipcRenderer.on(event, (_: any, ...args: Parameters<ServerToClientEvents[T]>) => callback(...args));
       return () => ipcRenderer.removeAllListeners(event);
+    },
+    emit: <T, R>(event: string, payload: T): Promise<R> => {
+      if (!isElectron) return Promise.resolve(null as R);
+      return new Promise((resolve, reject) => {
+        ipcRenderer.invoke(event, payload).then((ack: ACK<R>) => {
+          if (ack?.ok) resolve(ack.data);
+          else reject(new Error(ack?.error || 'unknown error'));
+        });
+      });
     },
   },
 

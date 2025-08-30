@@ -62,6 +62,8 @@ type StoreSchema = {
 };
 const store = new Store<StoreSchema>();
 
+const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
+
 const ClientToServerEventNames = [
   'acceptMemberInvitation',
   'actionMessage',
@@ -166,6 +168,8 @@ export const ServerToClientEventNames = [
   'serverSearch',
   'serverUpdate',
   'serversSet',
+  'SFUNewProducer',
+  'SFUProducerClosed',
   'shakeWindow',
   'userSearch',
   'userUpdate',
@@ -552,13 +556,24 @@ function connectSocket(token: string): Socket | null {
       socket.removeAllListeners(event);
     }
 
+    // Register event listeners
+    ClientToServerEventWithAckNames.forEach((event) => {
+      ipcMain.handle(event, (_, payload) => {
+        console.log(`${new Date().toLocaleString()} | socket.emit`, event, payload);
+        return new Promise((resolve) => {
+          socket.emit(event, payload, (ack) => {
+            console.log(`${new Date().toLocaleString()} | socket.onAck`, event, ack);
+            resolve(ack);
+          });
+        });
+      });
+    });
     ClientToServerEventNames.forEach((event) => {
       ipcMain.on(event, (_, ...args) => {
         console.log(`${new Date().toLocaleString()} | socket.emit`, event, ...args);
         socket.emit(event, ...args);
       });
     });
-
     ServerToClientEventNames.forEach((event) => {
       socket.on(event, async (...args) => {
         console.log(`${new Date().toLocaleString()} | socket.on`, event, ...args);
@@ -574,45 +589,61 @@ function connectSocket(token: string): Socket | null {
       });
     });
 
-    console.info('Socket connected');
+    console.info(`${new Date().toLocaleString()} | Socket connected`);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('connect', null);
     });
   });
 
   socket.on('disconnect', (reason) => {
-    console.info('Socket disconnected, reason:', reason);
+    // Clean up event listeners
+    for (const event of ClientToServerEventWithAckNames) {
+      ipcMain.removeHandler(event);
+    }
+    for (const event of ClientToServerEventNames) {
+      ipcMain.removeAllListeners(event);
+    }
+    for (const event of ServerToClientEventNames) {
+      socket.removeAllListeners(event);
+    }
+
+    console.info(`${new Date().toLocaleString()} | Socket disconnected, reason:`, reason);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('disconnect', reason);
     });
   });
 
   socket.on('reconnect', (attemptNumber) => {
-    console.info('Socket reconnected, attempt number:', attemptNumber);
+    console.info(`${new Date().toLocaleString()} | Socket reconnected, attempt number:`, attemptNumber);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect', attemptNumber);
     });
   });
 
   socket.on('error', (error) => {
-    console.error('Socket error:', error.message);
+    console.error(`${new Date().toLocaleString()} | Socket error:`, error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('error', error);
     });
   });
 
   socket.on('connect_error', (error) => {
-    console.error('Socket connect error:', error.message);
+    console.error(`${new Date().toLocaleString()} | Socket connect error:`, error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('connect_error', error);
     });
   });
 
   socket.on('reconnect_error', (error) => {
-    console.error('Socket reconnect error:', error.message);
+    console.error(`${new Date().toLocaleString()} | Socket reconnect error:`, error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect_error', error);
     });
+  });
+
+  socket.on('close', () => {
+    console.info(`${new Date().toLocaleString()} | Socket closed`);
+    socketInstance = disconnectSocket();
   });
 
   socket.connect();

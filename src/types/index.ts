@@ -328,6 +328,9 @@ export type ServerToClientEvents = {
   actionMessage: (...args: PromptMessage[]) => void;
   directMessage: (...args: DirectMessage[]) => void;
   shakeWindow: (...args: DirectMessage[]) => void;
+  // SFU
+  SFUNewProducer: (...args: { userId: string; producerId: string }[]) => void;
+  SFUProducerClosed: (...args: { userId: string; producerId: string }[]) => void;
   // Play Sound
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Echo
