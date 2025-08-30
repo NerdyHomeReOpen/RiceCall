@@ -119,7 +119,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
         if (selectedItemId === targetId) setSelectedItemId(null);
         else setSelectedItemId(targetId);
       }}
-      onDoubleClick={() => handleOpenDirectMessage(targetId, targetId)}
+      onDoubleClick={() => handleOpenDirectMessage(userId, targetId)}
       onContextMenu={(e) => {
         const x = e.clientX;
         const y = e.clientY;
