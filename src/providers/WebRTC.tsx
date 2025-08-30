@@ -100,7 +100,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const consumersRef = useRef<{ [producerId: string]: mediasoupClient.types.Consumer }>({}); // producerId -> consumer
 
   // Memos
-  const SPEAKING_VOLUME_THRESHOLD = useMemo(() => 1, []);
+  const SPEAKING_VOLUME_THRESHOLD = useMemo(() => 2, []);
 
   // States
   const [isPressSpeakKey, setIsPressSpeakKey] = useState<boolean>(false);
