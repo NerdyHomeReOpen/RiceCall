@@ -581,10 +581,13 @@ function connectSocket(token: string): Socket | null {
           window.webContents.send(event, ...args);
         });
         // Handle special events
-        if (event === 'shakeWindow' || event === 'directMessage') {
-          const { user1Id, user2Id, targetId, name: targetName } = args[0];
-          const userId = user1Id === targetId ? user2Id : user1Id;
-          createPopup('directMessage', `directMessage-${targetId}`, { userId, targetId, targetName, event, message: args[0] }, false);
+        if (event === 'shakeWindow') {
+          const initialData = args[0].initialData;
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false);
+        }
+        if (event === 'directMessage') {
+          const initialData = args[0].initialData;
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false);
         }
       });
     });

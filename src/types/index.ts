@@ -87,7 +87,7 @@ export type ChannelMessage = Message &
   };
 
 export type DirectMessage = Message &
-  Friend & {
+  User & {
     type: 'dm';
     user1Id: string;
     user2Id: string;
