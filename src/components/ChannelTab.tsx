@@ -53,7 +53,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
   const isMemberChannel = useMemo(() => channelVisibility === 'member', [channelVisibility]);
   const isPrivateChannel = useMemo(() => channelVisibility === 'private', [channelVisibility]);
   const isReadonlyChannel = useMemo(() => channelVisibility === 'readonly', [channelVisibility]);
-  const isFull = useMemo(() => channelUserLimit && channelUserLimit > channelMembers.length, [channelUserLimit, channelMembers]);
+  const isFull = useMemo(() => channelUserLimit && channelUserLimit <= channelMembers.length, [channelUserLimit, channelMembers]);
   const isSelected = useMemo(() => selectedItemId === `channel-${channelId}`, [selectedItemId, channelId]);
   const canJoin = useMemo(
     () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),

@@ -64,14 +64,14 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
     [serverOnlineMembers, categoryChannelIds, categoryId],
   );
   const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);
-  const isInChannel = useMemo(() => userCurrentChannelId !== categoryId, [userCurrentChannelId, categoryId]);
+  const isInChannel = useMemo(() => userCurrentChannelId === categoryId, [userCurrentChannelId, categoryId]);
   const isInCategory = useMemo(() => categoryMembers.some((m) => m.currentChannelId === userCurrentChannelId), [categoryMembers, userCurrentChannelId]);
   const isAllChannelReadOnly = useMemo(() => categoryChannels.every((c) => c.visibility === 'readonly'), [categoryChannels]);
   const isReceptionLobby = useMemo(() => serverReceptionLobbyId === categoryId, [serverReceptionLobbyId, categoryId]);
   const isMemberChannel = useMemo(() => categoryVisibility === 'member', [categoryVisibility]);
   const isPrivateChannel = useMemo(() => categoryVisibility === 'private', [categoryVisibility]);
   const isReadonlyChannel = useMemo(() => categoryVisibility === 'readonly', [categoryVisibility]);
-  const isFull = useMemo(() => categoryUserLimit && categoryUserLimit > categoryMembers.length, [categoryUserLimit, categoryMembers]);
+  const isFull = useMemo(() => categoryUserLimit && categoryUserLimit <= categoryMembers.length, [categoryUserLimit, categoryMembers]);
   const isSelected = useMemo(() => selectedItemId === `category-${categoryId}`, [selectedItemId, categoryId]);
   const canJoin = useMemo(
     () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
