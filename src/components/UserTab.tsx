@@ -75,6 +75,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   const isVoiceMuted = useMemo(() => webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds]);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
+  const canUpdatePermission = useMemo(() => !isUser && isSuperior && isMember(memberPermission), [memberPermission, isUser, isSuperior]);
   const statusIcon = useMemo(() => {
     if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
     if (!isUser && isSameChannel && isConnecting) return 'loading';
@@ -324,19 +325,19 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
               {
                 id: 'set-channel-mod',
                 label: t('set-channel-mod'),
-                show: !isUser && channelCategoryId !== null && isMember(memberPermission) && isSuperior && !isChannelMod(memberPermission),
+                show: canUpdatePermission && isChannelAdmin(permissionLevel) && !isChannelMod(memberPermission) && channelCategoryId !== null,
                 onClick: () => handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 3 }),
               },
               {
                 id: 'set-channel-admin',
                 label: t('set-channel-admin'),
-                show: !isUser && isMember(memberPermission) && isSuperior && !isChannelAdmin(memberPermission, false),
+                show: canUpdatePermission && isServerAdmin(permissionLevel) && !isChannelAdmin(memberPermission, false),
                 onClick: () => handleEditChannelPermission(memberUserId, serverId, channelCategoryId ? channelCategoryId : channelId, { permissionLevel: 4 }),
               },
               {
                 id: 'set-server-admin',
                 label: t('set-server-admin'),
-                show: !isUser && isMember(memberPermission) && isSuperior && !isServerAdmin(memberPermission, false),
+                show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerAdmin(memberPermission, false),
                 onClick: () => handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
               },
             ],
