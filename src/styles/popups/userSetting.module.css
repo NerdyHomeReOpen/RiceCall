@@ -383,7 +383,8 @@
   align-items: center;
   justify-content: flex-end;
   min-height: 45px;
-  padding: 0 15px;
+  padding: 10px;
+  gap: 10px;
   background: linear-gradient(to bottom, #fff, #f2f7f9);
   border-bottom: 1px solid #f1f1f1;
 }

@@ -104,6 +104,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 e.preventDefault();
                 editor?.chain().setTextAlign('left').focus().run();
                 setIsTextAlignLeft(editor?.isActive({ textAlign: 'left' }) || false);
+                syncStyles();
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -119,6 +120,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 e.preventDefault();
                 editor?.chain().setTextAlign('center').focus().run();
                 setIsTextAlignCenter(editor?.isActive({ textAlign: 'center' }) || false);
+                syncStyles();
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -134,6 +136,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 e.preventDefault();
                 editor?.chain().setTextAlign('right').focus().run();
                 setIsTextAlignRight(editor?.isActive({ textAlign: 'right' }) || false);
+                syncStyles();
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -149,6 +152,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 e.preventDefault();
                 editor?.chain().toggleBold().focus().run();
                 setIsBold(editor?.isActive('bold') || false);
+                syncStyles();
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -161,6 +165,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 e.preventDefault();
                 editor?.chain().toggleItalic().focus().run();
                 setIsItalic(editor?.isActive('italic') || false);
+                syncStyles();
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -173,6 +178,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 e.preventDefault();
                 editor?.chain().toggleUnderline().focus().run();
                 setIsUnderline(editor?.isActive('underline') || false);
+                syncStyles();
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -187,6 +193,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 const y = e.currentTarget.getBoundingClientRect().bottom;
                 contextMenu.showColorPicker(x, y, 'right-bottom', (color) => {
                   editor?.chain().setColor(color).focus().run();
+                  syncStyles();
                 });
               }}
             >
@@ -201,6 +208,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 const y = e.currentTarget.getBoundingClientRect().bottom;
                 contextMenu.showEmojiPicker(x, y, 'right-bottom', (code) => {
                   editor?.chain().insertEmoji({ code }).focus().run();
+                  syncStyles();
                 });
               }}
             >
@@ -214,6 +222,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               onClick={(e) => {
                 e.preventDefault();
                 editor?.chain().insertUserIcon({ gender: 'Male', level: '1' }).insertUserName({ name: 'Unknown' }).focus().run();
+                syncStyles();
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -227,6 +236,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 const videoId = linkUrl.trim().split('v=')[1].split('&')[0];
                 if (videoId && videoId.match(/^[\w-]+$/)) {
                   editor?.chain().insertYouTube(videoId).focus().run();
+                  syncStyles();
                 }
               }}
             >

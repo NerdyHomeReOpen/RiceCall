@@ -156,8 +156,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 3px;
-  height: 20px;
+  padding: 0 3px;
+  height: 2em;
   width: 100%;
 }
 
@@ -170,9 +170,6 @@
 }
 
 .account-select-delete-btn {
-  position: absolute;
-  right: 0;
-  top: 0;
   min-height: 18px;
   min-width: 18px;
   background-image: url('/loading_close.png');

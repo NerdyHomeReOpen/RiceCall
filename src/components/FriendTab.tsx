@@ -110,6 +110,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     ipc.popup.open('editFriend', 'editFriend', { userId, targetId });
   };
 
+  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+  };
+
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
     ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
     ipc.popup.onSubmit('dialogAlert', callback);
@@ -153,6 +157,12 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             label: t('view-profile'),
             show: !isUser,
             onClick: () => handleOpenUserInfo(userId, targetId),
+          },
+          {
+            id: 'add-friend',
+            label: t('add-friend'),
+            show: !isUser && !isFriend,
+            onClick: () => handleOpenApplyFriend(userId, targetId),
           },
           {
             id: 'edit-note',

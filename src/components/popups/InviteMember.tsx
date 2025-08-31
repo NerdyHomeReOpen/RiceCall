@@ -57,7 +57,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
               <div className={popup['avatar-picture']} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
             </div>
             <div className={popup['info-wrapper']}>
-              <div className={popup['bold-text']}>{targetName}</div>
+              <div className={popup['link-text']}>{targetName}</div>
               <div className={popup['sub-text']}>{targetDisplayId}</div>
             </div>
           </div>

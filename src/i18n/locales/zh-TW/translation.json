@@ -25,7 +25,7 @@
   "anyone-can-access-label": "任何人可以訪問",
   "applicants": "申請人數",
   "apply": "套用",
-  "apply-friend": "好友請求",
+  "apply-friend": "添加好友",
   "apply-friend-label": "您將添加以下聯絡人",
   "apply-member": "申請會員",
   "apply-member-note": "會員申請須知",
@@ -87,6 +87,7 @@
   "confirm-block-user": "確定要封鎖 {{0}} 嗎？",
   "confirm-delete-channel": "您確定要刪除頻道 {{0}} 嗎？",
   "confirm-delete-friend": "確定要刪除好友 {{0}} 嗎？",
+  "confirm-delete-friend-application": "確定要刪除好友請求嗎？",
   "confirm-delete-friend-group": "確定要刪除分組 {{0}} 嗎？",
   "confirm-kick-user": "確定要踢出 {{0}} 嗎？",
   "confirm-password": "確認密碼",
@@ -129,6 +130,7 @@
   "delete": "刪除",
   "delete-channel": "刪除頻道",
   "delete-friend": "刪除好友",
+  "delete-friend-application": "刪除好友請求",
   "delete-friend-group": "刪除分組",
   "deny-application": "拒絕申請",
   "description": "說明",
@@ -319,6 +321,7 @@
   "password-min-length": "密碼至少需要 8 個字",
   "password-required": "密碼為必填",
   "passwords-do-not-match": "密碼輸入不一致",
+  "pending": "待接受",
   "permanent": "永久",
   "permission": "身份",
   "permission-setting": "權限設置",
@@ -479,6 +482,5 @@
   "wealth": "財富值",
   "xp": "積分",
   "year": "年",
-  "yesterday": "昨天",
-  "pending": "待接受"
+  "yesterday": "昨天"
 }

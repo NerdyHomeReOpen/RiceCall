@@ -95,11 +95,13 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
           <div className={`${popup['content']} ${popup['col']}`}>
             <div className={popup['label']}>{t('apply-friend-label')}</div>
             <div className={popup['row']}>
-              <div className={popup['avatar-wrapper']} onClick={() => handleOpenUserInfo(userId, targetId)}>
+              <div className={popup['avatar-wrapper']}>
                 <div className={popup['avatar-picture']} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
               </div>
               <div className={popup['info-wrapper']}>
-                <div className={popup['bold-text']}>{targetName}</div>
+                <div className={popup['link-text']} onClick={() => handleOpenUserInfo(userId, targetId)}>
+                  {targetName}
+                </div>
                 <div className={popup['sub-text']}>{targetDisplayId}</div>
               </div>
             </div>

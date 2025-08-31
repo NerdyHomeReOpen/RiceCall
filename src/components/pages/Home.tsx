@@ -75,7 +75,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   // Handlers
   const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.trim();
-    if (!query || !canSearchRef.current) return;
+
+    if (!query) {
+      handleClearSearchState();
+      return;
+    }
+
+    if (!canSearchRef.current) return;
 
     ipc.socket.send('searchServer', { query });
     searchQueryRef.current = query;
@@ -84,6 +90,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(() => {
       canSearchRef.current = true;
+      if (searchQueryRef.current !== searchInputRef.current?.value) {
+        handleSearchServer(e);
+      }
     }, 500);
   };
 
@@ -221,8 +230,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 handleConnectServer(exactMatch.serverId, exactMatch.displayId);
               }}
             />
-            <div className={homePage['search-input-clear-btn']} onClick={handleClearSearchState} style={searchInputRef.current?.value ? {} : { display: 'none' }} />
-            <div className={homePage['search-input-icon']} style={!searchInputRef.current?.value ? {} : { display: 'none' }} />
+            <div className={homePage['search-input-clear-btn']} onClick={handleClearSearchState} style={searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
+            <div className={homePage['search-input-icon']} style={!searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
             <div className={homePage['search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
               {exactMatch && (
                 <>
@@ -248,8 +257,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                   ))}
                 </>
               )}
-              <div className={`${homePage['item']} ${homePage['input-empty-item']}`} style={!searchQueryRef.current ? {} : { display: 'none' }}>
-                {t('searchEmpty')}
+              <div className={`${homePage['item']} ${homePage['input-empty-item']}`} style={!searchInputRef.current?.value.trim() ? {} : { display: 'none' }}>
+                {t('search-empty')}
               </div>
             </div>
           </div>

@@ -206,17 +206,17 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
           />
 
           <div className={`${popup['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
-            <div className={styles['user-name-text']}>{targetName}</div>
+            <p className={styles['user-name-text']}>{targetName}</p>
             {targetVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${targetVip}`]}`} />}
             <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} />
           </div>
-          <div className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
+          <p className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
             @{targetDisplayId}
-          </div>
-          <div className={styles['user-info-text']}>
+          </p>
+          <p className={styles['user-info-text']}>
             {t(targetGender === 'Male' ? 'male' : 'female')} . {userAge} .{t(targetCountry, { ns: 'country' })}
-          </div>
-          <div className={styles['user-signature']} dangerouslySetInnerHTML={{ __html: targetSignature }} />
+          </p>
+          <p className={styles['user-signature']}>{targetSignature}</p>
 
           <div className={styles['tabs']}>
             <div

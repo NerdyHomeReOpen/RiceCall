@@ -126,11 +126,12 @@
 .signature-wrapper {
   display: flex;
   width: 60%;
-  height: 30px;
+  height: 40px;
   align-items: center;
   border: 1px solid #ffff;
   margin-left: 100px;
   padding: 2px 5px;
+  gap: 5px;
 }
 
 .signature-input {

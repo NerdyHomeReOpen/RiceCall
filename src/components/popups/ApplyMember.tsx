@@ -55,7 +55,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
               <div className={popup['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
             </div>
             <div className={popup['info-wrapper']}>
-              <div className={popup['bold-text']}>{serverName}</div>
+              <div className={popup['link-text']}>{serverName}</div>
               <div className={popup['sub-text']}>{`ID: ${serverDisplayId}`}</div>
             </div>
           </div>
