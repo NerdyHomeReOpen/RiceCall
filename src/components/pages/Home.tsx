@@ -293,7 +293,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       <webview src="https://ricecall.com.tw/announcement" className={homePage['webview']} style={section === 0 ? {} : { display: 'none' }} />
 
       {/* Recommended servers */}
-      <main className={homePage['recommended-servers']} style={section === 1 ? {} : { display: 'none' }}>
+      <main className={homePage['recommended-servers-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
         <RecommendServerList servers={recommendServerList} user={user} />
       </main>
 

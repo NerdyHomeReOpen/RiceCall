@@ -4,50 +4,56 @@ import React, { useMemo, useState } from 'react';
 import homePage from '@/styles/pages/home.module.css';
 
 // Types
-import type { RecommendServerList as RecommendServerListType, User } from '@/types';
+import type { RecommendServerList, User } from '@/types';
 
 // Components
-// import ServerCard from '@/components/ServerCard';
+import RecommendServerCard from '@/components/RecommendServerCard';
+
+// Providers
+import { useTranslation } from 'react-i18next';
 
 interface RecommendServerListProps {
   user: User;
-  servers: RecommendServerListType;
+  servers: RecommendServerList;
 }
 
-const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ servers }) => {
+const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ user, servers }) => {
+  // Hooks
+  const { t } = useTranslation();
+
   // States
-  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(0);
 
   // Memos
   const categories = useMemo(() => Object.keys(servers), [servers]);
 
   return (
-    <div className={homePage['recommended-servers-wrapper']}>
-      <aside className={homePage['category-sidebar']}>
-        <ul className={homePage['category-list']}>
-          {categories.map((category, index) => (
-            <li key={category}>
-              <button onClick={() => setActiveCategoryIndex(index)} className={`${homePage['category-item']} ${activeCategoryIndex === index ? homePage['category-item-active'] : ''}`}>
-                {category}
-              </button>
-            </li>
-          ))}
-        </ul>
+    <>
+      <aside className={homePage['sidebar']}>
+        <div className={homePage['scroll-view']}>
+          <div className={homePage['category-list']}>
+            {categories.map((category, index) => (
+              <div key={category}>
+                <div onClick={() => setSelectedCategoryId(index)} className={`${homePage['category-tab']} ${selectedCategoryId === index ? homePage['selected'] : ''}`}>
+                  {`${t(category)} (${servers[category].length})`}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </aside>
 
       <section className={homePage['servers-container']}>
-        <h2 className={homePage['category-title']}>{categories[activeCategoryIndex]}</h2>
-        {servers[categories[activeCategoryIndex]]?.length > 0 && (
-          <div className={homePage['servers']}>
-            {servers[categories[activeCategoryIndex]].map((server) => (
-              <div key={server.serverId} className={homePage['server-cards-recommended']}>
-                {/* <ServerCard user={user} server={server} /> */}
-              </div>
+        <div className={homePage['server-list-title']}>{t(categories[selectedCategoryId])}</div>
+        {servers[categories[selectedCategoryId]]?.length > 0 && (
+          <div className={homePage['server-list']}>
+            {Array.from({ length: 12 }).map((_, index) => (
+              <RecommendServerCard key={index} user={user} recommendServer={servers[categories[selectedCategoryId]][0]} />
             ))}
           </div>
         )}
       </section>
-    </div>
+    </>
   );
 });
 

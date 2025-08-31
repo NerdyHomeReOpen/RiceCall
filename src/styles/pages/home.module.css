@@ -26,6 +26,14 @@
   width: auto;
 }
 
+.home-header .mid {
+  -webkit-overflow-scrolling: touch;
+}
+
+.home-header .mid::-webkit-scrollbar {
+  height: 0;
+}
+
 /* Search Bar */
 
 .back-btn {
@@ -294,79 +302,64 @@
 
 .recommended-servers-wrapper {
   display: flex;
-  gap: 10px;
-  height: 100vh;
-  max-height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
-.category-sidebar {
-  width: 220px;
-  border-right: 1px solid #ccc;
-  padding-right: 10px;
-  max-height: 100vh;
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 280px;
+  min-width: 280px;
+  background-color: #f1f2f5;
+  border-right: 1px solid #c8cace;
+}
+
+.scroll-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  padding: 10px;
   overflow-y: auto;
-  background: #f4f6fa;
 }
 
 .category-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  padding: 15px;
+  flex: 1;
 }
 
-.category-item {
-  width: 100%;
-  text-align: left;
+.category-list .category-tab {
+  display: flex;
+  align-items: center;
+  border-radius: 3px;
   padding: 5px;
-  border-radius: 5px;
-  background: transparent;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
 
-.category-item:hover {
-  background-color: #f0f0f0;
+.category-list .category-tab.selected {
+  background-color: #d8dadc;
 }
 
-.category-item-active {
-  background-color: #3b82f6; /* azul */
-  color: white;
-  font-weight: bold;
+.category-list .category-tab:not(.selected):hover {
+  background-color: #d1d5da;
 }
 
 .servers-container {
-  width: 75%;
-  height: 500px;
-  overflow-y: auto;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding-right: 5px;
-  padding-top: 15px;
-  box-sizing: border-box;
-}
-
-.servers-container .category-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #333;
-  flex-basis: 100%;
-}
-
-.servers-container .servers {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-start;
-  gap: 40px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: auto;
+  width: 100%;
+  padding: 25px;
+  background: #f4f6fa;
 }
 
-.servers-container .servers .server-cards-recommended {
-  width: calc(33.333% - 10px);
-  min-width: 250px;
-  box-sizing: border-box;
+.recommended-servers-wrapper .server-list {
+  width: 100%;
+  justify-content: center;
 }
 
 .server-list-title {

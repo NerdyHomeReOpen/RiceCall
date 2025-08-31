@@ -10,20 +10,17 @@ import { useMainTab } from '@/providers/MainTab';
 import { useTranslation } from 'react-i18next';
 
 // Type
-import type { User, Server } from '@/types';
+import type { User, RecommendServer } from '@/types';
 
 // Services
 import ipc from '@/services/ipc.service';
 
-// Utils
-import { isMember, isServerOwner } from '@/utils/permission';
-
-interface ServerCardProps {
+interface RecommendServerCardProps {
   user: User;
-  server: Server;
+  recommendServer: RecommendServer;
 }
 
-const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
+const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ user, recommendServer }) => {
   // Hooks
   const contextMenu = useContextMenu();
   const loadingBox = useLoading();
@@ -31,11 +28,11 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   const { t } = useTranslation();
 
   // Destructuring
-  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, slogan: serverSlogan, favorite: serverFavorite, permissionLevel: serverPermissionLevel } = server;
+  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, slogan: serverSlogan, online: serverOnline } = recommendServer;
   const { userId, currentServerId: userCurrentServerId } = user;
 
   // Handles
-  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+  const handleServerSelect = (serverId: RecommendServer['serverId'], serverDisplayId: RecommendServer['displayId']) => {
     if (loadingBox.isLoading) return;
     if (serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
@@ -46,21 +43,8 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     ipc.socket.send('connectServer', { serverId });
   };
 
-  const handleFavoriteServer = (serverId: Server['serverId']) => {
-    ipc.socket.send('favoriteServer', { serverId });
-  };
-
-  const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': memberName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
-  };
-
-  const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
+  const handleOpenServerSetting = (userId: User['userId'], serverId: RecommendServer['serverId']) => {
     ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   return (
@@ -82,17 +66,6 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
             disabled: true,
             onClick: () => handleOpenServerSetting(userId, serverId),
           },
-          {
-            id: 'set-favorite',
-            label: !serverFavorite ? t('favorite') : t('unfavorite'),
-            onClick: () => handleFavoriteServer(serverId),
-          },
-          {
-            id: 'terminate-self-membership',
-            label: t('terminate-self-membership'),
-            show: isMember(serverPermissionLevel) && !isServerOwner(serverPermissionLevel),
-            onClick: () => handleTerminateMember(userId, serverId, t('self')),
-          },
         ]);
       }}
     >
@@ -100,14 +73,19 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
       <div className={homePage['server-info-text']}>
         <div className={homePage['server-name-text']}>{serverName}</div>
         <div className={homePage['server-id-box']}>
-          <div className={`${homePage['server-id-text']} ${isServerOwner(serverPermissionLevel) ? homePage['is-owner'] : ''}`}>{`ID: ${serverDisplayId}`}</div>
+          <div className={homePage['server-id-text']}>{`ID: ${serverDisplayId}`}</div>
         </div>
         <div className={homePage['server-slogen']}>{serverSlogan}</div>
+        {serverOnline >= 0 && (
+          <div className={homePage['server-online']}>
+            {t('online')}: {serverOnline}
+          </div>
+        )}
       </div>
     </div>
   );
 });
 
-ServerCard.displayName = 'ServerCard';
+RecommendServerCard.displayName = 'RecommendServerCard';
 
-export default ServerCard;
+export default RecommendServerCard;
