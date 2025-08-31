@@ -216,7 +216,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
               id: 'move-all-user-to-channel',
               label: t('move-all-user-to-channel'),
               show: !isInChannel && isChannelMod(permissionLevel) && channelUserIds.length > 0,
-              onClick: () => handleMoveAllUsersToChannel(channelUserIds, serverId, userCurrentChannelId),
+              onClick: () => handleMoveAllUsersToChannel(channelUserIds, serverId, userCurrentChannelId || ''),
             },
             {
               id: 'edit-channel-order',

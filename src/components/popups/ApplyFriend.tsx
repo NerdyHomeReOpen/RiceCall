@@ -30,9 +30,9 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
     const { t } = useTranslation();
 
     // States
+    const [section, setSection] = useState<number>(sentFriendApplicationData ? 3 : receivedFriendApplicationData ? 1 : 0); // 0: send, 1: sent, 2: edit, 3: approve
     const [friendGroups, setFriendGroups] = useState<FriendGroup[]>(friendGroupsData);
     const [friendApplication, setFriendApplication] = useState<FriendApplication>(sentFriendApplicationData || receivedFriendApplicationData || Default.friendApplication());
-    const [section, setSection] = useState<number>(sentFriendApplicationData ? 2 : receivedFriendApplicationData ? 1 : 0);
     const [selectedFriendGroupId, setSelectedFriendGroupId] = useState<FriendGroup['friendGroupId'] | null>(null);
 
     // Destructuring
@@ -40,12 +40,16 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
     const { description: applicationDesc } = friendApplication;
 
     // Handlers
-    const handleSendFriendApplication = (receiverId: User['userId'], preset: Partial<FriendApplication>) => {
-      ipc.socket.send('sendFriendApplication', { receiverId, preset });
+    const handleSendFriendApplication = (receiverId: User['userId'], preset: Partial<FriendApplication>, friendGroupId: FriendGroup['friendGroupId'] | null) => {
+      ipc.socket.send('sendFriendApplication', { receiverId, preset, friendGroupId });
     };
 
-    const handleApproveFriendApplication = (senderId: User['userId']) => {
-      ipc.socket.send('approveFriendApplication', { senderId });
+    const handleEditFriendApplication = (receiverId: User['userId'], update: Partial<FriendApplication>) => {
+      ipc.socket.send('editFriendApplication', { receiverId, update });
+    };
+
+    const handleApproveFriendApplication = (senderId: User['userId'], friendGroupId: FriendGroup['friendGroupId'] | null) => {
+      ipc.socket.send('approveFriendApplication', { senderId, friendGroupId });
     };
 
     const handleOpenCreateFriendGroup = () => {
@@ -101,6 +105,22 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
             </div>
             <div className={popup['split']} />
             <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
+              <div className={popup['label']}>{t('select-friend-group')}</div>
+              <div className={popup['row']}>
+                <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
+                  <select className={popup['select']} value={selectedFriendGroupId || ''} onChange={(e) => setSelectedFriendGroupId(e.target.value)}>
+                    <option value={''}>{t('none')}</option>
+                    {friendGroups.map((group) => (
+                      <option key={group.friendGroupId} value={group.friendGroupId}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className={popup['link-text']} onClick={() => handleOpenCreateFriendGroup()}>
+                  {t('create-friend-group')}
+                </div>
+              </div>
               <div className={popup['label']}>{t('note')}</div>
               <textarea rows={2} value={applicationDesc} onChange={(e) => setFriendApplication((prev) => ({ ...prev, description: e.target.value }))} />
             </div>
@@ -108,6 +128,10 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
               {t('friend-application-sent')}
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`} style={section === 2 ? {} : { display: 'none' }}>
+              <div className={popup['label']}>{t('note')}</div>
+              <textarea rows={2} value={applicationDesc} onChange={(e) => setFriendApplication((prev) => ({ ...prev, description: e.target.value }))} />
+            </div>
+            <div className={`${popup['input-box']} ${popup['col']}`} style={section === 3 ? {} : { display: 'none' }}>
               <div className={popup['label']}>{t('select-friend-group')}</div>
               <div className={popup['row']}>
                 <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
@@ -129,37 +153,53 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(
         </div>
 
         {/* Footer */}
-        <div className={popup['popup-footer']}>
+        <div className={popup['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
           <div
             className={popup['button']}
-            style={section === 0 ? {} : { display: 'none' }}
             onClick={() => {
-              handleSendFriendApplication(targetId, { description: applicationDesc });
+              handleSendFriendApplication(targetId, { description: applicationDesc }, selectedFriendGroupId);
               handleClose();
             }}
           >
             {t('submit')}
           </div>
-          <div className={popup['button']} style={section === 0 ? {} : { display: 'none' }} onClick={handleClose}>
+          <div className={popup['button']} onClick={handleClose}>
             {t('cancel')}
           </div>
-          <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => setSection(0)}>
+        </div>
+        <div className={popup['popup-footer']} style={section === 1 ? {} : { display: 'none' }}>
+          <div className={popup['button']} onClick={() => setSection(2)}>
             {t('modify')}
           </div>
-          <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={handleClose}>
+          <div className={popup['button']} onClick={handleClose}>
             {t('confirm')}
           </div>
+        </div>
+        <div className={popup['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
           <div
             className={popup['button']}
-            style={section === 2 ? {} : { display: 'none' }}
             onClick={() => {
-              handleApproveFriendApplication(targetId);
+              handleEditFriendApplication(targetId, { description: applicationDesc });
+              handleClose();
+            }}
+          >
+            {t('submit')}
+          </div>
+          <div className={popup['button']} onClick={handleClose}>
+            {t('cancel')}
+          </div>
+        </div>
+        <div className={popup['popup-footer']} style={section === 3 ? {} : { display: 'none' }}>
+          <div
+            className={popup['button']}
+            onClick={() => {
+              handleApproveFriendApplication(targetId, selectedFriendGroupId);
               handleClose();
             }}
           >
             {t('add')}
           </div>
-          <div className={popup['button']} style={section === 2 ? {} : { display: 'none' }} onClick={handleClose}>
+          <div className={popup['button']} onClick={handleClose}>
             {t('cancel')}
           </div>
         </div>

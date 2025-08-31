@@ -57,6 +57,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     requiredXp: friendRequiredXp,
     badges: friendBadges,
     status: friendStatus,
+    relationStatus: friendRelationStatus,
     isBlocked: friendIsBlocked,
     currentServerId: friendCurrentServerId,
   } = friend;
@@ -64,6 +65,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
 
   // Memos
   const isUser = useMemo(() => targetId === userId, [targetId, userId]);
+  const isOnline = useMemo(() => friendStatus !== 'offline', [friendStatus]);
+  const isStranger = useMemo(() => friendRelationStatus === 0, [friendRelationStatus]);
+  const isPending = useMemo(() => friendRelationStatus === 1, [friendRelationStatus]);
+  const isFriend = useMemo(() => friendRelationStatus === 2, [friendRelationStatus]);
 
   // Handlers
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
@@ -77,12 +82,20 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     ipc.socket.send('connectServer', { serverId });
   };
 
-  const handleBlockFriend = (targetId: User['userId'], isBlocked: Friend['isBlocked']) => {
-    handleOpenAlertDialog(t(`confirm-${isBlocked ? 'unblock' : 'block'}-user`, { '0': friendName }), () => ipc.socket.send('editFriend', { targetId, update: { isBlocked: !isBlocked } }));
+  const handleBlockUser = (targetId: User['userId']) => {
+    handleOpenAlertDialog(t('confirm-block-user', { '0': friendName }), () => ipc.socket.send('blockUser', { targetId }));
+  };
+
+  const handleUnblockUser = (targetId: User['userId']) => {
+    handleOpenAlertDialog(t('confirm-unblock-user', { '0': friendName }), () => ipc.socket.send('unblockUser', { targetId }));
   };
 
   const handleDeleteFriend = (targetId: User['userId']) => {
     handleOpenAlertDialog(t('confirm-delete-friend', { '0': friendName }), () => ipc.socket.send('deleteFriend', { targetId }));
+  };
+
+  const handleDeleteFriendApplication = (targetId: User['userId']) => {
+    handleOpenAlertDialog(t('confirm-delete-friend-application', { '0': friendName }), () => ipc.socket.send('deleteFriendApplication', { receiverId: targetId }));
   };
 
   const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
@@ -144,7 +157,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           {
             id: 'edit-note',
             label: t('edit-note'),
-            show: !isUser && !friendIsBlocked,
+            show: !isUser && isFriend,
             disabled: true,
             onClick: () => {
               /* TODO: handleFriendNote() */
@@ -157,7 +170,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           {
             id: 'permission-setting',
             label: t('permission-setting'),
-            show: !isUser && !friendIsBlocked,
+            show: !isUser && isFriend,
             icon: 'submenu',
             disabled: true,
             hasSubmenu: true,
@@ -183,28 +196,34 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           {
             id: 'edit-friend-group',
             label: t('edit-friend-group'),
-            show: !isUser && !friendIsBlocked,
+            show: !isUser && !isStranger && !friendIsBlocked,
             onClick: () => handleOpenEditFriend(userId, targetId),
           },
           {
             id: 'block',
             label: friendIsBlocked ? t('unblock') : t('block'),
-            show: !isUser,
-            onClick: () => handleBlockFriend(targetId, friendIsBlocked),
+            show: !isUser && isFriend,
+            onClick: () => (friendIsBlocked ? handleUnblockUser(targetId) : handleBlockUser(targetId)),
           },
           {
             id: 'delete-friend',
             label: t('delete-friend'),
-            show: !isUser,
+            show: !isUser && isFriend,
             onClick: () => handleDeleteFriend(targetId),
+          },
+          {
+            id: 'delete-friend-application',
+            label: t('delete-friend-application'),
+            show: !isUser && isPending,
+            onClick: () => handleDeleteFriendApplication(targetId),
           },
         ]);
       }}
     >
       <div
         className={styles['avatar-picture']}
-        style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: friendStatus === 'offline' ? 'grayscale(100%)' : '' }}
-        datatype={friendStatus !== 'online' ? friendStatus : ''}
+        style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: isOnline && isFriend ? '' : 'grayscale(100%)' }}
+        datatype={isOnline && isFriend ? friendStatus : ''}
       />
       <div className={styles['base-info-wrapper']}>
         <div className={styles['box']}>
@@ -213,7 +232,9 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           <LevelIcon level={friendLevel} xp={friendXp} requiredXp={friendRequiredXp} />
           <BadgeList badges={JSON.parse(friendBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
-        {friendStatus !== 'offline' && friendCurrentServerId ? (
+        {isPending ? (
+          <div className={styles['signature']}>{`(${t('pending')})`}</div>
+        ) : isOnline && friendCurrentServerId ? (
           <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendCurrentServerId, friendServer.displayId)}>
             <div className={styles['location-icon']} />
             <div className={styles['server-name-text']}>{friendServerName}</div>

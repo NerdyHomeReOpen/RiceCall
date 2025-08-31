@@ -70,6 +70,7 @@ const ClientToServerEventNames = [
   'addUserToQueue',
   'approveFriendApplication',
   'approveMemberApplication',
+  'blockUser',
   'blockUserFromChannel',
   'blockUserFromServer',
   'channelMessage',
@@ -91,6 +92,7 @@ const ClientToServerEventNames = [
   'editChannel',
   'editChannelPermission',
   'editFriend',
+  'editFriendApplication',
   'editFriendGroup',
   'editMember',
   'editMemberApplication',
@@ -116,7 +118,9 @@ const ClientToServerEventNames = [
   'sendMemberApplication',
   'sendMemberInvitation',
   'shakeWindow',
+  'stranger',
   'terminateMember',
+  'unblockUser',
   'unblockUserFromChannel',
   'unblockUserFromServer',
 ];
@@ -561,7 +565,7 @@ function connectSocket(token: string): Socket | null {
       ipcMain.handle(event, (_, payload) => {
         console.log(`${new Date().toLocaleString()} | socket.emit`, event, payload);
         return new Promise((resolve) => {
-          socket.emit(event, payload, (ack) => {
+          socket.emit(event, payload, (ack: any) => {
             console.log(`${new Date().toLocaleString()} | socket.onAck`, event, ack);
             resolve(ack);
           });

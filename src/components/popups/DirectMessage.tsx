@@ -65,7 +65,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const { name: targetCurrentServerName } = targetCurrentServer || {};
 
   // Memos
-  const isFriend = useMemo(() => !!friend, [friend]);
+  const isFriend = useMemo(() => friend?.relationStatus === 2, [friend]);
   const isOnline = useMemo(() => targetStatus !== 'offline', [targetStatus]);
   const isVerifiedUser = useMemo(() => false, []); // TODO: Remove this after implementing
 

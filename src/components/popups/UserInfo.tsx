@@ -98,7 +98,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   );
   const isProfilePrivate = useMemo(() => false, []); // TODO: implement privacy setting
   const isSelf = useMemo(() => userId === targetId, [userId, targetId]);
-  const isFriend = useMemo(() => friend?.userId === targetId, [friend, targetId]);
+  const isFriend = useMemo(() => friend?.relationStatus === 2, [friend]);
   const canSubmit = useMemo(
     () => targetName.trim() && targetGender.trim() && targetCountry.trim() && targetBirthYear && targetBirthMonth && targetBirthDay,
     [targetName, targetGender, targetCountry, targetBirthYear, targetBirthMonth, targetBirthDay],

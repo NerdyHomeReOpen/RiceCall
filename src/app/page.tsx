@@ -600,6 +600,14 @@ const RootPageComponent = () => {
 
   // Effects
   useEffect(() => {
+    for (const member of serverOnlineMembers) {
+      if (!friends.some((f) => f.targetId === member.userId) && member.userId !== user.userId) {
+        ipc.socket.send('stranger', { targetId: member.userId });
+      }
+    }
+  }, [serverOnlineMembers, friends, user.userId]);
+
+  useEffect(() => {
     if (user.currentServerId) {
       if (selectedTabRef.current !== 'server') {
         mainTabRef.current.setSelectedTabId('server');

@@ -25,7 +25,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
   const { t } = useTranslation();
 
   // States
-  const [section, setSection] = useState<number>(memberApplicationData ? 1 : 0);
+  const [section, setSection] = useState<number>(memberApplicationData ? 1 : 0); // 0: send, 1: sent, 2: edit
   const [memberApplication, setMemberApplication] = useState<MemberApplication>(memberApplicationData || Default.memberApplication());
 
   // Variables
@@ -35,6 +35,10 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
   // Handlers
   const handleSendMemberApplication = (serverId: Server['serverId'], preset: Partial<MemberApplication>) => {
     ipc.socket.send('sendMemberApplication', { serverId, preset });
+  };
+
+  const handleEditMemberApplication = (serverId: Server['serverId'], update: Partial<MemberApplication>) => {
+    ipc.socket.send('editMemberApplication', { serverId, update });
   };
 
   const handleClose = () => {
@@ -62,28 +66,22 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
           <div className={popup['split']} />
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
             <div className={popup['label']}>{t('note')}</div>
-            <textarea
-              rows={2}
-              value={applicationDes}
-              onChange={(e) =>
-                setMemberApplication((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-            />
+            <textarea rows={2} value={applicationDes} onChange={(e) => setMemberApplication((prev) => ({ ...prev, description: e.target.value }))} />
           </div>
           <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
             {t('member-application-sent')}
+          </div>
+          <div className={`${popup['input-box']} ${popup['col']}`} style={section === 2 ? {} : { display: 'none' }}>
+            <div className={popup['label']}>{t('note')}</div>
+            <textarea rows={2} value={applicationDes} onChange={(e) => setMemberApplication((prev) => ({ ...prev, description: e.target.value }))} />
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className={popup['popup-footer']}>
+      <div className={popup['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
         <div
           className={popup['button']}
-          style={section === 0 ? {} : { display: 'none' }}
           onClick={() => {
             handleSendMemberApplication(serverId, { description: applicationDes });
             handleClose();
@@ -91,14 +89,30 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
         >
           {t('submit')}
         </div>
-        <div className={popup['button']} style={section === 0 ? {} : { display: 'none' }} onClick={handleClose}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
-        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={() => setSection(0)}>
+      </div>
+      <div className={popup['popup-footer']} style={section === 1 ? {} : { display: 'none' }}>
+        <div className={popup['button']} onClick={() => setSection(0)}>
           {t('modify')}
         </div>
-        <div className={popup['button']} style={section === 1 ? {} : { display: 'none' }} onClick={handleClose}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('confirm')}
+        </div>
+      </div>
+      <div className={popup['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
+        <div
+          className={popup['button']}
+          onClick={() => {
+            handleEditMemberApplication(serverId, { description: applicationDes });
+            handleClose();
+          }}
+        >
+          {t('submit')}
+        </div>
+        <div className={popup['button']} onClick={handleClose}>
+          {t('cancel')}
         </div>
       </div>
     </div>

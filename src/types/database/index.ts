@@ -9,6 +9,7 @@ export type table_badges = {
   name: string;
   description: string;
   iconUrl: string;
+  createdAt: number;
 };
 
 export type table_channel_blocked_users = {
@@ -27,7 +28,7 @@ export type table_channel_muted_users = {
 export type table_channel_permissions = {
   userId: string;
   channelId: string;
-  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  permissionLevel: number;
 };
 
 export type table_channels = {
@@ -80,6 +81,8 @@ export type table_friend_groups = {
 export type table_friends = {
   userId: string;
   targetId: string;
+  note: string; // New: Note
+  relationStatus: number; // New: Relation Status (0: stranger, 1: pending, 2: friend, 3: blocked)
   isBlocked: boolean;
   friendGroupId: string | null;
   createdAt: number;
@@ -87,7 +90,7 @@ export type table_friends = {
 
 export type table_global_permissions = {
   userId: string;
-  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  permissionLevel: number;
 };
 
 export type table_member_applications = {
@@ -142,7 +145,7 @@ export type table_server_blocked_users = {
 export type table_server_permissions = {
   userId: string;
   serverId: string;
-  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  permissionLevel: number;
 };
 
 export type table_servers = {
@@ -213,8 +216,8 @@ export type table_users = {
   birthDay: number;
   status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
   gender: 'Male' | 'Female';
-  currentChannelId: string;
-  currentServerId: string;
+  currentChannelId: string | null;
+  currentServerId: string | null;
   lastActiveAt: number;
   createdAt: number;
 };

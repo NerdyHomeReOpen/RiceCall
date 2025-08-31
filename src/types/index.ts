@@ -228,15 +228,18 @@ export type ClientToServerEvents = {
   // Friend
   editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
   deleteFriend: (...args: { targetId: string }[]) => void;
+  blockUser: (...args: { targetId: string }[]) => void;
+  unblockUser: (...args: { targetId: string }[]) => void;
+  stranger: (...args: { targetId: string }[]) => void;
   // Friend Group
   createFriendGroup: (...args: { preset: Partial<table_friend_groups> }[]) => void;
   editFriendGroup: (...args: { friendGroupId: string; update: Partial<table_friend_groups> }[]) => void;
   deleteFriendGroup: (...args: { friendGroupId: string }[]) => void;
   // Friend Application
-  sendFriendApplication: (...args: { receiverId: string; preset: Partial<table_friend_applications> }[]) => void;
+  sendFriendApplication: (...args: { receiverId: string; preset: Partial<table_friend_applications>; friendGroupId: string | null }[]) => void;
   editFriendApplication: (...args: { receiverId: string; update: Partial<table_friend_applications> }[]) => void;
   deleteFriendApplication: (...args: { receiverId: string }[]) => void;
-  approveFriendApplication: (...args: { senderId: string }[]) => void;
+  approveFriendApplication: (...args: { senderId: string; friendGroupId: string | null }[]) => void;
   rejectFriendApplication: (...args: { senderId: string }[]) => void;
   // Queue
   joinQueue: (...args: { serverId: string; channelId: string }[]) => void;

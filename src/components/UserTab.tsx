@@ -73,7 +73,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   const isConnecting = useMemo(() => connectionStatus === 'connecting', [connectionStatus]);
   const isSpeaking = useMemo(() => !!webRTC.volumePercent?.[memberUserId], [memberUserId, webRTC.volumePercent]);
   const isVoiceMuted = useMemo(() => webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds]);
-  const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId), [friends, memberUserId]);
+  const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
   const statusIcon = useMemo(() => {
     if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
@@ -242,7 +242,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             id: 'move-to-channel',
             label: t('move-to-channel'),
             show: !isUser && isChannelMod(permissionLevel) && !isSameChannel && isSuperior,
-            onClick: () => handleMoveUserToChannel(memberUserId, serverId, userCurrentChannelId),
+            onClick: () => handleMoveUserToChannel(memberUserId, serverId, userCurrentChannelId || ''),
           },
           {
             id: 'separator',

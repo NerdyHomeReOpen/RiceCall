@@ -60,7 +60,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
   const categoryChannels = useMemo(() => serverChannels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [serverChannels, categoryId]);
   const categoryChannelIds = useMemo(() => new Set(categoryChannels.map((c) => c.channelId)), [categoryChannels]);
   const categoryMembers = useMemo(
-    () => serverOnlineMembers.filter((m) => categoryChannelIds.has(m.currentChannelId) || m.currentChannelId === categoryId),
+    () => serverOnlineMembers.filter((m) => categoryChannelIds.has(m.currentChannelId || '') || m.currentChannelId === categoryId),
     [serverOnlineMembers, categoryChannelIds, categoryId],
   );
   const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);

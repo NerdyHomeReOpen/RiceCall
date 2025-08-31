@@ -38,11 +38,16 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
 
   // Memos
   const friendGroupFriends = useMemo(() => {
-    return !friendGroupId
-      ? friends.filter((f) => !f.friendGroupId && !f.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)) // Default
-      : friendGroupId === 'blacklist'
-        ? friends.filter((f) => f.isBlocked) // Blacklist
-        : friends.filter((f) => f.friendGroupId === friendGroupId && !f.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Other
+    switch (friendGroupId) {
+      case '':
+        return friends.filter((f) => !f.friendGroupId && f.relationStatus !== 0 && !f.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Default
+      case 'blacklist':
+        return friends.filter((f) => f.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Blacklist
+      case 'stranger':
+        return friends.filter((f) => f.relationStatus === 0).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Stranger
+      default:
+        return friends.filter((f) => f.friendGroupId === friendGroupId && f.relationStatus !== 0 && !f.isBlocked).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Other
+    }
   }, [friendGroupId, friends]);
   const friendsOnlineCount = useMemo(() => friendGroupFriends.filter((f) => f.status !== 'offline').length, [friendGroupFriends]);
 
