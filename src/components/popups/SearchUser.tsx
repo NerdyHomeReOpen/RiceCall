@@ -46,7 +46,6 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
       }
       const { userId: targetId } = args[0];
       handleOpenApplyFriend(userId, targetId);
-      handleClose();
     },
     [userId],
   );
