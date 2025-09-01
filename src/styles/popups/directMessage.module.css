@@ -26,6 +26,7 @@
 }
 
 .direct-option-buttons .file-share,
+.direct-option-buttons .apply-friend,
 .direct-option-buttons .block-user,
 .direct-option-buttons .un-block-user,
 .direct-option-buttons .invite-temp-group,
@@ -45,6 +46,13 @@
 
 .direct-option-buttons .file-share {
   background-image: url('/im/Fileshare.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.direct-option-buttons .apply-friend {
+  background-image: url('/im/AddContact.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;

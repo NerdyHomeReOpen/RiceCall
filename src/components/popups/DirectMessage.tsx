@@ -43,6 +43,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   // States
   const [targetCurrentServer, setTargetCurrentServer] = useState<Server | null>(null);
+  const [friendState, setFriendState] = useState<Friend | null>(friend);
   const [directMessages, setDirectMessages] = useState<(DirectMessage | PromptMessage)[]>([]);
   const [cooldown, setCooldown] = useState<number>(0);
 
@@ -53,6 +54,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   // Destructuring
   const { avatarUrl: userAvatarUrl } = user;
   const {
+    userId: targetUserId,
+    name: targetName,
     avatarUrl: targetAvatarUrl,
     level: targetLevel,
     xp: targetXp,
@@ -65,11 +68,29 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const { name: targetCurrentServerName } = targetCurrentServer || {};
 
   // Memos
-  const isFriend = useMemo(() => friend?.relationStatus === 2, [friend]);
+  const isFriend = useMemo(() => friendState?.relationStatus === 2, [friendState]);
+  const isBlocked = useMemo(() => friendState?.isBlocked, [friendState]);
   const isOnline = useMemo(() => targetStatus !== 'offline', [targetStatus]);
   const isVerifiedUser = useMemo(() => false, []); // TODO: Remove this after implementing
 
   // Handlers
+  const handleOpenApplyFriend = () => {
+    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+  };
+
+  const handleBlockUser = () => {
+    handleOpenAlertDialog(t('confirm-block-user', { '0': targetName }), () => ipc.socket.send('blockUser', { targetId }));
+  };
+
+  const handleUnblockUser = () => {
+    handleOpenAlertDialog(t('confirm-unblock-user', { '0': targetName }), () => ipc.socket.send('unblockUser', { targetId }));
+  };
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
+  };
+
   const handleSendMessage = (targetId: User['userId'], preset: Partial<DirectMessage>) => {
     ipc.socket.send('directMessage', { targetId, preset });
   };
@@ -85,6 +106,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
     window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
   };
+
+  const handleFriendUpdate = useCallback(
+    (...args: { targetId: User['userId']; update: Partial<Friend> }[]) => {
+      if (targetId !== targetUserId) return;
+      setFriendState((prev) => ({ ...prev, ...args[0].update }) as Friend);
+    },
+    [targetId, targetUserId],
+  );
 
   const handleDirectMessage = useCallback(
     (...args: DirectMessage[]) => {
@@ -154,9 +183,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, [targetId, targetCurrentServerId]);
 
   useEffect(() => {
-    const unsubscribe = [ipc.socket.on('directMessage', handleDirectMessage), ipc.socket.on('shakeWindow', handleShakeWindow)];
+    const unsubscribe = [ipc.socket.on('friendUpdate', handleFriendUpdate), ipc.socket.on('directMessage', handleDirectMessage), ipc.socket.on('shakeWindow', handleShakeWindow)];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleDirectMessage, handleShakeWindow]);
+  }, [handleFriendUpdate, handleDirectMessage, handleShakeWindow]);
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -165,9 +194,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         <div className={styles['user-signature']}>{target.signature}</div>
         <div className={styles['direct-option-buttons']}>
           <div className={`${styles['file-share']} ${'disabled'}`} />
-          <div className={`${styles['block-user']} ${'disabled'}`} />
-          <div className={`${styles['un-block-user']} ${'disabled'}`} />
-          <div className={`${styles['invite-temp-group']} ${'disabled'}`} />
+          {!isFriend ? (
+            <div className={styles['apply-friend']} onClick={handleOpenApplyFriend} />
+          ) : (
+            <>
+              {!isBlocked ? <div className={styles['block-user']} onClick={handleBlockUser} /> : <div className={styles['un-block-user']} onClick={handleUnblockUser} />}
+              <div className={`${styles['invite-temp-group']} ${'disabled'}`} />
+            </>
+          )}
           <div className={`${styles['report']} ${'disabled'}`} />
         </div>
       </div>
