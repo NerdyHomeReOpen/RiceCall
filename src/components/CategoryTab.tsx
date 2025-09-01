@@ -280,7 +280,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
             channel={channel}
             server={server}
             serverOnlineMembers={serverOnlineMembers}
-            permissionOverride={categoryPermissionLevel}
             expanded={expanded}
             setExpanded={setExpanded}
             selectedItemId={selectedItemId}
