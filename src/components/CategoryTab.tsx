@@ -266,7 +266,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
           onClick={() => setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }))}
         />
         <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{categoryName}</div>
-        {!isAllChannelReadOnly && <div className={styles['channel-tab-count-text']}>{`(${categoryMembers.length})`}</div>}
+        {!isAllChannelReadOnly && <div className={styles['channel-user-count-text']}>{`(${categoryMembers.length})`}</div>}
         {!expanded[categoryId] && isInCategory && <div className={styles['my-location-icon']} />}
       </div>
 
