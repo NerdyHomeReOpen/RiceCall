@@ -212,7 +212,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
           {
             id: 'block',
             label: friendIsBlocked ? t('unblock') : t('block'),
-            show: !isUser && isFriend,
+            show: !isUser,
             onClick: () => (friendIsBlocked ? handleUnblockUser(targetId) : handleBlockUser(targetId)),
           },
           {
@@ -244,7 +244,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
         </div>
         {isPending ? (
           <div className={styles['signature']}>{`(${t('pending')})`}</div>
-        ) : isOnline && friendCurrentServerId ? (
+        ) : isFriend && isOnline && friendCurrentServerId ? (
           <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendCurrentServerId, friendServer.displayId)}>
             <div className={styles['location-icon']} />
             <div className={styles['server-name-text']}>{friendServerName}</div>
