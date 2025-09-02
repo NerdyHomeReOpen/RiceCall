@@ -43,6 +43,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
 
   // Refs
   const userTabRef = useRef<HTMLDivElement>(null);
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Destructuring
   const { userId, permissionLevel: globalPermission, currentChannelId: userCurrentChannelId } = user;
@@ -182,10 +183,17 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         if (selectedItemId === `user-${memberUserId}`) setSelectedItemId(null);
         else setSelectedItemId(`user-${memberUserId}`);
       }}
-      onDoubleClick={(e) => {
+      onMouseEnter={(e) => {
         const x = e.currentTarget.getBoundingClientRect().right;
         const y = e.currentTarget.getBoundingClientRect().top;
-        contextMenu.showUserInfoBlock(x, y, 'right-bottom', member);
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = setTimeout(() => {
+          contextMenu.showUserInfoBlock(x, y, 'right-bottom', member);
+        }, 200);
+      }}
+      onMouseLeave={() => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = null;
       }}
       draggable={!isUser && isChannelMod(permissionLevel) && isSuperior}
       onDragStart={(e) => handleDragStart(e, memberUserId, channelId)}
