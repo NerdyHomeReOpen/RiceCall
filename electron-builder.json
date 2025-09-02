@@ -51,6 +51,14 @@
       "repo": "RiceCall",
       "private": false,
       "releaseType": "release"
+    },
+    {
+      "provider": "github",
+      "owner": "NerdyHomeReOpen",
+      "repo": "RiceCall",
+      "private": false,
+      "releaseType": "release",
+      "channel": "dev"
     }
   ]
 }
