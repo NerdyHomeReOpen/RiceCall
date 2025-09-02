@@ -79,9 +79,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   const canUpdatePermission = useMemo(() => !isUser && isSuperior && isMember(memberPermission), [memberPermission, isUser, isSuperior]);
   const statusIcon = useMemo(() => {
     if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
-    if (!isUser && isSameChannel && isConnecting) return 'loading';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
+    if (!isUser && isSameChannel && isConnecting) return 'loading';
     return '';
   }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted]);
 

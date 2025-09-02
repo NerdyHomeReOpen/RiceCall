@@ -37,6 +37,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
 
   // Destructuring
   const {
+    userId: memberUserId,
     name: memberName,
     permissionLevel: memberPermission,
     nickname: memberNickname,
@@ -46,7 +47,8 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
     gender: memberGender,
     badges: memberBadges,
     vip: memberVip,
-    userId: memberUserId,
+    isTextMuted: memberIsTextMuted,
+    isVoiceMuted: memberIsVoiceMuted,
     currentChannelId: memberCurrentChannelId,
     position: memberPosition,
     leftTime: memberLeftTime,
@@ -65,11 +67,12 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
   const isVoiceMuted = useMemo(() => webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
   const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
   const statusIcon = useMemo(() => {
-    if (isVoiceMuted) return 'muted';
-    if (!isUser && isSameChannel && isConnecting) return 'loading';
+    if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
+    if (memberIsTextMuted) return 'no-text';
+    if (!isUser && isSameChannel && isConnecting) return 'loading';
     return '';
-  }, [isUser, isSameChannel, isVoiceMuted, isSpeaking, isConnecting]);
+  }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted]);
 
   // Handlers
   const handleIncreaseUserQueueTime = () => {
