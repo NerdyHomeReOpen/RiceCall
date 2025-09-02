@@ -120,7 +120,7 @@ const Popup = React.memo(() => {
       case 'channelPassword':
         return { title: t('please-enter-the-channel-password'), buttons: ['close'], node: <ChannelPassword {...initialData} />, hideHeader: false };
       case 'channelSetting':
-        return { title: t('edit-channel'), buttons: ['close'], node: <ChannelSetting {...initialData} />, hideHeader: false };
+        return { title: initialData?.channel.name || t('edit-channel'), buttons: ['close'], node: <ChannelSetting {...initialData} />, hideHeader: false };
       case 'createServer':
         return { title: t('create-server'), buttons: ['close'], node: <CreateServer {...initialData} />, hideHeader: false };
       case 'createChannel':
@@ -139,7 +139,7 @@ const Popup = React.memo(() => {
       case 'dialogInfo':
         return { title: t('info'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'INFO' }} />, hideHeader: false };
       case 'directMessage':
-        return { title: initialData?.targetName || t('direct-message'), buttons: ['close', 'minimize', 'maxsize'], node: <DirectMessage {...initialData} />, hideHeader: false };
+        return { title: initialData?.target.name || t('direct-message'), buttons: ['close', 'minimize', 'maxsize'], node: <DirectMessage {...initialData} />, hideHeader: false };
       case 'editChannelOrder':
         return { title: t('edit-channel-order'), buttons: ['close'], node: <EditChannelOrder {...initialData} />, hideHeader: false };
       case 'editChannelName':
@@ -163,7 +163,7 @@ const Popup = React.memo(() => {
       case 'serverBroadcast':
         return { title: t('server-broadcast'), buttons: ['close'], node: <ServerBroadcast {...initialData} />, hideHeader: false };
       case 'serverSetting':
-        return { title: t('server-setting'), buttons: ['close'], node: <ServerSetting {...initialData} />, hideHeader: false };
+        return { title: initialData?.server.name || t('server-setting'), buttons: ['close'], node: <ServerSetting {...initialData} />, hideHeader: false };
       case 'systemSetting':
         return { title: t('system-setting'), buttons: ['close'], node: <SystemSetting {...initialData} />, hideHeader: false };
       case 'userInfo':
