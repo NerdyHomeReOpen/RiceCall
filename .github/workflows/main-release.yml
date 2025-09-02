@@ -3,6 +3,7 @@ name: Release Main
 on:
   push:
     tags: ['*.*.*']
+    tags-ignore: ['*.*.*-*']
 
 permissions:
   contents: write
