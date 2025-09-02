@@ -12,7 +12,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-14, windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            build_name: win-x64
+            args: '--win --x64 --publish=never'
+          - os: windows-latest
+            build_name: win-ia32
+            args: '--win --ia32 --publish=never'
+
+          - os: macos-14
+            build_name: mac-x64
+            args: '--mac --x64 --publish=never'
+          - os: macos-14
+            build_name: mac-arm64
+            args: '--mac --arm64 --publish=never'
+
+          - os: ubuntu-latest
+            build_name: linux-x64
+            args: '--linux --x64 --publish=never'
 
     environment: dev
 
@@ -53,6 +70,7 @@ jobs:
           release: false
           args: --publish=never
           build_script_name: build:action
+          args: ${{ matrix.args }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
