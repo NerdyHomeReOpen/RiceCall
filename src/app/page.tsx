@@ -270,13 +270,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
             contextMenu.showNotifyMenu(x, y, 'right-bottom', [
               {
                 id: 'no-unread-notify',
-                label: `無未讀消息`, // TODO: t('no-unread-notify'),
+                label: t('no-unread-notify'),
                 show: !hasNotify,
                 className: 'readonly',
               },
               {
-                id: 'friend-applications',
-                label: `好友驗證`, // TODO: t('friend-applications'),
+                id: 'friend-verification',
+                label: t('friend-verification'),
                 icon: 'notify',
                 show: hasFriendApplication,
                 contentType: 'image',
@@ -286,8 +286,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                 onClick: () => handleOpenFriendVerification(userId),
               },
               {
-                id: 'member-invitations',
-                label: `語音群邀請`, // TODO: t('member-invitations'),
+                id: 'member-invitation',
+                label: t('member-invitation'),
                 icon: 'notify',
                 show: hasMemberInvitation,
                 contentType: 'image',
@@ -298,7 +298,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
               },
               {
                 id: 'system-notify',
-                label: `系統通知`, // TODO: t('system-notify'),
+                label: t('system-notify'),
                 icon: 'notify',
                 show: hasSystemNotify,
                 showContentLength: true,
