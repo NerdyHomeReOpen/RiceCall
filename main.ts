@@ -677,6 +677,11 @@ function disconnectSocket(): Socket | null {
 // Auto Updater
 function checkUpdate() {
   if (DEV) return;
+
+  // Dev channel // TODO: Remove this before release
+  autoUpdater.allowPrerelease = true;
+  autoUpdater.channel = 'dev';
+
   autoUpdater.checkForUpdates().catch((error) => {
     console.error('Cannot check for updates:', error);
   });
