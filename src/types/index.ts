@@ -171,7 +171,7 @@ export type PopupType =
   | 'directMessage'
   | 'editChannelName'
   | 'editChannelOrder'
-  | 'editFriend'
+  | 'editFriendFriendGroup'
   | 'editFriendGroupName'
   | 'editNickname'
   | 'friendVerification'

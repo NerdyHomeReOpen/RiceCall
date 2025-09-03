@@ -28,8 +28,8 @@ import DirectMessage from '@/components/popups/DirectMessage';
 import EditChannelName from '@/components/popups/EditChannelName';
 import EditChannelOrder from '@/components/popups/EditChannelOrder';
 import EditNickname from '@/components/popups/EditNickname';
+import EditFriendFriendGroup from '@/components/popups/EditFriendFriendGroup';
 import EditFriendGroupName from '@/components/popups/EditFriendGroupName';
-import EditFriend from '@/components/popups/EditFriend';
 import FriendVerification from '@/components/popups/FriendVerification';
 import MemberApplicationSetting from '@/components/popups/MemberApplicationSetting';
 import MemberInvitation from '@/components/popups/MemberInvitation';
@@ -144,10 +144,10 @@ const Popup = React.memo(() => {
         return { title: t('edit-channel-order'), buttons: ['close'], node: <EditChannelOrder {...initialData} />, hideHeader: false };
       case 'editChannelName':
         return { title: t('edit-channel-name'), buttons: ['close'], node: <EditChannelName {...initialData} />, hideHeader: false };
+      case 'editFriendFriendGroup':
+        return { title: t('edit-friend-friend-group'), buttons: ['close'], node: <EditFriendFriendGroup {...initialData} />, hideHeader: false };
       case 'editFriendGroupName':
-        return { title: t('edit-friend-group'), buttons: ['close'], node: <EditFriendGroupName {...initialData} />, hideHeader: false };
-      case 'editFriend':
-        return { title: t('edit-friend'), buttons: ['close'], node: <EditFriend {...initialData} />, hideHeader: false };
+        return { title: t('edit-friend-group-name'), buttons: ['close'], node: <EditFriendGroupName {...initialData} />, hideHeader: false };
       case 'editNickname':
         return { title: t('edit-nickname'), buttons: ['close'], node: <EditNickname {...initialData} />, hideHeader: false };
       case 'friendVerification':
@@ -159,7 +159,7 @@ const Popup = React.memo(() => {
       case 'memberInvitation':
         return { title: t('member-invitation'), buttons: ['close'], node: <MemberInvitation {...initialData} />, hideHeader: false };
       case 'searchUser':
-        return { title: t('add-friend'), buttons: ['close'], node: <SearchUser {...initialData} />, hideHeader: false };
+        return { title: t('search-user'), buttons: ['close'], node: <SearchUser {...initialData} />, hideHeader: false };
       case 'serverBroadcast':
         return { title: t('server-broadcast'), buttons: ['close'], node: <ServerBroadcast {...initialData} />, hideHeader: false };
       case 'serverSetting':

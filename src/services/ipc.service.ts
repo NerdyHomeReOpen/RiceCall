@@ -162,15 +162,15 @@ const ipcService = {
         Promise.all([data.channel({ userId, serverId, channelId })]).then(([channel]) => {
           ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, channel }, force);
         });
+      } else if (type === 'editFriendFriendGroup') {
+        const { userId, targetId } = initialData;
+        Promise.all([data.friend({ userId, targetId }), data.friendGroups({ userId })]).then(([friend, friendGroups]) => {
+          ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, friendGroups }, force);
+        });
       } else if (type === 'editFriendGroupName') {
         const { userId, friendGroupId } = initialData;
         Promise.all([data.friendGroup({ userId, friendGroupId })]).then(([friendGroup]) => {
           ipcRenderer.send('open-popup', type, id, { userId, friendGroupId, friendGroup }, force);
-        });
-      } else if (type === 'editFriend') {
-        const { userId, targetId } = initialData;
-        Promise.all([data.friend({ userId, targetId }), data.friendGroups({ userId })]).then(([friend, friendGroups]) => {
-          ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, friendGroups }, force);
         });
       } else if (type === 'editNickname') {
         const { userId, serverId } = initialData;

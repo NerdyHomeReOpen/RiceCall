@@ -30,7 +30,7 @@ type PopupType =
   | 'directMessage'
   | 'editChannelName'
   | 'editChannelOrder'
-  | 'editFriend'
+  | 'editFriendFriendGroup'
   | 'editFriendGroupName'
   | 'editNickname'
   | 'friendVerification'
@@ -201,8 +201,8 @@ export const PopupSize: Record<PopupType, { height: number; width: number }> = {
   editChannelOrder: { height: 550, width: 500 },
   editChannelName: { height: 200, width: 380 },
   editNickname: { height: 200, width: 380 },
+  editFriendFriendGroup: { height: 200, width: 380 },
   editFriendGroupName: { height: 200, width: 380 },
-  editFriend: { height: 200, width: 380 },
   friendVerification: { height: 550, width: 500 },
   imageCropper: { height: 520, width: 610 },
   inviteMember: { height: 300, width: 490 },

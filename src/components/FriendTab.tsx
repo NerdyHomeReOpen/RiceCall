@@ -106,8 +106,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
-  const handleOpenEditFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('editFriend', 'editFriend', { userId, targetId });
+  const handleOpenEditFriendFriendGroup = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('editFriendFriendGroup', 'editFriendFriendGroup', { userId, targetId });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
@@ -204,10 +204,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             ],
           },
           {
-            id: 'edit-friend-group',
-            label: t('edit-friend-group'),
+            id: 'edit-friend-friend-group',
+            label: t('edit-friend-friend-group'),
             show: !isUser && !isStranger && !friendIsBlocked,
-            onClick: () => handleOpenEditFriend(userId, targetId),
+            onClick: () => handleOpenEditFriendFriendGroup(userId, targetId),
           },
           {
             id: 'block',

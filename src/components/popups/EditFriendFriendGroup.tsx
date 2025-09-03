@@ -12,12 +12,12 @@ import popup from '@/styles/popup.module.css';
 // Services
 import ipc from '@/services/ipc.service';
 
-interface EditFriendPopupProps {
+interface EditFriendFriendGroupPopupProps {
   friend: Friend;
   friendGroups: FriendGroup[];
 }
 
-const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ friend: friendData, friendGroups: friendGroupsData }) => {
+const EditFriendFriendGroupPopup: React.FC<EditFriendFriendGroupPopupProps> = React.memo(({ friend: friendData, friendGroups: friendGroupsData }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -103,6 +103,6 @@ const EditFriendPopup: React.FC<EditFriendPopupProps> = React.memo(({ friend: fr
   );
 });
 
-EditFriendPopup.displayName = 'EditFriendPopup';
+EditFriendFriendGroupPopup.displayName = 'EditFriendFriendGroupPopup';
 
-export default EditFriendPopup;
+export default EditFriendFriendGroupPopup;
