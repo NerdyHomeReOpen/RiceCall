@@ -29,8 +29,10 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>(friendApplicationsData);
 
   // Handlers
-  const handleRejectFriendApplication = (senderId: User['userId']) => {
-    ipc.socket.send('rejectFriendApplication', { senderId });
+  const handleRejectFriendApplication = (senderId: User['userId'], applicationName: FriendApplication['name']) => {
+    handleOpenAlertDialog(t('confirm-reject-friend-application', { 0: applicationName }), () => {
+      ipc.socket.send('rejectFriendApplication', { senderId });
+    });
   };
 
   const handleRejectAllFriendApplication = () => {
@@ -48,8 +50,8 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
     ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
   };
 
-  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+  const handleOpenApproveFriend = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
@@ -118,10 +120,10 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                     </div>
                     <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
                       <div className={styles['action-buttons']}>
-                        <div className={styles['button']} onClick={() => handleOpenApplyFriend(userId, applicationSenderId)}>
+                        <div className={styles['button']} onClick={() => handleOpenApproveFriend(userId, applicationSenderId)}>
                           {t('accept')}
                         </div>
-                        <div className={styles['button']} onClick={() => handleRejectFriendApplication(applicationSenderId)}>
+                        <div className={styles['button']} onClick={() => handleRejectFriendApplication(applicationSenderId, applicationName)}>
                           {t('reject')}
                         </div>
                       </div>

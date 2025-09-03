@@ -80,7 +80,15 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
         {/* Friend Groups */}
         <div className={styles['friend-group-list']}>
           {filteredFriendGroups.map((friendGroup) => (
-            <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={filteredFriends} user={user} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+            <FriendGroupTab
+              key={friendGroup.friendGroupId}
+              friendGroup={friendGroup}
+              friendGroups={[defaultFriendGroup, ...friendGroups]}
+              friends={filteredFriends}
+              user={user}
+              selectedItemId={selectedItemId}
+              setSelectedItemId={setSelectedItemId}
+            />
           ))}
         </div>
       </div>

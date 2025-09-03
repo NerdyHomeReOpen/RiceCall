@@ -5,7 +5,7 @@ import styles from '@/styles/pages/friend.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Types
-import type { User, Friend, Server } from '@/types';
+import type { User, Friend, FriendGroup, Server } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -27,11 +27,12 @@ import LevelIcon from '@/components/LevelIcon';
 interface FriendTabProps {
   user: User;
   friend: Friend;
+  friendGroups: FriendGroup[];
   selectedItemId: string | null;
   setSelectedItemId: (id: string | null) => void;
 }
 
-const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selectedItemId, setSelectedItemId }) => {
+const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGroups, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -49,6 +50,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
   const {
     targetId,
     name: friendName,
+    note: friendNote,
     avatarUrl: friendAvatarUrl,
     signature: friendSignature,
     vip: friendVip,
@@ -106,8 +108,12 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
     ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
-  const handleOpenEditFriendFriendGroup = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('editFriendFriendGroup', 'editFriendFriendGroup', { userId, targetId });
+  const handleOpenEditFriendNote = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('editFriendNote', 'editFriendNote', { userId, targetId });
+  };
+
+  const handleEditFriend = (targetId: User['userId'], update: Partial<Friend>) => {
+    ipc.socket.send('editFriend', { targetId, update });
   };
 
   const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
@@ -168,10 +174,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             id: 'edit-note',
             label: t('edit-note'),
             show: !isUser && isFriend,
-            disabled: true,
-            onClick: () => {
-              /* TODO: handleFriendNote() */
-            },
+            onClick: () => handleOpenEditFriendNote(userId, targetId),
           },
           {
             id: 'separator',
@@ -207,7 +210,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
             id: 'edit-friend-friend-group',
             label: t('edit-friend-friend-group'),
             show: !isUser && !isStranger && !friendIsBlocked,
-            onClick: () => handleOpenEditFriendFriendGroup(userId, targetId),
+            icon: 'submenu',
+            hasSubmenu: true,
+            submenuItems: friendGroups.map((group, key) => ({
+              id: `friend-group-${key}`,
+              label: group.name,
+              show: !((group.friendGroupId || null) === friend.friendGroupId),
+              onClick: () => handleEditFriend(targetId, { friendGroupId: group.friendGroupId || null }),
+            })),
           },
           {
             id: 'block',
@@ -238,7 +248,9 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, selected
       <div className={styles['base-info-wrapper']}>
         <div className={styles['box']}>
           {friendVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
-          <div className={`${styles['name-text']} ${friendVip > 0 ? vip['vip-name-color'] : ''}`}>{friendName}</div>
+          <div className={`${styles['name-text']} ${friendVip > 0 ? vip['vip-name-color'] : ''}`}>
+            {friendNote || friendName} {friendNote !== '' ? `(${friendName})` : ''}
+          </div>
           <LevelIcon level={friendLevel} xp={friendXp} requiredXp={friendRequiredXp} />
           <BadgeList badges={JSON.parse(friendBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>

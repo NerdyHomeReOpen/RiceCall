@@ -13,6 +13,7 @@ import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } f
 type PopupType =
   | 'aboutus'
   | 'applyFriend'
+  | 'approveFriend'
   | 'applyMember'
   | 'blockMember'
   | 'changeTheme'
@@ -30,7 +31,7 @@ type PopupType =
   | 'directMessage'
   | 'editChannelName'
   | 'editChannelOrder'
-  | 'editFriendFriendGroup'
+  | 'editFriendNote'
   | 'editFriendGroupName'
   | 'editNickname'
   | 'friendVerification'
@@ -183,6 +184,7 @@ export const ServerToClientEventNames = [
 export const PopupSize: Record<PopupType, { height: number; width: number }> = {
   aboutus: { height: 750, width: 500 },
   applyFriend: { height: 375, width: 490 },
+  approveFriend: { height: 250, width: 400 },
   applyMember: { height: 300, width: 490 },
   blockMember: { height: 250, width: 400 },
   channelSetting: { height: 520, width: 600 },
@@ -201,7 +203,7 @@ export const PopupSize: Record<PopupType, { height: number; width: number }> = {
   editChannelOrder: { height: 550, width: 500 },
   editChannelName: { height: 200, width: 380 },
   editNickname: { height: 200, width: 380 },
-  editFriendFriendGroup: { height: 200, width: 380 },
+  editFriendNote: { height: 200, width: 380 },
   editFriendGroupName: { height: 200, width: 380 },
   friendVerification: { height: 550, width: 500 },
   imageCropper: { height: 520, width: 610 },

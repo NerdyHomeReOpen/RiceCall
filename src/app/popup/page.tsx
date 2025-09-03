@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 // Components
 import About from '@/components/popups/About';
 import ApplyFriend from '@/components/popups/ApplyFriend';
+import ApproveFriend from '@/components/popups/ApproveFriend';
 import ApplyMember from '@/components/popups/ApplyMember';
 import BlockMember from '@/components/popups/BlockMember';
 import ChangeTheme from '@/components/popups/ChangeTheme';
@@ -28,7 +29,7 @@ import DirectMessage from '@/components/popups/DirectMessage';
 import EditChannelName from '@/components/popups/EditChannelName';
 import EditChannelOrder from '@/components/popups/EditChannelOrder';
 import EditNickname from '@/components/popups/EditNickname';
-import EditFriendFriendGroup from '@/components/popups/EditFriendFriendGroup';
+import EditFriendNote from '@/components/popups/EditFriendNote';
 import EditFriendGroupName from '@/components/popups/EditFriendGroupName';
 import FriendVerification from '@/components/popups/FriendVerification';
 import MemberApplicationSetting from '@/components/popups/MemberApplicationSetting';
@@ -111,6 +112,8 @@ const Popup = React.memo(() => {
         return { title: t('apply-member'), buttons: ['close'], node: <ApplyMember {...initialData} />, hideHeader: false };
       case 'applyFriend':
         return { title: t('apply-friend'), buttons: ['close'], node: <ApplyFriend {...initialData} />, hideHeader: false };
+      case 'approveFriend':
+        return { title: t('apply-friend'), buttons: ['close'], node: <ApproveFriend {...initialData} />, hideHeader: false };
       case 'imageCropper':
         return { title: t('image-cropper'), buttons: ['close'], node: <ImageCropper {...initialData} />, hideHeader: false };
       case 'blockMember':
@@ -144,8 +147,8 @@ const Popup = React.memo(() => {
         return { title: t('edit-channel-order'), buttons: ['close'], node: <EditChannelOrder {...initialData} />, hideHeader: false };
       case 'editChannelName':
         return { title: t('edit-channel-name'), buttons: ['close'], node: <EditChannelName {...initialData} />, hideHeader: false };
-      case 'editFriendFriendGroup':
-        return { title: t('edit-friend-friend-group'), buttons: ['close'], node: <EditFriendFriendGroup {...initialData} />, hideHeader: false };
+      case 'editFriendNote':
+        return { title: t('edit-friend-note'), buttons: ['close'], node: <EditFriendNote {...initialData} />, hideHeader: false };
       case 'editFriendGroupName':
         return { title: t('edit-friend-group-name'), buttons: ['close'], node: <EditFriendGroupName {...initialData} />, hideHeader: false };
       case 'editNickname':

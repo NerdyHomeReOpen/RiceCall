@@ -125,7 +125,18 @@ const ipcService = {
           data.friendApplication({ senderId: userId, receiverId: targetId }),
           data.friendApplication({ senderId: targetId, receiverId: userId }),
         ]).then(([target, friendGroups, sentFriendApplication, receivedFriendApplication]) => {
-          ipcRenderer.send('open-popup', type, id, { userId, targetId, target, friendGroups, sentFriendApplication, receivedFriendApplication }, force);
+          if (!receivedFriendApplication) {
+            ipcRenderer.send('open-popup', 'applyFriend', 'applyFriend', { userId, targetId, target, friendGroups, sentFriendApplication}, force);
+          } else {
+            ipcRenderer.send('open-popup', 'approveFriend', 'approveFriend', { targetId, friendGroups }, force);
+          }
+        });
+      } else if (type === 'approveFriend') {
+        const { userId, targetId } = initialData;
+        Promise.all([
+          data.friendGroups({ userId }),
+        ]).then(([friendGroups]) => {
+          ipcRenderer.send('open-popup', type, id, { targetId, friendGroups }, force);
         });
       } else if (type === 'blockMember') {
         const { userId, serverId } = initialData;
@@ -162,7 +173,7 @@ const ipcService = {
         Promise.all([data.channel({ userId, serverId, channelId })]).then(([channel]) => {
           ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, channel }, force);
         });
-      } else if (type === 'editFriendFriendGroup') {
+      } else if (type === 'editFriendNote') {
         const { userId, targetId } = initialData;
         Promise.all([data.friend({ userId, targetId }), data.friendGroups({ userId })]).then(([friend, friendGroups]) => {
           ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, friendGroups }, force);

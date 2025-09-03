@@ -20,11 +20,12 @@ interface FriendGroupTabProps {
   user: User;
   friends: Friend[];
   friendGroup: FriendGroup;
+  friendGroups: FriendGroup[];
   selectedItemId: string | null;
   setSelectedItemId: (id: string | null) => void;
 }
 
-const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friendGroup, friends, selectedItemId, setSelectedItemId }) => {
+const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friendGroup, friends, friendGroups, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -100,7 +101,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
       {/* Expanded Sections */}
       <div className={styles['tab-content']} style={expanded ? {} : { display: 'none' }}>
         {friendGroupFriends.map((friend) => (
-          <FriendTab user={user} key={friend.targetId} friend={friend} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+          <FriendTab user={user} key={friend.targetId} friend={friend} friendGroups={friendGroups} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
         ))}
       </div>
     </div>

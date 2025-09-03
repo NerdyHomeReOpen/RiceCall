@@ -155,6 +155,7 @@ export type PopupType =
   | 'aboutus'
   | 'applyFriend'
   | 'applyMember'
+  | 'approveFriend'
   | 'blockMember'
   | 'changeTheme'
   | 'channelPassword'
@@ -171,7 +172,7 @@ export type PopupType =
   | 'directMessage'
   | 'editChannelName'
   | 'editChannelOrder'
-  | 'editFriendFriendGroup'
+  | 'editFriendNote'
   | 'editFriendGroupName'
   | 'editNickname'
   | 'friendVerification'
@@ -239,7 +240,7 @@ export type ClientToServerEvents = {
   sendFriendApplication: (...args: { receiverId: string; preset: Partial<table_friend_applications>; friendGroupId: string | null }[]) => void;
   editFriendApplication: (...args: { receiverId: string; update: Partial<table_friend_applications> }[]) => void;
   deleteFriendApplication: (...args: { receiverId: string }[]) => void;
-  approveFriendApplication: (...args: { senderId: string; friendGroupId: string | null }[]) => void;
+  approveFriendApplication: (...args: { senderId: string; friendGroupId: string | null; note: string }[]) => void;
   rejectFriendApplication: (...args: { senderId: string }[]) => void;
   // Queue
   joinQueue: (...args: { serverId: string; channelId: string }[]) => void;
