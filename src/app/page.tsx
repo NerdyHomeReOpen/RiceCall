@@ -675,9 +675,11 @@ const RootPageComponent: React.FC = React.memo(() => {
       if (selectedTabIdRef.current === 'server') {
         setSelectedTabIdRef.current('home');
       }
+
+      // Remove action messages and channel messages
+      setActionMessages([]);
+      setChannelMessages([]);
     }
-    setActionMessages([]);
-    setChannelMessages([]);
 
     loadingBoxRef.current.setIsLoading(false);
     loadingBoxRef.current.setLoadingServerId('');
