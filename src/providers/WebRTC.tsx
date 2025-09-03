@@ -6,7 +6,16 @@ import * as mediasoupClient from 'mediasoup-client';
 import ipc from '@/services/ipc.service';
 
 // Types
-import { SpeakingMode, ConsumerReturnType, TransportReturnType, ProducerReturnType, User, SFUConsumeParams, SFUCreateTransportParams, SFUProduceParams, SFUJoinParams, SFULeaveParams } from '@/types';
+import {
+  User,
+  SpeakingMode,
+  SFUCreateConsumerReturnType,
+  SFUCreateTransportReturnType,
+  SFUCreateProducerReturnType,
+  SFUCreateConsumerParams,
+  SFUCreateTransportParams,
+  SFUCreateProducerParams,
+} from '@/types';
 
 // Providers
 import { useSoundPlayer } from '@/providers/SoundPlayer';
@@ -363,12 +372,13 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   }, [changeSpeakerVolume]);
 
   const consumeOne = useCallback(
-    async (producerId: string) => {
+    async (producerId: string, channelId: string) => {
       if (!recvTransportRef.current) return;
-      const consumerInfo = await ipc.socket.emit<SFUConsumeParams, ConsumerReturnType>('SFUCreateConsumer', {
+      const consumerInfo = await ipc.socket.emit<SFUCreateConsumerParams, SFUCreateConsumerReturnType>('SFUCreateConsumer', {
         transportId: recvTransportRef.current!.id,
         producerId,
         rtpCapabilities: deviceRef.current.rtpCapabilities,
+        channelId,
       });
 
       const consumer = await recvTransportRef.current.consume({
@@ -413,8 +423,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     [removeSpeakerAudio],
   );
 
-  const setupSend = useCallback(async () => {
-    const transport = await ipc.socket.emit<SFUCreateTransportParams, TransportReturnType>('SFUCreateTransport', { direction: 'send' });
+  const setupSend = useCallback(async (channelId: string) => {
+    const transport = await ipc.socket.emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', { direction: 'send', channelId });
 
     if (!deviceRef.current.loaded) await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
 
@@ -430,7 +440,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     });
     sendTransportRef.current.on('produce', ({ kind, rtpParameters }, cb, eb) => {
       ipc.socket
-        .emit<SFUProduceParams, ProducerReturnType>('SFUCreateProducer', { transportId: sendTransportRef.current!.id, kind, rtpParameters })
+        .emit<SFUCreateProducerParams, SFUCreateProducerReturnType>('SFUCreateProducer', { transportId: sendTransportRef.current!.id, kind, rtpParameters, channelId })
         .then(({ id }) => {
           console.info('[WebRTC] SendTransport produced to SFU');
           cb({ id });
@@ -458,63 +468,52 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     });
   }, []);
 
-  const setupRecv = useCallback(async () => {
-    const transport = await ipc.socket.emit<SFUCreateTransportParams, TransportReturnType>('SFUCreateTransport', { direction: 'recv' });
+  const setupRecv = useCallback(
+    async (channelId: string) => {
+      const transport = await ipc.socket.emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', { direction: 'recv', channelId });
 
-    if (!deviceRef.current.loaded) await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
+      if (!deviceRef.current.loaded) await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
 
-    recvTransportRef.current = deviceRef.current.createRecvTransport(transport);
-    recvTransportRef.current.on('connect', ({ dtlsParameters }, cb, eb) => {
-      ipc.socket
-        .emit('SFUConnectTransport', { transportId: recvTransportRef.current!.id, dtlsParameters })
-        .then(() => {
-          console.info('[WebRTC] RecvTransport connected to SFU');
-          cb();
-        })
-        .catch(eb);
-    });
-    recvTransportRef.current.on('connectionstatechange', (s) => {
-      console.log('[WebRTC] RecvTransport connection state =', s);
-    });
+      recvTransportRef.current = deviceRef.current.createRecvTransport(transport);
+      recvTransportRef.current.on('connect', ({ dtlsParameters }, cb, eb) => {
+        ipc.socket
+          .emit('SFUConnectTransport', { transportId: recvTransportRef.current!.id, dtlsParameters })
+          .then(() => {
+            console.info('[WebRTC] RecvTransport connected to SFU');
+            cb();
+          })
+          .catch(eb);
+      });
+      recvTransportRef.current.on('connectionstatechange', (s) => {
+        console.log('[WebRTC] RecvTransport connection state =', s);
+      });
 
-    // consume existing producers
-    for (const producer of transport.producers ?? []) {
-      consumeOne(producer.id).catch(console.error);
-    }
-  }, [consumeOne]);
+      // consume existing producers
+      for (const producer of transport.producers ?? []) {
+        consumeOne(producer.id, channelId).catch(console.error);
+      }
+    },
+    [consumeOne],
+  );
 
-  const handleJoinSFUChannel = useCallback(
+  const handleSFUJoined = useCallback(
     async ({ channelId }: { channelId: string }) => {
-      await ipc.socket
-        .emit<SFUJoinParams, void>('SFUJoin', { channelId })
-        .then(() => console.info('[WebRTC] Joined SFU channel: ', channelId))
-        .catch((e) => {
-          console.error('[WebRTC] Error joining SFU channel: ', e);
-        });
-
       if (recvTransportRef.current) {
         recvTransportRef.current.close();
         recvTransportRef.current = null;
       }
-      await setupRecv();
+      await setupRecv(channelId);
 
       if (sendTransportRef.current) {
         sendTransportRef.current.close();
         sendTransportRef.current = null;
       }
-      await setupSend();
+      await setupSend(channelId);
     },
     [setupSend, setupRecv],
   );
 
-  const handleLeaveSFUChannel = useCallback(async ({ channelId }: { channelId: string }) => {
-    await ipc.socket
-      .emit<SFULeaveParams, void>('SFULeave', { channelId })
-      .then(() => console.info('[WebRTC] Left SFU channel: ', channelId))
-      .catch((e) => {
-        console.error('[WebRTC] Error leaving SFU channel: ', e);
-      });
-
+  const handleSFULeft = useCallback(async () => {
     if (recvTransportRef.current) {
       recvTransportRef.current.close();
       recvTransportRef.current = null;
@@ -526,10 +525,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   }, []);
 
   const handleNewProducer = useCallback(
-    async ({ userId, producerId }: { userId: string; producerId: string }) => {
+    async ({ userId, producerId, channelId }: { userId: string; producerId: string; channelId: string }) => {
       if (!recvTransportRef.current) return;
       console.info('[WebRTC] New producer: ', userId);
-      consumeOne(producerId).catch((e) => {
+      consumeOne(producerId, channelId).catch((e) => {
         console.error('[WebRTC] Error consuming producer: ', e);
       });
     },
@@ -636,13 +635,13 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       ipc.systemSettings.inputAudioDevice.get(handleEditInputDevice),
       ipc.systemSettings.outputAudioDevice.get(handleEditOutputDevice),
       ipc.systemSettings.speakingMode.get(handleEditSpeakingMode),
-      ipc.socket.on('channelConnected', handleJoinSFUChannel),
-      ipc.socket.on('channelDisconnected', handleLeaveSFUChannel),
+      ipc.socket.on('SFUJoined', handleSFUJoined),
+      ipc.socket.on('SFULeft', handleSFULeft),
       ipc.socket.on('SFUNewProducer', handleNewProducer),
       ipc.socket.on('SFUProducerClosed', handleProducerClosed),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleEditInputDevice, handleEditOutputDevice, handleJoinSFUChannel, handleLeaveSFUChannel, handleNewProducer, handleProducerClosed]);
+  }, [handleEditInputDevice, handleEditOutputDevice, handleSFUJoined, handleSFULeft, handleNewProducer, handleProducerClosed]);
 
   return (
     <WebRTCContext.Provider

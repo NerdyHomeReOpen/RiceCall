@@ -303,8 +303,10 @@ export type ServerToClientEvents = {
   serverChannelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
   serverChannelRemove: (...args: { channelId: string }[]) => void;
   // SFU
-  channelConnected: (...args: { channelId: string }[]) => void;
-  channelDisconnected: (...args: { channelId: string }[]) => void;
+  SFUJoined: (...args: { channelId: string }[]) => void;
+  SFULeft: () => void;
+  SFUNewProducer: (...args: { userId: string; producerId: string; channelId: string }[]) => void;
+  SFUProducerClosed: (...args: { userId: string; producerId: string }[]) => void;
   // Queue
   queueMembersSet: (...args: QueueMember[]) => void;
   // Member
@@ -331,9 +333,6 @@ export type ServerToClientEvents = {
   actionMessage: (...args: PromptMessage[]) => void;
   directMessage: (...args: DirectMessage[]) => void;
   shakeWindow: (...args: DirectMessage[]) => void;
-  // SFU
-  SFUNewProducer: (...args: { userId: string; producerId: string }[]) => void;
-  SFUProducerClosed: (...args: { userId: string; producerId: string }[]) => void;
   // Play Sound
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Echo
@@ -344,35 +343,18 @@ export type ServerToClientEvents = {
 
 export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
 
-export type TransportReturnType = {
+export type SFUCreateTransportParams = {
+  direction: 'send' | 'recv';
+  channelId: string;
+};
+
+export type SFUCreateTransportReturnType = {
   id: string;
   iceParameters: any;
   iceCandidates: any;
   dtlsParameters: any;
   routerRtpCapabilities: any;
-  producers?: ProducerReturnType[];
-};
-
-export type ProducerReturnType = {
-  id: string;
-  userId: string;
-  kind: mediasoupClient.types.MediaKind;
-};
-
-export type ConsumerReturnType = {
-  id: string;
-  userId: string;
-  producerId: string;
-  kind: mediasoupClient.types.MediaKind;
-  rtpParameters: any;
-};
-
-export type SFUJoinParams = {
-  channelId: string;
-};
-
-export type SFULeaveParams = {
-  channelId: string;
+  producers?: SFUCreateProducerReturnType[];
 };
 
 export type SFUConnectTransportParams = {
@@ -380,18 +362,30 @@ export type SFUConnectTransportParams = {
   dtlsParameters: any;
 };
 
-export type SFUCreateTransportParams = {
-  direction: 'send' | 'recv';
-};
-
-export type SFUProduceParams = {
+export type SFUCreateProducerParams = {
   kind: mediasoupClient.types.MediaKind;
   transportId: string;
   rtpParameters: any;
+  channelId: string;
 };
 
-export type SFUConsumeParams = {
+export type SFUCreateProducerReturnType = {
+  id: string;
+  userId: string;
+  kind: mediasoupClient.types.MediaKind;
+};
+
+export type SFUCreateConsumerParams = {
   transportId: string;
   producerId: string;
   rtpCapabilities: any;
+  channelId: string;
+};
+
+export type SFUCreateConsumerReturnType = {
+  id: string;
+  userId: string;
+  producerId: string;
+  kind: mediasoupClient.types.MediaKind;
+  rtpParameters: any;
 };

@@ -128,8 +128,6 @@ const ClientToServerEventNames = [
 
 export const ServerToClientEventNames = [
   'actionMessage',
-  'channelConnected',
-  'channelDisconnected',
   'channelMessage',
   'directMessage',
   'friendAdd',
@@ -173,6 +171,8 @@ export const ServerToClientEventNames = [
   'serverSearch',
   'serverUpdate',
   'serversSet',
+  'SFUJoined',
+  'SFULeft',
   'SFUNewProducer',
   'SFUProducerClosed',
   'shakeWindow',
