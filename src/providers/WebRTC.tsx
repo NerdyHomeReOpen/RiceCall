@@ -113,14 +113,56 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const [volumePercent, setVolumePercent] = useState<{ [userId: string]: number }>({});
   const [remoteUserStatusList, setRemoteUserStatusList] = useState<{ [userId: string]: RemoteUserStatus }>({}); // userId -> status
 
+  const detectSpeaking = useCallback(
+    (userId: string, analyserNode: AnalyserNode, dataArray: Uint8Array) => {
+      if (!analyserNode) return;
+      analyserNode.getByteTimeDomainData(dataArray);
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        const v = (dataArray[i] - 128) / 128;
+        sum += v * v;
+      }
+      const volume = Math.sqrt(sum / dataArray.length);
+      const volumePercent = Math.min(1, volume / 0.5) * 100;
+      volumePercentRef.current[userId] = volumePercent > SPEAKING_VOLUME_THRESHOLD ? volumePercent : 0;
+
+      const now = performance.now();
+      if (now - lastRefreshRef.current >= 80) {
+        lastRefreshRef.current = now;
+        setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
+      }
+
+      rafIdListRef.current[userId] = requestAnimationFrame(() => detectSpeaking(userId, analyserNode, dataArray));
+    },
+    [SPEAKING_VOLUME_THRESHOLD],
+  );
+
+  const removeSpeakerAudio = useCallback((userId: string) => {
+    if (rafIdListRef.current[userId]) {
+      cancelAnimationFrame(rafIdListRef.current[userId]);
+      delete rafIdListRef.current[userId];
+    }
+    if (speakerNodesRef.current[userId]) {
+      const { stream, source, gain, analyser } = speakerNodesRef.current[userId];
+      if (source) source.disconnect();
+      if (gain) gain.disconnect();
+      if (analyser) analyser.disconnect();
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+      delete speakerNodesRef.current[userId];
+    }
+  }, []);
+
   const initSpeakerAudio = useCallback(
     async (userId: string, stream: MediaStream) => {
-      // Disable tracks
+      if (!audioContextRef.current) return;
+
+      // Remove existing speaker audio
+      removeSpeakerAudio(userId);
+
+      // Disable tracks if muted
       stream.getAudioTracks().forEach((track) => {
         track.enabled = !muteIdsRef.current.includes(userId);
       });
-
-      if (!audioContextRef.current) return;
 
       // Create nodes
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
@@ -151,30 +193,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       // Initialize analyser
       analyserNode.fftSize = 2048;
       const dataArray = new Uint8Array(analyserNode.fftSize);
+      detectSpeaking(userId, analyserNode, dataArray);
 
-      const detectSpeaking = () => {
-        if (!analyserNode) return;
-        analyserNode.getByteTimeDomainData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          const v = (dataArray[i] - 128) / 128;
-          sum += v * v;
-        }
-        const volume = Math.sqrt(sum / dataArray.length);
-        const volumePercent = Math.min(1, volume / 0.5) * 100;
-        volumePercentRef.current[userId] = volumePercent > SPEAKING_VOLUME_THRESHOLD ? volumePercent : 0;
-
-        const now = performance.now();
-        if (now - lastRefreshRef.current >= 80) {
-          lastRefreshRef.current = now;
-          setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
-        }
-
-        rafIdListRef.current[userId] = requestAnimationFrame(detectSpeaking);
-      };
-      detectSpeaking();
-
-      // Create audio element
+      // Create audio element to force stream to play
       const speaker = new Audio();
       speaker.srcObject = stream;
       speaker.volume = 0;
@@ -183,17 +204,35 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       speaker.play().catch(() => {});
       speaker.remove();
     },
-    [SPEAKING_VOLUME_THRESHOLD],
+    [detectSpeaking, removeSpeakerAudio],
   );
+
+  const removeMicAudio = useCallback((userId: string) => {
+    if (rafIdListRef.current[userId]) {
+      cancelAnimationFrame(rafIdListRef.current[userId]);
+      delete rafIdListRef.current[userId];
+    }
+    if (micNodesRef.current) {
+      const { stream, source, gain, analyser } = micNodesRef.current;
+      if (source) source.disconnect();
+      if (gain) gain.disconnect();
+      if (analyser) analyser.disconnect();
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+      micNodesRef.current = { stream: null, source: null, gain: null, analyser: null };
+    }
+  }, []);
 
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
-      // Disable tracks
+      if (!audioContextRef.current) return;
+
+      // Remove existing mic audio
+      removeMicAudio(userId);
+
+      // Disable tracks if muted
       stream.getAudioTracks().forEach((track) => {
         track.enabled = micTakenRef.current ? (speakingModeRef.current === 'key' ? isPressSpeakKeyRef.current : true) : false;
       });
-
-      if (!audioContextRef.current) return;
 
       // Create nodes
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
@@ -217,30 +256,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       // Initialize analyser
       analyserNode.fftSize = 2048;
       const dataArray = new Uint8Array(analyserNode.fftSize);
-
-      const detectSpeaking = () => {
-        if (!analyserNode) return;
-        analyserNode.getByteTimeDomainData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          const v = (dataArray[i] - 128) / 128;
-          sum += v * v;
-        }
-        const volume = Math.sqrt(sum / dataArray.length);
-        const volumePercent = Math.min(1, volume / 0.5) * 100;
-        volumePercentRef.current[userId] = volumePercent > SPEAKING_VOLUME_THRESHOLD ? volumePercent : 0;
-
-        const now = performance.now();
-        if (now - lastRefreshRef.current >= 80) {
-          lastRefreshRef.current = now;
-          setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
-        }
-
-        requestAnimationFrame(detectSpeaking);
-      };
-      detectSpeaking();
+      detectSpeaking(userId, analyserNode, dataArray);
     },
-    [userId, SPEAKING_VOLUME_THRESHOLD],
+    [userId, detectSpeaking, removeMicAudio],
   );
 
   const changeBitrate = useCallback((bitrate: number) => {
@@ -363,7 +381,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
       consumersRef.current[producerId] = consumer;
       const userId = consumer.appData.userId as string;
-
       const stream = new MediaStream([consumer.track]);
       initSpeakerAudio(userId, stream);
 
@@ -377,34 +394,24 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     [initSpeakerAudio],
   );
 
-  const unconsumeOne = useCallback(async (producerId: string) => {
-    const consumer = consumersRef.current[producerId];
-    const userId = consumer.appData.userId as string;
+  const unconsumeOne = useCallback(
+    async (producerId: string) => {
+      const consumer = consumersRef.current[producerId];
+      const userId = consumer.appData.userId as string;
+      removeSpeakerAudio(userId);
+      consumer.close();
+      delete consumersRef.current[producerId];
 
-    if (rafIdListRef.current[userId]) {
-      cancelAnimationFrame(rafIdListRef.current[userId]);
-      delete rafIdListRef.current[userId];
-    }
+      setRemoteUserStatusList((prev) => {
+        const newState = { ...prev };
+        delete newState[userId];
+        return newState;
+      });
 
-    const { stream, source, gain, analyser } = speakerNodesRef.current[userId];
-
-    if (source) source.disconnect();
-    if (gain) gain.disconnect();
-    if (analyser) analyser.disconnect();
-    if (stream) stream.getTracks().forEach((t) => t.stop());
-
-    consumer.close();
-    delete consumersRef.current[producerId];
-    delete speakerNodesRef.current[userId];
-
-    setRemoteUserStatusList((prev) => {
-      const newState = { ...prev };
-      delete newState[userId];
-      return newState;
-    });
-
-    console.info('[WebRTC] Unconsumed producer: ', userId);
-  }, []);
+      console.info('[WebRTC] Unconsumed producer: ', userId);
+    },
+    [removeSpeakerAudio],
+  );
 
   const setupSend = useCallback(async () => {
     const transport = await ipc.socket.emit<SFUCreateTransportParams, TransportReturnType>('SFUCreateTransport', { direction: 'send' });
