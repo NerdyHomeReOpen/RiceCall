@@ -42,7 +42,6 @@ import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider, { useActionScanner } from '@/providers/ActionScanner';
 import ExpandedProvider from '@/providers/FindMe';
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
@@ -52,6 +51,7 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 import ipc from '@/services/ipc.service';
 import auth from '@/services/auth.service';
 import data from '@/services/data.service';
+import ErrorHandler from '@/utils/error';
 
 interface HeaderProps {
   user: User;
@@ -405,7 +405,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const mainTab = useMainTab();
   const loadingBox = useLoading();
   const soundPlayer = useSoundPlayer();
-  const socket = useSocket();
+  const { t } = useTranslation();
 
   // Refs
   const setSelectedTabIdRef = useRef(mainTab.setSelectedTabId);
@@ -415,6 +415,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
   const friendIdListRef = useRef<Set<string>>(new Set());
   const strangerIdListRef = useRef<Set<string>>(new Set());
+  const connectFailedMessageRef = useRef<string>(t('connection-failed-message'));
+  const reconnectionFailedMessageRef = useRef<string>(t('reconnection-failed-message'));
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -430,6 +432,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
 
   // Variables
   const { userId } = user;
@@ -593,6 +596,49 @@ const RootPageComponent: React.FC = React.memo(() => {
     });
   };
 
+  const handleConnect = () => {
+    console.info('[Socket] connected');
+    ipc.popup.close('errorDialog');
+    setUser(Default.user());
+    setServers([]);
+    setRecommendServerList({});
+    setFriends([]);
+    setFriendGroups([]);
+    setFriendApplications([]);
+    setMemberInvitations([]);
+    setSystemNotify([]);
+    setServerChannels([]);
+    setServerOnlineMembers([]);
+    setQueueMembers([]);
+    setChannelMessages([]);
+    setActionMessages([]);
+    setIsConnected(true);
+  };
+
+  const handleDisconnect = () => {
+    console.info('[Socket] disconnected');
+    setIsConnected(false);
+  };
+
+  const handleReconnect = (attemptNumber: number) => {
+    console.info('[Socket] reconnecting, attempt number:', attemptNumber);
+  };
+
+  const handleError = (message: string) => {
+    console.error('[Socket] error:', message);
+    new ErrorHandler(new Error(message)).show();
+  };
+
+  const handleConnectError = (error: Error) => {
+    console.error('[Socket] connect error:', error);
+    new ErrorHandler(new Error(connectFailedMessageRef.current), () => ipc.auth.logout()).show();
+  };
+
+  const handleReconnectError = (error: Error) => {
+    console.error('[Socket] reconnect error:', error);
+    new ErrorHandler(new Error(reconnectionFailedMessageRef.current), () => ipc.auth.logout()).show();
+  };
+
   // Effects
   useEffect(() => {
     friendIdListRef.current = new Set(friends.map((f) => f.targetId));
@@ -684,6 +730,12 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsubscribe = [
+      ipc.socket.on('connect', handleConnect),
+      ipc.socket.on('reconnect', handleReconnect),
+      ipc.socket.on('disconnect', handleDisconnect),
+      ipc.socket.on('error', handleError),
+      ipc.socket.on('connect_error', handleConnectError),
+      ipc.socket.on('reconnect_error', handleReconnectError),
       ipc.socket.on('userUpdate', handleUserUpdate),
       ipc.socket.on('serversSet', handleServersSet),
       ipc.socket.on('serverAdd', handleServerAdd),
@@ -725,7 +777,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       <ActionScannerProvider>
         <ExpandedProvider>
           <Header user={user} server={server} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
-          {!socket.isConnected ? (
+          {!isConnected ? (
             <LoadingSpinner />
           ) : (
             <>

@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect } from 'react';
 
 // Providers
-import SocketProvider from '@/providers/Socket';
 import ContextMenuProvider from '@/providers/ContextMenu';
 import MainTabProvider from '@/providers/MainTab';
 import ThemeProvider from '@/providers/Theme';
@@ -47,15 +46,13 @@ const Providers = ({ children }: ProvidersProps) => {
 
   return (
     <ThemeProvider>
-      <SocketProvider>
-        <MainTabProvider>
-          <LoadingProvider>
-            <ContextMenuProvider>
-              <SoundPlayerProvider>{children}</SoundPlayerProvider>
-            </ContextMenuProvider>
-          </LoadingProvider>
-        </MainTabProvider>
-      </SocketProvider>
+      <MainTabProvider>
+        <LoadingProvider>
+          <ContextMenuProvider>
+            <SoundPlayerProvider>{children}</SoundPlayerProvider>
+          </ContextMenuProvider>
+        </LoadingProvider>
+      </MainTabProvider>
     </ThemeProvider>
   );
 };
