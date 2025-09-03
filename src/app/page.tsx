@@ -405,7 +405,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
 
 Header.displayName = 'Header';
 
-const RootPageComponent = () => {
+const RootPageComponent: React.FC = React.memo(() => {
   // Hooks
   const mainTab = useMainTab();
   const loadingBox = useLoading();
@@ -414,12 +414,10 @@ const RootPageComponent = () => {
 
   // Refs
   const mainTabRef = useRef(mainTab);
-  const selectedTabRef = useRef(mainTab.selectedTabId);
+  const selectedTabIdRef = useRef(mainTab.selectedTabId);
   const loadingBoxRef = useRef(loadingBox);
   const soundPlayerRef = useRef(soundPlayer);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
-
-  selectedTabRef.current = mainTab.selectedTabId;
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -484,7 +482,7 @@ const RootPageComponent = () => {
     setFriends((prev) => prev.map((f) => (update.has(`${f.targetId}`) ? { ...f, ...update.get(`${f.targetId}`) } : f)));
   };
 
-  const handleFriendDelete = (...args: { targetId: string }[]) => {
+  const handleFriendRemove = (...args: { targetId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.targetId}`));
     setFriends((prev) => prev.filter((f) => !remove.has(`${f.targetId}`)));
   };
@@ -502,7 +500,7 @@ const RootPageComponent = () => {
     setFriendGroups((prev) => prev.map((fg) => (update.has(`${fg.friendGroupId}`) ? { ...fg, ...update.get(`${fg.friendGroupId}`) } : fg)));
   };
 
-  const handleFriendGroupDelete = (...args: { friendGroupId: string }[]) => {
+  const handleFriendGroupRemove = (...args: { friendGroupId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.friendGroupId}`));
     setFriendGroups((prev) => prev.filter((fg) => !remove.has(`${fg.friendGroupId}`)));
   };
@@ -551,7 +549,7 @@ const RootPageComponent = () => {
     setServerChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
   };
 
-  const handleServerChannelDelete = (...args: { channelId: string }[]) => {
+  const handleServerChannelRemove = (...args: { channelId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.channelId}`));
     setServerChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
   };
@@ -609,11 +607,11 @@ const RootPageComponent = () => {
 
   useEffect(() => {
     if (user.currentServerId) {
-      if (selectedTabRef.current !== 'server') {
+      if (selectedTabIdRef.current !== 'server') {
         mainTabRef.current.setSelectedTabId('server');
       }
     } else {
-      if (selectedTabRef.current === 'server') {
+      if (selectedTabIdRef.current === 'server') {
         mainTabRef.current.setSelectedTabId('home');
       }
     }
@@ -679,11 +677,11 @@ const RootPageComponent = () => {
       ipc.socket.on('friendsSet', handleFriendsSet),
       ipc.socket.on('friendAdd', handleFriendAdd),
       ipc.socket.on('friendUpdate', handleFriendUpdate),
-      ipc.socket.on('friendRemove', handleFriendDelete),
+      ipc.socket.on('friendRemove', handleFriendRemove),
       ipc.socket.on('friendGroupsSet', handleFriendGroupsSet),
       ipc.socket.on('friendGroupAdd', handleFriendGroupAdd),
       ipc.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
-      ipc.socket.on('friendGroupRemove', handleFriendGroupDelete),
+      ipc.socket.on('friendGroupRemove', handleFriendGroupRemove),
       ipc.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
       ipc.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
       ipc.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
@@ -694,7 +692,7 @@ const RootPageComponent = () => {
       ipc.socket.on('serverChannelsSet', handleServerChannelsSet),
       ipc.socket.on('serverChannelAdd', handleServerChannelAdd),
       ipc.socket.on('serverChannelUpdate', handleServerChannelUpdate),
-      ipc.socket.on('serverChannelRemove', handleServerChannelDelete),
+      ipc.socket.on('serverChannelRemove', handleServerChannelRemove),
       ipc.socket.on('memberInvitationAdd', handleMemberInvitationAdd),
       ipc.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
       ipc.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
@@ -736,7 +734,7 @@ const RootPageComponent = () => {
       </ActionScannerProvider>
     </WebRTCProvider>
   );
-};
+});
 
 RootPageComponent.displayName = 'RootPageComponent';
 
