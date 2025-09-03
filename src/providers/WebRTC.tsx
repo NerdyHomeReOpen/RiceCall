@@ -374,12 +374,18 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const consumeOne = useCallback(
     async (producerId: string, channelId: string) => {
       if (!recvTransportRef.current) return;
-      const consumerInfo = await ipc.socket.emit<SFUCreateConsumerParams, SFUCreateConsumerReturnType>('SFUCreateConsumer', {
-        transportId: recvTransportRef.current!.id,
-        producerId,
-        rtpCapabilities: deviceRef.current.rtpCapabilities,
-        channelId,
-      });
+      const consumerInfo = await ipc.socket
+        .emit<SFUCreateConsumerParams, SFUCreateConsumerReturnType>('SFUCreateConsumer', {
+          transportId: recvTransportRef.current!.id,
+          producerId,
+          rtpCapabilities: deviceRef.current.rtpCapabilities,
+          channelId,
+        })
+        .catch((e) => {
+          console.error('[WebRTC] Error creating consumer: ', e);
+          return null;
+        });
+      if (!consumerInfo) return;
 
       const consumer = await recvTransportRef.current.consume({
         id: consumerInfo.id,
@@ -424,7 +430,11 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   );
 
   const setupSend = useCallback(async (channelId: string) => {
-    const transport = await ipc.socket.emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', { direction: 'send', channelId });
+    const transport = await ipc.socket.emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', { direction: 'send', channelId }).catch((e) => {
+      console.error('[WebRTC] Error creating send transport: ', e);
+      return null;
+    });
+    if (!transport) return;
 
     if (!deviceRef.current.loaded) await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
 
@@ -470,7 +480,11 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   const setupRecv = useCallback(
     async (channelId: string) => {
-      const transport = await ipc.socket.emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', { direction: 'recv', channelId });
+      const transport = await ipc.socket.emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', { direction: 'recv', channelId }).catch((e) => {
+        console.error('[WebRTC] Error creating recv transport: ', e);
+        return null;
+      });
+      if (!transport) return;
 
       if (!deviceRef.current.loaded) await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
 
