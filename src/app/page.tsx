@@ -413,6 +413,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   const loadingBoxRef = useRef(loadingBox);
   const soundPlayerRef = useRef(soundPlayer);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
+  const friendIdListRef = useRef<Set<string>>(new Set());
+  const strangerIdListRef = useRef<Set<string>>(new Set());
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -593,12 +595,26 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Effects
   useEffect(() => {
+    friendIdListRef.current = new Set(friends.map((f) => f.targetId));
+  }, [friends]);
+
+  useEffect(() => {
+    const onlineIdList = new Set(serverOnlineMembers.map((m) => m.userId));
+
     for (const member of serverOnlineMembers) {
-      if (!friends.some((f) => f.targetId === member.userId) && member.userId !== user.userId) {
-        ipc.socket.send('stranger', { targetId: member.userId });
+      const userId = member.userId;
+      if (userId !== user.userId && !friendIdListRef.current.has(userId) && !strangerIdListRef.current.has(userId)) {
+        ipc.socket.send('stranger', { targetId: userId });
+        strangerIdListRef.current.add(userId);
       }
     }
-  }, [serverOnlineMembers, friends, user.userId]);
+
+    for (const userId of Array.from(strangerIdListRef.current)) {
+      if (!onlineIdList.has(userId)) {
+        strangerIdListRef.current.delete(userId);
+      }
+    }
+  }, [serverOnlineMembers, user.userId]);
 
   useEffect(() => {
     selectedTabIdRef.current = mainTab.selectedTabId;

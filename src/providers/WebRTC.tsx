@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useContext, createContext, useCallback, useMemo } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
-// import { io, Socket } from 'socket.io-client';
 
 // Services
 import ipc from '@/services/ipc.service';
