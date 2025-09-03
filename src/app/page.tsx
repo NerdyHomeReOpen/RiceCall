@@ -96,7 +96,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
     return systemNotify.length !== 0;
   }, [systemNotify]);
 
-  const mainTabs = useMemo(() => {
+  const mainTabs = useMemo<{ id: 'home' | 'friends' | 'server'; label: string }[]>(() => {
     return [
       { id: 'home', label: t('home') },
       { id: 'friends', label: t('friends') },
@@ -104,7 +104,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
     ];
   }, [t, serverName]);
 
-  const statusOptions = useMemo(() => {
+  const statusOptions = useMemo<{ status: User['status']; label: string }[]>(() => {
     return [
       { status: 'online', label: t('online') },
       { status: 'dnd', label: t('dnd') },
@@ -229,12 +229,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
           const TabClose = TabId === 'server';
           if (TabId === 'server' && !serverId) return null;
           return (
-            <div
-              key={`Tabs-${TabId}`}
-              data-tab-id={TabId}
-              className={`${header['tab']} ${TabId === mainTab.selectedTabId ? header['selected'] : ''}`}
-              onClick={() => mainTab.setSelectedTabId(TabId as 'home' | 'friends' | 'server')}
-            >
+            <div key={`Tabs-${TabId}`} data-tab-id={TabId} className={`${header['tab']} ${TabId === mainTab.selectedTabId ? header['selected'] : ''}`} onClick={() => mainTab.setSelectedTabId(TabId)}>
               <div className={header['tab-lable']}>{TabLable}</div>
               <div className={header['tab-bg']} />
               {TabClose && (
@@ -413,7 +408,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const socket = useSocket();
 
   // Refs
-  const mainTabRef = useRef(mainTab);
+  const setSelectedTabIdRef = useRef(mainTab.setSelectedTabId);
   const selectedTabIdRef = useRef(mainTab.selectedTabId);
   const loadingBoxRef = useRef(loadingBox);
   const soundPlayerRef = useRef(soundPlayer);
@@ -606,13 +601,17 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [serverOnlineMembers, friends, user.userId]);
 
   useEffect(() => {
+    selectedTabIdRef.current = mainTab.selectedTabId;
+  }, [mainTab.selectedTabId]);
+
+  useEffect(() => {
     if (user.currentServerId) {
       if (selectedTabIdRef.current !== 'server') {
-        mainTabRef.current.setSelectedTabId('server');
+        setSelectedTabIdRef.current('server');
       }
     } else {
       if (selectedTabIdRef.current === 'server') {
-        mainTabRef.current.setSelectedTabId('home');
+        setSelectedTabIdRef.current('home');
       }
     }
     setActionMessages([]);
@@ -629,7 +628,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       if (loadingBoxRef.current.isLoading || !serverDisplayId || !serverId) return;
 
       if (serverId === server.serverId) {
-        mainTabRef.current.setSelectedTabId('server');
+        mainTab.setSelectedTabId('server');
         return;
       }
 
@@ -639,7 +638,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [server.serverId, user.currentServerId]);
+  }, [server.serverId, user.currentServerId, mainTab]);
 
   useEffect(() => {
     if (!userId) return;
