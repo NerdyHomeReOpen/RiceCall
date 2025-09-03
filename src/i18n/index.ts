@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en' | 'ja' | 'fa' | 'pt-BR' | 'ru' | 'es-ES';
+export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en' | 'ja' | 'fa' | 'pt-BR' | 'ru' | 'es-ES' | 'tr';
 export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'zh-TW', label: '繁體中文' },
   { code: 'zh-CN', label: '简体中文' },
@@ -10,6 +10,7 @@ export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'ja', label: '日本語' },
   { code: 'es-ES', label: 'Español' },
   { code: 'fa', label: 'فارسی' },
+  { code: 'tr', label: 'Türkçe' },
 ];
 
 import otaClient from '@crowdin/ota-client';
@@ -43,7 +44,7 @@ class CrowdinBackend {
       .init({
         lng: 'zh-TW',
         fallbackLng: 'zh-TW',
-        supportedLngs: ['zh-TW', 'zh-CN', 'en', 'ja', 'fa', 'pt-BR', 'ru', 'es-ES'],
+        supportedLngs: ['zh-TW', 'zh-CN', 'en', 'ja', 'fa', 'pt-BR', 'ru', 'es-ES', 'tr'],
 
         ns: ['translation', 'rpc', 'message', 'country'],
         defaultNS: 'translation',
