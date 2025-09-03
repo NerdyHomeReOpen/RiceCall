@@ -106,3 +106,4 @@ jobs:
           removeArtifacts: true
           omitBodyDuringUpdate: true
           artifacts: 'dist/**'
+          token: ${{ secrets.GITHUB_TOKEN }}
