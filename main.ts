@@ -7,7 +7,7 @@ import { io, Socket } from 'socket.io-client';
 import DiscordRPC from 'discord-rpc';
 import serve from 'electron-serve';
 import Store from 'electron-store';
-import ElectronUpdater from 'electron-updater';
+import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 import dotenv from 'dotenv';
@@ -508,7 +508,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
   return authWindow;
 }
 
-async function createPopup(type: PopupType, id: string, data: any, force = true): Promise<BrowserWindow> {
+async function createPopup(type: PopupType, id: string, data: unknown, force = true): Promise<BrowserWindow> {
   // If force is true, destroy the popup
   if (force) {
     if (popups[id] && !popups[id].isDestroyed()) {
@@ -616,7 +616,7 @@ function connectSocket(token: string): Socket | null {
       ipcMain.handle(event, (_, payload) => {
         console.log(`${new Date().toLocaleString()} | socket.emit`, event, payload);
         return new Promise((resolve) => {
-          socket.emit(event, payload, (ack: any) => {
+          socket.emit(event, payload, (ack: { ok: true; data: unknown } | { ok: false; error: string }) => {
             console.log(`${new Date().toLocaleString()} | socket.onAck`, event, ack);
             resolve(ack);
           });
@@ -723,13 +723,6 @@ function disconnectSocket(): Socket | null {
 }
 
 // Auto Updater
-function checkUpdate() {
-  if (DEV) return;
-  autoUpdater.checkForUpdates().catch((error) => {
-    console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error);
-  });
-}
-
 function configureAutoUpdater() {
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
@@ -750,12 +743,12 @@ function configureAutoUpdater() {
     autoUpdater.updateConfigPath = path.join(app.getAppPath(), 'dev-app-update.yml');
   }
 
-  autoUpdater.on('error', (error: any) => {
+  autoUpdater.on('error', (error: Error) => {
     if (DEV) return;
     console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
   });
 
-  autoUpdater.on('update-available', (info: any) => {
+  autoUpdater.on('update-available', (info: UpdateInfo) => {
     dialog.showMessageBox({
       type: 'info',
       title: '有新版本可用',
@@ -768,15 +761,15 @@ function configureAutoUpdater() {
     console.info(`${new Date().toLocaleString()} | Is latest version`);
   });
 
-  autoUpdater.on('download-progress', (progressObj: any) => {
+  autoUpdater.on('download-progress', (progressInfo: ProgressInfo) => {
     if (DEV) return;
-    let message = `Downloading update: ${progressObj.bytesPerSecond}`;
-    message = `${message} - ${progressObj.percent}%`;
-    message = `${message} (${progressObj.transferred}/${progressObj.total})`;
+    let message = `Downloading update: ${progressInfo.bytesPerSecond}`;
+    message = `${message} - ${progressInfo.percent}%`;
+    message = `${message} (${progressInfo.transferred}/${progressInfo.total})`;
     console.info(`${new Date().toLocaleString()} | ${message}`);
   });
 
-  autoUpdater.on('update-downloaded', (info: any) => {
+  autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
     if (DEV) return;
     dialog
       .showMessageBox({
@@ -792,27 +785,26 @@ function configureAutoUpdater() {
       });
   });
 
+  function checkUpdate() {
+    if (DEV) return;
+    autoUpdater.checkForUpdates();
+  }
+
   // Check update every hour
   setInterval(checkUpdate, 60 * 60 * 1000);
   checkUpdate();
 }
 
-// Discord RPC Functions
-async function setActivity(presence: DiscordRPC.Presence) {
-  await rpc?.setActivity(presence).catch((error) => {
-    console.error(`${new Date().toLocaleString()} | Cannot set Discord RPC activity:`, error);
-  });
-}
-
+// Discord RPC
 async function configureDiscordRPC() {
   DiscordRPC.register(DISCORD_RPC_CLIENT_ID);
   rpc = new DiscordRPC.Client({ transport: 'ipc' });
-  rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID }).catch(() => {
-    console.warn(`${new Date().toLocaleString()} | Cannot login to Discord RPC, will not show Discord status`);
-    return null;
+  rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID });
+  rpc.on('error', (error: Error) => {
+    console.error(`${new Date().toLocaleString()} | Discord RPC error:`, error.message);
   });
-  rpc?.on('ready', () => {
-    setActivity(defaultPrecence);
+  rpc.on('ready', () => {
+    rpc?.setActivity(defaultPrecence);
   });
 }
 
@@ -920,7 +912,7 @@ app.on('ready', async () => {
     closePopups();
   });
 
-  ipcMain.on('popup-submit', (_, to, data?: any) => {
+  ipcMain.on('popup-submit', (_, to, data?: unknown) => {
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('popup-submit', to, data ?? null);
     });
@@ -957,7 +949,7 @@ app.on('ready', async () => {
 
   // Discord RPC handlers
   ipcMain.on('update-discord-presence', (_, updatePresence) => {
-    setActivity(updatePresence);
+    rpc?.setActivity(updatePresence);
   });
 
   // Env
