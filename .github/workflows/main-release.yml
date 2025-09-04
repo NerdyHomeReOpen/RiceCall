@@ -15,21 +15,21 @@ jobs:
         include:
           - os: windows-latest
             build_name: win-x64
-            args: '--win --x64 --publish=never'
+            args: '--win --x64'
           - os: windows-latest
             build_name: win-ia32
-            args: '--win --ia32 --publish=never'
+            args: '--win --ia32'
 
           - os: macos-13
             build_name: mac-x64
-            args: '--mac --x64 --publish=never'
+            args: '--mac --x64'
           - os: macos-14
             build_name: mac-arm64
-            args: '--mac --arm64 --publish=never'
+            args: '--mac --arm64'
 
           - os: ubuntu-latest
             build_name: linux-x64
-            args: '--linux --x64 --publish=never'
+            args: '--linux --x64'
 
     environment: main
 
@@ -58,6 +58,7 @@ jobs:
           echo "API_URL=${{ secrets.API_URL }}" > .env
           echo "WS_URL=${{ secrets.WS_URL }}" >> .env
           echo "CROWDIN_DISTRIBUTION_HASH=${{ secrets.CROWDIN_DISTRIBUTION_HASH }}" >> .env
+          echo "UPDATE_CHANNEL=latest" >> .env
 
       - name: Build electron
         uses: samuelmeuli/action-electron-builder@v1
