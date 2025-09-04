@@ -57,7 +57,7 @@
       "owner": "NerdyHomeReOpen",
       "repo": "RiceCall",
       "private": false,
-      "releaseType": "release",
+      "releaseType": "prerelease",
       "channel": "dev"
     }
   ]
