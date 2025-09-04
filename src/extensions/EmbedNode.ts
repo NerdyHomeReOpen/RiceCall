@@ -6,27 +6,27 @@ import markdown from '@/styles/markdown.module.css';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
-    youtube: {
-      insertYouTube: (id: string) => ReturnType;
+    embed: {
+      insertEmbed: (src: string) => ReturnType;
     };
   }
 }
 
-export const YouTubeNode = Node.create({
-  name: 'youtube',
+export const EmbedNode = Node.create({
+  name: 'embed',
   group: 'block',
   atom: true,
 
   addAttributes() {
-    return { videoId: {} };
+    return { src: {} };
   },
 
   parseHTML() {
     return [
       {
-        tag: 'iframe[data-youtube]',
+        tag: 'iframe[data-embed]',
         getAttrs: (el) => ({
-          videoId: (el as HTMLElement).dataset.youtube,
+          src: (el as HTMLElement).dataset.embed,
         }),
       },
     ];
@@ -36,21 +36,21 @@ export const YouTubeNode = Node.create({
     return [
       'iframe',
       {
-        'src': `https://www.youtube.com/embed/${node.attrs.videoId}?autoplay=1`,
-        'data-youtube': node.attrs.videoId,
+        'src': node.attrs.src,
+        'data-embed': node.attrs.src,
         'allowfullscreen': 'true',
-        'class': `${markdown['youtube-video']}`,
+        'class': `${markdown['embed-video']}`,
       },
     ];
   },
 
   addCommands() {
     return {
-      insertYouTube:
-        (id) =>
+      insertEmbed:
+        (src) =>
         ({ chain }) =>
           chain()
-            .insertContent({ type: this.name, attrs: { videoId: id } })
+            .insertContent({ type: this.name, attrs: { src: src } })
             .run(),
     };
   },

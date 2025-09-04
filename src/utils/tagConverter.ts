@@ -9,13 +9,13 @@ import permission from '@/styles/permission.module.css';
 const emojiRegex = /\[emoji=(.+?)]/g; // [emoji=code]
 const userIconRegex = /\[icon=(.+?)]/g; // [icon=gender-level]
 const userTagRegex = /\[tag=(.+?)]/g; // [tag=name]
-const ytRegex = /\[YT=(.+?)]/g; // [YT=https://www.youtube.com/watch?v=dQw4w9WgXcQ]
+const embedRegex = /\[Embed=(.+?)]/g; // [Embed=https://www.youtube.com/embed/dQw4w9WgXcQ]
 
 /* ---------- reverse ---------- */
 const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
 const userIconBackRegex = /<span[^>]+data-icon=['"]([^'"]+)['"][^>]*>[\s\S]*?<\/span>/g;
 const userTagBackRegex = /<span[^>]+data-name=['"]([^'"]+)['"][^>]*>[\s\S]*?<\/span>/g;
-const ytBackRegex = /<iframe[^>]+data-youtube=['"]([^'"]+)['"][^>]*><\/iframe>/g;
+const embedBackRegex = /<iframe[^>]+data-embed=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 
 export const fromTags = (raw: string) =>
   raw
@@ -33,11 +33,11 @@ export const fromTags = (raw: string) =>
     .replace(userTagRegex, (_, tag) => {
       return `<span data-name='${tag}' class='${markdown['user-name']}'>${tag}</span>`;
     })
-    // YouTube
-    .replace(ytRegex, (_, videoId) => {
-      return `<iframe data-youtube='${videoId}' class='${markdown['youtube-video']}' src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen="false"></iframe>`;
+    // Embed
+    .replace(embedRegex, (_, src) => {
+      return `<iframe data-embed='${src}' class='${markdown['embed-video']}' src="${src}" allowfullscreen="false"></iframe>`;
     });
 
 export const toTags = (html: string) => {
-  return html.replace(emojiBackRegex, '[emoji=$1]').replace(ytBackRegex, '[YT=$1]').replace(userIconBackRegex, '[icon=$1]').replace(userTagBackRegex, '[tag=$1]');
+  return html.replace(emojiBackRegex, '[emoji=$1]').replace(embedBackRegex, '[Embed=$1]').replace(userIconBackRegex, '[icon=$1]').replace(userTagBackRegex, '[tag=$1]');
 };
