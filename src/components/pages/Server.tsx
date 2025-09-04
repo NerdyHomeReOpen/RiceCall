@@ -320,14 +320,27 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   }, [t, serverName, serverOnlineMembers]);
 
   useEffect(() => {
-    setSpeakMode(ipc.systemSettings.speakingMode.get());
-    setSpeakHotKey(ipc.systemSettings.defaultSpeakingKey.get());
-    setChannelUIMode(ipc.systemSettings.channelUIMode.get());
+    const changeSpeakingMode = (speakingMode: SpeakingMode) => {
+      console.info('[ServerPage] speak mode updated: ', speakingMode);
+      setSpeakMode(speakingMode);
+    };
+    const changeDefaultSpeakingKey = (key: string) => {
+      console.info('[ServerPage] default speaking key updated: ', key);
+      setSpeakHotKey(key);
+    };
+    const changeChannelUIMode = (channelUIMode: ChannelUIMode) => {
+      console.info('[ServerPage] channel UI mode updated: ', channelUIMode);
+      setChannelUIMode(channelUIMode);
+    };
+
+    changeSpeakingMode(ipc.systemSettings.speakingMode.get());
+    changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
+    changeChannelUIMode(ipc.systemSettings.channelUIMode.get());
 
     const unsubscribe = [
-      ipc.systemSettings.speakingMode.onUpdate(setSpeakMode),
-      ipc.systemSettings.defaultSpeakingKey.onUpdate(setSpeakHotKey),
-      ipc.systemSettings.channelUIMode.onUpdate(setChannelUIMode),
+      ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode),
+      ipc.systemSettings.defaultSpeakingKey.onUpdate(changeDefaultSpeakingKey),
+      ipc.systemSettings.channelUIMode.onUpdate(changeChannelUIMode),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);

@@ -343,7 +343,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('auto-login', callback);
+        ipcRenderer.removeAllListeners('auto-login');
+        ipcRenderer.on('auto-login', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('auto-login');
       },
     },
@@ -361,7 +362,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('auto-launch', callback);
+        ipcRenderer.removeAllListeners('auto-launch');
+        ipcRenderer.on('auto-launch', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('auto-launch');
       },
     },
@@ -379,7 +381,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('always-on-top', callback);
+        ipcRenderer.removeAllListeners('always-on-top');
+        ipcRenderer.on('always-on-top', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('always-on-top');
       },
     },
@@ -397,7 +400,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('status-auto-idle', callback);
+        ipcRenderer.removeAllListeners('status-auto-idle');
+        ipcRenderer.on('status-auto-idle', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('status-auto-idle');
       },
     },
@@ -415,7 +419,8 @@ const ipcService = {
 
       onUpdate: (callback: (fontSize: number) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('status-auto-idle-minutes', callback);
+        ipcRenderer.removeAllListeners('status-auto-idle-minutes');
+        ipcRenderer.on('status-auto-idle-minutes', (_: any, fontSize: number) => callback(fontSize));
         return () => ipcRenderer.removeAllListeners('status-auto-idle-minutes');
       },
     },
@@ -433,7 +438,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('status-auto-dnd', callback);
+        ipcRenderer.removeAllListeners('status-auto-dnd');
+        ipcRenderer.on('status-auto-dnd', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('status-auto-dnd');
       },
     },
@@ -451,7 +457,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: ChannelUIMode) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('channel-ui-mode', callback);
+        ipcRenderer.removeAllListeners('channel-ui-mode');
+        ipcRenderer.on('channel-ui-mode', (_: any, channelUIMode: ChannelUIMode) => callback(channelUIMode));
         return () => ipcRenderer.removeAllListeners('channel-ui-mode');
       },
     },
@@ -469,7 +476,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('close-to-tray', callback);
+        ipcRenderer.removeAllListeners('close-to-tray');
+        ipcRenderer.on('close-to-tray', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('close-to-tray');
       },
     },
@@ -494,7 +502,8 @@ const ipcService = {
 
       onUpdate: (callback: (font: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('font', callback);
+        ipcRenderer.removeAllListeners('font');
+        ipcRenderer.on('font', (_: any, font: string) => callback(font));
         return () => ipcRenderer.removeAllListeners('font');
       },
     },
@@ -512,7 +521,8 @@ const ipcService = {
 
       onUpdate: (callback: (fontSize: number) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('font-size', callback);
+        ipcRenderer.removeAllListeners('font-size');
+        ipcRenderer.on('font-size', (_: any, fontSize: number) => callback(fontSize));
         return () => ipcRenderer.removeAllListeners('font-size');
       },
     },
@@ -530,7 +540,8 @@ const ipcService = {
 
       onUpdate: (callback: (deviceId: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('input-audio-device', callback);
+        ipcRenderer.removeAllListeners('input-audio-device');
+        ipcRenderer.on('input-audio-device', (_: any, deviceId: string) => callback(deviceId));
         return () => ipcRenderer.removeAllListeners('input-audio-device');
       },
     },
@@ -548,7 +559,8 @@ const ipcService = {
 
       onUpdate: (callback: (deviceId: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('output-audio-device', callback);
+        ipcRenderer.removeAllListeners('output-audio-device');
+        ipcRenderer.on('output-audio-device', (_: any, deviceId: string) => callback(deviceId));
         return () => ipcRenderer.removeAllListeners('output-audio-device');
       },
     },
@@ -566,7 +578,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('mix-effect', callback);
+        ipcRenderer.removeAllListeners('mix-effect');
+        ipcRenderer.on('mix-effect', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('mix-effect');
       },
     },
@@ -584,7 +597,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('mix-effect-type', callback);
+        ipcRenderer.removeAllListeners('mix-effect-type');
+        ipcRenderer.on('mix-effect-type', (_: any, key: string) => callback(key));
         return () => ipcRenderer.removeAllListeners('mix-effect-type');
       },
     },
@@ -602,7 +616,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('auto-mix-setting', callback);
+        ipcRenderer.removeAllListeners('auto-mix-setting');
+        ipcRenderer.on('auto-mix-setting', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('auto-mix-setting');
       },
     },
@@ -620,7 +635,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('echo-cancellation', callback);
+        ipcRenderer.removeAllListeners('echo-cancellation');
+        ipcRenderer.on('echo-cancellation', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('echo-cancellation');
       },
     },
@@ -638,7 +654,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('noise-cancellation', callback);
+        ipcRenderer.removeAllListeners('noise-cancellation');
+        ipcRenderer.on('noise-cancellation', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('noise-cancellation');
       },
     },
@@ -656,7 +673,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('microphone-amplification', callback);
+        ipcRenderer.removeAllListeners('microphone-amplification');
+        ipcRenderer.on('microphone-amplification', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('microphone-amplification');
       },
     },
@@ -674,7 +692,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('manual-mix-mode', callback);
+        ipcRenderer.removeAllListeners('manual-mix-mode');
+        ipcRenderer.on('manual-mix-mode', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('manual-mix-mode');
       },
     },
@@ -692,7 +711,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: MixMode) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('mix-mode', callback);
+        ipcRenderer.removeAllListeners('mix-mode');
+        ipcRenderer.on('mix-mode', (_: any, key: MixMode) => callback(key));
         return () => ipcRenderer.removeAllListeners('mix-mode');
       },
     },
@@ -710,7 +730,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: SpeakingMode) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('speaking-mode', callback);
+        ipcRenderer.removeAllListeners('speaking-mode');
+        ipcRenderer.on('speaking-mode', (_: any, key: SpeakingMode) => callback(key));
         return () => ipcRenderer.removeAllListeners('speaking-mode');
       },
     },
@@ -728,7 +749,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('default-speaking-key', callback);
+        ipcRenderer.removeAllListeners('default-speaking-key');
+        ipcRenderer.on('default-speaking-key', (_: any, key: string) => callback(key));
         return () => ipcRenderer.removeAllListeners('default-speaking-key');
       },
     },
@@ -746,7 +768,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('not-save-message-history', callback);
+        ipcRenderer.removeAllListeners('not-save-message-history');
+        ipcRenderer.on('not-save-message-history', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('not-save-message-history');
       },
     },
@@ -764,7 +787,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('hot-key-open-main-window', callback);
+        ipcRenderer.removeAllListeners('hot-key-open-main-window');
+        ipcRenderer.on('hot-key-open-main-window', (_: any, key: string) => callback(key));
         return () => ipcRenderer.removeAllListeners('hot-key-open-main-window');
       },
     },
@@ -782,7 +806,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('hot-key-increase-volume', callback);
+        ipcRenderer.removeAllListeners('hot-key-increase-volume');
+        ipcRenderer.on('hot-key-increase-volume', (_: any, key: string) => callback(key));
         return () => ipcRenderer.removeAllListeners('hot-key-increase-volume');
       },
     },
@@ -800,7 +825,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('hot-key-decrease-volume', callback);
+        ipcRenderer.removeAllListeners('hot-key-decrease-volume');
+        ipcRenderer.on('hot-key-decrease-volume', (_: any, key: string) => callback(key));
         return () => ipcRenderer.removeAllListeners('hot-key-decrease-volume');
       },
     },
@@ -818,7 +844,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('hot-key-toggle-speaker', callback);
+        ipcRenderer.removeAllListeners('hot-key-toggle-speaker');
+        ipcRenderer.on('hot-key-toggle-speaker', (_: any, key: string) => callback(key));
         return () => ipcRenderer.removeAllListeners('hot-key-toggle-speaker');
       },
     },
@@ -836,7 +863,8 @@ const ipcService = {
 
       onUpdate: (callback: (key: string) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('hot-key-toggle-microphone', callback);
+        ipcRenderer.removeAllListeners('hot-key-toggle-microphone');
+        ipcRenderer.on('hot-key-toggle-microphone', (_: any, key: string) => callback(key));
         return () => ipcRenderer.removeAllListeners('hot-key-toggle-microphone');
       },
     },
@@ -854,7 +882,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('disable-all-sound-effect', callback);
+        ipcRenderer.removeAllListeners('disable-all-sound-effect');
+        ipcRenderer.on('disable-all-sound-effect', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('disable-all-sound-effect');
       },
     },
@@ -872,7 +901,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('enter-voice-channel-sound', callback);
+        ipcRenderer.removeAllListeners('enter-voice-channel-sound');
+        ipcRenderer.on('enter-voice-channel-sound', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('enter-voice-channel-sound');
       },
     },
@@ -890,7 +920,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('leave-voice-channel-sound', callback);
+        ipcRenderer.removeAllListeners('leave-voice-channel-sound');
+        ipcRenderer.on('leave-voice-channel-sound', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('leave-voice-channel-sound');
       },
     },
@@ -908,7 +939,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('start-speaking-sound', callback);
+        ipcRenderer.removeAllListeners('start-speaking-sound');
+        ipcRenderer.on('start-speaking-sound', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('start-speaking-sound');
       },
     },
@@ -926,7 +958,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('stop-speaking-sound', callback);
+        ipcRenderer.removeAllListeners('stop-speaking-sound');
+        ipcRenderer.on('stop-speaking-sound', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('stop-speaking-sound');
       },
     },
@@ -944,7 +977,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('receive-direct-message-sound', callback);
+        ipcRenderer.removeAllListeners('receive-direct-message-sound');
+        ipcRenderer.on('receive-direct-message-sound', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('receive-direct-message-sound');
       },
     },
@@ -962,7 +996,8 @@ const ipcService = {
 
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (!isElectron) return () => {};
-        ipcRenderer.on('receive-channel-message-sound', callback);
+        ipcRenderer.removeAllListeners('receive-channel-message-sound');
+        ipcRenderer.on('receive-channel-message-sound', (_: any, enabled: boolean) => callback(enabled));
         return () => ipcRenderer.removeAllListeners('receive-channel-message-sound');
       },
     },

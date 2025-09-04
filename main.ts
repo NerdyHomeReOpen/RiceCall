@@ -975,7 +975,7 @@ app.on('ready', async () => {
       statusAutoIdle: store.get('statusAutoIdle') ?? false,
       statusAutoIdleMinutes: store.get('statusAutoIdleMinutes') || 10,
       statusAutoDnd: store.get('statusAutoDnd') ?? false,
-      channelUIMode: store.get('channelUIMode') || 'auto',
+      channelUIMode: store.get('channelUIMode') || 'classic',
       closeToTray: store.get('closeToTray') ?? false,
       dontShowDisclaimer: store.get('dontShowDisclaimer') ?? false,
       font: store.get('font') || '',
@@ -993,16 +993,16 @@ app.on('ready', async () => {
       mixMode: store.get('mixMode') || 'all',
       // Voice settings
       speakingMode: store.get('speakingMode') || 'key',
-      defaultSpeakingKey: store.get('defaultSpeakingKey') || '',
+      defaultSpeakingKey: store.get('defaultSpeakingKey') || 'v',
       // Privacy settings
       notSaveMessageHistory: store.get('notSaveMessageHistory') ?? true,
       // Hotkeys Settings
-      hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow') || '',
+      hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow') || 'F1',
       hotKeyScreenshot: store.get('hotKeyScreenshot') || '',
-      hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume') || '',
-      hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume') || '',
-      hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker') || '',
-      hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone') || '',
+      hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume') || 'Ctrl+m',
+      hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume') || 'Shift+m',
+      hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker') || 'Alt+m',
+      hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone') || 'Alt+v',
       // SoundEffect settings
       disableAllSoundEffect: store.get('disableAllSoundEffect') ?? false,
       enterVoiceChannelSound: store.get('enterVoiceChannelSound') ?? true,
@@ -1108,7 +1108,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-default-speaking-key', (event) => {
-    event.returnValue = store.get('defaultSpeakingKey') || '';
+    event.returnValue = store.get('defaultSpeakingKey') || 'v';
   });
 
   // Privacy
@@ -1118,23 +1118,23 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('get-hot-key-open-main-window', (event) => {
-    event.returnValue = store.get('hotKeyOpenMainWindow') || '';
+    event.returnValue = store.get('hotKeyOpenMainWindow') || 'F1';
   });
 
   ipcMain.on('get-hot-key-increase-volume', (event) => {
-    event.returnValue = store.get('hotKeyIncreaseVolume') || '';
+    event.returnValue = store.get('hotKeyIncreaseVolume') || 'Ctrl+m';
   });
 
   ipcMain.on('get-hot-key-decrease-volume', (event) => {
-    event.returnValue = store.get('hotKeyDecreaseVolume') || '';
+    event.returnValue = store.get('hotKeyDecreaseVolume') || 'Shift+m';
   });
 
   ipcMain.on('get-hot-key-toggle-speaker', (event) => {
-    event.returnValue = store.get('hotKeyToggleSpeaker') || '';
+    event.returnValue = store.get('hotKeyToggleSpeaker') || 'Alt+m';
   });
 
   ipcMain.on('get-hot-key-toggle-microphone', (event) => {
-    event.returnValue = store.get('hotKeyToggleMicrophone') || '';
+    event.returnValue = store.get('hotKeyToggleMicrophone') || 'Alt+v';
   });
 
   // SoundEffect
@@ -1318,7 +1318,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-default-speaking-key', (_, key) => {
-    store.set('defaultSpeakingKey', key || '');
+    store.set('defaultSpeakingKey', key || 'v');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1334,35 +1334,35 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
-    store.set('hotKeyOpenMainWindow', key || '');
+    store.set('hotKeyOpenMainWindow', key || 'F1');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-open-main-window', key);
     });
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key) => {
-    store.set('hotKeyIncreaseVolume', key || '');
+    store.set('hotKeyIncreaseVolume', key || 'Ctrl+m');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-increase-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
-    store.set('hotKeyDecreaseVolume', key || '');
+    store.set('hotKeyDecreaseVolume', key || 'Shift+m');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-decrease-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
-    store.set('hotKeyToggleSpeaker', key || '');
+    store.set('hotKeyToggleSpeaker', key || 'Alt+m');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-speaker', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
-    store.set('hotKeyToggleMicrophone', key || '');
+    store.set('hotKeyToggleMicrophone', key || 'Alt+v');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
