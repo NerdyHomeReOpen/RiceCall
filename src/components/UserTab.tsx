@@ -183,6 +183,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         if (selectedItemId === `user-${memberUserId}`) setSelectedItemId(null);
         else setSelectedItemId(`user-${memberUserId}`);
       }}
+      onDoubleClick={() => {
+        if (isUser) return;
+        handleOpenDirectMessage(userId, memberUserId);
+      }}
       onMouseEnter={(e) => {
         const x = e.currentTarget.getBoundingClientRect().right;
         const y = e.currentTarget.getBoundingClientRect().top;
