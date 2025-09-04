@@ -644,10 +644,14 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   }, [mutedIds]);
 
   useEffect(() => {
+    handleEditInputDevice(ipc.systemSettings.inputAudioDevice.get());
+    handleEditOutputDevice(ipc.systemSettings.outputAudioDevice.get());
+    handleEditSpeakingMode(ipc.systemSettings.speakingMode.get());
+
     const unsubscribe = [
-      ipc.systemSettings.inputAudioDevice.get(handleEditInputDevice),
-      ipc.systemSettings.outputAudioDevice.get(handleEditOutputDevice),
-      ipc.systemSettings.speakingMode.get(handleEditSpeakingMode),
+      ipc.systemSettings.inputAudioDevice.onUpdate(handleEditInputDevice),
+      ipc.systemSettings.outputAudioDevice.onUpdate(handleEditOutputDevice),
+      ipc.systemSettings.speakingMode.onUpdate(handleEditSpeakingMode),
       ipc.socket.on('SFUJoined', handleSFUJoined),
       ipc.socket.on('SFULeft', handleSFULeft),
       ipc.socket.on('SFUNewProducer', handleNewProducer),

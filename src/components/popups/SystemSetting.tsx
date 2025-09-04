@@ -191,7 +191,8 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   }, [hotKeys, handleSetHotKey]);
 
   useEffect(() => {
-    ipc.systemSettings.get((data) => {
+    const data = ipc.systemSettings.get();
+    if (data) {
       // Basic settings
       setAutoLogin(data.autoLogin);
       setAutoLaunch(data.autoLaunch);
@@ -244,11 +245,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
       setStopSpeakingSound(data.stopSpeakingSound);
       setReceiveDirectMessageSound(data.receiveDirectMessageSound);
       setReceiveChannelMessageSound(data.receiveChannelMessageSound);
-    });
+    }
 
-    ipc.fontList.get((fonts) => {
-      setFontList(fonts);
-    });
+    setFontList(ipc.fontList.get());
 
     activeInputRef.current = null;
 

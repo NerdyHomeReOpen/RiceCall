@@ -40,7 +40,10 @@ const Providers = ({ children }: ProvidersProps) => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = [ipc.systemSettings.font.get(handleEditFont), ipc.systemSettings.fontSize.get(handleEditFontSize)];
+    handleEditFont(ipc.systemSettings.font.get());
+    handleEditFontSize(ipc.systemSettings.fontSize.get());
+
+    const unsubscribe = [ipc.systemSettings.font.onUpdate(handleEditFont), ipc.systemSettings.fontSize.onUpdate(handleEditFontSize)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleEditFont, handleEditFontSize]);
 

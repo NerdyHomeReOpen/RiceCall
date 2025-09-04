@@ -1,7 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import ErrorHandler from '@/utils/error';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// Safe reference to electron's ipcRenderer
+let ipcRenderer: any = null;
+
+// Initialize ipcRenderer only in client-side and Electron environment
+if (typeof window !== 'undefined' && window.require) {
+  try {
+    const electron = window.require('electron');
+    ipcRenderer = electron.ipcRenderer;
+  } catch (error) {
+    console.warn('Not in Electron environment:', error);
+  }
+}
+
+const API_URL = ipcRenderer?.sendSync('get-env')?.API_URL || '';
 
 type RequestOptions = {
   headers?: Record<string, string>;

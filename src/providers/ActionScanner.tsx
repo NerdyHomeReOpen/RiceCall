@@ -222,15 +222,24 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
       toggleMicrophoneKeyRef.current = key;
     };
 
+    changeStatusAutoIdle(ipc.systemSettings.statusAutoIdle.get());
+    changeStatusAutoIdleMinutes(ipc.systemSettings.statusAutoIdleMinutes.get());
+    changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
+    changeHotKeyOpenMainWindow(ipc.systemSettings.hotKeyOpenMainWindow.get());
+    changeHotKeyIncreaseVolume(ipc.systemSettings.hotKeyIncreaseVolume.get());
+    changeHotKeyDecreaseVolume(ipc.systemSettings.hotKeyDecreaseVolume.get());
+    changeHotKeyToggleSpeaker(ipc.systemSettings.hotKeyToggleSpeaker.get());
+    changeHotKeyToggleMicrophone(ipc.systemSettings.hotKeyToggleMicrophone.get());
+
     const unsubscribe = [
-      ipc.systemSettings.statusAutoIdle.get(changeStatusAutoIdle),
-      ipc.systemSettings.statusAutoIdleMinutes.get(changeStatusAutoIdleMinutes),
-      ipc.systemSettings.defaultSpeakingKey.get(changeDefaultSpeakingKey),
-      ipc.systemSettings.hotKeyOpenMainWindow.get(changeHotKeyOpenMainWindow),
-      ipc.systemSettings.hotKeyIncreaseVolume.get(changeHotKeyIncreaseVolume),
-      ipc.systemSettings.hotKeyDecreaseVolume.get(changeHotKeyDecreaseVolume),
-      ipc.systemSettings.hotKeyToggleSpeaker.get(changeHotKeyToggleSpeaker),
-      ipc.systemSettings.hotKeyToggleMicrophone.get(changeHotKeyToggleMicrophone),
+      ipc.systemSettings.statusAutoIdle.onUpdate(changeStatusAutoIdle),
+      ipc.systemSettings.statusAutoIdleMinutes.onUpdate(changeStatusAutoIdleMinutes),
+      ipc.systemSettings.defaultSpeakingKey.onUpdate(changeDefaultSpeakingKey),
+      ipc.systemSettings.hotKeyOpenMainWindow.onUpdate(changeHotKeyOpenMainWindow),
+      ipc.systemSettings.hotKeyIncreaseVolume.onUpdate(changeHotKeyIncreaseVolume),
+      ipc.systemSettings.hotKeyDecreaseVolume.onUpdate(changeHotKeyDecreaseVolume),
+      ipc.systemSettings.hotKeyToggleSpeaker.onUpdate(changeHotKeyToggleSpeaker),
+      ipc.systemSettings.hotKeyToggleMicrophone.onUpdate(changeHotKeyToggleMicrophone),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en' | 'ja' | 'fa' | 'pt-BR' | 'ru' | 'es-ES' | 'tr';
 export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'zh-TW', label: '繁體中文' },
@@ -22,7 +21,20 @@ import zhTW_message from './locales/zh-TW/message.json';
 import zhTW_rpc from './locales/zh-TW/rpc.json';
 import zhTW_country from './locales/zh-TW/country.json';
 
-const hash = process.env.NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH || '';
+// Safe reference to electron's ipcRenderer
+let ipcRenderer: any = null;
+
+// Initialize ipcRenderer only in client-side and Electron environment
+if (typeof window !== 'undefined' && window.require) {
+  try {
+    const electron = window.require('electron');
+    ipcRenderer = electron.ipcRenderer;
+  } catch (error) {
+    console.warn('Not in Electron environment:', error);
+  }
+}
+
+const hash = ipcRenderer?.sendSync('get-env')?.CROWDIN_DISTRIBUTION_HASH || '';
 
 /** OTA backend */
 class CrowdinBackend {

@@ -1,6 +1,6 @@
 {
   "name": "ricecall",
-  "version": "0.2.0",
+  "version": "0.2.0-dev.20250904",
   "private": false,
   "description": "Ricecall",
   "author": {
@@ -20,8 +20,8 @@
     "next:export": "next export",
     "next:lint": "next lint",
     "electron:prep": "tsc -p tsconfig.electron.json",
-    "electron:dev": "electron -r tsx -r dotenv/config main.ts --dev",
-    "electron:start": "electron -r tsx -r dotenv/config main.ts",
+    "electron:dev": "electron -r tsx main.ts --dev",
+    "electron:start": "electron -r tsx main.ts",
     "electron:build": "electron-builder",
     "electron:build:deb": "electron-builder --linux deb",
     "electron:build:dmg": "electron-builder --mac dmg",
@@ -48,6 +48,7 @@
     "@types/react-color": "^3.0.13",
     "discord-rpc": "^4.0.1",
     "dotenv": "^16.5.0",
+    "dotenv-expand": "^12.0.3",
     "electron-serve": "^2.1.1",
     "electron-store": "^10.0.1",
     "electron-updater": "^6.6.2",
@@ -69,7 +70,8 @@
     "remark-gfm": "^4.0.1",
     "semver": "^7.7.2",
     "socket.io-client": "^4.8.1",
-    "twemoji": "^14.0.2"
+    "twemoji": "^14.0.2",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

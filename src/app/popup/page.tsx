@@ -194,7 +194,7 @@ const Popup = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    ipc.initialData.get((data) => setInitialData(data));
+    setInitialData(ipc.initialData.get());
   }, []);
 
   return (

@@ -182,8 +182,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   }, [actionScanner.isKeepAlive, user.status]);
 
   useEffect(() => {
+    isCloseToTray.current = ipc.systemSettings.closeToTray.get();
+
     const unsubscribe = [
-      ipc.systemSettings.closeToTray.get((enable) => (isCloseToTray.current = enable)),
+      ipc.systemSettings.closeToTray.onUpdate((enable) => (isCloseToTray.current = enable)),
       ipc.window.onUnmaximize(() => setIsFullscreen(false)),
       ipc.window.onMaximize(() => setIsFullscreen(true)),
     ];

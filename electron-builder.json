@@ -8,10 +8,10 @@
   "files": ["build/**/*", "out/**/*", "resources/**/*", "package.json"],
   "asar": true,
   "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-  "extraFiles": [
+  "extraResources": [
     {
       "from": ".env",
-      "to": ".env"
+      "to": "app.env"
     }
   ],
   "nsis": {
@@ -48,17 +48,7 @@
     {
       "provider": "github",
       "owner": "NerdyHomeReOpen",
-      "repo": "RiceCall",
-      "private": false,
-      "releaseType": "release"
-    },
-    {
-      "provider": "github",
-      "owner": "NerdyHomeReOpen",
-      "repo": "RiceCall",
-      "private": false,
-      "releaseType": "prerelease",
-      "channel": "dev"
+      "repo": "RiceCall"
     }
   ]
 }

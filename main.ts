@@ -1,68 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import fs from 'fs';
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
 import { io, Socket } from 'socket.io-client';
 import DiscordRPC from 'discord-rpc';
-import dotenv from 'dotenv';
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import ElectronUpdater from 'electron-updater';
+const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
+import dotenv from 'dotenv';
+import { expand } from 'dotenv-expand';
+import { z } from 'zod';
 
-type PopupType =
-  | 'aboutus'
-  | 'applyFriend'
-  | 'approveFriend'
-  | 'applyMember'
-  | 'blockMember'
-  | 'changeTheme'
-  | 'channelPassword'
-  | 'channelSetting'
-  | 'createChannel'
-  | 'createFriendGroup'
-  | 'createServer'
-  | 'dialogAlert'
-  | 'dialogAlert2'
-  | 'dialogError'
-  | 'dialogInfo'
-  | 'dialogSuccess'
-  | 'dialogWarning'
-  | 'directMessage'
-  | 'editChannelName'
-  | 'editChannelOrder'
-  | 'editFriendNote'
-  | 'editFriendGroupName'
-  | 'editNickname'
-  | 'friendVerification'
-  | 'imageCropper'
-  | 'inviteMember'
-  | 'memberApplicationSetting'
-  | 'memberInvitation'
-  | 'searchUser'
-  | 'serverBroadcast'
-  | 'serverSetting'
-  | 'systemSetting'
-  | 'userInfo'
-  | 'userSetting';
+const EnvSchema = z
+  .object({
+    API_URL: z.string(),
+    WS_URL: z.string(),
+    CROWDIN_DISTRIBUTION_HASH: z.string(),
+    UPDATE_CHANNEL: z.enum(['latest', 'dev']).default('latest'),
+  })
+  .partial();
+
+export type PublicConfig = Record<string, string>;
 
 dotenv.config();
 
 let tray: Tray | null = null;
 let isLogin: boolean = false;
 
-// AutoUpdater
-const { autoUpdater } = ElectronUpdater;
-
 // Store
-type StoreSchema = {
-  theme: string;
-  audioInputDevice: string;
-  audioOutputDevice: string;
-  dontShowDisclaimer: boolean;
-};
-const store = new Store<StoreSchema>();
+const store = new Store<Record<string, any>>();
 
+// Event
 const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
 
 const ClientToServerEventNames = [
@@ -181,6 +152,43 @@ export const ServerToClientEventNames = [
   'userUpdate',
 ];
 
+// Popup
+type PopupType =
+  | 'aboutus'
+  | 'applyFriend'
+  | 'approveFriend'
+  | 'applyMember'
+  | 'blockMember'
+  | 'changeTheme'
+  | 'channelPassword'
+  | 'channelSetting'
+  | 'createChannel'
+  | 'createFriendGroup'
+  | 'createServer'
+  | 'dialogAlert'
+  | 'dialogAlert2'
+  | 'dialogError'
+  | 'dialogInfo'
+  | 'dialogSuccess'
+  | 'dialogWarning'
+  | 'directMessage'
+  | 'editChannelName'
+  | 'editChannelOrder'
+  | 'editFriendNote'
+  | 'editFriendGroupName'
+  | 'editNickname'
+  | 'friendVerification'
+  | 'imageCropper'
+  | 'inviteMember'
+  | 'memberApplicationSetting'
+  | 'memberInvitation'
+  | 'searchUser'
+  | 'serverBroadcast'
+  | 'serverSetting'
+  | 'systemSetting'
+  | 'userInfo'
+  | 'userSetting';
+
 export const PopupSize: Record<PopupType, { height: number; width: number }> = {
   aboutus: { height: 750, width: 500 },
   applyFriend: { height: 375, width: 490 },
@@ -229,13 +237,15 @@ const APP_TRAY_ICON = {
   normal: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray.ico') : path.join(app.getAppPath(), 'resources', 'tray.png'),
 };
 
+// Env
+let env: Record<string, string> = {};
+
 // Windows
 let mainWindow: BrowserWindow;
 let authWindow: BrowserWindow;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
 let socketInstance: Socket | null = null;
 
 // Discord RPC
@@ -260,6 +270,45 @@ const defaultPrecence = {
 
 const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
+function readEnvFile(file: string, base: Record<string, string>) {
+  if (!fs.existsSync(file)) return base;
+
+  const cfg = dotenv.config({ path: file, processEnv: base, override: true });
+  expand(cfg);
+
+  return { ...base, ...(cfg.parsed ?? {}) };
+}
+
+export function loadEnv() {
+  // 1) Using process.env as base (can be overridden by system env)
+  let env: Record<string, string> = { ...process.env } as any;
+
+  // 2) Read files by context (from low to high, higher will override)
+  const files: string[] = [];
+  if (app.isPackaged) {
+    files.push(path.join(process.resourcesPath, 'app.env')); // default for packaged
+    files.push(path.join(app.getPath('userData'), 'app.env')); // user override
+  } else {
+    const root = process.cwd();
+    files.push(path.join(root, '.env')); // default for dev
+    // files.push(path.join(root, '.env.local')); // dev override
+  }
+  for (const file of files) env = readEnvFile(file, env);
+
+  // 3) Validate (optional: warn if missing values)
+  const parsed = EnvSchema.safeParse(env);
+  if (!parsed.success) {
+    console.warn(`${new Date().toLocaleString()} | [env] invalid values:`, parsed.error.flatten().fieldErrors);
+  } else {
+    Object.assign(env, parsed.data);
+  }
+
+  // 4) Fill process.env (for main process/sub process)
+  for (const [k, v] of Object.entries(env)) process.env[k] = String(v);
+
+  return { env, filesLoaded: files.filter(fs.existsSync) };
+}
+
 // Functions
 // async function checkIsHinet() {
 //   const ipData = await fetch('https://ipinfo.io/json').then((res) => res.json());
@@ -277,7 +326,6 @@ function waitForPort(port: number) {
         client.destroy();
         resolve(null);
       });
-
       client.once('error', () => {
         client.destroy();
         if (timeout <= 0) {
@@ -376,7 +424,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
     });
   } else {
     mainWindow.loadURL(`${BASE_URI}`);
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('close', (e) => {
@@ -470,8 +518,6 @@ async function createPopup(type: PopupType, id: string, data: any, force = true)
     if (popups[id] && !popups[id].isDestroyed()) {
       popups[id].show();
       popups[id].focus();
-      popups[id].setAlwaysOnTop(true);
-      popups[id].setAlwaysOnTop(false);
       return popups[id];
     }
   }
@@ -515,7 +561,9 @@ async function createPopup(type: PopupType, id: string, data: any, force = true)
   }
 
   ipcMain.removeAllListeners('get-initial-data');
-  ipcMain.handleOnce('get-initial-data', () => data);
+  ipcMain.on('get-initial-data', (event) => {
+    event.returnValue = data;
+  });
 
   popups[id].on('close', (e) => {
     e.preventDefault();
@@ -526,7 +574,6 @@ async function createPopup(type: PopupType, id: string, data: any, force = true)
   popups[id].webContents.once('did-finish-load', () => {
     popups[id].show();
     popups[id].focus();
-    popups[id].setAlwaysOnTop(true);
   });
 
   popups[id].webContents.setWindowOpenHandler(({ url }) => {
@@ -539,13 +586,14 @@ async function createPopup(type: PopupType, id: string, data: any, force = true)
 
 // Socket Functions
 function connectSocket(token: string): Socket | null {
+  console.log(`connectSocket url: ${env.WS_URL} using token: ${token}`);
   if (!token) return null;
 
   if (socketInstance) {
     socketInstance = disconnectSocket();
   }
 
-  const socket = io(WS_URL, {
+  const socket = io(env.WS_URL, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 1000,
@@ -657,7 +705,6 @@ function connectSocket(token: string): Socket | null {
   });
 
   socket.connect();
-
   return socket;
 }
 
@@ -672,20 +719,14 @@ function disconnectSocket(): Socket | null {
   }
 
   socketInstance.disconnect();
-
   return null;
 }
 
 // Auto Updater
 function checkUpdate() {
   if (DEV) return;
-
-  // Dev channel // TODO: Remove this before release
-  autoUpdater.allowPrerelease = true;
-  autoUpdater.channel = 'dev';
-
   autoUpdater.checkForUpdates().catch((error) => {
-    console.error('Cannot check for updates:', error);
+    console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error);
   });
 }
 
@@ -694,17 +735,24 @@ function configureAutoUpdater() {
   autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.allowDowngrade = false;
 
+  // Dev channel // TODO: Remove this before release
+  autoUpdater.allowPrerelease = true;
+  autoUpdater.channel = env.UPDATE_CHANNEL ?? 'latest';
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'NerdyHomeReOpen',
+    repo: 'RiceCall',
+    channel: env.UPDATE_CHANNEL ?? 'latest',
+  });
+
   if (DEV) {
     autoUpdater.forceDevUpdateConfig = true;
     autoUpdater.updateConfigPath = path.join(app.getAppPath(), 'dev-app-update.yml');
   }
 
   autoUpdater.on('error', (error: any) => {
-    if (DEV && error.message.includes('dev-app-update.yml')) {
-      console.info('Skip update check in development environment');
-      return;
-    }
-    console.error('Cannot check for updates:', error.message);
+    if (DEV) return;
+    console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
   });
 
   autoUpdater.on('update-available', (info: any) => {
@@ -716,17 +764,20 @@ function configureAutoUpdater() {
   });
 
   autoUpdater.on('update-not-available', () => {
-    console.info('目前是最新版本');
+    if (DEV) return;
+    console.info(`${new Date().toLocaleString()} | Is latest version`);
   });
 
   autoUpdater.on('download-progress', (progressObj: any) => {
-    let message = `下載速度: ${progressObj.bytesPerSecond}`;
-    message = `${message} - 已下載 ${progressObj.percent}%`;
+    if (DEV) return;
+    let message = `Downloading update: ${progressObj.bytesPerSecond}`;
+    message = `${message} - ${progressObj.percent}%`;
     message = `${message} (${progressObj.transferred}/${progressObj.total})`;
-    console.info(message);
+    console.info(`${new Date().toLocaleString()} | ${message}`);
   });
 
   autoUpdater.on('update-downloaded', (info: any) => {
+    if (DEV) return;
     dialog
       .showMessageBox({
         type: 'info',
@@ -741,16 +792,15 @@ function configureAutoUpdater() {
       });
   });
 
-  // Check update every minute
-  setInterval(checkUpdate, 60 * 1000);
+  // Check update every hour
+  setInterval(checkUpdate, 60 * 60 * 1000);
   checkUpdate();
 }
 
 // Discord RPC Functions
 async function setActivity(presence: DiscordRPC.Presence) {
-  return;
   await rpc?.setActivity(presence).catch((error) => {
-    console.error('Cannot set activity:', error);
+    console.error(`${new Date().toLocaleString()} | Cannot set Discord RPC activity:`, error);
   });
 }
 
@@ -758,7 +808,7 @@ async function configureDiscordRPC() {
   DiscordRPC.register(DISCORD_RPC_CLIENT_ID);
   rpc = new DiscordRPC.Client({ transport: 'ipc' });
   rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID }).catch(() => {
-    console.warn('Cannot login to Discord RPC, will not show Discord status');
+    console.warn(`${new Date().toLocaleString()} | Cannot login to Discord RPC, will not show Discord status`);
     return null;
   });
   rpc?.on('ready', () => {
@@ -812,11 +862,8 @@ function configureTray() {
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
   tray.setToolTip(`RiceCall v${app.getVersion()}`);
   tray.on('click', () => {
-    if (isLogin) {
-      mainWindow.show();
-    } else {
-      authWindow.show();
-    }
+    if (isLogin) mainWindow.show();
+    else authWindow.show();
   });
   setTrayIcon(isLogin);
 }
@@ -827,13 +874,9 @@ app.on('ready', async () => {
   configureDiscordRPC();
   configureTray();
 
-  // if (await checkIsHinet()) websocketUrl = WS_URL;
-
   if (!store.get('dontShowDisclaimer')) {
-    await createPopup('aboutus', 'aboutUs', null);
-    popups['aboutUs'].setAlwaysOnTop(true);
+    createPopup('aboutus', 'aboutUs', {});
   }
-
   createAuthWindow().then((authWindow) => authWindow.show());
   createMainWindow().then((mainWindow) => mainWindow.hide());
 
@@ -847,11 +890,9 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('logout', () => {
-    if (rpc) {
-      rpc.clearActivity().catch((error) => {
-        console.error('Cannot clear activity:', error);
-      });
-    }
+    rpc?.clearActivity().catch((error) => {
+      console.error(`${new Date().toLocaleString()} | Cannot clear activity:`, error);
+    });
     closePopups();
     mainWindow.hide();
     authWindow.show();
@@ -919,6 +960,11 @@ app.on('ready', async () => {
     setActivity(updatePresence);
   });
 
+  // Env
+  ipcMain.on('get-env', (event) => {
+    event.returnValue = env;
+  });
+
   // System settings handlers
   ipcMain.on('get-system-settings', (event) => {
     const settings = {
@@ -966,162 +1012,158 @@ app.on('ready', async () => {
       receiveDirectMessageSound: store.get('receiveDirectMessageSound') ?? true,
       receiveChannelMessageSound: store.get('receiveChannelMessageSound') ?? true,
     };
-    event.reply('system-settings', settings);
+    event.returnValue = settings;
   });
 
   // Basic
   ipcMain.on('get-auto-login', (event) => {
-    event.reply('auto-login', store.get('autoLogin') ?? false);
+    event.returnValue = store.get('autoLogin') ?? false;
   });
 
   ipcMain.on('get-auto-launch', (event) => {
-    event.reply('auto-launch', isAutoLaunchEnabled());
+    event.returnValue = isAutoLaunchEnabled();
   });
 
   ipcMain.on('get-always-on-top', (event) => {
-    event.reply('always-on-top', store.get('alwaysOnTop') ?? false);
+    event.returnValue = store.get('alwaysOnTop') ?? false;
   });
 
   ipcMain.on('get-status-auto-idle', (event) => {
-    event.reply('status-auto-idle', store.get('statusAutoIdle') ?? false);
+    event.returnValue = store.get('statusAutoIdle') ?? false;
   });
 
   ipcMain.on('get-status-auto-idle-minutes', (event) => {
-    event.reply('status-auto-idle-minutes', store.get('statusAutoIdleMinutes') || 10);
+    event.returnValue = store.get('statusAutoIdleMinutes') || 10;
   });
 
   ipcMain.on('get-status-auto-dnd', (event) => {
-    event.reply('status-auto-dnd', store.get('statusAutoDnd') ?? false);
+    event.returnValue = store.get('statusAutoDnd') ?? false;
   });
 
   ipcMain.on('get-channel-ui-mode', (event) => {
-    event.reply('channel-ui-mode', store.get('channelUIMode') || 'classic');
+    event.returnValue = store.get('channelUIMode') || 'classic';
   });
 
   ipcMain.on('get-close-to-tray', (event) => {
-    event.reply('close-to-tray', store.get('closeToTray') ?? false);
+    event.returnValue = store.get('closeToTray') ?? false;
   });
 
   ipcMain.on('get-font', (event) => {
-    event.reply('font', store.get('font') || 'Arial');
+    event.returnValue = store.get('font') || 'Arial';
   });
 
   ipcMain.on('get-font-size', (event) => {
-    event.reply('font-size', store.get('fontSize') || 13);
+    event.returnValue = store.get('fontSize') || 13;
   });
 
   ipcMain.on('get-font-list', async (event) => {
     const fonts = await fontList.getFonts();
-    event.reply('font-list', fonts);
-  });
-
-  ipcMain.on('get-not-save-message-history', (event) => {
-    event.reply('not-save-message-history', store.get('notSaveMessageHistory') ?? true);
+    event.returnValue = fonts;
   });
 
   // Mix
   ipcMain.on('get-input-audio-device', (event) => {
-    event.reply('input-audio-device', store.get('audioInputDevice') || '');
+    event.returnValue = store.get('audioInputDevice') || '';
   });
 
   ipcMain.on('get-output-audio-device', (event) => {
-    event.reply('output-audio-device', store.get('audioOutputDevice') || '');
+    event.returnValue = store.get('audioOutputDevice') || '';
   });
 
   ipcMain.on('get-mix-effect', (event) => {
-    event.reply('mix-effect', store.get('mixEffect') ?? false);
+    event.returnValue = store.get('mixEffect') ?? false;
   });
 
   ipcMain.on('get-mix-effect-type', (event) => {
-    event.reply('mix-effect-type', store.get('mixEffectType') || '');
+    event.returnValue = store.get('mixEffectType') || '';
   });
 
   ipcMain.on('get-auto-mix-setting', (event) => {
-    event.reply('auto-mix-setting', store.get('autoMixSetting') ?? false);
+    event.returnValue = store.get('autoMixSetting') ?? false;
   });
 
   ipcMain.on('get-echo-cancellation', (event) => {
-    event.reply('echo-cancellation', store.get('echoCancellation') ?? false);
+    event.returnValue = store.get('echoCancellation') ?? false;
   });
 
   ipcMain.on('get-noise-cancellation', (event) => {
-    event.reply('noise-cancellation', store.get('noiseCancellation') ?? false);
+    event.returnValue = store.get('noiseCancellation') ?? false;
   });
 
   ipcMain.on('get-microphone-amplification', (event) => {
-    event.reply('microphone-amplification', store.get('microphoneAmplification') ?? false);
+    event.returnValue = store.get('microphoneAmplification') ?? false;
   });
 
   ipcMain.on('get-manual-mix-mode', (event) => {
-    event.reply('manual-mix-mode', store.get('manualMixMode') ?? false);
+    event.returnValue = store.get('manualMixMode') ?? false;
   });
 
   ipcMain.on('get-mix-mode', (event) => {
-    event.reply('mix-mode', store.get('mixMode') || 'all');
+    event.returnValue = store.get('mixMode') || 'all';
   });
 
   // Voice
   ipcMain.on('get-speaking-mode', (event) => {
-    event.reply('speaking-mode', store.get('speakingMode') || 'key');
+    event.returnValue = store.get('speakingMode') || 'key';
   });
 
   ipcMain.on('get-default-speaking-key', (event) => {
-    event.reply('default-speaking-key', store.get('defaultSpeakingKey') || '');
+    event.returnValue = store.get('defaultSpeakingKey') || '';
   });
 
   // Privacy
   ipcMain.on('get-not-save-message-history', (event) => {
-    event.reply('not-save-message-history', store.get('notSaveMessageHistory') ?? true);
+    event.returnValue = store.get('notSaveMessageHistory') ?? true;
   });
 
   // HotKey
   ipcMain.on('get-hot-key-open-main-window', (event) => {
-    event.reply('hot-key-open-main-window', store.get('hotKeyOpenMainWindow') || '');
+    event.returnValue = store.get('hotKeyOpenMainWindow') || '';
   });
 
   ipcMain.on('get-hot-key-increase-volume', (event) => {
-    event.reply('hot-key-increase-volume', store.get('hotKeyIncreaseVolume') || '');
+    event.returnValue = store.get('hotKeyIncreaseVolume') || '';
   });
 
   ipcMain.on('get-hot-key-decrease-volume', (event) => {
-    event.reply('hot-key-decrease-volume', store.get('hotKeyDecreaseVolume') || '');
+    event.returnValue = store.get('hotKeyDecreaseVolume') || '';
   });
 
   ipcMain.on('get-hot-key-toggle-speaker', (event) => {
-    event.reply('hot-key-toggle-speaker', store.get('hotKeyToggleSpeaker') || '');
+    event.returnValue = store.get('hotKeyToggleSpeaker') || '';
   });
 
   ipcMain.on('get-hot-key-toggle-microphone', (event) => {
-    event.reply('hot-key-toggle-microphone', store.get('hotKeyToggleMicrophone') || '');
+    event.returnValue = store.get('hotKeyToggleMicrophone') || '';
   });
 
   // SoundEffect
   ipcMain.on('get-disable-all-sound-effect', (event) => {
-    event.reply('disable-all-sound-effect', store.get('disableAllSoundEffect') ?? false);
+    event.returnValue = store.get('disableAllSoundEffect') ?? false;
   });
 
   ipcMain.on('get-enter-voice-channel-sound', (event) => {
-    event.reply('enter-voice-channel-sound', store.get('enterVoiceChannelSound') ?? true);
+    event.returnValue = store.get('enterVoiceChannelSound') ?? true;
   });
 
   ipcMain.on('get-leave-voice-channel-sound', (event) => {
-    event.reply('leave-voice-channel-sound', store.get('leaveVoiceChannelSound') ?? true);
+    event.returnValue = store.get('leaveVoiceChannelSound') ?? true;
   });
 
   ipcMain.on('get-start-speaking-sound', (event) => {
-    event.reply('start-speaking-sound', store.get('startSpeakingSound') ?? true);
+    event.returnValue = store.get('startSpeakingSound') ?? true;
   });
 
   ipcMain.on('get-stop-speaking-sound', (event) => {
-    event.reply('stop-speaking-sound', store.get('stopSpeakingSound') ?? true);
+    event.returnValue = store.get('stopSpeakingSound') ?? true;
   });
 
   ipcMain.on('get-receive-direct-message-sound', (event) => {
-    event.reply('receive-direct-message-sound', store.get('receiveDirectMessageSound') ?? true);
+    event.returnValue = store.get('receiveDirectMessageSound') ?? true;
   });
 
   ipcMain.on('get-receive-channel-message-sound', (event) => {
-    event.reply('receive-channel-message-sound', store.get('receiveChannelMessageSound') ?? true);
+    event.returnValue = store.get('receiveChannelMessageSound') ?? true;
   });
 
   // Basic
@@ -1396,15 +1438,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-app.on('activate', async () => {
+app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    await createAuthWindow().then((authWindow) => {
-      authWindow.show();
-    });
-
-    await createMainWindow().then((mainWindow) => {
-      mainWindow.hide();
-    });
+    createAuthWindow().then((authWindow) => authWindow.show());
+    createMainWindow().then((mainWindow) => mainWindow.hide());
   }
 });
 
@@ -1414,6 +1451,7 @@ app.on('open-url', (event, url) => {
 });
 
 app.whenReady().then(() => {
+  env = loadEnv().env;
   const protocolClient = process.execPath;
   const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
 
@@ -1422,17 +1460,12 @@ app.whenReady().then(() => {
 
 if (!app.requestSingleInstanceLock()) {
   const hasDeepLink = process.argv.find((arg) => arg.startsWith('ricecall://'));
-  if (hasDeepLink) {
-    app.quit();
-  }
+  if (hasDeepLink) app.quit();
 } else {
   app.on('second-instance', (_, argv) => {
     const url = argv.find((arg) => arg.startsWith('ricecall://'));
-    if (url) {
-      handleDeepLink(url);
-    } else {
-      focusWindow();
-    }
+    if (url) handleDeepLink(url);
+    else focusWindow();
   });
 }
 
@@ -1450,6 +1483,6 @@ async function handleDeepLink(url: string) {
         break;
     }
   } catch (error) {
-    console.error('解析deeplink錯誤:', error);
+    console.error(`${new Date().toLocaleString()} | Error parsing deep link:`, error);
   }
 }

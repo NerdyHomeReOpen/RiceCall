@@ -119,15 +119,24 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
       receiveChannelMessageSoundRef.current = enabled;
     };
 
+    changeOutputAudioDevice(ipc.systemSettings.outputAudioDevice.get());
+    changeDisableAllSoundEffect(ipc.systemSettings.disableAllSoundEffect.get());
+    changeEnterVoiceChannelSound(ipc.systemSettings.enterVoiceChannelSound.get());
+    changeLeaveVoiceChannelSound(ipc.systemSettings.leaveVoiceChannelSound.get());
+    changeStartSpeakingSound(ipc.systemSettings.startSpeakingSound.get());
+    changeStopSpeakingSound(ipc.systemSettings.stopSpeakingSound.get());
+    changeReceiveDirectMessageSound(ipc.systemSettings.receiveDirectMessageSound.get());
+    changeReceiveChannelMessageSound(ipc.systemSettings.receiveChannelMessageSound.get());
+
     const unsubscribe = [
-      ipc.systemSettings.outputAudioDevice.get(changeOutputAudioDevice),
-      ipc.systemSettings.disableAllSoundEffect.get(changeDisableAllSoundEffect),
-      ipc.systemSettings.enterVoiceChannelSound.get(changeEnterVoiceChannelSound),
-      ipc.systemSettings.leaveVoiceChannelSound.get(changeLeaveVoiceChannelSound),
-      ipc.systemSettings.startSpeakingSound.get(changeStartSpeakingSound),
-      ipc.systemSettings.stopSpeakingSound.get(changeStopSpeakingSound),
-      ipc.systemSettings.receiveDirectMessageSound.get(changeReceiveDirectMessageSound),
-      ipc.systemSettings.receiveChannelMessageSound.get(changeReceiveChannelMessageSound),
+      ipc.systemSettings.outputAudioDevice.onUpdate(changeOutputAudioDevice),
+      ipc.systemSettings.disableAllSoundEffect.onUpdate(changeDisableAllSoundEffect),
+      ipc.systemSettings.enterVoiceChannelSound.onUpdate(changeEnterVoiceChannelSound),
+      ipc.systemSettings.leaveVoiceChannelSound.onUpdate(changeLeaveVoiceChannelSound),
+      ipc.systemSettings.startSpeakingSound.onUpdate(changeStartSpeakingSound),
+      ipc.systemSettings.stopSpeakingSound.onUpdate(changeStopSpeakingSound),
+      ipc.systemSettings.receiveDirectMessageSound.onUpdate(changeReceiveDirectMessageSound),
+      ipc.systemSettings.receiveChannelMessageSound.onUpdate(changeReceiveChannelMessageSound),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);

@@ -320,7 +320,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   }, [t, serverName, serverOnlineMembers]);
 
   useEffect(() => {
-    const unsubscribe = [ipc.systemSettings.speakingMode.get(setSpeakMode), ipc.systemSettings.defaultSpeakingKey.get(setSpeakHotKey), ipc.systemSettings.channelUIMode.get(setChannelUIMode)];
+    setSpeakMode(ipc.systemSettings.speakingMode.get());
+    setSpeakHotKey(ipc.systemSettings.defaultSpeakingKey.get());
+    setChannelUIMode(ipc.systemSettings.channelUIMode.get());
+
+    const unsubscribe = [
+      ipc.systemSettings.speakingMode.onUpdate(setSpeakMode),
+      ipc.systemSettings.defaultSpeakingKey.onUpdate(setSpeakHotKey),
+      ipc.systemSettings.channelUIMode.onUpdate(setChannelUIMode),
+    ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
