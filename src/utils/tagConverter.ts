@@ -16,6 +16,7 @@ const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
 const userIconBackRegex = /<span[^>]+data-icon=['"]([^'"]+)['"][^>]*>[\s\S]*?<\/span>/g;
 const userTagBackRegex = /<span[^>]+data-name=['"]([^'"]+)['"][^>]*>[\s\S]*?<\/span>/g;
 const embedBackRegex = /<iframe[^>]+data-embed=['"]([^'"]+)['"][^>]*><\/iframe>/g;
+const pTagRegex = /<p><\/p>/g;
 
 export const fromTags = (raw: string) =>
   raw
@@ -39,5 +40,5 @@ export const fromTags = (raw: string) =>
     });
 
 export const toTags = (html: string) => {
-  return html.replace(emojiBackRegex, '[emoji=$1]').replace(embedBackRegex, '[Embed=$1]').replace(userIconBackRegex, '[icon=$1]').replace(userTagBackRegex, '[tag=$1]');
+  return html.replace(emojiBackRegex, '[emoji=$1]').replace(embedBackRegex, '[Embed=$1]').replace(userIconBackRegex, '[icon=$1]').replace(userTagBackRegex, '[tag=$1]').replace(pTagRegex, '');
 };
