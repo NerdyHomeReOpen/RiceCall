@@ -50,7 +50,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const [isTextAlignLeft, setIsTextAlignLeft] = useState(false);
   const [isTextAlignCenter, setIsTextAlignCenter] = useState(false);
   const [isTextAlignRight, setIsTextAlignRight] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
 
   // Handlers
   const syncStyles = useCallback(() => {
@@ -219,55 +218,69 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
             </div>
             <div
               className={setting['button']}
+              style={{ position: 'relative' }}
               onClick={(e) => {
                 e.preventDefault();
-                editor?.chain().insertUserIcon({ gender: 'Male', level: '1' }).insertUserName({ name: 'Unknown' }).focus().run();
-                syncStyles();
+                const x = e.currentTarget.getBoundingClientRect().left;
+                const y = e.currentTarget.getBoundingClientRect().bottom;
+                contextMenu.showUserTagInput(x, y, 'right-bottom', (username) => {
+                  editor
+                    ?.chain()
+                    .insertUserIcon({ gender: 'Male', level: '2' })
+                    .insertUserName({ name: username || 'Unknown' })
+                    .focus()
+                    .run();
+                  syncStyles();
+                });
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M13.106 7.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V5.206H8.923v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907S8.308 9.84 7.371 9.84c-.895 0-1.442-.725-1.442-1.914" />
               </svg>
             </div>
+
             <div
               className={setting['button']}
               onClick={(e) => {
                 e.preventDefault();
-                const isYouTube = linkUrl.trim().startsWith('https://www.youtube.com/watch?v=');
-                const isTwitch = linkUrl.trim().startsWith('https://www.twitch.tv/');
-                const isKick = linkUrl.trim().startsWith('https://kick.com/');
-                if (isYouTube) {
-                  const videoId = linkUrl.trim().split('/watch?v=')[1].split('&')[0];
-                  const src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-                  if (videoId && videoId.match(/^[\w-]+$/)) {
-                    editor?.chain().insertEmbed(src).focus().run();
-                    syncStyles();
+                const x = e.currentTarget.getBoundingClientRect().left;
+                const y = e.currentTarget.getBoundingClientRect().bottom;
+                contextMenu.showEmbedLinkInput(x, y, 'right-bottom', (linkUrl) => {
+                  const isYouTube = linkUrl.trim().startsWith('https://www.youtube.com/watch?v=');
+                  const isTwitch = linkUrl.trim().startsWith('https://www.twitch.tv/');
+                  const isKick = linkUrl.trim().startsWith('https://kick.com/');
+                  if (isYouTube) {
+                    const videoId = linkUrl.trim().split('/watch?v=')[1].split('&')[0];
+                    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    if (videoId && videoId.match(/^[\w-]+$/)) {
+                      editor?.chain().insertEmbed(src).focus().run();
+                      syncStyles();
+                    }
+                  } else if (isTwitch) {
+                    const username = linkUrl.trim().split('twitch.tv/')[1].split('&')[0];
+                    const src = `https://player.twitch.tv/?channel=${username}&parent=localhost`;
+                    if (username && username.match(/^[\w-]+$/)) {
+                      editor?.chain().insertEmbed(src).focus().run();
+                      syncStyles();
+                    }
+                  } else if (isKick) {
+                    const username = linkUrl.trim().split('kick.com/')[1].split('&')[0];
+                    const src = `https://player.kick.com/${username}`;
+                    if (username && username.match(/^[\w-]+$/)) {
+                      editor?.chain().insertEmbed(src).focus().run();
+                      syncStyles();
+                    }
                   }
-                } else if (isTwitch) {
-                  const username = linkUrl.trim().split('twitch.tv/')[1].split('&')[0];
-                  const src = `https://player.twitch.tv/?channel=${username}&parent=localhost`;
-                  if (username && username.match(/^[\w-]+$/)) {
-                    editor?.chain().insertEmbed(src).focus().run();
-                    syncStyles();
-                  }
-                } else if (isKick) {
-                  const username = linkUrl.trim().split('kick.com/')[1].split('&')[0];
-                  const src = `https://player.kick.com/${username}`;
-                  if (username && username.match(/^[\w-]+$/)) {
-                    editor?.chain().insertEmbed(src).focus().run();
-                    syncStyles();
-                  }
-                }
+                });
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z" />
               </svg>
             </div>
-            <input type="text" placeholder="YouTube/Twitch/Kick" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} style={{ maxWidth: '150px' }} />
           </div>
 
-          <EditorContent editor={editor} className={markdown['setting-markdown-container']} style={{ wordBreak: 'break-all' }} maxLength={1000} />
+          <EditorContent editor={editor} className={`${markdown['setting-markdown-container']} ${markdown['markdown-content']}`} style={{ wordBreak: 'break-all' }} maxLength={1000} />
         </div>
       ) : (
         <div className={markdown['setting-markdown-container']} style={{ height: '380px' }}>

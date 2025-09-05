@@ -10,6 +10,8 @@ import UserInfoCard from '@/components/UserInfoCard';
 import BadgeInfoCard from '@/components/BadgeInfoCard';
 import EmojiPicker from '@/components/EmojiPicker';
 import ColorPicker from '@/components/ColorPicker';
+import EmbedLinkInput from '@/components/EmbedLinkInput';
+import UserTagInput from '@/components/UserTagInput';
 
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => void;
@@ -18,18 +20,16 @@ interface ContextMenuContextType {
   showBadgeInfoCard: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Badge) => void;
   showEmojiPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onEmojiSelect: (code: string, full: string) => void) => void;
   showColorPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => void;
+  showEmbedLinkInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => void;
+  showUserTagInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (username: string) => void) => void;
   closeContextMenu: () => void;
   closeNotifyMenu: () => void;
   closeUserInfoBlock: () => void;
   closeBadgeInfoCard: () => void;
   closeEmojiPicker: () => void;
   closeColorPicker: () => void;
-  isContextMenuVisible: boolean;
-  isNotifyMenuVisible: boolean;
-  isUserInfoVisible: boolean;
-  isBadgeInfoVisible: boolean;
-  isEmojiPickerVisible: boolean;
-  isColorPickerVisible: boolean;
+  closeEmbedLinkInput: () => void;
+  closeUserTagInput: () => void;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
@@ -45,20 +45,25 @@ interface ContextMenuProviderProps {
 }
 
 const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
-  // States
+  // Refs
   const [isContextMenuVisible, setIsContextMenuVisible] = React.useState(false);
   const [isNotifyMenuVisible, setIsNotifyMenuVisible] = React.useState(false);
   const [isUserInfoVisible, setIsUserInfoVisible] = React.useState(false);
   const [isBadgeInfoVisible, setIsBadgeInfoVisible] = React.useState(false);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = React.useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = React.useState(false);
+  const [isEmbedLinkInputVisible, setIsEmbedLinkInputVisible] = React.useState(false);
+  const [isUserTagInputVisible, setIsUserTagInputVisible] = React.useState(false);
 
+  // States
   const [contextMenu, setContextMenu] = React.useState<ReactNode | null>(null);
   const [notifyMenu, setNotifyMenu] = React.useState<ReactNode | null>(null);
   const [userInfo, setUserInfo] = React.useState<ReactNode | null>(null);
   const [badgeInfo, setBadgeInfo] = React.useState<ReactNode | null>(null);
   const [emojiPicker, setEmojiPicker] = React.useState<ReactNode | null>(null);
   const [colorPicker, setColorPicker] = React.useState<ReactNode | null>(null);
+  const [embedLinkInput, setEmbedLinkInput] = React.useState<ReactNode | null>(null);
+  const [userTagInput, setUserTagInput] = React.useState<ReactNode | null>(null);
 
   // Handlers
   const showContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => {
@@ -121,6 +126,26 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsColorPickerVisible(false);
   };
 
+  const showEmbedLinkInput = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => {
+    setEmbedLinkInput(<EmbedLinkInput onSubmit={onSubmit} onClose={closeEmbedLinkInput} x={x} y={y} direction={direction} />);
+    setIsEmbedLinkInputVisible(true);
+  };
+
+  const closeEmbedLinkInput = () => {
+    setEmbedLinkInput(null);
+    setIsEmbedLinkInputVisible(false);
+  };
+
+  const showUserTagInput = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (username: string) => void) => {
+    setUserTagInput(<UserTagInput onSubmit={onSubmit} onClose={closeUserTagInput} x={x} y={y} direction={direction} />);
+    setIsUserTagInputVisible(true);
+  };
+
+  const closeUserTagInput = () => {
+    setUserTagInput(null);
+    setIsUserTagInputVisible(false);
+  };
+
   // Effects
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -138,6 +163,8 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         if (isEmojiPickerVisible) closeEmojiPicker();
         if (isNotifyMenuVisible) closeNotifyMenu();
         if (isColorPickerVisible) closeColorPicker();
+        if (isEmbedLinkInputVisible) closeEmbedLinkInput();
+        if (isUserTagInputVisible) closeUserTagInput();
       }
     };
     document.addEventListener('pointerdown', onPointerDown);
@@ -146,7 +173,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('mousemove', onMouseMove);
     };
-  }, [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible, isUserInfoVisible, isNotifyMenuVisible, isColorPickerVisible]);
+  }, [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible, isUserInfoVisible, isNotifyMenuVisible, isColorPickerVisible, isEmbedLinkInputVisible, isUserTagInputVisible]);
 
   return (
     <ContextMenuContext.Provider
@@ -157,18 +184,16 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         showBadgeInfoCard,
         showEmojiPicker,
         showColorPicker,
+        showEmbedLinkInput,
+        showUserTagInput,
         closeContextMenu,
         closeNotifyMenu,
         closeUserInfoBlock,
         closeBadgeInfoCard,
         closeEmojiPicker,
         closeColorPicker,
-        isContextMenuVisible,
-        isNotifyMenuVisible,
-        isUserInfoVisible,
-        isBadgeInfoVisible,
-        isEmojiPickerVisible,
-        isColorPickerVisible,
+        closeEmbedLinkInput,
+        closeUserTagInput,
       }}
     >
       {isContextMenuVisible && contextMenu}
@@ -177,6 +202,8 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       {badgeInfo && badgeInfo}
       {isEmojiPickerVisible && emojiPicker}
       {isColorPickerVisible && colorPicker}
+      {isEmbedLinkInputVisible && embedLinkInput}
+      {isUserTagInputVisible && userTagInput}
       {children}
     </ContextMenuContext.Provider>
   );
