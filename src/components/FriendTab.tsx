@@ -127,12 +127,12 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
 
   // Effects
   useEffect(() => {
-    if (refreshed.current || !targetId || !friendCurrentServerId) return;
+    if (refreshed.current || !targetId || !friendCurrentServerId || friendIsBlocked || !isFriend) return;
     data.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
       if (server) setFriendServer(server);
     });
     refreshed.current = true;
-  }, [friendCurrentServerId, targetId]);
+  }, [targetId, friendCurrentServerId, friendIsBlocked, isFriend]);
 
   return (
     <div
@@ -242,8 +242,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     >
       <div
         className={styles['avatar-picture']}
-        style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: isOnline && isFriend ? '' : 'grayscale(100%)' }}
-        datatype={isOnline && isFriend ? friendStatus : ''}
+        style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: isOnline && isFriend && !friendIsBlocked ? '' : 'grayscale(100%)' }}
+        datatype={isOnline && isFriend && !friendIsBlocked ? friendStatus : ''}
       />
       <div className={styles['base-info-wrapper']}>
         <div className={styles['box']}>
@@ -256,7 +256,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
         </div>
         {isPending ? (
           <div className={styles['signature']}>{`(${t('pending')})`}</div>
-        ) : isFriend && isOnline && friendCurrentServerId ? (
+        ) : isFriend && isOnline && !friendIsBlocked && friendCurrentServerId ? (
           <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendCurrentServerId, friendServer.displayId)}>
             <div className={styles['location-icon']} />
             <div className={styles['server-name-text']}>{friendServerName}</div>
