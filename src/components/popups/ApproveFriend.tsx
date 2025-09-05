@@ -71,7 +71,6 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={`${popup['content']} ${popup['col']}`}>
-          <div className={popup['split']} />
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('select-friend-group')}</div>
             <div className={popup['row']}>
