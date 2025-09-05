@@ -450,6 +450,11 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Handlers
   const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
+    if (args[0].update.currentServerId) {
+      // Remove action messages and channel messages
+      setActionMessages([]);
+      setChannelMessages([]);
+    }
     setUser((prev) => ({ ...prev, ...args[0].update }));
   };
 
@@ -677,10 +682,6 @@ const RootPageComponent: React.FC = React.memo(() => {
       if (selectedTabIdRef.current === 'server') {
         setSelectedTabIdRef.current('home');
       }
-
-      // Remove action messages and channel messages
-      setActionMessages([]);
-      setChannelMessages([]);
     }
 
     loadingBoxRef.current.setIsLoading(false);
