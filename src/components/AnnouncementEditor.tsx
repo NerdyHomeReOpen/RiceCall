@@ -246,9 +246,9 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 const x = e.currentTarget.getBoundingClientRect().left;
                 const y = e.currentTarget.getBoundingClientRect().bottom;
                 contextMenu.showEmbedLinkInput(x, y, 'right-bottom', (linkUrl) => {
-                  const isYouTube = linkUrl.trim().startsWith('https://www.youtube.com/watch?v=');
-                  const isTwitch = linkUrl.trim().startsWith('https://www.twitch.tv/');
-                  const isKick = linkUrl.trim().startsWith('https://kick.com/');
+                  const isYouTube = linkUrl.trim().includes('youtube.com/');
+                  const isTwitch = linkUrl.trim().includes('twitch.tv/');
+                  const isKick = linkUrl.trim().includes('kick.com/');
                   if (isYouTube) {
                     const videoId = linkUrl.trim().split('/watch?v=')[1].split('&')[0];
                     const src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
@@ -258,7 +258,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                     }
                   } else if (isTwitch) {
                     const username = linkUrl.trim().split('twitch.tv/')[1].split('&')[0];
-                    const src = `https://player.twitch.tv/?channel=${username}&parent=localhost`;
+                    const src = `https://player.twitch.tv/?channel=${username}&autoplay=true&parent=localhost`;
                     if (username && username.match(/^[\w-]+$/)) {
                       editor?.chain().insertEmbed(src).focus().run();
                       syncStyles();
