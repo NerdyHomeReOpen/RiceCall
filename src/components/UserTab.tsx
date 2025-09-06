@@ -6,7 +6,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import type { Channel, Server, User, OnlineMember, Friend, Permission } from '@/types';
+import type { Channel, Server, User, OnlineMember, Friend, Permission, Category } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ interface UserTabProps {
   user: User;
   friends: Friend[];
   server: Server;
-  channel: Channel;
+  channel: Channel | Category;
   member: OnlineMember;
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;

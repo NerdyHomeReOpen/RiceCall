@@ -13,12 +13,12 @@ import { useFindMeContext } from '@/providers/FindMe';
 
 // Components
 import ChannelTab from '@/components/ChannelTab';
+import UserTab from '@/components/UserTab';
 
 // Services
 import ipc from '@/services/ipc.service';
 
 // Utils
-import Default from '@/utils/default';
 import { isMember, isChannelAdmin, isServerAdmin, isChannelMod } from '@/utils/permission';
 
 interface CategoryTabProps {
@@ -47,22 +47,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
 
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel), [globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel]);
-  const categoryLobby = useMemo(
-    () =>
-      Default.channel({
-        ...category,
-        name: t('channel-lobby'),
-        order: -1,
-        type: 'channel',
-      }),
-    [t, category],
-  );
   const categoryChannels = useMemo(() => serverChannels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [serverChannels, categoryId]);
-  const categoryChannelIds = useMemo(() => new Set(categoryChannels.map((c) => c.channelId)), [categoryChannels]);
-  const categoryMembers = useMemo(
-    () => serverOnlineMembers.filter((m) => categoryChannelIds.has(m.currentChannelId || '') || m.currentChannelId === categoryId),
-    [serverOnlineMembers, categoryChannelIds, categoryId],
-  );
+  const categoryMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === categoryId), [serverOnlineMembers, categoryId]);
   const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);
   const isInChannel = useMemo(() => userCurrentChannelId === categoryId, [userCurrentChannelId, categoryId]);
   const isInCategory = useMemo(() => categoryMembers.some((m) => m.currentChannelId === userCurrentChannelId), [categoryMembers, userCurrentChannelId]);
@@ -77,9 +63,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
     () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
     [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
   );
-  const filteredCategoryChannels = useMemo(
-    () => (!isReadonlyChannel ? [categoryLobby, ...categoryChannels] : categoryChannels).filter((ch) => !!ch).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
-    [categoryChannels, categoryLobby, isReadonlyChannel],
+  const filteredCategoryChannels = useMemo(() => categoryChannels.filter((ch) => !!ch).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [categoryChannels]);
+  const filteredCategoryMembers = useMemo(
+    () => categoryMembers.filter((m) => !!m).sort((a, b) => (a.permissionLevel !== b.permissionLevel ? a.permissionLevel - b.permissionLevel : a.createdAt - b.createdAt)),
+    [categoryMembers],
   );
 
   // Handlers
@@ -266,11 +253,16 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
           onClick={() => setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }))}
         />
         <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{categoryName}</div>
-        {!isAllChannelReadOnly && <div className={styles['channel-user-count-text']}>{`(${categoryMembers.length})`}</div>}
+        {!isReadonlyChannel && <div className={styles['channel-user-count-text']}>{`(${categoryMembers.length}${categoryUserLimit > 0 ? `/${categoryUserLimit}` : ''})`}</div>}
         {!expanded[categoryId] && isInCategory && <div className={styles['my-location-icon']} />}
       </div>
 
       {/* Expanded Sections */}
+      <div className={styles['user-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
+        {filteredCategoryMembers.map((member) => (
+          <UserTab key={member.userId} user={user} friends={friends} channel={category} server={server} member={member} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+        ))}
+      </div>
       <div className={styles['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
         {filteredCategoryChannels.map((channel) => (
           <ChannelTab
