@@ -9,7 +9,7 @@ import ServerList from '@/components/ServerList';
 import RecommendServerList from '@/components/RecommendServerList';
 
 // Type
-import type { RecommendServerList as RecommendServerListType, User, Server } from '@/types';
+import type { RecommendServerList as RecommendServerListType, User, Server, Announcement } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -42,6 +42,7 @@ SearchResultItem.displayName = 'SearchResultItem';
 interface HomePageProps {
   user: User;
   servers: Server[];
+  announcements: Announcement[];
   recommendServerList: RecommendServerListType;
   display: boolean;
 }

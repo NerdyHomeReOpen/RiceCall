@@ -12,6 +12,14 @@ export type table_badges = {
   createdAt: number;
 };
 
+export type table_announcement = {
+  id: number;
+  title: string;
+  date: string;
+  category: string;
+  content: string;
+}
+
 export type table_channel_blocked_users = {
   userId: string;
   channelId: string;
