@@ -243,7 +243,7 @@ let env: Record<string, string> = {};
 // Windows
 let mainWindow: BrowserWindow;
 let authWindow: BrowserWindow;
-let popups: Record<string, BrowserWindow>;
+let popups: Record<string, BrowserWindow> = {};
 
 // Socket
 let socketInstance: Socket | null = null;
