@@ -262,7 +262,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   }, [channelBitrate]);
 
   useEffect(() => {
-    if (actionMessages.length === 0) return;
+    if (actionMessages.length === 0) {
+      setShowActionMessage(false);
+      return;
+    }
     if (actionMessageTimer.current) clearTimeout(actionMessageTimer.current);
     setShowActionMessage(true);
     actionMessageTimer.current = setTimeout(() => setShowActionMessage(false), 8000);
