@@ -243,7 +243,7 @@ let env: Record<string, string> = {};
 // Windows
 let mainWindow: BrowserWindow;
 let authWindow: BrowserWindow;
-let popups: Record<string, BrowserWindow> = {};
+let popups: Record<string, BrowserWindow>;
 
 // Socket
 let socketInstance: Socket | null = null;
@@ -572,6 +572,9 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
   });
 
   popups[id].webContents.once('did-finish-load', () => {
+    if (mainWindow && mainWindow.isFocusable()) {
+      mainWindow.focus();
+    }
     popups[id].show();
     popups[id].focus();
   });
