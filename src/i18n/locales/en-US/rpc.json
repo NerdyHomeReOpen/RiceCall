@@ -3,8 +3,10 @@
   "friend-page": "Friend list",
   "home-page": "Home",
   "join-discord-server": "Join our Discord server",
+  "login-page": "登入頁面",
   "server-page": "Server page",
-  "user": "User:",
+  "un-login": "未登入",
+  "user": "使用者: {{0}}",
   "viewing-friend-page": "Viewing your friends list",
   "viewing-home-page": "Viewing the home page"
 }
