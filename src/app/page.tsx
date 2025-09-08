@@ -673,7 +673,48 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     selectedTabIdRef.current = mainTab.selectedTabId;
-  }, [mainTab.selectedTabId]);
+
+    switch (mainTab.selectedTabId) {
+      case 'home':
+        ipc.discord.updatePresence({
+          details: t('rpc:viewing-home-page'),
+          state: `${t('rpc:user', { '0': user.name })}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: t('rpc:home-page'),
+          timestamp: Date.now(),
+          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
+        });
+        break;
+      case 'friends':
+        ipc.discord.updatePresence({
+          details: t('rpc:viewing-friend-page'),
+          state: `${t('rpc:user', { '0': user.name })}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: t('rpc:vewing-friend-page'),
+          timestamp: Date.now(),
+          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
+        });
+        break;
+      case 'server':
+        ipc.discord.updatePresence({
+          details: `${t('in')} ${server.name}`,
+          state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: t('rpc:viewing-server-page'),
+          timestamp: Date.now(),
+          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
+        });
+        break;
+      default:
+        break;
+    }
+  }, [mainTab.selectedTabId, user, server, serverOnlineMembers]);
 
   useEffect(() => {
     if (user.currentServerId) {

@@ -118,24 +118,6 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);
 
-  useEffect(() => {
-    ipc.discord.updatePresence({
-      details: t('rpc:login-page'),
-      state: `${t('rpc:un-login')}`,
-      largeImageKey: 'app_icon',
-      largeImageText: 'RC Voice',
-      smallImageKey: 'login_icon',
-      smallImageText: t('rpc:login-page'),
-      timestamp: Date.now(),
-      buttons: [
-        {
-          label: t('rpc:join-discord-server'),
-          url: 'https://discord.gg/adCWzv6wwS',
-        },
-      ],
-    });
-  }, [t]);
-
   return (
     <main className={styles['login']} style={display ? {} : { display: 'none' }}>
       {/* Body */}

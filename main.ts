@@ -250,6 +250,7 @@ let socketInstance: Socket | null = null;
 
 // Discord RPC
 let rpc: DiscordRPC.Client | null = null;
+let startTimestamp = Date.now();
 
 const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
@@ -936,6 +937,7 @@ app.on('ready', async () => {
 
   // Discord RPC handlers
   ipcMain.on('update-discord-presence', (_, updatePresence) => {
+    updatePresence.startTimestamp = startTimestamp;
     rpc?.setActivity(updatePresence).catch((error) => {
       console.error(`${new Date().toLocaleString()} | Cannot update discord presence:`, error.message);
     });
