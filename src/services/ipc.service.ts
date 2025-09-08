@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode, ACK, Theme } from '@/types';
 import { LanguageKey } from '@/i18n';
 
@@ -317,7 +318,7 @@ const ipcService = {
     },
 
     onUpdate: (callback: (themes: Theme[]) => void) => {
-      if (!isElectron) return () => {};
+      if (!isElectron) return () => [];
       ipcRenderer.removeAllListeners('custom-themes');
       const listener = (_: any, themes: Theme[]) => callback(themes);
       ipcRenderer.on('custom-themes', listener);
@@ -330,15 +331,15 @@ const ipcService = {
         return ipcRenderer.sendSync('get-current-theme');
       },
 
-      set: (theme: Theme) => {
+      set: (theme: Theme | null) => {
         if (!isElectron) return;
         ipcRenderer.send('set-current-theme', theme);
       },
 
-      onUpdate: (callback: (theme: Theme) => void) => {
-        if (!isElectron) return () => {};
+      onUpdate: (callback: (theme: Theme | null) => void) => {
+        if (!isElectron) return () => null;
         ipcRenderer.removeAllListeners('current-theme');
-        const listener = (_: any, theme: Theme) => callback(theme);
+        const listener = (_: any, theme: Theme | null) => callback(theme);
         ipcRenderer.on('current-theme', listener);
         return () => ipcRenderer.removeListener('current-theme', listener);
       },

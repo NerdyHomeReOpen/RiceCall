@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 // CSS
 import friendPage from '@/styles/pages/friend.module.css';

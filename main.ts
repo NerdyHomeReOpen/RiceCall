@@ -250,7 +250,7 @@ let socketInstance: Socket | null = null;
 
 // Discord RPC
 let rpc: DiscordRPC.Client | null = null;
-let startTimestamp = Date.now();
+const startTimestamp = Date.now();
 
 const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
@@ -910,7 +910,7 @@ app.on('ready', async () => {
 
   // Language handlers
   ipcMain.on('get-language', (event) => {
-    event.returnValue = store.get('language') ?? 'zh-TW';
+    event.returnValue = store.get('language') || 'zh-TW';
   });
 
   ipcMain.on('set-language', (_, language) => {
@@ -922,12 +922,12 @@ app.on('ready', async () => {
 
   // Custom themes handlers
   ipcMain.on('get-custom-themes', (event) => {
-    const customThemes = store.get('customThemes');
+    const customThemes = store.get('customThemes') || [];
     event.returnValue = Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {});
   });
 
   ipcMain.on('add-custom-theme', (_, theme) => {
-    const customThemes = store.get('customThemes');
+    const customThemes = store.get('customThemes') || [];
     // Keep total 7 themes
     customThemes.unshift(theme);
     store.set('customThemes', customThemes);
@@ -940,7 +940,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('delete-custom-theme', (_, index) => {
-    const customThemes = store.get('customThemes');
+    const customThemes = store.get('customThemes') || [];
     // Keep total 7 themes
     customThemes.splice(index, 1);
     store.set('customThemes', customThemes);
@@ -953,7 +953,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-current-theme', (event) => {
-    event.returnValue = store.get('currentTheme') ?? {};
+    event.returnValue = store.get('currentTheme') || null;
   });
 
   ipcMain.on('set-current-theme', (_, theme) => {

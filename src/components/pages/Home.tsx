@@ -67,7 +67,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [section, setSection] = useState<number>(0);
 
   // Variables
-  const { userId, name: userName, currentServerId } = user;
+  const { userId, currentServerId } = user;
   const hasResults = !!exactMatch || !!personalResults.length || !!relatedResults.length;
   const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);

@@ -264,7 +264,7 @@ export type ClientToServerEvents = {
   // Echo
   ping: () => void;
   // Popup
-  openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
+  // openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
 };
 
 export type ServerToClientEvents = {

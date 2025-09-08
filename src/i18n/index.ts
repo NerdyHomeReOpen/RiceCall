@@ -60,6 +60,7 @@ class CrowdinBackend {
 
         ns: ['translation', 'rpc', 'message', 'country'],
         defaultNS: 'translation',
+        fallbackNS: false,
 
         interpolation: { escapeValue: false },
       });
@@ -67,9 +68,11 @@ class CrowdinBackend {
     i18next.use(initReactI18next).init({
       lng: 'zh-TW',
       fallbackLng: 'zh-TW',
+      supportedLngs: ['zh-TW', 'zh-CN', 'en', 'ja', 'fa', 'pt-BR', 'ru', 'es-ES', 'tr'],
 
       ns: ['translation', 'rpc', 'message', 'country'],
       defaultNS: 'translation',
+      fallbackNS: false,
 
       resources: {
         'zh-TW': { translation: zhTW, rpc: zhTW_rpc, message: zhTW_message, country: zhTW_country },

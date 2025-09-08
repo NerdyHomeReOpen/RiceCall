@@ -714,7 +714,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       default:
         break;
     }
-  }, [mainTab.selectedTabId, user, server, serverOnlineMembers]);
+  }, [mainTab.selectedTabId, user, server, serverOnlineMembers, t]);
 
   useEffect(() => {
     if (user.currentServerId) {
