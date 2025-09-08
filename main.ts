@@ -576,8 +576,9 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
 
 // Socket Functions
 function connectSocket(token: string): Socket | null {
-  console.log(`connectSocket url: ${env.WS_URL} using token: ${token}`);
   if (!token) return null;
+
+  console.log(`${new Date().toLocaleString()} | Connecting socket, URL: ${env.WS_URL}, token: ${token}`);
 
   if (socketInstance) {
     socketInstance = disconnectSocket();
