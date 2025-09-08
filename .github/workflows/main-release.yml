@@ -67,20 +67,41 @@ jobs:
           build_script_name: build:action
           args: ${{ matrix.args }}
 
-      - name: Upload artifacts
+      - name: Upload artifacts (Windows)
+        if: startsWith(matrix.os, 'windows')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.build_name }}
+          if-no-files-found: ignore
+          path: |
+            dist/*Setup.exe
+            dist/*Setup.exe.blockmap
+            dist/*{latest}.yml
+            dist/github/*{latest}.yml
+
+      - name: Upload artifacts (macOS)
+        if: startsWith(matrix.os, 'macos')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.build_name }}
+          if-no-files-found: ignore
           path: |
             dist/*.dmg
             dist/*.zip
             dist/*.blockmap
-            dist/*Setup.exe
-            dist/*Setup.exe.blockmap
+            dist/*{latest}-mac.yml
+            dist/github/*{latest}-mac.yml
+
+      - name: Upload artifacts (Linux)
+        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'linux')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.build_name }}
+          if-no-files-found: ignore
+          path: |
             dist/*.AppImage
-            dist/*.deb
-            dist/*.rpm
-            dist/*latest*.yml
+            dist/*{latest}-linux.yml
+            dist/github/*{latest}-linux.yml
 
   release:
     needs: build

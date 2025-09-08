@@ -57,7 +57,7 @@ jobs:
         run: |
           echo "API_URL=${{ secrets.API_URL }}" > .env
           echo "WS_URL=${{ secrets.WS_URL }}" >> .env
-          echo "UPDATE_CHANNEL=alpha" >> .env
+          echo "UPDATE_CHANNEL=dev" >> .env
 
       - name: Build electron
         uses: samuelmeuli/action-electron-builder@v1
@@ -67,21 +67,41 @@ jobs:
           build_script_name: build:action
           args: ${{ matrix.args }}
 
-      - name: Upload artifacts
+      - name: Upload artifacts (Windows)
+        if: startsWith(matrix.os, 'windows')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.build_name }}
+          if-no-files-found: ignore
+          path: |
+            dist/*Setup.exe
+            dist/*Setup.exe.blockmap
+            dist/*{latest,dev}.yml
+            dist/github/*{latest,dev}.yml
+
+      - name: Upload artifacts (macOS)
+        if: startsWith(matrix.os, 'macos')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.build_name }}
+          if-no-files-found: ignore
           path: |
             dist/*.dmg
             dist/*.zip
             dist/*.blockmap
-            dist/*Setup.exe
-            dist/*Setup.exe.blockmap
+            dist/*{latest,dev}-mac.yml
+            dist/github/*{latest,dev}-mac.yml
+
+      - name: Upload artifacts (Linux)
+        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'linux')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.build_name }}
+          if-no-files-found: ignore
+          path: |
             dist/*.AppImage
-            dist/*.deb
-            dist/*.rpm
-            dist/*latest*.yml
-            dist/*alpha*.yml
+            dist/*{latest,dev}-linux.yml
+            dist/github/*{latest,dev}-linux.yml
 
   release:
     needs: build

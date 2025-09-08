@@ -44,11 +44,21 @@
     "description": "Ricecall is a voice chat app that allows you to chat with your friends.",
     "fpm": ["--after-install=build_deb/after-install.sh"]
   },
+  "generateUpdatesFilesForAllChannels": true,
   "publish": [
     {
       "provider": "github",
       "owner": "NerdyHomeReOpen",
-      "repo": "RiceCall"
+      "repo": "RiceCall",
+      "releaseType": "release",
+      "channel": "latest"
+    },
+    {
+      "provider": "github",
+      "owner": "NerdyHomeReOpen",
+      "repo": "RiceCall",
+      "releaseType": "prerelease",
+      "channel": "dev"
     }
   ]
 }
