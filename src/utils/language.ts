@@ -72,21 +72,15 @@ export const getFormatTimestamp = (t: TFunction<'translation', undefined>, times
 
 export const getLangByIp = async (): Promise<LanguageKey> => {
   const response = await fetch(`${FREE_IP_API_URL}/json`);
-  if (!response.ok) return 'en';
+  if (!response.ok) return 'en-US';
 
   const data = await response.json();
 
   const lang: string | undefined = data.languages?.[0];
-  if (!lang) return 'en';
+  if (!lang) return 'en-US';
 
   const match = LANGUAGES.find(({ code }) => code.includes(lang));
-  if (!match) return 'en';
+  if (!match) return 'en-US';
 
   return match.code;
-};
-
-export const setupLanguage = async () => {
-  const language = localStorage.getItem('language') || (await getLangByIp());
-  localStorage.setItem('language', language);
-  i18n.changeLanguage(language);
 };

@@ -172,7 +172,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   // Variables
   const { userId, permissionLevel: globalPermissionLevel } = user;
-  const { serverId, name: serverName, announcement: serverAnnouncement, permissionLevel: serverPermissionLevel } = server;
+  const { serverId, announcement: serverAnnouncement, permissionLevel: serverPermissionLevel } = server;
   const {
     channelId,
     announcement: channelAnnouncement,
@@ -303,24 +303,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
       annAreaRef.current!.style.minWidth = '200px';
     }
   }, [channelUIMode]);
-
-  useEffect(() => {
-    ipc.discord.updatePresence({
-      details: `${t('in')} ${serverName}`,
-      state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
-      largeImageKey: 'app_icon',
-      largeImageText: 'RC Voice',
-      smallImageKey: 'home_icon',
-      smallImageText: t('rpc:viewing-server-page'),
-      timestamp: Date.now(),
-      buttons: [
-        {
-          label: t('rpc:join-discord-server'),
-          url: 'https://discord.gg/adCWzv6wwS',
-        },
-      ],
-    });
-  }, [t, serverName, serverOnlineMembers]);
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: SpeakingMode) => {

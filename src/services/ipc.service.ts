@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode, ACK } from '@/types';
+import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode, ACK, Theme } from '@/types';
+import { LanguageKey } from '@/i18n';
 
 // Services
 import data from '@/services/data.service';
@@ -103,7 +104,7 @@ const ipcService = {
   },
 
   initialData: {
-    get: (): any | null => {
+    get: (): Record<string, any> | null => {
       if (!isElectron) return null;
       return ipcRenderer.sendSync('get-initial-data');
     },
@@ -251,6 +252,43 @@ const ipcService = {
     },
   },
 
+  accounts: {
+    get: (): Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }> => {
+      if (!isElectron) return {};
+      return ipcRenderer.sendSync('get-accounts');
+    },
+
+    add: (account: string, { autoLogin, rememberAccount, password }: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
+      if (!isElectron) return;
+      ipcRenderer.send('add-account', account, { autoLogin, rememberAccount, password });
+    },
+
+    delete: (account: string) => {
+      if (!isElectron) return;
+      ipcRenderer.send('delete-account', account);
+    },
+
+    onUpdate: (callback: (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => void) => {
+      if (!isElectron) return () => {};
+      ipcRenderer.removeAllListeners('accounts');
+      const listener = (_: any, accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
+      ipcRenderer.on('accounts', listener);
+      return () => ipcRenderer.removeListener('accounts', listener);
+    },
+  },
+
+  language: {
+    get: (): LanguageKey => {
+      if (!isElectron) return 'zh-TW';
+      return ipcRenderer.sendSync('get-language');
+    },
+
+    set: (language: LanguageKey) => {
+      if (!isElectron) return;
+      ipcRenderer.send('set-language', language);
+    },
+  },
+
   auth: {
     login: (token: string) => {
       if (!isElectron) return;
@@ -260,6 +298,51 @@ const ipcService = {
     logout: () => {
       if (!isElectron) return;
       ipcRenderer.send('logout');
+    },
+  },
+
+  customThemes: {
+    get: (): Theme[] => {
+      if (!isElectron) return [];
+      return ipcRenderer.sendSync('get-custom-themes');
+    },
+
+    add: (theme: Theme) => {
+      if (!isElectron) return;
+      ipcRenderer.send('add-custom-theme', theme);
+    },
+
+    delete: (index: number) => {
+      if (!isElectron) return;
+      ipcRenderer.send('delete-custom-theme', index);
+    },
+
+    onUpdate: (callback: (themes: Theme[]) => void) => {
+      if (!isElectron) return () => [];
+      ipcRenderer.removeAllListeners('custom-themes');
+      const listener = (_: any, themes: Theme[]) => callback(themes);
+      ipcRenderer.on('custom-themes', listener);
+      return () => ipcRenderer.removeListener('custom-themes', listener);
+    },
+
+    current: {
+      get: (): Theme | null => {
+        if (!isElectron) return null;
+        return ipcRenderer.sendSync('get-current-theme');
+      },
+
+      set: (theme: Theme | null) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-current-theme', theme);
+      },
+
+      onUpdate: (callback: (theme: Theme | null) => void) => {
+        if (!isElectron) return () => null;
+        ipcRenderer.removeAllListeners('current-theme');
+        const listener = (_: any, theme: Theme | null) => callback(theme);
+        ipcRenderer.on('current-theme', listener);
+        return () => ipcRenderer.removeListener('current-theme', listener);
+      },
     },
   },
 

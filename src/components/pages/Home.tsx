@@ -9,7 +9,7 @@ import ServerList from '@/components/ServerList';
 import RecommendServerList from '@/components/RecommendServerList';
 
 // Type
-import type { RecommendServerList as RecommendServerListType, User, Server } from '@/types';
+import type { RecommendServerList as RecommendServerListType, User, Server, Announcement } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -42,6 +42,7 @@ SearchResultItem.displayName = 'SearchResultItem';
 interface HomePageProps {
   user: User;
   servers: Server[];
+  announcements: Announcement[];
   recommendServerList: RecommendServerListType;
   display: boolean;
 }
@@ -66,7 +67,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [section, setSection] = useState<number>(0);
 
   // Variables
-  const { userId, name: userName, currentServerId } = user;
+  const { userId, currentServerId } = user;
   const hasResults = !!exactMatch || !!personalResults.length || !!relatedResults.length;
   const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
@@ -187,25 +188,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       }
     };
   }, []);
-
-  useEffect(() => {
-    ipc.discord.updatePresence({
-      details: t('rpc:home-page'),
-      state: `${t('rpc:user')} ${userName}`,
-      largeImageKey: 'app_icon',
-      largeImageText: 'RC Voice',
-      smallImageKey: 'home_icon',
-      smallImageText: t('rpc:home-page'),
-      timestamp: Date.now(),
-      buttons: [
-        {
-          label: t('rpc:join-discord-server'),
-          url: 'https://discord.gg/adCWzv6wwS',
-        },
-      ],
-    });
-  }, [t, userName]);
-
   useEffect(() => {
     const unsubscribe = [ipc.socket.on('serverSearch', handleServerSearch), ipc.deepLink.onDeepLink(handleDeepLink)];
     return () => unsubscribe.forEach((unsub) => unsub());

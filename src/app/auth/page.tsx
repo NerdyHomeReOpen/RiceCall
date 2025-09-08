@@ -13,7 +13,13 @@ import RegisterPage from '@/components/pages/Register';
 import ipc from '@/services/ipc.service';
 import auth from '@/services/auth.service';
 
+// Providers
+import { useTranslation } from 'react-i18next';
+
 const Header: React.FC = React.memo(() => {
+  // Hooks
+  const { t } = useTranslation();
+
   // Handlers
   const handleMinimize = () => {
     ipc.window.minimize();
@@ -22,6 +28,25 @@ const Header: React.FC = React.memo(() => {
   const handleClose = () => {
     ipc.window.close();
   };
+
+  // Effects
+  useEffect(() => {
+    ipc.discord.updatePresence({
+      details: t('rpc:login-page'),
+      state: `${t('rpc:un-login')}`,
+      largeImageKey: 'app_icon',
+      largeImageText: 'RC Voice',
+      smallImageKey: 'login_icon',
+      smallImageText: t('rpc:login-page'),
+      timestamp: Date.now(),
+      buttons: [
+        {
+          label: t('rpc:join-discord-server'),
+          url: 'https://discord.gg/adCWzv6wwS',
+        },
+      ],
+    });
+  }, [t]);
 
   return (
     <header className={`${header['header']} ${header['big']}`}>

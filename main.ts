@@ -241,8 +241,8 @@ const APP_TRAY_ICON = {
 let env: Record<string, string> = {};
 
 // Windows
-let mainWindow: BrowserWindow;
-let authWindow: BrowserWindow;
+let mainWindow: BrowserWindow | null = null;
+let authWindow: BrowserWindow | null = null;
 let popups: Record<string, BrowserWindow> = {};
 
 // Socket
@@ -250,23 +250,7 @@ let socketInstance: Socket | null = null;
 
 // Discord RPC
 let rpc: DiscordRPC.Client | null = null;
-
-const defaultPrecence = {
-  details: '正在使用應用',
-  state: '準備中',
-  startTimestamp: Date.now(),
-  largeImageKey: 'app_icon',
-  largeImageText: '應用名稱',
-  smallImageKey: 'status_icon',
-  smallImageText: '狀態說明',
-  instance: false,
-  buttons: [
-    {
-      label: '加入我們的Discord伺服器',
-      url: 'https://discord.gg/adCWzv6wwS',
-    },
-  ],
-};
+const startTimestamp = Date.now();
 
 const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
@@ -343,7 +327,7 @@ function waitForPort(port: number) {
 }
 
 function focusWindow() {
-  const window = authWindow.isDestroyed() === false ? authWindow : mainWindow.isDestroyed() === false ? mainWindow : null;
+  const window = authWindow && authWindow.isDestroyed() === false ? authWindow : mainWindow && mainWindow.isDestroyed() === false ? mainWindow : null;
   if (window) {
     if (window.isMinimized()) window.restore();
     window.focus();
@@ -420,7 +404,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
 
   if (app.isPackaged || !DEV) {
     appServe(mainWindow).then(() => {
-      mainWindow.loadURL(`${BASE_URI}`);
+      mainWindow?.loadURL(`${BASE_URI}`);
     });
   } else {
     mainWindow.loadURL(`${BASE_URI}`);
@@ -429,19 +413,19 @@ async function createMainWindow(): Promise<BrowserWindow> {
 
   mainWindow.on('close', (e) => {
     e.preventDefault();
-    mainWindow.hide();
+    mainWindow?.hide();
   });
 
   mainWindow.on('maximize', () => {
-    mainWindow.webContents.send('maximize');
+    mainWindow?.webContents.send('maximize');
   });
 
   mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('unmaximize');
+    mainWindow?.webContents.send('unmaximize');
   });
 
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send(mainWindow.isMaximized() ? 'maximize' : 'unmaximize');
+    mainWindow?.webContents.send(mainWindow?.isMaximized() ? 'maximize' : 'unmaximize');
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -488,7 +472,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
 
   if (app.isPackaged || !DEV) {
     appServe(authWindow).then(() => {
-      authWindow.loadURL(`${BASE_URI}/auth.html`);
+      authWindow?.loadURL(`${BASE_URI}/auth.html`);
     });
   } else {
     authWindow.loadURL(`${BASE_URI}/auth`);
@@ -592,8 +576,9 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
 
 // Socket Functions
 function connectSocket(token: string): Socket | null {
-  console.log(`connectSocket url: ${env.WS_URL} using token: ${token}`);
   if (!token) return null;
+
+  console.log(`${new Date().toLocaleString()} | Connecting socket, URL: ${env.WS_URL}, token: ${token}`);
 
   if (socketInstance) {
     socketInstance = disconnectSocket();
@@ -749,17 +734,16 @@ function configureAutoUpdater() {
     autoUpdater.updateConfigPath = path.join(app.getAppPath(), 'dev-app-update.yml');
   }
 
-  autoUpdater.on('error', (error: Error) => {
-    if (DEV) return;
-    console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
-  });
-
   autoUpdater.on('update-available', (info: UpdateInfo) => {
-    dialog.showMessageBox({
-      type: 'info',
-      title: '有新版本可用',
-      message: `新版本 ${info.version} 發布於 ${new Date(info.releaseDate).toLocaleDateString()}，點擊確認後將開始下載...`,
-    });
+    dialog
+      .showMessageBox({
+        type: 'info',
+        title: '有新版本可用',
+        message: `新版本 ${info.version} 發布於 ${new Date(info.releaseDate).toLocaleDateString()}，正在開始下載...`,
+      })
+      .catch((error) => {
+        console.error(`${new Date().toLocaleString()} | Cannot show update dialog:`, error.message);
+      });
   });
 
   autoUpdater.on('update-not-available', () => {
@@ -769,10 +753,10 @@ function configureAutoUpdater() {
 
   autoUpdater.on('download-progress', (progressInfo: ProgressInfo) => {
     if (DEV) return;
-    let message = `Downloading update: ${progressInfo.bytesPerSecond}`;
+    let message = `${progressInfo.bytesPerSecond}`;
     message = `${message} - ${progressInfo.percent}%`;
     message = `${message} (${progressInfo.transferred}/${progressInfo.total})`;
-    console.info(`${new Date().toLocaleString()} | ${message}`);
+    console.info(`${new Date().toLocaleString()} | Downloading update: ${message}`);
   });
 
   autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
@@ -788,12 +772,18 @@ function configureAutoUpdater() {
         if (buttonIndex.response === 0) {
           autoUpdater.quitAndInstall(false, true);
         }
+      })
+      .catch((error) => {
+        console.error(`${new Date().toLocaleString()} | Cannot show update dialog:`, error.message);
       });
   });
 
   function checkUpdate() {
     if (DEV) return;
-    autoUpdater.checkForUpdates();
+    console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, env.UPDATE_CHANNEL);
+    autoUpdater.checkForUpdates().catch((error) => {
+      console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
+    });
   }
 
   // Check update every hour
@@ -805,12 +795,9 @@ function configureAutoUpdater() {
 async function configureDiscordRPC() {
   DiscordRPC.register(DISCORD_RPC_CLIENT_ID);
   rpc = new DiscordRPC.Client({ transport: 'ipc' });
-  rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID });
-  rpc.on('error', (error: Error) => {
-    console.error(`${new Date().toLocaleString()} | Discord RPC error:`, error.message);
-  });
-  rpc.on('ready', () => {
-    rpc?.setActivity(defaultPrecence);
+  rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID }).catch((error) => {
+    console.error(`${new Date().toLocaleString()} | Cannot login to discord rpc:`, error.message);
+    return null;
   });
 }
 
@@ -824,11 +811,8 @@ function setTrayIcon(isLogin: boolean) {
       label: '打開主視窗',
       type: 'normal',
       click: () => {
-        if (isLogin) {
-          mainWindow.show();
-        } else {
-          authWindow.show();
-        }
+        if (isLogin) mainWindow?.show();
+        else authWindow?.show();
       },
     },
     { type: 'separator' },
@@ -860,13 +844,15 @@ function configureTray() {
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
   tray.setToolTip(`RiceCall v${app.getVersion()}`);
   tray.on('click', () => {
-    if (isLogin) mainWindow.show();
-    else authWindow.show();
+    if (isLogin) mainWindow?.show();
+    else authWindow?.show();
   });
   setTrayIcon(isLogin);
 }
 
 app.on('ready', async () => {
+  env = loadEnv().env;
+
   // Configure
   configureAutoUpdater();
   configureDiscordRPC();
@@ -878,10 +864,37 @@ app.on('ready', async () => {
   createAuthWindow().then((authWindow) => authWindow.show());
   createMainWindow().then((mainWindow) => mainWindow.hide());
 
+  ipcMain.on('exit', () => {
+    app.exit();
+  });
+
+  // Accounts handlers
+  ipcMain.on('get-accounts', (event) => {
+    event.returnValue = store.get('accounts') ?? {};
+  });
+
+  ipcMain.on('add-account', (_, account: string, data: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
+    const accounts = store.get('accounts') ?? {};
+    accounts[account] = data;
+    store.set('accounts', accounts);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('accounts', accounts);
+    });
+  });
+
+  ipcMain.on('delete-account', (_, account: string) => {
+    const accounts = store.get('accounts') ?? {};
+    delete accounts[account];
+    store.set('accounts', accounts);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('accounts', accounts);
+    });
+  });
+
   // Auth handlers
   ipcMain.on('login', (_, token) => {
-    mainWindow.show();
-    authWindow.hide();
+    mainWindow?.show();
+    authWindow?.hide();
     socketInstance = connectSocket(token);
     isLogin = true;
     setTrayIcon(isLogin);
@@ -892,15 +905,66 @@ app.on('ready', async () => {
       console.error(`${new Date().toLocaleString()} | Cannot clear activity:`, error);
     });
     closePopups();
-    mainWindow.hide();
-    authWindow.show();
+    mainWindow?.hide();
+    authWindow?.show();
     socketInstance = disconnectSocket();
     isLogin = false;
     setTrayIcon(isLogin);
   });
 
-  ipcMain.on('exit', () => {
-    app.exit();
+  // Language handlers
+  ipcMain.on('get-language', (event) => {
+    event.returnValue = store.get('language') || 'zh-TW';
+  });
+
+  ipcMain.on('set-language', (_, language) => {
+    store.set('language', language);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('language', language);
+    });
+  });
+
+  // Custom themes handlers
+  ipcMain.on('get-custom-themes', (event) => {
+    const customThemes = store.get('customThemes') || [];
+    event.returnValue = Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {});
+  });
+
+  ipcMain.on('add-custom-theme', (_, theme) => {
+    const customThemes = store.get('customThemes') || [];
+    // Keep total 7 themes
+    customThemes.unshift(theme);
+    store.set('customThemes', customThemes);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send(
+        'custom-themes',
+        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
+      );
+    });
+  });
+
+  ipcMain.on('delete-custom-theme', (_, index) => {
+    const customThemes = store.get('customThemes') || [];
+    // Keep total 7 themes
+    customThemes.splice(index, 1);
+    store.set('customThemes', customThemes);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send(
+        'custom-themes',
+        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
+      );
+    });
+  });
+
+  ipcMain.on('get-current-theme', (event) => {
+    event.returnValue = store.get('currentTheme') || null;
+  });
+
+  ipcMain.on('set-current-theme', (_, theme) => {
+    store.set('currentTheme', theme);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('current-theme', theme);
+    });
   });
 
   // Popup handlers
@@ -955,7 +1019,10 @@ app.on('ready', async () => {
 
   // Discord RPC handlers
   ipcMain.on('update-discord-presence', (_, updatePresence) => {
-    rpc?.setActivity(updatePresence);
+    updatePresence.startTimestamp = startTimestamp;
+    rpc?.setActivity(updatePresence).catch((error) => {
+      console.error(`${new Date().toLocaleString()} | Cannot update discord presence:`, error.message);
+    });
   });
 
   // Env
@@ -1449,7 +1516,6 @@ app.on('open-url', (event, url) => {
 });
 
 app.whenReady().then(() => {
-  env = loadEnv().env;
   const protocolClient = process.execPath;
   const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
 

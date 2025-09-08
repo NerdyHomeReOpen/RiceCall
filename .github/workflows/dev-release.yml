@@ -15,21 +15,21 @@ jobs:
         include:
           - os: windows-latest
             build_name: win-x64
-            args: '--win --x64'
+            args: '--win --x64 --publish never -c electron-builder-dev.json'
           - os: windows-latest
             build_name: win-ia32
-            args: '--win --ia32'
+            args: '--win --ia32 --publish never -c electron-builder-dev.json'
 
           - os: macos-13
             build_name: mac-x64
-            args: '--mac --x64'
+            args: '--mac --x64 --publish never -c electron-builder-dev.json'
           - os: macos-14
             build_name: mac-arm64
-            args: '--mac --arm64'
+            args: '--mac --arm64 --publish never -c electron-builder-dev.json'
 
           - os: ubuntu-latest
             build_name: linux-x64
-            args: '--linux --x64'
+            args: '--linux --x64 --publish never -c electron-builder-dev.json'
 
     environment: dev
 
@@ -57,7 +57,6 @@ jobs:
         run: |
           echo "API_URL=${{ secrets.API_URL }}" > .env
           echo "WS_URL=${{ secrets.WS_URL }}" >> .env
-          echo "CROWDIN_DISTRIBUTION_HASH=${{ secrets.CROWDIN_DISTRIBUTION_HASH }}" >> .env
           echo "UPDATE_CHANNEL=dev" >> .env
 
       - name: Build electron
@@ -72,16 +71,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.build_name }}
+          merge-multiple: true
+          if-no-files-found: ignore
           path: |
+            # Windows
+            dist/*Setup.exe
+            dist/*Setup.exe.blockmap
+            # macOS
             dist/*.dmg
             dist/*.zip
             dist/*.blockmap
-            dist/*Setup.exe
-            dist/*Setup.exe.blockmap
+            # Linux
             dist/*.AppImage
-            dist/*.deb
-            dist/*.rpm
-            dist/*latest*.yml
+            # yml files
+            dist/**/*dev*.yml
 
   release:
     needs: build

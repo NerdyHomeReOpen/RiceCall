@@ -18,6 +18,7 @@ import {
   table_channel_permissions,
   table_channel_muted_users,
   table_server_blocked_users,
+  table_announcement,
 } from '@/types/database';
 
 export type Permission = {
@@ -43,6 +44,8 @@ export type Server = table_servers & table_user_servers & table_members & Permis
 export type RecommendServerList = {
   [category: string]: RecommendServer[];
 };
+
+export type Announcement = table_announcement;
 
 export type RecommendServer = table_servers & {
   online: number;
@@ -261,7 +264,7 @@ export type ClientToServerEvents = {
   // Echo
   ping: () => void;
   // Popup
-  openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
+  // openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
 };
 
 export type ServerToClientEvents = {
@@ -389,4 +392,10 @@ export type SFUCreateConsumerReturnType = {
   producerId: string;
   kind: mediasoupClient.types.MediaKind;
   rtpParameters: any;
+};
+
+export type Theme = {
+  headerImage: string;
+  mainColor: string;
+  secondaryColor: string;
 };

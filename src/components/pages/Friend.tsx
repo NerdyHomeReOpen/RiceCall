@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 // CSS
 import friendPage from '@/styles/pages/friend.module.css';
@@ -40,7 +40,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   const isComposingRef = useRef<boolean>(false);
 
   // Variables
-  const { name: userName, signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
+  const { signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
 
   // Handlers
   const handleChangeSignature = (signature: User['signature']) => {
@@ -59,25 +59,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   };
 
   const handleSidebarHandleUp = () => (isResizingSidebarRef.current = false);
-
-  // Effects
-  useEffect(() => {
-    ipc.discord.updatePresence({
-      details: t('rpc:friend-page'),
-      state: `${t('rpc:user')} ${userName}`,
-      largeImageKey: 'app_icon',
-      largeImageText: 'RC Voice',
-      smallImageKey: 'home_icon',
-      smallImageText: t('rpc:vewing-friend-page'),
-      timestamp: Date.now(),
-      buttons: [
-        {
-          label: t('rpc:join-discord-server'),
-          url: 'https://discord.gg/adCWzv6wwS',
-        },
-      ],
-    });
-  }, [t, userName]);
 
   return (
     <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>

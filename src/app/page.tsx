@@ -18,6 +18,7 @@ import type {
   FriendApplication,
   MemberInvitation,
   RecommendServerList,
+  Announcement,
   Friend,
   OnlineMember,
   QueueMember,
@@ -39,7 +40,7 @@ import Default from '@/utils/default';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
-import ActionScannerProvider, { useActionScanner } from '@/providers/ActionScanner';
+import ActionScannerProvider from '@/providers/ActionScanner';
 import ExpandedProvider from '@/providers/FindMe';
 import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
@@ -65,7 +66,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   // Hooks
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
-  const actionScanner = useActionScanner();
+  // const actionScanner = useActionScanner();
   const { t } = useTranslation();
 
   // Refs
@@ -161,8 +162,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   };
 
   const handleLanguageChange = (language: LanguageKey) => {
+    ipc.language.set(language);
     i18n.changeLanguage(language);
-    localStorage.setItem('language', language);
   };
 
   const handleOpenFriendVerification = (userId: User['userId']) => {
@@ -174,12 +175,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   };
 
   // Effects
-  useEffect(() => {
-    const next = actionScanner.isKeepAlive ? 'online' : 'idle';
-    if (user.status !== next) {
-      ipc.socket.send('editUser', { update: { status: next } });
-    }
-  }, [actionScanner.isKeepAlive, user.status]);
+  // TODO: fix auto set to online when manual set to idle or other status
+  // useEffect(() => {
+  //   const next = actionScanner.isKeepAlive ? 'online' : 'idle';
+  //   if (user.status !== next) {
+  //     ipc.socket.send('editUser', { update: { status: next } });
+  //   }
+  // }, [actionScanner.isKeepAlive, user.status]);
 
   useEffect(() => {
     isCloseToTray.current = ipc.systemSettings.closeToTray.get();
@@ -424,6 +426,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [user, setUser] = useState<User>(Default.user());
   const [servers, setServers] = useState<Server[]>([]);
   const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
@@ -671,7 +674,48 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     selectedTabIdRef.current = mainTab.selectedTabId;
-  }, [mainTab.selectedTabId]);
+
+    switch (mainTab.selectedTabId) {
+      case 'home':
+        ipc.discord.updatePresence({
+          details: t('rpc:viewing-home-page'),
+          state: `${t('rpc:user', { '0': user.name })}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: t('rpc:home-page'),
+          timestamp: Date.now(),
+          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
+        });
+        break;
+      case 'friends':
+        ipc.discord.updatePresence({
+          details: t('rpc:viewing-friend-page'),
+          state: `${t('rpc:user', { '0': user.name })}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: t('rpc:vewing-friend-page'),
+          timestamp: Date.now(),
+          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
+        });
+        break;
+      case 'server':
+        ipc.discord.updatePresence({
+          details: `${t('in')} ${server.name}`,
+          state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: t('rpc:viewing-server-page'),
+          timestamp: Date.now(),
+          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
+        });
+        break;
+      default:
+        break;
+    }
+  }, [mainTab.selectedTabId, user, server, serverOnlineMembers, t]);
 
   useEffect(() => {
     if (user.currentServerId) {
@@ -727,6 +771,9 @@ const RootPageComponent: React.FC = React.memo(() => {
       });
       data.recommendServerList().then((recommendServerList) => {
         if (recommendServerList) setRecommendServerList(recommendServerList);
+      });
+      data.announcements().then((announcements) => {
+        if (announcements) setAnnouncements(announcements);
       });
       setSystemNotify([]);
     };
@@ -786,7 +833,7 @@ const RootPageComponent: React.FC = React.memo(() => {
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage user={user} servers={servers} recommendServerList={recommendServerList} display={mainTab.selectedTabId === 'home'} />
+              <HomePage user={user} servers={servers} announcements={announcements} recommendServerList={recommendServerList} display={mainTab.selectedTabId === 'home'} />
               <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}

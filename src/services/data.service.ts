@@ -2,7 +2,7 @@
 import api from '@/services/api.service';
 
 // Types
-import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, RecommendServerList, MemberInvitation } from '@/types';
+import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, RecommendServerList, MemberInvitation, Announcement } from '@/types';
 
 export const dataService = {
   user: async ({ userId }: { userId: User['userId'] }): Promise<User | null> => {
@@ -58,6 +58,16 @@ export const dataService = {
   recommendServerList: async (): Promise<RecommendServerList | null> => {
     const recommendServerList = await api.post('/recommendServerList', {});
     return recommendServerList;
+  },
+
+  announcement: async ({ id }: { id: number }): Promise<Announcement | null> => {
+    const announcement = await api.post('/announcement', { id });
+    return announcement;
+  },
+
+  announcements: async (): Promise<Announcement[] | null> => {
+    const announcements = await api.post('/announcements', {});
+    return announcements;
   },
 
   channel: async ({ userId, serverId, channelId }: { userId: User['userId']; serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Channel | null> => {
