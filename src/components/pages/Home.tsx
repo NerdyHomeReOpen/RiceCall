@@ -191,7 +191,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   useEffect(() => {
     ipc.discord.updatePresence({
       details: t('rpc:home-page'),
-      state: `${t('rpc:user')} ${userName}`,
+      state: `${t('rpc:user', { userName })}`,
       largeImageKey: 'app_icon',
       largeImageText: 'RC Voice',
       smallImageKey: 'home_icon',
