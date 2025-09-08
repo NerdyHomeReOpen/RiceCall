@@ -40,7 +40,7 @@ import Default from '@/utils/default';
 
 // Providers
 import WebRTCProvider from '@/providers/WebRTC';
-import ActionScannerProvider, { useActionScanner } from '@/providers/ActionScanner';
+import ActionScannerProvider from '@/providers/ActionScanner';
 import ExpandedProvider from '@/providers/FindMe';
 import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   // Hooks
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
-  const actionScanner = useActionScanner();
+  // const actionScanner = useActionScanner();
   const { t } = useTranslation();
 
   // Refs
@@ -175,12 +175,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   };
 
   // Effects
-  useEffect(() => {
-    const next = actionScanner.isKeepAlive ? 'online' : 'idle';
-    if (user.status !== next) {
-      ipc.socket.send('editUser', { update: { status: next } });
-    }
-  }, [actionScanner.isKeepAlive, user.status]);
+  // TODO: fix auto set to online when manual set to idle or other status
+  // useEffect(() => {
+  //   const next = actionScanner.isKeepAlive ? 'online' : 'idle';
+  //   if (user.status !== next) {
+  //     ipc.socket.send('editUser', { update: { status: next } });
+  //   }
+  // }, [actionScanner.isKeepAlive, user.status]);
 
   useEffect(() => {
     isCloseToTray.current = ipc.systemSettings.closeToTray.get();
