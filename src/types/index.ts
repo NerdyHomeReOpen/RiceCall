@@ -393,3 +393,9 @@ export type SFUCreateConsumerReturnType = {
   kind: mediasoupClient.types.MediaKind;
   rtpParameters: any;
 };
+
+export type Theme = {
+  headerImage: string;
+  mainColor: string;
+  secondaryColor: string;
+};

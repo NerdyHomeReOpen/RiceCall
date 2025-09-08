@@ -860,6 +860,33 @@ app.on('ready', async () => {
   createAuthWindow().then((authWindow) => authWindow.show());
   createMainWindow().then((mainWindow) => mainWindow.hide());
 
+  ipcMain.on('exit', () => {
+    app.exit();
+  });
+
+  // Accounts handlers
+  ipcMain.on('get-accounts', (event) => {
+    event.returnValue = store.get('accounts') ?? {};
+  });
+
+  ipcMain.on('add-account', (_, account: string, data: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
+    const accounts = store.get('accounts') ?? {};
+    accounts[account] = data;
+    store.set('accounts', accounts);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('accounts', accounts);
+    });
+  });
+
+  ipcMain.on('delete-account', (_, account: string) => {
+    const accounts = store.get('accounts') ?? {};
+    delete accounts[account];
+    store.set('accounts', accounts);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('accounts', accounts);
+    });
+  });
+
   // Auth handlers
   ipcMain.on('login', (_, token) => {
     mainWindow?.show();
@@ -881,8 +908,59 @@ app.on('ready', async () => {
     setTrayIcon(isLogin);
   });
 
-  ipcMain.on('exit', () => {
-    app.exit();
+  // Language handlers
+  ipcMain.on('get-language', (event) => {
+    event.returnValue = store.get('language') ?? 'zh-TW';
+  });
+
+  ipcMain.on('set-language', (_, language) => {
+    store.set('language', language);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('language', language);
+    });
+  });
+
+  // Custom themes handlers
+  ipcMain.on('get-custom-themes', (event) => {
+    const customThemes = store.get('customThemes');
+    event.returnValue = Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {});
+  });
+
+  ipcMain.on('add-custom-theme', (_, theme) => {
+    const customThemes = store.get('customThemes');
+    // Keep total 7 themes
+    customThemes.unshift(theme);
+    store.set('customThemes', customThemes);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send(
+        'custom-themes',
+        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
+      );
+    });
+  });
+
+  ipcMain.on('delete-custom-theme', (_, index) => {
+    const customThemes = store.get('customThemes');
+    // Keep total 7 themes
+    customThemes.splice(index, 1);
+    store.set('customThemes', customThemes);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send(
+        'custom-themes',
+        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
+      );
+    });
+  });
+
+  ipcMain.on('get-current-theme', (event) => {
+    event.returnValue = store.get('currentTheme') ?? {};
+  });
+
+  ipcMain.on('set-current-theme', (_, theme) => {
+    store.set('currentTheme', theme);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('current-theme', theme);
+    });
   });
 
   // Popup handlers

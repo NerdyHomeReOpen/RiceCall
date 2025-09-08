@@ -16,10 +16,6 @@ interface RegisterFormData {
 }
 
 export const authService = {
-  isAutoLoginEnabled: () => localStorage.getItem('autoLogin') === 'true',
-
-  isRememberAccountEnabled: () => !!localStorage.getItem('account'),
-
   register: async (data: RegisterFormData) => {
     const res = await api.post('/register', data);
     return !!res;
@@ -28,10 +24,8 @@ export const authService = {
   login: async (data: LoginFormData): Promise<boolean> => {
     const res = await api.post('/login', data);
     if (!res?.token) return false;
-    const accounts = localStorage.getItem('accounts')?.split(',') || [];
-    if (data.rememberAccount && !accounts.includes(data.account)) {
-      accounts.push(data.account);
-      localStorage.setItem('accounts', accounts.join(','));
+    if (data.rememberAccount) {
+      ipc.accounts.add(data.account, data);
     }
     if (data.autoLogin) {
       localStorage.setItem('token', res.token);
@@ -42,7 +36,6 @@ export const authService = {
 
   logout: () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('autoLogin');
     ipc.auth.logout();
     return true;
   },

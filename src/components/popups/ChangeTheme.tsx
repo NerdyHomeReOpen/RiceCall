@@ -4,6 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from '@/styles/popups/changeTheme.module.css';
 import popup from '@/styles/popup.module.css';
 
+// Types
+import { Theme } from '@/types';
+
 // Services
 import ipc from '@/services/ipc.service';
 
@@ -12,14 +15,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useTranslation } from 'react-i18next';
 
 // Utils
-import { setThemeValue } from '@/utils/themeStorage';
 import { getDominantColor, getContrastColor, getVisibleColor, toRGBString, type RGB } from '@/utils/color';
-
-type Theme = {
-  headerImage: string;
-  mainColor: string;
-  secondaryColor: string;
-};
 
 const ChangeThemePopup: React.FC = React.memo(() => {
   // Hooks
@@ -45,9 +41,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     const mainColor = computedStyle.getPropertyValue('--main-color');
     const secondaryColor = computedStyle.getPropertyValue('--secondary-color');
 
-    setThemeValue('theme-main-color', mainColor);
-    setThemeValue('theme-secondary-color', secondaryColor);
-    setThemeValue('theme-header-image', headerImage);
+    ipc.customThemes.current.set({ headerImage, mainColor, secondaryColor });
   };
 
   const handleOpenImageCropper = (imageData: string) => {
@@ -63,13 +57,8 @@ const ChangeThemePopup: React.FC = React.memo(() => {
         secondaryColor: toRGBString(contrastColor),
       };
 
-      if (customThemes.unshift(newTheme) >= 7) customThemes.length = 7;
-
-      setThemeValue('theme-header-image', newTheme.headerImage);
-      setThemeValue('theme-main-color', newTheme.mainColor);
-      setThemeValue('theme-secondary-color', newTheme.secondaryColor);
-      setCustomThemes(customThemes);
-      localStorage.setItem('custom-themes', JSON.stringify(customThemes));
+      ipc.customThemes.current.set(newTheme);
+      ipc.customThemes.add(newTheme);
     });
   };
 
@@ -92,21 +81,13 @@ const ChangeThemePopup: React.FC = React.memo(() => {
       secondaryColor: toRGBString(contrastColor),
     };
 
-    if (customThemes.unshift(newTheme) >= 7) customThemes.length = 7;
-
-    setThemeValue('theme-header-image', newTheme.headerImage);
-    setThemeValue('theme-main-color', newTheme.mainColor);
-    setThemeValue('theme-secondary-color', newTheme.secondaryColor);
-    setCustomThemes(customThemes);
+    ipc.customThemes.current.set(newTheme);
+    ipc.customThemes.add(newTheme);
     setShowColorPicker(false);
-    localStorage.setItem('custom-themes', JSON.stringify(customThemes));
   };
 
   const handleRemoveCustom = (index: number) => {
-    const newThemes = customThemes;
-    newThemes[index] = undefined as unknown as Theme;
-    setCustomThemes(newThemes);
-    localStorage.setItem('custom-themes', JSON.stringify(newThemes));
+    ipc.customThemes.delete(index);
   };
 
   const handleColorSelect = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -139,9 +120,13 @@ const ChangeThemePopup: React.FC = React.memo(() => {
 
   // Effects
   useEffect(() => {
-    const localTheme = localStorage.getItem('custom-themes');
-
-    setCustomThemes(localTheme ? JSON.parse(localTheme) : Array.from({ length: 7 }));
+    const changeCustomTheme = (customThemes: Theme[]) => {
+      console.info('[Custom Themes] custom themes updated: ', customThemes);
+      setCustomThemes(customThemes);
+    };
+    changeCustomTheme(ipc.customThemes.get());
+    const unsubscribe = [ipc.customThemes.onUpdate(changeCustomTheme)];
+    return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
   useEffect(() => {

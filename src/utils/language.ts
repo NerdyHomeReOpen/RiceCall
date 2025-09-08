@@ -1,6 +1,9 @@
 import { TFunction } from 'i18next';
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
 
+// Services
+import ipc from '@/services/ipc.service';
+
 const FREE_IP_API_URL = 'https://ipinfo.io/json';
 
 export const getPermissionText = (t: TFunction<'translation', undefined>, permission: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8): string => {
@@ -83,10 +86,4 @@ export const getLangByIp = async (): Promise<LanguageKey> => {
   if (!match) return 'en';
 
   return match.code;
-};
-
-export const setupLanguage = async () => {
-  const language = localStorage.getItem('language') || (await getLangByIp());
-  localStorage.setItem('language', language);
-  i18n.changeLanguage(language);
 };

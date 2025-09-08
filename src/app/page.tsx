@@ -162,8 +162,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   };
 
   const handleLanguageChange = (language: LanguageKey) => {
+    ipc.language.set(language);
     i18n.changeLanguage(language);
-    localStorage.setItem('language', language);
   };
 
   const handleOpenFriendVerification = (userId: User['userId']) => {
