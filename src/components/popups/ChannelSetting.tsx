@@ -28,10 +28,10 @@ interface ChannelSettingPopupProps {
   user: User;
   server: Server;
   channel: Channel;
-  moderators: Member[]
+  members: Member[]
 }
 
-const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ userId, user, server, channel: channelData, moderators }) => {
+const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ userId, user, server, channel: channelData, members }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -45,7 +45,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [sortField, setSortField] = useState<string>('contribution');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [channelModerators, setChannelModerators] = useState<Member[]>(
-    moderators.filter(m => m.permissionLevel === 3 || m.permissionLevel === 4)
+    members.filter(m => m.permissionLevel === 3 || m.permissionLevel === 4)
   );
   
 
