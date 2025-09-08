@@ -44,7 +44,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [sortDirection, setSortDirection] = useState<1 | -1>(-1);
   const [sortField, setSortField] = useState<string>('contribution');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
-  const [channelModerators, setChannelModerators] = useState<Member[]>(moderators);  
+  const [channelModerators, setChannelModerators] = useState<Member[]>(
+    moderators.filter(m => m.permissionLevel === 3 || m.permissionLevel === 4)
+  );
   
 
   // Destructuring

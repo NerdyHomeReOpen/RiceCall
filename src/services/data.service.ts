@@ -65,8 +65,8 @@ export const dataService = {
     return channel;
   },
 
-  channelModerators: async ({ serverId, channelId }: { serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Channel | null> => {
-    const channel = await api.post('/channelModerators', { serverId, channelId });
+  channelMembers: async ({ serverId, channelId }: { serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Channel | null> => {
+    const channel = await api.post('/channelMembers', { serverId, channelId });
     return channel;
   },
 
