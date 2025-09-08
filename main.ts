@@ -779,6 +779,7 @@ function configureAutoUpdater() {
 
   function checkUpdate() {
     if (DEV) return;
+    console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, env.UPDATE_CHANNEL);
     autoUpdater.checkForUpdates().catch((error) => {
       console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
     });
@@ -849,6 +850,8 @@ function configureTray() {
 }
 
 app.on('ready', async () => {
+  env = loadEnv().env;
+
   // Configure
   configureAutoUpdater();
   configureDiscordRPC();
@@ -1512,7 +1515,6 @@ app.on('open-url', (event, url) => {
 });
 
 app.whenReady().then(() => {
-  env = loadEnv().env;
   const protocolClient = process.execPath;
   const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
 
