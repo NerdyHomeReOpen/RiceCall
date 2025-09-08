@@ -19,7 +19,7 @@ const EnvSchema = z
     API_URL: z.string(),
     WS_URL: z.string(),
     CROWDIN_DISTRIBUTION_HASH: z.string(),
-    UPDATE_CHANNEL: z.enum(['latest', 'dev']).default('latest'),
+    UPDATE_CHANNEL: z.enum(['latest', 'alpha', 'beta']).default('latest'),
   })
   .partial();
 
