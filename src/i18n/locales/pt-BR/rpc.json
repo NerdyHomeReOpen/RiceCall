@@ -3,8 +3,10 @@
   "friend-page": "Lista de amigos",
   "home-page": "Página inicial",
   "join-discord-server": "Entre em nosso servidor do Discord",
+  "login-page": "登入頁面",
   "server-page": "Chat em grupo",
-  "user": "Usuário:",
+  "un-login": "未登入",
+  "user": "使用者: {{0}}",
   "viewing-friend-page": "Visualizando a lista de amigos",
   "viewing-home-page": "Visualizando a página inicial"
 }
