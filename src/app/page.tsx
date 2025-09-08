@@ -18,6 +18,7 @@ import type {
   FriendApplication,
   MemberInvitation,
   RecommendServerList,
+  Announcement,
   Friend,
   OnlineMember,
   QueueMember,
@@ -424,6 +425,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [user, setUser] = useState<User>(Default.user());
   const [servers, setServers] = useState<Server[]>([]);
   const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
@@ -728,6 +730,9 @@ const RootPageComponent: React.FC = React.memo(() => {
       data.recommendServerList().then((recommendServerList) => {
         if (recommendServerList) setRecommendServerList(recommendServerList);
       });
+      data.announcements().then((announcements) => {
+        if (announcements) setAnnouncements(announcements);
+      });
       setSystemNotify([]);
     };
     refresh();
@@ -786,7 +791,7 @@ const RootPageComponent: React.FC = React.memo(() => {
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage user={user} servers={servers} recommendServerList={recommendServerList} display={mainTab.selectedTabId === 'home'} />
+              <HomePage user={user} servers={servers} announcements={announcements} recommendServerList={recommendServerList} display={mainTab.selectedTabId === 'home'} />
               <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}

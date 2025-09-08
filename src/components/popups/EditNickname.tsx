@@ -38,7 +38,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
   };
 
   return (
-    <form className={popup['popup-wrapper']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
@@ -75,7 +75,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
           {t('apply')}
         </div>
       </div>
-    </form>
+    </div>
   );
 });
 

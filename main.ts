@@ -499,6 +499,9 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     }
   } else {
     if (popups[id] && !popups[id].isDestroyed()) {
+      if (mainWindow && mainWindow.isFocusable()) {
+        mainWindow.focus();
+      }
       popups[id].show();
       popups[id].focus();
       return popups[id];
@@ -555,6 +558,9 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
   });
 
   popups[id].webContents.once('did-finish-load', () => {
+    if (mainWindow && mainWindow.isFocusable()) {
+      mainWindow.focus();
+    }
     popups[id].show();
     popups[id].focus();
   });
