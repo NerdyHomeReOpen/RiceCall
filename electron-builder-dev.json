@@ -49,8 +49,8 @@
       "provider": "github",
       "owner": "NerdyHomeReOpen",
       "repo": "RiceCall",
-      "releaseType": "release",
-      "channel": "latest"
+      "releaseType": "prerelease",
+      "channel": "dev"
     }
   ]
 }

@@ -15,21 +15,21 @@ jobs:
         include:
           - os: windows-latest
             build_name: win-x64
-            args: '--win --x64 --publish never'
+            args: '--win --x64 --publish never -c electron-builder-dev.json'
           - os: windows-latest
             build_name: win-ia32
-            args: '--win --ia32 --publish never'
+            args: '--win --ia32 --publish never -c electron-builder-dev.json'
 
           - os: macos-13
             build_name: mac-x64
-            args: '--mac --x64 --publish never'
+            args: '--mac --x64 --publish never -c electron-builder-dev.json'
           - os: macos-14
             build_name: mac-arm64
-            args: '--mac --arm64 --publish never'
+            args: '--mac --arm64 --publish never -c electron-builder-dev.json'
 
           - os: ubuntu-latest
             build_name: linux-x64
-            args: '--linux --x64 --publish never'
+            args: '--linux --x64 --publish never -c electron-builder-dev.json'
 
     environment: dev
 
@@ -67,41 +67,24 @@ jobs:
           build_script_name: build:action
           args: ${{ matrix.args }}
 
-      - name: Upload artifacts (Windows)
-        if: startsWith(matrix.os, 'windows')
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.build_name }}
+          merge-multiple: true
           if-no-files-found: ignore
           path: |
+            # Windows
             dist/*Setup.exe
             dist/*Setup.exe.blockmap
-            dist/*{latest,dev}.yml
-            dist/github/*{latest,dev}.yml
-
-      - name: Upload artifacts (macOS)
-        if: startsWith(matrix.os, 'macos')
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.build_name }}
-          if-no-files-found: ignore
-          path: |
+            # macOS
             dist/*.dmg
             dist/*.zip
             dist/*.blockmap
-            dist/*{latest,dev}-mac.yml
-            dist/github/*{latest,dev}-mac.yml
-
-      - name: Upload artifacts (Linux)
-        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'linux')
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.build_name }}
-          if-no-files-found: ignore
-          path: |
+            # Linux
             dist/*.AppImage
-            dist/*{latest,dev}-linux.yml
-            dist/github/*{latest,dev}-linux.yml
+            # yml files
+            dist/**/*dev*.yml
 
   release:
     needs: build
