@@ -58,7 +58,7 @@ jobs:
           echo "API_URL=${{ secrets.API_URL }}" > .env
           echo "WS_URL=${{ secrets.WS_URL }}" >> .env
           echo "CROWDIN_DISTRIBUTION_HASH=${{ secrets.CROWDIN_DISTRIBUTION_HASH }}" >> .env
-          echo "UPDATE_CHANNEL=dev" >> .env
+          echo "UPDATE_CHANNEL=alpha" >> .env
 
       - name: Build electron
         uses: samuelmeuli/action-electron-builder@v1
@@ -82,6 +82,7 @@ jobs:
             dist/*.deb
             dist/*.rpm
             dist/*latest*.yml
+            dist/*alpha*.yml
 
   release:
     needs: build
