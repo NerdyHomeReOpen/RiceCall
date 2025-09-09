@@ -34,12 +34,6 @@
   border: 1px solid #ccc;
 }
 
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .input-box {
   flex-direction: column;
 }

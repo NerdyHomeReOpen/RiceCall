@@ -140,7 +140,7 @@
   margin-top: 3px;
 }
 
-.search-border {
+.search-box {
   width: max-content;
   display: flex;
   align-items: center;
@@ -157,7 +157,7 @@
   background-position: 0 0;
 }
 
-.search-border:hover:not(:has(.search-prev:hover, .search-next:hover)) .search-icon {
+.search-box:hover:not(:has(.search-prev:hover, .search-next:hover)) .search-icon {
   background-position: -17px 0;
 }
 
@@ -165,7 +165,8 @@
   width: 100%;
   height: 100%;
   padding: 5px;
-  border: 0;
+  border: none !important;
+  border-left: 1px solid #ccc !important;
 }
 
 .toolbar {

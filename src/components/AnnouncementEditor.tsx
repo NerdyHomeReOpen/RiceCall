@@ -280,7 +280,12 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
             </div>
           </div>
 
-          <EditorContent editor={editor} className={`${markdown['setting-markdown-container']} ${markdown['markdown-content']}`} style={{ wordBreak: 'break-all' }} maxLength={1000} />
+          <EditorContent
+            editor={editor}
+            className={`${markdown['setting-markdown-container']} ${markdown['markdown-content']}`}
+            style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
+            maxLength={1000}
+          />
         </div>
       ) : (
         <div className={markdown['setting-markdown-container']} style={{ height: '380px' }}>

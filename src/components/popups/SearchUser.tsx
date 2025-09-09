@@ -65,7 +65,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
-          <div className={popup['input-group']}>
+          <div className={popup['col']}>
             <div className={`${popup['input-box']} ${popup['col']}`} style={{ position: 'relative' }}>
               <div className={popup['label']}>{t('please-input-user-account')}</div>
               <input name="search-query" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} required />

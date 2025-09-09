@@ -48,7 +48,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
-          <div className={popup['input-group']}>
+          <div className={popup['col']}>
             <div className={popup['input-box']}>
               <div className={popup['label']}>{t('parent-channel')}</div>
               <div className={popup['label']}>{parentChannelName || t('none')}</div>

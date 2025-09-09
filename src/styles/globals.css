@@ -160,6 +160,17 @@ button {
   pointer-events: none !important;
 }
 
+*[datatype='read-only'] {
+  pointer-events: none;
+  user-select: none;
+  &:hover {
+    cursor: default;
+  }
+  &:focus {
+    outline: none;
+  }
+}
+
 /* Hover Text */
 .has-hover-text {
   position: relative;

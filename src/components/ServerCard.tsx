@@ -79,7 +79,6 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
           {
             id: 'view-server-info',
             label: t('view-server-info'),
-            disabled: true,
             onClick: () => handleOpenServerSetting(userId, serverId),
           },
           {

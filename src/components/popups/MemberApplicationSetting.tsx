@@ -40,7 +40,7 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
-          <div className={popup['input-group']}>
+          <div className={popup['col']}>
             <div className={`${popup['input-box']} ${popup['row']}`}>
               <div className={popup['label']}>{t('is-receive-member-application-label')}</div>
               <input name="receive-apply" type="checkbox" checked={serverReceiveApplication} onChange={() => setServer((prev) => ({ ...prev, receiveApply: !serverReceiveApplication }))} />

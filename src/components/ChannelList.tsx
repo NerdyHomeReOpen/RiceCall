@@ -146,13 +146,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     <>
       {/* Header */}
       <div className={styles['sidebar-header']}>
-        <div
-          className={styles['avatar-box']}
-          onClick={() => {
-            if (!isServerAdmin(permissionLevel)) return;
-            handleOpenServerSetting(userId, serverId);
-          }}
-        >
+        <div className={styles['avatar-box']} onClick={() => handleOpenServerSetting(userId, serverId)}>
           <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
         </div>
         <div className={styles['base-info-wrapper']}>

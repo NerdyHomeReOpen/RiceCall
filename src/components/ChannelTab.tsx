@@ -177,7 +177,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
             {
               id: 'view-or-edit',
               label: t('view-or-edit'),
-              show: isChannelMod(permissionLevel),
               onClick: () => handleOpenChannelSetting(userId, serverId, channelId),
             },
             {

@@ -185,7 +185,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
             {
               id: 'view-or-edit',
               label: t('view-or-edit'),
-              show: isChannelMod(permissionLevel),
               onClick: () => handleOpenChannelSetting(userId, serverId, categoryId),
             },
             {
