@@ -424,8 +424,6 @@
   min-height: 18px;
   white-space: nowrap;
   text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
 }
 
 .friend-tab .server-name-text {
