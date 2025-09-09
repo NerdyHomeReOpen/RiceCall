@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 // CSS
 import friendPage from '@/styles/pages/friend.module.css';
@@ -60,6 +60,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
 
   const handleSidebarHandleUp = () => (isResizingSidebarRef.current = false);
 
+  // Effects
+  useEffect(() => {
+    signatureInputRef.current!.value = userSignature;
+  }, [userSignature]);
+
   return (
     <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
@@ -86,8 +91,10 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             placeholder={t('signature-placeholder')}
             onBlur={(e) => handleChangeSignature(e.target.value)}
             onKeyDown={(e) => {
+              if (e.key !== 'Enter') return;
+              else e.preventDefault();
               if (isComposingRef.current || !signatureInputRef.current) return;
-              if (e.key === 'Enter') signatureInputRef.current.blur();
+              signatureInputRef.current.blur();
             }}
             onCompositionStart={() => (isComposingRef.current = true)}
             onCompositionEnd={() => (isComposingRef.current = false)}
@@ -96,7 +103,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             className={emoji['emoji-icon']}
             onMouseDown={(e) => {
               e.preventDefault();
-              e.stopPropagation();
               const x = e.currentTarget.getBoundingClientRect().left;
               const y = e.currentTarget.getBoundingClientRect().bottom;
               contextMenu.showEmojiPicker(x, y, 'right-bottom', (_, full) => {
