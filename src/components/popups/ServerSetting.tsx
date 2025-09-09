@@ -352,9 +352,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       reader.readAsDataURL(file);
                     }}
                   />
-                  <label htmlFor="avatar-upload" className={popup['button']} style={{ marginTop: '10px' }}>
-                    {t('change-avatar')}
-                  </label>
+                  {isServerAdmin(permissionLevel) ? (
+                    <label htmlFor="avatar-upload" className={popup['button']} style={{ marginTop: '10px', height: '2em' }}>
+                      {t('change-avatar')}
+                    </label>
+                  ) : (
+                    <div style={{ marginTop: '10px', height: '2em' }} />
+                  )}
                 </div>
               </div>
               <div className={popup['col']}>
