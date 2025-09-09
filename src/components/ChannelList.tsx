@@ -54,6 +54,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
   const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
+  const filteredQueueMembers = useMemo(() => queueMembers.filter((member) => member.leftTime > 0), [queueMembers]);
   const filteredServerChannels = useMemo(
     () => serverChannels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
     [serverChannels],
@@ -248,7 +249,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div className={styles['queue-list']}>
-            {queueMembers.map((member) => (
+            {filteredQueueMembers.map((member) => (
               <QueueMemberTab key={member.userId} user={user} queueMember={member} server={server} channel={channel} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
             ))}
           </div>
