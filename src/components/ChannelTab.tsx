@@ -199,7 +199,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
             {
               id: 'delete-channel',
               label: t('delete-channel'),
-              show: isServerAdmin(permissionLevel) && !isLobby,
+              show: isChannelAdmin(permissionLevel) && !isLobby,
               onClick: () => handleDeleteChannel(serverId, channelId),
             },
             {
