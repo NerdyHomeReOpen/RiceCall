@@ -1,5 +1,5 @@
 {
-  "permissions-denied": "Permisos insuficientes",
+  "permissions-denied": "許可權不足",
   "voice-set-to-free-speech": "Este canal ha sido configurado para hablar libremente",
   "voice-set-to-forbid-speech": "Este canal ha sido configurado para que solo los administradores puedan hablar",
   "voice-set-to-queue": "Este canal está configurado para hablar por turno. Haz clic en \"Solicitar turno\" para hablar",
