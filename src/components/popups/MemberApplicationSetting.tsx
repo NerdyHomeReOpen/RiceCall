@@ -13,18 +13,17 @@ import popup from '@/styles/popup.module.css';
 import ipc from '@/services/ipc.service';
 
 interface MemberApplicationSettingPopupProps {
+  serverId: Server['serverId'];
   server: Server;
 }
 
-const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ server: serverData }) => {
+const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ serverId, server }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [server, setServer] = useState<Server>(serverData);
-
-  // Destructuring
-  const { serverId, receiveApply: serverReceiveApplication, applyNotice: serverApplyNote } = server;
+  const [serverReceiveApplication, setServerReceiveApplication] = useState<boolean>(server.receiveApply);
+  const [serverApplyNote, setServerApplyNote] = useState<string>(server.applyNotice);
 
   // Handlers
   const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
@@ -39,16 +38,14 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={popup['dialog-content']}>
-          <div className={popup['col']}>
-            <div className={`${popup['input-box']} ${popup['row']}`}>
-              <div className={popup['label']}>{t('is-receive-member-application-label')}</div>
-              <input name="receive-apply" type="checkbox" checked={serverReceiveApplication} onChange={() => setServer((prev) => ({ ...prev, receiveApply: !serverReceiveApplication }))} />
-            </div>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('apply-member-note')}</div>
-              <textarea name="apply-note" value={serverApplyNote} maxLength={100} onChange={(e) => setServer((prev) => ({ ...prev, applyNotice: e.target.value }))} />
-            </div>
+        <div className={`${popup['dialog-content']} ${popup['col']}`}>
+          <div className={`${popup['input-box']} ${popup['row']}`}>
+            <div className={popup['label']}>{t('is-receive-member-application-label')}</div>
+            <input name="receive-apply" type="checkbox" defaultChecked={serverReceiveApplication} onChange={() => setServerReceiveApplication(!serverReceiveApplication)} />
+          </div>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
+            <div className={popup['label']}>{t('apply-member-note')}</div>
+            <textarea name="apply-note" defaultValue={serverApplyNote} maxLength={100} onChange={(e) => setServerApplyNote(e.target.value)} />
           </div>
         </div>
       </div>
@@ -58,7 +55,7 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
         <div
           className={popup['button']}
           onClick={() => {
-            handleEditServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
+            handleEditServer(serverId, { receiveApply: serverReceiveApplication, applyNotice: serverApplyNote });
             handleClose();
           }}
         >

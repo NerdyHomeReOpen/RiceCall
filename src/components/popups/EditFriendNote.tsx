@@ -16,15 +16,15 @@ interface EditFriendNotePopupProps {
   friend: Friend;
 }
 
-const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ friend: friendData }) => {
+const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ friend }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [friendNote, setFriendNote] = useState<string>(friendData.note);
+  const [friendNote, setFriendNote] = useState<string>(friend.note);
 
   // Variables
-  const { targetId, name: targetName } = friendData;
+  const { targetId, name: targetName } = friend;
 
   // Handlers
   const handleEditFriend = (targetId: User['userId'], update: Partial<Friend>) => {
@@ -40,11 +40,9 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
-          <div className={popup['col']}>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('friend-note-name')}</div>
-              <input className={popup['input']} type="text" value={friendNote} placeholder={targetName} onChange={(e) => setFriendNote(e.target.value)} />
-            </div>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
+            <div className={popup['label']}>{t('friend-note-name')}</div>
+            <input className={popup['input']} type="text" defaultValue={friendNote} placeholder={targetName} onChange={(e) => setFriendNote(e.target.value)} />
           </div>
         </div>
       </div>

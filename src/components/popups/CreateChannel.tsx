@@ -47,16 +47,14 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={popup['dialog-content']}>
-          <div className={popup['col']}>
-            <div className={popup['input-box']}>
-              <div className={popup['label']}>{t('parent-channel')}</div>
-              <div className={popup['label']}>{parentChannelName || t('none')}</div>
-            </div>
-            <div className={popup['input-box']}>
-              <div className={popup['label']}>{t('channel-name')}</div>
-              <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel({ ...channel, name: e.target.value })} />
-            </div>
+        <div className={`${popup['dialog-content']} ${popup['col']}`}>
+          <div className={popup['input-box']}>
+            <div className={popup['label']}>{t('parent-channel')}</div>
+            <div className={popup['label']}>{parentChannelName || t('none')}</div>
+          </div>
+          <div className={popup['input-box']}>
+            <div className={popup['label']}>{t('channel-name')}</div>
+            <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel({ ...channel, name: e.target.value })} />
           </div>
         </div>
       </div>

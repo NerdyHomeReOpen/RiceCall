@@ -127,7 +127,7 @@ const ipcService = {
           data.friendApplication({ senderId: targetId, receiverId: userId }),
         ]).then(([target, friendGroups, sentFriendApplication, receivedFriendApplication]) => {
           if (!receivedFriendApplication) {
-            ipcRenderer.send('open-popup', 'applyFriend', 'applyFriend', { userId, targetId, target, friendGroups, sentFriendApplication }, force);
+            ipcRenderer.send('open-popup', 'applyFriend', 'applyFriend', { userId, targetId, target, friendGroups, friendApplication: sentFriendApplication }, force);
           } else {
             ipcRenderer.send('open-popup', 'approveFriend', 'approveFriend', { targetId, friendGroups }, force);
           }

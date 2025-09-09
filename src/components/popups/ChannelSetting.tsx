@@ -391,44 +391,41 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
       </div>
 
       {/* Footer */}
-      <div className={popup['popup-footer']}>
-        {isChannelMod(permissionLevel) ? (
-          <>
-            <div
-              className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-              onClick={() => {
-                handleEditChannel(serverId, channelId, {
-                  name: channelName,
-                  announcement: channelAnnouncement,
-                  password: channelPassword,
-                  order: channelOrder,
-                  userLimit: channelUserLimit,
-                  guestTextMaxLength: channelGuestTextMaxLength,
-                  guestTextWaitTime: channelGuestTextWaitTime,
-                  guestTextGapTime: channelGuestTextGapTime,
-                  bitrate: channelBitrate,
-                  forbidText: !!channelForbidText,
-                  forbidGuestText: !!channelForbidGuestText,
-                  forbidGuestVoice: !!channelForbidGuestVoice,
-                  forbidGuestQueue: !!channelForbidGuestQueue,
-                  forbidGuestUrl: !!channelForbidGuestUrl,
-                  visibility: channelVisibility,
-                  voiceMode: channelVoiceMode,
-                });
-                handleClose();
-              }}
-            >
-              {t('confirm')}
-            </div>
-            <div className={popup['button']} onClick={handleClose}>
-              {t('cancel')}
-            </div>
-          </>
-        ) : (
-          <div className={popup['button']} onClick={handleClose}>
-            {t('close')}
-          </div>
-        )}
+      <div className={popup['popup-footer']} style={isChannelMod(permissionLevel) ? {} : { display: 'none' }}>
+        <div
+          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
+          onClick={() => {
+            handleEditChannel(serverId, channelId, {
+              name: channelName,
+              announcement: channelAnnouncement,
+              password: channelPassword,
+              order: channelOrder,
+              userLimit: channelUserLimit,
+              guestTextMaxLength: channelGuestTextMaxLength,
+              guestTextWaitTime: channelGuestTextWaitTime,
+              guestTextGapTime: channelGuestTextGapTime,
+              bitrate: channelBitrate,
+              forbidText: !!channelForbidText,
+              forbidGuestText: !!channelForbidGuestText,
+              forbidGuestVoice: !!channelForbidGuestVoice,
+              forbidGuestQueue: !!channelForbidGuestQueue,
+              forbidGuestUrl: !!channelForbidGuestUrl,
+              visibility: channelVisibility,
+              voiceMode: channelVoiceMode,
+            });
+            handleClose();
+          }}
+        >
+          {t('confirm')}
+        </div>
+        <div className={popup['button']} onClick={handleClose}>
+          {t('cancel')}
+        </div>
+      </div>
+      <div className={popup['popup-footer']} style={!isChannelMod(permissionLevel) ? {} : { display: 'none' }}>
+        <div className={popup['button']} onClick={handleClose}>
+          {t('close')}
+        </div>
       </div>
     </div>
   );

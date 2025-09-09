@@ -770,36 +770,33 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
         </div>
 
         {/* Footer */}
-        <div className={popup['popup-footer']}>
-          {isServerAdmin(permissionLevel) ? (
-            <>
-              <div
-                className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-                onClick={() => {
-                  handleEditServer(serverId, {
-                    name: serverName,
-                    avatar: serverAvatar,
-                    avatarUrl: serverAvatarUrl,
-                    announcement: serverAnnouncement,
-                    description: serverDescription,
-                    type: serverType,
-                    slogan: serverSlogan,
-                    visibility: serverVisibility,
-                  });
-                  handleClose();
-                }}
-              >
-                {t('save')}
-              </div>
-              <div className={popup['button']} onClick={() => handleClose()}>
-                {t('cancel')}
-              </div>
-            </>
-          ) : (
-            <div className={popup['button']} onClick={() => handleClose()}>
-              {t('close')}
-            </div>
-          )}
+        <div className={popup['popup-footer']} style={isServerAdmin(permissionLevel) ? {} : { display: 'none' }}>
+          <div
+            className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
+            onClick={() => {
+              handleEditServer(serverId, {
+                name: serverName,
+                avatar: serverAvatar,
+                avatarUrl: serverAvatarUrl,
+                announcement: serverAnnouncement,
+                description: serverDescription,
+                type: serverType,
+                slogan: serverSlogan,
+                visibility: serverVisibility,
+              });
+              handleClose();
+            }}
+          >
+            {t('save')}
+          </div>
+          <div className={popup['button']} onClick={() => handleClose()}>
+            {t('cancel')}
+          </div>
+        </div>
+        <div className={popup['popup-footer']} style={!isServerAdmin(permissionLevel) ? {} : { display: 'none' }}>
+          <div className={popup['button']} onClick={() => handleClose()}>
+            {t('close')}
+          </div>
         </div>
       </div>
     );

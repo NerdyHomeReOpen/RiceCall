@@ -633,17 +633,14 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleError = (message: string) => {
-    console.error('[Socket] error:', message);
     new ErrorHandler(new Error(message)).show();
   };
 
-  const handleConnectError = (error: Error) => {
-    console.error('[Socket] connect error:', error);
+  const handleConnectError = () => {
     new ErrorHandler(new Error(connectFailedMessageRef.current), () => ipc.auth.logout()).show();
   };
 
-  const handleReconnectError = (error: Error) => {
-    console.error('[Socket] reconnect error:', error);
+  const handleReconnectError = () => {
     new ErrorHandler(new Error(reconnectionFailedMessageRef.current), () => ipc.auth.logout()).show();
   };
 

@@ -104,7 +104,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup['alert']}`} />
-          <div>
+          <div className={popup['col']}>
             <div className={popup['label']}>{t('confirm-block-user', { '0': memberNickname || memberName })}</div>
             <div className={popup['col']}>
               <div className={`${popup['input-box']} ${popup['row']}`}>

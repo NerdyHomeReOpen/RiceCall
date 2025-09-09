@@ -18,18 +18,15 @@ interface EditChannelNamePopupProps {
   channel: Channel;
 }
 
-const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ serverId, channelId, channel: channelData }) => {
+const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ serverId, channelId, channel }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [channel, setChannel] = useState<Channel>(channelData);
-
-  // Destructuring
-  const { name: channelName } = channel;
+  const [channelName, setChannelName] = useState<string>(channel.name);
 
   // Memos
-  const canSubmit = useMemo(() => channel.name.trim(), [channel.name]);
+  const canSubmit = useMemo(() => channelName.trim(), [channelName]);
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
@@ -45,11 +42,9 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
-          <div className={popup['col']}>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('channel-name-label')}</div>
-              <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))} />
-            </div>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
+            <div className={popup['label']}>{t('channel-name-label')}</div>
+            <input name="channel-name" type="text" defaultValue={channelName} maxLength={32} onChange={(e) => setChannelName(e.target.value)} />
           </div>
         </div>
       </div>

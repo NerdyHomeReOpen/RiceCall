@@ -13,18 +13,16 @@ import popup from '@/styles/popup.module.css';
 import ipc from '@/services/ipc.service';
 
 interface EditFriendGroupNamePopupProps {
+  friendGroupId: FriendGroup['friendGroupId'];
   friendGroup: FriendGroup;
 }
 
-const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.memo(({ friendGroup: originFriendGroup }) => {
+const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.memo(({ friendGroupId, friendGroup }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [friendGroup, setFriendGroup] = useState<FriendGroup>(originFriendGroup);
-
-  // Destructuring
-  const { friendGroupId, name: friendGroupName } = friendGroup;
+  const [friendGroupName, setFriendGroupName] = useState<string>(friendGroup.name);
 
   // Memos
   const canSubmit = useMemo(() => friendGroupName.trim(), [friendGroupName]);
@@ -43,11 +41,9 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
       {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
-          <div className={popup['col']}>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
-              <input name="friend-group-name" type="text" value={friendGroupName} maxLength={32} onChange={(e) => setFriendGroup((prev) => ({ ...prev, name: e.target.value }))} />
-            </div>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
+            <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
+            <input name="friend-group-name" type="text" defaultValue={friendGroupName} maxLength={32} onChange={(e) => setFriendGroupName(e.target.value)} />
           </div>
         </div>
       </div>

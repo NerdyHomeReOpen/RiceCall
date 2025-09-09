@@ -12,25 +12,21 @@ import { useTranslation } from 'react-i18next';
 // Services
 import ipc from '@/services/ipc.service';
 
-// Utils
-import Default from '@/utils/default';
-
 interface ApplyMemberPopupProps {
   server: Server;
   memberApplication: MemberApplication | null;
 }
 
-const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, memberApplication: memberApplicationData }) => {
+const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, memberApplication }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [section, setSection] = useState<number>(memberApplicationData ? 1 : 0); // 0: send, 1: sent, 2: edit
-  const [memberApplication, setMemberApplication] = useState<MemberApplication>(memberApplicationData || Default.memberApplication());
+  const [section, setSection] = useState<number>(memberApplication ? 1 : 0); // 0: send, 1: sent, 2: edit
+  const [applicationDesc, setApplicationDesc] = useState<MemberApplication['description']>(memberApplication?.description || '');
 
   // Variables
   const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
-  const { description: applicationDes } = memberApplication;
 
   // Handlers
   const handleSendMemberApplication = (serverId: Server['serverId'], preset: Partial<MemberApplication>) => {
@@ -66,14 +62,14 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
           <div className={popup['split']} />
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
             <div className={popup['label']}>{t('note')}</div>
-            <textarea rows={2} value={applicationDes} onChange={(e) => setMemberApplication((prev) => ({ ...prev, description: e.target.value }))} />
+            <textarea rows={2} defaultValue={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
           </div>
           <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
             {t('member-application-sent')}
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 2 ? {} : { display: 'none' }}>
             <div className={popup['label']}>{t('note')}</div>
-            <textarea rows={2} value={applicationDes} onChange={(e) => setMemberApplication((prev) => ({ ...prev, description: e.target.value }))} />
+            <textarea rows={2} defaultValue={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
           </div>
         </div>
       </div>
@@ -83,7 +79,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
         <div
           className={popup['button']}
           onClick={() => {
-            handleSendMemberApplication(serverId, { description: applicationDes });
+            handleSendMemberApplication(serverId, { description: applicationDesc });
             handleClose();
           }}
         >
@@ -94,7 +90,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
         </div>
       </div>
       <div className={popup['popup-footer']} style={section === 1 ? {} : { display: 'none' }}>
-        <div className={popup['button']} onClick={() => setSection(0)}>
+        <div className={popup['button']} onClick={() => setSection(2)}>
           {t('modify')}
         </div>
         <div className={popup['button']} onClick={handleClose}>
@@ -105,7 +101,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
         <div
           className={popup['button']}
           onClick={() => {
-            handleEditMemberApplication(serverId, { description: applicationDes });
+            handleEditMemberApplication(serverId, { description: applicationDesc });
             handleClose();
           }}
         >

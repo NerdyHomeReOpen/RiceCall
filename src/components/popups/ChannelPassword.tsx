@@ -36,7 +36,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
         <div className={popup['dialog-content']}>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('please-enter-the-channel-password')}</div>
-            <input type="text" value={password} maxLength={4} onChange={(e) => setPassword(e.target.value)} />
+            <input type="text" maxLength={4} onChange={(e) => setPassword(e.target.value)} />
           </div>
         </div>
       </div>

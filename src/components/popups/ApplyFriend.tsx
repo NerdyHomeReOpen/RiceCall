@@ -12,30 +12,26 @@ import { useTranslation } from 'react-i18next';
 // Services
 import ipc from '@/services/ipc.service';
 
-// Utils
-import Default from '@/utils/default';
-
 interface ApplyFriendPopupProps {
   userId: User['userId'];
   targetId: User['userId'];
-  friendGroups: FriendGroup[];
   target: User;
-  sentFriendApplication: FriendApplication | null;
+  friendGroups: FriendGroup[];
+  friendApplication: FriendApplication | null;
 }
 
-const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, targetId, friendGroups: friendGroupsData, target, sentFriendApplication: sentFriendApplicationData }) => {
+const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, targetId, friendGroups: friendGroupsData, target, friendApplication }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [section, setSection] = useState<number>(sentFriendApplicationData ? 1 : 0); // 0: send, 1: sent, 2: edit, 3: approve
+  const [section, setSection] = useState<number>(friendApplication ? 1 : 0); // 0: send, 1: sent, 2: edit
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>(friendGroupsData);
-  const [friendApplication, setFriendApplication] = useState<FriendApplication>(sentFriendApplicationData || Default.friendApplication());
-  const [selectedFriendGroupId, setSelectedFriendGroupId] = useState<FriendGroup['friendGroupId'] | null>(null);
+  const [friendGroupId, setFriendGroupId] = useState<FriendGroup['friendGroupId']>('');
+  const [applicationDesc, setApplicationDesc] = useState<FriendApplication['description']>(friendApplication?.description || '');
 
   // Destructuring
   const { name: targetName, displayId: targetDisplayId, avatarUrl: targetAvatarUrl } = target;
-  const { description: applicationDesc } = friendApplication;
 
   // Handlers
   const handleSendFriendApplication = (receiverId: User['userId'], preset: Partial<FriendApplication>, friendGroupId: FriendGroup['friendGroupId'] | null) => {
@@ -104,7 +100,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
             <div className={popup['label']}>{t('select-friend-group')}</div>
             <div className={popup['row']}>
               <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
-                <select className={popup['select']} value={selectedFriendGroupId || ''} onChange={(e) => setSelectedFriendGroupId(e.target.value)}>
+                <select className={popup['select']} onChange={(e) => setFriendGroupId(e.target.value)}>
                   <option value={''}>{t('none')}</option>
                   {friendGroups.map((group) => (
                     <option key={group.friendGroupId} value={group.friendGroupId}>
@@ -118,32 +114,14 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
               </div>
             </div>
             <div className={popup['label']}>{t('note')}</div>
-            <textarea rows={2} value={applicationDesc} onChange={(e) => setFriendApplication((prev) => ({ ...prev, description: e.target.value }))} />
+            <textarea rows={2} defaultValue={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
           </div>
           <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
             {t('friend-application-sent')}
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 2 ? {} : { display: 'none' }}>
             <div className={popup['label']}>{t('note')}</div>
-            <textarea rows={2} value={applicationDesc} onChange={(e) => setFriendApplication((prev) => ({ ...prev, description: e.target.value }))} />
-          </div>
-          <div className={`${popup['input-box']} ${popup['col']}`} style={section === 3 ? {} : { display: 'none' }}>
-            <div className={popup['label']}>{t('select-friend-group')}</div>
-            <div className={popup['row']}>
-              <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
-                <select className={popup['select']} value={selectedFriendGroupId || ''} onChange={(e) => setSelectedFriendGroupId(e.target.value || null)}>
-                  <option value={''}>{t('none')}</option>
-                  {friendGroups.map((group) => (
-                    <option key={group.friendGroupId} value={group.friendGroupId}>
-                      {group.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className={popup['link-text']} onClick={() => handleOpenCreateFriendGroup()}>
-                {t('create-friend-group')}
-              </div>
-            </div>
+            <textarea rows={2} defaultValue={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
           </div>
         </div>
       </div>
@@ -153,7 +131,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
         <div
           className={popup['button']}
           onClick={() => {
-            handleSendFriendApplication(targetId, { description: applicationDesc }, selectedFriendGroupId);
+            handleSendFriendApplication(targetId, { description: applicationDesc }, friendGroupId || null);
             handleClose();
           }}
         >

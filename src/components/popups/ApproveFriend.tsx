@@ -24,10 +24,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
   // States
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>(friendGroupsData);
   const [friendNotes, setFriendNotes] = useState<string>('');
-  const [selectedFriendGroupId, setSelectedFriendGroupId] = useState<FriendGroup['friendGroupId'] | null>(null);
-
-  // Destructuring
-  // const { name: targetName, displayId: targetDisplayId, avatarUrl: targetAvatarUrl } = target;
+  const [friendGroupId, setFriendGroupId] = useState<FriendGroup['friendGroupId']>('');
 
   // Handlers
   const handleApproveFriendApplication = (senderId: User['userId'], friendGroupId: FriendGroup['friendGroupId'] | null, friendNote: Friend['note']) => {
@@ -70,12 +67,12 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={`${popup['content']} ${popup['col']}`}>
+        <div className={`${popup['dialog-content']} ${popup['col']}`}>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('select-friend-group')}</div>
             <div className={popup['row']}>
               <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
-                <select className={popup['select']} value={selectedFriendGroupId || ''} onChange={(e) => setSelectedFriendGroupId(e.target.value || null)}>
+                <select className={popup['select']} onChange={(e) => setFriendGroupId(e.target.value)}>
                   <option value={''}>{t('none')}</option>
                   {friendGroups.map((group) => (
                     <option key={group.friendGroupId} value={group.friendGroupId}>
@@ -89,9 +86,9 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
               </div>
             </div>
           </div>
-          <div className={`${popup['input-box']} ${popup['col']}`} style={{ maxWidth: '60%' }}>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('friend-note-name')}</div>
-            <input className={popup['input']} type="text" value={friendNotes} onChange={(e) => setFriendNotes(e.target.value)} />
+            <input className={popup['input']} type="text" onChange={(e) => setFriendNotes(e.target.value)} style={{ maxWidth: '60%' }} />
           </div>
         </div>
       </div>
@@ -101,7 +98,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
         <div
           className={popup['button']}
           onClick={() => {
-            handleApproveFriendApplication(targetId, selectedFriendGroupId, friendNotes);
+            handleApproveFriendApplication(targetId, friendGroupId || null, friendNotes);
             handleClose();
           }}
         >

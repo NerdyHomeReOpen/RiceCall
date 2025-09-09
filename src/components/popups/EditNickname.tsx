@@ -18,15 +18,15 @@ interface EditNicknamePopupProps {
   member: Member;
 }
 
-const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId, serverId, member: memberData }) => {
+const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId, serverId, member }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [member, setMember] = useState<Member>(memberData);
+  const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
 
   // Destructuring
-  const { nickname: memberNickname, name: memberName } = member;
+  const { name: memberName } = member;
 
   // Handlers
   const handleEditMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
@@ -41,18 +41,16 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
     <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={popup['dialog-content']}>
-          <div className={popup['col']}>
-            <div className={popup['input-box']}>
-              <div className={popup['label']} style={{ minWidth: '2rem' }}>
-                {t('nickname')}:
-              </div>
-              <div className={popup['label']}>{memberName}</div>
+        <div className={`${popup['dialog-content']} ${popup['col']}`}>
+          <div className={popup['input-box']}>
+            <div className={popup['label']} style={{ minWidth: '2rem' }}>
+              {t('nickname')}:
             </div>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('please-enter-the-member-nickname')}</div>
-              <input name="nickname" type="text" value={memberNickname || ''} maxLength={32} onChange={(e) => setMember((prev) => ({ ...prev, nickname: e.target.value }))} />
-            </div>
+            <div className={popup['label']}>{memberName}</div>
+          </div>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
+            <div className={popup['label']}>{t('please-enter-the-member-nickname')}</div>
+            <input name="nickname" type="text" defaultValue={memberNickname} maxLength={32} onChange={(e) => setMemberNickname(e.target.value)} />
           </div>
         </div>
       </div>
@@ -62,7 +60,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         <div
           className={popup['button']}
           onClick={() => {
-            handleEditMember(userId, serverId, { nickname: memberNickname });
+            handleEditMember(userId, serverId, { nickname: memberNickname || null });
             handleClose();
           }}
         >
@@ -71,7 +69,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
-        <div className={popup['button']} onClick={() => handleEditMember(userId, serverId, { nickname: memberNickname })}>
+        <div className={popup['button']} onClick={() => handleEditMember(userId, serverId, { nickname: memberNickname || null })}>
           {t('apply')}
         </div>
       </div>

@@ -28,12 +28,15 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   const { t } = useTranslation();
 
   // States
-  const [server, setServer] = useState<Server>(Default.server());
   const [section, setSection] = useState<number>(0);
+  const [serverType, setServerType] = useState<Server['type']>(Default.server().type);
+  const [serverName, setServerName] = useState<Server['name']>(Default.server().name);
+  const [serverSlogan, setServerSlogan] = useState<Server['slogan']>(Default.server().slogan);
+  const [serverAvatar, setServerAvatar] = useState<Server['avatar']>(Default.server().avatar);
+  const [serverAvatarUrl, setServerAvatarUrl] = useState<Server['avatarUrl']>(Default.server().avatarUrl);
 
   // Destructuring
   const { level: userLevel } = user;
-  const { name: serverName, type: serverType, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan } = server;
 
   // Memos
   const serverTypes = useMemo(
@@ -76,7 +79,8 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
       formData.append('_file', data.imageDataUrl as string);
       const response = await api.post('/upload', formData);
       if (response) {
-        setServer((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
+        setServerAvatar(response.avatar);
+        setServerAvatarUrl(response.avatarUrl);
       }
     });
   };
@@ -101,7 +105,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                   key={type.value}
                   className={`${styles['button']} ${serverType === type.value ? styles['selected'] : ''}`}
                   onClick={() => {
-                    setServer((prev) => ({ ...prev, type: type.value as Server['type'] }));
+                    setServerType(type.value as Server['type']);
                     setSection(1);
                   }}
                 >
@@ -161,27 +165,13 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                 <div className={popup['label']} style={{ width: '100px' }}>
                   {t('server-name')}
                 </div>
-                <input
-                  name="server-name"
-                  type="text"
-                  value={serverName}
-                  placeholder={t('server-name-placeholder')}
-                  maxLength={32}
-                  onChange={(e) => setServer((prev) => ({ ...prev, name: e.target.value }))}
-                />
+                <input name="server-name" type="text" placeholder={t('server-name-placeholder')} maxLength={32} onChange={(e) => setServerName(e.target.value)} />
               </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']} style={{ width: '100px' }}>
                   {t('server-slogan')}
                 </div>
-                <input
-                  name="server-slogan"
-                  type="text"
-                  value={serverSlogan}
-                  placeholder={t('server-slogan-placeholder')}
-                  maxLength={32}
-                  onChange={(e) => setServer((prev) => ({ ...prev, slogan: e.target.value }))}
-                />
+                <input name="server-slogan" type="text" placeholder={t('server-slogan-placeholder')} maxLength={32} onChange={(e) => setServerSlogan(e.target.value)} />
               </div>
             </div>
           </div>

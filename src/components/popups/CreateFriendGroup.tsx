@@ -20,13 +20,10 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
   // States
-  const [friendGroup, setFriendGroup] = useState<FriendGroup>(Default.friendGroup());
-
-  // Destructuring
-  const { name: groupName } = friendGroup;
+  const [friendGroupName, setFriendGroupName] = useState<FriendGroup['name']>(Default.friendGroup().name);
 
   // Memos
-  const canSubmit = useMemo(() => groupName.trim(), [groupName]);
+  const canSubmit = useMemo(() => friendGroupName.trim(), [friendGroupName]);
 
   // Handlers
   const handleCreateFriendGroup = (preset: Partial<FriendGroup>) => {
@@ -44,7 +41,7 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
         <div className={popup['dialog-content']}>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
-            <input name="friend-group-name" type="text" value={groupName} maxLength={32} onChange={(e) => setFriendGroup((prev) => ({ ...prev, name: e.target.value }))} />
+            <input name="friend-group-name" type="text" maxLength={32} onChange={(e) => setFriendGroupName(e.target.value)} />
           </div>
         </div>
       </div>
@@ -54,7 +51,7 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
         <div
           className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
           onClick={() => {
-            handleCreateFriendGroup({ name: groupName });
+            handleCreateFriendGroup({ name: friendGroupName });
             handleClose();
           }}
         >
