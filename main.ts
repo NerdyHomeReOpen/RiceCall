@@ -46,6 +46,7 @@ const ClientToServerEventNames = [
   'blockUserFromChannel',
   'blockUserFromServer',
   'channelMessage',
+  'clearQueue',
   'connectChannel',
   'connectServer',
   'controlQueue',

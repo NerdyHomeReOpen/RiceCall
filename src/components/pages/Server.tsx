@@ -163,7 +163,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   // States
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
-  const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
   const [speakMode, setSpeakMode] = useState<SpeakingMode>('key');
   const [speakHotKey, setSpeakHotKey] = useState<string>('');
   const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
@@ -186,9 +185,18 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     guestTextMaxLength: channelGuestTextMaxLength,
     permissionLevel: channelPermissionLevel,
     isTextMuted: channelIsTextMuted,
+    isVoiceMuted: channelIsVoiceMuted,
   } = channel;
   const announcement = channelAnnouncement || serverAnnouncement;
   const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
+  const channelIsQueueMode = useMemo(() => channelVoiceMode === 'queue', [channelVoiceMode]);
+  const isMicTaken = useMemo(() => queueMembers.some((m) => m.position <= 0 && m.userId === userId), [queueMembers, userId]);
+  const isInQueue = useMemo(() => queueMembers.some((m) => m.position > 0 && m.userId === userId), [queueMembers, userId]);
+  const micText = useMemo(() => {
+    if (isMicTaken) return t('mic-taken');
+    if (isInQueue) return t('in-queue');
+    return t('take-mic');
+  }, [isMicTaken, isInQueue, t]);
   const micSubText = useMemo(() => {
     if (!isMicTaken) return '';
     if (speakMode === 'key') {
@@ -212,8 +220,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     ipc.socket.send('editChannel', { serverId, channelId, update });
   };
 
-  const handleJoinQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.socket.send('joinQueue', { serverId, channelId });
+  const handleJoinQueue = (serverId: Server['serverId'], channelId: Channel['channelId'], force?: boolean) => {
+    ipc.socket.send('joinQueue', { serverId, channelId, force });
   };
 
   const handleLeaveQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -238,6 +246,50 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   const handleEditMicVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
     webRTC.changeMicVolume(parseInt(e.target.value));
+  };
+
+  const handleClickMicButton = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (channelIsQueueMode) {
+      if (isMicTaken || isInQueue) {
+        const x = e.currentTarget.getBoundingClientRect().left;
+        const y = e.currentTarget.getBoundingClientRect().top;
+        contextMenu.showMicContextMenu(x, y, 'right-top', [
+          {
+            id: 'untake-mic',
+            label: t('untake-mic'),
+            show: channelIsQueueMode,
+            onClick: () => handleLeaveQueue(serverId, channelId),
+          },
+        ]);
+      } else {
+        const x = e.currentTarget.getBoundingClientRect().left;
+        const y = e.currentTarget.getBoundingClientRect().top;
+        contextMenu.showMicContextMenu(x, y, 'right-top', [
+          {
+            id: 'take-mic-in-queue',
+            label: t('take-mic-in-queue'),
+            show: channelIsQueueMode,
+            onClick: () => handleJoinQueue(serverId, channelId),
+          },
+          {
+            id: 'separator',
+            label: '',
+          },
+          {
+            id: 'take-mic-directly',
+            label: t('take-mic-directly'),
+            show: channelIsQueueMode,
+            onClick: () => handleJoinQueue(serverId, channelId, true),
+          },
+        ]);
+      }
+    } else {
+      if (isMicTaken) {
+        handleLeaveQueue(serverId, channelId);
+      } else {
+        handleJoinQueue(serverId, channelId);
+      }
+    }
   };
 
   const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -290,13 +342,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   }, [actionMessages]);
 
   useEffect(() => {
-    const newMicTaken = queueMembers.some((m) => m.position === 0 && m.userId === userId);
-    setIsMicTaken(newMicTaken);
-    if (newMicTaken !== isMicTakenRef.current) {
-      isMicTakenRef.current = newMicTaken;
-      webRTC.setIsMicTaken(newMicTaken);
+    if (isMicTaken !== isMicTakenRef.current) {
+      isMicTakenRef.current = isMicTaken;
+      webRTC.setIsMicTaken(isMicTaken);
     }
-  }, [queueMembers, userId, webRTC]);
+  }, [isMicTaken, webRTC]);
 
   useEffect(() => {
     if (channelId) {
@@ -420,43 +470,33 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                       id: 'free-speech',
                       label: t('free-speech'),
                       icon: channelVoiceMode === 'free' ? 'checked' : '',
-                      onClick: () => {
-                        handleEditChannel(serverId, channelId, { voiceMode: 'free' });
-                      },
+                      onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'free' }),
                     },
                     {
                       id: 'admin-speech',
                       label: t('admin-speech'),
                       icon: channelVoiceMode === 'admin' ? 'checked' : '',
-                      onClick: () => {
-                        handleEditChannel(serverId, channelId, { voiceMode: 'admin' });
-                      },
+                      onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'admin' }),
                     },
                     {
                       id: 'queue-speech',
                       label: t('queue-speech'),
                       icon: channelVoiceMode === 'queue' ? 'submenu' : '',
                       hasSubmenu: channelVoiceMode === 'queue',
-                      onClick: () => {
-                        handleEditChannel(serverId, channelId, { voiceMode: 'queue' });
-                      },
+                      onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'queue' }),
                       submenuItems: [
                         {
                           id: 'forbid-guest-queue',
                           label: t('forbid-queue'),
                           icon: channelForbidQueue ? 'checked' : '',
                           disabled: channelVoiceMode !== 'queue',
-                          onClick: () => {
-                            handleEditChannel(serverId, channelId, { forbidQueue: !channelForbidQueue });
-                          },
+                          onClick: () => handleEditChannel(serverId, channelId, { forbidQueue: !channelForbidQueue }),
                         },
                         {
                           id: 'control-queue',
                           label: t('control-queue'),
                           disabled: channelVoiceMode !== 'queue',
-                          onClick: () => {
-                            handleControlQueue(serverId, channelId);
-                          },
+                          onClick: () => handleControlQueue(serverId, channelId),
                         },
                       ],
                     },
@@ -467,12 +507,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
             </div>
             <div
-              className={`${styles['mic-button']} ${isMicTaken ? styles['active'] : ''}`}
-              onClick={isMicTaken ? () => handleLeaveQueue(serverId, channelId) : () => handleJoinQueue(serverId, channelId)}
+              className={`${styles['mic-button']} ${isMicTaken ? styles['speaking'] : ''} ${isInQueue ? styles['queuing'] : ''} ${channelIsVoiceMuted ? styles['muted'] : ''} ${!channelIsQueueMode ? styles['no-selection'] : ''}`}
+              onClick={handleClickMicButton}
             >
               <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div className={styles['mic-text']}>{isMicTaken ? t('mic-taken') : t('take-mic')}</div>
+                <div className={styles['mic-text']}>{micText}</div>
                 <div className={styles['mic-sub-text']}>{micSubText}</div>
               </div>
             </div>

@@ -16,11 +16,10 @@
   display: none;
 }
 
-.context-menu .separator {
+.separator {
   min-height: 1px;
   min-width: 100%;
   display: block;
-  margin: 3px 0;
   background-image: url('/ctrl/menu_spliter.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -116,6 +115,56 @@
 }
 
 .context-menu .option.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.mic-context-menu:not(:empty) {
+  z-index: 1000;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 154px;
+  max-width: 154px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 1px 1px #00000080;
+  overflow: hidden;
+}
+
+.mic-context-menu.hidden {
+  display: none;
+}
+
+.mic-context-menu .option {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 8px 30px;
+  color: #777;
+}
+
+.mic-context-menu .option::before {
+  position: absolute;
+  content: '';
+  left: 6px;
+  min-width: 16px;
+  min-height: 16px;
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: center center;
+  align-self: center;
+}
+
+.mic-context-menu .option:hover {
+  color: #333;
+}
+
+.mic-context-menu .option.disabled {
   color: #ccc;
   cursor: not-allowed;
 }

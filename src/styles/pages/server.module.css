@@ -370,12 +370,16 @@
   display: flex;
   align-items: center;
   height: 25px;
-  padding: 2px 20px 2px 8px;
+  padding: 2px 20px 0px 8px;
   gap: 5px;
 }
 
 .user-tab:not(.selected):hover {
   background-color: #d1d5da5c;
+}
+
+.user-tab .user-queue-position {
+  color: #777;
 }
 
 .user-tab .user-tab-name {
@@ -573,6 +577,18 @@
   cursor: pointer;
 }
 
+.mic-button.normal {
+  background-image: url('/channel/mic_state_normal.png');
+}
+
+.mic-button.queuing {
+  background-image: url('/channel/mic_state_queuing.png');
+}
+
+.mic-button.speaking {
+  background-image: url('/channel/mic_state_speaking.png');
+}
+
 .mic-button:hover {
   background-position: -154px 2px;
 }
@@ -589,45 +605,57 @@
   background-size: cover;
 }
 
-.mic-button.active .mic-icon {
+.mic-button:hover:not(.speaking) .mic-icon {
+  background-position: -24px 0;
+}
+
+.mic-button:active:not(.speaking) .mic-icon {
+  background-position: -48px 0;
+}
+
+.mic-button.muted .mic-icon {
+  background-position: -72px 0;
+}
+
+.mic-button.speaking:not(.muted) .mic-icon {
   background-image: url('/channel/icon_speaking_vol.png');
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-.mic-button.active .mic-icon.level1 {
+.mic-button.speaking:not(.muted) .mic-icon.level1 {
   background-position: -24px 0;
 }
 
-.mic-button.active .mic-icon.level2 {
+.mic-button.speaking:not(.muted) .mic-icon.level2 {
   background-position: -48px 0;
 }
 
-.mic-button.active .mic-icon.level3 {
+.mic-button.speaking:not(.muted) .mic-icon.level3 {
   background-position: -72px 0;
 }
 
-.mic-button.active .mic-icon.level4 {
+.mic-button.speaking:not(.muted) .mic-icon.level4 {
   background-position: -96px 0;
 }
 
-.mic-button.active .mic-icon.level5 {
+.mic-button.speaking:not(.muted) .mic-icon.level5 {
   background-position: -120px 0;
 }
 
-.mic-button.active .mic-icon.level6 {
+.mic-button.speaking:not(.muted) .mic-icon.level6 {
   background-position: -144px 0;
 }
 
-.mic-button.active .mic-icon.level7 {
+.mic-button.speaking:not(.muted) .mic-icon.level7 {
   background-position: -168px 0;
 }
 
-.mic-button.active .mic-icon.level8 {
+.mic-button.speaking:not(.muted) .mic-icon.level8 {
   background-position: -192px 0;
 }
 
-.mic-button.active .mic-icon.level9 {
+.mic-button.speaking:not(.muted) .mic-icon.level9 {
   background-position: -216px 0;
 }
 
@@ -643,27 +671,35 @@
   color: #777;
 }
 
-.mic-button.active .mic-text {
+.mic-button.queuing .mic-text {
+  color: #dda11e;
+}
+
+.mic-button.speaking .mic-text {
   color: #62a35b;
 }
 
 .mic-button::after {
   display: block;
   content: '';
-  min-height: 8px;
-  min-width: 8px;
+  min-height: 7px;
+  min-width: 11px;
   cursor: pointer;
-  background-image: url('/channel/triangle.png');
+  background-image: url('/channel/icon_mic_triangle.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
+.mic-button.no-selection::after {
+  background-image: none;
+}
+
 .mic-button:hover::after {
-  background-position: -9px 0;
+  background-position: -11px 0;
 }
 
 .mic-button:active::after {
-  background-position: -18px 0;
+  background-position: -22px 0;
 }
 
 .buttons {

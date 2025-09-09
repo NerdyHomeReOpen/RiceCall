@@ -20,6 +20,9 @@ import LevelIcon from '@/components/LevelIcon';
 // Services
 import ipc from '@/services/ipc.service';
 
+// Utils
+import { isChannelMod } from '@/utils/permission';
+
 interface QueueMemberTabProps {
   user: User;
   server: Server;
@@ -65,7 +68,6 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
   const isConnecting = useMemo(() => connectionStatus === 'connecting', [connectionStatus]);
   const isSpeaking = useMemo(() => !!webRTC.volumePercent?.[memberUserId], [memberUserId, webRTC.volumePercent]);
   const isVoiceMuted = useMemo(() => webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
-  const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
   const statusIcon = useMemo(() => {
     if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
@@ -88,9 +90,11 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
   };
 
   const handleRemoveUserFromQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberName }), () => {
-      ipc.socket.send('removeUserFromQueue', { serverId, channelId, userId });
-    });
+    handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberName }), () => ipc.socket.send('removeUserFromQueue', { serverId, channelId, userId }));
+  };
+
+  const handleClearQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    handleOpenAlertDialog(t('confirm-clear-queue'), () => ipc.socket.send('clearQueue', { serverId, channelId }));
   };
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
@@ -118,36 +122,41 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
           {
             id: 'increase-queue-time',
             label: t('increase-queue-time'),
-            show: isUser || isSuperior,
+            show: isChannelMod(permissionLevel),
             onClick: () => handleIncreaseUserQueueTime(),
           },
           {
             id: 'move-up-queue',
             label: t('move-up-queue'),
-            show: isUser || isSuperior,
+            show: isChannelMod(permissionLevel),
             onClick: () => handleMoveUserQueuePositionUp(memberUserId, serverId, channelId, memberPosition - 1),
           },
           {
             id: 'move-down-queue',
             label: t('move-down-queue'),
-            show: isUser || isSuperior,
+            show: isChannelMod(permissionLevel),
             onClick: () => handleMoveUserQueuePositionDown(memberUserId, serverId, channelId, memberPosition + 1),
           },
           {
             id: 'remove-from-queue',
             label: t('remove-from-queue'),
-            show: isUser || isSuperior,
+            show: isChannelMod(permissionLevel),
             onClick: () => handleRemoveUserFromQueue(memberUserId, serverId, channelId),
+          },
+          {
+            id: 'clear-queue',
+            label: t('clear-queue'),
+            show: isChannelMod(permissionLevel),
+            onClick: () => handleClearQueue(serverId, channelId),
           },
         ]);
       }}
     >
       <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} title={memberUserId !== userId ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
+      <div className={`${styles['user-queue-position']}`}>{memberPosition + 1}.</div>
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
-      <div
-        className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}
-      >{`${memberPosition + 1}. ${memberNickname || memberName}`}</div>
+      <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
       <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}

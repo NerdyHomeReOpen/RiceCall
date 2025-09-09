@@ -5,6 +5,7 @@ import type { ContextMenuItem, NotifyMenuItem, OnlineMember, Badge } from '@/typ
 
 // Components
 import ContextMenu from '@/components/ContextMenu';
+import MicContextMenu from '@/components/MicContextMenu';
 import NotifyMenu from '@/components/NotifyMenu';
 import UserInfoCard from '@/components/UserInfoCard';
 import BadgeInfoCard from '@/components/BadgeInfoCard';
@@ -15,6 +16,7 @@ import UserTagInput from '@/components/UserTagInput';
 
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => void;
+  showMicContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => void;
   showNotifyMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotifyMenuItem[]) => void;
   showUserInfoBlock: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: OnlineMember) => void;
   showBadgeInfoCard: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Badge) => void;
@@ -23,6 +25,7 @@ interface ContextMenuContextType {
   showEmbedLinkInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => void;
   showUserTagInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (username: string) => void) => void;
   closeContextMenu: () => void;
+  closeMicContextMenu: () => void;
   closeNotifyMenu: () => void;
   closeUserInfoBlock: () => void;
   closeBadgeInfoCard: () => void;
@@ -47,6 +50,7 @@ interface ContextMenuProviderProps {
 const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   // Refs
   const [isContextMenuVisible, setIsContextMenuVisible] = React.useState(false);
+  const [isMicContextMenuVisible, setIsMicContextMenuVisible] = React.useState(false);
   const [isNotifyMenuVisible, setIsNotifyMenuVisible] = React.useState(false);
   const [isUserInfoVisible, setIsUserInfoVisible] = React.useState(false);
   const [isBadgeInfoVisible, setIsBadgeInfoVisible] = React.useState(false);
@@ -57,6 +61,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
   // States
   const [contextMenu, setContextMenu] = React.useState<ReactNode | null>(null);
+  const [micContextMenu, setMicContextMenu] = React.useState<ReactNode | null>(null);
   const [notifyMenu, setNotifyMenu] = React.useState<ReactNode | null>(null);
   const [userInfo, setUserInfo] = React.useState<ReactNode | null>(null);
   const [badgeInfo, setBadgeInfo] = React.useState<ReactNode | null>(null);
@@ -74,6 +79,16 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const closeContextMenu = () => {
     setContextMenu(null);
     setIsContextMenuVisible(false);
+  };
+
+  const showMicContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => {
+    setMicContextMenu(<MicContextMenu items={items} onClose={closeMicContextMenu} x={x} y={y} direction={direction} />);
+    setIsMicContextMenuVisible(true);
+  };
+
+  const closeMicContextMenu = () => {
+    setMicContextMenu(null);
+    setIsMicContextMenuVisible(false);
   };
 
   const showNotifyMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotifyMenuItem[]) => {
@@ -159,6 +174,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const onPointerDown = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest('.context-menu-container')) {
         if (isContextMenuVisible) closeContextMenu();
+        if (isMicContextMenuVisible) closeMicContextMenu();
         if (isBadgeInfoVisible) closeBadgeInfoCard();
         if (isEmojiPickerVisible) closeEmojiPicker();
         if (isNotifyMenuVisible) closeNotifyMenu();
@@ -173,12 +189,23 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('mousemove', onMouseMove);
     };
-  }, [isContextMenuVisible, isBadgeInfoVisible, isEmojiPickerVisible, isUserInfoVisible, isNotifyMenuVisible, isColorPickerVisible, isEmbedLinkInputVisible, isUserTagInputVisible]);
+  }, [
+    isContextMenuVisible,
+    isMicContextMenuVisible,
+    isBadgeInfoVisible,
+    isEmojiPickerVisible,
+    isUserInfoVisible,
+    isNotifyMenuVisible,
+    isColorPickerVisible,
+    isEmbedLinkInputVisible,
+    isUserTagInputVisible,
+  ]);
 
   return (
     <ContextMenuContext.Provider
       value={{
         showContextMenu,
+        showMicContextMenu,
         showNotifyMenu,
         showUserInfoBlock,
         showBadgeInfoCard,
@@ -187,6 +214,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         showEmbedLinkInput,
         showUserTagInput,
         closeContextMenu,
+        closeMicContextMenu,
         closeNotifyMenu,
         closeUserInfoBlock,
         closeBadgeInfoCard,
@@ -197,6 +225,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       }}
     >
       {isContextMenuVisible && contextMenu}
+      {isMicContextMenuVisible && micContextMenu}
       {isNotifyMenuVisible && notifyMenu}
       {isUserInfoVisible && userInfo}
       {badgeInfo && badgeInfo}
