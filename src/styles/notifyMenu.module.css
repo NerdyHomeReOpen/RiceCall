@@ -54,6 +54,7 @@
   justify-content: flex-start;
   align-items: center;
   width: 100%;
+  gap: 5px;
   padding: 3px 30px;
 }
 
