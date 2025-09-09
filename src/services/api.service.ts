@@ -26,14 +26,9 @@ type ApiRequestData = {
 };
 
 const handleResponse = async (response: Response): Promise<any> => {
-  try {
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.message);
-    return result.data;
-  } catch (error: any) {
-    new ErrorHandler(error).show();
-    return null;
-  }
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message);
+  return result.data;
 };
 
 const apiService = {

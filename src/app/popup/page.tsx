@@ -98,6 +98,7 @@ const Popup = React.memo(() => {
   const { t } = useTranslation();
 
   // States
+  const [id, setId] = useState<string | null>(null);
   const [type, setType] = useState<PopupType | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
 
@@ -181,6 +182,8 @@ const Popup = React.memo(() => {
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
       const type = params.get('type') as PopupType;
+      const id = params.get('id') as string;
+      setId(id || null);
       setType(type || null);
     }
   }, []);
@@ -194,8 +197,9 @@ const Popup = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    setInitialData(ipc.initialData.get());
-  }, []);
+    if (!id) return;
+    setInitialData(ipc.initialData.get(id));
+  }, [id]);
 
   return (
     <>

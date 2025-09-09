@@ -547,8 +547,8 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     // popups[id].webContents.openDevTools();
   }
 
-  ipcMain.removeAllListeners('get-initial-data');
-  ipcMain.on('get-initial-data', (event) => {
+  ipcMain.removeAllListeners(`get-initial-data?id=${id}`);
+  ipcMain.on(`get-initial-data?id=${id}`, (event) => {
     event.returnValue = data;
   });
 

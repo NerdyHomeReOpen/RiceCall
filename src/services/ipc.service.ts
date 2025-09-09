@@ -104,9 +104,9 @@ const ipcService = {
   },
 
   initialData: {
-    get: (): Record<string, any> | null => {
+    get: (id: string): Record<string, any> | null => {
       if (!isElectron) return null;
-      return ipcRenderer.sendSync('get-initial-data');
+      return ipcRenderer.sendSync(`get-initial-data?id=${id}`);
     },
   },
 
