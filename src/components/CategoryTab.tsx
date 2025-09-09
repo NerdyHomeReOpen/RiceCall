@@ -217,9 +217,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
               id: 'broadcast',
               label: t('broadcast'),
               show: isChannelMod(permissionLevel),
-              onClick: () => {
-                handleOpenServerBroadcast(serverId, categoryId);
-              },
+              onClick: () => handleOpenServerBroadcast(serverId, categoryId),
             },
             {
               id: 'move-all-user-to-channel',

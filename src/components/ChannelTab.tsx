@@ -40,7 +40,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
 
   // Destructuring
   const { userId, permissionLevel: globalPermissionLevel, currentChannelId: userCurrentChannelId } = user;
-  const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel } = channel;
+  const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, permissionLevel: channelPermissionLevel } = channel;
   const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
 
   // Memos
@@ -209,7 +209,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
               id: 'broadcast',
               label: t('broadcast'),
               show: isChannelMod(permissionLevel),
-              onClick: () => handleOpenServerBroadcast(serverId, channelCategoryId ? channelCategoryId : channelId),
+              onClick: () => handleOpenServerBroadcast(serverId, channelId),
             },
             {
               id: 'move-all-user-to-channel',
