@@ -346,7 +346,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <input name="created-at" type="text" value={new Date(serverCreatedAt).toLocaleString()} readOnly />
                   </div>
                   <div className={`${popup['input-box']} ${popup['col']}`}>
-                    <div className={`${popup['label']} ${setting['wealth-coin-icon']}`}>{t('wealth')}</div>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <div className={popup['label']}>{t('wealth')}</div>
+                      <div className={setting['wealth-coin-icon']} />
+                    </div>
                     <input name="wealth" type="text" value={serverWealth} readOnly />
                   </div>
                 </div>

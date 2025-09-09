@@ -121,16 +121,9 @@
 }
 
 .wealth-coin-icon {
-  display: flex;
-  align-items: center;
-}
-
-.wealth-coin-icon::after {
   display: block;
-  content: '';
   height: 16px;
   width: 16px;
-  margin-left: 3px;
   background-image: url('/golden_pea.png');
   background-size: cover;
 }
