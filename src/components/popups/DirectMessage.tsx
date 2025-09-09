@@ -183,6 +183,12 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, [targetId, targetCurrentServerId]);
 
   useEffect(() => {
+    if (!friendState) {
+      ipc.socket.send('stranger', { targetId });
+    }
+  }, [friendState, targetId]);
+
+  useEffect(() => {
     const unsubscribe = [ipc.socket.on('friendUpdate', handleFriendUpdate), ipc.socket.on('directMessage', handleDirectMessage), ipc.socket.on('shakeWindow', handleShakeWindow)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleFriendUpdate, handleDirectMessage, handleShakeWindow]);
