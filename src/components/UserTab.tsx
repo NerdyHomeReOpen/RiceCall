@@ -86,12 +86,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted]);
 
   // Handlers
-  const handleMuteUser = (userId: User['userId']) => {
-    webRTC.muteUser(userId);
-  };
-
-  const handleUnmuteUser = (userId: User['userId']) => {
-    webRTC.unmuteUser(userId);
+  const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
+    webRTC.setIsUserMuted(userId, muted);
   };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Permission>) => {
@@ -114,11 +110,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     ipc.socket.send('addUserToQueue', { userId, serverId, channelId });
   };
 
-  const handleMuteUserTextInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isTextMuted: boolean) => {
+  const handleForbidUserTextInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isTextMuted: boolean) => {
     ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted } });
   };
 
-  const handleMuteUserVoiceInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isVoiceMuted: boolean) => {
+  const handleForbidUserVoiceInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isVoiceMuted: boolean) => {
     ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted } });
   };
 
@@ -239,7 +235,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             id: 'set-mute',
             label: isVoiceMuted ? t('unmute') : t('mute'),
             show: !isUser,
-            onClick: () => (isVoiceMuted ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
+            onClick: () => handleSetIsUserMuted(memberUserId, !isVoiceMuted),
           },
           {
             id: 'edit-nickname',
@@ -265,13 +261,13 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
             id: 'forbid-voice',
             label: memberIsVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
             show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-            onClick: () => handleMuteUserVoiceInChannel(memberUserId, serverId, channelId, !memberIsVoiceMuted),
+            onClick: () => handleForbidUserVoiceInChannel(memberUserId, serverId, channelId, !memberIsVoiceMuted),
           },
           {
             id: 'forbid-text',
             label: memberIsTextMuted ? t('unforbid-text') : t('forbid-text'),
             show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-            onClick: () => handleMuteUserTextInChannel(memberUserId, serverId, channelId, !memberIsTextMuted),
+            onClick: () => handleForbidUserTextInChannel(memberUserId, serverId, channelId, !memberIsTextMuted),
           },
           {
             id: 'kick-channel',

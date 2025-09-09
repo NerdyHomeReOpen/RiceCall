@@ -63,13 +63,13 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const startSpeak = useCallback(() => {
     if (speakingActiveRef.current) return;
     speakingActiveRef.current = true;
-    webRTC.toggleSpeakKey(true);
+    webRTC.setIsSpeakKeyPressed(true);
   }, [webRTC]);
 
   const stopSpeak = useCallback(() => {
     if (!speakingActiveRef.current) return;
     speakingActiveRef.current = false;
-    webRTC.toggleSpeakKey(false);
+    webRTC.setIsSpeakKeyPressed(false);
   }, [webRTC]);
 
   const toggleMainWindows = useCallback(() => {

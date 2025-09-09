@@ -189,6 +189,18 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   } = channel;
   const announcement = channelAnnouncement || serverAnnouncement;
   const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
+  const micSubText = useMemo(() => {
+    if (!isMicTaken) return '';
+    if (speakMode === 'key') {
+      if (webRTC.isPressingSpeakKey) {
+        if (webRTC.micVolume === 0) return t('mic-muted');
+        return t('speaking');
+      }
+      return t('press-key-to-speak', { '0': speakHotKey });
+    }
+    if (webRTC.micVolume === 0) return t('mic-muted');
+    return t('speaking');
+  }, [speakMode, speakHotKey, webRTC.isPressingSpeakKey, webRTC.micVolume, isMicTaken, t]);
 
   // Handlers
   const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
@@ -282,8 +294,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     setIsMicTaken(newMicTaken);
     if (newMicTaken !== isMicTakenRef.current) {
       isMicTakenRef.current = newMicTaken;
-      if (newMicTaken) webRTC.takeMic();
-      else webRTC.untakeMic();
+      webRTC.setIsMicTaken(newMicTaken);
     }
   }, [queueMembers, userId, webRTC]);
 
@@ -462,19 +473,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className={styles['mic-text']}>{isMicTaken ? t('mic-taken') : t('take-mic')}</div>
-                <div className={styles['mic-sub-text']}>
-                  {isMicTaken
-                    ? speakMode === 'key'
-                      ? webRTC.isPressSpeakKey
-                        ? webRTC.micVolume === 0
-                          ? t('mic-muted')
-                          : t('speaking')
-                        : t('press-key-to-speak', { '0': speakHotKey })
-                      : webRTC.micVolume === 0
-                        ? t('mic-muted')
-                        : t('speaking')
-                    : ''}
-                </div>
+                <div className={styles['mic-sub-text']}>{micSubText}</div>
               </div>
             </div>
             <div className={styles['buttons']}>
