@@ -94,7 +94,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
         <div className={`${styles['toggle-icon']} ${expanded ? styles['expanded'] : ''}`} />
         <div className={styles['tab-label']}>{friendGroupName}</div>
         <div className={styles['tab-count']}>
-          {friendGroupId !== 'blocked' && friendGroupId !== 'outlander' ? `(${friendsOnlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}
+          {friendGroupId !== 'blacklist' && friendGroupId !== 'stranger' ? `(${friendsOnlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}
         </div>
       </div>
 
