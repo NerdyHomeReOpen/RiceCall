@@ -121,7 +121,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   const detectSpeaking = useCallback(
     (userId: string, analyserNode: AnalyserNode, dataArray: Uint8Array) => {
-      if (!analyserNode) return;
       analyserNode.getByteTimeDomainData(dataArray);
       let sum = 0;
       for (let i = 0; i < dataArray.length; i++) {
@@ -160,7 +159,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   const initSpeakerAudio = useCallback(
     async (userId: string, stream: MediaStream) => {
-      if (!audioContextRef.current) return;
+      if (!audioContextRef.current) {
+        console.warn('[WebRTC] No audio context yet, skip init speaker audio');
+        return;
+      }
 
       // Remove existing speaker audio
       removeSpeakerAudio(userId);
@@ -230,14 +232,17 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
-      if (!audioContextRef.current) return;
+      if (!audioContextRef.current) {
+        console.warn('[WebRTC] No audio context yet, skip init mic audio');
+        return;
+      }
 
       // Remove existing mic audio
       removeMicAudio(userId);
 
       // Disable tracks if muted
       stream.getAudioTracks().forEach((track) => {
-        track.enabled = micTakenRef.current ? (speakingModeRef.current === 'key' ? isPressSpeakKeyRef.current : true) : false;
+        track.enabled = speakingModeRef.current === 'key' ? isPressSpeakKeyRef.current : true;
       });
 
       // Create nodes
@@ -313,20 +318,19 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   }, []);
 
   const setIsMicTaken = useCallback((taken: boolean) => {
-    micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
-      track.enabled = taken;
-    });
+    if (taken) {
+      audioProducerRef.current?.resume();
+    } else {
+      audioProducerRef.current?.pause();
+    }
     micTakenRef.current = taken;
   }, []);
 
   const setIsSpeakKeyPressed = useCallback((enable: boolean) => {
-    if (speakingModeRef.current !== 'key') {
-      console.warn('Not in key mode');
-      return;
-    }
+    if (speakingModeRef.current !== 'key') return;
     soundPlayerRef.current.playSound(enable ? 'startSpeaking' : 'stopSpeaking');
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
-      track.enabled = micTakenRef.current && enable;
+      track.enabled = enable;
     });
     setIsPressingSpeakKey(enable);
     isPressSpeakKeyRef.current = enable;
@@ -355,7 +359,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   const consumeOne = useCallback(
     async (producerId: string, channelId: string) => {
-      if (!recvTransportRef.current) return;
       const consumerInfo = await ipc.socket
         .emit<SFUCreateConsumerParams, SFUCreateConsumerReturnType>('SFUCreateConsumer', {
           transportId: recvTransportRef.current!.id,
@@ -369,7 +372,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         });
       if (!consumerInfo) return;
 
-      const consumer = await recvTransportRef.current.consume({
+      const consumer = await recvTransportRef.current!.consume({
         id: consumerInfo.id,
         kind: consumerInfo.kind,
         producerId: consumerInfo.producerId,
@@ -412,10 +415,15 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   );
 
   const setupSend = useCallback(async (channelId: string) => {
-    const transport = await ipc.socket.emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', { direction: 'send', channelId }).catch((e) => {
-      console.error('[WebRTC] Error creating send transport: ', e);
-      return null;
-    });
+    const transport = await ipc.socket
+      .emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', {
+        direction: 'send',
+        channelId,
+      })
+      .catch((e) => {
+        console.error('[WebRTC] Error creating send transport: ', e);
+        return null;
+      });
     if (!transport) return;
 
     if (!deviceRef.current.loaded) await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
@@ -423,7 +431,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     sendTransportRef.current = deviceRef.current.createSendTransport(transport);
     sendTransportRef.current.on('connect', ({ dtlsParameters }, cb, eb) => {
       ipc.socket
-        .emit('SFUConnectTransport', { transportId: sendTransportRef.current!.id, dtlsParameters })
+        .emit('SFUConnectTransport', {
+          transportId: sendTransportRef.current!.id,
+          dtlsParameters,
+        })
         .then(() => {
           console.info('[WebRTC] SendTransport connected to SFU');
           cb();
@@ -432,7 +443,12 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     });
     sendTransportRef.current.on('produce', ({ kind, rtpParameters }, cb, eb) => {
       ipc.socket
-        .emit<SFUCreateProducerParams, SFUCreateProducerReturnType>('SFUCreateProducer', { transportId: sendTransportRef.current!.id, kind, rtpParameters, channelId })
+        .emit<SFUCreateProducerParams, SFUCreateProducerReturnType>('SFUCreateProducer', {
+          transportId: sendTransportRef.current!.id,
+          kind,
+          rtpParameters,
+          channelId,
+        })
         .then(({ id }) => {
           console.info('[WebRTC] SendTransport produced to SFU');
           cb({ id });
@@ -444,11 +460,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     });
 
     const track = inputDesRef.current?.stream.getAudioTracks()[0];
-    if (!track) {
-      console.warn('[WebRTC] No mic track yet, skip produce');
-      return;
-    }
-
     audioProducerRef.current = await sendTransportRef.current.produce({ track, encodings: [{ maxBitrate: 256000 }], stopTracks: false });
     audioProducerRef.current.on('transportclose', () => {
       console.log('[WebRTC] Producer transport closed');
@@ -458,14 +469,24 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       console.log('[WebRTC] Producer track ended');
       audioProducerRef.current?.close();
     });
+    if (micTakenRef.current) {
+      audioProducerRef.current.resume();
+    } else {
+      audioProducerRef.current.pause();
+    }
   }, []);
 
   const setupRecv = useCallback(
     async (channelId: string) => {
-      const transport = await ipc.socket.emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', { direction: 'recv', channelId }).catch((e) => {
-        console.error('[WebRTC] Error creating recv transport: ', e);
-        return null;
-      });
+      const transport = await ipc.socket
+        .emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', {
+          direction: 'recv',
+          channelId,
+        })
+        .catch((e) => {
+          console.error('[WebRTC] Error creating recv transport: ', e);
+          return null;
+        });
       if (!transport) return;
 
       if (!deviceRef.current.loaded) await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
@@ -473,7 +494,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       recvTransportRef.current = deviceRef.current.createRecvTransport(transport);
       recvTransportRef.current.on('connect', ({ dtlsParameters }, cb, eb) => {
         ipc.socket
-          .emit('SFUConnectTransport', { transportId: recvTransportRef.current!.id, dtlsParameters })
+          .emit('SFUConnectTransport', {
+            transportId: recvTransportRef.current!.id,
+            dtlsParameters,
+          })
           .then(() => {
             console.info('[WebRTC] RecvTransport connected to SFU');
             cb();
@@ -522,7 +546,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   const handleNewProducer = useCallback(
     async ({ userId, producerId, channelId }: { userId: string; producerId: string; channelId: string }) => {
-      if (!recvTransportRef.current) return;
       console.info('[WebRTC] New producer: ', userId);
       consumeOne(producerId, channelId).catch((e) => {
         console.error('[WebRTC] Error consuming producer: ', e);

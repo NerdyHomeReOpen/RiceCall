@@ -22,7 +22,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import ipc from '@/services/ipc.service';
 
 // Utils
-import { isMember, isChannelAdmin } from '@/utils/permission';
+import { isMember, isChannelAdmin, isChannelMod } from '@/utils/permission';
 
 interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
@@ -66,7 +66,7 @@ const MessageInputBoxGuard = React.memo(
     const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
 
     const isForbidByMutedText = channelIsTextMuted;
-    const isForbidByForbidText = !isChannelAdmin(permissionLevel) && channelForbidText;
+    const isForbidByForbidText = !isChannelMod(permissionLevel) && channelForbidText;
     const isForbidByForbidGuestText = !isMember(permissionLevel) && channelForbidGuestText;
     const isForbidByForbidGuestTextGap = !isMember(permissionLevel) && leftGapTime > 0;
     const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
@@ -263,7 +263,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             onClick: () => handleLeaveQueue(serverId, channelId),
           },
         ]);
-      } else if (isChannelAdmin(permissionLevel)) {
+      } else if (isChannelMod(permissionLevel)) {
         const x = e.currentTarget.getBoundingClientRect().left;
         const y = e.currentTarget.getBoundingClientRect().top;
         contextMenu.showMicContextMenu(x, y, 'right-top', [
@@ -465,7 +465,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             <div className={styles['buttons']}>
               <div
                 className={styles['voice-mode-dropdown']}
-                style={isChannelAdmin(permissionLevel) ? {} : { display: 'none' }}
+                style={isChannelMod(permissionLevel) ? {} : { display: 'none' }}
                 onClick={(e) => {
                   const x = e.currentTarget.getBoundingClientRect().left;
                   const y = e.currentTarget.getBoundingClientRect().top;
@@ -511,7 +511,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
             </div>
             <div
-              className={`${styles['mic-button']} ${isMicTaken ? styles['speaking'] : ''} ${isInQueue ? styles['queuing'] : ''} ${channelIsVoiceMuted ? styles['muted'] : ''} ${channelIsQueueMode ? (isMicTaken || isInQueue || isChannelAdmin(permissionLevel) ? '' : styles['no-selection']) : styles['no-selection']}`}
+              className={`${styles['mic-button']} ${isMicTaken ? styles['speaking'] : ''} ${isInQueue ? styles['queuing'] : ''} ${channelIsVoiceMuted ? styles['muted'] : ''} ${!channelIsQueueMode || (!isChannelMod(permissionLevel) && !isMicTaken) ? styles['no-selection'] : ''}`}
               onClick={handleClickMicButton}
             >
               <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
