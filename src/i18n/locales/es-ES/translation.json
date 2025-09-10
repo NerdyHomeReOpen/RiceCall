@@ -86,6 +86,7 @@
   "close-to-tray-label": "Ocultar en el área de notificaciones de la barra del sistema",
   "confirm": "Confirmar",
   "confirm-block-user": "¿Estás seguro de que quieres bloquear a {{0}}?",
+  "confirm-clear-queue": "確定要清空麥序嗎？",
   "confirm-delete-channel": "您確定要刪除頻道 {{0}} 嗎？",
   "confirm-delete-friend": "¿Estás seguro de que quieres eliminar al amigo {{0}}?",
   "confirm-delete-friend-application": "確定要刪除好友請求嗎？",
