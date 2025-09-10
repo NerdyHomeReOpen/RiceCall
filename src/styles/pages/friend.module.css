@@ -92,7 +92,7 @@
 .base-info-wrapper .box {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 2px;
 }
 
 .base-info-wrapper .box.has-server {
@@ -361,7 +361,9 @@
   display: flex;
   align-items: center;
   border-radius: 3px;
+  height: 25px;
   padding: 5px;
+  gap: 2px;
   cursor: pointer;
 }
 
@@ -378,7 +380,6 @@
   display: inline-block;
   min-width: 14px;
   min-height: 14px;
-  margin-right: 5px;
   background-image: url('/channel/channelIcon.png');
   background-repeat: no-repeat;
   background-size: auto;

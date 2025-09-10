@@ -283,7 +283,7 @@
   align-items: center;
   height: 25px;
   padding: 2px 20px 2px 8px;
-  gap: 5px;
+  gap: 2px;
 }
 
 .channel-tab:hover {
@@ -371,7 +371,7 @@
   align-items: center;
   height: 25px;
   padding: 2px 20px 0px 8px;
-  gap: 5px;
+  gap: 2px;
 }
 
 .user-tab:not(.selected):hover {
@@ -569,7 +569,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
-  gap: 5px;
   background-image: url('/channel/mic_state_menu.png');
   background-repeat: no-repeat;
   background-size: auto;
