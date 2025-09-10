@@ -220,8 +220,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     ipc.socket.send('editChannel', { serverId, channelId, update });
   };
 
-  const handleJoinQueue = (serverId: Server['serverId'], channelId: Channel['channelId'], force?: boolean) => {
-    ipc.socket.send('joinQueue', { serverId, channelId, force });
+  const handleJoinQueue = (serverId: Server['serverId'], channelId: Channel['channelId'], position?: number) => {
+    ipc.socket.send('joinQueue', { serverId, channelId, position });
   };
 
   const handleLeaveQueue = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -279,7 +279,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             id: 'take-mic-directly',
             label: t('take-mic-directly'),
             show: channelIsQueueMode,
-            onClick: () => handleJoinQueue(serverId, channelId, true),
+            onClick: () => handleJoinQueue(serverId, channelId, 0),
           },
         ]);
       }

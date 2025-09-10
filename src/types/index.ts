@@ -246,7 +246,7 @@ export type ClientToServerEvents = {
   approveFriendApplication: (...args: { senderId: string; friendGroupId: string | null; note: string }[]) => void;
   rejectFriendApplication: (...args: { senderId: string }[]) => void;
   // Queue
-  joinQueue: (...args: { serverId: string; channelId: string; force?: boolean }[]) => void;
+  joinQueue: (...args: { serverId: string; channelId: string; position?: number }[]) => void;
   addUserToQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
   leaveQueue: (...args: { serverId: string; channelId: string }[]) => void;
   removeUserFromQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
