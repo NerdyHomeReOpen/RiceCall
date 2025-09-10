@@ -86,6 +86,7 @@
   "close-to-tray-label": "مخفی شدن در ناحیه اعلان‌های نوار سیستم",
   "confirm": "تایید کردن",
   "confirm-block-user": "آیا مطمئنید که می‌خواهید {{0}} را مسدود کنید؟",
+  "confirm-clear-queue": "確定要清空麥序嗎？",
   "confirm-delete-channel": "您確定要刪除頻道 {{0}} 嗎？",
   "confirm-delete-friend": "آیا مطمئن هستید که می‌خواهید {{0}} دوست را حذف کنید؟",
   "confirm-delete-friend-application": "確定要刪除好友請求嗎？",
