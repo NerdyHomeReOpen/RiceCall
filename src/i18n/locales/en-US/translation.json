@@ -86,6 +86,7 @@
   "close-to-tray-label": "Minimize the main window to the system tray ",
   "confirm": "Confirm",
   "confirm-block-user": "Are you sure you want to block {{0}}?",
+  "confirm-clear-queue": "確定要清空麥序嗎？",
   "confirm-delete-channel": "您確定要刪除頻道 {{0}} 嗎？",
   "confirm-delete-friend": " Are you sure you want to remove {{0}} from your friends?",
   "confirm-delete-friend-application": "確定要刪除好友請求嗎？",
