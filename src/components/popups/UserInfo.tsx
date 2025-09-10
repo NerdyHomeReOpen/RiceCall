@@ -243,6 +243,12 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               <div
                 className={`${popup['button']} ${popup['blue']} ${!canSubmit ? 'disabled' : ''}`}
                 onClick={() => {
+                  // extra country validation
+                  if (!countries.includes(targetCountry)) {
+                    handleOpenErrorDialog(t('invalid-country'));
+                    return;
+                  }
+        
                   handleEditUser({
                     name: targetName,
                     gender: targetGender,
