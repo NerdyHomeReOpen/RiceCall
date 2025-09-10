@@ -160,7 +160,6 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, server
       <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
       <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}
-      {isUser && <div className={styles['my-location-icon']} />}
     </div>
   );
 });

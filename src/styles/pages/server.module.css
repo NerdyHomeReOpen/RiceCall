@@ -605,16 +605,8 @@
   background-size: cover;
 }
 
-.mic-button:hover:not(.speaking) .mic-icon {
+.mic-button.queuing .mic-icon {
   background-position: -24px 0;
-}
-
-.mic-button:active:not(.speaking) .mic-icon {
-  background-position: -48px 0;
-}
-
-.mic-button.muted .mic-icon {
-  background-position: -72px 0;
 }
 
 .mic-button.speaking:not(.muted) .mic-icon {
@@ -659,6 +651,10 @@
   background-position: -216px 0;
 }
 
+.mic-button.muted .mic-icon {
+  background-position: -72px 0;
+}
+
 .mic-text {
   font-size: 1.1rem;
   font-weight: bold;
@@ -694,11 +690,11 @@
   background-image: none;
 }
 
-.mic-button:hover::after {
+.mic-button.queuing::after {
   background-position: -11px 0;
 }
 
-.mic-button:active::after {
+.mic-button.speaking::after {
   background-position: -22px 0;
 }
 
