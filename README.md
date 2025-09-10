@@ -3,7 +3,7 @@
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-v0.1.16-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.2.0-green"/>
   </div>
 </div>
 
@@ -120,11 +120,11 @@ RiceCall
 
 ```env
 # Server Settings (All variables need to be fill)
-NEXT_PUBLIC_API_URL=http://localhost:4500 # Don't add the final /
-NEXT_PUBLIC_WS_URL=https://localhost:4500 # If your server is on the same machine, use the same url
+API_URL=http://localhost:4500 # Don't add the final /
+WS_URL=https://localhost:4500 # If your server is on the same machine, use the same url
 
 # Crowdin Settings (Optional)
-NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH=put_your_hash_here # If not provided, will use local files (./src/i18n/locales/[lang]/[ns]) instead
+CROWDIN_DISTRIBUTION_HASH=put_your_hash_here # If not provided, will use local files (./src/i18n/locales/[lang]/[ns]) instead
 ```
 
 ### 2. Install dependency

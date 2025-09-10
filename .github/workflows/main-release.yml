@@ -1,0 +1,172 @@
+name: Release Main
+
+on:
+  push:
+    tags: ['[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            build_name: win-x64
+            args: '--win --x64 --publish never -c electron-builder.json'
+          - os: windows-latest
+            build_name: win-ia32
+            args: '--win --ia32 --publish never -c electron-builder.json'
+
+          - os: macos-13
+            build_name: mac-x64
+            args: '--mac --x64 --publish never -c electron-builder.json'
+          - os: macos-14
+            build_name: mac-arm64
+            args: '--mac --arm64 --publish never -c electron-builder.json'
+
+          - os: ubuntu-latest
+            build_name: linux-x64
+            args: '--linux --x64 --publish never -c electron-builder.json'
+
+    environment: main
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        id: py
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with: { node-version: 20, cache: yarn }
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Make .env file
+        run: |
+          echo "API_URL=${{ secrets.API_URL }}" > .env
+          echo "WS_URL=${{ secrets.WS_URL }}" >> .env
+          echo "UPDATE_CHANNEL=latest" >> .env
+
+      - name: Build electron
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: false
+          build_script_name: build:action
+          args: ${{ matrix.args }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.build_name }}
+          merge-multiple: true
+          if-no-files-found: ignore
+          path: |
+            # Windows
+            dist/*Setup.exe
+            dist/*Setup.exe.blockmap
+            # macOS
+            dist/*.dmg
+            dist/*.zip
+            dist/*.blockmap
+            # Linux
+            dist/*.AppImage
+            # yml files
+            dist/**/*latest*.yml
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with: { path: dist }
+
+      - name: Publish rolling prerelease
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## 如何安裝
+
+            :information_source: 由於本專案尚未申請應用簽名，若下載時遇到「不安全」警告，請自行承擔使用風險並斟酌下載。  
+
+            ### Windows
+
+            1. 找到 `RiceCall-x.x.x-win-x64-Setup.exe`  
+            2. 點擊下載並執行  
+            3. 依照安裝小精靈提示完成安裝
+
+            ### macOS
+
+            1. 找到 `RiceCall-x.x.x-mac-arm64.dmg`  
+            2. 點擊下載並打開，拖曳 **RiceCall** 至 **Applications** 資料夾  
+            3. 開啟 **Terminal (終端機)** 並輸入以下指令解除限制與簽名 :
+            ```bash
+            xattr -cr '/Applications/RiceCall.app'
+            codesign -fs - --deep '/Applications/RiceCall.app'
+            ```
+
+            ### Linux
+
+            1. 找到 `RiceCall-x.x.x-linux-x86_64.AppImage`  
+            2. 點擊下載並存放到想要的資料夾  
+            3. 打開終端機並輸入以下指令 (假設檔案位於下載資料夾) :
+            ```bash
+            cd ~/Downloads
+            chmod +x RiceCall-x.x.x-linux-x86_64.AppImage
+            ./RiceCall-x.x.x-linux-x86_64.AppImage
+            ```
+
+            ---
+
+            ## How to install
+
+            :information_source: Since this project has not applied for application signing yet, if you encounter an "unsafe" warning during download, please proceed at your own risk and discretion.  
+
+            ### Windows
+
+            1. Locate `RiceCall-x.x.x-win-x64-Setup.exe`  
+            2. Download and run it  
+            3. Follow the installation wizard to complete the setup  
+
+            ### macOS
+
+            1. Locate `RiceCall-x.x.x-mac-arm64.dmg`  
+            2. Download and open it, then drag **RiceCall** to the **Applications** folder  
+            3. Open **Terminal** and run the following commands to remove restrictions and apply codesign :  
+            ```bash
+            xattr -cr '/Applications/RiceCall.app'
+            codesign -fs - --deep '/Applications/RiceCall.app'
+            ```
+
+            ### Linux
+
+            1. Locate `RiceCall-x.x.x-linux-x86_64.AppImage`  
+            2. Download and place it in your preferred folder  
+            3. Open Terminal and run the following commands (assuming the file is in Downloads) :
+            ```bash
+            cd ~/Downloads
+            chmod +x RiceCall-x.x.x-linux-x86_64.AppImage
+            ./RiceCall-x.x.x-linux-x86_64.AppImage
+            ```
+          commit: ${{ github.sha }}
+          allowUpdates: true
+          replacesArtifacts: true
+          removeArtifacts: true
+          omitBodyDuringUpdate: true
+          artifacts: 'dist/**'
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -4,20 +4,22 @@
   flex-direction: column;
   min-width: 0;
   max-width: 100%;
-  margin-top: 0.125rem;
-  gap: 0.125rem;
+  gap: 3px;
 }
 
 .message-wrapper {
   display: flex;
   flex-direction: row;
-  gap: 0.125rem;
+  gap: 3px;
 }
 
 .info-icon {
   display: flex;
+  width: 12px;
   min-width: 12px;
+  height: 12px;
   min-height: 12px;
+  margin: 3px 0;
   background-image: url('/channel/NT_NOTIFY.png');
   background-repeat: no-repeat;
   background-position: center;
@@ -25,8 +27,11 @@
 
 .event-icon {
   display: flex;
+  width: 12px;
   min-width: 12px;
+  height: 12px;
   min-height: 12px;
+  margin: 3px 0;
   background-image: url('/channel/NT_NOTIFY.png');
   background-repeat: no-repeat;
   background-position: center;
@@ -34,8 +39,11 @@
 
 .warn-icon {
   display: flex;
+  width: 12px;
   min-width: 12px;
+  height: 12px;
   min-height: 12px;
+  margin: 3px 0;
   background-image: url('/channel/NT_WARNING.png');
   background-repeat: no-repeat;
   background-position: center;
@@ -43,8 +51,11 @@
 
 .alert-icon {
   display: flex;
+  width: 12px;
   min-width: 12px;
+  height: 12px;
   min-height: 12px;
+  margin: 3px 0;
   background-image: url('/channel/NT_ANNOUNCEMENT.png');
   background-repeat: no-repeat;
   background-position: center;
@@ -56,7 +67,7 @@
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  gap: 0.125rem;
+  gap: 3px;
 }
 
 .message-box .username-text {
@@ -69,13 +80,13 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 0.125rem;
+  gap: 3px;
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: 0.125rem;
+  gap: 3px;
 }
 
 .header .username-text {
@@ -88,7 +99,7 @@
 }
 
 .header .timestamp-text {
-  margin-left: 0.2rem;
+  margin-left: 5px;
   color: #888;
   font-size: 0.9em;
 }

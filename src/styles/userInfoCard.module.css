@@ -9,42 +9,42 @@
 }
 
 .vip-0 {
-  background-image: url('../../public/channel/ucard_vip0_bg.png');
+  background-image: url('/channel/ucard_vip0_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
 .vip-1 {
-  background-image: url('../../public/channel/ucard_vip1_bg.png');
+  background-image: url('/channel/ucard_vip1_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
 .vip-2 {
-  background-image: url('../../public/channel/ucard_vip2_bg.png');
+  background-image: url('/channel/ucard_vip2_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
 .vip-3 {
-  background-image: url('../../public/channel/ucard_vip3_bg.png');
+  background-image: url('/channel/ucard_vip3_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
 .vip-4 {
-  background-image: url('../../public/channel/ucard_vip4_bg.png');
+  background-image: url('/channel/ucard_vip4_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
 }
 
 .vip-5 {
-  background-image: url('../../public/channel/ucard_vip5_bg.png');
+  background-image: url('/channel/ucard_vip5_bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -52,10 +52,11 @@
 
 .body {
   flex: 1;
+  height: 164px;
   padding: 11px 12px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .top {
@@ -69,7 +70,7 @@
 .avatar-picture {
   min-height: 98px;
   min-width: 98px;
-  background-image: url('../../public/im/IMLogo.png');
+  background-image: url('/im/IMLogo.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -87,11 +88,8 @@
 }
 
 .bottom {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  margin-top: 10px;
 }
 
 .nickname-row {
@@ -102,7 +100,7 @@
 .nickname-row:not(:empty)::before {
   content: '';
   display: block;
-  background-image: url('../../public/channel/groupcard.png');
+  background-image: url('/channel/groupcard.png');
   background-repeat: no-repeat;
   min-width: 16px;
   min-height: 16px;
@@ -113,6 +111,10 @@
 }
 
 .nickname-text {
+  white-space: nowrap;
+  line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #1e667c;
 }
 
@@ -163,7 +165,7 @@
   margin: 0 5px;
   min-width: 2px;
   min-height: 12px;
-  background-image: url('../../public/icon_v_split.png');
+  background-image: url('/icon_v_split.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -171,6 +173,7 @@
 
 .contribution-wrapper {
   display: flex;
+  align-items: center;
 }
 
 .contribution-value {
@@ -195,7 +198,7 @@
 
 .xp-progress {
   background-color: #f6b03b;
-  border-radius: 0.125rem;
+  border-radius: 2px;
   height: 100%;
 }
 

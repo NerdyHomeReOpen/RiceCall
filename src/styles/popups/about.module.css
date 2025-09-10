@@ -1,5 +1,5 @@
 .app-logo {
-  background-image: url('../../../public/login_logo.png');
+  background-image: url('/login_logo.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -117,16 +117,8 @@
   color: #7289da;
 }
 
-.main-developer {
+.developer {
   background-color: rgb(216 63 63 / 80%);
-}
-
-.backend-developer {
-  background-color: rgb(63 136 216 / 80%);
-}
-
-.frontend-developer {
-  background-color: rgb(136 63 216 / 80%);
 }
 
 .machine-network {

@@ -10,18 +10,43 @@ import LoginPage from '@/components/pages/Login';
 import RegisterPage from '@/components/pages/Register';
 
 // Services
-import ipcService from '@/services/ipc.service';
-import authService from '@/services/auth.service';
+import ipc from '@/services/ipc.service';
+import auth from '@/services/auth.service';
+
+// Providers
+import { useTranslation } from 'react-i18next';
 
 const Header: React.FC = React.memo(() => {
+  // Hooks
+  const { t } = useTranslation();
+
   // Handlers
   const handleMinimize = () => {
-    ipcService.window.minimize();
+    ipc.window.minimize();
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
+
+  // Effects
+  useEffect(() => {
+    ipc.discord.updatePresence({
+      details: t('rpc:login-page'),
+      state: `${t('rpc:un-login')}`,
+      largeImageKey: 'app_icon',
+      largeImageText: 'RC Voice',
+      smallImageKey: 'login_icon',
+      smallImageText: t('rpc:login-page'),
+      timestamp: Date.now(),
+      buttons: [
+        {
+          label: t('rpc:join-discord-server'),
+          url: 'https://discord.gg/adCWzv6wwS',
+        },
+      ],
+    });
+  }, [t]);
 
   return (
     <header className={`${header['header']} ${header['big']}`}>
@@ -41,7 +66,7 @@ const Header: React.FC = React.memo(() => {
 
 Header.displayName = 'Header';
 
-const Auth: React.FC = () => {
+const Auth: React.FC = React.memo(() => {
   // States
   const [section, setSection] = useState<'register' | 'login'>('login');
 
@@ -49,27 +74,19 @@ const Auth: React.FC = () => {
   useEffect(() => {
     const autoLogin = async () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      await authService.autoLogin();
+      await auth.autoLogin();
     };
     autoLogin();
   }, []);
 
-  const getMainContent = () => {
-    switch (section) {
-      case 'login':
-        return <LoginPage setSection={setSection} />;
-      case 'register':
-        return <RegisterPage setSection={setSection} />;
-    }
-  };
-
   return (
     <>
       <Header />
-      {getMainContent()}
+      <LoginPage display={section === 'login'} setSection={setSection} />
+      <RegisterPage display={section === 'register'} setSection={setSection} />
     </>
   );
-};
+});
 
 Auth.displayName = 'Auth';
 

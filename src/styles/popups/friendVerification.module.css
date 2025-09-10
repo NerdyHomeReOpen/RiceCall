@@ -45,7 +45,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
 }
 
 .user-name-text {
@@ -57,9 +56,10 @@
 }
 
 .avatar-picture {
-  width: 3.5rem;
-  height: 3.5rem;
-  background-image: url('../../../public/im/SecretaryLogo.png');
+  cursor: pointer;
+  width: 45px;
+  height: 45px;
+  background-image: url('/im/SecretaryLogo.png');
   background-size: cover;
   background-position: center;
   border: 1px solid #969696;
@@ -74,14 +74,14 @@
   height: 80px;
   border: 1px solid #d8d8d8;
   background-color: #f6f6f6;
-  border-radius: 0.1rem;
-  padding: 0.5rem;
+  padding: 2px;
 }
 
 .content-text {
   display: flex;
-  flex-flow: column wrap;
   color: #5e5e5e;
+  word-break: break-all;
+  overflow-y: auto;
 }
 
 .action-buttons {
@@ -93,6 +93,7 @@
 .action-buttons {
   display: flex;
   cursor: pointer;
+  min-width: max-content;
 }
 
 .action-buttons .button {
@@ -128,7 +129,7 @@
 }
 
 .direct-message-icon {
-  background-image: url('../../../public/icon_notice_chat.png');
+  background-image: url('/icon_notice_chat.png');
   background-size: auto;
   background-position: center;
   background-position: 0 0;

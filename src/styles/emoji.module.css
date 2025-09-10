@@ -10,7 +10,7 @@
   content: '';
   min-width: 18px;
   min-height: 18px;
-  background-image: url('../../public/channel/FaceButton.png');
+  background-image: url('/channel/FaceButton.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   cursor: pointer;

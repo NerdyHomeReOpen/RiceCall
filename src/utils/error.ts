@@ -1,8 +1,5 @@
 // Services
-import ipcService from '@/services/ipc.service';
-
-// Types
-import { PopupType } from '@/types';
+import ipc from '@/services/ipc.service';
 
 export default class ErrorHandler {
   message: string;
@@ -14,14 +11,13 @@ export default class ErrorHandler {
   }
 
   show() {
-    ipcService.popup.open(PopupType.DIALOG_ERROR, 'errorDialog');
-    ipcService.popup.onSubmit('errorDialog', () => {
-      if (this.handler) this.handler();
-    });
-    ipcService.initialData.onRequest('errorDialog', {
+    ipc.popup.open('dialogError', 'errorDialog', {
       message: this.message,
       submitTo: 'errorDialog',
       timestamp: Date.now(),
+    });
+    ipc.popup.onSubmit('errorDialog', () => {
+      if (this.handler) this.handler();
     });
   }
 }

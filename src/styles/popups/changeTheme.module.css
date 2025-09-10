@@ -7,7 +7,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: url('../../../public/dialog_body_bg.png') no-repeat center center;
+  background: url('/dialog_body_bg.png') no-repeat center center;
   background-size: cover;
 }
 
@@ -91,7 +91,7 @@
 .image-selector {
   min-width: 60px;
   min-height: 60px;
-  background-image: url('../../../public/user_defined.png');
+  background-image: url('/user_defined.png');
 }
 
 .image-selector:hover {
@@ -103,7 +103,7 @@
 }
 
 .color-selector {
-  background-image: url('../../../public/palette.png');
+  background-image: url('/palette.png');
 }
 
 .color-selector-box {
@@ -111,14 +111,14 @@
   width: 280px;
   height: 145px;
   border: 1px solid #000;
-  left: 8rem;
-  top: 7rem;
+  left: 100px;
+  top: 100px;
   background-color: #fff;
   padding: 5px;
 }
 
 .color-selector-image {
-  background-image: url('../../../public/skin_palette.png');
+  background-image: url('/skin_palette.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -136,8 +136,8 @@
 
 .color-selected-color {
   background: #000;
-  height: 2rem;
-  width: 6rem;
+  height: 25px;
+  width: 60px;
 }
 
 .color-selected-btn {
@@ -160,7 +160,7 @@
 }
 
 .color-selected-save {
-  background-image: url('../../../public/palette_ok.png');
+  background-image: url('/palette_ok.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
@@ -168,116 +168,116 @@
 }
 
 .color-selected-cancel {
-  background-image: url('../../../public/palette_cancel.png');
+  background-image: url('/palette_cancel.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
 }
 
 .theme[data-theme-index='0'] {
-  background-image: url('../../../public/skin/57KJ57SF5Zue5oa2_preview.jpg');
+  background-image: url('/skin/57KJ57SF5Zue5oa2_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/57KJ57SF5Zue5oa2.jpg');
+  --header-image: url('/skin/57KJ57SF5Zue5oa2.jpg');
   --main-color: #f6e6d7;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='1'] {
-  background-image: url('../../../public/skin/57SU55yf56ul5bm0_preview.jpg');
+  background-image: url('/skin/57SU55yf56ul5bm0_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/57SU55yf56ul5bm0.jpg');
+  --header-image: url('/skin/57SU55yf56ul5bm0.jpg');
   --main-color: #1b71ac;
   --secondary-color: #fff;
 }
 
 .theme[data-theme-index='2'] {
-  background-image: url('../../../public/skin/5Y+v5oSb6LKT5ZKq_preview.jpg');
+  background-image: url('/skin/5Y+v5oSb6LKT5ZKq_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/5Y+v5oSb6LKT5ZKq.jpg');
+  --header-image: url('/skin/5Y+v5oSb6LKT5ZKq.jpg');
   --main-color: #efd1ab;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='3'] {
-  background-image: url('../../../public/skin/6YKj5LiA5bm0_preview.jpg');
+  background-image: url('/skin/6YKj5LiA5bm0_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/6YKj5LiA5bm0.jpg');
+  --header-image: url('/skin/6YKj5LiA5bm0.jpg');
   --main-color: #d4be99;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='4'] {
-  background-image: url('../../../public/skin/img_greenmood_preview.jpg');
+  background-image: url('/skin/img_greenmood_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/img_greenmood.jpg');
+  --header-image: url('/skin/img_greenmood.jpg');
   --main-color: #89c68b;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='5'] {
-  background-image: url('../../../public/skin/img_sunflower_preview.jpg');
+  background-image: url('/skin/img_sunflower_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/img_sunflower.jpg');
+  --header-image: url('/skin/img_sunflower.jpg');
   --main-color: #edd569;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='6'] {
-  background-image: url('../../../public/skin/img_sunset_preview.jpg');
+  background-image: url('/skin/img_sunset_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/img_sunset.jpg');
+  --header-image: url('/skin/img_sunset.jpg');
   --main-color: #7464ad;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='7'] {
-  background-image: url('../../../public/skin/img_colddrink_preview.jpg');
+  background-image: url('/skin/img_colddrink_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/img_colddrink.jpg');
+  --header-image: url('/skin/img_colddrink.jpg');
   --main-color: #e3908f;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='8'] {
-  background-image: url('../../../public/skin/img_pebble_preview.jpg');
+  background-image: url('/skin/img_pebble_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/img_pebble.jpg');
+  --header-image: url('/skin/img_pebble.jpg');
   --main-color: #a4cfd5;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='9'] {
-  background-image: url('../../../public/skin/img_love_preview.jpg');
+  background-image: url('/skin/img_love_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/img_love.jpg');
+  --header-image: url('/skin/img_love.jpg');
   --main-color: #aa7a52;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='10'] {
-  background-image: url('../../../public/skin/img_hamburger_preview.jpg');
+  background-image: url('/skin/img_hamburger_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/img_hamburger.jpg');
+  --header-image: url('/skin/img_hamburger.jpg');
   --main-color: #591234;
   --secondary-color: #fff;
 }
 
 .theme[data-theme-index='11'] {
-  background-image: url('../../../public/skin/img_coastline_preview.jpg');
+  background-image: url('/skin/img_coastline_preview.jpg');
   background-color: #000;
 
-  --header-image: url('../../../public/skin/img_coastline.jpg');
+  --header-image: url('/skin/img_coastline.jpg');
   --main-color: #313131;
   --secondary-color: #fff;
 }

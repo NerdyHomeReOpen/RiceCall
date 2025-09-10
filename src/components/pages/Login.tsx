@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from '@/styles/pages/login.module.css';
 
 // Services
-import authService from '@/services/auth.service';
+import auth from '@/services/auth.service';
+import ipc from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -17,10 +18,11 @@ interface FormDatas {
 }
 
 interface LoginPageProps {
+  display: boolean;
   setSection: (section: 'login' | 'register') => void;
 }
 
-const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
+const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -36,7 +38,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
     rememberAccount: false,
     autoLogin: false,
   });
-  const [accounts, setAccounts] = useState<string[]>([]);
+  const [accounts, setAccounts] = useState<Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showAccountselectBox, setShowAccountselectBox] = useState<boolean>(false);
 
@@ -44,12 +46,12 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     if (name === 'account') {
-      const match = accounts.find((acc: string) => acc === value);
+      const match = accounts[value];
       setFormData((prev) => ({
         ...prev,
         account: value,
-        rememberAccount: !!match,
-        autoLogin: !!match,
+        rememberAccount: match?.rememberAccount,
+        autoLogin: match?.autoLogin,
       }));
     } else if (name === 'autoLogin') {
       setFormData((prev) => ({
@@ -78,49 +80,48 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
   const handleSubmit = async () => {
     if (!formData.account || !formData.password) return;
     setIsLoading(true);
-    if (await authService.login(formData)) {
-      if (formData.rememberAccount && !accounts.includes(formData.account)) {
-        setAccounts([...accounts, formData.account]);
-        localStorage.setItem('login-account', formData.account);
-      }
+    if (await auth.login(formData)) {
+      localStorage.setItem('login-account', formData.account);
       setSection('login');
     }
     setIsLoading(false);
   };
 
+  const handleDeleteAccount = (account: string) => {
+    ipc.accounts.delete(account);
+  };
+
   // Effects
   useEffect(() => {
-    const loginAccount = localStorage.getItem('login-account');
+    const loginAccount = localStorage.getItem('login-account') || '';
     setFormData((prev) => ({
       ...prev,
-      account: loginAccount || '',
-      rememberAccount: !!loginAccount,
-      autoLogin: !!loginAccount,
+      account: accounts[loginAccount] ? loginAccount : '',
+      rememberAccount: !!accounts[loginAccount]?.rememberAccount,
+      autoLogin: !!accounts[loginAccount]?.autoLogin,
+      password: accounts[loginAccount]?.password || '',
     }));
-  }, []);
-
-  useEffect(() => {
-    const accounts = localStorage.getItem('accounts')?.split(',') || [];
-    setAccounts(accounts);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('accounts', accounts.join(','));
   }, [accounts]);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const changeAccounts = (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => {
+      setAccounts(accounts);
+    };
+    changeAccounts(ipc.accounts.get());
+    const unsubscribe = [ipc.accounts.onUpdate(changeAccounts)];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, []);
+
+  useEffect(() => {
+    const onPointerDown = (e: MouseEvent) => {
       if (!comboRef.current?.contains(e.target as Node)) setShowAccountselectBox(false);
     };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);
 
   return (
-    <main className={styles['login']}>
+    <main className={styles['login']} style={display ? {} : { display: 'none' }}>
       {/* Body */}
       <main className={styles['login-body']}>
         <div className={styles['app-logo']} />
@@ -133,7 +134,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
         >
           {isLoading && (
             <>
-              <div className={styles['loading-indicator']}>{t('on-login')}</div>
+              <div className={styles['loading-indicator']}>{`${t('logining')}...`}</div>
               <div className={styles['loading-bar']} />
             </>
           )}
@@ -151,7 +152,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                     }}
                   />
                   <div className={styles['account-select-box']} style={showAccountselectBox ? {} : { display: 'none' }}>
-                    {accounts.map((account) => (
+                    {Object.entries(accounts).map(([account, { autoLogin, rememberAccount, password }]) => (
                       <div
                         key={account}
                         className={styles['account-select-option-box']}
@@ -159,8 +160,9 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                           setFormData((prev) => ({
                             ...prev,
                             account: account,
-                            rememberAccount: true,
-                            autoLogin: true,
+                            rememberAccount: rememberAccount,
+                            autoLogin: autoLogin,
+                            password: password,
                           }));
                           setShowAccountselectBox(false);
                         }}
@@ -170,7 +172,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ setSection }) => {
                           className={styles['account-select-delete-btn']}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setAccounts(accounts.filter((a) => a !== account));
+                            handleDeleteAccount(account);
                           }}
                         />
                       </div>

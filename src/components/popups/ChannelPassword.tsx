@@ -1,45 +1,32 @@
 import React, { useState } from 'react';
 
-// Types
-import { User, Channel, Server } from '@/types';
-
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface ChannelPasswordPopupProps {
-  userId: User['userId'];
-  serverId: Server['serverId'];
-  channelId: Channel['channelId'];
+  submitTo: string;
 }
 
-const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ userId, serverId, channelId }) => {
+const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ submitTo }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
   // States
-  const [password, setPassword] = useState<string | null>(null);
+  const [password, setPassword] = useState<string>('');
 
   // Handlers
-  const handleJoinChannel = (
-    userId: User['userId'],
-    channelId: Channel['channelId'],
-    serverId: Server['serverId'],
-    password: string | null,
-  ) => {
-    if (!socket) return;
-    socket.send.connectChannel({ userId, channelId, serverId, password });
+  const handleSubmit = () => {
+    ipc.popup.submit(submitTo, password);
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (
@@ -49,16 +36,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
         <div className={popup['dialog-content']}>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('please-enter-the-channel-password')}</div>
-            <input
-              type="text"
-              value={password || ''}
-              maxLength={4}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '') setPassword(null);
-                else setPassword(value);
-              }}
-            />
+            <input type="text" maxLength={4} onChange={(e) => setPassword(e.target.value)} />
           </div>
         </div>
       </div>
@@ -66,15 +44,15 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
       {/* Footer */}
       <div className={popup['popup-footer']}>
         <div
-          className={`${popup['button']} ${password && password.length <= 4 ? '' : 'disabled'}`}
+          className={popup['button']}
           onClick={() => {
-            handleJoinChannel(userId, channelId, serverId, password);
+            handleSubmit();
             handleClose();
           }}
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

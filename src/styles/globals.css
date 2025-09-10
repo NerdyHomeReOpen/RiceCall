@@ -19,6 +19,8 @@
   border: none;
   box-sizing: border-box;
   outline: none;
+  margin: 0;
+  padding: 0;
 }
 
 html,
@@ -94,11 +96,11 @@ body {
 /* Radio & Checkbox */
 
 input[type='radio'] {
-  background-image: url('../../public/ctrl/radiobox_icon.png');
+  background-image: url('/ctrl/radiobox_icon.png');
 }
 
 input[type='checkbox'] {
-  background-image: url('../../public/ctrl/checkbox_icon.png');
+  background-image: url('/ctrl/checkbox_icon.png');
 }
 
 input[type='radio'],
@@ -156,4 +158,44 @@ button {
   color: #c5c5c5 !important;
   filter: grayscale(100%) !important;
   pointer-events: none !important;
+}
+
+*[datatype='read-only'] {
+  pointer-events: none;
+  user-select: none;
+  &:hover {
+    cursor: default;
+  }
+  &:focus {
+    outline: none;
+  }
+}
+
+/* Hover Text */
+.has-hover-text {
+  position: relative;
+  cursor: pointer;
+  &:hover {
+    .hover-text {
+      opacity: 1;
+    }
+  }
+}
+
+.hover-text {
+  z-index: 999;
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  padding-right: 3px;
+  padding-left: 3px;
+  background: #fff;
+  border: 1px solid #777;
+  border-radius: 3px;
+  white-space: nowrap;
+  color: #777;
+  opacity: 0;
 }

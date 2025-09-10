@@ -34,12 +34,6 @@
   border: 1px solid #ccc;
 }
 
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .input-box {
   flex-direction: column;
 }
@@ -59,7 +53,7 @@
   object-fit: cover;
   min-width: 100px;
   min-height: 100px;
-  background-image: url('../../../public/logo_server_def.png');
+  background-image: url('/logo_server_def.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -69,5 +63,5 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 0.5rem;
+  gap: 10px;
 }

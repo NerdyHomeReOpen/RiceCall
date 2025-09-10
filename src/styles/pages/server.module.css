@@ -21,10 +21,6 @@
   flex: 1;
   min-height: 0;
   min-width: 0;
-  overflow-y: hidden;
-}
-
-.scroll-view:hover {
   overflow-y: auto;
 }
 
@@ -32,6 +28,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  width: 280px;
   min-width: 280px;
   background-color: #f1f2f5;
 }
@@ -41,13 +38,12 @@
   display: flex;
   align-items: center;
   border-bottom: 2px solid #e0e0e4;
-  padding: 0.5rem;
+  padding: 5px;
   gap: 5px;
 }
 
 .avatar-box {
-  padding: 2px;
-  margin-left: 5px;
+  padding: 3px;
   cursor: pointer;
 }
 
@@ -57,7 +53,7 @@
   object-fit: cover;
   min-height: 50px;
   min-width: 50px;
-  background-image: url('../../../public/logo_server_def.png');
+  background-image: url('/logo_server_def.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -71,7 +67,7 @@
   z-index: 99;
   min-width: 52px;
   min-height: 52px;
-  background-image: url('../../../public/win_border.png');
+  background-image: url('/win_border.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -81,25 +77,23 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  height: 52px;
-  color: #777;
+  justify-content: space-between;
+  height: 60px;
+  padding: 3px;
   overflow: hidden;
 }
 
 .base-info-wrapper .box {
-  flex: 1;
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  height: 1rem;
   gap: 5px;
 }
 
 .verify-icon {
   min-width: 12px;
   min-height: 12px;
-  background-image: url('../../../public/icon_verify.png');
+  background-image: url('/icon_verify.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -107,9 +101,12 @@
 .name-text {
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  color: #666;
-  line-height: 1rem;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  color: #777;
 }
 
 .id-text {
@@ -117,6 +114,7 @@
   justify-content: flex-start;
   align-items: center;
   min-width: 75px;
+  color: #777;
 }
 
 .member-text {
@@ -124,6 +122,7 @@
   justify-content: flex-start;
   align-items: center;
   min-width: 55px;
+  color: #777;
 }
 
 .id-text::before {
@@ -131,7 +130,7 @@
   min-height: 12px;
   min-width: 12px;
   position: relative;
-  background-image: url('../../../public/channel/ID.png');
+  background-image: url('/channel/ID.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   margin-right: 5px;
@@ -142,7 +141,7 @@
   min-height: 12px;
   min-width: 12px;
   position: relative;
-  background-image: url('../../../public/channel/member.png');
+  background-image: url('/channel/member.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   margin-right: 5px;
@@ -165,7 +164,7 @@
   min-height: 16px;
   min-width: 20px;
   cursor: pointer;
-  background-image: url('../../../public/channel/icon_invite_friend.png');
+  background-image: url('/channel/icon_invite_friend.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -183,7 +182,7 @@
   min-width: 24px;
   cursor: pointer;
   position: relative;
-  background-image: url('../../../public/channel/icon_group_option.png');
+  background-image: url('/channel/icon_group_option.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -200,7 +199,7 @@
   min-height: 16px;
   min-width: 2px;
   background-size: auto;
-  background-image: url('../../../public/icon_v_split.png');
+  background-image: url('/icon_v_split.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -208,11 +207,10 @@
 .saperator-2 {
   display: block;
   min-height: 6px;
-  min-width: 100%;
-  margin: 0.5rem 0;
-  background-image: url('../../../public/channel/chn_tree_split.png');
+  margin: 5px 0;
+  background-image: url('/channel/chn_tree_split.png');
   background-repeat: no-repeat;
-  background-position: 0 0;
+  background-position: 50% 0;
 }
 
 .section-title-text {
@@ -220,34 +218,19 @@
   padding: 5px 10px;
 }
 
-.current-channel-ping {
-  display: flex;
-  position: absolute;
-  align-items: center;
-  border: 1px solid #000;
-  height: 1.8rem;
-  left: 2.3rem;
-  margin-top: 1rem;
-  padding-right: 3px;
-  padding-left: 3px;
-  background: #fff;
-  z-index: 99999;
-  opacity: 0;
-}
-
 .current-channel-box {
   height: 35px;
   display: flex;
   align-items: center;
   width: 100%;
-  flex-shrink: 0;
 }
 
 .current-channel-icon {
+  position: relative;
   min-height: 20px;
   min-width: 20px;
   margin-left: 8px;
-  background-image: url('../../../public/channel/NetworkStatus.png');
+  background-image: url('/channel/NetworkStatus.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -281,10 +264,12 @@
   text-overflow: ellipsis;
 }
 
-.mic-queue-list {
+.queue-list {
   display: flex;
   flex-direction: column;
   height: 120px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .channel-list {
@@ -296,8 +281,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: 1.8rem;
-  padding: 1px 20px 1px 8px;
+  height: 25px;
+  padding: 2px 20px 2px 8px;
   gap: 5px;
 }
 
@@ -314,16 +299,16 @@
   min-width: 14px;
   min-height: 14px;
   cursor: pointer;
-  background-image: url('../../../public/channel/channelIcon.png');
+  background-image: url('/channel/channelIcon.png');
   background-repeat: no-repeat;
   background-size: auto;
 }
 
-.channel-tab .tab-icon.public {
+.channel-tab .tab-icon {
   background-position: 0 0;
 }
 
-.channel-tab .tab-icon.public.expanded {
+.channel-tab .tab-icon.expanded {
   background-position: -14px 0;
 }
 
@@ -384,13 +369,17 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: 1.8rem;
-  padding: 1px 20px 1px 8px;
+  height: 25px;
+  padding: 2px 20px 0px 8px;
   gap: 5px;
 }
 
 .user-tab:not(.selected):hover {
   background-color: #d1d5da5c;
+}
+
+.user-tab .user-queue-position {
+  color: #777;
 }
 
 .user-tab .user-tab-name {
@@ -416,7 +405,7 @@
 .user-audio-state {
   min-height: 12px;
   min-width: 12px;
-  background-image: url('../../../public/channel/audioState.png');
+  background-image: url('/channel/audioState.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: -36px 0;
@@ -424,7 +413,7 @@
 }
 
 .user-audio-state.loading {
-  background-image: url('../../../public/loading.gif');
+  background-image: url('/loading.gif');
   background-size: cover;
   background-position: 0 0;
 }
@@ -437,22 +426,56 @@
   background-position: -12px 0;
 }
 
-.user-audio-state.notext {
+.user-audio-state.no-text {
   background-position: 0 0;
+}
+
+.queue-position {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #777;
+}
+
+.queue-seconds-remaining-box {
+  background: #fffed3;
+  border: 1px solid #f9ce7d;
+  border-radius: 3px;
+  padding-right: 3px;
+  padding-left: 3px;
+  display: flex;
+  align-items: center;
+  color: #777777;
+  margin-left: auto;
 }
 
 .my-location-icon {
   position: absolute;
   min-height: 15px;
   min-width: 15px;
-  right: 0.125rem;
+  right: 2px;
   cursor: pointer;
-  background-image: url('../../../public/mylocation.png');
+  background-image: url('/mylocation.png');
   background-repeat: no-repeat;
   background-size: cover;
 }
 
 /* Content */
+
+.content-layout {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content-layout.classic {
+  flex-direction: column !important;
+}
+
+.content-layout.three-line {
+  flex-direction: row !important;
+}
 
 .content {
   display: flex;
@@ -464,37 +487,42 @@
 
 .announcement-area {
   overflow-y: auto;
-  padding: 0.75rem;
+  padding: 10px;
+  height: 100%;
   min-height: 60px;
+  width: 100%;
+  min-width: 200px;
+}
+
+.bottom-area {
+  flex: 5;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  min-width: 260px;
+  overflow-y: hidden;
 }
 
 .message-area {
   display: flex;
-  flex: 5;
-  min-height: 60px;
-  padding: 0.75rem;
-  overflow-y: auto;
+  overflow-y: scroll;
+  padding: 10px;
+  height: 100%;
 }
 
 .broadcast-area {
   position: absolute;
-  right: 0;
   left: 0;
-  bottom: 6rem;
-  display: flex;
+  bottom: calc(100% + 10px);
+  width: 100%;
   min-height: 25px;
+  display: flex;
   align-items: center;
-  background-color: #fefee4;
   justify-content: center;
+  padding: 3px;
   border: solid 1.5px #f9c55d;
   border-radius: 2px;
-  margin: 0 0.75rem;
-  padding: 1px 5px;
-}
-
-.broadcast-area .broadcast-content {
-  flex: 5;
-  display: flex;
+  background-color: #fefee4;
 }
 
 .broadcast-area .broadcast-close {
@@ -514,8 +542,8 @@
 .input-area {
   position: relative;
   display: flex;
-  min-height: 80px;
-  padding: 0.75rem;
+  min-height: 60px;
+  margin: 10px;
 }
 
 .button-area {
@@ -523,9 +551,9 @@
   align-items: center;
   justify-content: space-between;
   flex: none;
-  padding: 0.75rem;
+  padding: 10px;
   border-top: 1px solid #e2e8f0;
-  background-image: url('../../../public/channel/chn_toolbar_bg.png');
+  background-image: url('/channel/chn_toolbar_bg.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
   background-color: #dddddf;
@@ -542,11 +570,23 @@
   justify-content: space-between;
   padding: 0 10px;
   gap: 5px;
-  background-image: url('../../../public/channel/mic_state_menu.png');
+  background-image: url('/channel/mic_state_menu.png');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 2px;
   cursor: pointer;
+}
+
+.mic-button.normal {
+  background-image: url('/channel/mic_state_normal.png');
+}
+
+.mic-button.queuing {
+  background-image: url('/channel/mic_state_queuing.png');
+}
+
+.mic-button.speaking {
+  background-image: url('/channel/mic_state_speaking.png');
 }
 
 .mic-button:hover {
@@ -560,50 +600,62 @@
 .mic-button .mic-icon {
   min-width: 24px;
   min-height: 30px;
-  background-image: url('../../../public/channel/icon_mic_state.png');
+  background-image: url('/channel/icon_mic_state.png');
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-.mic-button.active .mic-icon {
-  background-image: url('../../../public/channel/icon_speaking_vol.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.mic-button.active .mic-icon.level1 {
+.mic-button:hover:not(.speaking) .mic-icon {
   background-position: -24px 0;
 }
 
-.mic-button.active .mic-icon.level2 {
+.mic-button:active:not(.speaking) .mic-icon {
   background-position: -48px 0;
 }
 
-.mic-button.active .mic-icon.level3 {
+.mic-button.muted .mic-icon {
   background-position: -72px 0;
 }
 
-.mic-button.active .mic-icon.level4 {
+.mic-button.speaking:not(.muted) .mic-icon {
+  background-image: url('/channel/icon_speaking_vol.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.mic-button.speaking:not(.muted) .mic-icon.level1 {
+  background-position: -24px 0;
+}
+
+.mic-button.speaking:not(.muted) .mic-icon.level2 {
+  background-position: -48px 0;
+}
+
+.mic-button.speaking:not(.muted) .mic-icon.level3 {
+  background-position: -72px 0;
+}
+
+.mic-button.speaking:not(.muted) .mic-icon.level4 {
   background-position: -96px 0;
 }
 
-.mic-button.active .mic-icon.level5 {
+.mic-button.speaking:not(.muted) .mic-icon.level5 {
   background-position: -120px 0;
 }
 
-.mic-button.active .mic-icon.level6 {
+.mic-button.speaking:not(.muted) .mic-icon.level6 {
   background-position: -144px 0;
 }
 
-.mic-button.active .mic-icon.level7 {
+.mic-button.speaking:not(.muted) .mic-icon.level7 {
   background-position: -168px 0;
 }
 
-.mic-button.active .mic-icon.level8 {
+.mic-button.speaking:not(.muted) .mic-icon.level8 {
   background-position: -192px 0;
 }
 
-.mic-button.active .mic-icon.level9 {
+.mic-button.speaking:not(.muted) .mic-icon.level9 {
   background-position: -216px 0;
 }
 
@@ -619,27 +671,35 @@
   color: #777;
 }
 
-.mic-button.active .mic-text {
+.mic-button.queuing .mic-text {
+  color: #dda11e;
+}
+
+.mic-button.speaking .mic-text {
   color: #62a35b;
 }
 
 .mic-button::after {
   display: block;
   content: '';
-  min-height: 8px;
-  min-width: 8px;
+  min-height: 7px;
+  min-width: 11px;
   cursor: pointer;
-  background-image: url('../../../public/channel/triangle.png');
+  background-image: url('/channel/icon_mic_triangle.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
+.mic-button.no-selection::after {
+  background-image: none;
+}
+
 .mic-button:hover::after {
-  background-position: -9px 0;
+  background-position: -11px 0;
 }
 
 .mic-button:active::after {
-  background-position: -18px 0;
+  background-position: -22px 0;
 }
 
 .buttons {
@@ -654,7 +714,7 @@
   align-items: center;
   gap: 5px;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 5px;
   border-radius: 4px;
   background: none;
   color: #888;
@@ -669,7 +729,7 @@
   min-width: 8px;
   cursor: pointer;
   transform: rotate(180deg);
-  background-image: url('../../../public/channel/triangle.png');
+  background-image: url('/channel/triangle.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -693,7 +753,7 @@
   content: '';
   min-height: 18px;
   min-width: 18px;
-  background-image: url('../../../public/channel/music_bkg.png');
+  background-image: url('/channel/music_bkg.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -710,7 +770,7 @@
   position: absolute;
   min-height: 18px;
   min-width: 18px;
-  background-image: url('../../../public/channel/Mic.png');
+  background-image: url('/channel/Mic.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -721,7 +781,7 @@
   min-height: 18px;
   min-width: 18px;
   opacity: 0;
-  background-image: url('../../../public/channel/Mic.png');
+  background-image: url('/channel/Mic.png');
   background-repeat: no-repeat;
   background-position: -16px 0;
 }
@@ -742,7 +802,7 @@
   content: '';
   min-height: 18px;
   min-width: 18px;
-  background-image: url('../../../public/channel/speaker.png');
+  background-image: url('/channel/speaker.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -753,7 +813,7 @@
   min-height: 18px;
   min-width: 18px;
   opacity: 0;
-  background-image: url('../../../public/channel/speaker.png');
+  background-image: url('/channel/speaker.png');
   background-repeat: no-repeat;
   background-position: -18px 0;
 }
@@ -766,7 +826,7 @@
   min-height: 18px;
   min-width: 18px;
   cursor: pointer;
-  background-image: url('../../../public/channel/recorder.png');
+  background-image: url('/channel/recorder.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -784,7 +844,7 @@
   position: absolute;
   bottom: -3px;
   left: -3px;
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
@@ -796,13 +856,17 @@
   background: rgb(255 255 255 / 90%);
 }
 
+.mic-volume-container:hover .volume-slider,
+.speaker-volume-container:hover .volume-slider {
+  display: flex;
+}
+
 .slider-container {
   display: flex;
   position: relative;
   height: 120px;
   width: 4px;
   margin: 10px;
-  background: #bbb;
   border-radius: 2px;
 }
 
@@ -810,7 +874,7 @@
   appearance: none;
   position: absolute;
   top: calc(50% - 4px);
-  left: -60px;
+  left: -58px;
   width: 120px;
   height: 4px;
   background: #bbb;
@@ -855,7 +919,7 @@
 }
 
 .sidebar-footer .navegate-tab:first-child::before {
-  background-image: url('../../../public/channel/rdb_cur_channel.png');
+  background-image: url('/channel/rdb_cur_channel.png');
   background-position: 0 0;
   background-size: auto;
   min-height: 18px;
@@ -863,7 +927,7 @@
 }
 
 .sidebar-footer .navegate-tab:last-child::before {
-  background-image: url('../../../public/channel/rdb_all_channel.png');
+  background-image: url('/channel/rdb_all_channel.png');
   background-position: 0 0;
   background-size: auto;
   min-height: 18px;
@@ -893,7 +957,7 @@
   min-width: 70px;
   top: -15px;
   transition: left 0.2s ease;
-  background-image: url('../../../public/channel/switch_arrow.png');
+  background-image: url('/channel/switch_arrow.png');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;

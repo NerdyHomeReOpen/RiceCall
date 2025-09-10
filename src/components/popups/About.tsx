@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 
 // Package
@@ -13,10 +13,13 @@ import popup from '@/styles/popup.module.css';
 import { useTranslation } from 'react-i18next';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownContent from '@/components/MarkdownContent';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
+
+// Data
+import { staff } from '@/staff';
 
 const AboutPopup: React.FC = React.memo(() => {
   // Hooks
@@ -27,111 +30,27 @@ const AboutPopup: React.FC = React.memo(() => {
 
   // Handlers
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
-  // Variables
-  const titleColorClasses: Record<string, string> = {
-    [t('main-developer')]: styles['main-developer'],
-    [t('backend-developer')]: styles['backend-developer'],
-    [t('frontend-developer')]: styles['frontend-developer'],
-    [t('machine-network')]: styles['machine-network'],
-    [t('technical-support')]: styles['technical-support'],
-    [t('customer-service')]: styles['customer-service'],
+  const handleDontShowNextTime = () => {
+    ipc.systemSettings.disclaimer.dontShowNextTime();
   };
-  const currentYear = new Date().getFullYear();
-  const teamMembers = [
-    {
-      title: t('main-developer'),
-      contact: 'JoshHuang9508',
-      info: [
-        { label: 'Github', value: 'JoshHuang9508' },
-        { label: 'Discord', value: '614396443016560649' },
-      ],
-    },
-    {
-      title: t('main-developer'),
-      contact: 'yeci226',
-      info: [
-        { label: 'Github', value: 'yeci226' },
-        { label: 'Discord', value: '283946584461410305' },
-      ],
-    },
-    {
-      title: t('backend-developer'),
-      contact: 'yuusukealmal',
-      info: [
-        { label: 'Github', value: 'yuusukealmal' },
-        { label: 'Discord', value: '878830839822176287' },
-      ],
-    },
-    {
-      title: t('frontend-developer'),
-      contact: 'cablate',
-      info: [
-        { label: 'Github', value: 'cablate' },
-        { label: 'Discord', value: '337525692356886538' },
-      ],
-    },
-    {
-      title: t('frontend-developer'),
-      contact: 'cstrikeasia',
-      info: [
-        { label: 'Github', value: 'cstrikeasia' },
-        { label: 'Discord', value: '789742073036144640' },
-      ],
-    },
-    {
-      title: t('machine-network'),
-      contact: 'Cooookie16',
-      info: [
-        { label: 'Github', value: 'Cooookie16' },
-        { label: 'Discord', value: '370537724362620930' },
-      ],
-    },
-    {
-      title: t('machine-network'),
-      contact: 'yayacat',
-      info: [
-        { label: 'Github', value: 'yayacat' },
-        { label: 'Discord', value: '107918754251325440' },
-      ],
-    },
-    {
-      title: t('machine-network'),
-      contact: 'codingbear',
-      info: [
-        { label: 'Github', value: 'mcg25035' },
-        { label: 'Discord', value: '492908862647697409' },
-      ],
-    },
-    {
-      title: t('technical-support'),
-      contact: 'orlys',
-      info: [
-        { label: 'Github', value: 'Orlys' },
-        { label: 'Discord', value: '385825577698983937' },
-      ],
-    },
-    {
-      title: t('technical-support'),
-      contact: '5026',
-      info: [
-        { label: 'Github', value: 'SN-Koarashi' },
-        { label: 'Discord', value: '198418020329062400' },
-      ],
-    },
-    {
-      title: t('customer-service'),
-      contact: 'lingyu1121',
-      info: [{ label: 'Discord', value: '371580417096155137' }],
-    },
-    {
-      title: t('customer-service'),
-      contact: 'goujuanji_',
-      info: [{ label: 'Discord', value: '415152218690420736' }],
-    },
-  ];
+
+  // Memos
+  const TITLE_COLOR_CLASSES: Record<string, string> = useMemo(
+    () => ({
+      [t('developer')]: styles['developer'],
+      [t('developer')]: styles['developer'],
+      [t('developer')]: styles['developer'],
+      [t('developer')]: styles['developer'],
+      [t('machine-network')]: styles['machine-network'],
+      [t('technical-support')]: styles['technical-support'],
+      [t('customer-service')]: styles['customer-service'],
+    }),
+    [t],
+  );
+  const CURRENT_YEAR = useMemo(() => new Date().getFullYear(), []);
 
   return (
     <div className={`${popup['popup-wrapper']}`}>
@@ -142,68 +61,45 @@ const AboutPopup: React.FC = React.memo(() => {
 
           <div className={styles['app-info']}>
             <div className={styles['app-version-text']}>RiceCall v{version}</div>
-            <div className={styles['copyright-text']}>COPYRIGHT @ {currentYear} RiceCall.com ,ALL RIGHTS RESERVED.</div>
+            <div className={styles['copyright-text']}>COPYRIGHT @ {CURRENT_YEAR} RiceCall.com ,ALL RIGHTS RESERVED.</div>
             <div className={popup['row']} style={{ alignSelf: 'center' }}>
-              <div
-                className={popup['link-text']}
-                onClick={() => ipcService.window.openExternal('https://discord.com/invite/adCWzv6wwS')}
-              >
+              <div className={popup['link-text']} onClick={() => ipc.window.openExternal('https://discord.com/invite/adCWzv6wwS')}>
                 {t('get-help')}
               </div>
-              <div
-                className={popup['link-text']}
-                onClick={() => ipcService.window.openExternal('https://github.com/NerdyHomeReOpen/RiceCall')}
-              >
+              <div className={popup['link-text']} onClick={() => ipc.window.openExternal('https://github.com/NerdyHomeReOpen/RiceCall')}>
                 {t('project-repo')}
               </div>
-              <div
-                className={popup['link-text']}
-                onClick={() => ipcService.window.openExternal('http://ricecall.com.tw')}
-              >
+              <div className={popup['link-text']} onClick={() => ipc.window.openExternal('http://ricecall.com.tw')}>
                 {t('official-website')}
               </div>
             </div>
-            <MarkdownViewer markdownText={t('readme')} />
+            <MarkdownContent markdownText={t('readme')} />
           </div>
 
           <div className={styles['team-members']}>
             <p>{t('team-members')}:</p>
-            {teamMembers.map((member, index) => {
-              const githubInfo = member.info.find((item) => item.label === 'Github' && item.value);
-              const discordInfo = member.info.find((item) => item.label === 'Discord' && item.value);
+            {staff.map((member, index) => {
+              const githubInfo = member.github;
+              const discordInfo = member.discord;
               return (
-                <React.Fragment key={member.contact + index}>
-                  <div className={styles['team-member-card']}>
-                    <div className={styles['name-wrapper']}>
-                      <span className={`${styles['developer-title']} ${titleColorClasses[member.title]}`}>
-                        {member.title}
-                      </span>
-                      <span>{member.contact}</span>
-                    </div>
-                    <div className={styles['icon-wrapper']}>
-                      {githubInfo && (
-                        <div
-                          className={styles['github-icon-link']}
-                          title="GitHub"
-                          onClick={() => ipcService.window.openExternal(`https://github.com/${githubInfo.value}`)}
-                        >
-                          <FaGithub size={20} />
-                        </div>
-                      )}
-                      {discordInfo && (
-                        <div
-                          className={styles['discord-icon-link']}
-                          title="Discord"
-                          onClick={() =>
-                            ipcService.window.openExternal(`http://discordapp.com/users/${discordInfo.value}`)
-                          }
-                        >
-                          <FaDiscord size={20} />
-                        </div>
-                      )}
-                    </div>
+                <div key={index} className={styles['team-member-card']}>
+                  <div className={styles['name-wrapper']}>
+                    <span className={`${styles['developer-title']} ${TITLE_COLOR_CLASSES[t(member.title)]}`}>{t(member.title)}</span>
+                    <span>{member.contact}</span>
                   </div>
-                </React.Fragment>
+                  <div className={styles['icon-wrapper']}>
+                    {githubInfo && (
+                      <div className={styles['github-icon-link']} title="GitHub" onClick={() => ipc.window.openExternal(`https://github.com/${githubInfo}`)}>
+                        <FaGithub size={20} />
+                      </div>
+                    )}
+                    {discordInfo && (
+                      <div className={styles['discord-icon-link']} title="Discord" onClick={() => ipc.window.openExternal(`http://discordapp.com/users/${discordInfo}`)}>
+                        <FaDiscord size={20} />
+                      </div>
+                    )}
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -213,22 +109,13 @@ const AboutPopup: React.FC = React.memo(() => {
       {/* Footer */}
       <div className={`${popup['popup-footer']} aboutFooter`}>
         <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
-          <input
-            type="checkbox"
-            name="showDisclaimer"
-            checked={dontShowNextTime}
-            onChange={() => {
-              setDontShowNextTime(!dontShowNextTime);
-            }}
-          />
+          <input type="checkbox" name="showDisclaimer" onChange={(e) => setDontShowNextTime(e.target.checked)} />
           <div className={popup['label']}>{t('dont-show-next-time')}</div>
         </div>
         <div
           className={popup['button']}
           onClick={() => {
-            if (dontShowNextTime) {
-              ipcService.systemSettings.disclaimer.dontShowNextTime();
-            }
+            if (dontShowNextTime) handleDontShowNextTime();
             handleClose();
           }}
         >

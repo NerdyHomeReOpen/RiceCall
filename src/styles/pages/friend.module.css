@@ -25,11 +25,10 @@
 
 .avatar-picture {
   position: relative;
-  cursor: pointer;
   object-fit: cover;
   min-width: 40px;
   min-height: 40px;
-  background-image: url('../../../public/im/SecretaryLogo.png');
+  background-image: url('/im/SecretaryLogo.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -43,7 +42,7 @@
   z-index: 99;
   min-width: 42px;
   min-height: 42px;
-  background-image: url('../../../public/win_border.png');
+  background-image: url('/win_border.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -57,7 +56,7 @@
   right: 0;
   min-width: 13px;
   min-height: 13px;
-  background-image: url('../../../public/user_state.png');
+  background-image: url('/user_state.png');
   background-repeat: no-repeat;
   background-position: 0 0 !important;
 }
@@ -85,10 +84,9 @@
 .base-info-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   overflow: hidden;
-  height: 100%;
-  gap: 10px;
+  height: 40px;
 }
 
 .base-info-wrapper .box {
@@ -104,7 +102,7 @@
 .level-icon {
   min-width: 16px;
   min-height: 16px;
-  background-image: url('../../../public/im/LV.png');
+  background-image: url('/im/LV.png');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;
@@ -112,11 +110,10 @@
 
 .wealth-icon {
   border: none;
-  cursor: pointer;
-  margin-left: 3rem;
+  margin-left: 20px;
   min-width: 16px;
   min-height: 16px;
-  background-image: url('../../../public/silver_pea.png');
+  background-image: url('/silver_pea.png');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -129,11 +126,12 @@
 .signature-wrapper {
   display: flex;
   width: 60%;
-  height: 30px;
+  height: 40px;
   align-items: center;
   border: 1px solid #ffff;
   margin-left: 100px;
   padding: 2px 5px;
+  gap: 5px;
 }
 
 .signature-input {
@@ -186,6 +184,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  width: 280px;
   min-width: 280px;
   background-color: #f1f2f5;
 }
@@ -204,7 +203,7 @@
   flex: 1;
   text-align: center;
   cursor: pointer;
-  background-image: url('../../../public/friend_tab_item_bg.png');
+  background-image: url('/friend_tab_item_bg.png');
   background-size: 100% 72px;
   background-position: 0 0;
   min-height: 36px;
@@ -219,7 +218,7 @@
 .friend-list-icon {
   min-width: 16px;
   min-height: 16px;
-  background-image: url('../../../public/im/friend_list_page.png');
+  background-image: url('/im/friend_list_page.png');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;
@@ -228,7 +227,7 @@
 .recent-icon {
   min-width: 16px;
   min-height: 16px;
-  background-image: url('../../../public/im/recently_list_page.png');
+  background-image: url('/im/recently_list_page.png');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;
@@ -271,7 +270,7 @@
 .search-bar .search-icon {
   min-width: 20px;
   min-height: 20px;
-  background-image: url('../../../public/channel/channel_search.png');
+  background-image: url('/channel/channel_search.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -283,7 +282,7 @@
 .prev-icon {
   min-width: 30px;
   min-height: 30px;
-  background-image: url('../../../public/channel/search_pre.png');
+  background-image: url('/channel/search_pre.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   cursor: pointer;
@@ -292,7 +291,7 @@
 .next-icon {
   min-width: 30px;
   min-height: 30px;
-  background-image: url('../../../public/channel/search_next.png');
+  background-image: url('/channel/search_next.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   cursor: pointer;
@@ -341,7 +340,7 @@
   min-height: 16px;
   min-width: 16px;
   margin-right: 5px;
-  background-image: url('../../../public/im/add_group.png');
+  background-image: url('/im/add_group.png');
   background-repeat: no-repeat;
 }
 
@@ -350,7 +349,7 @@
   min-height: 16px;
   min-width: 16px;
   margin-right: 5px;
-  background-image: url('../../../public/im/add_friend.png');
+  background-image: url('/im/add_friend.png');
   background-repeat: no-repeat;
 }
 
@@ -363,6 +362,7 @@
   align-items: center;
   border-radius: 3px;
   padding: 5px;
+  cursor: pointer;
 }
 
 .friend-group-list .friend-group-tab.selected {
@@ -379,7 +379,7 @@
   min-width: 14px;
   min-height: 14px;
   margin-right: 5px;
-  background-image: url('../../../public/channel/channelIcon.png');
+  background-image: url('/channel/channelIcon.png');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;
@@ -424,8 +424,6 @@
   min-height: 18px;
   white-space: nowrap;
   text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
 }
 
 .friend-tab .server-name-text {
@@ -441,7 +439,7 @@
   content: '';
   min-height: 18px;
   min-width: 16px;
-  background-image: url('../../../public/mylocation.png');
+  background-image: url('/mylocation.png');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;

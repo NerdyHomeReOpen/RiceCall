@@ -8,11 +8,11 @@
 }
 
 .content .user-profile-content {
-  padding: 5px 15px;
+  padding: 10px;
 }
 
 .user-recent-visits-private {
-  background: url('../../../public/card/bg_list_tips.png') center center no-repeat;
+  background: url('/card/bg_list_tips.png') center center no-repeat;
   background-size: auto;
   height: 76px;
   width: 100%;
@@ -26,7 +26,7 @@
   text-align: center;
 }
 
-.user-about-me-show {
+.user-about-me {
   height: 100%;
   display: flex;
   justify-content: space-between;
@@ -36,8 +36,8 @@
   padding: 10px 15px;
 }
 
-.user-about-me-show::before,
-.user-about-me-show::after {
+.user-about-me::before,
+.user-about-me::after {
   content: '';
   min-height: 19px;
   min-width: 23px;
@@ -45,27 +45,21 @@
   background-size: cover;
 }
 
-.user-about-empty .user-about-me-show {
-  display: none;
-}
-
-.user-about-empty {
-  justify-content: flex-start;
-}
-
-.user-about-me-show::before {
-  background-image: url('../../../public/card/bg_left_quote.png');
+.user-about-me::before {
+  background-image: url('/card/bg_left_quote.png');
   background-repeat: no-repeat;
-  margin-bottom: 6rem;
+  align-self: flex-start;
+  margin-right: 10px;
 }
 
-.user-about-me-show::after {
-  background-image: url('../../../public/card/bg_right_quote.png');
+.user-about-me::after {
+  background-image: url('/card/bg_right_quote.png');
   background-repeat: no-repeat;
-  margin-top: 6rem;
+  align-self: flex-end;
+  margin-left: 10px;
 }
 
-.user-about-me-show-text {
+.user-about-me-text {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -107,7 +101,7 @@
   align-items: center;
   justify-content: center;
   color: white;
-  background-image: url('../../../public/im/wallpaper.png');
+  background-image: url('/im/wallpaper.png');
   background-size: cover;
   gap: 5px;
   padding-bottom: 38px;
@@ -135,12 +129,12 @@
 }
 
 .minimize-btn {
-  background-image: url('../../../public/im/btn-min.png');
+  background-image: url('/im/btn-min.png');
   background-repeat: no-repeat;
 }
 
 .close-btn {
-  background-image: url('../../../public/im/btn-close.png');
+  background-image: url('/im/btn-close.png');
   background-repeat: no-repeat;
 }
 
@@ -160,7 +154,7 @@
   min-height: 74px;
   object-fit: cover;
   display: inline-block;
-  background-image: url('../../../public/im/IMLogo.png');
+  background-image: url('/im/IMLogo.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -174,7 +168,7 @@
   left: -7px;
   width: 88px;
   height: 88px;
-  background-image: url('../../../public/im/avatar_border.png');
+  background-image: url('/im/avatar_border.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   z-index: 1;
@@ -207,15 +201,18 @@
 }
 
 .user-signature {
-  color: #fff;
-  width: 30rem;
-  font-size: 0.95em;
-  overflow-y: scroll;
-  text-align: center;
-  display: flex;
+  display: -webkit-box;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  max-width: 75%;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  box-orient: vertical;
+  text-align: center;
+  overflow: hidden;
+  color: #fff;
 }
 
 .user-signature:hover::-webkit-scrollbar-thumb {
@@ -240,7 +237,7 @@
   padding-bottom: 6px;
   gap: 5px;
   cursor: pointer;
-  background-image: url('../../../public/im/userpage_tab.png');
+  background-image: url('/im/userpage_tab.png');
   background-size: auto;
   background-repeat: repeat;
   background-position: 0 0;
@@ -258,7 +255,7 @@
   content: '';
   min-height: 14px;
   min-width: 13px;
-  background-image: url('../../../public/im/icon-about.png');
+  background-image: url('/im/icon-about.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -268,7 +265,7 @@
   content: '';
   min-height: 14px;
   min-width: 18px;
-  background-image: url('../../../public/im/icon-group.png');
+  background-image: url('/im/icon-group.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -325,7 +322,7 @@
   display: flex;
   align-items: center;
   font-size: 1em;
-  line-height: 1rem;
+  line-height: 1em;
   color: rgb(95 95 95);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -336,7 +333,7 @@
   display: flex;
   align-items: center;
   color: #777;
-  min-width: 2.5rem;
+  min-width: 30px;
 }
 
 .contribution-value-text::before {
@@ -345,7 +342,7 @@
   min-width: 12px;
   min-height: 12px;
   margin-right: 2px;
-  background-image: url('../../../public/card/icon_contribu.png');
+  background-image: url('/card/icon_contribu.png');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -363,7 +360,7 @@
   width: 12px;
   height: 12px;
   margin-right: 2px;
-  background-image: url('../../../public/card/icon_id.jpg');
+  background-image: url('/card/icon_id.jpg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: contain;
@@ -375,7 +372,7 @@
   width: 13px;
   height: 15px;
   margin-right: 5px;
-  background-image: url('../../../public/icon_creator.png');
+  background-image: url('/icon_creator.png');
   background-size: contain;
   background-position: 0 0;
 }
@@ -386,14 +383,15 @@
   align-items: center;
   justify-content: flex-end;
   min-height: 45px;
-  padding: 0 15px;
+  padding: 10px;
+  gap: 10px;
   background: linear-gradient(to bottom, #fff, #f2f7f9);
   border-bottom: 1px solid #f1f1f1;
 }
 
 .badge-viewer {
   display: flex;
-  gap: 0.25rem;
+  gap: 5px;
   height: 30px;
   align-items: center;
   border: 1px solid #d7d7d7;

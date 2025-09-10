@@ -248,7 +248,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                     handleOpenErrorDialog(t('invalid-country'));
                     return;
                   }
-
+        
                   handleEditUser({
                     name: targetName,
                     gender: targetGender,

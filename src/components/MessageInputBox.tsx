@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 // CSS
 import messageInputBox from '@/styles/messageInputBox.module.css';
@@ -11,85 +11,66 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import emoji from '@/styles/emoji.module.css';
 
 interface MessageInputBoxProps {
-  onSendMessage?: (message: string) => void;
+  onSend?: (message: string) => void;
   disabled?: boolean;
-  warning?: boolean;
   placeholder?: string;
   maxLength?: number;
 }
 
-const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(
-  ({ onSendMessage, disabled = false, warning = false, placeholder = '', maxLength = 2000 }) => {
-    // Hooks
-    const { t } = useTranslation();
-    const contextMenu = useContextMenu();
+const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, disabled = false, placeholder = '', maxLength = 2000 }) => {
+  // Hooks
+  const { t } = useTranslation();
+  const contextMenu = useContextMenu();
 
-    // Refs
-    const emojiIconRef = useRef<HTMLDivElement>(null);
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Refs
+  const isComposingRef = useRef<boolean>(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    // States
-    const [messageInput, setMessageInput] = useState<string>('');
-    const [isComposing, setIsComposing] = useState<boolean>(false);
-
-    // Variables
-    const isDisabled = disabled;
-    const isWarning = warning || messageInput.length >= maxLength;
-
-    return (
+  return (
+    <div className={`${messageInputBox['messageinput-box']} ${disabled ? messageInputBox['disabled'] : ''}`}>
       <div
-        className={`${messageInputBox['messageinput-box']} 
-        ${isWarning ? messageInputBox['warning'] : ''} 
-        ${isDisabled ? messageInputBox['disabled'] : ''}`}
-      >
-        <div
-          ref={emojiIconRef}
-          className={emoji['emoji-icon']}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            if (!emojiIconRef.current) return;
-            const x = emojiIconRef.current.getBoundingClientRect().x;
-            const y = emojiIconRef.current.getBoundingClientRect().y;
-            contextMenu.showEmojiPicker(x, y, true, 'unicode', (emoji) => {
-              setMessageInput((prev) => prev + emoji);
-              if (textareaRef.current) textareaRef.current.focus();
-            });
-          }}
-        />
+        className={emoji['emoji-icon']}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          const x = e.currentTarget.getBoundingClientRect().left;
+          const y = e.currentTarget.getBoundingClientRect().top;
+          contextMenu.showEmojiPicker(x, y, 'right-top', (_, full) => {
+            textareaRef.current?.focus();
+            document.execCommand('insertText', false, full);
+          });
+        }}
+      />
 
-        <textarea
-          ref={textareaRef}
-          rows={2}
-          placeholder={placeholder}
-          value={messageInput}
-          maxLength={maxLength}
-          onChange={(e) => {
-            if (isDisabled) return;
-            setMessageInput(e.target.value);
-          }}
-          onKeyDown={(e) => {
-            if (e.shiftKey) return;
-            if (e.key !== 'Enter') return;
-            else e.preventDefault();
-            if (!messageInput.trim()) return;
-            if (messageInput.length > maxLength) return;
-            if (isComposing) return;
-            if (isDisabled) return;
-            if (isWarning) return;
-            onSendMessage?.(messageInput);
-            setMessageInput('');
-          }}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={() => setIsComposing(false)}
-          aria-label={t('message-input-box')}
-        />
-        <div className={messageInputBox['message-input-length-text']}>
-          {messageInput.length}/{maxLength}
-        </div>
+      <textarea
+        ref={textareaRef}
+        rows={2}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        onChange={() => {
+          if (disabled) return;
+        }}
+        onKeyDown={(e) => {
+          const value = textareaRef.current?.value;
+          if (e.shiftKey) return;
+          if (e.key !== 'Enter') return;
+          else e.preventDefault();
+          if (!value) return;
+          if (value.length > maxLength) return;
+          if (isComposingRef.current) return;
+          if (disabled) return;
+          textareaRef.current!.value = '';
+          onSend?.(value);
+        }}
+        onCompositionStart={() => (isComposingRef.current = true)}
+        onCompositionEnd={() => (isComposingRef.current = false)}
+        aria-label={t('message-input-box')}
+      />
+      <div className={messageInputBox['message-input-length-text']}>
+        {textareaRef.current?.value.length}/{maxLength}
       </div>
-    );
-  },
-);
+    </div>
+  );
+});
 
 MessageInputBox.displayName = 'MessageInputBox';
 

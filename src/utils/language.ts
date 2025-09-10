@@ -1,21 +1,18 @@
 import { TFunction } from 'i18next';
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
 
-// Types
-import { Permission } from '@/types';
+const FREE_IP_API_URL = 'https://ipinfo.io/json';
 
-const FREE_IP_API_URL = process.env.NEXT_PUBLIC_FREE_IP_API_URL;
-
-export const getPermissionText = (t: TFunction<'translation', undefined>, permission: number): string => {
-  const permissionMap: Record<number, string> = {
-    [Permission.Guest]: t('guest'), // 1
-    [Permission.Member]: t('member'), // 2
-    [Permission.ChannelMod]: t('channel-mod'), // 3
-    [Permission.ChannelAdmin]: t('channel-admin'), // 4
-    [Permission.ServerAdmin]: t('server-admin'), // 5
-    [Permission.ServerOwner]: t('server-owner'), // 6
-    [Permission.Staff]: t('staff'), // 7
-    [Permission.Official]: t('official'), // 8
+export const getPermissionText = (t: TFunction<'translation', undefined>, permission: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8): string => {
+  const permissionMap: Record<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8, string> = {
+    1: t('guest'),
+    2: t('member'),
+    3: t('channel-mod'),
+    4: t('channel-admin'),
+    5: t('server-admin'),
+    6: t('server-owner'),
+    7: t('staff'),
+    8: t('super-admin'),
   };
   return permissionMap[permission] || t('unknown-user');
 };
@@ -41,8 +38,8 @@ export const getFormatTimeDiff = (t: TFunction<'translation', undefined>, timest
       const count = Math.floor(absDiff / interval.seconds);
       if (count >= 1) {
         const label = interval.label;
-        const timesAgo = t('ago', { '0': `${count}${label}` });
-        const timesFuture = t('future', { '0': `${count}${label}` });
+        const timesAgo = `${count}${label}${t('ago')}`;
+        const timesFuture = `${count}${label}${t('future')}`;
         return isFuture ? timesFuture : timesAgo;
       }
     }
@@ -75,21 +72,15 @@ export const getFormatTimestamp = (t: TFunction<'translation', undefined>, times
 
 export const getLangByIp = async (): Promise<LanguageKey> => {
   const response = await fetch(`${FREE_IP_API_URL}/json`);
-  if (!response.ok) return 'en';
+  if (!response.ok) return 'en-US';
 
   const data = await response.json();
 
   const lang: string | undefined = data.languages?.[0];
-  if (!lang) return 'en';
+  if (!lang) return 'en-US';
 
   const match = LANGUAGES.find(({ code }) => code.includes(lang));
-  if (!match) return 'en';
+  if (!match) return 'en-US';
 
   return match.code;
-};
-
-export const setupLanguage = async () => {
-  const language = localStorage.getItem('language') || (await getLangByIp());
-  localStorage.setItem('language', language);
-  i18n.changeLanguage(language);
 };
