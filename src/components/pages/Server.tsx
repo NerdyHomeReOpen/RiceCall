@@ -22,7 +22,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import ipc from '@/services/ipc.service';
 
 // Utils
-import { isMember, isChannelAdmin, isChannelMod } from '@/utils/permission';
+import { isMember, isChannelMod } from '@/utils/permission';
 
 interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
@@ -141,7 +141,7 @@ interface ServerPageProps {
   serverChannels: Channel[];
   queueMembers: QueueMember[];
   channel: Channel;
-  channelMessages: ChannelMessage[];
+  channelMessages: (ChannelMessage | PromptMessage)[];
   actionMessages: PromptMessage[];
   display: boolean;
 }
@@ -153,13 +153,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const contextMenu = useContextMenu();
 
   // Refs
-  const webRTCRef = useRef(webRTC);
   const isResizingSidebarRef = useRef<boolean>(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isResizingAnnAreaRef = useRef<boolean>(false);
   const annAreaRef = useRef<HTMLDivElement>(null);
   const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
-  const isMicTakenRef = useRef<boolean>(false);
 
   // States
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
@@ -187,30 +185,30 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     isTextMuted: channelIsTextMuted,
     isVoiceMuted: channelIsVoiceMuted,
   } = channel;
-  const announcement = channelAnnouncement || serverAnnouncement;
-  const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
+  const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel), [globalPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
+  const queueMember = useMemo(() => queueMembers.find((m) => m.userId === userId), [queueMembers, userId]);
   const channelIsQueueMode = useMemo(() => channelVoiceMode === 'queue', [channelVoiceMode]);
-  const isMicTaken = useMemo(() => queueMembers.some((m) => m.position <= 0 && m.userId === userId), [queueMembers, userId]);
-  const isInQueue = useMemo(() => queueMembers.some((m) => m.position > 0 && m.userId === userId), [queueMembers, userId]);
+  const isSpeaking = useMemo(() => queueMembers.some((m) => m.userId === userId && m.position <= 0), [queueMembers, userId]);
+  const isQueuing = useMemo(() => queueMembers.some((m) => m.userId === userId && m.position > 0), [queueMembers, userId]);
+  const isQueueControlled = useMemo(() => queueMembers.some((m) => m.userId === userId && m.position === 0 && m.isQueueControlled), [queueMembers, userId]);
 
   const micText = useMemo(() => {
-    if (isMicTaken) return t('mic-taken');
-    if (isInQueue) return t('in-queue');
+    if (isSpeaking) return t('mic-taken');
+    if (isQueuing) return t('mic-queued');
     return t('take-mic');
-  }, [isMicTaken, isInQueue, t]);
+  }, [isSpeaking, isQueuing, t]);
 
   const micSubText = useMemo(() => {
-    if (!isMicTaken) return '';
-    if (speakMode === 'key') {
-      if (webRTC.isPressingSpeakKey) {
-        if (webRTC.micVolume === 0) return t('mic-muted');
-        return t('speaking');
-      }
+    if (!isSpeaking) return '';
+    if (isQueuing) return t('in-queue-position', { '0': queueMember?.position.toString() || '-' });
+    if (channelIsVoiceMuted) return t('mic-forbidden');
+    if (isQueueControlled) return t('mic-controlled');
+    if (speakMode === 'key' && !webRTC.isPressingSpeakKey) {
       return t('press-key-to-speak', { '0': speakHotKey });
     }
     if (webRTC.micVolume === 0) return t('mic-muted');
     return t('speaking');
-  }, [speakMode, speakHotKey, webRTC.isPressingSpeakKey, webRTC.micVolume, isMicTaken, t]);
+  }, [speakMode, speakHotKey, webRTC.isPressingSpeakKey, webRTC.micVolume, isSpeaking, isQueuing, channelIsVoiceMuted, isQueueControlled, queueMember, t]);
 
   // Handlers
   const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
@@ -252,7 +250,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   const handleClickMicButton = (e: React.MouseEvent<HTMLDivElement>) => {
     if (channelIsQueueMode) {
-      if (isMicTaken || isInQueue) {
+      if (isSpeaking || isQueuing) {
         const x = e.currentTarget.getBoundingClientRect().left;
         const y = e.currentTarget.getBoundingClientRect().top;
         contextMenu.showMicContextMenu(x, y, 'right-top', [
@@ -281,14 +279,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             id: 'take-mic-directly',
             label: t('take-mic-directly'),
             show: channelIsQueueMode,
-            onClick: () => handleJoinQueue(serverId, channelId, 0),
+            onClick: () => handleJoinQueue(serverId, channelId, -2),
           },
         ]);
       } else {
         handleJoinQueue(serverId, channelId);
       }
     } else {
-      if (isMicTaken) {
+      if (isSpeaking) {
         handleLeaveQueue(serverId, channelId);
       } else {
         handleJoinQueue(serverId, channelId);
@@ -326,8 +324,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   // Effects
   useEffect(() => {
-    webRTCRef.current.changeBitrate(channelBitrate);
-  }, [channelBitrate]);
+    webRTC.changeBitrate(channelBitrate);
+  }, [channelBitrate, webRTC]);
+
+  useEffect(() => {
+    webRTC.setIsMicTaken(isSpeaking && !isQueueControlled);
+  }, [isSpeaking, isQueueControlled, webRTC]);
 
   useEffect(() => {
     if (actionMessages.length === 0) {
@@ -344,13 +346,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
       }
     };
   }, [actionMessages]);
-
-  useEffect(() => {
-    if (isMicTaken !== isMicTakenRef.current) {
-      isMicTakenRef.current = isMicTaken;
-      webRTC.setIsMicTaken(isMicTaken);
-    }
-  }, [isMicTaken, webRTC]);
 
   useEffect(() => {
     if (channelId) {
@@ -413,7 +408,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
           <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
             {/* Announcement Area */}
             <div ref={annAreaRef} className={styles['announcement-area']}>
-              <MarkdownContent markdownText={announcement} escapeHtml={false} />
+              <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} escapeHtml={false} />
             </div>
 
             {/* Resize Handle */}
@@ -499,6 +494,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                         {
                           id: 'control-queue',
                           label: t('control-queue'),
+                          icon: isQueueControlled ? 'checked' : '',
                           disabled: channelVoiceMode !== 'queue',
                           onClick: () => handleControlQueue(serverId, channelId),
                         },
@@ -511,7 +507,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
             </div>
             <div
-              className={`${styles['mic-button']} ${isMicTaken ? styles['speaking'] : ''} ${isInQueue ? styles['queuing'] : ''} ${channelIsVoiceMuted ? styles['muted'] : ''} ${!channelIsQueueMode || (!isChannelMod(permissionLevel) && !isMicTaken) ? styles['no-selection'] : ''}`}
+              className={`${styles['mic-button']} ${isSpeaking ? styles['speaking'] : ''} ${isQueuing ? styles['queuing'] : ''} ${channelIsVoiceMuted || isQueueControlled ? styles['muted'] : ''} ${!channelIsQueueMode || (!isChannelMod(permissionLevel) && !isSpeaking) ? styles['no-selection'] : ''}`}
               onClick={handleClickMicButton}
             >
               <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />

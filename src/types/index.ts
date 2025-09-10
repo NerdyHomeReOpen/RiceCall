@@ -68,6 +68,7 @@ export type OnlineMember = table_members & table_users & table_channel_muted_use
 export type QueueMember = OnlineMember & {
   position: number;
   leftTime: number;
+  isQueueControlled: boolean;
 };
 
 export type Member = table_members & table_users & table_server_blocked_users & Permission;
