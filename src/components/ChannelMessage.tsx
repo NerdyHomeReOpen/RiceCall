@@ -32,7 +32,16 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   const { t } = useTranslation();
 
   // Destructuring
-  const { userId: senderUserId, name: senderName, vip: senderVip, gender: senderGender, permissionLevel: senderPermissionLevel, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
+  const {
+    userId: senderUserId,
+    name: senderName,
+    nickname: senderNickname,
+    vip: senderVip,
+    gender: senderGender,
+    permissionLevel: senderPermissionLevel,
+    contents: messageContents,
+    timestamp: messageTimestamp,
+  } = messageGroup;
 
   // Memos
   const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
@@ -83,7 +92,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
               ]);
             }}
           >
-            {senderName}
+            {senderNickname || senderName}
           </div>
           <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
         </div>
