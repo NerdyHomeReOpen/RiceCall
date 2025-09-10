@@ -244,7 +244,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div className={styles['queue-list']}>
             {filteredQueueMembers.map((member) => (
-              <QueueMemberTab key={member.userId} user={user} queueMember={member} server={server} channel={channel} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+              <QueueMemberTab
+                key={member.userId}
+                user={user}
+                friends={friends}
+                queueMember={member}
+                server={server}
+                channel={channel}
+                selectedItemId={selectedItemId}
+                setSelectedItemId={setSelectedItemId}
+              />
             ))}
           </div>
           <div className={styles['saperator-2']} />
