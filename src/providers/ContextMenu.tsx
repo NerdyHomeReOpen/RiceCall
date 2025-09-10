@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, createContext, ReactNode } from 'react';
 
 // Types
-import type { ContextMenuItem, NotifyMenuItem, OnlineMember, Badge } from '@/types';
+import type { ContextMenuItem, NotifyMenuItem, OnlineMember, Badge, User } from '@/types';
 
 // Components
 import ContextMenu from '@/components/ContextMenu';
@@ -11,6 +11,7 @@ import UserInfoCard from '@/components/UserInfoCard';
 import BadgeInfoCard from '@/components/BadgeInfoCard';
 import EmojiPicker from '@/components/EmojiPicker';
 import ColorPicker from '@/components/ColorPicker';
+import StatusDropdown from '@/components/StatusDropdown';
 import EmbedLinkInput from '@/components/EmbedLinkInput';
 import UserTagInput from '@/components/UserTagInput';
 
@@ -22,6 +23,7 @@ interface ContextMenuContextType {
   showBadgeInfoCard: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Badge) => void;
   showEmojiPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onEmojiSelect: (code: string, full: string) => void) => void;
   showColorPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => void;
+  showStatusDropdown: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: User['status']) => void) => void;
   showEmbedLinkInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => void;
   showUserTagInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (username: string) => void) => void;
   closeContextMenu: () => void;
@@ -31,6 +33,7 @@ interface ContextMenuContextType {
   closeBadgeInfoCard: () => void;
   closeEmojiPicker: () => void;
   closeColorPicker: () => void;
+  closeStatusDropdown: () => void;
   closeEmbedLinkInput: () => void;
   closeUserTagInput: () => void;
 }
@@ -56,6 +59,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [isBadgeInfoVisible, setIsBadgeInfoVisible] = React.useState(false);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = React.useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = React.useState(false);
+  const [isStatusDropdownVisible, setIsStatusDropdownVisible] = React.useState(false);
   const [isEmbedLinkInputVisible, setIsEmbedLinkInputVisible] = React.useState(false);
   const [isUserTagInputVisible, setIsUserTagInputVisible] = React.useState(false);
 
@@ -67,6 +71,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [badgeInfo, setBadgeInfo] = React.useState<ReactNode | null>(null);
   const [emojiPicker, setEmojiPicker] = React.useState<ReactNode | null>(null);
   const [colorPicker, setColorPicker] = React.useState<ReactNode | null>(null);
+  const [statusDropdown, setStatusDropdown] = React.useState<ReactNode | null>(null);
   const [embedLinkInput, setEmbedLinkInput] = React.useState<ReactNode | null>(null);
   const [userTagInput, setUserTagInput] = React.useState<ReactNode | null>(null);
 
@@ -141,6 +146,16 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsColorPickerVisible(false);
   };
 
+  const showStatusDropdown = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: User['status']) => void) => {
+    setStatusDropdown(<StatusDropdown onStatusSelect={onStatusSelect} onClose={closeStatusDropdown} x={x} y={y} direction={direction} />);
+    setIsStatusDropdownVisible(true);
+  };
+
+  const closeStatusDropdown = () => {
+    setStatusDropdown(null);
+    setIsStatusDropdownVisible(false);
+  };
+
   const showEmbedLinkInput = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => {
     setEmbedLinkInput(<EmbedLinkInput onSubmit={onSubmit} onClose={closeEmbedLinkInput} x={x} y={y} direction={direction} />);
     setIsEmbedLinkInputVisible(true);
@@ -179,6 +194,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         if (isEmojiPickerVisible) closeEmojiPicker();
         if (isNotifyMenuVisible) closeNotifyMenu();
         if (isColorPickerVisible) closeColorPicker();
+        if (isStatusDropdownVisible) closeStatusDropdown();
         if (isEmbedLinkInputVisible) closeEmbedLinkInput();
         if (isUserTagInputVisible) closeUserTagInput();
       }
@@ -197,6 +213,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     isUserInfoVisible,
     isNotifyMenuVisible,
     isColorPickerVisible,
+    isStatusDropdownVisible,
     isEmbedLinkInputVisible,
     isUserTagInputVisible,
   ]);
@@ -211,6 +228,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         showBadgeInfoCard,
         showEmojiPicker,
         showColorPicker,
+        showStatusDropdown,
         showEmbedLinkInput,
         showUserTagInput,
         closeContextMenu,
@@ -220,6 +238,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         closeBadgeInfoCard,
         closeEmojiPicker,
         closeColorPicker,
+        closeStatusDropdown,
         closeEmbedLinkInput,
         closeUserTagInput,
       }}
@@ -231,6 +250,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       {badgeInfo && badgeInfo}
       {isEmojiPickerVisible && emojiPicker}
       {isColorPickerVisible && colorPicker}
+      {isStatusDropdownVisible && statusDropdown}
       {isEmbedLinkInputVisible && embedLinkInput}
       {isUserTagInputVisible && userTagInput}
       {children}

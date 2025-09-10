@@ -74,7 +74,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
 
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
   // Variables
   const { userId, name: userName, status: userStatus } = user;
@@ -104,15 +103,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
       { id: 'server', label: serverName },
     ];
   }, [t, serverName]);
-
-  const statusOptions = useMemo<{ status: User['status']; label: string }[]>(() => {
-    return [
-      { status: 'online', label: t('online') },
-      { status: 'dnd', label: t('dnd') },
-      { status: 'idle', label: t('idle') },
-      { status: 'gn', label: t('gn') },
-    ];
-  }, [t]);
 
   // Handlers
   const handleLeaveServer = (serverId: Server['serverId']) => {
@@ -203,25 +193,16 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
         </div>
         <div
           className={header['status-box']}
-          onClick={() => {
-            setShowStatusDropdown((prev) => !prev);
+          onClick={(e) => {
+            const x = e.currentTarget.getBoundingClientRect().left;
+            const y = e.currentTarget.getBoundingClientRect().bottom;
+            contextMenu.showStatusDropdown(x, y, 'right-bottom', (status) => {
+              handleChangeStatus(status);
+            });
           }}
         >
           <div className={header['status-display']} datatype={userStatus} />
           <div className={header['status-triangle']} />
-          <div className={`${header['status-dropdown']} ${showStatusDropdown ? '' : header['hidden']}`}>
-            {statusOptions.map((option) => (
-              <div
-                key={option.status}
-                className={header['option']}
-                datatype={option.status}
-                onClick={() => {
-                  handleChangeStatus(option.status as User['status']);
-                  setShowStatusDropdown(false);
-                }}
-              />
-            ))}
-          </div>
         </div>
       </div>
 
