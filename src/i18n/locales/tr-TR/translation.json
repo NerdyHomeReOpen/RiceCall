@@ -86,6 +86,7 @@
   "close-to-tray-label": "Sistem çubuğu bildirim alanına gizle",
   "confirm": "Elbette",
   "confirm-block-user": "{{0}}'ı engellemek istediğinizden emin misiniz?",
+  "confirm-clear-queue": "確定要清空麥序嗎？",
   "confirm-delete-channel": "您確定要刪除頻道 {{0}} 嗎？",
   "confirm-delete-friend": "Arkadaşınızı silmek istediğinizden emin misiniz {{0}}?",
   "confirm-delete-friend-application": "確定要刪除好友請求嗎？",
