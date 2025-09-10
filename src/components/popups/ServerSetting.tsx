@@ -19,9 +19,9 @@ import api from '@/services/api.service';
 // Utils
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
-import { isMember, isServerAdmin } from '@/utils/permission';
+import { isMember, isServerAdmin, isServerOwner } from '@/utils/permission';
 
-//Components
+// Components
 import AnnouncementEditor from '../AnnouncementEditor';
 
 interface ServerSettingPopupProps {
@@ -457,6 +457,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       } = member;
                       const isUser = memberUserId === userId;
                       const isSuperior = permissionLevel > memberPermission;
+                      const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
                       return (
                         <tr
                           key={memberUserId}
@@ -485,10 +486,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                 label: t('edit-nickname'),
                                 show: isMember(permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
                                 onClick: () => handleOpenEditNickname(memberUserId, serverId),
-                              },
-                              {
-                                id: 'separator',
-                                label: '',
                               },
                               {
                                 id: 'separator',
@@ -530,20 +527,17 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                   {
                                     id: 'terminate-member',
                                     label: t('terminate-member'),
-                                    show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission),
+                                    show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission) && !isServerOwner(memberPermission),
                                     onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
                                   },
                                   {
-                                    id: 'set-member',
-                                    label: t('set-member'),
-                                    show: !isUser && isMember(memberPermission) && isSuperior && !isMember(memberPermission, false),
-                                    onClick: () => handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 }),
-                                  },
-                                  {
                                     id: 'set-server-admin',
-                                    label: t('set-server-admin'),
-                                    show: !isUser && isMember(memberPermission) && isSuperior && !isServerAdmin(memberPermission, false),
-                                    onClick: () => handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
+                                    label: isServerAdmin(memberPermission) ? t('unset-server-admin') : t('set-server-admin'),
+                                    show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerOwner(memberPermission),
+                                    onClick: () =>
+                                      isServerAdmin(memberPermission)
+                                        ? handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 })
+                                        : handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
                                   },
                                 ],
                               },

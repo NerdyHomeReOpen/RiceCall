@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -6,10 +6,11 @@ import setting from '@/styles/popups/setting.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import type { Channel, Member, Server, User } from '@/types';
+import type { Channel, Member, Server, User, Permission } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
+import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -18,36 +19,32 @@ import ipc from '@/services/ipc.service';
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
 // Utils
-import { isChannelMod } from '@/utils/permission';
-
-// Utils
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
-import { isMember, isServerAdmin } from '@/utils/permission';
-import { useContextMenu } from '@/providers/ContextMenu';
+import { isMember, isServerAdmin, isChannelMod, isServerOwner, isChannelAdmin } from '@/utils/permission';
 
 interface ChannelSettingPopupProps {
   userId: User['userId'];
   user: User;
   server: Server;
   channel: Channel;
-  members: Member[];
+  channelMembers: Member[];
 }
 
-const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ userId, user, server, channel: channelData, members }) => {
+const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ userId, user, server, channel: channelData, channelMembers: channelMembersData }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
 
   // States
   const [channel, setChannel] = useState<Channel>(channelData);
+  const [channelMembers, setChannelMembers] = useState<Member[]>(channelMembersData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [searchModeratorsText, setModeratorsSearchText] = useState('');
   const [sortDirection, setSortDirection] = useState<1 | -1>(-1);
   const [sortField, setSortField] = useState<string>('contribution');
+  const [searchText, setSearchText] = useState('');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
-  const [channelModerators, setChannelModerators] = useState<Member[]>(members.filter((m) => m.permissionLevel === 3 || m.permissionLevel === 4));
 
   // Destructuring
   const { permissionLevel: userPermissionLevel } = user;
@@ -70,10 +67,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     guestTextWaitTime: channelGuestTextWaitTime,
     guestTextGapTime: channelGuestTextGapTime,
     bitrate: channelBitrate,
+    permissionLevel: channelPermissionLevel,
+    categoryId: channelCategoryId,
   } = channel;
 
   // Memos
-  const permissionLevel = useMemo(() => Math.max(userPermissionLevel, serverPermissionLevel), [userPermissionLevel, serverPermissionLevel]);
+  const permissionLevel = useMemo(() => Math.max(userPermissionLevel, serverPermissionLevel, channelPermissionLevel), [userPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
   const isLobby = useMemo(() => serverLobbyId === channelId, [serverLobbyId, channelId]);
   const isReceptionLobby = useMemo(() => serverReceptionLobbyId === channelId, [serverReceptionLobbyId, channelId]);
   const canSubmit = useMemo(() => channelName.trim(), [channelName]);
@@ -95,15 +94,53 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   );
   const filteredModerators = useMemo(
     () =>
-      channelModerators
-        .filter((m) => isMember(m.permissionLevel) && (m.nickname?.toLowerCase().includes(searchModeratorsText.toLowerCase()) || m.name.toLowerCase().includes(searchModeratorsText.toLowerCase())))
+      channelMembers
+        .filter(
+          (m) =>
+            isChannelMod(m.permissionLevel) &&
+            !isServerAdmin(m.permissionLevel) &&
+            (m.nickname?.toLowerCase().includes(searchText.toLowerCase()) || m.name.toLowerCase().includes(searchText.toLowerCase())),
+        )
         .sort(Sorter(sortField as keyof Member, sortDirection)),
-    [channelModerators, searchModeratorsText, sortField, sortDirection],
+    [channelMembers, searchText, sortField, sortDirection],
   );
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
     ipc.socket.send('editChannel', { serverId, channelId, update });
+  };
+
+  const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
+    ipc.socket.send('editServerPermission', { userId, serverId, update });
+  };
+
+  const handleEditChannelPermission = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Permission>) => {
+    ipc.socket.send('editChannelPermission', { userId, serverId, channelId, update });
+  };
+
+  const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
+  };
+
+  const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
+    ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
+  };
+
+  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId']) => {
+    ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
+  };
+
+  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
+  };
+
+  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
+  };
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleClose = () => {
@@ -115,34 +152,39 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     setSortDirection((d) => (field === sortField ? (d === 1 ? -1 : 1) : -1));
   };
 
-  const handleModeratorsSort = (field: keyof Member) => {
+  const handleMemberSort = (field: keyof Member) => {
     handleSort(field);
   };
 
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
+  const handleServerChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
+    const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
+    setChannel((prev) => (update.has(`${prev.channelId}`) ? { ...prev, ...update.get(`${prev.channelId}`) } : prev));
   };
 
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
+  const handleServerMemberAdd = (...args: { data: Member }[]) => {
+    setChannelMembers((prev) => [...prev, ...args.map((i) => i.data)]);
   };
 
-  const handleRemoveModerator = (targetId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-remove-moderator', { '0': userName }), () => {
-      ipc.socket.send('editChannelPermission', {
-        userId: targetId,
-        serverId,
-        channelId,
-        update: { permissionLevel: 2 },
-      });
-      setChannelModerators((prev) => prev.filter((m) => !(m.userId === targetId && m.serverId === serverId)));
-    });
+  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
+    const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
+    setChannelMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
   };
 
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
+  const handleServerMemberRemove = (...args: { userId: string; serverId: string }[]) => {
+    const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
+    setChannelMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   };
+
+  // Effects
+  useEffect(() => {
+    const unsubscribe = [
+      ipc.socket.on('serverChannelUpdate', handleServerChannelUpdate),
+      ipc.socket.on('serverMemberAdd', handleServerMemberAdd),
+      ipc.socket.on('serverMemberUpdate', handleServerMemberUpdate),
+      ipc.socket.on('serverMemberRemove', handleServerMemberRemove),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, []);
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -449,17 +491,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
-              <div className={popup['label']}>{`${t('channel-management')} (${channelModerators.length})`}</div>
+              <div className={popup['label']}>{`${t('channel-management')} (${channelMembers.length})`}</div>
               <div className={setting['search-box']}>
                 <div className={setting['search-icon']}></div>
-                <input
-                  name="search-query"
-                  type="text"
-                  className={setting['search-input']}
-                  placeholder={t('search-placeholder')}
-                  value={searchModeratorsText}
-                  onChange={(e) => setModeratorsSearchText(e.target.value)}
-                />
+                <input name="search-query" type="text" className={setting['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
               </div>
             </div>
             <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -467,7 +502,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <thead>
                   <tr>
                     {memberTableFields.map((field) => (
-                      <th key={field.field} onClick={() => handleModeratorsSort(field.field as keyof Member)}>
+                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
                         {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '↑' : '↓') : ''}`}
                       </th>
                     ))}
@@ -486,6 +521,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     } = moderator;
                     const isUser = memberUserId === userId;
                     const isSuperior = permissionLevel > memberPermission;
+                    const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
                     return (
                       <tr
                         key={memberUserId}
@@ -510,10 +546,82 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                               onClick: () => handleOpenUserInfo(userId, memberUserId),
                             },
                             {
-                              id: 'remove-moderator',
-                              label: t('remove-moderator'),
+                              id: 'edit-nickname',
+                              label: t('edit-nickname'),
                               show: isMember(permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
-                              onClick: () => handleRemoveModerator(memberUserId, channelId, serverId, memberName),
+                              onClick: () => handleOpenEditNickname(memberUserId, serverId),
+                            },
+                            {
+                              id: 'separator',
+                              label: '',
+                            },
+                            {
+                              id: 'forbid-voice',
+                              label: t('forbid-voice'),
+                              show: !isUser && isMember(permissionLevel) && isSuperior,
+                              disabled: true,
+                              onClick: () => {},
+                            },
+                            {
+                              id: 'forbid-text',
+                              label: t('forbid-text'),
+                              show: !isUser && isMember(permissionLevel) && isSuperior,
+                              disabled: true,
+                              onClick: () => {},
+                            },
+                            {
+                              id: 'block',
+                              label: t('block'),
+                              show: !isUser && isMember(permissionLevel) && isSuperior,
+                              onClick: () => {
+                                handleOpenBlockMember(memberUserId, serverId);
+                              },
+                            },
+                            {
+                              id: 'separator',
+                              label: '',
+                            },
+                            {
+                              id: 'member-management',
+                              label: t('member-management'),
+                              show: !isUser && isMember(memberPermission) && isSuperior,
+                              icon: 'submenu',
+                              hasSubmenu: true,
+                              submenuItems: [
+                                {
+                                  id: 'terminate-member',
+                                  label: t('terminate-member'),
+                                  show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission) && !isServerOwner(memberPermission),
+                                  onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
+                                },
+                                {
+                                  id: 'set-channel-mod',
+                                  label: isChannelMod(memberPermission) ? t('unset-channel-mod') : t('set-channel-mod'),
+                                  show: canUpdatePermission && isChannelAdmin(permissionLevel) && !isChannelAdmin(memberPermission) && channelCategoryId !== null,
+                                  onClick: () =>
+                                    isChannelMod(memberPermission)
+                                      ? handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 2 })
+                                      : handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 3 }),
+                                },
+                                {
+                                  id: 'set-channel-admin',
+                                  label: isChannelAdmin(memberPermission) ? t('unset-channel-admin') : t('set-channel-admin'),
+                                  show: canUpdatePermission && isServerAdmin(permissionLevel) && !isServerAdmin(memberPermission),
+                                  onClick: () =>
+                                    isChannelAdmin(memberPermission)
+                                      ? handleEditChannelPermission(memberUserId, serverId, channelCategoryId || channelId, { permissionLevel: 2 })
+                                      : handleEditChannelPermission(memberUserId, serverId, channelCategoryId || channelId, { permissionLevel: 4 }),
+                                },
+                                {
+                                  id: 'set-server-admin',
+                                  label: isServerAdmin(memberPermission) ? t('unset-server-admin') : t('set-server-admin'),
+                                  show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerOwner(memberPermission),
+                                  onClick: () =>
+                                    isServerAdmin(memberPermission)
+                                      ? handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 })
+                                      : handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
+                                },
+                              ],
                             },
                           ]);
                         }}

@@ -144,9 +144,11 @@ const ipcService = {
         });
       } else if (type === 'channelSetting') {
         const { userId, serverId, channelId } = initialData;
-        Promise.all([data.user({ userId }), data.server({ userId, serverId }), data.channel({ userId, serverId, channelId }), data.channelMembers({ serverId, channelId })]).then(([user, server, channel, members]) => {
-          ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, user, server, channel, members }, force);
-        });
+        Promise.all([data.user({ userId }), data.server({ userId, serverId }), data.channel({ userId, serverId, channelId }), data.channelMembers({ serverId, channelId })]).then(
+          ([user, server, channel, channelMembers]) => {
+            ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, user, server, channel, channelMembers }, force);
+          },
+        );
       } else if (type === 'createServer') {
         const { userId } = initialData;
         Promise.all([data.user({ userId }), data.servers({ userId })]).then(([user, servers]) => {
