@@ -190,6 +190,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const channelIsQueueMode = useMemo(() => channelVoiceMode === 'queue', [channelVoiceMode]);
   const isSpeaking = useMemo(() => queueMembers.some((m) => m.userId === userId && m.position <= 0), [queueMembers, userId]);
   const isQueuing = useMemo(() => queueMembers.some((m) => m.userId === userId && m.position > 0), [queueMembers, userId]);
+  const isIdling = useMemo(() => !isSpeaking && !isQueuing, [isSpeaking, isQueuing]);
   const isQueueControlled = useMemo(() => queueMembers.some((m) => m.userId === userId && m.position === 0 && m.isQueueControlled), [queueMembers, userId]);
 
   const micText = useMemo(() => {
@@ -199,7 +200,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   }, [isSpeaking, isQueuing, t]);
 
   const micSubText = useMemo(() => {
-    if (!isSpeaking) return '';
+    if (isIdling) return '';
     if (isQueuing) return t('in-queue-position', { '0': queueMember?.position.toString() || '-' });
     if (channelIsVoiceMuted) return t('mic-forbidden');
     if (isQueueControlled) return t('mic-controlled');
@@ -208,7 +209,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     }
     if (webRTC.micVolume === 0) return t('mic-muted');
     return t('speaking');
-  }, [speakMode, speakHotKey, webRTC.isPressingSpeakKey, webRTC.micVolume, isSpeaking, isQueuing, channelIsVoiceMuted, isQueueControlled, queueMember, t]);
+  }, [speakMode, speakHotKey, webRTC.isPressingSpeakKey, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isQueueControlled, queueMember, t]);
 
   // Handlers
   const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
@@ -250,7 +251,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   const handleClickMicButton = (e: React.MouseEvent<HTMLDivElement>) => {
     if (channelIsQueueMode) {
-      if (isSpeaking || isQueuing) {
+      if (!isIdling) {
         const x = e.currentTarget.getBoundingClientRect().left;
         const y = e.currentTarget.getBoundingClientRect().top;
         contextMenu.showMicContextMenu(x, y, 'right-top', [
@@ -507,12 +508,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
             </div>
             <div
-              className={`${styles['mic-button']} ${isSpeaking ? styles['speaking'] : ''} ${isQueuing ? styles['queuing'] : ''} ${channelIsVoiceMuted || isQueueControlled ? styles['muted'] : ''} ${!channelIsQueueMode || (!isChannelMod(permissionLevel) && !isSpeaking) ? styles['no-selection'] : ''}`}
+              className={`${styles['mic-button']} ${isSpeaking ? styles['speaking'] : ''} ${isQueuing ? styles['queuing'] : ''} ${channelIsVoiceMuted || isQueueControlled ? styles['muted'] : ''} ${!channelIsQueueMode || (!isChannelMod(permissionLevel) && isIdling) ? styles['no-selection'] : ''}`}
               onClick={handleClickMicButton}
             >
               <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div className={styles['mic-text']}>{micText}</div>
+                <div className={styles['mic-text']} style={{ fontSize: isIdling ? '1.3rem' : '1.1rem' }}>
+                  {micText}
+                </div>
                 <div className={styles['mic-sub-text']}>{micSubText}</div>
               </div>
             </div>
