@@ -192,11 +192,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const channelIsQueueMode = useMemo(() => channelVoiceMode === 'queue', [channelVoiceMode]);
   const isMicTaken = useMemo(() => queueMembers.some((m) => m.position <= 0 && m.userId === userId), [queueMembers, userId]);
   const isInQueue = useMemo(() => queueMembers.some((m) => m.position > 0 && m.userId === userId), [queueMembers, userId]);
+
   const micText = useMemo(() => {
     if (isMicTaken) return t('mic-taken');
     if (isInQueue) return t('in-queue');
     return t('take-mic');
   }, [isMicTaken, isInQueue, t]);
+
   const micSubText = useMemo(() => {
     if (!isMicTaken) return '';
     if (speakMode === 'key') {
@@ -261,7 +263,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             onClick: () => handleLeaveQueue(serverId, channelId),
           },
         ]);
-      } else {
+      } else if (isChannelAdmin(permissionLevel)) {
         const x = e.currentTarget.getBoundingClientRect().left;
         const y = e.currentTarget.getBoundingClientRect().top;
         contextMenu.showMicContextMenu(x, y, 'right-top', [
@@ -282,6 +284,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             onClick: () => handleJoinQueue(serverId, channelId, 0),
           },
         ]);
+      } else {
+        handleJoinQueue(serverId, channelId);
       }
     } else {
       if (isMicTaken) {
@@ -507,7 +511,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
             </div>
             <div
-              className={`${styles['mic-button']} ${isMicTaken ? styles['speaking'] : ''} ${isInQueue ? styles['queuing'] : ''} ${channelIsVoiceMuted ? styles['muted'] : ''} ${!channelIsQueueMode ? styles['no-selection'] : ''}`}
+              className={`${styles['mic-button']} ${isMicTaken ? styles['speaking'] : ''} ${isInQueue ? styles['queuing'] : ''} ${channelIsVoiceMuted ? styles['muted'] : ''} ${channelIsQueueMode ? (isMicTaken || isInQueue || isChannelAdmin(permissionLevel) ? '' : styles['no-selection']) : styles['no-selection']}`}
               onClick={handleClickMicButton}
             >
               <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
