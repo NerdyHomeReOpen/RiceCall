@@ -23,6 +23,9 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
   // Hooks
   const { t } = useTranslation();
 
+  // Destructuring
+  const { name: badgeName, description: badgeDescription, iconUrl: badgeIconUrl, showTo: badgeShowTo } = badge;
+
   // States
   const [display, setDisplay] = useState(false);
   const [cardX, setCardX] = useState(x);
@@ -66,17 +69,16 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
     <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['badge-info-card']}`} style={display ? { top: cardY, left: cardX } : { opacity: 0 }}>
       <div className={styles['badge-info-wrapper']}>
         <div className={styles['badge-avatar-box']}>
-          <div className={styles['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
+          <div className={styles['badge-image']} style={{ backgroundImage: `url(${badgeIconUrl})` }} />
           {/* <div className={styles['badge-rarity-text']}>{`[${badge.rare}]`}</div> */}
         </div>
         <div className={styles['badge-description-box']}>
-          <div className={styles['badge-name']}>{badge.name}</div>
-          <div className={styles['badge-description']}>{badge.description}</div>
+          <div className={styles['badge-name']}>{t(`${badgeName}`)}</div>
+          <div className={styles['badge-description']}>{t(`${badgeDescription}`)}</div>
         </div>
       </div>
       <div className={styles['badge-show-time-box']}>
-        <div>{t('show-to')}:</div>
-        <div>1970-01-01</div>
+        <div>{`${t('show-to')}: ${badgeShowTo <= 0 ? t('permanent') : new Date(badgeShowTo).toLocaleDateString()}`}</div>
       </div>
     </div>
   );

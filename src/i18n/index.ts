@@ -69,6 +69,7 @@ import zhTW from './locales/zh-TW/translation.json';
 import zhTW_message from './locales/zh-TW/message.json';
 import zhTW_rpc from './locales/zh-TW/rpc.json';
 import zhTW_country from './locales/zh-TW/country.json';
+import zhTW_badge from './locales/zh-TW/badge.json';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
@@ -107,7 +108,7 @@ class CrowdinBackend {
         fallbackLng: 'zh-TW',
         supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'ja-JP', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
 
-        ns: ['translation', 'rpc', 'message', 'country'],
+        ns: ['translation', 'rpc', 'message', 'country', 'badge'],
         defaultNS: 'translation',
         fallbackNS: false,
 
@@ -119,7 +120,7 @@ class CrowdinBackend {
       fallbackLng: 'zh-TW',
       supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'ja-JP', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
 
-      ns: ['translation', 'rpc', 'message', 'country'],
+      ns: ['translation', 'rpc', 'message', 'country', 'badge'],
       defaultNS: 'translation',
       fallbackNS: false,
 
@@ -132,7 +133,7 @@ class CrowdinBackend {
         'ru-RU': { translation: ruRU, rpc: ruRU_rpc, message: ruRU_message, country: ruRU_country },
         'tr-TR': { translation: trTR, rpc: trTR_rpc, message: trTR_message, country: trTR_country },
         'zh-CN': { translation: zhCN, rpc: zhCN_rpc, message: zhCN_message, country: zhCN_country },
-        'zh-TW': { translation: zhTW, rpc: zhTW_rpc, message: zhTW_message, country: zhTW_country },
+        'zh-TW': { translation: zhTW, rpc: zhTW_rpc, message: zhTW_message, country: zhTW_country, badge: zhTW_badge },
       },
 
       interpolation: { escapeValue: false },
