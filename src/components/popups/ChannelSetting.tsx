@@ -3,9 +3,10 @@ import React, { useMemo, useState } from 'react';
 // CSS
 import popup from '@/styles/popup.module.css';
 import setting from '@/styles/popups/setting.module.css';
+import permission from '@/styles/permission.module.css';
 
 // Types
-import type { Channel, Server, User } from '@/types';
+import type { Channel, Member, Server, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -19,20 +20,34 @@ import AnnouncementEditor from '@/components/AnnouncementEditor';
 // Utils
 import { isChannelMod } from '@/utils/permission';
 
+// Utils
+import Sorter from '@/utils/sorter';
+import { getPermissionText } from '@/utils/language';
+import { isMember, isServerAdmin } from '@/utils/permission';
+import { useContextMenu } from '@/providers/ContextMenu';
+
 interface ChannelSettingPopupProps {
+  userId: User['userId'];
   user: User;
   server: Server;
   channel: Channel;
+  members: Member[];
 }
 
-const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ user, server, channel: channelData }) => {
+const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ userId, user, server, channel: channelData, members }) => {
   // Hooks
   const { t } = useTranslation();
+  const contextMenu = useContextMenu();
 
   // States
   const [channel, setChannel] = useState<Channel>(channelData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [searchModeratorsText, setModeratorsSearchText] = useState('');
+  const [sortDirection, setSortDirection] = useState<1 | -1>(-1);
+  const [sortField, setSortField] = useState<string>('contribution');
+  const [selectedItemId, setSelectedItemId] = useState<string>('');
+  const [channelModerators, setChannelModerators] = useState<Member[]>(members.filter((m) => m.permissionLevel === 3 || m.permissionLevel === 4));
 
   // Destructuring
   const { permissionLevel: userPermissionLevel } = user;
@@ -69,6 +84,22 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         : [t('channel-info'), t('channel-announcement'), t('access-permission'), t('speaking-permission'), t('text-permission')],
     [t, permissionLevel],
   );
+  const memberTableFields = useMemo(
+    () => [
+      { name: t('name'), field: 'name' },
+      { name: t('permission'), field: 'permissionLevel' },
+      { name: t('contribution'), field: 'contribution' },
+      { name: t('join-date'), field: 'createdAt' },
+    ],
+    [t],
+  );
+  const filteredModerators = useMemo(
+    () =>
+      channelModerators
+        .filter((m) => isMember(m.permissionLevel) && (m.nickname?.toLowerCase().includes(searchModeratorsText.toLowerCase()) || m.name.toLowerCase().includes(searchModeratorsText.toLowerCase())))
+        .sort(Sorter(sortField as keyof Member, sortDirection)),
+    [channelModerators, searchModeratorsText, sortField, sortDirection],
+  );
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
@@ -77,6 +108,40 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   const handleClose = () => {
     ipc.window.close();
+  };
+
+  const handleSort = <T extends Member>(field: keyof T) => {
+    setSortField(String(field));
+    setSortDirection((d) => (field === sortField ? (d === 1 ? -1 : 1) : -1));
+  };
+
+  const handleModeratorsSort = (field: keyof Member) => {
+    handleSort(field);
+  };
+
+  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
+  };
+
+  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
+    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
+  };
+
+  const handleRemoveModerator = (targetId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
+    handleOpenAlertDialog(t('confirm-remove-moderator', { '0': userName }), () => {
+      ipc.socket.send('editChannelPermission', {
+        userId: targetId,
+        serverId,
+        channelId,
+        update: { permissionLevel: 2 },
+      });
+      setChannelModerators((prev) => prev.filter((m) => !(m.userId === targetId && m.serverId === serverId)));
+    });
+  };
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   return (
@@ -383,8 +448,89 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         {/* Channel Management */}
         <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
-            <div className={popup['header']}>
-              <div className={popup['label']}>{t('channel-management') + t('soon')}</div>
+            <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
+              <div className={popup['label']}>{`${t('channel-management')} (${channelModerators.length})`}</div>
+              <div className={setting['search-box']}>
+                <div className={setting['search-icon']}></div>
+                <input
+                  name="search-query"
+                  type="text"
+                  className={setting['search-input']}
+                  placeholder={t('search-placeholder')}
+                  value={searchModeratorsText}
+                  onChange={(e) => setModeratorsSearchText(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
+              <table style={{ height: '330px' }}>
+                <thead>
+                  <tr>
+                    {memberTableFields.map((field) => (
+                      <th key={field.field} onClick={() => handleModeratorsSort(field.field as keyof Member)}>
+                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '↑' : '↓') : ''}`}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className={setting['table-container']}>
+                  {filteredModerators.map((moderator) => {
+                    const {
+                      userId: memberUserId,
+                      name: memberName,
+                      nickname: memberNickname,
+                      gender: memberGender,
+                      permissionLevel: memberPermission,
+                      contribution: memberContribution,
+                      createdAt: memberJoinDate,
+                    } = moderator;
+                    const isUser = memberUserId === userId;
+                    const isSuperior = permissionLevel > memberPermission;
+                    return (
+                      <tr
+                        key={memberUserId}
+                        className={`${selectedItemId === `member-${memberUserId}` ? popup['selected'] : ''}`}
+                        onClick={() => {
+                          if (selectedItemId === `member-${memberUserId}`) setSelectedItemId('');
+                          else setSelectedItemId(`member-${memberUserId}`);
+                        }}
+                        onContextMenu={(e) => {
+                          const x = e.clientX;
+                          const y = e.clientY;
+                          contextMenu.showContextMenu(x, y, 'right-bottom', [
+                            {
+                              id: 'direct-message',
+                              label: t('direct-message'),
+                              show: !isUser,
+                              onClick: () => handleOpenDirectMessage(userId, memberUserId),
+                            },
+                            {
+                              id: 'view-profile',
+                              label: t('view-profile'),
+                              onClick: () => handleOpenUserInfo(userId, memberUserId),
+                            },
+                            {
+                              id: 'remove-moderator',
+                              label: t('remove-moderator'),
+                              show: isMember(permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
+                              onClick: () => handleRemoveModerator(memberUserId, channelId, serverId, memberName),
+                            },
+                          ]);
+                        }}
+                      >
+                        <td>
+                          <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
+                          <div className={`${popup['name']} ${memberNickname ? popup['highlight'] : ''}`}>{memberNickname || memberName}</div>
+                        </td>
+                        <td>{getPermissionText(t, memberPermission)}</td>
+                        <td>{memberContribution}</td>
+                        <td>{new Date(memberJoinDate).toISOString().slice(0, 10)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <div className={setting['note-text']}>{t('right-click-to-process')}</div>
             </div>
           </div>
         </div>
