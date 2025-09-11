@@ -391,10 +391,11 @@
 
 .badge-viewer {
   display: flex;
-  gap: 2px;
   align-items: center;
-  border: 1px solid #d7d7d7;
+  min-height: 30px;
+  gap: 2px;
   padding: 2px;
+  border: 1px solid #d7d7d7;
   background: #e8e8eb;
 }
 
