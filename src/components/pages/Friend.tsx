@@ -58,12 +58,18 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
     sidebarRef.current.style.width = `${e.clientX}px`;
   };
 
-  const handleSidebarHandleUp = () => (isResizingSidebarRef.current = false);
-
   // Effects
   useEffect(() => {
     signatureInputRef.current!.value = userSignature;
   }, [userSignature]);
+
+  useEffect(() => {
+    const resetResizing = () => {
+      isResizingSidebarRef.current = false;
+    };
+    document.addEventListener('pointerup', resetResizing);
+    return () => document.removeEventListener('pointerup', resetResizing);
+  }, []);
 
   return (
     <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
@@ -122,7 +128,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         </aside>
 
         {/* Resize Handle */}
-        <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} onPointerUp={handleSidebarHandleUp} />
+        <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
 
         {/* Right Content */}
         <main className={friendPage['content']}>

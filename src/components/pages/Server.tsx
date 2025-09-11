@@ -305,8 +305,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     sidebarRef.current.style.width = `${e.clientX}px`;
   };
 
-  const handleSidebarHandleUp = () => (isResizingSidebarRef.current = false);
-
   const handleAnnAreaHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isResizingAnnAreaRef.current = true;
@@ -320,8 +318,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
       annAreaRef.current.style.width = `${e.clientX - annAreaRef.current.offsetLeft}px`;
     }
   };
-
-  const handleAnnAreaHandleUp = () => (isResizingAnnAreaRef.current = false);
 
   // Effects
   useEffect(() => {
@@ -354,6 +350,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
       setLastMessageTime(0);
     }
   }, [channelId]);
+
+  useEffect(() => {
+    const resetResizing = () => {
+      isResizingSidebarRef.current = false;
+      isResizingAnnAreaRef.current = false;
+    };
+    document.addEventListener('pointerup', resetResizing);
+    return () => document.removeEventListener('pointerup', resetResizing);
+  }, []);
 
   useEffect(() => {
     if (channelUIMode === 'classic') {
@@ -401,7 +406,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
         </aside>
 
         {/* Resize Handle */}
-        <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} onPointerUp={handleSidebarHandleUp} />
+        <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
 
         {/* Right Content */}
         <main className={styles['content']}>
@@ -413,20 +418,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             </div>
 
             {/* Resize Handle */}
-            <div
-              className="resize-handle-vertical"
-              style={channelUIMode === 'classic' ? {} : { display: 'none' }}
-              onPointerDown={handleAnnAreaHandleDown}
-              onPointerMove={handleAnnAreaHandleMove}
-              onPointerUp={handleAnnAreaHandleUp}
-            />
-            <div
-              className="resize-handle"
-              style={channelUIMode === 'three-line' ? {} : { display: 'none' }}
-              onPointerDown={handleAnnAreaHandleDown}
-              onPointerMove={handleAnnAreaHandleMove}
-              onPointerUp={handleAnnAreaHandleUp}
-            />
+            <div className="resize-handle-vertical" style={channelUIMode === 'classic' ? {} : { display: 'none' }} onPointerDown={handleAnnAreaHandleDown} onPointerMove={handleAnnAreaHandleMove} />
+            <div className="resize-handle" style={channelUIMode === 'three-line' ? {} : { display: 'none' }} onPointerDown={handleAnnAreaHandleDown} onPointerMove={handleAnnAreaHandleMove} />
 
             {/* Bottom Area */}
             <div className={styles['bottom-area']}>
