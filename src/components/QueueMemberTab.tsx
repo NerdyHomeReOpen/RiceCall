@@ -185,7 +185,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
           {
             id: 'move-up-queue',
             label: t('move-up-queue'),
-            show: memberPosition > 0 && isChannelMod(permissionLevel),
+            show: memberPosition > 1 && isChannelMod(permissionLevel),
             onClick: () => handleMoveUserQueuePositionUp(memberUserId, serverId, channelId, memberPosition - 1),
           },
           {
