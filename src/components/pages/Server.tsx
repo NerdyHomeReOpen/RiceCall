@@ -495,7 +495,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                         {
                           id: 'control-queue',
                           label: t('control-queue'),
-                          icon: isQueueControlled ? 'checked' : '',
+                          icon: queueMembers.some((m) => m.isQueueControlled) ? 'checked' : '',
                           disabled: channelVoiceMode !== 'queue',
                           onClick: () => handleControlQueue(serverId, channelId),
                         },
