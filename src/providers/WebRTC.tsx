@@ -243,10 +243,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         speakerRef.current.play().catch((err) => {
           console.warn('Autoplay failed, user gesture needed:', err);
         });
-        stream.getAudioTracks().forEach((track) => {
-          track.enabled = false;
-          track.enabled = true;
-        });
       }
 
       // Initialize analyser
