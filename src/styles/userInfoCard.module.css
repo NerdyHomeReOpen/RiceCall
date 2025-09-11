@@ -84,7 +84,6 @@
   justify-content: space-between;
   overflow: hidden;
   padding-left: 10px;
-  gap: 4px;
 }
 
 .bottom {
@@ -200,10 +199,4 @@
   background-color: #f6b03b;
   border-radius: 2px;
   height: 100%;
-}
-
-.xp-text {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
 }

@@ -104,24 +104,22 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
 
           {/* Right Info */}
           <div className={styles['user-info-wrapper']}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
-              <div className={`${styles['name-text']} ${memberVip > 0 && vip['vip-name-color']}`}>{memberName}</div>
-              <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
-            </div>
-            <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className={`${styles['name-text']} ${memberVip > 0 && vip['vip-name-color']}`}>{memberName}</div>
+                <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
+              </div>
 
-            {/* VIP Info Text */}
-            {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
+              {/* VIP Info Text */}
+              <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
+              {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
+            </div>
 
             {/* Xp Info */}
             <div className={styles['xp-wrapper']}>
-              <div className={styles['level-text']}>{`${t('level')} ${memberLevel} `}</div>
+              <div className={styles['level-text']}>{`${t('level')} ${memberLevel} (${memberXp}/${memberRequiredXp})`}</div>
               <div className={styles['xp-progress-container']}>
                 <div className={styles['xp-progress']} style={{ width: `${(memberXp / memberRequiredXp) * 100}%` }} />
-              </div>
-              <div className={styles['xp-text']}>
-                <div>{memberXp}</div>
-                <div>{memberRequiredXp}</div>
               </div>
             </div>
           </div>
