@@ -31,7 +31,104 @@ let tray: Tray | null = null;
 let isLogin: boolean = false;
 
 // Store
-const store = new Store<Record<string, any>>();
+type StoreType = {
+  accounts: Record<string, any>;
+  language: string;
+  customThemes: Record<string, any>[];
+  currentTheme: string;
+  autoLogin: boolean;
+  autoLaunch: boolean;
+  alwaysOnTop: boolean;
+  closeToTray: boolean;
+  statusAutoIdle: boolean;
+  statusAutoIdleMinutes: number;
+  statusAutoDnd: boolean;
+  channelUIMode: string;
+  dontShowDisclaimer: boolean;
+  font: string;
+  fontSize: number;
+  inputAudioDevice: string;
+  outputAudioDevice: string;
+  mixEffect: boolean;
+  mixEffectType: string;
+  autoMixSetting: boolean;
+  echoCancellation: boolean;
+  noiseCancellation: boolean;
+  microphoneAmplification: boolean;
+  manualMixMode: boolean;
+  mixMode: string;
+  speakingMode: string;
+  defaultSpeakingKey: string;
+  notSaveMessageHistory: boolean;
+  hotKeyOpenMainWindow: string;
+  hotKeyScreenshot: string;
+  hotKeyIncreaseVolume: string;
+  hotKeyDecreaseVolume: string;
+  hotKeyToggleSpeaker: string;
+  hotKeyToggleMicrophone: string;
+  disableAllSoundEffect: boolean;
+  enterVoiceChannelSound: boolean;
+  leaveVoiceChannelSound: boolean;
+  startSpeakingSound: boolean;
+  stopSpeakingSound: boolean;
+  receiveDirectMessageSound: boolean;
+  receiveChannelMessageSound: boolean;
+};
+
+const store = new Store<StoreType>({
+  defaults: {
+    // Accounts
+    accounts: {},
+    // Language
+    language: 'zh-TW',
+    // Custom Themes
+    customThemes: [],
+    currentTheme: '',
+    // Basic settings
+    autoLogin: false,
+    autoLaunch: false,
+    alwaysOnTop: false,
+    closeToTray: false,
+    statusAutoIdle: false,
+    statusAutoIdleMinutes: 10,
+    statusAutoDnd: false,
+    channelUIMode: 'classic',
+    dontShowDisclaimer: false,
+    font: '',
+    fontSize: 13,
+    // Mix settings
+    inputAudioDevice: '',
+    outputAudioDevice: '',
+    mixEffect: false,
+    mixEffectType: '',
+    autoMixSetting: false,
+    echoCancellation: false,
+    noiseCancellation: false,
+    microphoneAmplification: false,
+    manualMixMode: false,
+    mixMode: 'all',
+    // Voice settings
+    speakingMode: 'key',
+    defaultSpeakingKey: 'v',
+    // Privacy settings
+    notSaveMessageHistory: true,
+    // Hotkeys Settings
+    hotKeyOpenMainWindow: 'F1',
+    hotKeyScreenshot: '',
+    hotKeyIncreaseVolume: 'Ctrl+m',
+    hotKeyDecreaseVolume: 'Shift+m',
+    hotKeyToggleSpeaker: 'Alt+m',
+    hotKeyToggleMicrophone: 'Alt+v',
+    // SoundEffect settings
+    disableAllSoundEffect: false,
+    enterVoiceChannelSound: true,
+    leaveVoiceChannelSound: true,
+    startSpeakingSound: true,
+    stopSpeakingSound: true,
+    receiveDirectMessageSound: true,
+    receiveChannelMessageSound: true,
+  },
+});
 
 // Event
 const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
@@ -871,11 +968,11 @@ app.on('ready', async () => {
 
   // Accounts handlers
   ipcMain.on('get-accounts', (event) => {
-    event.returnValue = store.get('accounts') ?? {};
+    event.returnValue = store.get('accounts');
   });
 
   ipcMain.on('add-account', (_, account: string, data: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
-    const accounts = store.get('accounts') ?? {};
+    const accounts = store.get('accounts');
     accounts[account] = data;
     store.set('accounts', accounts);
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -884,7 +981,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('delete-account', (_, account: string) => {
-    const accounts = store.get('accounts') ?? {};
+    const accounts = store.get('accounts');
     delete accounts[account];
     store.set('accounts', accounts);
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -915,7 +1012,7 @@ app.on('ready', async () => {
 
   // Language handlers
   ipcMain.on('get-language', (event) => {
-    event.returnValue = store.get('language') || 'zh-TW';
+    event.returnValue = store.get('language');
   });
 
   ipcMain.on('set-language', (_, language) => {
@@ -927,12 +1024,12 @@ app.on('ready', async () => {
 
   // Custom themes handlers
   ipcMain.on('get-custom-themes', (event) => {
-    const customThemes = store.get('customThemes') || [];
+    const customThemes = store.get('customThemes');
     event.returnValue = Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {});
   });
 
   ipcMain.on('add-custom-theme', (_, theme) => {
-    const customThemes = store.get('customThemes') || [];
+    const customThemes = store.get('customThemes');
     // Keep total 7 themes
     customThemes.unshift(theme);
     store.set('customThemes', customThemes);
@@ -945,7 +1042,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('delete-custom-theme', (_, index) => {
-    const customThemes = store.get('customThemes') || [];
+    const customThemes = store.get('customThemes');
     // Keep total 7 themes
     customThemes.splice(index, 1);
     store.set('customThemes', customThemes);
@@ -958,7 +1055,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-current-theme', (event) => {
-    event.returnValue = store.get('currentTheme') || null;
+    event.returnValue = store.get('currentTheme');
   });
 
   ipcMain.on('set-current-theme', (_, theme) => {
@@ -969,8 +1066,8 @@ app.on('ready', async () => {
   });
 
   // Popup handlers
-  ipcMain.on('open-popup', (_, type, id, data, force = true) => {
-    createPopup(type, id, data, force).then((popup) => popup.show());
+  ipcMain.on('open-popup', (_, type, id, data?, force = true) => {
+    createPopup(type, id, data ?? {}, force).then((popup) => popup.show());
   });
 
   ipcMain.on('close-popup', (_, id) => {
@@ -1035,55 +1132,55 @@ app.on('ready', async () => {
   ipcMain.on('get-system-settings', (event) => {
     const settings = {
       // Basic settings
-      autoLogin: store.get('autoLogin') ?? false,
+      autoLogin: store.get('autoLogin'),
       autoLaunch: isAutoLaunchEnabled(),
-      alwaysOnTop: store.get('alwaysOnTop') ?? false,
-      statusAutoIdle: store.get('statusAutoIdle') ?? false,
-      statusAutoIdleMinutes: store.get('statusAutoIdleMinutes') || 10,
-      statusAutoDnd: store.get('statusAutoDnd') ?? false,
-      channelUIMode: store.get('channelUIMode') || 'classic',
-      closeToTray: store.get('closeToTray') ?? false,
-      dontShowDisclaimer: store.get('dontShowDisclaimer') ?? false,
-      font: store.get('font') || '',
-      fontSize: store.get('fontSize') || 13,
+      alwaysOnTop: store.get('alwaysOnTop'),
+      statusAutoIdle: store.get('statusAutoIdle'),
+      statusAutoIdleMinutes: store.get('statusAutoIdleMinutes'),
+      statusAutoDnd: store.get('statusAutoDnd'),
+      channelUIMode: store.get('channelUIMode'),
+      closeToTray: store.get('closeToTray'),
+      dontShowDisclaimer: store.get('dontShowDisclaimer'),
+      font: store.get('font'),
+      fontSize: store.get('fontSize'),
       // Mix settings
-      inputAudioDevice: store.get('audioInputDevice') || '',
-      outputAudioDevice: store.get('audioOutputDevice') || '',
-      mixEffect: store.get('mixEffect') ?? false,
-      mixEffectType: store.get('mixEffectType') || '',
-      autoMixSetting: store.get('autoMixSetting') ?? false,
-      echoCancellation: store.get('echoCancellation') ?? false,
-      noiseCancellation: store.get('noiseCancellation') ?? false,
-      microphoneAmplification: store.get('microphoneAmplification') ?? false,
-      manualMixMode: store.get('manualMixMode') ?? false,
-      mixMode: store.get('mixMode') || 'all',
+      inputAudioDevice: store.get('audioInputDevice'),
+      outputAudioDevice: store.get('audioOutputDevice'),
+      mixEffect: store.get('mixEffect'),
+      mixEffectType: store.get('mixEffectType'),
+      autoMixSetting: store.get('autoMixSetting'),
+      echoCancellation: store.get('echoCancellation'),
+      noiseCancellation: store.get('noiseCancellation'),
+      microphoneAmplification: store.get('microphoneAmplification'),
+      manualMixMode: store.get('manualMixMode'),
+      mixMode: store.get('mixMode'),
       // Voice settings
-      speakingMode: store.get('speakingMode') || 'key',
-      defaultSpeakingKey: store.get('defaultSpeakingKey') || 'v',
+      speakingMode: store.get('speakingMode'),
+      defaultSpeakingKey: store.get('defaultSpeakingKey'),
       // Privacy settings
-      notSaveMessageHistory: store.get('notSaveMessageHistory') ?? true,
+      notSaveMessageHistory: store.get('notSaveMessageHistory'),
       // Hotkeys Settings
-      hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow') || 'F1',
-      hotKeyScreenshot: store.get('hotKeyScreenshot') || '',
-      hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume') || 'Ctrl+m',
-      hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume') || 'Shift+m',
-      hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker') || 'Alt+m',
-      hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone') || 'Alt+v',
+      hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow'),
+      hotKeyScreenshot: store.get('hotKeyScreenshot'),
+      hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume'),
+      hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume'),
+      hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker'),
+      hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone'),
       // SoundEffect settings
-      disableAllSoundEffect: store.get('disableAllSoundEffect') ?? false,
-      enterVoiceChannelSound: store.get('enterVoiceChannelSound') ?? true,
-      leaveVoiceChannelSound: store.get('leaveVoiceChannelSound') ?? true,
-      startSpeakingSound: store.get('startSpeakingSound') ?? true,
-      stopSpeakingSound: store.get('stopSpeakingSound') ?? true,
-      receiveDirectMessageSound: store.get('receiveDirectMessageSound') ?? true,
-      receiveChannelMessageSound: store.get('receiveChannelMessageSound') ?? true,
+      disableAllSoundEffect: store.get('disableAllSoundEffect'),
+      enterVoiceChannelSound: store.get('enterVoiceChannelSound'),
+      leaveVoiceChannelSound: store.get('leaveVoiceChannelSound'),
+      startSpeakingSound: store.get('startSpeakingSound'),
+      stopSpeakingSound: store.get('stopSpeakingSound'),
+      receiveDirectMessageSound: store.get('receiveDirectMessageSound'),
+      receiveChannelMessageSound: store.get('receiveChannelMessageSound'),
     };
     event.returnValue = settings;
   });
 
   // Basic
   ipcMain.on('get-auto-login', (event) => {
-    event.returnValue = store.get('autoLogin') ?? false;
+    event.returnValue = store.get('autoLogin');
   });
 
   ipcMain.on('get-auto-launch', (event) => {
@@ -1091,35 +1188,35 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-always-on-top', (event) => {
-    event.returnValue = store.get('alwaysOnTop') ?? false;
+    event.returnValue = store.get('alwaysOnTop');
   });
 
   ipcMain.on('get-status-auto-idle', (event) => {
-    event.returnValue = store.get('statusAutoIdle') ?? false;
+    event.returnValue = store.get('statusAutoIdle');
   });
 
   ipcMain.on('get-status-auto-idle-minutes', (event) => {
-    event.returnValue = store.get('statusAutoIdleMinutes') || 10;
+    event.returnValue = store.get('statusAutoIdleMinutes');
   });
 
   ipcMain.on('get-status-auto-dnd', (event) => {
-    event.returnValue = store.get('statusAutoDnd') ?? false;
+    event.returnValue = store.get('statusAutoDnd');
   });
 
   ipcMain.on('get-channel-ui-mode', (event) => {
-    event.returnValue = store.get('channelUIMode') || 'classic';
+    event.returnValue = store.get('channelUIMode');
   });
 
   ipcMain.on('get-close-to-tray', (event) => {
-    event.returnValue = store.get('closeToTray') ?? false;
+    event.returnValue = store.get('closeToTray');
   });
 
   ipcMain.on('get-font', (event) => {
-    event.returnValue = store.get('font') || 'Arial';
+    event.returnValue = store.get('font');
   });
 
   ipcMain.on('get-font-size', (event) => {
-    event.returnValue = store.get('fontSize') || 13;
+    event.returnValue = store.get('fontSize');
   });
 
   ipcMain.on('get-font-list', async (event) => {
@@ -1129,112 +1226,112 @@ app.on('ready', async () => {
 
   // Mix
   ipcMain.on('get-input-audio-device', (event) => {
-    event.returnValue = store.get('audioInputDevice') || '';
+    event.returnValue = store.get('audioInputDevice');
   });
 
   ipcMain.on('get-output-audio-device', (event) => {
-    event.returnValue = store.get('audioOutputDevice') || '';
+    event.returnValue = store.get('audioOutputDevice');
   });
 
   ipcMain.on('get-mix-effect', (event) => {
-    event.returnValue = store.get('mixEffect') ?? false;
+    event.returnValue = store.get('mixEffect');
   });
 
   ipcMain.on('get-mix-effect-type', (event) => {
-    event.returnValue = store.get('mixEffectType') || '';
+    event.returnValue = store.get('mixEffectType');
   });
 
   ipcMain.on('get-auto-mix-setting', (event) => {
-    event.returnValue = store.get('autoMixSetting') ?? false;
+    event.returnValue = store.get('autoMixSetting');
   });
 
   ipcMain.on('get-echo-cancellation', (event) => {
-    event.returnValue = store.get('echoCancellation') ?? false;
+    event.returnValue = store.get('echoCancellation');
   });
 
   ipcMain.on('get-noise-cancellation', (event) => {
-    event.returnValue = store.get('noiseCancellation') ?? false;
+    event.returnValue = store.get('noiseCancellation');
   });
 
   ipcMain.on('get-microphone-amplification', (event) => {
-    event.returnValue = store.get('microphoneAmplification') ?? false;
+    event.returnValue = store.get('microphoneAmplification');
   });
 
   ipcMain.on('get-manual-mix-mode', (event) => {
-    event.returnValue = store.get('manualMixMode') ?? false;
+    event.returnValue = store.get('manualMixMode');
   });
 
   ipcMain.on('get-mix-mode', (event) => {
-    event.returnValue = store.get('mixMode') || 'all';
+    event.returnValue = store.get('mixMode');
   });
 
   // Voice
   ipcMain.on('get-speaking-mode', (event) => {
-    event.returnValue = store.get('speakingMode') || 'key';
+    event.returnValue = store.get('speakingMode');
   });
 
   ipcMain.on('get-default-speaking-key', (event) => {
-    event.returnValue = store.get('defaultSpeakingKey') || 'v';
+    event.returnValue = store.get('defaultSpeakingKey');
   });
 
   // Privacy
   ipcMain.on('get-not-save-message-history', (event) => {
-    event.returnValue = store.get('notSaveMessageHistory') ?? true;
+    event.returnValue = store.get('notSaveMessageHistory');
   });
 
   // HotKey
   ipcMain.on('get-hot-key-open-main-window', (event) => {
-    event.returnValue = store.get('hotKeyOpenMainWindow') || 'F1';
+    event.returnValue = store.get('hotKeyOpenMainWindow');
   });
 
   ipcMain.on('get-hot-key-increase-volume', (event) => {
-    event.returnValue = store.get('hotKeyIncreaseVolume') || 'Ctrl+m';
+    event.returnValue = store.get('hotKeyIncreaseVolume');
   });
 
   ipcMain.on('get-hot-key-decrease-volume', (event) => {
-    event.returnValue = store.get('hotKeyDecreaseVolume') || 'Shift+m';
+    event.returnValue = store.get('hotKeyDecreaseVolume');
   });
 
   ipcMain.on('get-hot-key-toggle-speaker', (event) => {
-    event.returnValue = store.get('hotKeyToggleSpeaker') || 'Alt+m';
+    event.returnValue = store.get('hotKeyToggleSpeaker');
   });
 
   ipcMain.on('get-hot-key-toggle-microphone', (event) => {
-    event.returnValue = store.get('hotKeyToggleMicrophone') || 'Alt+v';
+    event.returnValue = store.get('hotKeyToggleMicrophone');
   });
 
   // SoundEffect
   ipcMain.on('get-disable-all-sound-effect', (event) => {
-    event.returnValue = store.get('disableAllSoundEffect') ?? false;
+    event.returnValue = store.get('disableAllSoundEffect');
   });
 
   ipcMain.on('get-enter-voice-channel-sound', (event) => {
-    event.returnValue = store.get('enterVoiceChannelSound') ?? true;
+    event.returnValue = store.get('enterVoiceChannelSound');
   });
 
   ipcMain.on('get-leave-voice-channel-sound', (event) => {
-    event.returnValue = store.get('leaveVoiceChannelSound') ?? true;
+    event.returnValue = store.get('leaveVoiceChannelSound');
   });
 
   ipcMain.on('get-start-speaking-sound', (event) => {
-    event.returnValue = store.get('startSpeakingSound') ?? true;
+    event.returnValue = store.get('startSpeakingSound');
   });
 
   ipcMain.on('get-stop-speaking-sound', (event) => {
-    event.returnValue = store.get('stopSpeakingSound') ?? true;
+    event.returnValue = store.get('stopSpeakingSound');
   });
 
   ipcMain.on('get-receive-direct-message-sound', (event) => {
-    event.returnValue = store.get('receiveDirectMessageSound') ?? true;
+    event.returnValue = store.get('receiveDirectMessageSound');
   });
 
   ipcMain.on('get-receive-channel-message-sound', (event) => {
-    event.returnValue = store.get('receiveChannelMessageSound') ?? true;
+    event.returnValue = store.get('receiveChannelMessageSound');
   });
 
   // Basic
   ipcMain.on('set-auto-login', (_, enable) => {
-    store.set('autoLogin', enable ?? false);
+    store.set('autoLogin', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('auto-login', enable);
     });
@@ -1248,7 +1345,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-always-on-top', (_, enable) => {
-    store.set('alwaysOnTop', enable ?? false);
+    store.set('alwaysOnTop', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.setAlwaysOnTop(enable);
       window.webContents.send('always-on-top', enable);
@@ -1256,49 +1353,49 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-status-auto-idle', (_, enable) => {
-    store.set('statusAutoIdle', enable ?? false);
+    store.set('statusAutoIdle', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('status-auto-idle', enable);
     });
   });
 
   ipcMain.on('set-status-auto-idle-minutes', (_, value) => {
-    store.set('statusAutoIdleMinutes', value || 10);
+    store.set('statusAutoIdleMinutes', value);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('status-auto-idle-minutes', value);
     });
   });
 
   ipcMain.on('set-status-auto-dnd', (_, enable) => {
-    store.set('statusAutoDnd', enable ?? false);
+    store.set('statusAutoDnd', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('status-auto-dnd', enable);
     });
   });
 
   ipcMain.on('set-channel-ui-mode', (_, mode) => {
-    store.set('channelUIMode', mode || 'classic');
+    store.set('channelUIMode', mode);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('channel-ui-mode', mode);
     });
   });
 
   ipcMain.on('set-close-to-tray', (_, enable) => {
-    store.set('closeToTray', enable ?? false);
+    store.set('closeToTray', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('close-to-tray', enable);
     });
   });
 
   ipcMain.on('set-font', (_, font) => {
-    store.set('font', font || 'Arial');
+    store.set('font', font);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('font', font);
     });
   });
 
   ipcMain.on('set-font-size', (_, fontSize) => {
-    store.set('fontSize', fontSize || 13);
+    store.set('fontSize', fontSize);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('font-size', fontSize);
     });
@@ -1306,70 +1403,70 @@ app.on('ready', async () => {
 
   // Mix
   ipcMain.on('set-input-audio-device', (_, deviceId) => {
-    store.set('audioInputDevice', deviceId || '');
+    store.set('audioInputDevice', deviceId);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('input-audio-device', deviceId);
     });
   });
 
   ipcMain.on('set-output-audio-device', (_, deviceId) => {
-    store.set('audioOutputDevice', deviceId || '');
+    store.set('audioOutputDevice', deviceId);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('output-audio-device', deviceId);
     });
   });
 
   ipcMain.on('set-mix-effect', (_, enable) => {
-    store.set('mixEffect', enable ?? false);
+    store.set('mixEffect', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('mix-effect', enable);
     });
   });
 
   ipcMain.on('set-mix-effect-type', (_, type) => {
-    store.set('mixEffectType', type || '');
+    store.set('mixEffectType', type);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('mix-effect-type', type);
     });
   });
 
   ipcMain.on('set-auto-mix-setting', (_, enable) => {
-    store.set('autoMixSetting', enable ?? false);
+    store.set('autoMixSetting', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('auto-mix-setting', enable);
     });
   });
 
   ipcMain.on('set-echo-cancellation', (_, enable) => {
-    store.set('echoCancellation', enable ?? false);
+    store.set('echoCancellation', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('echo-cancellation', enable);
     });
   });
 
   ipcMain.on('set-noise-cancellation', (_, enable) => {
-    store.set('noiseCancellation', enable ?? false);
+    store.set('noiseCancellation', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('noise-cancellation', enable);
     });
   });
 
   ipcMain.on('set-microphone-amplification', (_, enable) => {
-    store.set('microphoneAmplification', enable ?? false);
+    store.set('microphoneAmplification', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('microphone-amplification', enable);
     });
   });
 
   ipcMain.on('set-manual-mix-mode', (_, enable) => {
-    store.set('manualMixMode', enable ?? false);
+    store.set('manualMixMode', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('manual-mix-mode', enable);
     });
   });
 
   ipcMain.on('set-mix-mode', (_, mode) => {
-    store.set('mixMode', mode || 'all');
+    store.set('mixMode', mode);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('mix-mode', mode);
     });
@@ -1377,14 +1474,14 @@ app.on('ready', async () => {
 
   // Voice
   ipcMain.on('set-speaking-mode', (_, mode) => {
-    store.set('speakingMode', mode || 'key');
+    store.set('speakingMode', mode);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('speaking-mode', mode);
     });
   });
 
   ipcMain.on('set-default-speaking-key', (_, key) => {
-    store.set('defaultSpeakingKey', key || 'v');
+    store.set('defaultSpeakingKey', key);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1392,7 +1489,7 @@ app.on('ready', async () => {
 
   // Privacy
   ipcMain.on('set-not-save-message-history', (_, enable) => {
-    store.set('notSaveMessageHistory', enable ?? true);
+    store.set('notSaveMessageHistory', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('not-save-message-history', enable);
     });
@@ -1400,35 +1497,35 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
-    store.set('hotKeyOpenMainWindow', key || 'F1');
+    store.set('hotKeyOpenMainWindow', key);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-open-main-window', key);
     });
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key) => {
-    store.set('hotKeyIncreaseVolume', key || 'Ctrl+m');
+    store.set('hotKeyIncreaseVolume', key);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-increase-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
-    store.set('hotKeyDecreaseVolume', key || 'Shift+m');
+    store.set('hotKeyDecreaseVolume', key);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-decrease-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
-    store.set('hotKeyToggleSpeaker', key || 'Alt+m');
+    store.set('hotKeyToggleSpeaker', key);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-speaker', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
-    store.set('hotKeyToggleMicrophone', key || 'Alt+v');
+    store.set('hotKeyToggleMicrophone', key);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
@@ -1436,49 +1533,49 @@ app.on('ready', async () => {
 
   // SoundEffect
   ipcMain.on('set-disable-all-sound-effect', (_, enable) => {
-    store.set('disableAllSoundEffect', enable ?? false);
+    store.set('disableAllSoundEffect', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('disable-all-sound-effect', enable);
     });
   });
 
   ipcMain.on('set-enter-voice-channel-sound', (_, enable) => {
-    store.set('enterVoiceChannelSound', enable ?? true);
+    store.set('enterVoiceChannelSound', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('enter-voice-channel-sound', enable);
     });
   });
 
   ipcMain.on('set-leave-voice-channel-sound', (_, enable) => {
-    store.set('leaveVoiceChannelSound', enable ?? true);
+    store.set('leaveVoiceChannelSound', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('leave-voice-channel-sound', enable);
     });
   });
 
   ipcMain.on('set-start-speaking-sound', (_, enable) => {
-    store.set('startSpeakingSound', enable ?? true);
+    store.set('startSpeakingSound', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('start-speaking-sound', enable);
     });
   });
 
   ipcMain.on('set-stop-speaking-sound', (_, enable) => {
-    store.set('stopSpeakingSound', enable ?? true);
+    store.set('stopSpeakingSound', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('stop-speaking-sound', enable);
     });
   });
 
   ipcMain.on('set-receive-direct-message-sound', (_, enable) => {
-    store.set('receiveDirectMessageSound', enable ?? true);
+    store.set('receiveDirectMessageSound', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('receive-direct-message-sound', enable);
     });
   });
 
   ipcMain.on('set-receive-channel-message-sound', (_, enable) => {
-    store.set('receiveChannelMessageSound', enable ?? true);
+    store.set('receiveChannelMessageSound', enable);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('receive-channel-message-sound', enable);
     });

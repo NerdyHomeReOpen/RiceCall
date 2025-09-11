@@ -81,14 +81,6 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   // HotKey binds error
   const [inputFocus, setInputFocus] = useState<string | null>(null);
   const [conflicts, setConflicts] = useState<string[]>([]);
-  const [hotKeys, setHotKeys] = useState<Record<string, string>>({
-    speakingKey: defaultSpeakingKey,
-    openMainWindow: hotKeyOpenMainWindow,
-    increaseVolume: hotKeyIncreaseVolume,
-    decreaseVolume: hotKeyDecreaseVolume,
-    toggleSpeaker: hotKeyToggleSpeaker,
-    toggleMicrophone: hotKeyToggleMicrophone,
-  });
 
   // Memos
   const defaultHotKeyConfig = useMemo(
@@ -115,24 +107,13 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const handleSetHotKey = useCallback(
     (key: string, value: string | null) => {
       const target = defaultHotKeyConfig[key as keyof typeof defaultHotKeyConfig];
-      const targetValue = value ? value : target.default;
+      const targetValue = value ?? target.default;
       target.setFunc(targetValue);
     },
     [defaultHotKeyConfig],
   );
 
   // Effects
-  useEffect(() => {
-    setHotKeys({
-      speakingKey: defaultSpeakingKey,
-      openMainWindow: hotKeyOpenMainWindow,
-      increaseVolume: hotKeyIncreaseVolume,
-      decreaseVolume: hotKeyDecreaseVolume,
-      toggleSpeaker: hotKeyToggleSpeaker,
-      toggleMicrophone: hotKeyToggleMicrophone,
-    });
-  }, [defaultSpeakingKey, hotKeyOpenMainWindow, hotKeyIncreaseVolume, hotKeyDecreaseVolume, hotKeyToggleSpeaker, hotKeyToggleMicrophone]);
-
   useEffect(() => {
     const closeDelection = () => {
       setConflicts([]);
@@ -175,7 +156,14 @@ const SystemSettingPopup: React.FC = React.memo(() => {
       parts.push(key.length === 1 ? key.toLowerCase() : key);
       const mergeKey = parts.join('+');
 
-      const usedBy = Object.entries(hotKeys)
+      const usedBy = [
+        ['speakingKey', defaultSpeakingKey],
+        ['openMainWindow', hotKeyOpenMainWindow],
+        ['increaseVolume', hotKeyIncreaseVolume],
+        ['decreaseVolume', hotKeyDecreaseVolume],
+        ['toggleSpeaker', hotKeyToggleSpeaker],
+        ['toggleMicrophone', hotKeyToggleMicrophone],
+      ]
         .filter(([action, value]) => value === mergeKey && action !== current)
         .map(([, value]) => value);
 
@@ -188,7 +176,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [hotKeys, handleSetHotKey]);
+  }, [handleSetHotKey, defaultSpeakingKey, hotKeyOpenMainWindow, hotKeyIncreaseVolume, hotKeyDecreaseVolume, hotKeyToggleSpeaker, hotKeyToggleMicrophone]);
 
   useEffect(() => {
     const data = ipc.systemSettings.get();
@@ -197,46 +185,35 @@ const SystemSettingPopup: React.FC = React.memo(() => {
       setAutoLogin(data.autoLogin);
       setAutoLaunch(data.autoLaunch);
       setAlwaysOnTop(data.alwaysOnTop);
-
       setStatusAutoIdle(data.statusAutoIdle);
       setStatusAutoIdleMinutes(data.statusAutoIdleMinutes);
       setStatusAutoDnd(data.statusAutoDnd);
-
       setChannelUIMode(data.channelUIMode);
       setCloseToTray(data.closeToTray);
-
       setFontSize(data.fontSize);
       setFontFamily(data.font);
-
       // Mix Settings
       setSelectedInput(data.inputAudioDevice);
       setSelectedOutput(data.outputAudioDevice);
-
       setMixEffect(data.mixEffect);
       setMixEffectType(data.mixEffectType);
-
       setAutoMixSetting(data.autoMixSetting);
       setEchoCancellation(data.echoCancellation);
       setNoiseCancellation(data.noiseCancellation);
       setMicrophoneAmplification(data.microphoneAmplification);
-
       setManualMixMode(data.manualMixMode);
       setMixMode(data.mixMode);
-
       // Voice Settings
       setDefaultSpeakingMode(data.speakingMode);
-      setDefaultSpeakingKey(data.defaultSpeakingKey || defaultHotKeyConfig.speakingKey.default);
-
+      setDefaultSpeakingKey(data.defaultSpeakingKey);
       // Privacy settings
       setNotSaveMessageHistory(data.notSaveMessageHistory);
-
       // Hotkeys settings
-      setHotKeyOpenMainWindow(data.hotKeyOpenMainWindow || defaultHotKeyConfig.openMainWindow.default);
-      setHotKeyIncreaseVolume(data.hotKeyIncreaseVolume || defaultHotKeyConfig.increaseVolume.default);
-      setHotKeyDecreaseVolume(data.hotKeyDecreaseVolume || defaultHotKeyConfig.decreaseVolume.default);
-      setHotKeyToggleSpeaker(data.hotKeyToggleSpeaker || defaultHotKeyConfig.toggleSpeaker.default);
-      setHotKeyToggleMicrophone(data.hotKeyToggleMicrophone || defaultHotKeyConfig.toggleMicrophone.default);
-
+      setHotKeyOpenMainWindow(data.hotKeyOpenMainWindow);
+      setHotKeyIncreaseVolume(data.hotKeyIncreaseVolume);
+      setHotKeyDecreaseVolume(data.hotKeyDecreaseVolume);
+      setHotKeyToggleSpeaker(data.hotKeyToggleSpeaker);
+      setHotKeyToggleMicrophone(data.hotKeyToggleMicrophone);
       // SoundEffect settings
       setDisableAllSoundEffect(data.disableAllSoundEffect);
       setEnterVoiceChannelSound(data.enterVoiceChannelSound);
@@ -257,7 +234,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
       setInputDevices(inputs);
       setOutputDevices(outputs);
     });
-  }, [defaultHotKeyConfig, handleSetHotKey]);
+  }, []);
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -492,7 +469,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                   <input
                     name="speaking-key"
                     type="text"
-                    value={inputFocus === 'speakingKey' ? `> ${hotKeys['speakingKey']} <` : hotKeys['speakingKey']}
+                    value={inputFocus === 'speakingKey' ? `> ${defaultSpeakingKey} <` : defaultSpeakingKey}
                     style={{ maxWidth: '200px' }}
                     onClick={() => {
                       activeInputRef.current = 'speakingKey';
@@ -582,7 +559,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 ref={inputRef}
                 name={'hot-key-open-main-window'}
                 type="text"
-                value={inputFocus === 'openMainWindow' ? `> ${hotKeys['openMainWindow']} <` : hotKeys['openMainWindow']}
+                value={inputFocus === 'openMainWindow' ? `> ${hotKeyOpenMainWindow} <` : hotKeyOpenMainWindow}
                 style={{ maxWidth: '300px' }}
                 onClick={() => {
                   activeInputRef.current = 'openMainWindow';
@@ -603,7 +580,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 ref={inputRef}
                 name={'hot-key-increase-volume'}
                 type="text"
-                value={inputFocus === 'increaseVolume' ? `> ${hotKeys['increaseVolume']} <` : hotKeys['increaseVolume']}
+                value={inputFocus === 'increaseVolume' ? `> ${hotKeyIncreaseVolume} <` : hotKeyIncreaseVolume}
                 style={{ maxWidth: '300px' }}
                 onClick={() => {
                   activeInputRef.current = 'increaseVolume';
@@ -624,7 +601,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 ref={inputRef}
                 name={'hot-key-decrease-volume'}
                 type="text"
-                value={inputFocus === 'decreaseVolume' ? `> ${hotKeys['decreaseVolume']} <` : hotKeys['decreaseVolume']}
+                value={inputFocus === 'decreaseVolume' ? `> ${hotKeyDecreaseVolume} <` : hotKeyDecreaseVolume}
                 style={{ maxWidth: '300px' }}
                 onClick={() => {
                   activeInputRef.current = 'decreaseVolume';
@@ -645,7 +622,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 ref={inputRef}
                 name={'hot-key-toggle-speaker'}
                 type="text"
-                value={inputFocus === 'toggleSpeaker' ? `> ${hotKeys['toggleSpeaker']} <` : hotKeys['toggleSpeaker']}
+                value={inputFocus === 'toggleSpeaker' ? `> ${hotKeyToggleSpeaker} <` : hotKeyToggleSpeaker}
                 style={{ maxWidth: '300px' }}
                 onClick={() => {
                   activeInputRef.current = 'toggleSpeaker';
@@ -666,7 +643,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 ref={inputRef}
                 name={'hot-key-toggle-microphone'}
                 type="text"
-                value={inputFocus === 'toggleMicrophone' ? `> ${hotKeys['toggleMicrophone']} <` : hotKeys['toggleMicrophone']}
+                value={inputFocus === 'toggleMicrophone' ? `> ${hotKeyToggleMicrophone} <` : hotKeyToggleMicrophone}
                 style={{ maxWidth: '300px' }}
                 onClick={() => {
                   activeInputRef.current = 'toggleMicrophone';
@@ -776,46 +753,35 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             ipc.systemSettings.autoLogin.set(autoLogin);
             ipc.systemSettings.autoLaunch.set(autoLaunch);
             ipc.systemSettings.alwaysOnTop.set(alwaysOnTop);
-
             ipc.systemSettings.statusAutoIdle.set(statusAutoIdle);
             ipc.systemSettings.statusAutoIdleMinutes.set(statusAutoIdleMinutes);
             ipc.systemSettings.statusAutoDnd.set(statusAutoDnd);
-
             ipc.systemSettings.channelUIMode.set(channelUIMode);
             ipc.systemSettings.closeToTray.set(closeToTray);
-
             ipc.systemSettings.font.set(fontFamily);
             ipc.systemSettings.fontSize.set(fontSize);
-
             // Mix
             ipc.systemSettings.inputAudioDevice.set(selectedInput);
             ipc.systemSettings.outputAudioDevice.set(selectedOutput);
-
             ipc.systemSettings.mixEffect.set(mixEffect);
             ipc.systemSettings.mixEffectType.set(mixEffectType);
-
             ipc.systemSettings.autoMixSetting.set(autoMixSetting);
             ipc.systemSettings.echoCancellation.set(echoCancellation);
             ipc.systemSettings.noiseCancellation.set(noiseCancellation);
             ipc.systemSettings.microphoneAmplification.set(microphoneAmplification);
-
             ipc.systemSettings.manualMixMode.set(manualMixMode);
             ipc.systemSettings.mixMode.set(mixMode);
-
             // Voice
             ipc.systemSettings.speakingMode.set(defaultSpeakingMode);
             ipc.systemSettings.defaultSpeakingKey.set(defaultSpeakingKey);
-
             // Privacy
             ipc.systemSettings.notSaveMessageHistory.set(notSaveMessageHistory);
-
             // Hotkeys
             ipc.systemSettings.hotKeyOpenMainWindow.set(hotKeyOpenMainWindow);
             ipc.systemSettings.hotKeyIncreaseVolume.set(hotKeyIncreaseVolume);
             ipc.systemSettings.hotKeyDecreaseVolume.set(hotKeyDecreaseVolume);
             ipc.systemSettings.hotKeyToggleSpeaker.set(hotKeyToggleSpeaker);
             ipc.systemSettings.hotKeyToggleMicrophone.set(hotKeyToggleMicrophone);
-
             // SoundEffect
             ipc.systemSettings.disableAllSoundEffect.set(disableAllSoundEffect);
             ipc.systemSettings.enterVoiceChannelSound.set(enterVoiceChannelSound);
