@@ -67,6 +67,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
   };
 
   const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    if (!canJoin) return;
     if (!isChannelMod(permissionLevel) && isPrivateChannel) handleOpenChannelPassword(serverId, channelId);
     else ipc.socket.send('connectChannel', { serverId, channelId });
   };
@@ -153,10 +154,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
           if (isSelected) setSelectedItemId(null);
           else setSelectedItemId(`channel-${channelId}`);
         }}
-        onDoubleClick={() => {
-          if (!canJoin) return;
-          handleConnectChannel(serverId, channelId);
-        }}
+        onDoubleClick={() => handleConnectChannel(serverId, channelId)}
         draggable={isChannelMod(permissionLevel) && channelMembers.length > 0}
         onDragStart={(e) => handleDragStart(e, channelMembers, channelId)}
         onDragOver={(e) => e.preventDefault()}
@@ -248,7 +246,17 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
       {/* Expanded Sections */}
       <div className={styles['user-list']} style={expanded[channelId] ? {} : { display: 'none' }}>
         {filteredChannelMembers.map((member) => (
-          <UserTab key={member.userId} user={user} friends={friends} channel={channel} server={server} member={member} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+          <UserTab
+            key={member.userId}
+            user={user}
+            friends={friends}
+            channel={channel}
+            server={server}
+            member={member}
+            selectedItemId={selectedItemId}
+            setSelectedItemId={setSelectedItemId}
+            handleConnectChannel={handleConnectChannel}
+          />
         ))}
       </div>
     </>

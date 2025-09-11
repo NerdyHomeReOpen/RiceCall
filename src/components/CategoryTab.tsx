@@ -74,6 +74,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
   };
 
   const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    if (!canJoin) return;
     if (!isChannelMod(permissionLevel) && isPrivateChannel) handleOpenChannelPassword(serverId, channelId);
     else ipc.socket.send('connectChannel', { serverId, channelId });
   };
@@ -160,10 +161,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
           if (isSelected) setSelectedItemId(null);
           else setSelectedItemId(`category-${categoryId}`);
         }}
-        onDoubleClick={() => {
-          if (!canJoin) return;
-          handleConnectChannel(serverId, categoryId);
-        }}
+        onDoubleClick={() => handleConnectChannel(serverId, categoryId)}
         draggable={isChannelMod(permissionLevel) && categoryMembers.length > 0}
         onDragStart={(e) => handleDragStart(e, categoryMembers, categoryId)}
         onDragOver={(e) => e.preventDefault()}
@@ -256,7 +254,17 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
       {/* Expanded Sections */}
       <div className={styles['user-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
         {filteredCategoryMembers.map((member) => (
-          <UserTab key={member.userId} user={user} friends={friends} channel={category} server={server} member={member} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+          <UserTab
+            key={member.userId}
+            user={user}
+            friends={friends}
+            channel={category}
+            server={server}
+            member={member}
+            selectedItemId={selectedItemId}
+            setSelectedItemId={setSelectedItemId}
+            handleConnectChannel={handleConnectChannel}
+          />
         ))}
       </div>
       <div className={styles['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>

@@ -32,9 +32,10 @@ interface UserTabProps {
   member: OnlineMember;
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  handleConnectChannel: (serverId: Server['serverId'], channelId: Channel['channelId']) => void;
 }
 
-const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, server, member, selectedItemId, setSelectedItemId }) => {
+const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, server, member, selectedItemId, setSelectedItemId, handleConnectChannel }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -63,11 +64,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
   } = member;
-  const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermission, voiceMode: channelVoiceMode } = channel;
-  const { serverId, permissionLevel: serverPermission, lobbyId: serverLobbyId } = server;
+  const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel, voiceMode: channelVoiceMode } = channel;
+  const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId } = server;
 
   // Memos
-  const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermission, channelPermission), [globalPermission, serverPermission, channelPermission]);
+  const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel), [globalPermission, serverPermissionLevel, channelPermissionLevel]);
   const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId] || 'connecting', [memberUserId, webRTC.remoteUserStatusList]);
   const isUser = useMemo(() => memberUserId === userId, [memberUserId, userId]);
   const isSameChannel = useMemo(() => memberCurrentChannelId === userCurrentChannelId, [memberCurrentChannelId, userCurrentChannelId]);
@@ -77,6 +78,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
   const canUpdatePermission = useMemo(() => !isUser && isSuperior && isMember(memberPermission), [memberPermission, isUser, isSuperior]);
+
   const statusIcon = useMemo(() => {
     if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
@@ -96,10 +98,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
 
   const handleEditChannelPermission = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Permission>) => {
     ipc.socket.send('editChannelPermission', { userId, serverId, channelId, update });
-  };
-
-  const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.socket.send('connectChannel', { serverId, channelId });
   };
 
   const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
