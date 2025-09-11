@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 // Types
-import type { Friend, Server, User } from '@/types';
+import type { Badge, Friend, Server, User } from '@/types';
 
 // Components
-import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
+import BadgeItem from '@/components/BadgeItem';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -83,25 +83,35 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     if (monthDiff < 0 || (monthDiff === 0 && CURRENT_DAY < birthDate.getDate())) age--;
     return age;
   }, [targetBirthYear, targetBirthMonth, targetBirthDay, CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY]);
-  const joinedServers = useMemo(() => targetServers.filter((s) => isMember(s.permissionLevel) && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel), [targetServers]);
-  const favoriteServers = useMemo(
-    () => targetServers.filter((s) => s.favorite && isMember(s.permissionLevel) && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel),
-    [targetServers],
-  );
-  const recentServers = useMemo(
-    () =>
-      targetServers
-        .filter((s) => s.recent)
-        .sort((a, b) => b.timestamp - a.timestamp)
-        .slice(0, 4),
-    [targetServers],
-  );
   const isProfilePrivate = useMemo(() => false, []); // TODO: implement privacy setting
   const isSelf = useMemo(() => userId === targetId, [userId, targetId]);
   const isFriend = useMemo(() => friend?.relationStatus === 2, [friend]);
   const canSubmit = useMemo(
     () => targetName.trim() && targetGender.trim() && targetCountry.trim() && targetBirthYear && targetBirthMonth && targetBirthDay,
     [targetName, targetGender, targetCountry, targetBirthYear, targetBirthMonth, targetBirthDay],
+  );
+
+  const joinedServers = useMemo(() => {
+    return targetServers.filter((s) => isMember(s.permissionLevel) && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
+  }, [targetServers]);
+
+  const favoriteServers = useMemo(() => {
+    return targetServers.filter((s) => s.favorite && isMember(s.permissionLevel) && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
+  }, [targetServers]);
+
+  const recentServers = useMemo(() => {
+    return targetServers
+      .filter((s) => s.recent)
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 4);
+  }, [targetServers]);
+
+  const filteredBadges = useMemo(
+    () =>
+      JSON.parse(targetBadges)
+        .slice(0, 13)
+        .sort((a: Badge, b: Badge) => a.order - b.order),
+    [targetBadges],
   );
 
   // Handlers
@@ -248,7 +258,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                     handleOpenErrorDialog(t('invalid-country'));
                     return;
                   }
-        
+
                   handleEditUser({
                     name: targetName,
                     gender: targetGender,
@@ -310,7 +320,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             </div>
             <div className={popup['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
-              <BadgeList badges={JSON.parse(targetBadges)} position="left-top" direction="right-top" maxDisplay={13} />
+              {filteredBadges.map((badge: Badge) => (
+                <div key={badge.badgeId} className={styles['badge-item']}>
+                  <BadgeItem key={badge.badgeId} badge={badge} position="left-top" direction="right-top" />
+                </div>
+              ))}
             </div>
           </div>
         </div>

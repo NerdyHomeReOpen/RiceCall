@@ -391,10 +391,19 @@
 
 .badge-viewer {
   display: flex;
-  gap: 5px;
-  height: 30px;
+  gap: 2px;
   align-items: center;
   border: 1px solid #d7d7d7;
-  padding: 5px;
+  padding: 2px;
   background: #e8e8eb;
+}
+
+.badge-item {
+  padding: 2px;
+  border: 1px solid #fff0;
+  &:hover {
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    background: #ffffff6c;
+  }
 }
