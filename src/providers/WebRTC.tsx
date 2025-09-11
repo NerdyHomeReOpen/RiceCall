@@ -42,7 +42,7 @@ interface WebRTCContextType {
 
 type RemoteUserStatus = 'connecting' | 'connected' | 'disconnected';
 
-const WebRTCContext = createContext<WebRTCContextType>({} as WebRTCContextType);
+const WebRTCContext = createContext<WebRTCContextType | null>(null);
 
 export const useWebRTC = (): WebRTCContextType => {
   const context = useContext(WebRTCContext);
@@ -68,7 +68,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const speakerRef = useRef<HTMLAudioElement | null>(null);
   const soundPlayerRef = useRef(soundPlayer);
   // Mic
-  const micTakenRef = useRef<boolean>(false);
+  const isTakingMicRef = useRef<boolean>(false);
   const micMuteRef = useRef<boolean>(false);
   const micVolumeRef = useRef<number>(100);
   const micNodesRef = useRef<{ stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null; analyser: AnalyserNode | null }>({
@@ -112,6 +112,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const [isPressingSpeakKey, setIsPressingSpeakKey] = useState<boolean>(false);
   const [isMicMute, setIsMicMute] = useState<boolean>(false);
   const [isSpeakerMute, setIsSpeakerMute] = useState<boolean>(false);
+  const [isTakingMic, setIsTakingMic] = useState<boolean>(false);
   const [micVolume, setMicVolume] = useState<number>(100);
   const [mixVolume, setMixVolume] = useState<number>(100);
   const [speakerVolume, setSpeakerVolume] = useState<number>(100);
@@ -142,6 +143,56 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     [SPEAKING_VOLUME_THRESHOLD],
   );
 
+  const initLocalStorage = useCallback(() => {
+    const localMicVolume = window.localStorage.getItem('mic-volume') ?? '100';
+    const localSpeakerVolume = window.localStorage.getItem('speaker-volume') ?? '100';
+    const localIsMicMute = window.localStorage.getItem('is-mic-mute') ?? 'false';
+    const localIsSpeakerMute = window.localStorage.getItem('is-speaker-mute') ?? 'false';
+    const localMutedIds = window.localStorage.getItem('muted-ids') ?? '';
+
+    setMicVolume(parseInt(localMicVolume));
+    micVolumeRef.current = parseInt(localMicVolume);
+    setSpeakerVolume(parseInt(localSpeakerVolume));
+    speakerVolumeRef.current = parseInt(localSpeakerVolume);
+    setIsMicMute(localIsMicMute === 'true');
+    micMuteRef.current = localIsMicMute === 'true';
+    setIsSpeakerMute(localIsSpeakerMute === 'true');
+    speakerMuteRef.current = localIsSpeakerMute === 'true';
+    setMutedIds(localMutedIds.split(','));
+    mutedIdsRef.current = localMutedIds.split(',');
+  }, []);
+
+  const initAudioContext = useCallback(() => {
+    if (audioContextRef.current) return;
+
+    // Create audio context
+    const audioContext = new AudioContext();
+    audioContextRef.current = audioContext;
+
+    // Create input destination node
+    const inputDestination = audioContext.createMediaStreamDestination();
+    inputDesRef.current = inputDestination;
+
+    // Create output destination node
+    const outputDestination = audioContext.createMediaStreamDestination();
+    outputDesRef.current = outputDestination;
+
+    // Create master gain node
+    masterGainNodeRef.current = audioContext.createGain();
+    masterGainNodeRef.current.gain.value = speakerVolumeRef.current / 100;
+    masterGainNodeRef.current.connect(outputDestination);
+
+    // Create audio element
+    const speaker = new Audio();
+    speaker.srcObject = outputDesRef.current!.stream;
+    speaker.volume = 1;
+    speaker.autoplay = true;
+    speaker.style.display = 'none';
+    speaker.play().catch(() => {});
+    speakerRef.current = speaker;
+    document.body.appendChild(speaker);
+  }, []);
+
   const removeSpeakerAudio = useCallback((userId: string) => {
     if (rafIdListRef.current[userId]) {
       cancelAnimationFrame(rafIdListRef.current[userId]);
@@ -160,8 +211,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const initSpeakerAudio = useCallback(
     async (userId: string, stream: MediaStream) => {
       if (!audioContextRef.current) {
-        console.warn('[WebRTC] No audio context yet, skip init speaker audio');
-        return;
+        initAudioContext();
+        return initSpeakerAudio(userId, stream);
       }
 
       // Remove existing speaker audio
@@ -212,7 +263,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       speaker.play().catch(() => {});
       speaker.remove();
     },
-    [detectSpeaking, removeSpeakerAudio],
+    [detectSpeaking, removeSpeakerAudio, initAudioContext],
   );
 
   const removeMicAudio = useCallback((userId: string) => {
@@ -233,8 +284,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
       if (!audioContextRef.current) {
-        console.warn('[WebRTC] No audio context yet, skip init mic audio');
-        return;
+        initAudioContext();
+        return initMicAudio(stream);
       }
 
       // Remove existing mic audio
@@ -262,6 +313,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       const newTrack = inputDesRef.current!.stream.getAudioTracks()[0];
       if (audioProducerRef.current && newTrack) {
         await audioProducerRef.current.replaceTrack({ track: newTrack });
+        if (isTakingMicRef.current) audioProducerRef.current.resume();
+        else audioProducerRef.current.pause();
       }
 
       // Initialize analyser
@@ -269,44 +322,40 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       const dataArray = new Uint8Array(analyserNode.fftSize);
       detectSpeaking(userId, analyserNode, dataArray);
     },
-    [userId, detectSpeaking, removeMicAudio],
+    [userId, detectSpeaking, removeMicAudio, initAudioContext],
   );
 
   const changeBitrate = useCallback((bitrate: number) => {
-    const newBitrate = bitrate;
-    bitrateRef.current = newBitrate;
+    bitrateRef.current = bitrate;
   }, []);
 
   const changeMicVolume = useCallback((volume: number) => {
-    const newVolume = volume;
-    micNodesRef.current.gain!.gain.value = newVolume / 20;
-    setMicVolume(newVolume);
-    micVolumeRef.current = newVolume;
-    const isMicMute = newVolume === 0;
+    micNodesRef.current.gain!.gain.value = volume / 20;
+    setMicVolume(volume);
+    micVolumeRef.current = volume;
+    const isMicMute = volume === 0;
     setIsMicMute(isMicMute);
     micMuteRef.current = isMicMute;
     window.localStorage.setItem('is-mic-mute', isMicMute.toString());
-    window.localStorage.setItem('mic-volume', newVolume.toString());
+    window.localStorage.setItem('mic-volume', volume.toString());
   }, []);
 
   const changeMixVolume = useCallback((volume: number) => {
-    const newVolume = volume;
-    mixNodesRef.current.gain!.gain.value = newVolume / 100;
-    setMixVolume(newVolume);
-    mixVolumeRef.current = newVolume;
-    window.localStorage.setItem('mix-volume', newVolume.toString());
+    mixNodesRef.current.gain!.gain.value = volume / 100;
+    setMixVolume(volume);
+    mixVolumeRef.current = volume;
+    window.localStorage.setItem('mix-volume', volume.toString());
   }, []);
 
   const changeSpeakerVolume = useCallback((volume: number) => {
-    const newVolume = volume;
-    masterGainNodeRef.current!.gain.value = newVolume / 100;
-    setSpeakerVolume(newVolume);
-    speakerVolumeRef.current = newVolume;
-    const isSpeakerMute = newVolume === 0;
+    masterGainNodeRef.current!.gain.value = volume / 100;
+    setSpeakerVolume(volume);
+    speakerVolumeRef.current = volume;
+    const isSpeakerMute = volume === 0;
     setIsSpeakerMute(isSpeakerMute);
     speakerMuteRef.current = isSpeakerMute;
     window.localStorage.setItem('is-speaker-mute', isSpeakerMute.toString());
-    window.localStorage.setItem('speaker-volume', newVolume.toString());
+    window.localStorage.setItem('speaker-volume', volume.toString());
   }, []);
 
   const setIsUserMuted = useCallback((userId: string, muted: boolean) => {
@@ -315,15 +364,12 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     });
     setMutedIds((prev) => (muted ? [...prev, userId] : prev.filter((id) => id !== userId)));
     mutedIdsRef.current = muted ? [...mutedIdsRef.current, userId] : mutedIdsRef.current.filter((id) => id !== userId);
+    window.localStorage.setItem('muted-ids', mutedIdsRef.current.join(','));
   }, []);
 
   const setIsMicTaken = useCallback((taken: boolean) => {
-    if (taken) {
-      audioProducerRef.current?.resume();
-    } else {
-      audioProducerRef.current?.pause();
-    }
-    micTakenRef.current = taken;
+    setIsTakingMic(taken);
+    isTakingMicRef.current = taken;
   }, []);
 
   const setIsSpeakKeyPressed = useCallback((enable: boolean) => {
@@ -469,11 +515,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       console.log('[WebRTC] Producer track ended');
       audioProducerRef.current?.close();
     });
-    if (micTakenRef.current) {
-      audioProducerRef.current.resume();
-    } else {
-      audioProducerRef.current.pause();
-    }
+    if (isTakingMicRef.current) audioProducerRef.current.resume();
+    else audioProducerRef.current.pause();
   }, []);
 
   const setupRecv = useCallback(
@@ -594,60 +637,16 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     speakingModeRef.current = mode;
   };
 
+  // Effects
   useEffect(() => {
-    const localMicVolume = window.localStorage.getItem('mic-volume');
-    const localSpeakerVolume = window.localStorage.getItem('speaker-volume');
-    const localIsMicMute = window.localStorage.getItem('is-mic-mute');
-    const localIsSpeakerMute = window.localStorage.getItem('is-speaker-mute');
-    const localMutedIds = window.localStorage.getItem('muted-ids');
-
-    setMicVolume(localMicVolume !== null ? parseInt(localMicVolume) : 100);
-    micVolumeRef.current = localMicVolume !== null ? parseInt(localMicVolume) : 100;
-    setSpeakerVolume(localSpeakerVolume !== null ? parseInt(localSpeakerVolume) : 100);
-    speakerVolumeRef.current = localSpeakerVolume !== null ? parseInt(localSpeakerVolume) : 100;
-    setIsMicMute(localIsMicMute !== null ? localIsMicMute === 'true' : false);
-    micMuteRef.current = localIsMicMute !== null ? localIsMicMute === 'true' : false;
-    setIsSpeakerMute(localIsSpeakerMute !== null ? localIsSpeakerMute === 'true' : false);
-    speakerMuteRef.current = localIsSpeakerMute !== null ? localIsSpeakerMute === 'true' : false;
-    setMutedIds(localMutedIds !== null ? localMutedIds.split(',') : []);
-    mutedIdsRef.current = localMutedIds !== null ? localMutedIds.split(',') : [];
-  }, []);
+    if (isTakingMic) audioProducerRef.current?.resume();
+    else audioProducerRef.current?.pause();
+  }, [isTakingMic]);
 
   useEffect(() => {
-    // Initialize audio context
-    if (audioContextRef.current) return;
-
-    // Create audio context
-    const audioContext = new AudioContext();
-    audioContextRef.current = audioContext;
-
-    // Create input destination node
-    const inputDestination = audioContext.createMediaStreamDestination();
-    inputDesRef.current = inputDestination;
-
-    // Create output destination node
-    const outputDestination = audioContext.createMediaStreamDestination();
-    outputDesRef.current = outputDestination;
-
-    // Create master gain node
-    masterGainNodeRef.current = audioContext.createGain();
-    masterGainNodeRef.current.gain.value = speakerVolumeRef.current / 100;
-    masterGainNodeRef.current.connect(outputDestination);
-
-    // Create audio element
-    const speaker = new Audio();
-    speaker.srcObject = outputDesRef.current!.stream;
-    speaker.volume = 1;
-    speaker.autoplay = true;
-    speaker.style.display = 'none';
-    speaker.play().catch(() => {});
-    speakerRef.current = speaker;
-    document.body.appendChild(speaker);
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem('muted-ids', mutedIds.join(','));
-  }, [mutedIds]);
+    initAudioContext();
+    initLocalStorage();
+  }, [initAudioContext, initLocalStorage]);
 
   useEffect(() => {
     handleEditInputDevice(ipc.systemSettings.inputAudioDevice.get());

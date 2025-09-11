@@ -9,7 +9,7 @@ import permission from '@/styles/permission.module.css';
 const emojiRegex = /\[emoji=(.+?)]/g; // [emoji=code]
 const userIconRegex = /\[icon=(.+?)]/g; // [icon=gender-level]
 const userTagRegex = /\[tag=(.+?)]/g; // [tag=name]
-const embedRegex = /\[Embed=(.+?)]/g; // [Embed=https://www.youtube.com/embed/dQw4w9WgXcQ]
+const embedRegex = /\[embed=(.+?)]/g; // [embed=https://www.youtube.com/embed/dQw4w9WgXcQ]
 
 /* ---------- reverse ---------- */
 const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
@@ -24,7 +24,7 @@ export const fromTags = (raw: string) =>
     .replace(emojiRegex, (_, code) => {
       const emoji = emojis.find((e) => e.code === code);
       if (!emoji) return code;
-      return `<img data-emoji='${code}' class='${markdown['emoji']}' src='${emoji.path}'/>`;
+      return `<img data-emoji='${code}' class='${markdown['emoji']}' alt='[emoji=${code}]' src='${emoji.path}'/>`;
     })
     // User Tag
     .replace(userIconRegex, (_, icon) => {
@@ -36,9 +36,9 @@ export const fromTags = (raw: string) =>
     })
     // Embed
     .replace(embedRegex, (_, src) => {
-      return `<iframe data-embed='${src}' class='${markdown['embed-video']}' src="${src}" allowfullscreen="false"></iframe>`;
+      return `<iframe data-embed='${src}' class='${markdown['embed-video']}' src="${src}"></iframe>`;
     });
 
 export const toTags = (html: string) => {
-  return html.replace(emojiBackRegex, '[emoji=$1]').replace(embedBackRegex, '[Embed=$1]').replace(userIconBackRegex, '[icon=$1]').replace(userTagBackRegex, '[tag=$1]').replace(pTagRegex, '');
+  return html.replace(emojiBackRegex, '[emoji=$1]').replace(embedBackRegex, '[embed=$1]').replace(userIconBackRegex, '[icon=$1]').replace(userTagBackRegex, '[tag=$1]').replace(pTagRegex, '');
 };
