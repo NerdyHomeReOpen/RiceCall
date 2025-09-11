@@ -400,6 +400,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
   const connectFailedMessageRef = useRef<string>(t('connection-failed-message'));
   const reconnectionFailedMessageRef = useRef<string>(t('reconnection-failed-message'));
+  const serverIdRef = useRef<Server['serverId']>('');
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -432,10 +433,11 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Handlers
   const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
-    if (args[0].update.currentServerId) {
-      // Remove action messages and channel messages
+    if (args[0].update.currentServerId !== serverIdRef.current) {
+      // Remove action messages and channel messages while switching server
       setActionMessages([]);
       setChannelMessages([]);
+      serverIdRef.current = args[0].update.currentServerId || '';
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
   };
@@ -588,19 +590,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   const handleConnect = () => {
     console.info('[Socket] connected');
     ipc.popup.close('errorDialog');
-    setUser(Default.user());
-    setServers([]);
-    setRecommendServerList({});
-    setFriends([]);
-    setFriendGroups([]);
-    setFriendApplications([]);
-    setMemberInvitations([]);
-    setSystemNotify([]);
-    setServerChannels([]);
-    setServerOnlineMembers([]);
-    setQueueMembers([]);
-    setChannelMessages([]);
-    setActionMessages([]);
     setIsConnected(true);
   };
 
