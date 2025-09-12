@@ -485,6 +485,26 @@
   min-width: 500px;
 }
 
+.channel-tools-area {
+  overflow-y: hidden;
+  padding: 10px;
+  max-height: 50px;
+  width: 100%;
+  background-color: #f1f2f5;
+}
+
+.channel-tools-area .channel-tools-area-left {
+ display: flex;
+ flex-direction: row;
+ float: left;
+}
+
+.channel-tools-area .channel-tools-area-right {
+ display: flex;
+ flex-direction: row;
+ float: right;
+}
+
 .announcement-area {
   overflow-y: auto;
   padding: 10px;
@@ -735,6 +755,39 @@
 
 .voice-mode-dropdown:active::after {
   background-position: -18px 0;
+}
+
+.announcement-btn {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #888;
+}
+
+.announcement-btn::before {
+  content: '';
+  min-height: 15px;
+  min-width: 15px;
+  background-image: url('/im/chat.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.quizzes-btn {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #888;
+}
+
+.quizzes-btn::before {
+  content: "";
+  background-image: url('/channel/widget_vote.png');
+  background-position: -53px;
+  background-repeat: no-repeat;
+  width: 28px;
+  height: 25px;
+  display: inline-block;
 }
 
 .bkg-mode-btn {

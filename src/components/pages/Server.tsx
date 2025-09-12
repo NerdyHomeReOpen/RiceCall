@@ -161,6 +161,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   // States
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
+  const [showAnnouncement, setShowAnnouncement] = useState<boolean>(true);
   const [speakMode, setSpeakMode] = useState<SpeakingMode>('key');
   const [speakHotKey, setSpeakHotKey] = useState<string>('');
   const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
@@ -319,6 +320,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     }
   };
 
+  const handleToggleAnnouncement = (e: React.MouseEvent<HTMLDivElement>) => {
+    setShowAnnouncement(!showAnnouncement);
+  };
+
   // Effects
   useEffect(() => {
     webRTC.changeBitrate(channelBitrate);
@@ -412,10 +417,28 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
         <main className={styles['content']}>
           {/* Message Area */}
           <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
-            {/* Announcement Area */}
-            <div ref={annAreaRef} className={styles['announcement-area']}>
-              <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} escapeHtml={false} />
+            {/* Channel Tools */}
+            <div ref={annAreaRef} className={styles['channel-tools-area']}>
+              <div className={styles['channel-tools-area-left']}>
+                <div className={styles['buttons']}>
+                  <div className={styles['announcement-btn']} onClick={handleToggleAnnouncement}>{t('announcement')}</div>
+                </div>  
+              </div>
+              <div className={styles['channel-tools-area-right']}>
+                <div className={styles['buttons']}>
+                  <div className={styles['quizzes-btn']} onClick={handleToggleAnnouncement}></div>
+                </div>  
+              </div>              
             </div>
+            {/* Announcement Area */}
+           {showAnnouncement && (
+            <div ref={annAreaRef} className={styles['announcement-area']}>
+              <MarkdownContent
+                markdownText={channelAnnouncement || serverAnnouncement}
+                escapeHtml={false}
+              />
+            </div>
+          )}
 
             {/* Resize Handle */}
             <div className="resize-handle-vertical" style={channelUIMode === 'classic' ? {} : { display: 'none' }} onPointerDown={handleAnnAreaHandleDown} onPointerMove={handleAnnAreaHandleMove} />
