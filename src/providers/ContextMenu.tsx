@@ -190,7 +190,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       if (!(e.target as HTMLElement).closest('.context-menu-container')) {
         if (isContextMenuVisible) closeContextMenu();
         if (isMicContextMenuVisible) closeMicContextMenu();
-        if (isBadgeInfoVisible) closeBadgeInfoCard();
         if (isEmojiPickerVisible) closeEmojiPicker();
         if (isNotifyMenuVisible) closeNotifyMenu();
         if (isColorPickerVisible) closeColorPicker();

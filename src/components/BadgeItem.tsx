@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 // CSS
 import badgeStyle from '@/styles/badge.module.css';
@@ -19,14 +19,24 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direc
   // Hooks
   const contextMenu = useContextMenu();
 
+  // Refs
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   return (
     <div
       className="badge-info-card-container"
-      onClick={(e) => {
+      onMouseEnter={(e) => {
         const { left, right, top, bottom } = e.currentTarget.getBoundingClientRect();
         const x = position === 'left-top' || position === 'left-bottom' ? left : right;
         const y = position === 'left-top' || position === 'right-top' ? top : bottom;
-        contextMenu.showBadgeInfoCard(x, y, direction, badge);
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = setTimeout(() => {
+          contextMenu.showBadgeInfoCard(x, y, direction, badge);
+        }, 200);
+      }}
+      onMouseLeave={() => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = null;
       }}
     >
       <div className={badgeStyle['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
