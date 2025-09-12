@@ -14,7 +14,7 @@
   padding: 10px 5px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  background-color: #9fa4a7;
+  background-color: #0993e2;
   color: #fff;
   transform: scale(1);
 }
@@ -37,7 +37,8 @@
   justify-content: flex-start;
   align-items: center;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #87d0f8;
+  background-color: #fff;
   border-radius: 5px;
   color: #666;
   box-shadow: 0 1px 1px #00000080;
