@@ -28,7 +28,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const { t } = useTranslation();
 
   // Refs
-  const orderMap = useRef<Record<string, number>>(
+  const orderMapRef = useRef<Record<string, number>>(
     serverChannelsData.reduce(
       (acc, channel) => {
         acc[channel.channelId] = channel.order;
@@ -39,7 +39,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   );
 
   // States
-  const [serverChannels, setServerChannels] = useState<(Channel | Category)[]>(serverChannelsData);
+  const [serverChannels, setServerChannels] = useState<(Channel | Category)[]>(serverChannelsData.filter((c) => !c.isLobby));
   const [selectedChannel, setSelectedChannel] = useState<Channel | Category | null>(null);
   const [groupChannels, setGroupChannels] = useState<(Channel | Category)[]>([]);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -49,22 +49,24 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   // Memos
   const editedChannels = useMemo(() => {
-    const editedChannels: Partial<Channel>[] = [];
-    serverChannels
+    return serverChannels
       .filter((c) => !c.categoryId)
-      .forEach((c, index) => {
-        if (c.order !== index || c.order !== orderMap.current[c.channelId]) {
-          editedChannels.push({ order: index, channelId: c.channelId });
-        }
-        serverChannels
-          .filter((sc) => sc.categoryId === c.channelId)
-          .forEach((sc, sindex) => {
-            if (sc.order !== sindex || sc.order !== orderMap.current[sc.channelId]) {
-              editedChannels.push({ order: sindex, channelId: sc.channelId });
-            }
-          });
-      });
-    return editedChannels;
+      .reduce(
+        (acc, c, index) => {
+          if (c.order !== index || c.order !== orderMapRef.current[c.channelId]) {
+            acc.push({ order: index, channelId: c.channelId });
+          }
+          serverChannels
+            .filter((sc) => sc.categoryId === c.channelId)
+            .forEach((sc, sindex) => {
+              if (sc.order !== sindex || sc.order !== orderMapRef.current[sc.channelId]) {
+                acc.push({ order: sindex, channelId: sc.channelId });
+              }
+            });
+          return acc;
+        },
+        [] as { order: number; channelId: string }[],
+      );
   }, [serverChannels]);
   const currentIndex = useMemo(() => groupChannels.findIndex((c) => c.channelId === selectedChannelId), [groupChannels, selectedChannelId]);
   const firstChannel = useMemo(() => groupChannels[0], [groupChannels]);
