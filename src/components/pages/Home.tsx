@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
 // CSS
 import homePage from '@/styles/pages/home.module.css';
+import announcementStyle from '@/styles/announcement.module.css';
 
 // Components
 import ServerList from '@/components/ServerList';
@@ -47,7 +48,7 @@ interface HomePageProps {
   display: boolean;
 }
 
-const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, recommendServerList, display }) => {
+const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServerList, display }) => {
   // Hooks
   const { t } = useTranslation();
   const mainTab = useMainTab();
@@ -65,6 +66,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [personalResults, setPersonalResults] = useState<Server[]>([]);
   const [relatedResults, setRelatedResults] = useState<Server[]>([]);
   const [section, setSection] = useState<number>(0);
+  const [currentAnnouncementCategory, setCurrentAnnouncementCategory] = useState<Announcement['category']>('all');
 
   // Variables
   const { userId, currentServerId } = user;
@@ -72,6 +74,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
+
+  const categoryTabs = [
+    { key: 'all', label: t('all') },
+    { key: 'announcement', label: t('announcement') },
+    { key: 'event', label: t('event') },
+    { key: 'update', label: t('update') },
+    { key: 'system', label: t('system') },
+  ];
 
   // Handlers
   const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -272,7 +282,33 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       </header>
 
       {/* Announcement */}
-      <webview src="https://ricecall.com.tw/announcement" className={homePage['webview']} style={section === 0 ? {} : { display: 'none' }} />
+      <main className={homePage['home-body']} style={section === 0 ? {} : { display: 'none' }}>
+        <div className={announcementStyle['announcement-wrapper']}>
+          <div className={announcementStyle['announcement-header']}>
+            {categoryTabs.map((tab) => (
+              <div
+                key={tab.key}
+                className={`${announcementStyle['announcement-tab']} ${currentAnnouncementCategory === tab.key ? announcementStyle['active'] : ''}`}
+                onClick={() => setCurrentAnnouncementCategory(tab.key)}
+              >
+                {tab.label}
+              </div>
+            ))}
+          </div>
+          <div className={announcementStyle['announcement-container']}>
+            {announcements
+              .filter((a) => currentAnnouncementCategory === 'all' || a.category === currentAnnouncementCategory)
+              .map((a) => (
+                <div key={a.announcementId} className={announcementStyle['announcement-box']} onClick={() => {}}>
+                  <div className={announcementStyle['announcement-type']}>{t(`${a.category}`)}</div>
+                  <div className={announcementStyle['announcement-title']}>{a.title}</div>
+                  <div className={announcementStyle['announcement-date']}>{a.timestamp}</div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </main>
+      {/* <webview src="https://ricecall.com.tw/announcement" className={homePage['webview']} style={section === 0 ? {} : { display: 'none' }} /> */}
 
       {/* Recommended servers */}
       <main className={homePage['recommended-servers-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
