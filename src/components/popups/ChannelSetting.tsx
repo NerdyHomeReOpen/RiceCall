@@ -212,6 +212,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   type="text"
                   defaultValue={isLobby ? t(`${channelName}`) : channelName}
                   maxLength={32}
+                  disabled={isLobby}
                   onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
                   datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
                 />
