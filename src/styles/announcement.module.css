@@ -29,7 +29,7 @@
   background-color: #4f4f4d;
 }
 
-.announcement-container {
+.announcement-list {
   display: flex;
   flex-direction: column;
   font-weight: bold;
@@ -43,7 +43,7 @@
   box-shadow: 0 1px 1px #00000080;
 }
 
-.announcement-box {
+.announcement-list .announcement-item {
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -53,12 +53,91 @@
   border-bottom: 1px solid #ccc;
 }
 
-.announcement-box:last-child {
+.announcement-list .announcement-item:last-child {
   border-bottom: none;
+}
+
+.announcement-container {
+  display: flex;
+  flex-direction: row;
+  font-weight: bold;
+  margin-top: 10px;
+  overflow-y: auto;
+  min-height: 550px;
+  max-height: 550px;
+  border-radius: 5px;
+  padding: 5px;
+  gap: 5px;
+}
+
+.announcement-main-content {
+  width: 500px;
+  padding: 10px;
+  height: 420px;
+  border: 1px solid #4f4f4d80;
+}
+
+.announcement-container .announcement-content-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.announcement-container .announcement-content-detail {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100px;
+}
+
+.announcement-sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 5px;
+  flex: 1;
+}
+
+.announcement-sidebar .announcement-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
+  height: 80px;
+  background-color: #fff;
+  color: #666;
+  border: 1px solid #4f4f4d80;
+  cursor: pointer;
 }
 
 .announcement-type {
   flex: 1;
+}
+
+.announcement-type .type-announcement {
+  border-color: #aed6ff;
+  background-color: #e7f3ff;
+  color: #005cbf;
+}
+
+.announcement-type .type-update {
+  border-color: #b7f0c8;
+  background-color: #e6ffed;
+  color: #1e7e34;
+}
+
+.announcement-type .type-system {
+  border-color: #ffd9b3;
+  background-color: #fff0e6;
+  color: #c85a17;
+}
+
+.announcement-type .type-event {
+  border-color: #d9bfff;
+  background-color: #f3e8ff;
+  color: #5a189a;
 }
 
 .announcement-title {

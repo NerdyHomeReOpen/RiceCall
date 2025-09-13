@@ -298,17 +298,65 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               </div>
             ))}
           </div>
-          <div className={announcementStyle['announcement-container']}>
+          <div className={announcementStyle['announcement-list']}>
             {announcements
               .filter((a) => currentAnnouncementCategory === 'all' || a.category === currentAnnouncementCategory)
               .map((a) => (
-                <div key={a.announcementId} className={announcementStyle['announcement-box']} onClick={() => {}}>
+                <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => {}}>
                   <div className={announcementStyle['announcement-type']}>{t(`${a.category}`)}</div>
                   <div className={announcementStyle['announcement-title']}>{a.title}</div>
-                  <div className={announcementStyle['announcement-date']}>{getFormatDate(Date.now()) /* a.timestamp */}</div>
+                  <div className={announcementStyle['announcement-date']}>{getFormatDate(Date.now()) /* TODO: change to a.timestamp */}</div>
                 </div>
               ))}
           </div>
+          {/*<div className={announcementStyle['announcement-container']} style={{ display: 'none' }}>
+            <div className={announcementStyle['announcement-main-content']}>
+              {announcements
+                .slice(0, 1)
+                .filter((a) => currentAnnouncementCategory === 'all' || a.category === currentAnnouncementCategory)
+                .map((a) => (
+                  <div
+                    key={a.announcementId}
+                    style={
+                      a.attachment_url && a.attachment_url !== ''
+                        ? {
+                            backgroundImage: `url(${a.attachment_url})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                          }
+                        : {}
+                    }
+                    onClick={() => {}}
+                  >
+                    {(!a.attachment_url || a.attachment_url == '') && (
+                      <>
+                        <div className={announcementStyle['announcement-content-header']}>
+                          <div className={announcementStyle['announcement-content-detail']}>
+                            <div className={announcementStyle['announcement-title']}>{a.title}</div>
+                            <div className={announcementStyle['announcement-type']}>{t(`${a.category}`)}</div>
+                          </div>
+                          <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
+                        </div>
+                        <div className={announcementStyle['announcement-content']}>{a.content}</div>
+                      </>
+                    )}
+                  </div>
+                ))}
+            </div>
+            <div className={announcementStyle['announcement-sidebar']}>
+              {announcements
+                .slice(1, 6)
+                .filter((a) => currentAnnouncementCategory === 'all' || a.category === currentAnnouncementCategory)
+                .map((a) => (
+                  <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => {}}>
+                    <div className={announcementStyle['announcement-title']}>
+                      {a.title} | {t(`${a.category}`)}
+                    </div>
+                    <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
+                  </div>
+                ))}
+            </div>
+          </div>*/}
         </div>
       </main>
       {/* <webview src="https://ricecall.com.tw/announcement" className={homePage['webview']} style={section === 0 ? {} : { display: 'none' }} /> */}
