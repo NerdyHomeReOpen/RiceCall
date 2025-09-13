@@ -14,10 +14,10 @@ import { useTranslation } from 'react-i18next';
 
 interface RecommendServerListProps {
   user: User;
-  servers: RecommendServerList;
+  recommendServerList: RecommendServerList;
 }
 
-const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ user, servers }) => {
+const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ user, recommendServerList }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -25,7 +25,7 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
   const [selectedCategoryId, setSelectedCategoryId] = useState(0);
 
   // Memos
-  const categories = useMemo(() => Object.keys(servers), [servers]);
+  const categories = useMemo(() => Object.keys(recommendServerList), [recommendServerList]);
 
   return (
     <>
@@ -35,7 +35,7 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
             {categories.map((category, index) => (
               <div key={category}>
                 <div onClick={() => setSelectedCategoryId(index)} className={`${homePage['category-tab']} ${selectedCategoryId === index ? homePage['selected'] : ''}`}>
-                  {`${t(category)} (${servers[category].length})`}
+                  {`${t(category)} (${recommendServerList[category].length})`}
                 </div>
               </div>
             ))}
@@ -45,10 +45,10 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
 
       <section className={homePage['servers-container']}>
         <div className={homePage['server-list-title']}>{t(categories[selectedCategoryId])}</div>
-        {servers[categories[selectedCategoryId]]?.length > 0 && (
+        {recommendServerList[categories[selectedCategoryId]]?.length > 0 && (
           <div className={homePage['server-list']}>
-            {Array.from({ length: 12 }).map((_, index) => (
-              <RecommendServerCard key={index} user={user} recommendServer={servers[categories[selectedCategoryId]][0]} />
+            {recommendServerList[categories[selectedCategoryId]].map((server, index) => (
+              <RecommendServerCard key={index} user={user} recommendServer={server} />
             ))}
           </div>
         )}

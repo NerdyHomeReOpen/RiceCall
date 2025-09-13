@@ -55,7 +55,7 @@ export const dataService = {
     return serverMembers;
   },
 
-  recommendServerList: async (): Promise<RecommendServerList | null> => {
+  recommendServerList: async (): Promise<RecommendServerList> => {
     const recommendServerList = await api.post('/recommendServerList', {});
     return recommendServerList;
   },
