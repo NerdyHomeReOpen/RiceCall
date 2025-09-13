@@ -19,6 +19,7 @@
   "ago": "Adelante",
   "agreement": "Términos de servicio",
   "alert": "警告",
+  "all": "全部",
   "all-channel": "Todos los canales",
   "always-on-top-label": "La ventana principal siempre se muestra en primer plano",
   "anti-spam-setting": "Configuración antiacoso",
@@ -163,6 +164,7 @@
   "entertainment-mode": "Modo de entretenimiento",
   "entertainment-mode-description": "Sonido original y estéreo (aplicable en canales en modo micrófono, karaoke y eventos similares)",
   "error": "錯誤",
+  "event": "活動",
   "exit": "Salir",
   "faq": "Preguntas frecuentes (FAQ)",
   "favorite": "Agregar a favoritos",
@@ -196,6 +198,7 @@
   "future": "Atrás",
   "game": "Juego",
   "gender": "Género",
+  "general": "一般",
   "general-setting": "Configuración general",
   "get-help": "Obtener ayuda",
   "gn": "Desconectado",
@@ -456,6 +459,7 @@
   "submit": "Enviar",
   "success": "成功",
   "super-admin": "超級管理員",
+  "system": "系統",
   "system-notify": "系統通知",
   "system-setting": "Configuración del sistema",
   "take-mic": "Tomar el micrófono para hablar",
@@ -484,6 +488,7 @@
   "unset-channel-mod": "Quitar administrador del subcanal",
   "unset-server-admin": "Quitar administrador del grupo",
   "untake-mic": "下麥",
+  "update": "更新",
   "upload": "Subir",
   "upload-avatar": "Subir avatar",
   "user-info": "Perfil personal",
@@ -507,6 +512,5 @@
   "wealth": "Valor de riqueza",
   "xp": "Puntos",
   "year": "Años",
-  "yesterday": "Ayer",
-  "remove-moderator": "移除版主"
+  "yesterday": "Ayer"
 }
