@@ -8,6 +8,7 @@ import announcementStyle from '@/styles/announcement.module.css';
 // Components
 import ServerList from '@/components/ServerList';
 import RecommendServerList from '@/components/RecommendServerList';
+import MarkdownContent from '@/components/MarkdownContent';
 
 // Type
 import type { RecommendServerList as RecommendServerListType, User, Server, Announcement } from '@/types';
@@ -69,7 +70,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [personalResults, setPersonalResults] = useState<Server[]>([]);
   const [relatedResults, setRelatedResults] = useState<Server[]>([]);
   const [section, setSection] = useState<number>(0);
-  const [currentAnnouncementCategory, setCurrentAnnouncementCategory] = useState<Announcement['category']>('all');
+  const [selectedAnnouncementCategory, setSelectedAnnouncementCategory] = useState<Announcement['category']>('all');
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
 
   // Variables
   const { userId, currentServerId } = user;
@@ -80,7 +82,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   const categoryTabs = [
     { key: 'all', label: t('all') },
-    { key: 'announcement', label: t('announcement') },
+    { key: 'general', label: t('general') },
     { key: 'event', label: t('event') },
     { key: 'update', label: t('update') },
     { key: 'system', label: t('system') },
@@ -291,29 +293,39 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             {categoryTabs.map((tab) => (
               <div
                 key={tab.key}
-                className={`${announcementStyle['announcement-tab']} ${currentAnnouncementCategory === tab.key ? announcementStyle['active'] : ''}`}
-                onClick={() => setCurrentAnnouncementCategory(tab.key)}
+                className={`${announcementStyle['announcement-tab']} ${selectedAnnouncementCategory === tab.key ? announcementStyle['active'] : ''}`}
+                onClick={() => setSelectedAnnouncementCategory(tab.key)}
               >
-                {tab.label}
+                {t(tab.label)}
               </div>
             ))}
           </div>
           <div className={announcementStyle['announcement-list']}>
             {announcements
-              .filter((a) => currentAnnouncementCategory === 'all' || a.category === currentAnnouncementCategory)
+              .filter((a) => selectedAnnouncementCategory === 'all' || a.category === selectedAnnouncementCategory)
               .map((a) => (
-                <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => {}}>
-                  <div className={announcementStyle['announcement-type']}>{t(`${a.category}`)}</div>
+                <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => setSelectedAnnouncement(a)}>
+                  <div className={announcementStyle['announcement-type']} data-category={a.category}>
+                    {t(`${a.category}`)}
+                  </div>
                   <div className={announcementStyle['announcement-title']}>{a.title}</div>
-                  <div className={announcementStyle['announcement-date']}>{getFormatDate(Date.now()) /* TODO: change to a.timestamp */}</div>
+                  <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
                 </div>
               ))}
           </div>
-          {/*<div className={announcementStyle['announcement-container']} style={{ display: 'none' }}>
+          <div className={announcementStyle['announcement-detail-wrapper']} style={selectedAnnouncement ? {} : { display: 'none' }} onClick={() => setSelectedAnnouncement(null)}>
+            <div className={announcementStyle['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
+              <div className={announcementStyle['announcement-detail-title']}>{selectedAnnouncement?.title}</div>
+              <div className={announcementStyle['announcement-detail-content']}>
+                <MarkdownContent markdownText={selectedAnnouncement?.content ?? ''} escapeHtml={true} />
+              </div>
+            </div>
+          </div>
+          {/* <div className={announcementStyle['announcement-container']} style={{ display: 'none' }}>
             <div className={announcementStyle['announcement-main-content']}>
               {announcements
                 .slice(0, 1)
-                .filter((a) => currentAnnouncementCategory === 'all' || a.category === currentAnnouncementCategory)
+                .filter((a) => selectedAnnouncementCategory === 'all' || a.category === selectedAnnouncementCategory)
                 .map((a) => (
                   <div
                     key={a.announcementId}
@@ -346,7 +358,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             <div className={announcementStyle['announcement-sidebar']}>
               {announcements
                 .slice(1, 6)
-                .filter((a) => currentAnnouncementCategory === 'all' || a.category === currentAnnouncementCategory)
+                .filter((a) => selectedAnnouncementCategory === 'all' || a.category === selectedAnnouncementCategory)
                 .map((a) => (
                   <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => {}}>
                     <div className={announcementStyle['announcement-title']}>
@@ -356,7 +368,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                   </div>
                 ))}
             </div>
-          </div>*/}
+          </div> */}
         </div>
       </main>
 
