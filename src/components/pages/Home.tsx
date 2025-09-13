@@ -80,6 +80,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
 
+  const filteredAnnouncements = useMemo(
+    () => announcements.filter((a) => a.category === selectedAnnouncementCategory || selectedAnnouncementCategory === 'all').sort((a, b) => b.timestamp - a.timestamp),
+    [announcements, selectedAnnouncementCategory],
+  );
+
   const categoryTabs = [
     { key: 'all', label: t('all') },
     { key: 'general', label: t('general') },
@@ -301,17 +306,15 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             ))}
           </div>
           <div className={announcementStyle['announcement-list']}>
-            {announcements
-              .filter((a) => selectedAnnouncementCategory === 'all' || a.category === selectedAnnouncementCategory)
-              .map((a) => (
-                <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => setSelectedAnnouncement(a)}>
-                  <div className={announcementStyle['announcement-type']} data-category={a.category}>
-                    {t(`${a.category}`)}
-                  </div>
-                  <div className={announcementStyle['announcement-title']}>{a.title}</div>
-                  <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
+            {filteredAnnouncements.map((a) => (
+              <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => setSelectedAnnouncement(a)}>
+                <div className={announcementStyle['announcement-type']} data-category={a.category}>
+                  {t(`${a.category}`)}
                 </div>
-              ))}
+                <div className={announcementStyle['announcement-title']}>{a.title}</div>
+                <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
+              </div>
+            ))}
           </div>
           <div className={announcementStyle['announcement-detail-wrapper']} style={selectedAnnouncement ? {} : { display: 'none' }} onClick={() => setSelectedAnnouncement(null)}>
             <div className={announcementStyle['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
