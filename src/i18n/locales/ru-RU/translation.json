@@ -19,6 +19,7 @@
   "ago": "Назад",
   "agreement": "Условия использования",
   "alert": "警告",
+  "all": "全部",
   "all-channel": "Все каналы",
   "always-on-top-label": "Всегда поверх других окон",
   "anti-spam-setting": "Настройки конфиденциальности",
@@ -163,6 +164,7 @@
   "entertainment-mode": "Высокое",
   "entertainment-mode-description": "Для караоке, прослушивания музыки и других активностей",
   "error": "錯誤",
+  "event": "活動",
   "exit": "Выйти",
   "faq": "FAQ",
   "favorite": "Добавить в избранное",
@@ -196,6 +198,7 @@
   "future": "Через",
   "game": "Игры",
   "gender": "Пол",
+  "general": "一般",
   "general-setting": "Основные настройки",
   "get-help": "Получить помощь",
   "gn": "Не в сети",
@@ -456,6 +459,7 @@
   "submit": "Отправить",
   "success": "成功",
   "super-admin": "超級管理員",
+  "system": "系統",
   "system-notify": "系統通知",
   "system-setting": "Системные настройки",
   "take-mic": "Включить",
@@ -484,6 +488,7 @@
   "unset-channel-mod": "Снять модератора канала",
   "unset-server-admin": "Снять администратора сервера",
   "untake-mic": "下麥",
+  "update": "更新",
   "upload": "Загрузить",
   "upload-avatar": "Загрузить аватар",
   "user-info": "Профиль",
@@ -507,6 +512,5 @@
   "wealth": "Вклад",
   "xp": "Опыт",
   "year": "год",
-  "yesterday": "Вчера",
-  "remove-moderator": "移除版主"
+  "yesterday": "Вчера"
 }
