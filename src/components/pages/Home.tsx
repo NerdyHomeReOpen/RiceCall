@@ -20,6 +20,9 @@ import { useLoading } from '@/providers/Loading';
 // Services
 import ipc from '@/services/ipc.service';
 
+// Utils
+import { getFormatDate } from '@/utils/language';
+
 interface SearchResultItemProps {
   server: Server;
   onClick: () => void;
@@ -302,7 +305,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 <div key={a.announcementId} className={announcementStyle['announcement-box']} onClick={() => {}}>
                   <div className={announcementStyle['announcement-type']}>{t(`${a.category}`)}</div>
                   <div className={announcementStyle['announcement-title']}>{a.title}</div>
-                  <div className={announcementStyle['announcement-date']}>{a.timestamp}</div>
+                  <div className={announcementStyle['announcement-date']}>{getFormatDate(Date.now()) /* a.timestamp */}</div>
                 </div>
               ))}
           </div>
