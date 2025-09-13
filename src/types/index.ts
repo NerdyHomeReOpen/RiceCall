@@ -18,8 +18,10 @@ import {
   table_channel_permissions,
   table_channel_muted_users,
   table_server_blocked_users,
-  table_announcement,
+  table_announcements,
 } from '@/types/database';
+
+export type Announcement = table_announcements;
 
 export type Permission = {
   permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
@@ -44,8 +46,6 @@ export type Server = table_servers & table_user_servers & table_members & Permis
 export type RecommendServerList = {
   [category: string]: RecommendServer[];
 };
-
-export type Announcement = table_announcement;
 
 export type RecommendServer = table_servers & {
   online: number;

@@ -12,7 +12,7 @@ export type table_badges = {
   createdAt: number;
 };
 
-export type table_announcement = {
+export type table_announcements = {
   announcementId: number;
   title: string;
   timestamp: number;
