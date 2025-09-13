@@ -19,6 +19,7 @@
   "ago": "前",
   "agreement": "服務條款",
   "alert": "警告",
+  "all": "全部",
   "all-channel": "所有頻道",
   "always-on-top-label": "主視窗始終在最上層顯示",
   "anti-spam-setting": "防騷擾設定",
@@ -163,6 +164,7 @@
   "entertainment-mode": "娛樂模式",
   "entertainment-mode-description": "原汁原味，立體聲效（適用於排麥模式下的頻道、K歌等型活動語音）",
   "error": "錯誤",
+  "event": "活動",
   "exit": "退出",
   "faq": "FAQ",
   "favorite": "加入收藏",
@@ -196,6 +198,7 @@
   "future": "後",
   "game": "遊戲",
   "gender": "性別",
+  "general": "一般",
   "general-setting": "一般設定",
   "get-help": "獲得協助",
   "gn": "離線",
@@ -456,6 +459,7 @@
   "submit": "送出",
   "success": "成功",
   "super-admin": "超級管理員",
+  "system": "系統",
   "system-notify": "系統通知",
   "system-setting": "系統設定",
   "take-mic": "拿麥發言",
@@ -484,6 +488,7 @@
   "unset-channel-mod": "移除二級頻道管理員",
   "unset-server-admin": "移除群管理員",
   "untake-mic": "下麥",
+  "update": "更新",
   "upload": "上傳",
   "upload-avatar": "上傳頭像",
   "user-info": "個人檔案",
@@ -507,6 +512,5 @@
   "wealth": "財富值",
   "xp": "積分",
   "year": "年",
-  "yesterday": "昨天",
-  "remove-moderator": "移除版主"
+  "yesterday": "昨天"
 }
