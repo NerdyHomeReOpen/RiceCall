@@ -19,6 +19,7 @@
   "ago": "前",
   "agreement": "Termos de Serviço",
   "alert": "警告",
+  "all": "全部",
   "all-channel": "Todos os canais",
   "always-on-top-label": "Manter a janela do RiceCall sempre no topo",
   "anti-spam-setting": "Configurações de privacidade",
@@ -163,6 +164,7 @@
   "entertainment-mode": "Modo de entretenimento",
   "entertainment-mode-description": "Som estéreo autêntico (adequado para canais com modo fila, karaokê e outros eventos de voz)",
   "error": "錯誤",
+  "event": "活動",
   "exit": "Sair",
   "faq": "FAQ",
   "favorite": "Adicionar aos favoritos",
@@ -196,6 +198,7 @@
   "future": "後",
   "game": "Jogos",
   "gender": "Gênero",
+  "general": "一般",
   "general-setting": "Configurações gerais",
   "get-help": "Peça ajuda",
   "gn": "Fora",
@@ -456,6 +459,7 @@
   "submit": "Enviar",
   "success": "成功",
   "super-admin": "超級管理員",
+  "system": "系統",
   "system-notify": "系統通知",
   "system-setting": "Configurações",
   "take-mic": "Pegar o microfone",
@@ -484,6 +488,7 @@
   "unset-channel-mod": "Remover moderador do canal",
   "unset-server-admin": "Remover permissão de administrador",
   "untake-mic": "下麥",
+  "update": "更新",
   "upload": "Enviar",
   "upload-avatar": "Enviar imagem",
   "user-info": "Informações do usuário",
@@ -507,6 +512,5 @@
   "wealth": "Fortuna",
   "xp": "Experiência",
   "year": "ano",
-  "yesterday": "Ontem",
-  "remove-moderator": "移除版主"
+  "yesterday": "Ontem"
 }
