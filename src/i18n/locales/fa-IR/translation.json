@@ -19,6 +19,7 @@
   "ago": "前",
   "agreement": "شرایط خدمات",
   "alert": "警告",
+  "all": "全部",
   "all-channel": "همه چنل ها",
   "always-on-top-label": "پنجره اصلی همیشه در بالا نمایش داده می‌شود",
   "anti-spam-setting": "تنظیمات خصوصی",
@@ -163,6 +164,7 @@
   "entertainment-mode": "حالت سرگرمی",
   "entertainment-mode-description": "صدای اصلی و استریو (مناسب برای چنل های صف، کارائوکه و سایر)",
   "error": "錯誤",
+  "event": "活動",
   "exit": "خروج",
   "faq": "سوالات متداول",
   "favorite": "مورد علاقه",
@@ -196,6 +198,7 @@
   "future": "後",
   "game": "بازی",
   "gender": "جنسیت",
+  "general": "一般",
   "general-setting": "تنظیمات عمومی",
   "get-help": "دریافت کمک",
   "gn": "آفلاین",
@@ -456,6 +459,7 @@
   "submit": "ثبت کردن",
   "success": "成功",
   "super-admin": "超級管理員",
+  "system": "系統",
   "system-notify": "系統通知",
   "system-setting": "تنظیمات سیستم",
   "take-mic": "صحبت کردن",
@@ -484,6 +488,7 @@
   "unset-channel-mod": "پاک کردن مدیر چنل",
   "unset-server-admin": "پاک کردن ادمین سرور",
   "untake-mic": "下麥",
+  "update": "更新",
   "upload": "آپلود",
   "upload-avatar": "آپلود آواتار",
   "user-info": "مشخصات کاربر",
@@ -507,6 +512,5 @@
   "wealth": "ثروت",
   "xp": "اعتبار",
   "year": "سال",
-  "yesterday": "دیروز",
-  "remove-moderator": "移除版主"
+  "yesterday": "دیروز"
 }
