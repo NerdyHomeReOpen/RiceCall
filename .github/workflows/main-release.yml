@@ -164,6 +164,7 @@ jobs:
             ./RiceCall-x.x.x-linux-x86_64.AppImage
             ```
           commit: ${{ github.sha }}
+          prerelease: true
           allowUpdates: true
           replacesArtifacts: true
           removeArtifacts: true
