@@ -195,15 +195,29 @@
   overflow-y: auto;
 }
 
-.announcement-detail-title {
+.announcement-detail-header {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 10px;
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #ccc;
   font-weight: bold;
   font-size: 1.2em;
+}
+
+.announcement-detail-title {
+  flex: 5;
+  font-size: 1.2em;
+  align-items: flex-start;
+}
+
+.announcement-datail-date {
+  flex: 1;
+  font-size: 0.8em;
+  color: #999;
+  text-align: right;
 }
 
 .announcement-detail-content {

@@ -318,7 +318,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           </div>
           <div className={announcementStyle['announcement-detail-wrapper']} style={selectedAnnouncement ? {} : { display: 'none' }} onClick={() => setSelectedAnnouncement(null)}>
             <div className={announcementStyle['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
-              <div className={announcementStyle['announcement-detail-title']}>{selectedAnnouncement?.title}</div>
+              <div className={announcementStyle['announcement-detail-header']}>
+                <div className={announcementStyle['announcement-type']} data-category={selectedAnnouncement?.category}>
+                  {t(`${selectedAnnouncement?.category}`)}
+                </div>
+                <div className={announcementStyle['announcement-detail-title']}>{selectedAnnouncement?.title}</div>
+                <div className={announcementStyle['announcement-datail-date']}>{selectedAnnouncement && getFormatDate(selectedAnnouncement.timestamp)}</div>
+              </div>
               <div className={announcementStyle['announcement-detail-content']}>
                 <MarkdownContent markdownText={selectedAnnouncement?.content ?? ''} escapeHtml={true} />
               </div>
