@@ -35,7 +35,8 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
             {categories.map((category, index) => (
               <div key={category}>
                 <div onClick={() => setSelectedCategoryId(index)} className={`${homePage['category-tab']} ${selectedCategoryId === index ? homePage['selected'] : ''}`}>
-                  {`${t(category)} (${recommendServerList[category].length})`}
+                  <div className={homePage['category-name']}>{t(category)}</div>
+                  <div className={homePage['category-count']}>{`(${recommendServerList[category].length})`}</div>
                 </div>
               </div>
             ))}
