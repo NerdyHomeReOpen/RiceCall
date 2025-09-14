@@ -390,7 +390,7 @@
   "report": "Пожаловаться",
   "request-to-add-you-as-a-friend": "Заявка на добавление в друзья",
   "require-password-label": "訪問時輸入密碼",
-  "require-password-placeholder": "輸入1-4位數密碼，無輸入則只限管理員進入",
+  "require-password-placeholder": "Введите пароль из 1–4 цифр. Если пароль не введен, войти в канал смогут только администраторы.",
   "required-xp": "До следующего уровня",
   "right-click-to-process": "Щелкните правой кнопкой мыши, чтобы изменить",
   "save": "Сохранить",
