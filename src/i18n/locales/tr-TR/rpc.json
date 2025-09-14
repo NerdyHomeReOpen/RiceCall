@@ -1,9 +1,12 @@
 {
+  "chat-with-members": "{{0}} üyeyle sohbet edin",
   "friend-page": "Arkadaş Listesi",
-  "viewing-friend-page": "Arkadaş listesine göz atma",
   "home-page": "Ana Sayfa",
-  "viewing-home-page": "Ana Sayfaya Göz Atma",
   "join-discord-server": "Discord sunucumuza katılın",
+  "login-page": "登入頁面",
   "server-page": "Grup sohbeti",
-  "user": "kullanıcı:"
+  "un-login": "未登入",
+  "user": "使用者: {{0}}",
+  "viewing-friend-page": "Arkadaş listesine göz atma",
+  "viewing-home-page": "Ana Sayfaya Göz Atma"
 }
