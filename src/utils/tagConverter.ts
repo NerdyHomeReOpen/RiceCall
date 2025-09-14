@@ -10,6 +10,7 @@ const emojiRegex = /\[emoji=(.+?)]/g; // [emoji=code]
 const userIconRegex = /\[icon=(.+?)]/g; // [icon=gender-level]
 const userTagRegex = /\[tag=(.+?)]/g; // [tag=name]
 const embedRegex = /\[embed=(.+?)]/g; // [embed=https://www.youtube.com/embed/dQw4w9WgXcQ]
+const discordTimestampRegex = /&lt;t:(\d+):[A-Z]&gt;/g; // <t:timestamp:F>
 
 /* ---------- reverse ---------- */
 const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
@@ -37,6 +38,11 @@ export const fromTags = (raw: string) =>
     // Embed
     .replace(embedRegex, (_, src) => {
       return `<iframe data-embed='${src}' class='${markdown['embed-video']}' src="${src}"></iframe>`;
+    })
+    // Discord Timestamp
+    .replace(discordTimestampRegex, (_, timestamp) => {
+      const date = new Date(parseInt(timestamp) * 1000);
+      return date.toLocaleString();
     });
 
 export const toTags = (html: string) => {
