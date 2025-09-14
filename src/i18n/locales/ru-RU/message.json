@@ -1,7 +1,7 @@
 {
-  "accept-member-invitation-failed": "接受會員邀請失敗，請稍後再試。",
-  "account-already-exists": "帳號已存在。",
-  "account-not-found": "找不到帳號。",
+  "accept-member-invitation-failed": "Не удалось принять приглашение участника, повторите попытку позже",
+  "account-already-exists": "Учетная запись уже существует",
+  "account-not-found": "Учетная запись не найдена",
   "add-user-to-queue": "管理員【{{operator}}】將【{{target}}】添加到麥序。",
   "add-user-to-queue-failed": "將使用者加入麥序失敗，請稍後再試。",
   "approve-friend-application-failed": "接受好友申請失敗，請稍後再試。",
