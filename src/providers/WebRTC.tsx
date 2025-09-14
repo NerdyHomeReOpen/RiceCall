@@ -121,7 +121,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const [remoteUserStatusList, setRemoteUserStatusList] = useState<{ [userId: string]: RemoteUserStatus }>({}); // userId -> status
 
   const detectSpeaking = useCallback(
-    (userId: string, analyserNode: AnalyserNode, dataArray: Uint8Array) => {
+    (targetId: string, analyserNode: AnalyserNode, dataArray: Uint8Array) => {
       analyserNode.getByteTimeDomainData(dataArray);
       let sum = 0;
       for (let i = 0; i < dataArray.length; i++) {
@@ -130,7 +130,11 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       }
       const volume = Math.sqrt(sum / dataArray.length);
       const volumePercent = Math.min(1, volume / 0.5) * 100;
-      volumePercentRef.current[userId] = volumePercent > SPEAKING_VOLUME_THRESHOLD ? volumePercent : 0;
+      if (targetId === userId && !isTakingMicRef.current) {
+        volumePercentRef.current[targetId] = 0;
+      } else {
+        volumePercentRef.current[targetId] = volumePercent > SPEAKING_VOLUME_THRESHOLD ? volumePercent : 0;
+      }
 
       const now = performance.now();
       if (now - lastRefreshRef.current >= 80) {
@@ -138,9 +142,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
       }
 
-      rafIdListRef.current[userId] = requestAnimationFrame(() => detectSpeaking(userId, analyserNode, dataArray));
+      rafIdListRef.current[targetId] = requestAnimationFrame(() => detectSpeaking(targetId, analyserNode, dataArray));
     },
-    [SPEAKING_VOLUME_THRESHOLD],
+    [SPEAKING_VOLUME_THRESHOLD, userId],
   );
 
   const initLocalStorage = useCallback(() => {
