@@ -15,13 +15,14 @@ export type table_badges = {
 export type table_announcements = {
   announcementId: number;
   title: string;
-  timestamp: number;
-  attachment_url: string | null;
+  attachmentUrl: string | null;
   link: string | null;
-  category: string;
   content: string;
+  region: string;
+  category: string;
   discordChannelId: string | null;
   discordMessageId: string | null;
+  timestamp: number;
 };
 
 export type table_channel_blocked_users = {

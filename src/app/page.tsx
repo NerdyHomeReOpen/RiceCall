@@ -715,7 +715,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       data.recommendServerList().then((recommendServerList) => {
         if (recommendServerList) setRecommendServerList(recommendServerList);
       });
-      data.announcements().then((announcements) => {
+      data.announcements({ region: i18n.language }).then((announcements) => {
         if (announcements) setAnnouncements(announcements);
       });
       setSystemNotify([]);

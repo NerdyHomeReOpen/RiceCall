@@ -55,34 +55,19 @@ export const dataService = {
     return serverMembers;
   },
 
-  recommendServerList: async (): Promise<RecommendServerList> => {
-    const recommendServerList = await api.post('/recommendServerList', {});
-    return recommendServerList;
-  },
-
-  announcement: async ({ id }: { id: number }): Promise<Announcement | null> => {
-    const announcement = await api.post('/announcement', { id });
-    return announcement;
-  },
-
-  announcements: async (): Promise<Announcement[] | null> => {
-    const announcements = await api.post('/announcements', {});
-    return announcements;
-  },
-
   channel: async ({ userId, serverId, channelId }: { userId: User['userId']; serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Channel | null> => {
     const channel = await api.post('/channel', { userId, serverId, channelId });
-    return channel;
-  },
-
-  channelMembers: async ({ serverId, channelId }: { serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Member[] | []> => {
-    const channel = await api.post('/channelMembers', { serverId, channelId });
     return channel;
   },
 
   channels: async ({ userId, serverId }: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Channel[] | []> => {
     const channels = await api.post('/channels', { userId, serverId });
     return channels;
+  },
+
+  channelMembers: async ({ serverId, channelId }: { serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Member[] | []> => {
+    const channel = await api.post('/channelMembers', { serverId, channelId });
+    return channel;
   },
 
   member: async ({ serverId, userId, channelId }: { userId: User['userId']; serverId: Server['serverId']; channelId?: Channel['channelId'] }): Promise<Member | null> => {
@@ -100,14 +85,29 @@ export const dataService = {
     return memberApplications;
   },
 
+  memberInvitation: async ({ receiverId, serverId }: { receiverId: User['userId']; serverId: Server['serverId'] }): Promise<MemberInvitation | null> => {
+    const memberInvitations = await api.post('/memberInvitation', { receiverId, serverId });
+    return memberInvitations;
+  },
+
   memberInvitations: async ({ receiverId }: { receiverId: User['userId'] }): Promise<MemberInvitation[] | []> => {
     const memberInvitations = await api.post('/memberInvitations', { receiverId });
     return memberInvitations;
   },
 
-  memberInvitation: async ({ receiverId, serverId }: { receiverId: User['userId']; serverId: Server['serverId'] }): Promise<MemberInvitation | null> => {
-    const memberInvitations = await api.post('/memberInvitation', { receiverId, serverId });
-    return memberInvitations;
+  announcement: async ({ announcementId, region }: { announcementId: Announcement['announcementId']; region: Announcement['region'] }): Promise<Announcement | null> => {
+    const announcement = await api.post('/announcement', { announcementId, region });
+    return announcement;
+  },
+
+  announcements: async ({ region }: { region: Announcement['region'] }): Promise<Announcement[] | null> => {
+    const announcements = await api.post('/announcements', { region });
+    return announcements;
+  },
+
+  recommendServerList: async (): Promise<RecommendServerList> => {
+    const recommendServerList = await api.post('/recommendServerList', {});
+    return recommendServerList;
   },
 };
 
