@@ -1,10 +1,12 @@
 {
-  "official-developer": "開發人員",
-  "official-developer-description": "RC 官方開發者徽章",
-  "official-supporter": "客服人員",
-  "official-supporter-description": "RC 官方客服徽章",
-  "volunteer-tester": "測試人員",
-  "volunteer-tester-description": "RC 志願測試者徽章",
-  "volunteer-translator": "翻譯人員",
-  "volunteer-translator-description": "RC 志願翻譯者徽章"
+  "official-developer": "Разработчик",
+  "official-developer-description": "Официальный разработчик RiceCall",
+  "official-supporter": "Команда поддержки",
+  "official-supporter-description": "Официальный член команды поддержки RiceCall",
+  "volunteer-tester": "Тестировщик",
+  "volunteer-tester-description": "Волонтер-тестировщик RiceCall",
+  "volunteer-translator": "Переводчик",
+  "volunteer-translator-description": "Волонтер-переводчик RiceCall",
+  "rc-0.1-paticipant": "Участники RC v0.1",
+  "rc-0.1-paticipant-description": "Спасибо за участие в тестировании RC v0.1 и за ваше терпение! Став свидетелями эволюции этой версии, мы награждаем вас этим эксклюзивным значком."
 }

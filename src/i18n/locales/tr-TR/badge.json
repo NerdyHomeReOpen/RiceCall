@@ -1,10 +1,12 @@
 {
-  "official-developer": "開發人員",
-  "official-developer-description": "RC 官方開發者徽章",
-  "official-supporter": "客服人員",
-  "official-supporter-description": "RC 官方客服徽章",
-  "volunteer-tester": "測試人員",
-  "volunteer-tester-description": "RC 志願測試者徽章",
-  "volunteer-translator": "翻譯人員",
-  "volunteer-translator-description": "RC 志願翻譯者徽章"
+  "official-developer": "Developer",
+  "official-developer-description": "RiceCall Official Developer",
+  "official-supporter": "Support Team",
+  "official-supporter-description": "Official representative of the RiceCall User Support service",
+  "volunteer-tester": "Tester",
+  "volunteer-tester-description": "RiceCall Volunteer Tester",
+  "volunteer-translator": "Translator",
+  "volunteer-translator-description": "RiceCall Volunteer Translator",
+  "rc-0.1-paticipant": "RC v0.1 member",
+  "rc-0.1-paticipant-description": "Thank you for participating in the RC v0.1 testing and for your patience! As you have witnessed the evolution of this version, we are rewarding you with this exclusive badge."
 }
