@@ -25,7 +25,7 @@ import type {
 } from '@/types';
 
 // i18n
-import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
+import { LanguageKey, LANGUAGES } from '@/i18n';
 
 // Pages
 import FriendPage from '@/components/pages/Friend';
@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
   // const actionScanner = useActionScanner();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Refs
   const isCloseToTray = useRef<boolean>(true);
@@ -390,7 +390,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const mainTab = useMainTab();
   const loadingBox = useLoading();
   const soundPlayer = useSoundPlayer();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Refs
   const setSelectedTabIdRef = useRef(mainTab.setSelectedTabId);
@@ -715,13 +715,17 @@ const RootPageComponent: React.FC = React.memo(() => {
       data.recommendServerList().then((recommendServerList) => {
         if (recommendServerList) setRecommendServerList(recommendServerList);
       });
-      data.announcements({ region: i18n.language }).then((announcements) => {
-        if (announcements) setAnnouncements(announcements);
-      });
+
       setSystemNotify([]);
     };
     refresh();
   }, [userId]);
+
+  useEffect(() => {
+    data.announcements({ region: i18n.language }).then((announcements) => {
+      if (announcements) setAnnouncements(announcements);
+    });
+  }, [i18n.language]);
 
   useEffect(() => {
     const unsubscribe = [
