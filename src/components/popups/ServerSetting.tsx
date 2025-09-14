@@ -19,7 +19,7 @@ import api from '@/services/api.service';
 // Utils
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
-import { isMember, isServerAdmin, isServerOwner } from '@/utils/permission';
+import { isMember, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
 
 // Components
 import AnnouncementEditor from '../AnnouncementEditor';
@@ -70,13 +70,22 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     // Memos
     const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermission), [globalPermission, serverPermission]);
+    const totalMembers = useMemo(() => serverMembers.filter((m) => m.permissionLevel > 1).length, [serverMembers]);
+    const totalApplications = useMemo(() => memberApplications.length, [memberApplications]);
+    const totalBlockMembers = useMemo(() => serverMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now()).length, [serverMembers]);
+    const canSubmit = useMemo(() => serverName.trim(), [serverName]);
+
     const filteredMembers = useMemo(
       () =>
         serverMembers
-          .filter((m) => isMember(m.permissionLevel) && (m.nickname?.toLowerCase().includes(searchText.toLowerCase()) || m.name.toLowerCase().includes(searchText.toLowerCase())))
+          .filter(
+            (m) =>
+              isMember(m.permissionLevel) && !isStaff(m.permissionLevel) && (m.nickname?.toLowerCase().includes(searchText.toLowerCase()) || m.name.toLowerCase().includes(searchText.toLowerCase())),
+          )
           .sort(Sorter(sortField as keyof Member, sortDirection)),
       [serverMembers, searchText, sortField, sortDirection],
     );
+
     const filteredBlockMembers = useMemo(
       () =>
         serverMembers
@@ -86,6 +95,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           .sort(Sorter(sortField as keyof Member, sortDirection)),
       [serverMembers, searchText, sortField, sortDirection],
     );
+
     const filteredApplications = useMemo(
       () =>
         memberApplications
@@ -93,10 +103,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           .sort(Sorter(sortField as keyof MemberApplication, sortDirection)),
       [memberApplications, searchText, sortField, sortDirection],
     );
-    const totalMembers = useMemo(() => serverMembers.filter((m) => m.permissionLevel > 1).length, [serverMembers]);
-    const totalApplications = useMemo(() => memberApplications.length, [memberApplications]);
-    const totalBlockMembers = useMemo(() => serverMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now()).length, [serverMembers]);
-    const canSubmit = useMemo(() => serverName.trim(), [serverName]);
+
     const memberTableFields = useMemo(
       () => [
         { name: t('name'), field: 'name' },
@@ -106,6 +113,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       ],
       [t],
     );
+
     const applicationTableFields = useMemo(
       () => [
         { name: t('name'), field: 'name' },
@@ -114,6 +122,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       ],
       [t],
     );
+
     const blockMemberTableFields = useMemo(
       () => [
         { name: t('name'), field: 'name' },
@@ -121,6 +130,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       ],
       [t],
     );
+
     const settingPages = useMemo(
       () =>
         isServerAdmin(permissionLevel)
@@ -490,20 +500,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                               {
                                 id: 'separator',
                                 label: '',
-                              },
-                              {
-                                id: 'forbid-voice',
-                                label: t('forbid-voice'),
-                                show: !isUser && isMember(permissionLevel) && isSuperior,
-                                disabled: true,
-                                onClick: () => {},
-                              },
-                              {
-                                id: 'forbid-text',
-                                label: t('forbid-text'),
-                                show: !isUser && isMember(permissionLevel) && isSuperior,
-                                disabled: true,
-                                onClick: () => {},
                               },
                               {
                                 id: 'block',

@@ -138,15 +138,15 @@ interface ServerPageProps {
   friends: Friend[];
   server: Server;
   serverOnlineMembers: OnlineMember[];
-  serverChannels: Channel[];
-  queueMembers: QueueMember[];
   channel: Channel;
+  channels: Channel[];
   channelMessages: (ChannelMessage | PromptMessage)[];
   actionMessages: PromptMessage[];
+  queueMembers: QueueMember[];
   display: boolean;
 }
 
-const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, friends, server, serverOnlineMembers, serverChannels, channel, channelMessages, actionMessages, display, queueMembers }) => {
+const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, channels, channelMessages, actionMessages, queueMembers, display }) => {
   // Hooks
   const { t } = useTranslation();
   const webRTC = useWebRTC();
@@ -402,7 +402,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
       <main className={styles['server-body']}>
         {/* Left Sidebar */}
         <aside ref={sidebarRef} className={styles['sidebar']}>
-          <ChannelList user={user} friends={friends} server={server} serverOnlineMembers={serverOnlineMembers} serverChannels={serverChannels} channel={channel} queueMembers={queueMembers} />
+          <ChannelList user={user} friends={friends} server={server} serverOnlineMembers={serverOnlineMembers} channels={channels} channel={channel} queueMembers={queueMembers} />
         </aside>
 
         {/* Resize Handle */}

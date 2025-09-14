@@ -404,19 +404,19 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // States
   const [user, setUser] = useState<User>(Default.user());
-  const [servers, setServers] = useState<Server[]>([]);
-  const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
   const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
-  const [systemNotify, setSystemNotify] = useState<string[]>([]);
-  const [serverChannels, setServerChannels] = useState<Channel[]>([]);
+  const [servers, setServers] = useState<Server[]>([]);
   const [serverOnlineMembers, setServerOnlineMembers] = useState<OnlineMember[]>([]);
-  const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
+  const [channels, setChannels] = useState<Channel[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
+  const [systemNotify, setSystemNotify] = useState<string[]>([]);
+  const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
   const [isConnected, setIsConnected] = useState(false);
 
   // Variables
@@ -428,8 +428,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [servers, user.currentServerId]);
 
   const channel = useMemo(() => {
-    return serverChannels.find((item) => item.channelId === user.currentChannelId) || Default.channel();
-  }, [serverChannels, user.currentChannelId]);
+    return channels.find((item) => item.channelId === user.currentChannelId) || Default.channel();
+  }, [channels, user.currentChannelId]);
 
   // Handlers
   const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
@@ -440,24 +440,6 @@ const RootPageComponent: React.FC = React.memo(() => {
       serverIdRef.current = args[0].update.currentServerId || '';
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
-  };
-
-  const handleServersSet = (...args: Server[]) => {
-    setServers(args);
-  };
-
-  const handleServerAdd = (...args: { data: Server }[]) => {
-    setServers((prev) => [...prev, ...args.map((i) => i.data)]);
-  };
-
-  const handleServerUpdate = (...args: { serverId: string; update: Partial<Server> }[]) => {
-    const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
-    setServers((prev) => prev.map((s) => (update.has(`${s.serverId}`) ? { ...s, ...update.get(`${s.serverId}`) } : s)));
-  };
-
-  const handleServerRemove = (...args: { serverId: string }[]) => {
-    const remove = new Set(args.map((i) => `${i.serverId}`));
-    setServers((prev) => prev.filter((s) => !remove.has(`${s.serverId}`)));
   };
 
   const handleFriendsSet = (...args: Friend[]) => {
@@ -509,6 +491,24 @@ const RootPageComponent: React.FC = React.memo(() => {
     setFriendApplications((prev) => prev.filter((fa) => !args.some((i) => i.senderId === fa.senderId)));
   };
 
+  const handleServersSet = (...args: Server[]) => {
+    setServers(args);
+  };
+
+  const handleServerAdd = (...args: { data: Server }[]) => {
+    setServers((prev) => [...prev, ...args.map((i) => i.data)]);
+  };
+
+  const handleServerUpdate = (...args: { serverId: string; update: Partial<Server> }[]) => {
+    const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
+    setServers((prev) => prev.map((s) => (update.has(`${s.serverId}`) ? { ...s, ...update.get(`${s.serverId}`) } : s)));
+  };
+
+  const handleServerRemove = (...args: { serverId: string }[]) => {
+    const remove = new Set(args.map((i) => `${i.serverId}`));
+    setServers((prev) => prev.filter((s) => !remove.has(`${s.serverId}`)));
+  };
+
   const handleServerOnlineMembersSet = (...args: OnlineMember[]) => {
     setServerOnlineMembers(args);
   };
@@ -527,22 +527,22 @@ const RootPageComponent: React.FC = React.memo(() => {
     setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   };
 
-  const handleServerChannelsSet = (...args: Channel[]) => {
-    setServerChannels(args);
+  const handleChannelsSet = (...args: Channel[]) => {
+    setChannels(args);
   };
 
-  const handleServerChannelAdd = (...args: { data: Channel }[]) => {
-    setServerChannels((prev) => [...prev, ...args.map((i) => i.data)]);
+  const handleChannelAdd = (...args: { data: Channel }[]) => {
+    setChannels((prev) => [...prev, ...args.map((i) => i.data)]);
   };
 
-  const handleServerChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
+  const handleChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
     const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
-    setServerChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
+    setChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
   };
 
-  const handleServerChannelRemove = (...args: { channelId: string }[]) => {
+  const handleChannelRemove = (...args: { channelId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.channelId}`));
-    setServerChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
+    setChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
   };
 
   const handleMemberInvitationAdd = (...args: { data: MemberInvitation }[]) => {
@@ -733,9 +733,6 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.socket.on('reconnect_error', handleReconnectError),
       ipc.socket.on('userUpdate', handleUserUpdate),
       ipc.socket.on('serversSet', handleServersSet),
-      ipc.socket.on('serverAdd', handleServerAdd),
-      ipc.socket.on('serverUpdate', handleServerUpdate),
-      ipc.socket.on('serverRemove', handleServerRemove),
       ipc.socket.on('friendsSet', handleFriendsSet),
       ipc.socket.on('friendAdd', handleFriendAdd),
       ipc.socket.on('friendUpdate', handleFriendUpdate),
@@ -747,14 +744,17 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
       ipc.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
       ipc.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
+      ipc.socket.on('serverAdd', handleServerAdd),
+      ipc.socket.on('serverUpdate', handleServerUpdate),
+      ipc.socket.on('serverRemove', handleServerRemove),
       ipc.socket.on('serverOnlineMembersSet', handleServerOnlineMembersSet),
       ipc.socket.on('serverOnlineMemberAdd', handleServerOnlineMemberAdd),
       ipc.socket.on('serverOnlineMemberUpdate', handleServerOnlineMemberUpdate),
       ipc.socket.on('serverOnlineMemberRemove', handleServerOnlineMemberRemove),
-      ipc.socket.on('serverChannelsSet', handleServerChannelsSet),
-      ipc.socket.on('serverChannelAdd', handleServerChannelAdd),
-      ipc.socket.on('serverChannelUpdate', handleServerChannelUpdate),
-      ipc.socket.on('serverChannelRemove', handleServerChannelRemove),
+      ipc.socket.on('channelsSet', handleChannelsSet),
+      ipc.socket.on('channelAdd', handleChannelAdd),
+      ipc.socket.on('channelUpdate', handleChannelUpdate),
+      ipc.socket.on('channelRemove', handleChannelRemove),
       ipc.socket.on('memberInvitationAdd', handleMemberInvitationAdd),
       ipc.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
       ipc.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
@@ -782,9 +782,9 @@ const RootPageComponent: React.FC = React.memo(() => {
                 user={user}
                 friends={friends}
                 server={server}
-                channel={channel}
                 serverOnlineMembers={serverOnlineMembers}
-                serverChannels={serverChannels}
+                channel={channel}
+                channels={channels}
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
                 queueMembers={queueMembers}

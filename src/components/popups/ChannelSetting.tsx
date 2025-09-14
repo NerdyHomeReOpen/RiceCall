@@ -76,6 +76,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const isLobby = useMemo(() => serverLobbyId === channelId, [serverLobbyId, channelId]);
   const isReceptionLobby = useMemo(() => serverReceptionLobbyId === channelId, [serverReceptionLobbyId, channelId]);
   const canSubmit = useMemo(() => channelName.trim(), [channelName]);
+
   const settingPages = useMemo(
     () =>
       isChannelMod(permissionLevel)
@@ -83,6 +84,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         : [t('channel-info'), t('channel-announcement'), t('access-permission'), t('speaking-permission'), t('text-permission')],
     [t, permissionLevel],
   );
+
   const memberTableFields = useMemo(
     () => [
       { name: t('name'), field: 'name' },
@@ -92,6 +94,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     ],
     [t],
   );
+
   const filteredModerators = useMemo(
     () =>
       channelMembers
@@ -156,21 +159,21 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     handleSort(field);
   };
 
-  const handleServerChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
+  const handleChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
     const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
     setChannel((prev) => (update.has(`${prev.channelId}`) ? { ...prev, ...update.get(`${prev.channelId}`) } : prev));
   };
 
-  const handleServerMemberAdd = (...args: { data: Member }[]) => {
+  const handleChannelMemberAdd = (...args: { data: Member }[]) => {
     setChannelMembers((prev) => [...prev, ...args.map((i) => i.data)]);
   };
 
-  const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
+  const handleChannelMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
     const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
     setChannelMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
   };
 
-  const handleServerMemberRemove = (...args: { userId: string; serverId: string }[]) => {
+  const handleChannelMemberRemove = (...args: { userId: string; serverId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
     setChannelMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   };
@@ -178,10 +181,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   // Effects
   useEffect(() => {
     const unsubscribe = [
-      ipc.socket.on('serverChannelUpdate', handleServerChannelUpdate),
-      ipc.socket.on('serverMemberAdd', handleServerMemberAdd),
-      ipc.socket.on('serverMemberUpdate', handleServerMemberUpdate),
-      ipc.socket.on('serverMemberRemove', handleServerMemberRemove),
+      ipc.socket.on('channelUpdate', handleChannelUpdate),
+      ipc.socket.on('channelMemberAdd', handleChannelMemberAdd),
+      ipc.socket.on('channelMemberUpdate', handleChannelMemberUpdate),
+      ipc.socket.on('channelMemberRemove', handleChannelMemberRemove),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
@@ -492,7 +495,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
-              <div className={popup['label']}>{`${t('channel-management')} (${channelMembers.length})`}</div>
+              <div className={popup['label']}>{`${t('channel-management')} (${filteredModerators.length})`}</div>
               <div className={setting['search-box']}>
                 <div className={setting['search-icon']}></div>
                 <input name="search-query" type="text" className={setting['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
@@ -555,20 +558,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                             {
                               id: 'separator',
                               label: '',
-                            },
-                            {
-                              id: 'forbid-voice',
-                              label: t('forbid-voice'),
-                              show: !isUser && isMember(permissionLevel) && isSuperior,
-                              disabled: true,
-                              onClick: () => {},
-                            },
-                            {
-                              id: 'forbid-text',
-                              label: t('forbid-text'),
-                              show: !isUser && isMember(permissionLevel) && isSuperior,
-                              disabled: true,
-                              onClick: () => {},
                             },
                             {
                               id: 'block',

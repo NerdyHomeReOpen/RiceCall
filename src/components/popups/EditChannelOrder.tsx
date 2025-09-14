@@ -155,16 +155,16 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     setSelectedChannel(null);
   };
 
-  const handleServerChannelAdd = (...args: { data: Channel }[]) => {
+  const handleChannelAdd = (...args: { data: Channel }[]) => {
     setServerChannels((prev) => [...prev, ...args.map((i) => i.data)]);
   };
 
-  const handleServerChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
+  const handleChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
     const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
     setServerChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
   };
 
-  const handleServerChannelRemove = (...args: { channelId: string }[]) => {
+  const handleChannelRemove = (...args: { channelId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.channelId}`));
     setServerChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
   };
@@ -182,11 +182,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, [serverChannels]);
 
   useEffect(() => {
-    const unsubscribe = [
-      ipc.socket.on('serverChannelAdd', handleServerChannelAdd),
-      ipc.socket.on('serverChannelUpdate', handleServerChannelUpdate),
-      ipc.socket.on('serverChannelRemove', handleServerChannelRemove),
-    ];
+    const unsubscribe = [ipc.socket.on('channelAdd', handleChannelAdd), ipc.socket.on('channelUpdate', handleChannelUpdate), ipc.socket.on('channelRemove', handleChannelRemove)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 

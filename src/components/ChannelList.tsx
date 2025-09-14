@@ -28,12 +28,12 @@ interface ChannelListProps {
   friends: Friend[];
   server: Server;
   serverOnlineMembers: OnlineMember[];
-  serverChannels: (Channel | Category)[];
   channel: Channel;
+  channels: (Channel | Category)[];
   queueMembers: QueueMember[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, serverChannels, channel, queueMembers }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, channels, queueMembers }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -55,10 +55,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
   const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
   const filteredQueueMembers = useMemo(() => queueMembers.filter((member) => member.position >= 0 && member.leftTime > 0).sort((a, b) => a.position - b.position), [queueMembers]);
-  const filteredServerChannels = useMemo(
-    () => serverChannels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
-    [serverChannels],
-  );
+  const filteredChannels = useMemo(() => channels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
   const isVerifiedServer = useMemo(() => false, []); // TODO: implement
 
   // Handlers
@@ -110,10 +107,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
 
   // Effects
   useEffect(() => {
-    for (const channel of serverChannels) {
+    for (const channel of channels) {
       setExpanded((prev) => ({ ...prev, [channel.channelId]: prev[channel.channelId] != undefined ? prev[channel.channelId] : true }));
     }
-  }, [serverChannels]);
+  }, [channels]);
 
   useEffect(() => {
     let start = Date.now();
@@ -303,7 +300,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
               setSelectedItemId={setSelectedItemId}
             />
           ) : (
-            filteredServerChannels.map((item) =>
+            filteredChannels.map((item) =>
               item.type === 'category' ? (
                 <CategoryTab
                   key={item.channelId}
@@ -311,8 +308,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                   friends={friends}
                   server={server}
                   serverOnlineMembers={serverOnlineMembers}
-                  serverChannels={serverChannels}
                   category={item as Category}
+                  channels={channels}
                   expanded={expanded}
                   selectedItemId={selectedItemId}
                   setExpanded={setExpanded}

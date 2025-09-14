@@ -26,15 +26,15 @@ interface CategoryTabProps {
   friends: Friend[];
   server: Server;
   serverOnlineMembers: OnlineMember[];
-  serverChannels: (Channel | Category)[];
   category: Category;
+  channels: (Channel | Category)[];
   expanded: Record<string, boolean>;
   selectedItemId: string | null;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, server, serverOnlineMembers, serverChannels, category, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, server, serverOnlineMembers, category, channels, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -47,7 +47,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
 
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel), [globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel]);
-  const categoryChannels = useMemo(() => serverChannels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [serverChannels, categoryId]);
+  const categoryChannels = useMemo(() => channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [channels, categoryId]);
   const categoryMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === categoryId), [serverOnlineMembers, categoryId]);
   const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);
   const isInChannel = useMemo(() => userCurrentChannelId === categoryId, [userCurrentChannelId, categoryId]);
