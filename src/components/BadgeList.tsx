@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
-import styles from '@/styles/badge.module.css';
+import badgeStyle from '@/styles/badge.module.css';
 
 // Types
 import type { Badge } from '@/types';
@@ -11,19 +11,19 @@ import BadgeItem from '@/components/BadgeItem';
 
 interface BadgeListProps {
   badges: Badge[];
+  position?: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
+  direction?: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   maxDisplay?: number;
-  preferTop?: boolean;
 }
 
-const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, preferTop, maxDisplay = 21 }) => {
-  const sortedBadges = [...badges]
-    .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
-    .slice(0, maxDisplay);
+const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'left-top', direction = 'right-bottom', maxDisplay = 21 }) => {
+  // Memos
+  const filteredBadges = useMemo(() => badges.slice(0, maxDisplay).sort((a, b) => a.order - b.order), [badges, maxDisplay]);
 
   return (
-    <div className={styles['badge-viewer-wrapper']}>
-      {sortedBadges.map((badge) => (
-        <BadgeItem key={badge.badgeId} badge={badge} preferTop={preferTop} />
+    <div className={badgeStyle['badge-viewer-wrapper']}>
+      {filteredBadges.map((badge) => (
+        <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
       ))}
     </div>
   );

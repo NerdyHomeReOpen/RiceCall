@@ -1,0 +1,226 @@
+.announcement-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  height: 100%;
+  width: 100%;
+}
+
+.announcement-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background-color: #fff;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 1px #00000080;
+}
+
+.announcement-tab {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 10px 5px;
+  color: #898987;
+  font-weight: bold;
+  transition: color 0.1s ease;
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    border-bottom: 2px solid #e72525;
+    transition: all 0.1s ease;
+  }
+  &.active::after {
+    left: 0;
+    width: 100%;
+  }
+  &.active {
+    color: #e72525;
+  }
+}
+
+.announcement-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  margin-top: 10px;
+  overflow-y: auto;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  box-shadow: 0 1px 1px #00000080;
+}
+
+.announcement-item {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+  color: #666;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  &:hover {
+    background-color: #f1f2f5;
+  }
+}
+/* 
+.announcement-container {
+  display: flex;
+  flex-direction: row;
+  font-weight: bold;
+  margin-top: 10px;
+  overflow-y: auto;
+  min-height: 550px;
+  max-height: 550px;
+  border-radius: 5px;
+  padding: 5px;
+  gap: 5px;
+}
+
+.announcement-main-content {
+  width: 500px;
+  padding: 10px;
+  height: 420px;
+  border: 1px solid #4f4f4d80;
+}
+
+.announcement-container .announcement-content-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.announcement-container .announcement-content-detail {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100px;
+}
+
+.announcement-sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 5px;
+  flex: 1;
+}
+
+.announcement-sidebar .announcement-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
+  height: 80px;
+  background-color: #fff;
+  color: #666;
+  border: 1px solid #4f4f4d80;
+  cursor: pointer;
+} */
+
+.announcement-type {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #666;
+  background-color: #f1f2f5;
+  color: #666;
+  min-width: 50px;
+  width: fit-content;
+  text-align: center;
+  &[data-category='general'] {
+    border-color: #005cbf;
+    background-color: #e7f3ff;
+    color: #005cbf;
+  }
+
+  &[data-category='update'] {
+    border-color: #c85a17;
+    background-color: #fff0e6;
+    color: #c85a17;
+  }
+
+  &[data-category='system'] {
+    border-color: #e72525;
+    background-color: #fae6e6;
+    color: #e72525;
+  }
+
+  &[data-category='event'] {
+    border-color: #1e7e34;
+    background-color: #e6ffed;
+    color: #1e7e34;
+  }
+}
+
+.announcement-title {
+  flex: 5;
+}
+
+.announcement-date {
+  flex: 1;
+}
+
+.announcement-detail-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #00000060;
+}
+
+.announcement-detail-container {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  height: 80%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  box-shadow: 0 1px 1px #00000080;
+  overflow-y: auto;
+}
+
+.announcement-detail-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.announcement-detail-title {
+  flex: 5;
+  font-size: 1.2em;
+  align-items: flex-start;
+}
+
+.announcement-datail-date {
+  flex: 1;
+  font-size: 0.8em;
+  color: #999;
+  text-align: right;
+}
+
+.announcement-detail-content {
+  flex: 1;
+  padding: 10px;
+}

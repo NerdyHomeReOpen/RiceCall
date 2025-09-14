@@ -1,84 +1,56 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 // Types
-import { Member, User, Server } from '@/types';
+import type { Member, User, Server } from '@/types';
 
 // Providers
-import { useSocket } from '@/providers/Socket';
 import { useTranslation } from 'react-i18next';
 
 // CSS
 import popup from '@/styles/popup.module.css';
 
 // Services
-import getService from '@/services/get.service';
-import ipcService from '@/services/ipc.service';
-
-// Utils
-import Default from '@/utils/default';
+import ipc from '@/services/ipc.service';
 
 interface EditNicknamePopupProps {
   userId: User['userId'];
   serverId: Server['serverId'];
+  member: Member;
 }
 
-const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId, serverId }) => {
+const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId, serverId, member }) => {
   // Hooks
-  const socket = useSocket();
   const { t } = useTranslation();
 
-  // Refs
-  const refreshRef = useRef(false);
-
   // States
-  const [member, setMember] = useState<Member>(Default.member());
-  const [user, setUser] = useState<User>(Default.user());
+  const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
 
-  // Variables
-  const { nickname: memberNickname } = member;
-  const { name: userName } = user;
+  // Destructuring
+  const { name: memberName } = member;
 
   // Handlers
-  const handleEditMember = (member: Partial<Member>, userId: User['userId'], serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.editMember({ member, userId, serverId });
+  const handleEditMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
+    ipc.socket.send('editMember', { userId, serverId, update });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
-  // Effects
-  useEffect(() => {
-    if (!userId || !serverId || refreshRef.current) return;
-    const refresh = async () => {
-      refreshRef.current = true;
-      getService.user({ userId: userId }).then((user) => {
-        if (user) setUser(user);
-      });
-      getService.member({ userId: userId, serverId: serverId }).then((member) => {
-        if (member) setMember(member);
-      });
-    };
-    refresh();
-  }, [userId, serverId]);
-
   return (
-    <form className={popup['popup-wrapper']}>
+    <div className={popup['popup-wrapper']}>
       {/* Body */}
       <div className={popup['popup-body']}>
-        <div className={popup['dialog-content']}>
-          <div className={popup['input-group']}>
-            <div className={popup['input-box']}>
-              <div className={popup['label']} style={{ minWidth: '2rem' }}>
-                {t('nickname')}:
-              </div>
-              <div className={popup['label']}>{userName}</div>
+        <div className={`${popup['dialog-content']} ${popup['col']}`}>
+          <div className={popup['input-box']}>
+            <div className={popup['label']} style={{ minWidth: '2rem' }}>
+              {t('nickname')}:
             </div>
-            <div className={`${popup['input-box']} ${popup['col']}`}>
-              <div className={popup['label']}>{t('please-enter-the-member-nickname')}</div>
-              <input name="nickname" type="text" value={memberNickname || ''} maxLength={32} onChange={(e) => setMember((prev) => ({ ...prev, nickname: e.target.value }))} />
-            </div>
+            <div className={popup['label']}>{memberName}</div>
+          </div>
+          <div className={`${popup['input-box']} ${popup['col']}`}>
+            <div className={popup['label']}>{t('please-enter-the-member-nickname')}</div>
+            <input name="nickname" type="text" defaultValue={memberNickname} maxLength={32} onChange={(e) => setMemberNickname(e.target.value)} />
           </div>
         </div>
       </div>
@@ -88,20 +60,20 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         <div
           className={popup['button']}
           onClick={() => {
-            handleEditMember({ nickname: memberNickname }, userId, serverId);
+            handleEditMember(userId, serverId, { nickname: memberNickname || null });
             handleClose();
           }}
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
-        <div className={popup['button']} onClick={() => handleEditMember({ nickname: memberNickname }, userId, serverId)}>
-          {t('set')}
+        <div className={popup['button']} onClick={() => handleEditMember(userId, serverId, { nickname: memberNickname || null })}>
+          {t('apply')}
         </div>
       </div>
-    </form>
+    </div>
   );
 });
 

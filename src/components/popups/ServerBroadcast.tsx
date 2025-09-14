@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 // Types
-import { Server, Channel, Message } from '@/types';
+import type { Server, Channel, PromptMessage } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 
 // CSS
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface ServerBroadcastPopupProps {
   serverId: Server['serverId'];
@@ -21,28 +20,27 @@ interface ServerBroadcastPopupProps {
 const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ serverId, channelId }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
 
   // States
-  const [channelType, setChannelType] = useState<string>('current');
-  const [sendType, setSendType] = useState<string>('text');
+  const [sendType, setSendType] = useState<'text' | 'voice'>('text');
+  const [broadcastType, setBroadcastType] = useState<'channel' | 'server'>('channel');
   const [broadcastContent, setBroadcastContent] = useState<string>('');
 
-  // Variables
-  const maxLength = 300;
-  const canSend = broadcastContent.trim();
+  // Memos
+  const MAX_LENGTH = useMemo(() => 300, []);
+  const canSend = useMemo(() => broadcastContent.trim() && broadcastContent.length <= MAX_LENGTH, [broadcastContent, MAX_LENGTH]);
 
   // Handlers
-  const handleBroadcastServer = (
-    message: Partial<Message>,
-    serverId: Server['serverId'],
-    channelId: Channel['channelId'] | null,
-  ) => {
-    socket.send.actionMessage({ message, serverId, channelId });
+  const handleBroadcastChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<PromptMessage>) => {
+    ipc.socket.send('actionMessage', { serverId, channelId, preset });
+  };
+
+  const handleBroadcastServer = (serverId: Server['serverId'], preset: Partial<PromptMessage>) => {
+    ipc.socket.send('actionMessage', { serverId, preset });
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (
@@ -53,66 +51,30 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
           <div className={popup['row']}>
             <div className={popup['label']}>{t('receive-channel')}</div>
             <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
-              <input
-                name="channelType"
-                type="radio"
-                checked={channelType === 'current'}
-                onChange={() => {
-                  setChannelType('current');
-                }}
-              />
+              <input name="channelType" type="radio" checked={broadcastType === 'channel'} onChange={() => setBroadcastType('channel')} />
               <div className={popup['label']}>{t('current-channel')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
-              <input
-                name="channelType"
-                type="radio"
-                checked={channelType === 'all'}
-                onChange={() => {
-                  setChannelType('all');
-                }}
-              />
+              <input name="channelType" type="radio" checked={broadcastType === 'server'} onChange={() => setBroadcastType('server')} />
               <div className={popup['label']}>{t('all-channel')}</div>
             </div>
           </div>
           <div className={popup['row']}>
             <div className={popup['label']}>{t('broadcast-type')}</div>
             <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
-              <input
-                name="sendType"
-                type="radio"
-                checked={sendType === 'text'}
-                onChange={() => {
-                  setSendType('text');
-                }}
-              />
+              <input name="sendType" type="radio" checked={sendType === 'text'} onChange={() => setSendType('text')} />
               <div className={popup['label']}>{t('text-broadcast')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`} style={{ width: 'fit-content' }}>
-              <input
-                name="sendType"
-                type="radio"
-                checked={sendType === 'voice'}
-                onChange={() => {
-                  setSendType('voice');
-                }}
-              />
+              <input name="sendType" type="radio" checked={sendType === 'voice'} onChange={() => setSendType('voice')} />
               <div className={popup['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
             </div>
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('broadcast-content')}</div>
-            <textarea
-              name="content"
-              maxLength={300}
-              placeholder={t('markdown-support')}
-              style={{ minHeight: '90px' }}
-              onChange={(e) => {
-                setBroadcastContent(e.target.value);
-              }}
-            />
+            <textarea name="content" maxLength={MAX_LENGTH} style={{ minHeight: '90px' }} onChange={(e) => setBroadcastContent(e.target.value)} />
             <div className={popup['hint-text']}>
-              {broadcastContent.length}/{maxLength}
+              {broadcastContent.length}/{MAX_LENGTH}
             </div>
           </div>
         </div>
@@ -123,17 +85,17 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
         <div
           className={`${popup['button']} ${!canSend ? 'disabled' : ''}`}
           onClick={() => {
-            handleBroadcastServer(
-              { type: 'alert', content: broadcastContent },
-              serverId,
-              channelType === 'current' ? channelId : null,
-            );
+            if (broadcastType === 'channel') {
+              handleBroadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
+            } else {
+              handleBroadcastServer(serverId, { type: 'alert', content: broadcastContent });
+            }
             handleClose();
           }}
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

@@ -1,156 +1,83 @@
-export const enum Permission {
-  Guest = 1,
-  Member = 2,
-  ChannelMod = 3,
-  ChannelAdmin = 4,
-  ServerAdmin = 5,
-  ServerOwner = 6,
-  Staff = 7,
-  Official = 8,
-}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import * as mediasoupClient from 'mediasoup-client';
 
-export type User = {
-  userId: string;
-  name: string;
-  avatar: string;
-  avatarUrl: string;
-  signature: string;
-  country: string;
-  level: number;
-  vip: number;
-  vxp: number; // New: VIP Experience Points
-  xp: number;
-  requiredXp: number;
-  birthYear: number;
-  birthMonth: number;
-  birthDay: number;
-  status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
-  gender: 'Male' | 'Female';
-  currentChannelId: string;
-  currentServerId: string;
-  lastActiveAt: number;
-  createdAt: number;
-  badges: Badge[];
+import {
+  table_badges,
+  table_channels,
+  table_friend_groups,
+  table_friends,
+  table_friend_applications,
+  table_servers,
+  table_members,
+  table_member_applications,
+  table_member_invitations,
+  table_users,
+  table_user_servers,
+  table_user_badges,
+  table_server_permissions,
+  table_channel_permissions,
+  table_channel_muted_users,
+  table_server_blocked_users,
+  table_announcements,
+} from '@/types/database';
+
+export type Announcement = table_announcements;
+
+export type Permission = {
+  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 };
 
-export type Badge = {
-  badgeId: string;
-  name: string;
-  rare: string;
-  description: string;
-  order: number;
-  createdAt: number;
+export type BadgeList = {
+  badges: string;
 };
 
-export type FriendGroup = {
-  friendGroupId: string;
-  name: string;
-  order: number;
-  userId: string;
-  createdAt: number;
+export type User = table_users & Permission & BadgeList;
+
+export type Badge = table_badges & table_user_badges;
+
+export type Friend = table_friends & table_users & BadgeList;
+
+export type FriendGroup = table_friend_groups;
+
+export type FriendApplication = table_friend_applications & table_users;
+
+export type Server = table_servers & table_user_servers & table_members & Permission;
+
+export type RecommendServerList = {
+  [category: string]: RecommendServer[];
 };
 
-export type Friend = {
-  userId: string;
-  targetId: string;
-  isBlocked: boolean;
-  friendGroupId: string | null;
-  createdAt: number;
+export type RecommendServer = table_servers & {
+  online: number;
 };
 
-export type FriendApplication = User & {
-  // Change name to UserFriendApplication and separate
-  senderId: string;
-  receiverId: string;
-  description: string;
-  createdAt: number;
+export type Category = table_channels &
+  table_channel_muted_users &
+  Permission & {
+    type: 'category';
+  };
+
+export type Channel = table_channels &
+  table_channel_muted_users &
+  Permission & {
+    type: 'channel';
+  };
+
+export type OnlineMember = table_members & table_users & table_channel_muted_users & Permission & BadgeList;
+
+export type QueueMember = OnlineMember & {
+  position: number;
+  leftTime: number;
+  isQueueControlled: boolean;
 };
 
-export type RecommendedServers = {
-  [category: string]: Server[];
-};
+export type Member = table_members & table_users & table_server_blocked_users & Permission;
 
-export type Server = {
-  serverId: string;
-  name: string;
-  avatar: string;
-  avatarUrl: string;
-  announcement: string;
-  applyNotice: string;
-  description: string;
-  displayId: string;
-  slogan: string;
-  level: number;
-  wealth: number;
-  receiveApply: boolean;
-  type: 'game' | 'entertainment' | 'other';
-  visibility: 'public' | 'private' | 'invisible';
-  lobbyId: string;
-  receptionLobbyId: string | null;
-  ownerId: string;
-  createdAt: number;
-  // online: number;
-};
+export type MemberApplication = table_member_applications & table_users;
 
-export type BaseChannel = {
-  channelId: string;
-  name: string;
-  announcement: string;
-  password: string;
-  order: number;
-  bitrate: number;
-  userLimit: number;
-  guestTextGapTime: number;
-  guestTextWaitTime: number;
-  guestTextMaxLength: number;
-  isLobby: boolean;
-  forbidText: boolean;
-  forbidGuestText: boolean;
-  forbidGuestUrl: boolean;
-  type: 'category' | 'channel';
-  visibility: 'public' | 'member' | 'private' | 'readonly';
-  voiceMode: 'free' | 'queue' | 'forbidden';
-  categoryId: string | null;
-  serverId: string;
-  createdAt: number;
-};
-
-export type Category = BaseChannel & {
-  type: 'category';
-};
-
-export type Channel = BaseChannel & {
-  type: 'channel';
-};
-
-export type ApproveMemberApplicationPayload = {
-  userId: string;
-  serverId: string;
-  member?: Partial<Member>;
-};
-
-export type Member = {
-  userId: string;
-  serverId: string;
-  nickname: string | null;
-  contribution: number;
-  lastMessageTime: number;
-  lastJoinChannelTime: number;
-  isBlocked: number; // New: Change to number
-  permissionLevel: Permission;
-  createdAt: number;
-};
-
-export type MemberApplication = User & {
-  // Change name to ServerMemberApplication and separate
-  userId: string;
-  serverId: string;
-  description: string;
-  createdAt: number;
-};
+export type MemberInvitation = table_member_invitations & table_users;
 
 export type Message = {
-  // Change name to BaseMessage
   parameter: Record<string, string>;
   contentMetadata: Record<string, string>;
   content: string;
@@ -159,33 +86,20 @@ export type Message = {
 };
 
 export type ChannelMessage = Message &
-  ServerMember & {
+  OnlineMember & {
     type: 'general';
   };
 
 export type DirectMessage = Message &
-  UserFriend & {
+  User & {
     type: 'dm';
     user1Id: string;
     user2Id: string;
   };
 
-export type PromptMessage = Message & {
+export type PromptMessage = (DirectMessage | ChannelMessage | Message) & {
   type: 'alert' | 'info' | 'warn' | 'event';
 };
-
-export type UserServerStatus = {
-  recent: boolean;
-  owned: boolean;
-  favorite: boolean;
-  timestamp: number;
-};
-
-export type UserServer = Server & Member & UserServerStatus;
-
-export type UserFriend = User & Friend;
-
-export type ServerMember = User & Member;
 
 export type ContextMenuItem = {
   id: string;
@@ -194,6 +108,21 @@ export type ContextMenuItem = {
   disabled?: boolean;
   hasSubmenu?: boolean;
   submenuItems?: ContextMenuItem[];
+  icon?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  onClick?: () => void;
+};
+
+export type NotifyMenuItem = {
+  id: string;
+  label: string;
+  show?: boolean;
+  disabled?: boolean;
+  showContentLength?: boolean;
+  showContent?: boolean;
+  contentType?: string;
+  contents?: string[];
   icon?: string;
   className?: string;
   style?: React.CSSProperties;
@@ -220,159 +149,258 @@ export type DiscordPresence = {
   }[];
 };
 
-export type speakingMode = 'key' | 'auto';
+export type SpeakingMode = 'key' | 'auto';
 
-export type mixMode = 'all' | 'app';
+export type MixMode = 'all' | 'app';
 
-export enum SocketClientEvent {
+export type ChannelUIMode = 'classic' | 'three-line' | 'auto';
+
+export type PopupType =
+  | 'aboutus'
+  | 'applyFriend'
+  | 'applyMember'
+  | 'approveFriend'
+  | 'blockMember'
+  | 'changeTheme'
+  | 'channelPassword'
+  | 'channelSetting'
+  | 'createChannel'
+  | 'createFriendGroup'
+  | 'createServer'
+  | 'dialogAlert'
+  | 'dialogAlert2'
+  | 'dialogError'
+  | 'dialogInfo'
+  | 'dialogSuccess'
+  | 'dialogWarning'
+  | 'directMessage'
+  | 'editChannelName'
+  | 'editChannelOrder'
+  | 'editFriendNote'
+  | 'editFriendGroupName'
+  | 'editNickname'
+  | 'friendVerification'
+  | 'imageCropper'
+  | 'inviteMember'
+  | 'memberApplicationSetting'
+  | 'memberInvitation'
+  | 'searchUser'
+  | 'serverBroadcast'
+  | 'serverSetting'
+  | 'systemSetting'
+  | 'userInfo'
+  | 'userSetting';
+
+export type ClientToServerEvents = {
   // User
-  SEARCH_USER = 'searchUser',
-  EDIT_USER = 'editUser',
-  // Friend Group
-  CREATE_FRIEND_GROUP = 'createFriendGroup',
-  EDIT_FRIEND_GROUP = 'editFriendGroup',
-  DELETE_FRIEND_GROUP = 'deleteFriendGroup',
+  searchUser: (...args: { query: string }[]) => void;
+  editUser: (...args: { update: Partial<table_users> }[]) => void;
   // Friend
-  CREATE_FRIEND = 'createFriend',
-  EDIT_FRIEND = 'editFriend',
-  DELETE_FRIEND = 'deleteFriend',
+  editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
+  deleteFriend: (...args: { targetId: string }[]) => void;
+  blockUser: (...args: { targetId: string }[]) => void;
+  unblockUser: (...args: { targetId: string }[]) => void;
+  stranger: (...args: { targetId: string }[]) => void;
+  // Friend Group
+  createFriendGroup: (...args: { preset: Partial<table_friend_groups> }[]) => void;
+  editFriendGroup: (...args: { friendGroupId: string; update: Partial<table_friend_groups> }[]) => void;
+  deleteFriendGroup: (...args: { friendGroupId: string }[]) => void;
   // Friend Application
-  CREATE_FRIEND_APPLICATION = 'createFriendApplication',
-  EDIT_FRIEND_APPLICATION = 'editFriendApplication',
-  DELETE_FRIEND_APPLICATION = 'deleteFriendApplication',
-  APPROVE_FRIEND_APPLICATION = 'approveFriendApplication',
+  sendFriendApplication: (...args: { receiverId: string; preset: Partial<table_friend_applications>; friendGroupId: string | null }[]) => void;
+  editFriendApplication: (...args: { receiverId: string; update: Partial<table_friend_applications> }[]) => void;
+  deleteFriendApplication: (...args: { receiverId: string }[]) => void;
+  approveFriendApplication: (...args: { senderId: string; friendGroupId: string | null; note: string }[]) => void;
+  rejectFriendApplication: (...args: { senderId: string }[]) => void;
   // Server
-  FAVORITE_SERVER = 'favoriteServer',
-  SEARCH_SERVER = 'searchServer',
-  CONNECT_SERVER = 'connectServer',
-  DISCONNECT_SERVER = 'disconnectServer',
-  CREATE_SERVER = 'createServer',
-  EDIT_SERVER = 'editServer',
-  DELETE_SERVER = 'deleteServer',
+  favoriteServer: (...args: { serverId: string }[]) => void;
+  searchServer: (...args: { query: string }[]) => void;
+  connectServer: (...args: { serverId: string }[]) => void;
+  disconnectServer: (...args: { serverId: string }[]) => void;
+  blockUserFromServer: (...args: { userId: string; serverId: string; blockUntil?: number }[]) => void;
+  unblockUserFromServer: (...args: { userId: string; serverId: string }[]) => void;
+  createServer: (...args: { preset: Partial<table_servers> }[]) => void;
+  editServer: (...args: { serverId: string; update: Partial<table_servers> }[]) => void;
+  deleteServer: (...args: { serverId: string }[]) => void;
   // Channel
-  CONNECT_CHANNEL = 'connectChannel',
-  DISCONNECT_CHANNEL = 'disconnectChannel',
-  CREATE_CHANNEL = 'createChannel',
-  EDIT_CHANNEL = 'editChannel',
-  EDIT_CHANNELS = 'editChannels',
-  DELETE_CHANNEL = 'deleteChannel',
+  connectChannel: (...args: { serverId: string; channelId: string; password?: string }[]) => void;
+  moveUserToChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
+  disconnectChannel: (...args: { serverId: string; channelId: string }[]) => void;
+  blockUserFromChannel: (...args: { userId: string; serverId: string; channelId: string; blockUntil?: number }[]) => void;
+  unblockUserFromChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
+  createChannel: (...args: { serverId: string; preset: Partial<table_channels> }[]) => void;
+  editChannel: (...args: { serverId: string; channelId: string; update: Partial<table_channels> }[]) => void;
+  deleteChannel: (...args: { serverId: string; channelId: string }[]) => void;
+  muteUserInChannel: (...args: { userId: string; serverId: string; channelId: string; mute: Partial<table_channel_muted_users> }[]) => void;
   // Member
-  CREATE_MEMBER = 'createMember',
-  EDIT_MEMBER = 'editMember',
-  DELETE_MEMBER = 'deleteMember',
+  editMember: (...args: { userId: string; serverId: string; update: Partial<table_members> }[]) => void;
+  terminateMember: (...args: { userId: string; serverId: string }[]) => void;
+  // Permission
+  editServerPermission: (...args: { userId: string; serverId: string; update: Partial<table_server_permissions> }[]) => void;
+  editChannelPermission: (...args: { userId: string; serverId: string; channelId: string; update: Partial<table_channel_permissions> }[]) => void;
   // Member Application
-  CREATE_MEMBER_APPLICATION = 'createMemberApplication',
-  EDIT_MEMBER_APPLICATION = 'editMemberApplication',
-  DELETE_MEMBER_APPLICATION = 'deleteMemberApplication',
-  APPROVE_MEMBER_APPLICATION = 'approveMemberApplication',
+  sendMemberApplication: (...args: { serverId: string; preset: Partial<table_member_applications> }[]) => void;
+  editMemberApplication: (...args: { serverId: string; update: Partial<table_member_applications> }[]) => void;
+  deleteMemberApplication: (...args: { serverId: string }[]) => void;
+  approveMemberApplication: (...args: { userId: string; serverId: string }[]) => void;
+  rejectMemberApplication: (...args: { userId: string; serverId: string }[]) => void;
+  // Member Invitation
+  sendMemberInvitation: (...args: { receiverId: string; serverId: string; preset: Partial<table_member_invitations> }[]) => void;
+  editMemberInvitation: (...args: { receiverId: string; serverId: string; update: Partial<table_member_invitations> }[]) => void;
+  deleteMemberInvitation: (...args: { receiverId: string; serverId: string }[]) => void;
+  acceptMemberInvitation: (...args: { serverId: string }[]) => void;
+  rejectMemberInvitation: (...args: { serverId: string }[]) => void;
+  // Queue
+  joinQueue: (...args: { serverId: string; channelId: string; position?: number }[]) => void;
+  addUserToQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
+  leaveQueue: (...args: { serverId: string; channelId: string }[]) => void;
+  removeUserFromQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
+  clearQueue: (...args: { serverId: string; channelId: string }[]) => void;
+  increaseUserQueueTime: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
+  moveUserQueuePosition: (...args: { serverId: string; channelId: string; userId: string; position: number }[]) => void;
+  controlQueue: (...args: { serverId: string; channelId: string }[]) => void;
   // Message
-  CHANNEL_MESSAGE = 'channelMessage',
-  ACTION_MESSAGE = 'actionMessage',
-  DIRECT_MESSAGE = 'directMessage',
-  SHAKE_WINDOW = 'shakeWindow',
-  // RTC
-  RTC_OFFER = 'RTCOffer',
-  RTC_ANSWER = 'RTCAnswer',
-  RTC_ICE_CANDIDATE = 'RTCIceCandidate',
+  channelMessage: (...args: { serverId: string; channelId: string; preset: Partial<ChannelMessage> }[]) => void;
+  actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;
+  directMessage: (...args: { targetId: string; preset: Partial<DirectMessage> }[]) => void;
+  shakeWindow: (...args: { targetId: string }[]) => void;
   // Echo
-  PING = 'ping',
-}
+  ping: () => void;
+};
 
-export enum SocketServerEvent {
+export type ServerToClientEvents = {
+  // Socket
+  connect: () => void;
+  disconnect: () => void;
+  reconnect: (attemptNumbers: number) => void;
+  error: (message: string) => void;
+  connect_error: (error: any) => void;
+  reconnect_error: (error: any) => void;
   // Notification
-  NOTIFICATION = 'notification', // not used yet
+  notification: (...args: { message: string }[]) => void; // not used yet
   // User
-  USER_SEARCH = 'userSearch',
-  USER_UPDATE = 'userUpdate',
+  userSearch: (...args: User[]) => void;
+  userUpdate: (...args: { update: Partial<User> }[]) => void;
   // Friend Group
-  FRIEND_GROUPS_SET = 'friendGroupsSet',
-  FRIEND_GROUP_ADD = 'friendGroupAdd',
-  FRIEND_GROUP_UPDATE = 'friendGroupUpdate',
-  FRIEND_GROUP_REMOVE = 'friendGroupRemove',
+  friendGroupsSet: (...args: FriendGroup[]) => void;
+  friendGroupAdd: (...args: { data: FriendGroup }[]) => void;
+  friendGroupUpdate: (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => void;
+  friendGroupRemove: (...args: { friendGroupId: string }[]) => void;
   // Friend
-  FRIENDS_SET = 'friendsSet',
-  FRIEND_ADD = 'friendAdd',
-  FRIEND_UPDATE = 'friendUpdate',
-  FRIEND_REMOVE = 'friendRemove',
+  friendsSet: (...args: Friend[]) => void;
+  friendAdd: (...args: { data: Friend }[]) => void;
+  friendUpdate: (...args: { targetId: string; update: Partial<Friend> }[]) => void;
+  friendRemove: (...args: { targetId: string }[]) => void;
   // Friend Application
-  FRIEND_APPLICATIONS_SET = 'friendApplicationsSet',
-  FRIEND_APPLICATION_ADD = 'friendApplicationAdd',
-  FRIEND_APPLICATION_UPDATE = 'friendApplicationUpdate',
-  FRIEND_APPLICATION_REMOVE = 'friendApplicationRemove',
+  friendApplicationsSet: (...args: FriendApplication[]) => void;
+  friendApplicationAdd: (...args: { data: FriendApplication }[]) => void;
+  friendApplicationUpdate: (...args: { senderId: string; update: Partial<FriendApplication> }[]) => void;
+  friendApplicationRemove: (...args: { senderId: string }[]) => void;
   // Server
-  SERVER_SEARCH = 'serverSearch',
-  SERVERS_SET = 'serversSet',
-  SERVER_ADD = 'serverAdd',
-  SERVER_UPDATE = 'serverUpdate',
-  SERVER_REMOVE = 'serverRemove',
-  // Channel
-  SERVER_CHANNELS_SET = 'serverChannelsSet',
-  SERVER_CHANNEL_ADD = 'serverChannelAdd',
-  SERVER_CHANNEL_UPDATE = 'serverChannelUpdate',
-  SERVER_CHANNEL_REMOVE = 'serverChannelRemove',
-  // Member
-  SERVER_MEMBERS_SET = 'serverMembersSet',
-  SERVER_MEMBER_ADD = 'serverMemberAdd',
-  SERVER_MEMBER_UPDATE = 'serverMemberUpdate',
-  SERVER_MEMBER_REMOVE = 'serverMemberRemove',
-  SERVER_ONLINE_MEMBERS_SET = 'serverOnlineMembersSet',
-  SERVER_ONLINE_MEMBER_ADD = 'serverOnlineMemberAdd',
-  SERVER_ONLINE_MEMBER_REMOVE = 'serverOnlineMemberRemove',
+  serverSearch: (...args: Server[]) => void;
+  serversSet: (...args: Server[]) => void;
+  serverAdd: (...args: { data: Server }[]) => void;
+  serverUpdate: (...args: { serverId: string; update: Partial<Server> }[]) => void;
+  serverRemove: (...args: { serverId: string }[]) => void;
+  // Server Member
+  serverMembersSet: (...args: Member[]) => void;
+  serverMemberAdd: (...args: { data: Member }[]) => void;
+  serverMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
+  serverMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
+  // Server Online Member
+  serverOnlineMembersSet: (...args: OnlineMember[]) => void;
+  serverOnlineMemberAdd: (...args: { data: OnlineMember }[]) => void;
+  serverOnlineMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => void;
+  serverOnlineMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
   // Member Application
-  SERVER_MEMBER_APPLICATIONS_SET = 'serverMemberApplicationsSet',
-  SERVER_MEMBER_APPLICATION_ADD = 'serverMemberApplicationAdd',
-  SERVER_MEMBER_APPLICATION_UPDATE = 'serverMemberApplicationUpdate',
-  SERVER_MEMBER_APPLICATION_REMOVE = 'serverMemberApplicationRemove',
-  MEMBER_APPROVAL = 'memberApproval',
+  serverMemberApplicationsSet: (...args: MemberApplication[]) => void;
+  serverMemberApplicationAdd: (...args: { data: MemberApplication }[]) => void;
+  serverMemberApplicationUpdate: (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => void;
+  serverMemberApplicationRemove: (...args: { userId: string; serverId: string }[]) => void;
+  // Channel
+  channelsSet: (...args: Channel[]) => void;
+  channelAdd: (...args: { data: Channel }[]) => void;
+  channelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
+  channelRemove: (...args: { channelId: string }[]) => void;
+  // Channel Member
+  channelMemberAdd: (...args: { data: Member }[]) => void;
+  channelMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
+  channelMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
+  // Queue Member
+  queueMembersSet: (...args: QueueMember[]) => void;
+  // Member Invitation
+  memberInvitationsSet: (...args: MemberInvitation[]) => void;
+  memberInvitationAdd: (...args: { data: MemberInvitation }[]) => void;
+  memberInvitationUpdate: (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => void;
+  memberInvitationRemove: (...args: { serverId: string }[]) => void;
   // Message
-  CHANNEL_MESSAGE = 'channelMessage',
-  ACTION_MESSAGE = 'actionMessage',
-  DIRECT_MESSAGE = 'directMessage',
-  SHAKE_WINDOW = 'shakeWindow',
-  // RTC
-  RTC_OFFER = 'RTCOffer',
-  RTC_ANSWER = 'RTCAnswer',
-  RTC_ICE_CANDIDATE = 'RTCIceCandidate',
-  RTC_JOIN = 'RTCJoin',
-  RTC_LEAVE = 'RTCLeave',
+  channelMessage: (...args: ChannelMessage[]) => void;
+  actionMessage: (...args: PromptMessage[]) => void;
+  directMessage: (...args: DirectMessage[]) => void;
+  shakeWindow: (...args: DirectMessage[]) => void;
+  // SFU
+  SFUJoined: (...args: { channelId: string }[]) => void;
+  SFULeft: () => void;
+  SFUNewProducer: (...args: { userId: string; producerId: string; channelId: string }[]) => void;
+  SFUProducerClosed: (...args: { userId: string; producerId: string }[]) => void;
   // Play Sound
-  PLAY_SOUND = 'playSound',
-  // Echo
-  PONG = 'pong',
+  playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Popup
-  OPEN_POPUP = 'openPopup',
-}
+  openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
+  // Echo
+  pong: () => void;
+};
 
-export enum PopupType {
-  AVATAR_CROPPER = 'avatarCropper',
-  USER_INFO = 'userInfo',
-  USER_SETTING = 'userSetting',
-  CHANNEL_SETTING = 'channelSetting',
-  CHANNEL_PASSWORD = 'channelPassword',
-  SERVER_SETTING = 'serverSetting',
-  SERVER_BROADCAST = 'serverBroadcast',
-  BLOCK_MEMBER = 'blockMember',
-  SYSTEM_SETTING = 'systemSetting',
-  MEMBER_APPLY_SETTING = 'memberApplySetting',
-  CREATE_SERVER = 'createServer',
-  CREATE_CHANNEL = 'createChannel',
-  CREATE_FRIENDGROUP = 'createFriendGroup',
-  EDIT_CHANNEL_ORDER = 'editChannelOrder',
-  EDIT_CHANNEL_NAME = 'editChannelName',
-  EDIT_NICKNAME = 'editNickname',
-  EDIT_FRIENDGROUP = 'editFriendGroup',
-  EDIT_FRIEND = 'editFriend',
-  APPLY_MEMBER = 'applyMember',
-  APPLY_FRIEND = 'applyFriend',
-  SEARCH_USER = 'searchUser',
-  DIRECT_MESSAGE = 'directMessage',
-  DIALOG_ALERT = 'dialogAlert',
-  DIALOG_ALERT2 = 'dialogAlert2',
-  DIALOG_SUCCESS = 'dialogSuccess',
-  DIALOG_WARNING = 'dialogWarning',
-  DIALOG_ERROR = 'dialogError',
-  DIALOG_INFO = 'dialogInfo',
-  CHANGE_THEME = 'changeTheme',
-  ABOUTUS = 'aboutus',
-  FRIEND_VERIFICATION = 'friendVerification',
-}
+export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
+
+export type SFUCreateTransportParams = {
+  direction: 'send' | 'recv';
+  channelId: string;
+};
+
+export type SFUCreateTransportReturnType = {
+  id: string;
+  iceParameters: any;
+  iceCandidates: any;
+  dtlsParameters: any;
+  routerRtpCapabilities: any;
+  producers?: SFUCreateProducerReturnType[];
+};
+
+export type SFUConnectTransportParams = {
+  transportId: string;
+  dtlsParameters: any;
+};
+
+export type SFUCreateProducerParams = {
+  kind: mediasoupClient.types.MediaKind;
+  transportId: string;
+  rtpParameters: any;
+  channelId: string;
+};
+
+export type SFUCreateProducerReturnType = {
+  id: string;
+  userId: string;
+  kind: mediasoupClient.types.MediaKind;
+};
+
+export type SFUCreateConsumerParams = {
+  transportId: string;
+  producerId: string;
+  rtpCapabilities: any;
+  channelId: string;
+};
+
+export type SFUCreateConsumerReturnType = {
+  id: string;
+  userId: string;
+  producerId: string;
+  kind: mediasoupClient.types.MediaKind;
+  rtpParameters: any;
+};
+
+export type Theme = {
+  headerImage: string;
+  mainColor: string;
+  secondaryColor: string;
+};

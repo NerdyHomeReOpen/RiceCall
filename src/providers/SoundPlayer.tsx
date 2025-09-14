@@ -1,10 +1,10 @@
 import { createContext, ReactNode, useContext, useEffect, useRef } from 'react';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface SoundPlayerContextType {
-  playSound: (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking') => void;
+  playSound: (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => void;
 }
 
 const SoundPlayerContext = createContext<SoundPlayerContextType | null>(null);
@@ -31,45 +31,53 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
   const receiveChannelMessageSoundRef = useRef(false);
   const outputDeviceIdRef = useRef<string | null>(null);
 
-  const handlePlaySound = (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking') => {
-    if (disableAllSoundEffectRef.current) return;
+  const playSound = (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => {
+    console.info('[SoundPlayer] play sound: ', sound, force);
+
+    if (disableAllSoundEffectRef.current && !force) return;
 
     if (audioRef.current) {
       audioRef.current = null;
     }
 
-    if (sound === 'enterVoiceChannel' && enterVoiceChannelSoundRef.current) {
+    if (sound === 'enterVoiceChannel') {
+      if (!enterVoiceChannelSoundRef.current && !force) return;
       audioRef.current = new Audio('./sounds/JoinVoiceChannel.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'leaveVoiceChannel' && leaveVoiceChannelSoundRef.current) {
+    if (sound === 'leaveVoiceChannel') {
+      if (!leaveVoiceChannelSoundRef.current && !force) return;
       audioRef.current = new Audio('./sounds/LeaveVoiceChannel.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'receiveChannelMessage' && receiveChannelMessageSoundRef.current) {
+    if (sound === 'receiveChannelMessage') {
+      if (!receiveChannelMessageSoundRef.current && !force) return;
       audioRef.current = new Audio('./sounds/ReceiveChannelMsg.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'receiveDirectMessage' && receiveDirectMessageSoundRef.current) {
+    if (sound === 'receiveDirectMessage') {
+      if (!receiveDirectMessageSoundRef.current && !force) return;
       audioRef.current = new Audio('./sounds/ReceiveDirectMsg.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'startSpeaking' && startSpeakingSoundRef.current) {
-      audioRef.current = new Audio('./sounds/StartSpeaking.wav');
+    if (sound === 'startSpeaking') {
+      if (!startSpeakingSoundRef.current && !force) return;
+      audioRef.current = new Audio('./sounds/MicKeyDown.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
-    if (sound === 'stopSpeaking' && stopSpeakingSoundRef.current) {
-      audioRef.current = new Audio('./sounds/StopSpeaking.wav');
+    if (sound === 'stopSpeaking') {
+      if (!stopSpeakingSoundRef.current && !force) return;
+      audioRef.current = new Audio('./sounds/MicKeyUp.wav');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
@@ -78,53 +86,62 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
   // Effects
   useEffect(() => {
-    ipcService.systemSettings.disableAllSoundEffect.get(() => {});
-    ipcService.systemSettings.outputAudioDevice.get(() => {});
-    ipcService.systemSettings.enterVoiceChannelSound.get(() => {});
-    ipcService.systemSettings.leaveVoiceChannelSound.get(() => {});
-    ipcService.systemSettings.startSpeakingSound.get(() => {});
-    ipcService.systemSettings.stopSpeakingSound.get(() => {});
-    ipcService.systemSettings.receiveDirectMessageSound.get(() => {});
-    ipcService.systemSettings.receiveChannelMessageSound.get(() => {});
-
-    const offUpdateOutput = ipcService.systemSettings.outputAudioDevice.onUpdate((deviceId) => {
-      outputDeviceIdRef.current = deviceId || null;
-    });
-    const offUpdateDisableAllSoundEffect = ipcService.systemSettings.disableAllSoundEffect.onUpdate((enabled) => {
+    const changeDisableAllSoundEffect = (enabled: boolean) => {
+      console.info('[SoundPlayer] disable all sound effect updated: ', enabled);
       disableAllSoundEffectRef.current = enabled;
-    });
-    const offUpdateEnterVoiceChannelSound = ipcService.systemSettings.enterVoiceChannelSound.onUpdate((enabled) => {
-      enterVoiceChannelSoundRef.current = enabled;
-    });
-    const offUpdateLeaveVoiceChannelSound = ipcService.systemSettings.leaveVoiceChannelSound.onUpdate((enabled) => {
-      leaveVoiceChannelSoundRef.current = enabled;
-    });
-    const offUpdateStartSpeakingSound = ipcService.systemSettings.startSpeakingSound.onUpdate((enabled) => {
-      startSpeakingSoundRef.current = enabled;
-    });
-    const offUpdateStopSpeakingSound = ipcService.systemSettings.stopSpeakingSound.onUpdate((enabled) => {
-      stopSpeakingSoundRef.current = enabled;
-    });
-    const offUpdateReceiveDirectMessageSound = ipcService.systemSettings.receiveDirectMessageSound.onUpdate((enabled) => {
-      receiveDirectMessageSoundRef.current = enabled;
-    });
-    const offUpdateReceiveChannelMessageSound = ipcService.systemSettings.receiveChannelMessageSound.onUpdate((enabled) => {
-      receiveChannelMessageSoundRef.current = enabled;
-    });
-
-    return () => {
-      offUpdateOutput();
-      offUpdateDisableAllSoundEffect();
-      offUpdateEnterVoiceChannelSound();
-      offUpdateLeaveVoiceChannelSound();
-      offUpdateStartSpeakingSound();
-      offUpdateStopSpeakingSound();
-      offUpdateReceiveDirectMessageSound();
-      offUpdateReceiveChannelMessageSound();
     };
+    const changeOutputAudioDevice = (deviceId: string) => {
+      console.info('[SoundPlayer] output device updated: ', deviceId);
+      outputDeviceIdRef.current = deviceId || null;
+    };
+    const changeEnterVoiceChannelSound = (enabled: boolean) => {
+      console.info('[SoundPlayer] enter voice channel sound updated: ', enabled);
+      enterVoiceChannelSoundRef.current = enabled;
+    };
+    const changeLeaveVoiceChannelSound = (enabled: boolean) => {
+      console.info('[SoundPlayer] leave voice channel sound updated: ', enabled);
+      leaveVoiceChannelSoundRef.current = enabled;
+    };
+    const changeStartSpeakingSound = (enabled: boolean) => {
+      console.info('[SoundPlayer] start speaking sound updated: ', enabled);
+      startSpeakingSoundRef.current = enabled;
+    };
+    const changeStopSpeakingSound = (enabled: boolean) => {
+      console.info('[SoundPlayer] stop speaking sound updated: ', enabled);
+      stopSpeakingSoundRef.current = enabled;
+    };
+    const changeReceiveDirectMessageSound = (enabled: boolean) => {
+      console.info('[SoundPlayer] receive direct message sound updated: ', enabled);
+      receiveDirectMessageSoundRef.current = enabled;
+    };
+    const changeReceiveChannelMessageSound = (enabled: boolean) => {
+      console.info('[SoundPlayer] receive channel message sound updated: ', enabled);
+      receiveChannelMessageSoundRef.current = enabled;
+    };
+
+    changeOutputAudioDevice(ipc.systemSettings.outputAudioDevice.get());
+    changeDisableAllSoundEffect(ipc.systemSettings.disableAllSoundEffect.get());
+    changeEnterVoiceChannelSound(ipc.systemSettings.enterVoiceChannelSound.get());
+    changeLeaveVoiceChannelSound(ipc.systemSettings.leaveVoiceChannelSound.get());
+    changeStartSpeakingSound(ipc.systemSettings.startSpeakingSound.get());
+    changeStopSpeakingSound(ipc.systemSettings.stopSpeakingSound.get());
+    changeReceiveDirectMessageSound(ipc.systemSettings.receiveDirectMessageSound.get());
+    changeReceiveChannelMessageSound(ipc.systemSettings.receiveChannelMessageSound.get());
+
+    const unsubscribe = [
+      ipc.systemSettings.outputAudioDevice.onUpdate(changeOutputAudioDevice),
+      ipc.systemSettings.disableAllSoundEffect.onUpdate(changeDisableAllSoundEffect),
+      ipc.systemSettings.enterVoiceChannelSound.onUpdate(changeEnterVoiceChannelSound),
+      ipc.systemSettings.leaveVoiceChannelSound.onUpdate(changeLeaveVoiceChannelSound),
+      ipc.systemSettings.startSpeakingSound.onUpdate(changeStartSpeakingSound),
+      ipc.systemSettings.stopSpeakingSound.onUpdate(changeStopSpeakingSound),
+      ipc.systemSettings.receiveDirectMessageSound.onUpdate(changeReceiveDirectMessageSound),
+      ipc.systemSettings.receiveChannelMessageSound.onUpdate(changeReceiveChannelMessageSound),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
-  return <SoundPlayerContext.Provider value={{ playSound: handlePlaySound }}>{children}</SoundPlayerContext.Provider>;
+  return <SoundPlayerContext.Provider value={{ playSound }}>{children}</SoundPlayerContext.Provider>;
 };
 
 SoundPlayerProvider.displayName = 'SoundPlayerProvider';

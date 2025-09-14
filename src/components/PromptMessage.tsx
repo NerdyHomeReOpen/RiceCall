@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
@@ -10,7 +10,7 @@ import type { PromptMessage } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // Components
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownContent from '@/components/MarkdownContent';
 
 interface PromptMessageProps {
   messageGroup: PromptMessage & {
@@ -23,29 +23,27 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   // Hooks
   const { t } = useTranslation();
 
-  // Variables
+  // Destructuring
   const { contents: messageContents, parameter: messageParameter } = messageGroup;
 
-  const translatedMessages = messageContents.map((content) => {
-    if (content.includes(' ')) {
-      return content
-        .split(' ')
-        .map((_) => t(_, { ns: 'message', ...messageParameter }))
-        .join(' ');
-    } else {
-      return t(content, { ns: 'message', ...messageParameter });
-    }
-  });
+  // Memos
+  const translatedMessages = useMemo(
+    () =>
+      messageContents.map((content) =>
+        content
+          .split(' ')
+          .map((_) => t(_, { ns: 'message', ...messageParameter }))
+          .join(' '),
+      ),
+    [messageContents, messageParameter, t],
+  );
 
   return (
     <>
-      <div className={styles['header']}>
-        <div className={styles[`${messageType}-icon`]} />
-      </div>
-
+      <div className={styles[`${messageType}-icon`]} />
       <div className={styles['message-box']}>
         {translatedMessages.map((content, index) => (
-          <MarkdownViewer key={index} markdownText={content} />
+          <MarkdownContent key={index} markdownText={content} />
         ))}
       </div>
     </>

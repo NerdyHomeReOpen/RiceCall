@@ -1,0 +1,70 @@
+.notify-menu:not(:empty) {
+  z-index: 1000;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 200px;
+  padding: 2px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 1px 1px #00000080;
+  overflow: hidden;
+}
+
+.notify-menu .option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  padding: 6px 30px;
+  gap: 6px;
+  color: #333;
+  border-radius: 3px;
+}
+
+.notify-menu .option::before {
+  position: absolute;
+  content: '';
+  left: 6px;
+  min-width: 16px;
+  min-height: 16px;
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: center center;
+  align-self: center;
+  margin-right: 5px;
+}
+
+.notify-menu .option:not(.readonly):hover {
+  background-color: #d8dadc;
+  cursor: pointer;
+}
+
+.notify-menu .option[data-type='notify']::before {
+  background-image: url('/icon_notice_friend.png');
+}
+
+.notify-menu .contents {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  gap: 5px;
+  padding: 3px 30px;
+}
+
+.notify-menu img {
+  background-size: cover;
+  max-width: 32px;
+  max-height: 32px;
+  border: solid 1px #999999;
+}
+
+.notify-menu span {
+  margin: 5px 0;
+}

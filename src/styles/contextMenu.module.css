@@ -16,12 +16,11 @@
   display: none;
 }
 
-.context-menu .separator {
+.separator {
   min-height: 1px;
   min-width: 100%;
   display: block;
-  margin: 3px 0;
-  background-image: url('../../public/ctrl/menu_spliter.png');
+  background-image: url('/ctrl/menu_spliter.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
@@ -46,52 +45,61 @@
   background-repeat: no-repeat;
   background-position: center center;
   align-self: center;
-  margin-right: 5px;
 }
 
 .context-menu .option[data-type='setting']::before {
-  background-image: url('../../public/set.png');
+  background-image: url('/set.png');
 }
 
 .context-menu .option[data-type='message']::before {
-  background-image: url('../../public/message.png');
+  background-image: url('/message.png');
 }
 
 .context-menu .option[data-type='skin']::before {
-  background-image: url('../../public/skin.png');
+  background-image: url('/skin.png');
 }
 
 .context-menu .option[data-type='exit']::before {
-  background-image: url('../../public/exit.png');
+  background-image: url('/exit.png');
 }
 
-.context-menu .option[data-type='submenu']::before {
-  background-image: url('../../public/ctrl/icon_submenu.png');
+.context-menu .option[data-type='submenu-left']::before {
+  background-image: url('/ctrl/icon_submenu.png');
   transform: rotate(180deg);
 }
 
-.context-menu .option[data-type='memberManagement']::before {
-  background-image: url('../../public/channel/icon_membermgr.png');
+.context-menu .option[data-type='submenu']::before {
+  background-image: url('/ctrl/icon_submenu.png');
+  left: unset;
+  right: 6px;
 }
 
-.context-menu .option[data-type='memberapply']::before {
-  background-image: url('../../public/channel/icon_memberapply.png');
+.context-menu .option[data-type='checked']::before {
+  background-image: url('/ctrl/icon_menu_checked.png');
+}
+
+.context-menu .option[data-type='memberManagement']::before {
+  background-image: url('/channel/icon_membermgr.png');
+}
+
+.context-menu .option[data-type='applyMember']::before {
+  background-image: url('/channel/icon_memberapply.png');
 }
 
 .context-menu .option[data-type='editGroupcard']::before {
-  background-image: url('../../public/channel/icon_editGroupcard.png');
+  background-image: url('/channel/icon_editGroupcard.png');
 }
 
 .context-menu .option[data-type='locateme']::before {
-  background-image: url('../../public/channel/icon_locateme.png');
+  background-image: url('/channel/icon_locateme.png');
 }
 
 .context-menu .option[data-type='uncollect']::before {
-  background-image: url('../../public/channel/icon_uncollect.png');
+  background-image: url('/channel/icon_uncollect.png');
 }
 
 .context-menu .option[data-type='collect']::before {
-  background-image: url('../../public/channel/icon_collect.png');
+  background-image: url('/channel/icon_collect.png');
 }
 
 .context-menu .option:hover {
@@ -107,6 +115,56 @@
 }
 
 .context-menu .option.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.mic-context-menu:not(:empty) {
+  z-index: 1000;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 154px;
+  max-width: 154px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 1px 1px #00000080;
+  overflow: hidden;
+}
+
+.mic-context-menu.hidden {
+  display: none;
+}
+
+.mic-context-menu .option {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 8px 30px;
+  color: #777;
+}
+
+.mic-context-menu .option::before {
+  position: absolute;
+  content: '';
+  left: 6px;
+  min-width: 16px;
+  min-height: 16px;
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: center center;
+  align-self: center;
+}
+
+.mic-context-menu .option:hover {
+  color: #333;
+}
+
+.mic-context-menu .option.disabled {
   color: #ccc;
   cursor: not-allowed;
 }

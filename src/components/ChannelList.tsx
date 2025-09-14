@@ -1,118 +1,100 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import { PopupType, ServerMember, Channel, Server, User, Category, UserFriend, UserServer, SocketServerEvent } from '@/types';
+import type { OnlineMember, Channel, Server, User, Category, Friend, MemberApplication, QueueMember } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useSocket } from '@/providers/Socket';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
 
 // Components
 import ChannelTab from '@/components/ChannelTab';
 import CategoryTab from '@/components/CategoryTab';
+import QueueMemberTab from '@/components/QueueMemberTab';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
+
+// Utils
+import { isMember, isServerAdmin } from '@/utils/permission';
 
 interface ChannelListProps {
-  currentServer: UserServer;
-  currentChannel: Channel;
-  serverMembers: ServerMember[];
-  serverChannels: (Channel | Category)[];
-  friends: UserFriend[];
+  user: User;
+  friends: Friend[];
+  server: Server;
+  serverOnlineMembers: OnlineMember[];
+  channel: Channel;
+  channels: (Channel | Category)[];
+  queueMembers: QueueMember[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, currentChannel, serverMembers, serverChannels, friends }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, channels, queueMembers }) => {
   // Hooks
   const { t } = useTranslation();
-  const socket = useSocket();
   const contextMenu = useContextMenu();
   const findMe = useFindMeContext();
 
-  // Refs
-  const viewerRef = useRef<HTMLDivElement>(null);
-  const settingButtonRef = useRef<HTMLDivElement>(null);
-
   // States
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [view, setView] = useState<'all' | 'current'>('all');
+  const [viewType, setViewType] = useState<'all' | 'current'>('all');
   const [latency, setLatency] = useState<string>('0');
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(currentChannel.channelId);
-  const [selectedItemType, setSelectedItemType] = useState<string | null>('channel');
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [memberApplicationsCount, setMemberApplicationsCount] = useState<number>(0);
 
-  // Variables
-  const connectStatus = 4 - Math.floor(Number(latency) / 50);
-  const {
-    userId,
-    serverId,
-    name: serverName,
-    avatarUrl: serverAvatarUrl,
-    displayId: serverDisplayId,
-    receiveApply: serverReceiveApply,
-    permissionLevel: userPermission,
-    favorite: isFavorite,
-  } = currentServer;
-  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = currentChannel;
-  const isVerifiedServer = false;
-  const canEditNickname = userPermission > 1;
-  const canApplyMember = userPermission < 2;
-  const canOpenSettings = userPermission > 4;
-  const canManageChannel = userPermission > 4;
+  // Destructuring
+  const { userId, permissionLevel: globalPermissionLevel } = user;
+  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, receiveApply: serverReceiveApply, permissionLevel: serverPermissionLevel, favorite: isFavorite } = server;
+  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = channel;
+
+  // Memos
+  const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
+  const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
+  const filteredQueueMembers = useMemo(() => queueMembers.filter((member) => member.position >= 0 && member.leftTime > 0).sort((a, b) => a.position - b.position), [queueMembers]);
+  const filteredChannels = useMemo(() => channels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
+  const isVerifiedServer = useMemo(() => false, []); // TODO: implement
 
   // Handlers
   const handleFavoriteServer = (serverId: Server['serverId']) => {
-    if (!socket) return;
-    socket.send.favoriteServer({ serverId });
-  };
-
-  const handleOpenAlertDialog = (message: string) => {
-    ipcService.popup.open(PopupType.DIALOG_ALERT, 'alertDialog');
-    ipcService.initialData.onRequest('alertDialog', { message: message });
+    ipc.socket.send('favoriteServer', { serverId });
   };
 
   const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open(PopupType.SERVER_SETTING, 'serverSetting');
-    ipcService.initialData.onRequest('serverSetting', { serverId, userId });
+    ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
   };
 
   const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
-    if (!serverReceiveApply) {
-      handleOpenAlertDialog(t('cannot-apply'));
-      return;
-    }
-    ipcService.popup.open(PopupType.APPLY_MEMBER, 'applyMember');
-    ipcService.initialData.onRequest('applyMember', { serverId, userId });
+    if (!serverReceiveApply) handleOpenAlertDialog(t('cannot-apply-member'), () => {});
+    else ipc.popup.open('applyMember', 'applyMember', { userId, serverId });
   };
 
   const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open(PopupType.EDIT_NICKNAME, 'editNickname');
-    ipcService.initialData.onRequest('editNickname', { serverId, userId });
+    ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
   };
 
-  const handleOpenCreateChannel = (serverId: Server['serverId'], channelId: Category['categoryId'], userId: User['userId']) => {
-    ipcService.popup.open(PopupType.CREATE_CHANNEL, 'createChannel');
-    ipcService.initialData.onRequest('createChannel', { serverId, channelId, userId });
+  const handleOpenCreateChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    ipc.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
   };
 
   const handleOpenChangeChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipcService.popup.open(PopupType.EDIT_CHANNEL_ORDER, 'editChannelOrder');
-    ipcService.initialData.onRequest('editChannelOrder', { serverId, userId });
+    ipc.popup.open('editChannelOrder', 'editChannelOrder', { serverId, userId });
+  };
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleLocateUser = () => {
-    if (!findMe) return;
     findMe.findMe();
   };
 
-  const handleServerMemberApplicationsSet = (data: { count: number }) => {
-    setMemberApplicationsCount(data.count);
+  const handleServerMemberApplicationsSet = (...args: MemberApplication[]) => {
+    setMemberApplicationsCount(args.length);
   };
 
   const handleServerMemberApplicationAdd = () => {
@@ -125,24 +107,20 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
 
   // Effects
   useEffect(() => {
-    for (const channel of serverChannels) {
-      setExpanded((prev) => ({
-        ...prev,
-        [channel.channelId]: prev[channel.channelId] != undefined ? prev[channel.channelId] : true,
-      }));
+    for (const channel of channels) {
+      setExpanded((prev) => ({ ...prev, [channel.channelId]: prev[channel.channelId] != undefined ? prev[channel.channelId] : true }));
     }
-  }, [serverChannels]);
+  }, [channels]);
 
   useEffect(() => {
-    if (!socket) return;
     let start = Date.now();
     let end = Date.now();
-    socket.send.ping('ping');
+    ipc.socket.send('ping');
     const measure = setInterval(() => {
       start = Date.now();
-      socket.send.ping('ping');
+      ipc.socket.send('ping');
     }, 10000);
-    const clearPong = socket.on.pong(() => {
+    const clearPong = ipc.socket.on('pong', () => {
       end = Date.now();
       setLatency((end - start).toFixed(0));
     });
@@ -150,39 +128,22 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
       clearInterval(measure);
       clearPong();
     };
-  }, [socket]);
+  }, []);
 
   useEffect(() => {
-    if (!socket) return;
-
-    const eventHandlers = {
-      [SocketServerEvent.SERVER_MEMBER_APPLICATIONS_SET]: handleServerMemberApplicationsSet,
-      [SocketServerEvent.SERVER_MEMBER_APPLICATION_ADD]: handleServerMemberApplicationAdd,
-      [SocketServerEvent.SERVER_MEMBER_APPLICATION_REMOVE]: handleServerMemberApplicationRemove,
-    };
-    const unsubscribe: (() => void)[] = [];
-
-    Object.entries(eventHandlers).map(([event, handler]) => {
-      const unsub = socket.on[event as SocketServerEvent](handler);
-      unsubscribe.push(unsub);
-    });
-
-    return () => {
-      unsubscribe.forEach((unsub) => unsub());
-    };
-  }, [socket]);
+    const unsubscribe = [
+      ipc.socket.on('serverMemberApplicationsSet', handleServerMemberApplicationsSet),
+      ipc.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
+      ipc.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
+    ];
+    return () => unsubscribe.forEach((unsub) => unsub());
+  }, []);
 
   return (
     <>
       {/* Header */}
-      <div className={styles['sidebar-header']} ref={viewerRef}>
-        <div
-          className={styles['avatar-box']}
-          onClick={() => {
-            if (!canOpenSettings) return;
-            handleOpenServerSetting(userId, serverId);
-          }}
-        >
+      <div className={styles['sidebar-header']}>
+        <div className={styles['avatar-box']} onClick={() => handleOpenServerSetting(userId, serverId)}>
           <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
         </div>
         <div className={styles['base-info-wrapper']}>
@@ -192,7 +153,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
           </div>
           <div className={styles['box']}>
             <div className={styles['id-text']}>{serverDisplayId}</div>
-            <div className={styles['member-text']}>{serverMembers.length}</div>
+            <div className={styles['member-text']}>{serverOnlineMembers.length}</div>
             <div className={styles['options']}>
               <div
                 className={styles['invitation-icon']}
@@ -202,37 +163,34 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
               />
               <div className={styles['saperator-1']} />
               <div
-                ref={settingButtonRef}
                 className={styles['setting-icon']}
-                onClick={() => {
-                  if (!settingButtonRef.current) return;
-                  const x = settingButtonRef.current.getBoundingClientRect().left;
-                  const y = settingButtonRef.current.getBoundingClientRect().top + settingButtonRef.current.getBoundingClientRect().height;
-                  contextMenu.showContextMenu(x, y, false, false, [
+                onClick={(e) => {
+                  const x = e.currentTarget.getBoundingClientRect().left;
+                  const y = e.currentTarget.getBoundingClientRect().bottom;
+                  contextMenu.showContextMenu(x, y, 'right-bottom', [
                     {
-                      id: 'invitation',
-                      label: t('invitation'),
-                      show: canApplyMember,
-                      icon: 'memberapply',
+                      id: 'apply-member',
+                      label: t('apply-member'),
+                      show: !isMember(permissionLevel),
+                      icon: 'applyMember',
                       onClick: () => handleOpenApplyMember(userId, serverId),
                     },
                     {
                       id: 'member-management',
                       label: t('member-management'),
-                      show: canOpenSettings,
+                      show: isServerAdmin(permissionLevel),
                       icon: 'memberManagement',
                       onClick: () => handleOpenServerSetting(userId, serverId),
                     },
                     {
                       id: 'separator',
-                      show: canOpenSettings || canApplyMember,
                       label: '',
                     },
                     {
                       id: 'edit-nickname',
-                      label: t('edit-member-card'),
+                      label: t('edit-nickname'),
                       icon: 'editGroupcard',
-                      show: canEditNickname,
+                      show: isMember(permissionLevel),
                       onClick: () => handleOpenEditNickname(userId, serverId),
                     },
                     {
@@ -262,12 +220,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
                   ]);
                 }}
               >
-                <div
-                  className={`
-                      ${header['overlay']}
-                      ${canOpenSettings && memberApplicationsCount > 0 ? header['new'] : ''}
-                    `}
-                />
+                <div className={`${header['overlay']} ${isServerAdmin(permissionLevel) && memberApplicationsCount > 0 ? header['new'] : ''}`} />
               </div>
             </div>
           </div>
@@ -276,8 +229,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
 
       {/* Current Channel */}
       <div className={styles['current-channel-box']}>
-        <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]}`}>
-          <div className={`${styles['current-channel-ping']}`}>{`${latency}ms`}</div>
+        <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]} has-hover-text`}>
+          <div className={'hover-text'}>{`${latency}ms`}</div>
         </div>
         <div className={styles['current-channel-text']}>{currentChannelIsLobby ? t(`${currentChannelName}`) : currentChannelName}</div>
       </div>
@@ -286,116 +239,107 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ currentServer, cur
       {currentChannelVoiceMode === 'queue' && (
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
-          <div className={styles['mic-queue-list']}>
-            <div className={styles['user-list']}>
-              {/* {micQueueUsers.map((user) => (
-                    <UserTab
-                      key={user.id}
-                      user={user}
-                      server={server}
-                      mainUser={user}
-                    />
-                  ))} */}
-            </div>
+          <div className={styles['queue-list']}>
+            {filteredQueueMembers.map((member) => (
+              <QueueMemberTab
+                key={member.userId}
+                user={user}
+                friends={friends}
+                queueMember={member}
+                server={server}
+                channel={channel}
+                selectedItemId={selectedItemId}
+                setSelectedItemId={setSelectedItemId}
+              />
+            ))}
           </div>
           <div className={styles['saperator-2']} />
         </>
       )}
 
       {/* Channel List Title */}
-      <div className={styles['section-title-text']}>{view === 'current' ? t('current-channel') : t('all-channel')}</div>
+      <div className={styles['section-title-text']}>{viewType === 'current' ? t('current-channel') : t('all-channel')}</div>
 
       {/* Channel List */}
       <div
         className={styles['scroll-view']}
         onContextMenu={(e) => {
-          const x = e.clientX;
-          const y = e.clientY;
-          contextMenu.showContextMenu(x, y, false, false, [
+          const { clientX: x, clientY: y } = e;
+          contextMenu.showContextMenu(x, y, 'right-bottom', [
             {
               id: 'create-channel',
               label: t('create-channel'),
-              show: canManageChannel,
-              onClick: () => handleOpenCreateChannel(serverId, null, userId),
+              show: isServerAdmin(permissionLevel),
+              onClick: () => handleOpenCreateChannel(userId, serverId, ''),
             },
             {
               id: 'separator',
               label: '',
-              show: canManageChannel,
             },
             {
               id: 'edit-channel-order',
               label: t('edit-channel-order'),
-              show: canManageChannel,
+              show: isServerAdmin(permissionLevel),
               onClick: () => handleOpenChangeChannelOrder(userId, serverId),
             },
           ]);
         }}
       >
         <div className={styles['channel-list']}>
-          {view === 'current' ? (
+          {viewType === 'current' ? (
             <ChannelTab
               key={currentChannelId}
-              channel={currentChannel}
+              user={user}
               friends={friends}
-              currentChannel={currentChannel}
-              currentServer={currentServer}
-              serverMembers={serverMembers}
+              server={server}
+              serverOnlineMembers={serverOnlineMembers}
+              channel={channel}
               expanded={{ [currentChannelId]: true }}
               selectedItemId={selectedItemId}
-              selectedItemType={selectedItemType}
               setExpanded={() => {}}
               setSelectedItemId={setSelectedItemId}
-              setSelectedItemType={setSelectedItemType}
             />
           ) : (
-            serverChannels
-              .filter((ch) => !!ch && !ch.categoryId)
-              .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
-              .map((item) =>
-                item.type === 'category' ? (
-                  <CategoryTab
-                    key={item.channelId}
-                    category={item as Category}
-                    friends={friends}
-                    currentChannel={currentChannel}
-                    currentServer={currentServer}
-                    serverMembers={serverMembers}
-                    serverChannels={serverChannels}
-                    expanded={expanded}
-                    selectedItemId={selectedItemId}
-                    selectedItemType={selectedItemType}
-                    setExpanded={setExpanded}
-                    setSelectedItemId={setSelectedItemId}
-                    setSelectedItemType={setSelectedItemType}
-                  />
-                ) : (
-                  <ChannelTab
-                    key={item.channelId}
-                    channel={item as Channel}
-                    friends={friends}
-                    currentChannel={currentChannel}
-                    currentServer={currentServer}
-                    serverMembers={serverMembers}
-                    expanded={expanded}
-                    selectedItemId={selectedItemId}
-                    selectedItemType={selectedItemType}
-                    setExpanded={setExpanded}
-                    setSelectedItemId={setSelectedItemId}
-                    setSelectedItemType={setSelectedItemType}
-                  />
-                ),
-              )
+            filteredChannels.map((item) =>
+              item.type === 'category' ? (
+                <CategoryTab
+                  key={item.channelId}
+                  user={user}
+                  friends={friends}
+                  server={server}
+                  serverOnlineMembers={serverOnlineMembers}
+                  category={item as Category}
+                  channels={channels}
+                  expanded={expanded}
+                  selectedItemId={selectedItemId}
+                  setExpanded={setExpanded}
+                  setSelectedItemId={setSelectedItemId}
+                />
+              ) : (
+                <ChannelTab
+                  key={item.channelId}
+                  user={user}
+                  friends={friends}
+                  server={server}
+                  serverOnlineMembers={serverOnlineMembers}
+                  channel={item as Channel}
+                  expanded={expanded}
+                  selectedItemId={selectedItemId}
+                  setExpanded={setExpanded}
+                  setSelectedItemId={setSelectedItemId}
+                />
+              ),
+            )
           )}
         </div>
       </div>
 
       {/* Footer */}
       <div className={styles['sidebar-footer']}>
-        <div className={`${styles['navegate-tab']} ${view === 'current' ? styles['active'] : ''}`} onClick={() => setView('current')}>
+        <div className={`${styles['navegate-tab']} ${viewType === 'current' ? styles['active'] : ''}`} onClick={() => setViewType('current')}>
           {t('current-channel')}
         </div>
-        <div className={`${styles['navegate-tab']} ${view === 'all' ? styles['active'] : ''}`} onClick={() => setView('all')}>
+        <div className={`${styles['navegate-tab']} ${viewType === 'all' ? styles['active'] : ''}`} onClick={() => setViewType('all')}>
           {t('all-channel')}
         </div>
       </div>
