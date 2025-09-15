@@ -10,24 +10,18 @@
 .markdown-content h1 {
   font-size: 1.75em;
   font-weight: bold;
-  margin-block: 0.75rem;
-  margin-inline: 0;
   cursor: text;
 }
 
 .markdown-content h2 {
   font-size: 1.5em;
   font-weight: bold;
-  margin-block: 0.625rem;
-  margin-inline: 0;
   cursor: text;
 }
 
 .markdown-content h3 {
   font-size: 1.25em;
   font-weight: bold;
-  margin-block: 0.5rem;
-  margin-inline: 0;
   cursor: text;
 }
 
@@ -36,13 +30,10 @@
 .markdown-content h6 {
   font-size: 1em;
   font-weight: bold;
-  margin-block: 0.5rem;
-  margin-inline: 0;
   cursor: text;
 }
 
 .markdown-content p {
-  margin-block-start: 0;
   display: block;
   align-items: center;
   cursor: text;
@@ -65,21 +56,16 @@
 
 .markdown-content ul,
 .markdown-content ol {
-  margin-block-start: 0;
-  margin-inline: 0;
   padding-inline-start: 20px;
   list-style-position: outside;
   cursor: pointer;
 }
 
 .markdown-content li {
-  margin-block-start: 0;
   cursor: text;
 }
 
 .markdown-content blockquote {
-  margin-block: 0;
-  margin-inline: 0;
   padding: 0.125rem;
   padding-left: 1rem;
   color: #4f545c;
@@ -91,8 +77,6 @@
 
 /* inline code */
 .markdown-content code {
-  margin-block-start: 0;
-  margin-inline: 0;
   padding: 0.125rem 0.25rem;
   border-radius: 4px;
   background: #00000005;
@@ -108,16 +92,12 @@
 /* block code */
 .markdown-content pre {
   position: relative;
-  margin-block-start: 0;
-  margin-inline: 0;
   cursor: text;
 }
 
 .markdown-content hr {
   border: none;
   border-top: 1px dashed #d1d5db;
-  margin-block-start: 0.5rem;
-  margin-inline: 0;
 }
 
 .markdown-content table {
@@ -201,7 +181,7 @@
   max-width: 100%;
   margin-block-start: 0;
   margin-inline: 0;
-  /* border-radius: 8px; */
+  border-radius: 5px;
   cursor: pointer;
   pointer-events: none;
 }
