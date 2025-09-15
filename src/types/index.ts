@@ -65,7 +65,8 @@ export type Channel = table_channels &
 
 export type OnlineMember = table_members & table_users & table_channel_muted_users & Permission & BadgeList;
 
-export type QueueMember = OnlineMember & {
+export type QueueMember = {
+  userId: string;
   position: number;
   leftTime: number;
   isQueueControlled: boolean;

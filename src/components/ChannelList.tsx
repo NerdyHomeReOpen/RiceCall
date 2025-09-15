@@ -54,8 +54,21 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
   const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
-  const filteredQueueMembers = useMemo(() => queueMembers.filter((member) => member.position >= 0 && member.leftTime > 0).sort((a, b) => a.position - b.position), [queueMembers]);
+  const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
+  const filteredQueueMembers = useMemo<(QueueMember & OnlineMember)[]>(
+    () =>
+      queueMembers
+        .reduce<(QueueMember & OnlineMember)[]>((acc, qm) => {
+          if (qm.position < 0 || qm.leftTime <= 0) return acc;
+          const online = serverOnlineMemberMap.get(qm.userId);
+          if (!online) return acc;
+          acc.push({ ...qm, ...online });
+          return acc;
+        }, [])
+        .sort((a, b) => a.position - b.position),
+    [queueMembers, serverOnlineMemberMap],
+  );
   const isVerifiedServer = useMemo(() => false, []); // TODO: implement
 
   // Handlers
@@ -240,12 +253,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div className={styles['queue-list']}>
-            {filteredQueueMembers.map((member) => (
+            {filteredQueueMembers.map((queueMember) => (
               <QueueMemberTab
-                key={member.userId}
+                key={queueMember.userId}
                 user={user}
                 friends={friends}
-                queueMember={member}
+                queueMember={{ ...queueMember, ...serverOnlineMembers.find((m) => m.userId === queueMember.userId) }}
                 server={server}
                 channel={channel}
                 selectedItemId={selectedItemId}

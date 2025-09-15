@@ -6,7 +6,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import { User, QueueMember, Channel, Server, Permission, Friend } from '@/types';
+import { User, QueueMember, Channel, Server, Permission, Friend, OnlineMember } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -27,7 +27,7 @@ interface QueueMemberTabProps {
   friends: Friend[];
   server: Server;
   channel: Channel;
-  queueMember: QueueMember;
+  queueMember: OnlineMember & QueueMember;
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
