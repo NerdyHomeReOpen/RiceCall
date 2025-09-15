@@ -496,6 +496,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
     icon: APP_ICON,
     webPreferences: {
       webviewTag: true,
+      webSecurity: false,
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
