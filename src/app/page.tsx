@@ -433,11 +433,12 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Handlers
   const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
-    if (args[0].update.currentServerId !== serverIdRef.current) {
-      // Remove action messages and channel messages while switching server
+    // Remove action messages and channel messages while switching server
+    const currentServerId = args[0].update.currentServerId;
+    if (currentServerId !== undefined && currentServerId !== serverIdRef.current) {
       setActionMessages([]);
       setChannelMessages([]);
-      serverIdRef.current = args[0].update.currentServerId || '';
+      serverIdRef.current = currentServerId || '';
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
   };
