@@ -12,6 +12,19 @@ export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'tr-TR', label: 'Türkçe' },
 ];
 
+// ===== 新增：App -> Crowdin 語言代碼映射 =====
+const APP_TO_CROWDIN: Record<LanguageKey, string> = {
+  'zh-TW': 'zh-TW',
+  'zh-CN': 'zh-CN',
+  'en-US': 'en',
+  'ja-JP': 'ja',
+  'fa-IR': 'fa',
+  'pt-BR': 'pt-BR',
+  'ru-RU': 'ru',
+  'es-ES': 'es-ES',
+  'tr-TR': 'tr',
+};
+
 import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -86,15 +99,18 @@ if (typeof window !== 'undefined' && window.require) {
 
 const hash = ipcRenderer?.sendSync('get-env')?.CROWDIN_DISTRIBUTION_HASH || '';
 
+const toCrowdin = (lng: string) => APP_TO_CROWDIN[lng.replace('_', '-') as LanguageKey] ?? lng;
+
 /** OTA backend */
 class CrowdinBackend {
   type = 'backend' as const;
   client = new otaClient(hash);
   read(lng: string, _ns: string, cb: any) {
+    const crowdinLng = toCrowdin(lng);
     this.client
-      .getStringsByLocale(lng)
-      .then((data) => cb(null, data))
-      .catch((err) => cb(err, null));
+      .getStringsByLocale(crowdinLng)
+      .then((data: any) => cb(null, data))
+      .catch((err: any) => cb(err, null));
   }
 }
 
@@ -113,6 +129,8 @@ class CrowdinBackend {
         fallbackNS: false,
 
         interpolation: { escapeValue: false },
+        load: 'currentOnly' as const,
+        nonExplicitSupportedLngs: false,
       });
   } else {
     i18next.use(initReactI18next).init({
