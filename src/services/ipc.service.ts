@@ -116,6 +116,7 @@ const ipcService = {
       if (type === 'applyMember') {
         const { userId, serverId } = initialData;
         Promise.all([data.server({ userId, serverId }), data.memberApplication({ userId, serverId })]).then(([server, memberApplication]) => {
+          if (!server) return;
           ipcRenderer.send('open-popup', type, id, { server, memberApplication }, force);
         });
       } else if (type === 'applyFriend') {
@@ -125,9 +126,10 @@ const ipcService = {
           data.friendGroups({ userId }),
           data.friendApplication({ senderId: userId, receiverId: targetId }),
           data.friendApplication({ senderId: targetId, receiverId: userId }),
-        ]).then(([target, friendGroups, sentFriendApplication, receivedFriendApplication]) => {
+        ]).then(([target, friendGroups, friendApplication, receivedFriendApplication]) => {
+          if (!target || !friendGroups) return;
           if (!receivedFriendApplication) {
-            ipcRenderer.send('open-popup', 'applyFriend', 'applyFriend', { userId, targetId, target, friendGroups, friendApplication: sentFriendApplication }, force);
+            ipcRenderer.send('open-popup', 'applyFriend', 'applyFriend', { userId, targetId, target, friendGroups, friendApplication }, force);
           } else {
             ipcRenderer.send('open-popup', 'approveFriend', 'approveFriend', { targetId, friendGroups }, force);
           }
@@ -135,23 +137,27 @@ const ipcService = {
       } else if (type === 'approveFriend') {
         const { userId, targetId } = initialData;
         Promise.all([data.friendGroups({ userId })]).then(([friendGroups]) => {
+          if (!friendGroups) return;
           ipcRenderer.send('open-popup', type, id, { targetId, friendGroups }, force);
         });
       } else if (type === 'blockMember') {
         const { userId, serverId } = initialData;
         Promise.all([data.member({ userId, serverId })]).then(([member]) => {
+          if (!member) return;
           ipcRenderer.send('open-popup', type, id, { userId, serverId, member }, force);
         });
       } else if (type === 'channelSetting') {
         const { userId, serverId, channelId } = initialData;
         Promise.all([data.user({ userId }), data.server({ userId, serverId }), data.channel({ userId, serverId, channelId }), data.channelMembers({ serverId, channelId })]).then(
           ([user, server, channel, channelMembers]) => {
+            if (!user || !server || !channel || !channelMembers) return;
             ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, user, server, channel, channelMembers }, force);
           },
         );
       } else if (type === 'createServer') {
         const { userId } = initialData;
         Promise.all([data.user({ userId }), data.servers({ userId })]).then(([user, servers]) => {
+          if (!user || !servers) return;
           ipcRenderer.send('open-popup', type, id, { userId, user, servers }, force);
         });
       } else if (type === 'createChannel') {
@@ -160,69 +166,82 @@ const ipcService = {
           ipcRenderer.send('open-popup', type, id, { userId, serverId }, force);
         } else {
           Promise.all([data.channel({ userId, serverId, channelId })]).then(([parent]) => {
+            if (!parent) return;
             ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, parent }, force);
           });
         }
       } else if (type === 'directMessage') {
         const { userId, targetId, event, message } = initialData;
         Promise.all([data.user({ userId }), data.friend({ userId, targetId }), data.user({ userId: targetId })]).then(([user, friend, target]) => {
+          if (!user || !target) return;
           ipcRenderer.send('open-popup', type, id, { userId, targetId, user, friend, target, event, message }, force);
         });
       } else if (type === 'editChannelOrder') {
         const { userId, serverId } = initialData;
         Promise.all([data.channels({ userId, serverId })]).then(([serverChannels]) => {
+          if (!serverChannels) return;
           ipcRenderer.send('open-popup', type, id, { userId, serverId, serverChannels }, force);
         });
       } else if (type === 'editChannelName') {
         const { userId, serverId, channelId } = initialData;
         Promise.all([data.channel({ userId, serverId, channelId })]).then(([channel]) => {
+          if (!channel) return;
           ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, channel }, force);
         });
       } else if (type === 'editFriendNote') {
         const { userId, targetId } = initialData;
         Promise.all([data.friend({ userId, targetId }), data.friendGroups({ userId })]).then(([friend, friendGroups]) => {
+          if (!friend || !friendGroups) return;
           ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, friendGroups }, force);
         });
       } else if (type === 'editFriendGroupName') {
         const { userId, friendGroupId } = initialData;
         Promise.all([data.friendGroup({ userId, friendGroupId })]).then(([friendGroup]) => {
+          if (!friendGroup) return;
           ipcRenderer.send('open-popup', type, id, { userId, friendGroupId, friendGroup }, force);
         });
       } else if (type === 'editNickname') {
         const { userId, serverId } = initialData;
         Promise.all([data.member({ userId, serverId })]).then(([member]) => {
+          if (!member) return;
           ipcRenderer.send('open-popup', type, id, { userId, serverId, member }, force);
         });
       } else if (type === 'friendVerification') {
         const { userId } = initialData;
         Promise.all([data.friendApplications({ receiverId: userId })]).then(([friendApplications]) => {
+          if (!friendApplications) return;
           ipcRenderer.send('open-popup', type, id, { userId, friendApplications }, force);
         });
       } else if (type === 'inviteMember') {
         const { userId, serverId } = initialData;
         Promise.all([data.user({ userId }), data.memberInvitation({ serverId, receiverId: userId })]).then(([target, memberInvitation]) => {
+          if (!target) return;
           ipcRenderer.send('open-popup', type, id, { userId, serverId, target, memberInvitation }, force);
         });
       } else if (type === 'memberApplicationSetting') {
         const { userId, serverId } = initialData;
         Promise.all([data.server({ userId, serverId })]).then(([server]) => {
+          if (!server) return;
           ipcRenderer.send('open-popup', type, id, { userId, serverId, server }, force);
         });
       } else if (type === 'memberInvitation') {
         const { userId } = initialData;
         Promise.all([data.memberInvitations({ receiverId: userId })]).then(([memberInvitations]) => {
+          if (!memberInvitations) return;
           ipcRenderer.send('open-popup', type, id, { userId, memberInvitations }, force);
         });
       } else if (type === 'serverSetting') {
         const { userId, serverId } = initialData;
         Promise.all([data.user({ userId }), data.server({ userId, serverId }), data.serverMembers({ serverId }), data.memberApplications({ serverId })]).then(
           ([user, server, serverMembers, memberApplications]) => {
+            if (!user || !server || !serverMembers || !memberApplications) return;
             ipcRenderer.send('open-popup', type, id, { userId, serverId, user, server, serverMembers, memberApplications }, force);
           },
         );
       } else if (type === 'userInfo') {
         const { userId, targetId } = initialData;
         Promise.all([data.friend({ userId, targetId }), data.user({ userId: targetId }), data.servers({ userId: targetId })]).then(([friend, target, targetServers]) => {
+          if (!target || !targetServers) return;
           ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, target, targetServers }, force);
         });
       } else {
