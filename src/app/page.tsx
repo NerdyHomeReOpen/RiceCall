@@ -535,14 +535,14 @@ const RootPageComponent: React.FC = React.memo(() => {
     setChannels((prev) => [...prev, ...args.map((i) => i.data)]);
   };
 
-  const handleChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
-    const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
-    setChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
+  const handleChannelUpdate = (...args: { serverId: string; channelId: string; update: Partial<Channel> }[]) => {
+    const update = new Map(args.map((i) => [`${i.serverId}#${i.channelId}`, i.update] as const));
+    setChannels((prev) => prev.map((c) => (update.has(`${c.serverId}#${c.channelId}`) ? { ...c, ...update.get(`${c.serverId}#${c.channelId}`) } : c)));
   };
 
-  const handleChannelRemove = (...args: { channelId: string }[]) => {
-    const remove = new Set(args.map((i) => `${i.channelId}`));
-    setChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
+  const handleChannelRemove = (...args: { serverId: string; channelId: string }[]) => {
+    const remove = new Set(args.map((i) => `${i.serverId}#${i.channelId}`));
+    setChannels((prev) => prev.filter((c) => !remove.has(`${c.serverId}#${c.channelId}`)));
   };
 
   const handleMemberInvitationAdd = (...args: { data: MemberInvitation }[]) => {

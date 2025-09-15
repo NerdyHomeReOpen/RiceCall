@@ -319,8 +319,8 @@ export type ServerToClientEvents = {
   // Channel
   channelsSet: (...args: Channel[]) => void;
   channelAdd: (...args: { data: Channel }[]) => void;
-  channelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
-  channelRemove: (...args: { channelId: string }[]) => void;
+  channelUpdate: (...args: { serverId: string; channelId: string; update: Partial<Channel> }[]) => void;
+  channelRemove: (...args: { serverId: string; channelId: string }[]) => void;
   // Channel Member
   channelMemberAdd: (...args: { data: Member }[]) => void;
   channelMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;

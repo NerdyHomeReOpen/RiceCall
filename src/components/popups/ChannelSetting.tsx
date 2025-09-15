@@ -159,9 +159,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     handleSort(field);
   };
 
-  const handleChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
-    const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
-    setChannel((prev) => (update.has(`${prev.channelId}`) ? { ...prev, ...update.get(`${prev.channelId}`) } : prev));
+  const handleChannelUpdate = (...args: { serverId: string; channelId: string; update: Partial<Channel> }[]) => {
+    const update = new Map(args.map((i) => [`${i.serverId}#${i.channelId}`, i.update] as const));
+    setChannel((prev) => (update.has(`${prev.serverId}#${prev.channelId}`) ? { ...prev, ...update.get(`${prev.serverId}#${prev.channelId}`) } : prev));
   };
 
   const handleChannelMemberAdd = (...args: { data: Member }[]) => {
