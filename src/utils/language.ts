@@ -1,8 +1,6 @@
 import { TFunction } from 'i18next';
 import i18n, { LanguageKey, LANGUAGES } from '@/i18n';
 
-const FREE_IP_API_URL = 'https://ipinfo.io/json';
-
 export const getPermissionText = (t: TFunction<'translation', undefined>, permission: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8): string => {
   const permissionMap: Record<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8, string> = {
     1: t('guest'),
@@ -54,7 +52,7 @@ export const getFormatDate = (timestamp: number): string => {
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
   return `${year}-${month}-${day}`;
-}
+};
 
 export const getFormatTimestamp = (t: TFunction<'translation', undefined>, timestamp: number): string => {
   const timezoneLang = i18n.language;
@@ -79,7 +77,7 @@ export const getFormatTimestamp = (t: TFunction<'translation', undefined>, times
 };
 
 export const getLangByIp = async (): Promise<LanguageKey> => {
-  const response = await fetch(`${FREE_IP_API_URL}/json`);
+  const response = await fetch(`https://ipinfo.io/json`);
   if (!response.ok) return 'en-US';
 
   const data = await response.json();

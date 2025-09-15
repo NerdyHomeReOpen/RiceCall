@@ -312,6 +312,14 @@ const ipcService = {
       if (!isElectron) return;
       ipcRenderer.send('set-language', language);
     },
+
+    onUpdate: (callback: (language: LanguageKey) => void) => {
+      if (!isElectron) return () => {};
+      ipcRenderer.removeAllListeners('language');
+      const listener = (_: any, language: LanguageKey) => callback(language);
+      ipcRenderer.on('language', listener);
+      return () => ipcRenderer.removeListener('language', listener);
+    },
   },
 
   auth: {
