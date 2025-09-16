@@ -30,10 +30,10 @@ interface ChannelListProps {
   serverOnlineMembers: OnlineMember[];
   channel: Channel;
   channels: (Channel | Category)[];
-  queueMembers: QueueUser[];
+  queueUsers: QueueUser[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, channels, queueMembers }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, channels, queueUsers }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -58,16 +58,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const filteredChannels = useMemo(() => channels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
   const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
     () =>
-      queueMembers
-        .reduce<(QueueUser & OnlineMember)[]>((acc, qm) => {
-          if (qm.position < 0 || qm.leftTime <= 0) return acc;
-          const online = serverOnlineMemberMap.get(qm.userId);
+      queueUsers
+        .reduce<(QueueUser & OnlineMember)[]>((acc, qu) => {
+          if (qu.position < 0 || qu.leftTime <= 0) return acc;
+          const online = serverOnlineMemberMap.get(qu.userId);
           if (!online) return acc;
-          acc.push({ ...qm, ...online });
+          acc.push({ ...qu, ...online });
           return acc;
         }, [])
         .sort((a, b) => a.position - b.position),
-    [queueMembers, serverOnlineMemberMap],
+    [queueUsers, serverOnlineMemberMap],
   );
   const isVerifiedServer = useMemo(() => false, []); // TODO: implement
 
@@ -258,7 +258,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                 key={queueMember.userId}
                 user={user}
                 friends={friends}
-                queueMember={{ ...queueMember, ...serverOnlineMembers.find((m) => m.userId === queueMember.userId) }}
+                queueMember={queueMember}
                 server={server}
                 channel={channel}
                 selectedItemId={selectedItemId}
