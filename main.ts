@@ -1013,7 +1013,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-language', (_, language) => {
-    store.set('language', language);
+    store.set('language', language ?? 'zh-TW');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);
     });
@@ -1328,21 +1328,21 @@ app.on('ready', async () => {
 
   // Basic
   ipcMain.on('set-auto-login', (_, enable) => {
-    store.set('autoLogin', enable);
+    store.set('autoLogin', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('auto-login', enable);
     });
   });
 
   ipcMain.on('set-auto-launch', (_, enable) => {
-    setAutoLaunch(enable);
+    setAutoLaunch(enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('auto-launch', enable);
     });
   });
 
   ipcMain.on('set-always-on-top', (_, enable) => {
-    store.set('alwaysOnTop', enable);
+    store.set('alwaysOnTop', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.setAlwaysOnTop(enable);
       window.webContents.send('always-on-top', enable);
@@ -1350,49 +1350,49 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-status-auto-idle', (_, enable) => {
-    store.set('statusAutoIdle', enable);
+    store.set('statusAutoIdle', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('status-auto-idle', enable);
     });
   });
 
   ipcMain.on('set-status-auto-idle-minutes', (_, value) => {
-    store.set('statusAutoIdleMinutes', value);
+    store.set('statusAutoIdleMinutes', value ?? 10);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('status-auto-idle-minutes', value);
     });
   });
 
   ipcMain.on('set-status-auto-dnd', (_, enable) => {
-    store.set('statusAutoDnd', enable);
+    store.set('statusAutoDnd', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('status-auto-dnd', enable);
     });
   });
 
   ipcMain.on('set-channel-ui-mode', (_, mode) => {
-    store.set('channelUIMode', mode);
+    store.set('channelUIMode', mode ?? 'classic');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('channel-ui-mode', mode);
     });
   });
 
   ipcMain.on('set-close-to-tray', (_, enable) => {
-    store.set('closeToTray', enable);
+    store.set('closeToTray', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('close-to-tray', enable);
     });
   });
 
   ipcMain.on('set-font', (_, font) => {
-    store.set('font', font);
+    store.set('font', font ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('font', font);
     });
   });
 
   ipcMain.on('set-font-size', (_, fontSize) => {
-    store.set('fontSize', fontSize);
+    store.set('fontSize', fontSize ?? 13);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('font-size', fontSize);
     });
@@ -1400,70 +1400,70 @@ app.on('ready', async () => {
 
   // Mix
   ipcMain.on('set-input-audio-device', (_, deviceId) => {
-    store.set('audioInputDevice', deviceId);
+    store.set('audioInputDevice', deviceId ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('input-audio-device', deviceId);
     });
   });
 
   ipcMain.on('set-output-audio-device', (_, deviceId) => {
-    store.set('audioOutputDevice', deviceId);
+    store.set('audioOutputDevice', deviceId ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('output-audio-device', deviceId);
     });
   });
 
   ipcMain.on('set-mix-effect', (_, enable) => {
-    store.set('mixEffect', enable);
+    store.set('mixEffect', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('mix-effect', enable);
     });
   });
 
   ipcMain.on('set-mix-effect-type', (_, type) => {
-    store.set('mixEffectType', type);
+    store.set('mixEffectType', type ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('mix-effect-type', type);
     });
   });
 
   ipcMain.on('set-auto-mix-setting', (_, enable) => {
-    store.set('autoMixSetting', enable);
+    store.set('autoMixSetting', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('auto-mix-setting', enable);
     });
   });
 
   ipcMain.on('set-echo-cancellation', (_, enable) => {
-    store.set('echoCancellation', enable);
+    store.set('echoCancellation', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('echo-cancellation', enable);
     });
   });
 
   ipcMain.on('set-noise-cancellation', (_, enable) => {
-    store.set('noiseCancellation', enable);
+    store.set('noiseCancellation', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('noise-cancellation', enable);
     });
   });
 
   ipcMain.on('set-microphone-amplification', (_, enable) => {
-    store.set('microphoneAmplification', enable);
+    store.set('microphoneAmplification', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('microphone-amplification', enable);
     });
   });
 
   ipcMain.on('set-manual-mix-mode', (_, enable) => {
-    store.set('manualMixMode', enable);
+    store.set('manualMixMode', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('manual-mix-mode', enable);
     });
   });
 
   ipcMain.on('set-mix-mode', (_, mode) => {
-    store.set('mixMode', mode);
+    store.set('mixMode', mode ?? 'all');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('mix-mode', mode);
     });
@@ -1471,14 +1471,14 @@ app.on('ready', async () => {
 
   // Voice
   ipcMain.on('set-speaking-mode', (_, mode) => {
-    store.set('speakingMode', mode);
+    store.set('speakingMode', mode ?? 'key');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('speaking-mode', mode);
     });
   });
 
   ipcMain.on('set-default-speaking-key', (_, key) => {
-    store.set('defaultSpeakingKey', key);
+    store.set('defaultSpeakingKey', key ?? 'v');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1486,7 +1486,7 @@ app.on('ready', async () => {
 
   // Privacy
   ipcMain.on('set-not-save-message-history', (_, enable) => {
-    store.set('notSaveMessageHistory', enable);
+    store.set('notSaveMessageHistory', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('not-save-message-history', enable);
     });
@@ -1494,35 +1494,35 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
-    store.set('hotKeyOpenMainWindow', key);
+    store.set('hotKeyOpenMainWindow', key ?? 'F1');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-open-main-window', key);
     });
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key) => {
-    store.set('hotKeyIncreaseVolume', key);
+    store.set('hotKeyIncreaseVolume', key ?? 'PageUp');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-increase-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
-    store.set('hotKeyDecreaseVolume', key);
+    store.set('hotKeyDecreaseVolume', key ?? 'PageDown');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-decrease-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
-    store.set('hotKeyToggleSpeaker', key);
+    store.set('hotKeyToggleSpeaker', key ?? 'Alt+m');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-speaker', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
-    store.set('hotKeyToggleMicrophone', key);
+    store.set('hotKeyToggleMicrophone', key ?? 'v');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
@@ -1530,49 +1530,49 @@ app.on('ready', async () => {
 
   // SoundEffect
   ipcMain.on('set-disable-all-sound-effect', (_, enable) => {
-    store.set('disableAllSoundEffect', enable);
+    store.set('disableAllSoundEffect', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('disable-all-sound-effect', enable);
     });
   });
 
   ipcMain.on('set-enter-voice-channel-sound', (_, enable) => {
-    store.set('enterVoiceChannelSound', enable);
+    store.set('enterVoiceChannelSound', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('enter-voice-channel-sound', enable);
     });
   });
 
   ipcMain.on('set-leave-voice-channel-sound', (_, enable) => {
-    store.set('leaveVoiceChannelSound', enable);
+    store.set('leaveVoiceChannelSound', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('leave-voice-channel-sound', enable);
     });
   });
 
   ipcMain.on('set-start-speaking-sound', (_, enable) => {
-    store.set('startSpeakingSound', enable);
+    store.set('startSpeakingSound', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('start-speaking-sound', enable);
     });
   });
 
   ipcMain.on('set-stop-speaking-sound', (_, enable) => {
-    store.set('stopSpeakingSound', enable);
+    store.set('stopSpeakingSound', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('stop-speaking-sound', enable);
     });
   });
 
   ipcMain.on('set-receive-direct-message-sound', (_, enable) => {
-    store.set('receiveDirectMessageSound', enable);
+    store.set('receiveDirectMessageSound', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('receive-direct-message-sound', enable);
     });
   });
 
   ipcMain.on('set-receive-channel-message-sound', (_, enable) => {
-    store.set('receiveChannelMessageSound', enable);
+    store.set('receiveChannelMessageSound', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('receive-channel-message-sound', enable);
     });
