@@ -1,6 +1,6 @@
 {
   "accept-member-invitation-failed": "接受會員邀請失敗，請稍後再試。",
-  "account-already-exists": "帳號已存在。",
+  "account-already-exists": "حساب کاربری از قبل وجود دارد",
   "account-not-found": "找不到帳號。",
   "add-user-to-queue": "管理員【{{operator}}】將【{{target}}】添加到麥序。",
   "add-user-to-queue-failed": "將使用者加入麥序失敗，請稍後再試。",
