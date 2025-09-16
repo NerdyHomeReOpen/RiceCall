@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useContext, createContext, useCallback, useMemo } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
+import { getSystemAudioStream } from '@/utils/getSystemAudioStream';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -29,6 +30,7 @@ interface WebRTCContextType {
   changeMicVolume: (volume: number) => void;
   changeMixVolume: (volume: number) => void;
   changeSpeakerVolume: (volume: number) => void;
+  startSystemAudio: () => Promise<void>;
   isPressingSpeakKey: boolean;
   isMicMute: boolean;
   isSpeakerMute: boolean;
@@ -324,6 +326,51 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     },
     [userId, detectSpeaking, removeMicAudio, initAudioContext],
   );
+
+  const initSystemAudio = useCallback(
+    async (systemStream: MediaStream) => {
+      if (!audioContextRef.current) {
+        initAudioContext();
+        return initSystemAudio(systemStream);
+      }
+
+      // stop previous system tracks if needed
+      if (mixNodesRef.current.stream) {
+        mixNodesRef.current.stream.getTracks().forEach((t) => t.stop());
+      }
+
+      // Disable tracks si quieres control
+      systemStream.getAudioTracks().forEach((track) => {
+        track.enabled = true;
+      });
+
+      const sourceNode = audioContextRef.current.createMediaStreamSource(systemStream);
+      const gainNode = audioContextRef.current.createGain();
+      gainNode.gain.value = mixVolumeRef.current / 100;
+      const analyserNode = audioContextRef.current.createAnalyser();
+
+      mixNodesRef.current = { stream: systemStream, source: sourceNode, gain: gainNode, analyser: analyserNode };
+
+      sourceNode.connect(gainNode);
+      gainNode.connect(analyserNode);
+      analyserNode.connect(inputDesRef.current!);
+
+      const dataArray = new Uint8Array(analyserNode.fftSize);
+      analyserNode.fftSize = 2048;
+      detectSpeaking('system', analyserNode, dataArray);
+    },
+    [initAudioContext, detectSpeaking]
+  );
+
+  const startSystemAudio = useCallback(async () => {
+    try {
+      const systemStream = await getSystemAudioStream();
+      await initSystemAudio(systemStream);
+    } catch (err) {
+      console.error('[WebRTC] Error capturando audio del sistema', err);
+    }
+  }, [initSystemAudio]);
+
 
   const changeBitrate = useCallback((bitrate: number) => {
     bitrateRef.current = bitrate;
@@ -677,6 +724,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         changeMicVolume,
         changeMixVolume,
         changeSpeakerVolume,
+        startSystemAudio,
         isPressingSpeakKey,
         isMicMute,
         isSpeakerMute,

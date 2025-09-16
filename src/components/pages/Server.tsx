@@ -23,7 +23,6 @@ import ipc from '@/services/ipc.service';
 
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
-import { getSystemAudioStream } from '@/utils/getSystemAudioStream';
 
 
 interface MessageInputBoxGuardProps {
@@ -327,18 +326,18 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   const start = async () => {
     try {
-      const stream = await getSystemAudioStream();
-      console.log('STREAM');
-      console.log(stream);
+      // const stream = await getSystemAudioStream();
+      // console.log('STREAM');
+      // console.log(stream);
 
-      // Reproducir localmente (debug)…
-      const audio = document.createElement('audio');
-      audio.autoplay = true;
-      audio.srcObject = stream;
-      document.body.appendChild(audio);
+      // // Reproducir localmente (debug)…
+      // const audio = document.createElement('audio');
+      // audio.autoplay = true;
+      // audio.srcObject = stream;
+      // document.body.appendChild(audio);
+      
+      await webRTC.startSystemAudio();            
 
-      // …o inyectarlo a tu pipeline (WebAudio / WebRTC) de RiceCall
-      // por ejemplo, reemplazar la pista de micrófono en tu RTCPeerConnection
     } catch (e) {
       console.error('Error capturando audio del sistema', e);
     }
