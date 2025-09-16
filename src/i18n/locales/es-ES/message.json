@@ -111,7 +111,7 @@
   "search-user-failed": "Error al buscar usuario, por favor inténtalo de nuevo más tarde",
   "send-action-message-failed": "Error al enviar la transmisión, inténtalo más tarde",
   "send-direct-message-failed": "Error al enviar el mensaje en tiempo real, inténtalo más tarde",
-  "send-friend-application-failed": "Error al enviar solicitud de amistad, por favor inténtalo de nuevo más tarde",
+  "send-friend-application-failed": "Error al enviar solicitud de contacto, por favor inténtalo de nuevo más tarde",
   "send-friend-application-successed": "¡La solicitud de amistad ha sido enviada y está pendiente de la confirmación de la otra persona!",
   "send-member-application-failed": "Error al enviar la solicitud de membresía, inténtalo más tarde",
   "send-member-application-successed": "Solicitud de membresía enviada, espera la aprobación del administrador",
