@@ -13,6 +13,10 @@ import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } f
 import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
+import { initMain } from 'electron-audio-loopback';
+
+initMain();
+
 
 const EnvSchema = z
   .object({
@@ -500,6 +504,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
+      preload: path.join(app.getAppPath(), 'preload.js')
     },
     trafficLightPosition: { x: -100, y: -100 },
   });
@@ -568,6 +573,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
+      preload: path.join(app.getAppPath(), 'preload.js')
     },
     trafficLightPosition: { x: -100, y: -100 },
   });
@@ -632,6 +638,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
+      preload: path.join(app.getAppPath(), 'preload.js')
     },
     modal: true,
     trafficLightPosition: { x: -100, y: -100 },

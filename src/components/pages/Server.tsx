@@ -23,49 +23,7 @@ import ipc from '@/services/ipc.service';
 
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
-
-function isElectron() {
-  // heurística común
-  // @ts-ignore
-  return !!(typeof window !== 'undefined' && (window.process?.type || window.electron || navigator.userAgent.includes('Electron')));
-}
-
-function hasDesktopCapturer(): boolean {
-  // @ts-ignore
-  return typeof window !== 'undefined'
-    && !!window.electron
-    && !!window.electron.desktopCapturer
-    && typeof window.electron.desktopCapturer.getSources === 'function';
-}
-
-function getDesktopCapturer() {
-  if (typeof window === 'undefined') return null;
-  const isElectron = !!(window as any)?.process?.versions?.electron;
-  if (!isElectron) return null;
-
-  const wreq = (window as any).require;
-  if (typeof wreq !== 'function') return null;
-
-  try {
-    // Electron 28+ (recomendado en renderer)
-    const er = wreq('electron/renderer');
-    if (er?.desktopCapturer) return er.desktopCapturer;
-  } catch (e) {
-    // ignore
-  }
-  try {
-    // Fallback clásico
-    const eclassic = wreq('electron');
-    if (eclassic?.desktopCapturer) return eclassic.desktopCapturer;
-  } catch (e) {
-    // ignore
-  }
-  console.warn('desktopCapturer no disponible: prueba electron/renderer o revisa tu contexto');
-  return null;
-}
-
-
-
+import { getSystemAudioStream } from '@/utils/getSystemAudioStream';
 
 
 interface MessageInputBoxGuardProps {
@@ -366,59 +324,31 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
       annAreaRef.current.style.width = `${e.clientX - annAreaRef.current.offsetLeft}px`;
     }
   };
- 
 
-async function startScreenShare() {
-  // Funciona en navegador y en Electron
-  const gdm = navigator.mediaDevices?.getDisplayMedia;
-  if (typeof gdm !== 'function') throw new Error('SCREEN_CAPTURE_UNSUPPORTED');
+  const start = async () => {
+    try {
+      const stream = await getSystemAudioStream();
+      console.log('STREAM');
+      console.log(stream);
 
-  const stream = await gdm.call(navigator.mediaDevices, {
-    video: true,   // pide lo mínimo para máxima compatibilidad
-    audio: false,  // si necesitas audio del sistema, coméntalo y prueba solo en Chrome/Electron
-  });
+      // Reproducir localmente (debug)…
+      const audio = document.createElement('audio');
+      audio.autoplay = true;
+      audio.srcObject = stream;
+      document.body.appendChild(audio);
 
-  await attachAndPublish(stream);
-}
+      // …o inyectarlo a tu pipeline (WebAudio / WebRTC) de RiceCall
+      // por ejemplo, reemplazar la pista de micrófono en tu RTCPeerConnection
+    } catch (e) {
+      console.error('Error capturando audio del sistema', e);
+    }
+  };
 
-async function attachAndPublish(stream: MediaStream) {
-  screenStreamRef.current = stream;
-  setIsScreenSharing(true);
-
-  if (screenVideoRef.current) {
-    screenVideoRef.current.srcObject = stream;
-    screenVideoRef.current.muted = true;
-    screenVideoRef.current.playsInline = true;
-    await screenVideoRef.current.play().catch(() => {});
-  }
-
-  // Integra con tu WebRTC:
-  // webRTC.replaceOutgoingVideoTrack?.(stream.getVideoTracks()[0]);
-  // o webRTC.addTrackToMixer?.(stream.getVideoTracks()[0], { type: 'screen' });
-
-  const [videoTrack] = stream.getVideoTracks();
-  if (videoTrack) videoTrack.addEventListener('ended', stopScreenShare);
-}
-
-function stopScreenShare() {
-  screenStreamRef.current?.getTracks().forEach(t => t.stop());
-  screenStreamRef.current = null;
-
-  if (screenVideoRef.current) screenVideoRef.current.srcObject = null;
-  setIsScreenSharing(false);
-
-  // Limpia en tu WebRTC si corresponde
-  // webRTC.restorePreviousVideoTrack?.();
-}
-
-const handleClickMixingButton = async () => {
-  try {
-    if (!isScreenSharing) await startScreenShare();
-    else stopScreenShare();
-  } catch (e) {
-    console.error('screen share:', e);
-  }
-};
+  const handleClickMixingButton = async () => {
+  
+    console.log(window.loopbackAudio);
+    start();
+  };
 
 
   // Effects
@@ -514,30 +444,7 @@ const handleClickMixingButton = async () => {
         <main className={styles['content']}>
           {/* Message Area */}
           <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
-            {/* Announcement Area */}
-            {/* Screen Share Preview */}
-            <div
-              className={styles['screen-preview']}
-              style={!isScreenSharing ? { display: 'none' } : {}}
-            >
-              <div className={styles['screen-preview-header']}>
-                <span>{t('screen-sharing') || 'Compartiendo pantalla'}</span>
-                <button
-                  className={styles['screen-preview-stop']}
-                  onClick={stopScreenShare}
-                >
-                  {t('stop') || 'Detener'}
-                </button>
-              </div>
-
-              <video
-                ref={screenVideoRef}
-                autoPlay
-                muted
-                playsInline
-                className={styles['screen-preview-video']}
-              />
-            </div>
+            {/* Announcement Area */}            
             <div ref={annAreaRef} className={styles['announcement-area']}>
               <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} escapeHtml={false} />
             </div>
