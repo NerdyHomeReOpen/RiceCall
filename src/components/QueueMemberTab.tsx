@@ -53,6 +53,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
     currentChannelId: memberCurrentChannelId,
     position: memberPosition,
     leftTime: memberLeftTime,
+    isQueueControlled: memberIsQueueControlled,
   } = queueMember;
   const { userId, permissionLevel: globalPermission } = user;
   const { serverId, lobbyId: serverLobbyId, permissionLevel: serverPermission } = server;
@@ -66,16 +67,17 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
   const isConnecting = useMemo(() => connectionStatus === 'connecting', [connectionStatus]);
   const isSpeaking = useMemo(() => !!webRTC.volumePercent?.[memberUserId], [memberUserId, webRTC.volumePercent]);
   const isVoiceMuted = useMemo(() => webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
+  const isQueueControlled = useMemo(() => memberPosition === 0 && memberIsQueueControlled, [memberPosition, memberIsQueueControlled]);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
   const canUpdatePermission = useMemo(() => !isUser && isSuperior && isMember(memberPermission), [memberPermission, isUser, isSuperior]);
   const statusIcon = useMemo(() => {
-    if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
+    if (isVoiceMuted || memberIsVoiceMuted || isQueueControlled) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
     if (!isUser && isSameChannel && isConnecting) return 'loading';
     return '';
-  }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted]);
+  }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted, isQueueControlled]);
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
