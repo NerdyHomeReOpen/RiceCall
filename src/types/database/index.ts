@@ -94,8 +94,8 @@ export type table_friend_groups = {
 export type table_friends = {
   userId: string;
   targetId: string;
-  note: string; // New: Note
-  relationStatus: number; // New: Relation Status (0: stranger, 1: pending, 2: friend, 3: blocked)
+  note: string;
+  relationStatus: number;
   isBlocked: boolean;
   friendGroupId: string | null;
   createdAt: number;
@@ -125,10 +125,6 @@ export type table_members = {
   serverId: string;
   nickname: string | null;
   contribution: number;
-  // lastMessageTime: number; // Remove: change to frontend calculate
-  // lastJoinChannelTime: number; // Remove: change to frontend calculate
-  // isBlocked: number; // Remove: Change to table_server_blocked_users and table_channel_blocked_users
-  // permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // Remove: change to table_server_permissions and table_channel_permissions
   createdAt: number;
 };
 
@@ -174,6 +170,7 @@ export type table_servers = {
   level: number;
   wealth: number;
   receiveApply: boolean;
+  isVerified: boolean; // New: Is Verified
   type: 'game' | 'entertainment' | 'other';
   visibility: 'public' | 'private' | 'invisible';
   lobbyId: string;
@@ -212,21 +209,22 @@ export type table_user_vips = {
 export type table_users = {
   userId: string;
   name: string;
-  displayId: string; // New: Display ID (for search user)
+  displayId: string;
   avatar: string;
   avatarUrl: string;
-  email: string; // New: Email
+  email: string;
   signature: string;
-  about: string; // New: About
+  about: string;
   country: string;
   level: number;
   vip: number;
-  vxp: number; // New: VIP Experience Points
+  vxp: number;
   xp: number;
   requiredXp: number;
   birthYear: number;
   birthMonth: number;
   birthDay: number;
+  isVerified: boolean; // New: Is Verified
   status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
   gender: 'Male' | 'Female';
   currentChannelId: string | null;

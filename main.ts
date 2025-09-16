@@ -815,7 +815,6 @@ function configureAutoUpdater() {
   autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.allowDowngrade = false;
 
-  // Dev channel // TODO: Remove this before release
   autoUpdater.allowPrerelease = true;
   autoUpdater.channel = env.UPDATE_CHANNEL ?? 'latest';
   autoUpdater.setFeedURL({

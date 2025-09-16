@@ -5,7 +5,7 @@ import styles from '@/styles/pages/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import type { OnlineMember, Channel, Server, User, Category, Friend, MemberApplication, QueueMember } from '@/types';
+import type { OnlineMember, Channel, Server, User, Category, Friend, MemberApplication, QueueUser } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -30,7 +30,7 @@ interface ChannelListProps {
   serverOnlineMembers: OnlineMember[];
   channel: Channel;
   channels: (Channel | Category)[];
-  queueMembers: QueueMember[];
+  queueMembers: QueueUser[];
 }
 
 const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, channels, queueMembers }) => {
@@ -56,10 +56,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
-  const filteredQueueMembers = useMemo<(QueueMember & OnlineMember)[]>(
+  const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
     () =>
       queueMembers
-        .reduce<(QueueMember & OnlineMember)[]>((acc, qm) => {
+        .reduce<(QueueUser & OnlineMember)[]>((acc, qm) => {
           if (qm.position < 0 || qm.leftTime <= 0) return acc;
           const online = serverOnlineMemberMap.get(qm.userId);
           if (!online) return acc;
