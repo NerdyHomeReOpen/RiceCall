@@ -1,10 +1,10 @@
 {
   "accept-member-invitation-failed": "接受會員邀請失敗，請稍後再試。",
-  "account-already-exists": "帳號已存在。",
-  "account-not-found": "找不到帳號。",
+  "account-already-exists": "حساب کاربری از قبل وجود دارد",
+  "account-not-found": "حساب کاربری یافت نشد",
   "add-user-to-queue": "管理員【{{operator}}】將【{{target}}】添加到麥序。",
   "add-user-to-queue-failed": "將使用者加入麥序失敗，請稍後再試。",
-  "approve-friend-application-failed": "接受好友申請失敗，請稍後再試。",
+  "approve-friend-application-failed": "درخواست دوستی پذیرفته نشد، لطفا بعدا دوباره امتحان کنید",
   "approve-member-application-failed": "接受會員申請失敗，請稍後再試。",
   "block-user-from-channel": "【{{target}}】在【{{channel}}】被管理員【{{operator}}】封鎖。",
   "block-user-from-server": "【{{target}}】被管理員【{{operator}}】封鎖。",
