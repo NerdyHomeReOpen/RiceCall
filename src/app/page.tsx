@@ -448,7 +448,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleFriendAdd = (...args: { data: Friend }[]) => {
-    setFriends((prev) => [...prev, ...args.map((i) => i.data)]);
+    const exist = new Set(args.map((i) => `${i.data.targetId}`));
+    setFriends((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.targetId}`)).map((i) => i.data)]);
   };
 
   const handleFriendUpdate = (...args: { targetId: string; update: Partial<Friend> }[]) => {
@@ -466,7 +467,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
-    setFriendGroups((prev) => [...prev, ...args.map((i) => i.data)]);
+    const exist = new Set(args.map((i) => `${i.data.friendGroupId}`));
+    setFriendGroups((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.friendGroupId}`)).map((i) => i.data)]);
   };
 
   const handleFriendGroupUpdate = (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
@@ -480,7 +482,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
-    setFriendApplications((prev) => [...prev, ...args.map((i) => i.data)]);
+    const exist = new Set(args.map((i) => `${i.data.senderId}`));
+    setFriendApplications((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.senderId}`)).map((i) => i.data)]);
   };
 
   const handleFriendApplicationUpdate = (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
@@ -497,7 +500,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleServerAdd = (...args: { data: Server }[]) => {
-    setServers((prev) => [...prev, ...args.map((i) => i.data)]);
+    const exist = new Set(args.map((i) => `${i.data.serverId}`));
+    setServers((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.serverId}`)).map((i) => i.data)]);
   };
 
   const handleServerUpdate = (...args: { serverId: string; update: Partial<Server> }[]) => {
@@ -515,7 +519,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleServerOnlineMemberAdd = (...args: { data: OnlineMember }[]) => {
-    setServerOnlineMembers((prev) => [...prev, ...args.map((i) => i.data)]);
+    const exist = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+    setServerOnlineMembers((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.userId}#${i.data.serverId}`)).map((i) => i.data)]);
   };
 
   const handleServerOnlineMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
@@ -533,7 +538,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleChannelAdd = (...args: { data: Channel }[]) => {
-    setChannels((prev) => [...prev, ...args.map((i) => i.data)]);
+    const exist = new Set(args.map((i) => `${i.data.channelId}`));
+    setChannels((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.channelId}`)).map((i) => i.data)]);
   };
 
   const handleChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
@@ -547,7 +553,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleMemberInvitationAdd = (...args: { data: MemberInvitation }[]) => {
-    setMemberInvitations((prev) => [...prev, ...args.map((i) => i.data)]);
+    const exist = new Set(args.map((i) => `${i.data.serverId}`));
+    setMemberInvitations((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.serverId}`)).map((i) => i.data)]);
   };
 
   const handleMemberInvitationUpdate = (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => {

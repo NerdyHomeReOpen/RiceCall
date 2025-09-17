@@ -49,7 +49,8 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
   };
 
   const handleMemberInvitationAdd = (...args: { data: MemberInvitation }[]) => {
-    setMemberInvitations((prev) => [...prev, ...args.map((i) => i.data)]);
+    const exist = new Set(args.map((i) => `${i.data.serverId}`));
+    setMemberInvitations((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.serverId}`)).map((i) => i.data)]);
   };
 
   const handleMemberInvitationUpdate = (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => {

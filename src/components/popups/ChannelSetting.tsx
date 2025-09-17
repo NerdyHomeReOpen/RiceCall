@@ -165,7 +165,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   };
 
   const handleChannelMemberAdd = (...args: { data: Member }[]) => {
-    setChannelMembers((prev) => [...prev, ...args.map((i) => i.data)]);
+    const exist = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+    setChannelMembers((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.userId}#${i.data.serverId}`)).map((i) => i.data)]);
   };
 
   const handleChannelMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
