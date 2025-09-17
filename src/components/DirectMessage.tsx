@@ -29,6 +29,16 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
 
   // Memos
+  const formattedMessageContents = useMemo(
+    () =>
+      messageContents.map((content) =>
+        content
+          .split(' ')
+          .map((msg) => (msg.startsWith('message:') ? t(msg) : msg))
+          .join(' '),
+      ),
+    [messageContents, t],
+  );
   const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
 
   return (
@@ -37,7 +47,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
         <div className={styles['username-text']}>{senderName}</div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
       </div>
-      {messageContents.map((content, index) => (
+      {formattedMessageContents.map((content, index) => (
         <MarkdownContent key={index} markdownText={content} />
       ))}
     </div>

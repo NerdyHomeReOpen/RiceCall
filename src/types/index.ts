@@ -65,7 +65,8 @@ export type Channel = table_channels &
 
 export type OnlineMember = table_members & table_users & table_channel_muted_users & Permission & BadgeList;
 
-export type QueueMember = OnlineMember & {
+export type QueueUser = {
+  userId: string;
   position: number;
   leftTime: number;
   isQueueControlled: boolean;
@@ -129,6 +130,12 @@ export type NotifyMenuItem = {
   onClick?: () => void;
 };
 
+export type Theme = {
+  headerImage: string;
+  mainColor: string;
+  secondaryColor: string;
+};
+
 export type Emoji = {
   id: number;
   alt: string;
@@ -190,6 +197,8 @@ export type PopupType =
   | 'systemSetting'
   | 'userInfo'
   | 'userSetting';
+
+export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
 
 export type ClientToServerEvents = {
   // User
@@ -326,7 +335,7 @@ export type ServerToClientEvents = {
   channelMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
   channelMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
   // Queue Member
-  queueMembersSet: (...args: QueueMember[]) => void;
+  queueMembersSet: (...args: QueueUser[]) => void;
   // Member Invitation
   memberInvitationsSet: (...args: MemberInvitation[]) => void;
   memberInvitationAdd: (...args: { data: MemberInvitation }[]) => void;
@@ -349,8 +358,6 @@ export type ServerToClientEvents = {
   // Echo
   pong: () => void;
 };
-
-export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
 
 export type SFUCreateTransportParams = {
   direction: 'send' | 'recv';
@@ -397,10 +404,4 @@ export type SFUCreateConsumerReturnType = {
   producerId: string;
   kind: mediasoupClient.types.MediaKind;
   rtpParameters: any;
-};
-
-export type Theme = {
-  headerImage: string;
-  mainColor: string;
-  secondaryColor: string;
 };

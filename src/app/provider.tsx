@@ -43,21 +43,32 @@ const Providers = ({ children }: ProvidersProps) => {
     document.body.style.setProperty('--secondary-color', theme.secondaryColor, 'important');
   }, []);
 
+  const handleLanguageChange = useCallback((language: LanguageKey) => {
+    console.info('[Language] language updated: ', language);
+    if (!language) return;
+    i18n.changeLanguage(language);
+  }, []);
+
   // Effects
   useEffect(() => {
     handleFontChange(ipc.systemSettings.font.get());
     handleFontSizeChange(ipc.systemSettings.fontSize.get());
     handleThemeChange(ipc.customThemes.current.get());
+    handleLanguageChange(ipc.language.get());
 
-    const unsubscribe = [ipc.systemSettings.font.onUpdate(handleFontChange), ipc.systemSettings.fontSize.onUpdate(handleFontSizeChange), ipc.customThemes.current.onUpdate(handleThemeChange)];
+    const unsubscribe = [
+      ipc.systemSettings.font.onUpdate(handleFontChange),
+      ipc.systemSettings.fontSize.onUpdate(handleFontSizeChange),
+      ipc.customThemes.current.onUpdate(handleThemeChange),
+      ipc.language.onUpdate(handleLanguageChange),
+    ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleFontChange, handleFontSizeChange, handleThemeChange]);
+  }, [handleFontChange, handleFontSizeChange, handleThemeChange, handleLanguageChange]);
 
   useEffect(() => {
     const setupLanguage = async () => {
       const language = (ipc.language.get() || (await getLangByIp())) as LanguageKey;
       ipc.language.set(language);
-      i18n.changeLanguage(language);
     };
     setupLanguage();
   }, []);

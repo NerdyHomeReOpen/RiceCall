@@ -28,8 +28,6 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
 
   // Refs
   const comboRef = useRef<HTMLDivElement>(null);
-  const rememberAccountRef = useRef<HTMLInputElement>(null);
-  const autoLoginRef = useRef<HTMLInputElement>(null);
 
   // States
   const [formData, setFormData] = useState<FormDatas>({
@@ -50,8 +48,8 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
       setFormData((prev) => ({
         ...prev,
         account: value,
-        rememberAccount: match?.rememberAccount,
-        autoLogin: match?.autoLogin,
+        rememberAccount: match?.rememberAccount ?? false,
+        autoLogin: match?.autoLogin ?? false,
       }));
     } else if (name === 'autoLogin') {
       setFormData((prev) => ({
@@ -62,7 +60,11 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
     } else if (name === 'rememberAccount') {
       setFormData((prev) => {
         if (prev.autoLogin && !checked) {
-          return prev;
+          return {
+            ...prev,
+            autoLogin: false,
+            rememberAccount: false,
+          };
         }
         return {
           ...prev,
@@ -97,9 +99,9 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
     setFormData((prev) => ({
       ...prev,
       account: accounts[loginAccount] ? loginAccount : '',
+      password: accounts[loginAccount]?.password ?? '',
       rememberAccount: !!accounts[loginAccount]?.rememberAccount,
       autoLogin: !!accounts[loginAccount]?.autoLogin,
-      password: accounts[loginAccount]?.password || '',
     }));
   }, [accounts]);
 
@@ -143,7 +145,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
               <div className={styles['input-wrapper']}>
                 <div className={styles['label']}>{t('account')}</div>
                 <div className={styles['input-box']} ref={comboRef}>
-                  <input type="text" name="account" value={formData.account} onChange={handleInputChange} onBlur={() => {}} placeholder={t('please-input-account')} className={styles['input']} />
+                  <input type="text" name="account" value={formData.account} onChange={handleInputChange} placeholder={t('please-input-account')} className={styles['input']} />
                   <div
                     className={styles['combo-arrow']}
                     onClick={(e) => {
@@ -183,24 +185,16 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
               <div className={styles['input-wrapper']}>
                 <div className={styles['label']}>{t('password')}</div>
                 <div className={styles['input-box']}>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    onBlur={() => {}}
-                    placeholder={t('please-input-password')}
-                    className={styles['input']}
-                  />
+                  <input type="password" name="password" value={formData.password} onChange={handleInputChange} placeholder={t('please-input-password')} className={styles['input']} />
                 </div>
               </div>
               <div className={styles['check-wrapper']}>
                 <div className={styles['check-box']}>
-                  <input ref={rememberAccountRef} type="checkbox" name="rememberAccount" checked={formData.rememberAccount} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
+                  <input type="checkbox" name="rememberAccount" checked={formData.rememberAccount} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
                   {t('remember-account')}
                 </div>
                 <div className={styles['check-box']}>
-                  <input ref={autoLoginRef} type="checkbox" name="autoLogin" checked={formData.autoLogin} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
+                  <input type="checkbox" name="autoLogin" checked={formData.autoLogin} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
                   {t('auto-login')}
                 </div>
               </div>

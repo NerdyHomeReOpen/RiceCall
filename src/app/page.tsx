@@ -21,7 +21,7 @@ import type {
   Announcement,
   Friend,
   OnlineMember,
-  QueueMember,
+  QueueUser,
 } from '@/types';
 
 // i18n
@@ -414,7 +414,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
   const [systemNotify, setSystemNotify] = useState<string[]>([]);
-  const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
+  const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
   const [isConnected, setIsConnected] = useState(false);
@@ -433,11 +433,12 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Handlers
   const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
-    if (args[0].update.currentServerId !== serverIdRef.current) {
-      // Remove action messages and channel messages while switching server
+    // Remove action messages and channel messages while switching server
+    const currentServerId = args[0].update.currentServerId;
+    if (currentServerId !== undefined && currentServerId !== serverIdRef.current) {
       setActionMessages([]);
       setChannelMessages([]);
-      serverIdRef.current = args[0].update.currentServerId || '';
+      serverIdRef.current = currentServerId || '';
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
   };
@@ -447,7 +448,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleFriendAdd = (...args: { data: Friend }[]) => {
-    setFriends((prev) => [...prev, ...args.map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.targetId}`));
+    setFriends((prev) => prev.filter((f) => !add.has(`${f.targetId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleFriendUpdate = (...args: { targetId: string; update: Partial<Friend> }[]) => {
@@ -465,7 +467,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
-    setFriendGroups((prev) => [...prev, ...args.map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.friendGroupId}`));
+    setFriendGroups((prev) => prev.filter((fg) => !add.has(`${fg.friendGroupId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleFriendGroupUpdate = (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
@@ -479,7 +482,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
-    setFriendApplications((prev) => [...prev, ...args.map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.senderId}`));
+    setFriendApplications((prev) => prev.filter((fa) => !add.has(`${fa.senderId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleFriendApplicationUpdate = (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
@@ -496,7 +500,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleServerAdd = (...args: { data: Server }[]) => {
-    setServers((prev) => [...prev, ...args.map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.serverId}`));
+    setServers((prev) => prev.filter((s) => !add.has(`${s.serverId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleServerUpdate = (...args: { serverId: string; update: Partial<Server> }[]) => {
@@ -514,7 +519,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleServerOnlineMemberAdd = (...args: { data: OnlineMember }[]) => {
-    setServerOnlineMembers((prev) => [...prev, ...args.map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+    setServerOnlineMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleServerOnlineMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
@@ -532,7 +538,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleChannelAdd = (...args: { data: Channel }[]) => {
-    setChannels((prev) => [...prev, ...args.map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.channelId}`));
+    setChannels((prev) => prev.filter((c) => !add.has(`${c.channelId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
@@ -546,7 +553,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleMemberInvitationAdd = (...args: { data: MemberInvitation }[]) => {
-    setMemberInvitations((prev) => [...prev, ...args.map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.serverId}`));
+    setMemberInvitations((prev) => prev.filter((mi) => !add.has(`${mi.serverId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleMemberInvitationUpdate = (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => {
@@ -567,8 +575,8 @@ const RootPageComponent: React.FC = React.memo(() => {
     setActionMessages((prev) => [...prev, ...args]);
   };
 
-  const handleQueueMembersSet = (...args: QueueMember[]) => {
-    setQueueMembers(args);
+  const handleQueueUsersSet = (...args: QueueUser[]) => {
+    setQueueUsers(args);
   };
 
   const handlePlaySound = (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
@@ -766,7 +774,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.socket.on('actionMessage', handleActionMessage),
       ipc.socket.on('openPopup', handleOpenPopup),
       ipc.socket.on('playSound', handlePlaySound),
-      ipc.socket.on('queueMembersSet', handleQueueMembersSet),
+      ipc.socket.on('queueMembersSet', handleQueueUsersSet),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
@@ -791,7 +799,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 channels={channels}
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
-                queueMembers={queueMembers}
+                queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
               />
             </>

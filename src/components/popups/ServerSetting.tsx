@@ -70,7 +70,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     // Memos
     const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermission), [globalPermission, serverPermission]);
-    const totalMembers = useMemo(() => serverMembers.filter((m) => m.permissionLevel > 1).length, [serverMembers]);
+    const totalMembers = useMemo(() => serverMembers.filter((m) => isMember(m.permissionLevel) && !isStaff(m.permissionLevel)).length, [serverMembers]);
     const totalApplications = useMemo(() => memberApplications.length, [memberApplications]);
     const totalBlockMembers = useMemo(() => serverMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now()).length, [serverMembers]);
     const canSubmit = useMemo(() => serverName.trim(), [serverName]);
@@ -241,7 +241,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     };
 
     const handleServerMemberAdd = (...args: { data: Member }[]) => {
-      setServerMembers((prev) => [...prev, ...args.map((i) => i.data)]);
+      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+      setServerMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
     };
 
     const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
@@ -255,7 +256,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     };
 
     const handleServerMemberApplicationAdd = (...args: { data: MemberApplication }[]) => {
-      setMemberApplications((prev) => [...prev, ...args.map((i) => i.data)]);
+      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+      setMemberApplications((prev) => prev.filter((a) => !add.has(`${a.userId}#${a.serverId}`)).concat(args.map((i) => i.data)));
     };
 
     const handleServerMemberApplicationUpdate = (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => {

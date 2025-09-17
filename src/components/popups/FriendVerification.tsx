@@ -60,7 +60,8 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   };
 
   const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
-    setFriendApplications((prev) => [...prev, ...args.map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.senderId}`));
+    setFriendApplications((prev) => prev.filter((a) => !add.has(`${a.senderId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleFriendApplicationUpdate = (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {

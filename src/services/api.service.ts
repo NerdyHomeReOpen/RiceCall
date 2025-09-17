@@ -33,19 +33,22 @@ const handleResponse = async (response: Response): Promise<any> => {
 
 const apiService = {
   // GET request
-  get: async (endpoint: string): Promise<any | null> => {
+  get: async (endpoint: string, retry = true, retryCount = 0): Promise<any | null> => {
     try {
       const response = await fetch(`${API_URL}${endpoint}`);
 
       return await handleResponse(response);
     } catch (error: any) {
+      if (retry && retryCount < 3) {
+        return await apiService.get(endpoint, false, retryCount + 1);
+      }
       new ErrorHandler(error).show();
       return null;
     }
   },
 
   // POST request
-  post: async (endpoint: string, data: ApiRequestData | FormData, options?: RequestOptions): Promise<any | null> => {
+  post: async (endpoint: string, data: ApiRequestData | FormData, options?: RequestOptions, retry = true, retryCount = 0): Promise<any | null> => {
     try {
       const headers = new Headers({
         ...(data instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
@@ -61,13 +64,16 @@ const apiService = {
 
       return await handleResponse(response);
     } catch (error: any) {
+      if (retry && retryCount < 3) {
+        return await apiService.post(endpoint, data, options, false, retryCount + 1);
+      }
       new ErrorHandler(error).show();
       return null;
     }
   },
 
   // PATCH request
-  patch: async (endpoint: string, data: Record<string, any>): Promise<any | null> => {
+  patch: async (endpoint: string, data: Record<string, any>, retry = true, retryCount = 0): Promise<any | null> => {
     try {
       const headers = new Headers({
         'Content-Type': 'application/json',
@@ -81,6 +87,9 @@ const apiService = {
 
       return await handleResponse(response);
     } catch (error: any) {
+      if (retry && retryCount < 3) {
+        return await apiService.patch(endpoint, data, false, retryCount + 1);
+      }
       new ErrorHandler(error).show();
       return null;
     }

@@ -5,7 +5,7 @@ import styles from '@/styles/pages/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import type { OnlineMember, Channel, Server, User, Category, Friend, MemberApplication, QueueMember } from '@/types';
+import type { OnlineMember, Channel, Server, User, Category, Friend, MemberApplication, QueueUser } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -30,10 +30,10 @@ interface ChannelListProps {
   serverOnlineMembers: OnlineMember[];
   channel: Channel;
   channels: (Channel | Category)[];
-  queueMembers: QueueMember[];
+  queueUsers: QueueUser[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, channels, queueMembers }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, channels, queueUsers }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -54,8 +54,21 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
   const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
-  const filteredQueueMembers = useMemo(() => queueMembers.filter((member) => member.position >= 0 && member.leftTime > 0).sort((a, b) => a.position - b.position), [queueMembers]);
+  const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
+  const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
+    () =>
+      queueUsers
+        .reduce<(QueueUser & OnlineMember)[]>((acc, qu) => {
+          if (qu.position < 0 || qu.leftTime <= 0) return acc;
+          const online = serverOnlineMemberMap.get(qu.userId);
+          if (!online) return acc;
+          acc.push({ ...qu, ...online });
+          return acc;
+        }, [])
+        .sort((a, b) => a.position - b.position),
+    [queueUsers, serverOnlineMemberMap],
+  );
   const isVerifiedServer = useMemo(() => false, []); // TODO: implement
 
   // Handlers
@@ -240,12 +253,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div className={styles['queue-list']}>
-            {filteredQueueMembers.map((member) => (
+            {filteredQueueMembers.map((queueMember) => (
               <QueueMemberTab
-                key={member.userId}
+                key={queueMember.userId}
                 user={user}
                 friends={friends}
-                queueMember={member}
+                queueMember={queueMember}
                 server={server}
                 channel={channel}
                 selectedItemId={selectedItemId}

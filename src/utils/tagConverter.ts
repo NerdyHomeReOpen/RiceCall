@@ -37,7 +37,7 @@ export const fromTags = (raw: string) =>
     })
     // Embed
     .replace(embedRegex, (_, src) => {
-      return `<iframe data-embed='${src}' class='${markdown['embed-video']}' src="${src}"></iframe>`;
+      return `<iframe data-embed='${src}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="${src}"></iframe>`;
     })
     // Discord Timestamp
     .replace(discordTimestampRegex, (_, timestamp) => {

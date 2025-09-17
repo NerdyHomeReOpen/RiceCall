@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -6,7 +6,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import { User, QueueMember, Channel, Server, Permission, Friend } from '@/types';
+import { User, QueueUser, Channel, Server, Permission, Friend, OnlineMember } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -27,7 +27,7 @@ interface QueueMemberTabProps {
   friends: Friend[];
   server: Server;
   channel: Channel;
-  queueMember: QueueMember;
+  queueMember: QueueUser & OnlineMember;
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
@@ -37,6 +37,9 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const webRTC = useWebRTC();
+
+  // Refs
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Destructuring
   const {
@@ -53,6 +56,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
     currentChannelId: memberCurrentChannelId,
     position: memberPosition,
     leftTime: memberLeftTime,
+    isQueueControlled: memberIsQueueControlled,
   } = queueMember;
   const { userId, permissionLevel: globalPermission } = user;
   const { serverId, lobbyId: serverLobbyId, permissionLevel: serverPermission } = server;
@@ -66,16 +70,17 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
   const isConnecting = useMemo(() => connectionStatus === 'connecting', [connectionStatus]);
   const isSpeaking = useMemo(() => !!webRTC.volumePercent?.[memberUserId], [memberUserId, webRTC.volumePercent]);
   const isVoiceMuted = useMemo(() => webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
+  const isQueueControlled = useMemo(() => memberPosition === 0 && memberIsQueueControlled, [memberPosition, memberIsQueueControlled]);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
   const canUpdatePermission = useMemo(() => !isUser && isSuperior && isMember(memberPermission), [memberPermission, isUser, isSuperior]);
   const statusIcon = useMemo(() => {
-    if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
+    if (isVoiceMuted || memberIsVoiceMuted || isQueueControlled) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
     if (!isUser && isSameChannel && isConnecting) return 'loading';
     return '';
-  }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted]);
+  }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted, isQueueControlled]);
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
@@ -166,10 +171,17 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
         if (selectedItemId === `queue-${memberUserId}`) setSelectedItemId(null);
         else setSelectedItemId(`queue-${memberUserId}`);
       }}
-      onDoubleClick={(e) => {
+      onMouseEnter={(e) => {
         const x = e.currentTarget.getBoundingClientRect().right;
         const y = e.currentTarget.getBoundingClientRect().top;
-        contextMenu.showUserInfoBlock(x, y, 'right-bottom', queueMember);
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = setTimeout(() => {
+          contextMenu.showUserInfoBlock(x, y, 'right-bottom', queueMember);
+        }, 200);
+      }}
+      onMouseLeave={() => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = null;
       }}
       onContextMenu={(e) => {
         e.stopPropagation();

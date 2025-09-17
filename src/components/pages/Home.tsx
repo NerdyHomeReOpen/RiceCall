@@ -95,7 +95,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   // Handlers
   const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.trim();
+    const query = e.target.value;
 
     if (!query) {
       handleClearSearchState();
