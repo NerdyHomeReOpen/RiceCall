@@ -21,7 +21,7 @@ import type {
   Announcement,
   Friend,
   OnlineMember,
-  QueueMember,
+  QueueUser,
 } from '@/types';
 
 // i18n
@@ -414,7 +414,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
   const [systemNotify, setSystemNotify] = useState<string[]>([]);
-  const [queueMembers, setQueueMembers] = useState<QueueMember[]>([]);
+  const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
   const [isConnected, setIsConnected] = useState(false);
@@ -568,8 +568,8 @@ const RootPageComponent: React.FC = React.memo(() => {
     setActionMessages((prev) => [...prev, ...args]);
   };
 
-  const handleQueueMembersSet = (...args: QueueMember[]) => {
-    setQueueMembers(args);
+  const handleQueueUsersSet = (...args: QueueUser[]) => {
+    setQueueUsers(args);
   };
 
   const handlePlaySound = (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
@@ -767,7 +767,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.socket.on('actionMessage', handleActionMessage),
       ipc.socket.on('openPopup', handleOpenPopup),
       ipc.socket.on('playSound', handlePlaySound),
-      ipc.socket.on('queueMembersSet', handleQueueMembersSet),
+      ipc.socket.on('queueMembersSet', handleQueueUsersSet),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
@@ -792,7 +792,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 channels={channels}
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
-                queueMembers={queueMembers}
+                queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
               />
             </>

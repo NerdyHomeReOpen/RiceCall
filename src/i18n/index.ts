@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'ja-JP' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
+export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
 export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'zh-TW', label: '繁體中文' },
   { code: 'zh-CN', label: '简体中文' },
   { code: 'en-US', label: 'English' },
   { code: 'ru-RU', label: 'Русский' },
   { code: 'pt-BR', label: 'Português' },
-  { code: 'ja-JP', label: '日本語' },
   { code: 'es-ES', label: 'Español' },
   { code: 'fa-IR', label: 'فارسی' },
   { code: 'tr-TR', label: 'Türkçe' },
@@ -17,7 +16,6 @@ const APP_TO_CROWDIN: Record<LanguageKey, string> = {
   'zh-TW': 'zh-TW',
   'zh-CN': 'zh-CN',
   'en-US': 'en',
-  'ja-JP': 'ja',
   'fa-IR': 'fa',
   'pt-BR': 'pt-BR',
   'ru-RU': 'ru',
@@ -46,12 +44,6 @@ import faIR from './locales/fa-IR/translation.json';
 import faIR_message from './locales/fa-IR/message.json';
 import faIR_rpc from './locales/fa-IR/rpc.json';
 import faIR_country from './locales/fa-IR/country.json';
-
-// ja-JP
-import jaJP from './locales/ja-JP/translation.json';
-import jaJP_message from './locales/ja-JP/message.json';
-import jaJP_rpc from './locales/ja-JP/rpc.json';
-import jaJP_country from './locales/ja-JP/country.json';
 
 // pt-BR
 import ptBR from './locales/pt-BR/translation.json';
@@ -122,7 +114,7 @@ class CrowdinBackend {
       .init({
         lng: 'zh-TW',
         fallbackLng: 'zh-TW',
-        supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'ja-JP', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
+        supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
 
         ns: ['translation', 'rpc', 'message', 'country', 'badge'],
         defaultNS: 'translation',
@@ -136,7 +128,7 @@ class CrowdinBackend {
     i18next.use(initReactI18next).init({
       lng: 'zh-TW',
       fallbackLng: 'zh-TW',
-      supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'ja-JP', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
+      supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
 
       ns: ['translation', 'rpc', 'message', 'country', 'badge'],
       defaultNS: 'translation',
@@ -146,7 +138,6 @@ class CrowdinBackend {
         'en-US': { translation: enUS, rpc: enUS_rpc, message: enUS_message, country: enUS_country },
         'es-ES': { translation: esES, rpc: esES_rpc, message: esES_message, country: esES_country },
         'fa-IR': { translation: faIR, rpc: faIR_rpc, message: faIR_message, country: faIR_country },
-        'ja-JP': { translation: jaJP, rpc: jaJP_rpc, message: jaJP_message, country: jaJP_country },
         'pt-BR': { translation: ptBR, rpc: ptBR_rpc, message: ptBR_message, country: ptBR_country },
         'ru-RU': { translation: ruRU, rpc: ruRU_rpc, message: ruRU_message, country: ruRU_country },
         'tr-TR': { translation: trTR, rpc: trTR_rpc, message: trTR_message, country: trTR_country },
