@@ -31,6 +31,7 @@ interface WebRTCContextType {
   changeMixVolume: (volume: number) => void;
   changeSpeakerVolume: (volume: number) => void;
   toggleMixMode: () => Promise<void>;
+  toggleRecord: () => void;   
   isPressingSpeakKey: boolean;
   isMicMute: boolean;
   isSpeakerMute: boolean;
@@ -41,6 +42,7 @@ interface WebRTCContextType {
   volumePercent: { [userId: string]: number };
   remoteUserStatusList: { [userId: string]: RemoteUserStatus };
   isMixModeActive: boolean;
+  isRecording: boolean;  
 }
 
 type RemoteUserStatus = 'connecting' | 'connected' | 'disconnected';
@@ -92,6 +94,14 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     gain: null,
     analyser: null,
   });
+
+  // Recording
+  const recordDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordChunksRef = useRef<BlobPart[]>([]);
+  const isRecordingRef = useRef(false);
+  const [isRecording, setIsRecording] = useState(false);
+
   // Speaker
   const speakerMuteRef = useRef<boolean>(false);
   const speakerVolumeRef = useRef<number>(100);
@@ -400,6 +410,91 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       await startMixMode();
     }
   }, [startMixMode, stopMixMode]);
+
+  const disconnectSafe = (from?: AudioNode | null, to?: AudioNode | null) => {
+  try {
+    if (from && to) from.disconnect(to);
+  } catch {}
+};
+
+const ensureRecordGraph = useCallback(() => {
+  if (!audioContextRef.current) initAudioContext();
+
+  if (!recordDesRef.current) {
+    recordDesRef.current = audioContextRef.current!.createMediaStreamDestination();
+  }
+
+  // Limpia conexiones previas hacia recordDes
+  disconnectSafe(micNodesRef.current.analyser, recordDesRef.current);
+  disconnectSafe(mixNodesRef.current.analyser, recordDesRef.current);
+  disconnectSafe(masterGainNodeRef.current, recordDesRef.current);
+
+  // 🔑 Conecta fuentes a recordDes (NO destinos a destinos)
+  if (isSystemAudioActiveRef.current) {
+    // Mix ON: mic + sistema → record
+    if (micNodesRef.current.analyser) micNodesRef.current.analyser.connect(recordDesRef.current);
+    if (mixNodesRef.current.analyser) mixNodesRef.current.analyser.connect(recordDesRef.current);
+    // No conectamos masterGain para evitar duplicar remotos (ya entrarían por el loopback del SO)
+  } else {
+    // Mix OFF: mic + remotos → record
+    if (micNodesRef.current.analyser) micNodesRef.current.analyser.connect(recordDesRef.current);
+    if (masterGainNodeRef.current) masterGainNodeRef.current.connect(recordDesRef.current);
+  }
+}, [initAudioContext]);
+
+
+  const startRecording = useCallback(() => {
+    if (isRecordingRef.current) return;
+    ensureRecordGraph();
+
+    const stream = recordDesRef.current!.stream;
+    const mimeType =
+      MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' :
+      MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+
+    const mr = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    mediaRecorderRef.current = mr;
+    recordChunksRef.current = [];
+
+    mr.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordChunksRef.current.push(e.data); };
+    mr.onstop = async () => {
+      const blob = new Blob(recordChunksRef.current, { type: mimeType || 'audio/webm' });      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      a.href = url; a.download = `ricecall-room-${ts}.webm`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    };
+
+    mr.start(1000);
+    isRecordingRef.current = true;
+    setIsRecording(true);
+  }, [ensureRecordGraph]);
+
+
+  const stopRecording = useCallback(() => {
+    if (!isRecordingRef.current) return;
+    try {
+      mediaRecorderRef.current?.stop();
+    } catch (e) {
+      console.warn('[WebRTC] stopRecording error', e);
+    }
+
+    if (recordDesRef.current) {
+      disconnectSafe(micNodesRef.current.analyser, recordDesRef.current);
+      disconnectSafe(mixNodesRef.current.analyser, recordDesRef.current);
+      disconnectSafe(masterGainNodeRef.current, recordDesRef.current);
+    }
+
+    isRecordingRef.current = false;
+    setIsRecording(false);
+  }, []);
+
+  const toggleRecord = useCallback(() => {
+    if (isRecordingRef.current) stopRecording();
+    else startRecording();
+  }, [startRecording, stopRecording]);
 
 
   const changeBitrate = useCallback((bitrate: number) => {
@@ -756,6 +851,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         changeMixVolume,
         changeSpeakerVolume,
         toggleMixMode,
+        toggleRecord,
         isPressingSpeakKey,
         isMicMute,
         isSpeakerMute,
@@ -765,7 +861,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         mutedIds,
         remoteUserStatusList,
         volumePercent,
-        isMixModeActive
+        isMixModeActive,
+        isRecording
       }}
     >
       {children}

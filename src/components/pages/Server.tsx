@@ -343,9 +343,22 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     }
   };
 
+  const toggleRecord = async () => {
+    try {
+      webRTC.toggleRecord();
+    } catch (e) {
+      console.error('Error al alternar la grabación', e);
+    }   
+  };
+
   const handleToggleMixingMode = async () => {  
     toggleMixMode();
   };
+
+  const handleToggleRecord = async () => {  
+    toggleRecord();
+  };
+
 
   // Effects
   useEffect(() => {
@@ -571,7 +584,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                   btnCls={styles['speaker-btn']}
                 />
               </div>
-              <div className={styles['record-mode-btn']} />
+              <div
+                className={`${styles['record-mode-btn']} ${webRTC.isRecording ? styles['active'] : ''}`}
+                onClick={handleToggleRecord}
+                title={webRTC.isRecording ? t('recording-on') : t('recording-off')}
+              />
             </div>
           </div>
         </main>

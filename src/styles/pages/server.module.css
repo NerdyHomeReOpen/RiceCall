@@ -848,6 +848,14 @@
   background-position: 0 0;
 }
 
+.record-mode-btn.active {
+  filter: brightness(1.2);
+  outline: 2px solid var(--danger, #e74c3c);
+  border-radius: 6px;
+  animation: rec-blink 1s steps(2, jump-none) infinite;
+}
+@keyframes rec-blink { from { opacity: 1; } to { opacity: .6; } }
+
 .mic-volume-container,
 .speaker-volume-container {
   position: relative;
