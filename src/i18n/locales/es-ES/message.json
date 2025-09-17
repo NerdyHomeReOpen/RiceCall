@@ -58,7 +58,7 @@
   "downgraded-from-4": "Administrador [icon={{userGender}}-{{userPermissionLevel}}][tag={{userName}}] eliminaron sus moderador envíos.",
   "downgraded-from-5": "Administrador [icon={{userGender}}-{{userPermissionLevel}}][tag={{userName}}] eliminaron sus administrador del grupo envíos.",
   "edit-channel-failed": "Error al editar el canal, inténtalo nuevamente más tarde.",
-  "edit-friend-application-failed": "Error al editar la solicitud de amistad, inténtalo nuevamente más tarde.",
+  "edit-friend-application-failed": "Error al editar la solicitud de contacto, inténtalo nuevamente más tarde.",
   "edit-friend-failed": "Error al editar el contacto, por favor inténtalo de nuevo más tarde",
   "edit-friend-group-failed": "Error al editar la categoría de contactos, por favor, inténtalo de nuevo más tarde",
   "edit-member-application-failed": "Error al editar la solicitud de membresía, inténtalo más tarde",
@@ -160,6 +160,6 @@
   "voice-change-to-allow-queue": "El administrador [{{operator}}] ha permitido el modo cola.",
   "voice-change-to-forbid-queue": "El administrador [{{operator}}] ha bloqueado el modo cola.",
   "voice-change-to-free": "El canal de voz ha sido configurado para hablar libremente.",
-  "voice-change-to-queue": "El canal de voz ha sido cambiado a modo cola. Haz clic en \"Subir cola\" para hablar.",
+  "voice-change-to-queue": "El canal de voz ha sido cambiado a modo cola. Haz clic en \"Subir a la cola\" para hablar.",
   "wrong-password": "Contraseña incorrecta."
 }
