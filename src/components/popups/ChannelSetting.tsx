@@ -75,6 +75,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const permissionLevel = useMemo(() => Math.max(userPermissionLevel, serverPermissionLevel, channelPermissionLevel), [userPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
   const isLobby = useMemo(() => serverLobbyId === channelId, [serverLobbyId, channelId]);
   const isReceptionLobby = useMemo(() => serverReceptionLobbyId === channelId, [serverReceptionLobbyId, channelId]);
+  const totalModerators = useMemo(() => channelMembers.filter((m) => isChannelMod(m.permissionLevel) && !isServerAdmin(m.permissionLevel)).length, [channelMembers]);
   const canSubmit = useMemo(() => channelName.trim(), [channelName]);
 
   const settingPages = useMemo(
@@ -496,7 +497,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
           <div className={popup['col']}>
             <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
-              <div className={popup['label']}>{`${t('channel-management')} (${filteredModerators.length})`}</div>
+              <div className={popup['label']}>{`${t('channel-management')} (${totalModerators})`}</div>
               <div className={setting['search-box']}>
                 <div className={setting['search-icon']}></div>
                 <input name="search-query" type="text" className={setting['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
