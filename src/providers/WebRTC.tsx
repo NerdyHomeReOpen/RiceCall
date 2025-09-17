@@ -424,19 +424,13 @@ const ensureRecordGraph = useCallback(() => {
     recordDesRef.current = audioContextRef.current!.createMediaStreamDestination();
   }
 
-  // Limpia conexiones previas hacia recordDes
   disconnectSafe(micNodesRef.current.analyser, recordDesRef.current);
   disconnectSafe(mixNodesRef.current.analyser, recordDesRef.current);
   disconnectSafe(masterGainNodeRef.current, recordDesRef.current);
-
-  // 🔑 Conecta fuentes a recordDes (NO destinos a destinos)
   if (isSystemAudioActiveRef.current) {
-    // Mix ON: mic + sistema → record
     if (micNodesRef.current.analyser) micNodesRef.current.analyser.connect(recordDesRef.current);
     if (mixNodesRef.current.analyser) mixNodesRef.current.analyser.connect(recordDesRef.current);
-    // No conectamos masterGain para evitar duplicar remotos (ya entrarían por el loopback del SO)
   } else {
-    // Mix OFF: mic + remotos → record
     if (micNodesRef.current.analyser) micNodesRef.current.analyser.connect(recordDesRef.current);
     if (masterGainNodeRef.current) masterGainNodeRef.current.connect(recordDesRef.current);
   }
