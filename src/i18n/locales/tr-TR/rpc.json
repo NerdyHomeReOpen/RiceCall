@@ -3,10 +3,10 @@
   "friend-page": "Arkadaş Listesi",
   "home-page": "Ana Sayfa",
   "join-discord-server": "Discord sunucumuza katılın",
-  "login-page": "登入頁面",
+  "login-page": "Giriş Sayfası",
   "server-page": "Grup sohbeti",
-  "un-login": "未登入",
-  "user": "使用者: {{0}}",
+  "un-login": "Girişi İptal Et",
+  "user": "Kullanıcı ",
   "viewing-friend-page": "Arkadaş listesine göz atma",
   "viewing-home-page": "Ana Sayfaya Göz Atma"
 }
