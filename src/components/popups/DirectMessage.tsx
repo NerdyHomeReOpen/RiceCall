@@ -139,22 +139,24 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         const user2Id = userId.localeCompare(targetId) < 0 ? targetId : userId;
         // Check if the message array is in the current conversation
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
-        if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
-      });
+        if (isCurrentConversation) {
+          setDirectMessages((prev) => [...prev, item]);
 
-      const start = performance.now();
-      const shake = (time: number) => {
-        const elapsed = time - start;
-        if (elapsed > 500) {
-          document.body.style.transform = 'translate(0, 0)';
-          return;
+          const start = performance.now();
+          const shake = (time: number) => {
+            const elapsed = time - start;
+            if (elapsed > 500) {
+              document.body.style.transform = 'translate(0, 0)';
+              return;
+            }
+            const x = Math.round((Math.random() - 0.5) * 10);
+            const y = Math.round((Math.random() - 0.5) * 10);
+            document.body.style.transform = `translate(${x}px, ${y}px)`;
+            requestAnimationFrame(shake);
+          };
+          requestAnimationFrame(shake);
         }
-        const x = Math.round((Math.random() - 0.5) * 10);
-        const y = Math.round((Math.random() - 0.5) * 10);
-        document.body.style.transform = `translate(${x}px, ${y}px)`;
-        requestAnimationFrame(shake);
-      };
-      requestAnimationFrame(shake);
+      });
     },
     [userId, targetId],
   );
