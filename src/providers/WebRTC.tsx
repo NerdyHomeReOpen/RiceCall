@@ -30,7 +30,7 @@ interface WebRTCContextType {
   changeMicVolume: (volume: number) => void;
   changeMixVolume: (volume: number) => void;
   changeSpeakerVolume: (volume: number) => void;
-  startSystemAudio: () => Promise<void>;
+  toggleMixMode: () => Promise<void>;
   isPressingSpeakKey: boolean;
   isMicMute: boolean;
   isSpeakerMute: boolean;
@@ -40,6 +40,7 @@ interface WebRTCContextType {
   mutedIds: string[];
   volumePercent: { [userId: string]: number };
   remoteUserStatusList: { [userId: string]: RemoteUserStatus };
+  isMixModeActive: boolean;
 }
 
 type RemoteUserStatus = 'connecting' | 'connected' | 'disconnected';
@@ -69,6 +70,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
   const speakerRef = useRef<HTMLAudioElement | null>(null);
   const soundPlayerRef = useRef(soundPlayer);
+  const isSystemAudioActiveRef = useRef(false);
+  const [isMixModeActive, setIsMixModeActive] = useState<boolean>(false);
+
   // Mic
   const isTakingMicRef = useRef<boolean>(false);
   const micMuteRef = useRef<boolean>(false);
@@ -327,11 +331,11 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     [userId, detectSpeaking, removeMicAudio, initAudioContext],
   );
 
-  const initSystemAudio = useCallback(
+  const initMixMode = useCallback(
     async (systemStream: MediaStream) => {
       if (!audioContextRef.current) {
         initAudioContext();
-        return initSystemAudio(systemStream);
+        return initMixMode(systemStream);
       }
 
       // stop previous system tracks if needed
@@ -362,14 +366,40 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     [initAudioContext, detectSpeaking]
   );
 
-  const startSystemAudio = useCallback(async () => {
+  const startMixMode = useCallback(async () => {
+    if (isSystemAudioActiveRef.current) return;
     try {
       const systemStream = await getSystemAudioStream();
-      await initSystemAudio(systemStream);
+      await initMixMode(systemStream);
+      isSystemAudioActiveRef.current = true;
+      setIsMixModeActive(true);
+      
     } catch (err) {
-      console.error('[WebRTC] Error capturando audio del sistema', err);
+      console.error('[WebRTC] Error capturing audio from system', err);
     }
-  }, [initSystemAudio]);
+  }, [initMixMode]);
+
+  const stopMixMode = useCallback(() => {
+    if (!isSystemAudioActiveRef.current) return;
+
+    mixNodesRef.current.stream?.getTracks().forEach((t) => t.stop());
+    if (mixNodesRef.current.source) mixNodesRef.current.source.disconnect();
+    if (mixNodesRef.current.gain) mixNodesRef.current.gain.disconnect();
+    if (mixNodesRef.current.analyser) mixNodesRef.current.analyser.disconnect();
+
+    mixNodesRef.current = { stream: null, source: null, gain: null, analyser: null };
+    isSystemAudioActiveRef.current = false;
+    setIsMixModeActive(false);
+
+  }, []);
+  
+  const toggleMixMode = useCallback(async () => {
+    if (isSystemAudioActiveRef.current) {
+      stopMixMode();
+    } else {
+      await startMixMode();
+    }
+  }, [startMixMode, stopMixMode]);
 
 
   const changeBitrate = useCallback((bitrate: number) => {
@@ -632,6 +662,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       sendTransportRef.current.close();
       sendTransportRef.current = null;
     }
+    if (isSystemAudioActiveRef.current) stopMixMode();
   }, []);
 
   const handleNewProducer = useCallback(
@@ -724,7 +755,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         changeMicVolume,
         changeMixVolume,
         changeSpeakerVolume,
-        startSystemAudio,
+        toggleMixMode,
         isPressingSpeakKey,
         isMicMute,
         isSpeakerMute,
@@ -734,6 +765,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         mutedIds,
         remoteUserStatusList,
         volumePercent,
+        isMixModeActive
       }}
     >
       {children}

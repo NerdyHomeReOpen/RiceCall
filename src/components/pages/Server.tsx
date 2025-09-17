@@ -324,7 +324,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     }
   };
 
-  const start = async () => {
+  const toggleMixMode = async () => {
     try {
       // const stream = await getSystemAudioStream();
       // console.log('STREAM');
@@ -336,19 +336,16 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
       // audio.srcObject = stream;
       // document.body.appendChild(audio);
       
-      await webRTC.startSystemAudio();            
+      await webRTC.toggleMixMode();            
 
     } catch (e) {
       console.error('Error capturando audio del sistema', e);
     }
   };
 
-  const handleClickMixingButton = async () => {
-  
-    console.log(window.loopbackAudio);
-    start();
+  const handleToggleMixingMode = async () => {  
+    toggleMixMode();
   };
-
 
   // Effects
   useEffect(() => {
@@ -544,7 +541,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
             </div>
             <div className={styles['buttons']}>
-              <div className={styles['bkg-mode-btn']} onClick={handleClickMixingButton}>{t('mixing')}</div>
+              <div
+                className={`${styles['bkg-mode-btn']} ${webRTC.isMixModeActive ? styles['active'] : ''}`}
+                onClick={handleToggleMixingMode}
+                title={webRTC.isMixModeActive ? t('mixing-on') : t('mixing-off')}
+              >
+                {t('mixing')}
+              </div>
               <div className={styles['saperator-1']} />
               <div className={styles['mic-volume-container']}>
                 <div className={`${styles['mic-mode-btn']} ${webRTC.isMicMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} />

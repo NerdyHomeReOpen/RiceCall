@@ -753,6 +753,28 @@
   background-position: 0 0;
 }
 
+.bkg-mode-btn.active::before {
+  animation: musicMove 1.2s ease-in-out infinite;
+}
+
+@keyframes musicMove {
+  0%   { background-position: 0 0; }
+  50%  { background-position: -18px 0; }
+  100% { background-position: 0 0; }
+}
+
+.bkg-mode-btn.active {
+  filter: brightness(1.2);
+  outline: 2px solid var(--primary);
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bkg-mode-btn.active::before {
+    animation: none;
+  }
+}
+
 .mic-mode-btn {
   position: relative;
   width: 18px;
