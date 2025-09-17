@@ -241,8 +241,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     };
 
     const handleServerMemberAdd = (...args: { data: Member }[]) => {
-      const exist = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-      setServerMembers((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.userId}#${i.data.serverId}`)).map((i) => i.data)]);
+      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+      setServerMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
     };
 
     const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
@@ -256,8 +256,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     };
 
     const handleServerMemberApplicationAdd = (...args: { data: MemberApplication }[]) => {
-      const exist = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-      setMemberApplications((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.userId}#${i.data.serverId}`)).map((i) => i.data)]);
+      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+      setMemberApplications((prev) => prev.filter((a) => !add.has(`${a.userId}#${a.serverId}`)).concat(args.map((i) => i.data)));
     };
 
     const handleServerMemberApplicationUpdate = (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => {

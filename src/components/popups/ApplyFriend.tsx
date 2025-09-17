@@ -55,8 +55,8 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
   };
 
   const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
-    const exist = new Set(args.map((i) => `${i.data.friendGroupId}`));
-    setFriendGroups((prev) => [...prev, ...args.filter((i) => !exist.has(`${i.data.friendGroupId}`)).map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.friendGroupId}`));
+    setFriendGroups((prev) => prev.filter((fg) => !add.has(`${fg.friendGroupId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleFriendGroupUpdate = (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
