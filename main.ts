@@ -811,18 +811,22 @@ function disconnectSocket(): Socket | null {
 
 // Auto Updater
 function configureAutoUpdater() {
+  const channel = env.UPDATE_CHANNEL;
+  if (channel) {
+    autoUpdater.channel = channel;
+    autoUpdater.allowPrerelease = true;
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'NerdyHomeReOpen',
+      repo: 'RiceCall',
+      channel: channel,
+    });
+  } else {
+    autoUpdater.allowPrerelease = false;
+  }
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.allowDowngrade = false;
-
-  autoUpdater.allowPrerelease = true;
-  autoUpdater.channel = env.UPDATE_CHANNEL ?? 'latest';
-  autoUpdater.setFeedURL({
-    provider: 'github',
-    owner: 'NerdyHomeReOpen',
-    repo: 'RiceCall',
-    channel: env.UPDATE_CHANNEL ?? 'latest',
-  });
 
   if (DEV) {
     autoUpdater.forceDevUpdateConfig = true;
