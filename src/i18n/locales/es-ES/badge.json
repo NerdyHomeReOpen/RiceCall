@@ -1,12 +1,12 @@
 {
-  "official-developer": "Developer",
-  "official-developer-description": "RiceCall Official Developer",
-  "official-supporter": "Support Team",
-  "official-supporter-description": "Official representative of the RiceCall User Support service",
+  "official-developer": "Desarrollador RiceCall",
+  "official-developer-description": "Desarrollador Oficial RiceCall",
+  "official-supporter": "Atención al cliente",
+  "official-supporter-description": "Representante de soporte oficial RC",
   "volunteer-tester": "Tester",
-  "volunteer-tester-description": "RiceCall Volunteer Tester",
-  "volunteer-translator": "Translator",
-  "volunteer-translator-description": "RiceCall Volunteer Translator",
-  "rc-0.1-paticipant": "RC v0.1 member",
-  "rc-0.1-paticipant-description": "Thank you for participating in the RC v0.1 testing and for your patience! As you have witnessed the evolution of this version, we are rewarding you with this exclusive badge."
+  "volunteer-tester-description": "Voluntario oficial RC",
+  "volunteer-translator": "Traductor",
+  "volunteer-translator-description": "Traductor voluntario RiceCall",
+  "rc-0.1-paticipant": "Miembro RC v0.1",
+  "rc-0.1-paticipant-description": "Gracias por participar en las pruebas de la versión RC v0.1 y por su paciencia. Como han presenciado la evolución de esta versión, les recompensamos con esta insignia exclusiva."
 }
