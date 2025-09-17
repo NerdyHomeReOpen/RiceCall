@@ -70,7 +70,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     // Memos
     const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermission), [globalPermission, serverPermission]);
-    const totalMembers = useMemo(() => serverMembers.filter((m) => m.permissionLevel > 1).length, [serverMembers]);
+    const totalMembers = useMemo(() => serverMembers.filter((m) => isMember(m.permissionLevel) && !isStaff(m.permissionLevel)).length, [serverMembers]);
     const totalApplications = useMemo(() => memberApplications.length, [memberApplications]);
     const totalBlockMembers = useMemo(() => serverMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now()).length, [serverMembers]);
     const canSubmit = useMemo(() => serverName.trim(), [serverName]);
