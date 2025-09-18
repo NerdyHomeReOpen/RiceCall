@@ -20,21 +20,24 @@ import {
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 interface WebRTCContextType {
-  setIsUserMuted: (userId: string, muted: boolean) => void;
-  setIsMicTaken: (taken: boolean) => void;
-  setIsSpeakKeyPressed: (pressed: boolean) => void;
-  toggleSpeakerMute: () => void;
-  toggleMicMute: () => void;
+  setUserMuted: (userId: string, muted: boolean) => void;
+  setMicTaken: (taken: boolean) => void;
+  setSpeakKeyPressed: (pressed: boolean) => void;
+  setMixModeActive: (active: boolean) => void;
+  toggleSpeakerMuted: () => void;
+  toggleMicMuted: () => void;
   changeBitrate: (newBitrate: number) => void;
   changeMicVolume: (volume: number) => void;
   changeMixVolume: (volume: number) => void;
   changeSpeakerVolume: (volume: number) => void;
-  isPressingSpeakKey: boolean;
-  isMicMute: boolean;
-  isSpeakerMute: boolean;
+  isMicTaken: boolean;
+  isSpeakKeyPressed: boolean;
+  isMixModeActive: boolean;
+  isMicMuted: boolean;
+  isSpeakerMuted: boolean;
   micVolume: number;
-  speakerVolume: number;
   mixVolume: number;
+  speakerVolume: number;
   mutedIds: string[];
   volumePercent: { [userId: string]: number };
   remoteUserStatusList: { [userId: string]: RemoteUserStatus };
@@ -61,64 +64,79 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   // Refs
   const rafIdListRef = useRef<{ [userId: string]: number }>({}); // userId -> rAF id
-  const volumePercentRef = useRef<{ [userId: string]: number }>({});
   const lastRefreshRef = useRef<number>(0);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
   const speakerRef = useRef<HTMLAudioElement | null>(null);
   const soundPlayerRef = useRef(soundPlayer);
-  // Mic
-  const isTakingMicRef = useRef<boolean>(false);
-  const micMuteRef = useRef<boolean>(false);
-  const micVolumeRef = useRef<number>(100);
+
+  // Nodes
   const micNodesRef = useRef<{ stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null; analyser: AnalyserNode | null }>({
     stream: null,
     source: null,
     gain: null,
     analyser: null,
   });
-  const inputDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
-  // Mix
-  const mixVolumeRef = useRef<number>(100);
   const mixNodesRef = useRef<{ stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null; analyser: AnalyserNode | null }>({
     stream: null,
     source: null,
     gain: null,
     analyser: null,
   });
-  // Speaker
-  const speakerMuteRef = useRef<boolean>(false);
-  const speakerVolumeRef = useRef<number>(100);
   const speakerNodesRef = useRef<{ [id: string]: { stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null; analyser: AnalyserNode | null } }>({});
   const masterGainNodeRef = useRef<GainNode | null>(null);
+  const inputDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const outputDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+
   // Speaking Mode
   const speakingModeRef = useRef<SpeakingMode>('key');
-  const isPressSpeakKeyRef = useRef<boolean>(false);
+
   // Bitrate
   const bitrateRef = useRef<number>(64000);
-  // Mute
-  const mutedIdsRef = useRef<string[]>([]);
+
   // SFU
   const deviceRef = useRef<mediasoupClient.Device>(new mediasoupClient.Device());
   const sendTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
   const recvTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
   const consumersRef = useRef<{ [producerId: string]: mediasoupClient.types.Consumer }>({}); // producerId -> consumer
 
+  // States
+  const [isMixModeActive, setIsMixModeActive] = useState<boolean>(false);
+  const isMixModeActiveRef = useRef(false);
+
+  // Mic Volume
+  const [micVolume, setMicVolume] = useState<number>(100);
+  const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
+  const [isSpeakKeyPressed, setIsSpeakKeyPressed] = useState<boolean>(false);
+  const [isMicMuted, setIsMicMuted] = useState<boolean>(false);
+  const isMicTakenRef = useRef<boolean>(false);
+  const isSpeakKeyPressedRef = useRef<boolean>(false);
+  const isMicMutedRef = useRef<boolean>(false);
+  const micVolumeRef = useRef<number>(100);
+
+  // Mix Volume
+  const [mixVolume, setMixVolume] = useState<number>(100);
+  const mixVolumeRef = useRef<number>(100);
+
+  // Speaker Volume
+  const [speakerVolume, setSpeakerVolume] = useState<number>(100);
+  const [isSpeakerMuted, setIsSpeakerMuted] = useState<boolean>(false);
+  const speakerVolumeRef = useRef<number>(100);
+  const isSpeakerMutedRef = useRef<boolean>(false);
+
+  // Mute Ids
+  const [mutedIds, setMutedIds] = useState<string[]>([]);
+  const mutedIdsRef = useRef<string[]>([]);
+
+  // Volume Percent
+  const volumePercentRef = useRef<{ [userId: string]: number }>({});
+  const [volumePercent, setVolumePercent] = useState<{ [userId: string]: number }>({});
+
+  // Remote User Status
+  const [remoteUserStatusList, setRemoteUserStatusList] = useState<{ [userId: string]: RemoteUserStatus }>({}); // userId -> status
+
   // Memos
   const SPEAKING_VOLUME_THRESHOLD = useMemo(() => 2, []);
-
-  // States
-  const [isPressingSpeakKey, setIsPressingSpeakKey] = useState<boolean>(false);
-  const [isMicMute, setIsMicMute] = useState<boolean>(false);
-  const [isSpeakerMute, setIsSpeakerMute] = useState<boolean>(false);
-  const [isTakingMic, setIsTakingMic] = useState<boolean>(false);
-  const [micVolume, setMicVolume] = useState<number>(100);
-  const [mixVolume, setMixVolume] = useState<number>(100);
-  const [speakerVolume, setSpeakerVolume] = useState<number>(100);
-  const [mutedIds, setMutedIds] = useState<string[]>([]);
-  const [volumePercent, setVolumePercent] = useState<{ [userId: string]: number }>({});
-  const [remoteUserStatusList, setRemoteUserStatusList] = useState<{ [userId: string]: RemoteUserStatus }>({}); // userId -> status
 
   const detectSpeaking = useCallback(
     (targetId: string, analyserNode: AnalyserNode, dataArray: Uint8Array) => {
@@ -130,7 +148,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       }
       const volume = Math.sqrt(sum / dataArray.length);
       const volumePercent = Math.min(1, volume / 0.5) * 100;
-      if (targetId === userId && !isTakingMicRef.current) {
+      if (targetId === userId && !isMicTakenRef.current) {
         volumePercentRef.current[targetId] = 0;
       } else {
         volumePercentRef.current[targetId] = volumePercent > SPEAKING_VOLUME_THRESHOLD ? volumePercent : 0;
@@ -150,18 +168,18 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const initLocalStorage = useCallback(() => {
     const localMicVolume = window.localStorage.getItem('mic-volume') ?? '100';
     const localSpeakerVolume = window.localStorage.getItem('speaker-volume') ?? '100';
-    const localIsMicMute = window.localStorage.getItem('is-mic-mute') ?? 'false';
-    const localIsSpeakerMute = window.localStorage.getItem('is-speaker-mute') ?? 'false';
+    const localIsMicMuted = window.localStorage.getItem('is-mic-mute') ?? 'false';
+    const localIsSpeakerMuted = window.localStorage.getItem('is-speaker-mute') ?? 'false';
     const localMutedIds = window.localStorage.getItem('muted-ids') ?? '';
 
     setMicVolume(parseInt(localMicVolume));
     micVolumeRef.current = parseInt(localMicVolume);
     setSpeakerVolume(parseInt(localSpeakerVolume));
     speakerVolumeRef.current = parseInt(localSpeakerVolume);
-    setIsMicMute(localIsMicMute === 'true');
-    micMuteRef.current = localIsMicMute === 'true';
-    setIsSpeakerMute(localIsSpeakerMute === 'true');
-    speakerMuteRef.current = localIsSpeakerMute === 'true';
+    setIsMicMuted(localIsMicMuted === 'true');
+    isMicMutedRef.current = localIsMicMuted === 'true';
+    setIsSpeakerMuted(localIsSpeakerMuted === 'true');
+    isSpeakerMutedRef.current = localIsSpeakerMuted === 'true';
     setMutedIds(localMutedIds.split(','));
     mutedIdsRef.current = localMutedIds.split(',');
   }, []);
@@ -293,7 +311,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
       // Disable tracks if muted
       stream.getAudioTracks().forEach((track) => {
-        track.enabled = speakingModeRef.current === 'key' ? isPressSpeakKeyRef.current : true;
+        track.enabled = speakingModeRef.current === 'key' ? isSpeakKeyPressedRef.current : true;
       });
 
       // Create nodes
@@ -313,7 +331,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       const newTrack = inputDesRef.current!.stream.getAudioTracks()[0];
       if (audioProducerRef.current && newTrack) {
         await audioProducerRef.current.replaceTrack({ track: newTrack });
-        if (isTakingMicRef.current) audioProducerRef.current.resume();
+        if (isMicTakenRef.current) audioProducerRef.current.resume();
         else audioProducerRef.current.pause();
       }
 
@@ -325,6 +343,81 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     [userId, detectSpeaking, removeMicAudio, initAudioContext],
   );
 
+  const removeMixAudio = useCallback(() => {
+    if (rafIdListRef.current['system']) {
+      cancelAnimationFrame(rafIdListRef.current['system']);
+      delete rafIdListRef.current['system'];
+    }
+    if (mixNodesRef.current) {
+      const { stream, source, gain, analyser } = mixNodesRef.current;
+      if (source) source.disconnect();
+      if (gain) gain.disconnect();
+      if (analyser) analyser.disconnect();
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+      mixNodesRef.current = { stream: null, source: null, gain: null, analyser: null };
+    }
+  }, []);
+
+  const initMixMode = useCallback(
+    async (systemStream: MediaStream) => {
+      if (!audioContextRef.current) {
+        initAudioContext();
+        return initMixMode(systemStream);
+      }
+
+      // stop previous system tracks if needed
+      if (mixNodesRef.current.stream) {
+        mixNodesRef.current.stream.getTracks().forEach((t) => t.stop());
+      }
+
+      // Disable tracks si quieres control
+      systemStream.getAudioTracks().forEach((track) => {
+        track.enabled = true;
+      });
+
+      const sourceNode = audioContextRef.current.createMediaStreamSource(systemStream);
+      const gainNode = audioContextRef.current.createGain();
+      gainNode.gain.value = mixVolumeRef.current / 100;
+      const analyserNode = audioContextRef.current.createAnalyser();
+
+      mixNodesRef.current = { stream: systemStream, source: sourceNode, gain: gainNode, analyser: analyserNode };
+
+      sourceNode.connect(gainNode);
+      gainNode.connect(analyserNode);
+      analyserNode.connect(inputDesRef.current!);
+
+      const dataArray = new Uint8Array(analyserNode.fftSize);
+      analyserNode.fftSize = 2048;
+      detectSpeaking(userId, analyserNode, dataArray);
+    },
+    [initAudioContext, detectSpeaking, userId],
+  );
+
+  const startMixMode = useCallback(async () => {
+    await window.loopbackAudio.enable();
+    navigator.mediaDevices
+      .getDisplayMedia({
+        video: true,
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
+      })
+      .then((stream) => {
+        // TODO: Add video support
+        for (const track of stream.getVideoTracks()) {
+          track.stop();
+          stream.removeTrack(track);
+        }
+        window.loopbackAudio.disable();
+        initMixMode(stream);
+      })
+      .catch((err) => {
+        console.error('[WebRTC] Error capturing audio from system', err);
+      });
+  }, [initMixMode]);
+
   const changeBitrate = useCallback((bitrate: number) => {
     bitrateRef.current = bitrate;
   }, []);
@@ -333,10 +426,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     micNodesRef.current.gain!.gain.value = volume / 20;
     setMicVolume(volume);
     micVolumeRef.current = volume;
-    const isMicMute = volume === 0;
-    setIsMicMute(isMicMute);
-    micMuteRef.current = isMicMute;
-    window.localStorage.setItem('is-mic-mute', isMicMute.toString());
+    const isMicMuted = volume === 0;
+    setIsMicMuted(isMicMuted);
+    isMicMutedRef.current = isMicMuted;
+    window.localStorage.setItem('is-mic-mute', isMicMuted.toString());
     window.localStorage.setItem('mic-volume', volume.toString());
   }, []);
 
@@ -351,14 +444,14 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     masterGainNodeRef.current!.gain.value = volume / 100;
     setSpeakerVolume(volume);
     speakerVolumeRef.current = volume;
-    const isSpeakerMute = volume === 0;
-    setIsSpeakerMute(isSpeakerMute);
-    speakerMuteRef.current = isSpeakerMute;
-    window.localStorage.setItem('is-speaker-mute', isSpeakerMute.toString());
+    const isSpeakerMuted = volume === 0;
+    setIsSpeakerMuted(isSpeakerMuted);
+    isSpeakerMutedRef.current = isSpeakerMuted;
+    window.localStorage.setItem('is-speaker-mute', isSpeakerMuted.toString());
     window.localStorage.setItem('speaker-volume', volume.toString());
   }, []);
 
-  const setIsUserMuted = useCallback((userId: string, muted: boolean) => {
+  const setUserMuted = useCallback((userId: string, muted: boolean) => {
     speakerNodesRef.current[userId]?.stream?.getAudioTracks().forEach((track) => {
       track.enabled = !muted;
     });
@@ -367,23 +460,35 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     window.localStorage.setItem('muted-ids', mutedIdsRef.current.join(','));
   }, []);
 
-  const setIsMicTaken = useCallback((taken: boolean) => {
-    setIsTakingMic(taken);
-    isTakingMicRef.current = taken;
+  const setMicTaken = useCallback((taken: boolean) => {
+    if (taken) audioProducerRef.current?.resume();
+    else audioProducerRef.current?.pause();
+    setIsMicTaken(taken);
+    isMicTakenRef.current = taken;
   }, []);
 
-  const setIsSpeakKeyPressed = useCallback((enable: boolean) => {
+  const setSpeakKeyPressed = useCallback((enable: boolean) => {
     if (speakingModeRef.current !== 'key') return;
     soundPlayerRef.current.playSound(enable ? 'startSpeaking' : 'stopSpeaking');
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
       track.enabled = enable;
     });
-    setIsPressingSpeakKey(enable);
-    isPressSpeakKeyRef.current = enable;
+    setIsSpeakKeyPressed(enable);
+    isSpeakKeyPressedRef.current = enable;
   }, []);
 
-  const toggleMicMute = useCallback(() => {
-    if (micMuteRef.current) {
+  const setMixModeActive = useCallback(
+    (active: boolean) => {
+      if (active) startMixMode();
+      else removeMixAudio();
+      setIsMixModeActive(active);
+      isMixModeActiveRef.current = active;
+    },
+    [startMixMode, removeMixAudio],
+  );
+
+  const toggleMicMuted = useCallback(() => {
+    if (isMicMutedRef.current) {
       const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
       changeMicVolume(prevVolume);
     } else {
@@ -392,9 +497,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     }
   }, [changeMicVolume]);
 
-  const toggleSpeakerMute = useCallback(() => {
-    console.log('[WebRTC] toggleSpeakerMute', speakerMuteRef.current);
-    if (speakerMuteRef.current) {
+  const toggleSpeakerMuted = useCallback(() => {
+    console.log('[WebRTC] toggleSpeakerMute', isSpeakerMutedRef.current);
+    if (isSpeakerMutedRef.current) {
       const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
       changeSpeakerVolume(prevVolume);
     } else {
@@ -515,7 +620,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       console.log('[WebRTC] Producer track ended');
       audioProducerRef.current?.close();
     });
-    if (isTakingMicRef.current) audioProducerRef.current.resume();
+    if (isMicTakenRef.current) audioProducerRef.current.resume();
     else audioProducerRef.current.pause();
   }, []);
 
@@ -639,11 +744,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   // Effects
   useEffect(() => {
-    if (isTakingMic) audioProducerRef.current?.resume();
-    else audioProducerRef.current?.pause();
-  }, [isTakingMic]);
-
-  useEffect(() => {
     initAudioContext();
     initLocalStorage();
   }, [initAudioContext, initLocalStorage]);
@@ -668,18 +768,21 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   return (
     <WebRTCContext.Provider
       value={{
-        setIsUserMuted,
-        setIsMicTaken,
-        setIsSpeakKeyPressed,
-        toggleSpeakerMute,
-        toggleMicMute,
+        setUserMuted,
+        setMicTaken,
+        setSpeakKeyPressed,
+        setMixModeActive,
+        toggleSpeakerMuted,
+        toggleMicMuted,
         changeBitrate,
         changeMicVolume,
         changeMixVolume,
         changeSpeakerVolume,
-        isPressingSpeakKey,
-        isMicMute,
-        isSpeakerMute,
+        isMicTaken,
+        isSpeakKeyPressed,
+        isMixModeActive,
+        isMicMuted,
+        isSpeakerMuted,
         micVolume,
         mixVolume,
         speakerVolume,

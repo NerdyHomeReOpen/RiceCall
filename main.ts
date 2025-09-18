@@ -7,12 +7,15 @@ import { io, Socket } from 'socket.io-client';
 import DiscordRPC from 'discord-rpc';
 import serve from 'electron-serve';
 import Store from 'electron-store';
+import { initMain } from 'electron-audio-loopback';
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
+
+initMain();
 
 const EnvSchema = z
   .object({
@@ -500,6 +503,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
+      preload: path.join(app.getAppPath(), 'preload.js'),
     },
     trafficLightPosition: { x: -100, y: -100 },
   });
@@ -568,6 +572,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
+      preload: path.join(app.getAppPath(), 'preload.js'),
     },
     trafficLightPosition: { x: -100, y: -100 },
   });
@@ -632,6 +637,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
+      preload: path.join(app.getAppPath(), 'preload.js'),
     },
     modal: true,
     trafficLightPosition: { x: -100, y: -100 },

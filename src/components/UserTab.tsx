@@ -89,7 +89,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
-    webRTC.setIsUserMuted(userId, muted);
+    webRTC.setUserMuted(userId, muted);
   };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Permission>) => {

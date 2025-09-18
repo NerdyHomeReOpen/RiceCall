@@ -49,6 +49,7 @@
     "discord-rpc": "^4.0.1",
     "dotenv": "^16.5.0",
     "dotenv-expand": "^12.0.3",
+    "electron-audio-loopback": "^1.0.6",
     "electron-serve": "^2.1.1",
     "electron-store": "^10.0.1",
     "electron-updater": "^6.6.2",

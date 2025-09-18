@@ -753,6 +753,10 @@
   background-position: 0 0;
 }
 
+.bkg-mode-btn.active::before {
+  background-position: -18px 0;
+}
+
 .mic-mode-btn {
   position: relative;
   width: 18px;
@@ -956,4 +960,36 @@
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;
+}
+
+.screen-preview {
+  position: relative;
+  border: 1px solid var(--border-color, #333);
+  border-radius: 8px;
+  padding: 8px;
+  margin: 8px 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.screen-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.screen-preview-stop {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #999;
+  background: transparent;
+}
+
+.screen-preview-video {
+  width: 100%;
+  max-height: 40vh; /* para que no se dispare de tamaño */
+  object-fit: contain;
+  border-radius: 6px;
 }
