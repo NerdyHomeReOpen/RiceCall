@@ -159,9 +159,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const annAreaRef = useRef<HTMLDivElement>(null);
   const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const screenStreamRef = useRef<MediaStream | null>(null);
-  const screenVideoRef = useRef<HTMLVideoElement>(null);
-  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  // const screenStreamRef = useRef<MediaStream | null>(null);
+  // const screenVideoRef = useRef<HTMLVideoElement>(null);
+  // const [isScreenSharing, setIsScreenSharing] = useState(false);
 
   // States
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
@@ -223,7 +223,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     if (channelIsVoiceMuted || isControlled) className += ` ${styles['muted']}`;
     if (!channelIsQueueMode || (!isChannelMod(permissionLevel) && isIdling)) className += ` ${styles['no-selection']}`;
     return className;
-  }, [webRTC.isMicMuted, webRTC.micVolume, webRTC.isMicTaken, isSpeaking, isQueuing, channelIsVoiceMuted, isControlled, channelIsQueueMode, permissionLevel, isIdling]);
+  }, [isSpeaking, isQueuing, channelIsVoiceMuted, isControlled, channelIsQueueMode, permissionLevel, isIdling]);
 
   // Handlers
   const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
