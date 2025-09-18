@@ -77,8 +77,9 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
     if (isVoiceMuted || memberIsVoiceMuted || isControlled) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
+    if (connectionStatus === 'connecting') return 'loading';
     return '';
-  }, [isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted, isControlled]);
+  }, [isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted, isControlled, connectionStatus]);
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
