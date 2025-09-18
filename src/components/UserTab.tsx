@@ -72,7 +72,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId] || 'connecting', [memberUserId, webRTC.remoteUserStatusList]);
   const isUser = useMemo(() => memberUserId === userId, [memberUserId, userId]);
   const isSameChannel = useMemo(() => memberCurrentChannelId === userCurrentChannelId, [memberCurrentChannelId, userCurrentChannelId]);
-  const isConnecting = useMemo(() => connectionStatus === 'connecting', [connectionStatus]);
   const isSpeaking = useMemo(() => !!webRTC.volumePercent?.[memberUserId], [memberUserId, webRTC.volumePercent]);
   const isVoiceMuted = useMemo(() => webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds]);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
@@ -83,9 +82,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
-    if (!isUser && isSameChannel && isConnecting) return 'loading';
     return '';
-  }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted]);
+  }, [isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted]);
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {

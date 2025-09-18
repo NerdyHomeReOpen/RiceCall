@@ -153,6 +153,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const contextMenu = useContextMenu();
 
   // Refs
+  const webRTCRef = useRef(webRTC);
   const isResizingSidebarRef = useRef<boolean>(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isResizingAnnAreaRef = useRef<boolean>(false);
@@ -196,10 +197,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const isSpeaking = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position <= 0), [queueUsers, userId]);
   const isQueuing = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position > 0), [queueUsers, userId]);
   const isIdling = useMemo(() => !isSpeaking && !isQueuing, [isSpeaking, isQueuing]);
-  const isControlled = useMemo(
-    () => queueUsers.some((m) => m.userId === userId && m.position === 0 && !isChannelMod(permissionLevel) && m.isQueueControlled),
-    [queueUsers, userId, permissionLevel],
-  );
+  const isControlled = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position === 0 && !isChannelMod(permissionLevel) && m.isQueueControlled), [queueUsers, userId, permissionLevel]);
 
   const micText = useMemo(() => {
     if (isSpeaking) return t('mic-taken');
@@ -342,12 +340,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   // Effects
   useEffect(() => {
-    webRTC.changeBitrate(channelBitrate);
-  }, [channelBitrate, webRTC]);
+    webRTCRef.current.changeBitrate(channelBitrate);
+  }, [channelBitrate]);
 
   useEffect(() => {
-    webRTC.setMicTaken(isSpeaking && !isControlled);
-  }, [isSpeaking, isControlled, webRTC]);
+    webRTCRef.current.setMicTaken(isSpeaking && !isControlled, channelId);
+  }, [isSpeaking, isControlled, channelId]);
 
   useEffect(() => {
     if (actionMessages.length === 0) {
