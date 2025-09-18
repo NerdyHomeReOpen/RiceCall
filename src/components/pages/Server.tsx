@@ -191,7 +191,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const isSpeaking = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position <= 0), [queueUsers, userId]);
   const isQueuing = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position > 0), [queueUsers, userId]);
   const isIdling = useMemo(() => !isSpeaking && !isQueuing, [isSpeaking, isQueuing]);
-  const isQueueControlled = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position === 0 && m.isQueueControlled), [queueUsers, userId]);
+  const isQueueControlled = useMemo(
+    () => queueUsers.some((m) => m.userId === userId && m.position === 0 && !isChannelMod(permissionLevel) && m.isQueueControlled),
+    [queueUsers, userId, permissionLevel],
+  );
 
   const micText = useMemo(() => {
     if (isSpeaking) return t('mic-taken');
