@@ -82,9 +82,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
-    if (connectionStatus === 'connecting') return 'loading';
+    if (!isUser && connectionStatus === 'connecting') return 'loading';
     return '';
-  }, [isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted, connectionStatus]);
+  }, [isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted, connectionStatus, isUser]);
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
