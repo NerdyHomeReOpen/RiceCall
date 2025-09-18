@@ -82,7 +82,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     () =>
       isChannelMod(permissionLevel)
         ? [t('channel-info'), t('channel-announcement'), t('access-permission'), t('speaking-permission'), t('text-permission'), t('channel-management')]
-        : [t('channel-info'), t('channel-announcement'), t('access-permission'), t('speaking-permission'), t('text-permission')],
+        : [t('channel-info'), t('channel-announcement')],
     [t, permissionLevel],
   );
 
@@ -219,7 +219,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   maxLength={32}
                   disabled={isLobby}
                   onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -232,7 +232,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   max={999}
                   disabled={channelVisibility === 'readonly' || isLobby}
                   onChange={(e) => setChannel((prev) => ({ ...prev, userLimit: Math.max(0, Math.min(999, parseInt(e.target.value) || 0)) }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
               </div>
             </div>
@@ -264,7 +264,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     type="radio"
                     defaultChecked={channelBitrate === 64000}
                     onChange={() => setChannel((prev) => ({ ...prev, bitrate: 64000 }))}
-                    datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                    readOnly={!isChannelMod(permissionLevel)}
                   />
                   <div className={popup['label']}>{t('chat-mode')}</div>
                 </div>
@@ -277,7 +277,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     type="radio"
                     defaultChecked={channelBitrate === 256000}
                     onChange={() => setChannel((prev) => ({ ...prev, bitrate: 256000 }))}
-                    datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                    readOnly={!isChannelMod(permissionLevel)}
                   />
                   <div className={popup['label']}>{t('entertainment-mode')}</div>
                 </div>
@@ -320,7 +320,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   name="visibility"
                   defaultChecked={channelVisibility === 'public'}
                   onChange={() => setChannel((prev) => ({ ...prev, visibility: 'public' }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
                 <div className={popup['label']}>{t('anyone-can-access-label')}</div>
               </div>
@@ -331,7 +331,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   name="visibility"
                   defaultChecked={channelVisibility === 'member'}
                   onChange={() => setChannel((prev) => ({ ...prev, visibility: 'member' }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
                 <div className={popup['label']}>{t('forbid-guest-access-label')}</div>
               </div>
@@ -342,7 +342,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   name="visibility"
                   defaultChecked={channelVisibility === 'readonly'}
                   onChange={() => setChannel((prev) => ({ ...prev, visibility: 'readonly' }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
                 <div className={popup['label']}>{t('message-only-label')}</div>
               </div>
@@ -352,7 +352,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   name="visibility"
                   defaultChecked={channelVisibility === 'private'}
                   onChange={() => setChannel((prev) => ({ ...prev, visibility: 'private' }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
                 <div className={popup['label']}>{t('require-password-label')}</div>
               </div>
@@ -365,7 +365,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     maxLength={4}
                     placeholder={t('require-password-placeholder')}
                     onChange={(e) => setChannel((prev) => ({ ...prev, password: e.target.value }))}
-                    datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                    readOnly={!isChannelMod(permissionLevel)}
                   />
                 </div>
               )}
@@ -386,7 +386,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   type="checkbox"
                   defaultChecked={channelForbidGuestQueue}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestQueue: e.target.checked }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
                 <div className={popup['label']}>{t('forbid-guest-queue-label')}</div>
               </div>
@@ -396,7 +396,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   type="checkbox"
                   defaultChecked={channelForbidGuestVoice}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestVoice: e.target.checked }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
                 <div className={popup['label']}>{t('forbid-guest-voice-label')}</div>
               </div>
@@ -417,7 +417,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   type="checkbox"
                   defaultChecked={channelForbidText}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidText: e.target.checked }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
                 <div className={popup['label']}>{t('forbid-only-admin-text-label')}</div>
               </div>
@@ -427,7 +427,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   type="checkbox"
                   defaultChecked={channelForbidGuestText}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestText: e.target.checked }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
                 <div className={popup['label']}>{t('forbid-guest-text-label')}</div>
               </div>
@@ -437,7 +437,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   type="checkbox"
                   defaultChecked={channelForbidGuestUrl}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestUrl: e.target.checked }))}
-                  datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                  readOnly={!isChannelMod(permissionLevel)}
                 />
                 <div className={popup['label']}>{t('forbid-guest-url-label')}</div>
               </div>
@@ -452,7 +452,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     max={9999}
                     onChange={(e) => setChannel((prev) => ({ ...prev, guestTextMaxLength: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
-                    datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                    readOnly={!isChannelMod(permissionLevel)}
                   />
                   {t('characters')}
                 </div>
@@ -468,7 +468,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     max={9999}
                     onChange={(e) => setChannel((prev) => ({ ...prev, guestTextWaitTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
-                    datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                    readOnly={!isChannelMod(permissionLevel)}
                   />
                   {t('second')}
                 </div>
@@ -484,7 +484,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     max={9999}
                     onChange={(e) => setChannel((prev) => ({ ...prev, guestTextGapTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
-                    datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
+                    readOnly={!isChannelMod(permissionLevel)}
                   />
                   {t('second')}
                 </div>

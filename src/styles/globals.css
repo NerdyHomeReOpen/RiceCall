@@ -161,8 +161,8 @@ button {
 }
 
 *[datatype='read-only'] {
-  pointer-events: none;
-  user-select: text;
+  pointer-events: select;
+  user-select: none;
   &:hover {
     cursor: default;
   }
