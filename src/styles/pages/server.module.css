@@ -267,9 +267,6 @@
 .queue-list {
   display: flex;
   flex-direction: column;
-  height: 120px;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 .channel-list {
