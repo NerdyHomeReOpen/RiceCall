@@ -30,6 +30,7 @@ interface WebRTCContextType {
   changeMicVolume: (volume: number) => void;
   changeMixVolume: (volume: number) => void;
   changeSpeakerVolume: (volume: number) => void;
+  isMicTaken: boolean;
   isSpeakKeyPressed: boolean;
   isMixModeActive: boolean;
   isMicMuted: boolean;
@@ -387,9 +388,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
       const dataArray = new Uint8Array(analyserNode.fftSize);
       analyserNode.fftSize = 2048;
-      detectSpeaking('system', analyserNode, dataArray);
+      detectSpeaking(userId, analyserNode, dataArray);
     },
-    [initAudioContext, detectSpeaking],
+    [initAudioContext, detectSpeaking, userId],
   );
 
   const startMixMode = useCallback(async () => {
@@ -777,6 +778,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         changeMicVolume,
         changeMixVolume,
         changeSpeakerVolume,
+        isMicTaken,
         isSpeakKeyPressed,
         isMixModeActive,
         isMicMuted,

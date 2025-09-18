@@ -754,25 +754,7 @@
 }
 
 .bkg-mode-btn.active::before {
-  animation: musicMove 1.2s ease-in-out infinite;
-}
-
-@keyframes musicMove {
-  0%   { background-position: 0 0; }
-  50%  { background-position: -18px 0; }
-  100% { background-position: 0 0; }
-}
-
-.bkg-mode-btn.active {
-  filter: brightness(1.2);
-  outline: 2px solid var(--primary);
-  border-radius: 6px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bkg-mode-btn.active::before {
-    animation: none;
-  }
+  background-position: -18px 0;
 }
 
 .mic-mode-btn {
@@ -986,14 +968,14 @@
   border-radius: 8px;
   padding: 8px;
   margin: 8px 0;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .screen-preview-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: .9rem;
+  font-size: 0.9rem;
   margin-bottom: 6px;
 }
 
