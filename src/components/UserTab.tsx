@@ -78,7 +78,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
   const canUpdatePermission = useMemo(() => !isUser && isSuperior && isMember(memberPermission), [memberPermission, isUser, isSuperior]);
-  const isMixingMe = isUser && webRTC.isMixModeActive;
 
   const statusIcon = useMemo(() => {
     if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
@@ -90,7 +89,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
-    webRTC.setIsUserMuted(userId, muted);
+    webRTC.setUserMuted(userId, muted);
   };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Permission>) => {
@@ -347,14 +346,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         ]);
       }}
     >
-      <div
-        className={`
-          ${styles['user-audio-state']}
-          ${styles[statusIcon]}
-          ${isMixingMe ? styles['play'] : ''}
-        `}
-        title={!isUser ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : (isMixingMe ? t('mixing-on') : '')}
-      />
+      <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} title={!isUser ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>

@@ -84,7 +84,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
-    webRTC.setIsUserMuted(userId, muted);
+    webRTC.setUserMuted(userId, muted);
   };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Permission>) => {

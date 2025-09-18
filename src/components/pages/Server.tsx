@@ -24,7 +24,6 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
 
-
 interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
   lastMessageTime: number;
@@ -209,12 +208,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     if (isQueuing) return t('in-queue-position', { '0': queueUser?.position.toString() || '-' });
     if (channelIsVoiceMuted) return t('mic-forbidden');
     if (isQueueControlled) return t('mic-controlled');
-    if (speakMode === 'key' && !webRTC.isPressingSpeakKey) {
+    if (speakMode === 'key' && !webRTC.isSpeakKeyPressed) {
       return t('press-key-to-speak', { '0': speakHotKey });
     }
     if (webRTC.micVolume === 0) return t('mic-muted');
     return t('speaking');
-  }, [speakMode, speakHotKey, webRTC.isPressingSpeakKey, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isQueueControlled, queueUser, t]);
+  }, [speakMode, speakHotKey, webRTC.isSpeakKeyPressed, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isQueueControlled, queueUser, t]);
 
   // Handlers
   const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
@@ -239,7 +238,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   };
 
   const handleToggleSpeakerMute = () => {
-    webRTC.toggleSpeakerMute();
+    webRTC.toggleSpeakerMuted();
   };
 
   const handleEditSpeakerVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -247,11 +246,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   };
 
   const handleToggleMicMute = () => {
-    webRTC.toggleMicMute();
+    webRTC.toggleMicMuted();
   };
 
   const handleEditMicVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
     webRTC.changeMicVolume(parseInt(e.target.value));
+  };
+
+  const handleToggleMixingMode = async () => {
+    webRTC.setMixModeActive(!webRTC.isMixModeActive);
   };
 
   const handleClickMicButton = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -324,36 +327,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     }
   };
 
-  const toggleMixMode = async () => {
-    try {
-      // const stream = await getSystemAudioStream();
-      // console.log('STREAM');
-      // console.log(stream);
-
-      // // Reproducir localmente (debug)…
-      // const audio = document.createElement('audio');
-      // audio.autoplay = true;
-      // audio.srcObject = stream;
-      // document.body.appendChild(audio);
-      
-      await webRTC.toggleMixMode();            
-
-    } catch (e) {
-      console.error('Error capturando audio del sistema', e);
-    }
-  };
-
-  const handleToggleMixingMode = async () => {  
-    toggleMixMode();
-  };
-
   // Effects
   useEffect(() => {
     webRTC.changeBitrate(channelBitrate);
   }, [channelBitrate, webRTC]);
 
   useEffect(() => {
-    webRTC.setIsMicTaken(isSpeaking && !isQueueControlled);
+    webRTC.setMicTaken(isSpeaking && !isQueueControlled);
   }, [isSpeaking, isQueueControlled, webRTC]);
 
   useEffect(() => {
@@ -440,7 +420,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
         <main className={styles['content']}>
           {/* Message Area */}
           <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
-            {/* Announcement Area */}            
+            {/* Announcement Area */}
             <div ref={annAreaRef} className={styles['announcement-area']}>
               <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} escapeHtml={false} />
             </div>
@@ -550,10 +530,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
               <div className={styles['saperator-1']} />
               <div className={styles['mic-volume-container']}>
-                <div className={`${styles['mic-mode-btn']} ${webRTC.isMicMute || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} />
+                <div className={`${styles['mic-mode-btn']} ${webRTC.isMicMuted || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} />
                 <VolumeSlider
                   value={webRTC.micVolume}
-                  muted={webRTC.isMicMute || webRTC.micVolume === 0}
+                  muted={webRTC.isMicMuted || webRTC.micVolume === 0}
                   onChange={handleEditMicVolume}
                   onToggleMute={handleToggleMicMute}
                   railCls={styles['volume-slider']}
@@ -564,7 +544,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                 <div className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} />
                 <VolumeSlider
                   value={webRTC.speakerVolume}
-                  muted={webRTC.isSpeakerMute || webRTC.speakerVolume === 0}
+                  muted={webRTC.isSpeakerMuted || webRTC.speakerVolume === 0}
                   onChange={handleEditSpeakerVolume}
                   onToggleMute={handleToggleSpeakerMute}
                   railCls={styles['volume-slider']}
