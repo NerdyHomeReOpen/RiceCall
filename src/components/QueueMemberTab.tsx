@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/pages/server.module.css';
@@ -37,6 +37,9 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const webRTC = useWebRTC();
+
+  // Refs
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Destructuring
   const {
@@ -168,10 +171,17 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
         if (selectedItemId === `queue-${memberUserId}`) setSelectedItemId(null);
         else setSelectedItemId(`queue-${memberUserId}`);
       }}
-      onDoubleClick={(e) => {
+      onMouseEnter={(e) => {
         const x = e.currentTarget.getBoundingClientRect().right;
         const y = e.currentTarget.getBoundingClientRect().top;
-        contextMenu.showUserInfoBlock(x, y, 'right-bottom', queueMember);
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = setTimeout(() => {
+          contextMenu.showUserInfoBlock(x, y, 'right-bottom', queueMember);
+        }, 200);
+      }}
+      onMouseLeave={() => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = null;
       }}
       onContextMenu={(e) => {
         e.stopPropagation();

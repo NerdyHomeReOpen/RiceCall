@@ -156,7 +156,8 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   };
 
   const handleChannelAdd = (...args: { data: Channel }[]) => {
-    setServerChannels((prev) => [...prev, ...args.map((i) => i.data)]);
+    const add = new Set(args.map((i) => `${i.data.channelId}`));
+    setServerChannels((prev) => prev.filter((c) => !add.has(`${c.channelId}`)).concat(args.map((i) => i.data)));
   };
 
   const handleChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
