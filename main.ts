@@ -503,7 +503,6 @@ async function createMainWindow(): Promise<BrowserWindow> {
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
-      preload: path.join(app.getAppPath(), 'preload.js'),
     },
     trafficLightPosition: { x: -100, y: -100 },
   });
@@ -572,7 +571,6 @@ async function createAuthWindow(): Promise<BrowserWindow> {
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
-      preload: path.join(app.getAppPath(), 'preload.js'),
     },
     trafficLightPosition: { x: -100, y: -100 },
   });
@@ -637,7 +635,6 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
-      preload: path.join(app.getAppPath(), 'preload.js'),
     },
     modal: true,
     trafficLightPosition: { x: -100, y: -100 },

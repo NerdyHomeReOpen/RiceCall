@@ -1119,6 +1119,18 @@ const ipcService = {
       },
     },
   },
+
+  loopbackAudio: {
+    enable: () => {
+      if (!isElectron) return;
+      ipcRenderer.invoke('enable-loopback-audio');
+    },
+
+    disable: () => {
+      if (!isElectron) return;
+      ipcRenderer.invoke('disable-loopback-audio');
+    },
+  },
 };
 
 export default ipcService;

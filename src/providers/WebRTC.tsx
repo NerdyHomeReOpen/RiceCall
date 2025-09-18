@@ -393,7 +393,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   );
 
   const startMixMode = useCallback(async () => {
-    await window.loopbackAudio.enable();
+    ipc.loopbackAudio.enable();
     navigator.mediaDevices
       .getDisplayMedia({
         video: true,
@@ -409,7 +409,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
           track.stop();
           stream.removeTrack(track);
         }
-        window.loopbackAudio.disable();
+        ipc.loopbackAudio.disable();
         initMixMode(stream);
       })
       .catch((err) => {
