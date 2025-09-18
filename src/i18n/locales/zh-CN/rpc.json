@@ -1,12 +1,12 @@
 {
-  "chat-with-members": "與 {{0}} 位成員聊天",
+  "chat-with-members": "与 {{0}} 位成员聊天",
   "friend-page": "好友列表",
-  "home-page": "主頁",
-  "join-discord-server": "加入我們的Discord伺服器",
-  "login-page": "登入頁面",
-  "server-page": "群組聊天",
+  "home-page": "主页",
+  "join-discord-server": "加入我们的Discord伺服器",
+  "login-page": "登入页面",
+  "server-page": "群组聊天",
   "un-login": "未登入",
   "user": "使用者: {{0}}",
-  "viewing-friend-page": "正在瀏覽好友列表",
-  "viewing-home-page": "正在瀏覽主頁"
+  "viewing-friend-page": "正在浏览好友列表",
+  "viewing-home-page": "正在浏览主页"
 }
