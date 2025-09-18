@@ -523,8 +523,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         appData: { userId: consumerInfo.userId },
         rtpParameters: consumerInfo.rtpParameters,
       });
-
       consumersRef.current[producerId] = consumer;
+
       const userId = consumer.appData.userId as string;
       const stream = new MediaStream([consumer.track]);
       initSpeakerAudio(userId, stream);
@@ -542,6 +542,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const unconsumeOne = useCallback(
     async (producerId: string) => {
       const consumer = consumersRef.current[producerId];
+      if (!consumer) return;
+
       const userId = consumer.appData.userId as string;
       removeSpeakerAudio(userId);
       consumer.close();
