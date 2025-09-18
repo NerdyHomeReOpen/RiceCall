@@ -191,7 +191,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
           {
             id: 'increase-queue-time',
             label: t('increase-queue-time'),
-            show: isChannelMod(permissionLevel),
+            show: memberPosition === 0 && isChannelMod(permissionLevel),
             onClick: () => handleIncreaseUserQueueTime(),
           },
           {
@@ -248,7 +248,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
           {
             id: 'edit-nickname',
             label: t('edit-nickname'),
-            show: isMember(permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
+            show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
             onClick: () => handleOpenEditNickname(memberUserId, serverId),
           },
           {
@@ -282,7 +282,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
           {
             id: 'block',
             label: t('block'),
-            show: !isUser && isChannelMod(permissionLevel) && isSuperior,
+            show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
             onClick: () => handleOpenBlockMember(memberUserId, serverId),
           },
           {

@@ -238,7 +238,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'edit-nickname',
             label: t('edit-nickname'),
-            show: isMember(permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
+            show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
             onClick: () => handleOpenEditNickname(memberUserId, serverId),
           },
           {
@@ -282,7 +282,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'block',
             label: t('block'),
-            show: !isUser && isChannelMod(permissionLevel) && isSuperior,
+            show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
             onClick: () => handleOpenBlockMember(memberUserId, serverId),
           },
           {

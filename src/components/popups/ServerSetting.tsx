@@ -496,7 +496,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                               {
                                 id: 'edit-nickname',
                                 label: t('edit-nickname'),
-                                show: isMember(permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
+                                show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
                                 onClick: () => handleOpenEditNickname(memberUserId, serverId),
                               },
                               {
@@ -506,10 +506,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                               {
                                 id: 'block',
                                 label: t('block'),
-                                show: !isUser && isMember(permissionLevel) && isSuperior,
-                                onClick: () => {
-                                  handleOpenBlockMember(memberUserId, serverId);
-                                },
+                                show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+                                onClick: () => handleOpenBlockMember(memberUserId, serverId),
                               },
                               {
                                 id: 'separator',
