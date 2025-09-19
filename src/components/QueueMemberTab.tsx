@@ -64,7 +64,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
 
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermission, channelPermission), [globalPermission, serverPermission, channelPermission]);
-  const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId] || 'connecting', [memberUserId, webRTC.remoteUserStatusList]);
+  const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId], [memberUserId, webRTC.remoteUserStatusList]);
   const isUser = useMemo(() => memberUserId === userId, [memberUserId, userId]);
   const isSpeaking = useMemo(() => !!webRTC.volumePercent?.[memberUserId], [memberUserId, webRTC.volumePercent]);
   const isVoiceMuted = useMemo(() => webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
