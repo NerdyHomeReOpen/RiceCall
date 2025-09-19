@@ -225,7 +225,7 @@
   "image-too-large": "Размер изображения не должен превышать 5 Мб",
   "in": "in",
   "in-queue-position": "№{{0}}",
-  "increase-queue-time": "Увеличить время очереди для текущего пользователя",
+  "increase-queue-time": "Увеличить время",
   "info": "Информация",
   "input-announcement": "Введите объявление",
   "input-device": "Устройство ввода",
