@@ -601,7 +601,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     });
 
     const track = inputDesRef.current?.stream.getAudioTracks()[0];
-    audioProducerRef.current = await sendTransportRef.current.produce({ track, encodings: [{ maxBitrate: 256000 }], stopTracks: false });
+    audioProducerRef.current = await sendTransportRef.current.produce({ track, encodings: [{ maxBitrate: bitrateRef.current }], stopTracks: false });
     audioProducerRef.current.on('transportclose', () => {
       console.log('[WebRTC] Producer transport closed');
       audioProducerRef.current?.close();
@@ -672,6 +672,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   }, []);
 
   const changeBitrate = useCallback((bitrate: number) => {
+    audioProducerRef.current?.setRtpEncodingParameters({ maxBitrate: bitrate });
     bitrateRef.current = bitrate;
   }, []);
 
