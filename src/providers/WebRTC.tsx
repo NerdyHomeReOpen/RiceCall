@@ -145,7 +145,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const [remoteUserStatusList, setRemoteUserStatusList] = useState<{ [userId: string]: RemoteUserStatus }>({}); // userId -> status
 
   // Memos
-  const SPEAKING_VOLUME_THRESHOLD = useMemo(() => 2, []);
+  const SPEAKING_VOLUME_THRESHOLD = useMemo(() => 1, []);
 
   const detectSpeaking = useCallback(
     (targetId: string, analyserNode: AnalyserNode, dataArray: Uint8Array) => {
@@ -400,9 +400,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
       const dataArray = new Uint8Array(analyserNode.fftSize);
       analyserNode.fftSize = 2048;
-      detectSpeaking(userId, analyserNode, dataArray);
+      detectSpeaking('system', analyserNode, dataArray);
     },
-    [initAudioContext, detectSpeaking, userId],
+    [initAudioContext, detectSpeaking],
   );
 
   const startMixMode = useCallback(async () => {

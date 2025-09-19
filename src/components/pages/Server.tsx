@@ -194,6 +194,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const queueUser = useMemo(() => queueUsers.find((m) => m.userId === userId), [queueUsers, userId]);
   const channelIsQueueMode = useMemo(() => channelVoiceMode === 'queue', [channelVoiceMode]);
   const channelIsQueueControlled = useMemo(() => queueUsers.some((m) => m.isQueueControlled), [queueUsers]);
+  const volumnLevel = useMemo(() => Math.ceil(Math.max(webRTC.volumePercent[userId] || 0, webRTC.volumePercent['system'] || 0) / 10) - 1, [webRTC.volumePercent, userId]);
   const isSpeaking = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position <= 0), [queueUsers, userId]);
   const isQueuing = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position > 0), [queueUsers, userId]);
   const isIdling = useMemo(() => !isSpeaking && !isQueuing, [isSpeaking, isQueuing]);
@@ -524,7 +525,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
             </div>
             <div className={micBtnClass} onClick={handleClickMicButton}>
-              <div className={`${styles['mic-icon']} ${webRTC.volumePercent ? styles[`level${Math.ceil(webRTC.volumePercent[userId] / 10) - 1}`] : ''}`} />
+              <div className={`${styles['mic-icon']} ${volumnLevel ? styles[`level${volumnLevel}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className={styles['mic-text']} style={{ fontSize: isIdling ? '1.3rem' : '1.1rem' }}>
                   {micText}
