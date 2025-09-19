@@ -57,7 +57,7 @@ jobs:
         run: |
           echo "API_URL=${{ secrets.API_URL }}" > .env
           echo "WS_URL=${{ secrets.WS_URL }}" >> .env
-          echo "UPDATE_CHANNEL=latest" >> .env
+          echo "UPDATE_CHANNEL=" >> .env
 
       - name: Build electron
         uses: samuelmeuli/action-electron-builder@v1
