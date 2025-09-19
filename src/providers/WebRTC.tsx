@@ -23,7 +23,8 @@ interface WebRTCContextType {
   setUserMuted: (userId: string, muted: boolean) => void;
   setMicTaken: (taken: boolean, channelId: string) => void;
   setSpeakKeyPressed: (pressed: boolean) => void;
-  setMixModeActive: (active: boolean) => void;
+  toggleMixMode: () => void;
+  toggleRecording: () => void;
   toggleSpeakerMuted: () => void;
   toggleMicMuted: () => void;
   changeBitrate: (newBitrate: number) => void;
@@ -35,6 +36,7 @@ interface WebRTCContextType {
   isMixModeActive: boolean;
   isMicMuted: boolean;
   isSpeakerMuted: boolean;
+  isRecording: boolean;
   micVolume: number;
   mixVolume: number;
   speakerVolume: number;
@@ -87,6 +89,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const masterGainNodeRef = useRef<GainNode | null>(null);
   const inputDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const outputDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const recordDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
 
   // Speaking Mode
   const speakingModeRef = useRef<SpeakingMode>('key');
@@ -123,6 +126,12 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const [isSpeakerMuted, setIsSpeakerMuted] = useState<boolean>(false);
   const speakerVolumeRef = useRef<number>(100);
   const isSpeakerMutedRef = useRef<boolean>(false);
+
+  // Recorder
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const recordChunksRef = useRef<Blob[]>([]);
+  const isRecordingRef = useRef<boolean>(false);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
 
   // Mute Ids
   const [mutedIds, setMutedIds] = useState<string[]>([]);
@@ -198,6 +207,10 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     // Create output destination node
     const outputDestination = audioContext.createMediaStreamDestination();
     outputDesRef.current = outputDestination;
+
+    // Create record destination node
+    const recordDestination = audioContext.createMediaStreamDestination();
+    recordDesRef.current = recordDestination;
 
     // Create master gain node
     masterGainNodeRef.current = audioContext.createGain();
@@ -417,89 +430,40 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       });
   }, [initMixMode]);
 
-  const changeBitrate = useCallback((bitrate: number) => {
-    bitrateRef.current = bitrate;
+  const startRecording = useCallback(() => {
+    micNodesRef.current.gain?.connect(recordDesRef.current!);
+    mixNodesRef.current.gain?.connect(recordDesRef.current!);
+    masterGainNodeRef.current?.connect(recordDesRef.current!);
+
+    const stream = recordDesRef.current!.stream;
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+
+    const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    recorderRef.current = mediaRecorder;
+    recordChunksRef.current = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) recordChunksRef.current.push(e.data);
+    };
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(recordChunksRef.current, { type: mimeType || 'audio/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      a.href = url;
+      a.download = `ricecall-room-${ts}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    };
+
+    mediaRecorder.start(1000);
   }, []);
 
-  const changeMicVolume = useCallback((volume: number) => {
-    micNodesRef.current.gain!.gain.value = volume / 20;
-    setMicVolume(volume);
-    micVolumeRef.current = volume;
-    window.localStorage.setItem('mic-volume', volume.toString());
-    const isMicMuted = volume === 0;
-    setIsMicMuted(isMicMuted);
-    isMicMutedRef.current = isMicMuted;
-    window.localStorage.setItem('is-mic-mute', isMicMuted.toString());
+  const stopRecording = useCallback(() => {
+    recorderRef.current?.stop();
   }, []);
-
-  const changeMixVolume = useCallback((volume: number) => {
-    mixNodesRef.current.gain!.gain.value = volume / 100;
-    setMixVolume(volume);
-    mixVolumeRef.current = volume;
-    window.localStorage.setItem('mix-volume', volume.toString());
-  }, []);
-
-  const changeSpeakerVolume = useCallback((volume: number) => {
-    masterGainNodeRef.current!.gain.value = volume / 100;
-    setSpeakerVolume(volume);
-    speakerVolumeRef.current = volume;
-    window.localStorage.setItem('speaker-volume', volume.toString());
-    const isSpeakerMuted = volume === 0;
-    setIsSpeakerMuted(isSpeakerMuted);
-    isSpeakerMutedRef.current = isSpeakerMuted;
-    window.localStorage.setItem('is-speaker-mute', isSpeakerMuted.toString());
-  }, []);
-
-  const setUserMuted = useCallback((userId: string, muted: boolean) => {
-    Object.values(consumersRef.current).forEach((consumer) => {
-      if (consumer.appData.userId === userId && muted) consumer.pause();
-      else consumer.resume();
-    });
-    setMutedIds((prev) => (muted ? [...prev, userId] : prev.filter((id) => id !== userId)));
-    mutedIdsRef.current = muted ? [...mutedIdsRef.current, userId] : mutedIdsRef.current.filter((id) => id !== userId);
-    window.localStorage.setItem('muted-ids', mutedIdsRef.current.join(','));
-  }, []);
-
-  const setSpeakKeyPressed = useCallback((enable: boolean) => {
-    if (speakingModeRef.current !== 'key') return;
-    soundPlayerRef.current.playSound(enable ? 'startSpeaking' : 'stopSpeaking');
-    micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
-      track.enabled = enable;
-    });
-    setIsSpeakKeyPressed(enable);
-    isSpeakKeyPressedRef.current = enable;
-  }, []);
-
-  const setMixModeActive = useCallback(
-    (active: boolean) => {
-      if (active) startMixMode();
-      else removeMixAudio();
-      setIsMixModeActive(active);
-      isMixModeActiveRef.current = active;
-    },
-    [startMixMode, removeMixAudio],
-  );
-
-  const toggleMicMuted = useCallback(() => {
-    if (isMicMutedRef.current) {
-      const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
-      changeMicVolume(prevVolume);
-    } else {
-      localStorage.setItem('previous-mic-volume', micVolumeRef.current.toString());
-      changeMicVolume(0);
-    }
-  }, [changeMicVolume]);
-
-  const toggleSpeakerMuted = useCallback(() => {
-    console.log('[WebRTC] toggleSpeakerMute', isSpeakerMutedRef.current);
-    if (isSpeakerMutedRef.current) {
-      const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
-      changeSpeakerVolume(prevVolume);
-    } else {
-      localStorage.setItem('previous-speaker-volume', speakerVolumeRef.current.toString());
-      changeSpeakerVolume(0);
-    }
-  }, [changeSpeakerVolume]);
 
   const consumeOne = useCallback(
     async (producerId: string, channelId: string) => {
@@ -681,6 +645,59 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     }
   }, []);
 
+  const changeBitrate = useCallback((bitrate: number) => {
+    bitrateRef.current = bitrate;
+  }, []);
+
+  const changeMicVolume = useCallback((volume: number) => {
+    micNodesRef.current.gain!.gain.value = volume / 20;
+    setMicVolume(volume);
+    micVolumeRef.current = volume;
+    window.localStorage.setItem('mic-volume', volume.toString());
+    const isMicMuted = volume === 0;
+    setIsMicMuted(isMicMuted);
+    isMicMutedRef.current = isMicMuted;
+    window.localStorage.setItem('is-mic-mute', isMicMuted.toString());
+  }, []);
+
+  const changeMixVolume = useCallback((volume: number) => {
+    mixNodesRef.current.gain!.gain.value = volume / 100;
+    setMixVolume(volume);
+    mixVolumeRef.current = volume;
+    window.localStorage.setItem('mix-volume', volume.toString());
+  }, []);
+
+  const changeSpeakerVolume = useCallback((volume: number) => {
+    masterGainNodeRef.current!.gain.value = volume / 100;
+    setSpeakerVolume(volume);
+    speakerVolumeRef.current = volume;
+    window.localStorage.setItem('speaker-volume', volume.toString());
+    const isSpeakerMuted = volume === 0;
+    setIsSpeakerMuted(isSpeakerMuted);
+    isSpeakerMutedRef.current = isSpeakerMuted;
+    window.localStorage.setItem('is-speaker-mute', isSpeakerMuted.toString());
+  }, []);
+
+  const setUserMuted = useCallback((userId: string, muted: boolean) => {
+    Object.values(consumersRef.current).forEach((consumer) => {
+      if (consumer.appData.userId === userId && muted) consumer.pause();
+      else consumer.resume();
+    });
+    setMutedIds((prev) => (muted ? [...prev, userId] : prev.filter((id) => id !== userId)));
+    mutedIdsRef.current = muted ? [...mutedIdsRef.current, userId] : mutedIdsRef.current.filter((id) => id !== userId);
+    window.localStorage.setItem('muted-ids', mutedIdsRef.current.join(','));
+  }, []);
+
+  const setSpeakKeyPressed = useCallback((enable: boolean) => {
+    if (speakingModeRef.current !== 'key') return;
+    soundPlayerRef.current.playSound(enable ? 'startSpeaking' : 'stopSpeaking');
+    micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
+      track.enabled = enable;
+    });
+    setIsSpeakKeyPressed(enable);
+    isSpeakKeyPressedRef.current = enable;
+  }, []);
+
   const setMicTaken = useCallback(
     async (taken: boolean, channelId: string) => {
       if (taken) await setupSend(channelId);
@@ -690,6 +707,41 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     },
     [setupSend, closeSend],
   );
+
+  const toggleMixMode = useCallback(() => {
+    if (isMixModeActiveRef.current) removeMixAudio();
+    else startMixMode();
+    setIsMixModeActive(!isMixModeActiveRef.current);
+    isMixModeActiveRef.current = !isMixModeActiveRef.current;
+  }, [startMixMode, removeMixAudio]);
+
+  const toggleRecording = useCallback(() => {
+    if (isRecordingRef.current) stopRecording();
+    else startRecording();
+    setIsRecording(!isRecordingRef.current);
+    isRecordingRef.current = !isRecordingRef.current;
+  }, []);
+
+  const toggleMicMuted = useCallback(() => {
+    if (isMicMutedRef.current) {
+      const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
+      changeMicVolume(prevVolume);
+    } else {
+      localStorage.setItem('previous-mic-volume', micVolumeRef.current.toString());
+      changeMicVolume(0);
+    }
+  }, [changeMicVolume]);
+
+  const toggleSpeakerMuted = useCallback(() => {
+    console.log('[WebRTC] toggleSpeakerMute', isSpeakerMutedRef.current);
+    if (isSpeakerMutedRef.current) {
+      const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
+      changeSpeakerVolume(prevVolume);
+    } else {
+      localStorage.setItem('previous-speaker-volume', speakerVolumeRef.current.toString());
+      changeSpeakerVolume(0);
+    }
+  }, [changeSpeakerVolume]);
 
   const handleSFUJoined = useCallback(
     async ({ channelId }: { channelId: string }) => {
@@ -781,7 +833,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         setUserMuted,
         setMicTaken,
         setSpeakKeyPressed,
-        setMixModeActive,
+        toggleMixMode,
+        toggleRecording,
         toggleSpeakerMuted,
         toggleMicMuted,
         changeBitrate,
@@ -793,6 +846,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         isMixModeActive,
         isMicMuted,
         isSpeakerMuted,
+        isRecording,
         micVolume,
         mixVolume,
         speakerVolume,

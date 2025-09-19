@@ -265,7 +265,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   };
 
   const handleToggleMixingMode = async () => {
-    webRTC.setMixModeActive(!webRTC.isMixModeActive);
+    webRTC.toggleMixMode();
+  };
+
+  const handleToggleRecord = async () => {
+    webRTC.toggleRecording();
   };
 
   const handleClickMicButton = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -559,7 +563,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                   btnCls={styles['speaker-btn']}
                 />
               </div>
-              <div className={styles['record-mode-btn']} />
+              <div className={`${styles['record-mode-btn']} ${webRTC.isRecording ? styles['active'] : ''}`} onClick={handleToggleRecord} />
             </div>
           </div>
         </main>
