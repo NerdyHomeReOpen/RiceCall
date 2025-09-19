@@ -60,14 +60,14 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
           <div className={popup['split']} />
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
             <div className={popup['label']}>{t('note')}</div>
-            <textarea rows={2} defaultValue={invitationDesc} onChange={(e) => setInvitationDesc(e.target.value)} />
+            <textarea rows={2} value={invitationDesc} onChange={(e) => setInvitationDesc(e.target.value)} />
           </div>
           <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
             {t('member-invitation-sent')}
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 2 ? {} : { display: 'none' }}>
             <div className={popup['label']}>{t('note')}</div>
-            <textarea rows={2} defaultValue={invitationDesc} onChange={(e) => setInvitationDesc(e.target.value)} />
+            <textarea rows={2} value={invitationDesc} onChange={(e) => setInvitationDesc(e.target.value)} />
           </div>
         </div>
       </div>

@@ -50,7 +50,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('please-enter-the-member-nickname')}</div>
-            <input name="nickname" type="text" defaultValue={memberNickname} maxLength={32} onChange={(e) => setMemberNickname(e.target.value)} />
+            <input name="nickname" type="text" value={memberNickname} maxLength={32} onChange={(e) => setMemberNickname(e.target.value)} />
           </div>
         </div>
       </div>

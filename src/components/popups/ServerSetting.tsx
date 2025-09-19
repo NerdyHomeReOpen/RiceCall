@@ -310,7 +310,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       <input
                         name="name"
                         type="text"
-                        defaultValue={serverName}
+                        value={serverName}
                         maxLength={32}
                         onChange={(e) => setServer((prev) => ({ ...prev, name: e.target.value }))}
                         readOnly={!isServerAdmin(permissionLevel)}
@@ -318,7 +318,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     </div>
                     <div className={`${popup['input-box']} ${popup['col']}`}>
                       <div className={popup['label']}>{t('id')}</div>
-                      <input name="server-display-id" type="text" defaultValue={serverDisplayId} readOnly />
+                      <input name="server-display-id" type="text" value={serverDisplayId} readOnly />
                     </div>
                   </div>
                   <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -326,7 +326,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <input
                       name="slogan"
                       type="text"
-                      defaultValue={serverSlogan}
+                      value={serverSlogan}
                       maxLength={100}
                       onChange={(e) => setServer((prev) => ({ ...prev, slogan: e.target.value }))}
                       readOnly={!isServerAdmin(permissionLevel)}
@@ -337,7 +337,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <div className={popup['select-box']}>
                       <select
                         name="type"
-                        defaultValue={serverType}
+                        value={serverType}
                         onChange={(e) => setServer((prev) => ({ ...prev, type: e.target.value as Server['type'] }))}
                         datatype={!isServerAdmin(permissionLevel) ? 'read-only' : ''}
                       >
@@ -377,32 +377,27 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 <div className={popup['row']}>
                   <div className={`${popup['input-box']} ${popup['col']}`}>
                     <div className={popup['label']}>{t('level')}</div>
-                    <input name="level" type="text" defaultValue={serverLevel} readOnly />
+                    <input name="level" type="text" value={serverLevel} readOnly />
                   </div>
                   <div className={`${popup['input-box']} ${popup['col']}`}>
                     <div className={popup['label']}>{t('create-at')}</div>
-                    <input name="created-at" type="text" defaultValue={new Date(serverCreatedAt).toLocaleString()} readOnly />
+                    <input name="created-at" type="text" value={new Date(serverCreatedAt).toLocaleString()} readOnly />
                   </div>
                   <div className={`${popup['input-box']} ${popup['col']}`}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <div className={popup['label']}>{t('wealth')}</div>
                       <div className={setting['wealth-coin-icon']} />
                     </div>
-                    <input name="wealth" type="text" defaultValue={serverWealth} readOnly />
+                    <input name="wealth" type="text" value={serverWealth} readOnly />
                   </div>
                 </div>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('server-link')}</div>
-                  <input name="link" type="text" defaultValue={`https://ricecall.com.tw/join?sid=${serverDisplayId}`} readOnly />
+                  <input name="link" type="text" value={`https://ricecall.com.tw/join?sid=${serverDisplayId}`} readOnly />
                 </div>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('description')}</div>
-                  <textarea
-                    name="description"
-                    defaultValue={serverDescription}
-                    onChange={(e) => setServer((prev) => ({ ...prev, description: e.target.value }))}
-                    readOnly={!isServerAdmin(permissionLevel)}
-                  />
+                  <textarea name="description" value={serverDescription} onChange={(e) => setServer((prev) => ({ ...prev, description: e.target.value }))} readOnly={!isServerAdmin(permissionLevel)} />
                 </div>
               </div>
             </div>
@@ -435,14 +430,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 <div className={popup['label']}>{`${t('member')} (${totalMembers})`}</div>
                 <div className={setting['search-box']}>
                   <div className={setting['search-icon']}></div>
-                  <input
-                    name="search-query"
-                    type="text"
-                    className={setting['search-input']}
-                    placeholder={t('search-placeholder')}
-                    defaultValue={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                  />
+                  <input name="search-query" type="text" className={setting['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
                 </div>
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -569,7 +557,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     name="visibility"
                     type="radio"
                     value="public"
-                    defaultChecked={serverVisibility === 'public'}
+                    checked={serverVisibility === 'public'}
                     onChange={() => setServer((prev) => ({ ...prev, visibility: 'public' }))}
                     readOnly={!isServerAdmin(permissionLevel)}
                   />
@@ -581,7 +569,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       name="visibility"
                       type="radio"
                       value="private"
-                      defaultChecked={serverVisibility === 'private'}
+                      checked={serverVisibility === 'private'}
                       onChange={() => setServer((prev) => ({ ...prev, visibility: 'private' }))}
                       readOnly={!isServerAdmin(permissionLevel)}
                     />
@@ -595,7 +583,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       name="visibility"
                       type="radio"
                       value="invisible"
-                      defaultChecked={serverVisibility === 'invisible'}
+                      checked={serverVisibility === 'invisible'}
                       onChange={() => setServer((prev) => ({ ...prev, visibility: 'invisible' }))}
                       readOnly={!isServerAdmin(permissionLevel)}
                     />
@@ -623,7 +611,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       type="text"
                       className={setting['search-input']}
                       placeholder={t('search-placeholder')}
-                      defaultValue={searchText}
+                      value={searchText}
                       onChange={(e) => setSearchText(e.target.value)}
                     />
                   </div>
@@ -701,14 +689,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 <div className={popup['label']}>{`${t('blacklist')} (${filteredBlockMembers.length})`}</div>
                 <div className={setting['search-box']}>
                   <div className={setting['search-icon']}></div>
-                  <input
-                    name="search-query"
-                    type="text"
-                    className={setting['search-input']}
-                    placeholder={t('search-placeholder')}
-                    defaultValue={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                  />
+                  <input name="search-query" type="text" className={setting['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
                 </div>
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>

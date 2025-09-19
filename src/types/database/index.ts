@@ -52,6 +52,7 @@ export type table_channels = {
   order: number;
   bitrate: number;
   userLimit: number;
+  queueTime: number;
   guestTextGapTime: number;
   guestTextWaitTime: number;
   guestTextMaxLength: number;

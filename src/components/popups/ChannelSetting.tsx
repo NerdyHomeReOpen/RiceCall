@@ -58,6 +58,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     userLimit: channelUserLimit,
     voiceMode: channelVoiceMode,
     order: channelOrder,
+    queueTime: channelQueueTime,
     forbidText: channelForbidText,
     forbidGuestText: channelForbidGuestText,
     forbidGuestVoice: channelForbidGuestVoice,
@@ -215,7 +216,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   name="channel-name"
                   type="text"
-                  defaultValue={isLobby ? t(`${channelName}`) : channelName}
+                  value={isLobby ? t(`${channelName}`) : channelName}
                   maxLength={32}
                   disabled={isLobby}
                   onChange={(e) => setChannel((prev) => ({ ...prev, name: e.target.value }))}
@@ -227,7 +228,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   name="user-limit"
                   type="number"
-                  defaultValue={channelUserLimit}
+                  value={channelUserLimit}
                   min={0}
                   max={999}
                   disabled={channelVisibility === 'readonly' || isLobby}
@@ -241,7 +242,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <div className={popup['label']}>{t('channel-mode')}</div>
                 <div className={popup['select-box']}>
                   <select
-                    defaultValue={channelVoiceMode}
+                    value={channelVoiceMode}
                     onChange={(e) => setChannel((prev) => ({ ...prev, voiceMode: e.target.value as Channel['voiceMode'] }))}
                     datatype={!isChannelMod(permissionLevel) ? 'read-only' : ''}
                   >
@@ -251,6 +252,20 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   </select>
                 </div>
               </div>
+              {channelVoiceMode === 'queue' && (
+                <div className={`${popup['input-box']} ${popup['col']}`}>
+                  <div className={popup['label']}>{t('queue-time')}</div>
+                  <input
+                    name="queue-time"
+                    type="number"
+                    value={channelQueueTime}
+                    min={10}
+                    max={3600}
+                    onChange={(e) => setChannel((prev) => ({ ...prev, queueTime: Math.max(10, Math.min(3600, parseInt(e.target.value) || 0)) }))}
+                    readOnly={!isChannelMod(permissionLevel)}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <div className={setting['separator']} />
@@ -262,7 +277,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   <input
                     name="bitrate-64000"
                     type="radio"
-                    defaultChecked={channelBitrate === 64000}
+                    checked={channelBitrate === 64000}
                     onChange={() => setChannel((prev) => ({ ...prev, bitrate: 64000 }))}
                     readOnly={!isChannelMod(permissionLevel)}
                   />
@@ -275,7 +290,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   <input
                     name="bitrate-256000"
                     type="radio"
-                    defaultChecked={channelBitrate === 256000}
+                    checked={channelBitrate === 256000}
                     onChange={() => setChannel((prev) => ({ ...prev, bitrate: 256000 }))}
                     readOnly={!isChannelMod(permissionLevel)}
                   />
@@ -318,7 +333,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   type="radio"
                   name="visibility"
-                  defaultChecked={channelVisibility === 'public'}
+                  checked={channelVisibility === 'public'}
                   onChange={() => setChannel((prev) => ({ ...prev, visibility: 'public' }))}
                   readOnly={!isChannelMod(permissionLevel)}
                 />
@@ -329,7 +344,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   type="radio"
                   name="visibility"
-                  defaultChecked={channelVisibility === 'member'}
+                  checked={channelVisibility === 'member'}
                   onChange={() => setChannel((prev) => ({ ...prev, visibility: 'member' }))}
                   readOnly={!isChannelMod(permissionLevel)}
                 />
@@ -340,7 +355,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   type="radio"
                   name="visibility"
-                  defaultChecked={channelVisibility === 'readonly'}
+                  checked={channelVisibility === 'readonly'}
                   onChange={() => setChannel((prev) => ({ ...prev, visibility: 'readonly' }))}
                   readOnly={!isChannelMod(permissionLevel)}
                 />
@@ -350,7 +365,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   type="radio"
                   name="visibility"
-                  defaultChecked={channelVisibility === 'private'}
+                  checked={channelVisibility === 'private'}
                   onChange={() => setChannel((prev) => ({ ...prev, visibility: 'private' }))}
                   readOnly={!isChannelMod(permissionLevel)}
                 />
@@ -361,7 +376,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   <input
                     name="channel-password"
                     type="text"
-                    defaultValue={channelPassword}
+                    value={channelPassword}
                     maxLength={4}
                     placeholder={t('require-password-placeholder')}
                     onChange={(e) => setChannel((prev) => ({ ...prev, password: e.target.value }))}
@@ -384,7 +399,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   name="forbidGuestQueue"
                   type="checkbox"
-                  defaultChecked={channelForbidGuestQueue}
+                  checked={channelForbidGuestQueue}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestQueue: e.target.checked }))}
                   readOnly={!isChannelMod(permissionLevel)}
                 />
@@ -394,7 +409,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   name="forbidGuestVoice"
                   type="checkbox"
-                  defaultChecked={channelForbidGuestVoice}
+                  checked={channelForbidGuestVoice}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestVoice: e.target.checked }))}
                   readOnly={!isChannelMod(permissionLevel)}
                 />
@@ -415,7 +430,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   name="forbid-text"
                   type="checkbox"
-                  defaultChecked={channelForbidText}
+                  checked={channelForbidText}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidText: e.target.checked }))}
                   readOnly={!isChannelMod(permissionLevel)}
                 />
@@ -425,7 +440,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   name="forbid-guest-text"
                   type="checkbox"
-                  defaultChecked={channelForbidGuestText}
+                  checked={channelForbidGuestText}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestText: e.target.checked }))}
                   readOnly={!isChannelMod(permissionLevel)}
                 />
@@ -435,7 +450,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <input
                   name="forbid-guest-url"
                   type="checkbox"
-                  defaultChecked={channelForbidGuestUrl}
+                  checked={channelForbidGuestUrl}
                   onChange={(e) => setChannel((prev) => ({ ...prev, forbidGuestUrl: e.target.checked }))}
                   readOnly={!isChannelMod(permissionLevel)}
                 />
@@ -447,7 +462,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   <input
                     name="guest-text-max-length"
                     type="number"
-                    defaultValue={channelGuestTextMaxLength}
+                    value={channelGuestTextMaxLength}
                     min={0}
                     max={9999}
                     onChange={(e) => setChannel((prev) => ({ ...prev, guestTextMaxLength: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
@@ -463,7 +478,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   <input
                     name="guest-text-wait-time"
                     type="number"
-                    defaultValue={channelGuestTextWaitTime}
+                    value={channelGuestTextWaitTime}
                     min={0}
                     max={9999}
                     onChange={(e) => setChannel((prev) => ({ ...prev, guestTextWaitTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
@@ -479,7 +494,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   <input
                     name="guest-text-gap-time"
                     type="number"
-                    defaultValue={channelGuestTextGapTime}
+                    value={channelGuestTextGapTime}
                     min={0}
                     max={9999}
                     onChange={(e) => setChannel((prev) => ({ ...prev, guestTextGapTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
@@ -645,6 +660,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               password: channelPassword,
               order: channelOrder,
               userLimit: channelUserLimit,
+              queueTime: channelQueueTime,
               guestTextMaxLength: channelGuestTextMaxLength,
               guestTextWaitTime: channelGuestTextWaitTime,
               guestTextGapTime: channelGuestTextGapTime,

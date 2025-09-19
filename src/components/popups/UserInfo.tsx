@@ -464,14 +464,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('signature')}</div>
                 <div className={popup['row']}>
-                  <input
-                    ref={signatureInputRef}
-                    name="signature"
-                    type="text"
-                    defaultValue={targetSignature}
-                    maxLength={100}
-                    onChange={(e) => setTarget((prev) => ({ ...prev, signature: e.target.value }))}
-                  />
+                  <input ref={signatureInputRef} name="signature" type="text" value={targetSignature} maxLength={100} onChange={(e) => setTarget((prev) => ({ ...prev, signature: e.target.value }))} />
                   <div
                     className={emoji['emoji-icon']}
                     onClick={(e) => {
@@ -487,7 +480,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               </div>
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('about-me')}</div>
-                <textarea name="about" defaultValue={targetAbout} maxLength={200} onChange={(e) => setTarget((prev) => ({ ...prev, about: e.target.value }))} />
+                <textarea name="about" value={targetAbout} maxLength={200} onChange={(e) => setTarget((prev) => ({ ...prev, about: e.target.value }))} />
               </div>
             </div>
           </div>

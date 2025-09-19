@@ -41,11 +41,11 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
         <div className={`${popup['dialog-content']} ${popup['col']}`}>
           <div className={`${popup['input-box']} ${popup['row']}`}>
             <div className={popup['label']}>{t('is-receive-member-application-label')}</div>
-            <input name="receive-apply" type="checkbox" defaultChecked={serverReceiveApplication} onChange={() => setServerReceiveApplication(!serverReceiveApplication)} />
+            <input name="receive-apply" type="checkbox" checked={serverReceiveApplication} onChange={() => setServerReceiveApplication(!serverReceiveApplication)} />
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('apply-member-note')}</div>
-            <textarea name="apply-note" defaultValue={serverApplyNote} maxLength={100} onChange={(e) => setServerApplyNote(e.target.value)} />
+            <textarea name="apply-note" value={serverApplyNote} maxLength={100} onChange={(e) => setServerApplyNote(e.target.value)} />
           </div>
         </div>
       </div>
