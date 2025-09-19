@@ -519,6 +519,13 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
         return newState;
       });
 
+      delete volumePercentRef.current[userId];
+      setVolumePercent((prev) => {
+        const newState = { ...prev };
+        delete newState[userId];
+        return newState;
+      });
+
       console.info('[WebRTC] Unconsumed producer: ', userId);
     },
     [removeSpeakerAudio],
