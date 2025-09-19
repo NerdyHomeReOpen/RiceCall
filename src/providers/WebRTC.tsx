@@ -720,7 +720,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     else startRecording();
     setIsRecording(!isRecordingRef.current);
     isRecordingRef.current = !isRecordingRef.current;
-  }, []);
+  }, [startRecording, stopRecording]);
 
   const toggleMicMuted = useCallback(() => {
     if (isMicMutedRef.current) {
