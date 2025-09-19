@@ -200,7 +200,7 @@
   display: inline-block;
   width: 100%;
   height: 2em;
-  &:not([datatype='read-only']) {
+  &:not([datatype='read-only']):not([readOnly]) {
     box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
   }
 }
@@ -299,7 +299,7 @@
   width: 100%;
   height: 4em;
   resize: none;
-  &:not([datatype='read-only']) {
+  &:not([datatype='read-only']):not([readOnly]) {
     box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
   }
 }
@@ -323,7 +323,7 @@
   height: 2em;
   appearance: none;
   text-decoration: none;
-  &:not([datatype='read-only']) {
+  &:not([datatype='read-only']):not([readOnly]) {
     box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
   }
 }

@@ -101,6 +101,7 @@ const Default = {
     order: 0,
     bitrate: 64000,
     userLimit: 0,
+    queueTime: 300,
     permissionLevel: 1,
     guestTextGapTime: 0,
     guestTextWaitTime: 0,

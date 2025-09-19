@@ -63,13 +63,13 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const startSpeak = useCallback(() => {
     if (speakingActiveRef.current) return;
     speakingActiveRef.current = true;
-    webRTC.setIsSpeakKeyPressed(true);
+    webRTC.setSpeakKeyPressed(true);
   }, [webRTC]);
 
   const stopSpeak = useCallback(() => {
     if (!speakingActiveRef.current) return;
     speakingActiveRef.current = false;
-    webRTC.setIsSpeakKeyPressed(false);
+    webRTC.setSpeakKeyPressed(false);
   }, [webRTC]);
 
   const toggleMainWindows = useCallback(() => {
@@ -87,11 +87,11 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   }, [webRTC]);
 
   const toggleSpeakerMute = useCallback(() => {
-    webRTC.toggleSpeakerMute();
+    webRTC.toggleSpeakerMuted();
   }, [webRTC]);
 
   const toggleMicMute = useCallback(() => {
-    webRTC.toggleMicMute();
+    webRTC.toggleMicMuted();
   }, [webRTC]);
 
   // Effects

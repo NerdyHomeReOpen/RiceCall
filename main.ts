@@ -7,12 +7,15 @@ import { io, Socket } from 'socket.io-client';
 import DiscordRPC from 'discord-rpc';
 import serve from 'electron-serve';
 import Store from 'electron-store';
+import { initMain } from 'electron-audio-loopback-josh';
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
+
+initMain();
 
 const EnvSchema = z
   .object({

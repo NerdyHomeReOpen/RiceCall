@@ -62,14 +62,14 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
           <div className={popup['split']} />
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
             <div className={popup['label']}>{t('note')}</div>
-            <textarea rows={2} defaultValue={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
+            <textarea rows={2} value={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
           </div>
           <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
             {t('member-application-sent')}
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`} style={section === 2 ? {} : { display: 'none' }}>
             <div className={popup['label']}>{t('note')}</div>
-            <textarea rows={2} defaultValue={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
+            <textarea rows={2} value={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
           </div>
         </div>
       </div>

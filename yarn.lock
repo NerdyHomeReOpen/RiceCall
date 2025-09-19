@@ -2521,6 +2521,11 @@ ejs@^3.1.8:
   dependencies:
     jake "^10.8.5"
 
+electron-audio-loopback-josh@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/electron-audio-loopback-josh/-/electron-audio-loopback-josh-1.0.7.tgz#7819cfaadb29ed01f37559d0f3c79c8cdeb9981f"
+  integrity sha512-/1yjRaoYngFPsMolOcJPjhj4LroOhhGvFiGcdVOHWsVs0IvrGwG5zkB3yJhB7qGriAuigYaEFuMAkhtshl7CHQ==
+
 electron-builder@^25.1.8:
   version "25.1.8"
   resolved "https://registry.yarnpkg.com/electron-builder/-/electron-builder-25.1.8.tgz#b0e310f1600787610bb84c3f39bc7aadb2548486"

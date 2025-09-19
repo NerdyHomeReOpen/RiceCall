@@ -69,10 +69,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
 
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel), [globalPermission, serverPermissionLevel, channelPermissionLevel]);
-  const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId] || 'connecting', [memberUserId, webRTC.remoteUserStatusList]);
+  const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId], [memberUserId, webRTC.remoteUserStatusList]);
   const isUser = useMemo(() => memberUserId === userId, [memberUserId, userId]);
   const isSameChannel = useMemo(() => memberCurrentChannelId === userCurrentChannelId, [memberCurrentChannelId, userCurrentChannelId]);
-  const isConnecting = useMemo(() => connectionStatus === 'connecting', [connectionStatus]);
   const isSpeaking = useMemo(() => !!webRTC.volumePercent?.[memberUserId], [memberUserId, webRTC.volumePercent]);
   const isVoiceMuted = useMemo(() => webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds]);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
@@ -83,13 +82,13 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
-    if (!isUser && isSameChannel && isConnecting) return 'loading';
+    if (!isUser && connectionStatus === 'connecting') return 'loading';
     return '';
-  }, [isUser, isSameChannel, isConnecting, isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted]);
+  }, [isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted, connectionStatus, isUser]);
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
-    webRTC.setIsUserMuted(userId, muted);
+    webRTC.setUserMuted(userId, muted);
   };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Permission>) => {
@@ -238,7 +237,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'edit-nickname',
             label: t('edit-nickname'),
-            show: isMember(permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
+            show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
             onClick: () => handleOpenEditNickname(memberUserId, serverId),
           },
           {
@@ -282,7 +281,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'block',
             label: t('block'),
-            show: !isUser && isChannelMod(permissionLevel) && isSuperior,
+            show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
             onClick: () => handleOpenBlockMember(memberUserId, serverId),
           },
           {

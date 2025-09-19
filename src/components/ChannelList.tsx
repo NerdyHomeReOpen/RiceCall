@@ -252,19 +252,21 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
       {currentChannelVoiceMode === 'queue' && (
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
-          <div className={styles['queue-list']}>
-            {filteredQueueMembers.map((queueMember) => (
-              <QueueMemberTab
-                key={queueMember.userId}
-                user={user}
-                friends={friends}
-                queueMember={queueMember}
-                server={server}
-                channel={channel}
-                selectedItemId={selectedItemId}
-                setSelectedItemId={setSelectedItemId}
-              />
-            ))}
+          <div className={styles['scroll-view']} style={{ maxHeight: '120px' }}>
+            <div className={styles['queue-list']}>
+              {filteredQueueMembers.map((queueMember) => (
+                <QueueMemberTab
+                  key={queueMember.userId}
+                  user={user}
+                  friends={friends}
+                  queueMember={queueMember}
+                  server={server}
+                  channel={channel}
+                  selectedItemId={selectedItemId}
+                  setSelectedItemId={setSelectedItemId}
+                />
+              ))}
+            </div>
           </div>
           <div className={styles['saperator-2']} />
         </>
