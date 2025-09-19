@@ -159,6 +159,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       const volumePercent = Math.min(1, volume / 0.5) * 100;
       if (targetId === userId && !isMicTakenRef.current) {
         volumePercentRef.current[targetId] = 0;
+      } else if (targetId === 'system' && !isMicTakenRef.current) {
+        volumePercentRef.current[targetId] = 0;
       } else {
         volumePercentRef.current[targetId] = volumePercent > SPEAKING_VOLUME_THRESHOLD ? volumePercent : 0;
       }
@@ -233,6 +235,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       cancelAnimationFrame(rafIdListRef.current[userId]);
       delete rafIdListRef.current[userId];
     }
+
     if (speakerNodesRef.current[userId]) {
       const { stream, source, gain, analyser } = speakerNodesRef.current[userId];
       if (source) source.disconnect();
@@ -241,6 +244,13 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       if (stream) stream.getTracks().forEach((t) => t.stop());
       delete speakerNodesRef.current[userId];
     }
+
+    delete volumePercentRef.current[userId];
+    setVolumePercent((prev) => {
+      const newState = { ...prev };
+      delete newState[userId];
+      return newState;
+    });
   }, []);
 
   const initSpeakerAudio = useCallback(
@@ -302,6 +312,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       cancelAnimationFrame(rafIdListRef.current[userId]);
       delete rafIdListRef.current[userId];
     }
+
     if (micNodesRef.current) {
       const { stream, source, gain, analyser } = micNodesRef.current;
       if (source) source.disconnect();
@@ -310,6 +321,13 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       if (stream) stream.getTracks().forEach((t) => t.stop());
       micNodesRef.current = { stream: null, source: null, gain: null, analyser: null };
     }
+
+    delete volumePercentRef.current[userId];
+    setVolumePercent((prev) => {
+      const newState = { ...prev };
+      delete newState[userId];
+      return newState;
+    });
   }, [userId]);
 
   const initMicAudio = useCallback(
@@ -360,6 +378,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       cancelAnimationFrame(rafIdListRef.current['system']);
       delete rafIdListRef.current['system'];
     }
+
     if (mixNodesRef.current) {
       const { stream, source, gain, analyser } = mixNodesRef.current;
       if (source) source.disconnect();
@@ -368,6 +387,13 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       if (stream) stream.getTracks().forEach((t) => t.stop());
       mixNodesRef.current = { stream: null, source: null, gain: null, analyser: null };
     }
+
+    delete volumePercentRef.current['system'];
+    setVolumePercent((prev) => {
+      const newState = { ...prev };
+      delete newState['system'];
+      return newState;
+    });
   }, []);
 
   const initMixMode = useCallback(
@@ -509,18 +535,11 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       if (!consumer) return;
 
       const userId = consumer.appData.userId as string;
-      removeSpeakerAudio(userId);
       consumer.close();
       delete consumersRef.current[producerId];
+      removeSpeakerAudio(userId);
 
       setRemoteUserStatusList((prev) => {
-        const newState = { ...prev };
-        delete newState[userId];
-        return newState;
-      });
-
-      delete volumePercentRef.current[userId];
-      setVolumePercent((prev) => {
         const newState = { ...prev };
         delete newState[userId];
         return newState;
