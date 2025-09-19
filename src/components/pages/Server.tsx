@@ -192,6 +192,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   } = channel;
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel), [globalPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
   const queueUser = useMemo(() => queueUsers.find((m) => m.userId === userId), [queueUsers, userId]);
+  const queuePosition = useMemo(() => (queueUser?.position ?? 0) + 1, [queueUser]);
   const channelIsQueueMode = useMemo(() => channelVoiceMode === 'queue', [channelVoiceMode]);
   const channelIsQueueControlled = useMemo(() => queueUsers.some((m) => m.isQueueControlled), [queueUsers]);
   const volumnLevel = useMemo(() => Math.ceil(Math.max(webRTC.volumePercent[userId] || 0, webRTC.volumePercent['system'] || 0) / 10) - 1, [webRTC.volumePercent, userId]);
@@ -208,7 +209,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   const micSubText = useMemo(() => {
     if (isIdling) return '';
-    if (isQueuing) return t('in-queue-position', { '0': queueUser?.position.toString() || '-' });
+    if (isQueuing) return t('in-queue-position', { '0': queuePosition });
     if (channelIsVoiceMuted) return t('mic-forbidden');
     if (isControlled) return t('mic-controlled');
     if (speakMode === 'key' && !webRTC.isSpeakKeyPressed) {
@@ -216,7 +217,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     }
     if (webRTC.micVolume === 0) return t('mic-muted');
     return t('speaking');
-  }, [speakMode, speakHotKey, webRTC.isSpeakKeyPressed, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isControlled, queueUser, t]);
+  }, [speakMode, speakHotKey, webRTC.isSpeakKeyPressed, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isControlled, queuePosition, t]);
 
   const micBtnClass = useMemo(() => {
     let className = styles['mic-button'];
