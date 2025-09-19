@@ -142,7 +142,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               `${t('member-application-management')} (${totalApplications})`,
               `${t('blacklist-management')} (${totalBlockMembers})`,
             ]
-          : [t('server-info'), t('server-announcement')],
+          : isMember(permissionLevel)
+            ? [t('server-info'), t('server-announcement'), t('member-management')]
+            : [t('server-info'), t('server-announcement')],
       [t, totalApplications, totalBlockMembers, permissionLevel],
     );
 
