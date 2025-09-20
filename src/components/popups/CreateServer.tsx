@@ -58,8 +58,9 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
     ipc.socket.send('createServer', { preset });
   };
 
-  const handleOpenErrorDialog = (message: string) => {
-    ipc.popup.open('dialogError', 'errorDialog', { message, submitTo: 'errorDialog' });
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleClose = () => {
@@ -70,7 +71,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
     ipc.popup.open('imageCropper', 'imageCropper', { imageData: imageData, submitTo: 'imageCropper' });
     ipc.popup.onSubmit('imageCropper', async (data) => {
       if (data.imageDataUrl.length > 5 * 1024 * 1024) {
-        handleOpenErrorDialog(t('image-too-large', { '0': '5MB' }));
+        handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
         return;
       }
       const formData = new FormData();

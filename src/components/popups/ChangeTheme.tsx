@@ -232,9 +232,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       const file = e.target.files?.[0];
                       if (!file) return;
                       const reader = new FileReader();
-                      reader.onloadend = async () => {
-                        handleOpenImageCropper(reader.result as string);
-                      };
+                      reader.onloadend = () => handleOpenImageCropper(reader.result as string);
                       reader.readAsDataURL(file);
                     }}
                   />

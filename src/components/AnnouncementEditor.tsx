@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
@@ -9,6 +9,7 @@ import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { UserTag } from '@/extensions/UserTag';
 import { FontSize } from '@/extensions/FontSize';
 import { FontFamily } from '@/extensions/FontFamily';
+import { ImageNode } from '@/extensions/ImageNode';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -21,6 +22,10 @@ import MarkdownContent from '@/components/MarkdownContent';
 // Providers
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useTranslation } from 'react-i18next';
+
+// Services
+import api from '@/services/api.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import { fromTags, toTags } from '@/utils/tagConverter';
@@ -36,11 +41,14 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const editor = useEditor({
-    extensions: [StarterKit, TextStyle, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), FontSize, FontFamily, EmojiNode, YouTubeNode, TwitchNode, KickNode, UserTag],
+    extensions: [StarterKit, TextStyle, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), FontSize, FontFamily, EmojiNode, YouTubeNode, TwitchNode, KickNode, UserTag, ImageNode],
     content: fromTags(announcement),
     onUpdate: ({ editor }) => onChange(toTags(editor.getHTML())),
     immediatelyRender: false,
   });
+
+  // Refs
+  const isUploadingRef = useRef(false);
 
   // States
   const [isBold, setIsBold] = useState(false);
@@ -59,6 +67,30 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     setIsTextAlignCenter(editor?.isActive({ textAlign: 'center' }) || false);
     setIsTextAlignRight(editor?.isActive({ textAlign: 'right' }) || false);
   }, [editor]);
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
+  };
+
+  const handlePaste = async (imageData: string, fileName: string) => {
+    isUploadingRef.current = true;
+    if (imageData.length > 5 * 1024 * 1024) {
+      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      isUploadingRef.current = false;
+      return;
+    }
+    const formData = new FormData();
+    formData.append('_type', 'announcement');
+    formData.append('_fileName', `fileName-${Date.now()}`);
+    formData.append('_file', imageData);
+    const response = await api.post('/upload', formData);
+    if (response) {
+      editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
+      syncStyles();
+    }
+    isUploadingRef.current = false;
+  };
 
   // Effects
   useEffect(() => {
@@ -280,6 +312,20 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
             editor={editor}
             className={`${markdown['setting-markdown-container']} ${markdown['markdown-content']}`}
             style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
+            onPaste={(e) => {
+              e.preventDefault();
+              const items = e.clipboardData.items;
+              for (const item of items) {
+                if (item.type.startsWith('image/')) {
+                  const file = item.getAsFile();
+                  if (file && !isUploadingRef.current) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => handlePaste(reader.result as string, file.name);
+                    reader.readAsDataURL(file);
+                  }
+                }
+              }
+            }}
             maxLength={1000}
           />
         </div>
