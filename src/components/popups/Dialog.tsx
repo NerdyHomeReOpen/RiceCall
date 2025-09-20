@@ -8,6 +8,7 @@ import ipc from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
+import { fromTags } from '@/utils/tagConverter';
 
 enum DIALOG_ICON {
   ALERT = 'alert',
@@ -31,7 +32,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
   const { t } = useTranslation();
 
   // Variables
-  const formattedMessage = t(message, parameter);
+  const formattedMessage = fromTags(t(message, parameter));
 
   // Handlers
   const handleSubmit = () => {
