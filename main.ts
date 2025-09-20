@@ -202,8 +202,6 @@ const ClientToServerEventNames = [
 export const ServerToClientEventNames = [
   'actionMessage',
   'channelAdd',
-  'channelMemberAdd',
-  'channelMemberRemove',
   'channelMemberUpdate',
   'channelMessage',
   'channelRemove',
@@ -238,7 +236,6 @@ export const ServerToClientEventNames = [
   'serverMemberApplicationsSet',
   'serverMemberRemove',
   'serverMemberUpdate',
-  'serverMembersSet',
   'serverOnlineMemberAdd',
   'serverOnlineMemberRemove',
   'serverOnlineMemberUpdate',
