@@ -110,7 +110,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     formData.append('_file', imageData);
     const response = await api.post('/upload', formData);
     if (response) {
-      textareaRef.current!.value += `![${fileName}](${response.avatarUrl})`;
+      textareaRef.current?.focus();
+      document.execCommand('insertText', false, `![${fileName}](${response.avatarUrl})`);
     }
   };
 

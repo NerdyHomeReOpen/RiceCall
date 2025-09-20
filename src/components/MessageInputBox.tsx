@@ -50,7 +50,8 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
     formData.append('_file', imageData);
     const response = await api.post('/upload', formData);
     if (response) {
-      textareaRef.current!.value += `![${fileName}](${response.avatarUrl})`;
+      textareaRef.current?.focus();
+      document.execCommand('insertText', false, `![${fileName}](${response.avatarUrl})`);
     }
     isUploadingRef.current = false;
   };
