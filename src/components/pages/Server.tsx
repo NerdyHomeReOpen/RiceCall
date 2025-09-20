@@ -216,9 +216,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     if (speakMode === 'key' && !webRTC.isSpeakKeyPressed) {
       return t('press-key-to-speak', { '0': speakHotKey });
     }
+    if (webRTC.isMixModeActive) return t('speaking-with-mix');
     if (webRTC.micVolume === 0) return t('mic-muted');
     return t('speaking');
-  }, [speakMode, speakHotKey, webRTC.isSpeakKeyPressed, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isControlled, queuePosition, t]);
+  }, [speakMode, speakHotKey, webRTC.isSpeakKeyPressed, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isControlled, queuePosition, t, webRTC.isMixModeActive]);
 
   const micBtnClass = useMemo(() => {
     let className = styles['mic-button'];
