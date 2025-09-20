@@ -3,6 +3,7 @@ import * as mediasoupClient from 'mediasoup-client';
 
 // Services
 import ipc from '@/services/ipc.service';
+import api from '@/services/api.service';
 
 // Types
 import {
@@ -68,6 +69,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   // Refs
   const rafIdListRef = useRef<{ [userId: string]: number }>({}); // userId -> rAF id
   const lastRefreshRef = useRef<number>(0);
+  const isUploadingRef = useRef<boolean>(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
   const speakerRef = useRef<HTMLAudioElement | null>(null);
@@ -419,6 +421,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       gainNode.gain.value = mixVolumeRef.current / 100;
       const analyserNode = audioContextRef.current.createAnalyser();
 
+      // Connect to recording destination if recording
+      if (isRecordingRef.current) gainNode.connect(recordDesRef.current!);
+
       mixNodesRef.current = { stream: systemStream, source: sourceNode, gain: gainNode, analyser: analyserNode };
 
       sourceNode.connect(gainNode);
@@ -463,9 +468,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     masterGainNodeRef.current?.connect(recordDesRef.current!);
 
     const stream = recordDesRef.current!.stream;
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+    const mimeType = 'audio/webm;codecs=opus';
 
-    const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    const mediaRecorder = new MediaRecorder(stream, { mimeType });
     recorderRef.current = mediaRecorder;
     recordChunksRef.current = [];
 
@@ -473,19 +478,27 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       if (e.data && e.data.size > 0) recordChunksRef.current.push(e.data);
     };
     mediaRecorder.onstop = async () => {
-      const blob = new Blob(recordChunksRef.current, { type: mimeType || 'audio/webm' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      const ts = new Date().toISOString().replace(/[:.]/g, '-');
-      a.href = url;
-      a.download = `ricecall-room-${ts}.webm`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      if (isUploadingRef.current) return;
+      isUploadingRef.current = true;
+      const blob = new Blob(recordChunksRef.current, { type: mimeType });
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const fileName = `ricecall-record-${timestamp}`;
+      const formData = new FormData();
+      formData.append('_file', blob, fileName);
+      formData.append('_fileName', fileName);
+      const response = await api.post('/upload/record', formData);
+      if (response) {
+        const downloadUrl = response.downloadUrl;
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `${fileName}.mp3`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+      isUploadingRef.current = false;
     };
-
-    mediaRecorder.start(1000);
+    mediaRecorder.start();
   }, []);
 
   const stopRecording = useCallback(() => {
@@ -738,7 +751,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   const setMixMode = useCallback(
     (active: boolean) => {
-      if (isMicTakenRef.current) return;
       if (active) startMixMode();
       else removeMixAudio();
       setIsMixModeActive(active);
