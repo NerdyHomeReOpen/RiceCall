@@ -92,6 +92,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
   // Handlers
   const handleBlockUserFromServer = (userId: User['userId'], serverId: Server['serverId'], blockUntil: number) => {
     ipc.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
+    ipc.socket.send('terminateMember', { userId, serverId });
   };
 
   const handleClose = () => {
