@@ -22,7 +22,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
   const { t } = useTranslation();
 
   // States
-  const [blockType, setBlockType] = useState<'block-temporary' | 'block-permanent' | 'blockIP'>('block-temporary');
+  const [blockType, setBlockType] = useState<'block-temporary' | 'block-permanent' | 'block-ip'>('block-temporary');
   const [formatType, setFormatType] = useState<string>('hours');
   const [selectTime, setSelectTime] = useState<number>(1);
 
@@ -34,7 +34,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
     () => [
       { key: 'block-temporary', label: t('block-temporary'), disabled: false },
       { key: 'block-permanent', label: t('block-permanent'), disabled: false },
-      { key: 'blockIP', label: t('block-ip'), disabled: true },
+      { key: 'block-ip', label: t('block-ip'), disabled: true },
     ],
     [t],
   );
@@ -111,7 +111,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>{t('block-type')}</div>
                 <div className={popup['select-box']}>
-                  <select value={blockType} onChange={(e) => setBlockType(e.target.value as 'block-temporary' | 'block-permanent' | 'blockIP')}>
+                  <select value={blockType} onChange={(e) => setBlockType(e.target.value as 'block-temporary' | 'block-permanent' | 'block-ip')}>
                     {BLOCK_TYPE_OPTIONS.map((option) => (
                       <option key={option.key} value={option.key} disabled={option.disabled}>
                         {option.label}
