@@ -32,7 +32,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
   const { t } = useTranslation();
 
   // Variables
-  const formattedMessage = fromTags(t(message, parameter));
+  const formattedMessageContents = fromTags(t(message, parameter));
 
   // Handlers
   const handleSubmit = () => {
@@ -50,7 +50,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup[DIALOG_ICON[iconType]]}`} />
-          {formattedMessage} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
+          {formattedMessageContents} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
         </div>
       </div>
 

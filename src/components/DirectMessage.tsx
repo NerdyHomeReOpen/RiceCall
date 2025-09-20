@@ -29,17 +29,8 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
 
   // Memos
-  const formattedMessageContents = useMemo(
-    () =>
-      messageContents.map((content) =>
-        content
-          .split(' ')
-          .map((msg) => (msg.startsWith('message:') ? t(msg) : msg))
-          .join(' '),
-      ),
-    [messageContents, t],
-  );
   const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
+  const formattedMessageContents = useMemo(() => messageContents.map((content) => (content.startsWith('message:') ? t(content) : content)), [messageContents, t]);
 
   return (
     <div className={styles['message-box']}>

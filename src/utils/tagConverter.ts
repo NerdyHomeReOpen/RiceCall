@@ -21,7 +21,8 @@ const twitchBackRegex = /<iframe[^>]+data-twitch=['"]([^'"]+)['"][^>]*><\/iframe
 const kickBackRegex = /<iframe[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const pTagRegex = /<p><\/p>/g;
 
-export function escapeHtml(str: string) {
+export function escapeHtml(str: unknown) {
+  if (typeof str !== 'string') return str;
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
