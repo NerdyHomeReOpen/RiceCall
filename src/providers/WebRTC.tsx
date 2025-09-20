@@ -833,8 +833,8 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   // Effects
   useEffect(() => {
-    initAudioContext();
     initLocalStorage();
+    initAudioContext();
   }, [initAudioContext, initLocalStorage]);
 
   useEffect(() => {
