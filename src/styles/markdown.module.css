@@ -220,7 +220,8 @@
 }
 
 .user-name {
-  display: inline-block;
+  display: inline-block !important;
+  word-break: break-all !important;
   color: #226ba0;
   cursor: pointer;
   white-space: pre-wrap;
@@ -230,8 +231,8 @@
 }
 
 .user-icon {
-  display: inline-block;
-  vertical-align: text-bottom;
+  display: inline-block !important;
+  word-break: break-all !important;
 }
 
 .embed-video {

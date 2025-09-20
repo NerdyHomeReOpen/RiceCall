@@ -6,27 +6,33 @@ import markdown from '@/styles/markdown.module.css';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
-    embed: {
-      insertEmbed: (src: string) => ReturnType;
+    yt: {
+      insertYouTube: (videoId: string) => ReturnType;
+    };
+    tw: {
+      insertTwitch: (channel: string) => ReturnType;
+    };
+    kick: {
+      insertKick: (username: string) => ReturnType;
     };
   }
 }
 
-export const EmbedNode = Node.create({
-  name: 'embed',
+export const YouTubeNode = Node.create({
+  name: 'yt',
   group: 'block',
   atom: true,
 
   addAttributes() {
-    return { src: {} };
+    return { videoId: {} };
   },
 
   parseHTML() {
     return [
       {
-        tag: 'iframe[data-embed]',
+        tag: 'iframe[data-yt]',
         getAttrs: (el) => ({
-          src: (el as HTMLElement).dataset.embed,
+          videoId: (el as HTMLElement).dataset.yt,
         }),
       },
     ];
@@ -36,8 +42,8 @@ export const EmbedNode = Node.create({
     return [
       'iframe',
       {
-        'src': node.attrs.src,
-        'data-embed': node.attrs.src,
+        'src': `https://www.youtube.com/embed/${node.attrs.videoId}`,
+        'data-yt': node.attrs.videoId,
         'allowfullscreen': 'true',
         'class': `${markdown['embed-video']}`,
       },
@@ -46,11 +52,88 @@ export const EmbedNode = Node.create({
 
   addCommands() {
     return {
-      insertEmbed:
-        (src) =>
+      insertYouTube:
+        (videoId) =>
         ({ chain }) =>
           chain()
-            .insertContent({ type: this.name, attrs: { src: src } })
+            .insertContent({ type: this.name, attrs: { videoId: videoId } })
+            .run(),
+    };
+  },
+});
+
+export const TwitchNode = Node.create({
+  name: 'tw',
+  group: 'block',
+  atom: true,
+
+  addAttributes() {
+    return { channel: {} };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'iframe[data-tw]',
+        getAttrs: (el) => ({
+          channel: (el as HTMLElement).dataset.tw,
+        }),
+      },
+    ];
+  },
+
+  renderHTML({ node }) {
+    return [
+      'iframe',
+      {
+        'src': `https://player.twitch.tv/?channel=${node.attrs.channel}&autoplay=true&parent=localhost`,
+        'data-tw': node.attrs.channel,
+        'allowfullscreen': 'true',
+        'class': `${markdown['embed-video']}`,
+      },
+    ];
+  },
+
+  addCommands() {
+    return {
+      insertTwitch:
+        (channel) =>
+        ({ chain }) =>
+          chain()
+            .insertContent({ type: this.name, attrs: { channel: channel } })
+            .run(),
+    };
+  },
+});
+
+export const KickNode = Node.create({
+  name: 'kick',
+  group: 'block',
+  atom: true,
+
+  addAttributes() {
+    return { username: {} };
+  },
+
+  renderHTML({ node }) {
+    return [
+      'iframe',
+      {
+        'src': `https://player.kick.com/${node.attrs.username}`,
+        'data-kick': node.attrs.username,
+        'allowfullscreen': 'true',
+        'class': `${markdown['embed-video']}`,
+      },
+    ];
+  },
+
+  addCommands() {
+    return {
+      insertKick:
+        (username) =>
+        ({ chain }) =>
+          chain()
+            .insertContent({ type: this.name, attrs: { username: username } })
             .run(),
     };
   },

@@ -5,9 +5,8 @@ import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { EmojiNode } from '@/extensions/EmojiNode';
-import { EmbedNode } from '@/extensions/EmbedNode';
-import { UserName } from '@/extensions/UserName';
-import { UserIcon } from '@/extensions/UserIcon';
+import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
+import { UserTag } from '@/extensions/UserTag';
 import { FontSize } from '@/extensions/FontSize';
 import { FontFamily } from '@/extensions/FontFamily';
 
@@ -37,7 +36,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const editor = useEditor({
-    extensions: [StarterKit, TextStyle, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), FontSize, FontFamily, EmojiNode, EmbedNode, UserName, UserIcon],
+    extensions: [StarterKit, TextStyle, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), FontSize, FontFamily, EmojiNode, YouTubeNode, TwitchNode, KickNode, UserTag],
     content: fromTags(announcement),
     onUpdate: ({ editor }) => onChange(toTags(editor.getHTML())),
     immediatelyRender: false,
@@ -224,10 +223,10 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 const x = e.currentTarget.getBoundingClientRect().left;
                 const y = e.currentTarget.getBoundingClientRect().bottom;
                 contextMenu.showUserTagInput(x, y, 'right-bottom', (username) => {
+                  console.log(username);
                   editor
                     ?.chain()
-                    .insertUserIcon({ gender: 'Male', level: '2' })
-                    .insertUserName({ name: username || 'Unknown' })
+                    .insertUserTag({ name: username || 'Unknown' })
                     .focus()
                     .run();
                   syncStyles();
@@ -251,23 +250,20 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                   const isKick = linkUrl.trim().includes('kick.com/');
                   if (isYouTube) {
                     const videoId = linkUrl.trim().split('/watch?v=')[1].split('&')[0];
-                    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
                     if (videoId && videoId.match(/^[\w-]+$/)) {
-                      editor?.chain().insertEmbed(src).focus().run();
+                      editor?.chain().insertYouTube(videoId).focus().run();
                       syncStyles();
                     }
                   } else if (isTwitch) {
                     const username = linkUrl.trim().split('twitch.tv/')[1].split('&')[0];
-                    const src = `https://player.twitch.tv/?channel=${username}&autoplay=true&parent=localhost`;
                     if (username && username.match(/^[\w-]+$/)) {
-                      editor?.chain().insertEmbed(src).focus().run();
+                      editor?.chain().insertTwitch(username).focus().run();
                       syncStyles();
                     }
                   } else if (isKick) {
                     const username = linkUrl.trim().split('kick.com/')[1].split('&')[0];
-                    const src = `https://player.kick.com/${username}`;
                     if (username && username.match(/^[\w-]+$/)) {
-                      editor?.chain().insertEmbed(src).focus().run();
+                      editor?.chain().insertKick(username).focus().run();
                       syncStyles();
                     }
                   }
