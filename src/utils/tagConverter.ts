@@ -7,11 +7,11 @@ import permission from '@/styles/permission.module.css';
 
 /* ---------- forward  ---------- */
 const emojiRegex = /(?<![a-zA-Z0-9]):([^:]+):(?![a-zA-Z0-9])/g; // :code:
-const userTagRegex = /<@(.+?)>/g; // <@name>
+const userTagRegex = /<@(.+?)(-(\d+))?(-(\w+))?>/g; // <@name-level-gender> // level and gender are optional
 const ytRegex = /<&YT&(.+?)>/g; // <&YT&dQw4w9WgXcQ>
 const twitchRegex = /<&TW&(.+?)>/g; // <&TW&dQw4w9WgXcQ>
 const kickRegex = /<&KICK&(.+?)>/g; // <&KICK&dQw4w9WgXcQ>
-const discordTimestampRegex = /&lt;t:(\d+):([A-Z])&gt;/g; // <t:timestamp:F>
+const discordTimestampRegex = /<t:(\d+):([A-Z])>/g; // <t:timestamp:F>
 
 /* ---------- reverse ---------- */
 const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
@@ -39,8 +39,8 @@ export const fromTags = (raw: string) =>
       return `<img data-emoji='${code}' class='${markdown['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
     })
     // User Tag
-    .replace(userTagRegex, (_, tag) => {
-      return `<span data-name='${tag}'><span class='${markdown['user-icon']} ${permission['Male']} ${permission[`lv-2`]}'></span><span class='${markdown['user-name']}'>${tag}</span></span>`;
+    .replace(userTagRegex, (_, tag, _level, level = '2', _gender, gender = 'Male') => {
+      return `<span data-name='${tag}'><span class='${markdown['user-icon']} ${permission[gender]} ${permission[`lv-${level}`]}'></span><span class='${markdown['user-name']}'>${tag}</span></span>`;
     })
     // YouTube
     .replace(ytRegex, (_, videoId) => {

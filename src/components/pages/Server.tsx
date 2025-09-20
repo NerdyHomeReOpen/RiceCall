@@ -23,6 +23,7 @@ import ipc from '@/services/ipc.service';
 
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
+import { escapeHtml } from '@/utils/tagConverter';
 
 interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
@@ -468,7 +469,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                   channelGuestTextWaitTime={channelGuestTextWaitTime}
                   channelGuestTextMaxLength={channelGuestTextMaxLength}
                   channelIsTextMuted={channelIsTextMuted}
-                  onSend={(msg) => handleSendMessage(serverId, channelId, { type: 'general', content: msg })}
+                  onSend={(message) => handleSendMessage(serverId, channelId, { type: 'general', content: escapeHtml(message) })}
                 />
               </div>
             </div>

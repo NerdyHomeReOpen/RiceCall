@@ -22,6 +22,9 @@ import styles from '@/styles/popups/directMessage.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 
+// Utils
+import { escapeHtml } from '@/utils/tagConverter';
+
 interface DirectMessagePopupProps {
   userId: User['userId'];
   targetId: User['userId'];
@@ -328,7 +331,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 if (value.length > MAX_LENGTH) return;
                 if (isComposingRef.current) return;
                 textareaRef.current!.value = '';
-                handleSendMessage(targetId, { type: 'dm', content: value });
+                handleSendMessage(targetId, { type: 'dm', content: escapeHtml(value) });
               }}
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={() => (isComposingRef.current = false)}
