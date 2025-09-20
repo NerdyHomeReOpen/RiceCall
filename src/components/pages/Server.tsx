@@ -353,6 +353,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   useEffect(() => {
     webRTCRef.current.setMicTaken(isSpeaking && !isControlled, channelId);
+    webRTCRef.current.setMixMode(false);
   }, [isSpeaking, isControlled, channelId]);
 
   useEffect(() => {

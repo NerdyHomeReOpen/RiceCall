@@ -22,6 +22,7 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 interface WebRTCContextType {
   setUserMuted: (userId: string, muted: boolean) => void;
   setMicTaken: (taken: boolean, channelId: string) => void;
+  setMixMode: (active: boolean) => void;
   setSpeakKeyPressed: (pressed: boolean) => void;
   toggleMixMode: () => void;
   toggleRecording: () => void;
@@ -735,7 +736,19 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     [setupSend, closeSend],
   );
 
+  const setMixMode = useCallback(
+    (active: boolean) => {
+      if (isMicTakenRef.current) return;
+      if (active) startMixMode();
+      else removeMixAudio();
+      setIsMixModeActive(active);
+      isMixModeActiveRef.current = active;
+    },
+    [startMixMode, removeMixAudio],
+  );
+
   const toggleMixMode = useCallback(() => {
+    if (!isMicTakenRef.current) return;
     if (isMixModeActiveRef.current) removeMixAudio();
     else startMixMode();
     setIsMixModeActive(!isMixModeActiveRef.current);
@@ -859,6 +872,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       value={{
         setUserMuted,
         setMicTaken,
+        setMixMode,
         setSpeakKeyPressed,
         toggleMixMode,
         toggleRecording,
