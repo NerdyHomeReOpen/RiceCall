@@ -313,7 +313,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
             className={`${markdown['setting-markdown-container']} ${markdown['markdown-content']}`}
             style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
             onPaste={(e) => {
-              e.preventDefault();
               const items = e.clipboardData.items;
               for (const item of items) {
                 if (item.type.startsWith('image/')) {

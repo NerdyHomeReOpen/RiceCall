@@ -91,7 +91,6 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
           onSend?.(value);
         }}
         onPaste={(e) => {
-          e.preventDefault();
           const items = e.clipboardData.items;
           for (const item of items) {
             if (item.type.startsWith('image/')) {

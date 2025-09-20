@@ -307,7 +307,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               maxLength={MAX_LENGTH}
               className={styles['input']}
               onPaste={(e) => {
-                e.preventDefault();
                 const items = e.clipboardData.items;
                 for (const item of items) {
                   if (item.type.startsWith('image/')) {
