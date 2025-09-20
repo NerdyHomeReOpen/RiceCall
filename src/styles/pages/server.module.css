@@ -571,6 +571,7 @@
   background-size: auto;
   background-position: 0 2px;
   cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .mic-button.normal {
@@ -652,14 +653,12 @@
 }
 
 .mic-text {
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 1.1rem;
   color: #2594ca;
 }
 
 .mic-sub-text {
-  margin-top: 2px;
-  font-size: 11px;
+  font-size: 12px;
   color: #777;
 }
 
