@@ -29,6 +29,7 @@ export const countries = [
   'cambodia',
   'cameroon',
   'canada',
+  'catalonia',
   'central-african-republic',
   'chad',
   'channel-islands',
