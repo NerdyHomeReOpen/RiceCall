@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/pages/friend.module.css';
@@ -38,9 +38,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
   const contextMenu = useContextMenu();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
-
-  // Refs
-  const refreshed = useRef(false);
 
   // States
   const [friendServer, setFriendServer] = useState<Server>(Default.server());
@@ -127,11 +124,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
 
   // Effects
   useEffect(() => {
-    if (refreshed.current || !targetId || !friendCurrentServerId || friendIsBlocked || !isFriend) return;
+    if (!targetId || !friendCurrentServerId || friendIsBlocked || !isFriend) return;
     data.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
       if (server) setFriendServer(server);
     });
-    refreshed.current = true;
   }, [targetId, friendCurrentServerId, friendIsBlocked, isFriend]);
 
   return (
