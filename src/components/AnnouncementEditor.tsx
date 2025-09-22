@@ -3,12 +3,10 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
-import { TextStyle } from '@tiptap/extension-text-style';
+import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 import { EmojiNode } from '@/extensions/EmojiNode';
 import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { UserTag } from '@/extensions/UserTag';
-import { FontSize } from '@/extensions/FontSize';
-import { FontFamily } from '@/extensions/FontFamily';
 import { ImageNode } from '@/extensions/ImageNode';
 
 // CSS
@@ -30,6 +28,9 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { fromTags, toTags } from '@/utils/tagConverter';
 
+// Fonts
+import { fontList } from '@/font';
+
 interface AnnouncementEditorProps {
   announcement: string;
   showPreview?: boolean;
@@ -41,7 +42,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const editor = useEditor({
-    extensions: [StarterKit, TextStyle, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), FontSize, FontFamily, EmojiNode, YouTubeNode, TwitchNode, KickNode, UserTag, ImageNode],
+    extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, UserTag, ImageNode],
     content: fromTags(announcement),
     onUpdate: ({ editor }) => onChange(toTags(editor.getHTML())),
     immediatelyRender: false,
@@ -57,6 +58,8 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const [isTextAlignLeft, setIsTextAlignLeft] = useState(false);
   const [isTextAlignCenter, setIsTextAlignCenter] = useState(false);
   const [isTextAlignRight, setIsTextAlignRight] = useState(false);
+  const [fontSize, setFontSize] = useState('13px');
+  const [fontFamily, setFontFamily] = useState('Arial');
 
   // Handlers
   const syncStyles = useCallback(() => {
@@ -66,6 +69,8 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     setIsTextAlignLeft(editor?.isActive({ textAlign: 'left' }) || false);
     setIsTextAlignCenter(editor?.isActive({ textAlign: 'center' }) || false);
     setIsTextAlignRight(editor?.isActive({ textAlign: 'right' }) || false);
+    setFontSize(editor?.getAttributes('textStyle').fontSize || '13px');
+    setFontFamily(editor?.getAttributes('textStyle').fontFamily || 'Arial');
   }, [editor]);
 
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
@@ -105,22 +110,30 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
           {/* Toolbar */}
           <div className={setting['toolbar']}>
             <div className={popup['select-box']}>
-              <select onChange={(e) => editor?.chain().setMark('textStyle', { fontFamily: e.target.value }).focus().run()}>
-                <option value="" disabled>
-                  {t('font')}
-                </option>
-                <option value="Arial">Arial</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Courier New">Courier New</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Georgia">Georgia</option>
+              <select
+                value={fontFamily}
+                onChange={(e) => {
+                  editor?.chain().setFontFamily(e.target.value).focus().run();
+                  setFontFamily(e.target.value);
+                  syncStyles();
+                }}
+              >
+                {fontList.map((font) => (
+                  <option key={font.value} value={font.value}>
+                    {font.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className={popup['select-box']}>
-              <select onChange={(e) => editor?.chain().setMark('textStyle', { fontSize: e.target.value }).focus().run()}>
-                <option value="" disabled>
-                  {t('font-size')}
-                </option>
+              <select
+                value={fontSize}
+                onChange={(e) => {
+                  editor?.chain().setFontSize(e.target.value).focus().run();
+                  setFontSize(e.target.value);
+                  syncStyles();
+                }}
+              >
                 {Array.from({ length: 17 }, (_, i) => (
                   <option key={i} value={`${i + 8}px`}>
                     {i + 8}px
