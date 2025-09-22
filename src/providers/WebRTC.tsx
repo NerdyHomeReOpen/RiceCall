@@ -139,7 +139,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const volumePercentRef = useRef<{ [userId: string]: number }>({});
   const [volumePercent, setVolumePercent] = useState<{ [userId: string]: number }>({});
 
-  const detectSpeaking = useCallback((targetId: string | 'user', analyserNode: AnalyserNode, dataArray: Uint8Array) => {
+  const detectSpeaking = useCallback((targetId: string | 'user', analyserNode: AnalyserNode, dataArray: Uint8Array<ArrayBuffer>) => {
     analyserNode.getByteTimeDomainData(dataArray);
     let sum = 0;
     for (let i = 0; i < dataArray.length; i++) {
@@ -301,7 +301,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
       // Initialize analyser
       analyserNode.fftSize = 2048;
-      const dataArray = new Uint8Array(analyserNode.fftSize);
+      const dataArray = new Uint8Array(analyserNode.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking(userId, analyserNode, dataArray);
 
       // Create audio element to force stream to play
@@ -359,7 +359,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       gainNode.connect(inputAnalyserRef.current);
 
       // Start speaking detection
-      const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize);
+      const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking('user', inputAnalyserRef.current, dataArray);
 
       // Replace track
@@ -412,7 +412,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       if (isRecordingRef.current) gainNode.connect(recordDesRef.current!);
 
       // Start speaking detection
-      const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize);
+      const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking('system', inputAnalyserRef.current, dataArray);
     },
     [initAudioContext, removeMixAudio, detectSpeaking],
