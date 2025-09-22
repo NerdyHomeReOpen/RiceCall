@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
@@ -28,9 +28,6 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { fromTags, toTags } from '@/utils/tagConverter';
 
-// Fonts
-import { fontList } from '@/font';
-
 interface AnnouncementEditorProps {
   announcement: string;
   showPreview?: boolean;
@@ -50,6 +47,22 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   // Refs
   const isUploadingRef = useRef(false);
+
+  // Memos
+  const FONT_LIST = useMemo(
+    () => [
+      { label: 'Arial', value: 'Arial, sans-serif' },
+      { label: 'Times New Roman', value: '"Times New Roman", serif' },
+      { label: 'Georgia', value: 'Georgia, serif' },
+      { label: 'Verdana', value: 'Verdana, sans-serif' },
+      { label: 'Courier New', value: '"Courier New", monospace' },
+      { label: '微軟正黑體', value: '"Microsoft JhengHei", sans-serif' },
+      { label: '微軟雅黑', value: '"Microsoft YaHei", sans-serif' },
+      { label: 'PingFang TC', value: '"PingFang TC", sans-serif' },
+      { label: 'Noto Sans TC', value: '"Noto Sans TC", sans-serif' },
+    ],
+    [],
+  );
 
   // States
   const [isBold, setIsBold] = useState(false);
@@ -118,7 +131,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                   syncStyles();
                 }}
               >
-                {fontList.map((font) => (
+                {FONT_LIST.map((font) => (
                   <option key={font.value} value={font.value}>
                     {font.label}
                   </option>
