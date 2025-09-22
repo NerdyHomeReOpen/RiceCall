@@ -199,7 +199,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const channelIsQueueMode = useMemo(() => channelVoiceMode === 'queue', [channelVoiceMode]);
   const channelIsQueueControlled = useMemo(() => queueUsers.some((m) => m.isQueueControlled), [queueUsers]);
   const volumeLevel = useMemo(() => (webRTC.isSpeaking('user') ? Math.ceil(webRTC.getVolumePercent('user') / 10) - 1 : 0), [webRTC]);
-  const isMicTaken = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position === 0), [queueUsers, userId]);
+  const isMicTaken = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position <= 0), [queueUsers, userId]);
   const isQueuing = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position > 0), [queueUsers, userId]);
   const isIdling = useMemo(() => !isMicTaken && !isQueuing, [isMicTaken, isQueuing]);
   const isControlled = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position === 0 && !isChannelMod(permissionLevel) && m.isQueueControlled), [queueUsers, userId, permissionLevel]);
