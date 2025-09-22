@@ -47,12 +47,12 @@
 }
 
 .markdown-content blockquote {
-  padding: 0.125rem;
-  padding-left: 1rem;
+  margin: 4px 0;
+  padding: 0 8px 0 12px;
+  text-indent: 0;
   color: #4f545c;
   border-left: 4px solid #00000020;
   border-radius: 0 4px 4px 0;
-  background: #00000005;
 }
 
 /* inline code */

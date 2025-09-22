@@ -23,7 +23,13 @@ const pTagRegex = /<p><\/p>/g;
 
 export function escapeHtml(str: unknown): string {
   if (typeof str !== 'string') return str as string;
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+    .replace(/(^|\n)&gt;\s/g, '$1> ');
 }
 
 export const fromTags = (raw: string) =>
