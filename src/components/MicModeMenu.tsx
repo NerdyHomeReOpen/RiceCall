@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 // CSS
 import server from '@/styles/pages/server.module.css';
@@ -18,8 +18,6 @@ const MicModeMenu: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
   const webRTC = useWebRTC();
-
-  // States
 
   // Memos
   const volumePercent = webRTC.getVolumePercent('user');

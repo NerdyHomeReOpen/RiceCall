@@ -1,0 +1,10 @@
+{
+  "update-available": "有新版本可用",
+  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，正在開始下載...",
+  "update-downloaded": "安裝更新",
+  "update-downloaded-message": "版本 {{version}} 已下載完成，請點擊立即安裝按鈕進行安裝",
+  "install-update": "立即安裝",
+  "open-main-window": "打開主視窗pt-BR",
+  "logout": "登出pt-BR",
+  "exit": "退出pt-BR"
+}

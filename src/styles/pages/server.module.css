@@ -1041,7 +1041,9 @@
 }
 
 .mic-volume-container:has(.mic-btn:hover) .volume-slider,
-.speaker-volume-container:has(.speaker-btn:hover) .volume-slider {
+.mic-volume-container:has(.volume-slider:hover) .volume-slider,
+.speaker-volume-container:has(.speaker-btn:hover) .volume-slider,
+.speaker-volume-container:has(.volume-slider:hover) .volume-slider {
   display: flex;
 }
 
