@@ -24,6 +24,7 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
 import { escapeHtml } from '@/utils/tagConverter';
+import MicModeMenu from '@/components/MicModeMenu';
 
 interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
@@ -167,11 +168,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   // States
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
-  const [speakMode, setSpeakMode] = useState<SpeakingMode>('key');
-  const [speakHotKey, setSpeakHotKey] = useState<string>('');
+  const [speakingMode, setSpeakingMode] = useState<SpeakingMode>('key');
+  const [speakingKey, setSpeakingKey] = useState<string>('');
   const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
   const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
+  const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
 
   // Variables
   const { userId, permissionLevel: globalPermissionLevel } = user;
@@ -196,39 +198,39 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const queuePosition = useMemo(() => (queueUser?.position ?? 0) + 1, [queueUser]);
   const channelIsQueueMode = useMemo(() => channelVoiceMode === 'queue', [channelVoiceMode]);
   const channelIsQueueControlled = useMemo(() => queueUsers.some((m) => m.isQueueControlled), [queueUsers]);
-  const volumnLevel = useMemo(() => Math.ceil(Math.max(webRTC.volumePercent[userId] || 0, webRTC.volumePercent['system'] || 0) / 10) - 1, [webRTC.volumePercent, userId]);
-  const isSpeaking = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position <= 0), [queueUsers, userId]);
+  const volumeLevel = useMemo(() => (webRTC.isSpeaking('user') ? Math.ceil(webRTC.getVolumePercent('user') / 10) - 1 : 0), [webRTC]);
+  const isMicTaken = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position === 0), [queueUsers, userId]);
   const isQueuing = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position > 0), [queueUsers, userId]);
-  const isIdling = useMemo(() => !isSpeaking && !isQueuing, [isSpeaking, isQueuing]);
+  const isIdling = useMemo(() => !isMicTaken && !isQueuing, [isMicTaken, isQueuing]);
   const isControlled = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position === 0 && !isChannelMod(permissionLevel) && m.isQueueControlled), [queueUsers, userId, permissionLevel]);
 
   const micText = useMemo(() => {
-    if (isSpeaking) return t('mic-taken');
+    if (isMicTaken) return t('mic-taken');
     if (isQueuing) return t('mic-queued');
     return t('take-mic');
-  }, [isSpeaking, isQueuing, t]);
+  }, [isMicTaken, isQueuing, t]);
 
   const micSubText = useMemo(() => {
     if (isIdling) return '';
     if (isQueuing) return t('in-queue-position', { '0': queuePosition });
     if (channelIsVoiceMuted) return t('mic-forbidden');
     if (isControlled) return t('mic-controlled');
-    if (speakMode === 'key' && !webRTC.isSpeakKeyPressed) {
-      return t('press-key-to-speak', { '0': speakHotKey });
+    if (speakingMode === 'key' && !webRTC.isSpeakKeyPressed) {
+      return t('press-key-to-speak', { '0': speakingKey });
     }
     if (webRTC.isMixModeActive) return t('speaking-with-mix');
     if (webRTC.micVolume === 0) return t('mic-muted');
     return t('speaking');
-  }, [speakMode, speakHotKey, webRTC.isSpeakKeyPressed, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isControlled, queuePosition, t, webRTC.isMixModeActive]);
+  }, [speakingMode, speakingKey, webRTC.isSpeakKeyPressed, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isControlled, queuePosition, t, webRTC.isMixModeActive]);
 
   const micBtnClass = useMemo(() => {
     let className = styles['mic-button'];
-    if (isSpeaking) className += ` ${styles['speaking']}`;
+    if (isMicTaken) className += ` ${styles['speaking']}`;
     if (isQueuing) className += ` ${styles['queuing']}`;
     if (channelIsVoiceMuted || isControlled) className += ` ${styles['muted']}`;
     if (!channelIsQueueMode || (!isChannelMod(permissionLevel) && isIdling)) className += ` ${styles['no-selection']}`;
     return className;
-  }, [isSpeaking, isQueuing, channelIsVoiceMuted, isControlled, channelIsQueueMode, permissionLevel, isIdling]);
+  }, [isMicTaken, isQueuing, channelIsVoiceMuted, isControlled, channelIsQueueMode, permissionLevel, isIdling]);
 
   // Handlers
   const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
@@ -314,7 +316,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
         handleJoinQueue(serverId, channelId);
       }
     } else {
-      if (isSpeaking) {
+      if (isMicTaken) {
         handleLeaveQueue(serverId, channelId);
       } else {
         handleJoinQueue(serverId, channelId);
@@ -352,9 +354,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   }, [channelBitrate]);
 
   useEffect(() => {
-    webRTCRef.current.setMicTaken(isSpeaking && !isControlled, channelId);
+    webRTCRef.current.setMicTaken(isMicTaken && !isControlled, channelId);
     webRTCRef.current.setMixMode(false);
-  }, [isSpeaking, isControlled, channelId]);
+  }, [isMicTaken, isControlled, channelId]);
 
   useEffect(() => {
     if (actionMessages.length === 0) {
@@ -389,6 +391,16 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   }, []);
 
   useEffect(() => {
+    const onPointerDown = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest(`.${styles['mic-mode-menu']}`)) {
+        setIsMicModeMenuVisible(false);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, []);
+
+  useEffect(() => {
     if (channelUIMode === 'classic') {
       annAreaRef.current!.style.minWidth = '100%';
       annAreaRef.current!.style.minHeight = '60px';
@@ -400,12 +412,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: SpeakingMode) => {
-      console.info('[ServerPage] speak mode updated: ', speakingMode);
-      setSpeakMode(speakingMode);
+      console.info('[ServerPage] speaking mode updated: ', speakingMode);
+      setSpeakingMode(speakingMode);
     };
-    const changeDefaultSpeakingKey = (key: string) => {
-      console.info('[ServerPage] default speaking key updated: ', key);
-      setSpeakHotKey(key);
+    const changeSpeakingKey = (key: string) => {
+      console.info('[ServerPage] speaking key updated: ', key);
+      setSpeakingKey(key);
     };
     const changeChannelUIMode = (channelUIMode: ChannelUIMode) => {
       console.info('[ServerPage] channel UI mode updated: ', channelUIMode);
@@ -413,12 +425,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     };
 
     changeSpeakingMode(ipc.systemSettings.speakingMode.get());
-    changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
+    changeSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
     changeChannelUIMode(ipc.systemSettings.channelUIMode.get());
 
     const unsubscribe = [
       ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode),
-      ipc.systemSettings.defaultSpeakingKey.onUpdate(changeDefaultSpeakingKey),
+      ipc.systemSettings.defaultSpeakingKey.onUpdate(changeSpeakingKey),
       ipc.systemSettings.channelUIMode.onUpdate(changeChannelUIMode),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
@@ -529,7 +541,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
             </div>
             <div className={micBtnClass} onClick={handleClickMicButton}>
-              <div className={`${styles['mic-icon']} ${volumnLevel ? styles[`level${volumnLevel}`] : ''}`} />
+              <div className={`${styles['mic-icon']} ${isMicTaken ? styles[`level${volumeLevel}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className={styles['mic-text']} style={{ fontSize: isIdling ? '1.3rem' : '1.1rem' }}>
                   {micText}
@@ -547,15 +559,18 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
               </div>
               <div className={styles['saperator-1']} />
               <div className={styles['mic-volume-container']}>
-                <div className={`${styles['mic-mode-btn']} ${webRTC.isMicMuted || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} />
+                <div className={`${styles['mic-btn']} ${webRTC.isMicMuted || webRTC.micVolume === 0 ? styles['muted'] : styles['active']}`} />
                 <VolumeSlider
                   value={webRTC.micVolume}
                   muted={webRTC.isMicMuted || webRTC.micVolume === 0}
                   onChange={handleEditMicVolume}
                   onToggleMute={handleToggleMicMute}
                   railCls={styles['volume-slider']}
-                  btnCls={styles['mic-mode-btn']}
+                  btnCls={styles['mic-btn']}
                 />
+                <div className={styles['mic-mode-dropdown-btn']} onClick={() => setIsMicModeMenuVisible(true)}>
+                  {isMicModeMenuVisible ? <MicModeMenu /> : ''}
+                </div>
               </div>
               <div className={styles['speaker-volume-container']}>
                 <div className={`${styles['speaker-btn']} ${webRTC.speakerVolume === 0 ? styles['muted'] : ''}`} />

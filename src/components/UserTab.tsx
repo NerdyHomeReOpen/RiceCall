@@ -67,24 +67,22 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
   const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel, voiceMode: channelVoiceMode } = channel;
   const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId } = server;
 
-  // Memos
-  const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel), [globalPermission, serverPermissionLevel, channelPermissionLevel]);
-  const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId], [memberUserId, webRTC.remoteUserStatusList]);
-  const isUser = useMemo(() => memberUserId === userId, [memberUserId, userId]);
-  const isSameChannel = useMemo(() => memberCurrentChannelId === userCurrentChannelId, [memberCurrentChannelId, userCurrentChannelId]);
-  const isSpeaking = useMemo(() => !!webRTC.volumePercent[memberUserId] || (isUser && !!webRTC.volumePercent['system']), [memberUserId, webRTC.volumePercent, isUser]);
-  const isVoiceMuted = useMemo(() => webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds]);
-  const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
-  const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
-  const canUpdatePermission = useMemo(() => !isUser && isSuperior && isMember(memberPermission), [memberPermission, isUser, isSuperior]);
+  // Variables
+  const permissionLevel = Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel);
+  const isUser = memberUserId === userId;
+  const isSameChannel = memberCurrentChannelId === userCurrentChannelId;
+  const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
+  const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
+  const isFriend = friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2);
+  const isSuperior = permissionLevel > memberPermission;
+  const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
 
   const statusIcon = useMemo(() => {
-    if (isVoiceMuted || memberIsVoiceMuted) return 'muted';
+    if (isMuted || memberIsVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
-    if (!isUser && connectionStatus === 'connecting') return 'loading';
     return '';
-  }, [isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted, connectionStatus, isUser]);
+  }, [isSpeaking, memberIsTextMuted, isMuted, memberIsVoiceMuted]);
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
@@ -230,9 +228,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           },
           {
             id: 'set-mute',
-            label: isVoiceMuted ? t('unmute') : t('mute'),
+            label: isMuted ? t('unmute') : t('mute'),
             show: !isUser,
-            onClick: () => handleSetIsUserMuted(memberUserId, !isVoiceMuted),
+            onClick: () => handleSetIsUserMuted(memberUserId, !isMuted),
           },
           {
             id: 'edit-nickname',
@@ -345,7 +343,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         ]);
       }}
     >
-      <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} title={!isUser ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
+      <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>

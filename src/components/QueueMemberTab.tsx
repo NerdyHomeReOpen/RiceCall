@@ -62,24 +62,22 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
   const { serverId, lobbyId: serverLobbyId, permissionLevel: serverPermission } = server;
   const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermission } = channel;
 
-  // Memos
-  const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermission, channelPermission), [globalPermission, serverPermission, channelPermission]);
-  const connectionStatus = useMemo(() => webRTC.remoteUserStatusList?.[memberUserId], [memberUserId, webRTC.remoteUserStatusList]);
-  const isUser = useMemo(() => memberUserId === userId, [memberUserId, userId]);
-  const isSpeaking = useMemo(() => !!webRTC.volumePercent[memberUserId] || (isUser && !!webRTC.volumePercent['system']), [memberUserId, webRTC.volumePercent, isUser]);
-  const isVoiceMuted = useMemo(() => webRTC.volumePercent?.[memberUserId] === -1 || webRTC.mutedIds.includes(memberUserId), [memberUserId, webRTC.mutedIds, webRTC.volumePercent]);
-  const isControlled = useMemo(() => memberPosition === 0 && memberIsQueueControlled && !isChannelMod(memberPermission), [memberPosition, memberIsQueueControlled, memberPermission]);
-  const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
-  const isSuperior = useMemo(() => permissionLevel > memberPermission, [permissionLevel, memberPermission]);
-  const canUpdatePermission = useMemo(() => !isUser && isSuperior && isMember(memberPermission), [memberPermission, isUser, isSuperior]);
+  // Variables
+  const permissionLevel = Math.max(globalPermission, serverPermission, channelPermission);
+  const isUser = memberUserId === userId;
+  const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
+  const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
+  const isControlled = memberPosition === 0 && memberIsQueueControlled && !isChannelMod(memberPermission);
+  const isFriend = friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2);
+  const isSuperior = permissionLevel > memberPermission;
+  const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
 
   const statusIcon = useMemo(() => {
-    if (isVoiceMuted || memberIsVoiceMuted || isControlled) return 'muted';
+    if (isMuted || memberIsVoiceMuted || isControlled) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
-    if (!isUser && connectionStatus === 'connecting') return 'loading';
     return '';
-  }, [isSpeaking, memberIsTextMuted, isVoiceMuted, memberIsVoiceMuted, isControlled, connectionStatus, isUser]);
+  }, [isSpeaking, memberIsTextMuted, isMuted, memberIsVoiceMuted, isControlled]);
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
@@ -240,9 +238,9 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
           },
           {
             id: 'set-mute',
-            label: isVoiceMuted ? t('unmute') : t('mute'),
+            label: isMuted ? t('unmute') : t('mute'),
             show: !isUser,
-            onClick: () => handleSetIsUserMuted(memberUserId, !isVoiceMuted),
+            onClick: () => handleSetIsUserMuted(memberUserId, !isMuted),
           },
           {
             id: 'edit-nickname',
@@ -345,7 +343,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
         ]);
       }}
     >
-      <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} title={memberUserId !== userId ? t('connection-status', { '0': t(`connection-status-${connectionStatus}`) }) : ''} />
+      <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       <div className={`${styles['user-queue-position']}`}>{memberPosition + 1}.</div>
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
