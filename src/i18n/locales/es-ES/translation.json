@@ -275,7 +275,7 @@
   "mic-order": "Orden de la cola",
   "mic-queued": "Micrófono en cola",
   "mic-taken": "Micrófono tomado",
-  "mic-volume-threshold": "麥克風音量門檻",
+  "mic-volume-threshold": "Umbral de volumen del micrófono",
   "microphone": "Micrófono",
   "microphone-amplification-label": "Amplificación del micrófono",
   "minimize-to-tray": "Minimizar a la barra del sistema",
