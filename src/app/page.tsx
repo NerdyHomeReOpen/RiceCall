@@ -780,7 +780,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   return (
-    <WebRTCProvider userId={userId}>
+    <WebRTCProvider>
       <ActionScannerProvider>
         <ExpandedProvider>
           <Header user={user} server={server} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />

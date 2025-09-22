@@ -60,10 +60,9 @@ export const useWebRTC = (): WebRTCContextType => {
 
 interface WebRTCProviderProps {
   children: React.ReactNode;
-  userId: User['userId'];
 }
 
-const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
+const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // Providers
   const soundPlayer = useSoundPlayer();
 
@@ -161,7 +160,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
     const now = performance.now();
     if (now - lastRefreshRef.current >= 80) {
       lastRefreshRef.current = now;
-      setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
+      setVolumePercent((prev) => ({ ...prev, [targetId]: volumePercent }));
     }
 
     rafIdListRef.current[targetId] = requestAnimationFrame(() => detectSpeaking(targetId, analyserNode, dataArray));
@@ -322,9 +321,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   );
 
   const removeMicAudio = useCallback(() => {
-    if (rafIdListRef.current[userId]) {
-      cancelAnimationFrame(rafIdListRef.current[userId]);
-      delete rafIdListRef.current[userId];
+    if (rafIdListRef.current['user']) {
+      cancelAnimationFrame(rafIdListRef.current['user']);
+      delete rafIdListRef.current['user'];
     }
 
     if (micNodesRef.current) {
@@ -334,14 +333,7 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       if (stream) stream.getTracks().forEach((t) => t.stop());
       micNodesRef.current = { stream: null, source: null, gain: null };
     }
-
-    delete volumePercentRef.current[userId];
-    setVolumePercent((prev) => {
-      const newState = { ...prev };
-      delete newState[userId];
-      return newState;
-    });
-  }, [userId]);
+  }, []);
 
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
@@ -393,13 +385,6 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
       if (stream) stream.getTracks().forEach((t) => t.stop());
       mixNodesRef.current = { stream: null, source: null, gain: null };
     }
-
-    delete volumePercentRef.current['system'];
-    setVolumePercent((prev) => {
-      const newState = { ...prev };
-      delete newState['system'];
-      return newState;
-    });
   }, []);
 
   const initMixMode = useCallback(
@@ -783,9 +768,9 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
 
   const isSpeaking = useCallback((targetId: string | 'user') => (targetId === 'user' ? volumePercent['user'] > voiceThreshold : !!volumePercent[targetId]), [volumePercent, voiceThreshold]);
 
-  const isMuted = useCallback((targetId: string | 'user') => (targetId === 'user' ? mutedIds.includes('user') : mutedIds.includes(targetId)), [mutedIds]);
+  const isMuted = useCallback((targetId: string | 'user') => mutedIds.includes(targetId), [mutedIds]);
 
-  const getVolumePercent = useCallback((targetId: string | 'user') => (targetId === 'user' ? volumePercent['user'] : volumePercent[targetId]) ?? 0, [volumePercent]);
+  const getVolumePercent = useCallback((targetId: string | 'user') => volumePercent[targetId] ?? 0, [volumePercent]);
 
   const handleSFUJoined = useCallback(
     async ({ channelId }: { channelId: string }) => {

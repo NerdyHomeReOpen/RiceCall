@@ -25,7 +25,7 @@ const MicModeMenu: React.FC = React.memo(() => {
   // Memos
   const volumePercent = webRTC.getVolumePercent('user');
   const voiceThreshold = webRTC.voiceThreshold;
-  const activeColor = volumePercent < voiceThreshold ? 'gray' : '#62a35b';
+  const activeColor = webRTC.isSpeaking('user') ? '#62a35b' : 'gray';
   const voiceThresholdColor = `linear-gradient(to right, ${activeColor} ${volumePercent}%, #eee ${volumePercent}%)`;
 
   // Handlers
