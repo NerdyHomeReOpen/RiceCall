@@ -275,6 +275,7 @@
   "mic-order": "Порядок очереди",
   "mic-queued": "Очередь",
   "mic-taken": "Включен",
+  "mic-volume-threshold": "麥克風音量門檻",
   "microphone": "Микрофон",
   "microphone-amplification-label": "Усиление микрофона",
   "minimize-to-tray": "Свернуть в системный трей",
