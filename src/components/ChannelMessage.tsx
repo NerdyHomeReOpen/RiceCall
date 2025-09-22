@@ -44,8 +44,18 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   } = messageGroup;
 
   // Memos
+  const ALLOWED_MESSAGE_KEYS = useMemo(() => ['guest-send-an-external-link'], []);
   const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
-  const formattedMessageContents = useMemo(() => messageContents.map((content) => (content === 'guest-send-an-external-link' ? t('guest-send-an-external-link') : content)), [messageContents, t]);
+  const formattedMessageContents = useMemo(
+    () =>
+      messageContents.map((content) =>
+        content
+          .split(' ')
+          .map((c) => (ALLOWED_MESSAGE_KEYS.includes(c) ? t(c) : c))
+          .join(' '),
+      ),
+    [messageContents, t, ALLOWED_MESSAGE_KEYS],
+  );
   const isUser = useMemo(() => senderUserId === userId, [senderUserId, userId]);
 
   // handles

@@ -31,13 +31,22 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
 
   // Memos
   const escapedMessageParameter = useMemo(() => Object.fromEntries(Object.entries(messageParameter).map(([key, value]) => [key, escapeHtml(value)])), [messageParameter]);
-  const translatedMessagesContents = useMemo(() => messageContents.map((content) => t(content, { ns: 'message', ...escapedMessageParameter })), [messageContents, escapedMessageParameter, t]);
+  const formattedMessagesContents = useMemo(
+    () =>
+      messageContents.map((content) =>
+        content
+          .split(' ')
+          .map((c) => t(c, { ns: 'message', ...escapedMessageParameter }))
+          .join(' '),
+      ),
+    [messageContents, escapedMessageParameter, t],
+  );
 
   return (
     <>
       <div className={styles[`${messageType}-icon`]} />
       <div className={styles['message-box']}>
-        {translatedMessagesContents.map((content, index) => (
+        {formattedMessagesContents.map((content, index) => (
           <MarkdownContent key={index} markdownText={content} />
         ))}
       </div>

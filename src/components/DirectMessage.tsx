@@ -29,8 +29,18 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
 
   // Memos
+  const ALLOWED_MESSAGE_KEYS = useMemo(() => ['message:send-shake-window', 'message:receive-shake-window'], []);
   const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
-  const formattedMessageContents = useMemo(() => messageContents.map((content) => (content.startsWith('message:') ? t(content) : content)), [messageContents, t]);
+  const formattedMessageContents = useMemo(
+    () =>
+      messageContents.map((content) =>
+        content
+          .split(' ')
+          .map((c) => (ALLOWED_MESSAGE_KEYS.includes(c) ? t(c) : c))
+          .join(' '),
+      ),
+    [messageContents, t, ALLOWED_MESSAGE_KEYS],
+  );
 
   return (
     <div className={styles['message-box']}>
