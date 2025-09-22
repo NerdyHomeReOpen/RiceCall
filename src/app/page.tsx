@@ -28,9 +28,9 @@ import type {
 import { LanguageKey, LANGUAGES } from '@/i18n';
 
 // Pages
-import FriendPage from '@/components/pages/Friend';
-import HomePage from '@/components/pages/Home';
-import ServerPage from '@/components/pages/Server';
+import FriendPage from '@/pages/Friend';
+import HomePage from '@/pages/Home';
+import ServerPage from '@/pages/Server';
 
 // Components
 import LoadingSpinner from '@/components/common/LoadingSpinner';

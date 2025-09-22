@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 
 // Package
-import packageJson from '../../../package.json';
+import packageJson from '../../package.json';
 const version = packageJson.version;
 
 // CSS

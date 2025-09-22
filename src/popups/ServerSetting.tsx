@@ -22,7 +22,7 @@ import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
 
 // Components
-import AnnouncementEditor from '../AnnouncementEditor';
+import AnnouncementEditor from '@/components/AnnouncementEditor';
 
 interface ServerSettingPopupProps {
   userId: User['userId'];
