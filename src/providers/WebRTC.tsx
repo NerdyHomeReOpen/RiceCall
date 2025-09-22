@@ -141,34 +141,31 @@ const WebRTCProvider = ({ children, userId }: WebRTCProviderProps) => {
   const volumePercentRef = useRef<{ [userId: string]: number }>({});
   const [volumePercent, setVolumePercent] = useState<{ [userId: string]: number }>({});
 
-  const detectSpeaking = useCallback(
-    (targetId: string | 'user', analyserNode: AnalyserNode, dataArray: Uint8Array) => {
-      analyserNode.getByteTimeDomainData(dataArray);
-      let sum = 0;
-      for (let i = 0; i < dataArray.length; i++) {
-        const v = (dataArray[i] - 128) / 128;
-        sum += v * v;
-      }
-      const volume = Math.sqrt(sum / dataArray.length);
-      const volumePercent = Math.min(1, volume / 0.5) * 100;
-      if (targetId === userId && !isMicTakenRef.current) {
-        if (volumePercent > voiceThresholdRef.current) audioProducerRef.current?.resume();
-        else audioProducerRef.current?.pause();
-        volumePercentRef.current[targetId] = volumePercent;
-      } else {
-        volumePercentRef.current[targetId] = volumePercent;
-      }
+  const detectSpeaking = useCallback((targetId: string | 'user', analyserNode: AnalyserNode, dataArray: Uint8Array) => {
+    analyserNode.getByteTimeDomainData(dataArray);
+    let sum = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+      const v = (dataArray[i] - 128) / 128;
+      sum += v * v;
+    }
+    const volume = Math.sqrt(sum / dataArray.length);
+    const volumePercent = Math.min(1, volume / 0.5) * 100;
+    if (targetId === 'user' && !isMicTakenRef.current) {
+      if (volumePercent > voiceThresholdRef.current) audioProducerRef.current?.resume();
+      else audioProducerRef.current?.pause();
+      volumePercentRef.current[targetId] = volumePercent;
+    } else {
+      volumePercentRef.current[targetId] = volumePercent;
+    }
 
-      const now = performance.now();
-      if (now - lastRefreshRef.current >= 80) {
-        lastRefreshRef.current = now;
-        setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
-      }
+    const now = performance.now();
+    if (now - lastRefreshRef.current >= 80) {
+      lastRefreshRef.current = now;
+      setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
+    }
 
-      rafIdListRef.current[targetId] = requestAnimationFrame(() => detectSpeaking(targetId, analyserNode, dataArray));
-    },
-    [userId],
-  );
+    rafIdListRef.current[targetId] = requestAnimationFrame(() => detectSpeaking(targetId, analyserNode, dataArray));
+  }, []);
 
   const initLocalStorage = useCallback(() => {
     const localMicVolume = window.localStorage.getItem('mic-volume') ?? '100';
