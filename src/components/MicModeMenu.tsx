@@ -20,12 +20,12 @@ const MicModeMenu: React.FC = React.memo(() => {
   const webRTC = useWebRTC();
 
   // States
-  const [isVoiceThresholdDisabled, setIsVoiceThresholdDisabled] = useState(webRTC.voiceThreshold === 0);
 
   // Memos
   const volumePercent = webRTC.getVolumePercent('user');
-  const voiceThreshold = webRTC.voiceThreshold;
-  const activeColor = webRTC.isSpeaking('user') ? '#62a35b' : 'gray';
+  const volumeThreshold = webRTC.voiceThreshold;
+  const isActive = volumePercent > volumeThreshold;
+  const activeColor = isActive ? '#62a35b' : 'gray';
   const voiceThresholdColor = `linear-gradient(to right, ${activeColor} ${volumePercent}%, #eee ${volumePercent}%)`;
 
   // Handlers
@@ -48,27 +48,21 @@ const MicModeMenu: React.FC = React.memo(() => {
           <input type="radio" name="visibility" checked={webRTC.speakingMode === 'auto'} onChange={() => handleEditSpeakingMode('auto')} />
           <div className={popup['label']}>{t('default-speaking-mode-auto-label')}</div>
         </div>
-        <div className={`${popup['input-box']} ${popup['row']}`}>
-          <input
-            type="checkbox"
-            checked={!isVoiceThresholdDisabled}
-            onChange={() => {
-              handleEditVoiceThreshold(isVoiceThresholdDisabled ? voiceThreshold : 1);
-              setIsVoiceThresholdDisabled(!isVoiceThresholdDisabled);
-            }}
-          />
-          <div className={popup['label']}>{t('manually-adjust')}</div>
+        <div className={`${popup['input-box']} ${popup['col']}`}>
+          <div className={popup['label']}>{t('mic-volume-threshold')}</div>
+          <div className={server['voice-threshold-input-wrapper']}>
+            <input
+              className={server['voice-threshold-input']}
+              type="range"
+              min="0"
+              max="100"
+              value={webRTC.voiceThreshold}
+              style={{ background: voiceThresholdColor }}
+              onChange={(e) => handleEditVoiceThreshold(parseInt(e.target.value))}
+            />
+            <div className={`${server['voice-state-icon']} ${isActive ? server['active'] : ''}`} />
+          </div>
         </div>
-        <input
-          className={server['voice-threshold-input']}
-          disabled={isVoiceThresholdDisabled}
-          type="range"
-          min="0"
-          max="100"
-          value={webRTC.voiceThreshold}
-          style={{ background: voiceThresholdColor }}
-          onChange={(e) => handleEditVoiceThreshold(parseInt(e.target.value))}
-        />
       </div>
     </div>
   );

@@ -903,7 +903,14 @@
   overflow: hidden;
 }
 
+.mic-mode-menu .voice-threshold-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+
 .mic-mode-menu .voice-threshold-input {
+  flex: 1;
   -webkit-appearance: none;
   appearance: none;
   height: 10px;
@@ -932,6 +939,19 @@
     background: #fff;
     border: 2px solid #999;
     cursor: pointer;
+  }
+}
+
+.mic-mode-menu .voice-state-icon {
+  opacity: 0;
+  min-height: 12px;
+  min-width: 12px;
+  background-image: url('/channel/audioState.png');
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: -24px 0;
+  &.active {
+    opacity: 1;
   }
 }
 
