@@ -155,16 +155,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       else audioProducerRef.current?.pause();
     }
 
-    console.log(
-      Object.entries(volumePercentRef.current)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join('\n'),
-    );
-
     const now = performance.now();
-    if (now - lastRefreshRef.current >= 80) {
+    if (now - lastRefreshRef.current >= 10) {
       lastRefreshRef.current = now;
-      setVolumePercent((prev) => ({ ...prev, [targetId]: volumePercent }));
+      setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
     }
 
     rafIdListRef.current[targetId] = requestAnimationFrame(() => detectSpeaking(targetId, analyserNode, dataArray));
