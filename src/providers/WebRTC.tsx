@@ -7,7 +7,6 @@ import api from '@/services/api.service';
 
 // Types
 import {
-  User,
   SpeakingMode,
   SFUCreateConsumerReturnType,
   SFUCreateTransportReturnType,
@@ -149,13 +148,18 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
     const volume = Math.sqrt(sum / dataArray.length);
     const volumePercent = Math.min(1, volume / 0.5) * 100;
-    if (targetId === 'user' && !isMicTakenRef.current) {
+    volumePercentRef.current[targetId] = volumePercent;
+
+    if (targetId === 'user') {
       if (volumePercent > voiceThresholdRef.current) audioProducerRef.current?.resume();
       else audioProducerRef.current?.pause();
-      volumePercentRef.current[targetId] = volumePercent;
-    } else {
-      volumePercentRef.current[targetId] = volumePercent;
     }
+
+    console.log(
+      Object.entries(volumePercentRef.current)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join('\n'),
+    );
 
     const now = performance.now();
     if (now - lastRefreshRef.current >= 80) {
@@ -218,8 +222,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       const inputAnalyser = audioContextRef.current.createAnalyser();
       inputAnalyserRef.current = inputAnalyser;
       inputAnalyser.fftSize = 2048;
-      const dataArray = new Uint8Array(inputAnalyser.fftSize);
-      detectSpeaking('user', inputAnalyser, dataArray);
     }
 
     // Create master gain node
@@ -362,6 +364,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
 
+      // Start speaking detection
+      const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize);
+      detectSpeaking('user', inputAnalyserRef.current, dataArray);
+
       // Replace track
       const newTrack = inputDesRef.current.stream.getAudioTracks()[0];
       if (audioProducerRef.current && newTrack) {
@@ -369,7 +375,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         audioProducerRef.current.resume();
       }
     },
-    [removeMicAudio, initAudioContext],
+    [removeMicAudio, initAudioContext, detectSpeaking],
   );
 
   const removeMixAudio = useCallback(() => {
@@ -410,8 +416,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
       if (isRecordingRef.current) gainNode.connect(recordDesRef.current!);
+
+      // Start speaking detection
+      const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize);
+      detectSpeaking('system', inputAnalyserRef.current, dataArray);
     },
-    [initAudioContext, removeMixAudio],
+    [initAudioContext, removeMixAudio, detectSpeaking],
   );
 
   const startMixMode = useCallback(async () => {
@@ -766,7 +776,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
   }, [changeSpeakerVolume]);
 
-  const isSpeaking = useCallback((targetId: string | 'user') => (targetId === 'user' ? volumePercent['user'] > voiceThreshold : !!volumePercent[targetId]), [volumePercent, voiceThreshold]);
+  const isSpeaking = useCallback(
+    (targetId: string | 'user') => (targetId === 'user' ? isMicTaken && volumePercent['user'] > voiceThreshold : !!volumePercent[targetId]),
+    [isMicTaken, volumePercent, voiceThreshold],
+  );
 
   const isMuted = useCallback((targetId: string | 'user') => mutedIds.includes(targetId), [mutedIds]);
 
