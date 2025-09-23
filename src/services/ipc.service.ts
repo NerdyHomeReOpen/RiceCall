@@ -1118,6 +1118,15 @@ const ipcService = {
         return () => ipcRenderer.removeListener('receive-channel-message-sound', listener);
       },
     },
+
+    detectKeyPress: {
+      onDetect: (callback: (key: string) => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, key: string) => callback(key);
+        ipcRenderer.on('detected-key-press', listener);
+        return () => ipcRenderer.removeListener('detected-key-press', listener);
+      }
+    }
   },
 
   loopbackAudio: {

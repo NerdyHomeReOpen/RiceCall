@@ -15,6 +15,7 @@ import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
 import { initMainI18n, t } from './i18n.js';
+import { GlobalKeyboardListener, IGlobalKey } from 'node-global-key-listener';
 
 initMain();
 
@@ -1586,6 +1587,50 @@ app.on('ready', async () => {
   // Open external url handlers
   ipcMain.on('open-external', (_, url) => {
     shell.openExternal(url);
+  });
+
+  // initialize global keyboard listener
+  const keyListener = new GlobalKeyboardListener();
+  const lastTrigger: Record<string, number> = {};
+  
+  keyListener.addListener((event, isDown) => {
+    const pressedKeys = Object.keys(isDown).filter((k) => isDown[k as IGlobalKey]);
+
+    const normalized = pressedKeys.map((k) => {
+      if (k.includes("CTRL")) return "Ctrl";
+      if (k.includes("SHIFT")) return "Shift";
+      if (k.includes("ALT")) return "Alt";
+      return k.toLowerCase();
+    });
+
+    const keyName = (event.name ?? "").toLowerCase();
+    const ignoreedKeys = new Set([
+      'control',
+      'left shift',
+      'right shift',
+      'left alt',
+      'right alt',
+      'left ctrl',
+      'right ctrl'
+    ]);
+
+    if (!normalized.includes(keyName) && !ignoreedKeys.has(keyName)) {
+      normalized.push(keyName);
+    }
+    if (event.state === 'DOWN') {
+      const combo = normalized.join('+')
+      const now = Date.now();
+
+      const targetTigger = lastTrigger[combo] || now - 1000;
+      if (now - targetTigger > 500) {
+        lastTrigger[combo] = now;
+        console.log('Detected key press:', combo);
+        mainWindow?.webContents.send('detected-key-press', combo);
+        // BrowserWindow.getAllWindows().forEach((window) => {
+        //   window.webContents.send('detected-key-press', combo);
+        // });
+      }
+    }
   });
 });
 

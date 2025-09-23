@@ -42,6 +42,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   // States
   const [isKeepAlive, setIsKeepAlive] = useState<boolean>(true);
+  const [timer, setTimer] = useState<number>(Date.now());
 
   // Handlers
   const buildKey = (e: KeyboardEvent) => {
@@ -93,6 +94,37 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const toggleMicMute = useCallback(() => {
     webRTC.toggleMicMuted();
   }, [webRTC]);
+
+  ipc.systemSettings.detectKeyPress.onDetect((key) => {
+    const now = Date.now();
+    if (now - timer > 100) {
+      setTimer(now);
+      console.log('[ActionScanner] Detected key press: ', key);
+
+      // TODO: delay to action event
+
+      // switch (key) {
+      //   case speakingKeyRef.current:
+      //     startSpeak();
+      //     break;
+      //   case openMainWindowKeyRef.current:
+      //     toggleMainWindows();
+      //     break;
+      //   case increaseVolumeKeyRef.current:
+      //     toggleUpVolume();
+      //     break;
+      //   case decreaseVolumeKeyRef.current:
+      //     toggleDownVolume();
+      //     break;
+      //   case toggleSpeakerKeyRef.current:
+      //     toggleSpeakerMute();
+      //     break;
+      //   case toggleMicrophoneKeyRef.current:
+      //     toggleMicMute();
+      //     break;
+      // }
+    }
+  });
 
   // Effects
   useEffect(() => {
