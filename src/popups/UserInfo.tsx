@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 // Types
-import type { Badge, Friend, Server, User } from '@/types';
+import type { Badge, Friend, Server, User, UserConfig } from '@/types';
 
 // Components
 import LevelIcon from '@/components/LevelIcon';
@@ -14,6 +14,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 // Services
 import ipc from '@/services/ipc.service';
 import api from '@/services/api.service';
+import getDataService from '@/services/getData.service';
 
 // CSS
 import styles from '@/styles/popups/userSetting.module.css';
@@ -82,12 +83,26 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     if (monthDiff < 0 || (monthDiff === 0 && CURRENT_DAY < birthDate.getDate())) age--;
     return age;
   }, [targetBirthYear, targetBirthMonth, targetBirthDay, CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY]);
-  const isProfilePrivate = useMemo(() => false, []); // TODO: implement privacy setting
   const isSelf = useMemo(() => userId === targetId, [userId, targetId]);
   const isFriend = useMemo(() => friend?.relationStatus === 2, [friend]);
   const canSubmit = useMemo(
     () => targetName.trim() && targetGender.trim() && targetCountry.trim() && targetBirthYear && targetBirthMonth && targetBirthDay,
     [targetName, targetGender, targetCountry, targetBirthYear, targetBirthMonth, targetBirthDay],
+  );
+
+  const [targetConfig, setTargetConfig] = useState<UserConfig | null>(null);
+
+  const canSeeRecent = useMemo(
+    () => isSelf|| !!targetConfig?.privacyShareRecentServer,
+    [userId, targetId, targetConfig]
+  );
+  const canSeeJoined = useMemo(
+    () => isSelf || !!targetConfig?.privacyShareJoinedServer,
+    [userId, targetId, targetConfig]
+  );
+  const canSeeFavorite = useMemo(
+    () => isSelf || !!targetConfig?.privacyShareFavoriteServer,
+    [userId, targetId, targetConfig]
   );
 
   const joinedServers = useMemo(() => {
@@ -168,6 +183,23 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
       setCountries(json);
     })();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const cfg = await getDataService.userConfig({ userId: targetId });
+        if (!cancelled && cfg) setTargetConfig(cfg);
+      } catch (err) {
+        console.error('Error fetching target user config:', err);
+        setTargetConfig(null);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [targetId]);
+
 
   useEffect(() => {
     const daysInMonth = new Date(targetBirthYear, targetBirthMonth, 0).getDate();
@@ -292,7 +324,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
           <div className={styles['user-profile-content']}>
             <div className={popup['label']}>{t('recent-servers')}</div>
             <div className={styles['server-list']}>
-              {isProfilePrivate
+              {!canSeeRecent
                 ? PrivateElement(
                     <>
                       {t('not-public-recent-servers-top')}
@@ -336,7 +368,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               </select>
             </div>
             <div className={styles['server-list']} style={serversView === 'joined' ? {} : { display: 'none' }}>
-              {isProfilePrivate
+              {!canSeeJoined
                 ? PrivateElement(
                     <>
                       {t('not-public-joined-servers-top')}
@@ -360,7 +392,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                     ))}
             </div>
             <div className={styles['server-list']} style={serversView === 'favorite' ? {} : { display: 'none' }}>
-              {isProfilePrivate
+              {!canSeeFavorite
                 ? PrivateElement(
                     <>
                       {t('not-public-favorite-servers-top')}

@@ -577,9 +577,9 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({userI
               <input name="forbid-shake" type="checkbox" checked={forbidShake} onChange={() => setForbidShake(!forbidShake)} />
               <div className={popup['label']}>{t('forbid-shake-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="forbid-invite-group" type="checkbox" checked={forbidInviteGroup} onChange={() => setForbidInviteGroup(!forbidInviteGroup)} />
-              <div className={popup['label']}>{t('forbid-invite-group-label')}</div>
+            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+              <input name="forbid-invite-group" type="checkbox" checked={forbidInviteGroup} onChange={() => setForbidInviteGroup(!forbidInviteGroup)}/>
+              <div className={popup['label']}>{t('forbid-invite-group-label')} {t('soon')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
               <input name="forbid-stranger-message" type="checkbox" checked={forbidStrangerMessage} onChange={() => setForbidStrangerMessage(!forbidStrangerMessage)} />
