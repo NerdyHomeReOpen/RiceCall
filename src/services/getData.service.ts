@@ -2,12 +2,17 @@
 import api from '@/services/api.service';
 
 // Types
-import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, RecommendServerList, MemberInvitation, Announcement } from '@/types';
+import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, RecommendServerList, MemberInvitation, Announcement, UserConfig } from '@/types';
 
 export const getDataService = {
   user: async (params: { userId: User['userId'] }): Promise<User | null> => {
     const user = await api.get(`/user?${new URLSearchParams(params).toString()}`);
     return user;
+  },
+
+  userConfig: async (params: { userId: User['userId'] }): Promise<UserConfig> => {
+    const userConfig = await api.get(`/user/config?${new URLSearchParams(params).toString()}`);
+    return userConfig;
   },
 
   friend: async (params: { userId: User['userId']; targetId: User['userId'] }): Promise<Friend | null> => {
