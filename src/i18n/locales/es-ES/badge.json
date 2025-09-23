@@ -8,5 +8,11 @@
   "volunteer-translator": "Traductor",
   "volunteer-translator-description": "Traductor voluntario RiceCall",
   "rc-0.1-paticipant": "Miembro RC v0.1",
-  "rc-0.1-paticipant-description": "Gracias por participar en las pruebas de la versión RC v0.1 y por su paciencia. Como han presenciado la evolución de esta versión, les recompensamos con esta insignia exclusiva."
+  "rc-0.1-paticipant-description": "Gracias por participar en las pruebas de la versión RC v0.1 y por su paciencia. Como han presenciado la evolución de esta versión, les recompensamos con esta insignia exclusiva.",
+  "intern-anchor": "Artista pasante de anclaje certificado oficialmente por RC Voice",
+  "intern-anchor-description": "Artista pasante de anclaje certificado oficialmente por RC Voice",
+  "certified-anchor": "Artista de anclaje certificado oficialmente por RC Voice",
+  "certified-anchor-description": "Artista de anclaje certificado oficialmente por RC Voice",
+  "lively-anchor": "Insignia de artista Vitality Anchor",
+  "lively-anchor-description": "¡Transmisores en vivo! ¡Energía ilimitada! Los transmisores en vivo certificados oficialmente que transmitan al menos una hora recibirán una insignia de \"Transmisor en vivo\" al día siguiente, que se exhibirá durante un día."
 }

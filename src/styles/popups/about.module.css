@@ -90,7 +90,7 @@
   resize: none;
 }
 
-.developer-title {
+.staff-title {
   background-color: rgb(115 164 213 / 70%);
   color: #fff;
   padding: 4px;
@@ -117,18 +117,18 @@
   color: #7289da;
 }
 
-.developer {
+.color-1 {
   background-color: rgb(216 63 63 / 80%);
 }
 
-.machine-network {
+.color-2 {
   background-color: rgb(77 173 147 / 80%);
 }
 
-.technical-support {
+.color-3 {
   background-color: rgb(216 166 63 / 80%);
 }
 
-.customer-service {
+.color-4 {
   background-color: rgb(63 166 216 / 80%);
 }

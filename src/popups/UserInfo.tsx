@@ -26,9 +26,6 @@ import emoji from '@/styles/emoji.module.css';
 // Utils
 import { isMember, isStaff } from '@/utils/permission';
 
-// Country
-import { countries } from '@/country';
-
 interface UserInfoPopupProps {
   userId: User['userId'];
   targetId: User['userId'];
@@ -49,6 +46,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   const [target, setTarget] = useState(targetData);
   const [serversView, setServersView] = useState('joined');
   const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'userSetting'>('about');
+  const [countries, setCountries] = useState<string[]>([]);
 
   // Destructuring
   const {
@@ -188,6 +186,16 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     },
     [CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY],
   );
+
+  // Effects
+  useEffect(() => {
+    (async () => {
+      const res = await fetch('https://nerdyhomereopen.github.io/Details/country.json');
+      if (!res.ok) console.error(`Failed to fetch country.json: ${res.status}`);
+      const json = await res.json();
+      setCountries(json);
+    })();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

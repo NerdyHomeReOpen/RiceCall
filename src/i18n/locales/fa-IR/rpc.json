@@ -3,10 +3,10 @@
   "friend-page": "لیست دوستان",
   "home-page": "صفحه اصلی",
   "join-discord-server": "پیوستن به سرور دیسکورد",
-  "login-page": "登入頁面",
+  "login-page": "صفحه ورود",
   "server-page": "صفحه سرور",
-  "un-login": "未登入",
-  "user": "使用者: {{0}}",
+  "un-login": "وارد نشده‌اید",
+  "user": "کاربر: {{0}}",
   "viewing-friend-page": "مرور لیست دوستان",
   "viewing-home-page": "مشاهده صفحه اصلی"
 }

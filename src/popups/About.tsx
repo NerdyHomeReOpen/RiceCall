@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 
 // Package
@@ -18,8 +18,14 @@ import MarkdownContent from '@/components/MarkdownContent';
 // Services
 import ipc from '@/services/ipc.service';
 
-// Data
-import { staff } from '@/staff';
+type Staff = {
+  title: string;
+  contact: string;
+  github: string;
+  discord: string;
+  ricecall: string;
+  email: string;
+};
 
 const AboutPopup: React.FC = React.memo(() => {
   // Hooks
@@ -27,6 +33,7 @@ const AboutPopup: React.FC = React.memo(() => {
 
   // States
   const [dontShowNextTime, setDontShowNextTime] = useState(false);
+  const [staffs, setStaffs] = useState<Staff[]>([]);
 
   // Handlers
   const handleClose = () => {
@@ -37,20 +44,26 @@ const AboutPopup: React.FC = React.memo(() => {
     ipc.systemSettings.disclaimer.dontShowNextTime();
   };
 
+  const getTitleColorClass = (title: string) => {
+    if (['CEO', 'CTO', 'CFO', 'COO', 'CIO', 'CMO', 'CHRO'].some((t) => title.includes(t))) return styles['color-1'];
+    if (['HoT', 'HoO', 'HoM', 'HoB'].some((t) => title.includes(t))) return styles['color-2'];
+    if (['developer', 'machine-network', 'technical-support'].some((t) => title.includes(t))) return styles['color-3'];
+    if (['customer-service'].some((t) => title.includes(t))) return styles['color-4'];
+    return styles['color-5'];
+  };
+
   // Memos
-  const TITLE_COLOR_CLASSES: Record<string, string> = useMemo(
-    () => ({
-      [t('developer')]: styles['developer'],
-      [t('developer')]: styles['developer'],
-      [t('developer')]: styles['developer'],
-      [t('developer')]: styles['developer'],
-      [t('machine-network')]: styles['machine-network'],
-      [t('technical-support')]: styles['technical-support'],
-      [t('customer-service')]: styles['customer-service'],
-    }),
-    [t],
-  );
   const CURRENT_YEAR = useMemo(() => new Date().getFullYear(), []);
+
+  // Effects
+  useEffect(() => {
+    (async () => {
+      const res = await fetch('https://nerdyhomereopen.github.io/Details/staff.json');
+      if (!res.ok) console.error(`Failed to fetch staff.json: ${res.status}`);
+      const json = await res.json();
+      setStaffs(json);
+    })();
+  }, []);
 
   return (
     <div className={`${popup['popup-wrapper']}`}>
@@ -78,14 +91,14 @@ const AboutPopup: React.FC = React.memo(() => {
 
           <div className={styles['team-members']}>
             <p>{t('team-members')}:</p>
-            {staff.map((member, index) => {
-              const githubInfo = member.github;
-              const discordInfo = member.discord;
+            {staffs.map((staff, index) => {
+              const githubInfo = staff.github;
+              const discordInfo = staff.discord;
               return (
                 <div key={index} className={styles['team-member-card']}>
                   <div className={styles['name-wrapper']}>
-                    <span className={`${styles['developer-title']} ${TITLE_COLOR_CLASSES[t(member.title)]}`}>{t(member.title)}</span>
-                    <span>{member.contact}</span>
+                    <span className={`${styles['staff-title']} ${getTitleColorClass(staff.title)}`}>{t(staff.title)}</span>
+                    <span>{staff.contact}</span>
                   </div>
                   <div className={styles['icon-wrapper']}>
                     {githubInfo && (
