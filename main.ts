@@ -1591,47 +1591,77 @@ app.on('ready', async () => {
 
   // initialize global keyboard listener
   const keyListener = new GlobalKeyboardListener();
-  const lastTrigger: Record<string, number> = {};
-  
+  const lastKeyDown: Record<string, boolean> = Object.create(null);
+  const lastComboFiredAt: Record<string, number> = Object.create(null);
+  const COMBO_THROTTLE_MS = 10;
+
+  const IGNORED_KEYS = new Set(['control', 'left ctrl', 'right ctrl', 'shift', 'left shift', 'right shift', 'alt', 'left alt', 'right alt', 'meta', 'left meta', 'right meta', 'super', 'command']);
+
+  function getModifiers(isDown: Record<string, boolean>): string[] {
+    const hasCtrl = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('CTRL'));
+    const hasShift = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('SHIFT'));
+    const hasAlt = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('ALT'));
+    const hasMeta = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && (k.includes('META') || k.includes('SUPER') || k.includes('COMMAND')));
+
+    const mods: string[] = [];
+    if (hasCtrl) mods.push('Ctrl');
+    if (hasShift) mods.push('Shift');
+    if (hasAlt) mods.push('Alt');
+    if (hasMeta) mods.push('Meta');
+
+    return mods; // Order: Ctrl → Shift → Alt → Meta
+  }
+
+  function buildCombo(mods: string[], keyNameLower: string): string {
+    const parts = keyNameLower ? [...mods, keyNameLower] : [...mods];
+    return parts.join('+');
+  }
+
   keyListener.addListener((event, isDown) => {
-    const pressedKeys = Object.keys(isDown).filter((k) => isDown[k as IGlobalKey]);
+    const state = event.state; // 'DOWN' | 'UP'
+    const rawName = event.name ?? '';
+    const keyNameLower = rawName.toLowerCase().trim();
 
-    const normalized = pressedKeys.map((k) => {
-      if (k.includes("CTRL")) return "Ctrl";
-      if (k.includes("SHIFT")) return "Shift";
-      if (k.includes("ALT")) return "Alt";
-      return k.toLowerCase();
-    });
-
-    const keyName = (event.name ?? "").toLowerCase();
-    const ignoreedKeys = new Set([
-      'control',
-      'left shift',
-      'right shift',
-      'left alt',
-      'right alt',
-      'left ctrl',
-      'right ctrl'
-    ]);
-
-    if (!normalized.includes(keyName) && !ignoreedKeys.has(keyName)) {
-      normalized.push(keyName);
+    const isModifierOnly = IGNORED_KEYS.has(keyNameLower);
+    if (!rawName || isModifierOnly) {
+      if (state === 'DOWN') lastKeyDown[keyNameLower] = true;
+      else if (state === 'UP') lastKeyDown[keyNameLower] = false;
+      return;
     }
-    if (event.state === 'DOWN') {
-      const combo = normalized.join('+')
-      const now = Date.now();
 
-      const targetTigger = lastTrigger[combo] || now - 1000;
-      if (now - targetTigger > 500) {
-        lastTrigger[combo] = now;
-        console.log('Detected key press:', combo);
-        mainWindow?.webContents.send('detected-key-press', combo);
-        // BrowserWindow.getAllWindows().forEach((window) => {
-        //   window.webContents.send('detected-key-press', combo);
-        // });
-      }
+    const mods = getModifiers(isDown);
+    const combo = buildCombo(mods, keyNameLower);
+
+    if (state === 'DOWN') {
+      // Only trigger on edge-trigger: from UP -> DOWN
+      if (lastKeyDown[keyNameLower]) return;
+      lastKeyDown[keyNameLower] = true;
+
+      // Throttle: prevent duplicate trigger within 500ms
+      const now = Date.now();
+      const last = lastComboFiredAt[combo] ?? 0;
+      if (now - last < COMBO_THROTTLE_MS) return;
+      lastComboFiredAt[combo] = now;
+
+      // Send event
+      mainWindow?.webContents.send('detected-key-down', combo);
+      // BrowserWindow.getAllWindows().forEach(w => w.webContents.send('detected-key-press', combo));
+    } else if (state === 'UP') {
+      // Reset edge-trigger
+      lastKeyDown[keyNameLower] = false;
+
+      // Throttle: prevent duplicate trigger within 500ms
+      const now = Date.now();
+      const last = lastComboFiredAt[combo] ?? 0;
+      if (now - last < COMBO_THROTTLE_MS) return;
+      lastComboFiredAt[combo] = now;
+
+      // Send event
+      mainWindow?.webContents.send('detected-key-up', combo);
+      // BrowserWindow.getAllWindows().forEach(w => w.webContents.send('detected-key-press', combo));
     }
   });
+  // ----
 });
 
 app.on('before-quit', () => {
