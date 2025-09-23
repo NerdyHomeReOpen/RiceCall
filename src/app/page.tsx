@@ -289,7 +289,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                 id: 'system-setting',
                 label: t('system-setting'),
                 icon: 'setting',
-                onClick: handleOpenSystemSetting,
+                onClick: () => handleOpenSystemSetting(userId),
               },
               {
                 id: 'change-theme',

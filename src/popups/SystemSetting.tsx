@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 
 // Types
-import type { ChannelUIMode } from '@/types';
+import type { ChannelUIMode, User, UserConfig } from '@/types';
 
 // CSS
 import setting from '@/styles/popups/setting.module.css';
@@ -13,8 +13,14 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
 import ipc from '@/services/ipc.service';
+import api from '@/services/api.service';
+import getDataService from '@/services/getData.service';
 
-const SystemSettingPopup: React.FC = React.memo(() => {
+interface SystemSettingPopupProps {
+  userId: User['userId'];
+}
+
+const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({userId}) => {
   // Hooks
   const { t } = useTranslation();
   const soundPlayer = useSoundPlayer();
@@ -113,7 +119,73 @@ const SystemSettingPopup: React.FC = React.memo(() => {
     [defaultHotKeyConfig],
   );
 
+  const handleSaveUserConfig = useCallback(async () => {
+    try {
+      const config: UserConfig = {
+        userId: userId,
+        spamForbidAddFriend: forbidAddFriend,
+        spamForbidShake: forbidShake,
+        spamForbidInviteGroup: forbidInviteGroup,
+        spamForbidStrangerMessage: forbidStrangerMessage,
+        privacyShareCurrentServer: shareCurrentServer,
+        privacyShareRecentServer: shareRecentServer,
+        privacyShareJoinedServer: shareJoinedServer,
+        privacyShareFavoriteServer: shareFavoriteServer,
+        messagesNotSaveMessageHistory: notSaveMessageHistory,
+      };
+
+      await api.post('/user/config', config);
+    } catch (error) {
+      console.error("Error saving user config:", error);
+      throw error;
+    }
+  }, [
+    forbidAddFriend,
+    forbidShake,
+    forbidInviteGroup,
+    forbidStrangerMessage,
+    shareCurrentServer,
+    shareRecentServer,
+    shareJoinedServer,
+    shareFavoriteServer,
+    notSaveMessageHistory,
+  ]);
+
+  const applyUserConfig = useCallback((cfg: UserConfig) => {
+    setForbidAddFriend(!!cfg.spamForbidAddFriend);
+    setForbidShake(!!cfg.spamForbidShake);
+    setForbidInviteGroup(!!cfg.spamForbidInviteGroup);
+    setForbidStrangerMessage(!!cfg.spamForbidStrangerMessage);
+
+    setShareCurrentServer(!!cfg.privacyShareCurrentServer);
+    setShareRecentServer(!!cfg.privacyShareRecentServer);
+    setShareJoinedServer(!!cfg.privacyShareJoinedServer);
+    setShareFavoriteServer(!!cfg.privacyShareFavoriteServer);
+
+    setNotSaveMessageHistory(!!cfg.messagesNotSaveMessageHistory);
+  }, []);
+
+
+
+
   // Effects
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const cfg = await getDataService.userConfig({userId});
+        if (!cancelled && cfg) {
+          applyUserConfig(cfg);
+        }
+      } catch (err) {
+        console.error('Error fetching user config:', err);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [userId, applyUserConfig]);
+
   useEffect(() => {
     const closeDelection = () => {
       setConflicts([]);
@@ -495,42 +567,42 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           <div className={popup['col']}>
             {/* Anti-spam setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('anti-spam-setting') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('anti-spam-setting')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <input name="forbid-add-friend" type="checkbox" checked={forbidAddFriend} onChange={() => setForbidAddFriend(!forbidAddFriend)} />
               <div className={popup['label']}>{t('forbid-add-friend-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <input name="forbid-shake" type="checkbox" checked={forbidShake} onChange={() => setForbidShake(!forbidShake)} />
               <div className={popup['label']}>{t('forbid-shake-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <input name="forbid-invite-group" type="checkbox" checked={forbidInviteGroup} onChange={() => setForbidInviteGroup(!forbidInviteGroup)} />
               <div className={popup['label']}>{t('forbid-invite-group-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <input name="forbid-stranger-message" type="checkbox" checked={forbidStrangerMessage} onChange={() => setForbidStrangerMessage(!forbidStrangerMessage)} />
               <div className={popup['label']}>{t('forbid-stranger-message-label')}</div>
             </div>
 
             {/* Privacy setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('privacy-setting') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('privacy-setting')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <input name="share-current-server" type="checkbox" checked={shareCurrentServer} onChange={() => setShareCurrentServer(!shareCurrentServer)} />
               <div className={popup['label']}>{t('share-current-server-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <input name="share-recent-server" type="checkbox" checked={shareRecentServer} onChange={() => setShareRecentServer(!shareRecentServer)} />
               <div className={popup['label']}>{t('share-recent-server-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <input name="share-joined-server" type="checkbox" checked={shareJoinedServer} onChange={() => setShareJoinedServer(!shareJoinedServer)} />
               <div className={popup['label']}>{t('share-joined-server-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
               <input name="share-favorite-server" type="checkbox" checked={shareFavoriteServer} onChange={() => setShareFavoriteServer(!shareFavoriteServer)} />
               <div className={popup['label']}>{t('share-favorite-server-label')}</div>
             </div>
@@ -790,6 +862,9 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             ipc.systemSettings.stopSpeakingSound.set(stopSpeakingSound);
             ipc.systemSettings.receiveDirectMessageSound.set(receiveDirectMessageSound);
             ipc.systemSettings.receiveChannelMessageSound.set(receiveChannelMessageSound);
+            // Privacy
+            handleSaveUserConfig();
+
             handleClose();
           }}
         >
