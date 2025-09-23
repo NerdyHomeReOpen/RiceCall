@@ -25,9 +25,6 @@ import emoji from '@/styles/emoji.module.css';
 // Utils
 import { isMember, isStaff } from '@/utils/permission';
 
-// Country
-import { countries } from '@/country';
-
 interface UserInfoPopupProps {
   userId: User['userId'];
   targetId: User['userId'];
@@ -48,6 +45,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   const [target, setTarget] = useState(targetData);
   const [serversView, setServersView] = useState('joined');
   const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'userSetting'>('about');
+  const [countries, setCountries] = useState<string[]>([]);
 
   // Destructuring
   const {
@@ -123,15 +121,21 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
   };
 
-  const handleOpenErrorDialog = (message: string) => {
-    ipc.popup.open('dialogError', 'errorDialog', { message, submitTo: 'errorDialog' });
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
+  };
+
+  const handleOpenErrorDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogError', 'dialogError', { message, submitTo: 'dialogError' });
+    ipc.popup.onSubmit('dialogError', callback);
   };
 
   const handleOpenImageCropper = (userId: User['userId'], imageData: string) => {
     ipc.popup.open('imageCropper', 'imageCropper', { imageData, submitTo: 'imageCropper' });
     ipc.popup.onSubmit('imageCropper', async (data) => {
       if (data.imageDataUrl.length > 5 * 1024 * 1024) {
-        handleOpenErrorDialog(t('image-too-large', { '0': '5MB' }));
+        handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
         return;
       }
       const formData = new FormData();
@@ -168,6 +172,16 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     [CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY],
   );
 
+  // Effects
+  useEffect(() => {
+    (async () => {
+      const res = await fetch('https://nerdyhomereopen.github.io/Details/country.json');
+      if (!res.ok) console.error(`Failed to fetch country.json: ${res.status}`);
+      const json = await res.json();
+      setCountries(json);
+    })();
+  }, []);
+
   useEffect(() => {
     const daysInMonth = new Date(targetBirthYear, targetBirthMonth, 0).getDate();
     if (targetBirthDay > daysInMonth) {
@@ -203,10 +217,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               fileInput.onchange = (e) => {
                 const file = (e.target as HTMLInputElement).files?.[0];
                 if (!file) return;
-                if (file.size > 5 * 1024 * 1024) {
-                  handleOpenErrorDialog(t('image-too-large'));
-                  return;
-                }
                 const reader = new FileReader();
                 reader.onloadend = async () => handleOpenImageCropper(userId, reader.result as string);
                 reader.readAsDataURL(file);
@@ -255,7 +265,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 onClick={() => {
                   // extra country validation
                   if (!countries.includes(targetCountry)) {
-                    handleOpenErrorDialog(t('invalid-country'));
+                    handleOpenErrorDialog(t('invalid-country'), () => {});
                     return;
                   }
 

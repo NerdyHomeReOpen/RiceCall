@@ -1,15 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
-import { TextStyle } from '@tiptap/extension-text-style';
+import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 import { EmojiNode } from '@/extensions/EmojiNode';
-import { EmbedNode } from '@/extensions/EmbedNode';
-import { UserName } from '@/extensions/UserName';
-import { UserIcon } from '@/extensions/UserIcon';
-import { FontSize } from '@/extensions/FontSize';
-import { FontFamily } from '@/extensions/FontFamily';
+import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
+import { UserTag } from '@/extensions/UserTag';
+import { ImageNode } from '@/extensions/ImageNode';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -22,6 +20,10 @@ import MarkdownContent from '@/components/MarkdownContent';
 // Providers
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useTranslation } from 'react-i18next';
+
+// Services
+import api from '@/services/api.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import { fromTags, toTags } from '@/utils/tagConverter';
@@ -37,11 +39,30 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const editor = useEditor({
-    extensions: [StarterKit, TextStyle, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), FontSize, FontFamily, EmojiNode, EmbedNode, UserName, UserIcon],
+    extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, UserTag, ImageNode],
     content: fromTags(announcement),
     onUpdate: ({ editor }) => onChange(toTags(editor.getHTML())),
     immediatelyRender: false,
   });
+
+  // Refs
+  const isUploadingRef = useRef(false);
+
+  // Memos
+  const FONT_LIST = useMemo(
+    () => [
+      { label: 'Arial', value: 'Arial, sans-serif' },
+      { label: 'Times New Roman', value: '"Times New Roman", serif' },
+      { label: 'Georgia', value: 'Georgia, serif' },
+      { label: 'Verdana', value: 'Verdana, sans-serif' },
+      { label: 'Courier New', value: '"Courier New", monospace' },
+      { label: '微軟正黑體', value: '"Microsoft JhengHei", sans-serif' },
+      { label: '微軟雅黑', value: '"Microsoft YaHei", sans-serif' },
+      { label: 'PingFang TC', value: '"PingFang TC", sans-serif' },
+      { label: 'Noto Sans TC', value: '"Noto Sans TC", sans-serif' },
+    ],
+    [],
+  );
 
   // States
   const [isBold, setIsBold] = useState(false);
@@ -50,6 +71,8 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const [isTextAlignLeft, setIsTextAlignLeft] = useState(false);
   const [isTextAlignCenter, setIsTextAlignCenter] = useState(false);
   const [isTextAlignRight, setIsTextAlignRight] = useState(false);
+  const [fontSize, setFontSize] = useState('13px');
+  const [fontFamily, setFontFamily] = useState('Arial');
 
   // Handlers
   const syncStyles = useCallback(() => {
@@ -59,7 +82,33 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     setIsTextAlignLeft(editor?.isActive({ textAlign: 'left' }) || false);
     setIsTextAlignCenter(editor?.isActive({ textAlign: 'center' }) || false);
     setIsTextAlignRight(editor?.isActive({ textAlign: 'right' }) || false);
+    setFontSize(editor?.getAttributes('textStyle').fontSize || '13px');
+    setFontFamily(editor?.getAttributes('textStyle').fontFamily || 'Arial');
   }, [editor]);
+
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
+  };
+
+  const handlePaste = async (imageData: string, fileName: string) => {
+    isUploadingRef.current = true;
+    if (imageData.length > 5 * 1024 * 1024) {
+      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      isUploadingRef.current = false;
+      return;
+    }
+    const formData = new FormData();
+    formData.append('_type', 'announcement');
+    formData.append('_fileName', `fileName-${Date.now()}`);
+    formData.append('_file', imageData);
+    const response = await api.post('/upload', formData);
+    if (response) {
+      editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
+      syncStyles();
+    }
+    isUploadingRef.current = false;
+  };
 
   // Effects
   useEffect(() => {
@@ -74,22 +123,30 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
           {/* Toolbar */}
           <div className={setting['toolbar']}>
             <div className={popup['select-box']}>
-              <select onChange={(e) => editor?.chain().setMark('textStyle', { fontFamily: e.target.value }).focus().run()}>
-                <option value="" disabled>
-                  {t('font')}
-                </option>
-                <option value="Arial">Arial</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Courier New">Courier New</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Georgia">Georgia</option>
+              <select
+                value={fontFamily}
+                onChange={(e) => {
+                  editor?.chain().setFontFamily(e.target.value).focus().run();
+                  setFontFamily(e.target.value);
+                  syncStyles();
+                }}
+              >
+                {FONT_LIST.map((font) => (
+                  <option key={font.value} value={font.value}>
+                    {font.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className={popup['select-box']}>
-              <select onChange={(e) => editor?.chain().setMark('textStyle', { fontSize: e.target.value }).focus().run()}>
-                <option value="" disabled>
-                  {t('font-size')}
-                </option>
+              <select
+                value={fontSize}
+                onChange={(e) => {
+                  editor?.chain().setFontSize(e.target.value).focus().run();
+                  setFontSize(e.target.value);
+                  syncStyles();
+                }}
+              >
                 {Array.from({ length: 17 }, (_, i) => (
                   <option key={i} value={`${i + 8}px`}>
                     {i + 8}px
@@ -224,10 +281,10 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 const x = e.currentTarget.getBoundingClientRect().left;
                 const y = e.currentTarget.getBoundingClientRect().bottom;
                 contextMenu.showUserTagInput(x, y, 'right-bottom', (username) => {
+                  console.log(username);
                   editor
                     ?.chain()
-                    .insertUserIcon({ gender: 'Male', level: '2' })
-                    .insertUserName({ name: username || 'Unknown' })
+                    .insertUserTag({ name: username || 'Unknown' })
                     .focus()
                     .run();
                   syncStyles();
@@ -251,23 +308,20 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                   const isKick = linkUrl.trim().includes('kick.com/');
                   if (isYouTube) {
                     const videoId = linkUrl.trim().split('/watch?v=')[1].split('&')[0];
-                    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
                     if (videoId && videoId.match(/^[\w-]+$/)) {
-                      editor?.chain().insertEmbed(src).focus().run();
+                      editor?.chain().insertYouTube(videoId).focus().run();
                       syncStyles();
                     }
                   } else if (isTwitch) {
                     const username = linkUrl.trim().split('twitch.tv/')[1].split('&')[0];
-                    const src = `https://player.twitch.tv/?channel=${username}&autoplay=true&parent=localhost`;
                     if (username && username.match(/^[\w-]+$/)) {
-                      editor?.chain().insertEmbed(src).focus().run();
+                      editor?.chain().insertTwitch(username).focus().run();
                       syncStyles();
                     }
                   } else if (isKick) {
                     const username = linkUrl.trim().split('kick.com/')[1].split('&')[0];
-                    const src = `https://player.kick.com/${username}`;
                     if (username && username.match(/^[\w-]+$/)) {
-                      editor?.chain().insertEmbed(src).focus().run();
+                      editor?.chain().insertKick(username).focus().run();
                       syncStyles();
                     }
                   }
@@ -284,6 +338,19 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
             editor={editor}
             className={`${markdown['setting-markdown-container']} ${markdown['markdown-content']}`}
             style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
+            onPaste={(e) => {
+              const items = e.clipboardData.items;
+              for (const item of items) {
+                if (item.type.startsWith('image/')) {
+                  const file = item.getAsFile();
+                  if (file && !isUploadingRef.current) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => handlePaste(reader.result as string, file.name);
+                    reader.readAsDataURL(file);
+                  }
+                }
+              }
+            }}
             maxLength={1000}
           />
         </div>

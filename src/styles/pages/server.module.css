@@ -571,6 +571,7 @@
   background-size: auto;
   background-position: 0 2px;
   cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .mic-button.normal {
@@ -652,14 +653,12 @@
 }
 
 .mic-text {
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 1.1rem;
   color: #2594ca;
 }
 
 .mic-sub-text {
-  margin-top: 2px;
-  font-size: 11px;
+  font-size: 12px;
   color: #777;
 }
 
@@ -712,26 +711,23 @@
   color: #888;
   text-align: center;
   position: relative;
-}
-
-.voice-mode-dropdown::after {
-  display: block;
-  content: '';
-  min-height: 8px;
-  min-width: 8px;
-  cursor: pointer;
-  transform: rotate(180deg);
-  background-image: url('/channel/triangle.png');
-  background-repeat: no-repeat;
-  background-position: 0 0;
-}
-
-.voice-mode-dropdown:hover::after {
-  background-position: -9px 0;
-}
-
-.voice-mode-dropdown:active::after {
-  background-position: -18px 0;
+  &::after {
+    display: block;
+    content: '';
+    min-height: 8px;
+    min-width: 8px;
+    cursor: pointer;
+    transform: rotate(180deg);
+    background-image: url('/channel/triangle.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+  }
+  &:hover::after {
+    background-position: -9px 0;
+  }
+  &:active::after {
+    background-position: -18px 0;
+  }
 }
 
 .bkg-mode-btn {
@@ -840,68 +836,148 @@
   }
 }
 
-.mic-mode-btn {
+.mic-btn {
   position: relative;
+  min-width: 18px;
   width: 18px;
+  min-height: 18px;
   height: 18px;
   cursor: pointer;
-}
-
-.mic-mode-btn::before {
-  content: '';
-  position: absolute;
-  min-height: 18px;
-  min-width: 18px;
   background-image: url('/channel/Mic.png');
   background-repeat: no-repeat;
   background-position: 0 0;
+  &::after {
+    content: '';
+    position: absolute;
+    min-height: 18px;
+    min-width: 18px;
+    opacity: 0;
+    background-image: url('/channel/Mic.png');
+    background-repeat: no-repeat;
+    background-position: -16px 0;
+  }
+  &.muted::after {
+    opacity: 1;
+  }
 }
 
-.mic-mode-btn::after {
-  content: '';
+.mic-mode-dropdown-btn {
+  position: relative;
+  min-height: 8px;
+  height: 8px;
+  min-width: 8px;
+  width: 8px;
+  cursor: pointer;
+  &::after {
+    content: '';
+    position: absolute;
+    min-height: 8px;
+    min-width: 8px;
+    background-image: url('/channel/triangle.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    transform: rotate(180deg);
+  }
+  &:hover::after {
+    background-position: -9px 0;
+  }
+  &:active::after {
+    background-position: -18px 0;
+  }
+}
+
+.mic-mode-menu {
+  z-index: 1000;
   position: absolute;
-  min-height: 18px;
-  min-width: 18px;
-  opacity: 0;
-  background-image: url('/channel/Mic.png');
-  background-repeat: no-repeat;
-  background-position: -16px 0;
+  right: 0;
+  bottom: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 200px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 1px 1px #00000080;
+  overflow: hidden;
 }
 
-.mic-mode-btn.muted::after {
-  opacity: 1;
+.mic-mode-menu .voice-threshold-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.mic-mode-menu .voice-threshold-input {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #eee, #eee);
+  box-shadow: inset 0 -4px 4px -2px rgba(0, 0, 0, 0.1);
+  outline: none;
+  border: 1px solid #999;
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 8px;
+    height: 20px;
+    margin-top: -10px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    background: #fff;
+    border: 1px solid #999;
+    cursor: pointer;
+  }
+  &::-moz-range-thumb {
+    width: 15px;
+    height: 30px;
+    border-radius: 3px;
+    background: #fff;
+    border: 2px solid #999;
+    cursor: pointer;
+  }
+}
+
+.mic-mode-menu .voice-state-icon {
+  opacity: 0;
+  min-height: 12px;
+  min-width: 12px;
+  background-image: url('/channel/audioState.png');
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: -24px 0;
+  &.active {
+    opacity: 1;
+  }
 }
 
 .speaker-btn {
   position: relative;
+  min-width: 18px;
   width: 18px;
+  min-height: 18px;
   height: 18px;
   cursor: pointer;
-}
-
-.speaker-btn::before {
-  position: absolute;
-  content: '';
-  min-height: 18px;
-  min-width: 18px;
   background-image: url('/channel/speaker.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-}
-
-.speaker-btn::after {
-  position: absolute;
-  content: '';
-  min-height: 18px;
-  min-width: 18px;
-  opacity: 0;
-  background-image: url('/channel/speaker.png');
-  background-repeat: no-repeat;
-  background-position: -18px 0;
-}
-
-.speaker-btn.muted::after {
-  opacity: 1;
+  &::after {
+    position: absolute;
+    content: '';
+    min-height: 18px;
+    min-width: 18px;
+    opacity: 0;
+    background-image: url('/channel/speaker.png');
+    background-repeat: no-repeat;
+    background-position: -18px 0;
+  }
+  &.muted::after {
+    opacity: 1;
+  }
 }
 
 .record-mode-btn {
@@ -943,6 +1019,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  gap: 5px;
 }
 
 .mic-volume-container .volume-slider,
@@ -963,8 +1040,10 @@
   background: rgb(255 255 255 / 90%);
 }
 
-.mic-volume-container:hover .volume-slider,
-.speaker-volume-container:hover .volume-slider {
+.mic-volume-container:has(.mic-btn:hover) .volume-slider,
+.mic-volume-container:has(.volume-slider:hover) .volume-slider,
+.speaker-volume-container:has(.speaker-btn:hover) .volume-slider,
+.speaker-volume-container:has(.volume-slider:hover) .volume-slider {
   display: flex;
 }
 

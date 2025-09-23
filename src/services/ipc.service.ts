@@ -1120,6 +1120,22 @@ const ipcService = {
     },
   },
 
+  detectKey: {
+    onKeyDown: (callback: (key: string) => void) => {
+      if (!isElectron) return () => {};
+      const listener = (_: any, key: string) => callback(key);
+      ipcRenderer.on('detected-key-down', listener);
+      return () => ipcRenderer.removeListener('detected-key-down', listener);
+    },
+
+    onKeyUp: (callback: (key: string) => void) => {
+      if (!isElectron) return () => {};
+      const listener = (_: any, key: string) => callback(key);
+      ipcRenderer.on('detected-key-up', listener);
+      return () => ipcRenderer.removeListener('detected-key-up', listener);
+    },
+  },
+
   loopbackAudio: {
     enable: () => {
       if (!isElectron) return;

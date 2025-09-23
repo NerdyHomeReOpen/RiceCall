@@ -10,6 +10,10 @@ import { useContextMenu } from '@/providers/ContextMenu';
 // Styles
 import emoji from '@/styles/emoji.module.css';
 
+// Services
+import ipc from '@/services/ipc.service';
+import api from '@/services/api.service';
+
 interface MessageInputBoxProps {
   onSend?: (message: string) => void;
   disabled?: boolean;
@@ -23,8 +27,34 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   const contextMenu = useContextMenu();
 
   // Refs
+  const isUploadingRef = useRef<boolean>(false);
   const isComposingRef = useRef<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Handlers
+  const handleOpenAlertDialog = (message: string, callback: () => void) => {
+    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+    ipc.popup.onSubmit('dialogAlert', callback);
+  };
+
+  const handlePaste = async (imageData: string, fileName: string) => {
+    isUploadingRef.current = true;
+    if (imageData.length > 5 * 1024 * 1024) {
+      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      isUploadingRef.current = false;
+      return;
+    }
+    const formData = new FormData();
+    formData.append('_type', 'message');
+    formData.append('_fileName', `fileName-${Date.now()}`);
+    formData.append('_file', imageData);
+    const response = await api.post('/upload', formData);
+    if (response) {
+      textareaRef.current?.focus();
+      document.execCommand('insertText', false, `![${fileName}](${response.avatarUrl})`);
+    }
+    isUploadingRef.current = false;
+  };
 
   return (
     <div className={`${messageInputBox['messageinput-box']} ${disabled ? messageInputBox['disabled'] : ''}`}>
@@ -60,6 +90,19 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
           if (disabled) return;
           textareaRef.current!.value = '';
           onSend?.(value);
+        }}
+        onPaste={(e) => {
+          const items = e.clipboardData.items;
+          for (const item of items) {
+            if (item.type.startsWith('image/')) {
+              const file = item.getAsFile();
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => handlePaste(reader.result as string, file.name);
+                reader.readAsDataURL(file);
+              }
+            }
+          }
         }}
         onCompositionStart={() => (isComposingRef.current = true)}
         onCompositionEnd={() => (isComposingRef.current = false)}

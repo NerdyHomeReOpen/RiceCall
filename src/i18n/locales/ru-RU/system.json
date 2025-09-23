@@ -1,0 +1,10 @@
+{
+  "update-available": "Доступна новая версия",
+  "update-available-message": "Новая версия {{version}} была выпущена {{ReleaseDate}} и начинает загружаться...",
+  "update-downloaded": "Установите обновление",
+  "update-downloaded-message": "Версия {{version}} загружена, пожалуйста, нажмите кнопку \"Установить\"",
+  "install-update": "Установить",
+  "open-main-window": "Показать/скрыть главное меню",
+  "logout": "Отключиться",
+  "exit": "Выйти"
+}

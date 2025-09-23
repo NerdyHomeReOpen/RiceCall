@@ -15,11 +15,15 @@ import LevelIcon from '@/components/LevelIcon';
 // Services
 import ipc from '@/services/ipc.service';
 import data from '@/services/data.service';
+import api from '@/services/api.service';
 
 // CSS
 import styles from '@/styles/popups/directMessage.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
+
+// Utils
+import { escapeHtml } from '@/utils/tagConverter';
 
 interface DirectMessagePopupProps {
   userId: User['userId'];
@@ -74,8 +78,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const isVerifiedUser = useMemo(() => false, []); // TODO: Remove this after implementing
 
   // Handlers
-  const handleOpenApplyFriend = () => {
-    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+  const handleSendMessage = (targetId: User['userId'], preset: Partial<DirectMessage>) => {
+    ipc.socket.send('directMessage', { targetId, preset });
   };
 
   const handleBlockUser = () => {
@@ -86,13 +90,29 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     handleOpenAlertDialog(t('confirm-unblock-user', { '0': targetName }), () => ipc.socket.send('unblockUser', { targetId }));
   };
 
+  const handleOpenApplyFriend = () => {
+    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+  };
+
   const handleOpenAlertDialog = (message: string, callback: () => void) => {
     ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
     ipc.popup.onSubmit('dialogAlert', callback);
   };
 
-  const handleSendMessage = (targetId: User['userId'], preset: Partial<DirectMessage>) => {
-    ipc.socket.send('directMessage', { targetId, preset });
+  const handlePaste = async (imageData: string, fileName: string) => {
+    if (imageData.length > 5 * 1024 * 1024) {
+      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      return;
+    }
+    const formData = new FormData();
+    formData.append('_type', 'message');
+    formData.append('_fileName', `fileName-${Date.now()}`);
+    formData.append('_file', imageData);
+    const response = await api.post('/upload', formData);
+    if (response) {
+      textareaRef.current?.focus();
+      document.execCommand('insertText', false, `![${fileName}](${response.avatarUrl})`);
+    }
   };
 
   const handleSendShakeWindow = () => {
@@ -290,6 +310,19 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               placeholder={`${t('input-message')}...`}
               maxLength={MAX_LENGTH}
               className={styles['input']}
+              onPaste={(e) => {
+                const items = e.clipboardData.items;
+                for (const item of items) {
+                  if (item.type.startsWith('image/')) {
+                    const file = item.getAsFile();
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => handlePaste(reader.result as string, file.name);
+                      reader.readAsDataURL(file);
+                    }
+                  }
+                }
+              }}
               onKeyDown={(e) => {
                 const value = textareaRef.current?.value;
                 if (e.shiftKey) return;
@@ -299,7 +332,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 if (value.length > MAX_LENGTH) return;
                 if (isComposingRef.current) return;
                 textareaRef.current!.value = '';
-                handleSendMessage(targetId, { type: 'dm', content: value });
+                handleSendMessage(targetId, { type: 'dm', content: escapeHtml(value) });
               }}
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={() => (isComposingRef.current = false)}

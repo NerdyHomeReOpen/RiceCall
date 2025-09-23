@@ -1,28 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
-export const LANGUAGES: { code: LanguageKey; label: string }[] = [
-  { code: 'zh-TW', label: '繁體中文' },
-  { code: 'zh-CN', label: '简体中文' },
-  { code: 'en-US', label: 'English' },
-  { code: 'ru-RU', label: 'Русский' },
-  { code: 'pt-BR', label: 'Português' },
-  { code: 'es-ES', label: 'Español' },
-  { code: 'fa-IR', label: 'فارسی' },
-  { code: 'tr-TR', label: 'Türkçe' },
-];
-
-// ===== 新增：App -> Crowdin 語言代碼映射 =====
-const APP_TO_CROWDIN: Record<LanguageKey, string> = {
-  'zh-TW': 'zh-TW',
-  'zh-CN': 'zh-CN',
-  'en-US': 'en',
-  'fa-IR': 'fa',
-  'pt-BR': 'pt-BR',
-  'ru-RU': 'ru',
-  'es-ES': 'es-ES',
-  'tr-TR': 'tr',
-};
-
 import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -82,6 +58,29 @@ import zhTW_message from './locales/zh-TW/message.json';
 import zhTW_rpc from './locales/zh-TW/rpc.json';
 import zhTW_country from './locales/zh-TW/country.json';
 import zhTW_badge from './locales/zh-TW/badge.json';
+
+export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
+export const LANGUAGES: { code: LanguageKey; label: string }[] = [
+  { code: 'zh-TW', label: '繁體中文' },
+  { code: 'zh-CN', label: '简体中文' },
+  { code: 'en-US', label: 'English' },
+  { code: 'ru-RU', label: 'Русский' },
+  { code: 'pt-BR', label: 'Português' },
+  { code: 'es-ES', label: 'Español' },
+  { code: 'fa-IR', label: 'فارسی' },
+  { code: 'tr-TR', label: 'Türkçe' },
+];
+
+const APP_TO_CROWDIN: Record<LanguageKey, string> = {
+  'zh-TW': 'zh-TW',
+  'zh-CN': 'zh-CN',
+  'en-US': 'en',
+  'fa-IR': 'fa',
+  'pt-BR': 'pt-BR',
+  'ru-RU': 'ru',
+  'es-ES': 'es-ES',
+  'tr-TR': 'tr',
+};
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;

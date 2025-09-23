@@ -6,45 +6,79 @@ import markdown from '@/styles/markdown.module.css';
 import permission from '@/styles/permission.module.css';
 
 /* ---------- forward  ---------- */
-const emojiRegex = /\[emoji=(.+?)]/g; // [emoji=code]
-const userIconRegex = /\[icon=(.+?)]/g; // [icon=gender-level]
-const userTagRegex = /\[tag=(.+?)]/g; // [tag=name]
-const embedRegex = /\[embed=(.+?)]/g; // [embed=https://www.youtube.com/embed/dQw4w9WgXcQ]
-const discordTimestampRegex = /&lt;t:(\d+):[A-Z]&gt;/g; // <t:timestamp:F>
+const emojiRegex = /(?<![a-zA-Z0-9]):([^:]+):(?![a-zA-Z0-9])/g; // :code:
+const userTagRegex = /<@(.+?)(-(\d+))?(-(\w+))?>/g; // <@name-level-gender> // level and gender are optional
+const ytRegex = /<&YT&(.+?)>/g; // <&YT&dQw4w9WgXcQ>
+const twitchRegex = /<&TW&(.+?)>/g; // <&TW&dQw4w9WgXcQ>
+const kickRegex = /<&KICK&(.+?)>/g; // <&KICK&dQw4w9WgXcQ>
+const discordTimestampRegex = /<t:(\d+):([A-Z])>/g; // <t:timestamp:F>
 
 /* ---------- reverse ---------- */
 const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
-const userIconBackRegex = /<span[^>]+data-icon=['"]([^'"]+)['"][^>]*>[\s\S]*?<\/span>/g;
-const userTagBackRegex = /<span[^>]+data-name=['"]([^'"]+)['"][^>]*>[\s\S]*?<\/span>/g;
-const embedBackRegex = /<iframe[^>]+data-embed=['"]([^'"]+)['"][^>]*><\/iframe>/g;
+const userTagBackRegex = /<span[^>]+data-name=['"]([^'"]+)['"][^>]*>[\s\S]*?<\/span><\/span>/g;
+const ytBackRegex = /<iframe[^>]+data-yt=['"]([^'"]+)['"][^>]*><\/iframe>/g;
+const twitchBackRegex = /<iframe[^>]+data-twitch=['"]([^'"]+)['"][^>]*><\/iframe>/g;
+const kickBackRegex = /<iframe[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const pTagRegex = /<p><\/p>/g;
+
+export function escapeHtml(str: unknown): string {
+  if (typeof str !== 'string') return str as string;
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+    .replace(/(^|\n)&gt;\s/g, '$1> ');
+}
 
 export const fromTags = (raw: string) =>
   raw
-    // Emoji
-    .replace(emojiRegex, (_, code) => {
-      const emoji = emojis.find((e) => e.code === code);
-      if (!emoji) return code;
-      return `<img data-emoji='${code}' class='${markdown['emoji']}' alt='[emoji=${code}]' src='${emoji.path}'/>`;
-    })
-    // User Tag
-    .replace(userIconRegex, (_, icon) => {
-      const [gender, level] = icon.split('-');
-      return `<span data-icon='${icon}' class='${markdown['user-icon']} ${permission[gender || 'Male']} ${permission[`lv-${level || '1'}`]}'></span>`;
-    })
-    .replace(userTagRegex, (_, tag) => {
-      return `<span data-name='${tag}' class='${markdown['user-name']}'>${tag}</span>`;
-    })
-    // Embed
-    .replace(embedRegex, (_, src) => {
-      return `<iframe data-embed='${src}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="${src}"></iframe>`;
-    })
     // Discord Timestamp
     .replace(discordTimestampRegex, (_, timestamp) => {
       const date = new Date(parseInt(timestamp) * 1000);
       return date.toLocaleString();
+    })
+    // Emoji
+    .replace(emojiRegex, (_, code) => {
+      const emoji = emojis.find((e) => e.code === code);
+      if (!emoji) return code;
+      return `<img data-emoji='${code}' class='${markdown['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
+    })
+    // User Tag
+    .replace(userTagRegex, (_, tag, _level, level = '2', _gender, gender = 'Male') => {
+      return `<span data-name='${tag}'><span class='${markdown['user-icon']} ${permission[gender]} ${permission[`lv-${level}`]}'></span><span class='${markdown['user-name']}'>${tag}</span></span>`;
+    })
+    // YouTube
+    .replace(ytRegex, (_, videoId) => {
+      return `<iframe data-yt='${videoId}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://www.youtube.com/embed/${videoId}?autoplay=1"></iframe>`;
+    })
+    // Twitch
+    .replace(twitchRegex, (_, channel) => {
+      return `<iframe data-twitch='${channel}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.twitch.tv/?channel=${channel}&autoplay=true&parent=localhost"></iframe>`;
+    })
+    // Kick
+    .replace(kickRegex, (_, username) => {
+      return `<iframe data-kick='${username}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.kick.com/${username}"></iframe>`;
     });
 
 export const toTags = (html: string) => {
-  return html.replace(emojiBackRegex, '[emoji=$1]').replace(embedBackRegex, '[embed=$1]').replace(userIconBackRegex, '[icon=$1]').replace(userTagBackRegex, '[tag=$1]').replace(pTagRegex, '');
+  console.log(html);
+  return html
+    .replace(emojiBackRegex, (_, code) => {
+      return `:${escapeHtml(code)}:`;
+    })
+    .replace(ytBackRegex, (_, videoId) => {
+      return `<&YT&${escapeHtml(videoId)}>`;
+    })
+    .replace(twitchBackRegex, (_, channel) => {
+      return `<&TW&${escapeHtml(channel)}>`;
+    })
+    .replace(kickBackRegex, (_, username) => {
+      return `<&KICK&${escapeHtml(username)}>`;
+    })
+    .replace(userTagBackRegex, (_, tag) => {
+      return `<@${escapeHtml(tag)}>`;
+    })
+    .replace(pTagRegex, '');
 };

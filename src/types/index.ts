@@ -311,7 +311,6 @@ export type ServerToClientEvents = {
   serverUpdate: (...args: { serverId: string; update: Partial<Server> }[]) => void;
   serverRemove: (...args: { serverId: string }[]) => void;
   // Server Member
-  serverMembersSet: (...args: Member[]) => void;
   serverMemberAdd: (...args: { data: Member }[]) => void;
   serverMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
   serverMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
@@ -331,9 +330,7 @@ export type ServerToClientEvents = {
   channelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
   channelRemove: (...args: { channelId: string }[]) => void;
   // Channel Member
-  channelMemberAdd: (...args: { data: Member }[]) => void;
-  channelMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
-  channelMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
+  channelMemberUpdate: (...args: { userId: string; serverId: string; channelId: string; update: Partial<Member> }[]) => void;
   // Queue Member
   queueMembersSet: (...args: QueueUser[]) => void;
   // Member Invitation

@@ -1,78 +1,58 @@
 .markdown-content {
-  color: #222;
   user-select: text;
 }
 
-.markdown-content *:last-child {
-  margin-block-end: 0;
-}
-
 .markdown-content h1 {
-  font-size: 1.75em;
-  font-weight: bold;
-  cursor: text;
+  font-size: 1.5rem;
+  margin: 16px 0 8px;
 }
 
 .markdown-content h2 {
-  font-size: 1.5em;
-  font-weight: bold;
-  cursor: text;
+  font-size: 1.25rem;
+  margin: 16px 0 8px;
 }
 
 .markdown-content h3 {
-  font-size: 1.25em;
-  font-weight: bold;
-  cursor: text;
-}
-
-.markdown-content h4,
-.markdown-content h5,
-.markdown-content h6 {
-  font-size: 1em;
-  font-weight: bold;
-  cursor: text;
+  font-size: 1rem;
+  margin: 16px 0 8px;
 }
 
 .markdown-content p {
   display: block;
   align-items: center;
-  cursor: text;
   white-space: pre-wrap;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .markdown-content a {
-  color: #2563eb;
   font-weight: 500;
-  text-decoration: underline;
+  text-decoration: none;
   text-underline-offset: 0.125rem;
   white-space: pre-wrap;
+  word-break: break-word;
   cursor: pointer;
-}
-
-.markdown-content a:hover {
-  color: #1d4ed8;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .markdown-content ul,
 .markdown-content ol {
-  padding-inline-start: 20px;
   list-style-position: outside;
-  cursor: pointer;
+  margin: 4px 0 0 16px;
 }
 
 .markdown-content li {
-  cursor: text;
+  margin-bottom: 4px;
 }
 
 .markdown-content blockquote {
-  padding: 0.125rem;
-  padding-left: 1rem;
+  margin: 4px 0;
+  padding: 0 8px 0 12px;
+  text-indent: 0;
   color: #4f545c;
   border-left: 4px solid #00000020;
   border-radius: 0 4px 4px 0;
-  background: #00000005;
-  cursor: text;
 }
 
 /* inline code */
@@ -81,7 +61,6 @@
   border-radius: 4px;
   background: #00000005;
   border: 1px solid #00000010;
-  cursor: text;
   align-self: baseline;
   line-height: 1.5rem;
   font-family: monospace;
@@ -92,10 +71,10 @@
 /* block code */
 .markdown-content pre {
   position: relative;
-  cursor: text;
 }
 
 .markdown-content hr {
+  margin: 5px 0;
   border: none;
   border-top: 1px dashed #d1d5db;
 }
@@ -241,19 +220,19 @@
 }
 
 .user-name {
-  display: inline-block;
+  display: inline-block !important;
+  word-break: break-all !important;
   color: #226ba0;
   cursor: pointer;
   white-space: pre-wrap;
-}
-
-.user-name:hover {
-  text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .user-icon {
-  display: inline-block;
-  vertical-align: text-bottom;
+  display: inline-block !important;
+  word-break: break-all !important;
 }
 
 .embed-video {

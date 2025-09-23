@@ -83,11 +83,15 @@
   display: flex;
   align-items: center;
   gap: 3px;
+  overflow: hidden;
 }
 
 .header .username-text {
   cursor: pointer;
   color: #2f94db;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .header:hover .username-text {
@@ -98,10 +102,11 @@
   margin-left: 5px;
   color: #888;
   font-size: 0.9em;
+  min-width: fit-content;
 }
 
 .content {
   color: #000;
   user-select: text;
-  word-break: break-all;
+  word-break: break-word;
 }

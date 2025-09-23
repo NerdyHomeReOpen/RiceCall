@@ -1,0 +1,10 @@
+{
+  "update-available": "Nueva versión disponible",
+  "update-available-message": "Nueva versión {{version}} lanzada el {{releaseDate}}, iniciando descarga...",
+  "update-downloaded": "Instalación de la actualización",
+  "update-downloaded-message": "Se ha descargado la versión {{version}}. Haga clic en el botón \"Instalar ahora\" para instalarla.",
+  "install-update": "Instalar ahora",
+  "open-main-window": "Abrir ventana principal",
+  "logout": "Cerrar sesión",
+  "exit": "Salir"
+}

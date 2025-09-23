@@ -797,6 +797,11 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-floating-menu/-/extension-floating-menu-3.2.0.tgz#1bdbb6ad0bf14fc7a05e0fea6e26071e92dbe028"
   integrity sha512-CZJztT6eC8QKNwx+89PeJGhxSsGeU04/fPS18/y2DP4bEumrfTEq7jbtholJsLqErpghOdmm0XS+byYI6Dk9pg==
 
+"@tiptap/extension-font-family@^3.4.5":
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-font-family/-/extension-font-family-3.4.5.tgz#917dbedb26c8580b788dd40a8af5d0b8a0b7ff68"
+  integrity sha512-GX37E08yoXu2LRkCoG4abfHRt40AaX4TovbcXXomeyV7wHUhVVqjUr+W1L/HILMNF6dnR03NHROdAsjyIyxfJA==
+
 "@tiptap/extension-gapcursor@^3.2.0":
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-gapcursor/-/extension-gapcursor-3.2.0.tgz#00bf91bf9df120b70eb6b4592a1b609dcbcee7d3"
@@ -869,10 +874,10 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-text-align/-/extension-text-align-3.2.0.tgz#d5957dba839a7e83798a5dbb16944827d1f8ee30"
   integrity sha512-fnS4O92cyQWMUFdmiNkrKYzxbf8jBzxGFZMVir3Ihh1pKtTGfoz3d6gYMayb+kqMZDgt/JmWnZdb/mLjSzD42w==
 
-"@tiptap/extension-text-style@^3.2.0":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@tiptap/extension-text-style/-/extension-text-style-3.2.0.tgz#167465b6944c352c0d72b7aea414fe663f7d9228"
-  integrity sha512-jr5mItJNQUVF/aY39k74uJ3Q3qJVBlm5c9ID+gTlNjvotRfNH2Pl3MOxWj/O2O4ou8JlynK8XZfa2bWguzk63g==
+"@tiptap/extension-text-style@^3.4.5":
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-text-style/-/extension-text-style-3.4.5.tgz#c7eeb03edadfdbc952777664cc36622c2c6532b0"
+  integrity sha512-XbdXEJbAHZxl+M/XVJAFSgYzlF/yoouFtZ/YjUmGxt5m1s29le/nCMpGorlKhA5nFDx69jFTF4ULQzjD5rcjGA==
 
 "@tiptap/extension-text@^3.2.0":
   version "3.2.0"
@@ -5347,6 +5352,13 @@ node-fetch@^2.6.1, node-fetch@^2.7.0:
   dependencies:
     whatwg-url "^5.0.0"
 
+node-global-key-listener@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/node-global-key-listener/-/node-global-key-listener-0.3.0.tgz#8c5402c3d8fc36ba347f829a5b58dd10c3b17af5"
+  integrity sha512-yWB1OFrDlzXYm3+hYcE8xOscvclpBAQGXcBnc2ytenFLkZfxFipuCwhuIIlIKVtwBuDRkdXJVZMqN99cPVBFFA==
+  dependencies:
+    sudo-prompt "^9.2.1"
+
 node-gyp@^9.0.0:
   version "9.4.1"
   resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-9.4.1.tgz#8a1023e0d6766ecb52764cc3a734b36ff275e185"
@@ -6894,6 +6906,11 @@ stylelint@^16.17.0:
     svg-tags "^1.0.0"
     table "^6.9.0"
     write-file-atomic "^5.0.1"
+
+sudo-prompt@^9.2.1:
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/sudo-prompt/-/sudo-prompt-9.2.1.tgz#77efb84309c9ca489527a4e749f287e6bdd52afd"
+  integrity sha512-Mu7R0g4ig9TUuGSxJavny5Rv0egCEtpZRNMrZaYS1vxkiIxGiGUwoezU3LazIQ+KE04hTrTfNPgxU5gzi7F5Pw==
 
 sumchecker@^3.0.1:
   version "3.0.1"

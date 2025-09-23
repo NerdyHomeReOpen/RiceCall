@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -166,17 +166,20 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     setChannel((prev) => (update.has(`${prev.channelId}`) ? { ...prev, ...update.get(`${prev.channelId}`) } : prev));
   };
 
-  const handleChannelMemberAdd = (...args: { data: Member }[]) => {
+  const handleServerMemberAdd = (...args: { data: Member }[]) => {
     const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
     setChannelMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
   };
 
-  const handleChannelMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
-    const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
-    setChannelMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
-  };
+  const handleChannelMemberUpdate = useCallback(
+    (...args: { userId: string; serverId: string; channelId: string; update: Partial<Member> }[]) => {
+      const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}#${i.channelId}`, i.update] as const));
+      setChannelMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}#${channelId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}#${channelId}`) } : m)));
+    },
+    [channelId],
+  );
 
-  const handleChannelMemberRemove = (...args: { userId: string; serverId: string }[]) => {
+  const handleServerMemberRemove = (...args: { userId: string; serverId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
     setChannelMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   };
@@ -185,12 +188,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   useEffect(() => {
     const unsubscribe = [
       ipc.socket.on('channelUpdate', handleChannelUpdate),
-      ipc.socket.on('channelMemberAdd', handleChannelMemberAdd),
+      ipc.socket.on('serverMemberAdd', handleServerMemberAdd),
       ipc.socket.on('channelMemberUpdate', handleChannelMemberUpdate),
-      ipc.socket.on('channelMemberRemove', handleChannelMemberRemove),
+      ipc.socket.on('serverMemberRemove', handleServerMemberRemove),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, []);
+  }, [handleChannelMemberUpdate]);
 
   return (
     <div className={popup['popup-wrapper']}>

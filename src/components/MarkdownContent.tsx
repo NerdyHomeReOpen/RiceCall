@@ -99,10 +99,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
   };
 
   // Memos
-  const sanitized = useMemo(() => {
-    if (escapeHtml) return fromTags(markdownText.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
-    else return fromTags(markdownText);
-  }, [markdownText, escapeHtml]);
+  const sanitized = useMemo(() => fromTags(markdownText), [markdownText]);
 
   return (
     <div className={markdown['markdown-content']}>

@@ -69,7 +69,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(({ x, y, direction, o
             e.preventDefault();
           }}
           onClick={() => {
-            onEmojiSelect?.(e.code, `[emoji=${e.code}]`);
+            onEmojiSelect?.(e.code, `:${e.code}:`);
           }}
         />
       ))}

@@ -8,6 +8,7 @@ import ipc from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
+import { fromTags } from '@/utils/tagConverter';
 
 enum DIALOG_ICON {
   ALERT = 'alert',
@@ -31,7 +32,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
   const { t } = useTranslation();
 
   // Variables
-  const formattedMessage = t(message, parameter);
+  const formattedMessageContents = fromTags(t(message, parameter));
 
   // Handlers
   const handleSubmit = () => {
@@ -49,7 +50,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup[DIALOG_ICON[iconType]]}`} />
-          {formattedMessage} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
+          {formattedMessageContents} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
         </div>
       </div>
 

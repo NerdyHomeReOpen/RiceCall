@@ -22,7 +22,7 @@ import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
 
 // Components
-import AnnouncementEditor from '../AnnouncementEditor';
+import AnnouncementEditor from '@/components/AnnouncementEditor';
 
 interface ServerSettingPopupProps {
   userId: User['userId'];
@@ -142,7 +142,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               `${t('member-application-management')} (${totalApplications})`,
               `${t('blacklist-management')} (${totalBlockMembers})`,
             ]
-          : [t('server-info'), t('server-announcement')],
+          : isMember(permissionLevel)
+            ? [t('server-info'), t('server-announcement'), t('member-management')]
+            : [t('server-info'), t('server-announcement')],
       [t, totalApplications, totalBlockMembers, permissionLevel],
     );
 
@@ -191,11 +193,16 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
     };
 
+    const handleOpenAlertDialog = (message: string, callback: () => void) => {
+      ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+      ipc.popup.onSubmit('dialogAlert', callback);
+    };
+
     const handleOpenImageCropper = (serverId: Server['serverId'], imageData: string) => {
       ipc.popup.open('imageCropper', 'imageCropper', { imageData, submitTo: 'imageCropper' });
       ipc.popup.onSubmit('imageCropper', async (data) => {
         if (data.imageDataUrl.length > 5 * 1024 * 1024) {
-          handleOpenErrorDialog(t('image-too-large', { '0': '5MB' }));
+          handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           return;
         }
         const formData = new FormData();
@@ -207,15 +214,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           setServer((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
         }
       });
-    };
-
-    const handleOpenErrorDialog = (message: string) => {
-      ipc.popup.open('dialogError', 'dialogError', { message, submitTo: 'dialogError' });
-    };
-
-    const handleOpenAlertDialog = (message: string, callback: () => void) => {
-      ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-      ipc.popup.onSubmit('dialogAlert', callback);
     };
 
     const handleClose = () => {

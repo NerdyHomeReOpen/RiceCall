@@ -14,6 +14,8 @@ import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } f
 import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
+import { initMainI18n, t } from './i18n.js';
+import { GlobalKeyboardListener, IGlobalKey } from 'node-global-key-listener';
 
 initMain();
 
@@ -202,8 +204,6 @@ const ClientToServerEventNames = [
 export const ServerToClientEventNames = [
   'actionMessage',
   'channelAdd',
-  'channelMemberAdd',
-  'channelMemberRemove',
   'channelMemberUpdate',
   'channelMessage',
   'channelRemove',
@@ -238,7 +238,6 @@ export const ServerToClientEventNames = [
   'serverMemberApplicationsSet',
   'serverMemberRemove',
   'serverMemberUpdate',
-  'serverMembersSet',
   'serverOnlineMemberAdd',
   'serverOnlineMemberRemove',
   'serverOnlineMemberUpdate',
@@ -386,7 +385,7 @@ export function loadEnv() {
   // 3) Validate (optional: warn if missing values)
   const parsed = EnvSchema.safeParse(env);
   if (!parsed.success) {
-    console.warn(`${new Date().toLocaleString()} | [env] invalid values:`, parsed.error.flatten().fieldErrors);
+    console.warn(`${new Date().toLocaleString()} | Invalid env values:`, parsed.error.flatten().fieldErrors);
   } else {
     Object.assign(env, parsed.data);
   }
@@ -396,12 +395,6 @@ export function loadEnv() {
 
   return { env, filesLoaded: files.filter(fs.existsSync) };
 }
-
-// Functions
-// async function checkIsHinet() {
-//   const ipData = await fetch('https://ipinfo.io/json').then((res) => res.json());
-//   return ipData.org.startsWith('AS3462');
-// }
 
 function waitForPort(port: number) {
   return new Promise((resolve, reject) => {
@@ -455,7 +448,7 @@ function setAutoLaunch(enable: boolean) {
       openAsHidden: false,
     });
   } catch (error) {
-    console.error('設置開機自動啟動時出錯:', error);
+    console.error(`${new Date().toLocaleString()} | Set auto launch error:`, error);
   }
 }
 
@@ -464,7 +457,7 @@ function isAutoLaunchEnabled(): boolean {
     const settings = app.getLoginItemSettings();
     return settings.openAtLogin;
   } catch (error) {
-    console.error('讀取開機自動啟動狀態時出錯:', error);
+    console.error(`${new Date().toLocaleString()} | Get auto launch error:`, error);
     return false;
   }
 }
@@ -478,7 +471,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
 
   if (DEV) {
     waitForPort(PORT).catch((err) => {
-      console.error('Cannot connect to Next.js server:', err);
+      console.error(`${new Date().toLocaleString()} | Cannot connect to Next.js server:`, err);
       app.exit();
     });
   }
@@ -549,7 +542,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
 
   if (DEV) {
     waitForPort(PORT).catch((err) => {
-      console.error('Cannot connect to Next.js server:', err);
+      console.error(`${new Date().toLocaleString()} | Cannot connect to Next.js server:`, err);
       app.quit();
     });
   }
@@ -613,7 +606,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
 
   if (DEV) {
     waitForPort(PORT).catch((err) => {
-      console.error('Cannot connect to Next.js server:', err);
+      console.error(`${new Date().toLocaleString()} | Cannot connect to Next.js server:`, err);
       app.exit();
     });
   }
@@ -840,8 +833,8 @@ function configureAutoUpdater() {
     dialog
       .showMessageBox({
         type: 'info',
-        title: '有新版本可用',
-        message: `新版本 ${info.version} 發布於 ${new Date(info.releaseDate).toLocaleDateString()}，正在開始下載...`,
+        title: t('update-available'),
+        message: t('update-available-message', { version: info.version, releaseDate: new Date(info.releaseDate).toLocaleDateString() }),
       })
       .catch((error) => {
         console.error(`${new Date().toLocaleString()} | Cannot show update dialog:`, error.message);
@@ -866,9 +859,9 @@ function configureAutoUpdater() {
     dialog
       .showMessageBox({
         type: 'info',
-        title: '安裝更新',
-        message: `版本 ${info.version} 已下載完成，請點擊立即安裝按鈕進行安裝`,
-        buttons: ['立即安裝'],
+        title: t('update-downloaded'),
+        message: t('update-downloaded-message', { version: info.version }),
+        buttons: [t('install-update')],
       })
       .then((buttonIndex) => {
         if (buttonIndex.response === 0) {
@@ -910,7 +903,7 @@ function setTrayIcon(isLogin: boolean) {
   const contextMenu = Menu.buildFromTemplate([
     {
       id: 'open-main-window',
-      label: '打開主視窗',
+      label: t('open-main-window'),
       type: 'normal',
       click: () => {
         if (isLogin) mainWindow?.show();
@@ -920,7 +913,7 @@ function setTrayIcon(isLogin: boolean) {
     { type: 'separator' },
     {
       id: 'logout',
-      label: '登出',
+      label: t('logout'),
       type: 'normal',
       enabled: isLogin,
       click: () => {
@@ -930,7 +923,7 @@ function setTrayIcon(isLogin: boolean) {
     },
     {
       id: 'exit',
-      label: '退出',
+      label: t('exit'),
       type: 'normal',
       click: () => app.exit(),
     },
@@ -1021,6 +1014,8 @@ app.on('ready', async () => {
 
   ipcMain.on('set-language', (_, language) => {
     store.set('language', language ?? 'zh-TW');
+    initMainI18n(language ?? 'zh-TW');
+    setTrayIcon(isLogin);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);
     });
@@ -1593,6 +1588,80 @@ app.on('ready', async () => {
   ipcMain.on('open-external', (_, url) => {
     shell.openExternal(url);
   });
+
+  // initialize global keyboard listener
+  const keyListener = new GlobalKeyboardListener();
+  const lastKeyDown: Record<string, boolean> = Object.create(null);
+  const lastComboFiredAt: Record<string, number> = Object.create(null);
+  const COMBO_THROTTLE_MS = 10;
+
+  const IGNORED_KEYS = new Set(['control', 'left ctrl', 'right ctrl', 'shift', 'left shift', 'right shift', 'alt', 'left alt', 'right alt', 'meta', 'left meta', 'right meta', 'super', 'command']);
+
+  function getModifiers(isDown: Record<string, boolean>): string[] {
+    const hasCtrl = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('CTRL'));
+    const hasShift = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('SHIFT'));
+    const hasAlt = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('ALT'));
+    const hasMeta = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && (k.includes('META') || k.includes('SUPER') || k.includes('COMMAND')));
+
+    const mods: string[] = [];
+    if (hasCtrl) mods.push('Ctrl');
+    if (hasShift) mods.push('Shift');
+    if (hasAlt) mods.push('Alt');
+    if (hasMeta) mods.push('Meta');
+
+    return mods; // Order: Ctrl → Shift → Alt → Meta
+  }
+
+  function buildCombo(mods: string[], keyNameLower: string): string {
+    const parts = keyNameLower ? [...mods, keyNameLower] : [...mods];
+    return parts.join('+');
+  }
+
+  keyListener.addListener((event, isDown) => {
+    const state = event.state; // 'DOWN' | 'UP'
+    const rawName = event.name ?? '';
+    const keyNameLower = rawName.toLowerCase().trim();
+
+    const isModifierOnly = IGNORED_KEYS.has(keyNameLower);
+    if (!rawName || isModifierOnly) {
+      if (state === 'DOWN') lastKeyDown[keyNameLower] = true;
+      else if (state === 'UP') lastKeyDown[keyNameLower] = false;
+      return;
+    }
+
+    const mods = getModifiers(isDown);
+    const combo = buildCombo(mods, keyNameLower);
+
+    if (state === 'DOWN') {
+      // Only trigger on edge-trigger: from UP -> DOWN
+      if (lastKeyDown[keyNameLower]) return;
+      lastKeyDown[keyNameLower] = true;
+
+      // Throttle: prevent duplicate trigger within 500ms
+      const now = Date.now();
+      const last = lastComboFiredAt[combo] ?? 0;
+      if (now - last < COMBO_THROTTLE_MS) return;
+      lastComboFiredAt[combo] = now;
+
+      // Send event
+      mainWindow?.webContents.send('detected-key-down', combo);
+      // BrowserWindow.getAllWindows().forEach(w => w.webContents.send('detected-key-press', combo));
+    } else if (state === 'UP') {
+      // Reset edge-trigger
+      lastKeyDown[keyNameLower] = false;
+
+      // Throttle: prevent duplicate trigger within 500ms
+      const now = Date.now();
+      const last = lastComboFiredAt[combo] ?? 0;
+      if (now - last < COMBO_THROTTLE_MS) return;
+      lastComboFiredAt[combo] = now;
+
+      // Send event
+      mainWindow?.webContents.send('detected-key-up', combo);
+      // BrowserWindow.getAllWindows().forEach(w => w.webContents.send('detected-key-press', combo));
+    }
+  });
+  // ----
 });
 
 app.on('before-quit', () => {
@@ -1652,3 +1721,11 @@ async function handleDeepLink(url: string) {
     console.error(`${new Date().toLocaleString()} | Error parsing deep link:`, error);
   }
 }
+
+process.on('uncaughtException', (error) => {
+  console.error(`${new Date().toLocaleString()} | Uncaught exception:`, error);
+});
+
+process.on('unhandledRejection', (error) => {
+  console.error(`${new Date().toLocaleString()} | Unhandled rejection:`, error);
+});
