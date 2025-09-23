@@ -4,7 +4,7 @@
   "update-downloaded": "安裝更新",
   "update-downloaded-message": "版本 {{version}} 已下載完成，請點擊立即安裝按鈕進行安裝",
   "install-update": "立即安裝",
-  "open-main-window": "打開主視窗tr-TR",
-  "logout": "登出tr-TR",
-  "exit": "退出tr-TR"
+  "open-main-window": "Ana pencereyi aç",
+  "logout": "oturumu Kapat",
+  "exit": "Çıkış"
 }
