@@ -117,8 +117,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
     ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
-  const handleOpenSystemSetting = () => {
-    ipc.popup.open('systemSetting', 'systemSetting', {});
+  const handleOpenSystemSetting = (userId: User['userId']) => {
+    ipc.popup.open('systemSetting', 'systemSetting', { userId });
   };
 
   const handleOpenAboutUs = () => {
@@ -302,7 +302,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                 id: 'system-setting',
                 label: t('system-setting'),
                 icon: 'setting',
-                onClick: handleOpenSystemSetting,
+                onClick: () => handleOpenSystemSetting(userId),
               },
               {
                 id: 'change-theme',
