@@ -239,7 +239,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
       <div
         className={styles['avatar-picture']}
         style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: isOnline && isFriend && !friendIsBlocked ? '' : 'grayscale(100%)' }}
-        datatype={isOnline && isFriend && !friendIsBlocked ? friendStatus : ''}
+        datatype={isOnline && isFriend && !friendIsBlocked && friendStatus !== 'online' /* filter online status icon */ ? friendStatus : ''}
       />
       <div className={styles['base-info-wrapper']}>
         <div className={styles['box']}>
