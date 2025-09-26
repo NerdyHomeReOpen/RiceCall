@@ -7,6 +7,7 @@ import { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import hljs from 'highlight.js';
+import DOMPurify from 'dompurify';
 
 // CSS
 import 'highlight.js/styles/github.css';
@@ -18,12 +19,15 @@ import { useTranslation } from 'react-i18next';
 // Utils
 import { fromTags } from '@/utils/tagConverter';
 
+// DOMPurify
+const ALLOWED_TAGS = ['span', 'img', 'p', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'blockquote', 'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'strong', 'em', 'code', 'pre'];
+const ALLOWED_ATTR: string[] = ['id', 'src', 'alt', 'class', 'href', 'controls', 'width', 'height', 'allowfullscreen', 'type', 'style'];
+
 interface MarkdownContentProps {
   markdownText: string;
-  escapeHtml?: boolean;
 }
 
-const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText, escapeHtml = true }) => {
+const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -99,7 +103,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
   };
 
   // Memos
-  const sanitized = useMemo(() => fromTags(markdownText), [markdownText]);
+  const sanitized = useMemo(() => fromTags(DOMPurify.sanitize(markdownText, { ALLOWED_TAGS, ALLOWED_ATTR })), [markdownText]);
 
   return (
     <div className={markdown['markdown-content']}>

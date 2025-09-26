@@ -356,7 +356,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
         </div>
       ) : (
         <div className={markdown['setting-markdown-container']} style={{ height: '380px' }}>
-          <MarkdownContent markdownText={announcement} escapeHtml={false} />
+          <MarkdownContent markdownText={announcement} />
         </div>
       )}
     </div>

@@ -454,7 +454,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
           <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
             {/* Announcement Area */}
             <div ref={annAreaRef} className={styles['announcement-area']}>
-              <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} escapeHtml={false} />
+              <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} />
             </div>
 
             {/* Resize Handle */}

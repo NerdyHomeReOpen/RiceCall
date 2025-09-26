@@ -326,7 +326,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 <div className={announcementStyle['announcement-datail-date']}>{selectedAnnouncement && getFormatDate(selectedAnnouncement.timestamp)}</div>
               </div>
               <div className={announcementStyle['announcement-detail-content']}>
-                <MarkdownContent markdownText={selectedAnnouncement?.content ?? ''} escapeHtml={true} />
+                <MarkdownContent markdownText={selectedAnnouncement?.content ?? ''} />
               </div>
             </div>
           </div>
