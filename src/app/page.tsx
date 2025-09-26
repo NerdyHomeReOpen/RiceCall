@@ -441,6 +441,8 @@ const RootPageComponent: React.FC = React.memo(() => {
       serverIdRef.current = currentServerId || '';
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
+
+    ipc.toolbar.title.set(`${args[0].update.name || ''}`);
   };
 
   const handleFriendsSet = (...args: Friend[]) => {
