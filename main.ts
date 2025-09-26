@@ -491,6 +491,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      devTools: false,
       webviewTag: true,
       webSecurity: false,
       nodeIntegration: true,
@@ -560,6 +561,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      devTools: false,
       webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
@@ -624,6 +626,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      devTools: false,
       webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
@@ -1012,7 +1015,7 @@ app.on('ready', async () => {
   ipcMain.on('set-toolbar-title', (_, title: string) => {
     if (!tray) return;
     setTrayDetail(isLogin, title);
-    
+
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.setTitle(`${title} · RiceCall`);
     }
