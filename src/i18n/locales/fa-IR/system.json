@@ -1,9 +1,9 @@
 {
-  "update-available": "有新版本可用",
-  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，正在開始下載...",
-  "update-downloaded": "安裝更新",
-  "update-downloaded-message": "版本 {{version}} 已下載完成，請點擊立即安裝按鈕進行安裝",
-  "install-update": "立即安裝",
+  "update-available": "نسخه جدید در دسترس است",
+  "update-available-message": "نسخه جدید {{version}} در تاریخ {{releaseDate}} منتشر شد، در حال دانلود...",
+  "update-downloaded": "نصب به‌روزرسانی",
+  "update-downloaded-message": "نسخه {{version}} با موفقیت دانلود شد، لطفاً برای نصب روی دکمه «همین حالا نصب کن» کلیک کنید",
+  "install-update": "همین حالا نصب کن",
   "open-main-window": "نشان دان یا مخفی کردن منوی اصلی",
   "logout": "خروج",
   "exit": "خروج"
