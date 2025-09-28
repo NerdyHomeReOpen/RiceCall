@@ -1120,6 +1120,15 @@ const ipcService = {
     },
   },
 
+  toolbar: {
+    title: {
+      set: (title: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-toolbar-title', title);
+      },
+    },
+  },
+
   detectKey: {
     onKeyDown: (callback: (key: string) => void) => {
       if (!isElectron) return () => {};

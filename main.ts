@@ -491,6 +491,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      devTools: false,
       webviewTag: true,
       webSecurity: false,
       nodeIntegration: true,
@@ -560,6 +561,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      devTools: false,
       webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
@@ -624,6 +626,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     hasShadow: true,
     icon: APP_ICON,
     webPreferences: {
+      devTools: false,
       webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
@@ -897,7 +900,7 @@ async function configureDiscordRPC() {
 }
 
 // Tray Icon Functions
-function setTrayIcon(isLogin: boolean) {
+function setTrayDetail(isLogin: boolean, title: string | null = null) {
   if (!tray) return;
   const trayIconPath = isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
   const contextMenu = Menu.buildFromTemplate([
@@ -929,6 +932,7 @@ function setTrayIcon(isLogin: boolean) {
     },
   ]);
 
+  tray.setToolTip(`${title ? `${title} · ` : ''}RiceCall v${app.getVersion()}`);
   tray.setImage(nativeImage.createFromPath(trayIconPath));
   tray.setContextMenu(contextMenu);
 }
@@ -942,7 +946,7 @@ function configureTray() {
     if (isLogin) mainWindow?.show();
     else authWindow?.show();
   });
-  setTrayIcon(isLogin);
+  setTrayDetail(isLogin);
 }
 
 app.on('ready', async () => {
@@ -992,7 +996,7 @@ app.on('ready', async () => {
     authWindow?.hide();
     socketInstance = connectSocket(token);
     isLogin = true;
-    setTrayIcon(isLogin);
+    setTrayDetail(isLogin);
   });
 
   ipcMain.on('logout', () => {
@@ -1004,7 +1008,17 @@ app.on('ready', async () => {
     authWindow?.show();
     socketInstance = disconnectSocket();
     isLogin = false;
-    setTrayIcon(isLogin);
+    setTrayDetail(isLogin);
+  });
+
+  // toolbar handlers
+  ipcMain.on('set-toolbar-title', (_, title: string) => {
+    if (!tray) return;
+    setTrayDetail(isLogin, title);
+
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setTitle(`${title} · RiceCall`);
+    }
   });
 
   // Language handlers
@@ -1015,7 +1029,7 @@ app.on('ready', async () => {
   ipcMain.on('set-language', (_, language) => {
     store.set('language', language ?? 'zh-TW');
     initMainI18n(language ?? 'zh-TW');
-    setTrayIcon(isLogin);
+    setTrayDetail(isLogin);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);
     });

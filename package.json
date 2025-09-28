@@ -1,6 +1,6 @@
 {
   "name": "ricecall",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": false,
   "description": "Ricecall",
   "author": {
@@ -48,6 +48,7 @@
     "@tiptap/starter-kit": "^3.2.0",
     "@types/react-color": "^3.0.13",
     "discord-rpc": "^4.0.1",
+    "dompurify": "^3.2.7",
     "dotenv": "^16.5.0",
     "dotenv-expand": "^12.0.3",
     "electron-audio-loopback-josh": "^1.0.7",
