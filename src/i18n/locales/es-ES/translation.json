@@ -58,7 +58,7 @@
   "change-name": "Cambiar nombre",
   "change-theme": "Cambiar tema",
   "channel": "Canal",
-  "channel-admin": "Administrador del canal",
+  "channel-admin": "Moderador global",
   "channel-announcement": "Anuncio del canal",
   "channel-audio-quality": "Calidad de audio del canal",
   "channel-forbid-guest-text-message": "Este canal prohíbe a los visitantes enviar mensajes de texto.",
