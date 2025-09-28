@@ -7,11 +7,11 @@ import permission from '@/styles/permission.module.css';
 
 /* ---------- forward  ---------- */
 const emojiRegex = /(?<![a-zA-Z0-9]):([^:]+):(?![a-zA-Z0-9])/g; // :code:
-const userTagRegex = /<@(.+?)(-(\d+))?(-(\w+))?>/g; // <@name-level-gender> // level and gender are optional
-const ytRegex = /<&YT&(.+?)>/g; // <&YT&dQw4w9WgXcQ>
-const twitchRegex = /<&TW&(.+?)>/g; // <&TW&dQw4w9WgXcQ>
-const kickRegex = /<&KICK&(.+?)>/g; // <&KICK&dQw4w9WgXcQ>
-const discordTimestampRegex = /<t:(\d+):([A-Z])>/g; // <t:timestamp:F>
+const userTagRegex = /&lt;@(.+?)(-(\d+))?(-(\w+))?&gt;/g; // <@name-level-gender> // level and gender are optional
+const ytRegex = /&lt;&amp;YT&amp;(.+?)&gt;/g; // <&YT&dQw4w9WgXcQ>
+const twitchRegex = /&lt;&amp;TW&amp;(.+?)&gt;/g; // <&TW&dQw4w9WgXcQ>
+const kickRegex = /&lt;&amp;KICK&amp;(.+?)&gt;/g; // <&KICK&dQw4w9WgXcQ>
+const discordTimestampRegex = /&lt;&amp;t&amp;:(\d+):([A-Z])&gt;/g; // <t:timestamp:F>
 
 /* ---------- reverse ---------- */
 const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
@@ -69,16 +69,16 @@ export const toTags = (html: string) => {
       return `:${escapeHtml(code)}:`;
     })
     .replace(ytBackRegex, (_, videoId) => {
-      return `<&YT&${escapeHtml(videoId)}>`;
+      return `&lt;&amp;YT&amp;${escapeHtml(videoId)}&gt;`;
     })
     .replace(twitchBackRegex, (_, channel) => {
-      return `<&TW&${escapeHtml(channel)}>`;
+      return `&lt;&amp;TW&amp;${escapeHtml(channel)}&gt;`;
     })
     .replace(kickBackRegex, (_, username) => {
-      return `<&KICK&${escapeHtml(username)}>`;
+      return `&lt;&amp;KICK&amp;${escapeHtml(username)}&gt;`;
     })
     .replace(userTagBackRegex, (_, tag) => {
-      return `<@${escapeHtml(tag)}>`;
+      return `&lt;@${escapeHtml(tag)}&gt;`;
     })
     .replace(pTagRegex, '');
 };
