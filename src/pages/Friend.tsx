@@ -71,6 +71,24 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
     return () => document.removeEventListener('pointerup', resetResizing);
   }, []);
 
+  const userInfo = () => (
+    <div className={friendPage['user-info-wrapper']}>
+      <div className={friendPage['user-info']}>
+        <div className={friendPage['user-avatar']}></div>
+        <div className={friendPage['right-info']}>
+          <div className={friendPage['user-info-top']}>
+            <div className={`${friendPage['vip-icon']} ${vip['vip-icon']} ${vip['vip-1']}`}></div>
+            <div className={`${friendPage['user-name']} ${friendPage['vip-color']}`}>username</div>
+            <div className={friendPage['public-time']}>5分鐘前</div>
+          </div>
+          <div className={friendPage['signature']}>
+            signaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignature
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
@@ -130,9 +148,17 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         {/* Resize Handle */}
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
 
-        {/* Right Content */}
+        {/* Friend Active Content */}
         <main className={friendPage['content']}>
           <header className={friendPage['header']}>{t('friend-active')}</header>
+          <div className={`${friendPage['scroll-view']} ${friendPage['friend-active-wrapper']}`}>
+            <div className={friendPage['friend-active-list']}>
+              {/* User Info (todo: click to user info card)*/}
+              {Array.from({ length: 50 }).map((_, index) => (
+                <div key={index}>{userInfo()}</div>
+              ))}
+            </div>
+          </div>
         </main>
       </main>
     </main>
