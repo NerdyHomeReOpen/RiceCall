@@ -1,7 +1,7 @@
 {
   "accept-member-invitation-failed": "Error al aceptar la invitación de membresía, inténtalo más tarde",
   "account-already-exists": "La cuenta ya existe",
-  "account-not-found": "Cuenta no encontrada",
+  "account-not-found": "Esta cuenta no existe.",
   "add-user-to-queue": "El administrador [{{operator}}] ha añadido a [{{target}}] a la cola.",
   "add-user-to-queue-failed": "Error al añadir al usuario a la cola, inténtalo más tarde",
   "approve-friend-application-failed": "Error al aceptar solicitud de amistad, por favor, inténtalo de nuevo más tarde",
