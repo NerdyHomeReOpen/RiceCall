@@ -442,7 +442,9 @@ const RootPageComponent: React.FC = React.memo(() => {
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
 
-    ipc.toolbar.title.set(`${args[0].update.name || ''}`);
+    if (args[0].update.name) {
+      ipc.toolbar.title.set(`${args[0].update.name || user.name}`);
+    }
   };
 
   const handleFriendsSet = (...args: Friend[]) => {
