@@ -127,6 +127,7 @@ export type table_members = {
   nickname: string | null;
   contribution: number;
   createdAt: number;
+  lastJoinChannelTime: number;
 };
 
 export type table_recommend_server_categories = {

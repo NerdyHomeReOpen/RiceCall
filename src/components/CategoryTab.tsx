@@ -35,6 +35,29 @@ interface CategoryTabProps {
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
+const toMs = (v: unknown): number => {
+  if (v == null) return Number.NaN;
+  if (typeof v === 'number') return v;
+  const n = Number(v);
+  if (!Number.isNaN(n) && Number.isFinite(n)) return n;
+  const t = new Date(String(v)).getTime();
+  return Number.isNaN(t) ? Number.NaN : t;
+};
+
+const cmpCategory = (a: any, b: any) => {
+  const ta = toMs(a.lastJoinChannelTime);
+  const tb = toMs(b.lastJoinChannelTime);
+  const aNaN = Number.isNaN(ta);
+  const bNaN = Number.isNaN(tb);
+
+  if (aNaN && bNaN) return 0;
+  if (aNaN) return 1;
+  if (bNaN) return -1;
+
+  return tb - ta;
+};
+
+
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, server, serverOnlineMembers, category, channels, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
@@ -65,8 +88,11 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
   );
   const filteredCategoryChannels = useMemo(() => categoryChannels.filter((ch) => !!ch).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [categoryChannels]);
   const filteredCategoryMembers = useMemo(
-    () => categoryMembers.filter((m) => !!m).sort((a, b) => (a.permissionLevel !== b.permissionLevel ? a.permissionLevel - b.permissionLevel : a.createdAt - b.createdAt)),
-    [categoryMembers],
+    () =>
+      categoryMembers
+        .filter(Boolean)
+        .sort(cmpCategory),
+    [categoryMembers]
   );
 
   // Handlers
