@@ -23,7 +23,7 @@ import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Utils
-import { handleOpenApplyFriend, handleOpenAlertDialog } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenUserInfo } from '@/utils/popup';
 import { escapeHtml } from '@/utils/tagConverter';
 
 interface DirectMessagePopupProps {
@@ -231,7 +231,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         {/* Sidebar */}
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
-            <div className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
+            <div
+              className={`${styles['avatar-picture']} ${styles['clickable']} ${isFriend && isOnline ? '' : styles['offline']}`}
+              style={{ backgroundImage: `url(${targetAvatarUrl})` }}
+              onClick={() => handleOpenUserInfo(userId, targetId)}
+            />
             {targetVip > 0 && <div className={`${vip['vip-icon-big']} ${vip[`vip-${targetVip}`]}`} />}
             <div className={styles['user-state-box']}>
               <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} />
@@ -240,7 +244,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
           </div>
           <div className={styles['user-box']}>
-            <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${userAvatarUrl})` }} />
+            <div className={`${styles['avatar-picture']} ${styles['clickable']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, userId)} />
           </div>
         </div>
 
