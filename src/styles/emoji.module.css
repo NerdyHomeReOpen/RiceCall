@@ -25,39 +25,343 @@
   background-position: -36px 0;
 }
 
-.emoji-grid {
+.emoji-in-input {
   position: absolute;
-  z-index: 1000;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.emoji-grid {
   display: grid;
-  width: fit-content;
-  max-width: 350px;
-  height: fit-content;
-  max-height: 350px;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 5px;
-  padding: 5px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgb(0 0 0 / 10%);
-  overflow: hidden auto;
+  grid-template-columns: repeat(10, 1fr);
+  overflow: auto;
+  gap: 0;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #fff;
+  width: 100%;
+  height: 100%;
+  grid-auto-rows: 24px;
 }
 
 .emoji {
   display: flex;
   align-items: center;
-  min-width: 19px;
-  max-width: 19px;
-  min-height: 19px;
-  max-height: 19px;
+  width: 100%;
+  height: 100%;
   cursor: pointer;
-  border: 1px solid #fff0;
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
   background-position: center;
   background-repeat: no-repeat;
   background-size: 19px;
   overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .emoji:hover {
-  border: 1px solid #5898ff;
+  box-shadow: inset 0 0 0 1px #5898ff;
+}
+
+.emoji-grid > .emoji:nth-last-child(-n + 10) {
+  border-bottom-color: transparent;
+}
+
+.emoji-grid > .emoji:nth-child(10n) {
+  border-right-color: transparent;
+}
+
+.emoji-panel {
+  position: absolute;
+  z-index: 1000;
+  box-sizing: border-box;
+  width: 302px;
+  height: 237px;
+  padding: 0 1px 1px 0;
+  background: #fbfbfb;
+  border: 1px solid rgb(171, 171, 171);
+  border-radius: 2px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.emoji-panel-compact {
+  height: 15.7rem;
+}
+
+.emoji-fontbar {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 10px 0 0 10px;
+  gap: 5px;
+}
+
+.emoji-font-icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  margin-left: 0.8rem;
+  margin-right: 0.5rem;
+  background: url('/channel/FontButton.png') no-repeat center / contain;
+}
+
+.font-select-box {
+  width: 5rem !important;
+}
+
+.color-select-box {
+  display: flex;
+  min-width: max-content;
+  width: 100px;
+  max-width: 100%;
+  position: relative;
+  border: 1px solid #ccc;
+  height: 2.2rem;
+  width: 7rem;
+  align-items: center;
+  margin-left: 0.8rem;
+  overflow: visible;
+  background: #fff;
+  box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
+}
+
+.color-select-box .color-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 20px);
+  gap: 6px;
+  padding: 8px;
+  width: max-content;
+  height: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 5px rgb(0 0 0 / 10%);
+  z-index: 1001;
+}
+
+.color-select-box::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 2em;
+  width: 25px;
+  z-index: 1;
+  background-image: url('/channel/spliter.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+}
+
+.color-select-box::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  right: 0;
+  width: 26px;
+  height: 12px;
+  background-image: url('/login_combobox_triangle.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  pointer-events: none;
+}
+
+.color-select-box:hover::after {
+  background-position: -26px 0;
+}
+
+.color-select-box:active::after {
+  background-position: -52px 0;
+}
+
+.color-swatch {
+  width: 50px;
+  height: 17px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  margin-left: 0.5rem;
+  box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
+}
+
+.color-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 20px);
+  gap: 6px;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 5px rgb(0 0 0 / 10%);
+  z-index: 1001;
+}
+
+.color-option {
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.emoji-font-select {
+  font-size: 14px;
+  padding: 2px 6px;
+  background-color: #fff;
+}
+
+.emoji-pages {
+  box-sizing: border-box;
+  width: 22rem;
+  height: 12rem;
+  margin: 10px 0 10px 0;
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  align-self: center;
+  background: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+.emoji-page {
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.emoji-page.active {
+  display: block;
+}
+
+.emoji-page::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.emoji-grid::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+.emoji-grid {
+  scrollbar-width: none;
+}
+
+.emoji-tabs {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgb(244, 244, 243);
+  border-top: 1px solid rgb(223, 223, 223);
+}
+
+.emoji-tab-btn {
+  width: 42px;
+  height: 32px;
+  border: none;
+  background: none;
+  padding: 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.emoji-tab-btn + .emoji-tab-btn {
+  margin-left: 0;
+}
+.emoji-tab-label {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.emoji-tab-btn .img {
+  width: 42px;
+  height: 32px;
+  opacity: 0.7;
+}
+.emoji-tab-btn[aria-pressed='true'] .img {
+  opacity: 1;
+}
+
+.tab-def {
+  margin-left: 15px;
+}
+
+.tab-def::before,
+.tab-other::before,
+.tab-vip::before {
+  content: '';
+  display: block;
+  width: 42px;
+  height: 32px;
+  background-repeat: no-repeat;
+  opacity: 0.85;
+  background-position: 0 -1px;
+}
+
+.user-info-emoji::before {
+  background-position: 0 0;
+}
+
+.tab-def::before {
+  background-image: url('/im/deftab.png');
+}
+.tab-other::before {
+  background-image: url('/im/vipEm_Sign.png');
+}
+.tab-vip::before {
+  background-image: url('/im/viptab.png');
+}
+
+.tab-def:hover::before,
+.tab-other:hover::before,
+.tab-vip:hover:before {
+  background-position: -42px -1px;
+}
+
+.user-info-emoji:hover::before {
+  background-position: -42px 0;
+}
+
+.tab-def[aria-selected='true']::before,
+.tab-other[aria-selected='true']::before,
+.tab-vip[aria-selected='true']::before {
+  background-position: 0 -32px;
+}
+
+.emoji-native {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  line-height: 1;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+}
+
+.emoji-native:hover {
+  border-color: #5898ff;
+}
+
+.emoji-vip-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #888;
 }

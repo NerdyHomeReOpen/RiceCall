@@ -287,10 +287,17 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                     e.preventDefault();
                     const x = e.currentTarget.getBoundingClientRect().left;
                     const y = e.currentTarget.getBoundingClientRect().top;
-                    contextMenu.showEmojiPicker(x, y, 'right-top', (_, full) => {
-                      textareaRef.current?.focus();
-                      document.execCommand('insertText', false, full);
-                    });
+                    contextMenu.showEmojiPicker(
+                      x,
+                      y,
+                      'right-top',
+                      (_, full) => {
+                        textareaRef.current?.focus();
+                        document.execCommand('insertText', false, full);
+                      },
+                      e.currentTarget as HTMLElement,
+                      true,
+                    );
                   }}
                 />
                 <div className={`${styles['button']} ${styles['screen-shot']}`} />

@@ -129,10 +129,17 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
               e.preventDefault();
               const x = e.currentTarget.getBoundingClientRect().left;
               const y = e.currentTarget.getBoundingClientRect().bottom;
-              contextMenu.showEmojiPicker(x, y, 'right-bottom', (_, full) => {
-                signatureInputRef.current?.focus();
-                document.execCommand('insertText', false, full);
-              });
+              contextMenu.showEmojiPicker(
+                x,
+                y,
+                'right-bottom',
+                (_, full) => {
+                  signatureInputRef.current?.focus();
+                  document.execCommand('insertText', false, full);
+                },
+                e.currentTarget as HTMLElement,
+                false,
+              );
             }}
           />
         </div>
