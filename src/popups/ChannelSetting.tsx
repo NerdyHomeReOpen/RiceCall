@@ -19,6 +19,7 @@ import ipc from '@/services/ipc.service';
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenEditNickname, handleOpenBlockMember } from '@/utils/popup';
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isChannelMod, isServerOwner, isChannelAdmin } from '@/utils/permission';
@@ -125,27 +126,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
     handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
-  };
-
-  const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
-  };
-
-  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
-  };
-
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleClose = () => {

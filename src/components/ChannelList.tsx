@@ -21,6 +21,7 @@ import QueueMemberTab from '@/components/QueueMemberTab';
 import ipc from '@/services/ipc.service';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenServerSetting, handleOpenEditNickname, handleOpenCreateChannel, handleOpenEditChannelOrder } from '@/utils/popup';
 import { isMember, isServerAdmin } from '@/utils/permission';
 
 interface ChannelListProps {
@@ -76,30 +77,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     ipc.socket.send('favoriteServer', { serverId });
   };
 
-  const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
-  };
-
   const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
     if (!serverReceiveApply) handleOpenAlertDialog(t('cannot-apply-member'), () => {});
     else ipc.popup.open('applyMember', 'applyMember', { userId, serverId });
-  };
-
-  const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
-  };
-
-  const handleOpenCreateChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
-  };
-
-  const handleOpenChangeChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('editChannelOrder', 'editChannelOrder', { serverId, userId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleLocateUser = () => {
@@ -295,7 +275,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
               id: 'edit-channel-order',
               label: t('edit-channel-order'),
               show: isServerAdmin(permissionLevel),
-              onClick: () => handleOpenChangeChannelOrder(userId, serverId),
+              onClick: () => handleOpenEditChannelOrder(userId, serverId),
             },
           ]);
         }}

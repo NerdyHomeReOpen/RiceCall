@@ -15,6 +15,7 @@ import popup from '@/styles/popup.module.css';
 import ipc from '@/services/ipc.service';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenCreateChannel, handleOpenEditChannelName } from '@/utils/popup';
 import Default from '@/utils/default';
 
 interface EditChannelOrderPopupProps {
@@ -96,19 +97,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
       ipc.socket.send('deleteChannel', { serverId, channelId });
       setSelectedChannel(null);
     });
-  };
-
-  const handleOpenCreateChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
-  };
-
-  const handleOpenEditChannelName = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId, channelName: selectedChannel?.name ?? '' });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleClose = () => {

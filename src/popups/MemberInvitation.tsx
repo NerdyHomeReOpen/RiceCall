@@ -14,6 +14,7 @@ import ipc from '@/services/ipc.service';
 import { useTranslation } from 'react-i18next';
 
 // Utils
+import { handleOpenAlertDialog } from '@/utils/popup';
 import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
 interface MemberInvitationPopupProps {
@@ -41,11 +42,6 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
     handleOpenAlertDialog(t('confirm-reject-all-member-invitation'), () => {
       ipc.socket.send('rejectMemberInvitation', ...memberInvitations.map((item) => ({ serverId: item.serverId })));
     });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleMemberInvitationAdd = (...args: { data: MemberInvitation }[]) => {

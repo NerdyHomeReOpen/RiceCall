@@ -12,6 +12,9 @@ import popup from '@/styles/popup.module.css';
 // Services
 import ipc from '@/services/ipc.service';
 
+// Utils
+import { handleOpenApplyFriend } from '@/utils/popup';
+
 interface SearchUserPopupProps {
   userId: User['userId'];
 }
@@ -27,10 +30,6 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   // Handlers
   const handleSearchUser = (query: string) => {
     ipc.socket.send('searchUser', { query });
-  };
-
-  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
   };
 
   const handleClose = () => {

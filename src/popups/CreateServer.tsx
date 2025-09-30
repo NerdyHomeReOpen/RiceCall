@@ -16,6 +16,7 @@ import ipc from '@/services/ipc.service';
 import api from '@/services/api.service';
 
 // Utils
+import { handleOpenAlertDialog } from '@/utils/popup';
 import Default from '@/utils/default';
 
 interface CreateServerPopupProps {
@@ -56,11 +57,6 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   // Handlers
   const handleCreateServer = (preset: Partial<Server>) => {
     ipc.socket.send('createServer', { preset });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleClose = () => {

@@ -15,10 +15,8 @@ import { useContextMenu } from '@/providers/ContextMenu';
 // Components
 import MarkdownContent from '@/components/MarkdownContent';
 
-// Services
-import ipc from '@/services/ipc.service';
-
 // Utils
+import { handleOpenDirectMessage, handleOpenUserInfo } from '@/utils/popup';
 import { getFormatTimestamp } from '@/utils/language';
 
 interface ChannelMessageProps {
@@ -57,15 +55,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     [messageContents, t, ALLOWED_MESSAGE_KEYS],
   );
   const isUser = useMemo(() => senderUserId === userId, [senderUserId, userId]);
-
-  // handles
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
-  };
 
   return (
     <>
