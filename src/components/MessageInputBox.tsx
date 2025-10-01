@@ -61,10 +61,17 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
           e.preventDefault();
           const x = e.currentTarget.getBoundingClientRect().left;
           const y = e.currentTarget.getBoundingClientRect().top;
-          contextMenu.showEmojiPicker(x, y, 'right-top', (_, full) => {
-            textareaRef.current?.focus();
-            document.execCommand('insertText', false, full);
-          });
+          contextMenu.showEmojiPicker(
+            x,
+            y,
+            'right-top',
+            (_, full) => {
+              textareaRef.current?.focus();
+              document.execCommand('insertText', false, full);
+            },
+            e.currentTarget as HTMLElement,
+            true,
+          );
         }}
       />
 

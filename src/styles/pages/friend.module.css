@@ -455,10 +455,13 @@
 /* Main Content */
 
 .content {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-width: 500px;
-  height: auto;
+  min-height: 0;
   border-top: 2px solid #e0e0e4;
+  background-color: #f4f6fa;
 }
 
 .content .header {
@@ -466,4 +469,112 @@
   padding: 10px;
   background-color: #f4f6fa;
   font-weight: bold;
+}
+
+.content-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.user-info-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.friend-active-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  flex: 1;
+}
+
+.user-info-wrapper,
+.user-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: flex-start;
+}
+
+.user-avatar {
+  cursor: pointer;
+  background-image: url('/im/IMLogo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  min-height: 30px;
+  min-width: 30px;
+}
+
+.right-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.user-info-top {
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+}
+
+.user-info-top > div:first-child,
+.user-info-top > div:nth-child(2) {
+  flex-shrink: 0;
+}
+
+.user-info-top > div:last-child {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.user-info {
+  gap: 10px;
+}
+
+.vip-icon {
+  width: 14px;
+}
+
+.user-name {
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.signature {
+  color: #5c5d5e;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.user-name {
+  height: 14px;
+}
+
+.vip-color {
+  color: #4c99dd;
+}
+
+.public-time {
+  color: #8a8b8f;
+  font-size: 0.95rem;
 }

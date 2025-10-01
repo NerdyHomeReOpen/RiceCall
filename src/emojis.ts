@@ -7,7 +7,7 @@ export interface Emoji {
   path: string;
 }
 
-const customEmojis: Emoji[] = [
+export const defEmojis: Emoji[] = [
   { code: '1', alt: '微笑', path: '/smiles/1.gif' },
   { code: '2', alt: '開懷笑', path: '/smiles/2.gif' },
   { code: '3', alt: '眨眼', path: '/smiles/3.gif' },
@@ -70,11 +70,16 @@ const customEmojis: Emoji[] = [
   { code: '61', alt: '帶血的刀', path: '/smiles/61.gif' },
 ];
 
-const unicodeEmojis: Emoji[] = emojiData
+export const otherEmojis: Array<Emoji & { char: string }> = emojiData
   .filter((e) => e.codes.length <= 5)
   .map((emoji) => {
     const code = twemoji.convert.toCodePoint(emoji.char);
-    return { code, alt: emoji.name, path: `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png` };
+    return {
+      code,
+      alt: emoji.name,
+      path: `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png`,
+      char: emoji.char,
+    };
   });
 
-export const emojis = [...customEmojis, ...unicodeEmojis];
+export const emojis: Emoji[] = [...defEmojis, ...otherEmojis.map(({ code, alt, path }) => ({ code, alt, path }))];

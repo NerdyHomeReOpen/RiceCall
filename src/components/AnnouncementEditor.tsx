@@ -257,10 +257,17 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 e.preventDefault();
                 const x = e.currentTarget.getBoundingClientRect().left;
                 const y = e.currentTarget.getBoundingClientRect().bottom;
-                contextMenu.showEmojiPicker(x, y, 'right-bottom', (code) => {
-                  editor?.chain().insertEmoji({ code }).focus().run();
-                  syncStyles();
-                });
+                contextMenu.showEmojiPicker(
+                  x,
+                  y,
+                  'right-bottom',
+                  (code) => {
+                    editor?.chain().insertEmoji({ code }).focus().run();
+                    syncStyles();
+                  },
+                  e.currentTarget as HTMLElement,
+                  false,
+                );
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">

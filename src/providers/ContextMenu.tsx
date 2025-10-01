@@ -21,7 +21,15 @@ interface ContextMenuContextType {
   showNotifyMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotifyMenuItem[]) => void;
   showUserInfoBlock: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: OnlineMember) => void;
   showBadgeInfoCard: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Badge) => void;
-  showEmojiPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onEmojiSelect: (code: string, full: string) => void) => void;
+  showEmojiPicker: (
+    x: number,
+    y: number,
+    position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom',
+    onEmojiSelect: (code: string, full: string) => void,
+    anchorEl?: HTMLElement | null,
+    showFontbar?: boolean,
+    isUserInfo?: boolean,
+  ) => void;
   showColorPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => void;
   showStatusDropdown: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: User['status']) => void) => void;
   showEmbedLinkInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => void;
@@ -126,8 +134,16 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsBadgeInfoVisible(false);
   };
 
-  const showEmojiPicker = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onEmojiSelect: (code: string, full: string) => void) => {
-    setEmojiPicker(<EmojiPicker onEmojiSelect={onEmojiSelect} x={x} y={y} direction={direction} />);
+  const showEmojiPicker = (
+    x: number,
+    y: number,
+    direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom',
+    onEmojiSelect: (code: string, full: string) => void,
+    anchorEl?: HTMLElement | null,
+    showFontbar?: boolean,
+    isUserInfo?: boolean,
+  ) => {
+    setEmojiPicker(<EmojiPicker onEmojiSelect={onEmojiSelect} x={x} y={y} direction={direction} anchorEl={anchorEl} showFontbar={showFontbar} isUserInfo={isUserInfo} />);
     setIsEmojiPickerVisible(true);
   };
 

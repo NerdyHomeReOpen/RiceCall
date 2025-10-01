@@ -460,17 +460,34 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
 
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('signature')}</div>
-                <div className={popup['row']}>
-                  <input ref={signatureInputRef} name="signature" type="text" value={targetSignature} maxLength={100} onChange={(e) => setTarget((prev) => ({ ...prev, signature: e.target.value }))} />
+                <div style={{ position: 'relative', width: '100%' }}>
+                  <input
+                    ref={signatureInputRef}
+                    name="signature"
+                    type="text"
+                    value={targetSignature}
+                    maxLength={100}
+                    onChange={(e) => setTarget((prev) => ({ ...prev, signature: e.target.value }))}
+                    style={{ paddingRight: '28px', width: '100%' }}
+                  />
                   <div
-                    className={emoji['emoji-icon']}
-                    onClick={(e) => {
+                    className={`${emoji['emoji-icon']} ${emoji['emoji-in-input']}`}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
                       const x = e.currentTarget.getBoundingClientRect().left;
                       const y = e.currentTarget.getBoundingClientRect().top;
-                      contextMenu.showEmojiPicker(x, y, 'left-top', (_, full) => {
-                        signatureInputRef.current?.focus();
-                        document.execCommand('insertText', false, full);
-                      });
+                      contextMenu.showEmojiPicker(
+                        x,
+                        y,
+                        'left-top',
+                        (_, full) => {
+                          signatureInputRef.current?.focus();
+                          document.execCommand('insertText', false, full);
+                        },
+                        e.currentTarget as HTMLElement,
+                        false,
+                        true,
+                      );
                     }}
                   />
                 </div>
