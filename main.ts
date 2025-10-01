@@ -34,6 +34,7 @@ dotenv.config();
 
 let tray: Tray | null = null;
 let isLogin: boolean = false;
+let isUpdateNotified: boolean = false;
 
 // Store
 type StoreType = {
@@ -869,6 +870,7 @@ function configureAutoUpdater() {
       .then((buttonIndex) => {
         if (buttonIndex.response === 0) {
           autoUpdater.quitAndInstall(false, true);
+          isUpdateNotified = false;
         }
       })
       .catch((error) => {
@@ -878,9 +880,15 @@ function configureAutoUpdater() {
 
   function checkUpdate() {
     if (DEV) return;
+    if (isUpdateNotified) return;
     console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, env.UPDATE_CHANNEL);
-    autoUpdater.checkForUpdates().catch((error) => {
+    autoUpdater
+      .checkForUpdates()
+      .catch((error) => {
       console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
+      })
+      .finally(() => {
+        isUpdateNotified = true;
     });
   }
 
