@@ -61,7 +61,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
     [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
   );
   const filteredChannelMembers = useMemo(
-    () => channelMembers.filter(Boolean).sort((a, b) => a.lastJoinChannelAt - b.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
+    () => channelMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
     [channelMembers],
   );
 

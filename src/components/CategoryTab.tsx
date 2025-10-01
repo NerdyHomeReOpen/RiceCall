@@ -65,7 +65,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
   );
   const filteredCategoryChannels = useMemo(() => categoryChannels.filter(Boolean).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [categoryChannels]);
   const filteredCategoryMembers = useMemo(
-    () => categoryMembers.filter(Boolean).sort((a, b) => a.lastJoinChannelAt - b.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
+    () => categoryMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
     [categoryMembers],
   );
 
