@@ -275,7 +275,7 @@
   "mic-order": "Ordem de fala",
   "mic-queued": "Esperando na fila para falar",
   "mic-taken": "Microfone pego",
-  "mic-volume-threshold": "麥克風音量門檻",
+  "mic-volume-threshold": "麥克風靈敏度",
   "microphone": "Microfone",
   "microphone-amplification-label": "Amplificação de microfone",
   "minimize-to-tray": "Minimizar para a barra de tarefas",
