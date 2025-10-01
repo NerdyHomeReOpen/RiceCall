@@ -19,6 +19,8 @@ import {
 // Providers
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
+const MAX_RECORD_TIME = 20 * 60 * 1000; // 20 minutes
+
 interface WebRTCContextType {
   setUserMuted: (userId: string, muted: boolean) => void;
   setMicTaken: (taken: boolean, channelId: string) => void;
@@ -128,6 +130,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // Recorder
   const recorderRef = useRef<MediaRecorder | null>(null);
   const recordChunksRef = useRef<Blob[]>([]);
+  const recordTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isRecordingRef = useRef<boolean>(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
@@ -477,6 +480,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         a.click();
         a.remove();
       }
+      if (recordTimeoutRef.current) clearTimeout(recordTimeoutRef.current);
       isUploadingRef.current = false;
     };
     mediaRecorder.start();
@@ -750,6 +754,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     else startRecording();
     setIsRecording(!isRecordingRef.current);
     isRecordingRef.current = !isRecordingRef.current;
+
+    recordTimeoutRef.current = setTimeout(() => {
+      stopRecording();
+      setIsRecording(false);
+      isRecordingRef.current = false;
+    }, MAX_RECORD_TIME);
   }, [startRecording, stopRecording]);
 
   const toggleMicMuted = useCallback(() => {
