@@ -126,6 +126,7 @@ export type table_members = {
   serverId: string;
   nickname: string | null;
   contribution: number;
+  lastJoinChannelAt: number;
   createdAt: number;
 };
 

@@ -63,9 +63,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
     () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
     [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
   );
-  const filteredCategoryChannels = useMemo(() => categoryChannels.filter((ch) => !!ch).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [categoryChannels]);
+  const filteredCategoryChannels = useMemo(() => categoryChannels.filter(Boolean).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [categoryChannels]);
   const filteredCategoryMembers = useMemo(
-    () => categoryMembers.filter((m) => !!m).sort((a, b) => (a.permissionLevel !== b.permissionLevel ? a.permissionLevel - b.permissionLevel : a.createdAt - b.createdAt)),
+    () => categoryMembers.filter(Boolean).sort((a, b) => a.lastJoinChannelAt - b.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
     [categoryMembers],
   );
 

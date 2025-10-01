@@ -60,7 +60,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
     () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
     [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
   );
-  const filteredChannelMembers = useMemo(() => channelMembers.filter((mb) => !!mb).sort((a, b) => (a.nickname || a.name).localeCompare(b.nickname || b.name)), [channelMembers]);
+  const filteredChannelMembers = useMemo(
+    () => channelMembers.filter(Boolean).sort((a, b) => a.lastJoinChannelAt - b.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
+    [channelMembers],
+  );
 
   // Handlers
   const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {

@@ -505,7 +505,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   const handleServerOnlineMemberAdd = (...args: { data: OnlineMember }[]) => {
     const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-    setServerOnlineMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
+    setServerOnlineMembers((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
   };
 
   const handleServerOnlineMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
