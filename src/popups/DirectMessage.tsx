@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Components
-import MessageContent from '@/components/MessageContent';
+import DirectMessageContent from '@/components/DirectMessageContent';
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
@@ -25,7 +25,6 @@ import vip from '@/styles/vip.module.css';
 // Utils
 import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenUserInfo } from '@/utils/popup';
 import { escapeHtml } from '@/utils/tagConverter';
-import Default from '@/utils/default';
 
 interface DirectMessagePopupProps {
   userId: User['userId'];
@@ -276,7 +275,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
           )}
           <div className={styles['message-area']}>
-            <MessageContent messages={directMessages} user={user} channel={Default.channel()} server={Default.server()} />
+            <DirectMessageContent messages={directMessages} user={user} />
           </div>
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>

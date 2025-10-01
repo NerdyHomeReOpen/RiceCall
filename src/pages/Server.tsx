@@ -6,7 +6,7 @@ import styles from '@/styles/pages/server.module.css';
 
 // Components
 import MarkdownContent from '@/components/MarkdownContent';
-import MessageContent from '@/components/MessageContent';
+import ChannelMessageContent from '@/components/ChannelMessageContent';
 import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
@@ -465,13 +465,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             <div className={styles['bottom-area']}>
               {/* Message Area */}
               <div className={styles['message-area']}>
-                <MessageContent messages={channelMessages} user={user} channel={channel} server={server} />
+                <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} />
               </div>
 
               {/* Broadcast Area */}
               <div className={styles['input-area']}>
                 <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
-                  <MessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={channel} server={server} />
+                  <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={channel} server={server} />
                 </div>
                 <MessageInputBoxGuard
                   lastJoinChannelTime={lastJoinChannelTime}

@@ -98,7 +98,7 @@ export type DirectMessage = Message &
     user2Id: string;
   };
 
-export type PromptMessage = (DirectMessage | ChannelMessage | Message) & {
+export type PromptMessage = Message & {
   type: 'alert' | 'info' | 'warn' | 'event';
 };
 

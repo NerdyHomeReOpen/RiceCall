@@ -4,23 +4,20 @@ import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import styles from '@/styles/message.module.css';
 
 // Types
-import type { User, ChannelMessage, DirectMessage, PromptMessage, Channel, Server } from '@/types';
+import type { User, DirectMessage, PromptMessage } from '@/types';
 
 // Components
 import DirectMessageTab from '@/components/DirectMessage';
-import ChannelMessageTab from '@/components/ChannelMessage';
 import PromptMessageTab from '@/components/PromptMessage';
 
-type MessageGroup = (DirectMessage & { contents: string[] }) | (ChannelMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
+type MessageGroup = (DirectMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
 
-interface MessageContentProps {
-  messages: (DirectMessage | ChannelMessage | PromptMessage)[];
+interface DirectMessageContentProps {
+  messages: (DirectMessage | PromptMessage)[];
   user: User;
-  channel: Channel;
-  server: Server;
 }
 
-const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages, user, channel, server }) => {
+const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ messages }) => {
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -32,14 +29,10 @@ const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages, us
       const timeDiff = lastGroup && message.timestamp - lastGroup.timestamp;
       const nearTime = lastGroup && timeDiff <= 5 * 60 * 1000;
       const sameType = lastGroup && message.type === lastGroup.type;
-      const isGeneral = message.type === 'general';
       const isDm = message.type === 'dm';
-      const sameSender =
-        lastGroup &&
-        ((lastGroup.type === 'general' && message.type === 'general' && message.userId === lastGroup.userId) ||
-          (lastGroup.type === 'dm' && message.type === 'dm' && message.userId === lastGroup.userId));
+      const sameSender = lastGroup && lastGroup.type === 'dm' && message.type === 'dm' && message.userId === lastGroup.userId;
 
-      if (sameSender && nearTime && sameType && (isGeneral || isDm)) {
+      if (sameSender && nearTime && sameType && isDm) {
         lastGroup.contents.push(message.content);
       } else {
         acc.push({ ...message, contents: [message.content] });
@@ -61,13 +54,7 @@ const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages, us
       {messageGroups.map((messageGroup, index) => {
         return (
           <div key={index} className={styles['message-wrapper']}>
-            {messageGroup.type === 'general' ? (
-              <ChannelMessageTab messageGroup={messageGroup} user={user} channel={channel} server={server} />
-            ) : messageGroup.type === 'dm' ? (
-              <DirectMessageTab messageGroup={messageGroup} />
-            ) : (
-              <PromptMessageTab messageGroup={messageGroup} messageType={messageGroup.type} />
-            )}
+            {messageGroup.type === 'dm' ? <DirectMessageTab messageGroup={messageGroup} /> : <PromptMessageTab messageGroup={messageGroup} messageType={messageGroup.type} />}
           </div>
         );
       })}
@@ -76,6 +63,6 @@ const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages, us
   );
 });
 
-MessageContent.displayName = 'MessageContent';
+DirectMessageContent.displayName = 'DirectMessageContent';
 
-export default MessageContent;
+export default DirectMessageContent;
