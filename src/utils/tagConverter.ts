@@ -86,6 +86,11 @@ export const toTags = (raw: string) => {
 
 export const fromPreserveHtml = (raw: string) => {
   return raw
+    .replace(emojiRegex, (_, code) => {
+      const emoji = emojis.find((e) => e.code === code);
+      if (!emoji) return code;
+      return `<img data-emoji='${code}' class='${markdown['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
+    })
     .replace(discordTimestampPreserveRegex, (_, timestamp) => {
       const date = new Date(parseInt(timestamp) * 1000);
       return date.toLocaleString();
