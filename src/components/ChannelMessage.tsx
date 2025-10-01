@@ -6,7 +6,7 @@ import permission from '@/styles/permission.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Types
-import type { User, ChannelMessage } from '@/types';
+import type { User, ChannelMessage, Server, Channel } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -16,15 +16,18 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import MarkdownContent from '@/components/MarkdownContent';
 
 // Utils
-import { handleOpenDirectMessage, handleOpenUserInfo } from '@/utils/popup';
+import { isServerAdmin } from '@/utils/permission';
+import { handleOpenDirectMessage, handleOpenUserInfo, handleOpenBlockMember } from '@/utils/popup';
 import { getFormatTimestamp } from '@/utils/language';
 
 interface ChannelMessageProps {
   messageGroup: ChannelMessage & { contents: string[] };
-  userId: User['userId'];
+  user: User;
+  channel: Channel;
+  server: Server;
 }
 
-const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup, userId }) => {
+const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup, user, channel, server }) => {
   // Hooks
   const contextMenu = useContextMenu();
   const { t } = useTranslation();
@@ -41,6 +44,16 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     timestamp: messageTimestamp,
   } = messageGroup;
 
+  const { userId, permissionLevel: globalPermission } = user;
+
+  const { permissionLevel: channelPermissionLevel } = channel;
+  const { serverId, permissionLevel: serverPermissionLevel } = server;
+
+  // Variables
+  const permissionLevel = Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel);
+  const isUser = useMemo(() => senderUserId === userId, [senderUserId, userId]);
+  const isSuperior = permissionLevel > senderPermissionLevel;
+
   // Memos
   const ALLOWED_MESSAGE_KEYS = useMemo(() => ['guest-send-an-external-link'], []);
   const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
@@ -54,7 +67,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       ),
     [messageContents, t, ALLOWED_MESSAGE_KEYS],
   );
-  const isUser = useMemo(() => senderUserId === userId, [senderUserId, userId]);
 
   return (
     <>
@@ -78,6 +90,17 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
                   id: 'view-profile',
                   label: t('view-profile'),
                   onClick: () => handleOpenUserInfo(userId, senderUserId),
+                },
+                {
+                  id: 'separator',
+                  label: '',
+                  show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+                },
+                {
+                  id: 'block',
+                  label: t('block'),
+                  show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+                  onClick: () => handleOpenBlockMember(senderUserId, serverId),
                 },
               ]);
             }}

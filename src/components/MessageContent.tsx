@@ -4,7 +4,7 @@ import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import styles from '@/styles/message.module.css';
 
 // Types
-import type { User, ChannelMessage, DirectMessage, PromptMessage } from '@/types';
+import type { User, ChannelMessage, DirectMessage, PromptMessage, Channel, Server } from '@/types';
 
 // Components
 import DirectMessageTab from '@/components/DirectMessage';
@@ -15,10 +15,12 @@ type MessageGroup = (DirectMessage & { contents: string[] }) | (ChannelMessage &
 
 interface MessageContentProps {
   messages: (DirectMessage | ChannelMessage | PromptMessage)[];
-  userId: User['userId'];
+  user: User;
+  channel: Channel;
+  server: Server;
 }
 
-const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages, userId }) => {
+const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages, user, channel, server }) => {
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +62,7 @@ const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages, us
         return (
           <div key={index} className={styles['message-wrapper']}>
             {messageGroup.type === 'general' ? (
-              <ChannelMessageTab messageGroup={messageGroup} userId={userId} />
+              <ChannelMessageTab messageGroup={messageGroup} user={user} channel={channel} server={server} />
             ) : messageGroup.type === 'dm' ? (
               <DirectMessageTab messageGroup={messageGroup} />
             ) : (
