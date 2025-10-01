@@ -331,6 +331,9 @@ export const PopupSize: Record<PopupType, { height: number; width: number }> = {
 };
 
 // Constants
+const mainTitle = 'RiceCall';
+const versionTitle = `RiceCall v${app.getVersion()}`;
+
 const DEV = process.argv.includes('--dev');
 const PORT = 3000;
 const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
@@ -725,11 +728,25 @@ function connectSocket(token: string): Socket | null {
         // Handle special events
         if (event === 'shakeWindow') {
           const initialData = args[0].initialData;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false);
+          const title = initialData.name ?? '';
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
+            const prefixTitle = title !== '' ? `${title} · ` : '';
+            popup.webContents.on('did-finish-load', () => {
+              popup.setTitle(`${prefixTitle}${mainTitle}`);
+            });
+            // popup.show();
+          });
         }
         if (event === 'directMessage') {
           const initialData = args[0].initialData;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false);
+          const title = initialData.name ?? '';
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
+            const prefixTitle = title !== '' ? `${title} · ` : '';
+            popup.webContents.on('did-finish-load', () => {
+              popup.setTitle(`${prefixTitle}${mainTitle}`);
+            });
+            // popup.show();
+          });
         }
       });
     });
@@ -908,7 +925,7 @@ async function configureDiscordRPC() {
 }
 
 // Tray Icon Functions
-function setTrayDetail(isLogin: boolean, title: string | null = null) {
+function setTrayDetail(isLogin: boolean) {
   if (!tray) return;
   const trayIconPath = isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
   const contextMenu = Menu.buildFromTemplate([
@@ -939,8 +956,6 @@ function setTrayDetail(isLogin: boolean, title: string | null = null) {
       click: () => app.exit(),
     },
   ]);
-
-  tray.setToolTip(`${title ? `${title} · ` : ''}RiceCall v${app.getVersion()}`);
   tray.setImage(nativeImage.createFromPath(trayIconPath));
   tray.setContextMenu(contextMenu);
 }
@@ -949,7 +964,7 @@ function configureTray() {
   if (tray) tray.destroy();
   const trayIconPath = APP_TRAY_ICON.gray;
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
-  tray.setToolTip(`RiceCall v${app.getVersion()}`);
+  tray.setToolTip(versionTitle);
   tray.on('click', () => {
     if (isLogin) mainWindow?.show();
     else authWindow?.show();
@@ -1022,10 +1037,10 @@ app.on('ready', async () => {
   // toolbar handlers
   ipcMain.on('set-toolbar-title', (_, title: string) => {
     if (!tray) return;
-    setTrayDetail(isLogin, title);
+    tray.setToolTip(`${title ? `${title} · ` : ''}${versionTitle}`);
 
     if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.setTitle(`${title} · RiceCall`);
+      mainWindow.setTitle(`${title} · ${mainTitle}`);
     }
   });
 
@@ -1087,8 +1102,15 @@ app.on('ready', async () => {
   });
 
   // Popup handlers
-  ipcMain.on('open-popup', (_, type, id, data?, force = true) => {
-    createPopup(type, id, data ?? {}, force).then((popup) => popup.show());
+  ipcMain.on('open-popup', (_, type, id, data?, force = true, title = '') => {
+    console.log(`${new Date().toLocaleString()} | open popup`, type, id, title);
+    createPopup(type, id, data ?? {}, force).then((popup) => {
+      const prefixTitle = title !== '' ? `${title} · ` : '';
+      popup.webContents.on('did-finish-load', () => {
+        popup.setTitle(`${prefixTitle}${mainTitle}`);
+      });
+      popup.show();
+    });
   });
 
   ipcMain.on('close-popup', (_, id) => {
