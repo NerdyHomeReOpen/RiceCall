@@ -63,26 +63,6 @@ interface HeaderProps {
   systemNotify: string[];
 }
 
-const toMs = (v: unknown): number => {
-  if (v == null) return Number.NaN;
-  if (typeof v === 'number') return v;
-  const n = Number(v);
-  if (!Number.isNaN(n) && Number.isFinite(n)) return n;
-  const t = new Date(String(v)).getTime();
-  return Number.isNaN(t) ? Number.NaN : t;
-};
-
-const cmpLastJoinDesc = (a: { lastJoinChannelTime?: any }, b: { lastJoinChannelTime?: any }) => {
-  const ta = toMs(a.lastJoinChannelTime);
-  const tb = toMs(b.lastJoinChannelTime);
-  const aNaN = Number.isNaN(ta);
-  const bNaN = Number.isNaN(tb);
-  if (aNaN && bNaN) return 0;
-  if (aNaN) return 1;
-  if (bNaN) return -1;
-  return tb - ta;
-};
-
 const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplications, memberInvitations, systemNotify }) => {
   // Hooks
   const mainTab = useMainTab();
@@ -390,10 +370,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
 
 Header.displayName = 'Header';
 
-const RootPageComponent: React.FC = React.memo(() => { 
-
-  const sortOnlineMembersDesc = <T extends { lastJoinChannelTime?: any }>(arr: T[]) =>
-  [...arr].sort(cmpLastJoinDesc);
+const RootPageComponent: React.FC = React.memo(() => {
   // Hooks
   const mainTab = useMainTab();
   const loadingBox = useLoading();
@@ -418,10 +395,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
   const [servers, setServers] = useState<Server[]>([]);
   const [serverOnlineMembers, setServerOnlineMembers] = useState<OnlineMember[]>([]);
-  const serverOnlineMembersSorted = useMemo(
-    () => sortOnlineMembersDesc(serverOnlineMembers),
-    [serverOnlineMembers]
-  );
   const [channels, setChannels] = useState<Channel[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
@@ -441,8 +414,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   const channel = useMemo(() => {
     return channels.find((item) => item.channelId === user.currentChannelId) || Default.channel();
-  }, [channels, user.currentChannelId]);  
-
+  }, [channels, user.currentChannelId]);
 
   // Handlers
   const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
@@ -528,32 +500,22 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleServerOnlineMembersSet = (...args: OnlineMember[]) => {
-    setServerOnlineMembers(sortOnlineMembersDesc(args));
+    setServerOnlineMembers(args);
   };
 
   const handleServerOnlineMemberAdd = (...args: { data: OnlineMember }[]) => {
     const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-    setServerOnlineMembers((prev) =>
-      sortOnlineMembersDesc(
-        args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)))
-      )
-    );
+    setServerOnlineMembers((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
   };
 
   const handleServerOnlineMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
-   const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
-    setServerOnlineMembers((prev) => {
-      const updated = prev.map((m) =>
-        update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m
-      );
-      const sorted = sortOnlineMembersDesc(updated);
-      return sorted;
-    });
+    const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
+    setServerOnlineMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
   };
 
   const handleServerOnlineMemberRemove = (...args: { userId: string; serverId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
-    setServerOnlineMembers((prev) => sortOnlineMembersDesc(prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`))));
+    setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   };
 
   const handleChannelsSet = (...args: Channel[]) => {
@@ -817,7 +779,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 user={user}
                 friends={friends}
                 server={server}
-                serverOnlineMembers={serverOnlineMembersSorted}
+                serverOnlineMembers={serverOnlineMembers}
                 channel={channel}
                 channels={channels}
                 channelMessages={channelMessages}

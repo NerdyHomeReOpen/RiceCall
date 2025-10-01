@@ -33,29 +33,6 @@ interface ChannelTabProps {
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const toMs = (v: unknown): number => {
-  if (v == null) return Number.NaN;
-  if (typeof v === 'number') return v;
-  const n = Number(v);
-  if (!Number.isNaN(n) && Number.isFinite(n)) return n;
-  const t = new Date(String(v)).getTime();
-  return Number.isNaN(t) ? Number.NaN : t;
-};
-
-const cmpLastJoinDesc = (a: any, b: any) => {
-  const ta = toMs(a.lastJoinChannelTime);
-  const tb = toMs(b.lastJoinChannelTime);
-  const aNaN = Number.isNaN(ta);
-  const bNaN = Number.isNaN(tb);
-
-  if (aNaN && bNaN) return 0;
-  if (aNaN) return 1;
-  if (bNaN) return -1;
-
-  return tb - ta;
-};
-
-
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
@@ -84,10 +61,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
     [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
   );
   const filteredChannelMembers = useMemo(
-    () => channelMembers
-          .filter(Boolean)
-          .sort(cmpLastJoinDesc),
-    [channelMembers]
+    () => channelMembers.filter(Boolean).sort((a, b) => a.lastJoinChannelAt - b.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
+    [channelMembers],
   );
 
   // Handlers
