@@ -17,11 +17,56 @@ import markdown from '@/styles/markdown.module.css';
 import { useTranslation } from 'react-i18next';
 
 // Utils
-import { fromTags } from '@/utils/tagConverter';
+import { fromPreserveHtml, toPreserveHtml } from '@/utils/tagConverter';
 
 // DOMPurify
-const ALLOWED_TAGS = ['span', 'img', 'p', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'blockquote', 'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'strong', 'em', 'code', 'pre'];
-const ALLOWED_ATTR: string[] = ['id', 'src', 'alt', 'class', 'href', 'controls', 'width', 'height', 'allowfullscreen', 'type', 'style'];
+const ALLOWED_TAGS = [
+  'span',
+  'img',
+  'p',
+  'h1',
+  'h2',
+  'h3',
+  'ul',
+  'ol',
+  'li',
+  'blockquote',
+  'a',
+  'table',
+  'thead',
+  'tbody',
+  'tr',
+  'th',
+  'td',
+  'hr',
+  'strong',
+  'em',
+  'code',
+  'pre',
+  'yt',
+  'tw',
+  'kick',
+  'tag',
+  'time',
+];
+const ALLOWED_ATTR: string[] = [
+  'id',
+  'src',
+  'alt',
+  'class',
+  'href',
+  'controls',
+  'width',
+  'height',
+  'allowfullscreen',
+  'type',
+  'style',
+  'data-yt',
+  'data-tw',
+  'data-kick',
+  'data-tag',
+  'data-timestamp',
+];
 
 interface MarkdownContentProps {
   markdownText: string;
@@ -103,12 +148,14 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
   };
 
   // Memos
-  const sanitized = useMemo(() => fromTags(DOMPurify.sanitize(markdownText, { ALLOWED_TAGS, ALLOWED_ATTR })), [markdownText]);
+  const preserved = useMemo(() => toPreserveHtml(markdownText), [markdownText]);
+  const sanitized = useMemo(() => DOMPurify.sanitize(preserved, { ALLOWED_TAGS, ALLOWED_ATTR }), [preserved]);
+  const restored = useMemo(() => fromPreserveHtml(sanitized), [sanitized]);
 
   return (
     <div className={markdown['markdown-content']}>
       <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components} skipHtml={false} unwrapDisallowed={false}>
-        {sanitized}
+        {restored}
       </ReactMarkdown>
     </div>
   );

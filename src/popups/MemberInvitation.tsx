@@ -97,7 +97,6 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
               createdAt: memberInvitationCreatedAt,
               description: memberInvitationDescription,
             } = memberInvitation;
-            console.log(memberInvitation);
             return (
               <div key={memberInvitationServerId} className={styles['application']}>
                 <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${memberInvitationAvatarUrl})` }} />

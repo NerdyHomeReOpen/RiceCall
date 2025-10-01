@@ -281,7 +281,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 const x = e.currentTarget.getBoundingClientRect().left;
                 const y = e.currentTarget.getBoundingClientRect().bottom;
                 contextMenu.showUserTagInput(x, y, 'right-bottom', (username) => {
-                  console.log(username);
                   editor
                     ?.chain()
                     .insertUserTag({ name: username || 'Unknown' })

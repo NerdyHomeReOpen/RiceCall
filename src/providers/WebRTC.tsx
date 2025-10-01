@@ -635,7 +635,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
       // consume existing producers
       for (const producer of transport.producers ?? []) {
-        consumeOne(producer.id, channelId).catch(console.error);
+        consumeOne(producer.id, channelId).catch((e) => {
+          console.error('[WebRTC] Error consuming producer: ', e);
+        });
       }
     },
     [consumeOne],
@@ -813,7 +815,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const handleEditOutputDevice = useCallback((deviceId: string) => {
     const el = speakerRef.current;
     if (el && typeof el.setSinkId === 'function') {
-      el.setSinkId(deviceId).catch((err) => console.warn('[WebRTC] set output device failed: ', err));
+      el.setSinkId(deviceId).catch((err) => {
+        console.warn('[WebRTC] set output device failed: ', err);
+      });
     }
   }, []);
 
@@ -831,7 +835,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         .then(async (stream) => {
           initMicAudio(stream);
         })
-        .catch((err) => console.error('[WebRTC] access input device failed: ', err));
+        .catch((err) => {
+          console.error('[WebRTC] access input device failed: ', err);
+        });
     },
     [initMicAudio],
   );

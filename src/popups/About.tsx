@@ -59,7 +59,7 @@ const AboutPopup: React.FC = React.memo(() => {
   useEffect(() => {
     (async () => {
       const res = await fetch('https://nerdyhomereopen.github.io/Details/staff.json');
-      if (!res.ok) console.error(`Failed to fetch staff.json: ${res.status}`);
+      if (!res.ok) return;
       const json = await res.json();
       setStaffs(json);
     })();

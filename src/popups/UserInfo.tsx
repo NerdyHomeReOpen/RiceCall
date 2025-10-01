@@ -176,7 +176,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   useEffect(() => {
     (async () => {
       const res = await fetch('https://nerdyhomereopen.github.io/Details/country.json');
-      if (!res.ok) console.error(`Failed to fetch country.json: ${res.status}`);
+      if (!res.ok) return;
       const json = await res.json();
       setCountries(json);
     })();
