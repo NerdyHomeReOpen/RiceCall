@@ -22,6 +22,7 @@ import { useLoading } from '@/providers/Loading';
 import ipc from '@/services/ipc.service';
 
 // Utils
+import { handleOpenCreateServer } from '@/utils/popup';
 import { getFormatDate } from '@/utils/language';
 
 interface SearchResultItemProps {
@@ -115,10 +116,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         handleSearchServer(e);
       }
     }, 500);
-  };
-
-  const handleOpenCreateServer = (userId: User['userId']) => {
-    ipc.popup.open('createServer', 'createServer', { userId });
   };
 
   const handleClearSearchState = () => {

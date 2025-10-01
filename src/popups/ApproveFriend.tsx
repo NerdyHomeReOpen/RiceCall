@@ -12,6 +12,9 @@ import { useTranslation } from 'react-i18next';
 // Services
 import ipc from '@/services/ipc.service';
 
+// Utils
+import { handleOpenCreateFriendGroup } from '@/utils/popup';
+
 interface ApproveFriendPopupProps {
   targetId: User['userId'];
   friendGroups: FriendGroup[];
@@ -29,10 +32,6 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
   // Handlers
   const handleApproveFriendApplication = (senderId: User['userId'], friendGroupId: FriendGroup['friendGroupId'] | null, friendNote: Friend['note']) => {
     ipc.socket.send('approveFriendApplication', { senderId, friendGroupId, note: friendNote });
-  };
-
-  const handleOpenCreateFriendGroup = () => {
-    ipc.popup.open('createFriendGroup', 'createFriendGroup', {});
   };
 
   const handleClose = () => {

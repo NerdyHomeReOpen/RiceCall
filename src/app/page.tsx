@@ -36,6 +36,7 @@ import ServerPage from '@/pages/Server';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Utils
+import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme } from '@/utils/popup';
 import Default from '@/utils/default';
 
 // Providers
@@ -111,22 +112,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
 
   const handleChangeStatus = (status: User['status']) => {
     ipc.socket.send('editUser', { update: { status } });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenSystemSetting = () => {
-    ipc.popup.open('systemSetting', 'systemSetting', {});
-  };
-
-  const handleOpenAboutUs = () => {
-    ipc.popup.open('aboutus', 'aboutUs', {});
-  };
-
-  const handleOpenChangeTheme = () => {
-    ipc.popup.open('changeTheme', 'changeTheme', {});
   };
 
   const handleLogout = () => {
@@ -442,7 +427,9 @@ const RootPageComponent: React.FC = React.memo(() => {
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
 
-    ipc.toolbar.title.set(`${args[0].update.name || ''}`);
+    if (args[0].update.name) {
+      ipc.toolbar.title.set(`${args[0].update.name || user.name}`);
+    }
   };
 
   const handleFriendsSet = (...args: Friend[]) => {

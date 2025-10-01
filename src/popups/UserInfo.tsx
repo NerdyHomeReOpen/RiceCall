@@ -23,6 +23,7 @@ import permission from '@/styles/permission.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenApplyFriend } from '@/utils/popup';
 import { isMember, isStaff } from '@/utils/permission';
 
 interface UserInfoPopupProps {
@@ -115,20 +116,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   // Handlers
   const handleEditUser = (update: Partial<User>) => {
     ipc.socket.send('editUser', { update });
-  };
-
-  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
-  };
-
-  const handleOpenErrorDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogError', 'dialogError', { message, submitTo: 'dialogError' });
-    ipc.popup.onSubmit('dialogError', callback);
   };
 
   const handleOpenImageCropper = (userId: User['userId'], imageData: string) => {

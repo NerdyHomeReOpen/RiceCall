@@ -23,9 +23,9 @@ import { useTranslation } from 'react-i18next';
 
 // Services
 import api from '@/services/api.service';
-import ipc from '@/services/ipc.service';
 
 // Utils
+import { handleOpenAlertDialog } from '@/utils/popup';
 import { fromTags, toTags } from '@/utils/tagConverter';
 
 interface AnnouncementEditorProps {
@@ -85,11 +85,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     setFontSize(editor?.getAttributes('textStyle').fontSize || '13px');
     setFontFamily(editor?.getAttributes('textStyle').fontFamily || 'Arial');
   }, [editor]);
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
-  };
 
   const handlePaste = async (imageData: string, fileName: string) => {
     isUploadingRef.current = true;

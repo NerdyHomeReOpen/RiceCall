@@ -11,8 +11,10 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import emoji from '@/styles/emoji.module.css';
 
 // Services
-import ipc from '@/services/ipc.service';
 import api from '@/services/api.service';
+
+// Utils
+import { handleOpenAlertDialog } from '@/utils/popup';
 
 interface MessageInputBoxProps {
   onSend?: (message: string) => void;
@@ -32,11 +34,6 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Handlers
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
-  };
-
   const handlePaste = async (imageData: string, fileName: string) => {
     isUploadingRef.current = true;
     if (imageData.length > 5 * 1024 * 1024) {
