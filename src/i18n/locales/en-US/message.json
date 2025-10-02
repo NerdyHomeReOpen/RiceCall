@@ -139,6 +139,7 @@
   "text-change-to-max-length": "The maximum length of guest text messages has been changed to: {{0}} characters",
   "text-change-to-wait-time": "The wait time before guests can send messages has been changed to: {{0}} seconds",
   "too-many-failed-attempts": "Too many attempts, try again later.",
+  "unactivated-account": "帳號未啟用，請先至信箱啟用帳號。",
   "uncontrol-queue": "Administrator [{{operator}}] has been removed from queue management",
   "unforbade-text-in-channel": "The administrator [{{operator}}] has allowed you to send text messages.",
   "unforbade-voice-in-channel": "The administrator [{{operator}}] turned on the microphone for you.",
