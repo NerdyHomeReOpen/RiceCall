@@ -420,6 +420,24 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [channels, user.currentChannelId]);
 
   // Handlers
+  const clearAllData = () => {
+    setUser(Default.user());
+    setFriends([]);
+    setFriendGroups([]);
+    setFriendApplications([]);
+    setMemberInvitations([]);
+    setServers([]);
+    setServerOnlineMembers([]);
+    setChannels([]);
+    setChannelMessages([]);
+    setActionMessages([]);
+    setSystemNotify([]);
+    setQueueUsers([]);
+    setAnnouncements([]);
+    setNotifies([]);
+    setRecommendServerList({});
+  };
+
   const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
     // Remove action messages and channel messages while switching server
     const currentServerId = args[0].update.currentServerId;
@@ -591,6 +609,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   const handleDisconnect = () => {
     console.info('[Socket] disconnected');
+    clearAllData();
     setIsConnected(false);
   };
 
@@ -711,20 +730,23 @@ const RootPageComponent: React.FC = React.memo(() => {
       data.recommendServerList().then((recommendServerList) => {
         if (recommendServerList) setRecommendServerList(recommendServerList);
       });
-
-      setSystemNotify([]);
+      setSystemNotify([]); // TODO: Implement system notify
     };
     refresh();
   }, [userId]);
 
   useEffect(() => {
-    data.announcements({ region: i18n.language }).then((announcements) => {
-      if (announcements) setAnnouncements(announcements);
-    });
-    data.notifies({ region: i18n.language }).then((notifies) => {
-      if (notifies) setNotifies(notifies);
-    });
-  }, [i18n.language]);
+    if (!userId) return;
+    const refresh = async () => {
+      data.announcements({ region: i18n.language }).then((announcements) => {
+        if (announcements) setAnnouncements(announcements);
+      });
+      data.notifies({ region: i18n.language }).then((notifies) => {
+        if (notifies) setNotifies(notifies);
+      });
+    };
+    refresh();
+  }, [i18n.language, userId]);
 
   useEffect(() => {
     const unsubscribe = [
