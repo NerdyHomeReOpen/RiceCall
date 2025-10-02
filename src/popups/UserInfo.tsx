@@ -95,7 +95,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   }, [targetServers]);
 
   const favoriteServers = useMemo(() => {
-    return targetServers.filter((s) => s.favorite && isMember(s.permissionLevel) && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
+    return targetServers.filter((s) => s.favorite && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
   }, [targetServers]);
 
   const recentServers = useMemo(() => {
