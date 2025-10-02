@@ -205,6 +205,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (announcements.length > 0) {
+      setSelectedAnnouncement(announcements[announcements.length - 1]);
+    }
+  }, [announcements]);
+
   useEffect(() => {
     const unsubscribe = [ipc.socket.on('serverSearch', handleServerSearch), ipc.deepLink.onDeepLink(handleDeepLink)];
     return () => unsubscribe.forEach((unsub) => unsub());
@@ -292,24 +299,24 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       <main className={homePage['home-body']} style={section === 0 ? {} : { display: 'none' }}>
         <div className={announcementStyle['announcement-wrapper']}>
           <div className={announcementStyle['announcement-header']}>
-            {categoryTabs.map((tab) => (
+            {categoryTabs.map((categoryTab) => (
               <div
-                key={tab.key}
-                className={`${announcementStyle['announcement-tab']} ${selectedAnnouncementCategory === tab.key ? announcementStyle['active'] : ''}`}
-                onClick={() => setSelectedAnnouncementCategory(tab.key)}
+                key={categoryTab.key}
+                className={`${announcementStyle['announcement-tab']} ${selectedAnnouncementCategory === categoryTab.key ? announcementStyle['active'] : ''}`}
+                onClick={() => setSelectedAnnouncementCategory(categoryTab.key)}
               >
-                {t(tab.label)}
+                {t(categoryTab.label)}
               </div>
             ))}
           </div>
           <div className={announcementStyle['announcement-list']}>
-            {filteredAnnouncements.map((a) => (
-              <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => setSelectedAnnouncement(a)}>
-                <div className={announcementStyle['announcement-type']} data-category={a.category}>
-                  {t(`${a.category}`)}
+            {filteredAnnouncements.map((announcement) => (
+              <div key={announcement.announcementId} className={announcementStyle['announcement-item']} onClick={() => setSelectedAnnouncement(announcement)}>
+                <div className={announcementStyle['announcement-type']} data-category={announcement.category}>
+                  {t(`${announcement.category}`)}
                 </div>
-                <div className={announcementStyle['announcement-title']}>{a.title}</div>
-                <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
+                <div className={announcementStyle['announcement-title']}>{announcement.title}</div>
+                <div className={announcementStyle['announcement-date']}>{getFormatDate(announcement.timestamp)}</div>
               </div>
             ))}
           </div>
@@ -327,54 +334,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               </div>
             </div>
           </div>
-          {/* <div className={announcementStyle['announcement-container']} style={{ display: 'none' }}>
-            <div className={announcementStyle['announcement-main-content']}>
-              {announcements
-                .slice(0, 1)
-                .filter((a) => selectedAnnouncementCategory === 'all' || a.category === selectedAnnouncementCategory)
-                .map((a) => (
-                  <div
-                    key={a.announcementId}
-                    style={
-                      a.attachment_url && a.attachment_url !== ''
-                        ? {
-                            backgroundImage: `url(${a.attachment_url})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                          }
-                        : {}
-                    }
-                    onClick={() => {}}
-                  >
-                    {(!a.attachment_url || a.attachment_url == '') && (
-                      <>
-                        <div className={announcementStyle['announcement-content-header']}>
-                          <div className={announcementStyle['announcement-content-detail']}>
-                            <div className={announcementStyle['announcement-title']}>{a.title}</div>
-                            <div className={announcementStyle['announcement-type']}>{t(`${a.category}`)}</div>
-                          </div>
-                          <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
-                        </div>
-                        <div className={announcementStyle['announcement-content']}>{a.content}</div>
-                      </>
-                    )}
-                  </div>
-                ))}
-            </div>
-            <div className={announcementStyle['announcement-sidebar']}>
-              {announcements
-                .slice(1, 6)
-                .filter((a) => selectedAnnouncementCategory === 'all' || a.category === selectedAnnouncementCategory)
-                .map((a) => (
-                  <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => {}}>
-                    <div className={announcementStyle['announcement-title']}>
-                      {a.title} | {t(`${a.category}`)}
-                    </div>
-                    <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
-                  </div>
-                ))}
-            </div>
-          </div> */}
         </div>
       </main>
 
