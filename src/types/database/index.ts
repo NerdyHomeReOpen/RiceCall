@@ -59,10 +59,10 @@ export type table_channels = {
   guestTextMaxLength: number;
   isLobby: boolean;
   forbidText: boolean;
-  forbidQueue: boolean; // New: Forbid Queue
+  forbidQueue: boolean;
   forbidGuestText: boolean;
-  forbidGuestVoice: boolean; // New: Forbid Guest Voice
-  forbidGuestQueue: boolean; // New: Forbid Guest Queue
+  forbidGuestVoice: boolean;
+  forbidGuestQueue: boolean;
   forbidGuestUrl: boolean;
   type: 'category' | 'channel';
   visibility: 'public' | 'member' | 'private' | 'readonly';
@@ -181,7 +181,7 @@ export type table_servers = {
   level: number;
   wealth: number;
   receiveApply: boolean;
-  isVerified: boolean; // New: Is Verified
+  isVerified: boolean;
   type: 'game' | 'entertainment' | 'other';
   visibility: 'public' | 'private' | 'invisible';
   lobbyId: string;
@@ -223,7 +223,6 @@ export type table_users = {
   displayId: string;
   avatar: string;
   avatarUrl: string;
-  email: string;
   signature: string;
   about: string;
   country: string;
@@ -235,7 +234,7 @@ export type table_users = {
   birthYear: number;
   birthMonth: number;
   birthDay: number;
-  isVerified: boolean; // New: Is Verified
+  isVerified: boolean;
   status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
   gender: 'Male' | 'Female';
   currentChannelId: string | null;

@@ -7,7 +7,6 @@ const Default = {
     displayId: '',
     avatar: `${Date.now()}`,
     avatarUrl: `/default/userAvatar.webp`,
-    email: '',
     signature: '',
     about: '',
     status: 'online',
