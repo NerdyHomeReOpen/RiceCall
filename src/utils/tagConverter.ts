@@ -46,7 +46,25 @@ export const fromTags = (raw: string) => {
   return raw
     .replace(styleRegex, (_, fontSize, textColor, content) => {
       const fontSizeMap = { small: '14px', medium: '18px', large: '25px' };
-      return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${content}</span>`;
+      const processedContent = content.replace(emojiRegex, (_: string, code: string) => {
+        const emoji = emojis.find((e) => e.code === code);
+        if (!emoji) return code;
+        return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
+      });
+      if (processedContent.includes('data-emoji-wrapper')) {
+        const parts = processedContent.split(/(<span data-emoji-wrapper[^>]*>[\s\S]*?<\/span>)/g);
+        const styledParts = parts.map((part: string) => {
+          if (part.includes('data-emoji-wrapper')) {
+            return part;
+          } else if (part.trim()) {
+            return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${part}</span>`;
+          }
+          return part;
+        });
+        return styledParts.join('');
+      } else {
+        return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${processedContent}</span>`;
+      }
     })
     .replace(emojiRegex, (_, code) => {
       const emoji = emojis.find((e) => e.code === code);
@@ -96,15 +114,34 @@ export const toTags = (raw: string) => {
 };
 
 export const fromPreserveHtml = (raw: string) => {
-  let processed = raw.replace(emojiRegex, (_: string, code: string) => {
+  let processed = raw.replace(stylePreserveRegex, (_: string, fontSize: string, textColor: string, content: string) => {
+    const fontSizeMap = { small: '14px', medium: '18px', large: '25px' };
+    const processedContent = content.replace(emojiRegex, (_: string, code: string) => {
+      const emoji = emojis.find((e) => e.code === code);
+      if (!emoji) return code;
+      return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
+    });
+
+    if (processedContent.includes('data-emoji-wrapper')) {
+      const parts = processedContent.split(/(<span data-emoji-wrapper[^>]*>[\s\S]*?<\/span>)/g);
+      const styledParts = parts.map((part: string) => {
+        if (part.includes('data-emoji-wrapper')) {
+          return part;
+        } else if (part.trim()) {
+          return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${part}</span>`;
+        }
+        return part;
+      });
+      return styledParts.join('');
+    } else {
+      return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${processedContent}</span>`;
+    }
+  });
+
+  processed = processed.replace(emojiRegex, (_: string, code: string) => {
     const emoji = emojis.find((e) => e.code === code);
     if (!emoji) return code;
     return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
-  });
-
-  processed = processed.replace(stylePreserveRegex, (_: string, fontSize: string, textColor: string, content: string) => {
-    const fontSizeMap = { small: '14px', medium: '18px', large: '25px' };
-    return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${content}</span>`;
   });
 
   return processed
