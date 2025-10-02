@@ -5364,13 +5364,6 @@ node-fetch@^2.6.1, node-fetch@^2.7.0:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-global-key-listener@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/node-global-key-listener/-/node-global-key-listener-0.3.0.tgz#8c5402c3d8fc36ba347f829a5b58dd10c3b17af5"
-  integrity sha512-yWB1OFrDlzXYm3+hYcE8xOscvclpBAQGXcBnc2ytenFLkZfxFipuCwhuIIlIKVtwBuDRkdXJVZMqN99cPVBFFA==
-  dependencies:
-    sudo-prompt "^9.2.1"
-
 node-gyp@^9.0.0:
   version "9.4.1"
   resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-9.4.1.tgz#8a1023e0d6766ecb52764cc3a734b36ff275e185"
@@ -6918,11 +6911,6 @@ stylelint@^16.17.0:
     svg-tags "^1.0.0"
     table "^6.9.0"
     write-file-atomic "^5.0.1"
-
-sudo-prompt@^9.2.1:
-  version "9.2.1"
-  resolved "https://registry.yarnpkg.com/sudo-prompt/-/sudo-prompt-9.2.1.tgz#77efb84309c9ca489527a4e749f287e6bdd52afd"
-  integrity sha512-Mu7R0g4ig9TUuGSxJavny5Rv0egCEtpZRNMrZaYS1vxkiIxGiGUwoezU3LazIQ+KE04hTrTfNPgxU5gzi7F5Pw==
 
 sumchecker@^3.0.1:
   version "3.0.1"
