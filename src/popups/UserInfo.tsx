@@ -352,7 +352,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
                           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div className={`${permission[targetGender]} ${server.ownerId === userId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
+                            <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-value-text']}>{server.contribution}</div>
                           </div>
                         </div>
@@ -376,7 +376,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
                           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div className={`${styles['permission']} ${permission[targetGender]} ${server.ownerId === userId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
+                            <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-box']}>
                               <div className={styles['contribution-icon']} />
                               <div className={styles['contribution-value-text']}>{server.contribution}</div>
