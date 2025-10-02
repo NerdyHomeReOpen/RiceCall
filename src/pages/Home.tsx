@@ -277,12 +277,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
             {t('recommended-servers')}
           </div>
-          <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
+          {/* <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
             {t('game')}
           </div>
           <div className={`${homePage['navegate-tab']} ${section === 3 ? homePage['active'] : ''}`} data-key="30375" onClick={() => setSection(3)}>
             {t('live')}
-          </div>
+          </div> */}
         </div>
 
         <div className={homePage['right']}>
