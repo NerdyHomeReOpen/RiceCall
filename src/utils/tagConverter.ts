@@ -62,8 +62,10 @@ export const fromTags = (raw: string) => {
         return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
       });
 
-      if (processedContent.includes('data-emoji-wrapper')) {
-        const parts = processedContent.split(/(<span data-emoji-wrapper[^>]*>[\s\S]*?<\/span>)/g);
+      const contentWithBreaks = processedContent.replace(/\n/g, '<br>');
+
+      if (contentWithBreaks.includes('data-emoji-wrapper')) {
+        const parts = contentWithBreaks.split(/(<span data-emoji-wrapper[^>]*>[\s\S]*?<\/span>)/g);
         const styledParts = parts.map((part: string) => {
           if (part.includes('data-emoji-wrapper')) {
             return part;
@@ -74,7 +76,7 @@ export const fromTags = (raw: string) => {
         });
         return styledParts.join('');
       } else {
-        return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${processedContent}</span>`;
+        return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${contentWithBreaks}</span>`;
       }
     })
     .replace(emojiRegex, (_, code) => {
@@ -143,8 +145,10 @@ export const fromPreserveHtml = (raw: string) => {
       return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
     });
 
-    if (processedContent.includes('data-emoji-wrapper')) {
-      const parts = processedContent.split(/(<span data-emoji-wrapper[^>]*>[\s\S]*?<\/span>)/g);
+    const contentWithBreaks = processedContent.replace(/\n/g, '<br>');
+
+    if (contentWithBreaks.includes('data-emoji-wrapper')) {
+      const parts = contentWithBreaks.split(/(<span data-emoji-wrapper[^>]*>[\s\S]*?<\/span>)/g);
       const styledParts = parts.map((part: string) => {
         if (part.includes('data-emoji-wrapper')) {
           return part;
@@ -155,7 +159,7 @@ export const fromPreserveHtml = (raw: string) => {
       });
       return styledParts.join('');
     } else {
-      return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${processedContent}</span>`;
+      return `<span data-font-size="${fontSize}" data-text-color="${textColor}" style="font-size: ${fontSizeMap[fontSize as keyof typeof fontSizeMap]}; color: ${textColor};">${contentWithBreaks}</span>`;
     }
   });
 
