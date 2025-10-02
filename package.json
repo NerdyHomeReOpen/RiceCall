@@ -62,7 +62,6 @@
     "mediasoup-client": "^3.12.5",
     "net": "^1.0.2",
     "next": "^15.3.2",
-    "node-global-key-listener": "^0.3.0",
     "path": "^0.12.7",
     "react": "^19.0.0",
     "react-color": "^2.19.3",

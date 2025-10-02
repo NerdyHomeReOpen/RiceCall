@@ -1134,18 +1134,46 @@ const ipcService = {
   },
 
   detectKey: {
-    onKeyDown: (callback: (key: string) => void) => {
+    onDefaultSpeakingKeyToggled: (callback: () => void) => {
       if (!isElectron) return () => {};
-      const listener = (_: any, key: string) => callback(key);
-      ipcRenderer.on('detected-key-down', listener);
-      return () => ipcRenderer.removeListener('detected-key-down', listener);
+      const listener = () => callback();
+      ipcRenderer.on('toggle-default-speaking-key', listener);
+      return () => ipcRenderer.removeListener('toggle-default-speaking-key', listener);
     },
 
-    onKeyUp: (callback: (key: string) => void) => {
+    onHotKeyOpenMainWindowToggled: (callback: () => void) => {
       if (!isElectron) return () => {};
-      const listener = (_: any, key: string) => callback(key);
-      ipcRenderer.on('detected-key-up', listener);
-      return () => ipcRenderer.removeListener('detected-key-up', listener);
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-open-main-window', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-open-main-window', listener);
+    },
+
+    onHotKeyIncreaseVolumeToggled: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-increase-volume', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-increase-volume', listener);
+    },
+
+    onHotKeyDecreaseVolumeToggled: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-decrease-volume', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-decrease-volume', listener);
+    },
+
+    onHotKeyToggleSpeakerToggled: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-toggle-speaker', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-toggle-speaker', listener);
+    },
+
+    onHotKeyToggleMicrophoneToggled: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-toggle-microphone', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-toggle-microphone', listener);
     },
   },
 

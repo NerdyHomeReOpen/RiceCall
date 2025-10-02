@@ -10,12 +10,11 @@ import Store from 'electron-store';
 import { initMain } from 'electron-audio-loopback-josh';
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, globalShortcut } from 'electron';
 import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
 import { initMainI18n, t } from './i18n.js';
-import { GlobalKeyboardListener, IGlobalKey } from 'node-global-key-listener';
 
 initMain();
 
@@ -368,6 +367,16 @@ function readEnvFile(file: string, base: Record<string, string>) {
   expand(cfg);
 
   return { ...base, ...(cfg.parsed ?? {}) };
+}
+
+function registerHotkey(accelerator: string, callback: () => void) {
+  const success = globalShortcut.register(accelerator, () => {
+    console.log(`${new Date().toLocaleString()} | Hotkey triggered:`, accelerator);
+    callback();
+  });
+  if (!success) {
+    console.warn(`${new Date().toLocaleString()} | Failed to register hotkey:`, accelerator);
+  }
 }
 
 export function loadEnv() {
@@ -1524,7 +1533,13 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-default-speaking-key', (_, key) => {
+    globalShortcut.unregister(store.get('defaultSpeakingKey'));
     store.set('defaultSpeakingKey', key ?? 'v');
+    registerHotkey(key ?? 'v', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-default-speaking-key', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1540,35 +1555,65 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyOpenMainWindow'));
     store.set('hotKeyOpenMainWindow', key ?? 'F1');
+    registerHotkey(key ?? 'F1', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-open-main-window', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-open-main-window', key);
     });
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyIncreaseVolume'));
     store.set('hotKeyIncreaseVolume', key ?? 'PageUp');
+    registerHotkey(key ?? 'PageUp', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-increase-volume', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-increase-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyDecreaseVolume'));
     store.set('hotKeyDecreaseVolume', key ?? 'PageDown');
+    registerHotkey(key ?? 'PageDown', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-decrease-volume', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-decrease-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyToggleSpeaker'));
     store.set('hotKeyToggleSpeaker', key ?? 'Alt+m');
+    registerHotkey(key ?? 'Alt+m', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-toggle-speaker', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-speaker', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyToggleMicrophone'));
     store.set('hotKeyToggleMicrophone', key ?? 'v');
+    registerHotkey(key ?? 'v', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-toggle-microphone', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
@@ -1633,79 +1678,38 @@ app.on('ready', async () => {
     shell.openExternal(url);
   });
 
-  // initialize global keyboard listener
-  const keyListener = new GlobalKeyboardListener();
-  const lastKeyDown: Record<string, boolean> = Object.create(null);
-  const lastComboFiredAt: Record<string, number> = Object.create(null);
-  const COMBO_THROTTLE_MS = 10;
-
-  const IGNORED_KEYS = new Set(['control', 'left ctrl', 'right ctrl', 'shift', 'left shift', 'right shift', 'alt', 'left alt', 'right alt', 'meta', 'left meta', 'right meta', 'super', 'command']);
-
-  function getModifiers(isDown: Record<string, boolean>): string[] {
-    const hasCtrl = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('CTRL'));
-    const hasShift = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('SHIFT'));
-    const hasAlt = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('ALT'));
-    const hasMeta = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && (k.includes('META') || k.includes('SUPER') || k.includes('COMMAND')));
-
-    const mods: string[] = [];
-    if (hasCtrl) mods.push('Ctrl');
-    if (hasShift) mods.push('Shift');
-    if (hasAlt) mods.push('Alt');
-    if (hasMeta) mods.push('Meta');
-
-    return mods; // Order: Ctrl → Shift → Alt → Meta
-  }
-
-  function buildCombo(mods: string[], keyNameLower: string): string {
-    const parts = keyNameLower ? [...mods, keyNameLower] : [...mods];
-    return parts.join('+');
-  }
-
-  keyListener.addListener((event, isDown) => {
-    const state = event.state; // 'DOWN' | 'UP'
-    const rawName = event.name ?? '';
-    const keyNameLower = rawName.toLowerCase().trim();
-
-    const isModifierOnly = IGNORED_KEYS.has(keyNameLower);
-    if (!rawName || isModifierOnly) {
-      if (state === 'DOWN') lastKeyDown[keyNameLower] = true;
-      else if (state === 'UP') lastKeyDown[keyNameLower] = false;
-      return;
-    }
-
-    const mods = getModifiers(isDown);
-    const combo = buildCombo(mods, keyNameLower);
-
-    if (state === 'DOWN') {
-      // Only trigger on edge-trigger: from UP -> DOWN
-      if (lastKeyDown[keyNameLower]) return;
-      lastKeyDown[keyNameLower] = true;
-
-      // Throttle: prevent duplicate trigger within 500ms
-      const now = Date.now();
-      const last = lastComboFiredAt[combo] ?? 0;
-      if (now - last < COMBO_THROTTLE_MS) return;
-      lastComboFiredAt[combo] = now;
-
-      // Send event
-      mainWindow?.webContents.send('detected-key-down', combo);
-      // BrowserWindow.getAllWindows().forEach(w => w.webContents.send('detected-key-press', combo));
-    } else if (state === 'UP') {
-      // Reset edge-trigger
-      lastKeyDown[keyNameLower] = false;
-
-      // Throttle: prevent duplicate trigger within 500ms
-      const now = Date.now();
-      const last = lastComboFiredAt[combo] ?? 0;
-      if (now - last < COMBO_THROTTLE_MS) return;
-      lastComboFiredAt[combo] = now;
-
-      // Send event
-      mainWindow?.webContents.send('detected-key-up', combo);
-      // BrowserWindow.getAllWindows().forEach(w => w.webContents.send('detected-key-press', combo));
-    }
+  // Register Hotkey
+  globalShortcut.unregisterAll();
+  registerHotkey(store.get('defaultSpeakingKey'), () => {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
+    });
   });
-  // ----
+  registerHotkey(store.get('hotKeyOpenMainWindow'), () => {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('toggle-hot-key-open-main-window', store.get('hotKeyOpenMainWindow'));
+    });
+  });
+  registerHotkey(store.get('hotKeyIncreaseVolume'), () => {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('toggle-hot-key-increase-volume', store.get('hotKeyIncreaseVolume'));
+    });
+  });
+  registerHotkey(store.get('hotKeyDecreaseVolume'), () => {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('toggle-hot-key-decrease-volume', store.get('hotKeyDecreaseVolume'));
+    });
+  });
+  registerHotkey(store.get('hotKeyToggleSpeaker'), () => {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('toggle-hot-key-toggle-speaker', store.get('hotKeyToggleSpeaker'));
+    });
+  });
+  registerHotkey(store.get('hotKeyToggleMicrophone'), () => {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('toggle-hot-key-toggle-microphone', store.get('hotKeyToggleMicrophone'));
+    });
+  });
 });
 
 app.on('before-quit', () => {

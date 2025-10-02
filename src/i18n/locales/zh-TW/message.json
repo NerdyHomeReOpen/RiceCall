@@ -139,6 +139,7 @@
   "text-change-to-max-length": "遊客發送文字訊息的最大長度已變更為: {{0}}。",
   "text-change-to-wait-time": "遊客允許發送文字訊息的等待時間已變更為: {{0}} 秒。",
   "too-many-failed-attempts": "嘗試次數過多，請稍後再試。",
+  "unactivated-account": "帳號未啟用，請先至信箱啟用帳號。",
   "uncontrol-queue": "管理員【{{operator}}】放麥，麥序上的第一位可以說話。",
   "unforbade-text-in-channel": "您被管理員【{{operator}}】重新開啟傳送文字訊息。",
   "unforbade-voice-in-channel": "您被管理員【{{operator}}】重新開啟語音。",
