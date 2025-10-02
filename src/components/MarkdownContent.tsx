@@ -32,6 +32,7 @@ const ALLOWED_TAGS = [
   'li',
   'blockquote',
   'a',
+  'u',
   'table',
   'thead',
   'tbody',
