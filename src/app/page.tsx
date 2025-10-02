@@ -34,6 +34,7 @@ import ServerPage from '@/pages/Server';
 
 // Components
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import SystemNoticeToaster from '@/components/SystemNoticeToaster';
 
 // Utils
 import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme } from '@/utils/popup';
@@ -787,6 +788,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
               />
+              <SystemNoticeToaster announcement={announcements[announcements.length - 1]} />
             </>
           )}
         </ExpandedProvider>
