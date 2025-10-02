@@ -24,7 +24,7 @@ import vip from '@/styles/vip.module.css';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenUserInfo } from '@/utils/popup';
-import { escapeHtml } from '@/utils/tagConverter';
+import { fromTags, toTags } from '@/utils/tagConverter';
 
 interface DirectMessagePopupProps {
   userId: User['userId'];
@@ -44,7 +44,28 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   // Refs
   const isComposingRef = useRef<boolean>(false);
   const cooldownRef = useRef<number>(0);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('small');
+  const [textColor, setTextColor] = useState<string>('#000000');
+
+  useEffect(() => {
+    const savedFontSize = localStorage.getItem('messageInputBox-fontSize') as 'small' | 'medium' | 'large';
+    const savedTextColor = localStorage.getItem('messageInputBox-textColor');
+
+    if (savedFontSize) setFontSize(savedFontSize);
+    if (savedTextColor) setTextColor(savedTextColor);
+  }, []);
+
+  const updateFontSize = useCallback((size: 'small' | 'medium' | 'large') => {
+    setFontSize(size);
+    localStorage.setItem('messageInputBox-fontSize', size);
+  }, []);
+
+  const updateTextColor = useCallback((color: string) => {
+    setTextColor(color);
+    localStorage.setItem('messageInputBox-textColor', color);
+  }, []);
 
   // States
   const [targetCurrentServer, setTargetCurrentServer] = useState<Server | null>(null);
@@ -102,10 +123,36 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     formData.append('_file', imageData);
     const response = await api.post('/upload', formData);
     if (response) {
-      textareaRef.current?.focus();
+      editorRef.current?.focus();
       document.execCommand('insertText', false, `![${fileName}](${response.avatarUrl})`);
     }
   };
+
+  const insertHtmlAtCaret = useCallback((html: string) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+      editorRef.current?.appendChild(document.createTextNode(''));
+      return;
+    }
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    const fragment = document.createDocumentFragment();
+    let node: ChildNode | null;
+    let lastNode: ChildNode | null = null;
+    while ((node = temp.firstChild)) {
+      lastNode = fragment.appendChild(node);
+    }
+    range.insertNode(fragment);
+    if (lastNode) {
+      const newRange = document.createRange();
+      newRange.setStartAfter(lastNode);
+      newRange.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
+    }
+  }, []);
 
   const handleSendShakeWindow = () => {
     if (cooldown > 0) return;
@@ -292,11 +339,17 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                       y,
                       'right-top',
                       (_, full) => {
-                        textareaRef.current?.focus();
-                        document.execCommand('insertText', false, full);
+                        editorRef.current?.focus();
+                        const html = fromTags(full);
+                        insertHtmlAtCaret(html);
                       },
                       e.currentTarget as HTMLElement,
                       true,
+                      false,
+                      fontSize,
+                      textColor,
+                      updateFontSize,
+                      updateTextColor,
                     );
                   }}
                 />
@@ -307,12 +360,20 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 <div className={styles['history-message']}>{t('message-history')}</div>
               </div>
             </div>
-            <textarea
-              ref={textareaRef}
-              rows={2}
-              placeholder={`${t('input-message')}...`}
-              maxLength={MAX_LENGTH}
+            <div
+              ref={editorRef}
+              contentEditable
+              role="textbox"
+              aria-multiline="true"
+              aria-label={t('message-input-box')}
+              data-placeholder={`${t('input-message')}...`}
               className={styles['input']}
+              style={{
+                outline: 'none',
+                whiteSpace: 'pre-wrap',
+                fontSize: fontSize === 'small' ? '14px' : fontSize === 'medium' ? '16px' : '18px',
+                color: textColor,
+              }}
               onPaste={(e) => {
                 const items = e.clipboardData.items;
                 for (const item of items) {
@@ -327,19 +388,26 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 }
               }}
               onKeyDown={(e) => {
-                const value = textareaRef.current?.value;
                 if (e.shiftKey) return;
                 if (e.key !== 'Enter') return;
-                else e.preventDefault();
+                e.preventDefault();
+                if (isComposingRef.current) return;
+                let html = editorRef.current?.innerHTML || '';
+                html = html.replace(/^(?:<br\s*\/>|<br>)+/gi, '').replace(/(?:<br\s*\/>|<br>)+$/gi, '');
+                const value = toTags(html).trim();
                 if (!value) return;
                 if (value.length > MAX_LENGTH) return;
-                if (isComposingRef.current) return;
-                textareaRef.current!.value = '';
-                handleSendMessage(targetId, { type: 'dm', content: escapeHtml(value) });
+
+                const styledValue = `<style data-font-size="${fontSize}" data-text-color="${textColor}">${value}</style>`;
+                if (editorRef.current) {
+                  editorRef.current.innerHTML = '';
+                }
+                handleSendMessage(targetId, { type: 'dm', content: styledValue });
               }}
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={() => (isComposingRef.current = false)}
-              aria-label={t('message-input-box')}
+              suppressContentEditableWarning
+              onInput={() => {}}
             />
           </div>
         </div>

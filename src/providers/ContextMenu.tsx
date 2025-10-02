@@ -29,6 +29,10 @@ interface ContextMenuContextType {
     anchorEl?: HTMLElement | null,
     showFontbar?: boolean,
     isUserInfo?: boolean,
+    fontSize?: 'small' | 'medium' | 'large',
+    textColor?: string,
+    onFontSizeChange?: (size: 'small' | 'medium' | 'large') => void,
+    onTextColorChange?: (color: string) => void,
   ) => void;
   showColorPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => void;
   showStatusDropdown: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: User['status']) => void) => void;
@@ -142,8 +146,26 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     anchorEl?: HTMLElement | null,
     showFontbar?: boolean,
     isUserInfo?: boolean,
+    fontSize?: 'small' | 'medium' | 'large',
+    textColor?: string,
+    onFontSizeChange?: (size: 'small' | 'medium' | 'large') => void,
+    onTextColorChange?: (color: string) => void,
   ) => {
-    setEmojiPicker(<EmojiPicker onEmojiSelect={onEmojiSelect} x={x} y={y} direction={direction} anchorEl={anchorEl} showFontbar={showFontbar} isUserInfo={isUserInfo} />);
+    setEmojiPicker(
+      <EmojiPicker
+        onEmojiSelect={onEmojiSelect}
+        x={x}
+        y={y}
+        direction={direction}
+        anchorEl={anchorEl}
+        showFontbar={showFontbar}
+        isUserInfo={isUserInfo}
+        fontSize={fontSize}
+        textColor={textColor}
+        onFontSizeChange={onFontSizeChange}
+        onTextColorChange={onTextColorChange}
+      />,
+    );
     setIsEmojiPickerVisible(true);
   };
 

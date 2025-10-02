@@ -31,3 +31,14 @@
   align-self: flex-end;
   margin-left: 2px;
 }
+
+.contenteditable {
+  flex: 1;
+  display: block;
+  min-height: 38px;
+  line-height: 19px;
+  word-break: break-word;
+  overflow: auto;
+  max-height: 200px;
+  padding: 1px;
+}

@@ -18,10 +18,9 @@
 }
 
 .markdown-content p {
-  display: block;
-  align-items: center;
-  white-space: pre-wrap;
-  word-break: break-word;
+  display: inline;
+  margin: 0;
+  padding: 0;
 }
 
 .markdown-content a {
@@ -244,4 +243,17 @@
 .emoji {
   width: 19px;
   height: 19px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  vertical-align: middle;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+.emoji-wrapper {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 19px;
 }

@@ -23,6 +23,7 @@ import { fromPreserveHtml, toPreserveHtml } from '@/utils/tagConverter';
 const ALLOWED_TAGS = [
   'span',
   'img',
+  'div',
   'p',
   'h1',
   'h2',
@@ -55,6 +56,7 @@ const ALLOWED_ATTR: string[] = [
   'src',
   'alt',
   'class',
+  'draggable',
   'href',
   'controls',
   'width',
@@ -67,6 +69,9 @@ const ALLOWED_ATTR: string[] = [
   'data-kick',
   'data-tag',
   'data-timestamp',
+  'data-emoji-wrapper',
+  'data-font-size',
+  'data-text-color',
 ];
 
 interface MarkdownContentProps {
@@ -86,7 +91,26 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     h1: ({ node, ...props }: any) => <h1 {...props} />,
     h2: ({ node, ...props }: any) => <h2 {...props} />,
     h3: ({ node, ...props }: any) => <h3 {...props} />,
-    p: ({ node, ...props }: any) => <p {...props} />,
+    p: ({ node, children, ...props }: any) => {
+      const hasEmoji = React.Children.toArray(children).some((child: any) => child?.props?.className?.includes('emoji-wrapper'));
+
+      return (
+        <p
+          {...props}
+          style={
+            hasEmoji
+              ? {
+                  display: 'inline',
+                  margin: 0,
+                  padding: 0,
+                }
+              : undefined
+          }
+        >
+          {children}
+        </p>
+      );
+    },
     ul: ({ node, ...props }: any) => <ul {...props} />,
     ol: ({ node, ...props }: any) => <ol {...props} />,
     li: ({ node, ...props }: any) => <li {...props} />,
