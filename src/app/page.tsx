@@ -420,24 +420,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [channels, user.currentChannelId]);
 
   // Handlers
-  const clearAllData = () => {
-    setUser(Default.user());
-    setFriends([]);
-    setFriendGroups([]);
-    setFriendApplications([]);
-    setMemberInvitations([]);
-    setServers([]);
-    setServerOnlineMembers([]);
-    setChannels([]);
-    setChannelMessages([]);
-    setActionMessages([]);
-    setSystemNotify([]);
-    setQueueUsers([]);
-    setAnnouncements([]);
-    setNotifies([]);
-    setRecommendServerList({});
-  };
-
   const handleUserUpdate = (...args: { update: Partial<User> }[]) => {
     // Remove action messages and channel messages while switching server
     const currentServerId = args[0].update.currentServerId;
@@ -609,7 +591,21 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   const handleDisconnect = () => {
     console.info('[Socket] disconnected');
-    clearAllData();
+    setUser(Default.user());
+    setFriends([]);
+    setFriendGroups([]);
+    setFriendApplications([]);
+    setMemberInvitations([]);
+    setServers([]);
+    setServerOnlineMembers([]);
+    setChannels([]);
+    setChannelMessages([]);
+    setActionMessages([]);
+    setSystemNotify([]);
+    setQueueUsers([]);
+    setAnnouncements([]);
+    setNotifies([]);
+    setRecommendServerList({});
     setIsConnected(false);
   };
 
