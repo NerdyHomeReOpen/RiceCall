@@ -139,6 +139,7 @@
   "text-change-to-max-length": "O tamanho máximo das mensagens enviadas por visitantes foi alterado para: {{0}} caracteres",
   "text-change-to-wait-time": "O tempo de espera para visitantes enviarem mensagens de texto foi alterado para: {{0}} segundos",
   "too-many-failed-attempts": "Muitas tentativas, tente novamente mais tarde.",
+  "unactivated-account": "帳號未啟用，請先至信箱啟用帳號。",
   "uncontrol-queue": "O administrador 【{{operator}}】 liberou a fila.",
   "unforbade-text-in-channel": "【{{operator}}】 habilitou suas mensagens.",
   "unforbade-voice-in-channel": "Seu microfone foi habilitado por 【{{operator}}】.",
