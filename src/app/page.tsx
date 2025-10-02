@@ -22,6 +22,7 @@ import type {
   Friend,
   OnlineMember,
   QueueUser,
+  Notify,
 } from '@/types';
 
 // i18n
@@ -34,7 +35,7 @@ import ServerPage from '@/pages/Server';
 
 // Components
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import SystemNoticeToaster from '@/components/SystemNoticeToaster';
+import NotifyToaster from '@/components/NotifyToaster';
 
 // Utils
 import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme } from '@/utils/popup';
@@ -402,6 +403,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [systemNotify, setSystemNotify] = useState<string[]>([]);
   const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [notifies, setNotifies] = useState<Notify[]>([]);
   const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
   const [isConnected, setIsConnected] = useState(false);
 
@@ -719,6 +721,9 @@ const RootPageComponent: React.FC = React.memo(() => {
     data.announcements({ region: i18n.language }).then((announcements) => {
       if (announcements) setAnnouncements(announcements);
     });
+    data.notifies({ region: i18n.language }).then((notifies) => {
+      if (notifies) setNotifies(notifies);
+    });
   }, [i18n.language]);
 
   useEffect(() => {
@@ -788,7 +793,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
               />
-              <SystemNoticeToaster announcements={announcements} />
+              <NotifyToaster notifies={notifies} />
             </>
           )}
         </ExpandedProvider>

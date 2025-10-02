@@ -1,4 +1,4 @@
-.system-notice-toaster {
+.notify-toaster {
   z-index: 1000;
   position: absolute;
   right: 0;
@@ -18,11 +18,11 @@
   transition: transform 1s linear;
 }
 
-.system-notice-toaster.show {
+.notify-toaster.show {
   transform: translateY(0);
 }
 
-.system-notice-toaster-close {
+.notify-toaster-close {
   min-width: 18px;
   min-height: 18px;
   width: 18px;
@@ -34,10 +34,10 @@
   background-position: 0 0;
 }
 
-.system-notice-toaster-close:hover {
+.notify-toaster-close:hover {
   background-position: -18px 0;
 }
 
-.system-notice-toaster-close:active {
+.notify-toaster-close:active {
   background-position: -36px 0;
 }

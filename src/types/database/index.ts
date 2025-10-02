@@ -1,15 +1,8 @@
 export type table_accounts = {
   account: string;
+  email: string;
   password: string;
   userId: string;
-};
-
-export type table_badges = {
-  badgeId: string;
-  name: string;
-  description: string;
-  iconUrl: string;
-  createdAt: number;
 };
 
 export type table_announcements = {
@@ -23,6 +16,14 @@ export type table_announcements = {
   discordChannelId: string | null;
   discordMessageId: string | null;
   timestamp: number;
+};
+
+export type table_badges = {
+  badgeId: string;
+  name: string;
+  description: string;
+  iconUrl: string;
+  createdAt: number;
 };
 
 export type table_channel_blocked_users = {
@@ -68,12 +69,6 @@ export type table_channels = {
   voiceMode: 'free' | 'admin' | 'queue';
   categoryId: string | null;
   serverId: string;
-  createdAt: number;
-};
-
-export type table_codes = {
-  userId: string;
-  code: string;
   createdAt: number;
 };
 
@@ -130,6 +125,14 @@ export type table_members = {
   createdAt: number;
 };
 
+export type table_notifies = {
+  notifyId: number;
+  content: string;
+  region: string;
+  notifyUntil: number;
+  createdAt: number;
+};
+
 export type table_recommend_server_categories = {
   categoryId: string;
   name: string;
@@ -139,6 +142,12 @@ export type table_recommend_server_categories = {
 export type table_recommend_servers = {
   categoryId: string;
   serverId: string;
+};
+
+export type table_reset_email_requests = {
+  userId: string;
+  code: string;
+  createdAt: number;
 };
 
 export type table_reset_password_requests = {

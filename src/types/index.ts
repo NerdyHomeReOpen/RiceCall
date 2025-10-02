@@ -19,9 +19,12 @@ import {
   table_channel_muted_users,
   table_server_blocked_users,
   table_announcements,
+  table_notifies,
 } from '@/types/database';
 
 export type Announcement = table_announcements;
+
+export type Notify = table_notifies;
 
 export type Permission = {
   permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;

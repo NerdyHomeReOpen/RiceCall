@@ -2,7 +2,7 @@
 import api from '@/services/api.service';
 
 // Types
-import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, RecommendServerList, MemberInvitation, Announcement } from '@/types';
+import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, RecommendServerList, MemberInvitation, Announcement, Notify } from '@/types';
 
 export const getDataService = {
   user: async (params: { userId: User['userId'] }): Promise<User | null> => {
@@ -15,7 +15,7 @@ export const getDataService = {
     return friend;
   },
 
-  friends: async (params: { userId: User['userId'] }): Promise<Friend[] | []> => {
+  friends: async (params: { userId: User['userId'] }): Promise<Friend[]> => {
     const friends = await api.get(`/friends?${new URLSearchParams(params).toString()}`);
     return friends;
   },
@@ -25,7 +25,7 @@ export const getDataService = {
     return friendGroup;
   },
 
-  friendGroups: async (params: { userId: User['userId'] }): Promise<FriendGroup[] | []> => {
+  friendGroups: async (params: { userId: User['userId'] }): Promise<FriendGroup[]> => {
     const friendGroups = await api.get(`/friendGroups?${new URLSearchParams(params).toString()}`);
     return friendGroups;
   },
@@ -35,7 +35,7 @@ export const getDataService = {
     return friendApplication;
   },
 
-  friendApplications: async (params: { receiverId: User['userId'] }): Promise<FriendApplication[] | []> => {
+  friendApplications: async (params: { receiverId: User['userId'] }): Promise<FriendApplication[]> => {
     const friendApplications = await api.get(`/friendApplications?${new URLSearchParams(params).toString()}`);
     return friendApplications;
   },
@@ -45,12 +45,12 @@ export const getDataService = {
     return server;
   },
 
-  servers: async (params: { userId: User['userId'] }): Promise<Server[] | []> => {
+  servers: async (params: { userId: User['userId'] }): Promise<Server[]> => {
     const servers = await api.get(`/servers?${new URLSearchParams(params).toString()}`);
     return servers;
   },
 
-  serverMembers: async (params: { serverId: Server['serverId'] }): Promise<Member[] | []> => {
+  serverMembers: async (params: { serverId: Server['serverId'] }): Promise<Member[]> => {
     const serverMembers = await api.get(`/serverMembers?${new URLSearchParams(params).toString()}`);
     return serverMembers;
   },
@@ -60,12 +60,12 @@ export const getDataService = {
     return channel;
   },
 
-  channels: async (params: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Channel[] | []> => {
+  channels: async (params: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Channel[]> => {
     const channels = await api.get(`/channels?${new URLSearchParams(params).toString()}`);
     return channels;
   },
 
-  channelMembers: async (params: { serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Member[] | []> => {
+  channelMembers: async (params: { serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Member[]> => {
     const channel = await api.get(`/channelMembers?${new URLSearchParams(params).toString()}`);
     return channel;
   },
@@ -80,7 +80,7 @@ export const getDataService = {
     return memberApplication;
   },
 
-  memberApplications: async (params: { serverId: Server['serverId'] }): Promise<MemberApplication[] | []> => {
+  memberApplications: async (params: { serverId: Server['serverId'] }): Promise<MemberApplication[]> => {
     const memberApplications = await api.get(`/memberApplications?${new URLSearchParams(params).toString()}`);
     return memberApplications;
   },
@@ -90,14 +90,14 @@ export const getDataService = {
     return memberInvitations;
   },
 
-  memberInvitations: async (params: { receiverId: User['userId'] }): Promise<MemberInvitation[] | []> => {
+  memberInvitations: async (params: { receiverId: User['userId'] }): Promise<MemberInvitation[]> => {
     const memberInvitations = await api.get(`/memberInvitations?${new URLSearchParams(params).toString()}`);
     return memberInvitations;
   },
 
-  announcement: async (params: { announcementId: Announcement['announcementId']; region: Announcement['region'] }): Promise<Announcement | null> => {
-    const announcement = await api.get(`/announcement?${new URLSearchParams({ announcementId: params.announcementId.toString(), region: params.region }).toString()}`);
-    return announcement;
+  notifies: async (params: { region: Notify['region'] }): Promise<Notify[]> => {
+    const notify = await api.get(`/notifies?${new URLSearchParams(params).toString()}`);
+    return notify;
   },
 
   announcements: async (params: { region: Announcement['region'] }): Promise<Announcement[] | null> => {
