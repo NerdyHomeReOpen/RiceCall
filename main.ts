@@ -911,11 +911,11 @@ function configureAutoUpdater() {
     autoUpdater
       .checkForUpdates()
       .catch((error) => {
-      console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
+        console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
       })
       .finally(() => {
         isUpdateNotified = true;
-    });
+      });
   }
 
   // Check update every hour
@@ -1527,6 +1527,15 @@ app.on('ready', async () => {
   // Voice
   ipcMain.on('set-speaking-mode', (_, mode) => {
     store.set('speakingMode', mode ?? 'key');
+    if (mode === 'key') {
+      registerHotkey(store.get('defaultSpeakingKey'), () => {
+        BrowserWindow.getAllWindows().forEach((window) => {
+          window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
+        });
+      });
+    } else {
+      globalShortcut.unregister(store.get('defaultSpeakingKey'));
+    }
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('speaking-mode', mode);
     });
@@ -1535,11 +1544,13 @@ app.on('ready', async () => {
   ipcMain.on('set-default-speaking-key', (_, key) => {
     globalShortcut.unregister(store.get('defaultSpeakingKey'));
     store.set('defaultSpeakingKey', key ?? 'v');
-    registerHotkey(key ?? 'v', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-default-speaking-key', key);
+    if (store.get('speakingMode') === 'key') {
+      registerHotkey(key ?? 'v', () => {
+        BrowserWindow.getAllWindows().forEach((window) => {
+          window.webContents.send('toggle-default-speaking-key', key);
+        });
       });
-    });
+    }
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1680,11 +1691,13 @@ app.on('ready', async () => {
 
   // Register Hotkey
   globalShortcut.unregisterAll();
-  registerHotkey(store.get('defaultSpeakingKey'), () => {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
+  if (store.get('speakingMode') === 'key') {
+    registerHotkey(store.get('defaultSpeakingKey'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
+      });
     });
-  });
+  }
   registerHotkey(store.get('hotKeyOpenMainWindow'), () => {
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('toggle-hot-key-open-main-window', store.get('hotKeyOpenMainWindow'));
