@@ -52,14 +52,14 @@ export const fromTags = (raw: string) => {
         return content.replace(emojiRegex, (_: string, code: string) => {
           const emoji = emojis.find((e) => e.code === code);
           if (!emoji) return code;
-          return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
+          return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' ><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
         });
       }
 
       const processedContent = content.replace(emojiRegex, (_: string, code: string) => {
         const emoji = emojis.find((e) => e.code === code);
         if (!emoji) return code;
-        return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
+        return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' ><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
       });
 
       const contentWithBreaks = processedContent.replace(/\n/g, '<br>');
@@ -82,7 +82,7 @@ export const fromTags = (raw: string) => {
     .replace(emojiRegex, (_, code) => {
       const emoji = emojis.find((e) => e.code === code);
       if (!emoji) return code;
-      return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
+      return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' ><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
     })
     .replace(discordTimestampRegex, (_, timestamp) => {
       const date = new Date(parseInt(timestamp) * 1000);
@@ -142,7 +142,7 @@ export const fromPreserveHtml = (raw: string) => {
     const processedContent = content.replace(emojiRegex, (_: string, code: string) => {
       const emoji = emojis.find((e) => e.code === code);
       if (!emoji) return code;
-      return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
+      return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' ><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
     });
 
     const contentWithBreaks = processedContent.replace(/\n/g, '<br>');
@@ -166,7 +166,7 @@ export const fromPreserveHtml = (raw: string) => {
   processed = processed.replace(emojiRegex, (_: string, code: string) => {
     const emoji = emojis.find((e) => e.code === code);
     if (!emoji) return code;
-    return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' contenteditable='false'><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
+    return `<span data-emoji-wrapper class='${markdown['emoji-wrapper']}' ><div data-emoji='${code}' class='${markdown['emoji']}' style='background-image:url(${emoji.path})' draggable='false'></div></span>`;
   });
 
   return processed
