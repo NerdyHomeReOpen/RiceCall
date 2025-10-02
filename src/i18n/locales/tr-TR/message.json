@@ -139,6 +139,7 @@
   "text-change-to-max-length": "Ziyaretçiler tarafından gönderilen kısa mesajların maksimum uzunluğu şu şekilde değiştirildi: {{0}}",
   "text-change-to-wait-time": "Ziyaretçilerin kısa mesaj göndermesi için izin verilen bekleme süresi şu şekilde değiştirildi: {{0}} saniye",
   "too-many-failed-attempts": "Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.",
+  "unactivated-account": "帳號未啟用，請先至信箱啟用帳號。",
   "uncontrol-queue": "Yönetici [{{operator}}] mikrofonu açtı. Mikrofon kuyruğundaki ilk kişi konuşabilir.",
   "unforbade-text-in-channel": "Yönetici [{{operator}}] tarafından kısa mesaj göndermeniz yeniden etkinleştirildi。",
   "unforbade-voice-in-channel": "Yönetici [{{operator}}] sizin için mikrofonu açtı。",
