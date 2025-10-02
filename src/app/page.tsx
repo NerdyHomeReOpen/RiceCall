@@ -788,7 +788,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
               />
-              <SystemNoticeToaster announcement={announcements[announcements.length - 1]} />
+              <SystemNoticeToaster announcements={announcements} />
             </>
           )}
         </ExpandedProvider>

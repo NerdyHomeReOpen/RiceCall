@@ -10,23 +10,36 @@ import systemNoticeToaster from '@/styles/systemNoticeToaster.module.css';
 import MarkdownContent from '@/components/MarkdownContent';
 
 interface SystemNoticeToasterProps {
-  announcement?: Announcement;
+  announcements: Announcement[];
 }
 
-const SystemNoticeToaster: React.FC<SystemNoticeToasterProps> = React.memo(({ announcement }) => {
+const SystemNoticeToaster: React.FC<SystemNoticeToasterProps> = React.memo(({ announcements }) => {
   // States
   const [show, setShow] = useState(false);
+  const [showAnnouncementIndex, setShowAnnouncementIndex] = useState<number>(0);
+
+  // Handlers
+  const handleClose = () => {
+    setShow(false);
+    setTimeout(() => {
+      if (showAnnouncementIndex === 0) return;
+      setShowAnnouncementIndex((prev) => prev - 1);
+      setShow(true);
+    }, 2000);
+  };
 
   // Effects
   useEffect(() => {
-    setShow(!!announcement);
-  }, [announcement]);
+    if (announcements.length > 0) {
+      setShowAnnouncementIndex(announcements.length - 1);
+      setShow(true);
+    }
+  }, [announcements]);
 
-  if (!announcement) return null;
   return (
     <div className={`${systemNoticeToaster['system-notice-toaster']} ${show ? systemNoticeToaster['show'] : ''}`}>
-      <MarkdownContent markdownText={announcement.content} />
-      <div className={systemNoticeToaster['system-notice-toaster-close']} onClick={() => setShow(false)}></div>
+      <MarkdownContent markdownText={announcements[showAnnouncementIndex].content} />
+      <div className={systemNoticeToaster['system-notice-toaster-close']} onClick={handleClose}></div>
     </div>
   );
 });
