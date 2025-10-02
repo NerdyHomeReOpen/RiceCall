@@ -92,13 +92,15 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     h2: ({ node, ...props }: any) => <h2 {...props} />,
     h3: ({ node, ...props }: any) => <h3 {...props} />,
     p: ({ node, children, ...props }: any) => {
-      const hasEmoji = React.Children.toArray(children).some((child: any) => child?.props?.className?.includes('emoji-wrapper'));
+      const childrenArray = React.Children.toArray(children);
+      const hasEmoji = childrenArray.some((child: any) => child?.props?.className?.includes('emoji-wrapper'));
+      const hasText = childrenArray.some((child: any) => (typeof child === 'string' && child.trim() !== '') || (child?.props && !child?.props?.className?.includes('emoji-wrapper')));
 
       return (
         <p
           {...props}
           style={
-            hasEmoji
+            hasEmoji && !hasText
               ? {
                   display: 'inline',
                   margin: 0,
