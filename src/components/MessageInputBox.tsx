@@ -167,6 +167,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
             editorRef.current.innerHTML = '';
             setContentHtml('');
           }
+          contextMenu.closeEmojiPicker();
         }}
         onPaste={(e) => {
           const items = e.clipboardData.items;

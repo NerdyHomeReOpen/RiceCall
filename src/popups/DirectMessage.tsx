@@ -403,6 +403,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                   editorRef.current.innerHTML = '';
                 }
                 handleSendMessage(targetId, { type: 'dm', content: styledValue });
+                contextMenu.closeEmojiPicker();
               }}
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={() => (isComposingRef.current = false)}
