@@ -1029,6 +1029,39 @@ app.on('ready', async () => {
     socketInstance = connectSocket(token);
     isLogin = true;
     setTrayDetail(isLogin);
+
+    if (store.get('speakingMode') === 'key') {
+      registerHotkey(store.get('defaultSpeakingKey'), () => {
+        BrowserWindow.getAllWindows().forEach((window) => {
+          window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
+        });
+      });
+    }
+    registerHotkey(store.get('hotKeyOpenMainWindow'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-open-main-window', store.get('hotKeyOpenMainWindow'));
+      });
+    });
+    registerHotkey(store.get('hotKeyIncreaseVolume'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-increase-volume', store.get('hotKeyIncreaseVolume'));
+      });
+    });
+    registerHotkey(store.get('hotKeyDecreaseVolume'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-decrease-volume', store.get('hotKeyDecreaseVolume'));
+      });
+    });
+    registerHotkey(store.get('hotKeyToggleSpeaker'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-toggle-speaker', store.get('hotKeyToggleSpeaker'));
+      });
+    });
+    registerHotkey(store.get('hotKeyToggleMicrophone'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-toggle-microphone', store.get('hotKeyToggleMicrophone'));
+      });
+    });
   });
 
   ipcMain.on('logout', () => {
@@ -1691,38 +1724,6 @@ app.on('ready', async () => {
 
   // Register Hotkey
   globalShortcut.unregisterAll();
-  if (store.get('speakingMode') === 'key') {
-    registerHotkey(store.get('defaultSpeakingKey'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
-      });
-    });
-  }
-  registerHotkey(store.get('hotKeyOpenMainWindow'), () => {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('toggle-hot-key-open-main-window', store.get('hotKeyOpenMainWindow'));
-    });
-  });
-  registerHotkey(store.get('hotKeyIncreaseVolume'), () => {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('toggle-hot-key-increase-volume', store.get('hotKeyIncreaseVolume'));
-    });
-  });
-  registerHotkey(store.get('hotKeyDecreaseVolume'), () => {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('toggle-hot-key-decrease-volume', store.get('hotKeyDecreaseVolume'));
-    });
-  });
-  registerHotkey(store.get('hotKeyToggleSpeaker'), () => {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('toggle-hot-key-toggle-speaker', store.get('hotKeyToggleSpeaker'));
-    });
-  });
-  registerHotkey(store.get('hotKeyToggleMicrophone'), () => {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('toggle-hot-key-toggle-microphone', store.get('hotKeyToggleMicrophone'));
-    });
-  });
 });
 
 app.on('before-quit', () => {
