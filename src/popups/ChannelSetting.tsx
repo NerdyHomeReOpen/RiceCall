@@ -447,8 +447,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     type="number"
                     value={channelGuestTextMaxLength}
                     min={0}
-                    max={1000}
-                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextMaxLength: Math.max(0, Math.min(1000, parseInt(e.target.value) || 0)) }))}
+                    max={3000}
+                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextMaxLength: Math.max(0, Math.min(3000, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
                     readOnly={!isChannelMod(permissionLevel)}
                   />

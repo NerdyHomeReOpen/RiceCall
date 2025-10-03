@@ -23,7 +23,6 @@ import { fromPreserveHtml, toPreserveHtml } from '@/utils/tagConverter';
 const ALLOWED_TAGS = [
   'span',
   'img',
-  'div',
   'p',
   'br',
   'h1',
@@ -57,7 +56,6 @@ const ALLOWED_ATTR: string[] = [
   'src',
   'alt',
   'class',
-  'draggable',
   'href',
   'controls',
   'width',
@@ -70,9 +68,6 @@ const ALLOWED_ATTR: string[] = [
   'data-kick',
   'data-tag',
   'data-timestamp',
-  'data-emoji-wrapper',
-  'data-font-size',
-  'data-text-color',
 ];
 
 interface MarkdownContentProps {
@@ -92,28 +87,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     h1: ({ node, ...props }: any) => <h1 {...props} />,
     h2: ({ node, ...props }: any) => <h2 {...props} />,
     h3: ({ node, ...props }: any) => <h3 {...props} />,
-    p: ({ node, children, ...props }: any) => {
-      const childrenArray = React.Children.toArray(children);
-      const hasEmoji = childrenArray.some((child: any) => child?.props?.className?.includes('emoji-wrapper'));
-      const hasText = childrenArray.some((child: any) => (typeof child === 'string' && child.trim() !== '') || (child?.props && !child?.props?.className?.includes('emoji-wrapper')));
-
-      return (
-        <p
-          {...props}
-          style={
-            hasEmoji && !hasText
-              ? {
-                  display: 'inline',
-                  margin: 0,
-                  padding: 0,
-                }
-              : undefined
-          }
-        >
-          {children}
-        </p>
-      );
-    },
+    p: ({ node, ...props }: any) => <p {...props} />,
     ul: ({ node, ...props }: any) => <ul {...props} />,
     ol: ({ node, ...props }: any) => <ol {...props} />,
     li: ({ node, ...props }: any) => <li {...props} />,

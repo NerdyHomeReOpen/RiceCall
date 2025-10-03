@@ -72,7 +72,7 @@ const MessageInputBoxGuard = React.memo(
     const isForbidByForbidGuestTextGap = !isMember(permissionLevel) && leftGapTime > 0;
     const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
     const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
-    const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 1000;
+    const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
     const placeholder = useMemo(() => {
       if (isForbidByMutedText) return t('text-was-muted-in-channel-message');
       if (isForbidByForbidText) return t('channel-forbid-text-message');

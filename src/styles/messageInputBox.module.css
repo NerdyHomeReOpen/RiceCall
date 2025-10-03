@@ -19,10 +19,11 @@
   pointer-events: none;
 }
 
-.messageinput-box textarea {
+.messageinput-box .textarea {
   flex: 1;
   resize: none;
-  border: none;
+  border: none !important;
+  overflow: auto;
 }
 
 .message-input-length-text {
@@ -30,15 +31,4 @@
   font-size: 0.9em;
   align-self: flex-end;
   margin-left: 2px;
-}
-
-.contenteditable {
-  flex: 1;
-  display: block;
-  min-height: 38px;
-  line-height: 19px;
-  word-break: break-word;
-  overflow: auto;
-  max-height: 200px;
-  padding: 1px;
 }

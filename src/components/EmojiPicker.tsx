@@ -7,17 +7,20 @@ import emoji from '@/styles/emoji.module.css';
 import { defEmojis, otherEmojis } from '@/emojis';
 import popup from '@/styles/popup.module.css';
 
+// Providers
+import { useContextMenu } from '@/providers/ContextMenu';
+
 interface EmojiPickerProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
-  onEmojiSelect: (code: string, full: string) => void;
   anchorEl?: HTMLElement | null;
   showFontbar?: boolean;
   isUserInfo?: boolean;
-  fontSize?: 'small' | 'medium' | 'large';
+  fontSize?: string;
   textColor?: string;
-  onFontSizeChange?: (size: 'small' | 'medium' | 'large') => void;
+  onEmojiSelect?: (code: string, full: string) => void;
+  onFontSizeChange?: (size: string) => void;
   onTextColorChange?: (color: string) => void;
 }
 
@@ -26,16 +29,17 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     x,
     y,
     direction,
-    onEmojiSelect,
     anchorEl,
     showFontbar = false,
     isUserInfo = false,
-    fontSize: propFontSize = 'small',
+    fontSize: propFontSize = '13px',
     textColor: propTextColor = '#000000',
+    onEmojiSelect,
     onFontSizeChange,
     onTextColorChange,
   }) => {
     // Refs
+    const contextMenu = useContextMenu();
     const emojiPickerRef = useRef<HTMLDivElement>(null);
 
     // States
@@ -43,11 +47,10 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     const [pickerX, setPickerX] = useState<number>(x);
     const [pickerY, setPickerY] = useState<number>(y);
     const [activeTab, setActiveTab] = useState<'def' | 'other' | 'vip'>('def');
-    const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>(propFontSize);
-    const [colorPanelOpen, setColorPanelOpen] = useState(false);
+    const [fontSize, setFontSize] = useState<string>(propFontSize);
     const [selectedColor, setSelectedColor] = useState<string>(propTextColor);
-    const colorBoxRef = useRef<HTMLDivElement>(null);
 
+    // Effects
     useEffect(() => {
       setFontSize(propFontSize);
     }, [propFontSize]);
@@ -56,7 +59,6 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       setSelectedColor(propTextColor);
     }, [propTextColor]);
 
-    // Effects
     useEffect(() => {
       if (!emojiPickerRef.current) return;
 
@@ -119,22 +121,6 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       }
     }, [x, y, direction, anchorEl]);
 
-    useMemo(() => fontSize, [fontSize]);
-
-    useEffect(() => {
-      if (!colorPanelOpen) return;
-      const handleDocMouseDown = (e: MouseEvent | PointerEvent) => {
-        if (!colorBoxRef.current) return;
-        if (!colorBoxRef.current.contains(e.target as Node)) {
-          setColorPanelOpen(false);
-        }
-      };
-      document.addEventListener('pointerdown', handleDocMouseDown, true);
-      return () => {
-        document.removeEventListener('pointerdown', handleDocMouseDown, true);
-      };
-    }, [colorPanelOpen]);
-
     return (
       <div
         ref={emojiPickerRef}
@@ -146,57 +132,36 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
           <div className={emoji['emoji-fontbar']}>
             <div className={emoji['emoji-font-icon']} aria-hidden="true" />
             <div className={`${popup['select-box']} ${emoji['font-select-box']}`}>
-              <select
-                className={emoji['emoji-font-select']}
-                value={fontSize}
-                onChange={(e) => {
-                  const newSize = e.target.value as 'small' | 'medium' | 'large';
-                  setFontSize(newSize);
-                  onFontSizeChange?.(newSize);
-                }}
-              >
-                <option value="small">小</option>
-                <option value="medium">中</option>
-                <option value="large">大</option>
-              </select>
+              <div className={popup['select-box']}>
+                <select
+                  value={fontSize}
+                  onChange={(e) => {
+                    setFontSize(e.target.value);
+                    onFontSizeChange?.(e.target.value);
+                  }}
+                >
+                  {Array.from({ length: 17 }, (_, i) => (
+                    <option key={i} value={`${i + 8}px`}>
+                      {i + 8}px
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div
               className={`${emoji['color-select-box']}`}
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                if (e.currentTarget === e.target) setColorPanelOpen((prev) => !prev);
+              onMouseDown={(e) => {
+                e.preventDefault();
+                const x = e.currentTarget.getBoundingClientRect().right;
+                const y = e.currentTarget.getBoundingClientRect().top;
+                contextMenu.showColorPicker(x, y, 'left-top', (color) => {
+                  setSelectedColor(color);
+                  onTextColorChange?.(color);
+                });
               }}
-              ref={colorBoxRef}
             >
-              <button type="button" className={emoji['color-swatch']} style={{ backgroundColor: selectedColor }} onClick={() => setColorPanelOpen((prev) => !prev)} />
-              {colorPanelOpen && (
-                <div
-                  className={emoji['color-panel']}
-                  role="listbox"
-                  onMouseDown={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  {[{ value: '#000000' }, { value: '#0066cc' }, { value: '#2f4f2f' }, { value: '#f39c12' }, { value: '#ff7bac' }, { value: '#00bcd4' }, { value: '#9b59b6' }, { value: '#27ae60' }].map(
-                    (c) => (
-                      <button
-                        key={c.value}
-                        type="button"
-                        className={`${emoji['color-option']}`}
-                        style={{ backgroundColor: c.value, outline: selectedColor === c.value ? '2px solid #5898ff' : 'none' }}
-                        onClick={() => {
-                          setSelectedColor(c.value);
-                          setColorPanelOpen(false);
-                          onTextColorChange?.(c.value);
-                        }}
-                        role="option"
-                        aria-selected={selectedColor === c.value}
-                      />
-                    ),
-                  )}
-                </div>
-              )}
+              <div className={emoji['color-swatch']} style={{ backgroundColor: selectedColor }} />
             </div>
           </div>
         )}

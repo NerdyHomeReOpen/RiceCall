@@ -1,7 +1,17 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Color from '@tiptap/extension-color';
+import TextAlign from '@tiptap/extension-text-align';
+import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
+import { EmojiNode } from '@/extensions/EmojiNode';
+import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
+import { ImageNode } from '@/extensions/ImageNode';
+import { ChatEnter } from '@/extensions/ChatEnter';
 
 // CSS
 import messageInputBox from '@/styles/messageInputBox.module.css';
+import markdown from '@/styles/markdown.module.css';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -15,7 +25,7 @@ import api from '@/services/api.service';
 
 // Utils
 import { handleOpenAlertDialog } from '@/utils/popup';
-import { fromTags, toTags } from '@/utils/tagConverter';
+import { toTags } from '@/utils/tagConverter';
 
 interface MessageInputBoxProps {
   onSend?: (message: string) => void;
@@ -28,35 +38,28 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
+  const editor = useEditor({
+    extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, ImageNode, ChatEnter],
+    content: '',
+    onUpdate: ({ editor }) => setMessageInput(toTags(editor.getHTML())),
+    immediatelyRender: false,
+  });
 
   // Refs
   const isUploadingRef = useRef<boolean>(false);
   const isComposingRef = useRef<boolean>(false);
-  const editorRef = useRef<HTMLDivElement>(null);
-  const [contentHtml, setContentHtml] = useState<string>('');
+  const fontSizeRef = useRef<string>('13px');
+  const textColorRef = useRef<string>('#000000');
 
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('small');
-  const [textColor, setTextColor] = useState<string>('#000000');
-
-  useEffect(() => {
-    const savedFontSize = localStorage.getItem('messageInputBox-fontSize') as 'small' | 'medium' | 'large';
-    const savedTextColor = localStorage.getItem('messageInputBox-textColor');
-
-    if (savedFontSize) setFontSize(savedFontSize);
-    if (savedTextColor) setTextColor(savedTextColor);
-  }, []);
-
-  const updateFontSize = useCallback((size: 'small' | 'medium' | 'large') => {
-    setFontSize(size);
-    localStorage.setItem('messageInputBox-fontSize', size);
-  }, []);
-
-  const updateTextColor = useCallback((color: string) => {
-    setTextColor(color);
-    localStorage.setItem('messageInputBox-textColor', color);
-  }, []);
+  // States
+  const [messageInput, setMessageInput] = useState<string>('');
 
   // Handlers
+  const syncStyles = useCallback(() => {
+    fontSizeRef.current = editor?.getAttributes('textStyle').fontSize || '13px';
+    textColorRef.current = editor?.getAttributes('textStyle').color || '#000000';
+  }, [editor]);
+
   const handlePaste = async (imageData: string, fileName: string) => {
     isUploadingRef.current = true;
     if (imageData.length > 5 * 1024 * 1024) {
@@ -65,54 +68,38 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
       return;
     }
     const formData = new FormData();
-    formData.append('_type', 'message');
+    formData.append('_type', 'announcement');
     formData.append('_fileName', `fileName-${Date.now()}`);
     formData.append('_file', imageData);
     const response = await api.post('/upload', formData);
     if (response) {
-      editorRef.current?.focus();
-      document.execCommand('insertText', false, `![${fileName}](${response.avatarUrl})`);
+      editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
+      syncStyles();
     }
     isUploadingRef.current = false;
   };
 
-  const insertHtmlAtCaret = useCallback((html: string) => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) {
-      editorRef.current?.appendChild(document.createTextNode(''));
-      return;
-    }
-    const range = selection.getRangeAt(0);
-    range.deleteContents();
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-    const fragment = document.createDocumentFragment();
-    let node: ChildNode | null;
-    let lastNode: ChildNode | null = null;
-    while ((node = temp.firstChild)) {
-      lastNode = fragment.appendChild(node);
-    }
-    range.insertNode(fragment);
-    if (lastNode) {
-      const newRange = document.createRange();
-      newRange.setStartAfter(lastNode);
-      newRange.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(newRange);
-    }
-  }, []);
+  const handleEmojiSelect = (code: string) => {
+    editor?.chain().insertEmoji({ code }).focus().run();
+    syncStyles();
+  };
 
-  const valueAsCode = useMemo(() => toTags(contentHtml || ''), [contentHtml]);
+  const handleFontSizeChange = (size: string) => {
+    fontSizeRef.current = size;
+    editor?.chain().setFontSize(size).focus().run();
+    syncStyles();
+  };
 
+  const handleTextColorChange = (color: string) => {
+    textColorRef.current = color;
+    editor?.chain().setColor(color).focus().run();
+    syncStyles();
+  };
+
+  // Effects
   useEffect(() => {
-    const el = editorRef.current;
-    if (!el) return;
-    const handleInput = () => setContentHtml(el.innerHTML);
-    el.addEventListener('input', handleInput);
-    return () => {
-      el.removeEventListener('input', handleInput);
-    };
-  }, []);
+    editor?.on('selectionUpdate', syncStyles);
+  }, [editor, syncStyles]);
 
   return (
     <div className={`${messageInputBox['messageinput-box']} ${disabled ? messageInputBox['disabled'] : ''}`}>
@@ -126,55 +113,29 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
             x,
             y,
             'right-top',
-            (_, full) => {
-              editorRef.current?.focus();
-              const html = fromTags(full);
-              insertHtmlAtCaret(html);
-              if (editorRef.current) setContentHtml(editorRef.current.innerHTML);
-            },
             e.currentTarget as HTMLElement,
             true,
             false,
-            fontSize,
-            textColor,
-            updateFontSize,
-            updateTextColor,
+            fontSizeRef.current,
+            textColorRef.current,
+            (code) => handleEmojiSelect(code),
+            (size) => handleFontSizeChange(size),
+            (color) => handleTextColorChange(color),
           );
         }}
       />
-      <div
-        ref={editorRef}
-        contentEditable={!disabled}
-        role="textbox"
-        aria-multiline="true"
-        aria-label={t('message-input-box')}
-        data-placeholder={placeholder}
-        onKeyDown={(e) => {
-          if (e.shiftKey) return;
-          if (e.key !== 'Enter') return;
-          e.preventDefault();
-          if (isComposingRef.current) return;
-          if (disabled) return;
-          let html = editorRef.current?.innerHTML || '';
-          html = html.replace(/^(?:<br\s*\/>|<br>)+/gi, '').replace(/(?:<br\s*\/>|<br>)+$/gi, '');
-          const value = toTags(html).trim();
-          if (!value) return;
-          if (value.length > maxLength) return;
 
-          const styledValue = `<style data-font-size="${fontSize}" data-text-color="${textColor}">${value}</style>`;
-          onSend?.(styledValue);
-          if (editorRef.current) {
-            editorRef.current.innerHTML = '';
-            setContentHtml('');
-          }
-          contextMenu.closeEmojiPicker();
-        }}
+      <EditorContent
+        editor={editor}
+        placeholder={placeholder}
+        className={`${messageInputBox['textarea']} ${markdown['markdown-content']}`}
+        style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
         onPaste={(e) => {
           const items = e.clipboardData.items;
           for (const item of items) {
             if (item.type.startsWith('image/')) {
               const file = item.getAsFile();
-              if (file) {
+              if (file && !isUploadingRef.current) {
                 const reader = new FileReader();
                 reader.onloadend = () => handlePaste(reader.result as string, file.name);
                 reader.readAsDataURL(file);
@@ -182,20 +143,30 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
             }
           }
         }}
+        onInput={() => {
+          const text = editor?.getText();
+          if (text && text.length > maxLength) {
+            editor?.chain().setContent(text.slice(0, maxLength)).focus().run();
+          }
+        }}
+        onKeyDown={(e) => {
+          if (disabled) return;
+          if (isComposingRef.current) return;
+          if (e.shiftKey) return;
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (messageInput.trim().length === 0) return;
+            onSend?.(messageInput);
+            editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
+            syncStyles();
+          }
+        }}
         onCompositionStart={() => (isComposingRef.current = true)}
         onCompositionEnd={() => (isComposingRef.current = false)}
-        className={messageInputBox['contenteditable']}
-        style={{
-          outline: 'none',
-          whiteSpace: 'pre-wrap',
-          width: '100%',
-          fontSize: fontSize === 'small' ? '14px' : fontSize === 'medium' ? '18px' : '25px',
-          color: textColor,
-        }}
-        suppressContentEditableWarning
+        maxLength={maxLength}
       />
       <div className={messageInputBox['message-input-length-text']}>
-        {valueAsCode.length}/{maxLength}
+        {editor?.getText().length}/{maxLength}
       </div>
     </div>
   );

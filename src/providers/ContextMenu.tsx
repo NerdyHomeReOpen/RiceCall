@@ -13,7 +13,6 @@ import EmojiPicker from '@/components/EmojiPicker';
 import ColorPicker from '@/components/ColorPicker';
 import StatusDropdown from '@/components/StatusDropdown';
 import EmbedLinkInput from '@/components/EmbedLinkInput';
-import UserTagInput from '@/components/UserTagInput';
 
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => void;
@@ -25,19 +24,18 @@ interface ContextMenuContextType {
     x: number,
     y: number,
     position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom',
-    onEmojiSelect: (code: string, full: string) => void,
     anchorEl?: HTMLElement | null,
     showFontbar?: boolean,
     isUserInfo?: boolean,
-    fontSize?: 'small' | 'medium' | 'large',
+    fontSize?: string,
     textColor?: string,
-    onFontSizeChange?: (size: 'small' | 'medium' | 'large') => void,
+    onEmojiSelect?: (code: string, full: string) => void,
+    onFontSizeChange?: (size: string) => void,
     onTextColorChange?: (color: string) => void,
   ) => void;
   showColorPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => void;
   showStatusDropdown: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: User['status']) => void) => void;
   showEmbedLinkInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => void;
-  showUserTagInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (username: string) => void) => void;
   closeContextMenu: () => void;
   closeMicContextMenu: () => void;
   closeNotifyMenu: () => void;
@@ -47,7 +45,6 @@ interface ContextMenuContextType {
   closeColorPicker: () => void;
   closeStatusDropdown: () => void;
   closeEmbedLinkInput: () => void;
-  closeUserTagInput: () => void;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | null>(null);
@@ -73,7 +70,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [isColorPickerVisible, setIsColorPickerVisible] = React.useState(false);
   const [isStatusDropdownVisible, setIsStatusDropdownVisible] = React.useState(false);
   const [isEmbedLinkInputVisible, setIsEmbedLinkInputVisible] = React.useState(false);
-  const [isUserTagInputVisible, setIsUserTagInputVisible] = React.useState(false);
 
   // States
   const [contextMenu, setContextMenu] = React.useState<ReactNode | null>(null);
@@ -85,7 +81,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [colorPicker, setColorPicker] = React.useState<ReactNode | null>(null);
   const [statusDropdown, setStatusDropdown] = React.useState<ReactNode | null>(null);
   const [embedLinkInput, setEmbedLinkInput] = React.useState<ReactNode | null>(null);
-  const [userTagInput, setUserTagInput] = React.useState<ReactNode | null>(null);
 
   // Handlers
   const showContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => {
@@ -142,18 +137,17 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     x: number,
     y: number,
     direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom',
-    onEmojiSelect: (code: string, full: string) => void,
     anchorEl?: HTMLElement | null,
     showFontbar?: boolean,
     isUserInfo?: boolean,
-    fontSize?: 'small' | 'medium' | 'large',
+    fontSize?: string,
     textColor?: string,
-    onFontSizeChange?: (size: 'small' | 'medium' | 'large') => void,
+    onEmojiSelect?: (code: string, full: string) => void,
+    onFontSizeChange?: (size: string) => void,
     onTextColorChange?: (color: string) => void,
   ) => {
     setEmojiPicker(
       <EmojiPicker
-        onEmojiSelect={onEmojiSelect}
         x={x}
         y={y}
         direction={direction}
@@ -162,6 +156,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         isUserInfo={isUserInfo}
         fontSize={fontSize}
         textColor={textColor}
+        onEmojiSelect={onEmojiSelect}
         onFontSizeChange={onFontSizeChange}
         onTextColorChange={onTextColorChange}
       />,
@@ -204,16 +199,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsEmbedLinkInputVisible(false);
   };
 
-  const showUserTagInput = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (username: string) => void) => {
-    setUserTagInput(<UserTagInput onSubmit={onSubmit} onClose={closeUserTagInput} x={x} y={y} direction={direction} />);
-    setIsUserTagInputVisible(true);
-  };
-
-  const closeUserTagInput = () => {
-    setUserTagInput(null);
-    setIsUserTagInputVisible(false);
-  };
-
   // Effects
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -230,10 +215,11 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         if (isMicContextMenuVisible) closeMicContextMenu();
         if (isEmojiPickerVisible) closeEmojiPicker();
         if (isNotifyMenuVisible) closeNotifyMenu();
-        if (isColorPickerVisible) closeColorPicker();
         if (isStatusDropdownVisible) closeStatusDropdown();
         if (isEmbedLinkInputVisible) closeEmbedLinkInput();
-        if (isUserTagInputVisible) closeUserTagInput();
+      }
+      if (!(e.target as HTMLElement).closest('.color-picker-container')) {
+        if (isColorPickerVisible) closeColorPicker();
       }
     };
     document.addEventListener('pointerdown', onPointerDown);
@@ -252,7 +238,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     isColorPickerVisible,
     isStatusDropdownVisible,
     isEmbedLinkInputVisible,
-    isUserTagInputVisible,
   ]);
 
   return (
@@ -267,7 +252,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         showColorPicker,
         showStatusDropdown,
         showEmbedLinkInput,
-        showUserTagInput,
         closeContextMenu,
         closeMicContextMenu,
         closeNotifyMenu,
@@ -277,7 +261,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         closeColorPicker,
         closeStatusDropdown,
         closeEmbedLinkInput,
-        closeUserTagInput,
       }}
     >
       {isContextMenuVisible && contextMenu}
@@ -289,7 +272,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       {isColorPickerVisible && colorPicker}
       {isStatusDropdownVisible && statusDropdown}
       {isEmbedLinkInputVisible && embedLinkInput}
-      {isUserTagInputVisible && userTagInput}
       {children}
     </ContextMenuContext.Provider>
   );
