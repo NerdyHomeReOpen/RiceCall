@@ -627,6 +627,10 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Effects
   useEffect(() => {
+    ipc.toolbar.title.set(user.name);
+  }, [user]);
+
+  useEffect(() => {
     selectedTabIdRef.current = mainTab.selectedTabId;
 
     switch (mainTab.selectedTabId) {
