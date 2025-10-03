@@ -348,6 +348,7 @@
 
 .category-name {
   font-size: 1.1rem;
+  font-weight: bold;
 }
 
 .category-flag {
@@ -361,6 +362,7 @@
 
 .category-list .category-list .category-name {
   font-size: 1rem;
+  font-weight: unset;
 }
 
 .servers-container {

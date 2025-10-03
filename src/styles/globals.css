@@ -25,6 +25,7 @@
 
 html,
 body {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -34,7 +35,7 @@ body {
   font-family: Arial, sans-serif;
   font-size: 13px;
   --font-family: Arial, sans-serif;
-  overflow: hidden;
+  overflow: clip;
   color: var(--foreground);
   background: none;
   user-select: none;
