@@ -91,7 +91,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const { name: targetCurrentServerName } = targetCurrentServer || {};
 
   // Memos
-  const isWarning = useMemo(() => (editor ? editor.getText().length > MAX_LENGTH : false), [editor?.getText(), MAX_LENGTH]);
+  const textLength = editor?.getText().length || 0;
+  const isWarning = useMemo(() => textLength > MAX_LENGTH, [textLength]);
   const isFriend = useMemo(() => friendState?.relationStatus === 2, [friendState]);
   const isBlocked = useMemo(() => friendState?.isBlocked, [friendState]);
   const isOnline = useMemo(() => targetStatus !== 'offline', [targetStatus]);

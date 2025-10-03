@@ -16,7 +16,7 @@ export const ChatEnter = Extension.create({
         return splitBlock(editor.state, editor.view.dispatch);
       },
 
-      'Enter': ({ editor }) => {
+      'Enter': () => {
         return true;
       },
     };

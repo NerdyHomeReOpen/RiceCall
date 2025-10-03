@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useEditor, EditorContent, getText } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
@@ -55,7 +55,8 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   const [messageInput, setMessageInput] = useState<string>('');
 
   // Memos
-  const isWarning = useMemo(() => (editor ? editor.getText().length > maxLength : false), [editor?.getText(), maxLength]);
+  const textLength = editor?.getText().length || 0;
+  const isWarning = useMemo(() => textLength > maxLength, [textLength, maxLength]);
 
   // Handlers
   const syncStyles = useCallback(() => {
