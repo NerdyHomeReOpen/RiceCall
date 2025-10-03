@@ -65,7 +65,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
   } = member;
-  const mySelectId = `user-${memberUserId}`;
   const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel, voiceMode: channelVoiceMode } = channel;
   const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId } = server;
 
@@ -141,15 +140,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
 
   return (
     <div
-    ref={userTabRef}
-      tabIndex={-1}
-      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === mySelectId ? styles['selected'] : ''}`}
+      ref={userTabRef}
+      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `user-${memberUserId}` ? styles['selected'] : ''}`}
       onClick={() => {
-        if (selectedItemId === mySelectId) setSelectedItemId(null);
-        else setSelectedItemId(mySelectId);
-      }}
-      onFocus={() => {
-        if (selectedItemId !== mySelectId) setSelectedItemId(mySelectId);
+        if (selectedItemId === `user-${memberUserId}`) setSelectedItemId(null);
+        else setSelectedItemId(`user-${memberUserId}`);
       }}
       onDoubleClick={() => {
         if (isUser) return;
@@ -323,9 +318,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
       <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
-      <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>
-        {memberNickname || memberName}
-      </div>
+      <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
       <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isUser && <div className={styles['my-location-icon']} />}

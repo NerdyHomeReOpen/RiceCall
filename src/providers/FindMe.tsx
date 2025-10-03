@@ -1,40 +1,39 @@
-import { createContext, useContext, useRef, useState } from 'react';
+import { createContext, useContext, useRef } from 'react';
 
 interface FindMeContextType {
   findMe: () => void;
   handleCategoryExpanded: React.RefObject<() => void>;
   handleChannelExpanded: React.RefObject<() => void>;
   userTabRef: React.RefObject<HTMLDivElement | null>;
-  isUserSelected: boolean;
-  setUserSelected: (v: boolean) => void;
 }
 
 const FindMeContext = createContext<FindMeContextType | null>(null);
 
 export const useFindMeContext = () => {
   const context = useContext(FindMeContext);
-  if (!context) throw new Error('useFindMeContext must be used within an FindMeProvider');
+  if (!context) {
+    throw new Error('useFindMeContext must be used within an FindMeProvider');
+  }
   return context;
 };
 
 const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
+  // Refs
   const handleCategoryExpanded = useRef<() => void>(() => {});
   const handleChannelExpanded = useRef<() => void>(() => {});
   const userTabRef = useRef<HTMLDivElement>(null);
 
-  const [isUserSelected, setUserSelected] = useState(false);
-
+  // Handlers
   const findMe = () => {
     handleCategoryExpanded.current();
     handleChannelExpanded.current();
+
     setTimeout(() => {
-      const el = userTabRef.current;
-      if (!el) return;
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
-      el.focus({ preventScroll: true });
-      setUserSelected(true);
-    }, 150);
+      userTabRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 100);
   };
 
   return (
@@ -44,8 +43,6 @@ const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
         handleCategoryExpanded,
         handleChannelExpanded,
         userTabRef,
-        isUserSelected,
-        setUserSelected,
       }}
     >
       {children}
@@ -54,4 +51,5 @@ const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 FindMeProvider.displayName = 'FindMeProvider';
+
 export default FindMeProvider;
