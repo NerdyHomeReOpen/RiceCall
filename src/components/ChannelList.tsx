@@ -84,6 +84,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
 
   const handleLocateUser = () => {
     findMe.findMe();
+    setSelectedItemId(`user-${userId}`);
   };
 
   const handleServerMemberApplicationsSet = (...args: MemberApplication[]) => {
