@@ -302,6 +302,10 @@
   border: none !important;
 }
 
+.input.warning {
+  border: 1px solid #f00 !important;
+}
+
 @keyframes shake {
   0%,
   100% {

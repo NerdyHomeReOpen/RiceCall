@@ -91,6 +91,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const { name: targetCurrentServerName } = targetCurrentServer || {};
 
   // Memos
+  const isWarning = useMemo(() => (editor ? editor.getText().length > MAX_LENGTH : false), [editor?.getText(), MAX_LENGTH]);
   const isFriend = useMemo(() => friendState?.relationStatus === 2, [friendState]);
   const isBlocked = useMemo(() => friendState?.isBlocked, [friendState]);
   const isOnline = useMemo(() => targetStatus !== 'offline', [targetStatus]);
@@ -361,7 +362,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <EditorContent
               editor={editor}
               placeholder={t('input-message')}
-              className={`${styles['input']} ${markdown['markdown-content']}`}
+              className={`${styles['input']} ${markdown['markdown-content']} ${isWarning ? styles['warning'] : ''}`}
               style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
               onPaste={(e) => {
                 const items = e.clipboardData.items;
@@ -376,13 +377,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                   }
                 }
               }}
-              onInput={() => {
-                const text = editor?.getText();
-                if (text && text.length > MAX_LENGTH) {
-                  editor?.chain().setContent(text.slice(0, MAX_LENGTH)).focus().run();
-                }
-              }}
               onKeyDown={(e) => {
+                if (isWarning) return;
                 if (isComposingRef.current) return;
                 if (e.shiftKey) return;
                 if (e.key === 'Enter') {

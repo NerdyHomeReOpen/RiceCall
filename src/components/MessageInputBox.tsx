@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEditor, EditorContent, getText } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
@@ -54,6 +54,9 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   // States
   const [messageInput, setMessageInput] = useState<string>('');
 
+  // Memos
+  const isWarning = useMemo(() => (editor ? editor.getText().length > maxLength : false), [editor?.getText(), maxLength]);
+
   // Handlers
   const syncStyles = useCallback(() => {
     fontSizeRef.current = editor?.getAttributes('textStyle').fontSize || '13px';
@@ -102,7 +105,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   }, [editor, syncStyles]);
 
   return (
-    <div className={`${messageInputBox['messageinput-box']} ${disabled ? messageInputBox['disabled'] : ''}`}>
+    <div className={`${messageInputBox['messageinput-box']} ${disabled ? messageInputBox['disabled'] : ''} ${isWarning ? messageInputBox['warning'] : ''}`}>
       <div
         className={emoji['emoji-icon']}
         onMouseDown={(e) => {
@@ -143,14 +146,9 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
             }
           }
         }}
-        onInput={() => {
-          const text = editor?.getText();
-          if (text && text.length > maxLength) {
-            editor?.chain().setContent(text.slice(0, maxLength)).focus().run();
-          }
-        }}
         onKeyDown={(e) => {
           if (disabled) return;
+          if (isWarning) return;
           if (isComposingRef.current) return;
           if (e.shiftKey) return;
           if (e.key === 'Enter') {
