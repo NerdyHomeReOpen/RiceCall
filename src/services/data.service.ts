@@ -2,7 +2,7 @@
 import api from '@/services/api.service';
 
 // Types
-import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, RecommendServerList, MemberInvitation, Announcement, Notify } from '@/types';
+import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, MemberInvitation, Announcement, Notify, RecommendServer } from '@/types';
 
 export const getDataService = {
   user: async (params: { userId: User['userId'] }): Promise<User | null> => {
@@ -105,9 +105,9 @@ export const getDataService = {
     return announcements;
   },
 
-  recommendServerList: async (): Promise<RecommendServerList> => {
-    const recommendServerList = await api.get(`/recommendServerList`);
-    return recommendServerList;
+  recommendServers: async (): Promise<RecommendServer[]> => {
+    const recommendServers = await api.get(`/recommendServers`);
+    return recommendServers;
   },
 };
 

@@ -142,6 +142,7 @@ export type table_recommend_server_categories = {
 export type table_recommend_servers = {
   categoryId: string;
   serverId: string;
+  tags: string;
 };
 
 export type table_reset_email_requests = {

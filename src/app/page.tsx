@@ -17,12 +17,12 @@ import type {
   PromptMessage,
   FriendApplication,
   MemberInvitation,
-  RecommendServerList,
   Announcement,
   Friend,
   OnlineMember,
   QueueUser,
   Notify,
+  RecommendServer,
 } from '@/types';
 
 // i18n
@@ -404,7 +404,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [notifies, setNotifies] = useState<Notify[]>([]);
-  const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
+  const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
   const [isConnected, setIsConnected] = useState(false);
 
   // Variables
@@ -605,7 +605,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     setQueueUsers([]);
     setAnnouncements([]);
     setNotifies([]);
-    setRecommendServerList({});
+    setRecommendServers([]);
     setIsConnected(false);
   };
 
@@ -723,8 +723,8 @@ const RootPageComponent: React.FC = React.memo(() => {
       data.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
         if (memberInvitations) setMemberInvitations(memberInvitations);
       });
-      data.recommendServerList().then((recommendServerList) => {
-        if (recommendServerList) setRecommendServerList(recommendServerList);
+      data.recommendServers().then((recommendServerList) => {
+        if (recommendServerList) setRecommendServers(recommendServerList);
       });
       setSystemNotify([]); // TODO: Implement system notify
     };
@@ -797,7 +797,7 @@ const RootPageComponent: React.FC = React.memo(() => {
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage user={user} servers={servers} announcements={announcements} recommendServerList={recommendServerList} display={mainTab.selectedTabId === 'home'} />
+              <HomePage user={user} servers={servers} announcements={announcements} recommendServers={recommendServers} display={mainTab.selectedTabId === 'home'} />
               <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}

@@ -11,7 +11,7 @@ import RecommendServerList from '@/components/RecommendServerList';
 import MarkdownContent from '@/components/MarkdownContent';
 
 // Type
-import type { RecommendServerList as RecommendServerListType, User, Server, Announcement } from '@/types';
+import type { User, Server, Announcement, RecommendServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -49,11 +49,11 @@ interface HomePageProps {
   user: User;
   servers: Server[];
   announcements: Announcement[];
-  recommendServerList: RecommendServerListType;
+  recommendServers: RecommendServer[];
   display: boolean;
 }
 
-const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServerList, display }) => {
+const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServers, display }) => {
   // Hooks
   const { t } = useTranslation();
   const mainTab = useMainTab();
@@ -339,7 +339,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
       {/* Recommended servers */}
       <main className={homePage['recommended-servers-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
-        <RecommendServerList recommendServerList={recommendServerList} user={user} />
+        <RecommendServerList recommendServers={recommendServers} user={user} />
       </main>
 
       {/* Personal Exclusive */}

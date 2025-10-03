@@ -20,6 +20,7 @@ import {
   table_server_blocked_users,
   table_announcements,
   table_notifies,
+  table_recommend_servers,
 } from '@/types/database';
 
 export type Announcement = table_announcements;
@@ -50,9 +51,10 @@ export type RecommendServerList = {
   [category: string]: RecommendServer[];
 };
 
-export type RecommendServer = table_servers & {
-  online: number;
-};
+export type RecommendServer = table_servers &
+  table_recommend_servers & {
+    online: number;
+  };
 
 export type Category = table_channels &
   table_channel_muted_users &
