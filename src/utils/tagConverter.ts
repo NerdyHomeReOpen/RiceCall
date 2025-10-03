@@ -66,19 +66,19 @@ export const fromTags = (raw: string) => {
 
 export const toTags = (raw: string) => {
   return raw
-    .replace(emojiBackRegex, (_, code) => {
+    .replace(emojiBackRegex, (_: string, code: string) => {
       return `:${escapeHtml(code)}:`;
     })
-    .replace(userTagBackRegex, (_, name) => {
+    .replace(userTagBackRegex, (_: string, name: string) => {
       return `<@${escapeHtml(name)}>`;
     })
-    .replace(ytBackRegex, (_, videoId) => {
+    .replace(ytBackRegex, (_: string, videoId: string) => {
       return `<&YT&${escapeHtml(videoId)}>`;
     })
-    .replace(twitchBackRegex, (_, channel) => {
+    .replace(twitchBackRegex, (_: string, channel: string) => {
       return `<&TW&${escapeHtml(channel)}>`;
     })
-    .replace(kickBackRegex, (_, username) => {
+    .replace(kickBackRegex, (_: string, username: string) => {
       return `<&KICK&${escapeHtml(username)}>`;
     })
     .replace(pTagRegex, '');
@@ -86,31 +86,34 @@ export const toTags = (raw: string) => {
 
 export const fromPreserveHtml = (raw: string) => {
   return raw
-    .replace(emojiRegex, (_, code) => {
+    .replace(discordTimestampPreserveRegex, (_: string, timestamp: string) => {
+      const date = new Date(parseInt(timestamp) * 1000);
+      return date.toLocaleString();
+    })
+    .replace(emojiRegex, (_: string, code: string) => {
       const emoji = emojis.find((e) => e.code === code);
       if (!emoji) return code;
       return `<img data-emoji='${code}' class='${markdown['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
     })
-    .replace(discordTimestampPreserveRegex, (_, timestamp) => {
-      const date = new Date(parseInt(timestamp) * 1000);
-      return date.toLocaleString();
-    })
-    .replace(userTagPreserveRegex, (_, name, _level, level = '2', _gender, gender = 'Male') => {
+    .replace(userTagPreserveRegex, (_: string, name: string, _level: string, level: string = '2', _gender: string, gender: string = 'Male') => {
       return `<span data-name='${name}'><span class='${markdown['user-icon']} ${permission[gender]} ${permission[`lv-${level}`]}'></span><span class='${markdown['user-name']}'>${name}</span></span>`;
     })
-    .replace(ytPreserveRegex, (_, videoId) => {
+    .replace(ytPreserveRegex, (_: string, videoId: string) => {
       return `<iframe data-yt='${videoId}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://www.youtube.com/embed/${videoId}?autoplay=1"></iframe>`;
     })
-    .replace(twitchPreserveRegex, (_, channel) => {
+    .replace(twitchPreserveRegex, (_: string, channel: string) => {
       return `<iframe data-twitch='${channel}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.twitch.tv/?channel=${channel}&autoplay=true&parent=localhost"></iframe>`;
     })
-    .replace(kickPreserveRegex, (_, username) => {
+    .replace(kickPreserveRegex, (_: string, username: string) => {
       return `<iframe data-kick='${username}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.kick.com/${username}"></iframe>`;
     });
 };
 
 export const toPreserveHtml = (raw: string) => {
   return raw
+    .replace(emojiRegex, (_, code) => {
+      return `:${escapeHtml(code)}:`;
+    })
     .replace(discordTimestampRegex, (_, timestamp) => {
       return `<time data-timestamp='${escapeHtml(timestamp)}'></time>`;
     })

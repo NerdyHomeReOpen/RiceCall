@@ -24,6 +24,7 @@ const ALLOWED_TAGS = [
   'span',
   'img',
   'p',
+  'br',
   'h1',
   'h2',
   'h3',

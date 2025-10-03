@@ -23,7 +23,6 @@ import ipc from '@/services/ipc.service';
 
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
-import { escapeHtml } from '@/utils/tagConverter';
 import MicModeMenu from '@/components/MicModeMenu';
 
 interface MessageInputBoxGuardProps {
@@ -73,7 +72,7 @@ const MessageInputBoxGuard = React.memo(
     const isForbidByForbidGuestTextGap = !isMember(permissionLevel) && leftGapTime > 0;
     const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
     const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
-    const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 9999;
+    const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
     const placeholder = useMemo(() => {
       if (isForbidByMutedText) return t('text-was-muted-in-channel-message');
       if (isForbidByForbidText) return t('channel-forbid-text-message');
@@ -483,7 +482,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                   channelGuestTextWaitTime={channelGuestTextWaitTime}
                   channelGuestTextMaxLength={channelGuestTextMaxLength}
                   channelIsTextMuted={channelIsTextMuted}
-                  onSend={(message) => handleSendMessage(serverId, channelId, { type: 'general', content: escapeHtml(message) })}
+                  onSend={(message) => handleSendMessage(serverId, channelId, { type: 'general', content: message })}
                 />
               </div>
             </div>
