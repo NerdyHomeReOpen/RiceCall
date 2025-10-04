@@ -1,9 +1,9 @@
 {
-  "update-available": "有新版本可用",
-  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，正在開始下載...",
-  "update-downloaded": "安裝更新",
-  "update-downloaded-message": "版本 {{version}} 已下載完成，請點擊立即安裝按鈕進行安裝",
-  "install-update": "立即安裝",
+  "update-available": "Uma nova versão está disponível",
+  "update-available-message": "Nova versão {{version}} lançada em {{releaseDate}}, iniciando o download...",
+  "update-downloaded": "Instalar atualizações",
+  "update-downloaded-message": "A versão {{version}} foi baixada. Por favor, clique no botão \"Instalar Agora\" para prosseguir com a instalação.",
+  "install-update": "Instalar Agora",
   "open-main-window": "Mostrar/esconder menu principal",
   "logout": "Desconectar",
   "exit": "Sair"
