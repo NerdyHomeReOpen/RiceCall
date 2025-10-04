@@ -161,6 +161,19 @@ export type DiscordPresence = {
   }[];
 };
 
+export type UserConfig = {
+  userId: string;
+  spamForbidAddFriend: boolean;
+  spamForbidShake: boolean;
+  spamForbidInviteGroup: boolean;
+  spamForbidStrangerMessage: boolean;
+  privacyShareCurrentServer: boolean;
+  privacyShareRecentServer: boolean;
+  privacyShareJoinedServer: boolean;
+  privacyShareFavoriteServer: boolean;
+  messagesNotSaveMessageHistory: boolean;
+};
+
 export type SpeakingMode = 'key' | 'auto';
 
 export type MixMode = 'all' | 'app';
