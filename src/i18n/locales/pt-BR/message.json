@@ -66,6 +66,7 @@
   "edit-member-invitation-failed": "Erro ao editar pedido de Membro. Tente novamente mais tarde.",
   "edit-server-failed": "Erro ao editar o grupo. Tente novamente mais tarde.",
   "edit-user-failed": "Erro ao editar o usuário. Tente novamente mais tarde.",
+  "email-already-used": "該電子郵件地址已被使用。",
   "favorite-server-failed": "Erro ao adicionar o grupo aos favoritos. Tente novamente mais tarde.",
   "forbade-text-in-channel": "【{{operator}}】 desabilitou suas mensagens.",
   "forbade-voice-in-channel": "Seu microfone foi desabilitado por 【{{operator}}】.",
