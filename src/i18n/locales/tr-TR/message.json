@@ -66,6 +66,7 @@
   "edit-member-invitation-failed": "Üye davetini düzenleyemedi. Lütfen daha sonra tekrar deneyin.",
   "edit-server-failed": "Ses grubu düzenlenemedi, lütfen daha sonra tekrar deneyin",
   "edit-user-failed": "Kullanıcı düzenlenemedi, lütfen daha sonra tekrar deneyin",
+  "email-already-used": "該電子郵件地址已被使用。",
   "favorite-server-failed": "Ses grubu kaydedilemedi, lütfen daha sonra tekrar deneyin",
   "forbade-text-in-channel": "Yönetici [{{operator}}] tarafından kısa mesaj göndermeniz yasaklandı。",
   "forbade-voice-in-channel": "Mikrofonunuz yönetici [{{operator}}] tarafından devre dışı bırakıldı。",
