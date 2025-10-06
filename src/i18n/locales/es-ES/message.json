@@ -1,5 +1,5 @@
 {
-  "accept-member-invitation-failed": "Error al aceptar la invitación de membresía, inténtalo más tarde",
+  "accept-member-invitation-failed": "Error al aceptar la invitación de membresía, inténtalo más tardeR",
   "account-already-exists": "La cuenta ya existe",
   "account-not-found": "Esta cuenta no existe.",
   "add-user-to-queue": "El administrador [{{operator}}] ha añadido a [{{target}}] a la cola.",
@@ -66,7 +66,7 @@
   "edit-member-invitation-failed": "Error al editar la invitación de membresía, inténtalo más tarde",
   "edit-server-failed": "Error al editar grupo, por favor, inténtalo de nuevo más tarde",
   "edit-user-failed": "Error al editar usuario, por favor inténtalo de nuevo más tarde",
-  "email-already-used": "該電子郵件地址已被使用。",
+  "email-already-used": "Esta dirección de correo electrónico ya está en uso.",
   "favorite-server-failed": "Error al guardar el grupo en favoritos, por favor inténtalo de nuevo más tarde",
   "forbade-text-in-channel": "El administrador [{{operator}}] te ha bloqueado el chat de texto.",
   "forbade-voice-in-channel": "El administrador [{{operator}}] te ha bloqueado la voz.",
