@@ -66,6 +66,7 @@
   "edit-member-invitation-failed": "編輯會員邀請失敗，請稍後再試。",
   "edit-server-failed": "編輯語音群失敗，請稍後再試。",
   "edit-user-failed": "編輯使用者失敗，請稍後再試。",
+  "email-already-used": "該電子郵件地址已被使用。",
   "favorite-server-failed": "收藏語音群失敗，請稍後再試。",
   "forbade-text-in-channel": "您被管理員【{{operator}}】禁止傳送文字訊息。",
   "forbade-voice-in-channel": "您被管理員【{{operator}}】禁止語音。",
