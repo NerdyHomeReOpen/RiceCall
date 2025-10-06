@@ -66,6 +66,7 @@
   "edit-member-invitation-failed": "编辑会员邀请失败，请稍后再试。",
   "edit-server-failed": "编辑语音群失败，请稍后再试。",
   "edit-user-failed": "编辑使用者失败，请稍后再试。",
+  "email-already-used": "該電子郵件地址已被使用。",
   "favorite-server-failed": "编辑使用者失败，请稍后再试。",
   "forbade-text-in-channel": "您被管理员【{{operator}}】禁止传送文字讯息。",
   "forbade-voice-in-channel": "您被管理员【{{operator}}】禁止语音。",
