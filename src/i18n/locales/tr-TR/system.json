@@ -1,9 +1,9 @@
 {
   "update-available": "Yeni bir sürüm mevcut",
-  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，正在開始下載...",
-  "update-downloaded": "安裝更新",
-  "update-downloaded-message": "版本 {{version}} 已下載完成，請點擊立即安裝按鈕進行安裝",
-  "install-update": "立即安裝",
+  "update-available-message": "Yeni sürüm {{version}} {{releaseDate}} tarihinde yayımlandı, indirme işlemi başlıyor...",
+  "update-downloaded": "Güncellemeyi Yükleme",
+  "update-downloaded-message": "{{version}} sürümü indirildi. Lütfen yüklemek için Şimdi Yükle düğmesine tıklayın.",
+  "install-update": "Şimdi Yükle",
   "open-main-window": "Ana pencereyi aç",
   "logout": "oturumu Kapat",
   "exit": "Çıkış"
