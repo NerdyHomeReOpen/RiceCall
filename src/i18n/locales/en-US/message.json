@@ -66,7 +66,7 @@
   "edit-member-invitation-failed": "Failed to edit the members invitation, please try again later",
   "edit-server-failed": "Failed to edit the group. Please try again later.",
   "edit-user-failed": "Couldn't edit the user. Please try again later.",
-  "email-already-used": "該電子郵件地址已被使用。",
+  "email-already-used": "That email address is already in use.",
   "favorite-server-failed": "Failed to add the group to your favorites. Please try again later.",
   "forbade-text-in-channel": "The administrator [{{operator}}] has forbidden you to send text messages.",
   "forbade-voice-in-channel": "Your microphone has been disabled by the administrator [{{operator}}]",
