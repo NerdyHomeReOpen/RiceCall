@@ -10,14 +10,17 @@ import Store from 'electron-store';
 import { initMain } from 'electron-audio-loopback-josh';
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, globalShortcut } from 'electron';
 import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
 import { initMainI18n, t } from './i18n.js';
-import { GlobalKeyboardListener, IGlobalKey } from 'node-global-key-listener';
 
 initMain();
+
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('--no-sandbox');
+}
 
 const EnvSchema = z
   .object({
@@ -34,6 +37,7 @@ dotenv.config();
 
 let tray: Tray | null = null;
 let isLogin: boolean = false;
+let isUpdateNotified: boolean = false;
 
 // Store
 type StoreType = {
@@ -330,6 +334,9 @@ export const PopupSize: Record<PopupType, { height: number; width: number }> = {
 };
 
 // Constants
+const mainTitle = 'RiceCall';
+const versionTitle = `RiceCall v${app.getVersion()}`;
+
 const DEV = process.argv.includes('--dev');
 const PORT = 3000;
 const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
@@ -364,6 +371,16 @@ function readEnvFile(file: string, base: Record<string, string>) {
   expand(cfg);
 
   return { ...base, ...(cfg.parsed ?? {}) };
+}
+
+function registerHotkey(accelerator: string, callback: () => void) {
+  const success = globalShortcut.register(accelerator, () => {
+    console.log(`${new Date().toLocaleString()} | Hotkey triggered:`, accelerator);
+    callback();
+  });
+  if (!success) {
+    console.warn(`${new Date().toLocaleString()} | Failed to register hotkey:`, accelerator);
+  }
 }
 
 export function loadEnv() {
@@ -724,11 +741,25 @@ function connectSocket(token: string): Socket | null {
         // Handle special events
         if (event === 'shakeWindow') {
           const initialData = args[0].initialData;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false);
+          const title = initialData.name ?? '';
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
+            const prefixTitle = title !== '' ? `${title} · ` : '';
+            popup.webContents.on('did-finish-load', () => {
+              popup.setTitle(`${prefixTitle}${mainTitle}`);
+            });
+            // popup.show();
+          });
         }
         if (event === 'directMessage') {
           const initialData = args[0].initialData;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false);
+          const title = initialData.name ?? '';
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
+            const prefixTitle = title !== '' ? `${title} · ` : '';
+            popup.webContents.on('did-finish-load', () => {
+              popup.setTitle(`${prefixTitle}${mainTitle}`);
+            });
+            // popup.show();
+          });
         }
       });
     });
@@ -869,6 +900,7 @@ function configureAutoUpdater() {
       .then((buttonIndex) => {
         if (buttonIndex.response === 0) {
           autoUpdater.quitAndInstall(false, true);
+          isUpdateNotified = false;
         }
       })
       .catch((error) => {
@@ -878,10 +910,16 @@ function configureAutoUpdater() {
 
   function checkUpdate() {
     if (DEV) return;
+    if (isUpdateNotified) return;
     console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, env.UPDATE_CHANNEL);
-    autoUpdater.checkForUpdates().catch((error) => {
-      console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
-    });
+    autoUpdater
+      .checkForUpdates()
+      .catch((error) => {
+        console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
+      })
+      .finally(() => {
+        isUpdateNotified = true;
+      });
   }
 
   // Check update every hour
@@ -900,7 +938,7 @@ async function configureDiscordRPC() {
 }
 
 // Tray Icon Functions
-function setTrayDetail(isLogin: boolean, title: string | null = null) {
+function setTrayDetail(isLogin: boolean) {
   if (!tray) return;
   const trayIconPath = isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
   const contextMenu = Menu.buildFromTemplate([
@@ -931,8 +969,6 @@ function setTrayDetail(isLogin: boolean, title: string | null = null) {
       click: () => app.exit(),
     },
   ]);
-
-  tray.setToolTip(`${title ? `${title} · ` : ''}RiceCall v${app.getVersion()}`);
   tray.setImage(nativeImage.createFromPath(trayIconPath));
   tray.setContextMenu(contextMenu);
 }
@@ -941,7 +977,7 @@ function configureTray() {
   if (tray) tray.destroy();
   const trayIconPath = APP_TRAY_ICON.gray;
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
-  tray.setToolTip(`RiceCall v${app.getVersion()}`);
+  tray.setToolTip(versionTitle);
   tray.on('click', () => {
     if (isLogin) mainWindow?.show();
     else authWindow?.show();
@@ -997,6 +1033,39 @@ app.on('ready', async () => {
     socketInstance = connectSocket(token);
     isLogin = true;
     setTrayDetail(isLogin);
+
+    if (store.get('speakingMode') === 'key') {
+      registerHotkey(store.get('defaultSpeakingKey'), () => {
+        BrowserWindow.getAllWindows().forEach((window) => {
+          window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
+        });
+      });
+    }
+    registerHotkey(store.get('hotKeyOpenMainWindow'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-open-main-window', store.get('hotKeyOpenMainWindow'));
+      });
+    });
+    registerHotkey(store.get('hotKeyIncreaseVolume'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-increase-volume', store.get('hotKeyIncreaseVolume'));
+      });
+    });
+    registerHotkey(store.get('hotKeyDecreaseVolume'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-decrease-volume', store.get('hotKeyDecreaseVolume'));
+      });
+    });
+    registerHotkey(store.get('hotKeyToggleSpeaker'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-toggle-speaker', store.get('hotKeyToggleSpeaker'));
+      });
+    });
+    registerHotkey(store.get('hotKeyToggleMicrophone'), () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-toggle-microphone', store.get('hotKeyToggleMicrophone'));
+      });
+    });
   });
 
   ipcMain.on('logout', () => {
@@ -1014,10 +1083,10 @@ app.on('ready', async () => {
   // toolbar handlers
   ipcMain.on('set-toolbar-title', (_, title: string) => {
     if (!tray) return;
-    setTrayDetail(isLogin, title);
+    tray.setToolTip(`${title ? `${title} · ` : ''}${versionTitle}`);
 
     if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.setTitle(`${title} · RiceCall`);
+      mainWindow.setTitle(`${title} · ${mainTitle}`);
     }
   });
 
@@ -1079,8 +1148,15 @@ app.on('ready', async () => {
   });
 
   // Popup handlers
-  ipcMain.on('open-popup', (_, type, id, data?, force = true) => {
-    createPopup(type, id, data ?? {}, force).then((popup) => popup.show());
+  ipcMain.on('open-popup', (_, type, id, data?, force = true, title = '') => {
+    console.log(`${new Date().toLocaleString()} | open popup`, type, id, title);
+    createPopup(type, id, data ?? {}, force).then((popup) => {
+      const prefixTitle = title !== '' ? `${title} · ` : '';
+      popup.webContents.on('did-finish-load', () => {
+        popup.setTitle(`${prefixTitle}${mainTitle}`);
+      });
+      popup.show();
+    });
   });
 
   ipcMain.on('close-popup', (_, id) => {
@@ -1488,13 +1564,30 @@ app.on('ready', async () => {
   // Voice
   ipcMain.on('set-speaking-mode', (_, mode) => {
     store.set('speakingMode', mode ?? 'key');
+    if (mode === 'key') {
+      registerHotkey(store.get('defaultSpeakingKey'), () => {
+        BrowserWindow.getAllWindows().forEach((window) => {
+          window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
+        });
+      });
+    } else {
+      globalShortcut.unregister(store.get('defaultSpeakingKey'));
+    }
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('speaking-mode', mode);
     });
   });
 
   ipcMain.on('set-default-speaking-key', (_, key) => {
+    globalShortcut.unregister(store.get('defaultSpeakingKey'));
     store.set('defaultSpeakingKey', key ?? 'v');
+    if (store.get('speakingMode') === 'key') {
+      registerHotkey(key ?? 'v', () => {
+        BrowserWindow.getAllWindows().forEach((window) => {
+          window.webContents.send('toggle-default-speaking-key', key);
+        });
+      });
+    }
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1510,35 +1603,65 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyOpenMainWindow'));
     store.set('hotKeyOpenMainWindow', key ?? 'F1');
+    registerHotkey(key ?? 'F1', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-open-main-window', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-open-main-window', key);
     });
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyIncreaseVolume'));
     store.set('hotKeyIncreaseVolume', key ?? 'PageUp');
+    registerHotkey(key ?? 'PageUp', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-increase-volume', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-increase-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyDecreaseVolume'));
     store.set('hotKeyDecreaseVolume', key ?? 'PageDown');
+    registerHotkey(key ?? 'PageDown', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-decrease-volume', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-decrease-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyToggleSpeaker'));
     store.set('hotKeyToggleSpeaker', key ?? 'Alt+m');
+    registerHotkey(key ?? 'Alt+m', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-toggle-speaker', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-speaker', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
+    globalShortcut.unregister(store.get('hotKeyToggleMicrophone'));
     store.set('hotKeyToggleMicrophone', key ?? 'v');
+    registerHotkey(key ?? 'v', () => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('toggle-hot-key-toggle-microphone', key);
+      });
+    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
@@ -1603,79 +1726,8 @@ app.on('ready', async () => {
     shell.openExternal(url);
   });
 
-  // initialize global keyboard listener
-  const keyListener = new GlobalKeyboardListener();
-  const lastKeyDown: Record<string, boolean> = Object.create(null);
-  const lastComboFiredAt: Record<string, number> = Object.create(null);
-  const COMBO_THROTTLE_MS = 10;
-
-  const IGNORED_KEYS = new Set(['control', 'left ctrl', 'right ctrl', 'shift', 'left shift', 'right shift', 'alt', 'left alt', 'right alt', 'meta', 'left meta', 'right meta', 'super', 'command']);
-
-  function getModifiers(isDown: Record<string, boolean>): string[] {
-    const hasCtrl = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('CTRL'));
-    const hasShift = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('SHIFT'));
-    const hasAlt = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && k.includes('ALT'));
-    const hasMeta = Object.keys(isDown).some((k) => isDown[k as IGlobalKey] && (k.includes('META') || k.includes('SUPER') || k.includes('COMMAND')));
-
-    const mods: string[] = [];
-    if (hasCtrl) mods.push('Ctrl');
-    if (hasShift) mods.push('Shift');
-    if (hasAlt) mods.push('Alt');
-    if (hasMeta) mods.push('Meta');
-
-    return mods; // Order: Ctrl → Shift → Alt → Meta
-  }
-
-  function buildCombo(mods: string[], keyNameLower: string): string {
-    const parts = keyNameLower ? [...mods, keyNameLower] : [...mods];
-    return parts.join('+');
-  }
-
-  keyListener.addListener((event, isDown) => {
-    const state = event.state; // 'DOWN' | 'UP'
-    const rawName = event.name ?? '';
-    const keyNameLower = rawName.toLowerCase().trim();
-
-    const isModifierOnly = IGNORED_KEYS.has(keyNameLower);
-    if (!rawName || isModifierOnly) {
-      if (state === 'DOWN') lastKeyDown[keyNameLower] = true;
-      else if (state === 'UP') lastKeyDown[keyNameLower] = false;
-      return;
-    }
-
-    const mods = getModifiers(isDown);
-    const combo = buildCombo(mods, keyNameLower);
-
-    if (state === 'DOWN') {
-      // Only trigger on edge-trigger: from UP -> DOWN
-      if (lastKeyDown[keyNameLower]) return;
-      lastKeyDown[keyNameLower] = true;
-
-      // Throttle: prevent duplicate trigger within 500ms
-      const now = Date.now();
-      const last = lastComboFiredAt[combo] ?? 0;
-      if (now - last < COMBO_THROTTLE_MS) return;
-      lastComboFiredAt[combo] = now;
-
-      // Send event
-      mainWindow?.webContents.send('detected-key-down', combo);
-      // BrowserWindow.getAllWindows().forEach(w => w.webContents.send('detected-key-press', combo));
-    } else if (state === 'UP') {
-      // Reset edge-trigger
-      lastKeyDown[keyNameLower] = false;
-
-      // Throttle: prevent duplicate trigger within 500ms
-      const now = Date.now();
-      const last = lastComboFiredAt[combo] ?? 0;
-      if (now - last < COMBO_THROTTLE_MS) return;
-      lastComboFiredAt[combo] = now;
-
-      // Send event
-      mainWindow?.webContents.send('detected-key-up', combo);
-      // BrowserWindow.getAllWindows().forEach(w => w.webContents.send('detected-key-press', combo));
-    }
-  });
-  // ----
+  // Register Hotkey
+  globalShortcut.unregisterAll();
 });
 
 app.on('before-quit', () => {

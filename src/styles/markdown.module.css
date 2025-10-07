@@ -24,6 +24,10 @@
   word-break: break-word;
 }
 
+.markdown-content span {
+  user-select: text;
+}
+
 .markdown-content a {
   font-weight: 500;
   text-decoration: none;
@@ -220,6 +224,7 @@
 }
 
 .user-name {
+  user-select: text;
   display: inline-block !important;
   word-break: break-all !important;
   color: #226ba0;
@@ -231,6 +236,8 @@
 }
 
 .user-icon {
+  user-select: text;
+  vertical-align: text-top;
   display: inline-block !important;
   word-break: break-all !important;
 }

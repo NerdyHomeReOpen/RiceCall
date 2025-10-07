@@ -71,6 +71,24 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
     return () => document.removeEventListener('pointerup', resetResizing);
   }, []);
 
+  // const userInfo = () => (
+  //   <div className={friendPage['user-info-wrapper']}>
+  //     <div className={friendPage['user-info']}>
+  //       <div className={friendPage['user-avatar']}></div>
+  //       <div className={friendPage['right-info']}>
+  //         <div className={friendPage['user-info-top']}>
+  //           <div className={`${friendPage['vip-icon']} ${vip['vip-icon']} ${vip['vip-1']}`}></div>
+  //           <div className={`${friendPage['user-name']} ${friendPage['vip-color']}`}>username</div>
+  //           <div className={friendPage['public-time']}>5分鐘前</div>
+  //         </div>
+  //         <div className={friendPage['signature']}>
+  //           signaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignature
+  //         </div>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
+
   return (
     <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
@@ -111,7 +129,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
               e.preventDefault();
               const x = e.currentTarget.getBoundingClientRect().left;
               const y = e.currentTarget.getBoundingClientRect().bottom;
-              contextMenu.showEmojiPicker(x, y, 'right-bottom', (_, full) => {
+              contextMenu.showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, false, undefined, undefined, (_, full) => {
                 signatureInputRef.current?.focus();
                 document.execCommand('insertText', false, full);
               });
@@ -130,9 +148,12 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         {/* Resize Handle */}
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
 
-        {/* Right Content */}
+        {/* Friend Active Content */}
         <main className={friendPage['content']}>
           <header className={friendPage['header']}>{t('friend-active')}</header>
+          <div className={`${friendPage['scroll-view']} ${friendPage['friend-active-wrapper']}`}>
+            <div className={friendPage['friend-active-list']}>{/* todo: add friend active list */}</div>
+          </div>
         </main>
       </main>
     </main>

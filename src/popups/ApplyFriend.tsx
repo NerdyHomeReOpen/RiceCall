@@ -12,6 +12,9 @@ import { useTranslation } from 'react-i18next';
 // Services
 import ipc from '@/services/ipc.service';
 
+// Utils
+import { handleOpenUserInfo, handleOpenCreateFriendGroup } from '@/utils/popup';
+
 interface ApplyFriendPopupProps {
   userId: User['userId'];
   targetId: User['userId'];
@@ -40,14 +43,6 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
 
   const handleEditFriendApplication = (receiverId: User['userId'], update: Partial<FriendApplication>) => {
     ipc.socket.send('editFriendApplication', { receiverId, update });
-  };
-
-  const handleOpenCreateFriendGroup = () => {
-    ipc.popup.open('createFriendGroup', 'createFriendGroup', {});
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
   };
 
   const handleClose = () => {

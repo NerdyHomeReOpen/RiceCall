@@ -58,7 +58,7 @@ const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, o
   return (
     <div
       ref={colorPickerRef}
-      className={`context-menu-container ${colorStyles['color-picker']}`}
+      className={`color-picker-container context-menu-container ${colorStyles['color-picker']}`}
       style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}
       onMouseDown={(e) => e.stopPropagation()}
     >

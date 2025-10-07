@@ -37,89 +37,58 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const toggleMicrophoneKeyRef = useRef<string>('Alt+v');
   const lastActiveRef = useRef<number>(Date.now());
   const speakingActiveRef = useRef(false);
+  const speakingKeyPressedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // States
   const [isKeepAlive, setIsKeepAlive] = useState<boolean>(true);
 
   // Handlers
-  const startSpeak = useCallback(() => {
-    if (speakingActiveRef.current) return;
+  const handleSpeakingKeyToggled = useCallback(() => {
+    if (speakingKeyPressedTimeoutRef.current) clearTimeout(speakingKeyPressedTimeoutRef.current);
+    speakingKeyPressedTimeoutRef.current = setTimeout(() => {
+      speakingActiveRef.current = false;
+      webRTC.setSpeakKeyPressed(false);
+    }, 600);
+
+    if (speakingActiveRef.current || !webRTC.isMicTaken) return;
     speakingActiveRef.current = true;
     webRTC.setSpeakKeyPressed(true);
   }, [webRTC]);
 
-  const stopSpeak = useCallback(() => {
-    if (!speakingActiveRef.current) return;
-    speakingActiveRef.current = false;
-    webRTC.setSpeakKeyPressed(false);
-  }, [webRTC]);
-
-  const toggleMainWindows = useCallback(() => {
+  const handleOpenMainWindowToggled = useCallback(() => {
     // TODO: key detection in background
   }, []);
 
-  const toggleUpVolume = useCallback(() => {
+  const handleIncreaseVolumeToggled = useCallback(() => {
     const newValue = Math.min(100, webRTC.speakerVolume + 5);
     webRTC.changeSpeakerVolume(newValue);
   }, [webRTC]);
 
-  const toggleDownVolume = useCallback(() => {
+  const handleDecreaseVolumeToggled = useCallback(() => {
     const newValue = Math.max(0, webRTC.speakerVolume - 5);
     webRTC.changeSpeakerVolume(newValue);
   }, [webRTC]);
 
-  const toggleSpeakerMute = useCallback(() => {
+  const handleSpeakerMuteToggled = useCallback(() => {
     webRTC.toggleSpeakerMuted();
   }, [webRTC]);
 
-  const toggleMicMute = useCallback(() => {
+  const handleMicMuteToggled = useCallback(() => {
     webRTC.toggleMicMuted();
   }, [webRTC]);
 
-  const handleKeyDown = useCallback(
-    (key: string) => {
-      console.log('[ActionScanner] Detected key press: ', key);
-      switch (key) {
-        case speakingKeyRef.current:
-          startSpeak();
-          break;
-        case openMainWindowKeyRef.current:
-          toggleMainWindows();
-          break;
-        case increaseVolumeKeyRef.current:
-          toggleUpVolume();
-          break;
-        case decreaseVolumeKeyRef.current:
-          toggleDownVolume();
-          break;
-        case toggleSpeakerKeyRef.current:
-          toggleSpeakerMute();
-          break;
-        case toggleMicrophoneKeyRef.current:
-          toggleMicMute();
-          break;
-      }
-    },
-    [startSpeak, toggleMainWindows, toggleUpVolume, toggleDownVolume, toggleSpeakerMute, toggleMicMute],
-  );
-
-  const handleKeyUp = useCallback(
-    (key: string) => {
-      console.log('[ActionScanner] Detected key up: ', key);
-      switch (key) {
-        case speakingKeyRef.current:
-          stopSpeak();
-          break;
-      }
-    },
-    [stopSpeak],
-  );
-
   // Effects
   useEffect(() => {
-    const unsubscribe = [ipc.detectKey.onKeyDown(handleKeyDown), ipc.detectKey.onKeyUp(handleKeyUp)];
+    const unsubscribe = [
+      ipc.detectKey.onDefaultSpeakingKeyToggled(handleSpeakingKeyToggled),
+      ipc.detectKey.onHotKeyOpenMainWindowToggled(handleOpenMainWindowToggled),
+      ipc.detectKey.onHotKeyIncreaseVolumeToggled(handleIncreaseVolumeToggled),
+      ipc.detectKey.onHotKeyDecreaseVolumeToggled(handleDecreaseVolumeToggled),
+      ipc.detectKey.onHotKeyToggleSpeakerToggled(handleSpeakerMuteToggled),
+      ipc.detectKey.onHotKeyToggleMicrophoneToggled(handleMicMuteToggled),
+    ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleKeyDown, handleKeyUp]);
+  }, [handleSpeakingKeyToggled, handleOpenMainWindowToggled, handleIncreaseVolumeToggled, handleDecreaseVolumeToggled, handleSpeakerMuteToggled, handleMicMuteToggled]);
 
   useEffect(() => {
     if (!idleCheck.current) return;

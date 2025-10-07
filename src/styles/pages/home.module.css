@@ -331,22 +331,38 @@
   flex: 1;
 }
 
-.category-list .category-tab {
+.category-tab {
   display: flex;
   align-items: center;
   border-radius: 3px;
-  height: 25px;
   padding: 5px;
   gap: 2px;
   cursor: pointer;
+  &.selected {
+    background-color: #d8dadc;
+  }
+  &:not(.selected):hover {
+    background-color: #d1d5da;
+  }
 }
 
-.category-list .category-tab.selected {
-  background-color: #d8dadc;
+.category-name {
+  font-size: 1.1rem;
+  font-weight: bold;
 }
 
-.category-list .category-tab:not(.selected):hover {
-  background-color: #d1d5da;
+.category-flag {
+  height: 16px;
+  width: 16px;
+}
+
+.category-list .category-list .category-tab {
+  padding-left: 25px;
+}
+
+.category-list .category-list .category-name {
+  font-size: 1rem;
+  font-weight: unset;
 }
 
 .servers-container {

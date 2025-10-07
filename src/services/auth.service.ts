@@ -16,7 +16,7 @@ interface RegisterFormData {
 }
 
 export const authService = {
-  register: async (data: RegisterFormData) => {
+  register: async (data: RegisterFormData): Promise<boolean> => {
     const res = await api.post('/register', data);
     return !!res;
   },

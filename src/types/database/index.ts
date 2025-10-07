@@ -1,15 +1,8 @@
 export type table_accounts = {
   account: string;
+  email: string;
   password: string;
   userId: string;
-};
-
-export type table_badges = {
-  badgeId: string;
-  name: string;
-  description: string;
-  iconUrl: string;
-  createdAt: number;
 };
 
 export type table_announcements = {
@@ -23,6 +16,14 @@ export type table_announcements = {
   discordChannelId: string | null;
   discordMessageId: string | null;
   timestamp: number;
+};
+
+export type table_badges = {
+  badgeId: string;
+  name: string;
+  description: string;
+  iconUrl: string;
+  createdAt: number;
 };
 
 export type table_channel_blocked_users = {
@@ -58,22 +59,16 @@ export type table_channels = {
   guestTextMaxLength: number;
   isLobby: boolean;
   forbidText: boolean;
-  forbidQueue: boolean; // New: Forbid Queue
+  forbidQueue: boolean;
   forbidGuestText: boolean;
-  forbidGuestVoice: boolean; // New: Forbid Guest Voice
-  forbidGuestQueue: boolean; // New: Forbid Guest Queue
+  forbidGuestVoice: boolean;
+  forbidGuestQueue: boolean;
   forbidGuestUrl: boolean;
   type: 'category' | 'channel';
   visibility: 'public' | 'member' | 'private' | 'readonly';
   voiceMode: 'free' | 'admin' | 'queue';
   categoryId: string | null;
   serverId: string;
-  createdAt: number;
-};
-
-export type table_codes = {
-  userId: string;
-  code: string;
   createdAt: number;
 };
 
@@ -126,6 +121,15 @@ export type table_members = {
   serverId: string;
   nickname: string | null;
   contribution: number;
+  lastJoinChannelAt: number;
+  createdAt: number;
+};
+
+export type table_notifies = {
+  notifyId: number;
+  content: string;
+  region: string;
+  notifyUntil: number;
   createdAt: number;
 };
 
@@ -138,6 +142,13 @@ export type table_recommend_server_categories = {
 export type table_recommend_servers = {
   categoryId: string;
   serverId: string;
+  tags: string;
+};
+
+export type table_reset_email_requests = {
+  userId: string;
+  code: string;
+  createdAt: number;
 };
 
 export type table_reset_password_requests = {
@@ -171,7 +182,7 @@ export type table_servers = {
   level: number;
   wealth: number;
   receiveApply: boolean;
-  isVerified: boolean; // New: Is Verified
+  isVerified: boolean;
   type: 'game' | 'entertainment' | 'other';
   visibility: 'public' | 'private' | 'invisible';
   lobbyId: string;
@@ -213,7 +224,6 @@ export type table_users = {
   displayId: string;
   avatar: string;
   avatarUrl: string;
-  email: string;
   signature: string;
   about: string;
   country: string;
@@ -225,7 +235,7 @@ export type table_users = {
   birthYear: number;
   birthMonth: number;
   birthDay: number;
-  isVerified: boolean; // New: Is Verified
+  isVerified: boolean;
   status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
   gender: 'Male' | 'Female';
   currentChannelId: string | null;

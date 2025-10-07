@@ -17,11 +17,12 @@ import type {
   PromptMessage,
   FriendApplication,
   MemberInvitation,
-  RecommendServerList,
   Announcement,
   Friend,
   OnlineMember,
   QueueUser,
+  Notify,
+  RecommendServer,
 } from '@/types';
 
 // i18n
@@ -34,8 +35,10 @@ import ServerPage from '@/pages/Server';
 
 // Components
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import NotifyToaster from '@/components/NotifyToaster';
 
 // Utils
+import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme } from '@/utils/popup';
 import Default from '@/utils/default';
 
 // Providers
@@ -111,22 +114,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
 
   const handleChangeStatus = (status: User['status']) => {
     ipc.socket.send('editUser', { update: { status } });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenSystemSetting = () => {
-    ipc.popup.open('systemSetting', 'systemSetting', {});
-  };
-
-  const handleOpenAboutUs = () => {
-    ipc.popup.open('aboutus', 'aboutUs', {});
-  };
-
-  const handleOpenChangeTheme = () => {
-    ipc.popup.open('changeTheme', 'changeTheme', {});
   };
 
   const handleLogout = () => {
@@ -416,7 +403,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [systemNotify, setSystemNotify] = useState<string[]>([]);
   const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [recommendServerList, setRecommendServerList] = useState<RecommendServerList>({});
+  const [notifies, setNotifies] = useState<Notify[]>([]);
+  const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
   const [isConnected, setIsConnected] = useState(false);
 
   // Variables
@@ -441,8 +429,6 @@ const RootPageComponent: React.FC = React.memo(() => {
       serverIdRef.current = currentServerId || '';
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
-
-    ipc.toolbar.title.set(`${args[0].update.name || ''}`);
   };
 
   const handleFriendsSet = (...args: Friend[]) => {
@@ -522,7 +508,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   const handleServerOnlineMemberAdd = (...args: { data: OnlineMember }[]) => {
     const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-    setServerOnlineMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
+    setServerOnlineMembers((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
   };
 
   const handleServerOnlineMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
@@ -605,6 +591,21 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   const handleDisconnect = () => {
     console.info('[Socket] disconnected');
+    setUser(Default.user());
+    setFriends([]);
+    setFriendGroups([]);
+    setFriendApplications([]);
+    setMemberInvitations([]);
+    setServers([]);
+    setServerOnlineMembers([]);
+    setChannels([]);
+    setChannelMessages([]);
+    setActionMessages([]);
+    setSystemNotify([]);
+    setQueueUsers([]);
+    setAnnouncements([]);
+    setNotifies([]);
+    setRecommendServers([]);
     setIsConnected(false);
   };
 
@@ -625,6 +626,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   // Effects
+  useEffect(() => {
+    ipc.toolbar.title.set(user.name);
+  }, [user]);
+
   useEffect(() => {
     selectedTabIdRef.current = mainTab.selectedTabId;
 
@@ -722,20 +727,26 @@ const RootPageComponent: React.FC = React.memo(() => {
       data.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
         if (memberInvitations) setMemberInvitations(memberInvitations);
       });
-      data.recommendServerList().then((recommendServerList) => {
-        if (recommendServerList) setRecommendServerList(recommendServerList);
+      data.recommendServers().then((recommendServerList) => {
+        if (recommendServerList) setRecommendServers(recommendServerList);
       });
-
-      setSystemNotify([]);
+      setSystemNotify([]); // TODO: Implement system notify
     };
     refresh();
   }, [userId]);
 
   useEffect(() => {
-    data.announcements({ region: i18n.language }).then((announcements) => {
-      if (announcements) setAnnouncements(announcements);
-    });
-  }, [i18n.language]);
+    if (!userId) return;
+    const refresh = async () => {
+      data.announcements({ region: i18n.language }).then((announcements) => {
+        if (announcements) setAnnouncements(announcements);
+      });
+      data.notifies({ region: i18n.language }).then((notifies) => {
+        if (notifies) setNotifies(notifies);
+      });
+    };
+    refresh();
+  }, [i18n.language, userId]);
 
   useEffect(() => {
     const unsubscribe = [
@@ -790,7 +801,7 @@ const RootPageComponent: React.FC = React.memo(() => {
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage user={user} servers={servers} announcements={announcements} recommendServerList={recommendServerList} display={mainTab.selectedTabId === 'home'} />
+              <HomePage user={user} servers={servers} announcements={announcements} recommendServers={recommendServers} display={mainTab.selectedTabId === 'home'} />
               <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}
@@ -804,6 +815,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
               />
+              <NotifyToaster notifies={notifies} />
             </>
           )}
         </ExpandedProvider>

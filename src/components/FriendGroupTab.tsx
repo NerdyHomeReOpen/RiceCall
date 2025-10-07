@@ -16,6 +16,9 @@ import ipc from '@/services/ipc.service';
 // Components
 import FriendTab from '@/components/FriendTab';
 
+// Utils
+import { handleOpenAlertDialog, handleOpenEditFriendGroupName } from '@/utils/popup';
+
 interface FriendGroupTabProps {
   user: User;
   friends: Friend[];
@@ -55,15 +58,6 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
   // Handlers
   const handleDeleteFriendGroup = (friendGroupId: FriendGroup['friendGroupId']) => {
     handleOpenAlertDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipc.socket.send('deleteFriendGroup', { friendGroupId }));
-  };
-
-  const handleOpenEditFriendGroupName = (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']) => {
-    ipc.popup.open('editFriendGroupName', 'editFriendGroupName', { userId, friendGroupId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   return (

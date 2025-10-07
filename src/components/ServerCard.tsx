@@ -16,6 +16,7 @@ import type { User, Server } from '@/types';
 import ipc from '@/services/ipc.service';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenServerSetting } from '@/utils/popup';
 import { isMember, isServerOwner } from '@/utils/permission';
 
 interface ServerCardProps {
@@ -52,15 +53,6 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
     handleOpenAlertDialog(t('confirm-terminate-membership', { '0': memberName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
-  };
-
-  const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   return (

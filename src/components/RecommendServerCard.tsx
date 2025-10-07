@@ -15,6 +15,9 @@ import type { User, RecommendServer } from '@/types';
 // Services
 import ipc from '@/services/ipc.service';
 
+// Utils
+import { handleOpenServerSetting } from '@/utils/popup';
+
 interface RecommendServerCardProps {
   user: User;
   recommendServer: RecommendServer;
@@ -41,10 +44,6 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(serverDisplayId);
     ipc.socket.send('connectServer', { serverId });
-  };
-
-  const handleOpenServerSetting = (userId: User['userId'], serverId: RecommendServer['serverId']) => {
-    ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
   };
 
   return (

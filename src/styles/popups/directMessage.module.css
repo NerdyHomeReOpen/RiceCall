@@ -174,7 +174,7 @@
   align-items: center;
 }
 
-.action-area.clickable {
+.clickable {
   cursor: pointer;
 }
 
@@ -220,6 +220,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  overflow: hidden;
 }
 
 .input-area .top-bar {
@@ -298,6 +299,11 @@
   resize: none;
   overflow: auto;
   background: transparent;
+  border: none !important;
+}
+
+.input.warning {
+  border: 1px solid #f00 !important;
 }
 
 @keyframes shake {

@@ -9,10 +9,8 @@ import type { User, FriendGroup, Friend } from '@/types';
 // Providers
 import { useTranslation } from 'react-i18next';
 
-// Services
-import ipc from '@/services/ipc.service';
-
 // Utils
+import { handleOpenSearchUser, handleOpenCreateFriendGroup } from '@/utils/popup';
 import Default from '@/utils/default';
 
 // Components
@@ -45,15 +43,6 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
     () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
     [defaultFriendGroup, friendGroups, strangerFriendGroup, blacklistFriendGroup],
   );
-
-  // Handlers
-  const handleOpenSearchUser = (userId: User['userId']) => {
-    ipc.popup.open('searchUser', 'searchUser', { userId });
-  };
-
-  const handleOpenCreateFriendGroup = () => {
-    ipc.popup.open('createFriendGroup', 'createFriendGroup', {});
-  };
 
   return (
     <>

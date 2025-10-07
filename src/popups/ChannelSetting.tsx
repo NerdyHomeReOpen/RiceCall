@@ -19,6 +19,7 @@ import ipc from '@/services/ipc.service';
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenEditNickname, handleOpenBlockMember } from '@/utils/popup';
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isChannelMod, isServerOwner, isChannelAdmin } from '@/utils/permission';
@@ -125,27 +126,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
     handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
-  };
-
-  const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
-  };
-
-  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
-  };
-
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleClose = () => {
@@ -467,8 +447,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     type="number"
                     value={channelGuestTextMaxLength}
                     min={0}
-                    max={9999}
-                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextMaxLength: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
+                    max={3000}
+                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextMaxLength: Math.max(0, Math.min(3000, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
                     readOnly={!isChannelMod(permissionLevel)}
                   />
@@ -483,8 +463,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     type="number"
                     value={channelGuestTextWaitTime}
                     min={0}
-                    max={9999}
-                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextWaitTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
+                    max={1000}
+                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextWaitTime: Math.max(0, Math.min(1000, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
                     readOnly={!isChannelMod(permissionLevel)}
                   />
@@ -499,8 +479,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     type="number"
                     value={channelGuestTextGapTime}
                     min={0}
-                    max={9999}
-                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextGapTime: Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)) }))}
+                    max={1000}
+                    onChange={(e) => setChannel((prev) => ({ ...prev, guestTextGapTime: Math.max(0, Math.min(1000, parseInt(e.target.value) || 0)) }))}
                     style={{ width: '60px' }}
                     readOnly={!isChannelMod(permissionLevel)}
                   />

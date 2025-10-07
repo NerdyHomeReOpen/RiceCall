@@ -12,17 +12,22 @@ import { useTranslation } from 'react-i18next';
 // Services
 import auth from '@/services/auth.service';
 
+// Utils
+import { handleOpenAlertDialog } from '@/utils/popup';
+
 interface FormErrors {
   general?: string;
   account?: string;
   password?: string;
-  username?: string;
   confirmPassword?: string;
+  email?: string;
+  username?: string;
 }
 
 interface FormDatas {
   account: string;
   password: string;
+  email: string;
   username: string;
 }
 
@@ -44,17 +49,23 @@ function validatePassword(value: string, t: TFunction): string {
   return '';
 }
 
-function validateUsername(value: string, t: TFunction): string {
-  value = value.trim();
-  if (!value) return t('username-required');
-  if (value.length < 2) return t('username-min-length');
-  if (value.length > 32) return t('username-max-length');
-  if (!/^[A-Za-z0-9\u4e00-\u9fa5]+$/.test(value)) return t('username-invalid-format');
+function validateConfirmPassword(value: string, check: string, t: TFunction): string {
+  if (value !== check) return t('passwords-do-not-match');
   return '';
 }
 
-function validateCheckPassword(value: string, check: string, t: TFunction): string {
-  if (value !== check) return t('passwords-do-not-match');
+function validateEmail(value: string, t: TFunction): string {
+  if (!value) return t('email-required');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return t('email-invalid-format');
+  return '';
+}
+
+function validateUsername(value: string, t: TFunction): string {
+  value = value.trim();
+  if (!value) return t('username-required');
+  if (value.length < 1) return t('username-min-length');
+  if (value.length > 32) return t('username-max-length');
+  if (!/^[A-Za-z0-9\u4e00-\u9fa5]+$/.test(value)) return t('username-invalid-format');
   return '';
 }
 
@@ -72,6 +83,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
     account: '',
     password: '',
     username: '',
+    email: '',
   });
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [errors, setErrors] = useState<FormErrors>({});
@@ -102,7 +114,16 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
       setConfirmPassword(value);
       setErrors((prev) => ({
         ...prev,
-        confirmPassword: validateCheckPassword(value, formData.password, t),
+        confirmPassword: validateConfirmPassword(value, formData.password, t),
+      }));
+    } else if (name === 'email') {
+      setFormData((prev) => ({
+        ...prev,
+        email: value,
+      }));
+      setErrors((prev) => ({
+        ...prev,
+        email: validateEmail(value, t),
       }));
     } else if (name === 'username') {
       setFormData((prev) => ({
@@ -131,12 +152,17 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
     } else if (name === 'confirmPassword') {
       setErrors((prev) => ({
         ...prev,
-        confirmPassword: validateCheckPassword(value, formData.password, t),
+        confirmPassword: validateConfirmPassword(value, formData.password, t),
       }));
     } else if (name === 'username') {
       setErrors((prev) => ({
         ...prev,
         username: validateUsername(value, t),
+      }));
+    } else if (name === 'email') {
+      setErrors((prev) => ({
+        ...prev,
+        email: validateEmail(value, t),
       }));
     }
   };
@@ -155,6 +181,9 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
     if (!confirmPassword.trim()) {
       validationErrors.confirmPassword = t('please-input-password-again');
     }
+    if (!formData.email.trim()) {
+      validationErrors.email = t('please-input-email');
+    }
     if (Object.keys(validationErrors).length > 0) {
       setErrors((prev) => ({
         ...prev,
@@ -164,7 +193,11 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
       return;
     }
     setIsLoading(true);
-    if (await auth.register(formData)) setSection('login');
+    if (await auth.register(formData)) {
+      handleOpenAlertDialog(t('register-success', { '0': formData.email }), () => {
+        setSection('login');
+      });
+    }
     setIsLoading(false);
   };
 
@@ -238,6 +271,24 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
               </div>
               <div className={styles['input-wrapper']}>
                 <div className={styles['input-box']}>
+                  <div className={styles['label']}>{t('email')}</div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    onBlur={handleBlur}
+                    placeholder={t('please-input-email')}
+                    className={styles['input']}
+                    style={{
+                      borderColor: errors.email ? '#f87171' : '#d1d5db',
+                    }}
+                  />
+                </div>
+                {errors.email ? <div className={styles['warn-text']}>{errors.email}</div> : <div className={styles['hint-text']}>{t('email-hint')}</div>}
+              </div>
+              <div className={styles['input-wrapper']}>
+                <div className={styles['input-box']}>
                   <div className={styles['label']}>{t('nickname')}</div>
                   <input
                     name="username"
@@ -260,11 +311,13 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
                   !formData.account.trim() ||
                   !formData.password.trim() ||
                   !formData.username.trim() ||
+                  !formData.email.trim() ||
                   !confirmPassword.trim() ||
                   !!errors.account ||
                   !!errors.password ||
                   !!errors.confirmPassword ||
-                  !!errors.username
+                  !!errors.username ||
+                  !!errors.email
                 }
               >
                 {t('register')}

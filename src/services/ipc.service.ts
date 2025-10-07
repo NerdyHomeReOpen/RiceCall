@@ -151,7 +151,8 @@ const ipcService = {
         Promise.all([data.user({ userId }), data.server({ userId, serverId }), data.channel({ userId, serverId, channelId }), data.channelMembers({ serverId, channelId })]).then(
           ([user, server, channel, channelMembers]) => {
             if (!user || !server || !channel || !channelMembers) return;
-            ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, user, server, channel, channelMembers }, force);
+            const title = channel.name ?? '';
+            ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, user, server, channel, channelMembers }, force, title);
           },
         );
       } else if (type === 'createServer') {
@@ -174,7 +175,8 @@ const ipcService = {
         const { userId, targetId, event, message } = initialData;
         Promise.all([data.user({ userId }), data.friend({ userId, targetId }), data.user({ userId: targetId })]).then(([user, friend, target]) => {
           if (!user || !target) return;
-          ipcRenderer.send('open-popup', type, id, { userId, targetId, user, friend, target, event, message }, force);
+          const title = target.name ?? '';
+          ipcRenderer.send('open-popup', type, id, { userId, targetId, user, friend, target, event, message }, force, title);
         });
       } else if (type === 'editChannelOrder') {
         const { userId, serverId } = initialData;
@@ -235,14 +237,16 @@ const ipcService = {
         Promise.all([data.user({ userId }), data.server({ userId, serverId }), data.serverMembers({ serverId }), data.memberApplications({ serverId })]).then(
           ([user, server, serverMembers, memberApplications]) => {
             if (!user || !server || !serverMembers || !memberApplications) return;
-            ipcRenderer.send('open-popup', type, id, { userId, serverId, user, server, serverMembers, memberApplications }, force);
+            const title = server.name ?? '';
+            ipcRenderer.send('open-popup', type, id, { userId, serverId, user, server, serverMembers, memberApplications }, force, title);
           },
         );
       } else if (type === 'userInfo') {
         const { userId, targetId } = initialData;
         Promise.all([data.friend({ userId, targetId }), data.user({ userId: targetId }), data.servers({ userId: targetId })]).then(([friend, target, targetServers]) => {
           if (!target || !targetServers) return;
-          ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, target, targetServers }, force);
+          const title = target.name ?? '';
+          ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, target, targetServers }, force, title);
         });
       } else {
         ipcRenderer.send('open-popup', type, id, initialData, force);
@@ -1130,18 +1134,46 @@ const ipcService = {
   },
 
   detectKey: {
-    onKeyDown: (callback: (key: string) => void) => {
+    onDefaultSpeakingKeyToggled: (callback: () => void) => {
       if (!isElectron) return () => {};
-      const listener = (_: any, key: string) => callback(key);
-      ipcRenderer.on('detected-key-down', listener);
-      return () => ipcRenderer.removeListener('detected-key-down', listener);
+      const listener = () => callback();
+      ipcRenderer.on('toggle-default-speaking-key', listener);
+      return () => ipcRenderer.removeListener('toggle-default-speaking-key', listener);
     },
 
-    onKeyUp: (callback: (key: string) => void) => {
+    onHotKeyOpenMainWindowToggled: (callback: () => void) => {
       if (!isElectron) return () => {};
-      const listener = (_: any, key: string) => callback(key);
-      ipcRenderer.on('detected-key-up', listener);
-      return () => ipcRenderer.removeListener('detected-key-up', listener);
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-open-main-window', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-open-main-window', listener);
+    },
+
+    onHotKeyIncreaseVolumeToggled: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-increase-volume', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-increase-volume', listener);
+    },
+
+    onHotKeyDecreaseVolumeToggled: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-decrease-volume', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-decrease-volume', listener);
+    },
+
+    onHotKeyToggleSpeakerToggled: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-toggle-speaker', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-toggle-speaker', listener);
+    },
+
+    onHotKeyToggleMicrophoneToggled: (callback: () => void) => {
+      if (!isElectron) return () => {};
+      const listener = () => callback();
+      ipcRenderer.on('toggle-hot-key-toggle-microphone', listener);
+      return () => ipcRenderer.removeListener('toggle-hot-key-toggle-microphone', listener);
     },
   },
 

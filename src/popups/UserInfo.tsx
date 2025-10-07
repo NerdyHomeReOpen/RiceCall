@@ -23,6 +23,7 @@ import permission from '@/styles/permission.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenApplyFriend } from '@/utils/popup';
 import { isMember, isStaff } from '@/utils/permission';
 
 interface UserInfoPopupProps {
@@ -94,7 +95,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   }, [targetServers]);
 
   const favoriteServers = useMemo(() => {
-    return targetServers.filter((s) => s.favorite && isMember(s.permissionLevel) && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
+    return targetServers.filter((s) => s.favorite && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
   }, [targetServers]);
 
   const recentServers = useMemo(() => {
@@ -115,20 +116,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   // Handlers
   const handleEditUser = (update: Partial<User>) => {
     ipc.socket.send('editUser', { update });
-  };
-
-  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
-  };
-
-  const handleOpenErrorDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogError', 'dialogError', { message, submitTo: 'dialogError' });
-    ipc.popup.onSubmit('dialogError', callback);
   };
 
   const handleOpenImageCropper = (userId: User['userId'], imageData: string) => {
@@ -176,7 +163,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   useEffect(() => {
     (async () => {
       const res = await fetch('https://nerdyhomereopen.github.io/Details/country.json');
-      if (!res.ok) console.error(`Failed to fetch country.json: ${res.status}`);
+      if (!res.ok) return;
       const json = await res.json();
       setCountries(json);
     })();
@@ -365,7 +352,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
                           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div className={`${permission[targetGender]} ${server.ownerId === userId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
+                            <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-value-text']}>{server.contribution}</div>
                           </div>
                         </div>
@@ -389,7 +376,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
                           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div className={`${styles['permission']} ${permission[targetGender]} ${server.ownerId === userId ? permission[`lv-6`] : permission[`lv-${server.permissionLevel}`]}`} />
+                            <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
                             <div className={styles['contribution-box']}>
                               <div className={styles['contribution-icon']} />
                               <div className={styles['contribution-value-text']}>{server.contribution}</div>
@@ -473,14 +460,23 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
 
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('signature')}</div>
-                <div className={popup['row']}>
-                  <input ref={signatureInputRef} name="signature" type="text" value={targetSignature} maxLength={100} onChange={(e) => setTarget((prev) => ({ ...prev, signature: e.target.value }))} />
+                <div style={{ position: 'relative', width: '100%' }}>
+                  <input
+                    ref={signatureInputRef}
+                    name="signature"
+                    type="text"
+                    value={targetSignature}
+                    maxLength={100}
+                    onChange={(e) => setTarget((prev) => ({ ...prev, signature: e.target.value }))}
+                    style={{ paddingRight: '28px', width: '100%' }}
+                  />
                   <div
-                    className={emoji['emoji-icon']}
-                    onClick={(e) => {
+                    className={`${emoji['emoji-icon']} ${emoji['emoji-in-input']}`}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
                       const x = e.currentTarget.getBoundingClientRect().left;
                       const y = e.currentTarget.getBoundingClientRect().top;
-                      contextMenu.showEmojiPicker(x, y, 'left-top', (_, full) => {
+                      contextMenu.showEmojiPicker(x, y, 'left-top', e.currentTarget as HTMLElement, false, true, undefined, undefined, (_, full) => {
                         signatureInputRef.current?.focus();
                         document.execCommand('insertText', false, full);
                       });

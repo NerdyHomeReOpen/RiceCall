@@ -1,4 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Color from '@tiptap/extension-color';
+import TextAlign from '@tiptap/extension-text-align';
+import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
+import { EmojiNode } from '@/extensions/EmojiNode';
+import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
+import { ImageNode } from '@/extensions/ImageNode';
+import { ChatEnter } from '@/extensions/ChatEnter';
 
 // Types
 import { User, DirectMessage, Server, PromptMessage, Friend } from '@/types';
@@ -8,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 // Components
-import MessageContent from '@/components/MessageContent';
+import DirectMessageContent from '@/components/DirectMessageContent';
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
@@ -19,11 +28,16 @@ import api from '@/services/api.service';
 
 // CSS
 import styles from '@/styles/popups/directMessage.module.css';
+import markdown from '@/styles/markdown.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Utils
-import { escapeHtml } from '@/utils/tagConverter';
+import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenUserInfo } from '@/utils/popup';
+import { toTags } from '@/utils/tagConverter';
+
+const SHAKE_COOLDOWN = 3;
+const MAX_LENGTH = 1000;
 
 interface DirectMessagePopupProps {
   userId: User['userId'];
@@ -39,21 +53,26 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
+  const editor = useEditor({
+    extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, ImageNode, ChatEnter],
+    content: '',
+    onUpdate: ({ editor }) => setMessageInput(toTags(editor.getHTML())),
+    immediatelyRender: false,
+  });
 
   // Refs
+  const isUploadingRef = useRef<boolean>(false);
   const isComposingRef = useRef<boolean>(false);
+  const fontSizeRef = useRef<string>('13px');
+  const textColorRef = useRef<string>('#000000');
   const cooldownRef = useRef<number>(0);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // States
+  const [messageInput, setMessageInput] = useState<string>('');
   const [targetCurrentServer, setTargetCurrentServer] = useState<Server | null>(null);
   const [friendState, setFriendState] = useState<Friend | null>(friend);
   const [directMessages, setDirectMessages] = useState<(DirectMessage | PromptMessage)[]>([]);
   const [cooldown, setCooldown] = useState<number>(0);
-
-  // Memos
-  const SHAKE_COOLDOWN = useMemo(() => 3, []);
-  const MAX_LENGTH = useMemo(() => 2000, []);
 
   // Destructuring
   const { avatarUrl: userAvatarUrl } = user;
@@ -72,12 +91,57 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const { name: targetCurrentServerName } = targetCurrentServer || {};
 
   // Memos
+  const textLength = editor?.getText().length || 0;
+  const isWarning = useMemo(() => textLength > MAX_LENGTH, [textLength]);
   const isFriend = useMemo(() => friendState?.relationStatus === 2, [friendState]);
   const isBlocked = useMemo(() => friendState?.isBlocked, [friendState]);
   const isOnline = useMemo(() => targetStatus !== 'offline', [targetStatus]);
   const isVerifiedUser = useMemo(() => false, []); // TODO: Remove this after implementing
 
   // Handlers
+  const syncStyles = useCallback(() => {
+    fontSizeRef.current = editor?.getAttributes('textStyle').fontSize || '13px';
+    textColorRef.current = editor?.getAttributes('textStyle').color || '#000000';
+  }, [editor]);
+
+  const handlePaste = async (imageData: string, fileName: string) => {
+    isUploadingRef.current = true;
+    if (imageData.length > 5 * 1024 * 1024) {
+      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      isUploadingRef.current = false;
+      return;
+    }
+    const formData = new FormData();
+    formData.append('_type', 'announcement');
+    formData.append('_fileName', `fileName-${Date.now()}`);
+    formData.append('_file', imageData);
+    const response = await api.post('/upload', formData);
+    if (response) {
+      editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
+      syncStyles();
+    }
+    isUploadingRef.current = false;
+  };
+
+  const handleEmojiSelect = (code: string) => {
+    editor?.chain().insertEmoji({ code }).focus().run();
+    syncStyles();
+  };
+
+  const handleFontSizeChange = (size: string) => {
+    fontSizeRef.current = size;
+    editor?.chain().setFontSize(size).focus().run();
+    syncStyles();
+    localStorage.setItem('dm-fontSize', size);
+  };
+
+  const handleTextColorChange = (color: string) => {
+    textColorRef.current = color;
+    editor?.chain().setColor(color).focus().run();
+    syncStyles();
+    localStorage.setItem('dm-textColor', color);
+  };
+
   const handleSendMessage = (targetId: User['userId'], preset: Partial<DirectMessage>) => {
     ipc.socket.send('directMessage', { targetId, preset });
   };
@@ -88,31 +152,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   const handleUnblockUser = () => {
     handleOpenAlertDialog(t('confirm-unblock-user', { '0': targetName }), () => ipc.socket.send('unblockUser', { targetId }));
-  };
-
-  const handleOpenApplyFriend = () => {
-    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
-  };
-
-  const handlePaste = async (imageData: string, fileName: string) => {
-    if (imageData.length > 5 * 1024 * 1024) {
-      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-      return;
-    }
-    const formData = new FormData();
-    formData.append('_type', 'message');
-    formData.append('_fileName', `fileName-${Date.now()}`);
-    formData.append('_file', imageData);
-    const response = await api.post('/upload', formData);
-    if (response) {
-      textareaRef.current?.focus();
-      document.execCommand('insertText', false, `![${fileName}](${response.avatarUrl})`);
-    }
   };
 
   const handleSendShakeWindow = () => {
@@ -183,6 +222,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   // Effects
   useEffect(() => {
+    editor?.on('selectionUpdate', syncStyles);
+  }, [editor, syncStyles]);
+
+  useEffect(() => {
     if (event === 'shakeWindow') handleShakeWindow(message);
     if (event === 'directMessage') handleDirectMessage(message);
   }, [event, message, handleDirectMessage, handleShakeWindow]);
@@ -223,7 +266,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         <div className={styles['direct-option-buttons']}>
           <div className={`${styles['file-share']} ${'disabled'}`} />
           {!isFriend ? (
-            <div className={styles['apply-friend']} onClick={handleOpenApplyFriend} />
+            <div className={styles['apply-friend']} onClick={() => handleOpenApplyFriend(userId, targetId)} />
           ) : (
             <>
               {!isBlocked ? <div className={styles['block-user']} onClick={handleBlockUser} /> : <div className={styles['un-block-user']} onClick={handleUnblockUser} />}
@@ -239,7 +282,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         {/* Sidebar */}
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
-            <div className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
+            <div
+              className={`${styles['avatar-picture']} ${styles['clickable']} ${isFriend && isOnline ? '' : styles['offline']}`}
+              style={{ backgroundImage: `url(${targetAvatarUrl})` }}
+              onClick={() => handleOpenUserInfo(userId, targetId)}
+            />
             {targetVip > 0 && <div className={`${vip['vip-icon-big']} ${vip[`vip-${targetVip}`]}`} />}
             <div className={styles['user-state-box']}>
               <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} />
@@ -248,7 +295,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
           </div>
           <div className={styles['user-box']}>
-            <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${userAvatarUrl})` }} />
+            <div className={`${styles['avatar-picture']} ${styles['clickable']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, userId)} />
           </div>
         </div>
 
@@ -279,7 +326,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
           )}
           <div className={styles['message-area']}>
-            <MessageContent messages={directMessages} userId={userId} />
+            <DirectMessageContent messages={directMessages} user={user} />
           </div>
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>
@@ -291,10 +338,19 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                     e.preventDefault();
                     const x = e.currentTarget.getBoundingClientRect().left;
                     const y = e.currentTarget.getBoundingClientRect().top;
-                    contextMenu.showEmojiPicker(x, y, 'right-top', (_, full) => {
-                      textareaRef.current?.focus();
-                      document.execCommand('insertText', false, full);
-                    });
+                    contextMenu.showEmojiPicker(
+                      x,
+                      y,
+                      'right-top',
+                      e.currentTarget as HTMLElement,
+                      true,
+                      false,
+                      fontSizeRef.current,
+                      textColorRef.current,
+                      (code) => handleEmojiSelect(code),
+                      (size) => handleFontSizeChange(size),
+                      (color) => handleTextColorChange(color),
+                    );
                   }}
                 />
                 <div className={`${styles['button']} ${styles['screen-shot']}`} />
@@ -304,18 +360,17 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 <div className={styles['history-message']}>{t('message-history')}</div>
               </div>
             </div>
-            <textarea
-              ref={textareaRef}
-              rows={2}
-              placeholder={`${t('input-message')}...`}
-              maxLength={MAX_LENGTH}
-              className={styles['input']}
+            <EditorContent
+              editor={editor}
+              placeholder={t('input-message')}
+              className={`${styles['input']} ${markdown['markdown-content']} ${isWarning ? styles['warning'] : ''}`}
+              style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
               onPaste={(e) => {
                 const items = e.clipboardData.items;
                 for (const item of items) {
                   if (item.type.startsWith('image/')) {
                     const file = item.getAsFile();
-                    if (file) {
+                    if (file && !isUploadingRef.current) {
                       const reader = new FileReader();
                       reader.onloadend = () => handlePaste(reader.result as string, file.name);
                       reader.readAsDataURL(file);
@@ -324,19 +379,20 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 }
               }}
               onKeyDown={(e) => {
-                const value = textareaRef.current?.value;
-                if (e.shiftKey) return;
-                if (e.key !== 'Enter') return;
-                else e.preventDefault();
-                if (!value) return;
-                if (value.length > MAX_LENGTH) return;
+                if (isWarning) return;
                 if (isComposingRef.current) return;
-                textareaRef.current!.value = '';
-                handleSendMessage(targetId, { type: 'dm', content: escapeHtml(value) });
+                if (e.shiftKey) return;
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (messageInput.trim().length === 0) return;
+                  handleSendMessage(targetId, { type: 'dm', content: messageInput });
+                  editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
+                  syncStyles();
+                }
               }}
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={() => (isComposingRef.current = false)}
-              aria-label={t('message-input-box')}
+              maxLength={MAX_LENGTH}
             />
           </div>
         </div>

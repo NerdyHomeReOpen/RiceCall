@@ -1,0 +1,43 @@
+.notify-toaster {
+  z-index: 1000;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  max-width: 100%;
+  min-height: 25px;
+  margin: 10px;
+  padding: 3px;
+  gap: 3px;
+  border: solid 1.5px #f9c55d;
+  border-radius: 2px;
+  background-color: #fefee4;
+  transform: translateY(calc(100% + 10px));
+  transition: transform 1s linear;
+}
+
+.notify-toaster.show {
+  transform: translateY(0);
+}
+
+.notify-toaster-close {
+  min-width: 18px;
+  min-height: 18px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  cursor: pointer;
+  background-image: url('/loading_close.png');
+  background-size: cover;
+  background-position: 0 0;
+}
+
+.notify-toaster-close:hover {
+  background-position: -18px 0;
+}
+
+.notify-toaster-close:active {
+  background-position: -36px 0;
+}

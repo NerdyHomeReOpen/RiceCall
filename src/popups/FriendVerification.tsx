@@ -14,6 +14,7 @@ import ipc from '@/services/ipc.service';
 import { useTranslation } from 'react-i18next';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenApproveFriend, handleOpenUserInfo } from '@/utils/popup';
 import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
 interface FriendVerificationPopupProps {
@@ -40,23 +41,6 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
     handleOpenAlertDialog(t('confirm-reject-all-friend-application'), () => {
       ipc.socket.send('rejectFriendApplication', ...friendApplications.map((item) => ({ senderId: item.senderId })));
     });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenApproveFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {

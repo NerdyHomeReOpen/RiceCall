@@ -6,7 +6,6 @@ import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 import { EmojiNode } from '@/extensions/EmojiNode';
 import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
-import { UserTag } from '@/extensions/UserTag';
 import { ImageNode } from '@/extensions/ImageNode';
 
 // CSS
@@ -23,9 +22,9 @@ import { useTranslation } from 'react-i18next';
 
 // Services
 import api from '@/services/api.service';
-import ipc from '@/services/ipc.service';
 
 // Utils
+import { handleOpenAlertDialog } from '@/utils/popup';
 import { fromTags, toTags } from '@/utils/tagConverter';
 
 interface AnnouncementEditorProps {
@@ -39,7 +38,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const editor = useEditor({
-    extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, UserTag, ImageNode],
+    extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, ImageNode],
     content: fromTags(announcement),
     onUpdate: ({ editor }) => onChange(toTags(editor.getHTML())),
     immediatelyRender: false,
@@ -73,6 +72,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const [isTextAlignRight, setIsTextAlignRight] = useState(false);
   const [fontSize, setFontSize] = useState('13px');
   const [fontFamily, setFontFamily] = useState('Arial');
+  const [textColor, setTextColor] = useState('#000000');
 
   // Handlers
   const syncStyles = useCallback(() => {
@@ -84,12 +84,8 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     setIsTextAlignRight(editor?.isActive({ textAlign: 'right' }) || false);
     setFontSize(editor?.getAttributes('textStyle').fontSize || '13px');
     setFontFamily(editor?.getAttributes('textStyle').fontFamily || 'Arial');
+    setTextColor(editor?.getAttributes('textStyle').color || '#000000');
   }, [editor]);
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
-  };
 
   const handlePaste = async (imageData: string, fileName: string) => {
     isUploadingRef.current = true;
@@ -249,11 +245,12 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 const y = e.currentTarget.getBoundingClientRect().bottom;
                 contextMenu.showColorPicker(x, y, 'right-bottom', (color) => {
                   editor?.chain().setColor(color).focus().run();
+                  setTextColor(color);
                   syncStyles();
                 });
               }}
             >
-              <div style={{ backgroundColor: editor?.getAttributes('textStyle').color || '#FFFFFF', width: '16px', height: '16px', borderRadius: '2px' }} />
+              <div style={{ backgroundColor: textColor || '#FFFFFF', width: '16px', height: '16px', borderRadius: '2px' }} />
             </div>
 
             <div
@@ -262,7 +259,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 e.preventDefault();
                 const x = e.currentTarget.getBoundingClientRect().left;
                 const y = e.currentTarget.getBoundingClientRect().bottom;
-                contextMenu.showEmojiPicker(x, y, 'right-bottom', (code) => {
+                contextMenu.showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, false, undefined, undefined, (code) => {
                   editor?.chain().insertEmoji({ code }).focus().run();
                   syncStyles();
                 });
@@ -271,28 +268,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
                 <path d="M4.285 9.567a.5.5 0 0 1 .683.183A3.5 3.5 0 0 0 8 11.5a3.5 3.5 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5" />
-              </svg>
-            </div>
-            <div
-              className={setting['button']}
-              style={{ position: 'relative' }}
-              onClick={(e) => {
-                e.preventDefault();
-                const x = e.currentTarget.getBoundingClientRect().left;
-                const y = e.currentTarget.getBoundingClientRect().bottom;
-                contextMenu.showUserTagInput(x, y, 'right-bottom', (username) => {
-                  console.log(username);
-                  editor
-                    ?.chain()
-                    .insertUserTag({ name: username || 'Unknown' })
-                    .focus()
-                    .run();
-                  syncStyles();
-                });
-              }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M13.106 7.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V5.206H8.923v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907S8.308 9.84 7.371 9.84c-.895 0-1.442-.725-1.442-1.914" />
               </svg>
             </div>
 

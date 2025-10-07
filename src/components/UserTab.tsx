@@ -22,6 +22,7 @@ import LevelIcon from '@/components/LevelIcon';
 import ipc from '@/services/ipc.service';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenEditNickname, handleOpenApplyFriend, handleOpenBlockMember, handleOpenInviteMember } from '@/utils/popup';
 import { isMember, isServerAdmin, isServerOwner, isChannelMod, isChannelAdmin } from '@/utils/permission';
 
 interface UserTabProps {
@@ -123,35 +124,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
     handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
-  };
-
-  const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
-  };
-
-  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
-  };
-
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
-  };
-
-  const handleOpenInviteMember = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('inviteMember', `inviteMember`, { userId, serverId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleDragStart = (e: React.DragEvent, userId: User['userId'], channelId: Channel['channelId']) => {

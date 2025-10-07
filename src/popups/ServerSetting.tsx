@@ -17,6 +17,7 @@ import ipc from '@/services/ipc.service';
 import api from '@/services/api.service';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenMemberApplicationSetting, handleOpenEditNickname, handleOpenBlockMember } from '@/utils/popup';
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
@@ -171,31 +172,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const handleUnblockUserFromServer = (userId: User['userId'], userName: User['name'], serverId: Server['serverId']) => {
       handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipc.socket.send('unblockUserFromServer', { userId, serverId }));
-    };
-
-    const handleOpenMemberApplicationSetting = (userId: User['userId'], serverId: Server['serverId']) => {
-      ipc.popup.open('memberApplicationSetting', 'memberApplicationSetting', { userId, serverId });
-    };
-
-    const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
-      ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
-    };
-
-    const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId']) => {
-      ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
-    };
-
-    const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
-      ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
-    };
-
-    const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-      ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
-    };
-
-    const handleOpenAlertDialog = (message: string, callback: () => void) => {
-      ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-      ipc.popup.onSubmit('dialogAlert', callback);
     };
 
     const handleOpenImageCropper = (serverId: Server['serverId'], imageData: string) => {

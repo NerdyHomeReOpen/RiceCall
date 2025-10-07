@@ -18,6 +18,7 @@ import UserTab from '@/components/UserTab';
 import ipc from '@/services/ipc.service';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenChannelSetting, handleOpenCreateChannel, handleOpenEditChannelOrder, handleOpenServerBroadcast, handleOpenChannelPassword } from '@/utils/popup';
 import { isMember, isServerAdmin, isChannelMod, isChannelAdmin } from '@/utils/permission';
 
 interface ChannelTabProps {
@@ -59,7 +60,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
     () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
     [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
   );
-  const filteredChannelMembers = useMemo(() => channelMembers.filter((mb) => !!mb).sort((a, b) => (a.nickname || a.name).localeCompare(b.nickname || b.name)), [channelMembers]);
+  const filteredChannelMembers = useMemo(
+    () => channelMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
+    [channelMembers],
+  );
 
   // Handlers
   const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
@@ -82,32 +86,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
 
   const handleDeleteChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
     handleOpenAlertDialog(t('confirm-delete-channel', { '0': channelName }), () => ipc.socket.send('deleteChannel', { serverId, channelId }));
-  };
-
-  const handleOpenChannelSetting = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.popup.open('channelSetting', 'channelSetting', { userId, serverId, channelId });
-  };
-
-  const handleOpenCreateChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
-  };
-
-  const handleOpenEditChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
-    ipc.popup.open('editChannelOrder', 'editChannelOrder', { userId, serverId });
-  };
-
-  const handleOpenServerBroadcast = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.popup.open('serverBroadcast', 'serverBroadcast', { serverId, channelId });
-  };
-
-  const handleOpenChannelPassword = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.popup.open('channelPassword', 'channelPassword', { submitTo: 'channelPassword' });
-    ipc.popup.onSubmit('channelPassword', (password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   const handleDragStart = (e: React.DragEvent, members: OnlineMember[], currentChannelId: Channel['channelId']) => {

@@ -18,6 +18,7 @@ import ipc from '@/services/ipc.service';
 import data from '@/services/data.service';
 
 // Utils
+import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenApplyFriend, handleOpenEditFriendNote } from '@/utils/popup';
 import Default from '@/utils/default';
 
 // Components
@@ -97,29 +98,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     handleOpenAlertDialog(t('confirm-delete-friend-application', { '0': friendName }), () => ipc.socket.send('deleteFriendApplication', { receiverId: targetId }));
   };
 
-  const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
-  };
-
-  const handleOpenEditFriendNote = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('editFriendNote', 'editFriendNote', { userId, targetId });
-  };
-
   const handleEditFriend = (targetId: User['userId'], update: Partial<Friend>) => {
     ipc.socket.send('editFriend', { targetId, update });
-  };
-
-  const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-    ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
-  };
-
-  const handleOpenAlertDialog = (message: string, callback: () => void) => {
-    ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
-    ipc.popup.onSubmit('dialogAlert', callback);
   };
 
   // Effects

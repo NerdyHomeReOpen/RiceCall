@@ -6,7 +6,7 @@ import styles from '@/styles/pages/server.module.css';
 
 // Components
 import MarkdownContent from '@/components/MarkdownContent';
-import MessageContent from '@/components/MessageContent';
+import ChannelMessageContent from '@/components/ChannelMessageContent';
 import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
@@ -23,7 +23,6 @@ import ipc from '@/services/ipc.service';
 
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
-import { escapeHtml } from '@/utils/tagConverter';
 import MicModeMenu from '@/components/MicModeMenu';
 
 interface MessageInputBoxGuardProps {
@@ -73,7 +72,7 @@ const MessageInputBoxGuard = React.memo(
     const isForbidByForbidGuestTextGap = !isMember(permissionLevel) && leftGapTime > 0;
     const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
     const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
-    const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 9999;
+    const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
     const placeholder = useMemo(() => {
       if (isForbidByMutedText) return t('text-was-muted-in-channel-message');
       if (isForbidByForbidText) return t('channel-forbid-text-message');
@@ -465,13 +464,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             <div className={styles['bottom-area']}>
               {/* Message Area */}
               <div className={styles['message-area']}>
-                <MessageContent messages={channelMessages} userId={userId} />
+                <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} />
               </div>
 
               {/* Broadcast Area */}
               <div className={styles['input-area']}>
                 <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
-                  <MessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} userId={userId} />
+                  <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={channel} server={server} />
                 </div>
                 <MessageInputBoxGuard
                   lastJoinChannelTime={lastJoinChannelTime}
@@ -483,7 +482,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
                   channelGuestTextWaitTime={channelGuestTextWaitTime}
                   channelGuestTextMaxLength={channelGuestTextMaxLength}
                   channelIsTextMuted={channelIsTextMuted}
-                  onSend={(message) => handleSendMessage(serverId, channelId, { type: 'general', content: escapeHtml(message) })}
+                  onSend={(message) => handleSendMessage(serverId, channelId, { type: 'general', content: message })}
                 />
               </div>
             </div>

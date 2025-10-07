@@ -11,7 +11,7 @@ import RecommendServerList from '@/components/RecommendServerList';
 import MarkdownContent from '@/components/MarkdownContent';
 
 // Type
-import type { RecommendServerList as RecommendServerListType, User, Server, Announcement } from '@/types';
+import type { User, Server, Announcement, RecommendServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,7 @@ import { useLoading } from '@/providers/Loading';
 import ipc from '@/services/ipc.service';
 
 // Utils
+import { handleOpenCreateServer } from '@/utils/popup';
 import { getFormatDate } from '@/utils/language';
 
 interface SearchResultItemProps {
@@ -48,11 +49,11 @@ interface HomePageProps {
   user: User;
   servers: Server[];
   announcements: Announcement[];
-  recommendServerList: RecommendServerListType;
+  recommendServers: RecommendServer[];
   display: boolean;
 }
 
-const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServerList, display }) => {
+const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServers, display }) => {
   // Hooks
   const { t } = useTranslation();
   const mainTab = useMainTab();
@@ -115,10 +116,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         handleSearchServer(e);
       }
     }, 500);
-  };
-
-  const handleOpenCreateServer = (userId: User['userId']) => {
-    ipc.popup.open('createServer', 'createServer', { userId });
   };
 
   const handleClearSearchState = () => {
@@ -208,6 +205,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (announcements.length > 0) {
+      setSelectedAnnouncement(announcements[announcements.length - 1]);
+    }
+  }, [announcements]);
+
   useEffect(() => {
     const unsubscribe = [ipc.socket.on('serverSearch', handleServerSearch), ipc.deepLink.onDeepLink(handleDeepLink)];
     return () => unsubscribe.forEach((unsub) => unsub());
@@ -273,12 +277,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
             {t('recommended-servers')}
           </div>
-          <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
+          {/* <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
             {t('game')}
           </div>
           <div className={`${homePage['navegate-tab']} ${section === 3 ? homePage['active'] : ''}`} data-key="30375" onClick={() => setSection(3)}>
             {t('live')}
-          </div>
+          </div> */}
         </div>
 
         <div className={homePage['right']}>
@@ -295,24 +299,24 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       <main className={homePage['home-body']} style={section === 0 ? {} : { display: 'none' }}>
         <div className={announcementStyle['announcement-wrapper']}>
           <div className={announcementStyle['announcement-header']}>
-            {categoryTabs.map((tab) => (
+            {categoryTabs.map((categoryTab) => (
               <div
-                key={tab.key}
-                className={`${announcementStyle['announcement-tab']} ${selectedAnnouncementCategory === tab.key ? announcementStyle['active'] : ''}`}
-                onClick={() => setSelectedAnnouncementCategory(tab.key)}
+                key={categoryTab.key}
+                className={`${announcementStyle['announcement-tab']} ${selectedAnnouncementCategory === categoryTab.key ? announcementStyle['active'] : ''}`}
+                onClick={() => setSelectedAnnouncementCategory(categoryTab.key)}
               >
-                {t(tab.label)}
+                {t(categoryTab.label)}
               </div>
             ))}
           </div>
           <div className={announcementStyle['announcement-list']}>
-            {filteredAnnouncements.map((a) => (
-              <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => setSelectedAnnouncement(a)}>
-                <div className={announcementStyle['announcement-type']} data-category={a.category}>
-                  {t(`${a.category}`)}
+            {filteredAnnouncements.map((announcement) => (
+              <div key={announcement.announcementId} className={announcementStyle['announcement-item']} onClick={() => setSelectedAnnouncement(announcement)}>
+                <div className={announcementStyle['announcement-type']} data-category={announcement.category}>
+                  {t(`${announcement.category}`)}
                 </div>
-                <div className={announcementStyle['announcement-title']}>{a.title}</div>
-                <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
+                <div className={announcementStyle['announcement-title']}>{announcement.title}</div>
+                <div className={announcementStyle['announcement-date']}>{getFormatDate(announcement.timestamp)}</div>
               </div>
             ))}
           </div>
@@ -330,60 +334,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               </div>
             </div>
           </div>
-          {/* <div className={announcementStyle['announcement-container']} style={{ display: 'none' }}>
-            <div className={announcementStyle['announcement-main-content']}>
-              {announcements
-                .slice(0, 1)
-                .filter((a) => selectedAnnouncementCategory === 'all' || a.category === selectedAnnouncementCategory)
-                .map((a) => (
-                  <div
-                    key={a.announcementId}
-                    style={
-                      a.attachment_url && a.attachment_url !== ''
-                        ? {
-                            backgroundImage: `url(${a.attachment_url})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                          }
-                        : {}
-                    }
-                    onClick={() => {}}
-                  >
-                    {(!a.attachment_url || a.attachment_url == '') && (
-                      <>
-                        <div className={announcementStyle['announcement-content-header']}>
-                          <div className={announcementStyle['announcement-content-detail']}>
-                            <div className={announcementStyle['announcement-title']}>{a.title}</div>
-                            <div className={announcementStyle['announcement-type']}>{t(`${a.category}`)}</div>
-                          </div>
-                          <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
-                        </div>
-                        <div className={announcementStyle['announcement-content']}>{a.content}</div>
-                      </>
-                    )}
-                  </div>
-                ))}
-            </div>
-            <div className={announcementStyle['announcement-sidebar']}>
-              {announcements
-                .slice(1, 6)
-                .filter((a) => selectedAnnouncementCategory === 'all' || a.category === selectedAnnouncementCategory)
-                .map((a) => (
-                  <div key={a.announcementId} className={announcementStyle['announcement-item']} onClick={() => {}}>
-                    <div className={announcementStyle['announcement-title']}>
-                      {a.title} | {t(`${a.category}`)}
-                    </div>
-                    <div className={announcementStyle['announcement-date']}>{getFormatDate(a.timestamp)}</div>
-                  </div>
-                ))}
-            </div>
-          </div> */}
         </div>
       </main>
 
       {/* Recommended servers */}
       <main className={homePage['recommended-servers-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
-        <RecommendServerList recommendServerList={recommendServerList} user={user} />
+        <RecommendServerList recommendServers={recommendServers} user={user} />
       </main>
 
       {/* Personal Exclusive */}

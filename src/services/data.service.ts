@@ -2,113 +2,113 @@
 import api from '@/services/api.service';
 
 // Types
-import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, RecommendServerList, MemberInvitation, Announcement } from '@/types';
+import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, MemberInvitation, Announcement, Notify, RecommendServer } from '@/types';
 
-export const dataService = {
-  user: async ({ userId }: { userId: User['userId'] }): Promise<User | null> => {
-    const user = await api.post('/user', { userId });
+export const getDataService = {
+  user: async (params: { userId: User['userId'] }): Promise<User | null> => {
+    const user = await api.get(`/user?${new URLSearchParams(params).toString()}`);
     return user;
   },
 
-  friend: async ({ userId, targetId }: { userId: User['userId']; targetId: User['userId'] }): Promise<Friend | null> => {
-    const friend = await api.post('/friend', { userId, targetId });
+  friend: async (params: { userId: User['userId']; targetId: User['userId'] }): Promise<Friend | null> => {
+    const friend = await api.get(`/friend?${new URLSearchParams(params).toString()}`);
     return friend;
   },
 
-  friends: async ({ userId }: { userId: User['userId'] }): Promise<Friend[] | []> => {
-    const friends = await api.post('/friends', { userId });
+  friends: async (params: { userId: User['userId'] }): Promise<Friend[]> => {
+    const friends = await api.get(`/friends?${new URLSearchParams(params).toString()}`);
     return friends;
   },
 
-  friendGroup: async ({ userId, friendGroupId }: { userId: User['userId']; friendGroupId: FriendGroup['friendGroupId'] }): Promise<FriendGroup | null> => {
-    const friendGroup = await api.post('/friendGroup', { userId, friendGroupId });
+  friendGroup: async (params: { userId: User['userId']; friendGroupId: FriendGroup['friendGroupId'] }): Promise<FriendGroup | null> => {
+    const friendGroup = await api.get(`/friendGroup?${new URLSearchParams(params).toString()}`);
     return friendGroup;
   },
 
-  friendGroups: async ({ userId }: { userId: User['userId'] }): Promise<FriendGroup[] | []> => {
-    const friendGroups = await api.post('/friendGroups', { userId });
+  friendGroups: async (params: { userId: User['userId'] }): Promise<FriendGroup[]> => {
+    const friendGroups = await api.get(`/friendGroups?${new URLSearchParams(params).toString()}`);
     return friendGroups;
   },
 
-  friendApplication: async ({ receiverId, senderId }: { receiverId: User['userId']; senderId: User['userId'] }): Promise<FriendApplication | null> => {
-    const friendApplication = await api.post('/friendApplication', { receiverId, senderId });
+  friendApplication: async (params: { receiverId: User['userId']; senderId: User['userId'] }): Promise<FriendApplication | null> => {
+    const friendApplication = await api.get(`/friendApplication?${new URLSearchParams(params).toString()}`);
     return friendApplication;
   },
 
-  friendApplications: async ({ receiverId }: { receiverId: User['userId'] }): Promise<FriendApplication[] | []> => {
-    const friendApplications = await api.post('/friendApplications', { receiverId });
+  friendApplications: async (params: { receiverId: User['userId'] }): Promise<FriendApplication[]> => {
+    const friendApplications = await api.get(`/friendApplications?${new URLSearchParams(params).toString()}`);
     return friendApplications;
   },
 
-  server: async ({ userId, serverId }: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Server | null> => {
-    const server = await api.post('/server', { userId, serverId });
+  server: async (params: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Server | null> => {
+    const server = await api.get(`/server?${new URLSearchParams(params).toString()}`);
     return server;
   },
 
-  servers: async ({ userId }: { userId: User['userId'] }): Promise<Server[] | []> => {
-    const servers = await api.post('/servers', { userId });
+  servers: async (params: { userId: User['userId'] }): Promise<Server[]> => {
+    const servers = await api.get(`/servers?${new URLSearchParams(params).toString()}`);
     return servers;
   },
 
-  serverMembers: async ({ serverId }: { serverId: Server['serverId'] }): Promise<Member[] | []> => {
-    const serverMembers = await api.post('/serverMembers', { serverId });
+  serverMembers: async (params: { serverId: Server['serverId'] }): Promise<Member[]> => {
+    const serverMembers = await api.get(`/serverMembers?${new URLSearchParams(params).toString()}`);
     return serverMembers;
   },
 
-  channel: async ({ userId, serverId, channelId }: { userId: User['userId']; serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Channel | null> => {
-    const channel = await api.post('/channel', { userId, serverId, channelId });
+  channel: async (params: { userId: User['userId']; serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Channel | null> => {
+    const channel = await api.get(`/channel?${new URLSearchParams(params).toString()}`);
     return channel;
   },
 
-  channels: async ({ userId, serverId }: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Channel[] | []> => {
-    const channels = await api.post('/channels', { userId, serverId });
+  channels: async (params: { userId: User['userId']; serverId: Server['serverId'] }): Promise<Channel[]> => {
+    const channels = await api.get(`/channels?${new URLSearchParams(params).toString()}`);
     return channels;
   },
 
-  channelMembers: async ({ serverId, channelId }: { serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Member[] | []> => {
-    const channel = await api.post('/channelMembers', { serverId, channelId });
+  channelMembers: async (params: { serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Member[]> => {
+    const channel = await api.get(`/channelMembers?${new URLSearchParams(params).toString()}`);
     return channel;
   },
 
-  member: async ({ serverId, userId, channelId }: { userId: User['userId']; serverId: Server['serverId']; channelId?: Channel['channelId'] }): Promise<Member | null> => {
-    const member = await api.post('/member', { userId, serverId, channelId });
+  member: async (params: { userId: User['userId']; serverId: Server['serverId']; channelId?: Channel['channelId'] }): Promise<Member | null> => {
+    const member = await api.get(`/member?${new URLSearchParams(params).toString()}`);
     return member;
   },
 
-  memberApplication: async ({ userId, serverId }: { userId: User['userId']; serverId: Server['serverId'] }): Promise<MemberApplication | null> => {
-    const memberApplication = await api.post('/memberApplication', { userId, serverId });
+  memberApplication: async (params: { userId: User['userId']; serverId: Server['serverId'] }): Promise<MemberApplication | null> => {
+    const memberApplication = await api.get(`/memberApplication?${new URLSearchParams(params).toString()}`);
     return memberApplication;
   },
 
-  memberApplications: async ({ serverId }: { serverId: Server['serverId'] }): Promise<MemberApplication[] | []> => {
-    const memberApplications = await api.post('/memberApplications', { serverId });
+  memberApplications: async (params: { serverId: Server['serverId'] }): Promise<MemberApplication[]> => {
+    const memberApplications = await api.get(`/memberApplications?${new URLSearchParams(params).toString()}`);
     return memberApplications;
   },
 
-  memberInvitation: async ({ receiverId, serverId }: { receiverId: User['userId']; serverId: Server['serverId'] }): Promise<MemberInvitation | null> => {
-    const memberInvitations = await api.post('/memberInvitation', { receiverId, serverId });
+  memberInvitation: async (params: { receiverId: User['userId']; serverId: Server['serverId'] }): Promise<MemberInvitation | null> => {
+    const memberInvitations = await api.get(`/memberInvitation?${new URLSearchParams(params).toString()}`);
     return memberInvitations;
   },
 
-  memberInvitations: async ({ receiverId }: { receiverId: User['userId'] }): Promise<MemberInvitation[] | []> => {
-    const memberInvitations = await api.post('/memberInvitations', { receiverId });
+  memberInvitations: async (params: { receiverId: User['userId'] }): Promise<MemberInvitation[]> => {
+    const memberInvitations = await api.get(`/memberInvitations?${new URLSearchParams(params).toString()}`);
     return memberInvitations;
   },
 
-  announcement: async ({ announcementId, region }: { announcementId: Announcement['announcementId']; region: Announcement['region'] }): Promise<Announcement | null> => {
-    const announcement = await api.post('/announcement', { announcementId, region });
-    return announcement;
+  notifies: async (params: { region: Notify['region'] }): Promise<Notify[]> => {
+    const notify = await api.get(`/notifies?${new URLSearchParams(params).toString()}`);
+    return notify;
   },
 
-  announcements: async ({ region }: { region: Announcement['region'] }): Promise<Announcement[] | null> => {
-    const announcements = await api.post('/announcements', { region });
+  announcements: async (params: { region: Announcement['region'] }): Promise<Announcement[] | null> => {
+    const announcements = await api.get(`/announcements?${new URLSearchParams(params).toString()}`);
     return announcements;
   },
 
-  recommendServerList: async (): Promise<RecommendServerList> => {
-    const recommendServerList = await api.post('/recommendServerList', {});
-    return recommendServerList;
+  recommendServers: async (): Promise<RecommendServer[]> => {
+    const recommendServers = await api.get(`/recommendServers`);
+    return recommendServers;
   },
 };
 
-export default dataService;
+export default getDataService;
