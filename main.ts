@@ -18,6 +18,10 @@ import { initMainI18n, t } from './i18n.js';
 
 initMain();
 
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('--no-sandbox');
+}
+
 const EnvSchema = z
   .object({
     API_URL: z.string(),
