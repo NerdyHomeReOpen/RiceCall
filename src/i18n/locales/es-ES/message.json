@@ -158,7 +158,7 @@
   "user-already-in-channel": "El usuario ya está en el canal.",
   "user-not-in-channel": "El usuario no está en el canal.",
   "user-not-in-server": "El usuario no está en el grupo.",
-  "version-too-low": "版本過低，請先更新至[最新版本](https://ricecall.com.tw)。",
+  "version-too-low": "La versión es demasiado antigua, actualiza primero a la [última versión](https://ricecall.com.tw).",
   "voice-change-to-admin": "El canal de audio se ha configurado solo para administradores.",
   "voice-change-to-allow-queue": "El administrador [{{operator}}] ha permitido el modo cola.",
   "voice-change-to-forbid-queue": "El administrador [{{operator}}] ha bloqueado el modo cola.",
