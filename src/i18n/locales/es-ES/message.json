@@ -1,5 +1,5 @@
 {
-  "accept-member-invitation-failed": "Error al aceptar la invitación de membresía, inténtalo más tardeR",
+  "accept-member-invitation-failed": "Error al aceptar la invitación de membresía, inténtalo más tarde.",
   "account-already-exists": "La cuenta ya existe",
   "account-not-found": "Esta cuenta no existe.",
   "add-user-to-queue": "El administrador [{{operator}}] ha añadido a [{{target}}] a la cola.",
