@@ -14,7 +14,8 @@ import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 
 type Category = {
-  label: string;
+  id: string;
+  label: string[];
   tags: string[];
   emoji?: string;
   subCategories?: Category[];
@@ -22,40 +23,73 @@ type Category = {
 
 const CATEGORIES: Category[] = [
   {
-    label: 'official-groups',
+    id: 'official-groups',
+    label: ['official-groups'],
     tags: ['official'],
     emoji: '1f310',
   },
   {
-    label: 'taiwan-groups',
+    id: 'taiwan-groups',
+    label: ['taiwan-groups'],
     tags: ['taiwan'],
     emoji: '1f1f9-1f1fc',
     subCategories: [
       {
-        label: 'official-groups',
+        id: 'taiwan-official-groups',
+        label: ['taiwan-groups', 'official-groups'],
         tags: ['taiwan', 'official'],
       },
     ],
   },
   {
-    label: 'russia-groups',
+    id: 'russia-groups',
+    label: ['russia-groups'],
     tags: ['russia'],
     emoji: '1f1f7-1f1fa',
     subCategories: [
       {
-        label: 'official-groups',
+        id: 'russia-official-groups',
+        label: ['russia-groups', 'official-groups'],
         tags: ['russia', 'official'],
       },
     ],
   },
   {
-    label: 'brazil-groups',
+    id: 'brazil-groups',
+    label: ['brazil-groups'],
     tags: ['brazil'],
     emoji: '1f1e7-1f1f7',
     subCategories: [
       {
-        label: 'official-groups',
+        id: 'brazil-official-groups',
+        label: ['brazil-groups', 'official-groups'],
         tags: ['brazil', 'official'],
+      },
+    ],
+  },
+  {
+    id: 'turkey-groups',
+    label: ['turkey-groups'],
+    tags: ['turkey'],
+    emoji: '1f1f9-1f1f7',
+    subCategories: [
+      {
+        id: 'turkey-official-groups',
+        label: ['turkey-groups', 'official-groups'],
+        tags: ['turkey', 'official'],
+      },
+    ],
+  },
+  {
+    id: 'iran-groups',
+    label: ['iran-groups'],
+    tags: ['iran'],
+    emoji: '1f1f7-1f1f8',
+    subCategories: [
+      {
+        id: 'iran-official-groups',
+        label: ['iran-groups', 'official-groups'],
+        tags: ['iran', 'official'],
       },
     ],
   },
@@ -85,31 +119,25 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
             {CATEGORIES.map((category) => (
               <>
                 <div
-                  key={category.label}
-                  className={`${homePage['category-tab']} ${activeCategory.tags.join('-') === category.tags.join('-') ? homePage['selected'] : ''}`}
+                  key={category.id}
+                  className={`${homePage['category-tab']} ${activeCategory.id === category.id ? homePage['selected'] : ''}`}
                   onClick={() => {
                     setActiveCategory(category);
                     setSelectedFilter(category.tags);
                   }}
                 >
                   {category.emoji && (
-                    <Image
-                      src={`https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${category.emoji}.png`}
-                      alt={category.label}
-                      className={homePage['category-flag']}
-                      height={16}
-                      width={16}
-                    />
+                    <Image src={`https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${category.emoji}.png`} alt={category.id} className={homePage['category-flag']} height={16} width={16} />
                   )}
-                  <div className={homePage['category-name']}>{`${t(category.label)}`}</div>
+                  <div className={homePage['category-name']}>{`${t(category.label[category.label.length - 1])}`}</div>
                   <div className={homePage['category-count']}>{`(${recommendServers.filter((server) => category.tags.every((tag) => server.tags.includes(tag))).length})`}</div>
                 </div>
                 {category.subCategories && (
                   <div className={homePage['category-list']}>
                     {category.subCategories.map((subCategory) => (
                       <div
-                        key={subCategory.label}
-                        className={`${homePage['category-tab']} ${activeCategory.tags.join('-') === subCategory.tags.join('-') ? homePage['selected'] : ''}`}
+                        key={subCategory.id}
+                        className={`${homePage['category-tab']} ${activeCategory.id === subCategory.id ? homePage['selected'] : ''}`}
                         onClick={() => {
                           setActiveCategory(subCategory);
                           setSelectedFilter(subCategory.tags);
@@ -123,75 +151,21 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
                 )}
               </>
             ))}
-            {/* <div
-              onClick={() => {
-                setSelectedFilter(['official']);
-                setActiveTab('official-groups');
-              }}
-              className={`${homePage['category-tab']} ${activeTab === 'official-groups' ? homePage['selected'] : ''}`}
-            >
-              <Image src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f310.png" alt="official" className={homePage['category-flag']} height={16} width={16} />
-              <div className={homePage['category-name']}>{`${t('official-groups')}`}</div>
-              <div className={homePage['category-count']}>{`(${filteredRecommendServers.filter((server) => server.tags.includes('official')).length})`}</div>
-            </div>
-            <div
-              onClick={() => {
-                setSelectedFilter(['taiwan']);
-                setActiveTab('taiwan-groups');
-              }}
-              className={`${homePage['category-tab']} ${activeTab === 'taiwan-groups' ? homePage['selected'] : ''}`}
-            >
-              <Image src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f1f9-1f1fc.png" alt="taiwan" className={homePage['category-flag']} height={16} width={16} />
-              <div className={homePage['category-name']}>{`${t('taiwan-groups')}`}</div>
-              <div className={homePage['category-count']}>{`(${filteredRecommendServers.filter((server) => server.tags.includes('taiwan')).length})`}</div>
-            </div>
-            <div className={homePage['category-list']}>
-              <div
-                onClick={() => {
-                  setSelectedFilter(['taiwan']);
-                  setActiveTab('taiwan-groups');
-                }}
-                className={`${homePage['category-tab']} ${activeTab === 'taiwan-official-groups' ? homePage['selected'] : ''}`}
-              >
-                <div className={homePage['category-name']}>{`${t('taiwan-official-groups')}`}</div>
-                <div className={homePage['category-count']}>{`(${filteredRecommendServers.filter((server) => server.tags.includes('taiwan')).length})`}</div>
-              </div>
-            </div>
-            <div
-              onClick={() => {
-                setSelectedFilter(['russia']);
-                setActiveTab('russia-groups');
-              }}
-              className={`${homePage['category-tab']} ${activeTab === 'russia-groups' ? homePage['selected'] : ''}`}
-            >
-              <Image src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f1f7-1f1fa.png" alt="russia" className={homePage['category-flag']} height={16} width={16} />
-              <div className={homePage['category-name']}>{`${t('russia-groups')}`}</div>
-              <div className={homePage['category-count']}>{`(${filteredRecommendServers.filter((server) => server.tags.includes('russia')).length})`}</div>
-            </div>
-            <div
-              onClick={() => {
-                setSelectedFilter(['other']);
-                setActiveTab('other-groups');
-              }}
-              className={`${homePage['category-tab']} ${activeTab === 'other-groups' ? homePage['selected'] : ''}`}
-            >
-              <Image src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f1e7-1f1f7.png" alt="brazil" className={homePage['category-flag']} height={16} width={16} />
-              <div className={homePage['category-name']}>{`${t('brazil-groups')}`}</div>
-              <div className={homePage['category-count']}>{`(${filteredRecommendServers.filter((server) => server.tags.includes('brazil')).length})`}</div>
-            </div> */}
           </div>
         </div>
       </aside>
 
       <section className={homePage['servers-container']}>
-        <div className={homePage['server-list-title']}>{t(activeCategory.label)}</div>
-        {filteredRecommendServers.length > 0 && (
-          <div className={homePage['server-list']}>
-            {filteredRecommendServers.map((server, index) => (
-              <RecommendServerCard key={index} user={user} recommendServer={server} />
-            ))}
-          </div>
-        )}
+        <div>
+          <div className={homePage['server-list-title']}>{activeCategory.label.map((label) => t(label)).join(' > ')}</div>
+          {filteredRecommendServers.length > 0 && (
+            <div className={homePage['server-list']}>
+              {filteredRecommendServers.map((server) => (
+                <RecommendServerCard key={server.serverId} user={user} recommendServer={server} />
+              ))}
+            </div>
+          )}
+        </div>
       </section>
     </>
   );

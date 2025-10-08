@@ -368,7 +368,6 @@
 .servers-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: flex-start;
   overflow-y: auto;
   width: 100%;
@@ -378,7 +377,6 @@
 
 .recommended-servers-wrapper .server-list {
   width: 100%;
-  justify-content: center;
 }
 
 .server-list-title {

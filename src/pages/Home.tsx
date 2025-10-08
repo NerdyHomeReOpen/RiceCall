@@ -275,7 +275,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             {t('home')}
           </div>
           <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
-            {t('recommended-servers')}
+            {t('recommend')}
           </div>
           {/* <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
             {t('game')}
