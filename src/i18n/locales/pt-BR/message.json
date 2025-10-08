@@ -158,6 +158,7 @@
   "user-already-in-channel": "O usuário já está no canal.",
   "user-not-in-channel": "Usuário não encontrado no canal.",
   "user-not-in-server": "Usuário não encontrado no grupo.",
+  "version-too-low": "版本過低，請先更新至[最新版本]({{downloadUrl}})。",
   "voice-change-to-admin": "Este canal foi configurado para permitir a fala somente de administradores.",
   "voice-change-to-allow-queue": "O administrador 【{{operator}}】 habilitou a fila neste canal.",
   "voice-change-to-forbid-queue": "O administrador 【{{operator}}】 desabilitou novas entradas a fila.",
