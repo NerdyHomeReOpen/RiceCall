@@ -158,7 +158,7 @@
   "user-already-in-channel": "The user is already in the channel",
   "user-not-in-channel": "The user is missing from the channel",
   "user-not-in-server": "The user is missing from the group",
-  "version-too-low": "版本過低，請先更新至[最新版本]({{downloadUrl}})。",
+  "version-too-low": "版本過低，請先更新至[最新版本](https://ricecall.com.tw)。",
   "voice-change-to-admin": "The channel voice has been set to admin-only speech",
   "voice-change-to-allow-queue": "Administrator [{{operator}}] has enabled queueing for this channel.",
   "voice-change-to-forbid-queue": "The administrator [{{operator}}] has closed the queue in this channel.",
