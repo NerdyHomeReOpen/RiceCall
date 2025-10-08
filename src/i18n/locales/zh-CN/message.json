@@ -158,7 +158,7 @@
   "user-already-in-channel": "使用者已经在频道中。",
   "user-not-in-channel": "使用者不在频道中。",
   "user-not-in-server": "使用者不在語音群中。",
-  "version-too-low": "版本過低，請先更新至[最新版本]({{downloadUrl}})。",
+  "version-too-low": "版本過低，請先更新至[最新版本](https://ricecall.com.tw)。",
   "voice-change-to-admin": "该频道语音已被设为仅管理员发言。",
   "voice-change-to-allow-queue": "管理员【{{operator}}】将频道设定为允许排麦。",
   "voice-change-to-forbid-queue": "此频道被管理员【{{operator}}】设定为禁止排麦。",
