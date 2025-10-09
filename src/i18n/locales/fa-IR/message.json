@@ -158,7 +158,7 @@
   "user-already-in-channel": "کاربر هم‌اکنون در کانال است.",
   "user-not-in-channel": "کاربر در کانال نیست.",
   "user-not-in-server": "کاربر در گروه صوتی نیست.",
-  "version-too-low": "版本過低，請先更新至[最新版本](https://ricecall.com.tw)。",
+  "version-too-low": "نسخه خیلی قدیمی است، لطفاً ابتدا به آخرین نسخه به‌روزرسانی کنید.(https://ricecall.com.tw).",
   "voice-change-to-admin": "صدا در این کانال فقط برای مدیران قابل صحبت است.",
   "voice-change-to-allow-queue": "مدیر 【{{operator}}】 کانال را برای قرار گرفتن در صف میکروفون فعال کرد.",
   "voice-change-to-forbid-queue": "این کانال توسط مدیر 【{{operator}}】 برای قرار گرفتن در صف میکروفون ممنوع شد.",
