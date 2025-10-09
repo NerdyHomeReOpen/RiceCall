@@ -617,12 +617,12 @@ const RootPageComponent: React.FC = React.memo(() => {
     new ErrorHandler(new Error(message)).show();
   };
 
-  const handleConnectError = () => {
-    new ErrorHandler(new Error(connectFailedMessageRef.current), () => ipc.auth.logout()).show();
+  const handleConnectError = (message: string) => {
+    new ErrorHandler(new Error(message || connectFailedMessageRef.current), () => ipc.auth.logout()).show();
   };
 
-  const handleReconnectError = () => {
-    new ErrorHandler(new Error(reconnectionFailedMessageRef.current), () => ipc.auth.logout()).show();
+  const handleReconnectError = (message: string) => {
+    new ErrorHandler(new Error(message || reconnectionFailedMessageRef.current), () => ipc.auth.logout()).show();
   };
 
   // Effects
