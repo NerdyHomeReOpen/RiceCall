@@ -1,10 +1,10 @@
 {
-  "update-available": "有新版本可用",
-  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，正在開始下載...",
-  "update-downloaded": "安裝更新",
-  "update-downloaded-message": "版本 {{version}} 已下載完成，請點擊立即安裝按鈕進行安裝",
-  "install-update": "立即安裝",
-  "open-main-window": "打開主視窗",
-  "logout": "登出",
-  "exit": "退出"
+  "update-available": "新しいバージョンを利用できます",
+  "update-available-message": "バージョン {{version}} は {{releaseDate}} にリリースされました。ダウンロード中です...",
+  "update-downloaded": "更新をインストール",
+  "update-downloaded-message": "バージョン {{version}} がダウンロードされました。インストールを続行するには、「インストール」ボタンをクリックしてください",
+  "install-update": "今すぐインストールする",
+  "open-main-window": "メインメニューの表示/非表示",
+  "logout": "ログアウト",
+  "exit": "終了"
 }
