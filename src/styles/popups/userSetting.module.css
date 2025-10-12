@@ -143,12 +143,12 @@
 
 .minimize-btn:hover,
 .close-btn:hover {
-  background-position: -13px 0;
+  background-position: -14px 0;
 }
 
 .minimize-btn:active,
 .close-btn:active {
-  background-position: -26px 0;
+  background-position: -28px 0;
 }
 
 .avatar-picture {
