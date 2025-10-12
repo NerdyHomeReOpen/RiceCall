@@ -35,7 +35,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('classic');
   const [closeToTray, setCloseToTray] = useState<boolean>(true);
   const [fontSize, setFontSize] = useState<number>(13);
-  const [fontFamily, setFontFamily] = useState<string>('Arial');
+  const [fontFamily, setFontFamily] = useState<string>('宋体, Arial, sans-serif');
   const [fontList, setFontList] = useState<string[]>([]);
 
   const [selectedInput, setSelectedInput] = useState<string>('');
