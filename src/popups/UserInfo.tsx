@@ -303,13 +303,14 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 : recentServers.length === 0
                   ? PrivateElement(t('no-recent-servers'))
                   : recentServers.map((server) => (
-                      <div key={server.serverId} className={styles['server-card']} onClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                      <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
                         <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
                           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                             <div className={`${isSelf && server.ownerId === userId ? styles['is-owner'] : ''}`} />
-                            <div className={styles['display-id-text']}>{server.displayId}</div>
+                            <div className={styles['display-id-text']}
+  onDoubleClick={(e) => e.stopPropagation()}>{server.displayId}</div>
                           </div>
                         </div>
                       </div>
@@ -347,7 +348,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 : joinedServers.length === 0
                   ? PrivateElement(t('no-joined-servers'))
                   : joinedServers.map((server) => (
-                      <div key={server.serverId} className={styles['server-card']} onClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                      <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
                         <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>
@@ -371,7 +372,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 : favoriteServers.length === 0
                   ? PrivateElement(t('no-favorite-servers'))
                   : favoriteServers.map((server) => (
-                      <div key={server.serverId} className={styles['server-card']} onClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                      <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
                         <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                         <div className={styles['server-info-box']}>
                           <div className={styles['server-name-text']}>{server.name}</div>

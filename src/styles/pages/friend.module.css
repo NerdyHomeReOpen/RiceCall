@@ -364,7 +364,6 @@
   height: 25px;
   padding: 5px;
   gap: 2px;
-  cursor: pointer;
 }
 
 .friend-group-list .friend-group-tab.selected {

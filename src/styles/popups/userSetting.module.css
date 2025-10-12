@@ -290,7 +290,6 @@
   gap: 5px;
   width: calc(50% - 2.5px);
   padding: 5px;
-  cursor: pointer;
   align-items: center;
 }
 
@@ -327,6 +326,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .contribution-value-text {
@@ -352,6 +352,8 @@
   display: flex;
   align-items: center;
   color: #6d6d6d;
+  cursor: text;
+  user-select: text;
 }
 
 .display-id-text::before {
@@ -402,6 +404,7 @@
 .badge-item {
   padding: 2px;
   border: 1px solid #fff0;
+
   &:hover {
     border-radius: 2px;
     border: 1px solid #ccc;
