@@ -130,7 +130,6 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
                     <Image src={`https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${category.emoji}.png`} alt={category.id} className={homePage['category-flag']} height={16} width={16} />
                   )}
                   <div className={homePage['category-name']}>{`${t(category.label[category.label.length - 1])}`}</div>
-                  <div className={homePage['category-count']}>{`(${recommendServers.filter((server) => category.tags.every((tag) => server.tags.includes(tag))).length})`}</div>
                 </div>
                 {category.subCategories && (
                   <div className={homePage['category-list']}>
@@ -143,8 +142,7 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
                           setSelectedFilter(subCategory.tags);
                         }}
                       >
-                        <div className={homePage['category-name']}>{`${t(subCategory.label)}`}</div>
-                        <div className={homePage['category-count']}>{`(${recommendServers.filter((server) => subCategory.tags.every((tag) => server.tags.includes(tag))).length})`}</div>
+                        <div className={homePage['category-name']}>{`${t(subCategory.label[subCategory.label.length - 1])}`}</div>
                       </div>
                     ))}
                   </div>
