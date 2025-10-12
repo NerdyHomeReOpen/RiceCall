@@ -124,6 +124,7 @@
   align-items: center;
   min-width: 55px;
   color: #777;
+  text-shadow: 0 1px 0 #ffffff;
 }
 
 .id-text::before {
