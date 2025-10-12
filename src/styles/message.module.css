@@ -82,7 +82,6 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 3px;
   overflow: hidden;
 }
 
@@ -94,14 +93,9 @@
   white-space: nowrap;
 }
 
-.header:hover .username-text {
-  text-decoration: underline;
-}
-
 .header .timestamp-text {
   margin-left: 5px;
   color: #888;
-  font-size: 0.9em;
   min-width: fit-content;
 }
 
