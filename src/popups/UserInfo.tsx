@@ -215,7 +215,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
           <div className={`${popup['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
             <p className={styles['user-name-text']}>{targetName}</p>
             {targetVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${targetVip}`]}`} />}
-            <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} />
+            <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} isSelf={isSelf} isHover={true} />
           </div>
           <p className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
             @{targetDisplayId}
