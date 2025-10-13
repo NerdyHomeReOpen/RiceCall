@@ -507,7 +507,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   <tr>
                     {memberTableFields.map((field) => (
                       <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '↑' : '↓') : ''}`}
+                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                       </th>
                     ))}
                   </tr>

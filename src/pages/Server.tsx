@@ -160,6 +160,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const isResizingAnnAreaRef = useRef<boolean>(false);
   const annAreaRef = useRef<HTMLDivElement>(null);
   const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
+  const [messages, setMessages] = useState<(ChannelMessage | PromptMessage)[]>(channelMessages);
 
   // const screenStreamRef = useRef<MediaStream | null>(null);
   // const screenVideoRef = useRef<HTMLVideoElement>(null);
@@ -173,7 +174,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
   const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
   const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
-
   // Variables
   const { userId, permissionLevel: globalPermissionLevel } = user;
   const { serverId, announcement: serverAnnouncement, permissionLevel: serverPermissionLevel } = server;
@@ -435,6 +435,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
+  useEffect(() => {
+    setMessages(channelMessages);
+  }, [channelMessages, channelId]);
+
   return (
     <main className={styles['server']} style={display ? {} : { display: 'none' }}>
       {/* Body */}
@@ -464,7 +468,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ user, frien
             <div className={styles['bottom-area']}>
               {/* Message Area */}
               <div className={styles['message-area']}>
-                <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} />
+                <ChannelMessageContent messages={messages} user={user} channel={channel} server={server} onClearMessages={() => setMessages([])} />
               </div>
 
               {/* Broadcast Area */}

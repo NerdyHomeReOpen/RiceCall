@@ -526,5 +526,6 @@
   "wealth": "Вклад",
   "xp": "Опыт",
   "year": "год",
-  "yesterday": "Вчера"
+  "yesterday": "Вчера",
+  "clean-up-message": "сообщение об очистке"
 }

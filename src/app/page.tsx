@@ -556,8 +556,17 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleChannelMessage = (...args: ChannelMessage[]) => {
-    setChannelMessages((prev) => [...prev, ...args]);
+    const isCleared = localStorage.getItem('c');
+    setChannelMessages((prev) => {
+      if (isCleared) {
+        localStorage.removeItem('c');
+        return args;
+      } else {
+        return [...prev, ...args];
+      }
+    });
   };
+  
 
   const handleActionMessage = (...args: PromptMessage[]) => {
     setActionMessages((prev) => [...prev, ...args]);
