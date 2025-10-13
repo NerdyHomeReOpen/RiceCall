@@ -13,7 +13,7 @@ import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, globalShortcut } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
 import { initMainI18n, t } from './i18n.js';
@@ -390,16 +390,6 @@ let rpc: DiscordRPC.Client | null = null;
 const startTimestamp = Date.now();
 
 const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
-
-function registerHotkey(accelerator: string, callback: () => void) {
-  const success = globalShortcut.register(accelerator, () => {
-    console.log(`${new Date().toLocaleString()} | Hotkey triggered:`, accelerator);
-    callback();
-  });
-  if (!success) {
-    console.warn(`${new Date().toLocaleString()} | Failed to register hotkey:`, accelerator);
-  }
-}
 
 function waitForPort(port: number) {
   return new Promise((resolve, reject) => {
@@ -1022,39 +1012,6 @@ app.on('ready', async () => {
     socketInstance = connectSocket(token);
     isLogin = true;
     setTrayDetail(isLogin);
-
-    if (store.get('speakingMode') === 'key') {
-      registerHotkey(store.get('defaultSpeakingKey'), () => {
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
-        });
-      });
-    }
-    registerHotkey(store.get('hotKeyOpenMainWindow'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-open-main-window', store.get('hotKeyOpenMainWindow'));
-      });
-    });
-    registerHotkey(store.get('hotKeyIncreaseVolume'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-increase-volume', store.get('hotKeyIncreaseVolume'));
-      });
-    });
-    registerHotkey(store.get('hotKeyDecreaseVolume'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-decrease-volume', store.get('hotKeyDecreaseVolume'));
-      });
-    });
-    registerHotkey(store.get('hotKeyToggleSpeaker'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-toggle-speaker', store.get('hotKeyToggleSpeaker'));
-      });
-    });
-    registerHotkey(store.get('hotKeyToggleMicrophone'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-toggle-microphone', store.get('hotKeyToggleMicrophone'));
-      });
-    });
   });
 
   ipcMain.on('logout', () => {
@@ -1558,31 +1515,12 @@ app.on('ready', async () => {
 
   // Voice
   ipcMain.on('set-speaking-mode', (_, mode) => {
-    store.set('speakingMode', mode ?? 'key');
-    if (mode === 'key') {
-      registerHotkey(store.get('defaultSpeakingKey'), () => {
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
-        });
-      });
-    } else {
-      globalShortcut.unregister(store.get('defaultSpeakingKey'));
-    }
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('speaking-mode', mode);
     });
   });
 
   ipcMain.on('set-default-speaking-key', (_, key) => {
-    globalShortcut.unregister(store.get('defaultSpeakingKey'));
-    store.set('defaultSpeakingKey', key ?? 'v');
-    if (store.get('speakingMode') === 'key') {
-      registerHotkey(key ?? 'v', () => {
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send('toggle-default-speaking-key', key);
-        });
-      });
-    }
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1598,65 +1536,30 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyOpenMainWindow'));
-    store.set('hotKeyOpenMainWindow', key ?? 'F1');
-    registerHotkey(key ?? 'F1', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-open-main-window', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-open-main-window', key);
     });
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyIncreaseVolume'));
-    store.set('hotKeyIncreaseVolume', key ?? 'PageUp');
-    registerHotkey(key ?? 'PageUp', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-increase-volume', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-increase-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyDecreaseVolume'));
-    store.set('hotKeyDecreaseVolume', key ?? 'PageDown');
-    registerHotkey(key ?? 'PageDown', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-decrease-volume', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-decrease-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyToggleSpeaker'));
-    store.set('hotKeyToggleSpeaker', key ?? 'Alt+m');
-    registerHotkey(key ?? 'Alt+m', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-toggle-speaker', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-speaker', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyToggleMicrophone'));
-    store.set('hotKeyToggleMicrophone', key ?? 'v');
-    registerHotkey(key ?? 'v', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-toggle-microphone', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
@@ -1720,9 +1623,6 @@ app.on('ready', async () => {
   ipcMain.on('open-external', (_, url) => {
     shell.openExternal(url);
   });
-
-  // Register Hotkey
-  globalShortcut.unregisterAll();
 });
 
 app.on('before-quit', () => {
