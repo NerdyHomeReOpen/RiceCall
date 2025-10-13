@@ -1,8 +1,10 @@
 {
   "official-developer": "開発者",
   "official-developer-description": "RiceCall公式開発者",
-  "official-supporter": "サポートチーム",
-  "official-supporter-description": "RiceCallユーザーサポートサービスの公式代表者",
+  "official-support": "客服人員",
+  "official-support-description": "RC 官方客服徽章",
+  "volunteer-support": "客服人員",
+  "volunteer-support-description": "RC 志願客服徽章",
   "volunteer-tester": "テスター",
   "volunteer-tester-description": "RCボランティアテスターバッジ",
   "volunteer-translator": "翻訳者",
