@@ -791,14 +791,14 @@ function connectSocket(token: string): Socket | null {
   socket.on('connect_error', (error) => {
     console.error(`${new Date().toLocaleString()} | Socket connect error:`, error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('connect_error', error);
+      window.webContents.send('connect_error', error.message);
     });
   });
 
   socket.on('reconnect_error', (error) => {
     console.error(`${new Date().toLocaleString()} | Socket reconnect error:`, error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('reconnect_error', error);
+      window.webContents.send('reconnect_error', error.message);
     });
   });
 
