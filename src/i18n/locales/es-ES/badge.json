@@ -1,8 +1,10 @@
 {
   "official-developer": "Desarrollador RiceCall",
   "official-developer-description": "Desarrollador Oficial RiceCall",
-  "official-supporter": "Atención al cliente",
-  "official-supporter-description": "Representante de soporte oficial RC",
+  "official-support": "Personal de atención al cliente",
+  "official-support-description": "Insignia oficial de servicio al cliente de RC",
+  "volunteer-support": "Personal de atención al cliente",
+  "volunteer-support-description": "Insignia de servicio al cliente voluntario de RC",
   "volunteer-tester": "Tester",
   "volunteer-tester-description": "Voluntario oficial RC",
   "volunteer-translator": "Traductor",

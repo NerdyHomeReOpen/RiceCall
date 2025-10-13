@@ -158,6 +158,7 @@
   "user-already-in-channel": "Пользователь уже находится в канале",
   "user-not-in-channel": "Пользователь отсутствует в канале",
   "user-not-in-server": "Пользователь отсутствует в группе",
+  "version-too-low": "Ваша версия устарела, обновите RiceCall до [последней версии](https://ricecall.com.tw).",
   "voice-change-to-admin": "Канал в режиме администратора. Говорить могут только администраторы.",
   "voice-change-to-allow-queue": "Администратор [{{operator}}] открыл очередь в этом канале.",
   "voice-change-to-forbid-queue": "Администратор [{{operator}}] закрыл очередь в этом канале.",
