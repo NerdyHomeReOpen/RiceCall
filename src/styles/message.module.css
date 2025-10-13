@@ -4,7 +4,7 @@
   flex-direction: column;
   min-width: 0;
   max-width: 100%;
-  gap: 3px;
+  gap: 7px;
 }
 
 .message-wrapper {

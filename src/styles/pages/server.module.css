@@ -372,6 +372,7 @@
   height: 25px;
   padding: 2px 20px 0px 8px;
   gap: 2px;
+  text-shadow: 0 1px #fff;
 }
 
 .user-tab:not(.selected):hover {
