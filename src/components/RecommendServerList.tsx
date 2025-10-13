@@ -117,7 +117,7 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
         <div className={homePage['scroll-view']}>
           <div className={homePage['category-list']}>
             {CATEGORIES.map((category) => (
-              <>
+              <React.Fragment key={category.id}>
                 <div
                   key={category.id}
                   className={`${homePage['category-tab']} ${activeCategory.id === category.id ? homePage['selected'] : ''}`}
@@ -147,7 +147,7 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
                     ))}
                   </div>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </div>
         </div>
