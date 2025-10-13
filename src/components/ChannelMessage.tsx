@@ -71,7 +71,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   return (
     <div className={styles['message-box']}>
       <div className={styles['header']}>
-        <div className={`${senderPermissionLevel > 3 && permission[senderGender]} ${senderPermissionLevel > 3 && permission[`lv-${senderPermissionLevel}`]}`} />
+        <div className={`${senderPermissionLevel > 2 && permission[senderGender]} ${senderPermissionLevel > 2 && permission[`lv-${senderPermissionLevel}`]}`} />
         {senderVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
         <div
           className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`}
