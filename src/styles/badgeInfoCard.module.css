@@ -1,14 +1,14 @@
 .badge-info-card {
+  z-index: 1000;
   position: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 10px;
   background: #f4f6fa;
-  z-index: 1000;
   min-height: 145px;
-  min-width: 300px;
-  max-width: 300px;
+  width: 300px;
+  gap: 10px;
   border: 1px solid #e0e0e4;
 }
 
