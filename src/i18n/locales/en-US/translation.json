@@ -526,5 +526,6 @@
   "wealth": "Wealth",
   "xp": "xp",
   "year": "year",
-  "yesterday": "Yesterday"
+  "yesterday": "Yesterday",
+  "clean-up-message": "清除訊息"
 }
