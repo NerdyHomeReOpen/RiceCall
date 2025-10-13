@@ -41,10 +41,6 @@ body {
   user-select: none;
 }
 
-body {
-  border: 1px solid var(--main-color);
-}
-
 /* Scrollbar */
 
 ::-webkit-scrollbar {
