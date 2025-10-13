@@ -26,13 +26,13 @@
 }
 
 .context-menu .option {
-  position: relative;
-  display: flex;
-  justify-content: flex-start;
+  color: #333;
+  justify-content: center;
   align-items: center;
   width: 100%;
   padding: 5px 30px;
-  color: #333;
+  display: flex;
+  position: relative;
 }
 
 .context-menu .option::before {
