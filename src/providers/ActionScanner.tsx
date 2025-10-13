@@ -6,6 +6,8 @@ import { useWebRTC } from '@/providers/WebRTC';
 // Services
 import ipc from '@/services/ipc.service';
 
+const BASE_VOLUME = 5;
+
 type ActionScannerContextType = {
   isKeepAlive: boolean;
 };
@@ -37,59 +39,62 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const toggleMicrophoneKeyRef = useRef<string>('Alt+v');
   const lastActiveRef = useRef<number>(Date.now());
   const speakingActiveRef = useRef(false);
-  const speakingKeyPressedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // States
   const [isKeepAlive, setIsKeepAlive] = useState<boolean>(true);
 
   // Handlers
-  const handleSpeakingKeyToggled = useCallback(() => {
-    if (speakingKeyPressedTimeoutRef.current) clearTimeout(speakingKeyPressedTimeoutRef.current);
-    speakingKeyPressedTimeoutRef.current = setTimeout(() => {
-      speakingActiveRef.current = false;
-      webRTC.setSpeakKeyPressed(false);
-    }, 600);
+  const buildKey = (e: KeyboardEvent) => {
+    const parts: string[] = [];
+    if (e.ctrlKey) parts.push('Ctrl');
+    if (e.shiftKey) parts.push('Shift');
+    if (e.altKey) parts.push('Alt');
+    if (e.metaKey) parts.push('Cmd');
 
-    if (speakingActiveRef.current || !webRTC.isMicTaken) return;
+    let key = e.key;
+    if (key === ' ') key = 'Space';
+    if (/^f\d+$/i.test(key)) key = key.toUpperCase();
+    if (key === 'Meta') key = 'Cmd';
+
+    parts.push(key.length === 1 ? key.toLowerCase() : key);
+    return parts.join('+');
+  };
+
+  const startSpeak = useCallback(() => {
+    if (speakingActiveRef.current) return;
     speakingActiveRef.current = true;
     webRTC.setSpeakKeyPressed(true);
   }, [webRTC]);
 
-  const handleOpenMainWindowToggled = useCallback(() => {
+  const stopSpeak = useCallback(() => {
+    if (!speakingActiveRef.current) return;
+    speakingActiveRef.current = false;
+    webRTC.setSpeakKeyPressed(false);
+  }, [webRTC]);
+
+  const toggleMainWindows = useCallback(() => {
     // TODO: key detection in background
   }, []);
 
-  const handleIncreaseVolumeToggled = useCallback(() => {
-    const newValue = Math.min(100, webRTC.speakerVolume + 5);
+  const toggleUpVolume = useCallback(() => {
+    const newValue = Math.min(100, webRTC.speakerVolume + BASE_VOLUME);
     webRTC.changeSpeakerVolume(newValue);
   }, [webRTC]);
 
-  const handleDecreaseVolumeToggled = useCallback(() => {
-    const newValue = Math.max(0, webRTC.speakerVolume - 5);
+  const toggleDownVolume = useCallback(() => {
+    const newValue = Math.max(0, webRTC.speakerVolume - BASE_VOLUME);
     webRTC.changeSpeakerVolume(newValue);
   }, [webRTC]);
 
-  const handleSpeakerMuteToggled = useCallback(() => {
+  const toggleSpeakerMute = useCallback(() => {
     webRTC.toggleSpeakerMuted();
   }, [webRTC]);
 
-  const handleMicMuteToggled = useCallback(() => {
+  const toggleMicMute = useCallback(() => {
     webRTC.toggleMicMuted();
   }, [webRTC]);
 
   // Effects
-  useEffect(() => {
-    const unsubscribe = [
-      ipc.detectKey.onDefaultSpeakingKeyToggled(handleSpeakingKeyToggled),
-      ipc.detectKey.onHotKeyOpenMainWindowToggled(handleOpenMainWindowToggled),
-      ipc.detectKey.onHotKeyIncreaseVolumeToggled(handleIncreaseVolumeToggled),
-      ipc.detectKey.onHotKeyDecreaseVolumeToggled(handleDecreaseVolumeToggled),
-      ipc.detectKey.onHotKeyToggleSpeakerToggled(handleSpeakerMuteToggled),
-      ipc.detectKey.onHotKeyToggleMicrophoneToggled(handleMicMuteToggled),
-    ];
-    return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleSpeakingKeyToggled, handleOpenMainWindowToggled, handleIncreaseVolumeToggled, handleDecreaseVolumeToggled, handleSpeakerMuteToggled, handleMicMuteToggled]);
-
   useEffect(() => {
     if (!idleCheck.current) return;
     const id = setInterval(() => {
@@ -126,6 +131,61 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
     events.forEach(([e, opt]) => window.addEventListener(e, updateActivity, opt));
     return () => events.forEach(([e, opt]) => window.removeEventListener(e, updateActivity, opt));
   }, [isKeepAlive]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (new Set(['Shift', 'Control', 'Alt', 'Meta']).has(e.key)) return;
+      if (e.repeat) return;
+      const mk = buildKey(e);
+      switch (mk) {
+        case speakingKeyRef.current:
+          startSpeak();
+          break;
+        case openMainWindowKeyRef.current:
+          toggleMainWindows();
+          break;
+        case increaseVolumeKeyRef.current:
+          toggleUpVolume();
+          break;
+        case decreaseVolumeKeyRef.current:
+          toggleDownVolume();
+          break;
+        case toggleSpeakerKeyRef.current:
+          toggleSpeakerMute();
+          break;
+        case toggleMicrophoneKeyRef.current:
+          toggleMicMute();
+          break;
+      }
+    };
+
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (new Set(['Shift', 'Control', 'Alt', 'Meta']).has(e.key)) return;
+      const mk = buildKey(e);
+      switch (mk) {
+        case speakingKeyRef.current:
+          stopSpeak();
+          break;
+      }
+    };
+
+    // TODO: Use system event instead of window event
+    const onBlur = () => stopSpeak();
+    const onVisibility = () => {
+      if (document.hidden) stopSpeak();
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', onBlur);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', onBlur);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [startSpeak, stopSpeak, toggleMainWindows, toggleUpVolume, toggleDownVolume, toggleSpeakerMute, toggleMicMute]);
 
   useEffect(() => {
     const changeStatusAutoIdle = (enable: boolean) => {

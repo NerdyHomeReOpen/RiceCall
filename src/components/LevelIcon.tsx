@@ -10,13 +10,15 @@ interface LevelIconProps {
   level: number;
   xp: number;
   requiredXp: number;
+  isSelf?: boolean;
+  isHover?: boolean;
 }
 
-const LevelIcon: React.FC<LevelIconProps> = React.memo(({ level, xp, requiredXp }) => {
+const LevelIcon: React.FC<LevelIconProps> = React.memo(({ level, xp, requiredXp, isSelf, isHover }) => {
   // Hooks
   const { t } = useTranslation();
-
-  return <div className={`${gradeStyle['grade']} ${gradeStyle[`lv-${Math.min(56, level)}`]}`} title={`${t('level')}: ${level}, ${t('xp')}: ${xp}, ${t('required-xp')}: ${requiredXp - xp}`} />;
+  const title = isSelf ? `${t('level')}: ${level}, ${t('xp')}: ${xp}, ${t('required-xp')}: ${requiredXp - xp}` : isHover ? `${t('level')}: ${level}` : '';
+  return <div className={`${isHover && gradeStyle['grade-hover']} ${gradeStyle['grade']} ${gradeStyle[`lv-${Math.min(56, level)}`]}`} title={title} />;
 });
 
 LevelIcon.displayName = 'LevelIcon';

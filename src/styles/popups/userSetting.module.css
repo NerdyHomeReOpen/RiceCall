@@ -64,6 +64,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
+  user-select: text;
+  cursor: text;
 }
 
 .window-action-buttons,
@@ -93,19 +95,20 @@
 }
 
 .header {
-  position: relative;
-  min-height: 250px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
+  color: #fff;
+  -webkit-app-region: drag;
   background-image: url('/im/wallpaper.png');
   background-size: cover;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 5px;
-  padding-bottom: 38px;
-  -webkit-app-region: drag;
+  width: 100%;
+  min-height: 225px;
+  padding-bottom: 45px;
+  display: flex;
+  position: relative;
+  padding-top: 35px;
 }
 
 .window-action-buttons {
@@ -140,12 +143,12 @@
 
 .minimize-btn:hover,
 .close-btn:hover {
-  background-position: -13px 0;
+  background-position: -14px 0;
 }
 
 .minimize-btn:active,
 .close-btn:active {
-  background-position: -26px 0;
+  background-position: -28px 0;
 }
 
 .avatar-picture {
@@ -184,15 +187,23 @@
 }
 
 .user-name-text {
+  color: #fff;
   font-size: 1.5em;
   font-weight: bold;
-  color: #fff;
+  cursor: text;
+  user-select: text;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-account-text {
   font-size: 1em;
   color: #fff;
   cursor: pointer;
+  cursor: text;
+  user-select: text;
 }
 
 .user-info-text {
@@ -201,7 +212,6 @@
 }
 
 .user-signature {
-  display: -webkit-box;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
@@ -211,8 +221,12 @@
   line-clamp: 2;
   box-orient: vertical;
   text-align: center;
-  overflow: hidden;
   color: #fff;
+  cursor: text;
+  user-select: text;
+  display: flex;
+  max-height: 15px;
+  overflow: auto;
 }
 
 .user-signature:hover::-webkit-scrollbar-thumb {
@@ -290,7 +304,6 @@
   gap: 5px;
   width: calc(50% - 2.5px);
   padding: 5px;
-  cursor: pointer;
   align-items: center;
 }
 
@@ -306,6 +319,7 @@
   background-position: center;
   background-repeat: no-repeat;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
 .server-info-box {
@@ -327,6 +341,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .contribution-value-text {
@@ -352,6 +367,8 @@
   display: flex;
   align-items: center;
   color: #6d6d6d;
+  cursor: text;
+  user-select: text;
 }
 
 .display-id-text::before {
@@ -402,6 +419,7 @@
 .badge-item {
   padding: 2px;
   border: 1px solid #fff0;
+
   &:hover {
     border-radius: 2px;
     border: 1px solid #ccc;

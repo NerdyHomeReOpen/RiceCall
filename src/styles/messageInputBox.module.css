@@ -27,6 +27,10 @@
   overflow: auto;
 }
 
+.messageinput-box .textarea div {
+  height: 100%;
+}
+
 .message-input-length-text {
   color: #ccc;
   font-size: 0.9em;

@@ -1,8 +1,10 @@
 {
   "official-developer": "开发人员",
   "official-developer-description": "RC 官方开发者徽章",
-  "official-supporter": "客服人员",
-  "official-supporter-description": "RC 官方客服徽章",
+  "official-support": "客服人員",
+  "official-support-description": "RC 官方客服徽章",
+  "volunteer-support": "客服人員",
+  "volunteer-support-description": "RC 志願客服徽章",
   "volunteer-tester": "测试人员",
   "volunteer-tester-description": "RC 志愿测试者徽章",
   "volunteer-translator": "翻译人员",

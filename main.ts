@@ -3,41 +3,24 @@ import fs from 'fs';
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
-import { io, Socket } from 'socket.io-client';
+import dotenv from 'dotenv';
+dotenv.config();
 import DiscordRPC from 'discord-rpc';
 import serve from 'electron-serve';
 import Store from 'electron-store';
+import { io, Socket } from 'socket.io-client';
 import { initMain } from 'electron-audio-loopback-josh';
+initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, globalShortcut } from 'electron';
-import dotenv from 'dotenv';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
 import { initMainI18n, t } from './i18n.js';
 
-initMain();
-
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
 }
-
-const EnvSchema = z
-  .object({
-    API_URL: z.string(),
-    WS_URL: z.string(),
-    CROWDIN_DISTRIBUTION_HASH: z.string(),
-    UPDATE_CHANNEL: z.enum(['latest', 'dev']).default('latest'),
-  })
-  .partial();
-
-export type PublicConfig = Record<string, string>;
-
-dotenv.config();
-
-let tray: Tray | null = null;
-let isLogin: boolean = false;
-let isUpdateNotified: boolean = false;
 
 // Store
 type StoreType = {
@@ -83,61 +66,6 @@ type StoreType = {
   receiveDirectMessageSound: boolean;
   receiveChannelMessageSound: boolean;
 };
-
-const store = new Store<StoreType>({
-  defaults: {
-    // Accounts
-    accounts: {},
-    // Language
-    language: 'zh-TW',
-    // Custom Themes
-    customThemes: [],
-    currentTheme: '',
-    // Basic settings
-    autoLogin: false,
-    autoLaunch: false,
-    alwaysOnTop: false,
-    closeToTray: false,
-    statusAutoIdle: false,
-    statusAutoIdleMinutes: 10,
-    statusAutoDnd: false,
-    channelUIMode: 'classic',
-    dontShowDisclaimer: false,
-    font: '',
-    fontSize: 13,
-    // Mix settings
-    inputAudioDevice: '',
-    outputAudioDevice: '',
-    mixEffect: false,
-    mixEffectType: '',
-    autoMixSetting: false,
-    echoCancellation: false,
-    noiseCancellation: false,
-    microphoneAmplification: false,
-    manualMixMode: false,
-    mixMode: 'all',
-    // Voice settings
-    speakingMode: 'key',
-    defaultSpeakingKey: 'v',
-    // Privacy settings
-    notSaveMessageHistory: true,
-    // Hotkeys Settings
-    hotKeyOpenMainWindow: 'F1',
-    hotKeyScreenshot: '',
-    hotKeyIncreaseVolume: 'Ctrl+m',
-    hotKeyDecreaseVolume: 'Shift+m',
-    hotKeyToggleSpeaker: 'Alt+m',
-    hotKeyToggleMicrophone: 'Alt+v',
-    // SoundEffect settings
-    disableAllSoundEffect: false,
-    enterVoiceChannelSound: true,
-    leaveVoiceChannelSound: true,
-    startSpeakingSound: true,
-    stopSpeakingSound: true,
-    receiveDirectMessageSound: true,
-    receiveChannelMessageSound: true,
-  },
-});
 
 // Event
 const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
@@ -205,7 +133,7 @@ const ClientToServerEventNames = [
   'unblockUserFromServer',
 ];
 
-export const ServerToClientEventNames = [
+const ServerToClientEventNames = [
   'actionMessage',
   'channelAdd',
   'channelMemberUpdate',
@@ -296,7 +224,62 @@ type PopupType =
   | 'userInfo'
   | 'userSetting';
 
-export const PopupSize: Record<PopupType, { height: number; width: number }> = {
+const store = new Store<StoreType>({
+  defaults: {
+    // Accounts
+    accounts: {},
+    // Language
+    language: 'zh-TW',
+    // Custom Themes
+    customThemes: [],
+    currentTheme: '',
+    // Basic settings
+    autoLogin: false,
+    autoLaunch: false,
+    alwaysOnTop: false,
+    closeToTray: false,
+    statusAutoIdle: false,
+    statusAutoIdleMinutes: 10,
+    statusAutoDnd: false,
+    channelUIMode: 'classic',
+    dontShowDisclaimer: false,
+    font: '',
+    fontSize: 13,
+    // Mix settings
+    inputAudioDevice: '',
+    outputAudioDevice: '',
+    mixEffect: false,
+    mixEffectType: '',
+    autoMixSetting: false,
+    echoCancellation: false,
+    noiseCancellation: false,
+    microphoneAmplification: false,
+    manualMixMode: false,
+    mixMode: 'all',
+    // Voice settings
+    speakingMode: 'auto',
+    defaultSpeakingKey: '',
+    // Privacy settings
+    notSaveMessageHistory: true,
+    // Hotkeys Settings
+    hotKeyOpenMainWindow: '',
+    hotKeyScreenshot: '',
+    hotKeyIncreaseVolume: '',
+    hotKeyDecreaseVolume: '',
+    hotKeyToggleSpeaker: '',
+    hotKeyToggleMicrophone: '',
+    // SoundEffect settings
+    disableAllSoundEffect: false,
+    enterVoiceChannelSound: true,
+    leaveVoiceChannelSound: true,
+    startSpeakingSound: true,
+    stopSpeakingSound: true,
+    receiveDirectMessageSound: true,
+    receiveChannelMessageSound: true,
+  },
+});
+
+const PopupSize: Record<PopupType, { height: number; width: number }> = {
   aboutus: { height: 750, width: 500 },
   applyFriend: { height: 375, width: 490 },
   approveFriend: { height: 250, width: 400 },
@@ -334,9 +317,8 @@ export const PopupSize: Record<PopupType, { height: number; width: number }> = {
 };
 
 // Constants
-const mainTitle = 'RiceCall';
-const versionTitle = `RiceCall v${app.getVersion()}`;
-
+const MAIN_TITLE = 'RiceCall';
+const VERSION_TITLE = `RiceCall v${app.getVersion()}`;
 const DEV = process.argv.includes('--dev');
 const PORT = 3000;
 const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
@@ -347,43 +329,33 @@ const APP_TRAY_ICON = {
   normal: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray.ico') : path.join(app.getAppPath(), 'resources', 'tray.png'),
 };
 
+// Variables
+let isLogin: boolean = false;
+let isUpdateNotified: boolean = false;
+
+// Token
+let token: string = '';
+
 // Env
 let env: Record<string, string> = {};
 
-// Windows
-let mainWindow: BrowserWindow | null = null;
-let authWindow: BrowserWindow | null = null;
-let popups: Record<string, BrowserWindow> = {};
-
-// Socket
-let socketInstance: Socket | null = null;
-
-// Discord RPC
-let rpc: DiscordRPC.Client | null = null;
-const startTimestamp = Date.now();
-
-const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
+const EnvSchema = z
+  .object({
+    API_URL: z.string(),
+    WS_URL: z.string(),
+    CROWDIN_DISTRIBUTION_HASH: z.string(),
+    UPDATE_CHANNEL: z.enum(['latest', 'dev']).default('latest'),
+  })
+  .partial();
 
 function readEnvFile(file: string, base: Record<string, string>) {
   if (!fs.existsSync(file)) return base;
-
   const cfg = dotenv.config({ path: file, processEnv: base, override: true });
   expand(cfg);
-
   return { ...base, ...(cfg.parsed ?? {}) };
 }
 
-function registerHotkey(accelerator: string, callback: () => void) {
-  const success = globalShortcut.register(accelerator, () => {
-    console.log(`${new Date().toLocaleString()} | Hotkey triggered:`, accelerator);
-    callback();
-  });
-  if (!success) {
-    console.warn(`${new Date().toLocaleString()} | Failed to register hotkey:`, accelerator);
-  }
-}
-
-export function loadEnv() {
+function loadEnv() {
   // 1) Using process.env as base (can be overridden by system env)
   let env: Record<string, string> = { ...process.env } as any;
 
@@ -413,6 +385,12 @@ export function loadEnv() {
   return { env, filesLoaded: files.filter(fs.existsSync) };
 }
 
+// Discord RPC
+let rpc: DiscordRPC.Client | null = null;
+const startTimestamp = Date.now();
+
+const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
+
 function waitForPort(port: number) {
   return new Promise((resolve, reject) => {
     let timeout = 30000; // 30 seconds timeout
@@ -440,23 +418,6 @@ function waitForPort(port: number) {
   });
 }
 
-function focusWindow() {
-  const window = authWindow && authWindow.isDestroyed() === false ? authWindow : mainWindow && mainWindow.isDestroyed() === false ? mainWindow : null;
-  if (window) {
-    if (window.isMinimized()) window.restore();
-    window.focus();
-  }
-}
-
-function closePopups() {
-  Object.values(popups).forEach((popup) => {
-    if (popup && !popup.isDestroyed()) {
-      popup.close();
-    }
-  });
-  popups = {};
-}
-
 // Store Functions
 function setAutoLaunch(enable: boolean) {
   try {
@@ -479,7 +440,11 @@ function isAutoLaunchEnabled(): boolean {
   }
 }
 
-// Windows Functions
+// Windows
+let mainWindow: BrowserWindow | null = null;
+let authWindow: BrowserWindow | null = null;
+let popups: Record<string, BrowserWindow> = {};
+
 async function createMainWindow(): Promise<BrowserWindow> {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.focus();
@@ -686,7 +651,18 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
   return popups[id];
 }
 
-// Socket Functions
+function closePopups() {
+  Object.values(popups).forEach((popup) => {
+    if (popup && !popup.isDestroyed()) {
+      popup.close();
+    }
+  });
+  popups = {};
+}
+
+// Socket
+let socketInstance: Socket | null = null;
+
 function connectSocket(token: string): Socket | null {
   if (!token) return null;
 
@@ -745,7 +721,7 @@ function connectSocket(token: string): Socket | null {
           createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
             const prefixTitle = title !== '' ? `${title} · ` : '';
             popup.webContents.on('did-finish-load', () => {
-              popup.setTitle(`${prefixTitle}${mainTitle}`);
+              popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
             });
             // popup.show();
           });
@@ -756,7 +732,7 @@ function connectSocket(token: string): Socket | null {
           createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
             const prefixTitle = title !== '' ? `${title} · ` : '';
             popup.webContents.on('did-finish-load', () => {
-              popup.setTitle(`${prefixTitle}${mainTitle}`);
+              popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
             });
             // popup.show();
           });
@@ -805,14 +781,14 @@ function connectSocket(token: string): Socket | null {
   socket.on('connect_error', (error) => {
     console.error(`${new Date().toLocaleString()} | Socket connect error:`, error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('connect_error', error);
+      window.webContents.send('connect_error', error.message);
     });
   });
 
   socket.on('reconnect_error', (error) => {
     console.error(`${new Date().toLocaleString()} | Socket reconnect error:`, error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('reconnect_error', error);
+      window.webContents.send('reconnect_error', error.message);
     });
   });
 
@@ -937,7 +913,9 @@ async function configureDiscordRPC() {
   });
 }
 
-// Tray Icon Functions
+// Tray Icon
+let tray: Tray | null = null;
+
 function setTrayDetail(isLogin: boolean) {
   if (!tray) return;
   const trayIconPath = isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
@@ -977,7 +955,7 @@ function configureTray() {
   if (tray) tray.destroy();
   const trayIconPath = APP_TRAY_ICON.gray;
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
-  tray.setToolTip(versionTitle);
+  tray.setToolTip(VERSION_TITLE);
   tray.on('click', () => {
     if (isLogin) mainWindow?.show();
     else authWindow?.show();
@@ -1027,45 +1005,13 @@ app.on('ready', async () => {
   });
 
   // Auth handlers
-  ipcMain.on('login', (_, token) => {
+  ipcMain.on('login', (_, _token) => {
+    token = _token;
     mainWindow?.show();
     authWindow?.hide();
     socketInstance = connectSocket(token);
     isLogin = true;
     setTrayDetail(isLogin);
-
-    if (store.get('speakingMode') === 'key') {
-      registerHotkey(store.get('defaultSpeakingKey'), () => {
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
-        });
-      });
-    }
-    registerHotkey(store.get('hotKeyOpenMainWindow'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-open-main-window', store.get('hotKeyOpenMainWindow'));
-      });
-    });
-    registerHotkey(store.get('hotKeyIncreaseVolume'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-increase-volume', store.get('hotKeyIncreaseVolume'));
-      });
-    });
-    registerHotkey(store.get('hotKeyDecreaseVolume'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-decrease-volume', store.get('hotKeyDecreaseVolume'));
-      });
-    });
-    registerHotkey(store.get('hotKeyToggleSpeaker'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-toggle-speaker', store.get('hotKeyToggleSpeaker'));
-      });
-    });
-    registerHotkey(store.get('hotKeyToggleMicrophone'), () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-toggle-microphone', store.get('hotKeyToggleMicrophone'));
-      });
-    });
   });
 
   ipcMain.on('logout', () => {
@@ -1073,6 +1019,7 @@ app.on('ready', async () => {
       console.error(`${new Date().toLocaleString()} | Cannot clear activity:`, error);
     });
     closePopups();
+    token = '';
     mainWindow?.hide();
     authWindow?.show();
     socketInstance = disconnectSocket();
@@ -1083,10 +1030,10 @@ app.on('ready', async () => {
   // toolbar handlers
   ipcMain.on('set-toolbar-title', (_, title: string) => {
     if (!tray) return;
-    tray.setToolTip(`${title ? `${title} · ` : ''}${versionTitle}`);
+    tray.setToolTip(`${title ? `${title} · ` : ''}${VERSION_TITLE}`);
 
     if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.setTitle(`${title} · ${mainTitle}`);
+      mainWindow.setTitle(`${title} · ${MAIN_TITLE}`);
     }
   });
 
@@ -1153,7 +1100,7 @@ app.on('ready', async () => {
     createPopup(type, id, data ?? {}, force).then((popup) => {
       const prefixTitle = title !== '' ? `${title} · ` : '';
       popup.webContents.on('did-finish-load', () => {
-        popup.setTitle(`${prefixTitle}${mainTitle}`);
+        popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
       });
       popup.show();
     });
@@ -1215,6 +1162,11 @@ app.on('ready', async () => {
   // Env
   ipcMain.on('get-env', (event) => {
     event.returnValue = env;
+  });
+
+  // Token
+  ipcMain.on('get-token', (event) => {
+    event.returnValue = token;
   });
 
   // System settings handlers
@@ -1563,31 +1515,12 @@ app.on('ready', async () => {
 
   // Voice
   ipcMain.on('set-speaking-mode', (_, mode) => {
-    store.set('speakingMode', mode ?? 'key');
-    if (mode === 'key') {
-      registerHotkey(store.get('defaultSpeakingKey'), () => {
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send('toggle-default-speaking-key', store.get('defaultSpeakingKey'));
-        });
-      });
-    } else {
-      globalShortcut.unregister(store.get('defaultSpeakingKey'));
-    }
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('speaking-mode', mode);
     });
   });
 
   ipcMain.on('set-default-speaking-key', (_, key) => {
-    globalShortcut.unregister(store.get('defaultSpeakingKey'));
-    store.set('defaultSpeakingKey', key ?? 'v');
-    if (store.get('speakingMode') === 'key') {
-      registerHotkey(key ?? 'v', () => {
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send('toggle-default-speaking-key', key);
-        });
-      });
-    }
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1603,65 +1536,30 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyOpenMainWindow'));
-    store.set('hotKeyOpenMainWindow', key ?? 'F1');
-    registerHotkey(key ?? 'F1', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-open-main-window', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-open-main-window', key);
     });
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyIncreaseVolume'));
-    store.set('hotKeyIncreaseVolume', key ?? 'PageUp');
-    registerHotkey(key ?? 'PageUp', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-increase-volume', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-increase-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyDecreaseVolume'));
-    store.set('hotKeyDecreaseVolume', key ?? 'PageDown');
-    registerHotkey(key ?? 'PageDown', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-decrease-volume', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-decrease-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyToggleSpeaker'));
-    store.set('hotKeyToggleSpeaker', key ?? 'Alt+m');
-    registerHotkey(key ?? 'Alt+m', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-toggle-speaker', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-speaker', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
-    globalShortcut.unregister(store.get('hotKeyToggleMicrophone'));
-    store.set('hotKeyToggleMicrophone', key ?? 'v');
-    registerHotkey(key ?? 'v', () => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('toggle-hot-key-toggle-microphone', key);
-      });
-    });
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
@@ -1725,9 +1623,6 @@ app.on('ready', async () => {
   ipcMain.on('open-external', (_, url) => {
     shell.openExternal(url);
   });
-
-  // Register Hotkey
-  globalShortcut.unregisterAll();
 });
 
 app.on('before-quit', () => {
@@ -1766,7 +1661,13 @@ if (!app.requestSingleInstanceLock()) {
   app.on('second-instance', (_, argv) => {
     const url = argv.find((arg) => arg.startsWith('ricecall://'));
     if (url) handleDeepLink(url);
-    else focusWindow();
+    else {
+      const window = authWindow && authWindow.isDestroyed() === false ? authWindow : mainWindow && mainWindow.isDestroyed() === false ? mainWindow : null;
+      if (window) {
+        if (window.isMinimized()) window.restore();
+        window.focus();
+      }
+    }
   });
 }
 

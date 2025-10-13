@@ -14,7 +14,9 @@ if (typeof window !== 'undefined' && window.require) {
   }
 }
 
-const API_URL = ipcRenderer?.sendSync('get-env')?.API_URL || '';
+const getAPIURL = () => ipcRenderer?.sendSync('get-env')?.API_URL || '';
+
+const getToken = () => ipcRenderer?.sendSync('get-token') || '';
 
 type RequestOptions = {
   headers?: Record<string, string>;
@@ -33,14 +35,19 @@ const handleResponse = async (response: Response): Promise<any> => {
 
 const apiService = {
   // GET request
-  get: async (endpoint: string, retry = true, retryCount = 0): Promise<any | null> => {
+  get: async (endpoint: string, options?: RequestOptions, retry = true, retryCount = 0): Promise<any | null> => {
     try {
-      const response = await fetch(`${API_URL}${endpoint}`);
+      const response = await fetch(`${getAPIURL()}${endpoint}`, {
+        headers: {
+          ...(options?.headers || {}),
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
 
       return await handleResponse(response);
     } catch (error: any) {
       if (retry && retryCount < 3) {
-        return await apiService.get(endpoint, false, retryCount + 1);
+        return await apiService.get(endpoint, options, false, retryCount + 1);
       }
       new ErrorHandler(error).show();
       return null;
@@ -53,9 +60,10 @@ const apiService = {
       const headers = new Headers({
         ...(data instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...(options?.headers || {}),
+        Authorization: `Bearer ${getToken()}`,
       });
 
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      const response = await fetch(`${getAPIURL()}${endpoint}`, {
         method: 'POST',
         headers: headers,
         credentials: options?.credentials || 'omit',
@@ -73,13 +81,15 @@ const apiService = {
   },
 
   // PATCH request
-  patch: async (endpoint: string, data: Record<string, any>, retry = true, retryCount = 0): Promise<any | null> => {
+  patch: async (endpoint: string, data: Record<string, any>, options?: RequestOptions, retry = true, retryCount = 0): Promise<any | null> => {
     try {
       const headers = new Headers({
+        ...(options?.headers || {}),
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
       });
 
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      const response = await fetch(`${getAPIURL()}${endpoint}`, {
         method: 'PATCH',
         headers: headers,
         body: JSON.stringify(data),
@@ -88,7 +98,7 @@ const apiService = {
       return await handleResponse(response);
     } catch (error: any) {
       if (retry && retryCount < 3) {
-        return await apiService.patch(endpoint, data, false, retryCount + 1);
+        return await apiService.patch(endpoint, data, options, false, retryCount + 1);
       }
       new ErrorHandler(error).show();
       return null;

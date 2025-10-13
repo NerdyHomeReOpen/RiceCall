@@ -71,7 +71,7 @@ export const handleOpenChannelPassword = (serverId: Server['serverId'], channelI
 };
 
 export const handleOpenEditChannelName = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], channelName: Channel['name'] = '') => {
-  ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId, channelName: channelName});
+  ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId, channelName: channelName });
 };
 
 /* Applications popup */

@@ -97,7 +97,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         <div className={friendPage['base-info-wrapper']}>
           <div className={friendPage['box']}>
             <div className={friendPage['level-icon']} />
-            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} />
+            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} isSelf={true} isHover={true} />
             <div className={friendPage['wealth-icon']} />
             <div className={friendPage['wealth-value-text']}>0</div>
             {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}

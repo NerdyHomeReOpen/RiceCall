@@ -323,22 +323,22 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                   {
                     id: 'faq',
                     label: t('faq'),
-                    onClick: () => window.open('https://ricecall.com.tw/faq', '_blank'),
+                    onClick: () => window.open('https://ricecall.com.tw/#faq', '_blank'),
                   },
                   {
                     id: 'agreement',
                     label: t('agreement'),
-                    onClick: () => window.open('https://ricecall.com.tw/agreement', '_blank'),
+                    onClick: () => window.open('https://ricecall.com.tw/terms', '_blank'),
                   },
-                  {
-                    id: 'specification',
-                    label: t('specification'),
-                    onClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
-                  },
+                  // {
+                  //   id: 'specification',
+                  //   label: t('specification'),
+                  //   onClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
+                  // },
                   {
                     id: 'contact-us',
                     label: t('contact-us'),
-                    onClick: () => window.open('https://ricecall.com.tw/contactus', '_blank'),
+                    onClick: () => window.open('https://ricecall.com.tw/contact', '_blank'),
                   },
                   {
                     id: 'about-us',
@@ -617,12 +617,12 @@ const RootPageComponent: React.FC = React.memo(() => {
     new ErrorHandler(new Error(message)).show();
   };
 
-  const handleConnectError = () => {
-    new ErrorHandler(new Error(connectFailedMessageRef.current), () => ipc.auth.logout()).show();
+  const handleConnectError = (message: string) => {
+    new ErrorHandler(new Error(message || connectFailedMessageRef.current), () => ipc.auth.logout()).show();
   };
 
-  const handleReconnectError = () => {
-    new ErrorHandler(new Error(reconnectionFailedMessageRef.current), () => ipc.auth.logout()).show();
+  const handleReconnectError = (message: string) => {
+    new ErrorHandler(new Error(message || reconnectionFailedMessageRef.current), () => ipc.auth.logout()).show();
   };
 
   // Effects

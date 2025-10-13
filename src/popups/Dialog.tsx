@@ -10,6 +10,9 @@ import ipc from '@/services/ipc.service';
 import { useTranslation } from 'react-i18next';
 import { fromTags } from '@/utils/tagConverter';
 
+// Components
+import MarkdownContent from '@/components/MarkdownContent';
+
 enum DIALOG_ICON {
   ALERT = 'alert',
   ALERT2 = 'alert2',
@@ -50,7 +53,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup[DIALOG_ICON[iconType]]}`} />
-          {formattedMessageContents} {timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}
+          <MarkdownContent markdownText={`${formattedMessageContents} ${timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}`} />
         </div>
       </div>
 

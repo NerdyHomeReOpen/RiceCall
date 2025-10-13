@@ -54,6 +54,7 @@
   flex: 1;
   height: 164px;
   padding: 11px 12px;
+  padding-bottom: 5px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -94,6 +95,7 @@
 .nickname-row {
   display: flex;
   align-items: center;
+  margin-bottom: 5px;
 }
 
 .nickname-row:not(:empty)::before {
@@ -145,7 +147,6 @@
 .permission-wrapper {
   display: flex;
   align-items: center;
-  gap: 4px;
 }
 
 .permission-text {

@@ -95,14 +95,14 @@ if (typeof window !== 'undefined' && window.require) {
   }
 }
 
-const hash = ipcRenderer?.sendSync('get-env')?.CROWDIN_DISTRIBUTION_HASH || '';
+const getHash = () => ipcRenderer?.sendSync('get-env')?.CROWDIN_DISTRIBUTION_HASH || '';
 
 const toCrowdin = (lng: string) => APP_TO_CROWDIN[lng.replace('_', '-') as LanguageKey] ?? lng;
 
 /** OTA backend */
 class CrowdinBackend {
   type = 'backend' as const;
-  client = new otaClient(hash);
+  client = new otaClient(getHash());
   read(lng: string, _ns: string, cb: any) {
     const crowdinLng = toCrowdin(lng);
     this.client
@@ -113,7 +113,7 @@ class CrowdinBackend {
 }
 
 (async () => {
-  if (hash) {
+  if (getHash()) {
     i18next
       .use(new CrowdinBackend())
       .use(initReactI18next)

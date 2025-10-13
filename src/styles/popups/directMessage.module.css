@@ -302,11 +302,16 @@
   border: none !important;
 }
 
+.input div {
+  height: 100%;
+}
+
 .input.warning {
   border: 1px solid #f00 !important;
 }
 
 @keyframes shake {
+
   0%,
   100% {
     transform: translate(0, 0);
