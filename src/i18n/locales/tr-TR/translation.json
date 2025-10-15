@@ -239,7 +239,7 @@
   "invite-member-label": "Üye Daveti Nick",
   "invite-to-be-member": "Üye olmaya davet edin",
   "invite-you-to-be-member": "Üye olmanızı rica ediyoruz",
-  "iran-groups": "伊朗語音群",
+  "iran-groups": "İran Ses Grubu",
   "is-receive-member-application-label": "Üyelik başvurularının kabul edilip edilmeyeceği",
   "join-channel": "Bu kanala girin",
   "join-date": "Üyelik Süresi",
@@ -381,7 +381,7 @@
   "receive-direct-message-sound-label": "Özel mesaj alındı",
   "recent-earned": "Yakın zamanda edinilen",
   "recent-servers": "Son ziyaret edilen ses grupları",
-  "recommend": "推薦",
+  "recommend": "tavsiye etmek",
   "reconnection-failed-message": "Yeniden bağlantı kurulamadı. Otomatik olarak çıkış yapmak için Tamam'a basın.",
   "register": "kayıt olmak",
   "register-account": "Hesap oluştur",
@@ -485,7 +485,7 @@
   "text-broadcast": "Metin yayını",
   "text-permission": "Metin Lisansı",
   "text-was-muted-in-channel-message": "Kısa mesaj göndermeniz engellendi",
-  "turkey-groups": "土耳其語音群",
+  "turkey-groups": "Türkçe Ses Grubu",
   "type": "tip",
   "unblock": "engeli kaldır",
   "unblock-date": "Engelleme kaldırma tarihi",
@@ -527,5 +527,5 @@
   "xp": "integral",
   "year": "yıllar",
   "yesterday": "dün",
-  "clean-up-message": "清除訊息"
+  "clean-up-message": "Mesajı temizle"
 }
