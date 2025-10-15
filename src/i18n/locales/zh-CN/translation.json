@@ -239,7 +239,7 @@
   "invite-member-label": "您将邀请以下使用者",
   "invite-to-be-member": "邀请成为会员",
   "invite-you-to-be-member": "邀请您成为会员",
-  "iran-groups": "伊朗語音群",
+  "iran-groups": "伊朗语音群",
   "is-receive-member-application-label": "是否接收会员申请",
   "join-channel": "进入此频道",
   "join-date": "入会时间",
@@ -381,7 +381,7 @@
   "receive-direct-message-sound-label": "收到私聊讯息",
   "recent-earned": "最近获得",
   "recent-servers": "最近访问的语音群",
-  "recommend": "推薦",
+  "recommend": "推荐",
   "reconnection-failed-message": "重新连线失败，按下确定后将自动登出",
   "register": "注册",
   "register-account": "注册帐号",
@@ -485,7 +485,7 @@
   "text-broadcast": "文字广播",
   "text-permission": "文字许可权",
   "text-was-muted-in-channel-message": "你已被禁止发送文字讯息",
-  "turkey-groups": "土耳其語音群",
+  "turkey-groups": "土耳其语音群",
   "type": "类型",
   "unblock": "解除封锁",
   "unblock-date": "解除封锁日期",
@@ -527,5 +527,5 @@
   "xp": "积分",
   "year": "年",
   "yesterday": "昨天",
-  "clean-up-message": "清除訊息"
+  "clean-up-message": "清除信息"
 }
