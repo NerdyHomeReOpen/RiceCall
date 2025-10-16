@@ -287,7 +287,7 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   blockMember: { height: 250, width: 400 },
   channelSetting: { height: 520, width: 600 },
   channelPassword: { height: 200, width: 380 },
-  changeTheme: { height: 340, width: 480 },
+  changeTheme: { height: 335, width: 480 },
   createServer: { height: 436, width: 478 },
   createChannel: { height: 200, width: 380 },
   createFriendGroup: { height: 200, width: 380 },
