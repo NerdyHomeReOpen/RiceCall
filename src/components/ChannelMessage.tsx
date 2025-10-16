@@ -77,6 +77,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
           className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`}
           onClick={() => handleOpenUserInfo(userId, senderUserId)}
           onContextMenu={(e) => {
+            e.stopPropagation();
             const { clientX: x, clientY: y } = e;
             contextMenu.showContextMenu(x, y, 'right-bottom', [
               {

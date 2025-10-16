@@ -556,17 +556,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleChannelMessage = (...args: ChannelMessage[]) => {
-    const isCleared = localStorage.getItem('c');
-    setChannelMessages((prev) => {
-      if (isCleared) {
-        localStorage.removeItem('c');
-        return args;
-      } else {
-        return [...prev, ...args];
-      }
-    });
+    setChannelMessages((prev) => [...prev, ...args]);
   };
-  
 
   const handleActionMessage = (...args: PromptMessage[]) => {
     setActionMessages((prev) => [...prev, ...args]);
@@ -820,6 +811,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 channel={channel}
                 channels={channels}
                 channelMessages={channelMessages}
+                clearMessages={() => setChannelMessages([])}
                 actionMessages={actionMessages}
                 queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
