@@ -82,7 +82,7 @@
 }
 
 .input-box:hover {
-  border-color: #999;
+  border-color: var(--border-tertiary);
 }
 
 .combo-arrow {

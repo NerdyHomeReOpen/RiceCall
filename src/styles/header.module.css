@@ -325,7 +325,7 @@
 }
 
 .main-tabs .tab.selected .tab-lable {
-  color: var(--main-color, rgb(0 115 198));
+  color: var(--text-color, rgb(0 115 198));
 }
 
 .main-tabs .tab.selected .tab-close {
@@ -378,14 +378,12 @@
 }
 
 .name-box:hover {
-  color: var(--text-color-secondary);
   text-shadow: 0 0 4px #fff;
   background-color: #ffffff1f;
   border-radius: 3px;
 }
 
 .name-box:active {
-  color: var(--text-color-secondary);
   text-shadow: 0 0 4px #fff;
   background-color: #ffffff36;
 }

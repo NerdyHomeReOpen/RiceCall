@@ -426,7 +426,7 @@
 }
 
 .server-name-text {
-  color: #10469e;
+  color: var(--text-link);
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;

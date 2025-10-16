@@ -33,7 +33,7 @@
 .theme-slots-big div {
   position: relative;
   height: 120px;
-  border: 1px solid #fff;
+  border: 1px solid var(--border);
   cursor: pointer;
   background-size: cover;
   background-position: 0 0;
@@ -67,7 +67,7 @@
 .theme-slots-small div {
   position: relative;
   height: 60px;
-  border: 1px solid #fff;
+  border: 1px solid var(--border);
   cursor: pointer;
   background-size: cover;
   background-position: 0 0;

@@ -7,6 +7,7 @@
   --sidebar: #f1f2f5;
   --border: #ccc;
   --border-secondary: #ddd;
+  --border-tertiary: #bbb;
   --shadow: #00000080;
   --hover: #d1d5da5c;
   --selected: #d8dadc;
@@ -28,9 +29,40 @@
   --text-nickname: #6e849b;
   --notify-toaster-border: #f9c55d;
   --notify-toaster-background: #fefee4;
+  --button-background: linear-gradient(#fafafb, #e9e9ed);
 }
 
 @media (prefers-color-scheme: dark) {
+  :root {
+    /* --background: #1f1f1f;
+    --foreground: #292929;
+    --sidebar: #242424;
+    --border: #333;
+    --border-secondary: #222;
+    --border-tertiary: #444;
+    --shadow: #00000080;
+    --hover: #333;
+    --selected: #444;
+    --text-color: #eee;
+    --text-color-secondary: #ccc;
+    --text-color-tertiary: #aaa;
+    --text-color-quaternary: #888;
+    --text-color-quinary: #666;
+    --text-color-senary: #444;
+    --text-color-septenary: #222;
+    --text-color-octonary: #000;
+    --text-warning: #ff3030;
+    --text-link: #76a1ff;
+    --text-link-hover: #5c8aff;
+    --text-username: #2f94db;
+    --text-username-hover: #1d4ed8;
+    --text-vip-name: #e4493e;
+    --text-vip-name-hover: #9c3028;
+    --text-nickname: #6e849b;
+    --notify-toaster-border: #855800;
+    --notify-toaster-background: #3b3b00;
+    --button-background: linear-gradient(#242424, #1f1f1f); */
+  }
 }
 
 * {
@@ -55,7 +87,7 @@ body {
   --font-family: Arial, sans-serif;
   overflow: clip;
   color: var(--text-color);
-  background: none;
+  background-color: var(--background);
   user-select: none;
 }
 
@@ -120,8 +152,8 @@ input[type='checkbox'] {
 
 input[type='radio'],
 input[type='checkbox'] {
-  min-height: 20px;
-  min-width: 20px;
+  min-height: 19px;
+  min-width: 19px;
   background-size: inherit;
   background-position: 0 0;
   cursor: pointer;
@@ -213,4 +245,11 @@ button {
   white-space: nowrap;
   color: var(--text-color-quinary);
   opacity: 0;
+}
+
+input,
+select,
+textarea {
+  background-color: var(--background);
+  color: var(--text-color);
 }

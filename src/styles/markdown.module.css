@@ -35,8 +35,10 @@
   white-space: pre-wrap;
   word-break: break-word;
   cursor: pointer;
+  color: var(--text-link);
   &:hover {
     text-decoration: underline;
+    color: var(--text-link-hover);
   }
 }
 

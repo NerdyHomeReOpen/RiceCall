@@ -33,7 +33,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #e3e3e3;
+  border-bottom: 1px solid var(--border-secondary);
   color: var(--text-color-quaternary);
   padding: 10px 15px;
 }

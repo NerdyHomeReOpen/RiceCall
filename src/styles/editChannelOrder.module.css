@@ -5,7 +5,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 5px;
-  border-bottom: 2px solid #b4bdc7;
+  border-bottom: 2px solid var(--border-secondary);
   background-image: url('/channel/chn_toolbar_bg.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;

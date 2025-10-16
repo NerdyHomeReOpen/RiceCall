@@ -4,10 +4,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-image: url('/dialog_body_bg.png');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
+  background-color: var(--foreground);
 }
 
 .loading-bar {

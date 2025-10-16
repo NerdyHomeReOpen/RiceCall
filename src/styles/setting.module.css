@@ -59,9 +59,7 @@
   border-top: 1px solid #b4dbec;
   border-bottom: 1px solid #b4dbec;
   border-right: 1px solid #fff0;
-  background-image: url('/dialog_body_bg.png');
-  background-repeat: no-repeat;
-  background-size: cover;
+  background-color: var(--foreground);
 }
 
 .header-bar {

@@ -24,7 +24,7 @@
   width: 50%;
   padding: 10px;
   border: 1px solid var(--border);
-  background: linear-gradient(#fafafb, #e9e9ed);
+  background: var(--button-background);
   cursor: pointer;
   border-radius: 4px;
   text-align: center;

@@ -55,7 +55,7 @@
 }
 
 .badge-description-box .badge-name {
-  color: #264558;
+  color: var(--text-link);
   font-size: 1.25em;
   font-weight: bold;
 }

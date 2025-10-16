@@ -3,9 +3,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-image: url('/dialog_body_bg.png');
-  background-repeat: no-repeat;
-  background-size: cover;
+  background-color: var(--foreground);
 }
 
 .popup-wrapper:focus {
@@ -84,7 +82,7 @@
   width: max-content;
   padding: 0 10px;
   border-radius: 5px;
-  background: linear-gradient(#fafafb, #e9e9ed);
+  background: var(--button-background);
   color: var(--text-color-secondary);
 }
 

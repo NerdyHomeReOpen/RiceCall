@@ -1178,7 +1178,7 @@
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
-  border: 1px solid #999;
+  border: 1px solid var(--border-tertiary);
   background: transparent;
 }
 
