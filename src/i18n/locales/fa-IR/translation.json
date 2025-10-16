@@ -81,6 +81,7 @@
   "characters": "کاراکترها",
   "chat-mode": "حالت چت",
   "chat-mode-description": "تأخیر کم، کیفیت صدای روان (قابل استفاده برای صدای کانال در حالت‌های آزاد و دستوری)",
+  "clean-up-message": "پیام پاکسازی",
   "clear-queue": "خالی کردن صف میکروفون",
   "close": "بستن",
   "close-setting": "بستن تنظیمات",
@@ -524,8 +525,8 @@
   "voice-setting": "تنظیمات صدا",
   "warning": "هشدار",
   "wealth": "ثروت",
+  "week": "週",
   "xp": "اعتبار",
   "year": "سال",
-  "yesterday": "دیروز",
-  "clean-up-message": "پیام پاکسازی"
+  "yesterday": "دیروز"
 }
