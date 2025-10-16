@@ -81,6 +81,7 @@
   "characters": "字元",
   "chat-mode": "聊天模式",
   "chat-mode-description": "低延遲，音質流暢（適用於自由、指揮模式下的頻道語音）",
+  "clean-up-message": "清除訊息",
   "clear-queue": "清空麥序",
   "close": "關閉",
   "close-setting": "關閉主視窗時",
@@ -524,8 +525,8 @@
   "voice-setting": "語音設定",
   "warning": "警告",
   "wealth": "財富值",
+  "week": "週",
   "xp": "積分",
   "year": "年",
-  "yesterday": "昨天",
-  "clean-up-message": "清除訊息"
+  "yesterday": "昨天"
 }

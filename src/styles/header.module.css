@@ -317,7 +317,7 @@
   z-index: 1;
   text-overflow: ellipsis;
   overflow: hidden;
-  color: var(--secondary-color, var(--main-color, #fff));
+  color: var(--secondary-color);
   width: 100%;
   margin: 0 20px;
   text-align: center;
@@ -325,11 +325,11 @@
 }
 
 .main-tabs .tab.selected .tab-lable {
-  color: var(--text-color, rgb(0 115 198));
+  color: var(--main-color);
 }
 
 .main-tabs .tab.selected .tab-close {
-  color: var(--main-color, rgb(0 115 198));
+  color: var(--main-color);
 }
 
 /* Title */

@@ -3,11 +3,11 @@
   --secondary-color: #fff;
   --header-image: none;
   --background: #fff;
-  --foreground: #f4f6fa;
-  --sidebar: #f1f2f5;
+  --foreground: #f7f7f7;
+  --sidebar: #f1f1f1;
   --border: #ccc;
   --border-secondary: #ddd;
-  --border-tertiary: #bbb;
+  --border-tertiary: #999;
   --shadow: #00000080;
   --hover: #d1d5da5c;
   --selected: #d8dadc;
@@ -124,7 +124,7 @@ body {
 
 .resize-handle:active,
 .resize-handle:hover {
-  background-color: var(--border);
+  background-color: var(--border-tertiary);
 }
 
 .resize-handle-vertical {

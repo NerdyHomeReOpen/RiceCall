@@ -251,11 +251,11 @@
   display: flex;
   align-items: center;
   padding: 10px;
-  border-bottom: var(--border-secondary);
   padding-top: 0;
   padding-bottom: 0;
   padding-right: 0;
-  border-top: var(--border-secondary);
+  border-top: 1px solid var(--border-secondary);
+  border-bottom: 1px solid var(--border-secondary);
   background-color: var(--background);
 }
 
@@ -278,7 +278,7 @@
 }
 
 .prev-icon {
-  min-width: 30px;
+  min-width: 29px;
   min-height: 30px;
   background-image: url('/channel/search_pre.png');
   background-repeat: no-repeat;
@@ -287,7 +287,7 @@
 }
 
 .next-icon {
-  min-width: 30px;
+  min-width: 29px;
   min-height: 30px;
   background-image: url('/channel/search_next.png');
   background-repeat: no-repeat;

@@ -4,6 +4,7 @@
   flex-direction: column;
   min-width: 0;
   max-width: 100%;
+  gap: 5px;
 }
 
 .message-wrapper {
@@ -96,6 +97,7 @@
 
 .header .timestamp-text {
   margin-left: 5px;
+  font-size: 0.9em;
   color: var(--text-color-quaternary);
   min-width: fit-content;
 }
