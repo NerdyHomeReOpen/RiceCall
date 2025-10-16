@@ -445,7 +445,7 @@ let mainWindow: BrowserWindow | null = null;
 let authWindow: BrowserWindow | null = null;
 let popups: Record<string, BrowserWindow> = {};
 
-async function createMainWindow(): Promise<BrowserWindow> {
+async function createMainWindow(title?: string): Promise<BrowserWindow> {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.showInactive();
     mainWindow.setAlwaysOnTop(true);
@@ -461,7 +461,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
   }
 
   mainWindow = new BrowserWindow({
-    title: `Raidcall v${app.getVersion()}`,
+    title: title || VERSION_TITLE,
     width: 1080,
     height: 720,
     minWidth: 800,
@@ -476,7 +476,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
     icon: APP_ICON,
     show: false,
     webPreferences: {
-      // devTools: false,
+      devTools: false,
       webviewTag: true,
       webSecurity: false,
       nodeIntegration: true,
@@ -524,7 +524,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
   return mainWindow;
 }
 
-async function createAuthWindow(): Promise<BrowserWindow> {
+async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   if (authWindow && !authWindow.isDestroyed()) {
     authWindow.showInactive();
     authWindow.moveTop();
@@ -540,7 +540,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
   }
 
   authWindow = new BrowserWindow({
-    title: `Raidcall v${app.getVersion()}`,
+    title: title || VERSION_TITLE,
     width: 640,
     height: 480,
     thickFrame: true,
@@ -588,7 +588,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
   return authWindow;
 }
 
-async function createPopup(type: PopupType, id: string, data: unknown, force = true): Promise<BrowserWindow> {
+async function createPopup(type: PopupType, id: string, data: unknown, force = true, title?: string): Promise<BrowserWindow> {
   // If force is true, destroy the popup
   if (force) {
     if (popups[id] && !popups[id].isDestroyed()) {
@@ -611,7 +611,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
   }
 
   popups[id] = new BrowserWindow({
-    title: `Raidcall v${app.getVersion()}`,
+    title: title || VERSION_TITLE,
     width: PopupSize[type].width,
     height: PopupSize[type].height,
     thickFrame: true,
@@ -737,23 +737,15 @@ function connectSocket(token: string): Socket | null {
         // Handle special events
         if (event === 'shakeWindow') {
           const initialData = args[0].initialData;
-          const title = initialData.name ?? '';
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
-            const prefixTitle = title !== '' ? `${title} · ` : '';
-            popup.webContents.on('did-finish-load', () => {
-              popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
-            });
-          });
+          const title = initialData.name;
+          const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
         }
         if (event === 'directMessage') {
           const initialData = args[0].initialData;
-          const title = initialData.name ?? '';
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
-            const prefixTitle = title !== '' ? `${title} · ` : '';
-            popup.webContents.on('did-finish-load', () => {
-              popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
-            });
-          });
+          const title = initialData.name;
+          const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
         }
       });
     });
@@ -1046,11 +1038,9 @@ app.on('ready', async () => {
   // toolbar handlers
   ipcMain.on('set-toolbar-title', (_, title: string) => {
     if (!tray) return;
-    tray.setToolTip(`${title ? `${title} · ` : ''}${VERSION_TITLE}`);
-
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.setTitle(`${title} · ${MAIN_TITLE}`);
-    }
+    const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+    tray.setToolTip(fullTitle);
+    mainWindow?.setTitle(fullTitle);
   });
 
   // Language handlers
@@ -1111,14 +1101,10 @@ app.on('ready', async () => {
   });
 
   // Popup handlers
-  ipcMain.on('open-popup', (_, type, id, data?, force = true, title = '') => {
+  ipcMain.on('open-popup', (_, type, id, data?, force = true, title?: string) => {
     console.log(`${new Date().toLocaleString()} | open popup`, type, id, title);
-    createPopup(type, id, data ?? {}, force).then((popup) => {
-      const prefixTitle = title !== '' ? `${title} · ` : '';
-      popup.webContents.on('did-finish-load', () => {
-        popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
-      });
-    });
+    const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+    createPopup(type, id, data ?? {}, force, fullTitle);
   });
 
   ipcMain.on('close-popup', (_, id) => {
