@@ -19,6 +19,9 @@ import { useTranslation } from 'react-i18next';
 // Utils
 import { fromPreserveHtml, toPreserveHtml } from '@/utils/tagConverter';
 
+// Providers
+import { useImageViewer } from '@/providers/ImageViewer';
+
 // DOMPurify
 const ALLOWED_TAGS = [
   'span',
@@ -77,6 +80,7 @@ interface MarkdownContentProps {
 const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText }) => {
   // Hooks
   const { t } = useTranslation();
+  const { selectImage } = useImageViewer();
 
   // States
   const [isCopied, setIsCopied] = useState(false);
@@ -97,7 +101,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     th: ({ node, ...props }: any) => <th {...props} />,
     td: ({ node, ...props }: any) => <td {...props} />,
     hr: ({ node, ...props }: any) => <hr {...props} />,
-    img: ({ node, alt, ...props }: any) => <img alt={alt} {...props} />,
+    img: ({ node, alt, src, ...props }: any) => <img alt={alt} src={src} {...props} onClick={() => selectImage(src)} />,
     code: ({ node, className, children, ...props }: any) => {
       const language = className?.replace('language-', '') ?? '';
       const code = String(children).trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>');
