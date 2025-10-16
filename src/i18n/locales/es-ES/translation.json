@@ -81,6 +81,7 @@
   "characters": "Caracteres",
   "chat-mode": "Modo de chat",
   "chat-mode-description": "Baja latencia y calidad de audio fluida (aplicable en canales de voz en modo libre o de comando)",
+  "clean-up-message": "Borrar mensaje",
   "clear-queue": "Eliminar a todos de la cola",
   "close": "Cerrar",
   "close-setting": "Al cerrar la ventana principal",
@@ -524,8 +525,8 @@
   "voice-setting": "Configuración de voz",
   "warning": "Advertencia",
   "wealth": "Contribución",
+  "week": "週",
   "xp": "Puntos",
   "year": "Años",
-  "yesterday": "Ayer",
-  "clean-up-message": "Borrar mensaje"
+  "yesterday": "Ayer"
 }
