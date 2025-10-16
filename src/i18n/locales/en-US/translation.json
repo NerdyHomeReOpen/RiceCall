@@ -81,6 +81,7 @@
   "characters": "Characters",
   "chat-mode": "Chat Mode",
   "chat-mode-description": "Low latency, smooth quality (for free mode and admin mode channels)",
+  "clean-up-message": "Clean up message",
   "clear-queue": "Clear the queue",
   "close": "Close",
   "close-setting": "Close setting",
@@ -524,8 +525,8 @@
   "voice-setting": "Voice Settings",
   "warning": "Warning",
   "wealth": "Wealth",
+  "week": "週",
   "xp": "xp",
   "year": "year",
-  "yesterday": "Yesterday",
-  "clean-up-message": "Clean up message"
+  "yesterday": "Yesterday"
 }
