@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
+import setting from '@/styles/setting.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types

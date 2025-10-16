@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 
 // CSS
-import setting from '@/styles/popups/setting.module.css';
+import setting from '@/styles/setting.module.css';
 import popup from '@/styles/popup.module.css';
 import permission from '@/styles/permission.module.css';
 

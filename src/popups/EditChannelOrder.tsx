@@ -7,8 +7,8 @@ import type { Channel, Category, Server, User } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // CSS
-import styles from '@/styles/popups/editChannelOrder.module.css';
-import serverPage from '@/styles/pages/server.module.css';
+import styles from '@/styles/editChannelOrder.module.css';
+import serverPage from '@/styles/server.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services

@@ -4,7 +4,6 @@
   flex-direction: column;
   min-width: 0;
   max-width: 100%;
-  gap: 3px;
 }
 
 .message-wrapper {
@@ -69,7 +68,7 @@
 
 .message-box .username-text {
   align-self: center;
-  color: #2f94db;
+  color: var(--text-username);
 }
 
 .info-box {
@@ -89,7 +88,7 @@
 
 .header .username-text {
   cursor: pointer;
-  color: #2f94db;
+  color: var(--text-username);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -97,12 +96,12 @@
 
 .header .timestamp-text {
   margin-left: 5px;
-  color: #888;
+  color: var(--text-color-quaternary);
   min-width: fit-content;
 }
 
 .content {
-  color: #000;
+  color: var(--text-color);
   user-select: text;
   word-break: break-word;
 }

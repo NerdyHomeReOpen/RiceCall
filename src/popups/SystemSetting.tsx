@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import type { ChannelUIMode } from '@/types';
 
 // CSS
-import setting from '@/styles/popups/setting.module.css';
+import setting from '@/styles/setting.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Providers

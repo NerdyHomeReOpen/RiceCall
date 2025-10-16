@@ -5,11 +5,11 @@
   flex-direction: column;
   align-items: center;
   padding: 10px;
-  background: #f4f6fa;
   min-height: 145px;
   width: 300px;
   gap: 10px;
-  border: 1px solid #e0e0e4;
+  background-color: var(--foreground);
+  border: 1px solid var(--border);
 }
 
 .badge-info-wrapper {
@@ -39,7 +39,7 @@
 }
 
 .badge-avatar-box .badge-rarity-text {
-  color: #f3644b;
+  color: var(--text-vip-name);
   margin-top: 8px;
 }
 
@@ -61,11 +61,11 @@
 }
 
 .badge-description-box .badge-description {
-  color: #777;
+  color: var(--text-color-quaternary);
 }
 
 .badge-show-time-box {
   display: flex;
   width: 100%;
-  color: #777;
+  color: var(--text-color-quaternary);
 }

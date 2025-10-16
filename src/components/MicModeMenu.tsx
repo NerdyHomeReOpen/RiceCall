@@ -1,7 +1,7 @@
 import React from 'react';
 
 // CSS
-import server from '@/styles/pages/server.module.css';
+import server from '@/styles/server.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Types
@@ -55,7 +55,7 @@ const MicModeMenu: React.FC = React.memo(() => {
               min="0"
               max="100"
               value={webRTC.voiceThreshold}
-              style={{ background: voiceThresholdColor }}
+              style={{ backgroundColor: voiceThresholdColor }}
               onChange={(e) => handleEditVoiceThreshold(parseInt(e.target.value))}
             />
             <div className={`${server['voice-state-icon']} ${isActive ? server['active'] : ''}`} />

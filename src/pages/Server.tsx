@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 // CSS
-import styles from '@/styles/pages/server.module.css';
+import styles from '@/styles/server.module.css';
 
 // Components
 import MarkdownContent from '@/components/MarkdownContent';

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 
 // CSS
-import styles from '@/styles/pages/server.module.css';
+import styles from '@/styles/server.module.css';
 
 // Types
 import type { OnlineMember, Channel, Server, User, Category, Friend } from '@/types';

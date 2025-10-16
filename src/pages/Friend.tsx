@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useRef } from 'react';
 
 // CSS
-import friendPage from '@/styles/pages/friend.module.css';
+import friendPage from '@/styles/friend.module.css';
 import vip from '@/styles/vip.module.css';
 import emoji from '@/styles/emoji.module.css';
 

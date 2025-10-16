@@ -11,9 +11,9 @@
   margin: 10px;
   padding: 3px;
   gap: 3px;
-  border: solid 1.5px #f9c55d;
+  background-color: var(--notify-toaster-background);
+  border: solid 1.5px var(--notify-toaster-border);
   border-radius: 2px;
-  background-color: #fefee4;
   transform: translateY(calc(100% + 10px));
   transition: transform 1s linear;
 }

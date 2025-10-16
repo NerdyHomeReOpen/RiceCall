@@ -16,7 +16,7 @@ import ipc from '@/services/ipc.service';
 import api from '@/services/api.service';
 
 // CSS
-import styles from '@/styles/popups/userSetting.module.css';
+import styles from '@/styles/userSetting.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';

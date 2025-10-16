@@ -44,6 +44,7 @@
   justify-content: center;
   text-align: center;
   cursor: pointer;
+  width: calc(100% + 2px);
   padding: 5px 10px;
   border-top: 1px solid #fff0;
   border-bottom: 1px solid #fff0;
@@ -58,8 +59,9 @@
   border-top: 1px solid #b4dbec;
   border-bottom: 1px solid #b4dbec;
   border-right: 1px solid #fff0;
-  background-color: #f7f7f7;
-  width: calc(100% + 1px);
+  background-image: url('/dialog_body_bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .header-bar {
@@ -76,12 +78,12 @@
 }
 
 .link-text {
-  color: #3b82f6;
+  color: var(--text-link);
   transition: color 0.2s;
 }
 
 .link-text:hover {
-  color: #2563eb;
+  color: var(--text-link-hover);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -107,7 +109,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
 }
 
 .avatar-picture::before {
@@ -131,7 +133,7 @@
 .separator {
   height: 1px;
   width: 100%;
-  background-color: #dbdbdb;
+  background-color: var(--border-secondary);
   margin: 20px 0;
 }
 
@@ -144,8 +146,8 @@
   width: max-content;
   display: flex;
   align-items: center;
-  border: 1px solid #ccc;
-  background: #fff;
+  border: 1px solid var(--border);
+  background-color: var(--background);
 }
 
 .search-icon {
@@ -166,7 +168,7 @@
   height: 100%;
   padding: 5px;
   border: none !important;
-  border-left: 1px solid #ccc !important;
+  border-left: 1px solid var(--border) !important;
 }
 
 .toolbar {
@@ -184,25 +186,24 @@
   height: 2em;
   padding: 0 4px;
   cursor: pointer;
-  background: var(--button-bg, #f5f5f5);
-  border: 1px solid var(--button-border, #d0d0d0);
+  background-color: var(--background);
+  border: 1px solid var(--border);
   border-radius: 3px;
-  color: var(--text-color, #333);
+  color: var(--text-color);
 }
 
 .toolbar .button:hover {
-  background: var(--button-hover-bg, #e8e8e8);
-  border-color: var(--button-border-hover, #b0b0b0);
+  background-color: var(--hover);
 }
 
 .toolbar .button:active {
-  background: var(--button-active-bg, #ddd);
+  background-color: var(--selected);
 }
 
 .toolbar .button.active {
-  background: var(--button-active-bg, #a7c0e9);
-  border-color: var(--button-border-active, #50a1db);
-  color: var(--button-active-text, #fff);
+  background-color: #a7c0e9;
+  border-color: #50a1db;
+  color: #fff;
 }
 
 .toolbar .button:focus {
@@ -217,9 +218,10 @@
   flex-direction: column;
   width: 200px;
   padding: 5px;
-  background-color: var(--button-bg, #f5f5f5);
-  border: 1px solid #ccc;
+  background-color: var(--background);
+  border: 1px solid var(--border);
   border-radius: 5px;
+  box-shadow: 0 1px 1px var(--shadow);
 }
 
 .link-input {

@@ -310,8 +310,7 @@
 }
 
 .main-tabs .tab.selected .tab-bg {
-  background-color: #fff;
-  color: rgb(55 144 206);
+  background-color: var(--background);
 }
 
 .main-tabs .tab .tab-lable {
@@ -375,20 +374,20 @@
   padding: 0 2px;
   font-size: 0.9em;
   font-weight: bold;
-  color: #000;
+  color: var(--text-color);
 }
 
 .name-box:hover {
-  color: #222;
+  color: var(--text-color-secondary);
   text-shadow: 0 0 4px #fff;
-  background: #ffffff1f;
+  background-color: #ffffff1f;
   border-radius: 3px;
 }
 
 .name-box:active {
-  color: #222;
+  color: var(--text-color-secondary);
   text-shadow: 0 0 4px #fff;
-  background: #ffffff36;
+  background-color: #ffffff36;
 }
 
 .status-box {
@@ -400,13 +399,13 @@
 
 .status-box:hover:not(:has(.statusDropdown:hover)) {
   text-shadow: 0 0 4px #fff;
-  background: #ffffff1f;
+  background-color: #ffffff1f;
   border-radius: 3px;
 }
 
 .status-box:active:not(:has(.statusDropdown:active)) {
   text-shadow: 0 0 4px #fff;
-  background: #ffffff36;
+  background-color: #ffffff36;
 }
 
 .status-display {
@@ -461,12 +460,11 @@
   top: 20px;
   width: fit-content;
   height: fit-content;
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: var(--background);
+  border: 1px solid var(--border);
   border-radius: 3px;
-  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
+  box-shadow: 0 1px 1px var(--shadow);
   z-index: 1000;
-  padding: 3px;
 }
 
 .status-dropdown.hidden {
@@ -474,7 +472,6 @@
 }
 
 .status-dropdown .option {
-  color: #333;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -482,12 +479,11 @@
   box-sizing: unset;
   width: 13px;
   height: 13px;
-  padding: 2px;
+  padding: 3px 5px;
 }
 
 .status-dropdown .option:hover {
-  background-color: #0073c6;
-  color: #fff;
+  background-color: var(--hover);
 }
 
 .status-dropdown .option::before {

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
 // CSS
-import styles from '@/styles/pages/friend.module.css';
+import styles from '@/styles/friend.module.css';
 
 // Types
 import type { User, FriendGroup, Friend } from '@/types';

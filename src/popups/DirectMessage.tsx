@@ -27,7 +27,7 @@ import data from '@/services/data.service';
 import api from '@/services/api.service';
 
 // CSS
-import styles from '@/styles/popups/directMessage.module.css';
+import styles from '@/styles/directMessage.module.css';
 import markdown from '@/styles/markdown.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';

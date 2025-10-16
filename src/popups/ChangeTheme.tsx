@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
-import styles from '@/styles/popups/changeTheme.module.css';
+import styles from '@/styles/changeTheme.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Types

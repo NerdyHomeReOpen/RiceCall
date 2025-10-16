@@ -43,7 +43,7 @@
 
 .label {
   font-size: 0.9em;
-  color: #333;
+  color: var(--text-color-secondary);
   display: inline-block;
   width: 80px;
   text-align: right;
@@ -52,12 +52,12 @@
 
 .warn-text {
   margin-left: 80px;
-  color: red;
+  color: var(--text-warning);
 }
 
 .hint-text {
   margin-left: 80px;
-  color: #777;
+  color: var(--text-color-quaternary);
 }
 
 .input-wrapper {
@@ -72,14 +72,9 @@
   flex: 1;
   height: 29px;
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
   transition: box-shadow 0.3s ease;
-  background: #fcfcfc;
-}
-
-.input:focus {
-  background: #fff;
 }
 
 .input-box {
@@ -117,18 +112,18 @@
 .register-footer {
   width: 100%;
   padding: 10px 15px;
-  background-color: #f4f4f5;
+  background-color: var(--sidebar);
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  border-top: 1px solid #e3e3e5;
+  border-top: 1px solid var(--border-secondary);
   margin-top: auto;
 }
 
 .back-to-login {
   text-decoration: none;
   font-size: 0.9em;
-  color: #838383;
+  color: var(--text-color-quaternary);
   display: flex;
   align-items: flex-end;
   cursor: pointer;

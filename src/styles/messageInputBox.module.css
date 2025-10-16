@@ -11,11 +11,11 @@
 }
 
 .message-input-box.warning {
-  border-color: #f00;
+  border-color: var(--text-warning);
 }
 
 .message-input-box.disabled {
-  color: #8f8f8f;
+  color: var(--text-color-quaternary);
   opacity: 0.5;
   pointer-events: none;
 }
@@ -32,7 +32,7 @@
 }
 
 .message-input-length-text {
-  color: #ccc;
+  color: var(--text-color-senary);
   font-size: 0.9em;
   align-self: flex-end;
   margin-left: 2px;

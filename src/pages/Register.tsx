@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import type { TFunction } from 'i18next';
 
 // CSS
-import styles from '@/styles/pages/register.module.css';
+import styles from '@/styles/register.module.css';
 
 // Providers
 import { useTranslation } from 'react-i18next';

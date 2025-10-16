@@ -1,15 +1,15 @@
 .message {
   padding: 8px;
   margin-bottom: 15px;
-  background: #fff8dc;
-  border: 1px solid #ffd700;
-  color: #666;
+  background-color: var(--notify-toaster-background);
+  border: 1px solid var(--notify-toaster-border);
+  color: var(--text-color-quaternary);
   font-size: 0.9em;
 }
 
 .select-type-text {
   font-weight: bold;
-  color: #646464;
+  color: var(--text-color-quaternary);
 }
 
 .button-group {
@@ -23,15 +23,19 @@
 .button-group .button {
   width: 50%;
   padding: 10px;
-  border: 1px solid #e1e1e1;
-  background-image: linear-gradient(to bottom, #fffffa, #f4f4f4);
+  border: 1px solid var(--border);
+  background: linear-gradient(#fafafb, #e9e9ed);
   cursor: pointer;
   border-radius: 4px;
   text-align: center;
 }
 
 .button-group .button:hover {
-  border: 1px solid #ccc;
+  background: var(--hover);
+}
+
+.button-group .button:active {
+  background: var(--selected);
 }
 
 .input-box {
