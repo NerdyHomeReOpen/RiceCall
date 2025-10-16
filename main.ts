@@ -447,7 +447,9 @@ let popups: Record<string, BrowserWindow> = {};
 
 async function createMainWindow(): Promise<BrowserWindow> {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.focus();
+    mainWindow.showInactive();
+    mainWindow.setAlwaysOnTop(true);
+    mainWindow.flashFrame(true);
     return mainWindow;
   }
 
@@ -472,8 +474,9 @@ async function createMainWindow(): Promise<BrowserWindow> {
     fullscreenable: true,
     hasShadow: true,
     icon: APP_ICON,
+    show: false,
     webPreferences: {
-      devTools: false,
+      // devTools: false,
       webviewTag: true,
       webSecurity: false,
       nodeIntegration: true,
@@ -491,6 +494,10 @@ async function createMainWindow(): Promise<BrowserWindow> {
     mainWindow.loadURL(`${BASE_URI}`);
     // mainWindow.webContents.openDevTools();
   }
+
+  mainWindow.on('focus', () => {
+    mainWindow?.flashFrame(false);
+  });
 
   mainWindow.on('close', (e) => {
     e.preventDefault();
@@ -519,7 +526,9 @@ async function createMainWindow(): Promise<BrowserWindow> {
 
 async function createAuthWindow(): Promise<BrowserWindow> {
   if (authWindow && !authWindow.isDestroyed()) {
-    authWindow.focus();
+    authWindow.showInactive();
+    authWindow.moveTop();
+    authWindow.flashFrame(true);
     return authWindow;
   }
 
@@ -542,6 +551,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
     fullscreenable: false,
     hasShadow: true,
     icon: APP_ICON,
+    show: false,
     webPreferences: {
       devTools: false,
       webviewTag: true,
@@ -560,6 +570,10 @@ async function createAuthWindow(): Promise<BrowserWindow> {
     authWindow.loadURL(`${BASE_URI}/auth`);
     // authWindow.webContents.openDevTools();
   }
+
+  authWindow.on('focus', () => {
+    authWindow?.flashFrame(false);
+  });
 
   authWindow.on('close', (e) => {
     e.preventDefault();
@@ -582,8 +596,9 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     }
   } else {
     if (popups[id] && !popups[id].isDestroyed()) {
-      popups[id].show();
-      popups[id].focus();
+      popups[id].showInactive();
+      popups[id].moveTop();
+      popups[id].flashFrame(true);
       return popups[id];
     }
   }
@@ -607,6 +622,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     fullscreenable: false,
     hasShadow: true,
     icon: APP_ICON,
+    show: false,
     webPreferences: {
       devTools: false,
       webviewTag: true,
@@ -614,7 +630,6 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
       contextIsolation: false,
       backgroundThrottling: false,
     },
-    modal: true,
     trafficLightPosition: { x: -100, y: -100 },
   });
 
@@ -632,15 +647,20 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     event.returnValue = data;
   });
 
+  popups[id].on('ready-to-show', () => {
+    popups[id].showInactive();
+    popups[id].moveTop();
+    popups[id].flashFrame(true);
+  });
+
+  popups[id].on('focus', () => {
+    popups[id].flashFrame(false);
+  });
+
   popups[id].on('close', (e) => {
     e.preventDefault();
     popups[id].destroy();
     delete popups[id];
-  });
-
-  popups[id].webContents.once('did-finish-load', () => {
-    popups[id].show();
-    popups[id].focus();
   });
 
   popups[id].webContents.setWindowOpenHandler(({ url }) => {
@@ -723,7 +743,6 @@ function connectSocket(token: string): Socket | null {
             popup.webContents.on('did-finish-load', () => {
               popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
             });
-            // popup.show();
           });
         }
         if (event === 'directMessage') {
@@ -734,7 +753,6 @@ function connectSocket(token: string): Socket | null {
             popup.webContents.on('did-finish-load', () => {
               popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
             });
-            // popup.show();
           });
         }
       });
@@ -774,7 +792,7 @@ function connectSocket(token: string): Socket | null {
   socket.on('error', (error) => {
     console.error(`${new Date().toLocaleString()} | Socket error:`, error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('error', error);
+      window.webContents.send('error', error.message);
     });
   });
 
@@ -925,8 +943,8 @@ function setTrayDetail(isLogin: boolean) {
       label: t('open-main-window'),
       type: 'normal',
       click: () => {
-        if (isLogin) mainWindow?.show();
-        else authWindow?.show();
+        if (isLogin) mainWindow?.showInactive();
+        else authWindow?.showInactive();
       },
     },
     { type: 'separator' },
@@ -957,8 +975,8 @@ function configureTray() {
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
   tray.setToolTip(VERSION_TITLE);
   tray.on('click', () => {
-    if (isLogin) mainWindow?.show();
-    else authWindow?.show();
+    if (isLogin) mainWindow?.showInactive();
+    else authWindow?.showInactive();
   });
   setTrayDetail(isLogin);
 }
@@ -971,10 +989,8 @@ app.on('ready', async () => {
   configureDiscordRPC();
   configureTray();
 
-  if (!store.get('dontShowDisclaimer')) {
-    createPopup('aboutus', 'aboutUs', {});
-  }
-  createAuthWindow().then((authWindow) => authWindow.show());
+  if (!store.get('dontShowDisclaimer')) createPopup('aboutus', 'aboutUs', {});
+  createAuthWindow().then((authWindow) => authWindow.showInactive());
   createMainWindow().then((mainWindow) => mainWindow.hide());
 
   ipcMain.on('exit', () => {
@@ -1007,7 +1023,7 @@ app.on('ready', async () => {
   // Auth handlers
   ipcMain.on('login', (_, _token) => {
     token = _token;
-    mainWindow?.show();
+    mainWindow?.showInactive();
     authWindow?.hide();
     socketInstance = connectSocket(token);
     isLogin = true;
@@ -1021,7 +1037,7 @@ app.on('ready', async () => {
     closePopups();
     token = '';
     mainWindow?.hide();
-    authWindow?.show();
+    authWindow?.showInactive();
     socketInstance = disconnectSocket();
     isLogin = false;
     setTrayDetail(isLogin);
@@ -1102,7 +1118,6 @@ app.on('ready', async () => {
       popup.webContents.on('did-finish-load', () => {
         popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
       });
-      popup.show();
     });
   });
 
@@ -1637,8 +1652,8 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createAuthWindow().then((authWindow) => authWindow.show());
-    createMainWindow().then((mainWindow) => mainWindow.hide());
+    createAuthWindow().then((authWindow) => authWindow.showInactive());
+    createMainWindow().then((mainWindow) => mainWindow.showInactive());
   }
 });
 
