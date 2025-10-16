@@ -374,7 +374,7 @@
   "queue": "排麦",
   "queue-speech": "排麦发言",
   "queue-time": "发言时间(秒)",
-  "quick-enter-server": "按Enter键快速进入语音群",
+  "quick-enter-server": "按Enter鍵快速進入 {{0}}",
   "readme": "## 使用声明\n\n**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)**（以下简称 RC 语音）为 **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)**（以下简称本团队）**独立开发**之专案，**与 RaidCall 原开发团队、伺服器或任何官方组织无任何关联**。请使用者自行斟酌并承担使用风险（*Use at your own risk*）。\n\n目前 RC 语音所有版本皆为测试版本，若在使用过程中发现问题，欢迎透过以下方式回报:\n- 应用程式内: 右上角选单 > 意见反馈\n- GitHub: [问题回报](https://github.com/NerdyHomeReOpen/RiceCall/issues)\n- Discord: 加入 [官方群组](https://discord.gg/adCWzv6wwS) 以获取最新资讯\n\n请注意，RC 语音之所有资料（包括但不限于帐号、等级、VIP、语音群等）**可能会遭到重置、遗失或删除**，本团队保有最终决策权。\n\nRC 语音**并非 RaidCall 的延续、重制或官方授权版本**，亦**不提供 RaidCall 服务的还原、支援或帐号资料恢复**。此专案纯属爱好者社群自发性的开发行动，旨在提供一个新的语音交流平台，**不以商业化为目的**。\n\nRC 语音所有内容仅供学术研究与技术交流使用。如涉及任何版权、商标或其他权利问题，欢迎来信与我们联系协商。\n\nRC 语音虽参考或沿用部分 RaidCall 相关素材，但最终成品皆为本团队独立创作，**不代表 RaidCall 官方立场或意图**。因此，我们**不提供与 RaidCall 相关之任何技术支援、帐号恢复或资料查询服务**。如有相关问题，请洽原 RaidCall 官方。\n\n### 开源参与方式\n\n我们欢迎各界开发者参与 RC 语音的开发与维护。您可透过以下方式加入贡献:\n* 填写 [意愿表单](https://forms.gle/ZowwAS22dGpKkGcZ8)（请先加入 [Discord 官方群组](https://discord.gg/adCWzv6wwS)，若我们有需要会联系您并指派身份组）\n* Fork 本专案并提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)，贡献新功能或修复\n\n感谢您的支持与参与！\n\n此声明可在应用程式中找到: 右上角选单 > 帮助中心 > 关于 RiceCall。",
   "receive-channel": "接收频道",
   "receive-channel-message-sound-label": "收到频道讯息",
