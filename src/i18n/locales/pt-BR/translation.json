@@ -81,6 +81,7 @@
   "characters": "Caracteres",
   "chat-mode": "Modo do chat",
   "chat-mode-description": "Lalência baixa, qualidade lisa (para fala livre e modo fila)",
+  "clean-up-message": "Limpar mensagem",
   "clear-queue": "Limpar a fila",
   "close": "Fechar",
   "close-setting": "Fechar configuração",
@@ -524,8 +525,8 @@
   "voice-setting": "Configurações de som",
   "warning": "Aviso",
   "wealth": "Fortuna",
+  "week": "週",
   "xp": "Experiência",
   "year": "ano",
-  "yesterday": "Ontem",
-  "clean-up-message": "Limpar mensagem"
+  "yesterday": "Ontem"
 }
