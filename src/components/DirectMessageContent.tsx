@@ -15,9 +15,10 @@ type MessageGroup = (DirectMessage & { contents: string[] }) | (PromptMessage & 
 interface DirectMessageContentProps {
   messages: (DirectMessage | PromptMessage)[];
   user: User;
+  isScrollToBottom?: boolean;
 }
 
-const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ messages }) => {
+const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ messages, isScrollToBottom = true }) => {
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -43,10 +44,9 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
 
   // Effects
   useLayoutEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: 'auto',
-      block: 'end',
-    });
+    if (isScrollToBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+    }
   }, [messageGroups]);
 
   return (

@@ -66,6 +66,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const fontSizeRef = useRef<string>('13px');
   const textColorRef = useRef<string>('#000000');
   const cooldownRef = useRef<number>(0);
+  const isScrollToBottomRef = useRef<boolean>(true);
 
   // States
   const [messageInput, setMessageInput] = useState<string>('');
@@ -220,6 +221,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     [userId, targetId],
   );
 
+  const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    isScrollToBottomRef.current = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
+  };
+
   // Effects
   useEffect(() => {
     editor?.on('selectionUpdate', syncStyles);
@@ -325,8 +330,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               <div className={styles['action-title']}>{t('official-badge')}</div>
             </div>
           )}
-          <div className={styles['message-area']}>
-            <DirectMessageContent messages={directMessages} user={user} />
+          <div onScroll={handleMessageAreaScroll} className={styles['message-area']}>
+            <DirectMessageContent messages={directMessages} user={user} isScrollToBottom={isScrollToBottomRef.current} />
           </div>
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>

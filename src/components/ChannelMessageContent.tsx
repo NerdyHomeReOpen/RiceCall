@@ -17,9 +17,10 @@ interface ChannelMessageContentProps {
   user: User;
   channel: Channel;
   server: Server;
+  isScrollToBottom?: boolean;
 }
 
-const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server }) => {
+const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server, isScrollToBottom = true }) => {
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +46,9 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
 
   // Effects
   useLayoutEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+    if (isScrollToBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+    }
   }, [messageGroups]);
 
   return (

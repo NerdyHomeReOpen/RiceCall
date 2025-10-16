@@ -162,6 +162,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
+    const isScrollToBottomRef = useRef<boolean>(true);
 
     // const screenStreamRef = useRef<MediaStream | null>(null);
     // const screenVideoRef = useRef<HTMLVideoElement>(null);
@@ -169,12 +170,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
+    const [showLastMessage, setShowLastMessage] = useState<boolean>(false);
     const [speakingMode, setSpeakingMode] = useState<SpeakingMode>('key');
     const [speakingKey, setSpeakingKey] = useState<string>('');
     const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
     const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
+
     // Variables
     const { userId, permissionLevel: globalPermissionLevel } = user;
     const { serverId, announcement: serverAnnouncement, permissionLevel: serverPermissionLevel } = server;
@@ -348,6 +351,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       }
     };
 
+    const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
+      isScrollToBottomRef.current = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
+    };
+
     // Effects
     useEffect(() => {
       webRTCRef.current.changeBitrate(channelBitrate);
@@ -436,6 +443,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       return () => unsubscribe.forEach((unsub) => unsub());
     }, []);
 
+    useEffect(() => {
+      if (isScrollToBottomRef.current) return;
+      setShowLastMessage(true);
+      setTimeout(() => {
+        setShowLastMessage(false);
+      }, 10);
+    }, [channelMessages]);
+
     return (
       <main className={styles['server']} style={display ? {} : { display: 'none' }}>
         {/* Body */}
@@ -466,6 +481,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 {/* Message Area */}
                 <div
                   className={styles['message-area']}
+                  onScroll={handleMessageAreaScroll}
                   onContextMenu={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -481,11 +497,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     ]);
                   }}
                 >
-                  <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} />
+                  <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} isScrollToBottom={isScrollToBottomRef.current} />
                 </div>
 
                 {/* Broadcast Area */}
                 <div className={styles['input-area']}>
+                  <div className={`${styles['last-message-area']} ${showLastMessage ? styles['show'] : ''}`}>
+                    <ChannelMessageContent messages={channelMessages.slice(-1)} user={user} channel={channel} server={server} />
+                  </div>
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={channel} server={server} />
                   </div>

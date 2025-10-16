@@ -4,14 +4,14 @@
   flex-direction: column;
   min-width: 0;
   max-width: 100%;
-  gap: 7px;
+  gap: 3px;
 }
 
 .message-wrapper {
   display: flex;
   flex-direction: row;
-  gap: 3px;
   align-items: center;
+  gap: 3px;
 }
 
 .info-icon {

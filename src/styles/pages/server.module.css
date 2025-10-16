@@ -526,18 +526,21 @@
   background-color: #fefee4;
 }
 
-.broadcast-area .broadcast-close {
-  z-index: 2;
-  min-width: 12px;
-  min-height: 12px;
-  position: relative;
-  border-radius: 50%;
-  background-color: #f9c55d;
-  color: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+.last-message-area {
+  z-index: 10;
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  width: 100%;
+  padding: 10px 0;
+  background-color: #fff;
+  opacity: 0;
+  transition: opacity 3000ms ease-in-out;
+}
+
+.last-message-area.show {
+  opacity: 1;
+  transition: opacity 0ms ease-in-out;
 }
 
 .input-area {
@@ -549,6 +552,7 @@
 }
 
 .button-area {
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -559,7 +563,6 @@
   background-repeat: no-repeat;
   background-size: 100% 100%;
   background-color: #dddddf;
-  z-index: 10;
 }
 
 .mic-button {

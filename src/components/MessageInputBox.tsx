@@ -106,7 +106,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   }, [editor, syncStyles]);
 
   return (
-    <div className={`${messageInputBox['messageinput-box']} ${disabled ? messageInputBox['disabled'] : ''} ${isWarning ? messageInputBox['warning'] : ''}`}>
+    <div className={`${messageInputBox['message-input-box']} ${disabled ? messageInputBox['disabled'] : ''} ${isWarning ? messageInputBox['warning'] : ''}`}>
       <div
         className={emoji['emoji-icon']}
         onMouseDown={(e) => {

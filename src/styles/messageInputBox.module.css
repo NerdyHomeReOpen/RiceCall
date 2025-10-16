@@ -1,4 +1,4 @@
-.messageinput-box {
+.message-input-box {
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -10,24 +10,24 @@
   gap: 5px;
 }
 
-.messageinput-box.warning {
+.message-input-box.warning {
   border-color: #f00;
 }
 
-.messageinput-box.disabled {
+.message-input-box.disabled {
   color: #8f8f8f;
   opacity: 0.5;
   pointer-events: none;
 }
 
-.messageinput-box .textarea {
+.message-input-box .textarea {
   flex: 1;
   resize: none;
   border: none !important;
   overflow: auto;
 }
 
-.messageinput-box .textarea div {
+.message-input-box .textarea div {
   height: 100%;
 }
 
