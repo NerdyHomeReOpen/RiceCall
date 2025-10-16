@@ -81,6 +81,7 @@
   "characters": "Karakter",
   "chat-mode": "Sohbet Modu",
   "chat-mode-description": "Düşük gecikme, pürüzsüz ses kalitesi (serbest ve komut modlarındaki kanal sesine uygulanabilir)",
+  "clean-up-message": "Mesajı temizle",
   "clear-queue": "Kuyrugu Temizle",
   "close": "kapanış",
   "close-setting": "Ana pencereyi kapatırken",
@@ -524,8 +525,8 @@
   "voice-setting": "Metin okuma ayarları",
   "warning": "Uyarı",
   "wealth": "Varlık",
+  "week": "週",
   "xp": "integral",
   "year": "yıllar",
-  "yesterday": "dün",
-  "clean-up-message": "Mesajı temizle"
+  "yesterday": "dün"
 }
