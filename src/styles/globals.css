@@ -250,6 +250,5 @@ button {
 input,
 select,
 textarea {
-  background-color: var(--background);
   color: var(--text-color);
 }
