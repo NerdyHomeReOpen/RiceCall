@@ -163,6 +163,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const annAreaRef = useRef<HTMLDivElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
     const isScrollToBottomRef = useRef<boolean>(true);
+    const lastMessageTimer = useRef<NodeJS.Timeout | null>(null);
 
     // const screenStreamRef = useRef<MediaStream | null>(null);
     // const screenVideoRef = useRef<HTMLVideoElement>(null);
@@ -446,9 +447,16 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     useEffect(() => {
       if (isScrollToBottomRef.current) return;
       setShowLastMessage(true);
-      setTimeout(() => {
+      if (lastMessageTimer.current) clearTimeout(lastMessageTimer.current);
+      lastMessageTimer.current = setTimeout(() => {
         setShowLastMessage(false);
-      }, 10);
+      }, 1000);
+      return () => {
+        if (lastMessageTimer.current) {
+          clearTimeout(lastMessageTimer.current);
+          lastMessageTimer.current = null;
+        }
+      };
     }, [channelMessages]);
 
     return (

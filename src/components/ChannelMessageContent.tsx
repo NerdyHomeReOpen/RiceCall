@@ -22,7 +22,7 @@ interface ChannelMessageContentProps {
 
 const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server, isScrollToBottom = true }) => {
   // Refs
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageViewerRef = useRef<HTMLDivElement>(null);
 
   // Memos
   const messageGroups = useMemo(() => {
@@ -46,13 +46,16 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
 
   // Effects
   useLayoutEffect(() => {
-    if (isScrollToBottom) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+    if (isScrollToBottom && messageViewerRef.current?.lastElementChild) {
+      (messageViewerRef.current.lastElementChild as HTMLElement).scrollIntoView({
+        behavior: 'auto',
+        block: 'end',
+      });
     }
-  }, [messageGroups]);
+  }, [messageGroups, isScrollToBottom]);
 
   return (
-    <div className={styles['message-viewer-wrapper']}>
+    <div ref={messageViewerRef} className={styles['message-viewer-wrapper']}>
       {messageGroups.map((messageGroup, index) => (
         <div key={index} className={styles['message-wrapper']}>
           {messageGroup.type === 'general' ? (
@@ -62,7 +65,6 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
           )}
         </div>
       ))}
-      <div ref={messagesEndRef} />
     </div>
   );
 });

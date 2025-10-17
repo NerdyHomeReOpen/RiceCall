@@ -20,7 +20,7 @@ interface DirectMessageContentProps {
 
 const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ messages, isScrollToBottom = true }) => {
   // Refs
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesViewerRef = useRef<HTMLDivElement>(null);
 
   // Memos
   const messageGroups = useMemo(() => {
@@ -44,13 +44,16 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
 
   // Effects
   useLayoutEffect(() => {
-    if (isScrollToBottom) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+    if (isScrollToBottom && messagesViewerRef.current?.lastElementChild) {
+      (messagesViewerRef.current.lastElementChild as HTMLElement).scrollIntoView({
+        behavior: 'auto',
+        block: 'end',
+      });
     }
-  }, [messageGroups]);
+  }, [messageGroups, isScrollToBottom]);
 
   return (
-    <div className={styles['message-viewer-wrapper']}>
+    <div ref={messagesViewerRef} className={styles['message-viewer-wrapper']}>
       {messageGroups.map((messageGroup, index) => {
         return (
           <div key={index} className={styles['message-wrapper']}>
@@ -58,7 +61,6 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
           </div>
         );
       })}
-      <div ref={messagesEndRef} />
     </div>
   );
 });
