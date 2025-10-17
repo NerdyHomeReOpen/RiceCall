@@ -27,7 +27,7 @@
 
 .context-menu .option {
   color: var(--text-color-secondary);
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
   padding: 5px 30px;

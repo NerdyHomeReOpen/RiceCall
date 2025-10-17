@@ -534,13 +534,22 @@
   width: 100%;
   padding: 10px 0;
   background-color: var(--background);
-  opacity: 0;
-  transition: opacity 3000ms ease-in-out;
+  animation: fade-out 2000ms forwards;
+  pointer-events: none;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    display: none;
+  }
 }
 
 .last-message-area.show {
-  opacity: 1;
-  transition: opacity 0ms ease-in-out;
+  animation: none;
 }
 
 .input-area {
