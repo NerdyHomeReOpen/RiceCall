@@ -84,7 +84,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   };
 
   const handleEmojiSelect = (code: string) => {
-    editor?.chain().insertEmoji({ code }).focus().run();
+    editor?.chain().insertEmoji({ code }).setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
     syncStyles();
   };
 

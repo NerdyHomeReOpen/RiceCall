@@ -125,7 +125,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   };
 
   const handleEmojiSelect = (code: string) => {
-    editor?.chain().insertEmoji({ code }).focus().run();
+    editor?.chain().insertEmoji({ code }).setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
     syncStyles();
   };
 
