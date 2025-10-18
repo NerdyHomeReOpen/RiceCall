@@ -219,6 +219,7 @@ button {
 }
 
 /* Hover Text */
+
 .has-hover-text {
   position: relative;
   cursor: pointer;
@@ -251,4 +252,14 @@ input,
 select,
 textarea {
   color: var(--text-color);
+}
+
+/* Tiptap */
+
+.ProseMirror .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #999;
+  float: left;
+  height: 0;
+  pointer-events: none;
 }
