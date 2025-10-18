@@ -67,6 +67,7 @@
   align-items: center;
   justify-content: flex-start;
   user-select: text;
+  word-break: break-all;
   cursor: text;
 }
 
@@ -107,10 +108,10 @@
   gap: 5px;
   width: 100%;
   min-height: 225px;
-  padding-bottom: 45px;
+  padding-bottom: 60px;
   display: flex;
   position: relative;
-  padding-top: 35px;
+  padding-top: 30px;
 }
 
 .window-action-buttons {
@@ -308,7 +309,6 @@
 }
 
 .server-card:hover {
-  background-color: var(--hover);
   border: 1px solid var(--border);
 }
 
