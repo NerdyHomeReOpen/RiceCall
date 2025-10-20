@@ -589,28 +589,43 @@ const RootPageComponent: React.FC = React.memo(() => {
     setIsConnected(true);
   };
 
-  const handleDisconnect = () => {
-    console.info('[Socket] disconnected');
-    setUser(Default.user());
-    setFriends([]);
-    setFriendGroups([]);
-    setFriendApplications([]);
-    setMemberInvitations([]);
-    setServers([]);
-    setServerOnlineMembers([]);
-    setChannels([]);
-    setChannelMessages([]);
-    setActionMessages([]);
-    setSystemNotify([]);
-    setQueueUsers([]);
-    setAnnouncements([]);
-    setNotifies([]);
-    setRecommendServers([]);
+  const handleDisconnect = (reason?: string) => {
+    console.info('[Socket] disconnected, reason:', reason);
+    
+    // Only clear state if disconnect is intentional (logout or server-initiated)
+    // Don't clear state for temporary network issues that will auto-reconnect
+    const shouldClearState = 
+      reason === 'io server disconnect' || 
+      reason === 'io client disconnect';
+    
+    if (shouldClearState) {
+      console.info('[Socket] Clearing state due to intentional disconnect');
+      setUser(Default.user());
+      setFriends([]);
+      setFriendGroups([]);
+      setFriendApplications([]);
+      setMemberInvitations([]);
+      setServers([]);
+      setServerOnlineMembers([]);
+      setChannels([]);
+      setChannelMessages([]);
+      setActionMessages([]);
+      setSystemNotify([]);
+      setQueueUsers([]);
+      setAnnouncements([]);
+      setNotifies([]);
+      setRecommendServers([]);
+    } else {
+      console.info('[Socket] Preserving state for reconnection');
+    }
+    
     setIsConnected(false);
   };
 
   const handleReconnect = (attemptNumber: number) => {
-    console.info('[Socket] reconnecting, attempt number:', attemptNumber);
+    console.info('[Socket] reconnected successfully, attempt number:', attemptNumber);
+    // Connection will be set to true by the 'connect' event that follows
+    // State is preserved from before disconnect, so user stays in their room
   };
 
   const handleError = (message: string) => {

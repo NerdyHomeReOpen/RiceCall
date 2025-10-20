@@ -284,7 +284,7 @@ export type ClientToServerEvents = {
 export type ServerToClientEvents = {
   // Socket
   connect: () => void;
-  disconnect: () => void;
+  disconnect: (reason?: string) => void;
   reconnect: (attemptNumbers: number) => void;
   error: (message: string) => void;
   connect_error: (error: any) => void;
