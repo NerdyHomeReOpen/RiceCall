@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: var(--foreground);
+  background-color: var(--background);
 }
 
 .popup-wrapper:focus {

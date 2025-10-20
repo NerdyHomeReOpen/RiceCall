@@ -306,6 +306,8 @@
   width: calc(50% - 2.5px);
   padding: 5px;
   align-items: center;
+  border: 1px solid var(--border-secondary);
+  cursor: pointer;
 }
 
 .server-card:hover {
@@ -341,7 +343,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  cursor: pointer;
 }
 
 .contribution-value-text {
@@ -367,8 +368,6 @@
   display: flex;
   align-items: center;
   color: var(--text-color-quaternary);
-  cursor: text;
-  user-select: text;
 }
 
 .display-id-text::before {
@@ -402,7 +401,7 @@
   min-height: 45px;
   padding: 10px;
   gap: 10px;
-  background: linear-gradient(to bottom, var(--background), var(--foreground));
+  background: linear-gradient(to bottom, var(--background), var(--sidebar));
   border-bottom: 1px solid var(--border-secondary);
 }
 

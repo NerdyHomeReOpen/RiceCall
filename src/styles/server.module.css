@@ -1091,7 +1091,7 @@
   width: 14px;
   height: 14px;
   background-color: var(--background);
-  border: 2px solid var(--border);
+  border: 2px solid var(--border-tertiary);
   border-radius: 50%;
   cursor: pointer;
 }
