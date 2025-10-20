@@ -55,7 +55,7 @@ const MicModeMenu: React.FC = React.memo(() => {
               min="0"
               max="100"
               value={webRTC.voiceThreshold}
-              style={{ backgroundColor: voiceThresholdColor }}
+              style={{ background: voiceThresholdColor }}
               onChange={(e) => handleEditVoiceThreshold(parseInt(e.target.value))}
             />
             <div className={`${server['voice-state-icon']} ${isActive ? server['active'] : ''}`} />
