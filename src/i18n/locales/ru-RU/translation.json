@@ -81,6 +81,7 @@
   "characters": "Символы",
   "chat-mode": "Стандартное",
   "chat-mode-description": "Для голосового общения и дискуссий",
+  "clean-up-message": "сообщение об очистке",
   "clear-queue": "Очистить очередь",
   "close": "Закрыть",
   "close-setting": "Настройки окна",
@@ -524,8 +525,8 @@
   "voice-setting": "Настройки голоса",
   "warning": "Предупреждение",
   "wealth": "Вклад",
+  "week": "Hеделя",
   "xp": "Опыт",
   "year": "год",
-  "yesterday": "Вчера",
-  "clean-up-message": "сообщение об очистке"
+  "yesterday": "Вчера"
 }
