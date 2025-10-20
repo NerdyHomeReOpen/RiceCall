@@ -17,11 +17,12 @@ interface ChannelMessageContentProps {
   user: User;
   channel: Channel;
   server: Server;
+  isScrollToBottom?: boolean;
 }
 
-const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server }) => {
+const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server, isScrollToBottom = true }) => {
   // Refs
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageViewerRef = useRef<HTMLDivElement>(null);
 
   // Memos
   const messageGroups = useMemo(() => {
@@ -45,26 +46,25 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
 
   // Effects
   useLayoutEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: 'auto',
-      block: 'end',
-    });
-  }, [messageGroups]);
+    if (isScrollToBottom && messageViewerRef.current?.lastElementChild) {
+      (messageViewerRef.current.lastElementChild as HTMLElement).scrollIntoView({
+        behavior: 'auto',
+        block: 'end',
+      });
+    }
+  }, [messageGroups, isScrollToBottom]);
 
   return (
-    <div className={styles['message-viewer-wrapper']}>
-      {messageGroups.map((messageGroup, index) => {
-        return (
-          <div key={index} className={styles['message-wrapper']}>
-            {messageGroup.type === 'general' ? (
-              <ChannelMessageTab messageGroup={messageGroup} user={user} channel={channel} server={server} />
-            ) : (
-              <PromptMessageTab messageGroup={messageGroup} messageType={messageGroup.type} />
-            )}
-          </div>
-        );
-      })}
-      <div ref={messagesEndRef} />
+    <div ref={messageViewerRef} className={styles['message-viewer-wrapper']}>
+      {messageGroups.map((messageGroup, index) => (
+        <div key={index} className={styles['message-wrapper']}>
+          {messageGroup.type === 'general' ? (
+            <ChannelMessageTab messageGroup={messageGroup} user={user} channel={channel} server={server} />
+          ) : (
+            <PromptMessageTab messageGroup={messageGroup} messageType={messageGroup.type} />
+          )}
+        </div>
+      ))}
     </div>
   );
 });

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
-import styles from '@/styles/pages/login.module.css';
+import styles from '@/styles/login.module.css';
 
 // Services
 import auth from '@/services/auth.service';

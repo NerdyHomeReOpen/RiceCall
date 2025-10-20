@@ -6,8 +6,9 @@
   justify-content: flex-start;
   align-items: center;
   padding: 15px;
-  overflow-y: scroll;
   gap: 5px;
+  background-color: var(--foreground);
+  overflow-y: scroll;
 }
 
 .header {
@@ -23,11 +24,11 @@
 }
 
 .all-cancel-text:hover {
-  color: #666;
+  color: var(--text-color-quaternary);
 }
 
 .all-cancel-text:active {
-  color: #999;
+  color: var(--text-color-senary);
 }
 
 .body {
@@ -52,7 +53,7 @@
 }
 
 .time-text {
-  color: #666;
+  color: var(--text-color-quaternary);
 }
 
 .avatar-picture {
@@ -62,7 +63,7 @@
   background-image: url('/im/SecretaryLogo.png');
   background-size: cover;
   background-position: center;
-  border: 1px solid #969696;
+  border: 1px solid var(--border);
   margin-right: 15px;
 }
 
@@ -72,14 +73,14 @@
   justify-content: space-between;
   align-items: flex-start;
   height: 80px;
-  border: 1px solid #d8d8d8;
-  background-color: #f6f6f6;
+  border: 1px solid var(--border);
+  background-color: var(--background);
   padding: 2px;
 }
 
 .content-text {
   display: flex;
-  color: #5e5e5e;
+  color: var(--text-color-quaternary);
   word-break: break-all;
   overflow-y: auto;
 }
@@ -101,30 +102,28 @@
   align-items: center;
   justify-content: center;
   padding: 3px;
-  background-color: #fbfbfb;
-  border: 1px solid #9d9e9f;
-  border-top: 1px solid #9d9e9f;
-  border-bottom: 1px solid #9d9e9f;
+  background-color: var(--background);
+  border: 1px solid var(--border);
   height: 23px;
 }
 
 .action-buttons .button:last-child {
-  border-right: 1px solid #9d9e9f;
+  border-right: 1px solid var(--border);
 }
 
 .action-buttons .button:hover {
-  background-color: #fbfbfb;
-  border-color: #666;
+  background-color: var(--hover);
+  border-color: var(--border);
 }
 
 .action-buttons .button:active {
-  background-color: #e8e8e8;
-  border-color: #9f9f9f;
+  background-color: var(--selected);
+  border-color: var(--border);
 }
 
 .direct-message-button {
-  height: 27px;
-  width: 27px;
+  height: 28px;
+  width: 30px;
   cursor: pointer;
 }
 

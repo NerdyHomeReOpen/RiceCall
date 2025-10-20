@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 
 // CSS
-import setting from '@/styles/popups/setting.module.css';
+import setting from '@/styles/setting.module.css';
 import popup from '@/styles/popup.module.css';
 import permission from '@/styles/permission.module.css';
 
@@ -413,7 +413,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <tr>
                       {memberTableFields.map((field) => (
                         <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '↑' : '↓') : ''}`}
+                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                         </th>
                       ))}
                     </tr>
@@ -597,7 +597,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <tr>
                       {applicationTableFields.map((field) => (
                         <th key={field.field} onClick={() => handleApplicationSort(field.field as keyof MemberApplication)}>
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '↑' : '↓') : ''}`}
+                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                         </th>
                       ))}
                     </tr>
@@ -672,7 +672,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <tr>
                       {blockMemberTableFields.map((field) => (
                         <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '↑' : '↓') : ''}`}
+                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                         </th>
                       ))}
                     </tr>

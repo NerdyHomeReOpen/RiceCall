@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
+import setting from '@/styles/setting.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
@@ -507,7 +507,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   <tr>
                     {memberTableFields.map((field) => (
                       <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '↑' : '↓') : ''}`}
+                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                       </th>
                     ))}
                   </tr>

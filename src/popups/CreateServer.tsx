@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 
 // CSS
-import styles from '@/styles/popups/createServer.module.css';
+import styles from '@/styles/createServer.module.css';
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
+import setting from '@/styles/setting.module.css';
 
 // Types
 import type { User, Server } from '@/types';

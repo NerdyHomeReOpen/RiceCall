@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 
 // CSS
-import styles from '@/styles/pages/server.module.css';
+import styles from '@/styles/server.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
@@ -162,7 +162,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
         hoverTimerRef.current = null;
       }}
-      draggable={!isUser && isChannelMod(permissionLevel) && isSuperior}
+      draggable={!isUser && isServerAdmin(permissionLevel) && isSuperior}
       onDragStart={(e) => handleDragStart(e, memberUserId, channelId)}
       onContextMenu={(e) => {
         e.stopPropagation();
@@ -217,7 +217,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'move-to-channel',
             label: t('move-to-channel'),
-            show: !isUser && isChannelMod(permissionLevel) && !isSameChannel && isSuperior,
+            show: !isUser && isServerAdmin(permissionLevel) && !isSameChannel && isSuperior,
             onClick: () => handleMoveUserToChannel(memberUserId, serverId, userCurrentChannelId || ''),
           },
           {

@@ -2,16 +2,66 @@
   --main-color: #0073c6;
   --secondary-color: #fff;
   --header-image: none;
-  --background: 0.97 0.01 275;
-  --foreground: 0.2 0.01 275;
+  --background: #fff;
+  --foreground: #f7f7f7;
+  --sidebar: #f1f1f1;
+  --border: #ccc;
+  --border-secondary: #ddd;
+  --border-tertiary: #999;
+  --shadow: #00000080;
+  --hover: #d1d5da5c;
+  --selected: #d8dadc;
+  --text-color: #000;
+  --text-color-secondary: #222;
+  --text-color-tertiary: #444;
+  --text-color-quaternary: #666;
+  --text-color-quinary: #888;
+  --text-color-senary: #aaa;
+  --text-color-septenary: #ccc;
+  --text-color-octonary: #eee;
+  --text-warning: #ff3030;
+  --text-link: #2563eb;
+  --text-link-hover: #1d4ed8;
+  --text-username: #2f94db;
+  --text-username-hover: #1d4ed8;
+  --text-vip-name: #e4493e;
+  --text-vip-name-hover: #9c3028;
+  --text-nickname: #6e849b;
+  --notify-toaster-border: #f9c55d;
+  --notify-toaster-background: #fefee4;
+  --button-background: linear-gradient(#fafafb, #e9e9ed);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --main-color: #0073c6;
-    --secondary-color: #fff;
-    --background: 0.2 0.01 275;
-    --foreground: 0.9 0.01 275;
+    /* --background: #1f1f1f;
+    --foreground: #292929;
+    --sidebar: #242424;
+    --border: #333;
+    --border-secondary: #222;
+    --border-tertiary: #444;
+    --shadow: #00000080;
+    --hover: #333;
+    --selected: #444;
+    --text-color: #eee;
+    --text-color-secondary: #ccc;
+    --text-color-tertiary: #aaa;
+    --text-color-quaternary: #888;
+    --text-color-quinary: #666;
+    --text-color-senary: #444;
+    --text-color-septenary: #222;
+    --text-color-octonary: #000;
+    --text-warning: #ff3030;
+    --text-link: #76a1ff;
+    --text-link-hover: #5c8aff;
+    --text-username: #2f94db;
+    --text-username-hover: #1d4ed8;
+    --text-vip-name: #e4493e;
+    --text-vip-name-hover: #9c3028;
+    --text-nickname: #6e849b;
+    --notify-toaster-border: #855800;
+    --notify-toaster-background: #3b3b00;
+    --button-background: linear-gradient(#242424, #1f1f1f); */
   }
 }
 
@@ -36,8 +86,8 @@ body {
   font-size: 13px;
   --font-family: Arial, sans-serif;
   overflow: clip;
-  color: var(--foreground);
-  background: none;
+  color: var(--text-color);
+  background-color: var(--background);
   user-select: none;
 }
 
@@ -53,41 +103,41 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #6d6d6d0f;
+  background-color: #6d6d6d0f;
   border-radius: 4px;
   border: 1px solid #6d6d6d26;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6d6d6d38;
+  background-color: #6d6d6d38;
 }
 
 /* Resize Handle */
 
 .resize-handle {
-  min-width: 3px;
+  min-width: 2px;
   height: 100%;
-  background: rgb(229 231 235);
+  background-color: var(--border-secondary);
   cursor: col-resize;
-  transition: background 0.1s ease-in-out;
+  transition: background-color 0.1s ease-in-out;
 }
 
 .resize-handle:active,
 .resize-handle:hover {
-  background: rgb(200 202 206);
+  background-color: var(--border-tertiary);
 }
 
 .resize-handle-vertical {
   width: 100%;
   min-height: 3px;
-  background: rgb(229 231 235);
+  background-color: var(--border-secondary);
   cursor: row-resize;
-  transition: background 0.1s ease-in-out;
+  transition: background-color 0.1s ease-in-out;
 }
 
 .resize-handle-vertical:active,
 .resize-handle-vertical:hover {
-  background: rgb(200 202 206);
+  background-color: var(--border);
 }
 
 /* Radio & Checkbox */
@@ -102,8 +152,8 @@ input[type='checkbox'] {
 
 input[type='radio'],
 input[type='checkbox'] {
-  min-height: 20px;
-  min-width: 20px;
+  min-height: 19px;
+  min-width: 19px;
   background-size: inherit;
   background-position: 0 0;
   cursor: pointer;
@@ -169,6 +219,7 @@ button {
 }
 
 /* Hover Text */
+
 .has-hover-text {
   position: relative;
   cursor: pointer;
@@ -189,10 +240,26 @@ button {
   height: 20px;
   padding-right: 3px;
   padding-left: 3px;
-  background: #fff;
-  border: 1px solid #777;
+  background-color: var(--background);
+  border: 1px solid var(--border);
   border-radius: 3px;
   white-space: nowrap;
-  color: #777;
+  color: var(--text-color-quinary);
   opacity: 0;
+}
+
+input,
+select,
+textarea {
+  color: var(--text-color);
+}
+
+/* Tiptap */
+
+.ProseMirror .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #999;
+  float: left;
+  height: 0;
+  pointer-events: none;
 }

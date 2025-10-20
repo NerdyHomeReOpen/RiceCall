@@ -1,9 +1,9 @@
 .vip-name-color {
-  color: #e4493e /* #d16059 */ !important;
+  color: var(--text-vip-name) /* #d16059 */ !important;
 }
 
 .vip-name-color.clickable:hover {
-  color: #9c3028 !important;
+  color: var(--text-vip-name-hover) !important;
 }
 
 .vip-icon {

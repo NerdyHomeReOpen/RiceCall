@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 
 // CSS
-import styles from '@/styles/pages/server.module.css';
+import styles from '@/styles/server.module.css';
 
 // Types
 import type { OnlineMember, Channel, Server, User, Friend } from '@/types';
@@ -133,7 +133,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
           else setSelectedItemId(`channel-${channelId}`);
         }}
         onDoubleClick={() => handleConnectChannel(serverId, channelId)}
-        draggable={isChannelMod(permissionLevel) && channelMembers.length > 0}
+        draggable={isServerAdmin(permissionLevel) && channelMembers.length > 0}
         onDragStart={(e) => handleDragStart(e, channelMembers, channelId)}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
@@ -190,7 +190,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
             {
               id: 'move-all-user-to-channel',
               label: t('move-all-user-to-channel'),
-              show: !isInChannel && isChannelMod(permissionLevel) && channelUserIds.length > 0,
+              show: !isInChannel && isServerAdmin(permissionLevel) && channelUserIds.length > 0,
               onClick: () => handleMoveAllUsersToChannel(channelUserIds, serverId, userCurrentChannelId || ''),
             },
             {

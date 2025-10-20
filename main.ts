@@ -287,7 +287,7 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   blockMember: { height: 250, width: 400 },
   channelSetting: { height: 520, width: 600 },
   channelPassword: { height: 200, width: 380 },
-  changeTheme: { height: 340, width: 480 },
+  changeTheme: { height: 335, width: 480 },
   createServer: { height: 436, width: 478 },
   createChannel: { height: 200, width: 380 },
   createFriendGroup: { height: 200, width: 380 },
@@ -445,9 +445,11 @@ let mainWindow: BrowserWindow | null = null;
 let authWindow: BrowserWindow | null = null;
 let popups: Record<string, BrowserWindow> = {};
 
-async function createMainWindow(): Promise<BrowserWindow> {
+async function createMainWindow(title?: string): Promise<BrowserWindow> {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.focus();
+    mainWindow.showInactive();
+    mainWindow.setAlwaysOnTop(true);
+    mainWindow.flashFrame(true);
     return mainWindow;
   }
 
@@ -459,7 +461,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
   }
 
   mainWindow = new BrowserWindow({
-    title: `Raidcall v${app.getVersion()}`,
+    title: title || VERSION_TITLE,
     width: 1080,
     height: 720,
     minWidth: 800,
@@ -472,6 +474,7 @@ async function createMainWindow(): Promise<BrowserWindow> {
     fullscreenable: true,
     hasShadow: true,
     icon: APP_ICON,
+    show: false,
     webPreferences: {
       devTools: false,
       webviewTag: true,
@@ -491,6 +494,10 @@ async function createMainWindow(): Promise<BrowserWindow> {
     mainWindow.loadURL(`${BASE_URI}`);
     // mainWindow.webContents.openDevTools();
   }
+
+  mainWindow.on('focus', () => {
+    mainWindow?.flashFrame(false);
+  });
 
   mainWindow.on('close', (e) => {
     e.preventDefault();
@@ -517,9 +524,11 @@ async function createMainWindow(): Promise<BrowserWindow> {
   return mainWindow;
 }
 
-async function createAuthWindow(): Promise<BrowserWindow> {
+async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   if (authWindow && !authWindow.isDestroyed()) {
-    authWindow.focus();
+    authWindow.showInactive();
+    authWindow.moveTop();
+    authWindow.flashFrame(true);
     return authWindow;
   }
 
@@ -531,7 +540,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
   }
 
   authWindow = new BrowserWindow({
-    title: `Raidcall v${app.getVersion()}`,
+    title: title || VERSION_TITLE,
     width: 640,
     height: 480,
     thickFrame: true,
@@ -542,6 +551,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
     fullscreenable: false,
     hasShadow: true,
     icon: APP_ICON,
+    show: false,
     webPreferences: {
       devTools: false,
       webviewTag: true,
@@ -561,6 +571,10 @@ async function createAuthWindow(): Promise<BrowserWindow> {
     // authWindow.webContents.openDevTools();
   }
 
+  authWindow.on('focus', () => {
+    authWindow?.flashFrame(false);
+  });
+
   authWindow.on('close', (e) => {
     e.preventDefault();
     app.exit();
@@ -574,7 +588,7 @@ async function createAuthWindow(): Promise<BrowserWindow> {
   return authWindow;
 }
 
-async function createPopup(type: PopupType, id: string, data: unknown, force = true): Promise<BrowserWindow> {
+async function createPopup(type: PopupType, id: string, data: unknown, force = true, title?: string): Promise<BrowserWindow> {
   // If force is true, destroy the popup
   if (force) {
     if (popups[id] && !popups[id].isDestroyed()) {
@@ -582,8 +596,9 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     }
   } else {
     if (popups[id] && !popups[id].isDestroyed()) {
-      popups[id].show();
-      popups[id].focus();
+      popups[id].showInactive();
+      popups[id].moveTop();
+      popups[id].flashFrame(true);
       return popups[id];
     }
   }
@@ -596,7 +611,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
   }
 
   popups[id] = new BrowserWindow({
-    title: `Raidcall v${app.getVersion()}`,
+    title: title || VERSION_TITLE,
     width: PopupSize[type].width,
     height: PopupSize[type].height,
     thickFrame: true,
@@ -607,6 +622,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     fullscreenable: false,
     hasShadow: true,
     icon: APP_ICON,
+    show: false,
     webPreferences: {
       devTools: false,
       webviewTag: true,
@@ -614,7 +630,6 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
       contextIsolation: false,
       backgroundThrottling: false,
     },
-    modal: true,
     trafficLightPosition: { x: -100, y: -100 },
   });
 
@@ -632,15 +647,20 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     event.returnValue = data;
   });
 
+  popups[id].on('ready-to-show', () => {
+    popups[id].showInactive();
+    popups[id].moveTop();
+    popups[id].flashFrame(true);
+  });
+
+  popups[id].on('focus', () => {
+    popups[id].flashFrame(false);
+  });
+
   popups[id].on('close', (e) => {
     e.preventDefault();
     popups[id].destroy();
     delete popups[id];
-  });
-
-  popups[id].webContents.once('did-finish-load', () => {
-    popups[id].show();
-    popups[id].focus();
   });
 
   popups[id].webContents.setWindowOpenHandler(({ url }) => {
@@ -717,25 +737,15 @@ function connectSocket(token: string): Socket | null {
         // Handle special events
         if (event === 'shakeWindow') {
           const initialData = args[0].initialData;
-          const title = initialData.name ?? '';
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
-            const prefixTitle = title !== '' ? `${title} · ` : '';
-            popup.webContents.on('did-finish-load', () => {
-              popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
-            });
-            // popup.show();
-          });
+          const title = initialData.name;
+          const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
         }
         if (event === 'directMessage') {
           const initialData = args[0].initialData;
-          const title = initialData.name ?? '';
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false).then((popup) => {
-            const prefixTitle = title !== '' ? `${title} · ` : '';
-            popup.webContents.on('did-finish-load', () => {
-              popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
-            });
-            // popup.show();
-          });
+          const title = initialData.name;
+          const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
         }
       });
     });
@@ -774,7 +784,7 @@ function connectSocket(token: string): Socket | null {
   socket.on('error', (error) => {
     console.error(`${new Date().toLocaleString()} | Socket error:`, error.message);
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('error', error);
+      window.webContents.send('error', error.message);
     });
   });
 
@@ -925,8 +935,8 @@ function setTrayDetail(isLogin: boolean) {
       label: t('open-main-window'),
       type: 'normal',
       click: () => {
-        if (isLogin) mainWindow?.show();
-        else authWindow?.show();
+        if (isLogin) mainWindow?.showInactive();
+        else authWindow?.showInactive();
       },
     },
     { type: 'separator' },
@@ -957,8 +967,8 @@ function configureTray() {
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
   tray.setToolTip(VERSION_TITLE);
   tray.on('click', () => {
-    if (isLogin) mainWindow?.show();
-    else authWindow?.show();
+    if (isLogin) mainWindow?.showInactive();
+    else authWindow?.showInactive();
   });
   setTrayDetail(isLogin);
 }
@@ -971,10 +981,8 @@ app.on('ready', async () => {
   configureDiscordRPC();
   configureTray();
 
-  if (!store.get('dontShowDisclaimer')) {
-    createPopup('aboutus', 'aboutUs', {});
-  }
-  createAuthWindow().then((authWindow) => authWindow.show());
+  if (!store.get('dontShowDisclaimer')) createPopup('aboutus', 'aboutUs', {});
+  createAuthWindow().then((authWindow) => authWindow.showInactive());
   createMainWindow().then((mainWindow) => mainWindow.hide());
 
   ipcMain.on('exit', () => {
@@ -1007,7 +1015,7 @@ app.on('ready', async () => {
   // Auth handlers
   ipcMain.on('login', (_, _token) => {
     token = _token;
-    mainWindow?.show();
+    mainWindow?.showInactive();
     authWindow?.hide();
     socketInstance = connectSocket(token);
     isLogin = true;
@@ -1021,7 +1029,7 @@ app.on('ready', async () => {
     closePopups();
     token = '';
     mainWindow?.hide();
-    authWindow?.show();
+    authWindow?.showInactive();
     socketInstance = disconnectSocket();
     isLogin = false;
     setTrayDetail(isLogin);
@@ -1030,11 +1038,9 @@ app.on('ready', async () => {
   // toolbar handlers
   ipcMain.on('set-toolbar-title', (_, title: string) => {
     if (!tray) return;
-    tray.setToolTip(`${title ? `${title} · ` : ''}${VERSION_TITLE}`);
-
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.setTitle(`${title} · ${MAIN_TITLE}`);
-    }
+    const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+    tray.setToolTip(fullTitle);
+    mainWindow?.setTitle(fullTitle);
   });
 
   // Language handlers
@@ -1095,15 +1101,10 @@ app.on('ready', async () => {
   });
 
   // Popup handlers
-  ipcMain.on('open-popup', (_, type, id, data?, force = true, title = '') => {
+  ipcMain.on('open-popup', (_, type, id, data?, force = true, title?: string) => {
     console.log(`${new Date().toLocaleString()} | open popup`, type, id, title);
-    createPopup(type, id, data ?? {}, force).then((popup) => {
-      const prefixTitle = title !== '' ? `${title} · ` : '';
-      popup.webContents.on('did-finish-load', () => {
-        popup.setTitle(`${prefixTitle}${MAIN_TITLE}`);
-      });
-      popup.show();
-    });
+    const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+    createPopup(type, id, data ?? {}, force, fullTitle);
   });
 
   ipcMain.on('close-popup', (_, id) => {
@@ -1637,8 +1638,8 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createAuthWindow().then((authWindow) => authWindow.show());
-    createMainWindow().then((mainWindow) => mainWindow.hide());
+    createAuthWindow().then((authWindow) => authWindow.showInactive());
+    createMainWindow().then((mainWindow) => mainWindow.showInactive());
   }
 });
 

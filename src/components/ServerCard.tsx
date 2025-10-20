@@ -1,7 +1,7 @@
 import React from 'react';
 
 // CSS
-import homePage from '@/styles/pages/home.module.css';
+import homePage from '@/styles/home.module.css';
 
 // Providers
 import { useContextMenu } from '@/providers/ContextMenu';

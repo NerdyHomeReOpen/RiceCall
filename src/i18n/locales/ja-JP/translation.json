@@ -81,6 +81,7 @@
   "characters": "キャラクタ",
   "chat-mode": "僅用於中文",
   "chat-mode-description": "低遅延、スムーズな品質（フリーモードと管理者モードのチャンネル）",
+  "clean-up-message": "クリーンアップメッセージ",
   "clear-queue": "キューをクリアする",
   "close": "閉じる",
   "close-setting": "設定を閉じる",
@@ -524,6 +525,7 @@
   "voice-setting": "音声設定",
   "warning": "注意",
   "wealth": "富の値",
+  "week": "週",
   "xp": "クレジット",
   "year": "年",
   "yesterday": "昨日"

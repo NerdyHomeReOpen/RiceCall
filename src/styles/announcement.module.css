@@ -10,10 +10,10 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  background-color: #fff;
+  background-color: var(--background);
   align-items: center;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   box-shadow: 0 1px 1px #00000080;
 }
 
@@ -24,7 +24,7 @@
   width: 100%;
   height: 100%;
   padding: 10px 5px;
-  color: #898987;
+  color: var(--text-color-quaternary);
   font-weight: bold;
   transition: color 0.1s ease;
   &::after {
@@ -52,11 +52,11 @@
   flex-direction: column;
   font-weight: bold;
   margin-top: 10px;
-  overflow-y: auto;
+  background-color: var(--background);
   border-radius: 5px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  box-shadow: 0 1px 1px #00000080;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 1px var(--shadow);
+  overflow-y: auto;
 }
 
 .announcement-item {
@@ -65,20 +65,20 @@
   align-items: center;
   padding: 10px;
   gap: 10px;
-  color: #666;
-  border-bottom: 1px solid #ccc;
+  color: var(--text-color-quaternary);
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
   &:hover {
-    background-color: #f1f2f5;
+    background-color: var(--hover);
   }
 }
 
 .announcement-type {
   padding: 5px;
   border-radius: 5px;
-  border: 1px solid #666;
-  background-color: #f1f2f5;
-  color: #666;
+  border: 1px solid var(--border);
+  background-color: var(--hover);
+  color: var(--text-color-quaternary);
   min-width: 50px;
   width: fit-content;
   text-align: center;
@@ -127,7 +127,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #00000060;
+  background-color: var(--shadow);
 }
 
 .announcement-detail-container {
@@ -137,9 +137,9 @@
   height: 80%;
   padding: 10px;
   border-radius: 5px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  box-shadow: 0 1px 1px #00000080;
+  border: 1px solid var(--border);
+  background-color: var(--background);
+  box-shadow: 0 1px 1px var(--shadow);
   overflow-y: auto;
 }
 
@@ -150,7 +150,7 @@
   gap: 10px;
   align-items: center;
   padding: 10px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--border);
   font-weight: bold;
   font-size: 1.2em;
 }

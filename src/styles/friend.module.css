@@ -119,7 +119,7 @@
 }
 
 .wealth-value-text {
-  color: #7e7c6e;
+  color: var(--text-color-quaternary);
   text-align: left;
 }
 
@@ -128,7 +128,7 @@
   width: 60%;
   height: 40px;
   align-items: center;
-  border: 1px solid #ffff;
+  border: 1px solid #fff0;
   margin-left: 100px;
   padding: 2px 5px;
   gap: 5px;
@@ -147,13 +147,12 @@
 
 .signature-input:empty::before {
   content: attr(data-placeholder-text);
-  color: #000;
   pointer-events: none;
   display: block;
 }
 
 .signature-wrapper:focus-within {
-  border: 1px solid #dfe2e5;
+  border: 1px solid var(--border);
   border-radius: 3px;
 }
 
@@ -186,7 +185,7 @@
   min-height: 0;
   width: 280px;
   min-width: 280px;
-  background-color: #f1f2f5;
+  background-color: var(--sidebar);
 }
 
 .sidebar .navigate-tabs {
@@ -252,18 +251,17 @@
   display: flex;
   align-items: center;
   padding: 10px;
-  border-bottom: 1px solid #ddd;
   padding-top: 0;
   padding-bottom: 0;
   padding-right: 0;
-  border-top: 1px solid #ddd;
-  background: #fff;
+  border-top: 1px solid var(--border-secondary);
+  border-bottom: 1px solid var(--border-secondary);
+  background-color: var(--background);
 }
 
 .search-bar .search-input {
   flex: 1;
   padding: 5px;
-  border: 1px solid #fff;
   width: 125px;
 }
 
@@ -280,7 +278,7 @@
 }
 
 .prev-icon {
-  min-width: 30px;
+  min-width: 29px;
   min-height: 30px;
   background-image: url('/channel/search_pre.png');
   background-repeat: no-repeat;
@@ -289,7 +287,7 @@
 }
 
 .next-icon {
-  min-width: 30px;
+  min-width: 29px;
   min-height: 30px;
   background-image: url('/channel/search_next.png');
   background-repeat: no-repeat;
@@ -313,26 +311,26 @@
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background-color: #f4f4f5;
-  border-top: 1px solid #e3e3e5;
+  background-color: var(--sidebar);
+  border-top: 1px solid var(--border);
   border-bottom-left-radius: 5px;
 }
 
 .sidebar-footer .button {
   display: flex;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #fff;
   text-align: left;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: #6e7c7e;
   padding: 5px 20px;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--text-color-quaternary);
 }
 
 .sidebar-footer .button:hover {
-  background-color: #d1d5da5c;
+  background-color: var(--hover);
 }
 
 .sidebar-footer .button[datatype='addGroup']::before {
@@ -367,11 +365,11 @@
 }
 
 .friend-group-list .friend-group-tab.selected {
-  background-color: #d8dadc;
+  background-color: var(--selected);
 }
 
-.friend-group-list .friend-group-tab:not(.selected):hover {
-  background-color: #d1d5da;
+.friend-group-list .friend-group-tab:hover {
+  background-color: var(--hover);
 }
 
 .friend-group-list .friend-group-tab .toggle-icon {
@@ -404,11 +402,11 @@
 }
 
 .friend-tab.selected {
-  background-color: #d8dadc;
+  background-color: var(--selected);
 }
 
 .friend-tab:not(.selected):hover {
-  background-color: #d1d5da5c;
+  background-color: var(--hover);
 }
 
 .friend-tab .name-text {
@@ -419,7 +417,7 @@
 }
 
 .friend-tab .signature {
-  color: #888;
+  color: var(--text-color-quaternary);
   overflow: hidden;
   min-height: 18px;
   white-space: nowrap;
@@ -459,14 +457,14 @@
   flex: 1;
   min-width: 500px;
   min-height: 0;
-  border-top: 2px solid #e0e0e4;
-  background-color: #f4f6fa;
+  border-top: 2px solid var(--border-secondary);
+  background-color: var(--foreground);
 }
 
 .content .header {
   font-size: 1em;
   padding: 10px;
-  background-color: #f4f6fa;
+  background-color: var(--foreground);
   font-weight: bold;
 }
 
@@ -557,7 +555,7 @@
 }
 
 .signature {
-  color: #5c5d5e;
+  color: var(--text-color-quaternary);
   word-wrap: break-word;
   word-break: break-word;
   white-space: normal;
@@ -574,6 +572,6 @@
 }
 
 .public-time {
-  color: #8a8b8f;
+  color: var(--text-color-quaternary);
   font-size: 0.95rem;
 }

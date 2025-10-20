@@ -5,10 +5,10 @@
   flex-direction: column;
   justify-content: space-around;
   min-width: max-content;
-  background: #fff;
-  border: 1px solid #ccc;
+  background-color: var(--background);
+  border: 1px solid var(--border);
   border-radius: 5px;
-  box-shadow: 0 1px 1px #00000080;
+  box-shadow: 0 1px 1px var(--shadow);
   overflow: hidden;
 }
 
@@ -26,13 +26,13 @@
 }
 
 .context-menu .option {
-  position: relative;
-  display: flex;
+  color: var(--text-color-secondary);
   justify-content: flex-start;
   align-items: center;
   width: 100%;
   padding: 5px 30px;
-  color: #333;
+  display: flex;
+  position: relative;
 }
 
 .context-menu .option::before {
@@ -103,7 +103,7 @@
 }
 
 .context-menu .option:hover {
-  background: #eee;
+  background-color: var(--hover);
 }
 
 .context-menu .option.has-submenu .context-menu {
@@ -115,7 +115,7 @@
 }
 
 .context-menu .option.disabled {
-  color: #ccc;
+  color: var(--text-color-senary);
   cursor: not-allowed;
 }
 
@@ -127,10 +127,10 @@
   justify-content: space-around;
   min-width: 154px;
   max-width: 154px;
-  background: #fff;
-  border: 1px solid #ccc;
+  background-color: var(--background);
+  border: 1px solid var(--border);
   border-radius: 5px;
-  box-shadow: 0 1px 1px #00000080;
+  box-shadow: 0 1px 1px var(--shadow);
   overflow: hidden;
 }
 
@@ -145,7 +145,7 @@
   align-items: center;
   width: 100%;
   padding: 8px 30px;
-  color: #777;
+  color: var(--text-color-quaternary);
 }
 
 .mic-context-menu .option::before {
@@ -161,10 +161,10 @@
 }
 
 .mic-context-menu .option:hover {
-  color: #333;
+  color: var(--text-color-secondary);
 }
 
 .mic-context-menu .option.disabled {
-  color: #ccc;
+  color: var(--text-color-senary);
   cursor: not-allowed;
 }

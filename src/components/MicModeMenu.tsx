@@ -1,7 +1,7 @@
 import React from 'react';
 
 // CSS
-import server from '@/styles/pages/server.module.css';
+import server from '@/styles/server.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Types

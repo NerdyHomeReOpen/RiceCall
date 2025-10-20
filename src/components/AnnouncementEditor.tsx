@@ -10,7 +10,7 @@ import { ImageNode } from '@/extensions/ImageNode';
 
 // CSS
 import popup from '@/styles/popup.module.css';
-import setting from '@/styles/popups/setting.module.css';
+import setting from '@/styles/setting.module.css';
 import markdown from '@/styles/markdown.module.css';
 
 // Components

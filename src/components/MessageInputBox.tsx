@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Placeholder from '@tiptap/extension-placeholder';
 import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
@@ -39,10 +40,24 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const editor = useEditor({
-    extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, ImageNode, ChatEnter],
+    extensions: [
+      StarterKit,
+      Placeholder.configure({ placeholder: ({ editor }) => (editor.storage as unknown as { placeholder: string }).placeholder }),
+      Color,
+      TextAlign.configure({ types: ['paragraph', 'heading'] }),
+      TextStyle,
+      FontFamily,
+      FontSize,
+      EmojiNode,
+      YouTubeNode,
+      TwitchNode,
+      KickNode,
+      ImageNode,
+      ChatEnter,
+    ],
     content: '',
     onUpdate: ({ editor }) => setMessageInput(toTags(editor.getHTML())),
-    immediatelyRender: false,
+    immediatelyRender: true,
   });
 
   // Refs
@@ -84,7 +99,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   };
 
   const handleEmojiSelect = (code: string) => {
-    editor?.chain().insertEmoji({ code }).focus().run();
+    editor?.chain().insertEmoji({ code }).setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
     syncStyles();
   };
 
@@ -105,8 +120,14 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
     editor?.on('selectionUpdate', syncStyles);
   }, [editor, syncStyles]);
 
+  useEffect(() => {
+    if (!editor) return;
+    (editor.storage as unknown as { placeholder: string }).placeholder = placeholder;
+    editor.view.dispatch(editor.state.tr);
+  }, [placeholder, editor]);
+
   return (
-    <div className={`${messageInputBox['messageinput-box']} ${disabled ? messageInputBox['disabled'] : ''} ${isWarning ? messageInputBox['warning'] : ''}`}>
+    <div className={`${messageInputBox['message-input-box']} ${disabled ? messageInputBox['disabled'] : ''} ${isWarning ? messageInputBox['warning'] : ''}`}>
       <div
         className={emoji['emoji-icon']}
         onMouseDown={(e) => {

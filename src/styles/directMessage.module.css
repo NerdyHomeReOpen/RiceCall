@@ -107,7 +107,7 @@
   width: fit-content;
   padding: 10px;
   flex-direction: column;
-  border-right: 1px solid #e0e0e4;
+  border-right: 1px solid var(--border);
 }
 
 .avatar-picture {
@@ -231,8 +231,8 @@
   background-size: 100%;
   background-repeat: no-repeat;
   background-position: 0 0;
-  border-bottom: 1px solid #e0e0e4;
-  border-top: 1px solid #e0e0e4;
+  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border);
   justify-content: space-between;
 }
 
@@ -298,7 +298,6 @@
   padding: 8px;
   resize: none;
   overflow: auto;
-  background: transparent;
   border: none !important;
 }
 
@@ -307,11 +306,10 @@
 }
 
 .input.warning {
-  border: 1px solid #f00 !important;
+  border: 1px solid var(--text-warning) !important;
 }
 
 @keyframes shake {
-
   0%,
   100% {
     transform: translate(0, 0);

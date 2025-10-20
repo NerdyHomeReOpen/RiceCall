@@ -811,6 +811,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 channel={channel}
                 channels={channels}
                 channelMessages={channelMessages}
+                clearMessages={() => setChannelMessages([])}
                 actionMessages={actionMessages}
                 queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}

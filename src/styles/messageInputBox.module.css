@@ -1,38 +1,38 @@
-.messageinput-box {
+.message-input-box {
   flex: 1;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   max-width: 100%;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 5px;
   padding: 5px;
   gap: 5px;
 }
 
-.messageinput-box.warning {
-  border-color: #f00;
+.message-input-box.warning {
+  border-color: var(--text-warning);
 }
 
-.messageinput-box.disabled {
-  color: #8f8f8f;
+.message-input-box.disabled {
+  color: var(--text-color-quaternary);
   opacity: 0.5;
   pointer-events: none;
 }
 
-.messageinput-box .textarea {
+.message-input-box .textarea {
   flex: 1;
   resize: none;
   border: none !important;
   overflow: auto;
 }
 
-.messageinput-box .textarea div {
+.message-input-box .textarea div {
   height: 100%;
 }
 
 .message-input-length-text {
-  color: #ccc;
+  color: var(--text-color-senary);
   font-size: 0.9em;
   align-self: flex-end;
   margin-left: 2px;

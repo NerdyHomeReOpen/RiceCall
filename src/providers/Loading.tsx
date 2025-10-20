@@ -1,7 +1,7 @@
 import React, { useContext, createContext, ReactNode, useState } from 'react';
 
 // CSS
-import homePage from '@/styles/pages/home.module.css';
+import homePage from '@/styles/home.module.css';
 
 // Providers
 import { useTranslation } from 'react-i18next';

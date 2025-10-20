@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 // CSS
-import homePage from '@/styles/pages/home.module.css';
+import homePage from '@/styles/home.module.css';
 import announcementStyle from '@/styles/announcement.module.css';
 
 // Components
@@ -241,8 +241,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             <div className={homePage['search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
               {exactMatch && (
                 <>
-                  <div className={`${homePage['header-text']} ${homePage['exactMatch']}`} style={exactMatch ? {} : { display: 'none' }}>
-                    {t('quick-enter-server')}
+                  <div className={`${homePage['header-text']} ${homePage['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
+                    {t('quick-enter-server', { '0': exactMatch.displayId })}
                   </div>
                   <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => handleConnectServer(exactMatch.serverId, exactMatch.displayId)} />
                 </>

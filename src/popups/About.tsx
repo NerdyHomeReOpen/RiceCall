@@ -6,7 +6,7 @@ import packageJson from '../../package.json';
 const version = packageJson.version;
 
 // CSS
-import styles from '@/styles/popups/about.module.css';
+import styles from '@/styles/about.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Providers

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import type { TFunction } from 'i18next';
 
 // CSS
-import styles from '@/styles/pages/register.module.css';
+import styles from '@/styles/register.module.css';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -226,9 +226,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
                     onBlur={handleBlur}
                     placeholder={t('please-input-account')}
                     className={styles['input']}
-                    style={{
-                      borderColor: errors.account ? '#f87171' : '#d1d5db',
-                    }}
+                    style={errors.account ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
                 {errors.account ? <div className={styles['warn-text']}>{errors.account}</div> : <div className={styles['hint-text']}>{t('account-hint')}</div>}
@@ -244,9 +242,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
                     onBlur={handleBlur}
                     placeholder={t('please-input-password')}
                     className={styles['input']}
-                    style={{
-                      borderColor: errors.password ? '#f87171' : '#d1d5db',
-                    }}
+                    style={errors.password ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
                 {errors.password ? <div className={styles['warn-text']}>{errors.password}</div> : <div className={styles['hint-text']}>{t('password-hint')}</div>}
@@ -262,9 +258,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
                     onBlur={handleBlur}
                     placeholder={t('please-input-password-again')}
                     className={styles['input']}
-                    style={{
-                      borderColor: errors.confirmPassword ? '#f87171' : '#d1d5db',
-                    }}
+                    style={errors.confirmPassword ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
                 {errors.confirmPassword ? <div className={styles['warn-text']}>{errors.confirmPassword}</div> : <div className={styles['hint-text']}>{t('repeat-password-hint')}</div>}
@@ -280,9 +274,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
                     onBlur={handleBlur}
                     placeholder={t('please-input-email')}
                     className={styles['input']}
-                    style={{
-                      borderColor: errors.email ? '#f87171' : '#d1d5db',
-                    }}
+                    style={errors.email ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
                 {errors.email ? <div className={styles['warn-text']}>{errors.email}</div> : <div className={styles['hint-text']}>{t('email-hint')}</div>}
@@ -297,9 +289,7 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
                     onBlur={handleBlur}
                     placeholder={t('please-input-nickname')}
                     className={styles['input']}
-                    style={{
-                      borderColor: errors.username ? '#f87171' : '#d1d5db',
-                    }}
+                    style={errors.username ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
                 {errors.username ? <div className={styles['warn-text']}>{errors.username}</div> : <div className={styles['hint-text']}>{t('nickname-hint')}</div>}

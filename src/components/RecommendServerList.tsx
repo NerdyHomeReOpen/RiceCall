@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
 // CSS
-import homePage from '@/styles/pages/home.module.css';
+import homePage from '@/styles/home.module.css';
 
 // Types
 import type { RecommendServer, User } from '@/types';
