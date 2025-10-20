@@ -158,7 +158,7 @@
   "user-already-in-channel": "Kullanıcı zaten kanalda.",
   "user-not-in-channel": "Kullanıcı kanalda değil.",
   "user-not-in-server": "Kullanıcı ses grubunda değildir.",
-  "version-too-low": "版本過低，請先更新至[最新版本](https://ricecall.com.tw)。",
+  "version-too-low": "Sürüm çok düşük, lütfen önce [en son sürüme](https://ricecall.com.tw) güncelleyin.",
   "voice-change-to-admin": "Bu kanalın sesli sohbeti, yalnızca yöneticilerin konuşmasına izin verecek şekilde ayarlanmıştır.",
   "voice-change-to-allow-queue": "Yönetici [{{operator}}] bu kanal için sıraya alma özelliğini etkinleştirmiştir.",
   "voice-change-to-forbid-queue": "Bu kanal, yönetici 【{{operator}}】 tarafından sesli sohbeti yasaklamak üzere ayarlanmıştır.",
