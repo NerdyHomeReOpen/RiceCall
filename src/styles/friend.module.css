@@ -312,7 +312,7 @@
   gap: 10px;
   padding: 10px;
   background-color: var(--sidebar);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-secondary);
   border-bottom-left-radius: 5px;
 }
 
