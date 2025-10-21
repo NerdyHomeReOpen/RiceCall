@@ -7,7 +7,6 @@
   align-items: center;
   padding: 15px;
   gap: 5px;
-  background-color: var(--foreground);
   overflow-y: scroll;
 }
 
