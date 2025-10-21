@@ -332,7 +332,7 @@
   align-items: center;
   border-radius: 3px;
   padding: 5px;
-  gap: 2px;
+  gap: 3px;
   cursor: pointer;
   &.selected {
     background-color: var(--selected);
@@ -350,10 +350,6 @@
 .category-flag {
   height: 16px;
   width: 16px;
-}
-
-.category-list .category-list .category-tab {
-  padding-left: 25px;
 }
 
 .category-list .category-list .category-name {
