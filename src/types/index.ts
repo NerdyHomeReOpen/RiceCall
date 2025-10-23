@@ -277,18 +277,18 @@ export type ClientToServerEvents = {
   actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;
   directMessage: (...args: { targetId: string; preset: Partial<DirectMessage> }[]) => void;
   shakeWindow: (...args: { targetId: string }[]) => void;
-  // Echo
-  ping: () => void;
 };
 
 export type ServerToClientEvents = {
   // Socket
   connect: () => void;
-  disconnect: () => void;
-  reconnect: (attemptNumbers: number) => void;
-  error: (message: string) => void;
   connect_error: (error: any) => void;
+  connect_timeout: () => void;
+  reconnect: () => void;
+  reconnect_attempt: (attemptNumbers: number) => void;
   reconnect_error: (error: any) => void;
+  reconnect_failed: () => void;
+  disconnect: () => void;
   // Notification
   notification: (...args: { message: string }[]) => void; // not used yet
   // User
@@ -357,8 +357,8 @@ export type ServerToClientEvents = {
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Popup
   openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
-  // Echo
-  pong: () => void;
+  // Error
+  error: (message: string) => void;
 };
 
 export type SFUCreateTransportParams = {

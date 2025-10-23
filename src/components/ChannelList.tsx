@@ -42,7 +42,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
 
   // States
   const [viewType, setViewType] = useState<'all' | 'current'>('all');
-  const [latency, setLatency] = useState<string>('0');
+  const [latency, setLatency] = useState<number>(0);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [memberApplicationsCount, setMemberApplicationsCount] = useState<number>(0);
@@ -107,21 +107,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   }, [channels]);
 
   useEffect(() => {
-    let start = Date.now();
-    let end = Date.now();
-    ipc.socket.send('ping');
-    const measure = setInterval(() => {
-      start = Date.now();
-      ipc.socket.send('ping');
-    }, 10000);
-    const clearPong = ipc.socket.on('pong', () => {
-      end = Date.now();
-      setLatency((end - start).toFixed(0));
-    });
-    return () => {
-      clearInterval(measure);
-      clearPong();
-    };
+    const interval = setInterval(() => {
+      setLatency(ipc.latency.get());
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
