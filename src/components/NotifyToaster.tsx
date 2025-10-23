@@ -38,7 +38,7 @@ const NotifyToaster: React.FC<NotifyToasterProps> = React.memo(({ notifies }) =>
 
   return (
     <div className={`${notifyToaster['notify-toaster']} ${show ? notifyToaster['show'] : ''}`}>
-      <MarkdownContent markdownText={notifies[showNotifyIndex]?.content ?? ''} />
+      <MarkdownContent markdownText={notifies[showNotifyIndex]?.content ?? ''} selectable={false} />
       <div className={notifyToaster['notify-toaster-close']} onClick={handleClose}></div>
     </div>
   );

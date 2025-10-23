@@ -75,9 +75,10 @@ const ALLOWED_ATTR: string[] = [
 
 interface MarkdownContentProps {
   markdownText: string;
+  selectable?: boolean;
 }
 
-const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText }) => {
+const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText, selectable = true }) => {
   // Hooks
   const { t } = useTranslation();
   const { selectImage } = useImageViewer();
@@ -159,7 +160,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
   const restored = useMemo(() => fromPreserveHtml(sanitized), [sanitized]);
 
   return (
-    <div className={markdown['markdown-content']}>
+    <div className={`${markdown['markdown-content']}`} style={{ userSelect: selectable ? 'text' : 'none' }}>
       <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components} skipHtml={false} unwrapDisallowed={false}>
         {restored}
       </ReactMarkdown>
