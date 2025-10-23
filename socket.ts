@@ -209,13 +209,15 @@ export function connectSocket(token: string) {
         });
         // Handle special events
         if (event === 'shakeWindow') {
-          const initialData = args[0].initialData;
+          const initialData: Record<string, unknown> | undefined = args[0].initialData;
+          if (!initialData) return;
           const title = initialData.name;
           const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
           createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
         }
         if (event === 'directMessage') {
-          const initialData = args[0].initialData;
+          const initialData: Record<string, unknown> | undefined = args[0].initialData;
+          if (!initialData) return;
           const title = initialData.name;
           const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
           createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
