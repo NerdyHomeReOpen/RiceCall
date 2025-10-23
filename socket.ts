@@ -5,6 +5,9 @@ import { createPopup } from './main';
 import { MAIN_TITLE, VERSION_TITLE } from './main';
 import { env } from './env';
 
+// Types
+type ACK<T> = { ok: true; data: T } | { ok: false; error: string };
+
 // Event
 const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
 
@@ -130,6 +133,23 @@ export let latency: number = 0;
 export let seq: number = 0;
 export let interval: NodeJS.Timeout | null = null;
 
+async function emitWithRetry<T>(event: string, payload: unknown, retries = 1): Promise<ACK<T>> {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await new Promise<ACK<T>>((resolve, reject) => {
+        socket?.timeout(5000).emit(event, payload, (err: unknown, ack: ACK<T>) => {
+          if (err) reject(err);
+          else resolve(ack);
+        });
+      });
+    } catch (err) {
+      if (i === retries) throw err;
+      console.warn(`${new Date().toLocaleString()} | Retrying(#${retries}) socket.emit `, event, payload);
+    }
+  }
+  throw new Error('Failed to emit event with retry');
+}
+
 export function connectSocket(token: string) {
   if (!token) return;
 
@@ -161,10 +181,15 @@ export function connectSocket(token: string) {
       ipcMain.handle(event, (_, payload) => {
         console.log(`${new Date().toLocaleString()} | socket.emit`, event, payload);
         return new Promise((resolve) => {
-          socket?.emit(event, payload, (ack: { ok: true; data: unknown } | { ok: false; error: string }) => {
-            console.log(`${new Date().toLocaleString()} | socket.onAck`, event, ack);
-            resolve(ack);
-          });
+          emitWithRetry(event, payload)
+            .then((ack) => {
+              console.log(`${new Date().toLocaleString()} | socket.onAck`, event, ack);
+              resolve(ack);
+            })
+            .catch((err) => {
+              console.error(`${new Date().toLocaleString()} | socket.emit error`, event, err);
+              resolve({ ok: false, error: err.message });
+            });
         });
       });
     });
@@ -258,9 +283,8 @@ export function connectSocket(token: string) {
       if (err) {
         console.warn(`${new Date().toLocaleString()} | Heartbeat ${seq} timeout`);
       } else {
-        const latencyValue = Date.now() - start;
-        console.log(`${new Date().toLocaleString()} | ACK for #${ack.seq} in ${latencyValue} ms`);
-        latency = latencyValue;
+        latency = Date.now() - start;
+        console.log(`${new Date().toLocaleString()} | ACK for #${ack.seq} in ${latency} ms`);
       }
     });
   }, 30000);
