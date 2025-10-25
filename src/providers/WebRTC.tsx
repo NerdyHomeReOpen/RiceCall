@@ -731,7 +731,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const setSpeakKeyPressed = useCallback((enable: boolean) => {
-    if (speakingModeRef.current !== 'key') return;
+    if (speakingModeRef.current !== 'key' || !isMicTakenRef.current) return;
     soundPlayerRef.current.playSound(enable ? 'startSpeaking' : 'stopSpeaking');
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
       track.enabled = enable;
