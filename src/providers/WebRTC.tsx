@@ -3,7 +3,6 @@ import * as mediasoupClient from 'mediasoup-client';
 
 // Services
 import ipc from '@/services/ipc.service';
-import api from '@/services/api.service';
 
 // Types
 import {
@@ -19,7 +18,28 @@ import {
 // Providers
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
-const MAX_RECORD_TIME = 20 * 60 * 1000; // 20 minutes
+// Utils
+import { encodeWAV } from '@/utils/encodeWav';
+
+const workletCode = `
+class RecorderProcessor extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.buffers = [];
+  }
+
+  process(inputs) {
+    const input = inputs[0];
+    if (!input || !input[0]) return true;
+    const left = input[0];
+    const right = input[1] || input[0]; // 單聲道時複製
+    this.port.postMessage({ left, right });
+    return true;
+  }
+}
+
+registerProcessor('recorder-processor', RecorderProcessor);
+`;
 
 interface WebRTCContextType {
   setUserMuted: (userId: string, muted: boolean) => void;
@@ -70,7 +90,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // Refs
   const rafIdListRef = useRef<{ [userId: string]: number }>({}); // userId -> rAF id
   const lastRefreshRef = useRef<number>(0);
-  const isUploadingRef = useRef<boolean>(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
   const speakerRef = useRef<HTMLAudioElement | null>(null);
@@ -84,7 +103,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const inputAnalyserRef = useRef<AnalyserNode | null>(null);
   const inputDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const outputDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
-  const recordDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const recorderDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const recorderGainRef = useRef<GainNode | null>(null);
 
   // Speaking Mode
   const [speakingMode, setSpeakingMode] = useState<SpeakingMode>('key');
@@ -128,9 +148,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const [voiceThreshold, setVoiceThreshold] = useState<number>(1);
 
   // Recorder
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const recordChunksRef = useRef<Blob[]>([]);
-  const recordTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const buffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
   const isRecordingRef = useRef<boolean>(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
@@ -189,10 +207,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     voiceThresholdRef.current = parseInt(localVoiceThreshold);
   }, []);
 
-  const initAudioContext = useCallback(() => {
+  const initAudioContext = useCallback(async () => {
     // Create audio context
     if (!audioContextRef.current) {
       const audioContext = new AudioContext();
+      await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
       audioContextRef.current = audioContext;
     }
 
@@ -209,9 +228,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
 
     // Create record destination node
-    if (!recordDesRef.current) {
+    if (!recorderDesRef.current) {
       const recordDestination = audioContextRef.current.createMediaStreamDestination();
-      recordDesRef.current = recordDestination;
+      recorderDesRef.current = recordDestination;
     }
 
     // Create input analyser node
@@ -412,7 +431,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       sourceNode.connect(gainNode);
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
-      if (isRecordingRef.current) gainNode.connect(recordDesRef.current!);
+      if (isRecordingRef.current) gainNode.connect(recorderDesRef.current!);
 
       // Start speaking detection
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
@@ -447,49 +466,43 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       });
   }, [initMixMode]);
 
-  const startRecording = useCallback(() => {
-    micNodesRef.current.gain?.connect(recordDesRef.current!);
-    mixNodesRef.current.gain?.connect(recordDesRef.current!);
-    masterGainNodeRef.current?.connect(recordDesRef.current!);
+  const startRecording = useCallback(async () => {
+    if (!audioContextRef.current || !recorderDesRef.current) {
+      initAudioContext();
+      return startRecording();
+    }
 
-    const stream = recordDesRef.current!.stream;
-    const mimeType = 'audio/webm;codecs=opus';
+    recorderGainRef.current = audioContextRef.current.createGain();
+    recorderGainRef.current.connect(recorderDesRef.current);
 
-    const mediaRecorder = new MediaRecorder(stream, { mimeType });
-    recorderRef.current = mediaRecorder;
-    recordChunksRef.current = [];
+    micNodesRef.current.gain?.connect(recorderGainRef.current);
+    mixNodesRef.current.gain?.connect(recorderGainRef.current);
+    masterGainNodeRef.current?.connect(recorderGainRef.current);
 
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) recordChunksRef.current.push(e.data);
+    const recorderNode = new AudioWorkletNode(audioContextRef.current, 'recorder-processor');
+    recorderGainRef.current.connect(recorderNode);
+
+    recorderNode.port.onmessage = (e) => {
+      const { left, right } = e.data;
+      buffersRef.current.push({ left: left.slice(), right: right.slice() });
     };
-    mediaRecorder.onstop = async () => {
-      if (isUploadingRef.current) return;
-      isUploadingRef.current = true;
-      const blob = new Blob(recordChunksRef.current, { type: mimeType });
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const fileName = `ricecall-record-${timestamp}`;
-      const formData = new FormData();
-      formData.append('_file', blob, fileName);
-      formData.append('_fileName', fileName);
-      const response = await api.post('/upload/record', formData);
-      if (response) {
-        const downloadUrl = response.downloadUrl;
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = `${fileName}.mp3`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      }
-      if (recordTimeoutRef.current) clearTimeout(recordTimeoutRef.current);
-      isUploadingRef.current = false;
-    };
-    mediaRecorder.start();
-  }, []);
+  }, [initAudioContext]);
 
   const stopRecording = useCallback(() => {
-    recorderRef.current?.stop();
-  }, []);
+    if (!audioContextRef.current) {
+      initAudioContext();
+      return stopRecording();
+    }
+
+    recorderGainRef.current!.disconnect();
+
+    const wavBlob = encodeWAV(buffersRef.current, audioContextRef.current.sampleRate);
+    const url = URL.createObjectURL(wavBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ricecall-record-${Date.now()}.wav`;
+    a.click();
+  }, [initAudioContext]);
 
   const consumeOne = useCallback(
     async (producerId: string, channelId: string) => {
@@ -760,12 +773,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     else startRecording();
     setIsRecording(!isRecordingRef.current);
     isRecordingRef.current = !isRecordingRef.current;
-
-    recordTimeoutRef.current = setTimeout(() => {
-      stopRecording();
-      setIsRecording(false);
-      isRecordingRef.current = false;
-    }, MAX_RECORD_TIME);
   }, [startRecording, stopRecording]);
 
   const toggleMicMuted = useCallback(() => {
