@@ -526,30 +526,21 @@
   background-color: var(--notify-toaster-background);
 }
 
-.last-message-area {
+.new-message-area {
   z-index: 10;
+  display: none;
   position: absolute;
-  left: 0;
-  bottom: 100%;
-  width: 100%;
-  padding: 10px 0;
-  background-color: var(--background);
-  animation: fade-out 2000ms forwards;
+  right: -4px;
+  bottom: calc(100% - 4px);
+  height: 8px;
+  width: 8px;
+  border-radius: 4px;
+  background-color: var(--text-warning);
   pointer-events: none;
 }
 
-@keyframes fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    display: none;
-  }
-}
-
-.last-message-area.show {
-  animation: none;
+.new-message-area.show {
+  display: block;
 }
 
 .input-area {

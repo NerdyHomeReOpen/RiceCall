@@ -162,22 +162,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
-    const isScrollToBottomRef = useRef<boolean>(true);
-    const lastMessageTimer = useRef<NodeJS.Timeout | null>(null);
-
-    // const screenStreamRef = useRef<MediaStream | null>(null);
-    // const screenVideoRef = useRef<HTMLVideoElement>(null);
-    // const [isScreenSharing, setIsScreenSharing] = useState(false);
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
-    const [showLastMessage, setShowLastMessage] = useState<boolean>(false);
+    const [showNewMessage, setShowNewMessage] = useState<boolean>(false);
     const [speakingMode, setSpeakingMode] = useState<SpeakingMode>('key');
     const [speakingKey, setSpeakingKey] = useState<string>('');
     const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
     const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
+    const [isScrollToBottom, setIsScrollToBottom] = useState<boolean>(true);
 
     // Variables
     const { userId, permissionLevel: globalPermissionLevel } = user;
@@ -353,7 +348,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     };
 
     const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
-      isScrollToBottomRef.current = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
+      const isScrollToBottom = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
+      setIsScrollToBottom(isScrollToBottom);
+      if (isScrollToBottom) setShowNewMessage(false);
     };
 
     // Effects
@@ -445,19 +442,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, []);
 
     useEffect(() => {
-      if (isScrollToBottomRef.current) return;
-      setShowLastMessage(true);
-      if (lastMessageTimer.current) clearTimeout(lastMessageTimer.current);
-      lastMessageTimer.current = setTimeout(() => {
-        setShowLastMessage(false);
-      }, 1000);
-      return () => {
-        if (lastMessageTimer.current) {
-          clearTimeout(lastMessageTimer.current);
-          lastMessageTimer.current = null;
-        }
-      };
-    }, [channelMessages]);
+      setShowNewMessage(!isScrollToBottom);
+    }, [channelMessages]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
       <main className={styles['server']} style={display ? {} : { display: 'none' }}>
@@ -505,14 +491,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     ]);
                   }}
                 >
-                  <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} isScrollToBottom={isScrollToBottomRef.current} />
+                  <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} isScrollToBottom={isScrollToBottom} />
                 </div>
 
                 {/* Broadcast Area */}
                 <div className={styles['input-area']}>
-                  <div className={`${styles['last-message-area']} ${showLastMessage ? styles['show'] : ''}`}>
-                    <ChannelMessageContent messages={channelMessages.slice(-1)} user={user} channel={channel} server={server} />
-                  </div>
+                  <div className={`${styles['new-message-area']} ${showNewMessage ? styles['show'] : ''}`} />
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={channel} server={server} />
                   </div>
