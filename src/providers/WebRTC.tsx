@@ -431,7 +431,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       sourceNode.connect(gainNode);
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
-      if (isRecordingRef.current) gainNode.connect(recorderDesRef.current!);
+      if (isRecordingRef.current) gainNode.connect(recorderGainRef.current!);
 
       // Start speaking detection
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
@@ -500,7 +500,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     const url = URL.createObjectURL(wavBlob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ricecall-record-${Date.now()}.wav`;
+    a.download = `ricecall-record-${new Date().toISOString()}.wav`;
     a.click();
   }, [initAudioContext]);
 
