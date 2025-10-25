@@ -37,7 +37,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  border-bottom: 2px solid var(--border-secondary);
+  border-bottom: 1px solid var(--border-secondary);
   padding: 5px;
   gap: 5px;
 }
@@ -558,7 +558,6 @@
   justify-content: space-between;
   flex: none;
   padding: 10px;
-  border-top: 1px solid var(--border-secondary);
   background-image: url('/channel/chn_toolbar_bg.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -1092,7 +1091,7 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  border-top: 2px solid var(--border-secondary);
+  border-top: 1px solid var(--border-secondary);
 }
 
 .sidebar-footer .navegate-tab {

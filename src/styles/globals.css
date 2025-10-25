@@ -129,7 +129,7 @@ body {
 
 .resize-handle-vertical {
   width: 100%;
-  min-height: 3px;
+  min-height: 2px;
   background-color: var(--border-secondary);
   cursor: row-resize;
   transition: background-color 0.1s ease-in-out;
