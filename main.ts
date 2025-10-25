@@ -1186,12 +1186,14 @@ app.on('ready', async () => {
 
   // Voice
   ipcMain.on('set-speaking-mode', (_, mode) => {
+    store.set('speakingMode', mode ?? 'key');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('speaking-mode', mode);
     });
   });
 
   ipcMain.on('set-default-speaking-key', (_, key) => {
+    store.set('defaultSpeakingKey', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1207,30 +1209,35 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
+    store.set('hotKeyOpenMainWindow', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-open-main-window', key);
     });
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key) => {
+    store.set('hotKeyIncreaseVolume', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-increase-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
+    store.set('hotKeyDecreaseVolume', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-decrease-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
+    store.set('hotKeyToggleSpeaker', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-speaker', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
+    store.set('hotKeyToggleMicrophone', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
