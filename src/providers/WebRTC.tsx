@@ -502,6 +502,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     a.href = url;
     a.download = `ricecall-record-${new Date().toISOString()}.wav`;
     a.click();
+
+    buffersRef.current = [];
   }, [initAudioContext]);
 
   const consumeOne = useCallback(
