@@ -29,7 +29,7 @@
   --text-nickname: #6e849b;
   --notify-toaster-border: #f9c55d;
   --notify-toaster-background: #fefee4;
-  --button-background: linear-gradient(#fafafb, #e9e9ed);
+  --button-background: #fdfdfd;
 }
 
 @media (prefers-color-scheme: dark) {
