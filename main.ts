@@ -12,9 +12,9 @@ import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 import { initMainI18n, t } from './i18n.js';
-import { connectSocket, disconnectSocket, latency } from './socket.ts';
-import { env, loadEnv } from './env.ts';
-import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.ts';
+import { connectSocket, disconnectSocket, latency } from './socket.js';
+import { env, loadEnv } from './env.js';
+import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');

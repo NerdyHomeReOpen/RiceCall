@@ -1,9 +1,9 @@
 import { io, Socket } from 'socket.io-client';
 import { ipcMain } from 'electron';
 import { BrowserWindow } from 'electron';
-import { createPopup } from './main';
-import { MAIN_TITLE, VERSION_TITLE } from './main';
-import { env } from './env';
+import { createPopup } from './main.js';
+import { MAIN_TITLE, VERSION_TITLE } from './main.js';
+import { env } from './env.js';
 
 // Types
 type ACK<T> = { ok: true; data: T } | { ok: false; error: string };
