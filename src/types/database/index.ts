@@ -133,12 +133,6 @@ export type table_notifies = {
   createdAt: number;
 };
 
-export type table_recommend_server_categories = {
-  categoryId: string;
-  name: string;
-  order: number;
-};
-
 export type table_recommend_servers = {
   categoryId: string;
   serverId: string;
@@ -216,6 +210,19 @@ export type table_user_vips = {
   userId: string;
   vip: number;
   createdAt: number;
+};
+
+export type table_user_settings = {
+  userId: string;
+  forbidFriendApplications: boolean;
+  forbidShakeMessages: boolean;
+  forbidMemberInvitations: boolean;
+  forbidStrangerMessages: boolean;
+  shareCurrentServer: boolean;
+  shareRecentServers: boolean;
+  shareJoinedServers: boolean;
+  shareFavoriteServers: boolean;
+  notSaveMessageHistory: boolean;
 };
 
 export type table_users = {

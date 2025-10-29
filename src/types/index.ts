@@ -2,25 +2,27 @@
 import * as mediasoupClient from 'mediasoup-client';
 
 import {
+  table_announcements,
   table_badges,
+  table_channel_muted_users,
+  table_channel_permissions,
   table_channels,
+  table_friend_applications,
   table_friend_groups,
   table_friends,
-  table_friend_applications,
-  table_servers,
-  table_members,
+  table_global_permissions,
   table_member_applications,
   table_member_invitations,
-  table_users,
-  table_user_servers,
-  table_user_badges,
-  table_server_permissions,
-  table_channel_permissions,
-  table_channel_muted_users,
-  table_server_blocked_users,
-  table_announcements,
+  table_members,
   table_notifies,
   table_recommend_servers,
+  table_server_blocked_users,
+  table_server_permissions,
+  table_servers,
+  table_user_badges,
+  table_user_servers,
+  table_user_settings,
+  table_users,
 } from '@/types/database';
 
 export type Announcement = table_announcements;
@@ -35,7 +37,7 @@ export type BadgeList = {
   badges: string;
 };
 
-export type User = table_users & Permission & BadgeList;
+export type User = table_users & table_global_permissions & BadgeList;
 
 export type Badge = table_badges & table_user_badges;
 
@@ -45,11 +47,7 @@ export type FriendGroup = table_friend_groups;
 
 export type FriendApplication = table_friend_applications & table_users;
 
-export type Server = table_servers & table_user_servers & table_members & Permission;
-
-export type RecommendServerList = {
-  [category: string]: RecommendServer[];
-};
+export type Server = table_servers & table_user_servers & table_members & table_server_permissions;
 
 export type RecommendServer = table_servers &
   table_recommend_servers & {
@@ -58,17 +56,17 @@ export type RecommendServer = table_servers &
 
 export type Category = table_channels &
   table_channel_muted_users &
-  Permission & {
+  table_channel_permissions & {
     type: 'category';
   };
 
 export type Channel = table_channels &
   table_channel_muted_users &
-  Permission & {
+  table_channel_permissions & {
     type: 'channel';
   };
 
-export type OnlineMember = table_members & table_users & table_channel_muted_users & Permission & BadgeList;
+export type OnlineMember = table_members & table_users & table_channel_muted_users & table_channel_permissions & BadgeList;
 
 export type QueueUser = {
   userId: string;
@@ -77,7 +75,7 @@ export type QueueUser = {
   isQueueControlled: boolean;
 };
 
-export type Member = table_members & table_users & table_server_blocked_users & Permission;
+export type Member = table_members & table_users & table_server_blocked_users & table_channel_permissions;
 
 export type MemberApplication = table_member_applications & table_users;
 
@@ -209,6 +207,7 @@ export type ClientToServerEvents = {
   // User
   searchUser: (...args: { query: string }[]) => void;
   editUser: (...args: { update: Partial<table_users> }[]) => void;
+  editUserSettings: (...args: { update: Partial<table_user_settings> }[]) => void;
   // Friend
   editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
   deleteFriend: (...args: { targetId: string }[]) => void;

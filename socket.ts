@@ -49,6 +49,7 @@ const ClientToServerEventNames = [
   'editServer',
   'editServerPermission',
   'editUser',
+  'editUserSettings',
   'favoriteServer',
   'increaseUserQueueTime',
   'joinQueue',
