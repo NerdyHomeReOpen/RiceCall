@@ -73,7 +73,7 @@
   align-items: flex-start;
   height: 80px;
   border: 1px solid var(--border);
-  background-color: var(--background);
+  background-color: var(--background-secondary);
   padding: 2px;
 }
 

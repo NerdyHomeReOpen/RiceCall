@@ -251,7 +251,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--foreground);
+  background-color: var(--background-secondary);
   border-top: 1px solid var(--border);
 }
 

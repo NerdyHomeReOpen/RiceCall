@@ -53,7 +53,9 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup[DIALOG_ICON[iconType]]}`} />
-          <MarkdownContent markdownText={`${formattedMessageContents} ${timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}`} />
+          <div className={popup['dialog-message']}>
+            <MarkdownContent markdownText={`${formattedMessageContents} ${timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}`} />{' '}
+          </div>
         </div>
       </div>
 

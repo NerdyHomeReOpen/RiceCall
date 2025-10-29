@@ -57,7 +57,7 @@
   padding: 0 8px 0 12px;
   text-indent: 0;
   color: var(--text-color-quaternary);
-  border-left: 4px solid var(--border-secondary);
+  border-left: 4px solid var(--border);
   border-radius: 0 4px 4px 0;
 }
 
@@ -65,7 +65,7 @@
 .markdown-content code {
   padding: 0.125rem 0.25rem;
   border-radius: 4px;
-  background-color: var(--sidebar);
+  background-color: var(--background-secondary);
   border: 1px solid var(--border);
   align-self: baseline;
   line-height: 1.5rem;
@@ -82,7 +82,7 @@
 .markdown-content hr {
   margin: 5px 0;
   border: none;
-  border-top: 1px dashed var(--border-secondary);
+  border-top: 1px dashed var(--border);
 }
 
 .markdown-content table {
@@ -98,7 +98,7 @@
   display: flex;
   position: sticky;
   top: 0;
-  background-color: var(--sidebar);
+  background-color: var(--background-secondary);
 }
 
 .markdown-content table tr {
@@ -118,7 +118,7 @@
 .markdown-content table tr th {
   height: auto;
   width: 100%;
-  background-color: var(--sidebar);
+  background-color: var(--background-secondary);
   border: 1px solid var(--border);
   border-top: 0;
   border-left: 0;
@@ -184,7 +184,7 @@
 .markdown-content .code-wrapper {
   padding: 0.5rem;
   border-radius: 4px;
-  background-color: var(--sidebar);
+  background-color: var(--background-secondary);
   border: 1px solid var(--border);
   font-family: monospace !important;
 }

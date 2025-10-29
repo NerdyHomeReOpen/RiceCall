@@ -6,9 +6,8 @@
   justify-content: space-around;
   min-width: 200px;
   background-color: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  box-shadow: 0 1px 1px var(--shadow);
+  border-radius: 3px;
+  box-shadow: var(--box-shadow);
   overflow: hidden;
 }
 

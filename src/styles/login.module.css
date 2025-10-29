@@ -78,11 +78,11 @@
   position: relative;
   display: flex;
   border: 1px solid var(--border);
-  box-shadow: inset 0.3px 0.5px 1px rgb(0 0 0 / 10%);
+  box-shadow: inset 1px 1px 3px rgb(0 0 0 / 10%) inset;
 }
 
 .input-box:hover {
-  border-color: var(--border-tertiary);
+  border-color: var(--border-secondary);
 }
 
 .combo-arrow {
@@ -249,11 +249,11 @@
 .login-footer {
   width: 100%;
   padding: 10px 15px;
-  background-color: var(--sidebar);
+  background-color: var(--footer-background);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid var(--border-secondary);
+  border-top: 1px solid var(--border);
 }
 
 .create-account,

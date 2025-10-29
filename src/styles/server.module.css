@@ -37,7 +37,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border-secondary);
+  border-bottom: 1px solid var(--border);
   padding: 5px;
   gap: 5px;
 }
@@ -57,6 +57,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+  box-shadow: 0px 2px 2px var(--shadow);
 }
 
 .avatar-picture::before {
@@ -67,7 +68,7 @@
   z-index: 99;
   min-width: 52px;
   min-height: 52px;
-  background-image: url('/win_border.png');
+  background-image: url('/channel/server_logo_border.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -78,8 +79,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 60px;
-  padding: 3px;
+  gap: 5px;
   overflow: hidden;
 }
 
@@ -216,7 +216,7 @@
 }
 
 .section-title-text {
-  color: var(--text-color-quaternary);
+  color: var(--text-color-senary);
   padding: 5px 10px;
 }
 
@@ -502,6 +502,7 @@
   min-height: 200px;
   min-width: 260px;
   overflow-y: hidden;
+  background-color: var(--background-secondary);
 }
 
 .message-area {
@@ -557,11 +558,11 @@
   align-items: center;
   justify-content: space-between;
   flex: none;
-  padding: 10px;
+  padding: 4px 10px;
   background-image: url('/channel/chn_toolbar_bg.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  background-color: var(--sidebar);
+  background-color: var(--background-secondary);
 }
 
 .mic-button {
@@ -904,9 +905,8 @@
   min-width: 200px;
   padding: 10px;
   background-color: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  box-shadow: 0 1px 1px var(--shadow);
+  border-radius: 3px;
+  box-shadow: var(--box-shadow);
   overflow: hidden;
 }
 
@@ -1042,9 +1042,8 @@
   padding: 3px;
   width: 24px;
   height: fit-content;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 1px var(--shadow);
+  border-radius: 3px;
+  box-shadow: var(--box-shadow);
   background-color: var(--background);
 }
 
@@ -1081,7 +1080,7 @@
   width: 14px;
   height: 14px;
   background-color: var(--background);
-  border: 2px solid var(--border-tertiary);
+  border: 2px solid var(--border-secondary);
   border-radius: 50%;
   cursor: pointer;
 }
@@ -1091,7 +1090,7 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  border-top: 1px solid var(--border-secondary);
+  border-top: 1px solid var(--border);
 }
 
 .sidebar-footer .navegate-tab {
@@ -1177,7 +1176,7 @@
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
-  border: 1px solid var(--border-tertiary);
+  border: 1px solid var(--border-secondary);
   background: transparent;
 }
 
