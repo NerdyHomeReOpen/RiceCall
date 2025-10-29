@@ -20,7 +20,7 @@ import ipc from '@/services/ipc.service';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenChannelSetting, handleOpenCreateChannel, handleOpenEditChannelOrder, handleOpenServerBroadcast, handleOpenChannelPassword } from '@/utils/popup';
-import { isMember, isChannelAdmin, isServerAdmin, isChannelMod } from '@/utils/permission';
+import { isMember, isChannelAdmin, isServerAdmin, isChannelMod, isStaff } from '@/utils/permission';
 
 interface CategoryTabProps {
   user: User;
@@ -48,6 +48,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
 
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel), [globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel]);
+  const serverUserIds = useMemo(() => serverOnlineMembers.map((mb) => mb.userId), [serverOnlineMembers]);
   const categoryChannels = useMemo(() => channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [channels, categoryId]);
   const categoryMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === categoryId), [serverOnlineMembers, categoryId]);
   const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);
@@ -86,6 +87,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
 
   const handleMoveAllUsersToChannel = (userIds: User['userId'][], serverId: Server['serverId'], channelId: Channel['channelId']) => {
     ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId })));
+  };
+
+  const handleKickUsersFromServer = (userIds: User['userId'][], serverId: Server['serverId']) => {
+    handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
   };
 
   const handleDeleteChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -203,6 +208,22 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ user, friends, ser
               label: t('edit-channel-order'),
               show: isServerAdmin(permissionLevel),
               onClick: () => handleOpenEditChannelOrder(userId, serverId),
+            },
+            {
+              id: 'separator',
+              label: '',
+            },
+            {
+              id: 'kick-channel-users-from-server',
+              label: t('kick-channel-users-from-server'),
+              show: isStaff(permissionLevel) && categoryMembers.length > 0,
+              onClick: () => handleKickUsersFromServer(categoryUserIds, serverId),
+            },
+            {
+              id: 'kick-all-users-from-server',
+              label: t('kick-all-users-from-server'),
+              show: isStaff(permissionLevel) && serverOnlineMembers.length > 0,
+              onClick: () => handleKickUsersFromServer(serverUserIds, serverId),
             },
             {
               id: 'separator',

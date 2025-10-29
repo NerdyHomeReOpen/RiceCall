@@ -19,7 +19,7 @@ import ipc from '@/services/ipc.service';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenChannelSetting, handleOpenCreateChannel, handleOpenEditChannelOrder, handleOpenServerBroadcast, handleOpenChannelPassword } from '@/utils/popup';
-import { isMember, isServerAdmin, isChannelMod, isChannelAdmin } from '@/utils/permission';
+import { isMember, isServerAdmin, isChannelMod, isChannelAdmin, isStaff } from '@/utils/permission';
 
 interface ChannelTabProps {
   user: User;
@@ -46,6 +46,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
 
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel), [globalPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
+  const serverUserIds = useMemo(() => serverOnlineMembers.map((mb) => mb.userId), [serverOnlineMembers]);
   const channelMembers = useMemo(() => serverOnlineMembers.filter((mb) => mb.currentChannelId === channelId), [serverOnlineMembers, channelId]);
   const channelUserIds = useMemo(() => channelMembers.map((mb) => mb.userId), [channelMembers]);
   const isInChannel = useMemo(() => userCurrentChannelId === channelId, [userCurrentChannelId, channelId]);
@@ -82,6 +83,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
 
   const handleMoveAllUsersToChannel = (userIds: User['userId'][], serverId: Server['serverId'], channelId: Channel['channelId']) => {
     ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId })));
+  };
+
+  const handleKickUsersFromServer = (userIds: User['userId'][], serverId: Server['serverId']) => {
+    handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
   };
 
   const handleDeleteChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
@@ -198,6 +203,22 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
               label: t('edit-channel-order'),
               show: isServerAdmin(permissionLevel),
               onClick: () => handleOpenEditChannelOrder(userId, serverId),
+            },
+            {
+              id: 'separator',
+              label: '',
+            },
+            {
+              id: 'kick-channel-users-from-server',
+              label: t('kick-channel-users-from-server'),
+              show: isStaff(permissionLevel) && channelMembers.length > 0,
+              onClick: () => handleKickUsersFromServer(channelUserIds, serverId),
+            },
+            {
+              id: 'kick-all-users-from-server',
+              label: t('kick-all-users-from-server'),
+              show: isStaff(permissionLevel) && serverOnlineMembers.length > 0,
+              onClick: () => handleKickUsersFromServer(serverUserIds, serverId),
             },
             {
               id: 'separator',

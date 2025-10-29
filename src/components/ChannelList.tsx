@@ -22,7 +22,7 @@ import ipc from '@/services/ipc.service';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenServerSetting, handleOpenEditNickname, handleOpenCreateChannel, handleOpenEditChannelOrder } from '@/utils/popup';
-import { isMember, isServerAdmin } from '@/utils/permission';
+import { isMember, isServerAdmin, isStaff } from '@/utils/permission';
 
 interface ChannelListProps {
   user: User;
@@ -64,6 +64,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
   const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
+  const serverUserIds = useMemo(() => serverOnlineMembers.map((mb) => mb.userId), [serverOnlineMembers]);
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
   const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
@@ -93,6 +94,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const handleLocateUser = () => {
     findMe.findMe();
     setSelectedItemId(`user-${userId}`);
+  };
+
+  const handleKickUsersFromServer = (userIds: User['userId'][], serverId: Server['serverId']) => {
+    handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
   };
 
   const handleServerMemberApplicationsSet = (...args: MemberApplication[]) => {
@@ -264,6 +269,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
               label: t('create-channel'),
               show: isServerAdmin(permissionLevel),
               onClick: () => handleOpenCreateChannel(userId, serverId, ''),
+            },
+            {
+              id: 'separator',
+              label: '',
+            },
+            {
+              id: 'kick-all-users-from-server',
+              label: t('kick-all-users-from-server'),
+              show: isStaff(permissionLevel) && serverUserIds.length > 0,
+              onClick: () => handleKickUsersFromServer(serverUserIds, serverId),
             },
             {
               id: 'separator',
