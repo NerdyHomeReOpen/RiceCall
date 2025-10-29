@@ -49,7 +49,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
 
   // Destructuring
   const { userId, permissionLevel: globalPermissionLevel } = user;
-  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, receiveApply: serverReceiveApply, permissionLevel: serverPermissionLevel, favorite: isFavorite } = server;
+  const {
+    serverId,
+    name: serverName,
+    avatarUrl: serverAvatarUrl,
+    displayId: serverDisplayId,
+    receiveApply: serverReceiveApply,
+    permissionLevel: serverPermissionLevel,
+    favorite: isFavorite,
+    isVerified: isVerifiedServer,
+  } = server;
   const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = channel;
 
   // Memos
@@ -70,7 +79,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
         .sort((a, b) => a.position - b.position),
     [queueUsers, serverOnlineMemberMap],
   );
-  const isVerifiedServer = useMemo(() => false, []); // TODO: implement
 
   // Handlers
   const handleFavoriteServer = (serverId: Server['serverId']) => {
@@ -131,7 +139,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
         </div>
         <div className={styles['base-info-wrapper']}>
           <div className={styles['box']}>
-            {isVerifiedServer && <div className={styles['verify-icon']} title={t('official-verified-server')}></div>}
+            {!!isVerifiedServer && <div className={styles['verify-icon']} title={t('official-verified-server')}></div>}
             <div className={styles['name-text']}>{serverName} </div>
           </div>
           <div className={styles['box']}>
