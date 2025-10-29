@@ -508,7 +508,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                           </td>
                           <td>{getPermissionText(t, memberPermission)}</td>
                           <td>{memberContribution}</td>
-                          <td>{new Date(memberJoinDate).toISOString().slice(0, 10)}</td>
+                          <td>{new Date(memberJoinDate).toLocaleString()}</td>
                         </tr>
                       );
                     })}
@@ -645,7 +645,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                         >
                           <td>{applicationName}</td>
                           <td>{applicationDescription}</td>
-                          <td>{new Date(applicationCreatedAt).toISOString().slice(0, 10)}</td>
+                          <td>{new Date(applicationCreatedAt).toLocaleString()}</td>
                         </tr>
                       );
                     })}
@@ -702,7 +702,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                           }}
                         >
                           <td>{memberNickname || memberName}</td>
-                          <td>{memberBlockedUntil === -1 ? t('permanent') : new Date(memberBlockedUntil).toISOString().slice(0, 10)}</td>
+                          <td>{memberBlockedUntil === -1 ? t('permanent') : new Date(memberBlockedUntil).toLocaleString()}</td>
                         </tr>
                       );
                     })}

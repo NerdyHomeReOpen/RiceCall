@@ -127,9 +127,7 @@ const VolumeSlider = React.memo(
       </div>
     );
   },
-  (prev, next) =>
-    prev.value === next.value && // 比較關鍵 prop
-    prev.muted === next.muted,
+  (prev, next) => prev.value === next.value && prev.muted === next.muted,
 );
 
 VolumeSlider.displayName = 'VolumeSlider';
@@ -173,6 +171,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
     const [isScrollToBottom, setIsScrollToBottom] = useState<boolean>(true);
+    const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
 
     // Variables
     const { userId, permissionLevel: globalPermissionLevel } = user;
@@ -406,16 +405,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, []);
 
     useEffect(() => {
-      if (channelUIMode === 'classic') {
-        annAreaRef.current!.style.minWidth = '100%';
-        annAreaRef.current!.style.minHeight = '60px';
-      } else if (channelUIMode === 'three-line') {
-        annAreaRef.current!.style.minHeight = '100%';
-        annAreaRef.current!.style.minWidth = '200px';
-      }
-    }, [channelUIMode]);
-
-    useEffect(() => {
       const changeSpeakingMode = (speakingMode: SpeakingMode) => {
         console.info('[ServerPage] speaking mode updated: ', speakingMode);
         setSpeakingMode(speakingMode);
@@ -462,13 +451,41 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             {/* Message Area */}
             <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
               {/* Announcement Area */}
-              <div ref={annAreaRef} className={styles['announcement-area']}>
-                <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} />
-              </div>
+              {isAnnouncementVisible && (
+                <div
+                  ref={annAreaRef}
+                  className={styles['announcement-area']}
+                  style={isAnnouncementVisible ? (channelUIMode === 'classic' ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }) : { display: 'none' }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const { clientX: x, clientY: y } = e;
+                    contextMenu.showContextMenu(x, y, 'right-bottom', [
+                      {
+                        id: 'close-announcement',
+                        label: t('close-announcement'),
+                        onClick: () => setIsAnnouncementVisible(false),
+                      },
+                    ]);
+                  }}
+                >
+                  <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} />
+                </div>
+              )}
 
               {/* Resize Handle */}
-              <div className="resize-handle-vertical" style={channelUIMode === 'classic' ? {} : { display: 'none' }} onPointerDown={handleAnnAreaHandleDown} onPointerMove={handleAnnAreaHandleMove} />
-              <div className="resize-handle" style={channelUIMode === 'three-line' ? {} : { display: 'none' }} onPointerDown={handleAnnAreaHandleDown} onPointerMove={handleAnnAreaHandleMove} />
+              <div
+                className="resize-handle-vertical"
+                style={channelUIMode === 'classic' && isAnnouncementVisible ? {} : { display: 'none' }}
+                onPointerDown={handleAnnAreaHandleDown}
+                onPointerMove={handleAnnAreaHandleMove}
+              />
+              <div
+                className="resize-handle"
+                style={channelUIMode === 'three-line' && isAnnouncementVisible ? {} : { display: 'none' }}
+                onPointerDown={handleAnnAreaHandleDown}
+                onPointerMove={handleAnnAreaHandleMove}
+              />
 
               {/* Bottom Area */}
               <div className={styles['bottom-area']}>
@@ -487,6 +504,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         id: 'clean-up-message',
                         label: t('clean-up-message'),
                         onClick: () => clearMessages(),
+                      },
+                      {
+                        id: 'open-announcement',
+                        label: t('open-announcement'),
+                        show: !isAnnouncementVisible,
+                        onClick: () => setIsAnnouncementVisible(true),
                       },
                     ]);
                   }}
