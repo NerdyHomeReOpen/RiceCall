@@ -189,14 +189,6 @@ const Popup = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') ipc.window.close();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
-
-  useEffect(() => {
     if (!id) return;
     setInitialData(ipc.initialData.get(id));
   }, [id]);

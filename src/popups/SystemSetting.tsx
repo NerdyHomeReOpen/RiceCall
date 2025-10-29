@@ -135,7 +135,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
       // reset to default
       if (e.key === 'Escape') {
-        handleSetHotKey(current, null);
+        handleSetHotKey(current, '');
         closeDelection();
         return;
       }
@@ -392,7 +392,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Mix Setting */}
-            <div className={popup['header']}>
+            {/* <div className={popup['header']}>
               <div className={popup['label']}>{t('mix-setting') + ' ' + t('soon')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
@@ -429,10 +429,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <input name="microphone-amplification" type="checkbox" checked={microphoneAmplification} disabled={autoMixSetting} onChange={(e) => setMicrophoneAmplification(e.target.checked)} />
                 <div className={popup['label']}>{t('microphone-amplification-label')}</div>
               </div>
-            </div>
+            </div> */}
 
             {/* Mix mode setting */}
-            <div className={popup['header']}>
+            {/* <div className={popup['header']}>
               <div className={popup['label']}>{t('mix-mode-setting') + ' ' + t('soon')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
@@ -448,7 +448,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <input name="mix-app-source" type="radio" checked={mixMode === 'app'} disabled={!manualMixMode} onChange={() => setMixMode('app')} />
                 <div className={popup['label']}>{t('mix-app-source-label')}</div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
