@@ -163,7 +163,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
-    const [showNewMessage, setShowNewMessage] = useState<boolean>(false);
     const [speakingMode, setSpeakingMode] = useState<SpeakingMode>('key');
     const [speakingKey, setSpeakingKey] = useState<string>('');
     const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
@@ -349,7 +348,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
       const isScrollToBottom = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
       setIsScrollToBottom(isScrollToBottom);
-      if (isScrollToBottom) setShowNewMessage(false);
     };
 
     // Effects
@@ -429,10 +427,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       ];
       return () => unsubscribe.forEach((unsub) => unsub());
     }, []);
-
-    useEffect(() => {
-      setShowNewMessage(!isScrollToBottom);
-    }, [channelMessages]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
       <main className={styles['server']} style={display ? {} : { display: 'none' }}>
@@ -519,7 +513,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
                 {/* Broadcast Area */}
                 <div className={styles['input-area']}>
-                  <div className={`${styles['new-message-area']} ${showNewMessage ? styles['show'] : ''}`} />
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={channel} server={server} />
                   </div>
