@@ -80,16 +80,12 @@
   padding: 0 10px;
   border: 1px solid var(--border);
   border-radius: 5px;
-  background: var(--button-background);
+  background: linear-gradient(#fdfdfd, #ededed);
   color: var(--text-color-secondary);
 }
 
 .button:hover {
-  background: var(--hover);
-}
-
-.button:active {
-  background: var(--selected);
+  background: linear-gradient(#ededed, #fdfdfd);
 }
 
 .button.blue {
