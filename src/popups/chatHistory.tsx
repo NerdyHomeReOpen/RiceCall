@@ -55,7 +55,7 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(() => {
           <div className={chatHistory['body-box']}>
             <div className={`${chatHistory['body-left']} ${friednList['friend-group-list']}`}>
               <div className={chatHistory['friend-group-box']}>
-                <div className={`${friednList['friend-group-tab']} ${chatHistory['friend-tab']}`}>
+                <div className={`${friednList['friend-group-tab']}`}>
                   <div className={`${friednList['toggle-icon']} ${friednList['expanded']}`}></div>
                   <div>黑名單</div>
                   <div>(0)</div>
@@ -75,10 +75,14 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(() => {
             <div className={chatHistory['body-right']}>
               <div className={chatHistory['body-right-top']}>
                 <div className={chatHistory['body-right-top-title']}>與 %d 的聊天訊息紀錄</div>
-                <div className={chatHistory['body-right-top-delete-button-box']}></div>
-
+                <div className={chatHistory['body-right-top-delete-button-box']}>
+                <div className={chatHistory['delete-button-icon']}></div>
+                <div className={chatHistory['delete-button-text']}>刪除紀錄</div>
+                </div>
               </div>
-              <div className={chatHistory['body-right-botton']}></div>
+              <div className={chatHistory['body-right-botton']}>
+                <div className={chatHistory['message-date']}></div>
+              </div>
             </div>
           </div>
         </div>
