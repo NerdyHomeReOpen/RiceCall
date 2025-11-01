@@ -43,6 +43,7 @@
   "blacklist-management": "黑名單管理",
   "block": "封鎖",
   "block-ip": "封鎖IP",
+  "block-location": "封鎖區域",
   "block-permanent": "永久封鎖",
   "block-temporary": "暫時封鎖",
   "block-time": "封鎖時間",

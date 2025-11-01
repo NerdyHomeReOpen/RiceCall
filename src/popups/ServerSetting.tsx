@@ -469,7 +469,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                                 id: 'block',
                                 label: t('block'),
                                 show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-                                onClick: () => handleOpenBlockMember(memberUserId, serverId),
+                                onClick: () => handleOpenBlockMember(userId, memberUserId, serverId, null),
                               },
                               {
                                 id: 'separator',

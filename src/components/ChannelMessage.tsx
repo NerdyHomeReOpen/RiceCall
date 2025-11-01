@@ -46,7 +46,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
 
   const { userId, permissionLevel: globalPermission } = user;
 
-  const { permissionLevel: channelPermissionLevel } = channel;
+  const { channelId, permissionLevel: channelPermissionLevel } = channel;
   const { serverId, permissionLevel: serverPermissionLevel } = server;
 
   // Variables
@@ -100,7 +100,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
                 id: 'block',
                 label: t('block'),
                 show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-                onClick: () => handleOpenBlockMember(senderUserId, serverId),
+                onClick: () => handleOpenBlockMember(userId, senderUserId, serverId, channelId),
               },
             ]);
           }}

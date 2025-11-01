@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 
 // Types
-import type { Member, Server, User } from '@/types';
+import type { Member, Server, Channel, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -12,12 +12,17 @@ import popup from '@/styles/popup.module.css';
 // Services
 import ipc from '@/services/ipc.service';
 
+// Utils
+import { isServerAdmin } from '@/utils/permission';
+
 interface BlockMemberPopupProps {
   serverId: Server['serverId'];
-  member: Member;
+  channelId: Channel['channelId'] | undefined;
+  userMember: Member;
+  targetMember: Member;
 }
 
-const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId, member }) => {
+const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId, channelId, userMember, targetMember }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -25,18 +30,26 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
   const [blockType, setBlockType] = useState<'block-temporary' | 'block-permanent' | 'block-ip'>('block-temporary');
   const [formatType, setFormatType] = useState<string>('hours');
   const [selectTime, setSelectTime] = useState<number>(1);
+  const [selectMode, setSearchMode] = useState<string>(channelId !== undefined ? 'channel' : 'server');
 
   // Destructuring
-  const { userId, name: memberName, nickname: memberNickname } = member;
+  const { permissionLevel: userPermission } = userMember;
+  const { userId, name: memberName, nickname: memberNickname } = targetMember;
 
   // Memos
   const BLOCK_TYPE_OPTIONS = useMemo(
-    () => [
-      { key: 'block-temporary', label: t('block-temporary'), disabled: false },
-      { key: 'block-permanent', label: t('block-permanent'), disabled: false },
-      { key: 'block-ip', label: t('block-ip'), disabled: true },
-    ],
-    [t],
+    () =>
+      selectMode === 'server'
+        ? [
+            { key: 'block-temporary', label: t('block-temporary'), disabled: false },
+            { key: 'block-permanent', label: t('block-permanent'), disabled: false },
+            { key: 'block-ip', label: t('block-ip'), disabled: true },
+          ]
+        : [
+            { key: 'block-temporary', label: t('block-temporary'), disabled: false },
+            { key: 'block-permanent', label: t('block-permanent'), disabled: false },
+          ],
+    [t, selectMode],
   );
   const FORMAT_TYPE_OPTIONS = useMemo(
     () => [
@@ -95,6 +108,10 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
     ipc.socket.send('terminateMember', { userId, serverId });
   };
 
+  const handleBlockUserFromChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], blockUntil: number) => {
+    ipc.socket.send('blockUserFromChannel', { userId, serverId, channelId, blockUntil });
+  };
+
   const handleClose = () => {
     ipc.window.close();
   };
@@ -108,6 +125,13 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
           <div className={popup['col']}>
             <div className={popup['label']}>{t('confirm-block-user', { '0': memberNickname || memberName })}</div>
             <div className={popup['col']}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <div className={popup['label']}>{t('block-location')}</div>
+                <input type="radio" disabled={channelId === undefined} checked={selectMode === 'channel'} onChange={() => setSearchMode('channel')} />
+                <div className={`${popup['label']} ${channelId === undefined ? 'disabled' : ''}`}>{t('current-channel')}</div>
+                <input type="radio" disabled={!isServerAdmin(userPermission)} checked={selectMode === 'server'} onChange={() => setSearchMode('server')} />
+                <div className={`${popup['label']} ${!isServerAdmin(userPermission) ? 'disabled' : ''}`}>{t('servers')}</div>
+              </div>
               <div className={`${popup['input-box']} ${popup['row']}`}>
                 <div className={popup['label']}>{t('block-type')}</div>
                 <div className={popup['select-box']}>
@@ -150,7 +174,11 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
         <div
           className={popup['button']}
           onClick={() => {
-            handleBlockUserFromServer(userId, serverId, blockType === 'block-temporary' ? Date.now() + BLOCK_TIME : -1);
+            if (channelId !== undefined && selectMode === 'channel') {
+              handleBlockUserFromChannel(userId, serverId, channelId, blockType === 'block-temporary' ? Date.now() + BLOCK_TIME : -1);
+            } else {
+              handleBlockUserFromServer(userId, serverId, blockType === 'block-temporary' ? Date.now() + BLOCK_TIME : -1);
+            }
             handleClose();
           }}
         >

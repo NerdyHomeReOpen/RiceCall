@@ -65,7 +65,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
   } = member;
-  const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel, voiceMode: channelVoiceMode } = channel;
+  const { channelId, isLobby: currentChannelIsLobby, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel, voiceMode: channelVoiceMode } = channel;
   const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId } = server;
 
   // Variables
@@ -251,8 +251,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'block',
             label: t('block'),
-            show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-            onClick: () => handleOpenBlockMember(memberUserId, serverId),
+            show: !isUser && (currentChannelIsLobby ? isServerAdmin(permissionLevel) : isChannelMod(permissionLevel)) && isSuperior,
+            onClick: () => handleOpenBlockMember(userId, memberUserId, serverId, currentChannelIsLobby ? null : channelId),
           },
           {
             id: 'separator',
