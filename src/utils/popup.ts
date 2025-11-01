@@ -45,8 +45,12 @@ export const handleOpenEditNickname = (userId: User['userId'], serverId: Server[
   ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
 };
 
-export const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId']) => {
-  ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
+export const handleOpenBlockMember = (userId: User['userId'], targetId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'] | null) => {
+  if (channelId) {
+    ipc.popup.open('blockMemberFromChannel', `blockMemberFromChannel`, { userId, targetId, serverId, channelId });
+    return;
+  }
+  ipc.popup.open('blockMemberFromServer', `blockMember`, { userId, targetId, serverId });
 };
 
 export const handleOpenInviteMember = (userId: User['userId'], serverId: Server['serverId']) => {

@@ -140,11 +140,17 @@ const ipcService = {
           if (!friendGroups) return;
           ipcRenderer.send('open-popup', type, id, { targetId, friendGroups }, force);
         });
-      } else if (type === 'blockMember') {
-        const { userId, serverId } = initialData;
-        Promise.all([data.member({ userId, serverId })]).then(([member]) => {
-          if (!member) return;
-          ipcRenderer.send('open-popup', type, id, { userId, serverId, member }, force);
+      } else if (type === 'blockMemberFromChannel') {
+        const { userId, targetId, serverId, channelId } = initialData;
+        Promise.all([data.member({ userId, serverId, channelId }), data.member({ userId: targetId, serverId, channelId })]).then(([userMember, targetMember]) => {
+          if (!userMember || !targetMember) return;
+          ipcRenderer.send('open-popup', 'blockMember', id, { userId, serverId, channelId, userMember, targetMember }, force);
+        });
+      } else if (type === 'blockMemberFromServer') {
+        const { userId, targetId, serverId } = initialData;
+        Promise.all([data.member({ userId, serverId }), data.member({ userId: targetId, serverId })]).then(([userMember, targetMember]) => {
+          if (!userMember || !targetMember) return;
+          ipcRenderer.send('open-popup', 'blockMember', id, { userId, serverId, undefined, userMember, targetMember }, force);
         });
       } else if (type === 'channelSetting') {
         const { userId, serverId, channelId } = initialData;
