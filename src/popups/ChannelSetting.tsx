@@ -78,14 +78,23 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const isLobby = useMemo(() => serverLobbyId === channelId, [serverLobbyId, channelId]);
   const isReceptionLobby = useMemo(() => serverReceptionLobbyId === channelId, [serverReceptionLobbyId, channelId]);
   const totalModerators = useMemo(() => channelMembers.filter((m) => isChannelMod(m.permissionLevel) && !isServerAdmin(m.permissionLevel)).length, [channelMembers]);
+  const totalBlockMembers = useMemo(() => channelMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now()).length, [channelMembers]);
   const canSubmit = useMemo(() => channelName.trim(), [channelName]);
 
   const settingPages = useMemo(
     () =>
       isChannelMod(permissionLevel)
-        ? [t('channel-info'), t('channel-announcement'), t('access-permission'), t('speaking-permission'), t('text-permission'), t('channel-management')]
+        ? [
+            t('channel-info'),
+            t('channel-announcement'),
+            t('access-permission'),
+            t('speaking-permission'),
+            t('text-permission'),
+            t('channel-management'),
+            `${t('blacklist-management')} (${totalBlockMembers})`,
+          ]
         : [t('channel-info'), t('channel-announcement')],
-    [t, permissionLevel],
+    [t, permissionLevel, totalBlockMembers],
   );
 
   const memberTableFields = useMemo(
@@ -98,6 +107,14 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     [t],
   );
 
+  const blockMemberTableFields = useMemo(
+    () => [
+      { name: t('name'), field: 'name' },
+      { name: t('unblock-date'), field: 'isBlocked' },
+    ],
+    [t],
+  );
+
   const filteredModerators = useMemo(
     () =>
       channelMembers
@@ -106,6 +123,16 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
             isChannelMod(m.permissionLevel) &&
             !isServerAdmin(m.permissionLevel) &&
             (m.nickname?.toLowerCase().includes(searchText.toLowerCase()) || m.name.toLowerCase().includes(searchText.toLowerCase())),
+        )
+        .sort(Sorter(sortField as keyof Member, sortDirection)),
+    [channelMembers, searchText, sortField, sortDirection],
+  );
+
+  const filteredBlockMembers = useMemo(
+    () =>
+      channelMembers
+        .filter(
+          (m) => (m.blockedUntil === -1 || m.blockedUntil > Date.now()) && (m.nickname?.toLowerCase().includes(searchText.toLowerCase()) || m.name.toLowerCase().includes(searchText.toLowerCase())),
         )
         .sort(Sorter(sortField as keyof Member, sortDirection)),
     [channelMembers, searchText, sortField, sortDirection],
@@ -126,6 +153,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
     handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
+  };
+
+  const handleUnblockUserFromChannel = (userId: User['userId'], userName: User['name'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipc.socket.send('unblockUserFromChannel', { userId, serverId, channelId }));
   };
 
   const handleClose = () => {
@@ -563,7 +594,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                               id: 'block',
                               label: t('block'),
                               show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-                              onClick: () => handleOpenBlockMember(memberUserId, serverId),
+                              onClick: () => handleOpenBlockMember(userId, memberUserId, serverId, null),
                             },
                             {
                               id: 'separator',
@@ -621,6 +652,69 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                         <td>{getPermissionText(t, memberPermission)}</td>
                         <td>{memberContribution}</td>
                         <td>{new Date(memberJoinDate).toLocaleString()}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <div className={setting['note-text']}>{t('right-click-to-process')}</div>
+            </div>
+          </div>
+        </div>
+        {/* Blacklist Management */}
+        <div className={setting['right']} style={activeTabIndex === 6 ? {} : { display: 'none' }}>
+          <div className={popup['col']}>
+            <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
+              <div className={popup['label']}>{`${t('blacklist')} (${filteredBlockMembers.length})`}</div>
+              <div className={setting['search-box']}>
+                <div className={setting['search-icon']}></div>
+                <input name="search-query" type="text" className={setting['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+              </div>
+            </div>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
+              <table style={{ height: '330px' }}>
+                <thead>
+                  <tr>
+                    {blockMemberTableFields.map((field) => (
+                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
+                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className={setting['table-container']}>
+                  {filteredBlockMembers.map((member) => {
+                    const { userId: memberUserId, nickname: memberNickname, name: memberName, blockedUntil: memberBlockedUntil } = member;
+                    const isUser = memberUserId === userId;
+                    return (
+                      <tr
+                        key={memberUserId}
+                        className={`${selectedItemId === `blocked-${memberUserId}` ? popup['selected'] : ''}`}
+                        onClick={() => {
+                          if (selectedItemId === `blocked-${memberUserId}`) setSelectedItemId('');
+                          else setSelectedItemId(`blocked-${memberUserId}`);
+                        }}
+                        onContextMenu={(e) => {
+                          const x = e.clientX;
+                          const y = e.clientY;
+                          contextMenu.showContextMenu(x, y, 'right-bottom', [
+                            {
+                              id: 'view-profile',
+                              label: t('view-profile'),
+                              show: !isUser,
+                              onClick: () => handleOpenUserInfo(userId, memberUserId),
+                            },
+                            {
+                              id: 'unblock',
+                              label: t('unblock'),
+                              show: true,
+                              onClick: () => handleUnblockUserFromChannel(memberUserId, memberName, serverId, channelId),
+                            },
+                          ]);
+                        }}
+                      >
+                        <td>{memberNickname || memberName}</td>
+                        <td>{memberBlockedUntil === -1 ? t('permanent') : new Date(memberBlockedUntil).toLocaleString()}</td>
                       </tr>
                     );
                   })}
