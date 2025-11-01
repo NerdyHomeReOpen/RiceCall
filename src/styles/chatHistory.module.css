@@ -192,8 +192,14 @@
   width: 16px;
 }
 
+.body-right-botton {
+  display: flex;
+  justify-content: center;
+}
+
 .message-date {
-  background: linear-gradient(180deg,rgba(244, 247, 252, 1) 0%, rgba(182, 206, 220, 1) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(244, 247, 252, 1) 100%);
+  border-bottom: 1px solid #b6cedc;
   height: 32px;
-  width: 100%;
+  width: 95%;
 }
