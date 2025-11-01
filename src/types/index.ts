@@ -95,6 +95,13 @@ export type ChannelMessage = Message &
     type: 'general';
   };
 
+export type ChatHistory = Message &
+  User & {
+    type: 'chatHistory';
+    user1Id: string;
+    user2Id: string;
+  };
+
 export type DirectMessage = Message &
   User & {
     type: 'dm';
@@ -230,6 +237,7 @@ export type PopupType =
   | 'dialogSuccess'
   | 'dialogWarning'
   | 'directMessage'
+  | 'chatHistory'
   | 'editChannelName'
   | 'editChannelOrder'
   | 'editFriendNote'
@@ -322,6 +330,7 @@ export type ClientToServerEvents = {
   actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;
   directMessage: (...args: { targetId: string; preset: Partial<DirectMessage> }[]) => void;
   shakeWindow: (...args: { targetId: string }[]) => void;
+  chatHistory: (...args: { userId: string; targetId: string }[]) => void;
 };
 
 export type ServerToClientEvents = {
@@ -385,6 +394,7 @@ export type ServerToClientEvents = {
   actionMessage: (...args: PromptMessage[]) => void;
   directMessage: (...args: DirectMessage[]) => void;
   shakeWindow: (...args: DirectMessage[]) => void;
+  chatHistory: (...args: ChatHistory[]) => void;
   // SFU
   SFUJoined: (...args: { channelId: string }[]) => void;
   SFULeft: () => void;

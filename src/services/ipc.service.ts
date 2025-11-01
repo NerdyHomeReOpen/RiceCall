@@ -171,6 +171,13 @@ const ipcService = {
             ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, parent }, force);
           });
         }
+      } else if (type === 'chatHistory') {
+        const { userId, targetId } = initialData;
+        Promise.all([data.user({ userId }), data.friend({ userId, targetId }), data.user({ userId: targetId })]).then(([user, friend, target]) => {
+          if (!user || !target) return;
+          const title = target.name ?? '';
+          ipcRenderer.send('open-popup', type, id, { userId, targetId, user, friend, target }, force, title);
+        });
       } else if (type === 'directMessage') {
         const { userId, targetId, event, message } = initialData;
         Promise.all([data.user({ userId }), data.friend({ userId, targetId }), data.user({ userId: targetId })]).then(([user, friend, target]) => {
