@@ -14,6 +14,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 
 // Utils
 import { escapeHtml } from '@/utils/tagConverter';
+import { getPermissionText } from '@/utils/language';
 
 interface PromptMessageProps {
   messageGroup: PromptMessage & {
@@ -36,10 +37,10 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
       messageContents.map((content) =>
         content
           .split(' ')
-          .map((c) => t(c, { ns: 'message', ...escapedMessageParameter }))
+          .map((c) => t(c, { ns: 'message', ...{ ...escapedMessageParameter, permissionText: getPermissionText(t, parseInt(messageParameter.userPermissionLevel)) } }))
           .join(' '),
       ),
-    [messageContents, escapedMessageParameter, t],
+    [messageContents, escapedMessageParameter, messageParameter, t],
   );
 
   return (
