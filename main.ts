@@ -299,7 +299,7 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     icon: APP_ICON,
     show: false,
     webPreferences: {
-      devTools: false,
+      devTools: DEV,
       webviewTag: true,
       webSecurity: false,
       nodeIntegration: true,
@@ -376,7 +376,7 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
     icon: APP_ICON,
     show: false,
     webPreferences: {
-      devTools: false,
+      devTools: DEV,
       webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
@@ -447,7 +447,7 @@ export async function createPopup(type: PopupType, id: string, data: unknown, fo
     icon: APP_ICON,
     show: false,
     webPreferences: {
-      devTools: false,
+      devTools: DEV,
       webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
