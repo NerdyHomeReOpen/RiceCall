@@ -33,7 +33,7 @@ import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenUserInfo } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenChatHistory, handleOpenUserInfo } from '@/utils/popup';
 import { toTags } from '@/utils/tagConverter';
 
 const SHAKE_COOLDOWN = 3;
@@ -362,7 +362,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`} onClick={handleSendShakeWindow} />
               </div>
               <div className={styles['buttons']}>
-                <div className={styles['history-message']}>{t('message-history')}</div>
+                <div 
+                className={styles['history-message']}
+                onClick={() => handleOpenChatHistory(userId, targetId)}
+                >{t('message-history')}</div>
               </div>
             </div>
             <EditorContent
