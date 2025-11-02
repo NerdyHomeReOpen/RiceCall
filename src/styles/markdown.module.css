@@ -228,7 +228,7 @@
   user-select: text;
   display: inline-block !important;
   word-break: break-all !important;
-  color: #226ba0;
+  color: var(--text-username);
   cursor: pointer;
   white-space: pre-wrap;
   &:hover {
