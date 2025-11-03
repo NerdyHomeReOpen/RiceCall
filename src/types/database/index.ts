@@ -133,12 +133,6 @@ export type table_notifies = {
   createdAt: number;
 };
 
-export type table_recommend_server_categories = {
-  categoryId: string;
-  name: string;
-  order: number;
-};
-
 export type table_recommend_servers = {
   categoryId: string;
   serverId: string;
@@ -184,7 +178,7 @@ export type table_servers = {
   receiveApply: boolean;
   isVerified: boolean;
   type: 'game' | 'entertainment' | 'other';
-  visibility: 'public' | 'private' | 'invisible';
+  visibility: 'public' | 'private' | 'invisible' | 'blocked';
   lobbyId: string;
   receptionLobbyId: string | null;
   ownerId: string;
@@ -194,6 +188,13 @@ export type table_servers = {
 export type table_tokens = {
   userId: string;
   token: string;
+  createdAt: number;
+};
+
+export type table_user_activities = {
+  activityId: number;
+  userId: string;
+  content: string;
   createdAt: number;
 };
 
@@ -214,8 +215,21 @@ export type table_user_servers = {
 
 export type table_user_vips = {
   userId: string;
-  vip: number;
+  expiresAt: number;
   createdAt: number;
+};
+
+export type table_user_settings = {
+  userId: string;
+  forbidFriendApplications: boolean;
+  forbidShakeMessages: boolean;
+  forbidMemberInvitations: boolean;
+  forbidStrangerMessages: boolean;
+  shareCurrentServer: boolean;
+  shareRecentServers: boolean;
+  shareJoinedServers: boolean;
+  shareFavoriteServers: boolean;
+  notSaveMessageHistory: boolean;
 };
 
 export type table_users = {

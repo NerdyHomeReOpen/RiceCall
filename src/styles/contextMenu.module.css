@@ -6,9 +6,8 @@
   justify-content: space-around;
   min-width: max-content;
   background-color: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  box-shadow: 0 1px 1px var(--shadow);
+  border-radius: 3px;
+  box-shadow: var(--box-shadow);
   overflow: hidden;
 }
 
@@ -23,6 +22,7 @@
   background-image: url('/ctrl/menu_spliter.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
+  margin: 2px 0;
 }
 
 .context-menu .option {
@@ -31,6 +31,7 @@
   align-items: center;
   width: 100%;
   padding: 5px 30px;
+  margin: 2px 0;
   display: flex;
   position: relative;
 }
@@ -128,9 +129,8 @@
   min-width: 154px;
   max-width: 154px;
   background-color: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  box-shadow: 0 1px 1px var(--shadow);
+  border-radius: 3px;
+  box-shadow: var(--box-shadow);
   overflow: hidden;
 }
 

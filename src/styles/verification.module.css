@@ -7,7 +7,6 @@
   align-items: center;
   padding: 15px;
   gap: 5px;
-  background-color: var(--foreground);
   overflow-y: scroll;
 }
 
@@ -74,7 +73,7 @@
   align-items: flex-start;
   height: 80px;
   border: 1px solid var(--border);
-  background-color: var(--background);
+  background-color: var(--background-secondary);
   padding: 2px;
 }
 

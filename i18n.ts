@@ -26,6 +26,7 @@ import zhCN_system from './src/i18n/locales/zh-CN/system.json' with { type: 'jso
 import zhTW_system from './src/i18n/locales/zh-TW/system.json' with { type: 'json' };
 
 export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
+
 export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'zh-TW', label: '繁體中文' },
   { code: 'zh-CN', label: '简体中文' },

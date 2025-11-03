@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import type { User, FriendApplication } from '@/types';
 
 // CSS
-import styles from '@/styles/friendVerification.module.css';
+import styles from '@/styles/verification.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services

@@ -55,7 +55,7 @@
   background-color: var(--background);
   border-radius: 5px;
   border: 1px solid var(--border);
-  box-shadow: 0 1px 1px var(--shadow);
+  box-shadow: 0 1px 1px #00000080;
   overflow-y: auto;
 }
 
@@ -127,7 +127,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--shadow);
+  background-color: #00000080;
 }
 
 .announcement-detail-container {
@@ -139,7 +139,7 @@
   border-radius: 5px;
   border: 1px solid var(--border);
   background-color: var(--background);
-  box-shadow: 0 1px 1px var(--shadow);
+  box-shadow: 0 1px 1px #00000080;
   overflow-y: auto;
 }
 

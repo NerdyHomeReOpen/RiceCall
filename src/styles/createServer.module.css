@@ -23,10 +23,10 @@
 .button-group .button {
   width: 50%;
   padding: 10px;
-  border: 1px solid var(--border);
   background: var(--button-background);
-  cursor: pointer;
+  border: 1px solid var(--border);
   border-radius: 4px;
+  cursor: pointer;
   text-align: center;
 }
 

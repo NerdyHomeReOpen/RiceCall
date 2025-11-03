@@ -26,7 +26,7 @@ const CATEGORIES: Category[] = [
     id: 'official-groups',
     label: ['official-groups'],
     tags: ['official'],
-    emoji: '1f310',
+    emoji: '2705',
   },
   {
     id: 'taiwan-groups',
@@ -84,7 +84,7 @@ const CATEGORIES: Category[] = [
     id: 'iran-groups',
     label: ['iran-groups'],
     tags: ['iran'],
-    emoji: '1f1f7-1f1f8',
+    emoji: '1f1ee-1f1f7',
     subCategories: [
       {
         id: 'iran-official-groups',
@@ -133,7 +133,7 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
                 </div>
                 {category.subCategories && (
                   <div className={homePage['category-list']}>
-                    {category.subCategories.map((subCategory) => (
+                    {category.subCategories.map((subCategory, index) => (
                       <div
                         key={subCategory.id}
                         className={`${homePage['category-tab']} ${activeCategory.id === subCategory.id ? homePage['selected'] : ''}`}
@@ -142,7 +142,8 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
                           setSelectedFilter(subCategory.tags);
                         }}
                       >
-                        <div className={homePage['category-name']}>{`${t(subCategory.label[subCategory.label.length - 1])}`}</div>
+                        <span className={homePage['category-tab-icon']}>{index !== (category.subCategories?.length ?? 0) - 1 ? '├─' : '└─'}</span>
+                        <div className={homePage['category-name']}>{t(subCategory.label[subCategory.label.length - 1])}</div>
                       </div>
                     ))}
                   </div>

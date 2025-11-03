@@ -1,22 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import fs from 'fs';
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
 import dotenv from 'dotenv';
 dotenv.config();
-import DiscordRPC from 'discord-rpc';
 import serve from 'electron-serve';
 import Store from 'electron-store';
-import { io, Socket } from 'socket.io-client';
 import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
-import { expand } from 'dotenv-expand';
-import { z } from 'zod';
 import { initMainI18n, t } from './i18n.js';
+import { connectSocket, disconnectSocket, latency } from './socket.js';
+import { env, loadEnv } from './env.js';
+import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -66,126 +64,6 @@ type StoreType = {
   receiveDirectMessageSound: boolean;
   receiveChannelMessageSound: boolean;
 };
-
-// Event
-const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
-
-const ClientToServerEventNames = [
-  'acceptMemberInvitation',
-  'actionMessage',
-  'addUserToQueue',
-  'approveFriendApplication',
-  'approveMemberApplication',
-  'blockUser',
-  'blockUserFromChannel',
-  'blockUserFromServer',
-  'channelMessage',
-  'clearQueue',
-  'connectChannel',
-  'connectServer',
-  'controlQueue',
-  'createChannel',
-  'createFriendGroup',
-  'createServer',
-  'deleteChannel',
-  'deleteFriend',
-  'deleteFriendApplication',
-  'deleteFriendGroup',
-  'deleteMemberApplication',
-  'deleteMemberInvitation',
-  'deleteServer',
-  'directMessage',
-  'disconnectChannel',
-  'disconnectServer',
-  'editChannel',
-  'editChannelPermission',
-  'editFriend',
-  'editFriendApplication',
-  'editFriendGroup',
-  'editMember',
-  'editMemberApplication',
-  'editMemberInvitation',
-  'editServer',
-  'editServerPermission',
-  'editUser',
-  'favoriteServer',
-  'increaseUserQueueTime',
-  'joinQueue',
-  'leaveQueue',
-  'moveUserQueuePosition',
-  'moveUserToChannel',
-  'muteUserInChannel',
-  'ping',
-  'rejectFriendApplication',
-  'rejectMemberApplication',
-  'rejectMemberInvitation',
-  'removeUserFromQueue',
-  'searchServer',
-  'searchUser',
-  'sendFriendApplication',
-  'sendMemberApplication',
-  'sendMemberInvitation',
-  'shakeWindow',
-  'stranger',
-  'terminateMember',
-  'unblockUser',
-  'unblockUserFromChannel',
-  'unblockUserFromServer',
-];
-
-const ServerToClientEventNames = [
-  'actionMessage',
-  'channelAdd',
-  'channelMemberUpdate',
-  'channelMessage',
-  'channelRemove',
-  'channelUpdate',
-  'channelsSet',
-  'directMessage',
-  'friendAdd',
-  'friendApplicationAdd',
-  'friendApplicationRemove',
-  'friendApplicationUpdate',
-  'friendApplicationsSet',
-  'friendGroupAdd',
-  'friendGroupRemove',
-  'friendGroupUpdate',
-  'friendGroupsSet',
-  'friendRemove',
-  'friendUpdate',
-  'friendsSet',
-  'memberInvitationAdd',
-  'memberInvitationRemove',
-  'memberInvitationUpdate',
-  'notification', // not used yet
-  'openPopup',
-  'playSound',
-  'pong',
-  'queueMembersSet',
-  'serverAdd',
-  'serverMemberAdd',
-  'serverMemberApplicationAdd',
-  'serverMemberApplicationRemove',
-  'serverMemberApplicationUpdate',
-  'serverMemberApplicationsSet',
-  'serverMemberRemove',
-  'serverMemberUpdate',
-  'serverOnlineMemberAdd',
-  'serverOnlineMemberRemove',
-  'serverOnlineMemberUpdate',
-  'serverOnlineMembersSet',
-  'serverRemove',
-  'serverSearch',
-  'serverUpdate',
-  'serversSet',
-  'SFUJoined',
-  'SFULeft',
-  'SFUNewProducer',
-  'SFUProducerClosed',
-  'shakeWindow',
-  'userSearch',
-  'userUpdate',
-];
 
 // Popup
 type PopupType =
@@ -317,77 +195,22 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
 };
 
 // Constants
-const MAIN_TITLE = 'RiceCall';
-const VERSION_TITLE = `RiceCall v${app.getVersion()}`;
-const DEV = process.argv.includes('--dev');
-const PORT = 3000;
-const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
-const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
-const APP_ICON = process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'icon.ico') : path.join(app.getAppPath(), 'resources', 'icon.png');
-const APP_TRAY_ICON = {
+export const START_TIMESTAMP = Date.now();
+export const MAIN_TITLE = 'RiceCall';
+export const VERSION_TITLE = `RiceCall v${app.getVersion()}`;
+export const DEV = process.argv.includes('--dev');
+export const PORT = 3000;
+export const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
+export const APP_ICON = process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'icon.ico') : path.join(app.getAppPath(), 'resources', 'icon.png');
+export const APP_TRAY_ICON = {
   gray: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray_gray.ico') : path.join(app.getAppPath(), 'resources', 'tray_gray.png'),
   normal: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray.ico') : path.join(app.getAppPath(), 'resources', 'tray.png'),
 };
 
 // Variables
+let token: string = '';
 let isLogin: boolean = false;
 let isUpdateNotified: boolean = false;
-
-// Token
-let token: string = '';
-
-// Env
-let env: Record<string, string> = {};
-
-const EnvSchema = z
-  .object({
-    API_URL: z.string(),
-    WS_URL: z.string(),
-    CROWDIN_DISTRIBUTION_HASH: z.string(),
-    UPDATE_CHANNEL: z.enum(['latest', 'dev']).default('latest'),
-  })
-  .partial();
-
-function readEnvFile(file: string, base: Record<string, string>) {
-  if (!fs.existsSync(file)) return base;
-  const cfg = dotenv.config({ path: file, processEnv: base, override: true });
-  expand(cfg);
-  return { ...base, ...(cfg.parsed ?? {}) };
-}
-
-function loadEnv() {
-  // 1) Using process.env as base (can be overridden by system env)
-  let env: Record<string, string> = { ...process.env } as any;
-
-  // 2) Read files by context (from low to high, higher will override)
-  const files: string[] = [];
-  if (app.isPackaged) {
-    files.push(path.join(process.resourcesPath, 'app.env')); // default for packaged
-    files.push(path.join(app.getPath('userData'), 'app.env')); // user override
-  } else {
-    const root = process.cwd();
-    files.push(path.join(root, '.env')); // default for dev
-    // files.push(path.join(root, '.env.local')); // dev override
-  }
-  for (const file of files) env = readEnvFile(file, env);
-
-  // 3) Validate (optional: warn if missing values)
-  const parsed = EnvSchema.safeParse(env);
-  if (!parsed.success) {
-    console.warn(`${new Date().toLocaleString()} | Invalid env values:`, parsed.error.flatten().fieldErrors);
-  } else {
-    Object.assign(env, parsed.data);
-  }
-
-  // 4) Fill process.env (for main process/sub process)
-  for (const [k, v] of Object.entries(env)) process.env[k] = String(v);
-
-  return { env, filesLoaded: files.filter(fs.existsSync) };
-}
-
-// Discord RPC
-let rpc: DiscordRPC.Client | null = null;
-const startTimestamp = Date.now();
 
 const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
@@ -445,7 +268,7 @@ let mainWindow: BrowserWindow | null = null;
 let authWindow: BrowserWindow | null = null;
 let popups: Record<string, BrowserWindow> = {};
 
-async function createMainWindow(title?: string): Promise<BrowserWindow> {
+export async function createMainWindow(title?: string): Promise<BrowserWindow> {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.showInactive();
     mainWindow.setAlwaysOnTop(true);
@@ -476,7 +299,7 @@ async function createMainWindow(title?: string): Promise<BrowserWindow> {
     icon: APP_ICON,
     show: false,
     webPreferences: {
-      devTools: false,
+      devTools: DEV,
       webviewTag: true,
       webSecurity: false,
       nodeIntegration: true,
@@ -524,7 +347,7 @@ async function createMainWindow(title?: string): Promise<BrowserWindow> {
   return mainWindow;
 }
 
-async function createAuthWindow(title?: string): Promise<BrowserWindow> {
+export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   if (authWindow && !authWindow.isDestroyed()) {
     authWindow.showInactive();
     authWindow.moveTop();
@@ -553,7 +376,7 @@ async function createAuthWindow(title?: string): Promise<BrowserWindow> {
     icon: APP_ICON,
     show: false,
     webPreferences: {
-      devTools: false,
+      devTools: DEV,
       webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
@@ -588,7 +411,7 @@ async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   return authWindow;
 }
 
-async function createPopup(type: PopupType, id: string, data: unknown, force = true, title?: string): Promise<BrowserWindow> {
+export async function createPopup(type: PopupType, id: string, data: unknown, force = true, title?: string): Promise<BrowserWindow> {
   // If force is true, destroy the popup
   if (force) {
     if (popups[id] && !popups[id].isDestroyed()) {
@@ -624,7 +447,7 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
     icon: APP_ICON,
     show: false,
     webPreferences: {
-      devTools: false,
+      devTools: DEV,
       webviewTag: true,
       nodeIntegration: true,
       contextIsolation: false,
@@ -671,158 +494,13 @@ async function createPopup(type: PopupType, id: string, data: unknown, force = t
   return popups[id];
 }
 
-function closePopups() {
+export function closePopups() {
   Object.values(popups).forEach((popup) => {
     if (popup && !popup.isDestroyed()) {
       popup.close();
     }
   });
   popups = {};
-}
-
-// Socket
-let socketInstance: Socket | null = null;
-
-function connectSocket(token: string): Socket | null {
-  if (!token) return null;
-
-  console.log(`${new Date().toLocaleString()} | Connecting socket, URL: ${env.WS_URL}, token: ${token}`);
-
-  if (socketInstance) {
-    socketInstance = disconnectSocket();
-  }
-
-  const socket = io(env.WS_URL, {
-    transports: ['websocket'],
-    reconnection: true,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 20000,
-    timeout: 10000,
-    autoConnect: false,
-    query: { token: token },
-  });
-
-  socket.on('connect', () => {
-    for (const event of ClientToServerEventNames) {
-      ipcMain.removeAllListeners(event);
-    }
-    for (const event of ServerToClientEventNames) {
-      socket.removeAllListeners(event);
-    }
-
-    // Register event listeners
-    ClientToServerEventWithAckNames.forEach((event) => {
-      ipcMain.handle(event, (_, payload) => {
-        console.log(`${new Date().toLocaleString()} | socket.emit`, event, payload);
-        return new Promise((resolve) => {
-          socket.emit(event, payload, (ack: { ok: true; data: unknown } | { ok: false; error: string }) => {
-            console.log(`${new Date().toLocaleString()} | socket.onAck`, event, ack);
-            resolve(ack);
-          });
-        });
-      });
-    });
-    ClientToServerEventNames.forEach((event) => {
-      ipcMain.on(event, (_, ...args) => {
-        console.log(`${new Date().toLocaleString()} | socket.emit`, event, ...args);
-        socket.emit(event, ...args);
-      });
-    });
-    ServerToClientEventNames.forEach((event) => {
-      socket.on(event, async (...args) => {
-        console.log(`${new Date().toLocaleString()} | socket.on`, event, ...args);
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send(event, ...args);
-        });
-        // Handle special events
-        if (event === 'shakeWindow') {
-          const initialData = args[0].initialData;
-          const title = initialData.name;
-          const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
-        }
-        if (event === 'directMessage') {
-          const initialData = args[0].initialData;
-          const title = initialData.name;
-          const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
-        }
-      });
-    });
-
-    console.info(`${new Date().toLocaleString()} | Socket connected`);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('connect', null);
-    });
-  });
-
-  socket.on('disconnect', (reason) => {
-    // Clean up event listeners
-    for (const event of ClientToServerEventWithAckNames) {
-      ipcMain.removeHandler(event);
-    }
-    for (const event of ClientToServerEventNames) {
-      ipcMain.removeAllListeners(event);
-    }
-    for (const event of ServerToClientEventNames) {
-      socket.removeAllListeners(event);
-    }
-
-    console.info(`${new Date().toLocaleString()} | Socket disconnected, reason:`, reason);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('disconnect', reason);
-    });
-  });
-
-  socket.on('reconnect', (attemptNumber) => {
-    console.info(`${new Date().toLocaleString()} | Socket reconnected, attempt number:`, attemptNumber);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('reconnect', attemptNumber);
-    });
-  });
-
-  socket.on('error', (error) => {
-    console.error(`${new Date().toLocaleString()} | Socket error:`, error.message);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('error', error.message);
-    });
-  });
-
-  socket.on('connect_error', (error) => {
-    console.error(`${new Date().toLocaleString()} | Socket connect error:`, error.message);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('connect_error', error.message);
-    });
-  });
-
-  socket.on('reconnect_error', (error) => {
-    console.error(`${new Date().toLocaleString()} | Socket reconnect error:`, error.message);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('reconnect_error', error.message);
-    });
-  });
-
-  socket.on('close', () => {
-    console.info(`${new Date().toLocaleString()} | Socket closed`);
-    socketInstance = disconnectSocket();
-  });
-
-  socket.connect();
-  return socket;
-}
-
-function disconnectSocket(): Socket | null {
-  if (!socketInstance) return null;
-
-  for (const event of ClientToServerEventNames) {
-    ipcMain.removeAllListeners(event);
-  }
-  for (const event of ServerToClientEventNames) {
-    socketInstance.removeAllListeners(event);
-  }
-
-  socketInstance.disconnect();
-  return null;
 }
 
 // Auto Updater
@@ -913,20 +591,10 @@ function configureAutoUpdater() {
   checkUpdate();
 }
 
-// Discord RPC
-async function configureDiscordRPC() {
-  DiscordRPC.register(DISCORD_RPC_CLIENT_ID);
-  rpc = new DiscordRPC.Client({ transport: 'ipc' });
-  rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID }).catch((error) => {
-    console.error(`${new Date().toLocaleString()} | Cannot login to discord rpc:`, error.message);
-    return null;
-  });
-}
-
 // Tray Icon
 let tray: Tray | null = null;
 
-function setTrayDetail(isLogin: boolean) {
+export function setTrayDetail(isLogin: boolean) {
   if (!tray) return;
   const trayIconPath = isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
   const contextMenu = Menu.buildFromTemplate([
@@ -961,7 +629,7 @@ function setTrayDetail(isLogin: boolean) {
   tray.setContextMenu(contextMenu);
 }
 
-function configureTray() {
+export function configureTray() {
   if (tray) tray.destroy();
   const trayIconPath = APP_TRAY_ICON.gray;
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
@@ -974,7 +642,8 @@ function configureTray() {
 }
 
 app.on('ready', async () => {
-  env = loadEnv().env;
+  // Load env
+  loadEnv();
 
   // Configure
   configureAutoUpdater();
@@ -1015,23 +684,21 @@ app.on('ready', async () => {
   // Auth handlers
   ipcMain.on('login', (_, _token) => {
     token = _token;
+    isLogin = true;
     mainWindow?.showInactive();
     authWindow?.hide();
-    socketInstance = connectSocket(token);
-    isLogin = true;
+    connectSocket(token);
     setTrayDetail(isLogin);
   });
 
   ipcMain.on('logout', () => {
-    rpc?.clearActivity().catch((error) => {
-      console.error(`${new Date().toLocaleString()} | Cannot clear activity:`, error);
-    });
+    clearDiscordPresence();
     closePopups();
     token = '';
+    isLogin = false;
     mainWindow?.hide();
     authWindow?.showInactive();
-    socketInstance = disconnectSocket();
-    isLogin = false;
+    disconnectSocket();
     setTrayDetail(isLogin);
   });
 
@@ -1154,10 +821,8 @@ app.on('ready', async () => {
 
   // Discord RPC handlers
   ipcMain.on('update-discord-presence', (_, updatePresence) => {
-    updatePresence.startTimestamp = startTimestamp;
-    rpc?.setActivity(updatePresence).catch((error) => {
-      console.error(`${new Date().toLocaleString()} | Cannot update discord presence:`, error.message);
-    });
+    updatePresence.startTimestamp = START_TIMESTAMP;
+    updateDiscordPresence(updatePresence);
   });
 
   // Env
@@ -1168,6 +833,11 @@ app.on('ready', async () => {
   // Token
   ipcMain.on('get-token', (event) => {
     event.returnValue = token;
+  });
+
+  // Latency
+  ipcMain.on('get-latency', (event) => {
+    event.returnValue = latency;
   });
 
   // System settings handlers
@@ -1516,12 +1186,14 @@ app.on('ready', async () => {
 
   // Voice
   ipcMain.on('set-speaking-mode', (_, mode) => {
+    store.set('speakingMode', mode ?? 'key');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('speaking-mode', mode);
     });
   });
 
   ipcMain.on('set-default-speaking-key', (_, key) => {
+    store.set('defaultSpeakingKey', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('default-speaking-key', key);
     });
@@ -1537,30 +1209,35 @@ app.on('ready', async () => {
 
   // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
+    store.set('hotKeyOpenMainWindow', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-open-main-window', key);
     });
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key) => {
+    store.set('hotKeyIncreaseVolume', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-increase-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key) => {
+    store.set('hotKeyDecreaseVolume', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-decrease-volume', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key) => {
+    store.set('hotKeyToggleSpeaker', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-speaker', key);
     });
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key) => {
+    store.set('hotKeyToggleMicrophone', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('hot-key-toggle-microphone', key);
     });
@@ -1627,9 +1304,8 @@ app.on('ready', async () => {
 });
 
 app.on('before-quit', () => {
-  rpc?.destroy().catch((error) => {
-    console.error('Cannot destroy Discord RPC:', error);
-  });
+  disconnectSocket();
+  clearDiscordPresence();
 });
 
 app.on('window-all-closed', () => {

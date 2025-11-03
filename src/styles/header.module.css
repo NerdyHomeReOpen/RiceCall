@@ -459,9 +459,8 @@
   width: fit-content;
   height: fit-content;
   background-color: var(--background);
-  border: 1px solid var(--border);
   border-radius: 3px;
-  box-shadow: 0 1px 1px var(--shadow);
+  box-shadow: var(--box-shadow);
   z-index: 1000;
 }
 

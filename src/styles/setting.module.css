@@ -131,7 +131,7 @@
 .separator {
   height: 1px;
   width: 100%;
-  background-color: var(--border-secondary);
+  background-color: var(--border);
   margin: 20px 0;
 }
 
@@ -217,9 +217,8 @@
   width: 200px;
   padding: 5px;
   background-color: var(--background);
-  border: 1px solid var(--border);
   border-radius: 5px;
-  box-shadow: 0 1px 1px var(--shadow);
+  box-shadow: var(--box-shadow);
 }
 
 .link-input {

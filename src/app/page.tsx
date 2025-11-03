@@ -385,8 +385,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   const loadingBoxRef = useRef(loadingBox);
   const soundPlayerRef = useRef(soundPlayer);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
-  const connectFailedMessageRef = useRef<string>(t('connection-failed-message'));
-  const reconnectionFailedMessageRef = useRef<string>(t('reconnection-failed-message'));
   const serverIdRef = useRef<Server['serverId']>('');
 
   // States
@@ -405,7 +403,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [notifies, setNotifies] = useState<Notify[]>([]);
   const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
 
   // Variables
   const { userId } = user;
@@ -586,43 +583,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   const handleConnect = () => {
     console.info('[Socket] connected');
     ipc.popup.close('errorDialog');
-    setIsConnected(true);
-  };
-
-  const handleDisconnect = () => {
-    console.info('[Socket] disconnected');
-    setUser(Default.user());
-    setFriends([]);
-    setFriendGroups([]);
-    setFriendApplications([]);
-    setMemberInvitations([]);
-    setServers([]);
-    setServerOnlineMembers([]);
-    setChannels([]);
-    setChannelMessages([]);
-    setActionMessages([]);
-    setSystemNotify([]);
-    setQueueUsers([]);
-    setAnnouncements([]);
-    setNotifies([]);
-    setRecommendServers([]);
-    setIsConnected(false);
-  };
-
-  const handleReconnect = (attemptNumber: number) => {
-    console.info('[Socket] reconnecting, attempt number:', attemptNumber);
   };
 
   const handleError = (message: string) => {
     new ErrorHandler(new Error(message)).show();
-  };
-
-  const handleConnectError = (message: string) => {
-    new ErrorHandler(new Error(message || connectFailedMessageRef.current), () => ipc.auth.logout()).show();
-  };
-
-  const handleReconnectError = (message: string) => {
-    new ErrorHandler(new Error(message || reconnectionFailedMessageRef.current), () => ipc.auth.logout()).show();
   };
 
   // Effects
@@ -751,11 +715,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     const unsubscribe = [
       ipc.socket.on('connect', handleConnect),
-      ipc.socket.on('reconnect', handleReconnect),
-      ipc.socket.on('disconnect', handleDisconnect),
-      ipc.socket.on('error', handleError),
-      ipc.socket.on('connect_error', handleConnectError),
-      ipc.socket.on('reconnect_error', handleReconnectError),
       ipc.socket.on('userUpdate', handleUserUpdate),
       ipc.socket.on('serversSet', handleServersSet),
       ipc.socket.on('friendsSet', handleFriendsSet),
@@ -783,11 +742,12 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.socket.on('memberInvitationAdd', handleMemberInvitationAdd),
       ipc.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
       ipc.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
+      ipc.socket.on('queueMembersSet', handleQueueUsersSet),
       ipc.socket.on('channelMessage', handleChannelMessage),
       ipc.socket.on('actionMessage', handleActionMessage),
       ipc.socket.on('openPopup', handleOpenPopup),
       ipc.socket.on('playSound', handlePlaySound),
-      ipc.socket.on('queueMembersSet', handleQueueUsersSet),
+      ipc.socket.on('error', handleError),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
@@ -797,7 +757,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       <ActionScannerProvider>
         <ExpandedProvider>
           <Header user={user} server={server} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
-          {!isConnected ? (
+          {!true ? (
             <LoadingSpinner />
           ) : (
             <>

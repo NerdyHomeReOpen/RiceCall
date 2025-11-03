@@ -54,14 +54,14 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>('key');
   const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>('v');
 
-  const [forbidAddFriend, setForbidAddFriend] = useState<boolean>(false);
-  const [forbidShake, setForbidShake] = useState<boolean>(false);
-  const [forbidInviteGroup, setForbidInviteGroup] = useState<boolean>(false);
-  const [forbidStrangerMessage, setForbidStrangerMessage] = useState<boolean>(false);
+  const [forbidFriendApplications, setForbidFriendApplications] = useState<boolean>(false);
+  const [forbidShakeMessages, setForbidShakeMessages] = useState<boolean>(false);
+  const [forbidMemberInvitations, setForbidMemberInvitations] = useState<boolean>(false);
+  const [forbidStrangerMessages, setForbidStrangerMessages] = useState<boolean>(false);
   const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(false);
-  const [shareRecentServer, setShareRecentServer] = useState<boolean>(false);
-  const [shareJoinedServer, setShareJoinedServer] = useState<boolean>(false);
-  const [shareFavoriteServer, setShareFavoriteServer] = useState<boolean>(false);
+  const [shareRecentServers, setShareRecentServers] = useState<boolean>(false);
+  const [shareJoinedServers, setShareJoinedServers] = useState<boolean>(false);
+  const [shareFavoriteServers, setShareFavoriteServers] = useState<boolean>(false);
   const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(false);
 
   const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>('F1');
@@ -135,7 +135,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
       // reset to default
       if (e.key === 'Escape') {
-        handleSetHotKey(current, null);
+        handleSetHotKey(current, '');
         closeDelection();
         return;
       }
@@ -392,7 +392,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             </div>
 
             {/* Mix Setting */}
-            <div className={popup['header']}>
+            {/* <div className={popup['header']}>
               <div className={popup['label']}>{t('mix-setting') + ' ' + t('soon')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
@@ -429,10 +429,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <input name="microphone-amplification" type="checkbox" checked={microphoneAmplification} disabled={autoMixSetting} onChange={(e) => setMicrophoneAmplification(e.target.checked)} />
                 <div className={popup['label']}>{t('microphone-amplification-label')}</div>
               </div>
-            </div>
+            </div> */}
 
             {/* Mix mode setting */}
-            <div className={popup['header']}>
+            {/* <div className={popup['header']}>
               <div className={popup['label']}>{t('mix-mode-setting') + ' ' + t('soon')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
@@ -448,7 +448,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
                 <input name="mix-app-source" type="radio" checked={mixMode === 'app'} disabled={!manualMixMode} onChange={() => setMixMode('app')} />
                 <div className={popup['label']}>{t('mix-app-source-label')}</div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -498,20 +498,20 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               <div className={popup['label']}>{t('anti-spam-setting') + ' ' + t('soon')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="forbid-add-friend" type="checkbox" checked={forbidAddFriend} onChange={() => setForbidAddFriend(!forbidAddFriend)} />
-              <div className={popup['label']}>{t('forbid-add-friend-label')}</div>
+              <input name="forbid-friend-applications" type="checkbox" checked={forbidFriendApplications} onChange={() => setForbidFriendApplications(!forbidFriendApplications)} />
+              <div className={popup['label']}>{t('forbid-friend-applications-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="forbid-shake" type="checkbox" checked={forbidShake} onChange={() => setForbidShake(!forbidShake)} />
-              <div className={popup['label']}>{t('forbid-shake-label')}</div>
+              <input name="forbid-shake-messages" type="checkbox" checked={forbidShakeMessages} onChange={() => setForbidShakeMessages(!forbidShakeMessages)} />
+              <div className={popup['label']}>{t('forbid-shake-messages-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="forbid-invite-group" type="checkbox" checked={forbidInviteGroup} onChange={() => setForbidInviteGroup(!forbidInviteGroup)} />
-              <div className={popup['label']}>{t('forbid-invite-group-label')}</div>
+              <input name="forbid-member-invitations" type="checkbox" checked={forbidMemberInvitations} onChange={() => setForbidMemberInvitations(!forbidMemberInvitations)} />
+              <div className={popup['label']}>{t('forbid-member-invitations-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="forbid-stranger-message" type="checkbox" checked={forbidStrangerMessage} onChange={() => setForbidStrangerMessage(!forbidStrangerMessage)} />
-              <div className={popup['label']}>{t('forbid-stranger-message-label')}</div>
+              <input name="forbid-stranger-messages" type="checkbox" checked={forbidStrangerMessages} onChange={() => setForbidStrangerMessages(!forbidStrangerMessages)} />
+              <div className={popup['label']}>{t('forbid-stranger-messages-label')}</div>
             </div>
 
             {/* Privacy setting */}
@@ -523,16 +523,16 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               <div className={popup['label']}>{t('share-current-server-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="share-recent-server" type="checkbox" checked={shareRecentServer} onChange={() => setShareRecentServer(!shareRecentServer)} />
-              <div className={popup['label']}>{t('share-recent-server-label')}</div>
+              <input name="share-recent-servers" type="checkbox" checked={shareRecentServers} onChange={() => setShareRecentServers(!shareRecentServers)} />
+              <div className={popup['label']}>{t('share-recent-servers-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="share-joined-server" type="checkbox" checked={shareJoinedServer} onChange={() => setShareJoinedServer(!shareJoinedServer)} />
-              <div className={popup['label']}>{t('share-joined-server-label')}</div>
+              <input name="share-joined-servers" type="checkbox" checked={shareJoinedServers} onChange={() => setShareJoinedServers(!shareJoinedServers)} />
+              <div className={popup['label']}>{t('share-joined-servers-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="share-favorite-server" type="checkbox" checked={shareFavoriteServer} onChange={() => setShareFavoriteServer(!shareFavoriteServer)} />
-              <div className={popup['label']}>{t('share-favorite-server-label')}</div>
+              <input name="share-favorite-servers" type="checkbox" checked={shareFavoriteServers} onChange={() => setShareFavoriteServers(!shareFavoriteServers)} />
+              <div className={popup['label']}>{t('share-favorite-servers-label')}</div>
             </div>
 
             {/* Message history setting */}
@@ -790,6 +790,19 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             ipc.systemSettings.stopSpeakingSound.set(stopSpeakingSound);
             ipc.systemSettings.receiveDirectMessageSound.set(receiveDirectMessageSound);
             ipc.systemSettings.receiveChannelMessageSound.set(receiveChannelMessageSound);
+            ipc.socket.send('editUserSettings', {
+              update: {
+                forbidFriendApplications,
+                forbidShakeMessages,
+                forbidMemberInvitations,
+                forbidStrangerMessages,
+                shareCurrentServer,
+                shareRecentServers,
+                shareJoinedServers,
+                shareFavoriteServers,
+                notSaveMessageHistory,
+              },
+            });
             handleClose();
           }}
         >

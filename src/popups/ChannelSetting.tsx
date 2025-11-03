@@ -620,7 +620,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                         </td>
                         <td>{getPermissionText(t, memberPermission)}</td>
                         <td>{memberContribution}</td>
-                        <td>{new Date(memberJoinDate).toISOString().slice(0, 10)}</td>
+                        <td>{new Date(memberJoinDate).toLocaleString()}</td>
                       </tr>
                     );
                   })}

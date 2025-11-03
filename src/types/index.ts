@@ -4,38 +4,39 @@ import * as mediasoupClient from 'mediasoup-client';
 import {
   table_badges,
   table_channels,
+  table_friend_applications,
   table_friend_groups,
   table_friends,
-  table_friend_applications,
-  table_servers,
-  table_members,
+  table_global_permissions,
+  table_server_permissions,
   table_member_applications,
   table_member_invitations,
-  table_users,
-  table_user_servers,
+  table_members,
+  table_recommend_servers,
+  table_servers,
+  table_user_activities,
   table_user_badges,
-  table_server_permissions,
+  table_user_settings,
+  table_user_servers,
+  table_users,
   table_channel_permissions,
-  table_channel_muted_users,
   table_server_blocked_users,
+  table_channel_muted_users,
   table_announcements,
   table_notifies,
-  table_recommend_servers,
 } from '@/types/database';
 
 export type Announcement = table_announcements;
 
 export type Notify = table_notifies;
 
-export type Permission = {
-  permissionLevel: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-};
-
 export type BadgeList = {
   badges: string;
 };
 
-export type User = table_users & Permission & BadgeList;
+export type User = table_users & table_global_permissions & BadgeList;
+
+export type UserActivity = table_user_activities;
 
 export type Badge = table_badges & table_user_badges;
 
@@ -45,11 +46,7 @@ export type FriendGroup = table_friend_groups;
 
 export type FriendApplication = table_friend_applications & table_users;
 
-export type Server = table_servers & table_user_servers & table_members & Permission;
-
-export type RecommendServerList = {
-  [category: string]: RecommendServer[];
-};
+export type Server = table_servers & table_user_servers & table_members & table_server_permissions;
 
 export type RecommendServer = table_servers &
   table_recommend_servers & {
@@ -58,17 +55,17 @@ export type RecommendServer = table_servers &
 
 export type Category = table_channels &
   table_channel_muted_users &
-  Permission & {
+  table_channel_permissions & {
     type: 'category';
   };
 
 export type Channel = table_channels &
   table_channel_muted_users &
-  Permission & {
+  table_channel_permissions & {
     type: 'channel';
   };
 
-export type OnlineMember = table_members & table_users & table_channel_muted_users & Permission & BadgeList;
+export type OnlineMember = table_members & table_users & table_channel_muted_users & table_server_permissions & BadgeList;
 
 export type QueueUser = {
   userId: string;
@@ -77,7 +74,7 @@ export type QueueUser = {
   isQueueControlled: boolean;
 };
 
-export type Member = table_members & table_users & table_server_blocked_users & Permission;
+export type Member = table_members & table_users & table_server_blocked_users & table_server_permissions;
 
 export type MemberApplication = table_member_applications & table_users;
 
@@ -209,6 +206,7 @@ export type ClientToServerEvents = {
   // User
   searchUser: (...args: { query: string }[]) => void;
   editUser: (...args: { update: Partial<table_users> }[]) => void;
+  editUserSettings: (...args: { update: Partial<table_user_settings> }[]) => void;
   // Friend
   editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
   deleteFriend: (...args: { targetId: string }[]) => void;
@@ -277,18 +275,18 @@ export type ClientToServerEvents = {
   actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;
   directMessage: (...args: { targetId: string; preset: Partial<DirectMessage> }[]) => void;
   shakeWindow: (...args: { targetId: string }[]) => void;
-  // Echo
-  ping: () => void;
 };
 
 export type ServerToClientEvents = {
   // Socket
   connect: () => void;
-  disconnect: () => void;
-  reconnect: (attemptNumbers: number) => void;
-  error: (message: string) => void;
   connect_error: (error: any) => void;
+  connect_timeout: () => void;
+  reconnect: () => void;
+  reconnect_attempt: (attemptNumbers: number) => void;
   reconnect_error: (error: any) => void;
+  reconnect_failed: () => void;
+  disconnect: () => void;
   // Notification
   notification: (...args: { message: string }[]) => void; // not used yet
   // User
@@ -357,8 +355,8 @@ export type ServerToClientEvents = {
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Popup
   openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
-  // Echo
-  pong: () => void;
+  // Error
+  error: (message: string) => void;
 };
 
 export type SFUCreateTransportParams = {

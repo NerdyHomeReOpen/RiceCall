@@ -114,8 +114,7 @@
   top: 100px;
   padding: 5px;
   background-color: var(--background);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 1px var(--shadow);
+  box-shadow: var(--box-shadow);
 }
 
 .color-selector-image {

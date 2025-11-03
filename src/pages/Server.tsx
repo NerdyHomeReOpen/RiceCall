@@ -127,9 +127,7 @@ const VolumeSlider = React.memo(
       </div>
     );
   },
-  (prev, next) =>
-    prev.value === next.value && // 比較關鍵 prop
-    prev.muted === next.muted,
+  (prev, next) => prev.value === next.value && prev.muted === next.muted,
 );
 
 VolumeSlider.displayName = 'VolumeSlider';
@@ -162,22 +160,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
-    const isScrollToBottomRef = useRef<boolean>(true);
-    const lastMessageTimer = useRef<NodeJS.Timeout | null>(null);
-
-    // const screenStreamRef = useRef<MediaStream | null>(null);
-    // const screenVideoRef = useRef<HTMLVideoElement>(null);
-    // const [isScreenSharing, setIsScreenSharing] = useState(false);
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
-    const [showLastMessage, setShowLastMessage] = useState<boolean>(false);
     const [speakingMode, setSpeakingMode] = useState<SpeakingMode>('key');
     const [speakingKey, setSpeakingKey] = useState<string>('');
     const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('three-line');
     const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
+    const [isScrollToBottom, setIsScrollToBottom] = useState<boolean>(true);
+    const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
 
     // Variables
     const { userId, permissionLevel: globalPermissionLevel } = user;
@@ -353,7 +346,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     };
 
     const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
-      isScrollToBottomRef.current = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
+      const isScrollToBottom = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
+      setIsScrollToBottom(isScrollToBottom);
     };
 
     // Effects
@@ -409,16 +403,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, []);
 
     useEffect(() => {
-      if (channelUIMode === 'classic') {
-        annAreaRef.current!.style.minWidth = '100%';
-        annAreaRef.current!.style.minHeight = '60px';
-      } else if (channelUIMode === 'three-line') {
-        annAreaRef.current!.style.minHeight = '100%';
-        annAreaRef.current!.style.minWidth = '200px';
-      }
-    }, [channelUIMode]);
-
-    useEffect(() => {
       const changeSpeakingMode = (speakingMode: SpeakingMode) => {
         console.info('[ServerPage] speaking mode updated: ', speakingMode);
         setSpeakingMode(speakingMode);
@@ -444,21 +428,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       return () => unsubscribe.forEach((unsub) => unsub());
     }, []);
 
-    useEffect(() => {
-      if (isScrollToBottomRef.current) return;
-      setShowLastMessage(true);
-      if (lastMessageTimer.current) clearTimeout(lastMessageTimer.current);
-      lastMessageTimer.current = setTimeout(() => {
-        setShowLastMessage(false);
-      }, 1000);
-      return () => {
-        if (lastMessageTimer.current) {
-          clearTimeout(lastMessageTimer.current);
-          lastMessageTimer.current = null;
-        }
-      };
-    }, [channelMessages]);
-
     return (
       <main className={styles['server']} style={display ? {} : { display: 'none' }}>
         {/* Body */}
@@ -476,13 +445,41 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             {/* Message Area */}
             <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
               {/* Announcement Area */}
-              <div ref={annAreaRef} className={styles['announcement-area']}>
-                <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} />
-              </div>
+              {isAnnouncementVisible && (
+                <div
+                  ref={annAreaRef}
+                  className={styles['announcement-area']}
+                  style={isAnnouncementVisible ? (channelUIMode === 'classic' ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }) : { display: 'none' }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const { clientX: x, clientY: y } = e;
+                    contextMenu.showContextMenu(x, y, 'right-bottom', [
+                      {
+                        id: 'close-announcement',
+                        label: t('close-announcement'),
+                        onClick: () => setIsAnnouncementVisible(false),
+                      },
+                    ]);
+                  }}
+                >
+                  <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} />
+                </div>
+              )}
 
               {/* Resize Handle */}
-              <div className="resize-handle-vertical" style={channelUIMode === 'classic' ? {} : { display: 'none' }} onPointerDown={handleAnnAreaHandleDown} onPointerMove={handleAnnAreaHandleMove} />
-              <div className="resize-handle" style={channelUIMode === 'three-line' ? {} : { display: 'none' }} onPointerDown={handleAnnAreaHandleDown} onPointerMove={handleAnnAreaHandleMove} />
+              <div
+                className="resize-handle-vertical"
+                style={channelUIMode === 'classic' && isAnnouncementVisible ? {} : { display: 'none' }}
+                onPointerDown={handleAnnAreaHandleDown}
+                onPointerMove={handleAnnAreaHandleMove}
+              />
+              <div
+                className="resize-handle"
+                style={channelUIMode === 'three-line' && isAnnouncementVisible ? {} : { display: 'none' }}
+                onPointerDown={handleAnnAreaHandleDown}
+                onPointerMove={handleAnnAreaHandleMove}
+              />
 
               {/* Bottom Area */}
               <div className={styles['bottom-area']}>
@@ -502,17 +499,20 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                         label: t('clean-up-message'),
                         onClick: () => clearMessages(),
                       },
+                      {
+                        id: 'open-announcement',
+                        label: t('open-announcement'),
+                        show: !isAnnouncementVisible,
+                        onClick: () => setIsAnnouncementVisible(true),
+                      },
                     ]);
                   }}
                 >
-                  <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} isScrollToBottom={isScrollToBottomRef.current} />
+                  <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} isScrollToBottom={isScrollToBottom} />
                 </div>
 
                 {/* Broadcast Area */}
                 <div className={styles['input-area']}>
-                  <div className={`${styles['last-message-area']} ${showLastMessage ? styles['show'] : ''}`}>
-                    <ChannelMessageContent messages={channelMessages.slice(-1)} user={user} channel={channel} server={server} />
-                  </div>
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={channel} server={server} />
                   </div>
