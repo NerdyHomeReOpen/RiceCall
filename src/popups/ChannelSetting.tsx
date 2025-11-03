@@ -6,7 +6,7 @@ import setting from '@/styles/setting.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import type { Channel, Member, Server, User, Permission } from '@/types';
+import type { Channel, Member, Server, User } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -120,7 +120,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     ipc.socket.send('editServerPermission', { userId, serverId, update });
   };
 
-  const handleEditChannelPermission = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Permission>) => {
+  const handleEditChannelPermission = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
     ipc.socket.send('editChannelPermission', { userId, serverId, channelId, update });
   };
 

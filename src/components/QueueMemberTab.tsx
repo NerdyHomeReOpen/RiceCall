@@ -6,7 +6,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import { User, QueueUser, Channel, Server, Permission, Friend, OnlineMember } from '@/types';
+import { User, QueueUser, Channel, Server, Friend, OnlineMember } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -85,11 +85,11 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
     webRTC.setUserMuted(userId, muted);
   };
 
-  const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Permission>) => {
+  const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
     ipc.socket.send('editServerPermission', { userId, serverId, update });
   };
 
-  const handleEditChannelPermission = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Permission>) => {
+  const handleEditChannelPermission = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
     ipc.socket.send('editChannelPermission', { userId, serverId, channelId, update });
   };
 
