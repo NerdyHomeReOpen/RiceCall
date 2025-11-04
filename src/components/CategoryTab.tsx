@@ -46,14 +46,20 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     // Destructuring
     const { userId, permissionLevel: globalPermissionLevel, currentChannelId: userCurrentChannelId } = user;
     const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, userLimit: categoryUserLimit, permissionLevel: categoryPermissionLevel } = category;
+    const { permissionLevel: currentChannelPermissionLevel } = currentChannel;
     const { serverId, permissionLevel: serverPermissionLevel, receptionLobbyId: serverReceptionLobbyId } = server;
 
     // Memos
     const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel), [globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel]);
+    const currentPermissionLevel = useMemo(
+      () => Math.max(globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel),
+      [globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel],
+    );
     const serverUserIds = useMemo(() => serverOnlineMembers.map((mb) => mb.userId), [serverOnlineMembers]);
     const categoryChannels = useMemo(() => channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [channels, categoryId]);
     const categoryMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === categoryId), [serverOnlineMembers, categoryId]);
     const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);
+    const movableMembers = useMemo(() => categoryMembers.filter((mb) => mb.permissionLevel <= currentPermissionLevel).map((mb) => mb.userId), [categoryMembers, currentPermissionLevel]);
     const isInChannel = useMemo(() => userCurrentChannelId === categoryId, [userCurrentChannelId, categoryId]);
     const isInCategory = useMemo(() => categoryMembers.some((m) => m.currentChannelId === userCurrentChannelId), [categoryMembers, userCurrentChannelId]);
     const isReceptionLobby = useMemo(() => serverReceptionLobbyId === categoryId, [serverReceptionLobbyId, categoryId]);
@@ -100,7 +106,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     };
 
     const handleDragStart = (e: React.DragEvent, members: OnlineMember[], currentChannelId: Channel['channelId']) => {
-      const userIds = members.filter((m) => m.permissionLevel < permissionLevel).map((m) => m.userId);
+      const userIds = members.filter((m) => m.permissionLevel <= permissionLevel).map((m) => m.userId);
       e.dataTransfer.setData('type', 'moveAllUsers');
       e.dataTransfer.setData('userIds', userIds.join(','));
       e.dataTransfer.setData('currentChannelId', currentChannelId);
@@ -144,10 +150,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             else setSelectedItemId(`category-${categoryId}`);
           }}
           onDoubleClick={() => handleConnectChannel(serverId, categoryId)}
-          draggable={isServerAdmin(permissionLevel) && categoryMembers.length > 0}
+          draggable={isChannelMod(permissionLevel) && movableMembers.length > 0}
           onDragStart={(e) => handleDragStart(e, categoryMembers, categoryId)}
           onDragOver={(e) => {
-            if (isChannelMod(permissionLevel) && !isInChannel && !isReadonlyChannel) {
+            if (isChannelMod(permissionLevel) && !isReadonlyChannel) {
               e.preventDefault();
             } else {
               e.dataTransfer.dropEffect = 'none';
@@ -202,14 +208,14 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               {
                 id: 'broadcast',
                 label: t('broadcast'),
-                show: isChannelMod(permissionLevel),
+                show: isChannelAdmin(permissionLevel),
                 onClick: () => handleOpenServerBroadcast(serverId, categoryId),
               },
               {
                 id: 'move-all-user-to-channel',
                 label: t('move-all-user-to-channel'),
-                show: !isInChannel && isServerAdmin(permissionLevel) && categoryUserIds.length !== 0,
-                onClick: () => handleMoveAllUsersToChannel(categoryUserIds, serverId, categoryId),
+                show: !isInChannel && isServerAdmin(permissionLevel) && movableMembers.length !== 0,
+                onClick: () => handleMoveAllUsersToChannel(movableMembers, serverId, categoryId),
               },
               {
                 id: 'edit-channel-order',
