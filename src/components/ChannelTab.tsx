@@ -27,13 +27,14 @@ interface ChannelTabProps {
   server: Server;
   serverOnlineMembers: OnlineMember[];
   channel: Channel;
+  currentChannel: Channel;
   expanded: Record<string, boolean>;
   selectedItemId: string | null;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, currentChannel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -140,7 +141,13 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
         onDoubleClick={() => handleConnectChannel(serverId, channelId)}
         draggable={isServerAdmin(permissionLevel) && channelMembers.length > 0}
         onDragStart={(e) => handleDragStart(e, channelMembers, channelId)}
-        onDragOver={(e) => e.preventDefault()}
+        onDragOver={(e) => {
+          if (isChannelMod(permissionLevel) && !isInChannel && !isReadonlyChannel) {
+            e.preventDefault();
+          } else {
+            e.dataTransfer.dropEffect = 'none';
+          }
+        }}
         onDrop={(e) => {
           if (isReadonlyChannel) return;
           handleDrop(e, serverId, channelId);
@@ -250,6 +257,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
             user={user}
             friends={friends}
             channel={channel}
+            currentChannel={currentChannel}
             server={server}
             member={member}
             selectedItemId={selectedItemId}

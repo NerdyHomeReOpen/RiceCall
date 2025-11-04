@@ -30,13 +30,14 @@ interface UserTabProps {
   friends: Friend[];
   server: Server;
   channel: Channel | Category;
+  currentChannel: Channel;
   member: OnlineMember;
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
   handleConnectChannel: (serverId: Server['serverId'], channelId: Channel['channelId']) => void;
 }
 
-const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, server, member, selectedItemId, setSelectedItemId, handleConnectChannel }) => {
+const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, currentChannel, server, member, selectedItemId, setSelectedItemId, handleConnectChannel }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -66,16 +67,20 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
     currentServerId: memberCurrentServerId,
   } = member;
   const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel, voiceMode: channelVoiceMode } = channel;
+  const { permissionLevel: currentChannelPermissionLevel } = currentChannel;
   const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId } = server;
 
   // Variables
-  const permissionLevel = Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel);
+  const permissionLevel = Math.max(globalPermission, serverPermissionLevel, currentChannelPermissionLevel);
+  const targetPermissionLevel = Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel);
   const isUser = memberUserId === userId;
   const isSameChannel = memberCurrentChannelId === userCurrentChannelId;
   const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
   const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
   const isFriend = friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2);
   const isSuperior = permissionLevel > memberPermission;
+  const isSameChannelMod = isChannelMod(targetPermissionLevel) && isChannelMod(permissionLevel);
+  const isSameChannelAdmin = isChannelAdmin(targetPermissionLevel) && isChannelAdmin(permissionLevel);
   const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
 
   const statusIcon = useMemo(() => {
@@ -162,7 +167,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
         if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
         hoverTimerRef.current = null;
       }}
-      draggable={!isUser && isServerAdmin(permissionLevel) && isSuperior}
+      draggable={!isUser && isSameChannelMod && permissionLevel >= memberPermission}
       onDragStart={(e) => handleDragStart(e, memberUserId, channelId)}
       onContextMenu={(e) => {
         e.stopPropagation();
@@ -217,7 +222,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'move-to-channel',
             label: t('move-to-channel'),
-            show: !isUser && isServerAdmin(permissionLevel) && !isSameChannel && isSuperior,
+            show: !isUser && isSameChannelMod && !isSameChannel && permissionLevel >= memberPermission,
             onClick: () => handleMoveUserToChannel(memberUserId, serverId, userCurrentChannelId || ''),
           },
           {
@@ -273,7 +278,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
           {
             id: 'member-management',
             label: t('member-management'),
-            show: !isUser && isMember(memberPermission) && isSuperior,
+            show: canUpdatePermission && (isServerAdmin(permissionLevel) || (isSameChannelMod && channelCategoryId !== null)),
             icon: 'submenu',
             hasSubmenu: true,
             submenuItems: [
@@ -286,7 +291,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, se
               {
                 id: 'set-channel-mod',
                 label: isChannelMod(memberPermission) ? t('unset-channel-mod') : t('set-channel-mod'),
-                show: canUpdatePermission && isChannelAdmin(permissionLevel) && !isChannelAdmin(memberPermission) && channelCategoryId !== null,
+                show: canUpdatePermission && isSameChannelAdmin && !isChannelAdmin(memberPermission) && channelCategoryId !== null,
                 onClick: () =>
                   isChannelMod(memberPermission)
                     ? handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 2 })
