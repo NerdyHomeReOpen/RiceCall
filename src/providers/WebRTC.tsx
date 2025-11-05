@@ -814,8 +814,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const handleSFUJoined = useCallback(
     async ({ channelId }: { channelId: string }) => {
       await setupRecv(channelId);
+      if (isMicTakenRef.current) setupSend(channelId);
     },
-    [setupRecv],
+    [setupRecv, setupSend],
   );
 
   const handleSFULeft = useCallback(async () => {

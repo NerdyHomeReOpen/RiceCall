@@ -134,7 +134,7 @@ export let latency: number = 0;
 export let seq: number = 0;
 export let interval: NodeJS.Timeout | null = null;
 
-async function emitWithRetry<T>(event: string, payload: unknown, retries = 1): Promise<ACK<T>> {
+async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): Promise<ACK<T>> {
   for (let i = 0; i <= retries; i++) {
     try {
       return await new Promise<ACK<T>>((resolve, reject) => {
@@ -204,7 +204,7 @@ export function connectSocket(token: string) {
 
     ServerToClientEventNames.forEach((event) => {
       socket?.on(event, async (...args) => {
-        console.log(`${new Date().toLocaleString()} | socket.on`, event, ...args);
+        if (event !== 'queueMembersSet' && event !== 'serverOnlineMemberUpdate') console.log(`${new Date().toLocaleString()} | socket.on`, event, ...args);
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
