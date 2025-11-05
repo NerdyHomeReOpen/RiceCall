@@ -52,10 +52,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
     () => Math.max(globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel),
     [globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel],
   );
-  const serverUserIds = useMemo(() => serverOnlineMembers.map((mb) => mb.userId), [serverOnlineMembers]);
-  const channelMembers = useMemo(() => serverOnlineMembers.filter((mb) => mb.currentChannelId === channelId), [serverOnlineMembers, channelId]);
-  const channelUserIds = useMemo(() => channelMembers.map((mb) => mb.userId), [channelMembers]);
-  const movableMembers = useMemo(() => channelMembers.filter((mb) => mb.permissionLevel <= currentPermissionLevel).map((mb) => mb.userId), [channelMembers, currentPermissionLevel]);
+  const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
+  const channelMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === channelId), [serverOnlineMembers, channelId]);
+  const channelUserIds = useMemo(() => channelMembers.map((m) => m.userId), [channelMembers]);
+  const movableUserIds = useMemo(() => channelMembers.filter((m) => m.permissionLevel <= currentPermissionLevel).map((m) => m.userId), [channelMembers, currentPermissionLevel]);
   const isInChannel = useMemo(() => userCurrentChannelId === channelId, [userCurrentChannelId, channelId]);
   const isLobby = useMemo(() => serverLobbyId === channelId, [serverLobbyId, channelId]);
   const isReceptionLobby = useMemo(() => serverReceptionLobbyId === channelId, [serverReceptionLobbyId, channelId]);
@@ -100,8 +100,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
     handleOpenAlertDialog(t('confirm-delete-channel', { '0': channelName }), () => ipc.socket.send('deleteChannel', { serverId, channelId }));
   };
 
-  const handleDragStart = (e: React.DragEvent, members: OnlineMember[], currentChannelId: Channel['channelId']) => {
-    const userIds = members.filter((m) => m.permissionLevel <= permissionLevel).map((m) => m.userId);
+  const handleDragStart = (e: React.DragEvent, userIds: User['userId'][], currentChannelId: Channel['channelId']) => {
     e.dataTransfer.setData('type', 'moveAllUsers');
     e.dataTransfer.setData('userIds', userIds.join(','));
     e.dataTransfer.setData('currentChannelId', currentChannelId);
@@ -145,8 +144,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
           else setSelectedItemId(`channel-${channelId}`);
         }}
         onDoubleClick={() => handleConnectChannel(serverId, channelId)}
-        draggable={isChannelMod(permissionLevel) && movableMembers.length > 0}
-        onDragStart={(e) => handleDragStart(e, channelMembers, channelId)}
+        draggable={isChannelMod(permissionLevel) && movableUserIds.length > 0}
+        onDragStart={(e) => handleDragStart(e, movableUserIds, channelId)}
         onDragOver={(e) => {
           if (isChannelMod(permissionLevel) && !isReadonlyChannel) {
             e.preventDefault();
@@ -208,8 +207,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ user, friends, serve
             {
               id: 'move-all-user-to-channel',
               label: t('move-all-user-to-channel'),
-              show: !isInChannel && isChannelMod(permissionLevel) && movableMembers.length > 0,
-              onClick: () => handleMoveAllUsersToChannel(movableMembers, serverId, userCurrentChannelId || ''),
+              show: !isInChannel && isChannelMod(permissionLevel) && movableUserIds.length > 0,
+              onClick: () => handleMoveAllUsersToChannel(movableUserIds, serverId, userCurrentChannelId || ''),
             },
             {
               id: 'edit-channel-order',

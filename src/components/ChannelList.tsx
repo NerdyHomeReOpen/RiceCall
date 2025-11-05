@@ -64,17 +64,17 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
   const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
-  const serverUserIds = useMemo(() => serverOnlineMembers.map((mb) => mb.userId), [serverOnlineMembers]);
+  const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
-  const filteredChannels = useMemo(() => channels.filter((ch) => !!ch && !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
+  const filteredChannels = useMemo(() => channels.filter((c) => !!c && !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
   const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
     () =>
       queueUsers
-        .reduce<(QueueUser & OnlineMember)[]>((acc, qu) => {
-          if (qu.position < 0 || qu.leftTime <= 0) return acc;
-          const online = serverOnlineMemberMap.get(qu.userId);
+        .reduce<(QueueUser & OnlineMember)[]>((acc, qm) => {
+          if (qm.position < 0 || qm.leftTime <= 0) return acc;
+          const online = serverOnlineMemberMap.get(qm.userId);
           if (!online) return acc;
-          acc.push({ ...qu, ...online });
+          acc.push({ ...qm, ...online });
           return acc;
         }, [])
         .sort((a, b) => a.position - b.position),
