@@ -337,6 +337,10 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow?.webContents.send(mainWindow?.isMaximized() ? 'maximize' : 'unmaximize');
+    mainWindow?.webContents.executeJavaScript(`
+      history.pushState = () => {};
+      history.back = () => {};
+      history.forward = () => {};`);
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -401,6 +405,13 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   authWindow.on('close', (e) => {
     e.preventDefault();
     app.exit();
+  });
+
+  authWindow.webContents.on('did-finish-load', () => {
+    authWindow?.webContents.executeJavaScript(`
+      history.pushState = () => {};
+      history.back = () => {};
+      history.forward = () => {};`);
   });
 
   authWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -468,6 +479,13 @@ export async function createPopup(type: PopupType, id: string, data: unknown, fo
   ipcMain.removeAllListeners(`get-initial-data?id=${id}`);
   ipcMain.on(`get-initial-data?id=${id}`, (event) => {
     event.returnValue = data;
+  });
+
+  popups[id].webContents.on('did-finish-load', () => {
+    popups[id].webContents.executeJavaScript(`
+      history.pushState = () => {};
+      history.back = () => {};
+      history.forward = () => {};`);
   });
 
   popups[id].on('ready-to-show', () => {
