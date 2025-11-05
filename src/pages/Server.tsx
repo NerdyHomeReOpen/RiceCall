@@ -627,8 +627,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     btnCls={styles['speaker-btn']}
                   />
                 </div>
-                <div className={`${styles['record-mode']} ${webRTC.isRecording ? styles['active'] : ''}`} onClick={handleToggleRecord}>
-                  <div className={`${styles['record-mode-btn']} ${webRTC.isRecording ? styles['active'] : ''}`} />
+                <div className={`${styles['record-mode']} ${webRTC.isRecording ? styles['active'] : ''}`}>
+                  <div className={`${styles['record-mode-btn']} ${webRTC.isRecording ? styles['active'] : ''}`} onClick={handleToggleRecord} />
                   <div className={`${styles['record-mode-text']} ${webRTC.isRecording ? styles['active'] : ''}`}>{getFormatTimeFromSecond(webRTC.recordTime)}</div>
                 </div>
               </div>

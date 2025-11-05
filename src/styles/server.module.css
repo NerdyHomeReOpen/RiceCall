@@ -977,10 +977,11 @@
 
 .record-mode-text {
   display: none;
+  align-items: center;
   margin-left: 5px;
   color: var(--text-color-quaternary);
   &.active {
-    display: block;
+    display: flex;
   }
 }
 
