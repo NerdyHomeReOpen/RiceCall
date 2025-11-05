@@ -101,30 +101,17 @@ jobs:
           tag: ${{ github.ref_name }}
           name: Dev Release ${{ github.ref_name }}
           body: |
-            ## 該版本為開發版本
+            ## ⚙️ This Version is a Development Build
 
-            :warning: 所有以 `-dev.xxxxxxxx` 結尾的版本皆為開發中版本，開發中版本所使用的伺服器獨立於正式版所使用之伺服器，帳號亦不通用
+            ⚠️ Versions ending with `-dev.xxxxxxxx` are **development builds**.
+            These builds may contain **unstable or experimental features**, and unexpected behavior may occur.
 
-            若要下載最新版本，請點擊下方連接:
-            > https://github.com/NerdyHomeReOpen/RiceCall/releases/latest
+            To download the latest **stable version**, please visit:
 
-            若你接受**需要重建帳號並且隨時會清除所有資料的風險**，並想了解最新開發進度，方可下載並使用
+            > [https://github.com/NerdyHomeReOpen/RiceCall/releases/latest](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest)
 
-            另提醒，下載測試版本將會**強制刪除正式版本**，請斟酌考慮後再進行下載
-
-            ---
-
-            ## This Version is a Dev Build
-
-            :warning: All versions ending with `-dev.xxxxxxxx` are development builds.  
-            Development builds use servers that are independent from the official release servers, and accounts are not shared between them.  
-
-            To download the latest version, please visit:  
-            > https://github.com/NerdyHomeReOpen/RiceCall/releases/latest  
-
-            If you accept the **risk of needing to recreate your account and having all data wiped at any time**, and wish to follow the latest development progress, you may download and use these builds.  
-
-            Please note: Installing a test build will **forcefully remove the official release version**. Consider carefully before proceeding.
+            Development builds are intended for testing and early access.
+            Use them only if you understand that **stability is not guaranteed**.
           commit: ${{ github.sha }}
           prerelease: true
           allowUpdates: true
