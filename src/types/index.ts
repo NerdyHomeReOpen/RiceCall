@@ -356,7 +356,7 @@ export type ServerToClientEvents = {
   // Popup
   openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
   // Error
-  error: (message: string) => void;
+  error: (error: Error) => void;
 };
 
 export type SFUCreateTransportParams = {

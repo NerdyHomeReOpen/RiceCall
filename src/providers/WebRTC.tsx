@@ -69,6 +69,7 @@ interface WebRTCContextType {
   speakerVolume: number;
   voiceThreshold: number;
   speakingMode: SpeakingMode;
+  recordTime: number;
 }
 
 const WebRTCContext = createContext<WebRTCContextType | null>(null);
@@ -149,8 +150,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   // Recorder
   const buffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isRecordingRef = useRef<boolean>(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [recordTime, setRecordTime] = useState<number>(0);
 
   // Mute Ids
   const mutedIdsRef = useRef<string[]>([]);
@@ -472,6 +475,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       return startRecording();
     }
 
+    setRecordTime(0);
     recorderGainRef.current = audioContextRef.current.createGain();
     recorderGainRef.current.connect(recorderDesRef.current);
 
@@ -495,6 +499,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
 
     recorderGainRef.current!.disconnect();
+    if (timerRef.current) clearInterval(timerRef.current);
 
     const wavBlob = encodeWAV(buffersRef.current, audioContextRef.current.sampleRate);
     const url = URL.createObjectURL(wavBlob);
@@ -809,8 +814,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const handleSFUJoined = useCallback(
     async ({ channelId }: { channelId: string }) => {
       await setupRecv(channelId);
+      if (isMicTakenRef.current) setupSend(channelId);
     },
-    [setupRecv],
+    [setupRecv, setupSend],
   );
 
   const handleSFULeft = useCallback(async () => {
@@ -878,6 +884,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   // Effects
   useEffect(() => {
+    if (!isRecording) return;
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setRecordTime((prev) => prev + 1);
+    }, 1000);
+  }, [isRecording]);
+
+  useEffect(() => {
     initLocalStorage();
     initAudioContext();
   }, [initAudioContext, initLocalStorage]);
@@ -929,6 +943,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         speakerVolume,
         speakingMode,
         voiceThreshold,
+        recordTime,
       }}
     >
       {children}

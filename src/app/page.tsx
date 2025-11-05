@@ -585,8 +585,8 @@ const RootPageComponent: React.FC = React.memo(() => {
     ipc.popup.close('errorDialog');
   };
 
-  const handleError = (message: string) => {
-    new ErrorHandler(new Error(message)).show();
+  const handleError = (error: Error) => {
+    new ErrorHandler(error).show();
   };
 
   // Effects

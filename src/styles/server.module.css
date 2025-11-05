@@ -970,6 +970,21 @@
   }
 }
 
+.record-mode {
+  display: flex;
+  flex-direction: row;
+}
+
+.record-mode-text {
+  display: none;
+  align-items: center;
+  margin-left: 5px;
+  color: var(--text-color-quaternary);
+  &.active {
+    display: flex;
+  }
+}
+
 .record-mode-btn {
   position: relative;
   min-height: 18px;

@@ -55,7 +55,7 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
         <div
           className={popup['button']}
           onClick={() => {
-            handleEditServer(serverId, { receiveApply: serverReceiveApplication, applyNotice: serverApplyNote });
+            handleEditServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
             handleClose();
           }}
         >

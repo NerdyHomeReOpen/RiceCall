@@ -125,10 +125,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
       }
     }
 
-    for (const ch of newGroupChannels) {
-      const index = newServerChannels.findIndex((sch) => sch.channelId === ch.channelId);
+    for (const gc of newGroupChannels) {
+      const index = newServerChannels.findIndex((sc) => sc.channelId === gc.channelId);
       if (index !== -1) {
-        newServerChannels[index].order = ch.order;
+        newServerChannels[index].order = gc.order;
       }
     }
     setServerChannels(newServerChannels.sort((a, b) => a.order - b.order));
@@ -163,8 +163,8 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     if (serverChannels.length === 0) return;
     setExpanded((prev) => {
       const next: Record<string, boolean> = { ...prev };
-      for (const ch of serverChannels) {
-        if (next[ch.channelId] === undefined) next[ch.channelId] = true;
+      for (const sc of serverChannels) {
+        if (next[sc.channelId] === undefined) next[sc.channelId] = true;
       }
       return next;
     });
@@ -187,7 +187,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           onClick={(e) => {
             e.stopPropagation();
             setSelectedChannel(selectedChannelId === categoryId ? null : category);
-            setGroupChannels(serverChannels.filter((ch) => !ch.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)));
+            setGroupChannels(serverChannels.filter((sc) => !sc.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)));
           }}
         >
           <div
@@ -205,8 +205,8 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         <div className={serverPage['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
           {subChannels
             .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
-            .filter((ch) => ch.type === 'channel')
-            .map((channel) => channelTab(channel))}
+            .filter((sc) => sc.type === 'channel')
+            .map((sc) => channelTab(sc))}
         </div>
       </div>
     );
@@ -223,7 +223,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         onClick={(e) => {
           e.stopPropagation();
           setSelectedChannel(selectedChannelId === channelId ? null : channel);
-          setGroupChannels(serverChannels.filter((ch) => ch.categoryId === channelCategoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)));
+          setGroupChannels(serverChannels.filter((sc) => sc.categoryId === channelCategoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)));
         }}
       >
         <div className={`${serverPage['tab-icon']} ${serverPage[channelVisibility]} ${channelIsLobby ? serverPage['lobby'] : ''}`} onClick={(e) => e.stopPropagation()} />
@@ -310,8 +310,8 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           <div className={serverPage['channel-list']} onClick={(e) => e.stopPropagation()}>
             {serverChannels
               .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
-              .filter((ch) => !ch.categoryId)
-              .map((channel) => (channel.type === 'category' ? categoryTab(channel) : channelTab(channel)))}
+              .filter((sc) => !sc.categoryId)
+              .map((sc) => (sc.type === 'category' ? categoryTab(sc) : channelTab(sc)))}
           </div>
         </div>
       </div>
