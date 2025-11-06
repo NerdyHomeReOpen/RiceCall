@@ -325,15 +325,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       gainNode.connect(analyserNode);
       gainNode.connect(masterGainNodeRef.current);
 
-      // Replace track
-      const newStream = outputDesRef.current.stream;
-      if (speakerRef.current && newStream) {
-        speakerRef.current.srcObject = newStream;
-        speakerRef.current.play().catch((err) => {
-          console.warn('Autoplay failed, user gesture needed:', err);
-        });
-      }
-
       // Initialize analyser
       analyserNode.fftSize = 2048;
       const dataArray = new Uint8Array(analyserNode.fftSize) as Uint8Array<ArrayBuffer>;
