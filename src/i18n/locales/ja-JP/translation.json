@@ -294,7 +294,6 @@
   "mic-order": "マイク注文",
   "mic-queued": "マイクの列に並ぶ",
   "mic-taken": "已拿麥",
-  "mic-volume-threshold": "マイク感度",
   "microphone": "マイク",
   "microphone-amplification-label": "マイク増幅",
   "minimize-to-tray": "トレイに最小化",
@@ -557,5 +556,6 @@
   "week": "週",
   "xp": "クレジット",
   "year": "年",
-  "yesterday": "昨日"
+  "yesterday": "昨日",
+  "current-speaking-mode": "當前說話方式"
 }
