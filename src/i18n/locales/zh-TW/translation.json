@@ -1,4 +1,11 @@
 {
+  "CEO": "總執行長",
+  "COO-brazil": "巴西運營長",
+  "COO-iran": "伊朗運營長",
+  "COO-russia": "俄羅斯運營長",
+  "COO-taiwan": "台灣運營長",
+  "COO-turkey": "土耳其運營長",
+  "CTO": "技術長",
   "about-me": "關於我",
   "about-ricecall": "關於RiceCall",
   "about-us": "關於我們",
@@ -389,6 +396,8 @@
   "recent-servers": "最近訪問的語音群",
   "recommend": "推薦",
   "reconnection-failed-message": "重新連線失敗，按下確定後將自動登出",
+  "record-format": "錄音格式",
+  "record-setting": "錄音設定",
   "register": "註冊",
   "register-account": "註冊帳號",
   "register-success": "帳號註冊成功，請至 {{0}} 驗證你的電子郵件以啟用帳號，帳號未啟用前將無法登入",
@@ -533,7 +542,5 @@
   "week": "週",
   "xp": "積分",
   "year": "年",
-  "yesterday": "昨天",
-  "record-setting": "錄音設定",
-  "record-format": "錄音格式"
+  "yesterday": "昨天"
 }
