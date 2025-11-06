@@ -426,11 +426,12 @@ const RootPageComponent: React.FC = React.memo(() => {
       serverIdRef.current = currentServerId || '';
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
+    if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
   };
 
-  const handleFriendsSet = (...args: Friend[]) => {
-    setFriends(args);
-  };
+  // const handleFriendsSet = (...args: Friend[]) => {
+  //   setFriends(args);
+  // };
 
   const handleFriendAdd = (...args: { data: Friend }[]) => {
     const add = new Set(args.map((i) => `${i.data.targetId}`));
@@ -447,9 +448,9 @@ const RootPageComponent: React.FC = React.memo(() => {
     setFriends((prev) => prev.filter((f) => !remove.has(`${f.targetId}`)));
   };
 
-  const handleFriendGroupsSet = (...args: FriendGroup[]) => {
-    setFriendGroups(args);
-  };
+  // const handleFriendGroupsSet = (...args: FriendGroup[]) => {
+  //   setFriendGroups(args);
+  // };
 
   const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
     const add = new Set(args.map((i) => `${i.data.friendGroupId}`));
@@ -480,9 +481,9 @@ const RootPageComponent: React.FC = React.memo(() => {
     setFriendApplications((prev) => prev.filter((fa) => !args.some((i) => i.senderId === fa.senderId)));
   };
 
-  const handleServersSet = (...args: Server[]) => {
-    setServers(args);
-  };
+  // const handleServersSet = (...args: Server[]) => {
+  //   setServers(args);
+  // };
 
   const handleServerAdd = (...args: { data: Server }[]) => {
     const add = new Set(args.map((i) => `${i.data.serverId}`));
@@ -499,9 +500,9 @@ const RootPageComponent: React.FC = React.memo(() => {
     setServers((prev) => prev.filter((s) => !remove.has(`${s.serverId}`)));
   };
 
-  const handleServerOnlineMembersSet = (...args: OnlineMember[]) => {
-    setServerOnlineMembers(args);
-  };
+  // const handleServerOnlineMembersSet = (...args: OnlineMember[]) => {
+  //   setServerOnlineMembers(args);
+  // };
 
   const handleServerOnlineMemberAdd = (...args: { data: OnlineMember }[]) => {
     const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
@@ -518,9 +519,9 @@ const RootPageComponent: React.FC = React.memo(() => {
     setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   };
 
-  const handleChannelsSet = (...args: Channel[]) => {
-    setChannels(args);
-  };
+  // const handleChannelsSet = (...args: Channel[]) => {
+  //   setChannels(args);
+  // };
 
   const handleChannelAdd = (...args: { data: Channel }[]) => {
     const add = new Set(args.map((i) => `${i.data.channelId}`));
@@ -592,6 +593,15 @@ const RootPageComponent: React.FC = React.memo(() => {
   // Effects
   useEffect(() => {
     ipc.toolbar.title.set(user.name);
+  }, [user]);
+
+  useEffect(() => {
+    if (user.userId) return;
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+    data.user({ userId }).then((user) => {
+      if (user) setUser(user);
+    });
   }, [user]);
 
   useEffect(() => {
@@ -713,15 +723,25 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [i18n.language, userId]);
 
   useEffect(() => {
+    if (!userId || !server.serverId) return;
+    const refresh = async () => {
+      data.channels({ userId: userId, serverId: server.serverId }).then((channels) => {
+        if (channels) setChannels(channels);
+      });
+      data.serverOnlineMembers({ serverId: server.serverId }).then((serverOnlineMembers) => {
+        if (serverOnlineMembers) setServerOnlineMembers(serverOnlineMembers);
+      });
+    };
+    refresh();
+  }, [userId, server.serverId]);
+
+  useEffect(() => {
     const unsubscribe = [
       ipc.socket.on('connect', handleConnect),
       ipc.socket.on('userUpdate', handleUserUpdate),
-      ipc.socket.on('serversSet', handleServersSet),
-      ipc.socket.on('friendsSet', handleFriendsSet),
       ipc.socket.on('friendAdd', handleFriendAdd),
       ipc.socket.on('friendUpdate', handleFriendUpdate),
       ipc.socket.on('friendRemove', handleFriendRemove),
-      ipc.socket.on('friendGroupsSet', handleFriendGroupsSet),
       ipc.socket.on('friendGroupAdd', handleFriendGroupAdd),
       ipc.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
       ipc.socket.on('friendGroupRemove', handleFriendGroupRemove),
@@ -731,11 +751,9 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.socket.on('serverAdd', handleServerAdd),
       ipc.socket.on('serverUpdate', handleServerUpdate),
       ipc.socket.on('serverRemove', handleServerRemove),
-      ipc.socket.on('serverOnlineMembersSet', handleServerOnlineMembersSet),
       ipc.socket.on('serverOnlineMemberAdd', handleServerOnlineMemberAdd),
       ipc.socket.on('serverOnlineMemberUpdate', handleServerOnlineMemberUpdate),
       ipc.socket.on('serverOnlineMemberRemove', handleServerOnlineMemberRemove),
-      ipc.socket.on('channelsSet', handleChannelsSet),
       ipc.socket.on('channelAdd', handleChannelAdd),
       ipc.socket.on('channelUpdate', handleChannelUpdate),
       ipc.socket.on('channelRemove', handleChannelRemove),
@@ -757,7 +775,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       <ActionScannerProvider>
         <ExpandedProvider>
           <Header user={user} server={server} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
-          {!true ? (
+          {!userId ? (
             <LoadingSpinner />
           ) : (
             <>

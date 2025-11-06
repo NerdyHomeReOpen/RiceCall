@@ -253,7 +253,7 @@ export type ClientToServerEvents = {
   // User
   searchUser: (...args: { query: string }[]) => void;
   editUser: (...args: { update: Partial<table_users> }[]) => void;
-  editUserSettings: (...args: { update: Partial<table_user_settings> }[]) => void;
+  editUserSetting: (...args: { update: Partial<table_user_settings> }[]) => void;
   // Friend
   editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
   deleteFriend: (...args: { targetId: string }[]) => void;
@@ -340,23 +340,19 @@ export type ServerToClientEvents = {
   userSearch: (...args: User[]) => void;
   userUpdate: (...args: { update: Partial<User> }[]) => void;
   // Friend Group
-  friendGroupsSet: (...args: FriendGroup[]) => void;
   friendGroupAdd: (...args: { data: FriendGroup }[]) => void;
   friendGroupUpdate: (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => void;
   friendGroupRemove: (...args: { friendGroupId: string }[]) => void;
   // Friend
-  friendsSet: (...args: Friend[]) => void;
   friendAdd: (...args: { data: Friend }[]) => void;
   friendUpdate: (...args: { targetId: string; update: Partial<Friend> }[]) => void;
   friendRemove: (...args: { targetId: string }[]) => void;
   // Friend Application
-  friendApplicationsSet: (...args: FriendApplication[]) => void;
   friendApplicationAdd: (...args: { data: FriendApplication }[]) => void;
   friendApplicationUpdate: (...args: { senderId: string; update: Partial<FriendApplication> }[]) => void;
   friendApplicationRemove: (...args: { senderId: string }[]) => void;
   // Server
   serverSearch: (...args: Server[]) => void;
-  serversSet: (...args: Server[]) => void;
   serverAdd: (...args: { data: Server }[]) => void;
   serverUpdate: (...args: { serverId: string; update: Partial<Server> }[]) => void;
   serverRemove: (...args: { serverId: string }[]) => void;
@@ -365,17 +361,14 @@ export type ServerToClientEvents = {
   serverMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
   serverMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
   // Server Online Member
-  serverOnlineMembersSet: (...args: OnlineMember[]) => void;
   serverOnlineMemberAdd: (...args: { data: OnlineMember }[]) => void;
   serverOnlineMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => void;
   serverOnlineMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
   // Member Application
-  serverMemberApplicationsSet: (...args: MemberApplication[]) => void;
   serverMemberApplicationAdd: (...args: { data: MemberApplication }[]) => void;
   serverMemberApplicationUpdate: (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => void;
   serverMemberApplicationRemove: (...args: { userId: string; serverId: string }[]) => void;
   // Channel
-  channelsSet: (...args: Channel[]) => void;
   channelAdd: (...args: { data: Channel }[]) => void;
   channelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
   channelRemove: (...args: { channelId: string }[]) => void;
@@ -384,7 +377,6 @@ export type ServerToClientEvents = {
   // Queue Member
   queueMembersSet: (...args: QueueUser[]) => void;
   // Member Invitation
-  memberInvitationsSet: (...args: MemberInvitation[]) => void;
   memberInvitationAdd: (...args: { data: MemberInvitation }[]) => void;
   memberInvitationUpdate: (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => void;
   memberInvitationRemove: (...args: { serverId: string }[]) => void;

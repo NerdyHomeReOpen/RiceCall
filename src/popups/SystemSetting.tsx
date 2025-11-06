@@ -61,14 +61,14 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
   const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>(systemSettings.speakingMode);
   const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>(systemSettings.defaultSpeakingKey);
 
-  const [forbidFriendApplications, setForbidFriendApplications] = useState<boolean>(user.forbidFriendApplications);
-  const [forbidShakeMessages, setForbidShakeMessages] = useState<boolean>(user.forbidShakeMessages);
-  const [forbidMemberInvitations, setForbidMemberInvitations] = useState<boolean>(user.forbidMemberInvitations);
-  const [forbidStrangerMessages, setForbidStrangerMessages] = useState<boolean>(user.forbidStrangerMessages);
-  const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(user.shareCurrentServer);
-  const [shareRecentServers, setShareRecentServers] = useState<boolean>(user.shareRecentServers);
-  const [shareJoinedServers, setShareJoinedServers] = useState<boolean>(user.shareJoinedServers);
-  const [shareFavoriteServers, setShareFavoriteServers] = useState<boolean>(user.shareFavoriteServers);
+  const [forbidFriendApplications, setForbidFriendApplications] = useState<boolean>(user.forbidFriendApplications ?? false);
+  const [forbidShakeMessages, setForbidShakeMessages] = useState<boolean>(user.forbidShakeMessages ?? false);
+  const [forbidMemberInvitations, setForbidMemberInvitations] = useState<boolean>(user.forbidMemberInvitations ?? false);
+  const [forbidStrangerMessages, setForbidStrangerMessages] = useState<boolean>(user.forbidStrangerMessages ?? false);
+  const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(user.shareCurrentServer ?? false);
+  const [shareRecentServers, setShareRecentServers] = useState<boolean>(user.shareRecentServers ?? false);
+  const [shareJoinedServers, setShareJoinedServers] = useState<boolean>(user.shareJoinedServers ?? false);
+  const [shareFavoriteServers, setShareFavoriteServers] = useState<boolean>(user.shareFavoriteServers ?? false);
   const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(systemSettings.notSaveMessageHistory);
 
   const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>(systemSettings.hotKeyOpenMainWindow);
@@ -104,7 +104,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
 
   // Handlers
   const handleEditUserSetting = (update: Partial<UserSetting>) => {
-    ipc.socket.send('editUserSettings', { update });
+    ipc.socket.send('editUserSetting', { update });
   };
 
   const handleClose = () => {
@@ -476,19 +476,19 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
               <div className={popup['label']}>{t('anti-spam-setting')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="forbid-friend-applications" type="checkbox" checked={forbidFriendApplications} onChange={() => setForbidFriendApplications(!forbidFriendApplications)} />
+              <input name="forbid-friend-applications" type="checkbox" checked={forbidFriendApplications} onChange={(e) => setForbidFriendApplications(e.target.checked)} />
               <div className={popup['label']}>{t('forbid-friend-applications-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="forbid-shake-messages" type="checkbox" checked={forbidShakeMessages} onChange={() => setForbidShakeMessages(!forbidShakeMessages)} />
+              <input name="forbid-shake-messages" type="checkbox" checked={forbidShakeMessages} onChange={(e) => setForbidShakeMessages(e.target.checked)} />
               <div className={popup['label']}>{t('forbid-shake-messages-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="forbid-member-invitations" type="checkbox" checked={forbidMemberInvitations} onChange={() => setForbidMemberInvitations(!forbidMemberInvitations)} />
+              <input name="forbid-member-invitations" type="checkbox" checked={forbidMemberInvitations} onChange={(e) => setForbidMemberInvitations(e.target.checked)} />
               <div className={popup['label']}>{t('forbid-member-invitations-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="forbid-stranger-messages" type="checkbox" checked={forbidStrangerMessages} onChange={() => setForbidStrangerMessages(!forbidStrangerMessages)} />
+              <input name="forbid-stranger-messages" type="checkbox" checked={forbidStrangerMessages} onChange={(e) => setForbidStrangerMessages(e.target.checked)} />
               <div className={popup['label']}>{t('forbid-stranger-messages-label')}</div>
             </div>
 
@@ -497,19 +497,19 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
               <div className={popup['label']}>{t('privacy-setting')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="share-current-server" type="checkbox" checked={shareCurrentServer} onChange={() => setShareCurrentServer(!shareCurrentServer)} />
+              <input name="share-current-server" type="checkbox" checked={shareCurrentServer} onChange={(e) => setShareCurrentServer(e.target.checked)} />
               <div className={popup['label']}>{t('share-current-server-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="share-recent-servers" type="checkbox" checked={shareRecentServers} onChange={() => setShareRecentServers(!shareRecentServers)} />
+              <input name="share-recent-servers" type="checkbox" checked={shareRecentServers} onChange={(e) => setShareRecentServers(e.target.checked)} />
               <div className={popup['label']}>{t('share-recent-servers-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="share-joined-servers" type="checkbox" checked={shareJoinedServers} onChange={() => setShareJoinedServers(!shareJoinedServers)} />
+              <input name="share-joined-servers" type="checkbox" checked={shareJoinedServers} onChange={(e) => setShareJoinedServers(e.target.checked)} />
               <div className={popup['label']}>{t('share-joined-servers-label')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="share-favorite-servers" type="checkbox" checked={shareFavoriteServers} onChange={() => setShareFavoriteServers(!shareFavoriteServers)} />
+              <input name="share-favorite-servers" type="checkbox" checked={shareFavoriteServers} onChange={(e) => setShareFavoriteServers(e.target.checked)} />
               <div className={popup['label']}>{t('share-favorite-servers-label')}</div>
             </div>
 
@@ -518,7 +518,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
               <div className={popup['label']}>{t('message-history-setting')}</div>
             </div>
             <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="not-save-message-history" type="checkbox" checked={notSaveMessageHistory} onChange={() => setNotSaveMessageHistory(!notSaveMessageHistory)} />
+              <input name="not-save-message-history" type="checkbox" checked={notSaveMessageHistory} onChange={(e) => setNotSaveMessageHistory(e.target.checked)} />
               <div className={popup['label']}>{t('not-save-message-history-label')}</div>
             </div>
           </div>

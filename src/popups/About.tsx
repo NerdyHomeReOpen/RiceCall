@@ -45,10 +45,9 @@ const AboutPopup: React.FC = React.memo(() => {
   };
 
   const getTitleColorClass = (title: string) => {
-    if (['CEO', 'CTO', 'CFO', 'COO', 'CIO', 'CMO', 'CHRO'].some((t) => title.includes(t))) return styles['color-1'];
-    if (['HoT', 'HoO', 'HoM', 'HoB'].some((t) => title.includes(t))) return styles['color-2'];
+    if (['CEO'].some((t) => title.includes(t))) return styles['color-1'];
+    if (['CTO', 'CFO', 'COO', 'CIO', 'CMO', 'CHRO'].some((t) => title.includes(t))) return styles['color-2'];
     if (['developer', 'machine-network', 'technical-support'].some((t) => title.includes(t))) return styles['color-3'];
-    if (['customer-service'].some((t) => title.includes(t))) return styles['color-4'];
     return styles['color-5'];
   };
 

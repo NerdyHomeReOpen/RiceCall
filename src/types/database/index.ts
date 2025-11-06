@@ -221,15 +221,15 @@ export type table_user_vips = {
 
 export type table_user_settings = {
   userId: string;
-  forbidFriendApplications: boolean;
-  forbidShakeMessages: boolean;
-  forbidMemberInvitations: boolean;
-  forbidStrangerMessages: boolean;
-  shareCurrentServer: boolean;
-  shareRecentServers: boolean;
-  shareJoinedServers: boolean;
-  shareFavoriteServers: boolean;
-  notSaveMessageHistory: boolean;
+  forbidFriendApplications: boolean | null;
+  forbidShakeMessages: boolean | null;
+  forbidMemberInvitations: boolean | null;
+  forbidStrangerMessages: boolean | null;
+  shareCurrentServer: boolean | null;
+  shareRecentServers: boolean | null;
+  shareJoinedServers: boolean | null;
+  shareFavoriteServers: boolean | null;
+  notSaveMessageHistory: boolean | null;
 };
 
 export type table_users = {
