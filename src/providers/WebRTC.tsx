@@ -213,56 +213,65 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const initAudioContext = useCallback(async () => {
     // Create audio context
-    if (!audioContextRef.current) {
-      const audioContext = new AudioContext();
-      await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
-      audioContextRef.current = audioContext;
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
     }
+    const audioContext = new AudioContext();
+    await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
+    audioContextRef.current = audioContext;
 
     // Create input destination node
-    if (!inputDesRef.current) {
-      const inputDestination = audioContextRef.current.createMediaStreamDestination();
-      inputDesRef.current = inputDestination;
+    if (inputDesRef.current) {
+      inputDesRef.current.disconnect();
     }
+    const inputDestination = audioContextRef.current.createMediaStreamDestination();
+    inputDesRef.current = inputDestination;
 
     // Create output destination node
-    if (!outputDesRef.current) {
-      const outputDestination = audioContextRef.current.createMediaStreamDestination();
-      outputDesRef.current = outputDestination;
+    if (outputDesRef.current) {
+      outputDesRef.current.disconnect();
     }
+    const outputDestination = audioContextRef.current.createMediaStreamDestination();
+    outputDesRef.current = outputDestination;
 
     // Create record destination node
-    if (!recorderDesRef.current) {
-      const recordDestination = audioContextRef.current.createMediaStreamDestination();
-      recorderDesRef.current = recordDestination;
+    if (recorderDesRef.current) {
+      recorderDesRef.current.disconnect();
     }
+    const recordDestination = audioContextRef.current.createMediaStreamDestination();
+    recorderDesRef.current = recordDestination;
 
     // Create input analyser node
-    if (!inputAnalyserRef.current) {
-      const inputAnalyser = audioContextRef.current.createAnalyser();
-      inputAnalyserRef.current = inputAnalyser;
-      inputAnalyser.fftSize = 2048;
+    if (inputAnalyserRef.current) {
+      inputAnalyserRef.current.disconnect();
     }
+    const inputAnalyser = audioContextRef.current.createAnalyser();
+    inputAnalyserRef.current = inputAnalyser;
+    inputAnalyser.fftSize = 2048;
 
     // Create master gain node
-    if (!masterGainNodeRef.current) {
-      const masterGainNode = audioContextRef.current.createGain();
-      masterGainNodeRef.current = masterGainNode;
-      masterGainNode.gain.value = speakerVolumeRef.current / 100;
-      masterGainNode.connect(outputDesRef.current!);
+    if (masterGainNodeRef.current) {
+      masterGainNodeRef.current.disconnect();
     }
+    const masterGainNode = audioContextRef.current.createGain();
+    masterGainNodeRef.current = masterGainNode;
+    masterGainNode.gain.value = speakerVolumeRef.current / 100;
+    masterGainNode.connect(outputDesRef.current!);
 
     // Create audio element
-    if (!speakerRef.current) {
-      const speaker = new Audio();
-      speaker.srcObject = outputDesRef.current.stream;
-      speaker.volume = 1;
-      speaker.autoplay = true;
-      speaker.style.display = 'none';
-      speaker.play().catch(() => {});
-      speakerRef.current = speaker;
-      document.body.appendChild(speaker);
+    if (speakerRef.current) {
+      speakerRef.current.srcObject = null;
+      speakerRef.current.pause();
+      speakerRef.current.remove();
     }
+    const speaker = new Audio();
+    speaker.srcObject = outputDesRef.current.stream;
+    speaker.volume = 1;
+    speaker.autoplay = true;
+    speaker.style.display = 'none';
+    speaker.play().catch(() => {});
+    speakerRef.current = speaker;
+    document.body.appendChild(speaker);
   }, []);
 
   const removeSpeakerAudio = useCallback((userId: string) => {
