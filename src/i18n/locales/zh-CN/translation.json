@@ -294,7 +294,6 @@
   "mic-order": "麦序",
   "mic-queued": "排队拿麦中",
   "mic-taken": "已拿麥",
-  "mic-volume-threshold": "麥克風靈敏度",
   "microphone": "麦克风",
   "microphone-amplification-label": "麦克风放大",
   "minimize-to-tray": "最小化到系统列",
@@ -557,5 +556,6 @@
   "week": "周",
   "xp": "积分",
   "year": "年",
-  "yesterday": "昨天"
+  "yesterday": "昨天",
+  "current-speaking-mode": "當前說話方式"
 }
