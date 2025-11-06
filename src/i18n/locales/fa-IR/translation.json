@@ -1,4 +1,11 @@
 {
+  "CEO": "總執行長",
+  "COO-brazil": "巴西運營長",
+  "COO-iran": "伊朗運營長",
+  "COO-russia": "俄羅斯運營長",
+  "COO-taiwan": "台灣運營長",
+  "COO-turkey": "土耳其運營長",
+  "CTO": "技術長",
   "about-me": "درباره من",
   "about-ricecall": "درباره رایس کال",
   "about-us": "درباره ما",
@@ -52,6 +59,7 @@
   "broadcast-content": "پخش محتوا",
   "broadcast-type": "نوع پخش کردن",
   "cancel": "انصراف",
+  "cannot-add-yourself": "無法添加自己為好友",
   "cannot-apply-member": "امکان درخواست عضویت وجود ندارد، این گروه صوتی درخواست عضویت نمی‌پذیرد",
   "cannot-read-image": "تصویر قابل خواندن نیست",
   "category": "دسته",
@@ -332,6 +340,18 @@
   "none": "هیچ کدام",
   "not-available-page": "این صفحه هنوز باز نشده است",
   "not-public": "این یک چنل خصوصی است",
+  "not-public-favorite-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開收藏的群"
+  },
+  "not-public-joined-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開加入的群"
+  },
+  "not-public-recent-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開最近訪問"
+  },
   "not-save-message-history-label": "تاریخچه پیام ها را ذخیره نکن",
   "note": "پیام اضافی",
   "notify-friend-online": "وقتی دوستان آنلاین هستند به من یادآوری کن",
@@ -389,6 +409,8 @@
   "recent-servers": "سرورهایی که اخیرا بازدید کردید",
   "recommend": "منتخب",
   "reconnection-failed-message": "اتصال مجدد ناموفق بود. برای خروج خودکار، تأیید را فشار دهید",
+  "record-format": "錄音格式",
+  "record-setting": "錄音設定",
   "register": "ثبت نام",
   "register-account": "ثبت حساب کاربری",
   "register-success": "ثبت‌نام حساب با موفقیت انجام شد. لطفاً برای فعال‌سازی حساب خود به {{0}} مراجعه کرده و ایمیل خود را تأیید کنید. تا زمانی که حساب تأیید نشود، امکان ورود وجود ندارد",
@@ -512,6 +534,7 @@
   "upload": "آپلود",
   "upload-avatar": "آپلود آواتار",
   "user-info": "مشخصات کاربر",
+  "user-is-friend": "該用戶已經是好友",
   "user-limit": "محدودیت کاربر",
   "user-not-found": "کاربر وجود ندارد",
   "user-setting": "تنظیمات کاربر",
@@ -533,7 +556,5 @@
   "week": "هفته",
   "xp": "اعتبار",
   "year": "سال",
-  "yesterday": "دیروز",
-  "record-setting": "錄音設定",
-  "record-format": "錄音格式"
+  "yesterday": "دیروز"
 }
