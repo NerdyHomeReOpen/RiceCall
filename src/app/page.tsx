@@ -23,6 +23,7 @@ import type {
   QueueUser,
   Notify,
   RecommendServer,
+  FriendActivity,
 } from '@/types';
 
 // i18n
@@ -390,6 +391,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   // States
   const [user, setUser] = useState<User>(Default.user());
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [friendActivities, setFriendActivities] = useState<FriendActivity[]>([]);
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
   const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
@@ -695,6 +697,9 @@ const RootPageComponent: React.FC = React.memo(() => {
       data.friends({ userId: userId }).then((friends) => {
         if (friends) setFriends(friends);
       });
+      data.friendActivities({ userId: userId }).then((friendActivities) => {
+        if (friendActivities) setFriendActivities(friendActivities);
+      });
       data.friendGroups({ userId: userId }).then((friendGroups) => {
         if (friendGroups) setFriendGroups(friendGroups);
       });
@@ -789,7 +794,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           ) : (
             <>
               <HomePage user={user} servers={servers} announcements={announcements} recommendServers={recommendServers} display={mainTab.selectedTabId === 'home'} />
-              <FriendPage user={user} friends={friends} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
+              <FriendPage user={user} friends={friends} friendActivities={friendActivities} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}
                 friends={friends}

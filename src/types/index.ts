@@ -38,11 +38,11 @@ export type User = table_users & table_global_permissions & table_user_settings 
 
 export type UserSetting = table_user_settings;
 
-export type UserActivity = table_user_activities;
-
 export type Badge = table_badges & table_user_badges;
 
 export type Friend = table_friends & table_users & BadgeList;
+
+export type FriendActivity = table_friends & table_users & table_user_activities;
 
 export type FriendGroup = table_friend_groups;
 

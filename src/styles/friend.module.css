@@ -477,7 +477,7 @@
   overflow-y: auto;
 }
 
-.user-info-wrapper {
+.user-activity-wrapper {
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -486,24 +486,18 @@
 .friend-active-list {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 15px;
   flex: 1;
 }
 
-.user-info-wrapper,
-.user-info {
+.user-activity {
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-
-.user-info {
-  display: flex;
-  align-items: flex-start;
+  width: 100%;
 }
 
 .user-avatar {
-  cursor: pointer;
   background-image: url('/im/IMLogo.png');
   background-size: contain;
   background-repeat: no-repeat;
@@ -513,31 +507,34 @@
 }
 
 .right-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  width: 100%;
 }
 
-.user-info-top {
+.user-activity-top {
   flex-direction: row;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   min-width: 0;
+  gap: 3px;
 }
 
-.user-info-top > div:first-child,
-.user-info-top > div:nth-child(2) {
+.user-activity-top > div:first-child,
+.user-activity-top > div:nth-child(2) {
   flex-shrink: 0;
 }
 
-.user-info-top > div:last-child {
+.user-activity-top > div:last-child {
   flex-shrink: 0;
   margin-left: auto;
 }
 
-.user-info {
+.user-activity {
   gap: 10px;
 }
 
@@ -563,14 +560,11 @@
 }
 
 .user-name {
-  height: 14px;
+  color: var(--text-username);
 }
 
-.vip-color {
-  color: #4c99dd;
-}
-
-.public-time {
-  color: var(--text-color-quaternary);
-  font-size: 0.95rem;
+.timestamp {
+  align-self: flex-end;
+  color: var(--text-color-quinary);
+  font-size: 0.9em;
 }
