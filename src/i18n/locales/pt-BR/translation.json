@@ -294,7 +294,6 @@
   "mic-order": "Ordem de fala",
   "mic-queued": "Esperando na fila para falar",
   "mic-taken": "Microfone pego",
-  "mic-volume-threshold": "Sensibilidade do Microfone",
   "microphone": "Microfone",
   "microphone-amplification-label": "Amplificação de microfone",
   "minimize-to-tray": "Minimizar para a barra de tarefas",
@@ -557,5 +556,6 @@
   "week": "Semana",
   "xp": "Experiência",
   "year": "ano",
-  "yesterday": "Ontem"
+  "yesterday": "Ontem",
+  "current-speaking-mode": "當前說話方式"
 }
