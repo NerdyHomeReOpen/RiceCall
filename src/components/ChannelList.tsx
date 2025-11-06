@@ -202,6 +202,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                     {
                       id: 'report',
                       label: t('report'),
+                      icon: 'report',
                       disabled: true,
                       onClick: () => {
                         /* TODO: handleOpenReport */
@@ -344,6 +345,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
           )}
         </div>
       </div>
+
+      {/* Saperator */}
+      <div className={styles['saperator-3']} />
 
       {/* Footer */}
       <div className={styles['sidebar-footer']}>
