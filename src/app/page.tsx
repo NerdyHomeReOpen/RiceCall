@@ -423,6 +423,9 @@ const RootPageComponent: React.FC = React.memo(() => {
     if (currentServerId !== undefined && currentServerId !== serverIdRef.current) {
       setActionMessages([]);
       setChannelMessages([]);
+      setQueueUsers([]);
+      setChannels([]);
+      setServerOnlineMembers([]);
       serverIdRef.current = currentServerId || '';
     }
     setUser((prev) => ({ ...prev, ...args[0].update }));
