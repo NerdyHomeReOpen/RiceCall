@@ -1,4 +1,11 @@
 {
+  "CEO": "總執行長",
+  "COO-brazil": "巴西運營長",
+  "COO-iran": "伊朗運營長",
+  "COO-russia": "俄羅斯運營長",
+  "COO-taiwan": "台灣運營長",
+  "COO-turkey": "土耳其運營長",
+  "CTO": "技術長",
   "about-me": "自己紹介",
   "about-ricecall": "RiceCallについて",
   "about-us": "RiceCallについて",
@@ -52,6 +59,7 @@
   "broadcast-content": "放送内容",
   "broadcast-type": "放送の種類",
   "cancel": "キャンセル",
+  "cannot-add-yourself": "無法添加自己為好友",
   "cannot-apply-member": "メンバー申請を送信することはできません。このグループでは申請を受け付けていません",
   "cannot-read-image": "画像を読み取ることができません",
   "category": "ジャンル",
@@ -332,6 +340,18 @@
   "none": "カテゴリ名を設定してください",
   "not-available-page": "ページはまだ開いていません",
   "not-public": "これはプライベートチャンネルです",
+  "not-public-favorite-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開收藏的群"
+  },
+  "not-public-joined-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開加入的群"
+  },
+  "not-public-recent-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開最近訪問"
+  },
   "not-save-message-history-label": "チャット履歴を保存しない",
   "note": "注記",
   "notify-friend-online": "友達がオンラインになったときに通知します",
@@ -389,6 +409,8 @@
   "recent-servers": "最近グループを訪問していない",
   "recommend": "ブースト",
   "reconnection-failed-message": "接続を復元できません。「OK」をクリックすると、アカウントから自動的にログアウトされます",
+  "record-format": "錄音格式",
+  "record-setting": "錄音設定",
   "register": "新規登録",
   "register-account": "新規登録",
   "register-success": "登録が完了しました。{{0}} のリンクにアクセスしてメールアドレスを確認し、アカウントを有効化してください。アカウントが有効化されるまでログインできません",
@@ -512,6 +534,7 @@
   "upload": "アップロード",
   "upload-avatar": "アバター画像のアップロード",
   "user-info": "プロフィール",
+  "user-is-friend": "該用戶已經是好友",
   "user-limit": "ユーザー制限",
   "user-not-found": "アカウントが存在しません",
   "user-setting": "ユーザー プロファイルの設定",
@@ -533,7 +556,5 @@
   "week": "週",
   "xp": "クレジット",
   "year": "年",
-  "yesterday": "昨日",
-  "record-setting": "錄音設定",
-  "record-format": "錄音格式"
+  "yesterday": "昨日"
 }
