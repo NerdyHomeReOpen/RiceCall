@@ -1,4 +1,11 @@
 {
+  "CEO": "總執行長",
+  "COO-brazil": "巴西運營長",
+  "COO-iran": "伊朗運營長",
+  "COO-russia": "俄羅斯運營長",
+  "COO-taiwan": "台灣運營長",
+  "COO-turkey": "土耳其運營長",
+  "CTO": "技術長",
   "about-me": "Sobre mim",
   "about-ricecall": "Sobre o RiceCall",
   "about-us": "Sobre nós",
@@ -52,6 +59,7 @@
   "broadcast-content": "Conteúdo da transmissão",
   "broadcast-type": "Tipo de transmissão",
   "cancel": "Cancelar",
+  "cannot-add-yourself": "無法添加自己為好友",
   "cannot-apply-member": "Este grupo não aceita pedidos para se tornar membro",
   "cannot-read-image": "A imagem não pode ser lida",
   "category": "Seção",
@@ -332,6 +340,18 @@
   "none": "Nenhum",
   "not-available-page": "Essa página ainda não está disponível",
   "not-public": "Este é um canal privado",
+  "not-public-favorite-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開收藏的群"
+  },
+  "not-public-joined-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開加入的群"
+  },
+  "not-public-recent-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開最近訪問"
+  },
   "not-save-message-history-label": "Não salvar o histórico de mensagens",
   "note": "Observação",
   "notify-friend-online": "Notificar quando conectar",
@@ -389,6 +409,8 @@
   "recent-servers": "Grupos visitados recentemente",
   "recommend": "Recomendar",
   "reconnection-failed-message": "Não foi possível restaurar a conexão. Após clicar em \"OK\", você será automaticamente desconectado da sua conta",
+  "record-format": "錄音格式",
+  "record-setting": "錄音設定",
   "register": "Criar",
   "register-account": "Criar conta",
   "register-success": "O registro da conta foi realizado com sucesso. Acesse {{0}} para verificar seu endereço de e-mail e ativar sua conta. Você não poderá fazer login até que sua conta seja ativada.",
@@ -512,6 +534,7 @@
   "upload": "Enviar",
   "upload-avatar": "Enviar imagem",
   "user-info": "Informações do usuário",
+  "user-is-friend": "該用戶已經是好友",
   "user-limit": "Limite de usuários",
   "user-not-found": "Este usuário não existe",
   "user-setting": "Configurações de usuário",
@@ -533,7 +556,5 @@
   "week": "Semana",
   "xp": "Experiência",
   "year": "ano",
-  "yesterday": "Ontem",
-  "record-setting": "錄音設定",
-  "record-format": "錄音格式"
+  "yesterday": "Ontem"
 }
