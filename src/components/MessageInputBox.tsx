@@ -31,11 +31,10 @@ import { toTags } from '@/utils/tagConverter';
 interface MessageInputBoxProps {
   onSend?: (message: string) => void;
   disabled?: boolean;
-  placeholder?: string;
   maxLength?: number;
 }
 
-const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, disabled = false, placeholder = '', maxLength = 2000 }) => {
+const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, disabled = false, maxLength = 2000 }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -122,9 +121,8 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
 
   useEffect(() => {
     if (!editor) return;
-    (editor.storage as unknown as { placeholder: string }).placeholder = placeholder;
     editor.view.dispatch(editor.state.tr);
-  }, [placeholder, editor]);
+  }, [editor]);
 
   return (
     <div className={`${messageInputBox['message-input-box']} ${disabled ? messageInputBox['disabled'] : ''} ${isWarning ? messageInputBox['warning'] : ''}`}>
@@ -152,9 +150,8 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
 
       <EditorContent
         editor={editor}
-        placeholder={placeholder}
         className={`${messageInputBox['textarea']} ${markdown['markdown-content']}`}
-        style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
+        style={{ wordBreak: 'break-all', border: 'none' }}
         onPaste={(e) => {
           const items = e.clipboardData.items;
           for (const item of items) {

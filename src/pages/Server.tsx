@@ -52,9 +52,6 @@ const MessageInputBoxGuard = React.memo(
     channelIsTextMuted,
     onSend,
   }: MessageInputBoxGuardProps) => {
-    // Hooks
-    const { t } = useTranslation();
-
     // States
     const [now, setNow] = useState(Date.now());
 
@@ -74,16 +71,8 @@ const MessageInputBoxGuard = React.memo(
     const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
     const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
     const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
-    const placeholder = useMemo(() => {
-      if (isForbidByMutedText) return t('text-was-muted-in-channel-message');
-      if (isForbidByForbidText) return t('channel-forbid-text-message');
-      if (isForbidByForbidGuestText) return t('channel-forbid-guest-text-message');
-      if (isForbidByForbidGuestTextGap) return t('channel-guest-text-gap-time-message', { '0': leftGapTime.toString() });
-      if (isForbidByForbidGuestTextWait) return t('channel-guest-text-wait-time-message', { '0': leftWaitTime.toString() });
-      return `${t('input-message')}...`;
-    }, [t, isForbidByMutedText, isForbidByForbidText, isForbidByForbidGuestText, isForbidByForbidGuestTextGap, isForbidByForbidGuestTextWait, leftGapTime, leftWaitTime]);
 
-    return <MessageInputBox disabled={disabled} maxLength={maxLength} placeholder={placeholder} onSend={onSend} />;
+    return <MessageInputBox disabled={disabled} maxLength={maxLength} onSend={onSend} />;
   },
 );
 
