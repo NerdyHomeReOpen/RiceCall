@@ -294,7 +294,6 @@
   "mic-order": "ترتیب میکروفون",
   "mic-queued": "در حال قرار گرفتن در صف میکروفون",
   "mic-taken": "میکروفون گرفته شد",
-  "mic-volume-threshold": "حساسیت میکروفون",
   "microphone": "میکروفون",
   "microphone-amplification-label": "تقویت میکروفون",
   "minimize-to-tray": "کوچک کردن به سینی",
@@ -557,5 +556,6 @@
   "week": "هفته",
   "xp": "اعتبار",
   "year": "سال",
-  "yesterday": "دیروز"
+  "yesterday": "دیروز",
+  "current-speaking-mode": "當前說話方式"
 }
