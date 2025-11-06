@@ -72,7 +72,6 @@
   box-sizing: border-box;
   padding: 0 1px 1px 0;
   background-color: var(--background);
-  border: 1px solid var(--border);
   border-radius: 2px;
   box-shadow: var(--box-shadow);
   display: flex;
