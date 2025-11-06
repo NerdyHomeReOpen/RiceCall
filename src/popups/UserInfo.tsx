@@ -65,6 +65,9 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     birthDay: targetBirthDay,
     country: targetCountry,
     badges: targetBadges,
+    shareFavoriteServers: targetShareFavoriteServers,
+    shareJoinedServers: targetShareJoinedServers,
+    shareRecentServers: targetShareRecentServers,
   } = target;
 
   // Memos
@@ -82,7 +85,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     if (monthDiff < 0 || (monthDiff === 0 && CURRENT_DAY < birthDate.getDate())) age--;
     return age;
   }, [targetBirthYear, targetBirthMonth, targetBirthDay, CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY]);
-  const isProfilePrivate = useMemo(() => false, []); // TODO: implement privacy setting
   const isSelf = useMemo(() => userId === targetId, [userId, targetId]);
   const isFriend = useMemo(() => friend?.relationStatus === 2, [friend]);
   const canSubmit = useMemo(
@@ -179,8 +181,34 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     }
   }, [targetBirthYear, targetBirthMonth, targetBirthDay, CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY, isFutureDate]);
 
-  const PrivateElement = (text: React.ReactNode) => {
-    return <div className={styles['user-recent-visits-private']}>{text}</div>;
+  const RecentServerNotPublicElement = () => {
+    return (
+      <div className={styles['user-recent-visits-private']}>
+        {t('not-public-recent-servers.top')}
+        <br />
+        {t('not-public-recent-servers.bottom')}
+      </div>
+    );
+  };
+
+  const FavoriteServerNotPublicElement = () => {
+    return (
+      <div className={styles['user-recent-visits-private']}>
+        {t('not-public-favorite-servers.top')}
+        <br />
+        {t('not-public-favorite-servers.bottom')}
+      </div>
+    );
+  };
+
+  const JoinServerNotPublicElement = () => {
+    return (
+      <div className={styles['user-recent-visits-private']}>
+        {t('not-public-joined-servers.top')}
+        <br />
+        {t('not-public-joined-servers.bottom')}
+      </div>
+    );
   };
 
   return (
@@ -292,30 +320,26 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
           <div className={styles['user-profile-content']}>
             <div className={popup['label']}>{t('recent-servers')}</div>
             <div className={styles['server-list']}>
-              {isProfilePrivate
-                ? PrivateElement(
-                    <>
-                      {t('not-public-recent-servers-top')}
-                      <br />
-                      {t('not-public-recent-servers-bottom')}
-                    </>,
-                  )
-                : recentServers.length === 0
-                  ? PrivateElement(t('no-recent-servers'))
-                  : recentServers.map((server) => (
-                      <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
-                        <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
-                        <div className={styles['server-info-box']}>
-                          <div className={styles['server-name-text']}>{server.name}</div>
-                          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                            <div className={`${isSelf && server.ownerId === userId ? styles['is-owner'] : ''}`} />
-                            <div className={styles['display-id-text']} onDoubleClick={(e) => e.stopPropagation()}>
-                              {server.displayId}
-                            </div>
-                          </div>
+              {!isSelf && targetShareRecentServers ? (
+                <RecentServerNotPublicElement />
+              ) : recentServers.length === 0 ? (
+                <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
+              ) : (
+                recentServers.map((server) => (
+                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                    <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+                    <div className={styles['server-info-box']}>
+                      <div className={styles['server-name-text']}>{server.name}</div>
+                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                        <div className={`${isSelf && server.ownerId === userId ? styles['is-owner'] : ''}`} />
+                        <div className={styles['display-id-text']} onDoubleClick={(e) => e.stopPropagation()}>
+                          {server.displayId}
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
             <div className={popup['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
@@ -338,55 +362,47 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               </select>
             </div>
             <div className={styles['server-list']} style={serversView === 'joined' ? {} : { display: 'none' }}>
-              {isProfilePrivate
-                ? PrivateElement(
-                    <>
-                      {t('not-public-joined-servers-top')}
-                      <br />
-                      {t('not-public-joined-servers-bottom')}
-                    </>,
-                  )
-                : joinedServers.length === 0
-                  ? PrivateElement(t('no-joined-servers'))
-                  : joinedServers.map((server) => (
-                      <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
-                        <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
-                        <div className={styles['server-info-box']}>
-                          <div className={styles['server-name-text']}>{server.name}</div>
-                          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
-                            <div className={styles['contribution-value-text']}>{server.contribution}</div>
-                          </div>
-                        </div>
+              {!isSelf && targetShareJoinedServers ? (
+                <JoinServerNotPublicElement />
+              ) : joinedServers.length === 0 ? (
+                <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
+              ) : (
+                joinedServers.map((server) => (
+                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                    <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+                    <div className={styles['server-info-box']}>
+                      <div className={styles['server-name-text']}>{server.name}</div>
+                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
+                        <div className={styles['contribution-value-text']}>{server.contribution}</div>
                       </div>
-                    ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
             <div className={styles['server-list']} style={serversView === 'favorite' ? {} : { display: 'none' }}>
-              {isProfilePrivate
-                ? PrivateElement(
-                    <>
-                      {t('not-public-favorite-servers-top')}
-                      <br />
-                      {t('not-public-favorite-servers-bottom')}
-                    </>,
-                  )
-                : favoriteServers.length === 0
-                  ? PrivateElement(t('no-favorite-servers'))
-                  : favoriteServers.map((server) => (
-                      <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
-                        <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
-                        <div className={styles['server-info-box']}>
-                          <div className={styles['server-name-text']}>{server.name}</div>
-                          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
-                            <div className={styles['contribution-box']}>
-                              <div className={styles['contribution-icon']} />
-                              <div className={styles['contribution-value-text']}>{server.contribution}</div>
-                            </div>
-                          </div>
+              {!isSelf && targetShareFavoriteServers ? (
+                <FavoriteServerNotPublicElement />
+              ) : favoriteServers.length === 0 ? (
+                <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
+              ) : (
+                favoriteServers.map((server) => (
+                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                    <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+                    <div className={styles['server-info-box']}>
+                      <div className={styles['server-name-text']}>{server.name}</div>
+                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
+                        <div className={styles['contribution-box']}>
+                          <div className={styles['contribution-icon']} />
+                          <div className={styles['contribution-value-text']}>{server.contribution}</div>
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
