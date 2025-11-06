@@ -1,4 +1,11 @@
 {
+  "CEO": "總執行長",
+  "COO-brazil": "巴西運營長",
+  "COO-iran": "伊朗運營長",
+  "COO-russia": "俄羅斯運營長",
+  "COO-taiwan": "台灣運營長",
+  "COO-turkey": "土耳其運營長",
+  "CTO": "技術長",
   "about-me": "Hakkımda",
   "about-ricecall": "RiceCall Hakkında",
   "about-us": "Hakkımızda",
@@ -52,6 +59,7 @@
   "broadcast-content": "Yayın içeriği",
   "broadcast-type": "Yayın Türü",
   "cancel": "İptal etmek",
+  "cannot-add-yourself": "無法添加自己為好友",
   "cannot-apply-member": "Bu ses grubu için üyelik başvuruları kabul edilmez.",
   "cannot-read-image": "Resim okunamıyor",
   "category": "kategori",
@@ -332,6 +340,18 @@
   "none": "hiçbiri",
   "not-available-page": "Bu sayfa henüz açık değil",
   "not-public": "Diğer taraf bunu kamuoyuna açıklamadı",
+  "not-public-favorite-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開收藏的群"
+  },
+  "not-public-joined-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開加入的群"
+  },
+  "not-public-recent-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開最近訪問"
+  },
   "not-save-message-history-label": "Sohbet mesajı geçmişini kaydetme",
   "note": "Not",
   "notify-friend-online": "Arkadaşlarım çevrimiçi olduğunda bana hatırlat",
@@ -389,6 +409,8 @@
   "recent-servers": "Son ziyaret edilen ses grupları",
   "recommend": "tavsiye etmek",
   "reconnection-failed-message": "Yeniden bağlantı kurulamadı. Otomatik olarak çıkış yapmak için Tamam'a basın.",
+  "record-format": "錄音格式",
+  "record-setting": "錄音設定",
   "register": "kayıt olmak",
   "register-account": "Hesap oluştur",
   "register-success": "Hesap kaydı başarıyla tamamlandı. Hesabınızı etkinleştirmek için lütfen {{0}} adresine giderek e-posta adresinizi doğrulayın. Hesabınız etkinleştirilene kadar oturum açamazsınız.",
@@ -512,6 +534,7 @@
   "upload": "Yüklemek",
   "upload-avatar": "Bir avatar yükleyin",
   "user-info": "Kişisel Profil",
+  "user-is-friend": "該用戶已經是好友",
   "user-limit": "Maksimum kişi sayısı (kişi)",
   "user-not-found": "Kullanıcı mevcut değil",
   "user-setting": "Kullanıcı Ayarı",
@@ -533,7 +556,5 @@
   "week": "Hafta",
   "xp": "integral",
   "year": "yıllar",
-  "yesterday": "dün",
-  "record-setting": "錄音設定",
-  "record-format": "錄音格式"
+  "yesterday": "dün"
 }
