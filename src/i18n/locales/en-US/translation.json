@@ -294,7 +294,6 @@
   "mic-order": "Mic order",
   "mic-queued": "Queuing for a microphone",
   "mic-taken": "Mic taken",
-  "mic-volume-threshold": "Microphone Sensitivity",
   "microphone": "Microphone",
   "microphone-amplification-label": "Microphone amplification",
   "minimize-to-tray": "Minimize to Tray",
@@ -557,5 +556,6 @@
   "week": "Week",
   "xp": "xp",
   "year": "year",
-  "yesterday": "Yesterday"
+  "yesterday": "Yesterday",
+  "current-speaking-mode": "當前說話方式"
 }
