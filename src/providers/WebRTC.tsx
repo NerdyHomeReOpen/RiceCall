@@ -19,7 +19,7 @@ import {
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Utils
-import { encodeWAV } from '@/utils/encodeWav';
+import { encodeAudio } from '@/utils/encodeAudio';
 
 const workletCode = `
 class RecorderProcessor extends AudioWorkletProcessor {
@@ -149,6 +149,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const [voiceThreshold, setVoiceThreshold] = useState<number>(1);
 
   // Recorder
+  const recordFormatRef = useRef<'wav' | 'mp3'>('mp3');
   const buffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isRecordingRef = useRef<boolean>(false);
@@ -501,11 +502,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     recorderGainRef.current!.disconnect();
     if (timerRef.current) clearInterval(timerRef.current);
 
-    const wavBlob = encodeWAV(buffersRef.current, audioContextRef.current.sampleRate);
-    const url = URL.createObjectURL(wavBlob);
+    const blob = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate, recordFormatRef.current);
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ricecall-record-${new Date().toISOString()}.wav`;
+    a.download = `ricecall-record-${new Date().toISOString()}.${recordFormatRef.current}`;
     a.click();
 
     buffersRef.current = [];
@@ -882,6 +883,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     speakingModeRef.current = mode;
   };
 
+  const handleEditRecordFormat = (format: 'wav' | 'mp3') => {
+    recordFormatRef.current = format;
+  };
+
   // Effects
   useEffect(() => {
     if (!isRecording) return;
@@ -900,11 +905,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     handleEditInputDevice(ipc.systemSettings.inputAudioDevice.get());
     handleEditOutputDevice(ipc.systemSettings.outputAudioDevice.get());
     handleEditSpeakingMode(ipc.systemSettings.speakingMode.get());
+    handleEditRecordFormat(ipc.systemSettings.recordFormat.get());
 
     const unsubscribe = [
       ipc.systemSettings.inputAudioDevice.onUpdate(handleEditInputDevice),
       ipc.systemSettings.outputAudioDevice.onUpdate(handleEditOutputDevice),
       ipc.systemSettings.speakingMode.onUpdate(handleEditSpeakingMode),
+      ipc.systemSettings.recordFormat.onUpdate(handleEditRecordFormat),
       ipc.socket.on('SFUJoined', handleSFUJoined),
       ipc.socket.on('SFULeft', handleSFULeft),
       ipc.socket.on('SFUNewProducer', handleNewProducer),

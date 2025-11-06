@@ -36,6 +36,8 @@ export type BadgeList = {
 
 export type User = table_users & table_global_permissions & BadgeList;
 
+export type UserSetting = table_user_settings;
+
 export type UserActivity = table_user_activities;
 
 export type Badge = table_badges & table_user_badges;

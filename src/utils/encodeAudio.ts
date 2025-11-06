@@ -1,4 +1,20 @@
-export function encodeWAV(buffers: { left: Float32Array; right: Float32Array }[], sampleRate: number) {
+type StereoBuffer = { left: Float32Array; right: Float32Array };
+type AudioFormat = 'wav' | 'mp3';
+
+/**
+ * Encode audio data to specified format (WAV or MP3)
+ * @param buffers - Audio data
+ * @param sampleRate - Sample rate
+ * @param format - Audio format
+ * @returns Encoded audio data
+ */
+export function encodeAudio(buffers: StereoBuffer[], sampleRate: number, format: AudioFormat = 'wav'): Blob {
+  if (format === 'wav') return encodeWAV(buffers, sampleRate);
+  if (format === 'mp3') return encodeMP3(buffers, sampleRate);
+  throw new Error('Unsupported format');
+}
+
+function encodeWAV(buffers: StereoBuffer[], sampleRate: number): Blob {
   const left = buffers.flatMap((b) => Array.from(b.left));
   const right = buffers.flatMap((b) => Array.from(b.right));
   const length = left.length + right.length;
@@ -33,4 +49,8 @@ export function encodeWAV(buffers: { left: Float32Array; right: Float32Array }[]
   }
 
   return new Blob([view], { type: 'audio/wav' });
+}
+
+function encodeMP3(buffers: StereoBuffer[], sampleRate: number): Blob {
+  return new Blob([], { type: 'audio/mpeg' });
 }

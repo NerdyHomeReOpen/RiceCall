@@ -399,7 +399,6 @@ const ipcService = {
 
   systemSettings: {
     get: (): {
-      // Basic settings
       autoLogin: boolean;
       autoLaunch: boolean;
       alwaysOnTop: boolean;
@@ -411,9 +410,9 @@ const ipcService = {
       fontSize: number;
       font: string;
 
-      // Mix settings
       inputAudioDevice: string;
       outputAudioDevice: string;
+      recordFormat: 'wav' | 'mp3';
       mixEffect: boolean;
       mixEffectType: string;
       autoMixSetting: boolean;
@@ -423,14 +422,11 @@ const ipcService = {
       manualMixMode: boolean;
       mixMode: MixMode;
 
-      // Voice settings
       speakingMode: SpeakingMode;
       defaultSpeakingKey: string;
 
-      // Privacy settings
       notSaveMessageHistory: boolean;
 
-      // Hotheys Settings
       hotKeyOpenMainWindow: string;
       hotKeyScreenshot: string;
       hotKeyIncreaseVolume: string;
@@ -438,7 +434,6 @@ const ipcService = {
       hotKeyToggleSpeaker: string;
       hotKeyToggleMicrophone: string;
 
-      // SoundEffect Setting
       disableAllSoundEffect: boolean;
       enterVoiceChannelSound: boolean;
       leaveVoiceChannelSound: boolean;
@@ -683,6 +678,25 @@ const ipcService = {
         const listener = (_: any, deviceId: string) => callback(deviceId);
         ipcRenderer.on('output-audio-device', listener);
         return () => ipcRenderer.removeListener('output-audio-device', listener);
+      },
+    },
+
+    recordFormat: {
+      set: (format: 'wav' | 'mp3') => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-record-format', format);
+      },
+
+      get: (): 'wav' | 'mp3' => {
+        if (!isElectron) return 'wav';
+        return ipcRenderer.sendSync('get-record-format');
+      },
+
+      onUpdate: (callback: (format: 'wav' | 'mp3') => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, format: 'wav' | 'mp3') => callback(format);
+        ipcRenderer.on('record-format', listener);
+        return () => ipcRenderer.removeListener('record-format', listener);
       },
     },
 
