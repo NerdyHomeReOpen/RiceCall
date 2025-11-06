@@ -34,7 +34,7 @@ export type BadgeList = {
   badges: string;
 };
 
-export type User = table_users & table_global_permissions & BadgeList;
+export type User = table_users & table_global_permissions & table_user_settings & BadgeList;
 
 export type UserSetting = table_user_settings;
 
@@ -104,6 +104,51 @@ export type DirectMessage = Message &
 
 export type PromptMessage = Message & {
   type: 'alert' | 'info' | 'warn' | 'event';
+};
+
+export type SystemSettings = {
+  autoLogin: boolean;
+  autoLaunch: boolean;
+  alwaysOnTop: boolean;
+  statusAutoIdle: boolean;
+  statusAutoIdleMinutes: number;
+  statusAutoDnd: boolean;
+  channelUIMode: ChannelUIMode;
+  closeToTray: boolean;
+  fontSize: number;
+  font: string;
+
+  inputAudioDevice: string;
+  outputAudioDevice: string;
+  recordFormat: 'wav' | 'mp3';
+  mixEffect: boolean;
+  mixEffectType: string;
+  autoMixSetting: boolean;
+  echoCancellation: boolean;
+  noiseCancellation: boolean;
+  microphoneAmplification: boolean;
+  manualMixMode: boolean;
+  mixMode: MixMode;
+
+  speakingMode: SpeakingMode;
+  defaultSpeakingKey: string;
+
+  notSaveMessageHistory: boolean;
+
+  hotKeyOpenMainWindow: string;
+  hotKeyScreenshot: string;
+  hotKeyIncreaseVolume: string;
+  hotKeyDecreaseVolume: string;
+  hotKeyToggleSpeaker: string;
+  hotKeyToggleMicrophone: string;
+
+  disableAllSoundEffect: boolean;
+  enterVoiceChannelSound: boolean;
+  leaveVoiceChannelSound: boolean;
+  startSpeakingSound: boolean;
+  stopSpeakingSound: boolean;
+  receiveDirectMessageSound: boolean;
+  receiveChannelMessageSound: boolean;
 };
 
 export type ContextMenuItem = {

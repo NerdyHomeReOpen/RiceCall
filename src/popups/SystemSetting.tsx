@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 
 // Types
-import type { ChannelUIMode, UserSetting } from '@/types';
+import type { ChannelUIMode, SystemSettings, User, UserSetting } from '@/types';
 
 // CSS
 import setting from '@/styles/setting.module.css';
@@ -14,7 +14,13 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 // Services
 import ipc from '@/services/ipc.service';
 
-const SystemSettingPopup: React.FC = React.memo(() => {
+interface SystemSettingPopupProps {
+  userId: User['userId'];
+  user: User;
+  systemSettings: SystemSettings;
+}
+
+const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user, systemSettings }) => {
   // Hooks
   const { t } = useTranslation();
   const soundPlayer = useSoundPlayer();
@@ -27,57 +33,57 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
-
-  const [autoLaunch, setAutoLaunch] = useState<boolean>(false);
-  const [autoLogin, setAutoLogin] = useState<boolean>(false);
-  const [alwaysOnTop, setAlwaysOnTop] = useState<boolean>(false);
-  const [statusAutoIdle, setStatusAutoIdle] = useState<boolean>(true);
-  const [statusAutoIdleMinutes, setStatusAutoIdleMinutes] = useState<number>(10);
-  const [statusAutoDnd, setStatusAutoDnd] = useState<boolean>(false);
-  const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('classic');
-  const [closeToTray, setCloseToTray] = useState<boolean>(true);
-  const [fontSize, setFontSize] = useState<number>(13);
-  const [fontFamily, setFontFamily] = useState<string>('宋体, Arial, sans-serif');
   const [fontList, setFontList] = useState<string[]>([]);
 
-  const [selectedInput, setSelectedInput] = useState<string>('');
-  const [selectedOutput, setSelectedOutput] = useState<string>('');
-  const [recordFormat, setRecordFormat] = useState<'wav' | 'mp3'>('wav');
-  const [mixEffect, setMixEffect] = useState<boolean>(false);
-  const [mixEffectType, setMixEffectType] = useState<string>('');
-  const [autoMixSetting, setAutoMixSetting] = useState<boolean>(false);
-  const [echoCancellation, setEchoCancellation] = useState<boolean>(false);
-  const [noiseCancellation, setNoiseCancellation] = useState<boolean>(false);
-  const [microphoneAmplification, setMicrophoneAmplification] = useState<boolean>(false);
-  const [manualMixMode, setManualMixMode] = useState<boolean>(false);
-  const [mixMode, setMixMode] = useState<'all' | 'app'>('all');
+  const [autoLaunch, setAutoLaunch] = useState<boolean>(systemSettings.autoLaunch);
+  const [autoLogin, setAutoLogin] = useState<boolean>(systemSettings.autoLogin);
+  const [alwaysOnTop, setAlwaysOnTop] = useState<boolean>(systemSettings.alwaysOnTop);
+  const [statusAutoIdle, setStatusAutoIdle] = useState<boolean>(systemSettings.statusAutoIdle);
+  const [statusAutoIdleMinutes, setStatusAutoIdleMinutes] = useState<number>(systemSettings.statusAutoIdleMinutes);
+  const [statusAutoDnd, setStatusAutoDnd] = useState<boolean>(systemSettings.statusAutoDnd);
+  const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>(systemSettings.channelUIMode);
+  const [closeToTray, setCloseToTray] = useState<boolean>(systemSettings.closeToTray);
+  const [fontSize, setFontSize] = useState<number>(systemSettings.fontSize);
+  const [fontFamily, setFontFamily] = useState<string>(systemSettings.font);
 
-  const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>('key');
-  const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>('v');
+  const [selectedInput, setSelectedInput] = useState<string>(systemSettings.inputAudioDevice);
+  const [selectedOutput, setSelectedOutput] = useState<string>(systemSettings.outputAudioDevice);
+  const [recordFormat, setRecordFormat] = useState<'wav' | 'mp3'>(systemSettings.recordFormat);
+  // const [mixEffect, setMixEffect] = useState<boolean>(systemSettings.mixEffect);
+  // const [mixEffectType, setMixEffectType] = useState<string>(systemSettings.mixEffectType);
+  // const [autoMixSetting, setAutoMixSetting] = useState<boolean>(systemSettings.autoMixSetting);
+  // const [echoCancellation, setEchoCancellation] = useState<boolean>(systemSettings.echoCancellation);
+  // const [noiseCancellation, setNoiseCancellation] = useState<boolean>(systemSettings.noiseCancellation);
+  // const [microphoneAmplification, setMicrophoneAmplification] = useState<boolean>(systemSettings.microphoneAmplification);
+  // const [manualMixMode, setManualMixMode] = useState<boolean>(systemSettings.manualMixMode);
+  // const [mixMode, setMixMode] = useState<'all' | 'app'>(systemSettings.mixMode);
 
-  const [forbidFriendApplications, setForbidFriendApplications] = useState<boolean>(false);
-  const [forbidShakeMessages, setForbidShakeMessages] = useState<boolean>(false);
-  const [forbidMemberInvitations, setForbidMemberInvitations] = useState<boolean>(false);
-  const [forbidStrangerMessages, setForbidStrangerMessages] = useState<boolean>(false);
-  const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(false);
-  const [shareRecentServers, setShareRecentServers] = useState<boolean>(false);
-  const [shareJoinedServers, setShareJoinedServers] = useState<boolean>(false);
-  const [shareFavoriteServers, setShareFavoriteServers] = useState<boolean>(false);
-  const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(false);
+  const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>(systemSettings.speakingMode);
+  const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>(systemSettings.defaultSpeakingKey);
 
-  const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>('F1');
-  const [hotKeyIncreaseVolume, setHotKeyIncreaseVolume] = useState<string>('PageUp');
-  const [hotKeyDecreaseVolume, setHotKeyDecreaseVolume] = useState<string>('PageDown');
-  const [hotKeyToggleSpeaker, setHotKeyToggleSpeaker] = useState<string>('Alt+m');
-  const [hotKeyToggleMicrophone, setHotKeyToggleMicrophone] = useState<string>('Alt+v');
+  const [forbidFriendApplications, setForbidFriendApplications] = useState<boolean>(user.forbidFriendApplications);
+  const [forbidShakeMessages, setForbidShakeMessages] = useState<boolean>(user.forbidShakeMessages);
+  const [forbidMemberInvitations, setForbidMemberInvitations] = useState<boolean>(user.forbidMemberInvitations);
+  const [forbidStrangerMessages, setForbidStrangerMessages] = useState<boolean>(user.forbidStrangerMessages);
+  const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(user.shareCurrentServer);
+  const [shareRecentServers, setShareRecentServers] = useState<boolean>(user.shareRecentServers);
+  const [shareJoinedServers, setShareJoinedServers] = useState<boolean>(user.shareJoinedServers);
+  const [shareFavoriteServers, setShareFavoriteServers] = useState<boolean>(user.shareFavoriteServers);
+  const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(systemSettings.notSaveMessageHistory);
 
-  const [disableAllSoundEffect, setDisableAllSoundEffect] = useState<boolean>(false);
-  const [enterVoiceChannelSound, setEnterVoiceChannelSound] = useState<boolean>(false);
-  const [leaveVoiceChannelSound, setLeaveVoiceChannelSound] = useState<boolean>(false);
-  const [startSpeakingSound, setStartSpeakingSound] = useState<boolean>(false);
-  const [stopSpeakingSound, setStopSpeakingSound] = useState<boolean>(false);
-  const [receiveDirectMessageSound, setReceiveDirectMessageSound] = useState<boolean>(false);
-  const [receiveChannelMessageSound, setReceiveChannelMessageSound] = useState<boolean>(false);
+  const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>(systemSettings.hotKeyOpenMainWindow);
+  const [hotKeyIncreaseVolume, setHotKeyIncreaseVolume] = useState<string>(systemSettings.hotKeyIncreaseVolume);
+  const [hotKeyDecreaseVolume, setHotKeyDecreaseVolume] = useState<string>(systemSettings.hotKeyDecreaseVolume);
+  const [hotKeyToggleSpeaker, setHotKeyToggleSpeaker] = useState<string>(systemSettings.hotKeyToggleSpeaker);
+  const [hotKeyToggleMicrophone, setHotKeyToggleMicrophone] = useState<string>(systemSettings.hotKeyToggleMicrophone);
+
+  const [disableAllSoundEffect, setDisableAllSoundEffect] = useState<boolean>(systemSettings.disableAllSoundEffect);
+  const [enterVoiceChannelSound, setEnterVoiceChannelSound] = useState<boolean>(systemSettings.enterVoiceChannelSound);
+  const [leaveVoiceChannelSound, setLeaveVoiceChannelSound] = useState<boolean>(systemSettings.leaveVoiceChannelSound);
+  const [startSpeakingSound, setStartSpeakingSound] = useState<boolean>(systemSettings.startSpeakingSound);
+  const [stopSpeakingSound, setStopSpeakingSound] = useState<boolean>(systemSettings.stopSpeakingSound);
+  const [receiveDirectMessageSound, setReceiveDirectMessageSound] = useState<boolean>(systemSettings.receiveDirectMessageSound);
+  const [receiveChannelMessageSound, setReceiveChannelMessageSound] = useState<boolean>(systemSettings.receiveChannelMessageSound);
 
   // HotKey binds error
   const [inputFocus, setInputFocus] = useState<string | null>(null);
@@ -184,51 +190,6 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   }, [handleSetHotKey, defaultSpeakingKey, hotKeyOpenMainWindow, hotKeyIncreaseVolume, hotKeyDecreaseVolume, hotKeyToggleSpeaker, hotKeyToggleMicrophone]);
 
   useEffect(() => {
-    const data = ipc.systemSettings.get();
-    if (data) {
-      setAutoLogin(data.autoLogin);
-      setAutoLaunch(data.autoLaunch);
-      setAlwaysOnTop(data.alwaysOnTop);
-      setStatusAutoIdle(data.statusAutoIdle);
-      setStatusAutoIdleMinutes(data.statusAutoIdleMinutes);
-      setStatusAutoDnd(data.statusAutoDnd);
-      setChannelUIMode(data.channelUIMode);
-      setCloseToTray(data.closeToTray);
-      setFontSize(data.fontSize);
-      setFontFamily(data.font);
-
-      setSelectedInput(data.inputAudioDevice);
-      setSelectedOutput(data.outputAudioDevice);
-      setRecordFormat(data.recordFormat);
-      setMixEffect(data.mixEffect);
-      setMixEffectType(data.mixEffectType);
-      setAutoMixSetting(data.autoMixSetting);
-      setEchoCancellation(data.echoCancellation);
-      setNoiseCancellation(data.noiseCancellation);
-      setMicrophoneAmplification(data.microphoneAmplification);
-      setManualMixMode(data.manualMixMode);
-      setMixMode(data.mixMode);
-
-      setDefaultSpeakingMode(data.speakingMode);
-      setDefaultSpeakingKey(data.defaultSpeakingKey);
-
-      setNotSaveMessageHistory(data.notSaveMessageHistory);
-
-      setHotKeyOpenMainWindow(data.hotKeyOpenMainWindow);
-      setHotKeyIncreaseVolume(data.hotKeyIncreaseVolume);
-      setHotKeyDecreaseVolume(data.hotKeyDecreaseVolume);
-      setHotKeyToggleSpeaker(data.hotKeyToggleSpeaker);
-      setHotKeyToggleMicrophone(data.hotKeyToggleMicrophone);
-
-      setDisableAllSoundEffect(data.disableAllSoundEffect);
-      setEnterVoiceChannelSound(data.enterVoiceChannelSound);
-      setLeaveVoiceChannelSound(data.leaveVoiceChannelSound);
-      setStartSpeakingSound(data.startSpeakingSound);
-      setStopSpeakingSound(data.stopSpeakingSound);
-      setReceiveDirectMessageSound(data.receiveDirectMessageSound);
-      setReceiveChannelMessageSound(data.receiveChannelMessageSound);
-    }
-
     setFontList(ipc.fontList.get());
 
     navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -780,14 +741,14 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             ipc.systemSettings.inputAudioDevice.set(selectedInput);
             ipc.systemSettings.outputAudioDevice.set(selectedOutput);
             ipc.systemSettings.recordFormat.set(recordFormat);
-            ipc.systemSettings.mixEffect.set(mixEffect);
-            ipc.systemSettings.mixEffectType.set(mixEffectType);
-            ipc.systemSettings.autoMixSetting.set(autoMixSetting);
-            ipc.systemSettings.echoCancellation.set(echoCancellation);
-            ipc.systemSettings.noiseCancellation.set(noiseCancellation);
-            ipc.systemSettings.microphoneAmplification.set(microphoneAmplification);
-            ipc.systemSettings.manualMixMode.set(manualMixMode);
-            ipc.systemSettings.mixMode.set(mixMode);
+            // ipc.systemSettings.mixEffect.set(mixEffect);
+            // ipc.systemSettings.mixEffectType.set(mixEffectType);
+            // ipc.systemSettings.autoMixSetting.set(autoMixSetting);
+            // ipc.systemSettings.echoCancellation.set(echoCancellation);
+            // ipc.systemSettings.noiseCancellation.set(noiseCancellation);
+            // ipc.systemSettings.microphoneAmplification.set(microphoneAmplification);
+            // ipc.systemSettings.manualMixMode.set(manualMixMode);
+            // ipc.systemSettings.mixMode.set(mixMode);
 
             ipc.systemSettings.speakingMode.set(defaultSpeakingMode);
             ipc.systemSettings.defaultSpeakingKey.set(defaultSpeakingKey);

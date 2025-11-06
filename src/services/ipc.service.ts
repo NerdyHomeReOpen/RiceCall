@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode, ACK, Theme } from '@/types';
+import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode, ACK, Theme, SystemSettings } from '@/types';
 import { LanguageKey } from '@/i18n';
 
 // Services
@@ -241,6 +241,13 @@ const ipcService = {
             ipcRenderer.send('open-popup', type, id, { userId, serverId, user, server, serverMembers, memberApplications }, force, title);
           },
         );
+      } else if (type === 'systemSetting') {
+        const { userId } = initialData;
+        const systemSettings = ipcService.systemSettings.get();
+        Promise.all([data.user({ userId })]).then(([user]) => {
+          if (!user) return;
+          ipcRenderer.send('open-popup', type, id, { userId, user, systemSettings }, force);
+        });
       } else if (type === 'userInfo') {
         const { userId, targetId } = initialData;
         Promise.all([data.friend({ userId, targetId }), data.user({ userId: targetId }), data.servers({ userId: targetId })]).then(([friend, target, targetServers]) => {
@@ -398,50 +405,7 @@ const ipcService = {
   },
 
   systemSettings: {
-    get: (): {
-      autoLogin: boolean;
-      autoLaunch: boolean;
-      alwaysOnTop: boolean;
-      statusAutoIdle: boolean;
-      statusAutoIdleMinutes: number;
-      statusAutoDnd: boolean;
-      channelUIMode: ChannelUIMode;
-      closeToTray: boolean;
-      fontSize: number;
-      font: string;
-
-      inputAudioDevice: string;
-      outputAudioDevice: string;
-      recordFormat: 'wav' | 'mp3';
-      mixEffect: boolean;
-      mixEffectType: string;
-      autoMixSetting: boolean;
-      echoCancellation: boolean;
-      noiseCancellation: boolean;
-      microphoneAmplification: boolean;
-      manualMixMode: boolean;
-      mixMode: MixMode;
-
-      speakingMode: SpeakingMode;
-      defaultSpeakingKey: string;
-
-      notSaveMessageHistory: boolean;
-
-      hotKeyOpenMainWindow: string;
-      hotKeyScreenshot: string;
-      hotKeyIncreaseVolume: string;
-      hotKeyDecreaseVolume: string;
-      hotKeyToggleSpeaker: string;
-      hotKeyToggleMicrophone: string;
-
-      disableAllSoundEffect: boolean;
-      enterVoiceChannelSound: boolean;
-      leaveVoiceChannelSound: boolean;
-      startSpeakingSound: boolean;
-      stopSpeakingSound: boolean;
-      receiveDirectMessageSound: boolean;
-      receiveChannelMessageSound: boolean;
-    } | null => {
+    get: (): SystemSettings | null => {
       if (!isElectron) return null;
       return ipcRenderer.sendSync('get-system-settings');
     },
