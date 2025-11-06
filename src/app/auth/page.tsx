@@ -79,6 +79,12 @@ const Auth: React.FC = React.memo(() => {
     autoLogin();
   }, []);
 
+  useEffect(() => {
+    history.pushState = () => {};
+    history.back = () => {};
+    history.forward = () => {};
+  }, []);
+
   return (
     <>
       <Header />

@@ -193,6 +193,12 @@ const Popup = React.memo(() => {
     setInitialData(ipc.initialData.get(id));
   }, [id]);
 
+  useEffect(() => {
+    history.pushState = () => {};
+    history.back = () => {};
+    history.forward = () => {};
+  }, []);
+
   return (
     <>
       {!hideHeader && (

@@ -773,6 +773,12 @@ const RootPageComponent: React.FC = React.memo(() => {
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
+  useEffect(() => {
+    history.pushState = () => {};
+    history.back = () => {};
+    history.forward = () => {};
+  }, []);
+
   return (
     <WebRTCProvider>
       <ActionScannerProvider>
