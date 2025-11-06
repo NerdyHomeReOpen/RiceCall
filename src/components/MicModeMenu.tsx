@@ -14,6 +14,25 @@ import { useWebRTC } from '@/providers/WebRTC';
 // services
 import ipc from '@/services/ipc.service';
 
+function lerpColor(color1: string, color2: string, t: number) {
+  const c1 = parseInt(color1.slice(1), 16);
+  const c2 = parseInt(color2.slice(1), 16);
+
+  const r1 = (c1 >> 16) & 0xff;
+  const g1 = (c1 >> 8) & 0xff;
+  const b1 = c1 & 0xff;
+
+  const r2 = (c2 >> 16) & 0xff;
+  const g2 = (c2 >> 8) & 0xff;
+  const b2 = c2 & 0xff;
+
+  const r = Math.round(r1 + (r2 - r1) * t);
+  const g = Math.round(g1 + (g2 - g1) * t);
+  const b = Math.round(b1 + (b2 - b1) * t);
+
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
 const MicModeMenu: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
@@ -23,7 +42,7 @@ const MicModeMenu: React.FC = React.memo(() => {
   const volumePercent = webRTC.getVolumePercent('user');
   const volumeThreshold = webRTC.voiceThreshold;
   const isActive = volumePercent > volumeThreshold;
-  const activeColor = isActive ? '#62a35b' : 'gray';
+  const activeColor = isActive ? lerpColor('#0fb300', '#be0000', Math.pow(volumePercent / 100, 2)) : 'gray';
   const voiceThresholdColor = `linear-gradient(to right, ${activeColor} ${volumePercent}%, #eee ${volumePercent}%)`;
 
   // Handlers
