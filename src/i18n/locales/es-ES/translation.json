@@ -294,7 +294,6 @@
   "mic-order": "Orden de la cola",
   "mic-queued": "Micrófono en cola",
   "mic-taken": "Micrófono tomado",
-  "mic-volume-threshold": "Sensibilidad del micrófono",
   "microphone": "Micrófono",
   "microphone-amplification-label": "Amplificación del micrófono",
   "minimize-to-tray": "Minimizar a la barra del sistema",
@@ -557,5 +556,6 @@
   "week": "Semana",
   "xp": "Puntos",
   "year": "Años",
-  "yesterday": "Ayer"
+  "yesterday": "Ayer",
+  "current-speaking-mode": "當前說話方式"
 }
