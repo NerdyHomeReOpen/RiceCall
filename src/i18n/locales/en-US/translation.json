@@ -1,4 +1,11 @@
 {
+  "CEO": "總執行長",
+  "COO-brazil": "巴西運營長",
+  "COO-iran": "伊朗運營長",
+  "COO-russia": "俄羅斯運營長",
+  "COO-taiwan": "台灣運營長",
+  "COO-turkey": "土耳其運營長",
+  "CTO": "技術長",
   "about-me": "About me",
   "about-ricecall": "About RiceCall",
   "about-us": "About us",
@@ -52,6 +59,7 @@
   "broadcast-content": "Broadcast content",
   "broadcast-type": "Type of broadcast",
   "cancel": "Cancel",
+  "cannot-add-yourself": "無法添加自己為好友",
   "cannot-apply-member": "It is not possible to submit a member application; this group does not accept applications.",
   "cannot-read-image": "Cannot read image",
   "category": "Category",
@@ -332,6 +340,18 @@
   "none": "None",
   "not-available-page": "The page is not open yet",
   "not-public": "This is a private channel",
+  "not-public-favorite-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開收藏的群"
+  },
+  "not-public-joined-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開加入的群"
+  },
+  "not-public-recent-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開最近訪問"
+  },
   "not-save-message-history-label": "Do not save chat history",
   "note": "Note:",
   "notify-friend-online": "Remind me when a friend goes online.",
@@ -389,6 +409,8 @@
   "recent-servers": "Recently visited groups",
   "recommend": "Recommend",
   "reconnection-failed-message": "Unable to restore connection. After clicking ‘OK’, you will be automatically logged out of your account.",
+  "record-format": "錄音格式",
+  "record-setting": "錄音設定",
   "register": "Register",
   "register-account": "Register account",
   "register-success": "Your registration was successful, please follow the link {{0}} to confirm your email address and activate your account. You will not be able to log in until your account is activated.",
@@ -512,6 +534,7 @@
   "upload": "Upload",
   "upload-avatar": "Upload avatar",
   "user-info": "User Info",
+  "user-is-friend": "該用戶已經是好友",
   "user-limit": "User Limit",
   "user-not-found": "User not found",
   "user-setting": "User setting",
@@ -533,7 +556,5 @@
   "week": "Week",
   "xp": "xp",
   "year": "year",
-  "yesterday": "Yesterday",
-  "record-setting": "錄音設定",
-  "record-format": "錄音格式"
+  "yesterday": "Yesterday"
 }
