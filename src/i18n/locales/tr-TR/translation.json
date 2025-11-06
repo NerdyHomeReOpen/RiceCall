@@ -294,7 +294,6 @@
   "mic-order": "Mai Xu",
   "mic-queued": "Mikrofon sırası",
   "mic-taken": "Mikrofonu aldım bile.",
-  "mic-volume-threshold": "Mikrofon hassasiyeti",
   "microphone": "mikrofon",
   "microphone-amplification-label": "Mikrofon Amplifikasyonu",
   "minimize-to-tray": "Görev Çubuğuna Küçült",
@@ -557,5 +556,6 @@
   "week": "Hafta",
   "xp": "integral",
   "year": "yıllar",
-  "yesterday": "dün"
+  "yesterday": "dün",
+  "current-speaking-mode": "當前說話方式"
 }
