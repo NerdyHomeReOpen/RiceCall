@@ -1,4 +1,11 @@
 {
+  "CEO": "總執行長",
+  "COO-brazil": "巴西運營長",
+  "COO-iran": "伊朗運營長",
+  "COO-russia": "俄羅斯運營長",
+  "COO-taiwan": "台灣運營長",
+  "COO-turkey": "土耳其運營長",
+  "CTO": "技術長",
   "about-me": "Обо мне",
   "about-ricecall": "О RiceCall",
   "about-us": "О нас",
@@ -52,6 +59,7 @@
   "broadcast-content": "Текст объявления",
   "broadcast-type": "Тип объявления",
   "cancel": "Отменить",
+  "cannot-add-yourself": "無法添加自己為好友",
   "cannot-apply-member": "Невозможно подать заявку на вступление, эта группа не принимает заявки.",
   "cannot-read-image": "Невозможно посмотреть изображение",
   "category": "Категория",
@@ -332,6 +340,18 @@
   "none": "Отсутствует",
   "not-available-page": "Страница еще не открыта",
   "not-public": "Это приватный канал",
+  "not-public-favorite-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開收藏的群"
+  },
+  "not-public-joined-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開加入的群"
+  },
+  "not-public-recent-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開最近訪問"
+  },
   "not-save-message-history-label": "Не сохранять историю чата",
   "note": "Заметка:",
   "notify-friend-online": "Напомни мне, когда друг online",
@@ -389,6 +409,8 @@
   "recent-servers": "Недавно посещенные группы",
   "recommend": "Рекомендованные группы",
   "reconnection-failed-message": "Не удалось восстановить соединение. После нажатия кнопки «ОК»  вы автоматически выйдите из учетной записи.",
+  "record-format": "錄音格式",
+  "record-setting": "錄音設定",
   "register": "Регистрация",
   "register-account": "Создать учетную запись",
   "register-success": "Регистрация прошла успешно, пожалуйста, перейдите по ссылке {{0}}, чтобы подтвердить свой адрес электронной почты для активации учетной записи. Вы не сможете войти в программу, пока учетная запись не будет активирована.",
@@ -512,6 +534,7 @@
   "upload": "Загрузить",
   "upload-avatar": "Загрузить аватар",
   "user-info": "Профиль",
+  "user-is-friend": "該用戶已經是好友",
   "user-limit": "Пользовательский лимит (чел.)",
   "user-not-found": "Пользователь не найден",
   "user-setting": "Пользовательские настройки",
@@ -533,7 +556,5 @@
   "week": "Hеделя",
   "xp": "Опыт",
   "year": "год",
-  "yesterday": "Вчера",
-  "record-setting": "錄音設定",
-  "record-format": "錄音格式"
+  "yesterday": "Вчера"
 }
