@@ -614,7 +614,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     audioProducerRef.current = await sendTransportRef.current.produce({
       track,
       encodings: [{ maxBitrate: bitrateRef.current }],
-      codecOptions: { opusStereo: false },
+      codecOptions: {
+        opusStereo: true,
+        opusDtx: false,
+        opusFec: true,
+        opusMaxPlaybackRate: 48000,
+        opusMaxAverageBitrate: bitrateRef.current,
+      },
       stopTracks: false,
     });
     audioProducerRef.current.on('transportclose', () => {
