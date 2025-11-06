@@ -1,4 +1,11 @@
 {
+  "CEO": "總執行長",
+  "COO-brazil": "巴西運營長",
+  "COO-iran": "伊朗運營長",
+  "COO-russia": "俄羅斯運營長",
+  "COO-taiwan": "台灣運營長",
+  "COO-turkey": "土耳其運營長",
+  "CTO": "技術長",
   "about-me": "关于我",
   "about-ricecall": "关于RiceCall",
   "about-us": "关于我们",
@@ -52,6 +59,7 @@
   "broadcast-content": "广播内容",
   "broadcast-type": "广播类型",
   "cancel": "取消",
+  "cannot-add-yourself": "無法添加自己為好友",
   "cannot-apply-member": "无法申请会员，此语音群不接受会员申请",
   "cannot-read-image": "无法读取图片",
   "category": "类别",
@@ -332,6 +340,18 @@
   "none": "无",
   "not-available-page": "此页面尚未开放",
   "not-public": "对方没有对外公开",
+  "not-public-favorite-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開收藏的群"
+  },
+  "not-public-joined-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開加入的群"
+  },
+  "not-public-recent-servers": {
+    "top": "對方沒有對外",
+    "bottom": "公開最近訪問"
+  },
   "not-save-message-history-label": "不保存聊天讯息纪录",
   "note": "附言",
   "notify-friend-online": "好友上线提醒我",
@@ -389,6 +409,8 @@
   "recent-servers": "最近访问的语音群",
   "recommend": "推荐",
   "reconnection-failed-message": "重新连线失败，按下确定后将自动登出",
+  "record-format": "錄音格式",
+  "record-setting": "錄音設定",
   "register": "注册",
   "register-account": "注册帐号",
   "register-success": "帳號註冊成功，請至 {{0}} 驗證你的電子郵件以啟用帳號，帳號未啟用前將無法登入",
@@ -512,6 +534,7 @@
   "upload": "上传",
   "upload-avatar": "上传头像",
   "user-info": "个人档案",
+  "user-is-friend": "該用戶已經是好友",
   "user-limit": "人数上限(人)",
   "user-not-found": "用户不存在",
   "user-setting": "使用者设定",
@@ -533,7 +556,5 @@
   "week": "周",
   "xp": "积分",
   "year": "年",
-  "yesterday": "昨天",
-  "record-setting": "錄音設定",
-  "record-format": "錄音格式"
+  "yesterday": "昨天"
 }
