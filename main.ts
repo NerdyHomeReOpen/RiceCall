@@ -1351,7 +1351,7 @@ async function handleDeepLink(url: string) {
     const { hostname } = new URL(url);
     switch (hostname) {
       case 'join':
-        const serverId = new URL(url).searchParams.get('serverId');
+        const serverId = new URL(url).searchParams.get('sid');
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send('deepLink', serverId);
         });
