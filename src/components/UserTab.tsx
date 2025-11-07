@@ -6,7 +6,7 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 // Types
-import type { Channel, Server, User, OnlineMember, Friend, Category } from '@/types';
+import type { Channel, Server, User, OnlineMember, Friend, Category, QueueUser } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -32,12 +32,13 @@ interface UserTabProps {
   channel: Channel | Category;
   currentChannel: Channel;
   member: OnlineMember;
+  queueUsers: QueueUser[];
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
   handleConnectChannel: (serverId: Server['serverId'], channelId: Channel['channelId']) => void;
 }
 
-const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, currentChannel, server, member, selectedItemId, setSelectedItemId, handleConnectChannel }) => {
+const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, currentChannel, server, member, queueUsers, selectedItemId, setSelectedItemId, handleConnectChannel }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -74,6 +75,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
   const permissionLevel = Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel);
   const currentPermissionLevel = Math.max(globalPermission, serverPermissionLevel, currentChannelPermissionLevel);
   const isUser = memberUserId === userId;
+  const isUserInQueue = queueUsers.some((qu) => qu.userId === memberUserId);
   const isSameChannel = memberCurrentChannelId === userCurrentChannelId;
   const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
   const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
@@ -181,6 +183,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
           {
             id: 'add-to-queue',
             label: t('add-to-queue'),
+            disabled: isUserInQueue,
             show: !isUser && isChannelMod(permissionLevel) && isSuperior && isSameChannel && channelVoiceMode === 'queue',
             onClick: () => handleAddUserToQueue(memberUserId, serverId, channelId),
           },
