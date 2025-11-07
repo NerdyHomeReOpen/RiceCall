@@ -216,7 +216,7 @@ const ipcService = {
         });
       } else if (type === 'inviteMember') {
         const { userId, serverId } = initialData;
-        Promise.all([data.user({ userId }), data.memberInvitation({ serverId, receiverId: userId })]).then(([target, memberInvitation]) => {
+        Promise.all([data.member({ userId, serverId }), data.memberInvitation({ serverId, receiverId: userId })]).then(([target, memberInvitation]) => {
           if (!target) return;
           ipcRenderer.send('open-popup', type, id, { userId, serverId, target, memberInvitation }, force);
         });

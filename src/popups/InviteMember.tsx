@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import popup from '@/styles/popup.module.css';
 
 // Types
-import type { User, Server, MemberInvitation } from '@/types';
+import type { Server, MemberInvitation, Member } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ import ipcService from '@/services/ipc.service';
 
 interface InviteMemberPopupProps {
   serverId: Server['serverId'];
-  target: User;
+  target: Member;
   memberInvitation: MemberInvitation | null;
 }
 
@@ -27,14 +27,14 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
   const [invitationDesc, setInvitationDesc] = useState<string>(memberInvitation?.description || '');
 
   // Destructuring
-  const { userId: targetId, name: targetName, avatarUrl: targetAvatarUrl, displayId: targetDisplayId } = target;
+  const { userId: targetId, name: targetName, avatarUrl: targetAvatarUrl, displayId: targetDisplayId, contribution: targetContribution } = target;
 
   // Handlers
-  const handleSendMemberInvitation = (receiverId: User['userId'], serverId: Server['serverId'], preset: Partial<MemberInvitation>) => {
+  const handleSendMemberInvitation = (receiverId: Member['userId'], serverId: Server['serverId'], preset: Partial<MemberInvitation>) => {
     ipcService.socket.send('sendMemberInvitation', { receiverId, serverId, preset });
   };
 
-  const handleEditMemberInvitation = (receiverId: User['userId'], serverId: Server['serverId'], update: Partial<MemberInvitation>) => {
+  const handleEditMemberInvitation = (receiverId: Member['userId'], serverId: Server['serverId'], update: Partial<MemberInvitation>) => {
     ipcService.socket.send('editMemberInvitation', { receiverId, serverId, update });
   };
 
@@ -53,8 +53,12 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
               <div className={popup['avatar-picture']} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
             </div>
             <div className={popup['info-wrapper']}>
-              <div className={popup['link-text']}>{targetName}</div>
-              <div className={popup['sub-text']}>{targetDisplayId}</div>
+              <div className={popup['link-text']}>
+                {targetName} ({targetDisplayId})
+              </div>
+              <div className={popup['sub-text']}>
+                {t('contribution')}: {targetContribution}
+              </div>
             </div>
           </div>
           <div className={popup['split']} />
