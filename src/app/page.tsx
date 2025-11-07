@@ -749,6 +749,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     if (!userId || !server.serverId) return;
+    setServerMemberApplications([]);
     const refresh = async () => {
       data.channels({ userId: userId, serverId: server.serverId }).then((channels) => {
         if (channels) setChannels(channels);
@@ -756,6 +757,9 @@ const RootPageComponent: React.FC = React.memo(() => {
       data.serverOnlineMembers({ serverId: server.serverId }).then((serverOnlineMembers) => {
         if (serverOnlineMembers) setServerOnlineMembers(serverOnlineMembers);
       });
+      // data.memberApplications({ serverId: server.serverId }).then((serverMemberApplications) => {
+      //   if (serverMemberApplications) setServerMemberApplications(serverMemberApplications);
+      // });
     };
     refresh();
   }, [userId, server.serverId]);
