@@ -20,6 +20,7 @@ import type {
   Announcement,
   Friend,
   OnlineMember,
+  MemberApplication,
   QueueUser,
   Notify,
   RecommendServer,
@@ -397,6 +398,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
   const [servers, setServers] = useState<Server[]>([]);
   const [serverOnlineMembers, setServerOnlineMembers] = useState<OnlineMember[]>([]);
+  const [serverMemberApplications, setServerMemberApplications] = useState<MemberApplication[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
@@ -522,6 +524,21 @@ const RootPageComponent: React.FC = React.memo(() => {
   const handleServerOnlineMemberRemove = (...args: { userId: string; serverId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
     setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
+  };
+
+  const handleServerMemberApplicationAdd = (...args: { data: MemberApplication }[]) => {
+    const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+    setServerMemberApplications((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
+  };
+
+  // const handleServerMemberApplicationUpdate = (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => {
+  //   const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
+  //   setServerMemberApplications((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
+  // };
+
+  const handleServerMemberApplicationRemove = (...args: { userId: string; serverId: string }[]) => {
+    const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
+    setServerMemberApplications((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   };
 
   // const handleChannelsSet = (...args: Channel[]) => {
@@ -762,6 +779,8 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.socket.on('serverOnlineMemberAdd', handleServerOnlineMemberAdd),
       ipc.socket.on('serverOnlineMemberUpdate', handleServerOnlineMemberUpdate),
       ipc.socket.on('serverOnlineMemberRemove', handleServerOnlineMemberRemove),
+      ipc.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
+      ipc.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
       ipc.socket.on('channelAdd', handleChannelAdd),
       ipc.socket.on('channelUpdate', handleChannelUpdate),
       ipc.socket.on('channelRemove', handleChannelRemove),
@@ -800,7 +819,8 @@ const RootPageComponent: React.FC = React.memo(() => {
                 friends={friends}
                 server={server}
                 serverOnlineMembers={serverOnlineMembers}
-                channel={channel}
+                serverMemberApplications={serverMemberApplications}
+                currentChannel={channel}
                 channels={channels}
                 channelMessages={channelMessages}
                 clearMessages={() => setChannelMessages([])}
