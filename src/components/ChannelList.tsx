@@ -5,7 +5,7 @@ import styles from '@/styles/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import type { OnlineMember, Channel, Server, User, Category, Friend, MemberApplication, QueueUser } from '@/types';
+import type { OnlineMember, Channel, Server, User, Category, Friend, QueueUser } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -100,9 +100,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
   };
 
-  const handleServerMemberApplicationsSet = (...args: MemberApplication[]) => {
-    setMemberApplicationsCount(args.length);
-  };
+  // const handleServerMemberApplicationsSet = (...args: MemberApplication[]) => {
+  //   setMemberApplicationsCount(args.length);
+  // };
 
   const handleServerMemberApplicationAdd = () => {
     setMemberApplicationsCount((prev) => prev + 1);
@@ -127,11 +127,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   }, []);
 
   useEffect(() => {
-    const unsubscribe = [
-      ipc.socket.on('serverMemberApplicationsSet', handleServerMemberApplicationsSet),
-      ipc.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
-      ipc.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
-    ];
+    const unsubscribe = [ipc.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd), ipc.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
