@@ -177,11 +177,22 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   );
 
   const handleDeepLink = useCallback(
-    (serverId: string) => {
-      if (!userId) return;
-      handleConnectServer(serverId, userId);
+    async (serverId: string) => {
+      if (!userId || !serverId) return;
+      ipc.socket.send('searchServer', { query: serverId });
+      const servers: Server[] = await new Promise((resolve) => {
+        const off = ipc.socket.on('serverSearch', (...args: Server[]) => {
+          off();
+          resolve(args);
+        });
+      });
+      const target = servers.find((s) => s.displayId === serverId);
+      if (!target) {
+        return;
+      }
+      handleConnectServer(target.serverId, target.displayId);
     },
-    [userId, handleConnectServer],
+    [userId, handleConnectServer]
   );
 
   // Effects
