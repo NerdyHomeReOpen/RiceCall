@@ -1,0 +1,205 @@
+.content {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+.header-box {
+  gap: 0.77rem;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  background-color: #f7f7f7;
+  height: 50px;
+  padding: 10px;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.select-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.search-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+  align-items: center;
+}
+
+.search-title {
+  display: flex;
+  align-items: center;
+  width: 80px;
+  height: 25px;
+}
+
+.search-input-box {
+  display: flex;
+  flex-direction: row;
+  box-shadow: inset 1px 1px 3px #0000001a;
+  border: 1px solid var(--border);
+  background-color: var(--background);
+  align-items: center;
+}
+
+.search-input-box input {
+  border: unset !important;
+  background-color: unset !important;
+  box-shadow: unset !important;
+  padding: 0.5rem;
+}
+
+.search-icon {
+  background-image: url('/icon_search.png');
+  background-repeat: no-repeat;
+  background-size: auto;
+  width: 16px;
+  height: 16px;
+  background-position: 0 0;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.search-input-box:hover .search-icon {
+  background-position: -16px 0;
+}
+
+.search-input-box:hover .search-icon:active {
+  background-position: -33px 0;
+}
+
+.body-box {
+  height: 100%;
+  width: 100%;
+  background-color: #fcfcfc;
+  display: flex;
+}
+
+.body-left {
+  border-right: 1px solid #d6d6d6;
+  width: 250px;
+  overflow: auto;
+  height: calc(100% - 4.5rem);
+  min-height: 467.34px;
+  flex: unset !important;
+}
+
+.friend-group-box,
+.friend-group-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.friend-group {
+  border-radius: 3px;
+  align-items: center;
+  gap: 2px;
+  height: 25px;
+  padding: 5px;
+  display: flex;
+}
+
+.friend-info-box {
+  border-radius: 3px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+  padding: 5 10 5 50;
+  display: flex;
+  position: relative;
+}
+
+.friend-info-box.selected {
+  background-color: var(--selected);
+}
+
+
+.friend-info-box:hover {
+  background-color: var(--hover);
+}
+
+.avatar-box {
+  display: flex;
+}
+
+.avatar-border {
+  background-image: url('/win_border.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  z-index: 1;
+}
+
+.avatar {
+  object-fit: cover;
+  background-image: url('/im/SecretaryLogo.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-width: 30px;
+  min-height: 30px;
+  position: relative;
+}
+
+.name {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.body-right {
+  height: 100%;
+  width: 100%;
+}
+
+.body-right-top {
+  height: 28px;
+  width: 100%;
+  background-color: #fafcff;
+  border-bottom: 1px solid #d6d6d6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.body-right-top-title {
+  margin-left: 0.8rem;
+}
+
+.body-right-top-delete-button-box {
+  width: 80px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #b1b1b1;
+  margin-right: 0.8rem;
+  padding: 2px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  justify-content: space-between;
+}
+
+.delete-button-icon {
+  background-image: url('/Delete_ico.png');
+  background-size: auto;
+  height: 16px;
+  width: 16px;
+}
+
+.body-right-botton {
+  display: flex;
+  justify-content: center;
+}
+
+.message-date {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(244, 247, 252, 1) 100%);
+  border-bottom: 1px solid #b6cedc;
+  height: 32px;
+  width: 95%;
+}
