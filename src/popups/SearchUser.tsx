@@ -51,7 +51,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         else handleOpenApplyFriend(userId, targetId);
       });
     },
-    [userId],
+    [userId, t],
   );
 
   // Effects
