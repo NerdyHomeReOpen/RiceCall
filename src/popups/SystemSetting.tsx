@@ -65,11 +65,11 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
   const [forbidShakeMessages, setForbidShakeMessages] = useState<boolean>(user.forbidShakeMessages ?? false);
   const [forbidMemberInvitations, setForbidMemberInvitations] = useState<boolean>(user.forbidMemberInvitations ?? false);
   const [forbidStrangerMessages, setForbidStrangerMessages] = useState<boolean>(user.forbidStrangerMessages ?? false);
-  const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(user.shareCurrentServer ?? false);
-  const [shareRecentServers, setShareRecentServers] = useState<boolean>(user.shareRecentServers ?? false);
-  const [shareJoinedServers, setShareJoinedServers] = useState<boolean>(user.shareJoinedServers ?? false);
-  const [shareFavoriteServers, setShareFavoriteServers] = useState<boolean>(user.shareFavoriteServers ?? false);
-  const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(systemSettings.notSaveMessageHistory);
+  const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(user.shareCurrentServer ?? true);
+  const [shareRecentServers, setShareRecentServers] = useState<boolean>(user.shareRecentServers ?? true);
+  const [shareJoinedServers, setShareJoinedServers] = useState<boolean>(user.shareJoinedServers ?? true);
+  const [shareFavoriteServers, setShareFavoriteServers] = useState<boolean>(user.shareFavoriteServers ?? true);
+  const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(systemSettings.notSaveMessageHistory ?? true);
 
   const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>(systemSettings.hotKeyOpenMainWindow);
   const [hotKeyIncreaseVolume, setHotKeyIncreaseVolume] = useState<string>(systemSettings.hotKeyIncreaseVolume);
