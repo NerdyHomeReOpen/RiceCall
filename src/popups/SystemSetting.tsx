@@ -770,15 +770,15 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
             ipc.systemSettings.receiveChannelMessageSound.set(receiveChannelMessageSound);
 
             handleEditUserSetting({
-              forbidFriendApplications,
-              forbidShakeMessages,
-              forbidMemberInvitations,
-              forbidStrangerMessages,
-              shareCurrentServer,
-              shareRecentServers,
-              shareJoinedServers,
-              shareFavoriteServers,
-              notSaveMessageHistory,
+              forbidFriendApplications: !!forbidFriendApplications,
+              forbidShakeMessages: !!forbidShakeMessages,
+              forbidMemberInvitations: !!forbidMemberInvitations,
+              forbidStrangerMessages: !!forbidStrangerMessages,
+              shareCurrentServer: !!shareCurrentServer,
+              shareRecentServers: !!shareRecentServers,
+              shareJoinedServers: !!shareJoinedServers,
+              shareFavoriteServers: !!shareFavoriteServers,
+              notSaveMessageHistory: !!notSaveMessageHistory,
             });
             handleClose();
           }}
