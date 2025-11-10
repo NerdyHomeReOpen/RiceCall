@@ -1,155 +1,126 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/cd9fb652-f032-4fb7-b949-91305d37f103" height="100px" align="center">
+  <img width="1920" height="1080" alt="discord_banner" src="https://github.com/user-attachments/assets/488a1f4c-4e03-463a-85c7-a1eef22cc505" />
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-0.3.4-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.3.3-green"/>
     <a title="Crowdin" target="_blank" href="https://crowdin.com"><img src="https://badges.crowdin.net/rice-call/localized.svg"></a>
   </div>
 </div>
 
-## 使用聲明
+## Terms of Use
 
-**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)**（以下簡稱 RC 語音）為 **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)**（以下簡稱本團隊）**獨立開發**之專案，**與 RaidCall 原開發團隊、伺服器或任何官方組織無任何關聯**。請使用者自行斟酌並承擔使用風險（_Use at your own risk_）。
+**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)** (hereinafter referred to as RC Voice) is an **independently developed** project by **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)** (hereinafter referred to as the Team).  
+**It has no connection whatsoever with the original RaidCall development team, servers, or any official organization.** Please use at your own risk.  
 
-目前 RC 語音所有版本皆為測試版本，若在使用過程中發現問題，歡迎透過以下方式回報：
+Currently, all versions of RC Voice are test builds. If you encounter issues while using the software, you are welcome to report them through the following channels:
 
-- 應用程式內：右上角選單 > 意見反饋
-- GitHub：[問題回報](https://github.com/NerdyHomeReOpen/RiceCall/issues)
-- Discord：加入 [官方群組](https://discord.gg/adCWzv6wwS) 以獲取最新資訊
+- In-app: Top-right menu > Feedback  
+- GitHub: [Issue Report](https://github.com/NerdyHomeReOpen/RiceCall/issues)  
+- Discord: Join our [Discord](https://discord.gg/s86Yra4dUb) server to report or ask an issue freely
 
-請注意，RC 語音之所有資料（包括但不限於帳號、等級、VIP、語音群等）**可能會遭到重置、遺失或刪除**，本團隊保有最終決策權。
+Please note that all data in RC Voice (including but not limited to accounts, levels, VIP, and voice servers) **may be reset, lost, or deleted**. The Team reserves final decision rights.  
 
-RC 語音**並非 RaidCall 的延續、重製或官方授權版本**，亦**不提供 RaidCall 服務的還原、支援或帳號資料恢復**。此專案純屬愛好者社群自發性的開發行動，旨在提供一個新的語音交流平台，**不以商業化為目的**。
+RC Voice is **not a continuation, remake, or officially licensed version of RaidCall**, and it **does not provide restoration of RaidCall services, support, or account data recovery**.  
+This project is purely a community-driven initiative by enthusiasts, intended to provide a new voice communication platform, **without any commercial purpose**.  
 
-RC 語音所有內容僅供學術研究與技術交流使用。如涉及任何版權、商標或其他權利問題，歡迎來信與我們聯繫協商。
+All RC Voice content is provided solely for academic research and technical exchange. If there are any concerns regarding copyright, trademarks, or other rights, please contact us for resolution.  
 
-RC 語音雖參考或沿用部分 RaidCall 相關素材，但最終成品皆為本團隊獨立創作，**不代表 RaidCall 官方立場或意圖**。因此，我們**不提供與 RaidCall 相關之任何技術支援、帳號恢復或資料查詢服務**。如有相關問題，請洽原 RaidCall 官方。
+While RC Voice may reference or reuse certain RaidCall-related materials, the final product is entirely an independent creation of the Team, and **does not represent the stance or intent of RaidCall.**  
+Therefore, we **do not provide any technical support, account recovery, or data retrieval services related to RaidCall.** For such issues, please contact the original RaidCall officials.
 
-### 開源參與方式
+### How to Contribute
 
-我們歡迎各界開發者參與 RC 語音的開發與維護。您可透過以下方式加入貢獻：
+We welcome developers from all backgrounds to contribute to the development and maintenance of RC Voice. You can participate through the following methods:
 
-- 填寫 [意願表單](https://forms.gle/ZowwAS22dGpKkGcZ8)（請先加入 [Discord 官方群組](https://discord.gg/adCWzv6wwS)，若我們有需要會聯繫您並指派身份組）
-- Fork 本專案並提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)，貢獻新功能或修復
+- Fill out the [Application Form](https://forms.gle/ZowwAS22dGpKkGcZ8) (if needed, we will contact you and assign a contributor role)  
+- Fork the project and submit a [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls) with new features or fixes  
 
-感謝您的支持與參與！
+Thank you for your support and participation!  
 
-## 安裝方法
+## Installation Guide
 
-下方為載點，請先閱讀過說明文件後再開始下載:
+Please read the documentation before downloading. 
 
-[下載點](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest)
+> [Official Website Download](https://ricecall.com.tw)  
+> [GitHub Download](https://github.com/NerdyHomeReOpen/RiceCall/releases/tag/latest)
 
-## 常見問題
+## Technical Architecture
 
-### Q. 這裡是官方嗎
+* **Frontend (Client):** React, Electron
+* **Backend (Server):** Node.js
+* **Database:** MySQL
+* **Communication Protocols:** WebRTC / WebSocket / HTTP
 
-A. 不是，我們是一群由熱忱組成的團隊，跟原官方無任何關係
-
-### Q. 為什麼沒有群
-
-A. 目前沒有推薦語音群，無聊沒事可以去 10 或 2000000 逛逛喔
-
-### Q. 怎麼獲得VIP
-
-A. 目前未開放購買，將會在正式版開放時提供管道
-
-### Q. 我要多久可以升一次等級
-
-A. 請在 [這裡](https://docs.google.com/spreadsheets/d/1cV9BghtRDgzh9QBgsSON9NoVdPoGUHsOJEJwrzxNLJk/edit?usp=sharing) 查看
-
-### Q. 轉圈圈怎麼辦
-
-A. 登出重新登入，頻繁觸發請至 [Discord 官方群組](https://discord.gg/adCWzv6wwS) 或 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 回報
-
-### Q. 彈出錯誤視窗怎麼辦
-
-A. 請截圖並附上觸發方式至 [Discord 官方群組](https://discord.gg/adCWzv6wwS) 或 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 回報
-
-### Q. 我無法登入
-
-A. 請先確定自己下載的是[最新版本](https://github.com/NerdyHomeReOpen/RiceCall/releases/latest) ，對照版本號，若持續發生請至 [Discord 官方群組](https://discord.gg/adCWzv6wwS) 或 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 回報
-
-### Q: 我的問題不在以上的內容中
-
-A: 請加入我們的 [Discord 官方群組](https://discord.gg/adCWzv6wwS) 或至 [Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 頁面詳細描述你所遇到的問題
-
-## 技術架構
-
-- **前端 (Client):** React, Electron
-- **後端 (Server):** Node.js
-- **資料庫 (Database):** SQLite
-- **通訊協定 (Protocol):** WebRTC / WebSocket
-
-## 專案架構
+## Project Structure
 
 ```bash
 RiceCall
-├── public/                   # 靜態資源 (圖片、icons 等)
-├── resources/                # Electron 打包相關資源
-├── src/                      # 原始碼
-│   ├── app/                  # Next.js 頁面
-│   ├── components/           # React/Electron 元件
-│   ├── i18n/                 # i18n 文件及初始設定
+├── public/                   # Static assets (images, icons, etc.)
+├── resources/                # Electron packaging resources
+├── src/                      # Source code
+│   ├── app/                  # Next.js pages
+│   ├── components/           # React/Electron components
+│   ├── i18n/                 # i18n files and initialization
 │   ├── providers/            # React Providers
-│   ├── services/             # API 呼叫、資料處理
-│   ├── styles/               # CSS
-│   ├── types/                # 類型定義
-│   ├── utils/                # 功能檔案
-├── .env.example              # 環境變數範例
-├── .gitignore                # Git 忽略清單
-├── .prettierrc               # Prettier 設定
-├── crowdin.yml               # Crowdin 設定
-├── dev-app-update.yml        # 應用程式更新設定 (Electron auto-update)
-├── Dockerfile                # Docker 部署設定
-├── electron-builder.json     # Electron 打包設定
-├── eslint.config.mjs         # ESLint 設定
-├── LICENSE                   # 專案授權
-├── main.ts                   # Electron 入口文件
-├── next.config.ts            # Next 設定
-├── package.json              # npm/yarn 依賴管理
-├── README.md                 # 這份文件
-├── tsconfig.electron.json    # TypeScript 設定 (用於 main.ts)
-├── tsconfig.json             # TypeScript 設定
-├── yarn.lock                 # Yarn 鎖定依賴版本
+│   ├── services/             # API calls and data processing
+│   ├── styles/               # CSS files
+│   ├── types/                # Type definitions
+│   ├── utils/                # Utility functions
+├── .env.example              # Example environment variables
+├── .gitignore                # Git ignore rules
+├── .prettierrc               # Prettier configuration
+├── crowdin.yml               # Crowdin configuration
+├── dev-app-update.yml        # Electron auto-update configuration
+├── Dockerfile                # Docker deployment settings
+├── electron-builder.json     # Electron packaging configuration
+├── eslint.config.mjs         # ESLint configuration
+├── LICENSE                   # Project license
+├── main.ts                   # Electron entry point
+├── next.config.ts            # Next.js configuration
+├── package.json              # npm/yarn dependency management
+├── README.md                 # This document
+├── tsconfig.electron.json    # TypeScript config for Electron (main.ts)
+├── tsconfig.json             # TypeScript configuration
+├── yarn.lock                 # Yarn lockfile
 ```
 
-## 建置本地環境
+## Setting Up Local Environment
 
-### 1. Copy .env.example to .env and fill all required option
+### 1. Copy `.env.example` to `.env` and fill in all required options
 
 ```env
-# Server Settings (All variables need to be fill)
-API_URL=http://localhost:4500 # Don't add the final /
-WS_URL=https://localhost:4500 # If your server is on the same machine, use the same url
+# Server Settings (All variables must be filled)
+API_URL=http://localhost:4500 # Do not include the trailing slash
+WS_URL=https://localhost:4500 # Use the same URL if your server runs locally
 
 # Crowdin Settings (Optional)
-CROWDIN_DISTRIBUTION_HASH=put_your_hash_here # If not provided, will use local files (./src/i18n/locales/[lang]/[ns]) instead
+CROWDIN_DISTRIBUTION_HASH=put_your_hash_here # If omitted, local files (./src/i18n/locales/[lang]/[ns]) will be used
 ```
 
-### 2. Install dependency
+### 2. Install dependencies
 
 ```bash
 yarn install
 ```
 
-### 3. Start dev client
+### 3. Start the development client
 
 ```bash
 yarn dev
 ```
 
-### 4. Build
+### 4. Build the application
 
 ```bash
-yarn build # For all platform
-yarn build:deb # For linux .deb file
-yarn build:dmg # For macOS .dmg file
+yarn build       # Build for all platforms
+yarn build:deb   # Build Linux .deb package
+yarn build:dmg   # Build macOS .dmg package
 ```
 
-### Other scripts
+### Other Scripts
 
 ```bash
-yarn format # Format all files with prettier
+yarn format # Format all files with Prettier
 ```
+
