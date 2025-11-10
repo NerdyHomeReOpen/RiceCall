@@ -51,12 +51,12 @@
   height: 100%;
   width: 100%;
   margin-left: 10px;
-  gap: 5px;
+  gap: 10px;
 }
 
 .badge-description-box .badge-name {
-  color: var(--text-link);
-  font-size: 1.25em;
+  color: var(--text-color-quaternary);
+  font-size: 1.1em;
   font-weight: bold;
 }
 
@@ -64,8 +64,7 @@
   color: var(--text-color-quaternary);
 }
 
-.badge-show-time-box {
-  display: flex;
+.badge-show-time {
   width: 100%;
   color: var(--text-color-quaternary);
 }

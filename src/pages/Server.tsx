@@ -11,7 +11,7 @@ import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
-import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueUser, ChannelUIMode } from '@/types';
+import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueUser, ChannelUIMode, MemberApplication } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -52,9 +52,6 @@ const MessageInputBoxGuard = React.memo(
     channelIsTextMuted,
     onSend,
   }: MessageInputBoxGuardProps) => {
-    // Hooks
-    const { t } = useTranslation();
-
     // States
     const [now, setNow] = useState(Date.now());
 
@@ -74,16 +71,8 @@ const MessageInputBoxGuard = React.memo(
     const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
     const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
     const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
-    const placeholder = useMemo(() => {
-      if (isForbidByMutedText) return t('text-was-muted-in-channel-message');
-      if (isForbidByForbidText) return t('channel-forbid-text-message');
-      if (isForbidByForbidGuestText) return t('channel-forbid-guest-text-message');
-      if (isForbidByForbidGuestTextGap) return t('channel-guest-text-gap-time-message', { '0': leftGapTime.toString() });
-      if (isForbidByForbidGuestTextWait) return t('channel-guest-text-wait-time-message', { '0': leftWaitTime.toString() });
-      return `${t('input-message')}...`;
-    }, [t, isForbidByMutedText, isForbidByForbidText, isForbidByForbidGuestText, isForbidByForbidGuestTextGap, isForbidByForbidGuestTextWait, leftGapTime, leftWaitTime]);
 
-    return <MessageInputBox disabled={disabled} maxLength={maxLength} placeholder={placeholder} onSend={onSend} />;
+    return <MessageInputBox disabled={disabled} maxLength={maxLength} onSend={onSend} />;
   },
 );
 
@@ -138,7 +127,8 @@ interface ServerPageProps {
   friends: Friend[];
   server: Server;
   serverOnlineMembers: OnlineMember[];
-  channel: Channel;
+  serverMemberApplications: MemberApplication[];
+  currentChannel: Channel;
   channels: Channel[];
   channelMessages: (ChannelMessage | PromptMessage)[];
   clearMessages: () => void;
@@ -148,7 +138,7 @@ interface ServerPageProps {
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
-  ({ user, friends, server, serverOnlineMembers, channel, channels, channelMessages, clearMessages, actionMessages, queueUsers, display }) => {
+  ({ user, friends, server, serverOnlineMembers, serverMemberApplications, currentChannel, channels, channelMessages, clearMessages, actionMessages, queueUsers, display }) => {
     // Hooks
     const { t } = useTranslation();
     const webRTC = useWebRTC();
@@ -190,7 +180,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       permissionLevel: channelPermissionLevel,
       isTextMuted: channelIsTextMuted,
       isVoiceMuted: channelIsVoiceMuted,
-    } = channel;
+    } = currentChannel;
     const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel), [globalPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
     const queueUser = useMemo(() => queueUsers.find((m) => m.userId === userId), [queueUsers, userId]);
     const queuePosition = useMemo(() => (queueUser?.position ?? 0) + 1, [queueUser]);
@@ -435,7 +425,16 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         <main className={styles['server-body']}>
           {/* Left Sidebar */}
           <aside ref={sidebarRef} className={styles['sidebar']}>
-            <ChannelList user={user} friends={friends} server={server} serverOnlineMembers={serverOnlineMembers} channels={channels} channel={channel} queueUsers={queueUsers} />
+            <ChannelList
+              user={user}
+              friends={friends}
+              server={server}
+              serverOnlineMembers={serverOnlineMembers}
+              serverMemberApplications={serverMemberApplications}
+              channels={channels}
+              currentChannel={currentChannel}
+              queueUsers={queueUsers}
+            />
           </aside>
 
           {/* Resize Handle */}
@@ -509,13 +508,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     ]);
                   }}
                 >
-                  <ChannelMessageContent messages={channelMessages} user={user} channel={channel} server={server} isScrollToBottom={isScrollToBottom} />
+                  <ChannelMessageContent messages={channelMessages} user={user} channel={currentChannel} server={server} isScrollToBottom={isScrollToBottom} />
                 </div>
 
                 {/* Broadcast Area */}
                 <div className={styles['input-area']}>
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
-                    <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={channel} server={server} />
+                    <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={currentChannel} server={server} />
                   </div>
                   <MessageInputBoxGuard
                     lastJoinChannelTime={lastJoinChannelTime}

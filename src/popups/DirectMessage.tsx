@@ -33,7 +33,7 @@ import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenUserInfo } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenChatHistory, handleOpenUserInfo } from '@/utils/popup';
 import { toTags } from '@/utils/tagConverter';
 
 const SHAKE_COOLDOWN = 3;
@@ -269,16 +269,16 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       <div className={styles['header']}>
         <div className={styles['user-signature']}>{target.signature}</div>
         <div className={styles['direct-option-buttons']}>
-          <div className={`${styles['file-share']} ${'disabled'}`} />
+          <div className={`${styles['file-share']} disabled`} />
           {!isFriend ? (
             <div className={styles['apply-friend']} onClick={() => handleOpenApplyFriend(userId, targetId)} />
           ) : (
             <>
               {!isBlocked ? <div className={styles['block-user']} onClick={handleBlockUser} /> : <div className={styles['un-block-user']} onClick={handleUnblockUser} />}
-              <div className={`${styles['invite-temp-group']} ${'disabled'}`} />
+              <div className={`${styles['invite-temp-group']} disabled`} />
             </>
           )}
-          <div className={`${styles['report']} ${'disabled'}`} />
+          <div className={`${styles['report']} disabled`} />
         </div>
       </div>
 
@@ -288,7 +288,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
             <div
-              className={`${styles['avatar-picture']} ${styles['clickable']} ${isFriend && isOnline ? '' : styles['offline']}`}
+              className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`}
               style={{ backgroundImage: `url(${targetAvatarUrl})` }}
               onClick={() => handleOpenUserInfo(userId, targetId)}
             />
@@ -296,11 +296,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div className={styles['user-state-box']}>
               <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} />
               {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
-              <BadgeList badges={JSON.parse(targetBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} />
+              <BadgeList badges={JSON.parse(targetBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} grid={true} />
             </div>
           </div>
           <div className={styles['user-box']}>
-            <div className={`${styles['avatar-picture']} ${styles['clickable']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, userId)} />
+            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, userId)} />
           </div>
         </div>
 
@@ -308,7 +308,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         <div className={styles['main-content']}>
           {isFriend && isOnline && targetCurrentServerId && (
             <div
-              className={`${styles['action-area']} ${styles['clickable']}`}
+              className={styles['action-area']}
+              style={targetCurrentServer ? { cursor: 'pointer' } : {}}
               onClick={() => {
                 if (!targetCurrentServer) return;
                 handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId);
@@ -336,7 +337,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>
               <div className={styles['buttons']}>
-                <div className={`${styles['button']} ${styles['font']}`} />
+                <div className={`${styles['button']} ${styles['font']} disabled`} />
                 <div
                   className={`${styles['button']} ${styles['emoji']}`}
                   onMouseDown={(e) => {
@@ -358,11 +359,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                     );
                   }}
                 />
-                <div className={`${styles['button']} ${styles['screen-shot']}`} />
+                <div className={`${styles['button']} ${styles['screen-shot']} disabled`} />
                 <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`} onClick={handleSendShakeWindow} />
               </div>
               <div className={styles['buttons']}>
-                <div className={styles['history-message']}>{t('message-history')}</div>
+                <div className={`${styles['history-message']} disabled`} onClick={() => handleOpenChatHistory(userId, targetId)}>
+                  {t('message-history')}
+                </div>
               </div>
             </div>
             <EditorContent

@@ -5,7 +5,7 @@ import styles from '@/styles/server.module.css';
 import header from '@/styles/header.module.css';
 
 // Types
-import type { OnlineMember, Channel, Server, User, Category, Friend, MemberApplication, QueueUser } from '@/types';
+import type { OnlineMember, Channel, Server, User, Category, Friend, QueueUser, MemberApplication } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -29,12 +29,13 @@ interface ChannelListProps {
   friends: Friend[];
   server: Server;
   serverOnlineMembers: OnlineMember[];
-  channel: Channel;
+  serverMemberApplications: MemberApplication[];
+  currentChannel: Channel;
   channels: (Channel | Category)[];
   queueUsers: QueueUser[];
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, channel, channels, queueUsers }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, serverMemberApplications, currentChannel, channels, queueUsers }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -45,7 +46,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const [latency, setLatency] = useState<number>(0);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [memberApplicationsCount, setMemberApplicationsCount] = useState<number>(0);
 
   // Destructuring
   const { userId, permissionLevel: globalPermissionLevel } = user;
@@ -59,7 +59,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     favorite: isFavorite,
     isVerified: isVerifiedServer,
   } = server;
-  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = channel;
+  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = currentChannel;
 
   // Memos
   const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
@@ -100,18 +100,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
   };
 
-  const handleServerMemberApplicationsSet = (...args: MemberApplication[]) => {
-    setMemberApplicationsCount(args.length);
-  };
-
-  const handleServerMemberApplicationAdd = () => {
-    setMemberApplicationsCount((prev) => prev + 1);
-  };
-
-  const handleServerMemberApplicationRemove = () => {
-    setMemberApplicationsCount((prev) => Math.max(prev - 1, 0));
-  };
-
   // Effects
   useEffect(() => {
     for (const channel of channels) {
@@ -124,15 +112,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
       setLatency(ipc.latency.get());
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = [
-      ipc.socket.on('serverMemberApplicationsSet', handleServerMemberApplicationsSet),
-      ipc.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
-      ipc.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
-    ];
-    return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
 
   return (
@@ -202,6 +181,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                     {
                       id: 'report',
                       label: t('report'),
+                      icon: 'report',
                       disabled: true,
                       onClick: () => {
                         /* TODO: handleOpenReport */
@@ -216,7 +196,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                   ]);
                 }}
               >
-                <div className={`${header['overlay']} ${isServerAdmin(permissionLevel) && memberApplicationsCount > 0 ? header['new'] : ''}`} />
+                <div className={`${header['overlay']} ${isServerAdmin(permissionLevel) && serverMemberApplications.length > 0 ? header['new'] : ''}`} />
               </div>
             </div>
           </div>
@@ -244,7 +224,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                   friends={friends}
                   queueMember={queueMember}
                   server={server}
-                  channel={channel}
+                  channel={currentChannel}
                   selectedItemId={selectedItemId}
                   setSelectedItemId={setSelectedItemId}
                 />
@@ -301,8 +281,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
               friends={friends}
               server={server}
               serverOnlineMembers={serverOnlineMembers}
-              channel={channel}
-              currentChannel={channel}
+              channel={currentChannel}
+              currentChannel={currentChannel}
+              queueUsers={queueUsers}
               expanded={{ [currentChannelId]: true }}
               selectedItemId={selectedItemId}
               setExpanded={() => {}}
@@ -319,7 +300,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                   serverOnlineMembers={serverOnlineMembers}
                   category={item as Category}
                   channels={channels}
-                  currentChannel={channel}
+                  currentChannel={currentChannel}
+                  queueUsers={queueUsers}
                   expanded={expanded}
                   selectedItemId={selectedItemId}
                   setExpanded={setExpanded}
@@ -333,7 +315,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                   server={server}
                   serverOnlineMembers={serverOnlineMembers}
                   channel={item as Channel}
-                  currentChannel={channel}
+                  currentChannel={currentChannel}
+                  queueUsers={queueUsers}
                   expanded={expanded}
                   selectedItemId={selectedItemId}
                   setExpanded={setExpanded}
@@ -344,6 +327,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
           )}
         </div>
       </div>
+
+      {/* Saperator */}
+      <div className={styles['saperator-3']} />
 
       {/* Footer */}
       <div className={styles['sidebar-footer']}>

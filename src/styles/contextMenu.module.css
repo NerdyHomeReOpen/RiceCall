@@ -95,6 +95,10 @@
   background-image: url('/channel/icon_locateme.png');
 }
 
+.context-menu .option[data-type='report']::before {
+  background-image: url('/channel/icon_report.png');
+}
+
 .context-menu .option[data-type='uncollect']::before {
   background-image: url('/channel/icon_uncollect.png');
 }

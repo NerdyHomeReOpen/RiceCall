@@ -12,7 +12,7 @@ import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
 // Types
-import type { User, Friend, FriendGroup } from '@/types';
+import type { User, Friend, FriendGroup, FriendActivity } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -21,14 +21,18 @@ import { useContextMenu } from '@/providers/ContextMenu';
 // Services
 import ipc from '@/services/ipc.service';
 
+// Utils
+import { getFormatTimeDiff } from '@/utils/language';
+
 interface FriendPageProps {
   user: User;
   friends: Friend[];
+  friendActivities: FriendActivity[];
   friendGroups: FriendGroup[];
   display: boolean;
 }
 
-const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, friends, friendGroups, display }) => {
+const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, friends, friendActivities, friendGroups, display }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -70,24 +74,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
     document.addEventListener('pointerup', resetResizing);
     return () => document.removeEventListener('pointerup', resetResizing);
   }, []);
-
-  // const userInfo = () => (
-  //   <div className={friendPage['user-info-wrapper']}>
-  //     <div className={friendPage['user-info']}>
-  //       <div className={friendPage['user-avatar']}></div>
-  //       <div className={friendPage['right-info']}>
-  //         <div className={friendPage['user-info-top']}>
-  //           <div className={`${friendPage['vip-icon']} ${vip['vip-icon']} ${vip['vip-1']}`}></div>
-  //           <div className={`${friendPage['user-name']} ${friendPage['vip-color']}`}>username</div>
-  //           <div className={friendPage['public-time']}>5分鐘前</div>
-  //         </div>
-  //         <div className={friendPage['signature']}>
-  //           signaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignaturesignature
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
 
   return (
     <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
@@ -152,7 +138,21 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
         <main className={friendPage['content']}>
           <header className={friendPage['header']}>{t('friend-active')}</header>
           <div className={`${friendPage['scroll-view']} ${friendPage['friend-active-wrapper']}`}>
-            <div className={friendPage['friend-active-list']}>{/* todo: add friend active list */}</div>
+            <div className={friendPage['friend-active-list']}>
+              {friendActivities.map((friendActivity, index) => (
+                <div key={index} className={friendPage['user-activity']}>
+                  <div className={friendPage['user-avatar']} style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }} />
+                  <div className={friendPage['right-info']}>
+                    <div className={friendPage['user-activity-top']}>
+                      <div className={`${friendPage['vip-icon']} ${vip['vip-icon']} ${vip[`vip-${friendActivity.vip}`]}`}></div>
+                      <div className={friendPage['user-name']}>{friendActivity.name}</div>
+                      <div className={friendPage['timestamp']}>{getFormatTimeDiff(t, friendActivity.createdAt)}</div>
+                    </div>
+                    <div className={friendPage['signature']}>{friendActivity.content}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </main>
       </main>

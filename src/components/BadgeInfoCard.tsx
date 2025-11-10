@@ -70,16 +70,14 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
       <div className={styles['badge-info-wrapper']}>
         <div className={styles['badge-avatar-box']}>
           <div className={styles['badge-image']} style={{ backgroundImage: `url(${badgeIconUrl})` }} />
-          {/* <div className={styles['badge-rarity-text']}>{`[${badge.rare}]`}</div> */}
+          <div className={styles['badge-rarity-text']}>{`[${t('rare')}]`}</div>
         </div>
         <div className={styles['badge-description-box']}>
           <div className={styles['badge-name']}>{t(`${badgeName}`)}</div>
           <div className={styles['badge-description']}>{t(`${badgeDescription}`)}</div>
         </div>
       </div>
-      <div className={styles['badge-show-time-box']}>
-        <div>{`${t('show-to')}: ${badgeShowTo <= 0 ? t('permanent') : new Date(badgeShowTo).toLocaleDateString()}`}</div>
-      </div>
+      <div className={styles['badge-show-time']}>{`${t('show-to')}: ${badgeShowTo <= 0 ? t('permanent') : new Date(badgeShowTo).toLocaleDateString()}`}</div>
     </div>
   );
 });

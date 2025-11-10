@@ -20,6 +20,10 @@ export const handleOpenDirectMessage = (userId: User['userId'], targetId: User['
   ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
 };
 
+export const handleOpenChatHistory = (userId: User['userId'], targetId: User['userId']) => {
+  ipc.popup.open('chatHistory', 'chatHistory', { userId, targetId });
+};
+
 export const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
   ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
 };
@@ -109,8 +113,8 @@ export const handleOpenEditFriendGroupName = (userId: User['userId'], friendGrou
 };
 
 /* SystemMenu popup */
-export const handleOpenSystemSetting = () => {
-  ipc.popup.open('systemSetting', 'systemSetting', {});
+export const handleOpenSystemSetting = (userId: User['userId']) => {
+  ipc.popup.open('systemSetting', 'systemSetting', { userId });
 };
 
 export const handleOpenAboutUs = () => {

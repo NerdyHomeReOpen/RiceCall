@@ -11,6 +11,7 @@ import popup from '@/styles/popup.module.css';
 
 // Services
 import ipc from '@/services/ipc.service';
+import data from '@/services/data.service';
 
 // Utils
 import { handleOpenApplyFriend } from '@/utils/popup';
@@ -25,7 +26,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
 
   // States
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isNotFound, setIsNotFound] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Handlers
   const handleSearchUser = (query: string) => {
@@ -40,18 +41,22 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
     (...args: User[]) => {
       // TODO: Need to handle while already friend
       if (!args.length) {
-        setIsNotFound(true);
+        setError(t('user-not-found'));
         return;
       }
       const { userId: targetId } = args[0];
-      handleOpenApplyFriend(userId, targetId);
+      data.friend({ userId, targetId }).then((friend) => {
+        if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
+        else if (targetId === userId) setError(t('cannot-add-yourself'));
+        else handleOpenApplyFriend(userId, targetId);
+      });
     },
-    [userId],
+    [userId, t],
   );
 
   // Effects
   useEffect(() => {
-    setIsNotFound(false);
+    setError(null);
   }, [searchQuery]);
 
   useEffect(() => {
@@ -67,9 +72,9 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
           <div className={`${popup['input-box']} ${popup['col']}`} style={{ position: 'relative' }}>
             <div className={popup['label']}>{t('please-input-user-account')}</div>
             <input name="search-query" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} required />
-            {isNotFound && (
+            {error && (
               <div style={{ position: 'absolute', top: '2rem', right: '0' }} className={`${popup['label']} ${popup['error-message']}`}>
-                ({t('user-not-found')})
+                {`(${t(error)})`}
               </div>
             )}
           </div>

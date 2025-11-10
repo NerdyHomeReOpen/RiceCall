@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from 'react';
 import styles from '@/styles/server.module.css';
 
 // Types
-import type { OnlineMember, Channel, Server, User, Category, Friend } from '@/types';
+import type { OnlineMember, Channel, Server, User, Category, Friend, QueueUser } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -30,6 +30,7 @@ interface CategoryTabProps {
   category: Category;
   channels: (Channel | Category)[];
   currentChannel: Channel;
+  queueUsers: QueueUser[];
   expanded: Record<string, boolean>;
   selectedItemId: string | null;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
@@ -37,7 +38,7 @@ interface CategoryTabProps {
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(
-  ({ user, friends, server, serverOnlineMembers, category, channels, currentChannel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+  ({ user, friends, server, serverOnlineMembers, category, channels, currentChannel, queueUsers, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
     // Hooks
     const { t } = useTranslation();
     const contextMenu = useContextMenu();
@@ -170,7 +171,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               {
                 id: 'join-channel',
                 label: t('join-channel'),
-                show: canJoin,
+                disabled: !canJoin,
+                show: !isInChannel,
                 onClick: () => handleConnectChannel(serverId, categoryId),
               },
               {
@@ -229,13 +231,15 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               {
                 id: 'kick-channel-users-from-server',
                 label: t('kick-channel-users-from-server'),
-                show: isStaff(permissionLevel) && categoryMembers.length > 0,
+                disabled: categoryMembers.length === 0,
+                show: isStaff(permissionLevel),
                 onClick: () => handleKickUsersFromServer(categoryUserIds, serverId),
               },
               {
                 id: 'kick-all-users-from-server',
                 label: t('kick-all-users-from-server'),
-                show: isStaff(permissionLevel) && serverOnlineMembers.length > 0,
+                disabled: serverOnlineMembers.length === 0,
+                show: isStaff(permissionLevel),
                 onClick: () => handleKickUsersFromServer(serverUserIds, serverId),
               },
               {
@@ -245,7 +249,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               {
                 id: 'set-reception-lobby',
                 label: t('set-reception-lobby'),
-                show: isServerAdmin(permissionLevel) && !isReceptionLobby && !isPrivateChannel && !isReadonlyChannel,
+                disabled: isPrivateChannel || isReadonlyChannel,
+                show: isServerAdmin(permissionLevel) && !isReceptionLobby,
                 onClick: () => handleEditServer(serverId, { receptionLobbyId: categoryId }),
               },
             ]);
@@ -271,6 +276,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               currentChannel={currentChannel}
               server={server}
               member={member}
+              queueUsers={queueUsers}
               selectedItemId={selectedItemId}
               setSelectedItemId={setSelectedItemId}
               handleConnectChannel={handleConnectChannel}
@@ -287,6 +293,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               currentChannel={currentChannel}
               server={server}
               serverOnlineMembers={serverOnlineMembers}
+              queueUsers={queueUsers}
               expanded={expanded}
               setExpanded={setExpanded}
               selectedItemId={selectedItemId}

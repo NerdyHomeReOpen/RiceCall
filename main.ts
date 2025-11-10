@@ -39,6 +39,7 @@ type StoreType = {
   fontSize: number;
   inputAudioDevice: string;
   outputAudioDevice: string;
+  recordFormat: 'wav' | 'mp3';
   mixEffect: boolean;
   mixEffectType: string;
   autoMixSetting: boolean;
@@ -100,7 +101,8 @@ type PopupType =
   | 'serverSetting'
   | 'systemSetting'
   | 'userInfo'
-  | 'userSetting';
+  | 'userSetting'
+  | 'chatHistory';
 
 const store = new Store<StoreType>({
   defaults: {
@@ -126,6 +128,7 @@ const store = new Store<StoreType>({
     // Mix settings
     inputAudioDevice: '',
     outputAudioDevice: '',
+    recordFormat: 'mp3',
     mixEffect: false,
     mixEffectType: '',
     autoMixSetting: false,
@@ -192,6 +195,7 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   systemSetting: { height: 520, width: 600 },
   userInfo: { height: 630, width: 440 },
   userSetting: { height: 700, width: 500 },
+  chatHistory: { height: 547, width: 714 },
 };
 
 // Constants
@@ -843,7 +847,6 @@ app.on('ready', async () => {
   // System settings handlers
   ipcMain.on('get-system-settings', (event) => {
     const settings = {
-      // Basic settings
       autoLogin: store.get('autoLogin'),
       autoLaunch: isAutoLaunchEnabled(),
       alwaysOnTop: store.get('alwaysOnTop'),
@@ -855,9 +858,9 @@ app.on('ready', async () => {
       dontShowDisclaimer: store.get('dontShowDisclaimer'),
       font: store.get('font'),
       fontSize: store.get('fontSize'),
-      // Mix settings
       inputAudioDevice: store.get('audioInputDevice'),
       outputAudioDevice: store.get('audioOutputDevice'),
+      recordFormat: store.get('recordFormat'),
       mixEffect: store.get('mixEffect'),
       mixEffectType: store.get('mixEffectType'),
       autoMixSetting: store.get('autoMixSetting'),
@@ -866,19 +869,15 @@ app.on('ready', async () => {
       microphoneAmplification: store.get('microphoneAmplification'),
       manualMixMode: store.get('manualMixMode'),
       mixMode: store.get('mixMode'),
-      // Voice settings
       speakingMode: store.get('speakingMode'),
       defaultSpeakingKey: store.get('defaultSpeakingKey'),
-      // Privacy settings
       notSaveMessageHistory: store.get('notSaveMessageHistory'),
-      // Hotkeys Settings
       hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow'),
       hotKeyScreenshot: store.get('hotKeyScreenshot'),
       hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume'),
       hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume'),
       hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker'),
       hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone'),
-      // SoundEffect settings
       disableAllSoundEffect: store.get('disableAllSoundEffect'),
       enterVoiceChannelSound: store.get('enterVoiceChannelSound'),
       leaveVoiceChannelSound: store.get('leaveVoiceChannelSound'),
@@ -890,7 +889,6 @@ app.on('ready', async () => {
     event.returnValue = settings;
   });
 
-  // Basic
   ipcMain.on('get-auto-login', (event) => {
     event.returnValue = store.get('autoLogin');
   });
@@ -936,13 +934,16 @@ app.on('ready', async () => {
     event.returnValue = fonts;
   });
 
-  // Mix
   ipcMain.on('get-input-audio-device', (event) => {
     event.returnValue = store.get('audioInputDevice');
   });
 
   ipcMain.on('get-output-audio-device', (event) => {
     event.returnValue = store.get('audioOutputDevice');
+  });
+
+  ipcMain.on('get-record-format', (event) => {
+    event.returnValue = store.get('recordFormat');
   });
 
   ipcMain.on('get-mix-effect', (event) => {
@@ -977,7 +978,6 @@ app.on('ready', async () => {
     event.returnValue = store.get('mixMode');
   });
 
-  // Voice
   ipcMain.on('get-speaking-mode', (event) => {
     event.returnValue = store.get('speakingMode');
   });
@@ -986,12 +986,10 @@ app.on('ready', async () => {
     event.returnValue = store.get('defaultSpeakingKey');
   });
 
-  // Privacy
   ipcMain.on('get-not-save-message-history', (event) => {
     event.returnValue = store.get('notSaveMessageHistory');
   });
 
-  // HotKey
   ipcMain.on('get-hot-key-open-main-window', (event) => {
     event.returnValue = store.get('hotKeyOpenMainWindow');
   });
@@ -1012,7 +1010,6 @@ app.on('ready', async () => {
     event.returnValue = store.get('hotKeyToggleMicrophone');
   });
 
-  // SoundEffect
   ipcMain.on('get-disable-all-sound-effect', (event) => {
     event.returnValue = store.get('disableAllSoundEffect');
   });
@@ -1041,7 +1038,6 @@ app.on('ready', async () => {
     event.returnValue = store.get('receiveChannelMessageSound');
   });
 
-  // Basic
   ipcMain.on('set-auto-login', (_, enable) => {
     store.set('autoLogin', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -1113,7 +1109,6 @@ app.on('ready', async () => {
     });
   });
 
-  // Mix
   ipcMain.on('set-input-audio-device', (_, deviceId) => {
     store.set('audioInputDevice', deviceId ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -1125,6 +1120,13 @@ app.on('ready', async () => {
     store.set('audioOutputDevice', deviceId ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('output-audio-device', deviceId);
+    });
+  });
+
+  ipcMain.on('set-record-format', (_, format) => {
+    store.set('recordFormat', format ?? 'mp3');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('record-format', format);
     });
   });
 
@@ -1184,7 +1186,6 @@ app.on('ready', async () => {
     });
   });
 
-  // Voice
   ipcMain.on('set-speaking-mode', (_, mode) => {
     store.set('speakingMode', mode ?? 'key');
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -1199,7 +1200,6 @@ app.on('ready', async () => {
     });
   });
 
-  // Privacy
   ipcMain.on('set-not-save-message-history', (_, enable) => {
     store.set('notSaveMessageHistory', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -1207,7 +1207,6 @@ app.on('ready', async () => {
     });
   });
 
-  // HotKey
   ipcMain.on('set-hot-key-open-main-window', (_, key) => {
     store.set('hotKeyOpenMainWindow', key ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -1243,7 +1242,6 @@ app.on('ready', async () => {
     });
   });
 
-  // SoundEffect
   ipcMain.on('set-disable-all-sound-effect', (_, enable) => {
     store.set('disableAllSoundEffect', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -1355,7 +1353,7 @@ async function handleDeepLink(url: string) {
     const { hostname } = new URL(url);
     switch (hostname) {
       case 'join':
-        const serverId = new URL(url).searchParams.get('serverId');
+        const serverId = new URL(url).searchParams.get('sid');
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send('deepLink', serverId);
         });

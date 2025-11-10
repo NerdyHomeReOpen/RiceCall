@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 
 // Types
-import type { ChannelUIMode } from '@/types';
+import type { ChannelUIMode, SystemSettings, User, UserSetting } from '@/types';
 
 // CSS
 import setting from '@/styles/setting.module.css';
@@ -14,7 +14,13 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 // Services
 import ipc from '@/services/ipc.service';
 
-const SystemSettingPopup: React.FC = React.memo(() => {
+interface SystemSettingPopupProps {
+  userId: User['userId'];
+  user: User;
+  systemSettings: SystemSettings;
+}
+
+const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user, systemSettings }) => {
   // Hooks
   const { t } = useTranslation();
   const soundPlayer = useSoundPlayer();
@@ -25,58 +31,59 @@ const SystemSettingPopup: React.FC = React.memo(() => {
 
   // States
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-
-  const [autoLaunch, setAutoLaunch] = useState<boolean>(false);
-  const [autoLogin, setAutoLogin] = useState<boolean>(false);
-  const [alwaysOnTop, setAlwaysOnTop] = useState<boolean>(false);
-  const [statusAutoIdle, setStatusAutoIdle] = useState<boolean>(true);
-  const [statusAutoIdleMinutes, setStatusAutoIdleMinutes] = useState<number>(10);
-  const [statusAutoDnd, setStatusAutoDnd] = useState<boolean>(false);
-  const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>('classic');
-  const [closeToTray, setCloseToTray] = useState<boolean>(true);
-  const [fontSize, setFontSize] = useState<number>(13);
-  const [fontFamily, setFontFamily] = useState<string>('宋体, Arial, sans-serif');
-  const [fontList, setFontList] = useState<string[]>([]);
-
-  const [selectedInput, setSelectedInput] = useState<string>('');
-  const [selectedOutput, setSelectedOutput] = useState<string>('');
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
-  const [mixEffect, setMixEffect] = useState<boolean>(false);
-  const [mixEffectType, setMixEffectType] = useState<string>('');
-  const [autoMixSetting, setAutoMixSetting] = useState<boolean>(false);
-  const [echoCancellation, setEchoCancellation] = useState<boolean>(false);
-  const [noiseCancellation, setNoiseCancellation] = useState<boolean>(false);
-  const [microphoneAmplification, setMicrophoneAmplification] = useState<boolean>(false);
-  const [manualMixMode, setManualMixMode] = useState<boolean>(false);
-  const [mixMode, setMixMode] = useState<'all' | 'app'>('all');
+  const [fontList, setFontList] = useState<string[]>([]);
 
-  const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>('key');
-  const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>('v');
+  const [autoLaunch, setAutoLaunch] = useState<boolean>(systemSettings.autoLaunch);
+  const [autoLogin, setAutoLogin] = useState<boolean>(systemSettings.autoLogin);
+  const [alwaysOnTop, setAlwaysOnTop] = useState<boolean>(systemSettings.alwaysOnTop);
+  const [statusAutoIdle, setStatusAutoIdle] = useState<boolean>(systemSettings.statusAutoIdle);
+  const [statusAutoIdleMinutes, setStatusAutoIdleMinutes] = useState<number>(systemSettings.statusAutoIdleMinutes);
+  const [statusAutoDnd, setStatusAutoDnd] = useState<boolean>(systemSettings.statusAutoDnd);
+  const [channelUIMode, setChannelUIMode] = useState<ChannelUIMode>(systemSettings.channelUIMode);
+  const [closeToTray, setCloseToTray] = useState<boolean>(systemSettings.closeToTray);
+  const [fontSize, setFontSize] = useState<number>(systemSettings.fontSize);
+  const [fontFamily, setFontFamily] = useState<string>(systemSettings.font);
 
-  const [forbidFriendApplications, setForbidFriendApplications] = useState<boolean>(false);
-  const [forbidShakeMessages, setForbidShakeMessages] = useState<boolean>(false);
-  const [forbidMemberInvitations, setForbidMemberInvitations] = useState<boolean>(false);
-  const [forbidStrangerMessages, setForbidStrangerMessages] = useState<boolean>(false);
-  const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(false);
-  const [shareRecentServers, setShareRecentServers] = useState<boolean>(false);
-  const [shareJoinedServers, setShareJoinedServers] = useState<boolean>(false);
-  const [shareFavoriteServers, setShareFavoriteServers] = useState<boolean>(false);
-  const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(false);
+  const [selectedInput, setSelectedInput] = useState<string>(systemSettings.inputAudioDevice);
+  const [selectedOutput, setSelectedOutput] = useState<string>(systemSettings.outputAudioDevice);
+  const [recordFormat, setRecordFormat] = useState<'wav' | 'mp3'>(systemSettings.recordFormat);
+  // const [mixEffect, setMixEffect] = useState<boolean>(systemSettings.mixEffect);
+  // const [mixEffectType, setMixEffectType] = useState<string>(systemSettings.mixEffectType);
+  // const [autoMixSetting, setAutoMixSetting] = useState<boolean>(systemSettings.autoMixSetting);
+  // const [echoCancellation, setEchoCancellation] = useState<boolean>(systemSettings.echoCancellation);
+  // const [noiseCancellation, setNoiseCancellation] = useState<boolean>(systemSettings.noiseCancellation);
+  // const [microphoneAmplification, setMicrophoneAmplification] = useState<boolean>(systemSettings.microphoneAmplification);
+  // const [manualMixMode, setManualMixMode] = useState<boolean>(systemSettings.manualMixMode);
+  // const [mixMode, setMixMode] = useState<'all' | 'app'>(systemSettings.mixMode);
 
-  const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>('F1');
-  const [hotKeyIncreaseVolume, setHotKeyIncreaseVolume] = useState<string>('PageUp');
-  const [hotKeyDecreaseVolume, setHotKeyDecreaseVolume] = useState<string>('PageDown');
-  const [hotKeyToggleSpeaker, setHotKeyToggleSpeaker] = useState<string>('Alt+m');
-  const [hotKeyToggleMicrophone, setHotKeyToggleMicrophone] = useState<string>('Alt+v');
+  const [defaultSpeakingMode, setDefaultSpeakingMode] = useState<'key' | 'auto'>(systemSettings.speakingMode);
+  const [defaultSpeakingKey, setDefaultSpeakingKey] = useState<string>(systemSettings.defaultSpeakingKey);
 
-  const [disableAllSoundEffect, setDisableAllSoundEffect] = useState<boolean>(false);
-  const [enterVoiceChannelSound, setEnterVoiceChannelSound] = useState<boolean>(false);
-  const [leaveVoiceChannelSound, setLeaveVoiceChannelSound] = useState<boolean>(false);
-  const [startSpeakingSound, setStartSpeakingSound] = useState<boolean>(false);
-  const [stopSpeakingSound, setStopSpeakingSound] = useState<boolean>(false);
-  const [receiveDirectMessageSound, setReceiveDirectMessageSound] = useState<boolean>(false);
-  const [receiveChannelMessageSound, setReceiveChannelMessageSound] = useState<boolean>(false);
+  const [forbidFriendApplications, setForbidFriendApplications] = useState<boolean>(user.forbidFriendApplications ?? false);
+  const [forbidShakeMessages, setForbidShakeMessages] = useState<boolean>(user.forbidShakeMessages ?? false);
+  const [forbidMemberInvitations, setForbidMemberInvitations] = useState<boolean>(user.forbidMemberInvitations ?? false);
+  const [forbidStrangerMessages, setForbidStrangerMessages] = useState<boolean>(user.forbidStrangerMessages ?? false);
+  const [shareCurrentServer, setShareCurrentServer] = useState<boolean>(user.shareCurrentServer ?? false);
+  const [shareRecentServers, setShareRecentServers] = useState<boolean>(user.shareRecentServers ?? false);
+  const [shareJoinedServers, setShareJoinedServers] = useState<boolean>(user.shareJoinedServers ?? false);
+  const [shareFavoriteServers, setShareFavoriteServers] = useState<boolean>(user.shareFavoriteServers ?? false);
+  const [notSaveMessageHistory, setNotSaveMessageHistory] = useState<boolean>(systemSettings.notSaveMessageHistory);
+
+  const [hotKeyOpenMainWindow, setHotKeyOpenMainWindow] = useState<string>(systemSettings.hotKeyOpenMainWindow);
+  const [hotKeyIncreaseVolume, setHotKeyIncreaseVolume] = useState<string>(systemSettings.hotKeyIncreaseVolume);
+  const [hotKeyDecreaseVolume, setHotKeyDecreaseVolume] = useState<string>(systemSettings.hotKeyDecreaseVolume);
+  const [hotKeyToggleSpeaker, setHotKeyToggleSpeaker] = useState<string>(systemSettings.hotKeyToggleSpeaker);
+  const [hotKeyToggleMicrophone, setHotKeyToggleMicrophone] = useState<string>(systemSettings.hotKeyToggleMicrophone);
+
+  const [disableAllSoundEffect, setDisableAllSoundEffect] = useState<boolean>(systemSettings.disableAllSoundEffect);
+  const [enterVoiceChannelSound, setEnterVoiceChannelSound] = useState<boolean>(systemSettings.enterVoiceChannelSound);
+  const [leaveVoiceChannelSound, setLeaveVoiceChannelSound] = useState<boolean>(systemSettings.leaveVoiceChannelSound);
+  const [startSpeakingSound, setStartSpeakingSound] = useState<boolean>(systemSettings.startSpeakingSound);
+  const [stopSpeakingSound, setStopSpeakingSound] = useState<boolean>(systemSettings.stopSpeakingSound);
+  const [receiveDirectMessageSound, setReceiveDirectMessageSound] = useState<boolean>(systemSettings.receiveDirectMessageSound);
+  const [receiveChannelMessageSound, setReceiveChannelMessageSound] = useState<boolean>(systemSettings.receiveChannelMessageSound);
 
   // HotKey binds error
   const [inputFocus, setInputFocus] = useState<string | null>(null);
@@ -96,6 +103,10 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   );
 
   // Handlers
+  const handleEditUserSetting = (update: Partial<UserSetting>) => {
+    ipc.socket.send('editUserSetting', { update });
+  };
+
   const handleClose = () => {
     ipc.window.close();
   };
@@ -179,54 +190,7 @@ const SystemSettingPopup: React.FC = React.memo(() => {
   }, [handleSetHotKey, defaultSpeakingKey, hotKeyOpenMainWindow, hotKeyIncreaseVolume, hotKeyDecreaseVolume, hotKeyToggleSpeaker, hotKeyToggleMicrophone]);
 
   useEffect(() => {
-    const data = ipc.systemSettings.get();
-    if (data) {
-      // Basic settings
-      setAutoLogin(data.autoLogin);
-      setAutoLaunch(data.autoLaunch);
-      setAlwaysOnTop(data.alwaysOnTop);
-      setStatusAutoIdle(data.statusAutoIdle);
-      setStatusAutoIdleMinutes(data.statusAutoIdleMinutes);
-      setStatusAutoDnd(data.statusAutoDnd);
-      setChannelUIMode(data.channelUIMode);
-      setCloseToTray(data.closeToTray);
-      setFontSize(data.fontSize);
-      setFontFamily(data.font);
-      // Mix Settings
-      setSelectedInput(data.inputAudioDevice);
-      setSelectedOutput(data.outputAudioDevice);
-      setMixEffect(data.mixEffect);
-      setMixEffectType(data.mixEffectType);
-      setAutoMixSetting(data.autoMixSetting);
-      setEchoCancellation(data.echoCancellation);
-      setNoiseCancellation(data.noiseCancellation);
-      setMicrophoneAmplification(data.microphoneAmplification);
-      setManualMixMode(data.manualMixMode);
-      setMixMode(data.mixMode);
-      // Voice Settings
-      setDefaultSpeakingMode(data.speakingMode);
-      setDefaultSpeakingKey(data.defaultSpeakingKey);
-      // Privacy settings
-      setNotSaveMessageHistory(data.notSaveMessageHistory);
-      // Hotkeys settings
-      setHotKeyOpenMainWindow(data.hotKeyOpenMainWindow);
-      setHotKeyIncreaseVolume(data.hotKeyIncreaseVolume);
-      setHotKeyDecreaseVolume(data.hotKeyDecreaseVolume);
-      setHotKeyToggleSpeaker(data.hotKeyToggleSpeaker);
-      setHotKeyToggleMicrophone(data.hotKeyToggleMicrophone);
-      // SoundEffect settings
-      setDisableAllSoundEffect(data.disableAllSoundEffect);
-      setEnterVoiceChannelSound(data.enterVoiceChannelSound);
-      setLeaveVoiceChannelSound(data.leaveVoiceChannelSound);
-      setStartSpeakingSound(data.startSpeakingSound);
-      setStopSpeakingSound(data.stopSpeakingSound);
-      setReceiveDirectMessageSound(data.receiveDirectMessageSound);
-      setReceiveChannelMessageSound(data.receiveChannelMessageSound);
-    }
-
     setFontList(ipc.fontList.get());
-
-    activeInputRef.current = null;
 
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       const inputs = devices.filter((device) => device.kind === 'audioinput');
@@ -391,6 +355,20 @@ const SystemSettingPopup: React.FC = React.memo(() => {
               </div>
             </div>
 
+            {/* Record Setting */}
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('record-setting')}</div>
+            </div>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
+              <div className={popup['label']}>{t('record-format')}</div>
+              <div className={popup['select-box']}>
+                <select value={recordFormat} onChange={(e) => setRecordFormat(e.target.value as 'wav' | 'mp3')}>
+                  <option value="wav">{'WAV'}</option>
+                  <option value="mp3">{'MP3'}</option>
+                </select>
+              </div>
+            </div>
+
             {/* Mix Setting */}
             {/* <div className={popup['header']}>
               <div className={popup['label']}>{t('mix-setting') + ' ' + t('soon')}</div>
@@ -495,52 +473,52 @@ const SystemSettingPopup: React.FC = React.memo(() => {
           <div className={popup['col']}>
             {/* Anti-spam setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('anti-spam-setting') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('anti-spam-setting')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="forbid-friend-applications" type="checkbox" checked={forbidFriendApplications} onChange={() => setForbidFriendApplications(!forbidFriendApplications)} />
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="forbid-friend-applications" type="checkbox" checked={forbidFriendApplications} onChange={(e) => setForbidFriendApplications(e.target.checked)} />
               <div className={popup['label']}>{t('forbid-friend-applications-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="forbid-shake-messages" type="checkbox" checked={forbidShakeMessages} onChange={() => setForbidShakeMessages(!forbidShakeMessages)} />
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="forbid-shake-messages" type="checkbox" checked={forbidShakeMessages} onChange={(e) => setForbidShakeMessages(e.target.checked)} />
               <div className={popup['label']}>{t('forbid-shake-messages-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="forbid-member-invitations" type="checkbox" checked={forbidMemberInvitations} onChange={() => setForbidMemberInvitations(!forbidMemberInvitations)} />
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="forbid-member-invitations" type="checkbox" checked={forbidMemberInvitations} onChange={(e) => setForbidMemberInvitations(e.target.checked)} />
               <div className={popup['label']}>{t('forbid-member-invitations-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="forbid-stranger-messages" type="checkbox" checked={forbidStrangerMessages} onChange={() => setForbidStrangerMessages(!forbidStrangerMessages)} />
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="forbid-stranger-messages" type="checkbox" checked={forbidStrangerMessages} onChange={(e) => setForbidStrangerMessages(e.target.checked)} />
               <div className={popup['label']}>{t('forbid-stranger-messages-label')}</div>
             </div>
 
             {/* Privacy setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('privacy-setting') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('privacy-setting')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="share-current-server" type="checkbox" checked={shareCurrentServer} onChange={() => setShareCurrentServer(!shareCurrentServer)} />
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="share-current-server" type="checkbox" checked={shareCurrentServer} onChange={(e) => setShareCurrentServer(e.target.checked)} />
               <div className={popup['label']}>{t('share-current-server-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="share-recent-servers" type="checkbox" checked={shareRecentServers} onChange={() => setShareRecentServers(!shareRecentServers)} />
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="share-recent-servers" type="checkbox" checked={shareRecentServers} onChange={(e) => setShareRecentServers(e.target.checked)} />
               <div className={popup['label']}>{t('share-recent-servers-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="share-joined-servers" type="checkbox" checked={shareJoinedServers} onChange={() => setShareJoinedServers(!shareJoinedServers)} />
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="share-joined-servers" type="checkbox" checked={shareJoinedServers} onChange={(e) => setShareJoinedServers(e.target.checked)} />
               <div className={popup['label']}>{t('share-joined-servers-label')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="share-favorite-servers" type="checkbox" checked={shareFavoriteServers} onChange={() => setShareFavoriteServers(!shareFavoriteServers)} />
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="share-favorite-servers" type="checkbox" checked={shareFavoriteServers} onChange={(e) => setShareFavoriteServers(e.target.checked)} />
               <div className={popup['label']}>{t('share-favorite-servers-label')}</div>
             </div>
 
             {/* Message history setting */}
             <div className={popup['header']}>
-              <div className={popup['label']}>{t('message-history-setting') + ' ' + t('soon')}</div>
+              <div className={popup['label']}>{t('message-history-setting')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
-              <input name="not-save-message-history" type="checkbox" checked={notSaveMessageHistory} onChange={() => setNotSaveMessageHistory(!notSaveMessageHistory)} />
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="not-save-message-history" type="checkbox" checked={notSaveMessageHistory} onChange={(e) => setNotSaveMessageHistory(e.target.checked)} />
               <div className={popup['label']}>{t('not-save-message-history-label')}</div>
             </div>
           </div>
@@ -749,7 +727,6 @@ const SystemSettingPopup: React.FC = React.memo(() => {
         <div
           className={popup['button']}
           onClick={() => {
-            // Basic
             ipc.systemSettings.autoLogin.set(autoLogin);
             ipc.systemSettings.autoLaunch.set(autoLaunch);
             ipc.systemSettings.alwaysOnTop.set(alwaysOnTop);
@@ -760,29 +737,30 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             ipc.systemSettings.closeToTray.set(closeToTray);
             ipc.systemSettings.font.set(fontFamily);
             ipc.systemSettings.fontSize.set(fontSize);
-            // Mix
+
             ipc.systemSettings.inputAudioDevice.set(selectedInput);
             ipc.systemSettings.outputAudioDevice.set(selectedOutput);
-            ipc.systemSettings.mixEffect.set(mixEffect);
-            ipc.systemSettings.mixEffectType.set(mixEffectType);
-            ipc.systemSettings.autoMixSetting.set(autoMixSetting);
-            ipc.systemSettings.echoCancellation.set(echoCancellation);
-            ipc.systemSettings.noiseCancellation.set(noiseCancellation);
-            ipc.systemSettings.microphoneAmplification.set(microphoneAmplification);
-            ipc.systemSettings.manualMixMode.set(manualMixMode);
-            ipc.systemSettings.mixMode.set(mixMode);
-            // Voice
+            ipc.systemSettings.recordFormat.set(recordFormat);
+            // ipc.systemSettings.mixEffect.set(mixEffect);
+            // ipc.systemSettings.mixEffectType.set(mixEffectType);
+            // ipc.systemSettings.autoMixSetting.set(autoMixSetting);
+            // ipc.systemSettings.echoCancellation.set(echoCancellation);
+            // ipc.systemSettings.noiseCancellation.set(noiseCancellation);
+            // ipc.systemSettings.microphoneAmplification.set(microphoneAmplification);
+            // ipc.systemSettings.manualMixMode.set(manualMixMode);
+            // ipc.systemSettings.mixMode.set(mixMode);
+
             ipc.systemSettings.speakingMode.set(defaultSpeakingMode);
             ipc.systemSettings.defaultSpeakingKey.set(defaultSpeakingKey);
-            // Privacy
+
             ipc.systemSettings.notSaveMessageHistory.set(notSaveMessageHistory);
-            // Hotkeys
+
             ipc.systemSettings.hotKeyOpenMainWindow.set(hotKeyOpenMainWindow);
             ipc.systemSettings.hotKeyIncreaseVolume.set(hotKeyIncreaseVolume);
             ipc.systemSettings.hotKeyDecreaseVolume.set(hotKeyDecreaseVolume);
             ipc.systemSettings.hotKeyToggleSpeaker.set(hotKeyToggleSpeaker);
             ipc.systemSettings.hotKeyToggleMicrophone.set(hotKeyToggleMicrophone);
-            // SoundEffect
+
             ipc.systemSettings.disableAllSoundEffect.set(disableAllSoundEffect);
             ipc.systemSettings.enterVoiceChannelSound.set(enterVoiceChannelSound);
             ipc.systemSettings.leaveVoiceChannelSound.set(leaveVoiceChannelSound);
@@ -790,18 +768,17 @@ const SystemSettingPopup: React.FC = React.memo(() => {
             ipc.systemSettings.stopSpeakingSound.set(stopSpeakingSound);
             ipc.systemSettings.receiveDirectMessageSound.set(receiveDirectMessageSound);
             ipc.systemSettings.receiveChannelMessageSound.set(receiveChannelMessageSound);
-            ipc.socket.send('editUserSettings', {
-              update: {
-                forbidFriendApplications,
-                forbidShakeMessages,
-                forbidMemberInvitations,
-                forbidStrangerMessages,
-                shareCurrentServer,
-                shareRecentServers,
-                shareJoinedServers,
-                shareFavoriteServers,
-                notSaveMessageHistory,
-              },
+
+            handleEditUserSetting({
+              forbidFriendApplications: !!forbidFriendApplications,
+              forbidShakeMessages: !!forbidShakeMessages,
+              forbidMemberInvitations: !!forbidMemberInvitations,
+              forbidStrangerMessages: !!forbidStrangerMessages,
+              shareCurrentServer: !!shareCurrentServer,
+              shareRecentServers: !!shareRecentServers,
+              shareJoinedServers: !!shareJoinedServers,
+              shareFavoriteServers: !!shareFavoriteServers,
+              notSaveMessageHistory: !!notSaveMessageHistory,
             });
             handleClose();
           }}

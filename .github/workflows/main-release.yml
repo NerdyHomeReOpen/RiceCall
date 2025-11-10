@@ -100,39 +100,6 @@ jobs:
           tag: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            ## 如何安裝
-
-            :information_source: 由於本專案尚未申請應用簽名，若下載時遇到「不安全」警告，請自行承擔使用風險並斟酌下載。  
-
-            ### Windows
-
-            1. 找到 `RiceCall-x.x.x-win-x64-Setup.exe`  
-            2. 點擊下載並執行  
-            3. 依照安裝小精靈提示完成安裝
-
-            ### macOS
-
-            1. 找到 `RiceCall-x.x.x-mac-arm64.dmg`  
-            2. 點擊下載並打開，拖曳 **RiceCall** 至 **Applications** 資料夾  
-            3. 開啟 **Terminal (終端機)** 並輸入以下指令解除限制與簽名 :
-            ```bash
-            xattr -cr '/Applications/RiceCall.app'
-            codesign -fs - --deep '/Applications/RiceCall.app'
-            ```
-
-            ### Linux
-
-            1. 找到 `RiceCall-x.x.x-linux-x86_64.AppImage`  
-            2. 點擊下載並存放到想要的資料夾  
-            3. 打開終端機並輸入以下指令 (假設檔案位於下載資料夾) :
-            ```bash
-            cd ~/Downloads
-            chmod +x RiceCall-x.x.x-linux-x86_64.AppImage
-            ./RiceCall-x.x.x-linux-x86_64.AppImage
-            ```
-
-            ---
-
             ## How to install
 
             :information_source: Since this project has not applied for application signing yet, if you encounter an "unsafe" warning during download, please proceed at your own risk and discretion.  

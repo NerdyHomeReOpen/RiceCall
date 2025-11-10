@@ -2,7 +2,22 @@
 import api from '@/services/api.service';
 
 // Types
-import type { User, Server, Channel, FriendApplication, Friend, MemberApplication, Member, FriendGroup, MemberInvitation, Announcement, Notify, RecommendServer } from '@/types';
+import type {
+  User,
+  Server,
+  Channel,
+  FriendApplication,
+  Friend,
+  MemberApplication,
+  Member,
+  FriendGroup,
+  MemberInvitation,
+  Announcement,
+  Notify,
+  RecommendServer,
+  OnlineMember,
+  FriendActivity,
+} from '@/types';
 
 export const getDataService = {
   user: async (params: { userId: User['userId'] }): Promise<User | null> => {
@@ -18,6 +33,11 @@ export const getDataService = {
   friends: async (params: { userId: User['userId'] }): Promise<Friend[]> => {
     const friends = await api.get(`/friends?${new URLSearchParams(params).toString()}`);
     return friends;
+  },
+
+  friendActivities: async (params: { userId: User['userId'] }): Promise<FriendActivity[]> => {
+    const friendActivities = await api.get(`/friendActivities?${new URLSearchParams(params).toString()}`);
+    return friendActivities;
   },
 
   friendGroup: async (params: { userId: User['userId']; friendGroupId: FriendGroup['friendGroupId'] }): Promise<FriendGroup | null> => {
@@ -53,6 +73,11 @@ export const getDataService = {
   serverMembers: async (params: { serverId: Server['serverId'] }): Promise<Member[]> => {
     const serverMembers = await api.get(`/serverMembers?${new URLSearchParams(params).toString()}`);
     return serverMembers;
+  },
+
+  serverOnlineMembers: async (params: { serverId: Server['serverId'] }): Promise<OnlineMember[]> => {
+    const serverOnlineMembers = await api.get(`/serverOnlineMembers?${new URLSearchParams(params).toString()}`);
+    return serverOnlineMembers;
   },
 
   channel: async (params: { userId: User['userId']; serverId: Server['serverId']; channelId: Channel['channelId'] }): Promise<Channel | null> => {

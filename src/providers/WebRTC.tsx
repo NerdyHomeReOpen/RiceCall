@@ -19,7 +19,7 @@ import {
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Utils
-import { encodeWAV } from '@/utils/encodeWav';
+import { encodeAudio } from '@/utils/encodeAudio';
 
 const workletCode = `
 class RecorderProcessor extends AudioWorkletProcessor {
@@ -149,6 +149,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const [voiceThreshold, setVoiceThreshold] = useState<number>(1);
 
   // Recorder
+  const recordFormatRef = useRef<'wav' | 'mp3'>('mp3');
   const buffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isRecordingRef = useRef<boolean>(false);
@@ -212,56 +213,65 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const initAudioContext = useCallback(async () => {
     // Create audio context
-    if (!audioContextRef.current) {
-      const audioContext = new AudioContext();
-      await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
-      audioContextRef.current = audioContext;
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
     }
+    const audioContext = new AudioContext();
+    await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
+    audioContextRef.current = audioContext;
 
     // Create input destination node
-    if (!inputDesRef.current) {
-      const inputDestination = audioContextRef.current.createMediaStreamDestination();
-      inputDesRef.current = inputDestination;
+    if (inputDesRef.current) {
+      inputDesRef.current.disconnect();
     }
+    const inputDestination = audioContextRef.current.createMediaStreamDestination();
+    inputDesRef.current = inputDestination;
 
     // Create output destination node
-    if (!outputDesRef.current) {
-      const outputDestination = audioContextRef.current.createMediaStreamDestination();
-      outputDesRef.current = outputDestination;
+    if (outputDesRef.current) {
+      outputDesRef.current.disconnect();
     }
+    const outputDestination = audioContextRef.current.createMediaStreamDestination();
+    outputDesRef.current = outputDestination;
 
     // Create record destination node
-    if (!recorderDesRef.current) {
-      const recordDestination = audioContextRef.current.createMediaStreamDestination();
-      recorderDesRef.current = recordDestination;
+    if (recorderDesRef.current) {
+      recorderDesRef.current.disconnect();
     }
+    const recordDestination = audioContextRef.current.createMediaStreamDestination();
+    recorderDesRef.current = recordDestination;
 
     // Create input analyser node
-    if (!inputAnalyserRef.current) {
-      const inputAnalyser = audioContextRef.current.createAnalyser();
-      inputAnalyserRef.current = inputAnalyser;
-      inputAnalyser.fftSize = 2048;
+    if (inputAnalyserRef.current) {
+      inputAnalyserRef.current.disconnect();
     }
+    const inputAnalyser = audioContextRef.current.createAnalyser();
+    inputAnalyserRef.current = inputAnalyser;
+    inputAnalyser.fftSize = 2048;
 
     // Create master gain node
-    if (!masterGainNodeRef.current) {
-      const masterGainNode = audioContextRef.current.createGain();
-      masterGainNodeRef.current = masterGainNode;
-      masterGainNode.gain.value = speakerVolumeRef.current / 100;
-      masterGainNode.connect(outputDesRef.current!);
+    if (masterGainNodeRef.current) {
+      masterGainNodeRef.current.disconnect();
     }
+    const masterGainNode = audioContextRef.current.createGain();
+    masterGainNodeRef.current = masterGainNode;
+    masterGainNode.gain.value = speakerVolumeRef.current / 100;
+    masterGainNode.connect(outputDesRef.current!);
 
     // Create audio element
-    if (!speakerRef.current) {
-      const speaker = new Audio();
-      speaker.srcObject = outputDesRef.current.stream;
-      speaker.volume = 1;
-      speaker.autoplay = true;
-      speaker.style.display = 'none';
-      speaker.play().catch(() => {});
-      speakerRef.current = speaker;
-      document.body.appendChild(speaker);
+    if (speakerRef.current) {
+      speakerRef.current.srcObject = null;
+      speakerRef.current.pause();
+      speakerRef.current.remove();
     }
+    const speaker = new Audio();
+    speaker.srcObject = outputDesRef.current.stream;
+    speaker.volume = 1;
+    speaker.autoplay = true;
+    speaker.style.display = 'none';
+    speaker.play().catch(() => {});
+    speakerRef.current = speaker;
+    document.body.appendChild(speaker);
   }, []);
 
   const removeSpeakerAudio = useCallback((userId: string) => {
@@ -314,15 +324,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       sourceNode.connect(gainNode);
       gainNode.connect(analyserNode);
       gainNode.connect(masterGainNodeRef.current);
-
-      // Replace track
-      const newStream = outputDesRef.current.stream;
-      if (speakerRef.current && newStream) {
-        speakerRef.current.srcObject = newStream;
-        speakerRef.current.play().catch((err) => {
-          console.warn('Autoplay failed, user gesture needed:', err);
-        });
-      }
 
       // Initialize analyser
       analyserNode.fftSize = 2048;
@@ -501,11 +502,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     recorderGainRef.current!.disconnect();
     if (timerRef.current) clearInterval(timerRef.current);
 
-    const wavBlob = encodeWAV(buffersRef.current, audioContextRef.current.sampleRate);
-    const url = URL.createObjectURL(wavBlob);
+    const blob = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate, recordFormatRef.current);
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ricecall-record-${new Date().toISOString()}.wav`;
+    a.download = `ricecall-record-${new Date().toISOString()}.${recordFormatRef.current}`;
     a.click();
 
     buffersRef.current = [];
@@ -613,7 +614,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     audioProducerRef.current = await sendTransportRef.current.produce({
       track,
       encodings: [{ maxBitrate: bitrateRef.current }],
-      codecOptions: { opusStereo: false },
+      codecOptions: {
+        opusStereo: true,
+        opusDtx: false,
+        opusFec: true,
+        opusMaxPlaybackRate: 48000,
+        opusMaxAverageBitrate: bitrateRef.current,
+      },
       stopTracks: false,
     });
     audioProducerRef.current.on('transportclose', () => {
@@ -882,6 +889,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     speakingModeRef.current = mode;
   };
 
+  const handleEditRecordFormat = (format: 'wav' | 'mp3') => {
+    recordFormatRef.current = format;
+  };
+
   // Effects
   useEffect(() => {
     if (!isRecording) return;
@@ -900,11 +911,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     handleEditInputDevice(ipc.systemSettings.inputAudioDevice.get());
     handleEditOutputDevice(ipc.systemSettings.outputAudioDevice.get());
     handleEditSpeakingMode(ipc.systemSettings.speakingMode.get());
+    handleEditRecordFormat(ipc.systemSettings.recordFormat.get());
 
     const unsubscribe = [
       ipc.systemSettings.inputAudioDevice.onUpdate(handleEditInputDevice),
       ipc.systemSettings.outputAudioDevice.onUpdate(handleEditOutputDevice),
       ipc.systemSettings.speakingMode.onUpdate(handleEditSpeakingMode),
+      ipc.systemSettings.recordFormat.onUpdate(handleEditRecordFormat),
       ipc.socket.on('SFUJoined', handleSFUJoined),
       ipc.socket.on('SFULeft', handleSFULeft),
       ipc.socket.on('SFUNewProducer', handleNewProducer),

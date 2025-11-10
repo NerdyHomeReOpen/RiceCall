@@ -98,7 +98,7 @@
 .header .timestamp-text {
   margin-left: 5px;
   font-size: 0.9em;
-  color: var(--text-color-quaternary);
+  color: var(--text-color-quinary);
   min-width: fit-content;
 }
 

@@ -1,4 +1,11 @@
 {
+  "CEO": "CEO",
+  "COO-brazil": "Brazilian Operations Director",
+  "COO-iran": "Iranian Operations Chief",
+  "COO-russia": "Russian Operations Chief",
+  "COO-taiwan": "Taiwan Operations Director",
+  "COO-turkey": "Turkish Operations Director",
+  "CTO": "Technical Director",
   "about-me": "About me",
   "about-ricecall": "About RiceCall",
   "about-us": "About us",
@@ -52,6 +59,7 @@
   "broadcast-content": "Broadcast content",
   "broadcast-type": "Type of broadcast",
   "cancel": "Cancel",
+  "cannot-add-yourself": "Unable to add myself as a friend",
   "cannot-apply-member": "It is not possible to submit a member application; this group does not accept applications.",
   "cannot-read-image": "Cannot read image",
   "category": "Category",
@@ -286,7 +294,6 @@
   "mic-order": "Mic order",
   "mic-queued": "Queuing for a microphone",
   "mic-taken": "Mic taken",
-  "mic-volume-threshold": "Microphone Sensitivity",
   "microphone": "Microphone",
   "microphone-amplification-label": "Microphone amplification",
   "minimize-to-tray": "Minimize to Tray",
@@ -332,6 +339,18 @@
   "none": "None",
   "not-available-page": "The page is not open yet",
   "not-public": "This is a private channel",
+  "not-public-favorite-servers": {
+    "top": "The other party did not disclose the information.",
+    "bottom": "Publicly collected groups"
+  },
+  "not-public-joined-servers": {
+    "top": "The other party did not disclose the information.",
+    "bottom": "publicly joined groups"
+  },
+  "not-public-recent-servers": {
+    "top": "The other party did not disclose the information.",
+    "bottom": "PublicRecent Visits"
+  },
   "not-save-message-history-label": "Do not save chat history",
   "note": "Note:",
   "notify-friend-online": "Remind me when a friend goes online.",
@@ -381,6 +400,7 @@
   "queue-speech": "Queue Mode",
   "queue-time": "Queue time (sec)",
   "quick-enter-server": "Press Enter to Quick Join Group",
+  "rare": "rare",
   "readme": "## Disclaimer\n\n**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)** (referred to as RC voice) is an **independent development** project by **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)** (referred to as this team). It is **not affiliated with the original development team, server, or any official organization of RaidCall**. Please use it at your own risk.\n\nCurrently, all versions of RC voice are test versions. If you find any issues during use, please report them through the following methods:\n- In the application: Menu > Feedback\n- GitHub: [Issue Report](https://github.com/NerdyHomeReOpen/RiceCall/issues)\n- Discord: Join [Official Discord](https://discord.gg/adCWzv6wwS) to get the latest information\n\nPlease note that all data (including but not limited to account, level, VIP, voice group, etc.) of RC voice **may be reset, lost, or deleted**, and this team reserves the final decision.\n\nRC voice **is not a continuation, remake, or official authorization version of RaidCall**, and **does not provide restoration, support, or account data recovery for RaidCall services**. This project is purely a self-initiated development action by the enthusiast community, aiming to provide a new voice communication platform, **not for commercial purposes**.\n\nRC voice's content is only for academic research and technical exchange. If you have any copyright, trademark, or other rights issues, please contact us for consultation.\n\nAlthough RC voice refers to or uses some related materials of RaidCall, the final product is entirely created by this team, **not representing the official stance or intention of RaidCall**. Therefore, we **do not provide any technical support, account recovery, or data query services related to RaidCall**. If you have any related issues, please contact the official RaidCall.\n\n### Open Source Participation\n\nWe welcome all developers to participate in the development and maintenance of RC voice. You can contribute through the following methods:\n* Fill in the [intention form](https://forms.gle/ZowwAS22dGpKkGcZ8) (please join the [Official Discord](https://discord.gg/adCWzv6wwS) first, and we will contact you if we need to assign you an identity group)\n* Fork this project and submit a [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls) to contribute new features or fixes\n\nThank you for your support and participation!\n\nThis disclaimer can be found in the application: Menu > Help Center > About RiceCall.",
   "receive-channel": "Receive channel",
   "receive-channel-message-sound-label": "Messages in the channel",
@@ -389,6 +409,8 @@
   "recent-servers": "Recently visited groups",
   "recommend": "Recommend",
   "reconnection-failed-message": "Unable to restore connection. After clicking ‘OK’, you will be automatically logged out of your account.",
+  "record-format": "Recording format",
+  "record-setting": "Recording settings",
   "register": "Register",
   "register-account": "Register account",
   "register-success": "Your registration was successful, please follow the link {{0}} to confirm your email address and activate your account. You will not be able to log in until your account is activated.",
@@ -512,6 +534,7 @@
   "upload": "Upload",
   "upload-avatar": "Upload avatar",
   "user-info": "User Info",
+  "user-is-friend": "This user is already a friend.",
   "user-limit": "User Limit",
   "user-not-found": "User not found",
   "user-setting": "User setting",
@@ -533,5 +556,6 @@
   "week": "Week",
   "xp": "xp",
   "year": "year",
-  "yesterday": "Yesterday"
+  "yesterday": "Yesterday",
+  "current-speaking-mode": "Current speaking style"
 }

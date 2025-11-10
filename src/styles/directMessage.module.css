@@ -40,10 +40,6 @@
   cursor: pointer;
 }
 
-.direct-option-buttons .disabled {
-  cursor: not-allowed;
-}
-
 .direct-option-buttons .file-share {
   background-image: url('/im/Fileshare.png');
   background-size: contain;
@@ -115,6 +111,7 @@
   min-height: 100px;
   margin: 10px;
   position: relative;
+  cursor: pointer;
   background-image: url('/im/IMLogo.png');
   background-size: cover;
   background-repeat: no-repeat;
@@ -142,7 +139,6 @@
 .user-state-box {
   display: flex;
   flex-wrap: nowrap;
-  align-items: center;
 }
 
 .user-friend-split {
@@ -172,10 +168,6 @@
   width: 100%;
   display: flex;
   align-items: center;
-}
-
-.clickable {
-  cursor: pointer;
 }
 
 .action-area::after {
@@ -251,8 +243,6 @@
 }
 
 .input-area .top-bar .buttons .button.font {
-  filter: grayscale(100%);
-  cursor: not-allowed;
   background-image: url('/FontButton.png');
 }
 
@@ -261,8 +251,6 @@
 }
 
 .input-area .top-bar .buttons .button.screen-shot {
-  filter: grayscale(100%);
-  cursor: not-allowed;
   background-image: url('/ScreenShot.png');
 }
 
@@ -271,13 +259,12 @@
 }
 
 .input-area .top-bar .history-message {
-  filter: grayscale(100%);
-  cursor: not-allowed;
   height: 100%;
   width: auto;
   display: flex;
   align-items: center;
   margin-right: 15px;
+  cursor: pointer;
 }
 
 .input-area .top-bar .history-message::before {

@@ -1,4 +1,11 @@
 {
+  "CEO": "最高経営責任者（CEO）",
+  "COO-brazil": "ブラジルのオペレーションディレクター",
+  "COO-iran": "イラン作戦部長",
+  "COO-russia": "ロシア作戦部長",
+  "COO-taiwan": "台湾オペレーションディレクター",
+  "COO-turkey": "トルコオペレーションディレクター",
+  "CTO": "テクニカルディレクター",
   "about-me": "自己紹介",
   "about-ricecall": "RiceCallについて",
   "about-us": "RiceCallについて",
@@ -52,6 +59,7 @@
   "broadcast-content": "放送内容",
   "broadcast-type": "放送の種類",
   "cancel": "キャンセル",
+  "cannot-add-yourself": "自分を友達として追加できません",
   "cannot-apply-member": "メンバー申請を送信することはできません。このグループでは申請を受け付けていません",
   "cannot-read-image": "画像を読み取ることができません",
   "category": "ジャンル",
@@ -286,7 +294,6 @@
   "mic-order": "マイク注文",
   "mic-queued": "マイクの列に並ぶ",
   "mic-taken": "已拿麥",
-  "mic-volume-threshold": "マイク感度",
   "microphone": "マイク",
   "microphone-amplification-label": "マイク増幅",
   "minimize-to-tray": "トレイに最小化",
@@ -332,6 +339,18 @@
   "none": "カテゴリ名を設定してください",
   "not-available-page": "ページはまだ開いていません",
   "not-public": "これはプライベートチャンネルです",
+  "not-public-favorite-servers": {
+    "top": "相手側は情報を開示しませんでした。",
+    "bottom": "公開収集グループ"
+  },
+  "not-public-joined-servers": {
+    "top": "相手側は情報を開示しませんでした。",
+    "bottom": "公開参加グループ"
+  },
+  "not-public-recent-servers": {
+    "top": "相手側は情報を開示しませんでした。",
+    "bottom": "公開最近訪問"
+  },
   "not-save-message-history-label": "チャット履歴を保存しない",
   "note": "注記",
   "notify-friend-online": "友達がオンラインになったときに通知します",
@@ -381,6 +400,7 @@
   "queue-speech": "マイクをオンにする",
   "queue-time": "キュー時間（秒）",
   "quick-enter-server": "Enterキーを押してグループにクイック参加する",
+  "rare": "レア",
   "readme": "## 利用規約\n\n**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)**（以下、RCボイスと呼称）は、**[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)**（以下、本チーム）によって**独自に開発されたプロジェクト**です。**RaidCallの元開発チーム、サーバー、またはその他の公式組織とは一切関係ありません**。ご利用は自己責任でお願いいたします（*Use at your own risk*）。\n\n現在のRCボイスはすべてテストバージョンです。ご利用中に不具合などを発見された場合は、以下の方法でご報告ください：\n\n* アプリ内：右上のメニュー > フィードバック\n* GitHub：[Issueを報告](https://github.com/NerdyHomeReOpen/RiceCall/issues)\n* Discord：[公式サーバー](https://discord.gg/adCWzv6wwS) に参加して最新情報を入手\n\nRCボイスに関する**すべてのデータ（アカウント、レベル、VIP、ボイスグループなどを含むがそれに限らない）については、リセット・紛失・削除される可能性があります**。最終的な判断は本チームが行います。\n\nRCボイスは**RaidCallの継続、リメイク、または公式認可を受けたバージョンではありません**。**RaidCallのサービスの復元、サポート、アカウントデータの回復なども提供しておりません**。本プロジェクトは愛好家による自発的な開発活動であり、**営利目的ではありません**。\n\nRCボイスの内容はすべて、学術研究および技術的な交流を目的として提供されます。著作権、商標、その他の権利に関する問題がございましたら、お手数ですがご連絡のうえご相談ください。\n\nRCボイスはRaidCallに関する素材を一部参考または使用している場合がありますが、最終的な成果物はすべて本チームによって**独自に制作されたもの**であり、**RaidCall公式の立場や意図を示すものではありません**。そのため、**RaidCallに関連する技術サポート、アカウント回復、データの照会などのサービスは一切提供しておりません**。関連する問題については、元のRaidCall公式にお問い合わせください。\n\n### オープンソースへの参加方法\n\nRCボイスの開発および保守にご協力いただける開発者の皆様を歓迎いたします。以下の方法でご参加いただけます：\n\n* [参加希望フォーム](https://forms.gle/ZowwAS22dGpKkGcZ8) を記入（まずは [Discord公式サーバー](https://discord.gg/adCWzv6wwS) にご参加ください。必要があればこちらからご連絡し、ロールを付与します）\n* 本プロジェクトをForkし、[Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls) を送信して機能追加や不具合修正を行う\n\nご支援・ご参加に心より感謝いたします！\n\nこの免責事項はアプリ内で確認できます：メニュー > ヘルプセンター > RCボイスについて",
   "receive-channel": "受信チャンネル",
   "receive-channel-message-sound-label": "チャンネル内のメッセージ",
@@ -389,6 +409,8 @@
   "recent-servers": "最近グループを訪問していない",
   "recommend": "ブースト",
   "reconnection-failed-message": "接続を復元できません。「OK」をクリックすると、アカウントから自動的にログアウトされます",
+  "record-format": "記録フォーマット",
+  "record-setting": "録画設定",
   "register": "新規登録",
   "register-account": "新規登録",
   "register-success": "登録が完了しました。{{0}} のリンクにアクセスしてメールアドレスを確認し、アカウントを有効化してください。アカウントが有効化されるまでログインできません",
@@ -512,6 +534,7 @@
   "upload": "アップロード",
   "upload-avatar": "アバター画像のアップロード",
   "user-info": "プロフィール",
+  "user-is-friend": "このユーザーは既に友達です。",
   "user-limit": "ユーザー制限",
   "user-not-found": "アカウントが存在しません",
   "user-setting": "ユーザー プロファイルの設定",
@@ -533,5 +556,6 @@
   "week": "週",
   "xp": "クレジット",
   "year": "年",
-  "yesterday": "昨日"
+  "yesterday": "昨日",
+  "current-speaking-mode": "現在の話し方"
 }

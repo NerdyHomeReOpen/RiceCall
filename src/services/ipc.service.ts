@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode, ACK, Theme } from '@/types';
+import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode, ACK, Theme, SystemSettings } from '@/types';
 import { LanguageKey } from '@/i18n';
 
 // Services
@@ -171,6 +171,13 @@ const ipcService = {
             ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, parent }, force);
           });
         }
+      } else if (type === 'chatHistory') {
+        const { userId, targetId } = initialData;
+        Promise.all([data.user({ userId }), data.friend({ userId, targetId }), data.user({ userId: targetId })]).then(([user, friend, target]) => {
+          if (!user || !target) return;
+          const title = target.name ?? '';
+          ipcRenderer.send('open-popup', type, id, { userId, targetId, user, friend, target }, force, title);
+        });
       } else if (type === 'directMessage') {
         const { userId, targetId, event, message } = initialData;
         Promise.all([data.user({ userId }), data.friend({ userId, targetId }), data.user({ userId: targetId })]).then(([user, friend, target]) => {
@@ -216,7 +223,7 @@ const ipcService = {
         });
       } else if (type === 'inviteMember') {
         const { userId, serverId } = initialData;
-        Promise.all([data.user({ userId }), data.memberInvitation({ serverId, receiverId: userId })]).then(([target, memberInvitation]) => {
+        Promise.all([data.member({ userId, serverId }), data.memberInvitation({ serverId, receiverId: userId })]).then(([target, memberInvitation]) => {
           if (!target) return;
           ipcRenderer.send('open-popup', type, id, { userId, serverId, target, memberInvitation }, force);
         });
@@ -241,6 +248,13 @@ const ipcService = {
             ipcRenderer.send('open-popup', type, id, { userId, serverId, user, server, serverMembers, memberApplications }, force, title);
           },
         );
+      } else if (type === 'systemSetting') {
+        const { userId } = initialData;
+        const systemSettings = ipcService.systemSettings.get();
+        Promise.all([data.user({ userId })]).then(([user]) => {
+          if (!user) return;
+          ipcRenderer.send('open-popup', type, id, { userId, user, systemSettings }, force);
+        });
       } else if (type === 'userInfo') {
         const { userId, targetId } = initialData;
         Promise.all([data.friend({ userId, targetId }), data.user({ userId: targetId }), data.servers({ userId: targetId })]).then(([friend, target, targetServers]) => {
@@ -398,55 +412,7 @@ const ipcService = {
   },
 
   systemSettings: {
-    get: (): {
-      // Basic settings
-      autoLogin: boolean;
-      autoLaunch: boolean;
-      alwaysOnTop: boolean;
-      statusAutoIdle: boolean;
-      statusAutoIdleMinutes: number;
-      statusAutoDnd: boolean;
-      channelUIMode: ChannelUIMode;
-      closeToTray: boolean;
-      fontSize: number;
-      font: string;
-
-      // Mix settings
-      inputAudioDevice: string;
-      outputAudioDevice: string;
-      mixEffect: boolean;
-      mixEffectType: string;
-      autoMixSetting: boolean;
-      echoCancellation: boolean;
-      noiseCancellation: boolean;
-      microphoneAmplification: boolean;
-      manualMixMode: boolean;
-      mixMode: MixMode;
-
-      // Voice settings
-      speakingMode: SpeakingMode;
-      defaultSpeakingKey: string;
-
-      // Privacy settings
-      notSaveMessageHistory: boolean;
-
-      // Hotheys Settings
-      hotKeyOpenMainWindow: string;
-      hotKeyScreenshot: string;
-      hotKeyIncreaseVolume: string;
-      hotKeyDecreaseVolume: string;
-      hotKeyToggleSpeaker: string;
-      hotKeyToggleMicrophone: string;
-
-      // SoundEffect Setting
-      disableAllSoundEffect: boolean;
-      enterVoiceChannelSound: boolean;
-      leaveVoiceChannelSound: boolean;
-      startSpeakingSound: boolean;
-      stopSpeakingSound: boolean;
-      receiveDirectMessageSound: boolean;
-      receiveChannelMessageSound: boolean;
-    } | null => {
+    get: (): SystemSettings | null => {
       if (!isElectron) return null;
       return ipcRenderer.sendSync('get-system-settings');
     },
@@ -683,6 +649,25 @@ const ipcService = {
         const listener = (_: any, deviceId: string) => callback(deviceId);
         ipcRenderer.on('output-audio-device', listener);
         return () => ipcRenderer.removeListener('output-audio-device', listener);
+      },
+    },
+
+    recordFormat: {
+      set: (format: 'wav' | 'mp3') => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-record-format', format);
+      },
+
+      get: (): 'wav' | 'mp3' => {
+        if (!isElectron) return 'wav';
+        return ipcRenderer.sendSync('get-record-format');
+      },
+
+      onUpdate: (callback: (format: 'wav' | 'mp3') => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, format: 'wav' | 'mp3') => callback(format);
+        ipcRenderer.on('record-format', listener);
+        return () => ipcRenderer.removeListener('record-format', listener);
       },
     },
 

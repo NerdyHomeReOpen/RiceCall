@@ -41,6 +41,7 @@ import ServerSetting from '@/popups/ServerSetting';
 import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
+import ChatHistory from '@/popups/chatHistory';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -172,6 +173,8 @@ const Popup = React.memo(() => {
         return { title: t('system-setting'), buttons: ['close'], node: <SystemSetting {...initialData} />, hideHeader: false };
       case 'userInfo':
         return { title: t('user-info'), buttons: ['close'], node: <UserInfo {...initialData} />, hideHeader: true };
+      case 'chatHistory':
+        return { title: t('chat-history'), buttons: ['close'], node: <ChatHistory {...initialData} />, hideHeader: false };
       default:
         return { title: '', buttons: [], node: null, hideHeader: true };
     }
@@ -192,6 +195,12 @@ const Popup = React.memo(() => {
     if (!id) return;
     setInitialData(ipc.initialData.get(id));
   }, [id]);
+
+  useEffect(() => {
+    history.pushState = () => {};
+    history.back = () => {};
+    history.forward = () => {};
+  }, []);
 
   return (
     <>

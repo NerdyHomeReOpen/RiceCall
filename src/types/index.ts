@@ -34,13 +34,15 @@ export type BadgeList = {
   badges: string;
 };
 
-export type User = table_users & table_global_permissions & BadgeList;
+export type User = table_users & table_global_permissions & table_user_settings & BadgeList;
 
-export type UserActivity = table_user_activities;
+export type UserSetting = table_user_settings;
 
 export type Badge = table_badges & table_user_badges;
 
 export type Friend = table_friends & table_users & BadgeList;
+
+export type FriendActivity = table_friends & table_users & table_user_activities;
 
 export type FriendGroup = table_friend_groups;
 
@@ -93,6 +95,13 @@ export type ChannelMessage = Message &
     type: 'general';
   };
 
+export type ChatHistory = Message &
+  User & {
+    type: 'chatHistory';
+    user1Id: string;
+    user2Id: string;
+  };
+
 export type DirectMessage = Message &
   User & {
     type: 'dm';
@@ -102,6 +111,51 @@ export type DirectMessage = Message &
 
 export type PromptMessage = Message & {
   type: 'alert' | 'info' | 'warn' | 'event';
+};
+
+export type SystemSettings = {
+  autoLogin: boolean;
+  autoLaunch: boolean;
+  alwaysOnTop: boolean;
+  statusAutoIdle: boolean;
+  statusAutoIdleMinutes: number;
+  statusAutoDnd: boolean;
+  channelUIMode: ChannelUIMode;
+  closeToTray: boolean;
+  fontSize: number;
+  font: string;
+
+  inputAudioDevice: string;
+  outputAudioDevice: string;
+  recordFormat: 'wav' | 'mp3';
+  mixEffect: boolean;
+  mixEffectType: string;
+  autoMixSetting: boolean;
+  echoCancellation: boolean;
+  noiseCancellation: boolean;
+  microphoneAmplification: boolean;
+  manualMixMode: boolean;
+  mixMode: MixMode;
+
+  speakingMode: SpeakingMode;
+  defaultSpeakingKey: string;
+
+  notSaveMessageHistory: boolean;
+
+  hotKeyOpenMainWindow: string;
+  hotKeyScreenshot: string;
+  hotKeyIncreaseVolume: string;
+  hotKeyDecreaseVolume: string;
+  hotKeyToggleSpeaker: string;
+  hotKeyToggleMicrophone: string;
+
+  disableAllSoundEffect: boolean;
+  enterVoiceChannelSound: boolean;
+  leaveVoiceChannelSound: boolean;
+  startSpeakingSound: boolean;
+  stopSpeakingSound: boolean;
+  receiveDirectMessageSound: boolean;
+  receiveChannelMessageSound: boolean;
 };
 
 export type ContextMenuItem = {
@@ -183,6 +237,7 @@ export type PopupType =
   | 'dialogSuccess'
   | 'dialogWarning'
   | 'directMessage'
+  | 'chatHistory'
   | 'editChannelName'
   | 'editChannelOrder'
   | 'editFriendNote'
@@ -206,7 +261,7 @@ export type ClientToServerEvents = {
   // User
   searchUser: (...args: { query: string }[]) => void;
   editUser: (...args: { update: Partial<table_users> }[]) => void;
-  editUserSettings: (...args: { update: Partial<table_user_settings> }[]) => void;
+  editUserSetting: (...args: { update: Partial<table_user_settings> }[]) => void;
   // Friend
   editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
   deleteFriend: (...args: { targetId: string }[]) => void;
@@ -275,6 +330,7 @@ export type ClientToServerEvents = {
   actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;
   directMessage: (...args: { targetId: string; preset: Partial<DirectMessage> }[]) => void;
   shakeWindow: (...args: { targetId: string }[]) => void;
+  chatHistory: (...args: { userId: string; targetId: string }[]) => void;
 };
 
 export type ServerToClientEvents = {
@@ -293,23 +349,19 @@ export type ServerToClientEvents = {
   userSearch: (...args: User[]) => void;
   userUpdate: (...args: { update: Partial<User> }[]) => void;
   // Friend Group
-  friendGroupsSet: (...args: FriendGroup[]) => void;
   friendGroupAdd: (...args: { data: FriendGroup }[]) => void;
   friendGroupUpdate: (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => void;
   friendGroupRemove: (...args: { friendGroupId: string }[]) => void;
   // Friend
-  friendsSet: (...args: Friend[]) => void;
   friendAdd: (...args: { data: Friend }[]) => void;
   friendUpdate: (...args: { targetId: string; update: Partial<Friend> }[]) => void;
   friendRemove: (...args: { targetId: string }[]) => void;
   // Friend Application
-  friendApplicationsSet: (...args: FriendApplication[]) => void;
   friendApplicationAdd: (...args: { data: FriendApplication }[]) => void;
   friendApplicationUpdate: (...args: { senderId: string; update: Partial<FriendApplication> }[]) => void;
   friendApplicationRemove: (...args: { senderId: string }[]) => void;
   // Server
   serverSearch: (...args: Server[]) => void;
-  serversSet: (...args: Server[]) => void;
   serverAdd: (...args: { data: Server }[]) => void;
   serverUpdate: (...args: { serverId: string; update: Partial<Server> }[]) => void;
   serverRemove: (...args: { serverId: string }[]) => void;
@@ -318,17 +370,14 @@ export type ServerToClientEvents = {
   serverMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
   serverMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
   // Server Online Member
-  serverOnlineMembersSet: (...args: OnlineMember[]) => void;
   serverOnlineMemberAdd: (...args: { data: OnlineMember }[]) => void;
   serverOnlineMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => void;
   serverOnlineMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
   // Member Application
-  serverMemberApplicationsSet: (...args: MemberApplication[]) => void;
   serverMemberApplicationAdd: (...args: { data: MemberApplication }[]) => void;
   serverMemberApplicationUpdate: (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => void;
   serverMemberApplicationRemove: (...args: { userId: string; serverId: string }[]) => void;
   // Channel
-  channelsSet: (...args: Channel[]) => void;
   channelAdd: (...args: { data: Channel }[]) => void;
   channelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
   channelRemove: (...args: { channelId: string }[]) => void;
@@ -337,7 +386,6 @@ export type ServerToClientEvents = {
   // Queue Member
   queueMembersSet: (...args: QueueUser[]) => void;
   // Member Invitation
-  memberInvitationsSet: (...args: MemberInvitation[]) => void;
   memberInvitationAdd: (...args: { data: MemberInvitation }[]) => void;
   memberInvitationUpdate: (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => void;
   memberInvitationRemove: (...args: { serverId: string }[]) => void;
@@ -346,6 +394,7 @@ export type ServerToClientEvents = {
   actionMessage: (...args: PromptMessage[]) => void;
   directMessage: (...args: DirectMessage[]) => void;
   shakeWindow: (...args: DirectMessage[]) => void;
+  chatHistory: (...args: ChatHistory[]) => void;
   // SFU
   SFUJoined: (...args: { channelId: string }[]) => void;
   SFULeft: () => void;

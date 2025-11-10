@@ -14,14 +14,15 @@ interface BadgeListProps {
   position?: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   direction?: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   maxDisplay?: number;
+  grid?: boolean;
 }
 
-const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'left-top', direction = 'right-bottom', maxDisplay = 21 }) => {
+const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'left-top', direction = 'right-bottom', maxDisplay = 21, grid = false }) => {
   // Memos
   const filteredBadges = useMemo(() => badges.slice(0, maxDisplay).sort((a, b) => a.order - b.order), [badges, maxDisplay]);
 
   return (
-    <div className={badgeStyle['badge-viewer-wrapper']}>
+    <div className={`${badgeStyle['badge-viewer-wrapper']} ${grid ? badgeStyle['grid'] : ''}`}>
       {filteredBadges.map((badge) => (
         <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
       ))}
