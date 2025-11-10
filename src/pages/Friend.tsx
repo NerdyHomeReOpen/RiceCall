@@ -144,7 +144,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
                   <div className={friendPage['user-avatar']} style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }} />
                   <div className={friendPage['right-info']}>
                     <div className={friendPage['user-activity-top']}>
-                      <div className={`${friendPage['vip-icon']} ${vip['vip-icon']} ${vip[`vip-${friendActivity.vip}`]}`}></div>
+                      {friendActivity.vip > 0 && <div className={`${friendPage['vip-icon']} ${vip['vip-icon']} ${vip[`vip-${friendActivity.vip}`]}`}></div>}
                       <div className={friendPage['user-name']}>{friendActivity.name}</div>
                       <div className={friendPage['timestamp']}>{getFormatTimeDiff(t, friendActivity.createdAt)}</div>
                     </div>

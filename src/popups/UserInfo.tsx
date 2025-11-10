@@ -320,7 +320,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
           <div className={styles['user-profile-content']}>
             <div className={popup['label']}>{t('recent-servers')}</div>
             <div className={styles['server-list']}>
-              {!isSelf && targetShareRecentServers ? (
+              {!isSelf && !targetShareRecentServers ? (
                 <RecentServerNotPublicElement />
               ) : recentServers.length === 0 ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
@@ -362,7 +362,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               </select>
             </div>
             <div className={styles['server-list']} style={serversView === 'joined' ? {} : { display: 'none' }}>
-              {!isSelf && targetShareJoinedServers ? (
+              {!isSelf && !targetShareJoinedServers ? (
                 <JoinServerNotPublicElement />
               ) : joinedServers.length === 0 ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
@@ -382,7 +382,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               )}
             </div>
             <div className={styles['server-list']} style={serversView === 'favorite' ? {} : { display: 'none' }}>
-              {!isSelf && targetShareFavoriteServers ? (
+              {!isSelf && !targetShareFavoriteServers ? (
                 <FavoriteServerNotPublicElement />
               ) : favoriteServers.length === 0 ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
