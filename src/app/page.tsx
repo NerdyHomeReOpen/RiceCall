@@ -436,10 +436,6 @@ const RootPageComponent: React.FC = React.memo(() => {
     if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
   };
 
-  // const handleFriendsSet = (...args: Friend[]) => {
-  //   setFriends(args);
-  // };
-
   const handleFriendAdd = (...args: { data: Friend }[]) => {
     const add = new Set(args.map((i) => `${i.data.targetId}`));
     setFriends((prev) => prev.filter((f) => !add.has(`${f.targetId}`)).concat(args.map((i) => i.data)));
@@ -454,10 +450,6 @@ const RootPageComponent: React.FC = React.memo(() => {
     const remove = new Set(args.map((i) => `${i.targetId}`));
     setFriends((prev) => prev.filter((f) => !remove.has(`${f.targetId}`)));
   };
-
-  // const handleFriendGroupsSet = (...args: FriendGroup[]) => {
-  //   setFriendGroups(args);
-  // };
 
   const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
     const add = new Set(args.map((i) => `${i.data.friendGroupId}`));
@@ -488,10 +480,6 @@ const RootPageComponent: React.FC = React.memo(() => {
     setFriendApplications((prev) => prev.filter((fa) => !args.some((i) => i.senderId === fa.senderId)));
   };
 
-  // const handleServersSet = (...args: Server[]) => {
-  //   setServers(args);
-  // };
-
   const handleServerAdd = (...args: { data: Server }[]) => {
     const add = new Set(args.map((i) => `${i.data.serverId}`));
     setServers((prev) => prev.filter((s) => !add.has(`${s.serverId}`)).concat(args.map((i) => i.data)));
@@ -506,10 +494,6 @@ const RootPageComponent: React.FC = React.memo(() => {
     const remove = new Set(args.map((i) => `${i.serverId}`));
     setServers((prev) => prev.filter((s) => !remove.has(`${s.serverId}`)));
   };
-
-  // const handleServerOnlineMembersSet = (...args: OnlineMember[]) => {
-  //   setServerOnlineMembers(args);
-  // };
 
   const handleServerOnlineMemberAdd = (...args: { data: OnlineMember }[]) => {
     const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
@@ -531,19 +515,10 @@ const RootPageComponent: React.FC = React.memo(() => {
     setServerMemberApplications((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
   };
 
-  // const handleServerMemberApplicationUpdate = (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => {
-  //   const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
-  //   setServerMemberApplications((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
-  // };
-
   const handleServerMemberApplicationRemove = (...args: { userId: string; serverId: string }[]) => {
     const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
     setServerMemberApplications((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
   };
-
-  // const handleChannelsSet = (...args: Channel[]) => {
-  //   setChannels(args);
-  // };
 
   const handleChannelAdd = (...args: { data: Channel }[]) => {
     const add = new Set(args.map((i) => `${i.data.channelId}`));
