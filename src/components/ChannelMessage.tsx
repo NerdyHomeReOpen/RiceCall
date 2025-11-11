@@ -71,8 +71,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   return (
     <div className={styles['message-box']}>
       <div
-        className={styles['header']}
-        onClick={() => handleOpenUserInfo(userId, senderUserId)}
+        className={`${styles['header']}`}
         onContextMenu={(e) => {
           e.stopPropagation();
           const { clientX: x, clientY: y } = e;
@@ -104,7 +103,9 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       >
         <div className={`${senderPermissionLevel > 2 && permission[senderGender]} ${senderPermissionLevel > 2 && permission[`lv-${senderPermissionLevel}`]}`} />
         {senderVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
-        <div className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`}>{senderNickname || senderName}</div>
+        <div className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`} onClick={() => handleOpenUserInfo(userId, senderUserId)}>
+          {senderNickname || senderName}
+        </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
       </div>
       {formattedMessageContents.map((content, index) => (
