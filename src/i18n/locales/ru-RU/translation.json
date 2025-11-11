@@ -340,7 +340,7 @@
   "not-available-page": "Страница еще не открыта",
   "not-public": "Это приватный канал",
   "not-public-favorite-servers": {
-    "top": "對方沒有對外",
+    "top": "Другая сторона не раскрыла эту информацию.",
     "bottom": "Избранные группы"
   },
   "not-public-joined-servers": {
