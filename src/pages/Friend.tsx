@@ -144,7 +144,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
                 .filter(friendActivity => friendActivity.relationStatus === 2)
                 .map((friendActivity, index) => (
                   <div key={index} className={friendPage['user-activity']}>
-                    <div className={friendPage['user-avatar']} style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }} onClick={() => handleOpenUserInfo(userId, friendActivity.userId)} />
+                    <div
+                      className={friendPage['user-avatar']}
+                      style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }}
+                    // onClick={() => handleOpenUserInfo(userId, friendActivity.userId)}
+                    />
                     <div className={friendPage['right-info']}>
                       <div className={friendPage['user-activity-top']}>
                         {friendActivity.vip !== 0 && (
