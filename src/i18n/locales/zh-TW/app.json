@@ -577,5 +577,10 @@
   "week": "週",
   "xp": "積分",
   "year": "年",
-  "yesterday": "昨天"
+  "yesterday": "昨天",
+  "recommend-server": "推薦語音群",
+  "entertainment-server": "娛樂語音群",
+  "community-server": "社群語音群",
+  "game-server": "遊戲語音群",
+  "education-server": "教育語音群"
 }
