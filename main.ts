@@ -305,7 +305,7 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     webPreferences: {
       devTools: DEV,
       webviewTag: true,
-      webSecurity: false,
+      webSecurity: true,
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
@@ -354,7 +354,6 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
 export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   if (authWindow && !authWindow.isDestroyed()) {
     authWindow.showInactive();
-    authWindow.moveTop();
     authWindow.flashFrame(true);
     return authWindow;
   }
@@ -424,7 +423,6 @@ export async function createPopup(type: PopupType, id: string, data: unknown, fo
   } else {
     if (popups[id] && !popups[id].isDestroyed()) {
       popups[id].showInactive();
-      popups[id].moveTop();
       popups[id].flashFrame(true);
       return popups[id];
     }
@@ -476,7 +474,6 @@ export async function createPopup(type: PopupType, id: string, data: unknown, fo
 
   popups[id].on('ready-to-show', () => {
     popups[id].showInactive();
-    popups[id].moveTop();
     popups[id].flashFrame(true);
   });
 

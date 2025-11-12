@@ -70,41 +70,40 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
 
   return (
     <div className={styles['message-box']}>
-      <div className={styles['header']}>
+      <div
+        className={`${styles['header']}`}
+        onContextMenu={(e) => {
+          e.stopPropagation();
+          const { clientX: x, clientY: y } = e;
+          contextMenu.showContextMenu(x, y, 'right-bottom', [
+            {
+              id: 'direct-message',
+              label: t('direct-message'),
+              show: !isUser,
+              onClick: () => handleOpenDirectMessage(userId, senderUserId),
+            },
+            {
+              id: 'view-profile',
+              label: t('view-profile'),
+              onClick: () => handleOpenUserInfo(userId, senderUserId),
+            },
+            {
+              id: 'separator',
+              label: '',
+              show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+            },
+            {
+              id: 'block',
+              label: t('block'),
+              show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+              onClick: () => handleOpenBlockMember(senderUserId, serverId),
+            },
+          ]);
+        }}
+      >
         <div className={`${senderPermissionLevel > 2 && permission[senderGender]} ${senderPermissionLevel > 2 && permission[`lv-${senderPermissionLevel}`]}`} />
         {senderVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
-        <div
-          className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`}
-          onClick={() => handleOpenUserInfo(userId, senderUserId)}
-          onContextMenu={(e) => {
-            e.stopPropagation();
-            const { clientX: x, clientY: y } = e;
-            contextMenu.showContextMenu(x, y, 'right-bottom', [
-              {
-                id: 'direct-message',
-                label: t('direct-message'),
-                show: !isUser,
-                onClick: () => handleOpenDirectMessage(userId, senderUserId),
-              },
-              {
-                id: 'view-profile',
-                label: t('view-profile'),
-                onClick: () => handleOpenUserInfo(userId, senderUserId),
-              },
-              {
-                id: 'separator',
-                label: '',
-                show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-              },
-              {
-                id: 'block',
-                label: t('block'),
-                show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-                onClick: () => handleOpenBlockMember(senderUserId, serverId),
-              },
-            ]);
-          }}
-        >
+        <div className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`} onClick={() => handleOpenUserInfo(userId, senderUserId)}>
           {senderNickname || senderName}
         </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>

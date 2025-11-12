@@ -23,6 +23,7 @@ import ipc from '@/services/ipc.service';
 
 // Utils
 import { getFormatTimeDiff } from '@/utils/language';
+// import { handleOpenUserInfo } from '@/utils/popup';
 
 interface FriendPageProps {
   user: User;
@@ -139,19 +140,34 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
           <header className={friendPage['header']}>{t('friend-active')}</header>
           <div className={`${friendPage['scroll-view']} ${friendPage['friend-active-wrapper']}`}>
             <div className={friendPage['friend-active-list']}>
-              {friendActivities.map((friendActivity, index) => (
-                <div key={index} className={friendPage['user-activity']}>
-                  <div className={friendPage['user-avatar']} style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }} />
-                  <div className={friendPage['right-info']}>
-                    <div className={friendPage['user-activity-top']}>
-                      <div className={`${friendPage['vip-icon']} ${vip['vip-icon']} ${vip[`vip-${friendActivity.vip}`]}`}></div>
-                      <div className={friendPage['user-name']}>{friendActivity.name}</div>
-                      <div className={friendPage['timestamp']}>{getFormatTimeDiff(t, friendActivity.createdAt)}</div>
+              {friendActivities
+                .filter((friendActivity) => friendActivity.relationStatus === 2)
+                .map((friendActivity, index) => (
+                  <div key={index} className={friendPage['user-activity']}>
+                    <div
+                      className={friendPage['user-avatar']}
+                      style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }}
+                      onClick={() => {
+                        /* TODO: handleOpenUserInfo(userId, friendActivity.userId) */
+                      }}
+                    />
+                    <div className={friendPage['right-info']}>
+                      <div className={friendPage['user-activity-top']}>
+                        {friendActivity.vip !== 0 && <div className={`${friendPage['vip-icon']} ${vip['vip-icon']} ${vip[`vip-${friendActivity.vip}`]}`}></div>}
+                        <div
+                          className={friendPage['user-name']}
+                          onClick={() => {
+                            /* TODO: handleOpenUserInfo(userId, friendActivity.userId) */
+                          }}
+                        >
+                          {friendActivity.name}
+                        </div>
+                        <div className={friendPage['timestamp']}>{getFormatTimeDiff(t, friendActivity.createdAt)}</div>
+                      </div>
+                      <div className={friendPage['signature']}>{friendActivity.content}</div>
                     </div>
-                    <div className={friendPage['signature']}>{friendActivity.content}</div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </main>
