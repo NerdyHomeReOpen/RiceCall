@@ -60,8 +60,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     relationStatus: friendRelationStatus,
     isBlocked: friendIsBlocked,
     currentServerId: friendCurrentServerId,
+    shareCurrentServer: friendShareCurrentServer,
   } = friend;
-  const { name: friendServerName } = friendServer;
 
   // Memos
   const isUser = useMemo(() => targetId === userId, [targetId, userId]);
@@ -104,11 +104,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
 
   // Effects
   useEffect(() => {
-    if (!targetId || !friendCurrentServerId || friendIsBlocked || !isFriend) return;
+    if (!targetId || !friendCurrentServerId || friendIsBlocked || !isFriend || !friendShareCurrentServer) {
+      setFriendServer(Default.server());
+      return;
+    }
     data.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
       if (server) setFriendServer(server);
     });
-  }, [targetId, friendCurrentServerId, friendIsBlocked, isFriend]);
+  }, [targetId, friendCurrentServerId, friendIsBlocked, isFriend, friendShareCurrentServer]);
 
   return (
     <div
@@ -232,10 +235,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
         </div>
         {isPending ? (
           <div className={styles['signature']}>{`(${t('pending')})`}</div>
-        ) : isFriend && isOnline && !friendIsBlocked && friendCurrentServerId ? (
-          <div className={`${styles['box']} ${friendCurrentServerId ? styles['has-server'] : ''}`} onClick={() => handleServerSelect(friendCurrentServerId, friendServer.displayId)}>
+        ) : friendServer.name && friendServer.displayId && friendServer.serverId ? (
+          <div className={`${styles['box']} ${styles['has-server']}`} onClick={() => handleServerSelect(friendServer.serverId, friendServer.displayId)}>
             <div className={styles['location-icon']} />
-            <div className={styles['server-name-text']}>{friendServerName}</div>
+            <div className={styles['server-name-text']}>{friendServer.name}</div>
           </div>
         ) : (
           <div className={styles['signature']}>{friendSignature}</div>

@@ -40,7 +40,7 @@ export type UserSetting = table_user_settings;
 
 export type Badge = table_badges & table_user_badges;
 
-export type Friend = table_friends & table_users & BadgeList;
+export type Friend = table_friends & table_users & table_user_settings & BadgeList;
 
 export type FriendActivity = table_friends & table_users & table_user_activities;
 
