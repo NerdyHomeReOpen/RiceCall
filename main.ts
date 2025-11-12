@@ -579,11 +579,11 @@ function configureAutoUpdater() {
     console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, env.UPDATE_CHANNEL);
     autoUpdater
       .checkForUpdates()
+      .then(() => {
+        isUpdateNotified = true;
+      })
       .catch((error) => {
         console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
-      })
-      .finally(() => {
-        isUpdateNotified = true;
       });
   }
 
