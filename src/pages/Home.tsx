@@ -192,7 +192,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       }
       handleConnectServer(target.serverId, target.displayId);
     },
-    [userId, handleConnectServer]
+    [userId, handleConnectServer],
   );
 
   // Effects
@@ -370,9 +370,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
 HomePageComponent.displayName = 'HomePageComponent';
 
-// use dynamic import to disable SSR
-const HomePage = dynamic(() => Promise.resolve(HomePageComponent), {
-  ssr: false,
-});
+const HomePage = dynamic(() => Promise.resolve(HomePageComponent), { ssr: false });
 
 export default HomePage;

@@ -641,9 +641,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
 ServerPageComponent.displayName = 'ServerPageComponent';
 
-// use dynamic import to disable SSR
-const ServerPage = dynamic(() => Promise.resolve(ServerPageComponent), {
-  ssr: false,
-});
+const ServerPage = dynamic(() => Promise.resolve(ServerPageComponent), { ssr: false });
 
 export default ServerPage;

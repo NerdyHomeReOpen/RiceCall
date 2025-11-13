@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
@@ -22,7 +23,7 @@ interface LoginPageProps {
   setSection: (section: 'login' | 'register') => void;
 }
 
-const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection }) => {
+const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setSection }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -231,6 +232,8 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
   );
 });
 
-LoginPage.displayName = 'LoginPage';
+LoginPageComponent.displayName = 'LoginPageComponent';
+
+const LoginPage = dynamic(() => Promise.resolve(LoginPageComponent), { ssr: false });
 
 export default LoginPage;

@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 
 // Types
@@ -74,7 +75,7 @@ interface RegisterPageProps {
   setSection: (section: 'login' | 'register') => void;
 }
 
-const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSection }) => {
+const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display, setSection }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -328,6 +329,8 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
   );
 });
 
-RegisterPage.displayName = 'RegisterPage';
+RegisterPageComponent.displayName = 'RegisterPageComponent';
+
+const RegisterPage = dynamic(() => Promise.resolve(RegisterPageComponent), { ssr: false });
 
 export default RegisterPage;
