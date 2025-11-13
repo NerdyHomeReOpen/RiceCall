@@ -82,8 +82,16 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
   const handleSubmit = async () => {
     if (!formData.account || !formData.password) return;
     setIsLoading(true);
-    if (await auth.login(formData)) {
+    const res = await auth.login(formData);
+    if (res.success) {
+      if (formData.rememberAccount) {
+        ipc.accounts.add(formData.account, formData);
+      }
+      if (formData.autoLogin) {
+        localStorage.setItem('token', res.token);
+      }
       localStorage.setItem('login-account', formData.account);
+      ipc.auth.login(res.token);
       setSection('login');
     }
     setIsLoading(false);

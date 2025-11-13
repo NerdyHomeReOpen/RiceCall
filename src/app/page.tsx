@@ -119,7 +119,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   };
 
   const handleLogout = () => {
-    auth.logout();
+    auth.logout().then((success) => {
+      if (success) ipc.auth.logout();
+    });
   };
 
   const handleExit = () => {
@@ -565,7 +567,10 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.popup.open(p.type, p.id, p.initialData, p.force);
       popupOffSubmitRef.current?.();
       popupOffSubmitRef.current = ipc.popup.onSubmit(p.id, () => {
-        if (p.id === 'logout') ipc.auth.logout();
+        if (p.id === 'logout')
+          auth.logout().then((success) => {
+            if (success) ipc.auth.logout();
+          });
       });
     });
   };

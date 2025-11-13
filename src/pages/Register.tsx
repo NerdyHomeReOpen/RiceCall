@@ -193,8 +193,9 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
       return;
     }
     setIsLoading(true);
-    if (await auth.register(formData)) {
-      handleOpenAlertDialog(t('register-success', { '0': formData.email }), () => {
+    const res = await auth.register(formData);
+    if (res.success) {
+      handleOpenAlertDialog(t(res.message, { '0': formData.email }), () => {
         setSection('login');
       });
     }

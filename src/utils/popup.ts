@@ -71,6 +71,18 @@ export const handleOpenChannelPassword = (onSubmit: (password: string) => void) 
   ipc.popup.onSubmit('channelPassword', onSubmit);
 };
 
+export const handleOpenEditChannelName = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], channelName: Channel['name'] = '') => {
+  ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId, channelName: channelName });
+};
+
+export const handleOpenFriendVerification = (userId: User['userId']) => {
+  ipc.popup.open('friendVerification', 'friendVerification', { userId });
+};
+
+export const handleOpenMemberInvitation = (userId: User['userId']) => {
+  ipc.popup.open('memberInvitation', 'memberInvitation', { userId });
+};
+
 export const handleOpenSearchUser = (userId: User['userId']) => {
   ipc.popup.open('searchUser', 'searchUser', { userId });
 };
