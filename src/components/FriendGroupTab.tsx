@@ -67,6 +67,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
         className={`${styles['friend-group-tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''}`}
         onClick={() => setExpanded((prev) => !prev)}
         onContextMenu={(e) => {
+          e.preventDefault();
           const x = e.clientX;
           const y = e.clientY;
           contextMenu.showContextMenu(x, y, 'right-bottom', [

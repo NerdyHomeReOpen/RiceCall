@@ -124,7 +124,9 @@ const ChangeThemePopup: React.FC = React.memo(() => {
       console.info('[Custom Themes] custom themes updated: ', customThemes);
       setCustomThemes(customThemes);
     };
+
     changeCustomTheme(ipc.customThemes.get());
+
     const unsubscribe = [ipc.customThemes.onUpdate(changeCustomTheme)];
     return () => unsubscribe.forEach((unsub) => unsub());
   }, []);
@@ -204,6 +206,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                           }
                           onClick={handleSelectTheme}
                           onContextMenu={(e) => {
+                            e.preventDefault();
                             const x = e.clientX;
                             const y = e.clientY;
                             contextMenu.showContextMenu(x, y, 'right-bottom', [

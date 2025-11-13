@@ -242,6 +242,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
       <div
         className={styles['scroll-view']}
         onContextMenu={(e) => {
+          e.preventDefault();
           const { clientX: x, clientY: y } = e;
           contextMenu.showContextMenu(x, y, 'right-bottom', [
             {

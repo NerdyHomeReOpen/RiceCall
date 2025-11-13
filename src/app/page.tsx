@@ -40,7 +40,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import NotifyToaster from '@/components/NotifyToaster';
 
 // Utils
-import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme } from '@/utils/popup';
+import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme, handleOpenFriendVerification, handleOpenMemberInvitation } from '@/utils/popup';
 import Default from '@/utils/default';
 
 // Providers
@@ -143,14 +143,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   const handleLanguageChange = (language: LanguageKey) => {
     ipc.language.set(language);
     i18n.changeLanguage(language);
-  };
-
-  const handleOpenFriendVerification = (userId: User['userId']) => {
-    ipc.popup.open('friendVerification', 'friendVerification', { userId });
-  };
-
-  const handleOpenMemberInvitation = (userId: User['userId']) => {
-    ipc.popup.open('memberInvitation', 'memberInvitation', { userId });
   };
 
   // Effects

@@ -535,6 +535,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                           else setSelectedItemId(`member-${memberUserId}`);
                         }}
                         onContextMenu={(e) => {
+                          e.preventDefault();
                           const x = e.clientX;
                           const y = e.clientY;
                           contextMenu.showContextMenu(x, y, 'right-bottom', [

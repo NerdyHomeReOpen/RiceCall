@@ -51,6 +51,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
       className={homePage['server-card']}
       onClick={() => handleServerSelect(serverId, serverDisplayId)}
       onContextMenu={(e) => {
+        e.preventDefault();
         const x = e.clientX;
         const y = e.clientY;
         contextMenu.showContextMenu(x, y, 'right-bottom', [

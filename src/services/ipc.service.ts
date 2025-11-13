@@ -78,11 +78,6 @@ const ipcService = {
       ipcRenderer.send('window-control', 'unmaximize');
     },
 
-    openExternal: (url: string) => {
-      if (!isElectron) return;
-      ipcRenderer.send('open-external', url);
-    },
-
     close: () => {
       if (!isElectron) return;
       ipcRenderer.send('window-control', 'close');

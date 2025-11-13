@@ -160,6 +160,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             handleDrop(e, serverId, channelId);
           }}
           onContextMenu={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             const { clientX: x, clientY: y } = e;
             contextMenu.showContextMenu(x, y, 'right-bottom', [

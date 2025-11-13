@@ -23,6 +23,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
   // Handlers
   const handleSubmit = () => {
     ipc.popup.submit(submitTo, password);
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -43,13 +44,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleSubmit();
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={handleSubmit}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

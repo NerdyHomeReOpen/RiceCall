@@ -4,7 +4,6 @@ import type { User, Server, Channel, FriendGroup } from '@/types';
 // Services
 import ipc from '@/services/ipc.service';
 
-/* Dialog */
 export const handleOpenAlertDialog = (message: string, callback: () => void) => {
   ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
   ipc.popup.onSubmit('dialogAlert', callback);
@@ -15,7 +14,6 @@ export const handleOpenErrorDialog = (message: string, callback: () => void) => 
   ipc.popup.onSubmit('dialogError', callback);
 };
 
-/* General popup */
 export const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
   ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
 };
@@ -28,7 +26,6 @@ export const handleOpenUserInfo = (userId: User['userId'], targetId: User['userI
   ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
 };
 
-/* Group popup */
 export const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
   ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
 };
@@ -69,25 +66,11 @@ export const handleOpenServerBroadcast = (serverId: Server['serverId'], channelI
   ipc.popup.open('serverBroadcast', 'serverBroadcast', { serverId, channelId });
 };
 
-export const handleOpenChannelPassword = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+export const handleOpenChannelPassword = (onSubmit: (password: string) => void) => {
   ipc.popup.open('channelPassword', 'channelPassword', { submitTo: 'channelPassword' });
-  ipc.popup.onSubmit('channelPassword', (password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
+  ipc.popup.onSubmit('channelPassword', onSubmit);
 };
 
-export const handleOpenEditChannelName = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], channelName: Channel['name'] = '') => {
-  ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId, channelName: channelName });
-};
-
-/* Applications popup */
-export const handleOpenFriendVerification = (userId: User['userId']) => {
-  ipc.popup.open('friendVerification', 'friendVerification', { userId });
-};
-
-export const handleOpenMemberInvitation = (userId: User['userId']) => {
-  ipc.popup.open('memberInvitation', 'memberInvitation', { userId });
-};
-
-/* Friend popup */
 export const handleOpenSearchUser = (userId: User['userId']) => {
   ipc.popup.open('searchUser', 'searchUser', { userId });
 };
@@ -112,7 +95,6 @@ export const handleOpenEditFriendGroupName = (userId: User['userId'], friendGrou
   ipc.popup.open('editFriendGroupName', 'editFriendGroupName', { userId, friendGroupId });
 };
 
-/* SystemMenu popup */
 export const handleOpenSystemSetting = (userId: User['userId']) => {
   ipc.popup.open('systemSetting', 'systemSetting', { userId });
 };

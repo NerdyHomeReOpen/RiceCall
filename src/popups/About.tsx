@@ -75,13 +75,13 @@ const AboutPopup: React.FC = React.memo(() => {
             <div className={styles['app-version-text']}>RiceCall v{version}</div>
             <div className={styles['copyright-text']}>COPYRIGHT @ {CURRENT_YEAR} RiceCall.com ,ALL RIGHTS RESERVED.</div>
             <div className={popup['row']} style={{ alignSelf: 'center' }}>
-              <div className={popup['link-text']} onClick={() => ipc.window.openExternal('https://discord.com/invite/adCWzv6wwS')}>
+              <div className={popup['link-text']} onClick={() => window.open('https://discord.com/invite/adCWzv6wwS', '_blank')}>
                 {t('get-help')}
               </div>
-              <div className={popup['link-text']} onClick={() => ipc.window.openExternal('https://github.com/NerdyHomeReOpen/RiceCall')}>
+              <div className={popup['link-text']} onClick={() => window.open('https://github.com/NerdyHomeReOpen/RiceCall', '_blank')}>
                 {t('project-repo')}
               </div>
-              <div className={popup['link-text']} onClick={() => ipc.window.openExternal('http://ricecall.com.tw')}>
+              <div className={popup['link-text']} onClick={() => window.open('http://ricecall.com.tw', '_blank')}>
                 {t('official-website')}
               </div>
             </div>
@@ -101,12 +101,12 @@ const AboutPopup: React.FC = React.memo(() => {
                   </div>
                   <div className={styles['icon-wrapper']}>
                     {githubInfo && (
-                      <div className={styles['github-icon-link']} title="GitHub" onClick={() => ipc.window.openExternal(`https://github.com/${githubInfo}`)}>
+                      <div className={styles['github-icon-link']} title="GitHub" onClick={() => window.open(`https://github.com/${githubInfo}`, '_blank')}>
                         <FaGithub size={20} />
                       </div>
                     )}
                     {discordInfo && (
-                      <div className={styles['discord-icon-link']} title="Discord" onClick={() => ipc.window.openExternal(`http://discordapp.com/users/${discordInfo}`)}>
+                      <div className={styles['discord-icon-link']} title="Discord" onClick={() => window.open(`http://discordapp.com/users/${discordInfo}`, '_blank')}>
                         <FaDiscord size={20} />
                       </div>
                     )}

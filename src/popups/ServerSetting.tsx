@@ -441,6 +441,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             else setSelectedItemId(`member-${memberUserId}`);
                           }}
                           onContextMenu={(e) => {
+                            e.preventDefault();
                             const x = e.clientX;
                             const y = e.clientY;
                             contextMenu.showContextMenu(x, y, 'right-bottom', [
@@ -615,6 +616,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             else setSelectedItemId(`application-${applicationUserId}`);
                           }}
                           onContextMenu={(e) => {
+                            e.preventDefault();
                             const x = e.clientX;
                             const y = e.clientY;
                             contextMenu.showContextMenu(x, y, 'right-bottom', [
@@ -690,6 +692,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             else setSelectedItemId(`blocked-${memberUserId}`);
                           }}
                           onContextMenu={(e) => {
+                            e.preventDefault();
                             const x = e.clientX;
                             const y = e.clientY;
                             contextMenu.showContextMenu(x, y, 'right-bottom', [

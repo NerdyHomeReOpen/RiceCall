@@ -164,6 +164,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             handleDrop(e, serverId, categoryId);
           }}
           onContextMenu={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             const x = e.clientX;
             const y = e.clientY;

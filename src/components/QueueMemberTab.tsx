@@ -153,6 +153,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
         hoverTimerRef.current = null;
       }}
       onContextMenu={(e) => {
+        e.preventDefault();
         e.stopPropagation();
         const x = e.clientX;
         const y = e.clientY;

@@ -245,7 +245,7 @@
 .main-tabs .tab::before {
   content: '';
   position: absolute;
-  z-index: 100;
+  z-index: 2;
   top: 0;
   left: 0;
   min-width: 10px;
@@ -258,7 +258,7 @@
 .main-tabs .tab::after {
   content: '';
   position: absolute;
-  z-index: 100;
+  z-index: 2;
   top: 0;
   right: 0;
   min-width: 10px;
