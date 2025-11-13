@@ -93,6 +93,10 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
     ipc.accounts.delete(account);
   };
 
+  const handleForgotPassword = () => {
+    window.open('https://ricecall.com.tw/forget', '_blank');
+  };
+
   // Effects
   useEffect(() => {
     const loginAccount = localStorage.getItem('login-account') || '';
@@ -211,12 +215,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
         <div className={styles['create-account']} onClick={() => setSection('register')}>
           {t('register-account')}
         </div>
-        <div
-          className={styles['forget-password']}
-          onClick={() => {
-            /*TODO: handleForgotPassword() */
-          }}
-        >
+        <div className={styles['forget-password']} onClick={() => handleForgotPassword()}>
           {t('forgot-password')}
         </div>
       </div>
