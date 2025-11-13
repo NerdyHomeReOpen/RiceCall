@@ -28,7 +28,7 @@ type ApiRequestData = {
 const handleResponse = async (response: Response): Promise<any> => {
   const result = await response.json();
   if (!response.ok) throw new Error(result.message);
-  result.data.message = result.message || '';
+  if (result.data) result.data.message = result.message || '';
   return result.data;
 };
 
