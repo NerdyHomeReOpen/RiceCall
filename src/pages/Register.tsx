@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import auth from '@/services/auth.service';
 
 // Utils
-import { handleOpenAlertDialog } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenErrorDialog } from '@/utils/popup';
 
 interface FormErrors {
   general?: string;
@@ -193,13 +193,19 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
       }));
       return;
     }
+
     setIsLoading(true);
-    const res = await auth.register(formData);
+
+    const res = await auth.register(formData).catch((error) => {
+      handleOpenErrorDialog(t(error.message), () => {});
+      return { success: false } as { success: false };
+    });
     if (res.success) {
       handleOpenAlertDialog(t(res.message, { '0': formData.email }), () => {
         setSection('login');
       });
     }
+
     setIsLoading(false);
   };
 

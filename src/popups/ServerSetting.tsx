@@ -17,7 +17,15 @@ import ipc from '@/services/ipc.service';
 import api from '@/services/api.service';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenMemberApplicationSetting, handleOpenEditNickname, handleOpenBlockMember } from '@/utils/popup';
+import {
+  handleOpenAlertDialog,
+  handleOpenDirectMessage,
+  handleOpenUserInfo,
+  handleOpenMemberApplicationSetting,
+  handleOpenEditNickname,
+  handleOpenBlockMember,
+  handleOpenImageCropper,
+} from '@/utils/popup';
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
@@ -175,24 +183,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipc.socket.send('unblockUserFromServer', { userId, serverId }));
     };
 
-    const handleOpenImageCropper = (serverId: Server['serverId'], imageData: string) => {
-      ipc.popup.open('imageCropper', 'imageCropper', { imageData, submitTo: 'imageCropper' });
-      ipc.popup.onSubmit('imageCropper', async (data) => {
-        if (data.imageDataUrl.length > 5 * 1024 * 1024) {
-          handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-          return;
-        }
-        const formData = new FormData();
-        formData.append('_type', 'server');
-        formData.append('_fileName', serverId);
-        formData.append('_file', data.imageDataUrl as string);
-        const response = await api.post('/upload', formData);
-        if (response) {
-          setServer((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
-        }
-      });
-    };
-
     const handleClose = () => {
       ipc.window.close();
     };
@@ -335,7 +325,21 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       const file = e.target.files?.[0];
                       if (!file) return;
                       const reader = new FileReader();
-                      reader.onloadend = async () => handleOpenImageCropper(serverId, reader.result as string);
+                      reader.onloadend = async () =>
+                        handleOpenImageCropper(reader.result as string, async (data) => {
+                          if (data.imageDataUrl.length > 5 * 1024 * 1024) {
+                            handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+                            return;
+                          }
+                          const formData = new FormData();
+                          formData.append('_type', 'server');
+                          formData.append('_fileName', serverAvatar);
+                          formData.append('_file', data.imageDataUrl as string);
+                          const response = await api.post('/upload', formData);
+                          if (response) {
+                            setServer((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
+                          }
+                        });
                       reader.readAsDataURL(file);
                     }}
                   />

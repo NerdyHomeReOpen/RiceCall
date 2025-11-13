@@ -10,6 +10,7 @@ import ipc from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
+import { handleOpenErrorDialog } from '@/utils/popup';
 
 interface FormDatas {
   account: string;
@@ -82,8 +83,13 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
 
   const handleSubmit = async () => {
     if (!formData.account || !formData.password) return;
+
     setIsLoading(true);
-    const res = await auth.login(formData);
+
+    const res = await auth.login(formData).catch((error) => {
+      handleOpenErrorDialog(t(error.message), () => {});
+      return { success: false } as { success: false };
+    });
     if (res.success) {
       if (formData.rememberAccount) {
         ipc.accounts.add(formData.account, formData);
@@ -95,6 +101,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
       ipc.auth.login(res.token);
       setSection('login');
     }
+
     setIsLoading(false);
   };
 

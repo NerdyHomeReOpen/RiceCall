@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -40,7 +40,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import NotifyToaster from '@/components/NotifyToaster';
 
 // Utils
-import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme, handleOpenFriendVerification, handleOpenMemberInvitation } from '@/utils/popup';
+import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme, handleOpenFriendVerification, handleOpenMemberInvitation, handleOpenErrorDialog } from '@/utils/popup';
 import Default from '@/utils/default';
 
 // Providers
@@ -57,7 +57,6 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 import ipc from '@/services/ipc.service';
 import auth from '@/services/auth.service';
 import data from '@/services/data.service';
-import ErrorHandler from '@/utils/error';
 
 interface HeaderProps {
   user: User;
@@ -580,9 +579,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     ipc.popup.close('errorDialog');
   };
 
-  const handleError = (error: Error) => {
-    new ErrorHandler(error).show();
-  };
+  const handleError = useCallback((error: Error) => handleOpenErrorDialog(t(error.message), () => {}), [t]);
 
   // Effects
   useEffect(() => {
@@ -771,7 +768,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.socket.on('error', handleError),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, []);
+  }, [handleError]);
 
   useEffect(() => {
     history.pushState = () => {};

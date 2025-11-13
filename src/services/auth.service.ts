@@ -22,7 +22,7 @@ export const authService = {
   register: async (data: RegisterFormData): Promise<{ success: boolean; message: string }> => {
     const res = await api.post('/register', data);
 
-    return { success: !!res, message: res?.message || '' };
+    return { success: !!res, message: res.message };
   },
 
   login: async (data: LoginFormData): Promise<{ success: true; token: string } | { success: false }> => {
@@ -46,7 +46,10 @@ export const authService = {
     const token = localStorage.getItem('token');
     if (!token) return { success: false };
 
-    const res = await api.post('/token/verify', { token, version });
+    const res = await api.post('/token/verify', {
+      token,
+      version,
+    });
     if (!res?.token) return { success: false };
 
     return { success: true, token: res.token };

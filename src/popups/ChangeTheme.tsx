@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 
 // Utils
 import { getDominantColor, getContrastColor, getVisibleColor, toRGBString, type RGB } from '@/utils/color';
+import { handleOpenImageCropper } from '@/utils/popup';
 
 const ChangeThemePopup: React.FC = React.memo(() => {
   // Hooks
@@ -42,24 +43,6 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     const secondaryColor = computedStyle.getPropertyValue('--secondary-color');
 
     ipc.customThemes.current.set({ headerImage, mainColor, secondaryColor });
-  };
-
-  const handleOpenImageCropper = (imageData: string) => {
-    ipc.popup.open('imageCropper', 'imageCropper', { imageData, submitTo: 'imageCropper' });
-    ipc.popup.onSubmit('imageCropper', async (data) => {
-      const base64String = data.imageDataUrl as string;
-      const dominantColor = await getDominantColor(base64String);
-      const visibleColor = getVisibleColor(dominantColor);
-      const contrastColor = getContrastColor(dominantColor);
-      const newTheme: Theme = {
-        headerImage: `url(${base64String})`,
-        mainColor: toRGBString(visibleColor),
-        secondaryColor: toRGBString(contrastColor),
-      };
-
-      ipc.customThemes.current.set(newTheme);
-      ipc.customThemes.add(newTheme);
-    });
   };
 
   const handleSaveSelectedColor = () => {
@@ -235,7 +218,20 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       const file = e.target.files?.[0];
                       if (!file) return;
                       const reader = new FileReader();
-                      reader.onloadend = () => handleOpenImageCropper(reader.result as string);
+                      reader.onloadend = () =>
+                        handleOpenImageCropper(reader.result as string, async (data) => {
+                          const base64String = data.imageDataUrl as string;
+                          const dominantColor = await getDominantColor(base64String);
+                          const visibleColor = getVisibleColor(dominantColor);
+                          const contrastColor = getContrastColor(dominantColor);
+                          const newTheme: Theme = {
+                            headerImage: `url(${base64String})`,
+                            mainColor: toRGBString(visibleColor),
+                            secondaryColor: toRGBString(contrastColor),
+                          };
+                          ipc.customThemes.current.set(newTheme);
+                          ipc.customThemes.add(newTheme);
+                        });
                       reader.readAsDataURL(file);
                     }}
                   />
