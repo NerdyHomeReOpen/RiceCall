@@ -105,6 +105,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
   // Handlers
   const handleEditUserSetting = (update: Partial<UserSetting>) => {
     ipc.socket.send('editUserSetting', { update });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -780,12 +781,11 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
               shareFavoriteServers: !!shareFavoriteServers,
               notSaveMessageHistory: !!notSaveMessageHistory,
             });
-            handleClose();
           }}
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

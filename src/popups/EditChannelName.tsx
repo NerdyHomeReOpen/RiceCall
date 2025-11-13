@@ -31,6 +31,7 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
     ipc.socket.send('editChannel', { serverId, channelId, update });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -51,14 +52,7 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div
-          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
-            if (!canSubmit) return;
-            handleEditChannel(serverId, channelId, { name: channelName });
-            handleClose();
-          }}
-        >
+        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditChannel(serverId, channelId, { name: channelName }) : null)}>
           {t('save')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

@@ -90,6 +90,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   // Handlers
   const handleEditChannels = (serverId: Server['serverId'], updates: Partial<Channel>[]) => {
     ipc.socket.send('editChannel', ...updates.map((update) => ({ serverId, channelId: update.channelId!, update })));
+    ipc.window.close();
   };
 
   const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
@@ -318,13 +319,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div
-          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
-            handleEditChannels(serverId, editedChannels);
-            handleClose();
-          }}
-        >
+        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditChannels(serverId, editedChannels) : null)}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

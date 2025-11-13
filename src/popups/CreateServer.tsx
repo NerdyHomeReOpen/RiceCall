@@ -57,6 +57,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   // Handlers
   const handleCreateServer = (preset: Partial<Server>) => {
     ipc.socket.send('createServer', { preset });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -181,16 +182,17 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
           </div>
           <div
             className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-            onClick={() => {
-              handleCreateServer({
-                name: serverName,
-                avatar: serverAvatar,
-                avatarUrl: serverAvatarUrl,
-                slogan: serverSlogan,
-                type: serverType,
-              });
-              handleClose();
-            }}
+            onClick={() =>
+              canSubmit
+                ? handleCreateServer({
+                    name: serverName,
+                    avatar: serverAvatar,
+                    avatarUrl: serverAvatarUrl,
+                    slogan: serverSlogan,
+                    type: serverType,
+                  })
+                : null
+            }
           >
             {t('confirm')}
           </div>

@@ -33,10 +33,12 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   // Handlers
   const handleBroadcastChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<PromptMessage>) => {
     ipc.socket.send('actionMessage', { serverId, channelId, preset });
+    ipc.window.close();
   };
 
   const handleBroadcastServer = (serverId: Server['serverId'], preset: Partial<PromptMessage>) => {
     ipc.socket.send('actionMessage', { serverId, preset });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -84,14 +86,13 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
       <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${!canSend ? 'disabled' : ''}`}
-          onClick={() => {
-            if (broadcastType === 'channel') {
-              handleBroadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
-            } else {
-              handleBroadcastServer(serverId, { type: 'alert', content: broadcastContent });
-            }
-            handleClose();
-          }}
+          onClick={() =>
+            canSend
+              ? broadcastType === 'channel'
+                ? handleBroadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent })
+                : handleBroadcastServer(serverId, { type: 'alert', content: broadcastContent })
+              : null
+          }
         >
           {t('confirm')}
         </div>

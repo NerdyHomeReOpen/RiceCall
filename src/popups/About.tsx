@@ -36,12 +36,13 @@ const AboutPopup: React.FC = React.memo(() => {
   const [staffs, setStaffs] = useState<Staff[]>([]);
 
   // Handlers
-  const handleClose = () => {
+  const handleDontShowNextTime = () => {
+    ipc.systemSettings.disclaimer.dontShowNextTime();
     ipc.window.close();
   };
 
-  const handleDontShowNextTime = () => {
-    ipc.systemSettings.disclaimer.dontShowNextTime();
+  const handleClose = () => {
+    ipc.window.close();
   };
 
   const getTitleColorClass = (title: string) => {
@@ -124,13 +125,7 @@ const AboutPopup: React.FC = React.memo(() => {
           <input type="checkbox" name="showDisclaimer" onChange={(e) => setDontShowNextTime(e.target.checked)} />
           <div className={popup['label']}>{t('dont-show-next-time')}</div>
         </div>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            if (dontShowNextTime) handleDontShowNextTime();
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => (dontShowNextTime ? handleDontShowNextTime() : handleClose())}>
           {t('close')}
         </div>
       </div>

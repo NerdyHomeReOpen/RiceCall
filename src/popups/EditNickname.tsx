@@ -31,6 +31,11 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
   // Handlers
   const handleEditMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
     ipc.socket.send('editMember', { userId, serverId, update });
+    ipc.window.close();
+  };
+
+  const applyEditMember = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Member>) => {
+    ipc.socket.send('editMember', { userId, serverId, update });
   };
 
   const handleClose = () => {
@@ -57,19 +62,13 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleEditMember(userId, serverId, { nickname: memberNickname || null });
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleEditMember(userId, serverId, { nickname: memberNickname || null })}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
-        <div className={popup['button']} onClick={() => handleEditMember(userId, serverId, { nickname: memberNickname || null })}>
+        <div className={popup['button']} onClick={() => applyEditMember(userId, serverId, { nickname: memberNickname || null })}>
           {t('apply')}
         </div>
       </div>

@@ -160,6 +160,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
       ipc.socket.send('editServer', { serverId, update });
+      ipc.window.close();
     };
 
     const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
@@ -728,7 +729,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
         <div className={popup['popup-footer']} style={isServerAdmin(permissionLevel) ? {} : { display: 'none' }}>
           <div
             className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-            onClick={() => {
+            onClick={() =>
               handleEditServer(serverId, {
                 name: serverName,
                 avatar: serverAvatar,
@@ -738,9 +739,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 type: serverType,
                 slogan: serverSlogan,
                 visibility: serverVisibility,
-              });
-              handleClose();
-            }}
+              })
+            }
           >
             {t('save')}
           </div>

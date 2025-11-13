@@ -114,6 +114,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
     ipc.socket.send('editChannel', { serverId, channelId, update });
+    ipc.window.close();
   };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
@@ -637,7 +638,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
       <div className={popup['popup-footer']} style={isChannelMod(permissionLevel) ? {} : { display: 'none' }}>
         <div
           className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
+          onClick={() =>
             handleEditChannel(serverId, channelId, {
               name: channelName,
               announcement: channelAnnouncement,
@@ -656,9 +657,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               forbidGuestUrl: !!channelForbidGuestUrl,
               visibility: channelVisibility,
               voiceMode: channelVoiceMode,
-            });
-            handleClose();
-          }}
+            })
+          }
         >
           {t('confirm')}
         </div>

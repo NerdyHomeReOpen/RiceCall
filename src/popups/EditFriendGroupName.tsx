@@ -30,6 +30,7 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
   // Handlers
   const handleEditFriendGroup = (friendGroupId: FriendGroup['friendGroupId'], update: Partial<FriendGroup>) => {
     ipc.socket.send('editFriendGroup', { friendGroupId, update });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -50,13 +51,7 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div
-          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
-            handleEditFriendGroup(friendGroupId, { name: friendGroupName });
-            handleClose();
-          }}
-        >
+        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditFriendGroup(friendGroupId, { name: friendGroupName }) : null)}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

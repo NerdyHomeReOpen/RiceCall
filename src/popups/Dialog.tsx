@@ -42,7 +42,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
   // Handlers
   const handleSubmit = () => {
     ipc.popup.submit(submitTo);
-    handleClose();
+    ipc.window.close();
   };
 
   const handleClose = () => {

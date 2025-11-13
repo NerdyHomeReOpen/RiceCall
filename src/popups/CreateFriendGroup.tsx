@@ -28,6 +28,7 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
   // Handlers
   const handleCreateFriendGroup = (preset: Partial<FriendGroup>) => {
     ipc.socket.send('createFriendGroup', { preset });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -48,13 +49,7 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div
-          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
-            handleCreateFriendGroup({ name: friendGroupName });
-            handleClose();
-          }}
-        >
+        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleCreateFriendGroup({ name: friendGroupName }) : null)}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

@@ -32,10 +32,12 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
   // Handlers
   const handleSendMemberInvitation = (receiverId: Member['userId'], serverId: Server['serverId'], preset: Partial<MemberInvitation>) => {
     ipcService.socket.send('sendMemberInvitation', { receiverId, serverId, preset });
+    ipcService.window.close();
   };
 
   const handleEditMemberInvitation = (receiverId: Member['userId'], serverId: Server['serverId'], update: Partial<MemberInvitation>) => {
     ipcService.socket.send('editMemberInvitation', { receiverId, serverId, update });
+    ipcService.window.close();
   };
 
   const handleClose = () => {
@@ -78,13 +80,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
 
       {/* Footer */}
       <div className={popup['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleSendMemberInvitation(targetId, serverId, { description: invitationDesc });
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleSendMemberInvitation(targetId, serverId, { description: invitationDesc })}>
           {t('submit')}
         </div>
         <div className={popup['button']} onClick={handleClose}>
@@ -100,13 +96,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
         </div>
       </div>
       <div className={popup['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleEditMemberInvitation(targetId, serverId, { description: invitationDesc });
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleEditMemberInvitation(targetId, serverId, { description: invitationDesc })}>
           {t('submit')}
         </div>
         <div className={popup['button']} onClick={handleClose}>
