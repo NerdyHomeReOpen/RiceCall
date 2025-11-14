@@ -96,7 +96,7 @@
   "permission-denied": "دسترسی کافی نیست.",
   "receive-shake-window": "طرف مقابل برای شما ویبره پنجره فرستاد",
   "register-failed": "ثبت نام ناموفق بود، لطفا بعدا دوباره امتحان کنید",
-  "register-success": "ثبت نام با موفقیت انجام شد.",
+  "register-success": "帳號註冊成功，請至 {{0}} 驗證你的電子郵件以啟用帳號，帳號未啟用前將無法登入。若未收到驗證信件，請至[官方網站](https://ricecall.com.tw)重新發送驗證信件。",
   "reject-friend-application-failed": "رد درخواست دوستی ناموفق بود، لطفاً بعداً دوباره امتحان کنید.",
   "reject-member-application-failed": "رد درخواست عضویت ناموفق بود، لطفاً بعداً دوباره امتحان کنید.",
   "reject-member-invitation-failed": "رد دعوت‌نامه عضویت ناموفق بود، لطفاً بعداً دوباره امتحان کنید.",

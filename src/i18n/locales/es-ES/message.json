@@ -96,7 +96,7 @@
   "permission-denied": "Permiso denegado.",
   "receive-shake-window": "El contacto te ha enviado un zumbido.",
   "register-failed": "Error al registrarse, por favor, inténtalo de nuevo más tarde",
-  "register-success": "Registro exitoso.",
+  "register-success": "Registro de cuenta exitoso. Por favor, dirígete a {{0}} para verificar tu dirección de correo electrónico y activar su cuenta. No podrás iniciar sesión hasta que su cuenta esté activada. Si no has recibido un correo electrónico de verificación, visita el [sitio web oficial](https://ricecall.com.tw) para que te lo reenvíen.",
   "reject-friend-application-failed": "Error al rechazar la solicitud de contacto, inténtalo más tarde",
   "reject-member-application-failed": "Error al rechazar la solicitud de membresía, inténtalo más tarde",
   "reject-member-invitation-failed": "Error al rechazar la invitación de membresía, inténtalo más tarde",
