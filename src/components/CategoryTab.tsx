@@ -200,7 +200,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               {
                 id: 'delete-channel',
                 label: t('delete-channel'),
-                show: isServerAdmin(permissionLevel),
+                show: isChannelAdmin(permissionLevel),
                 onClick: () => handleDeleteChannel(serverId, categoryId),
               },
               {
