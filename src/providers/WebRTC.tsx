@@ -450,7 +450,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       .getDisplayMedia({
         video: true,
         audio: {
-          channelCount: 1,
+          channelCount: 2,
           echoCancellation: false,
           noiseSuppression: false,
           autoGainControl: false,
@@ -864,7 +864,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       navigator.mediaDevices
         .getUserMedia({
           audio: {
-            channelCount: 1,
+            channelCount: 2,
             echoCancellation: false,
             noiseSuppression: false,
             autoGainControl: false,
