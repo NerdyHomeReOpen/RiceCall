@@ -128,7 +128,7 @@ const store = new Store<StoreType>({
     // Mix settings
     inputAudioDevice: '',
     outputAudioDevice: '',
-    recordFormat: 'mp3',
+    recordFormat: 'wav',
     mixEffect: false,
     mixEffectType: '',
     autoMixSetting: false,
@@ -1121,7 +1121,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-record-format', (_, format) => {
-    store.set('recordFormat', format ?? 'mp3');
+    store.set('recordFormat', format ?? 'wav');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('record-format', format);
     });

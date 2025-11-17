@@ -149,7 +149,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const [voiceThreshold, setVoiceThreshold] = useState<number>(1);
 
   // Recorder
-  const recordFormatRef = useRef<'wav' | 'mp3'>('mp3');
+  const recordFormatRef = useRef<'wav' | 'mp3'>('wav');
   const buffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isRecordingRef = useRef<boolean>(false);
