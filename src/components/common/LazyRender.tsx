@@ -6,10 +6,11 @@ interface LazyRenderProps {
   root?: React.RefObject<Element | null>;
   rootMargin?: string;
   once?: boolean;
+  forceVisible?: boolean;
 }
 
-const LazyRender: React.FC<LazyRenderProps> = ({ children, placeholderHeight = 48, root, rootMargin = '200px', once = true }) => {
-  const [isVisible, setIsVisible] = useState(false);
+const LazyRender: React.FC<LazyRenderProps> = ({ children, placeholderHeight = 48, root, rootMargin = '200px', once = true, forceVisible = false }) => {
+  const [isVisible, setIsVisible] = useState<boolean>(() => !!forceVisible);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const placeholderStyle = useMemo(
     () => ({
@@ -20,6 +21,10 @@ const LazyRender: React.FC<LazyRenderProps> = ({ children, placeholderHeight = 4
   );
 
   useEffect(() => {
+    if (forceVisible) {
+      setIsVisible(true);
+      return;
+    }
     if (isVisible && once) return;
     const node = containerRef.current;
     if (!node) return;
@@ -47,7 +52,7 @@ const LazyRender: React.FC<LazyRenderProps> = ({ children, placeholderHeight = 4
     return () => {
       observer.disconnect();
     };
-  }, [root?.current, rootMargin, once, isVisible]);
+  }, [root, rootMargin, once, isVisible, forceVisible]);
 
   return <div ref={containerRef}>{isVisible ? children : <div style={placeholderStyle} />}</div>;
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 
 // CSS
 import styles from '@/styles/server.module.css';
@@ -79,6 +79,14 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     }
     return map;
   }, [serverOnlineMembers]);
+  const targetChannelMeta = useMemo(() => channels.find((item) => item.channelId === currentChannelId), [channels, currentChannelId]);
+  const targetCategoryId = useMemo(() => {
+    if (!targetChannelMeta) return null;
+    if ((targetChannelMeta as Channel).type === 'channel') {
+      return (targetChannelMeta as Channel).categoryId ?? null;
+    }
+    return targetChannelMeta.channelId;
+  }, [targetChannelMeta]);
   const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
     () =>
       queueUsers
@@ -125,6 +133,51 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (viewType !== 'all') return;
+    if (!targetCategoryId) return;
+    setExpanded((prev) => {
+      if (prev[targetCategoryId]) return prev;
+      return { ...prev, [targetCategoryId]: true };
+    });
+  }, [targetCategoryId, viewType]);
+
+  const scrollToChannel = useCallback(
+    (channelId: string) => {
+      const container = scrollContainerRef.current;
+      if (!container || !channelId) return false;
+      const targetNode = container.querySelector<HTMLElement>(`[data-channel-scroll-id="channel-${channelId}"]`);
+      if (!targetNode) return false;
+      targetNode.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth',
+      });
+      return true;
+    },
+    [scrollContainerRef],
+  );
+
+  useEffect(() => {
+    if (viewType !== 'all') return;
+    if (!currentChannelId) return;
+    if (targetCategoryId && !expanded[targetCategoryId]) return;
+    let attempts = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const tryScroll = () => {
+      const success = scrollToChannel(currentChannelId);
+      if (success || attempts >= 8) {
+        if (timer) clearTimeout(timer);
+        return;
+      }
+      attempts += 1;
+      timer = setTimeout(tryScroll, 120);
+    };
+    timer = setTimeout(tryScroll, 100);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [viewType, currentChannelId, scrollToChannel, expanded, targetCategoryId]);
 
   return (
     <>
@@ -307,7 +360,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
           ) : (
             filteredChannels.map((item) =>
               item.type === 'category' ? (
-                <LazyRender key={`category-${item.channelId}`} root={scrollContainerRef} placeholderHeight={56}>
+                <LazyRender
+                  key={`category-${item.channelId}`}
+                  root={scrollContainerRef}
+                  placeholderHeight={56}
+                  forceVisible={viewType === 'all' && targetCategoryId === item.channelId}
+                >
                   <CategoryTab
                     user={user}
                     friends={friends}
@@ -325,7 +383,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                   />
                 </LazyRender>
               ) : (
-                <LazyRender key={`channel-${item.channelId}`} root={scrollContainerRef} placeholderHeight={48}>
+                <LazyRender
+                  key={`channel-${item.channelId}`}
+                  root={scrollContainerRef}
+                  placeholderHeight={48}
+                  forceVisible={viewType === 'all' && currentChannelId === item.channelId}
+                >
                   <ChannelTab
                     user={user}
                     friends={friends}

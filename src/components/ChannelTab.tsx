@@ -160,6 +160,7 @@ const ChannelTabComponent: React.FC<ChannelTabProps> = ({
         <div
           key={channelId}
           className={`${styles['channel-tab']} ${isSelected ? styles['selected'] : ''}`}
+          data-channel-scroll-id={`channel-${channelId}`}
           onClick={() => {
             if (isSelected) setSelectedItemId(null);
             else setSelectedItemId(`channel-${channelId}`);

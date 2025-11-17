@@ -155,6 +155,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         <div
           key={categoryId}
           className={`${styles['channel-tab']} ${isSelected ? styles['selected'] : ''}`}
+          data-channel-scroll-id={`channel-${categoryId}`}
           onClick={() => {
             if (isSelected) setSelectedItemId(null);
             else setSelectedItemId(`category-${categoryId}`);
