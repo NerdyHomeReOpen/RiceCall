@@ -5,6 +5,7 @@
   min-width: 0;
   max-width: 100%;
   gap: 5px;
+  overflow-y: scroll;
 }
 
 .message-wrapper {
@@ -12,6 +13,23 @@
   flex-direction: row;
   align-items: first baseline;
   gap: 3px;
+}
+
+.new-message-alert {
+  position: absolute;
+  right: 10;
+  padding: 5px 10px;
+  top: calc(100% - 160px);
+  border-radius: 10px;
+  background-color: #ff3b3b;
+  color: #ffffff;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+  &:hover {
+    cursor: pointer;
+    background-color: #cc2121;
+  }
 }
 
 .info-icon {
