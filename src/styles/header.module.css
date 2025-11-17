@@ -240,6 +240,7 @@
   overflow: hidden;
   white-space: nowrap;
   padding: 0 13px;
+  font-size: 15px;
 }
 
 .main-tabs .tab::before {
@@ -325,7 +326,7 @@
 }
 
 .main-tabs .tab.selected .tab-lable {
-  color: var(--main-color);
+  color: var(--main-text-color);
 }
 
 .main-tabs .tab.selected .tab-close {

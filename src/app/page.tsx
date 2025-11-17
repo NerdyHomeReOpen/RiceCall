@@ -208,7 +208,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                   height="12"
                   viewBox="0 0 24 24"
                 >
-                  <circle cx="12" cy="12" r="12" fill="var(--main-color, rgb(55 144 206))" />
+                  <circle cx="12" cy="12" r="12" fill="var(--main-text-color, rgb(55 144 206))" />
                   <path d="M17 7L7 17M7 7l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}

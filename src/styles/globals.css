@@ -1,5 +1,6 @@
 :root {
   --main-color: #0073c6;
+  --main-text-color:#3790ce;
   --secondary-color: #fff;
   --header-image: none;
   --background: #fbfbfb;
@@ -12,14 +13,15 @@
   --selected: #00000020;
   --footer-background: #edeff1;
   --text-color: #000;
-  --text-color-secondary: #222;
+  --text-color-secondary: #333;
   --text-color-tertiary: #444;
   --text-color-quaternary: #666;
-  --text-color-quinary: #888;
-  --text-color-senary: #aaa;
+  --text-color-quinary: #999;
+  --text-color-senary: #a8a8a8;
   --text-color-septenary: #ccc;
   --text-color-octonary: #eee;
-  --text-warning: #ff3030;
+  --text-color-quaternary-plus: #777;
+  --text-warning: #ff0000;
   --text-link: #0059a1;
   --text-link-hover: #0059a1;
   --text-username: #2f94db;
@@ -30,6 +32,7 @@
   --notify-toaster-border: #f9c55d;
   --notify-toaster-background: #fefee4;
   --button-background: #fdfdfd;
+  --popup-background: #f7f7f7;
 }
 
 @media (prefers-color-scheme: dark) {

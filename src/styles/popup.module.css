@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: var(--background);
+  background-color: var(--popup-background);
 }
 
 .popup-wrapper:focus {
@@ -191,6 +191,7 @@
   display: inline-block;
   width: 100%;
   height: 2em;
+  box-shadow: inset 1px 1px 3px #0000001a;
   &:not([datatype='read-only']):not([readOnly]) {
     box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
   }

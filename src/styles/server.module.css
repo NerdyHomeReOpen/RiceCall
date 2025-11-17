@@ -114,7 +114,7 @@
   justify-content: flex-start;
   align-items: center;
   min-width: 75px;
-  color: var(--text-color-quinary);
+  color: var(--text-color-quaternary-plus);
   text-shadow: 0 1px 0 #ffffff;
 }
 
@@ -123,7 +123,7 @@
   justify-content: flex-start;
   align-items: center;
   min-width: 55px;
-  color: var(--text-color-quinary);
+  color: var(--text-color-quaternary-plus);
   text-shadow: 0 1px 0 #ffffff;
 }
 
@@ -135,7 +135,7 @@
   background-image: url('/channel/ID.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-  margin-right: 5px;
+  margin-right: 2px;
 }
 
 .member-text::before {
@@ -146,7 +146,7 @@
   background-image: url('/channel/member.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-  margin-right: 5px;
+  margin-right: 2px;
 }
 
 .options {
@@ -223,6 +223,7 @@
 .section-title-text {
   color: var(--text-color-senary);
   padding: 5px 10px;
+  text-shadow: 0 1px #fff;
 }
 
 .current-channel-box {
@@ -360,7 +361,7 @@
 }
 
 .channel-tab .channel-user-count-text {
-  color: var(--text-color-quaternary);
+  color: #808080;
 }
 
 .user-list {
@@ -730,7 +731,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: var(--text-color-quaternary);
+  color: var(--text-color-secondary);
   &::before {
     content: '';
     min-height: 18px;
