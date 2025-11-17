@@ -124,6 +124,6 @@ export const handleOpenApplyMember = (userId: User['userId'], serverId: Server['
 };
 
 export const handleOpenImageCropper = (imageData: string, onSubmit: (data: { imageDataUrl: string }) => void) => {
-  ipc.popup.open('imageCropper', 'imageCropper', { imageData: imageData });
+  ipc.popup.open('imageCropper', 'imageCropper', { imageData: imageData, submitTo: 'imageCropper' });
   ipc.popup.onSubmit('imageCropper', onSubmit);
 };
