@@ -1031,9 +1031,9 @@ app.on('ready', async () => {
     console.log(`${new Date().toLocaleString()} | open popup`, type, id);
 
     const loader = popupLoaders[type];
-    const loadedData = loader ? await loader(initialData) : initialData;
+    if (loader) initialData = await loader(initialData);
 
-    createPopup(type, id, loadedData, force);
+    createPopup(type, id, initialData, force);
   });
 
   ipcMain.on('close-popup', (_, id) => {

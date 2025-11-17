@@ -277,7 +277,6 @@ type Popup = {
   type: PopupType;
   title: string;
   buttons: ('close' | 'minimize' | 'maxsize')[];
-  initialData?: any;
   node: () => React.ReactNode | null;
   hideHeader: boolean;
 };
