@@ -38,7 +38,7 @@ interface UserTabProps {
   handleConnectChannel: (serverId: Server['serverId'], channelId: Channel['channelId']) => void;
 }
 
-const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, currentChannel, server, member, queueUsers, selectedItemId, setSelectedItemId, handleConnectChannel }) => {
+const UserTabComponent: React.FC<UserTabProps> = ({ user, friends, channel, currentChannel, server, member, queueUsers, selectedItemId, setSelectedItemId, handleConnectChannel }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -89,6 +89,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
     if (memberIsTextMuted) return 'no-text';
     return '';
   }, [isSpeaking, memberIsTextMuted, isMuted, memberIsVoiceMuted]);
+  const parsedBadges = useMemo(() => JSON.parse(memberBadges), [memberBadges]);
+  const selectedKey = `user-${memberUserId}`;
+  const isSelected = selectedItemId === selectedKey;
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
@@ -146,10 +149,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
   return (
     <div
       ref={userTabRef}
-      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `user-${memberUserId}` ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['user-tab']} ${isSelected ? styles['selected'] : ''}`}
       onClick={() => {
-        if (selectedItemId === `user-${memberUserId}`) setSelectedItemId(null);
-        else setSelectedItemId(`user-${memberUserId}`);
+        if (isSelected) setSelectedItemId(null);
+        else setSelectedItemId(selectedKey);
       }}
       onDoubleClick={() => {
         if (isUser) return;
@@ -327,12 +330,82 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
-      <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
+      <BadgeList badges={parsedBadges} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isUser && <div className={styles['my-location-icon']} />}
     </div>
   );
-});
+};
 
-UserTab.displayName = 'UserTab';
+UserTabComponent.displayName = 'UserTab';
 
-export default UserTab;
+const hasFriendRelation = (friends: Friend[], memberId: User['userId']) =>
+  friends.some((friend) => friend.targetId === memberId && friend.relationStatus === 2);
+
+const isMemberInQueue = (queueUsers: QueueUser[], memberId: User['userId']) => queueUsers.some((qu) => qu.userId === memberId);
+
+const didSelectionChange = (prevSelectedId: string | null, nextSelectedId: string | null, memberId: User['userId']) => {
+  const prevSelected = prevSelectedId === `user-${memberId}`;
+  const nextSelected = nextSelectedId === `user-${memberId}`;
+  return prevSelected !== nextSelected;
+};
+
+const areUsersEqual = (prevUser: User, nextUser: User) =>
+  prevUser.userId === nextUser.userId &&
+  prevUser.permissionLevel === nextUser.permissionLevel &&
+  prevUser.currentChannelId === nextUser.currentChannelId;
+
+const areServersEqual = (prevServer: Server, nextServer: Server) =>
+  prevServer.serverId === nextServer.serverId &&
+  prevServer.permissionLevel === nextServer.permissionLevel &&
+  prevServer.lobbyId === nextServer.lobbyId;
+
+const areChannelsEqual = (prevChannel: Channel | Category, nextChannel: Channel | Category) =>
+  prevChannel.channelId === nextChannel.channelId &&
+  prevChannel.categoryId === nextChannel.categoryId &&
+  prevChannel.permissionLevel === nextChannel.permissionLevel &&
+  prevChannel.voiceMode === nextChannel.voiceMode;
+
+const areCurrentChannelsEqual = (prevChannel: Channel, nextChannel: Channel) =>
+  prevChannel.permissionLevel === nextChannel.permissionLevel;
+
+const areMembersEqual = (prevMember: OnlineMember, nextMember: OnlineMember) =>
+  prevMember.userId === nextMember.userId &&
+  prevMember.name === nextMember.name &&
+  prevMember.permissionLevel === nextMember.permissionLevel &&
+  prevMember.nickname === nextMember.nickname &&
+  prevMember.level === nextMember.level &&
+  prevMember.xp === nextMember.xp &&
+  prevMember.requiredXp === nextMember.requiredXp &&
+  prevMember.gender === nextMember.gender &&
+  prevMember.badges === nextMember.badges &&
+  prevMember.vip === nextMember.vip &&
+  prevMember.isTextMuted === nextMember.isTextMuted &&
+  prevMember.isVoiceMuted === nextMember.isVoiceMuted &&
+  prevMember.currentChannelId === nextMember.currentChannelId &&
+  prevMember.currentServerId === nextMember.currentServerId;
+
+const areUserTabPropsEqual = (prev: Readonly<UserTabProps>, next: Readonly<UserTabProps>) => {
+  if (!areUsersEqual(prev.user, next.user)) return false;
+  if (!areServersEqual(prev.server, next.server)) return false;
+  if (!areChannelsEqual(prev.channel, next.channel)) return false;
+  if (!areCurrentChannelsEqual(prev.currentChannel, next.currentChannel)) return false;
+  if (!areMembersEqual(prev.member, next.member)) return false;
+
+  if (prev.friends !== next.friends) {
+    const prevFriend = hasFriendRelation(prev.friends, prev.member.userId);
+    const nextFriend = hasFriendRelation(next.friends, next.member.userId);
+    if (prevFriend !== nextFriend) return false;
+  }
+
+  if (prev.queueUsers !== next.queueUsers) {
+    const prevQueue = isMemberInQueue(prev.queueUsers, prev.member.userId);
+    const nextQueue = isMemberInQueue(next.queueUsers, next.member.userId);
+    if (prevQueue !== nextQueue) return false;
+  }
+
+  if (didSelectionChange(prev.selectedItemId, next.selectedItemId, prev.member.userId)) return false;
+
+  return true;
+};
+
+export default React.memo(UserTabComponent, areUserTabPropsEqual);

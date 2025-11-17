@@ -33,7 +33,7 @@ interface QueueMemberTabProps {
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friends, server, channel, queueMember, selectedItemId, setSelectedItemId }) => {
+const QueueMemberTabComponent: React.FC<QueueMemberTabProps> = ({ user, friends, server, channel, queueMember, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -79,6 +79,9 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
     if (memberIsTextMuted) return 'no-text';
     return '';
   }, [isSpeaking, memberIsTextMuted, isMuted, memberIsVoiceMuted, isControlled]);
+  const parsedBadges = useMemo(() => JSON.parse(memberBadges), [memberBadges]);
+  const selectedKey = `queue-${memberUserId}`;
+  const isSelected = selectedItemId === selectedKey;
 
   // Handlers
   const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
@@ -135,10 +138,10 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
 
   return (
     <div
-      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `queue-${memberUserId}` ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['user-tab']} ${isSelected ? styles['selected'] : ''}`}
       onClick={() => {
-        if (selectedItemId === `queue-${memberUserId}`) setSelectedItemId(null);
-        else setSelectedItemId(`queue-${memberUserId}`);
+        if (isSelected) setSelectedItemId(null);
+        else setSelectedItemId(selectedKey);
       }}
       onMouseEnter={(e) => {
         const x = e.currentTarget.getBoundingClientRect().right;
@@ -321,12 +324,67 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
       <div className={`${styles['user-queue-position']}`}>{memberPosition + 1}.</div>
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
-      <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
+      <BadgeList badges={parsedBadges} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}
     </div>
   );
-});
+};
 
-QueueMemberTab.displayName = 'QueueMemberTab';
+QueueMemberTabComponent.displayName = 'QueueMemberTab';
 
-export default QueueMemberTab;
+const hasFriendRelation = (friends: Friend[], memberId: User['userId']) =>
+  friends.some((friend) => friend.targetId === memberId && friend.relationStatus === 2);
+
+const areUsersBasicEqual = (prevUser: User, nextUser: User) =>
+  prevUser.userId === nextUser.userId && prevUser.permissionLevel === nextUser.permissionLevel;
+
+const areServersBasicEqual = (prevServer: Server, nextServer: Server) =>
+  prevServer.serverId === nextServer.serverId &&
+  prevServer.permissionLevel === nextServer.permissionLevel &&
+  prevServer.lobbyId === nextServer.lobbyId;
+
+const areChannelsBasicEqual = (prevChannel: Channel, nextChannel: Channel) =>
+  prevChannel.channelId === nextChannel.channelId &&
+  prevChannel.categoryId === nextChannel.categoryId &&
+  prevChannel.permissionLevel === nextChannel.permissionLevel;
+
+const areQueueMembersEqual = (prevMember: QueueUser & OnlineMember, nextMember: QueueUser & OnlineMember) =>
+  prevMember.userId === nextMember.userId &&
+  prevMember.name === nextMember.name &&
+  prevMember.permissionLevel === nextMember.permissionLevel &&
+  prevMember.nickname === nextMember.nickname &&
+  prevMember.gender === nextMember.gender &&
+  prevMember.badges === nextMember.badges &&
+  prevMember.vip === nextMember.vip &&
+  prevMember.isTextMuted === nextMember.isTextMuted &&
+  prevMember.isVoiceMuted === nextMember.isVoiceMuted &&
+  prevMember.currentServerId === nextMember.currentServerId &&
+  prevMember.currentChannelId === nextMember.currentChannelId &&
+  prevMember.position === nextMember.position &&
+  prevMember.leftTime === nextMember.leftTime &&
+  prevMember.isQueueControlled === nextMember.isQueueControlled;
+
+const didQueueSelectionChange = (prevSelectedId: string | null, nextSelectedId: string | null, memberId: User['userId']) => {
+  const prevSelected = prevSelectedId === `queue-${memberId}`;
+  const nextSelected = nextSelectedId === `queue-${memberId}`;
+  return prevSelected !== nextSelected;
+};
+
+const areQueueMemberTabPropsEqual = (prev: Readonly<QueueMemberTabProps>, next: Readonly<QueueMemberTabProps>) => {
+  if (!areUsersBasicEqual(prev.user, next.user)) return false;
+  if (!areServersBasicEqual(prev.server, next.server)) return false;
+  if (!areChannelsBasicEqual(prev.channel, next.channel)) return false;
+  if (!areQueueMembersEqual(prev.queueMember, next.queueMember)) return false;
+
+  if (prev.friends !== next.friends) {
+    const prevFriend = hasFriendRelation(prev.friends, prev.queueMember.userId);
+    const nextFriend = hasFriendRelation(next.friends, next.queueMember.userId);
+    if (prevFriend !== nextFriend) return false;
+  }
+
+  if (didQueueSelectionChange(prev.selectedItemId, next.selectedItemId, prev.queueMember.userId)) return false;
+
+  return true;
+};
+
+export default React.memo(QueueMemberTabComponent, areQueueMemberTabPropsEqual);

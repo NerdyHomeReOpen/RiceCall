@@ -73,6 +73,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [section, setSection] = useState<number>(0);
   const [selectedAnnouncementCategory, setSelectedAnnouncementCategory] = useState<Announcement['category']>('all');
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
+  const [isPreloading, setIsPreloading] = useState<boolean>(false);
 
   // Variables
   const { userId, currentServerId } = user;
@@ -228,8 +229,27 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     return () => unsubscribe.forEach((unsub) => unsub());
   }, [handleServerSearch, handleDeepLink]);
 
+  useEffect(() => {
+    if (loadingBox.isLoading) {
+      setIsPreloading(true);
+      return;
+    }
+    if (!display) {
+      setIsPreloading(false);
+    }
+  }, [loadingBox.isLoading, display]);
+
+  const shouldRender = display || isPreloading;
+  const hiddenDuringPreloadStyle: React.CSSProperties = {
+    visibility: 'hidden',
+    pointerEvents: 'none',
+    position: 'absolute',
+    inset: 0,
+  };
+  const rootStyle: React.CSSProperties | undefined = display ? undefined : isPreloading ? hiddenDuringPreloadStyle : { display: 'none' };
+
   return (
-    <main className={homePage['home']} style={display ? {} : { display: 'none' }}>
+    <main className={homePage['home']} style={rootStyle} aria-hidden={!display}>
       {/* Header */}
       <header className={homePage['home-header']}>
         <div className={homePage['left']}>

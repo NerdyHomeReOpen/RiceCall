@@ -35,8 +35,19 @@ interface ChannelTabProps {
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const ChannelTab: React.FC<ChannelTabProps> = React.memo(
-  ({ user, friends, server, serverOnlineMembers, channel, currentChannel, queueUsers, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+const ChannelTabComponent: React.FC<ChannelTabProps> = ({
+  user,
+  friends,
+  server,
+  serverOnlineMembers,
+  channel,
+  currentChannel,
+  queueUsers,
+  expanded,
+  selectedItemId,
+  setExpanded,
+  setSelectedItemId,
+}) => {
     // Hooks
     const { t } = useTranslation();
     const contextMenu = useContextMenu();
@@ -70,9 +81,15 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
       [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
     );
+    const isExpanded = expanded[channelId] ?? false;
     const filteredChannelMembers = useMemo(
-      () => channelMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
-      [channelMembers],
+      () =>
+        !isExpanded
+          ? []
+          : channelMembers
+              .filter(Boolean)
+              .sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
+      [channelMembers, isExpanded],
     );
 
     // Handlers
@@ -253,16 +270,16 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           }}
         >
           <div
-            className={`${styles['tab-icon']} ${expanded[channelId] ? styles['expanded'] : ''} ${isLobby ? styles['lobby'] : styles[channelVisibility]}`}
+            className={`${styles['tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${isLobby ? styles['lobby'] : styles[channelVisibility]}`}
             onClick={() => setExpanded((prev) => ({ ...prev, [channelId]: !prev[channelId] }))}
           />
           <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{isLobby ? t(`${channelName}`) : channelName}</div>
           {!isReadonlyChannel && <div className={styles['channel-user-count-text']}>{`(${channelMembers.length}${channelUserLimit > 0 ? `/${channelUserLimit}` : ''})`}</div>}
-          {isInChannel && !expanded[channelId] && <div className={styles['my-location-icon']} />}
+          {isInChannel && !isExpanded && <div className={styles['my-location-icon']} />}
         </div>
 
         {/* Expanded Sections */}
-        <div className={styles['user-list']} style={expanded[channelId] ? {} : { display: 'none' }}>
+        <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
           {filteredChannelMembers.map((member) => (
             <UserTab
               key={member.userId}
@@ -281,9 +298,27 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         </div>
       </>
     );
-  },
-);
+  };
 
-ChannelTab.displayName = 'ChannelTab';
+const getExpandedState = (expanded: Record<string, boolean>, channelId: string) => expanded[channelId] ?? false;
 
-export default ChannelTab;
+const areChannelTabPropsEqual = (prev: Readonly<ChannelTabProps>, next: Readonly<ChannelTabProps>) => {
+  if (prev.user !== next.user) return false;
+  if (prev.friends !== next.friends) return false;
+  if (prev.server !== next.server) return false;
+  if (prev.serverOnlineMembers !== next.serverOnlineMembers) return false;
+  if (prev.channel !== next.channel) return false;
+  if (prev.currentChannel !== next.currentChannel) return false;
+  if (prev.queueUsers !== next.queueUsers) return false;
+  if (prev.selectedItemId !== next.selectedItemId) return false;
+
+  const prevExpanded = getExpandedState(prev.expanded, prev.channel.channelId);
+  const nextExpanded = getExpandedState(next.expanded, next.channel.channelId);
+  if (prevExpanded !== nextExpanded) return false;
+
+  return true;
+};
+
+ChannelTabComponent.displayName = 'ChannelTab';
+
+export default React.memo(ChannelTabComponent, areChannelTabPropsEqual);

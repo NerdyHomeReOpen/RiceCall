@@ -73,10 +73,19 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
       [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
     );
-    const filteredCategoryChannels = useMemo(() => categoryChannels.filter(Boolean).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [categoryChannels]);
+    const isExpanded = expanded[categoryId] ?? false;
+    const filteredCategoryChannels = useMemo(
+      () => categoryChannels.filter(Boolean).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
+      [categoryChannels],
+    );
     const filteredCategoryMembers = useMemo(
-      () => categoryMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
-      [categoryMembers],
+      () =>
+        !isExpanded
+          ? []
+          : categoryMembers
+              .filter(Boolean)
+              .sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
+      [categoryMembers, isExpanded],
     );
 
     // Handlers
@@ -258,16 +267,16 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           }}
         >
           <div
-            className={`${styles['tab-icon']} ${expanded[categoryId] ? styles['expanded'] : ''} ${styles[categoryVisibility]}`}
+            className={`${styles['tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[categoryVisibility]}`}
             onClick={() => setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }))}
           />
           <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{categoryName}</div>
           {!isReadonlyChannel && <div className={styles['channel-user-count-text']}>{`(${categoryMembers.length}${categoryUserLimit > 0 ? `/${categoryUserLimit}` : ''})`}</div>}
-          {!expanded[categoryId] && isInCategory && <div className={styles['my-location-icon']} />}
+          {!isExpanded && isInCategory && <div className={styles['my-location-icon']} />}
         </div>
 
         {/* Expanded Sections */}
-        <div className={styles['user-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
+        <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
           {filteredCategoryMembers.map((member) => (
             <UserTab
               key={member.userId}
@@ -284,7 +293,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             />
           ))}
         </div>
-        <div className={styles['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
+        <div className={styles['channel-list']} style={isExpanded ? {} : { display: 'none' }}>
           {filteredCategoryChannels.map((channel) => (
             <ChannelTab
               key={channel.channelId}
