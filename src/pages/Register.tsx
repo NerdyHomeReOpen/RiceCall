@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 
 // Types
@@ -13,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import auth from '@/services/auth.service';
 
 // Utils
-import { handleOpenAlertDialog } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenErrorDialog } from '@/utils/popup';
 
 interface FormErrors {
   general?: string;
@@ -74,7 +75,7 @@ interface RegisterPageProps {
   setSection: (section: 'login' | 'register') => void;
 }
 
-const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSection }) => {
+const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display, setSection }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -192,12 +193,19 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
       }));
       return;
     }
+
     setIsLoading(true);
-    if (await auth.register(formData)) {
-      handleOpenAlertDialog(t('register-success', { '0': formData.email }), () => {
+
+    const res = await auth.register(formData).catch((error) => {
+      handleOpenErrorDialog(t(error.message), () => {});
+      return { success: false } as { success: false };
+    });
+    if (res.success) {
+      handleOpenAlertDialog(t(res.message, { '0': formData.email }), () => {
         setSection('login');
       });
     }
+
     setIsLoading(false);
   };
 
@@ -327,6 +335,8 @@ const RegisterPage: React.FC<RegisterPageProps> = React.memo(({ display, setSect
   );
 });
 
-RegisterPage.displayName = 'RegisterPage';
+RegisterPageComponent.displayName = 'RegisterPageComponent';
+
+const RegisterPage = dynamic(() => Promise.resolve(RegisterPageComponent), { ssr: false });
 
 export default RegisterPage;

@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import ErrorHandler from '@/utils/error';
-
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
 
@@ -30,6 +28,7 @@ type ApiRequestData = {
 const handleResponse = async (response: Response): Promise<any> => {
   const result = await response.json();
   if (!response.ok) throw new Error(result.message);
+  if (result.data) result.data.message = result.message || '';
   return result.data;
 };
 
@@ -49,8 +48,7 @@ const apiService = {
       if (retry && retryCount < 3) {
         return await apiService.get(endpoint, options, false, retryCount + 1);
       }
-      new ErrorHandler(error).show();
-      return null;
+      throw error;
     }
   },
 
@@ -75,8 +73,7 @@ const apiService = {
       if (retry && retryCount < 3) {
         return await apiService.post(endpoint, data, options, false, retryCount + 1);
       }
-      new ErrorHandler(error).show();
-      return null;
+      throw error;
     }
   },
 
@@ -100,8 +97,7 @@ const apiService = {
       if (retry && retryCount < 3) {
         return await apiService.patch(endpoint, data, options, false, retryCount + 1);
       }
-      new ErrorHandler(error).show();
-      return null;
+      throw error;
     }
   },
 };

@@ -8,6 +8,8 @@ import ipc from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
+
+// Utils
 import { fromTags } from '@/utils/tagConverter';
 
 // Components
@@ -40,7 +42,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
   // Handlers
   const handleSubmit = () => {
     ipc.popup.submit(submitTo);
-    handleClose();
+    ipc.window.close();
   };
 
   const handleClose = () => {

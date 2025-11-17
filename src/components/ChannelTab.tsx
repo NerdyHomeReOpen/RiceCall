@@ -82,7 +82,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
       if (!canJoin) return;
-      if (!isChannelMod(permissionLevel) && isPrivateChannel) handleOpenChannelPassword(serverId, channelId);
+      if (!isChannelMod(permissionLevel) && isPrivateChannel) handleOpenChannelPassword((password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
       else ipc.socket.send('connectChannel', { serverId, channelId });
     };
 
@@ -160,6 +160,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             handleDrop(e, serverId, channelId);
           }}
           onContextMenu={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             const { clientX: x, clientY: y } = e;
             contextMenu.showContextMenu(x, y, 'right-bottom', [
@@ -188,13 +189,13 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               {
                 id: 'create-sub-channel',
                 label: t('create-sub-channel'),
-                show: isChannelAdmin(permissionLevel) && channelCategoryId !== null && !isLobby,
+                show: !isLobby && isChannelAdmin(permissionLevel),
                 onClick: () => handleOpenCreateChannel(userId, serverId, channelCategoryId ? channelCategoryId : channelId),
               },
               {
                 id: 'delete-channel',
                 label: t('delete-channel'),
-                show: isChannelAdmin(permissionLevel) && channelCategoryId !== null && !isLobby,
+                show: !isLobby && isChannelAdmin(permissionLevel),
                 onClick: () => handleDeleteChannel(serverId, channelId),
               },
               {

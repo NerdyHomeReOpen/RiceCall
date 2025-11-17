@@ -23,7 +23,7 @@ import permission from '@/styles/permission.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenApplyFriend } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenApplyFriend, handleOpenImageCropper } from '@/utils/popup';
 import { isMember, isStaff } from '@/utils/permission';
 
 interface UserInfoPopupProps {
@@ -120,25 +120,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     ipc.socket.send('editUser', { update });
   };
 
-  const handleOpenImageCropper = (userId: User['userId'], imageData: string) => {
-    ipc.popup.open('imageCropper', 'imageCropper', { imageData, submitTo: 'imageCropper' });
-    ipc.popup.onSubmit('imageCropper', async (data) => {
-      if (data.imageDataUrl.length > 5 * 1024 * 1024) {
-        handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-        return;
-      }
-      const formData = new FormData();
-      formData.append('_type', 'user');
-      formData.append('_fileName', userId);
-      formData.append('_file', data.imageDataUrl as string);
-      const response = await api.post('/upload', formData);
-      if (response) {
-        setTarget((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
-        handleEditUser({ avatar: response.avatar, avatarUrl: response.avatarUrl });
-      }
-    });
-  };
-
   const handleMinimize = () => {
     ipc.window.minimize();
   };
@@ -233,7 +214,22 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 const file = (e.target as HTMLInputElement).files?.[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onloadend = async () => handleOpenImageCropper(userId, reader.result as string);
+                reader.onloadend = async () =>
+                  handleOpenImageCropper(reader.result as string, async (data) => {
+                    if (data.imageDataUrl.length > 5 * 1024 * 1024) {
+                      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+                      return;
+                    }
+                    const formData = new FormData();
+                    formData.append('_type', 'user');
+                    formData.append('_fileName', userId);
+                    formData.append('_file', data.imageDataUrl as string);
+                    const response = await api.post('/upload', formData);
+                    if (response) {
+                      setTarget((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
+                      handleEditUser({ avatar: response.avatar, avatarUrl: response.avatarUrl });
+                    }
+                  });
                 reader.readAsDataURL(file);
               };
               fileInput.click();

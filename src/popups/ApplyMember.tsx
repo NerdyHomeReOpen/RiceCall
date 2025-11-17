@@ -31,10 +31,12 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
   // Handlers
   const handleSendMemberApplication = (serverId: Server['serverId'], preset: Partial<MemberApplication>) => {
     ipc.socket.send('sendMemberApplication', { serverId, preset });
+    ipc.window.close();
   };
 
   const handleEditMemberApplication = (serverId: Server['serverId'], update: Partial<MemberApplication>) => {
     ipc.socket.send('editMemberApplication', { serverId, update });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -76,13 +78,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
 
       {/* Footer */}
       <div className={popup['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleSendMemberApplication(serverId, { description: applicationDesc });
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleSendMemberApplication(serverId, { description: applicationDesc })}>
           {t('submit')}
         </div>
         <div className={popup['button']} onClick={handleClose}>
@@ -98,13 +94,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
         </div>
       </div>
       <div className={popup['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleEditMemberApplication(serverId, { description: applicationDesc });
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleEditMemberApplication(serverId, { description: applicationDesc })}>
           {t('submit')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 // Types
 import type { User } from '@/types';
@@ -28,6 +28,9 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
+  // Memos
+  const canSubmit = useMemo(() => searchQuery.trim(), [searchQuery]);
+
   // Handlers
   const handleSearchUser = (query: string) => {
     ipc.socket.send('searchUser', { query });
@@ -49,6 +52,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
         else if (targetId === userId) setError(t('cannot-add-yourself'));
         else handleOpenApplyFriend(userId, targetId);
+        ipc.window.close();
       });
     },
     [userId, t],
@@ -83,7 +87,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div className={`${popup['button']} ${!searchQuery.trim() ? 'disabled' : ''}`} onClick={() => handleSearchUser(searchQuery)}>
+        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleSearchUser(searchQuery) : null)}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

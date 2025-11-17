@@ -74,7 +74,10 @@ const Auth: React.FC = React.memo(() => {
   useEffect(() => {
     const autoLogin = async () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      await auth.autoLogin();
+      const res = await auth.autoLogin();
+      if (res.success) {
+        ipc.auth.login(res.token);
+      }
     };
     autoLogin();
   }, []);

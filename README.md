@@ -3,7 +3,7 @@
   <div height="20px">　</div>
   <div>
     <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-v0.3.5-green"/>
+    <img src="https://img.shields.io/badge/Latest-v0.3.6-green"/>
     <a title="Crowdin" target="_blank" href="https://crowdin.com"><img src="https://badges.crowdin.net/rice-call/localized.svg"></a>
   </div>
 </div>
@@ -56,33 +56,41 @@ Please read the documentation before downloading.
 
 ```bash
 RiceCall
-├── public/                   # Static assets (images, icons, etc.)
+├── build_deb/                # Linux post-install scripts
+├── public/                   # Static assets (images, icons, fonts, etc.)
 ├── resources/                # Electron packaging resources
-├── src/                      # Source code
-│   ├── app/                  # Next.js pages
-│   ├── components/           # React/Electron components
-│   ├── i18n/                 # i18n files and initialization
-│   ├── providers/            # React Providers
-│   ├── services/             # API calls and data processing
-│   ├── styles/               # CSS files
-│   ├── types/                # Type definitions
+├── scripts/                  # Development and maintenance scripts
+├── src/
+│   ├── app/                  # Entry pages for the Next.js App Router
+│   ├── components/           # Reusable React components
+│   ├── extensions/           # TipTap editor extensions
+│   ├── i18n/                 # i18n initialization and translations
+│   ├── pages/                # Legacy pages integrated with Electron
+│   ├── popups/               # Popup view components
+│   ├── providers/            # React context providers
+│   ├── services/             # API and IPC service layer
+│   ├── styles/               # CSS and styling assets
+│   ├── types/                # Shared TypeScript types
 │   ├── utils/                # Utility functions
-├── .env.example              # Example environment variables
-├── .gitignore                # Git ignore rules
-├── .prettierrc               # Prettier configuration
-├── crowdin.yml               # Crowdin configuration
+│   ├── emojis.ts             # Emoji definitions
+│   └── next-env.d.ts         # Next.js environment type declarations
+├── crowdin.yml               # Crowdin localization configuration
 ├── dev-app-update.yml        # Electron auto-update configuration
-├── Dockerfile                # Docker deployment settings
+├── discord.ts                # Discord Rich Presence integration
+├── Dockerfile                # Docker deployment configuration
 ├── electron-builder.json     # Electron packaging configuration
+├── electron-builder-dev.json # Electron packaging configuration for dev builds
+├── env.ts                    # Environment variable loader
 ├── eslint.config.mjs         # ESLint configuration
+├── i18n.ts                   # i18n bootstrap for CLI/scripts
 ├── LICENSE                   # Project license
-├── main.ts                   # Electron entry point
+├── main.ts                   # Electron main-process entry point
 ├── next.config.ts            # Next.js configuration
-├── package.json              # npm/yarn dependency management
-├── README.md                 # This document
-├── tsconfig.electron.json    # TypeScript config for Electron (main.ts)
-├── tsconfig.json             # TypeScript configuration
-├── yarn.lock                 # Yarn lockfile
+├── package.json              # Dependencies and npm/yarn scripts
+├── socket.ts                 # Socket bootstrap
+├── tsconfig.electron.json    # TypeScript config for the Electron main process
+├── tsconfig.json             # TypeScript config for the renderer
+└── yarn.lock                 # Dependency lockfile
 ```
 
 ## Setting Up Local Environment
@@ -92,10 +100,13 @@ RiceCall
 ```env
 # Server Settings (All variables must be filled)
 API_URL=http://localhost:4500 # Do not include the trailing slash
-WS_URL=https://localhost:4500 # Use the same URL if your server runs locally
+WS_URL=http://localhost:4500 # Use the same URL if your server runs locally
 
 # Crowdin Settings (Optional)
-CROWDIN_DISTRIBUTION_HASH=put_your_hash_here # If omitted, local files (./src/i18n/locales/[lang]/[ns]) will be used
+CROWDIN_DISTRIBUTION_HASH= # If not provided, will use local files (./src/i18n/locales/[lang]/[ns]) instead
+
+# Update Settings (Optional)
+UPDATE_CHANNEL=latest # The channel to update the app (latest, dev)
 ```
 
 ### 2. Install dependencies

@@ -1,6 +1,5 @@
 // Services
 import api from '@/services/api.service';
-import ipc from '@/services/ipc.service';
 
 // Package
 import packageJson from '../../package.json';
@@ -20,45 +19,40 @@ interface RegisterFormData {
 }
 
 export const authService = {
-  register: async (data: RegisterFormData): Promise<boolean> => {
+  register: async (data: RegisterFormData): Promise<{ success: boolean; message: string }> => {
     const res = await api.post('/register', data);
-    return !!res;
+
+    return { success: !!res, message: res.message };
   },
 
-  login: async (data: LoginFormData): Promise<boolean> => {
+  login: async (data: LoginFormData): Promise<{ success: true; token: string } | { success: false }> => {
     const res = await api.post('/login', {
       account: data.account,
       password: data.password,
       version,
     });
-    if (!res?.token) return false;
+    if (!res?.token) return { success: false };
 
-    if (data.rememberAccount) {
-      ipc.accounts.add(data.account, data);
-    }
-    if (data.autoLogin) {
-      localStorage.setItem('token', res.token);
-    }
-
-    ipc.auth.login(res.token);
-    return true;
+    return { success: true, token: res.token };
   },
 
-  logout: () => {
+  logout: async (): Promise<boolean> => {
     localStorage.removeItem('token');
-    ipc.auth.logout();
+
     return true;
   },
 
-  autoLogin: async () => {
+  autoLogin: async (): Promise<{ success: true; token: string } | { success: false }> => {
     const token = localStorage.getItem('token');
-    if (!token) return false;
+    if (!token) return { success: false };
 
-    const res = await api.post('/token/verify', { token, version });
-    if (!res?.token) return false;
+    const res = await api.post('/token/verify', {
+      token,
+      version,
+    });
+    if (!res?.token) return { success: false };
 
-    ipc.auth.login(res.token);
-    return true;
+    return { success: true, token: res.token };
   },
 };
 

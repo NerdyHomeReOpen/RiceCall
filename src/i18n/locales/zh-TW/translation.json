@@ -413,7 +413,6 @@
   "record-setting": "錄音設定",
   "register": "註冊",
   "register-account": "註冊帳號",
-  "register-success": "帳號註冊成功，請至 {{0}} 驗證你的電子郵件以啟用帳號，帳號未啟用前將無法登入",
   "registering": "註冊中",
   "reject": "拒絕",
   "reject-all": "全部拒絕",
@@ -557,5 +556,6 @@
   "xp": "積分",
   "year": "年",
   "yesterday": "昨天",
-  "current-speaking-mode": "當前說話方式"
+  "current-speaking-mode": "當前說話方式",
+  "entertainment-groups": "娛樂語音群"
 }

@@ -88,6 +88,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     status: targetStatus,
     currentServerId: targetCurrentServerId,
     badges: targetBadges,
+    shareCurrentServer: targetShareCurrentServer,
   } = target;
   const { name: targetCurrentServerName } = targetCurrentServer || {};
 
@@ -246,11 +247,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, []);
 
   useEffect(() => {
-    if (!targetId || !targetCurrentServerId) return;
+    if (!targetId || !targetCurrentServerId || isBlocked || !isFriend || !targetShareCurrentServer) {
+      setTargetCurrentServer(null);
+      return;
+    }
     data.server({ userId: targetId, serverId: targetCurrentServerId }).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
-  }, [targetId, targetCurrentServerId]);
+  }, [targetId, targetCurrentServerId, isBlocked, isFriend, targetShareCurrentServer]);
 
   useEffect(() => {
     if (!friendState) {
@@ -306,31 +310,22 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
         {/* Main Content */}
         <div className={styles['main-content']}>
-          {isFriend && isOnline && targetCurrentServerId && (
-            <div
-              className={styles['action-area']}
-              style={targetCurrentServer ? { cursor: 'pointer' } : {}}
-              onClick={() => {
-                if (!targetCurrentServer) return;
-                handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId);
-              }}
-            >
+          {isFriend && isOnline && targetCurrentServer ? (
+            <div className={styles['action-area']} style={{ cursor: 'pointer' }} onClick={() => handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId)}>
               <div className={`${styles['action-icon']} ${styles['in-server']}`} />
               <div className={styles['action-title']}>{targetCurrentServerName}</div>
             </div>
-          )}
-          {(!isFriend || !isOnline) && (
+          ) : !isFriend || !isOnline ? (
             <div className={styles['action-area']}>
               {!isFriend && <div className={styles['action-title']}>{t('non-friend-message')}</div>}
               {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
             </div>
-          )}
-          {isVerifiedUser && ( // TODO: Official badge
+          ) : isVerifiedUser ? ( // TODO: Official badge
             <div className={styles['action-area']}>
               <div className={styles['action-icon']} />
               <div className={styles['action-title']}>{t('official-badge')}</div>
             </div>
-          )}
+          ) : null}
           <div onScroll={handleMessageAreaScroll} className={styles['message-area']}>
             <DirectMessageContent messages={directMessages} user={user} isScrollToBottom={isScrollToBottomRef.current} />
           </div>

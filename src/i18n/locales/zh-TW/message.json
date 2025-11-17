@@ -96,7 +96,7 @@
   "permission-denied": "許可權不足。",
   "receive-shake-window": "對方向您發送了一次視窗震動。",
   "register-failed": "註冊失敗，請稍後再試。",
-  "register-success": "註冊成功。",
+  "register-success": "帳號註冊成功，請至 {{0}} 驗證你的電子郵件以啟用帳號，帳號未啟用前將無法登入。若未收到驗證信件，請至[官方網站](https://ricecall.com.tw)重新發送驗證信件。",
   "reject-friend-application-failed": "拒絕好友申請失敗，請稍後再試。",
   "reject-member-application-failed": "拒絕會員申請失敗，請稍後再試。",
   "reject-member-invitation-failed": "拒絕會員邀請失敗，請稍後再試。",

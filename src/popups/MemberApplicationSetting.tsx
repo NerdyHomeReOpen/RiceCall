@@ -28,6 +28,7 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
   // Handlers
   const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
     ipc.socket.send('editServer', { serverId, update });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -52,13 +53,7 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleEditServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleEditServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote })}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

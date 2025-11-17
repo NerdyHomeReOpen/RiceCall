@@ -170,6 +170,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
       draggable={!isUser && isChannelMod(permissionLevel) && permissionLevel >= memberPermission}
       onDragStart={(e) => handleDragStart(e, memberUserId, channelId)}
       onContextMenu={(e) => {
+        e.preventDefault();
         e.stopPropagation();
         const x = e.clientX;
         const y = e.clientY;

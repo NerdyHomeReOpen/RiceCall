@@ -32,6 +32,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
   // Handlers
   const handleApproveFriendApplication = (senderId: User['userId'], friendGroupId: FriendGroup['friendGroupId'] | null, friendNote: Friend['note']) => {
     ipc.socket.send('approveFriendApplication', { senderId, friendGroupId, note: friendNote });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -95,13 +96,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleApproveFriendApplication(targetId, friendGroupId || null, friendNotes);
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleApproveFriendApplication(targetId, friendGroupId || null, friendNotes)}>
           {t('add')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

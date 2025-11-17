@@ -29,6 +29,7 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
   // Handlers
   const handleEditFriend = (targetId: User['userId'], update: Partial<Friend>) => {
     ipc.socket.send('editFriend', { targetId, update });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -49,13 +50,7 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleEditFriend(targetId, { note: friendNote });
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleEditFriend(targetId, { note: friendNote })}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

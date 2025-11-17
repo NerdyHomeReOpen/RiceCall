@@ -105,6 +105,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
   // Handlers
   const handleEditUserSetting = (update: Partial<UserSetting>) => {
     ipc.socket.send('editUserSetting', { update });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -364,7 +365,9 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
               <div className={popup['select-box']}>
                 <select value={recordFormat} onChange={(e) => setRecordFormat(e.target.value as 'wav' | 'mp3')}>
                   <option value="wav">{'WAV'}</option>
-                  <option value="mp3">{'MP3'}</option>
+                  <option value="mp3" disabled>
+                    {'MP3' + t('soon')}
+                  </option>
                 </select>
               </div>
             </div>
@@ -517,9 +520,9 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
             <div className={popup['header']}>
               <div className={popup['label']}>{t('message-history-setting')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']}`}>
-              <input name="not-save-message-history" type="checkbox" checked={notSaveMessageHistory} onChange={(e) => setNotSaveMessageHistory(e.target.checked)} />
-              <div className={popup['label']}>{t('not-save-message-history-label')}</div>
+            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+              <input name="not-save-message-history" type="checkbox" checked={true} onChange={() => setNotSaveMessageHistory(true)} />
+              <div className={popup['label']}>{t('not-save-message-history-label') + t('soon')}</div>
             </div>
           </div>
         </div>
@@ -780,12 +783,11 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
               shareFavoriteServers: !!shareFavoriteServers,
               notSaveMessageHistory: !!notSaveMessageHistory,
             });
-            handleClose();
           }}
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={() => handleClose()}>
+        <div className={popup['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

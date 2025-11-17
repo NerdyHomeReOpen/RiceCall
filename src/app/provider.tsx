@@ -87,6 +87,6 @@ const Providers = ({ children }: ProvidersProps) => {
   );
 };
 
-Providers.displayName = 'Page';
+Providers.displayName = 'Providers';
 
 export default Providers;

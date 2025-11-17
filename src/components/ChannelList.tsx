@@ -21,7 +21,7 @@ import QueueMemberTab from '@/components/QueueMemberTab';
 import ipc from '@/services/ipc.service';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenServerSetting, handleOpenEditNickname, handleOpenCreateChannel, handleOpenEditChannelOrder } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenServerSetting, handleOpenEditNickname, handleOpenCreateChannel, handleOpenEditChannelOrder, handleOpenApplyMember } from '@/utils/popup';
 import { isMember, isServerAdmin, isStaff } from '@/utils/permission';
 
 interface ChannelListProps {
@@ -86,9 +86,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     ipc.socket.send('favoriteServer', { serverId });
   };
 
-  const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
+  const handleApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
     if (!serverReceiveApply) handleOpenAlertDialog(t('cannot-apply-member'), () => {});
-    else ipc.popup.open('applyMember', 'applyMember', { userId, serverId });
+    else handleOpenApplyMember(userId, serverId);
   };
 
   const handleLocateUser = () => {
@@ -148,7 +148,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                       label: t('apply-member'),
                       show: !isMember(permissionLevel),
                       icon: 'applyMember',
-                      onClick: () => handleOpenApplyMember(userId, serverId),
+                      onClick: () => handleApplyMember(userId, serverId),
                     },
                     {
                       id: 'member-management',
@@ -242,6 +242,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
       <div
         className={styles['scroll-view']}
         onContextMenu={(e) => {
+          e.preventDefault();
           const { clientX: x, clientY: y } = e;
           contextMenu.showContextMenu(x, y, 'right-bottom', [
             {

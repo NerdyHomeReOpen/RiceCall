@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
@@ -9,6 +10,7 @@ import ipc from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
+import { handleOpenErrorDialog } from '@/utils/popup';
 
 interface FormDatas {
   account: string;
@@ -22,7 +24,7 @@ interface LoginPageProps {
   setSection: (section: 'login' | 'register') => void;
 }
 
-const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection }) => {
+const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setSection }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -81,16 +83,34 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
 
   const handleSubmit = async () => {
     if (!formData.account || !formData.password) return;
+
     setIsLoading(true);
-    if (await auth.login(formData)) {
+
+    const res = await auth.login(formData).catch((error) => {
+      handleOpenErrorDialog(t(error.message), () => {});
+      return { success: false } as { success: false };
+    });
+    if (res.success) {
+      if (formData.rememberAccount) {
+        ipc.accounts.add(formData.account, formData);
+      }
+      if (formData.autoLogin) {
+        localStorage.setItem('token', res.token);
+      }
       localStorage.setItem('login-account', formData.account);
+      ipc.auth.login(res.token);
       setSection('login');
     }
+
     setIsLoading(false);
   };
 
   const handleDeleteAccount = (account: string) => {
     ipc.accounts.delete(account);
+  };
+
+  const handleForgotPassword = () => {
+    window.open('https://ricecall.com.tw/forget', '_blank');
   };
 
   // Effects
@@ -211,12 +231,7 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
         <div className={styles['create-account']} onClick={() => setSection('register')}>
           {t('register-account')}
         </div>
-        <div
-          className={styles['forget-password']}
-          onClick={() => {
-            /*TODO: handleForgotPassword() */
-          }}
-        >
+        <div className={styles['forget-password']} onClick={() => handleForgotPassword()}>
           {t('forgot-password')}
         </div>
       </div>
@@ -224,6 +239,8 @@ const LoginPage: React.FC<LoginPageProps> = React.memo(({ display, setSection })
   );
 });
 
-LoginPage.displayName = 'LoginPage';
+LoginPageComponent.displayName = 'LoginPageComponent';
+
+const LoginPage = dynamic(() => Promise.resolve(LoginPageComponent), { ssr: false });
 
 export default LoginPage;

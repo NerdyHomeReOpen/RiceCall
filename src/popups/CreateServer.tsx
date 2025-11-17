@@ -16,7 +16,7 @@ import ipc from '@/services/ipc.service';
 import api from '@/services/api.service';
 
 // Utils
-import { handleOpenAlertDialog } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenImageCropper } from '@/utils/popup';
 import Default from '@/utils/default';
 
 interface CreateServerPopupProps {
@@ -57,29 +57,11 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   // Handlers
   const handleCreateServer = (preset: Partial<Server>) => {
     ipc.socket.send('createServer', { preset });
+    ipc.window.close();
   };
 
   const handleClose = () => {
     ipc.window.close();
-  };
-
-  const handleOpenImageCropper = (serverId: Server['serverId'], imageData: string) => {
-    ipc.popup.open('imageCropper', 'imageCropper', { imageData: imageData, submitTo: 'imageCropper' });
-    ipc.popup.onSubmit('imageCropper', async (data) => {
-      if (data.imageDataUrl.length > 5 * 1024 * 1024) {
-        handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-        return;
-      }
-      const formData = new FormData();
-      formData.append('_type', 'server');
-      formData.append('_fileName', serverId);
-      formData.append('_file', data.imageDataUrl as string);
-      const response = await api.post('/upload', formData);
-      if (response) {
-        setServerAvatar(response.avatar);
-        setServerAvatarUrl(response.avatarUrl);
-      }
-    });
   };
 
   return (
@@ -143,7 +125,22 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                   const file = e.target.files?.[0];
                   if (!file) return;
                   const reader = new FileReader();
-                  reader.onloadend = () => handleOpenImageCropper(serverAvatar, reader.result as string);
+                  reader.onloadend = () =>
+                    handleOpenImageCropper(reader.result as string, async (data) => {
+                      if (data.imageDataUrl.length > 5 * 1024 * 1024) {
+                        handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+                        return;
+                      }
+                      const formData = new FormData();
+                      formData.append('_type', 'server');
+                      formData.append('_fileName', serverAvatar);
+                      formData.append('_file', data.imageDataUrl as string);
+                      const response = await api.post('/upload', formData);
+                      if (response) {
+                        setServerAvatar(response.avatar);
+                        setServerAvatarUrl(response.avatarUrl);
+                      }
+                    });
                   reader.readAsDataURL(file);
                 }}
               />
@@ -181,16 +178,17 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
           </div>
           <div
             className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-            onClick={() => {
-              handleCreateServer({
-                name: serverName,
-                avatar: serverAvatar,
-                avatarUrl: serverAvatarUrl,
-                slogan: serverSlogan,
-                type: serverType,
-              });
-              handleClose();
-            }}
+            onClick={() =>
+              canSubmit
+                ? handleCreateServer({
+                    name: serverName,
+                    avatar: serverAvatar,
+                    avatarUrl: serverAvatarUrl,
+                    slogan: serverSlogan,
+                    type: serverType,
+                  })
+                : null
+            }
           >
             {t('confirm')}
           </div>

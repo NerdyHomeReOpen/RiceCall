@@ -73,6 +73,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       <div
         className={`${styles['header']}`}
         onContextMenu={(e) => {
+          e.preventDefault();
           e.stopPropagation();
           const { clientX: x, clientY: y } = e;
           contextMenu.showContextMenu(x, y, 'right-bottom', [

@@ -86,7 +86,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     const handleConnectChannel = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
       if (!canJoin) return;
-      if (!isChannelMod(permissionLevel) && isPrivateChannel) handleOpenChannelPassword(serverId, channelId);
+      if (!isChannelMod(permissionLevel) && isPrivateChannel) handleOpenChannelPassword((password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
       else ipc.socket.send('connectChannel', { serverId, channelId });
     };
 
@@ -164,6 +164,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             handleDrop(e, serverId, categoryId);
           }}
           onContextMenu={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             const x = e.clientX;
             const y = e.clientY;

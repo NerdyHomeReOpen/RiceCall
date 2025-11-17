@@ -128,7 +128,7 @@ const store = new Store<StoreType>({
     // Mix settings
     inputAudioDevice: '',
     outputAudioDevice: '',
-    recordFormat: 'mp3',
+    recordFormat: 'wav',
     mixEffect: false,
     mixEffectType: '',
     autoMixSetting: false,
@@ -579,11 +579,11 @@ function configureAutoUpdater() {
     console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, env.UPDATE_CHANNEL);
     autoUpdater
       .checkForUpdates()
+      .then(() => {
+        isUpdateNotified = true;
+      })
       .catch((error) => {
         console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
-      })
-      .finally(() => {
-        isUpdateNotified = true;
       });
   }
 
@@ -855,8 +855,8 @@ app.on('ready', async () => {
       dontShowDisclaimer: store.get('dontShowDisclaimer'),
       font: store.get('font'),
       fontSize: store.get('fontSize'),
-      inputAudioDevice: store.get('audioInputDevice'),
-      outputAudioDevice: store.get('audioOutputDevice'),
+      inputAudioDevice: store.get('inputAudioDevice'),
+      outputAudioDevice: store.get('outputAudioDevice'),
       recordFormat: store.get('recordFormat'),
       mixEffect: store.get('mixEffect'),
       mixEffectType: store.get('mixEffectType'),
@@ -932,11 +932,11 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('get-input-audio-device', (event) => {
-    event.returnValue = store.get('audioInputDevice');
+    event.returnValue = store.get('inputAudioDevice');
   });
 
   ipcMain.on('get-output-audio-device', (event) => {
-    event.returnValue = store.get('audioOutputDevice');
+    event.returnValue = store.get('outputAudioDevice');
   });
 
   ipcMain.on('get-record-format', (event) => {
@@ -1107,21 +1107,21 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-input-audio-device', (_, deviceId) => {
-    store.set('audioInputDevice', deviceId ?? '');
+    store.set('inputAudioDevice', deviceId ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('input-audio-device', deviceId);
     });
   });
 
   ipcMain.on('set-output-audio-device', (_, deviceId) => {
-    store.set('audioOutputDevice', deviceId ?? '');
+    store.set('outputAudioDevice', deviceId ?? '');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('output-audio-device', deviceId);
     });
   });
 
   ipcMain.on('set-record-format', (_, format) => {
-    store.set('recordFormat', format ?? 'mp3');
+    store.set('recordFormat', format ?? 'wav');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('record-format', format);
     });

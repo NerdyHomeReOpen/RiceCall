@@ -39,10 +39,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
   // Handlers
   const handleSendFriendApplication = (receiverId: User['userId'], preset: Partial<FriendApplication>, friendGroupId: FriendGroup['friendGroupId'] | null) => {
     ipc.socket.send('sendFriendApplication', { receiverId, preset, friendGroupId });
+    ipc.window.close();
   };
 
   const handleEditFriendApplication = (receiverId: User['userId'], update: Partial<FriendApplication>) => {
     ipc.socket.send('editFriendApplication', { receiverId, update });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -124,13 +126,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
 
       {/* Footer */}
       <div className={popup['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleSendFriendApplication(targetId, { description: applicationDesc }, friendGroupId || null);
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleSendFriendApplication(targetId, { description: applicationDesc }, friendGroupId || null)}>
           {t('submit')}
         </div>
         <div className={popup['button']} onClick={handleClose}>
@@ -146,13 +142,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
         </div>
       </div>
       <div className={popup['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
-        <div
-          className={popup['button']}
-          onClick={() => {
-            handleEditFriendApplication(targetId, { description: applicationDesc });
-            handleClose();
-          }}
-        >
+        <div className={popup['button']} onClick={() => handleEditFriendApplication(targetId, { description: applicationDesc })}>
           {t('submit')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

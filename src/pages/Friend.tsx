@@ -178,8 +178,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
 
 FriendPageComponent.displayName = 'FriendPageComponent';
 
-const FriendPage = dynamic(() => Promise.resolve(FriendPageComponent), {
-  ssr: false,
-});
+const FriendPage = dynamic(() => Promise.resolve(FriendPageComponent), { ssr: false });
 
 export default FriendPage;

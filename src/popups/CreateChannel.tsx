@@ -37,6 +37,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
   // Handlers
   const handleCreateChannel = (serverId: Server['serverId'], preset: Partial<Channel>) => {
     ipc.socket.send('createChannel', { serverId, preset });
+    ipc.window.close();
   };
 
   const handleClose = () => {
@@ -63,10 +64,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
       <div className={popup['popup-footer']}>
         <div
           className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
-            handleCreateChannel(serverId, { name: channelName, categoryId: parentChannelId || null });
-            handleClose();
-          }}
+          onClick={() => (canSubmit ? handleCreateChannel(serverId, { name: channelName, categoryId: parentChannelId || null }) : null)}
         >
           {t('confirm')}
         </div>

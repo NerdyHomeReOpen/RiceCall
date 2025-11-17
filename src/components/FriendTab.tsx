@@ -19,7 +19,6 @@ import data from '@/services/data.service';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenApplyFriend, handleOpenEditFriendNote } from '@/utils/popup';
-import Default from '@/utils/default';
 
 // Components
 import BadgeList from '@/components/BadgeList';
@@ -41,7 +40,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
   const loadingBox = useLoading();
 
   // States
-  const [friendServer, setFriendServer] = useState<Server>(Default.server());
+  const [friendCurrentServer, setFriendCurrentServer] = useState<Server | null>(null);
 
   // Destructuring
   const { userId, currentServerId: userCurrentServerId } = user;
@@ -105,11 +104,11 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
   // Effects
   useEffect(() => {
     if (!targetId || !friendCurrentServerId || friendIsBlocked || !isFriend || !friendShareCurrentServer) {
-      setFriendServer(Default.server());
+      setFriendCurrentServer(null);
       return;
     }
     data.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
-      if (server) setFriendServer(server);
+      if (server) setFriendCurrentServer(server);
     });
   }, [targetId, friendCurrentServerId, friendIsBlocked, isFriend, friendShareCurrentServer]);
 
@@ -123,6 +122,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
       }}
       onDoubleClick={() => handleOpenDirectMessage(userId, targetId)}
       onContextMenu={(e) => {
+        e.preventDefault();
         const x = e.clientX;
         const y = e.clientY;
         contextMenu.showContextMenu(x, y, 'right-bottom', [
@@ -235,10 +235,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
         </div>
         {isPending ? (
           <div className={styles['signature']}>{`(${t('pending')})`}</div>
-        ) : friendServer.name && friendServer.displayId && friendServer.serverId ? (
-          <div className={`${styles['box']} ${styles['has-server']}`} onClick={() => handleServerSelect(friendServer.serverId, friendServer.displayId)}>
+        ) : friendCurrentServer ? (
+          <div className={`${styles['box']} ${styles['has-server']}`} onClick={() => handleServerSelect(friendCurrentServer.serverId, friendCurrentServer.displayId)}>
             <div className={styles['location-icon']} />
-            <div className={styles['server-name-text']}>{friendServer.name}</div>
+            <div className={styles['server-name-text']}>{friendCurrentServer.name}</div>
           </div>
         ) : (
           <div className={styles['signature']}>{friendSignature}</div>
