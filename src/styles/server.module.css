@@ -512,7 +512,7 @@
 
 .message-area {
   display: flex;
-  overflow-y: scroll;
+  overflow-y: hidden;
   padding: 10px;
   height: 100%;
 }
