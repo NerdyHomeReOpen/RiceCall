@@ -18,6 +18,7 @@ import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from
 import authService from './auth.service.js';
 import dataService from './data.service.js';
 import apiService from './api.service.js';
+import popupLoaders from './popupLoader.js';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -268,6 +269,49 @@ function isAutoLaunchEnabled(): boolean {
     console.error(`${new Date().toLocaleString()} | Get auto launch error:`, error);
     return false;
   }
+}
+
+export function getSettings() {
+  return {
+    autoLogin: store.get('autoLogin'),
+    autoLaunch: isAutoLaunchEnabled(),
+    alwaysOnTop: store.get('alwaysOnTop'),
+    statusAutoIdle: store.get('statusAutoIdle'),
+    statusAutoIdleMinutes: store.get('statusAutoIdleMinutes'),
+    statusAutoDnd: store.get('statusAutoDnd'),
+    channelUIMode: store.get('channelUIMode'),
+    closeToTray: store.get('closeToTray'),
+    dontShowDisclaimer: store.get('dontShowDisclaimer'),
+    font: store.get('font'),
+    fontSize: store.get('fontSize'),
+    inputAudioDevice: store.get('inputAudioDevice'),
+    outputAudioDevice: store.get('outputAudioDevice'),
+    recordFormat: store.get('recordFormat'),
+    mixEffect: store.get('mixEffect'),
+    mixEffectType: store.get('mixEffectType'),
+    autoMixSetting: store.get('autoMixSetting'),
+    echoCancellation: store.get('echoCancellation'),
+    noiseCancellation: store.get('noiseCancellation'),
+    microphoneAmplification: store.get('microphoneAmplification'),
+    manualMixMode: store.get('manualMixMode'),
+    mixMode: store.get('mixMode'),
+    speakingMode: store.get('speakingMode'),
+    defaultSpeakingKey: store.get('defaultSpeakingKey'),
+    notSaveMessageHistory: store.get('notSaveMessageHistory'),
+    hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow'),
+    hotKeyScreenshot: store.get('hotKeyScreenshot'),
+    hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume'),
+    hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume'),
+    hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker'),
+    hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone'),
+    disableAllSoundEffect: store.get('disableAllSoundEffect'),
+    enterVoiceChannelSound: store.get('enterVoiceChannelSound'),
+    leaveVoiceChannelSound: store.get('leaveVoiceChannelSound'),
+    startSpeakingSound: store.get('startSpeakingSound'),
+    stopSpeakingSound: store.get('stopSpeakingSound'),
+    receiveDirectMessageSound: store.get('receiveDirectMessageSound'),
+    receiveChannelMessageSound: store.get('receiveChannelMessageSound'),
+  };
 }
 
 // Windows
@@ -983,203 +1027,13 @@ app.on('ready', async () => {
   });
 
   // Popup handlers
-  ipcMain.on('open-popup', (_, type, id, initialData?, force = true) => {
+  ipcMain.on('open-popup', async (_, type, id, initialData?, force = true) => {
     console.log(`${new Date().toLocaleString()} | open popup`, type, id);
 
-    if (type === 'applyMember') {
-      const { userId, serverId } = initialData;
-      Promise.all([dataService.server({ userId, serverId }), dataService.memberApplication({ userId, serverId })]).then(([server, memberApplication]) => {
-        if (!server) return;
-        createPopup(type, id, { server, memberApplication }, force);
-      });
-    } else if (type === 'applyFriend') {
-      const { userId, targetId } = initialData;
-      Promise.all([
-        dataService.user({ userId: targetId }),
-        dataService.friendGroups({ userId }),
-        dataService.friendApplication({ senderId: userId, receiverId: targetId }),
-        dataService.friendApplication({ senderId: targetId, receiverId: userId }),
-      ]).then(([target, friendGroups, friendApplication, receivedFriendApplication]) => {
-        if (!target || !friendGroups) return;
-        if (!receivedFriendApplication) {
-          createPopup('applyFriend', 'applyFriend', { userId, targetId, target, friendGroups, friendApplication }, force);
-        } else {
-          createPopup('approveFriend', 'approveFriend', { targetId, friendGroups }, force);
-        }
-      });
-    } else if (type === 'approveFriend') {
-      const { userId, targetId } = initialData;
-      Promise.all([dataService.friendGroups({ userId })]).then(([friendGroups]) => {
-        if (!friendGroups) return;
-        createPopup(type, id, { targetId, friendGroups }, force);
-      });
-    } else if (type === 'blockMember') {
-      const { userId, serverId } = initialData;
-      Promise.all([dataService.member({ userId, serverId })]).then(([member]) => {
-        if (!member) return;
-        createPopup(type, id, { userId, serverId, member }, force);
-      });
-    } else if (type === 'channelSetting') {
-      const { userId, serverId, channelId } = initialData;
-      Promise.all([
-        dataService.user({ userId }),
-        dataService.server({ userId, serverId }),
-        dataService.channel({ userId, serverId, channelId }),
-        dataService.channelMembers({ serverId, channelId }),
-      ]).then(([user, server, channel, channelMembers]) => {
-        if (!user || !server || !channel || !channelMembers) return;
-        const title = channel.name ?? '';
-        createPopup(type, id, { userId, serverId, channelId, user, server, channel, channelMembers }, force, title);
-      });
-    } else if (type === 'createServer') {
-      const { userId } = initialData;
-      Promise.all([dataService.user({ userId }), dataService.servers({ userId })]).then(([user, servers]) => {
-        if (!user || !servers) return;
-        createPopup(type, id, { userId, user, servers }, force);
-      });
-    } else if (type === 'createChannel') {
-      const { userId, serverId, channelId } = initialData;
-      if (!channelId) {
-        createPopup(type, id, { userId, serverId }, force);
-      } else {
-        Promise.all([dataService.channel({ userId, serverId, channelId })]).then(([parent]) => {
-          if (!parent) return;
-          createPopup(type, id, { userId, serverId, channelId, parent }, force);
-        });
-      }
-    } else if (type === 'chatHistory') {
-      const { userId, targetId } = initialData;
-      Promise.all([dataService.user({ userId }), dataService.friend({ userId, targetId }), dataService.user({ userId: targetId })]).then(([user, friend, target]) => {
-        if (!user || !target) return;
-        const title = target.name ?? '';
-        createPopup(type, id, { userId, targetId, user, friend, target }, force, title);
-      });
-    } else if (type === 'directMessage') {
-      const { userId, targetId, event, message } = initialData;
-      Promise.all([dataService.user({ userId }), dataService.friend({ userId, targetId }), dataService.user({ userId: targetId })]).then(([user, friend, target]) => {
-        if (!user || !target) return;
-        const title = target.name ?? '';
-        createPopup(type, id, { userId, targetId, user, friend, target, event, message }, force, title);
-      });
-    } else if (type === 'editChannelOrder') {
-      const { userId, serverId } = initialData;
-      Promise.all([dataService.channels({ userId, serverId })]).then(([serverChannels]) => {
-        if (!serverChannels) return;
-        createPopup(type, id, { userId, serverId, serverChannels }, force);
-      });
-    } else if (type === 'editChannelName') {
-      const { userId, serverId, channelId } = initialData;
-      Promise.all([dataService.channel({ userId, serverId, channelId })]).then(([channel]) => {
-        if (!channel) return;
-        createPopup(type, id, { userId, serverId, channelId, channel }, force);
-      });
-    } else if (type === 'editFriendNote') {
-      const { userId, targetId } = initialData;
-      Promise.all([dataService.friend({ userId, targetId }), dataService.friendGroups({ userId })]).then(([friend, friendGroups]) => {
-        if (!friend || !friendGroups) return;
-        createPopup(type, id, { userId, targetId, friend, friendGroups }, force);
-      });
-    } else if (type === 'editFriendGroupName') {
-      const { userId, friendGroupId } = initialData;
-      Promise.all([dataService.friendGroup({ userId, friendGroupId })]).then(([friendGroup]) => {
-        if (!friendGroup) return;
-        createPopup(type, id, { userId, friendGroupId, friendGroup }, force);
-      });
-    } else if (type === 'editNickname') {
-      const { userId, serverId } = initialData;
-      Promise.all([dataService.member({ userId, serverId })]).then(([member]) => {
-        if (!member) return;
-        createPopup(type, id, { userId, serverId, member }, force);
-      });
-    } else if (type === 'friendVerification') {
-      const { userId } = initialData;
-      Promise.all([dataService.friendApplications({ receiverId: userId })]).then(([friendApplications]) => {
-        if (!friendApplications) return;
-        createPopup(type, id, { userId, friendApplications }, force);
-      });
-    } else if (type === 'inviteMember') {
-      const { userId, serverId } = initialData;
-      Promise.all([dataService.member({ userId, serverId }), dataService.memberInvitation({ serverId, receiverId: userId })]).then(([target, memberInvitation]) => {
-        if (!target) return;
-        createPopup(type, id, { userId, serverId, target, memberInvitation }, force);
-      });
-    } else if (type === 'memberApplicationSetting') {
-      const { userId, serverId } = initialData;
-      Promise.all([dataService.server({ userId, serverId })]).then(([server]) => {
-        if (!server) return;
-        createPopup(type, id, { userId, serverId, server }, force);
-      });
-    } else if (type === 'memberInvitation') {
-      const { userId } = initialData;
-      Promise.all([dataService.memberInvitations({ receiverId: userId })]).then(([memberInvitations]) => {
-        if (!memberInvitations) return;
-        createPopup(type, id, { userId, memberInvitations }, force);
-      });
-    } else if (type === 'serverSetting') {
-      const { userId, serverId } = initialData;
-      Promise.all([dataService.user({ userId }), dataService.server({ userId, serverId }), dataService.serverMembers({ serverId }), dataService.memberApplications({ serverId })]).then(
-        ([user, server, serverMembers, memberApplications]) => {
-          if (!user || !server || !serverMembers || !memberApplications) return;
-          const title = server.name ?? '';
-          createPopup(type, id, { userId, serverId, user, server, serverMembers, memberApplications }, force, title);
-        },
-      );
-    } else if (type === 'systemSetting') {
-      const { userId } = initialData;
-      const systemSettings = {
-        autoLogin: store.get('autoLogin'),
-        autoLaunch: isAutoLaunchEnabled(),
-        alwaysOnTop: store.get('alwaysOnTop'),
-        statusAutoIdle: store.get('statusAutoIdle'),
-        statusAutoIdleMinutes: store.get('statusAutoIdleMinutes'),
-        statusAutoDnd: store.get('statusAutoDnd'),
-        channelUIMode: store.get('channelUIMode'),
-        closeToTray: store.get('closeToTray'),
-        dontShowDisclaimer: store.get('dontShowDisclaimer'),
-        font: store.get('font'),
-        fontSize: store.get('fontSize'),
-        inputAudioDevice: store.get('inputAudioDevice'),
-        outputAudioDevice: store.get('outputAudioDevice'),
-        recordFormat: store.get('recordFormat'),
-        mixEffect: store.get('mixEffect'),
-        mixEffectType: store.get('mixEffectType'),
-        autoMixSetting: store.get('autoMixSetting'),
-        echoCancellation: store.get('echoCancellation'),
-        noiseCancellation: store.get('noiseCancellation'),
-        microphoneAmplification: store.get('microphoneAmplification'),
-        manualMixMode: store.get('manualMixMode'),
-        mixMode: store.get('mixMode'),
-        speakingMode: store.get('speakingMode'),
-        defaultSpeakingKey: store.get('defaultSpeakingKey'),
-        notSaveMessageHistory: store.get('notSaveMessageHistory'),
-        hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow'),
-        hotKeyScreenshot: store.get('hotKeyScreenshot'),
-        hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume'),
-        hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume'),
-        hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker'),
-        hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone'),
-        disableAllSoundEffect: store.get('disableAllSoundEffect'),
-        enterVoiceChannelSound: store.get('enterVoiceChannelSound'),
-        leaveVoiceChannelSound: store.get('leaveVoiceChannelSound'),
-        startSpeakingSound: store.get('startSpeakingSound'),
-        stopSpeakingSound: store.get('stopSpeakingSound'),
-        receiveDirectMessageSound: store.get('receiveDirectMessageSound'),
-        receiveChannelMessageSound: store.get('receiveChannelMessageSound'),
-      };
-      Promise.all([dataService.user({ userId })]).then(([user]) => {
-        if (!user) return;
-        createPopup(type, id, { userId, user, systemSettings }, force);
-      });
-    } else if (type === 'userInfo') {
-      const { userId, targetId } = initialData;
-      Promise.all([dataService.friend({ userId, targetId }), dataService.user({ userId: targetId }), dataService.servers({ userId: targetId })]).then(([friend, target, targetServers]) => {
-        if (!target || !targetServers) return;
-        const title = target.name ?? '';
-        createPopup(type, id, { userId, targetId, friend, target, targetServers }, force, title);
-      });
-    } else {
-      createPopup(type, id, initialData, force);
-    }
+    const loader = popupLoaders[type];
+    const loadedData = loader ? await loader(initialData) : initialData;
+
+    createPopup(type, id, loadedData, force);
   });
 
   ipcMain.on('close-popup', (_, id) => {
@@ -1250,47 +1104,7 @@ app.on('ready', async () => {
 
   // System settings handlers
   ipcMain.on('get-system-settings', (event) => {
-    const settings = {
-      autoLogin: store.get('autoLogin'),
-      autoLaunch: isAutoLaunchEnabled(),
-      alwaysOnTop: store.get('alwaysOnTop'),
-      statusAutoIdle: store.get('statusAutoIdle'),
-      statusAutoIdleMinutes: store.get('statusAutoIdleMinutes'),
-      statusAutoDnd: store.get('statusAutoDnd'),
-      channelUIMode: store.get('channelUIMode'),
-      closeToTray: store.get('closeToTray'),
-      dontShowDisclaimer: store.get('dontShowDisclaimer'),
-      font: store.get('font'),
-      fontSize: store.get('fontSize'),
-      inputAudioDevice: store.get('inputAudioDevice'),
-      outputAudioDevice: store.get('outputAudioDevice'),
-      recordFormat: store.get('recordFormat'),
-      mixEffect: store.get('mixEffect'),
-      mixEffectType: store.get('mixEffectType'),
-      autoMixSetting: store.get('autoMixSetting'),
-      echoCancellation: store.get('echoCancellation'),
-      noiseCancellation: store.get('noiseCancellation'),
-      microphoneAmplification: store.get('microphoneAmplification'),
-      manualMixMode: store.get('manualMixMode'),
-      mixMode: store.get('mixMode'),
-      speakingMode: store.get('speakingMode'),
-      defaultSpeakingKey: store.get('defaultSpeakingKey'),
-      notSaveMessageHistory: store.get('notSaveMessageHistory'),
-      hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow'),
-      hotKeyScreenshot: store.get('hotKeyScreenshot'),
-      hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume'),
-      hotKeyDecreaseVolume: store.get('hotKeyDecreaseVolume'),
-      hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker'),
-      hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone'),
-      disableAllSoundEffect: store.get('disableAllSoundEffect'),
-      enterVoiceChannelSound: store.get('enterVoiceChannelSound'),
-      leaveVoiceChannelSound: store.get('leaveVoiceChannelSound'),
-      startSpeakingSound: store.get('startSpeakingSound'),
-      stopSpeakingSound: store.get('stopSpeakingSound'),
-      receiveDirectMessageSound: store.get('receiveDirectMessageSound'),
-      receiveChannelMessageSound: store.get('receiveChannelMessageSound'),
-    };
-    event.returnValue = settings;
+    event.returnValue = getSettings();
   });
 
   ipcMain.on('get-auto-login', (event) => {

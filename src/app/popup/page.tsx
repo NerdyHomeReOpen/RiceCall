@@ -94,8 +94,196 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
 
 Header.displayName = 'Header';
 
+const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
+  aboutus: {
+    type: 'aboutus',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  applyFriend: {
+    type: 'applyFriend',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  applyMember: {
+    type: 'applyMember',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  approveFriend: {
+    type: 'approveFriend',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  blockMember: {
+    type: 'blockMember',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  changeTheme: {
+    type: 'changeTheme',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  channelPassword: {
+    type: 'channelPassword',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  channelSetting: {
+    type: 'channelSetting',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  createServer: {
+    type: 'createServer',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  createChannel: {
+    type: 'createChannel',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  createFriendGroup: {
+    type: 'createFriendGroup',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  dialogAlert: {
+    type: 'dialogAlert',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  dialogAlert2: {
+    type: 'dialogAlert2',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  dialogError: {
+    type: 'dialogError',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  dialogInfo: {
+    type: 'dialogInfo',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  dialogSuccess: {
+    type: 'dialogSuccess',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  dialogWarning: {
+    type: 'dialogWarning',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  directMessage: {
+    type: 'directMessage',
+    buttons: ['close', 'minimize', 'maxsize'],
+    hideHeader: false,
+  },
+  editChannelOrder: {
+    type: 'editChannelOrder',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  editChannelName: {
+    type: 'editChannelName',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  editFriendNote: {
+    type: 'editFriendNote',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  editFriendGroupName: {
+    type: 'editFriendGroupName',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  editNickname: {
+    type: 'editNickname',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  friendVerification: {
+    type: 'friendVerification',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  imageCropper: {
+    type: 'imageCropper',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  inviteMember: {
+    type: 'inviteMember',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  memberApplicationSetting: {
+    type: 'memberApplicationSetting',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  memberInvitation: {
+    type: 'memberInvitation',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  searchUser: {
+    type: 'searchUser',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  serverBroadcast: {
+    type: 'serverBroadcast',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  serverSetting: {
+    type: 'serverSetting',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  systemSetting: {
+    type: 'systemSetting',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  userInfo: {
+    type: 'userInfo',
+    buttons: ['close'],
+    hideHeader: true,
+  },
+  userSetting: {
+    type: 'userSetting',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  chatHistory: {
+    type: 'chatHistory',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+};
+
+type Popup = {
+  id: string;
+  type: PopupType;
+  title: string;
+  buttons: ('close' | 'minimize' | 'maxsize')[];
+  initialData?: any;
+  node: () => React.ReactNode | null;
+  hideHeader: boolean;
+};
+
 const Popup = React.memo(() => {
-  // Language
+  // Hooks
   const { t } = useTranslation();
 
   // States
@@ -104,81 +292,92 @@ const Popup = React.memo(() => {
   const [initialData, setInitialData] = useState<any | null>(null);
 
   // Memos
-  const { title, buttons, node, hideHeader } = useMemo<{ title: string; buttons: ('close' | 'minimize' | 'maxsize')[]; node: React.ReactNode | null; hideHeader: boolean }>(() => {
-    if (!type || !initialData) return { title: '', buttons: [], node: null, hideHeader: true };
+  const { title, buttons, node, hideHeader } = useMemo<Popup>(() => {
+    if (!id || !type || !initialData) return { id: '', type: 'dialogAlert', title: '', buttons: ['close'], node: () => null, hideHeader: true };
 
-    switch (type) {
-      case 'aboutus':
-        return { title: t('about-ricecall'), buttons: ['close'], node: <About {...initialData} />, hideHeader: false };
-      case 'applyMember':
-        return { title: t('apply-member'), buttons: ['close'], node: <ApplyMember {...initialData} />, hideHeader: false };
-      case 'applyFriend':
-        return { title: t('apply-friend'), buttons: ['close'], node: <ApplyFriend {...initialData} />, hideHeader: false };
-      case 'approveFriend':
-        return { title: t('apply-friend'), buttons: ['close'], node: <ApproveFriend {...initialData} />, hideHeader: false };
-      case 'imageCropper':
-        return { title: t('image-cropper'), buttons: ['close'], node: <ImageCropper {...initialData} />, hideHeader: false };
-      case 'blockMember':
-        return { title: t('block'), buttons: ['close'], node: <BlockMember {...initialData} />, hideHeader: false };
-      case 'changeTheme':
-        return { title: t('change-theme'), buttons: ['close'], node: <ChangeTheme {...initialData} />, hideHeader: false };
-      case 'channelPassword':
-        return { title: t('please-enter-the-channel-password'), buttons: ['close'], node: <ChannelPassword {...initialData} />, hideHeader: false };
-      case 'channelSetting':
-        return { title: initialData?.channel.name || t('edit-channel'), buttons: ['close'], node: <ChannelSetting {...initialData} />, hideHeader: false };
-      case 'createServer':
-        return { title: t('create-server'), buttons: ['close'], node: <CreateServer {...initialData} />, hideHeader: false };
-      case 'createChannel':
-        return { title: t('create-channel'), buttons: ['close'], node: <CreateChannel {...initialData} />, hideHeader: false };
-      case 'createFriendGroup':
-        return { title: t('create-friend-group'), buttons: ['close'], node: <CreateFriendGroup {...initialData} />, hideHeader: false };
-      case 'dialogAlert':
-      case 'dialogAlert2':
-        return { title: t('alert'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'ALERT' }} />, hideHeader: false };
-      case 'dialogSuccess':
-        return { title: t('success'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'SUCCESS' }} />, hideHeader: false };
-      case 'dialogWarning':
-        return { title: t('warning'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'WARNING' }} />, hideHeader: false };
-      case 'dialogError':
-        return { title: t('error'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'ERROR' }} />, hideHeader: false };
-      case 'dialogInfo':
-        return { title: t('info'), buttons: ['close'], node: <Dialog {...{ ...initialData, iconType: 'INFO' }} />, hideHeader: false };
-      case 'directMessage':
-        return { title: initialData?.target.name || t('direct-message'), buttons: ['close', 'minimize', 'maxsize'], node: <DirectMessage {...initialData} />, hideHeader: false };
-      case 'editChannelOrder':
-        return { title: t('edit-channel-order'), buttons: ['close'], node: <EditChannelOrder {...initialData} />, hideHeader: false };
-      case 'editChannelName':
-        return { title: t('edit-channel-name'), buttons: ['close'], node: <EditChannelName {...initialData} />, hideHeader: false };
-      case 'editFriendNote':
-        return { title: t('edit-friend-note'), buttons: ['close'], node: <EditFriendNote {...initialData} />, hideHeader: false };
-      case 'editFriendGroupName':
-        return { title: t('edit-friend-group-name'), buttons: ['close'], node: <EditFriendGroupName {...initialData} />, hideHeader: false };
-      case 'editNickname':
-        return { title: t('edit-nickname'), buttons: ['close'], node: <EditNickname {...initialData} />, hideHeader: false };
-      case 'friendVerification':
-        return { title: t('friend-verification'), buttons: ['close'], node: <FriendVerification {...initialData} />, hideHeader: false };
-      case 'inviteMember':
-        return { title: t('invite-member'), buttons: ['close'], node: <InviteMember {...initialData} />, hideHeader: false };
-      case 'memberApplicationSetting':
-        return { title: t('member-application-setting'), buttons: ['close'], node: <MemberApplicationSetting {...initialData} />, hideHeader: false };
-      case 'memberInvitation':
-        return { title: t('member-invitation'), buttons: ['close'], node: <MemberInvitation {...initialData} />, hideHeader: false };
-      case 'searchUser':
-        return { title: t('search-user'), buttons: ['close'], node: <SearchUser {...initialData} />, hideHeader: false };
-      case 'serverBroadcast':
-        return { title: t('server-broadcast'), buttons: ['close'], node: <ServerBroadcast {...initialData} />, hideHeader: false };
-      case 'serverSetting':
-        return { title: initialData?.server.name || t('server-setting'), buttons: ['close'], node: <ServerSetting {...initialData} />, hideHeader: false };
-      case 'systemSetting':
-        return { title: t('system-setting'), buttons: ['close'], node: <SystemSetting {...initialData} />, hideHeader: false };
-      case 'userInfo':
-        return { title: t('user-info'), buttons: ['close'], node: <UserInfo {...initialData} />, hideHeader: true };
-      case 'chatHistory':
-        return { title: t('chat-history'), buttons: ['close'], node: <ChatHistory {...initialData} />, hideHeader: false };
-      default:
-        return { title: '', buttons: [], node: null, hideHeader: true };
-    }
-  }, [type, initialData, t]);
+    const title = {
+      aboutus: t('about-ricecall'),
+      applyFriend: t('apply-friend'),
+      applyMember: t('apply-member'),
+      approveFriend: t('approve-friend'),
+      blockMember: t('block'),
+      changeTheme: t('change-theme'),
+      channelPassword: t('please-enter-the-channel-password'),
+      channelSetting: initialData?.channel?.name || t('edit-channel'),
+      createServer: t('create-server'),
+      createChannel: t('create-channel'),
+      createFriendGroup: t('create-friend-group'),
+      dialogAlert: t('alert'),
+      dialogAlert2: t('alert'),
+      dialogError: t('error'),
+      dialogInfo: t('info'),
+      dialogSuccess: t('success'),
+      dialogWarning: t('warning'),
+      directMessage: initialData?.target?.name || t('direct-message'),
+      editChannelOrder: t('edit-channel-order'),
+      editChannelName: t('edit-channel-name'),
+      editFriendNote: t('edit-friend-note'),
+      editFriendGroupName: t('edit-friend-group-name'),
+      editNickname: t('edit-nickname'),
+      friendVerification: t('friend-verification'),
+      imageCropper: t('image-cropper'),
+      inviteMember: t('invite-member'),
+      memberApplicationSetting: t('member-application-setting'),
+      memberInvitation: t('member-invitation'),
+      searchUser: t('search-user'),
+      serverBroadcast: t('server-broadcast'),
+      serverSetting: initialData?.server?.name || t('server-setting'),
+      systemSetting: t('system-setting'),
+      userInfo: t('user-info'),
+      userSetting: t('user-setting'),
+      chatHistory: t('chat-history'),
+    };
+
+    const node = {
+      aboutus: () => <About {...initialData} />,
+      applyFriend: () => <ApplyFriend {...initialData} />,
+      applyMember: () => <ApplyMember {...initialData} />,
+      approveFriend: () => <ApproveFriend {...initialData} />,
+      blockMember: () => <BlockMember {...initialData} />,
+      changeTheme: () => <ChangeTheme {...initialData} />,
+      channelPassword: () => <ChannelPassword {...initialData} />,
+      channelSetting: () => <ChannelSetting {...initialData} />,
+      createChannel: () => <CreateChannel {...initialData} />,
+      createFriendGroup: () => <CreateFriendGroup {...initialData} />,
+      createServer: () => <CreateServer {...initialData} />,
+      dialogAlert: () => <Dialog {...{ ...initialData, iconType: 'ALERT' }} />,
+      dialogAlert2: () => <Dialog {...{ ...initialData, iconType: 'ALERT' }} />,
+      dialogError: () => <Dialog {...{ ...initialData, iconType: 'ERROR' }} />,
+      dialogInfo: () => <Dialog {...{ ...initialData, iconType: 'INFO' }} />,
+      dialogSuccess: () => <Dialog {...{ ...initialData, iconType: 'SUCCESS' }} />,
+      dialogWarning: () => <Dialog {...{ ...initialData, iconType: 'WARNING' }} />,
+      directMessage: () => <DirectMessage {...initialData} />,
+      editChannelOrder: () => <EditChannelOrder {...initialData} />,
+      editChannelName: () => <EditChannelName {...initialData} />,
+      editFriendNote: () => <EditFriendNote {...initialData} />,
+      editFriendGroupName: () => <EditFriendGroupName {...initialData} />,
+      editNickname: () => <EditNickname {...initialData} />,
+      friendVerification: () => <FriendVerification {...initialData} />,
+      imageCropper: () => <ImageCropper {...initialData} />,
+      inviteMember: () => <InviteMember {...initialData} />,
+      memberApplicationSetting: () => <MemberApplicationSetting {...initialData} />,
+      memberInvitation: () => <MemberInvitation {...initialData} />,
+      searchUser: () => <SearchUser {...initialData} />,
+      serverBroadcast: () => <ServerBroadcast {...initialData} />,
+      serverSetting: () => <ServerSetting {...initialData} />,
+      systemSetting: () => <SystemSetting {...initialData} />,
+      userInfo: () => <UserInfo {...initialData} />,
+      userSetting: () => <UserInfo {...initialData} />,
+      chatHistory: () => <ChatHistory {...initialData} />,
+    };
+
+    return {
+      ...defaultPopup[type],
+      id,
+      title: title[type],
+      node: node[type],
+    };
+  }, [id, type, initialData, t]);
 
   // Effects
   useEffect(() => {
@@ -211,7 +410,7 @@ const Popup = React.memo(() => {
           titleBoxIcon={type === 'changeTheme' ? header['title-box-skin-icon'] : type === 'directMessage' ? header['title-box-direct-message-icon'] : undefined}
         />
       )}
-      {node}
+      {node && node()}
     </>
   );
 });
