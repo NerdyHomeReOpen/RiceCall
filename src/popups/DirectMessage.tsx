@@ -23,8 +23,6 @@ import LevelIcon from '@/components/LevelIcon';
 
 // Services
 import ipc from '@/services/ipc.service';
-import data from '@/services/data.service';
-import api from '@/services/api.service';
 
 // CSS
 import styles from '@/styles/directMessage.module.css';
@@ -117,7 +115,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     formData.append('_type', 'announcement');
     formData.append('_fileName', `fileName-${Date.now()}`);
     formData.append('_file', imageData);
-    const response = await api.post('/upload', formData);
+    const response = await ipc.data.upload(formData);
     if (response) {
       editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
       syncStyles();
@@ -251,7 +249,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       setTargetCurrentServer(null);
       return;
     }
-    data.server({ userId: targetId, serverId: targetCurrentServerId }).then((server) => {
+    ipc.data.server(targetId, targetCurrentServerId).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
   }, [targetId, targetCurrentServerId, isBlocked, isFriend, targetShareCurrentServer]);

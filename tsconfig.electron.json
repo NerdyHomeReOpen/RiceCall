@@ -11,6 +11,6 @@
     "outDir": "build",
     "skipLibCheck": true
   },
-  "include": ["main.ts", "i18n.ts", "socket.ts", "env.ts", "discord.ts"],
+  "include": ["main.ts", "i18n.ts", "socket.ts", "env.ts", "discord.ts", "data.service.ts", "api.service.ts", "auth.service.ts"],
   "exclude": ["node_modules"]
 }

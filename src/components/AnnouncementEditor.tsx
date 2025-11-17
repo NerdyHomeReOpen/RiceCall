@@ -21,7 +21,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import api from '@/services/api.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
 import { handleOpenAlertDialog } from '@/utils/popup';
@@ -98,7 +98,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     formData.append('_type', 'announcement');
     formData.append('_fileName', `fileName-${Date.now()}`);
     formData.append('_file', imageData);
-    const response = await api.post('/upload', formData);
+    const response = await ipc.data.upload(formData);
     if (response) {
       editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
       syncStyles();

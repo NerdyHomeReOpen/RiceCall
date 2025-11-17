@@ -15,7 +15,6 @@ import { useLoading } from '@/providers/Loading';
 
 // Services
 import ipc from '@/services/ipc.service';
-import data from '@/services/data.service';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenApplyFriend, handleOpenEditFriendNote } from '@/utils/popup';
@@ -107,7 +106,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
       setFriendCurrentServer(null);
       return;
     }
-    data.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
+    ipc.data.server(targetId, friendCurrentServerId).then((server) => {
       if (server) setFriendCurrentServer(server);
     });
   }, [targetId, friendCurrentServerId, friendIsBlocked, isFriend, friendShareCurrentServer]);

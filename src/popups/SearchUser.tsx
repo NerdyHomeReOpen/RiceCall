@@ -11,7 +11,6 @@ import popup from '@/styles/popup.module.css';
 
 // Services
 import ipc from '@/services/ipc.service';
-import data from '@/services/data.service';
 
 // Utils
 import { handleOpenApplyFriend } from '@/utils/popup';
@@ -48,7 +47,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         return;
       }
       const { userId: targetId } = args[0];
-      data.friend({ userId, targetId }).then((friend) => {
+      ipc.data.friend(userId, targetId).then((friend) => {
         if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
         else if (targetId === userId) setError(t('cannot-add-yourself'));
         else handleOpenApplyFriend(userId, targetId);

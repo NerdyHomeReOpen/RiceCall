@@ -11,10 +11,10 @@ import styles from '@/styles/register.module.css';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import auth from '@/services/auth.service';
+import ipc from '@/services/ipc.service';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenErrorDialog } from '@/utils/popup';
+import { handleOpenAlertDialog } from '@/utils/popup';
 
 interface FormErrors {
   general?: string;
@@ -196,10 +196,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     setIsLoading(true);
 
-    const res = await auth.register(formData).catch((error) => {
-      handleOpenErrorDialog(t(error.message), () => {});
-      return { success: false } as { success: false };
-    });
+    const res = await ipc.auth.register(formData.account, formData.password, formData.username);
     if (res.success) {
       handleOpenAlertDialog(t(res.message, { '0': formData.email }), () => {
         setSection('login');
