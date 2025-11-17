@@ -39,6 +39,11 @@ const CATEGORIES: Category[] = [
         label: ['taiwan-groups', 'official-groups'],
         tags: ['taiwan', 'official'],
       },
+      {
+        id: 'taiwan-entertainment-groups',
+        label: ['taiwan-groups', 'entertainment-groups'],
+        tags: ['taiwan', 'entertainment'],
+      },
     ],
   },
   {
@@ -51,6 +56,11 @@ const CATEGORIES: Category[] = [
         id: 'russia-official-groups',
         label: ['russia-groups', 'official-groups'],
         tags: ['russia', 'official'],
+      },
+      {
+        id: 'russia-entertainment-groups',
+        label: ['russia-groups', 'entertainment-groups'],
+        tags: ['russia', 'entertainment'],
       },
     ],
   },
@@ -65,6 +75,11 @@ const CATEGORIES: Category[] = [
         label: ['brazil-groups', 'official-groups'],
         tags: ['brazil', 'official'],
       },
+      {
+        id: 'brazil-entertainment-groups',
+        label: ['brazil-groups', 'entertainment-groups'],
+        tags: ['brazil', 'entertainment'],
+      },
     ],
   },
   {
@@ -78,6 +93,11 @@ const CATEGORIES: Category[] = [
         label: ['turkey-groups', 'official-groups'],
         tags: ['turkey', 'official'],
       },
+      {
+        id: 'turkey-entertainment-groups',
+        label: ['turkey-groups', 'entertainment-groups'],
+        tags: ['turkey', 'entertainment'],
+      },
     ],
   },
   {
@@ -90,6 +110,11 @@ const CATEGORIES: Category[] = [
         id: 'iran-official-groups',
         label: ['iran-groups', 'official-groups'],
         tags: ['iran', 'official'],
+      },
+      {
+        id: 'iran-entertainment-groups',
+        label: ['iran-groups', 'entertainment-groups'],
+        tags: ['iran', 'entertainment'],
       },
     ],
   },
