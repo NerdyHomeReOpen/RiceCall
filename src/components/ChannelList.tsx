@@ -67,6 +67,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((c) => !!c && !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
+  const channelMemberMap = useMemo(() => {
+    const map = new Map<string, OnlineMember[]>();
+    for (const member of serverOnlineMembers) {
+      const key = member.currentChannelId;
+      if (!key) continue;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(member);
+    }
+    return map;
+  }, [serverOnlineMembers]);
   const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
     () =>
       queueUsers
@@ -289,6 +299,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
               selectedItemId={selectedItemId}
               setExpanded={() => {}}
               setSelectedItemId={setSelectedItemId}
+              channelMemberMap={channelMemberMap}
             />
           ) : (
             filteredChannels.map((item) =>
@@ -307,6 +318,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                   selectedItemId={selectedItemId}
                   setExpanded={setExpanded}
                   setSelectedItemId={setSelectedItemId}
+                  channelMemberMap={channelMemberMap}
                 />
               ) : (
                 <ChannelTab
@@ -322,6 +334,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                   selectedItemId={selectedItemId}
                   setExpanded={setExpanded}
                   setSelectedItemId={setSelectedItemId}
+                  channelMemberMap={channelMemberMap}
                 />
               ),
             )

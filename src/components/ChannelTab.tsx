@@ -33,6 +33,7 @@ interface ChannelTabProps {
   selectedItemId: string | null;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  channelMemberMap: Map<string, OnlineMember[]>;
 }
 
 const ChannelTabComponent: React.FC<ChannelTabProps> = ({
@@ -47,6 +48,7 @@ const ChannelTabComponent: React.FC<ChannelTabProps> = ({
   selectedItemId,
   setExpanded,
   setSelectedItemId,
+  channelMemberMap,
 }) => {
     // Hooks
     const { t } = useTranslation();
@@ -66,7 +68,7 @@ const ChannelTabComponent: React.FC<ChannelTabProps> = ({
       [globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel],
     );
     const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
-    const channelMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === channelId), [serverOnlineMembers, channelId]);
+    const channelMembers = useMemo(() => channelMemberMap.get(channelId) ?? [], [channelMemberMap, channelId]);
     const channelUserIds = useMemo(() => channelMembers.map((m) => m.userId), [channelMembers]);
     const movableUserIds = useMemo(() => channelMembers.filter((m) => m.permissionLevel <= currentPermissionLevel).map((m) => m.userId), [channelMembers, currentPermissionLevel]);
     const isInChannel = useMemo(() => userCurrentChannelId === channelId, [userCurrentChannelId, channelId]);

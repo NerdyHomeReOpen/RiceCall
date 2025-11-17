@@ -35,10 +35,11 @@ interface CategoryTabProps {
   selectedItemId: string | null;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  channelMemberMap: Map<string, OnlineMember[]>;
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(
-  ({ user, friends, server, serverOnlineMembers, category, channels, currentChannel, queueUsers, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+  ({ user, friends, server, serverOnlineMembers, category, channels, currentChannel, queueUsers, expanded, selectedItemId, setExpanded, setSelectedItemId, channelMemberMap }) => {
     // Hooks
     const { t } = useTranslation();
     const contextMenu = useContextMenu();
@@ -58,7 +59,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     );
     const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
     const categoryChannels = useMemo(() => channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [channels, categoryId]);
-    const categoryMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === categoryId), [serverOnlineMembers, categoryId]);
+    const categoryMembers = useMemo(() => channelMemberMap.get(categoryId) ?? [], [channelMemberMap, categoryId]);
     const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);
     const movableUserIds = useMemo(() => categoryMembers.filter((m) => m.permissionLevel <= currentPermissionLevel).map((m) => m.userId), [categoryMembers, currentPermissionLevel]);
     const isInChannel = useMemo(() => userCurrentChannelId === categoryId, [userCurrentChannelId, categoryId]);
@@ -308,6 +309,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
               setExpanded={setExpanded}
               selectedItemId={selectedItemId}
               setSelectedItemId={setSelectedItemId}
+              channelMemberMap={channelMemberMap}
             />
           ))}
         </div>
