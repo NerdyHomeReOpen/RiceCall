@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/server.module.css';
@@ -16,6 +16,7 @@ import { useFindMeContext } from '@/providers/FindMe';
 import ChannelTab from '@/components/ChannelTab';
 import CategoryTab from '@/components/CategoryTab';
 import QueueMemberTab from '@/components/QueueMemberTab';
+import LazyRender from '@/components/common/LazyRender';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -40,6 +41,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const findMe = useFindMeContext();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // States
   const [viewType, setViewType] = useState<'all' | 'current'>('all');
@@ -138,7 +140,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
           </div>
           <div className={styles['box']}>
             <div className={styles['id-text']}>{serverDisplayId}</div>
-            <div className={styles['member-text']}>{serverOnlineMembers.length}</div>
+            <div className={styles['member-text']}>{serverOnlineMembers.length > 0 && serverOnlineMembers.length}</div>
             <div className={styles['options']}>
               <div
                 className={styles['invitation-icon']}
@@ -251,6 +253,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
       {/* Channel List */}
       <div
         className={styles['scroll-view']}
+        ref={scrollContainerRef}
         onContextMenu={(e) => {
           e.preventDefault();
           const { clientX: x, clientY: y } = e;
@@ -304,38 +307,40 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
           ) : (
             filteredChannels.map((item) =>
               item.type === 'category' ? (
-                <CategoryTab
-                  key={item.channelId}
-                  user={user}
-                  friends={friends}
-                  server={server}
-                  serverOnlineMembers={serverOnlineMembers}
-                  category={item as Category}
-                  channels={channels}
-                  currentChannel={currentChannel}
-                  queueUsers={queueUsers}
-                  expanded={expanded}
-                  selectedItemId={selectedItemId}
-                  setExpanded={setExpanded}
-                  setSelectedItemId={setSelectedItemId}
-                  channelMemberMap={channelMemberMap}
-                />
+                <LazyRender key={`category-${item.channelId}`} root={scrollContainerRef} placeholderHeight={56}>
+                  <CategoryTab
+                    user={user}
+                    friends={friends}
+                    server={server}
+                    serverOnlineMembers={serverOnlineMembers}
+                    category={item as Category}
+                    channels={channels}
+                    currentChannel={currentChannel}
+                    queueUsers={queueUsers}
+                    expanded={expanded}
+                    selectedItemId={selectedItemId}
+                    setExpanded={setExpanded}
+                    setSelectedItemId={setSelectedItemId}
+                    channelMemberMap={channelMemberMap}
+                  />
+                </LazyRender>
               ) : (
-                <ChannelTab
-                  key={item.channelId}
-                  user={user}
-                  friends={friends}
-                  server={server}
-                  serverOnlineMembers={serverOnlineMembers}
-                  channel={item as Channel}
-                  currentChannel={currentChannel}
-                  queueUsers={queueUsers}
-                  expanded={expanded}
-                  selectedItemId={selectedItemId}
-                  setExpanded={setExpanded}
-                  setSelectedItemId={setSelectedItemId}
-                  channelMemberMap={channelMemberMap}
-                />
+                <LazyRender key={`channel-${item.channelId}`} root={scrollContainerRef} placeholderHeight={48}>
+                  <ChannelTab
+                    user={user}
+                    friends={friends}
+                    server={server}
+                    serverOnlineMembers={serverOnlineMembers}
+                    channel={item as Channel}
+                    currentChannel={currentChannel}
+                    queueUsers={queueUsers}
+                    expanded={expanded}
+                    selectedItemId={selectedItemId}
+                    setExpanded={setExpanded}
+                    setSelectedItemId={setSelectedItemId}
+                    channelMemberMap={channelMemberMap}
+                  />
+                </LazyRender>
               ),
             )
           )}
