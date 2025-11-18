@@ -215,7 +215,7 @@ const ipcService = {
 
     upload: async (formData: FormData): Promise<any | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-upload', formData);
+      return await ipcRenderer.invoke('data-upload', formData.get('_type'), formData.get('_fileName'), formData.get('_file'));
     },
   },
 

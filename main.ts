@@ -937,7 +937,11 @@ app.on('ready', async () => {
     });
   });
 
-  ipcMain.handle('data-upload', async (_, formData: FormData) => {
+  ipcMain.handle('data-upload', async (_, _type: string, _fileName: string, _file: string) => {
+    const formData = new FormData();
+    formData.append('_type', _type);
+    formData.append('_fileName', _fileName);
+    formData.append('_file', _file);
     return await apiService.post('/upload', formData).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message }, true);
       return null;
