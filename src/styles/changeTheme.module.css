@@ -178,7 +178,7 @@
   background-color: #000;
 
   --header-image: url('/skin/57KJ57SF5Zue5oa2.jpg');
-  --main-color: #f6e6d7;
+  --main-text-color: #f6e6d7;
   --secondary-color: #000;
 }
 
@@ -187,7 +187,7 @@
   background-color: #000;
 
   --header-image: url('/skin/57SU55yf56ul5bm0.jpg');
-  --main-color: #1b71ac;
+  --main-text-color: #1b71ac;
   --secondary-color: #fff;
 }
 
@@ -196,7 +196,7 @@
   background-color: #000;
 
   --header-image: url('/skin/5Y+v5oSb6LKT5ZKq.jpg');
-  --main-color: #efd1ab;
+  --main-text-color: #efd1ab;
   --secondary-color: #000;
 }
 
@@ -205,7 +205,7 @@
   background-color: #000;
 
   --header-image: url('/skin/6YKj5LiA5bm0.jpg');
-  --main-color: #d4be99;
+  --main-text-color: #d4be99;
   --secondary-color: #000;
 }
 
@@ -214,7 +214,7 @@
   background-color: #000;
 
   --header-image: url('/skin/img_greenmood.jpg');
-  --main-color: #89c68b;
+  --main-text-color: #89c68b;
   --secondary-color: #000;
 }
 
@@ -223,7 +223,7 @@
   background-color: #000;
 
   --header-image: url('/skin/img_sunflower.jpg');
-  --main-color: #edd569;
+  --main-text-color: #edd569;
   --secondary-color: #000;
 }
 
@@ -232,7 +232,7 @@
   background-color: #000;
 
   --header-image: url('/skin/img_sunset.jpg');
-  --main-color: #7464ad;
+  --main-text-color: #7464ad;
   --secondary-color: #000;
 }
 
@@ -241,7 +241,7 @@
   background-color: #000;
 
   --header-image: url('/skin/img_colddrink.jpg');
-  --main-color: #e3908f;
+  --main-text-color: #e3908f;
   --secondary-color: #000;
 }
 
@@ -250,7 +250,7 @@
   background-color: #000;
 
   --header-image: url('/skin/img_pebble.jpg');
-  --main-color: #a4cfd5;
+  --main-text-color: #a4cfd5;
   --secondary-color: #000;
 }
 
@@ -259,7 +259,7 @@
   background-color: #000;
 
   --header-image: url('/skin/img_love.jpg');
-  --main-color: #aa7a52;
+  --main-text-color: #aa7a52;
   --secondary-color: #000;
 }
 
@@ -268,7 +268,7 @@
   background-color: #000;
 
   --header-image: url('/skin/img_hamburger.jpg');
-  --main-color: #591234;
+  --main-text-color: #591234;
   --secondary-color: #fff;
 }
 
@@ -277,7 +277,7 @@
   background-color: #000;
 
   --header-image: url('/skin/img_coastline.jpg');
-  --main-color: #313131;
+  --main-text-color: #313131;
   --secondary-color: #fff;
 }
 
@@ -286,7 +286,7 @@
   background-color: #000;
 
   --header-image: linear-gradient(to bottom, #0073c6, #0073c6);
-  --main-color: #0073c6;
+  --main-text-color: #0073c6;
   --secondary-color: #fff;
 }
 
@@ -295,7 +295,7 @@
   background-color: #000;
 
   --header-image: linear-gradient(to bottom, #6d95da, #6d95da);
-  --main-color: #6d95da;
+  --main-text-color: #6d95da;
   --secondary-color: #fff;
 }
 
@@ -304,7 +304,7 @@
   background-color: #000;
 
   --header-image: linear-gradient(to bottom, #91b719, #729714);
-  --main-color: #91b719;
+  --main-text-color: #91b719;
   --secondary-color: #fff;
 }
 
@@ -313,7 +313,7 @@
   background-color: #000;
 
   --header-image: linear-gradient(to bottom, #d7aa35, #c79c2d);
-  --main-color: #d7aa35;
+  --main-text-color: #d7aa35;
   --secondary-color: #fff;
 }
 
@@ -322,7 +322,7 @@
   background-color: #000;
 
   --header-image: linear-gradient(to bottom, #f3c89a, #edc193);
-  --main-color: #f3c89a;
+  --main-text-color: #f3c89a;
   --secondary-color: #fff;
 }
 
@@ -331,7 +331,7 @@
   background-color: #000;
 
   --header-image: linear-gradient(to bottom, #d74a33, #c8412b);
-  --main-color: #d74a33;
+  --main-text-color: #d74a33;
   --secondary-color: #fff;
 }
 
@@ -340,7 +340,7 @@
   background-color: #000;
 
   --header-image: linear-gradient(to bottom, #ae6b73, #ab6a72);
-  --main-color: #ae6b73;
+  --main-text-color: #ae6b73;
   --secondary-color: #fff;
 }
 

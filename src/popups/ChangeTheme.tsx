@@ -182,7 +182,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                             {
                               'backgroundColor': customTheme.mainColor,
                               'backgroundImage': customTheme.headerImage,
-                              '--main-color': customTheme.mainColor,
+                              '--main-text-color': customTheme.mainColor,
                               '--secondary-color': customTheme.secondaryColor,
                               '--header-image': customTheme.headerImage,
                             } as React.CSSProperties
