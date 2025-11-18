@@ -716,6 +716,7 @@ app.on('ready', async () => {
         if (res?.success) {
           token = res.token;
           isLogin = true;
+          mainWindow?.loadURL(`${BASE_URI}`);
           mainWindow?.showInactive();
           authWindow?.hide();
           connectSocket(token);
@@ -725,12 +726,14 @@ app.on('ready', async () => {
       })
       .catch((error) => {
         createPopup('dialogError', 'dialogError', { message: error.message }, true);
+        return { success: false };
       });
   });
 
   ipcMain.handle('auth-logout', async () => {
     token = '';
     isLogin = false;
+    mainWindow?.loadURL(`about:blank`);
     mainWindow?.hide();
     authWindow?.showInactive();
     disconnectSocket();
@@ -740,6 +743,7 @@ app.on('ready', async () => {
   ipcMain.handle('auth-register', async (_, account: string, password: string, username: string) => {
     return await authService.register({ account, password, username }).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message }, true);
+      return { success: false };
     });
   });
 
@@ -750,6 +754,7 @@ app.on('ready', async () => {
         if (res?.success) {
           token = res.token;
           isLogin = true;
+          mainWindow?.loadURL(`${BASE_URI}`);
           mainWindow?.showInactive();
           authWindow?.hide();
           connectSocket(token);
@@ -759,6 +764,7 @@ app.on('ready', async () => {
       })
       .catch((error) => {
         createPopup('dialogError', 'dialogError', { message: error.message }, true);
+        return { success: false };
       });
   });
 
