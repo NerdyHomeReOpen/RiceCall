@@ -136,6 +136,7 @@
   "create-server": "Create group",
   "create-sub-channel": "Add sub-channel",
   "current-channel": "Current channel",
+  "current-speaking-mode": "Current speaking style",
   "customer-service": "Customer service",
   "day": "day",
   "default-microphone": "Default Microphone",
@@ -177,6 +178,7 @@
   "enable": "Enable",
   "enter-channel-sound-label": "Enter channel",
   "entertainment": "Entertainment",
+  "entertainment-groups": "娛樂語音群",
   "entertainment-mode": "Entertainment mode",
   "entertainment-mode-description": "Original quality, stereo effect (for queued channels, karaoke etc)",
   "error": "Error",
@@ -223,6 +225,7 @@
   "guest-text-gap-time-label": "Interval between guest messages:",
   "guest-text-max-length-label": "Maximum length of guest text messages:",
   "guest-text-wait-time-label": "Wait time before guests can send messages:",
+  "has-new-message": "{{0}} 則新訊息",
   "help-center": "Help center",
   "hide-online-to-friend": "Don't show your online account",
   "home": "Home",
@@ -555,7 +558,5 @@
   "week": "Week",
   "xp": "xp",
   "year": "year",
-  "yesterday": "Yesterday",
-  "current-speaking-mode": "Current speaking style",
-  "entertainment-groups": "娛樂語音群"
+  "yesterday": "Yesterday"
 }
