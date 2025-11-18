@@ -170,8 +170,6 @@
 }
 
 .markdown-content img:not(.emoji) {
-  width: 60%;
-  height: 60%;
   max-width: 1024px;
   max-height: 1024px;
 }
