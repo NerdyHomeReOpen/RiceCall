@@ -4,6 +4,8 @@
   flex-direction: column;
   overflow: hidden;
   background-color: var(--popup-background);
+  border: 1px solid #466378;
+  border-top: unset;
 }
 
 .popup-wrapper:focus {
