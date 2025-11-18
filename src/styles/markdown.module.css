@@ -163,14 +163,17 @@
 }
 
 .markdown-content img {
-  width: 50%;
-  height: 50%;
-  max-width: 1024px;
-  max-height: 1024px;
   margin-block-start: 0;
   margin-inline: 0;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.markdown-content img:not(.emoji) {
+  width: 60%;
+  height: 60%;
+  max-width: 1024px;
+  max-height: 1024px;
 }
 
 .container {
