@@ -136,6 +136,7 @@
   "create-server": "創建語音群",
   "create-sub-channel": "新增次級頻道",
   "current-channel": "當前頻道",
+  "current-speaking-mode": "當前說話方式",
   "customer-service": "客服",
   "day": "天",
   "default-microphone": "系統默認麥克風",
@@ -177,6 +178,7 @@
   "enable": "啟用",
   "enter-channel-sound-label": "進入語音頻道",
   "entertainment": "娛樂",
+  "entertainment-groups": "娛樂語音群",
   "entertainment-mode": "娛樂模式",
   "entertainment-mode-description": "原汁原味，立體聲效（適用於排麥模式下的頻道、K歌等型活動語音）",
   "error": "錯誤",
@@ -223,6 +225,7 @@
   "guest-text-gap-time-label": "遊客每次發送文字訊息的相隔時間",
   "guest-text-max-length-label": "遊客發送文字訊息的最大長度",
   "guest-text-wait-time-label": "遊客允許發送文字訊息的等待時間",
+  "has-new-message": "{{0}} 則新訊息",
   "help-center": "幫助中心",
   "hide-online-to-friend": "對好友隱藏上線",
   "home": "首頁",
@@ -555,7 +558,5 @@
   "week": "週",
   "xp": "積分",
   "year": "年",
-  "yesterday": "昨天",
-  "current-speaking-mode": "當前說話方式",
-  "entertainment-groups": "娛樂語音群"
+  "yesterday": "昨天"
 }

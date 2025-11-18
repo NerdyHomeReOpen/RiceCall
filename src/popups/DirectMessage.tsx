@@ -112,7 +112,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       return;
     }
     const formData = new FormData();
-    formData.append('_type', 'announcement');
+    formData.append('_type', 'message');
     formData.append('_fileName', `fileName-${Date.now()}`);
     formData.append('_file', imageData);
     const response = await ipc.data.upload(formData);

@@ -160,7 +160,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
-    const [isScrollToBottom, setIsScrollToBottom] = useState<boolean>(true);
     const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
 
     // Variables
@@ -336,11 +335,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       }
     };
 
-    const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
-      const isScrollToBottom = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
-      setIsScrollToBottom(isScrollToBottom);
-    };
-
     // Effects
     useEffect(() => {
       webRTCRef.current.changeBitrate(channelBitrate);
@@ -486,7 +480,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 {/* Message Area */}
                 <div
                   className={styles['message-area']}
-                  onScroll={handleMessageAreaScroll}
                   onContextMenu={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -508,7 +501,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     ]);
                   }}
                 >
-                  <ChannelMessageContent messages={channelMessages} user={user} channel={currentChannel} server={server} isScrollToBottom={isScrollToBottom} />
+                  <ChannelMessageContent messages={channelMessages} user={user} channel={currentChannel} server={server} />
                 </div>
 
                 {/* Broadcast Area */}
