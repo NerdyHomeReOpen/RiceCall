@@ -289,6 +289,7 @@
   height: 25px;
   padding: 2px 20px 2px 8px;
   gap: 2px;
+  margin-right: 5px;
 }
 
 .channel-tab:hover {
@@ -379,6 +380,7 @@
   padding: 2px 20px 0px 23px;
   gap: 2px;
   text-shadow: 0 1px #fff;
+  margin-right: 5px;
 }
 
 .queue-list .user-tab {

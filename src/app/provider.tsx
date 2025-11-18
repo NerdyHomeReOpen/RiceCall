@@ -40,7 +40,7 @@ const Providers = ({ children }: ProvidersProps) => {
     console.info('[Theme] theme updated: ', theme);
     if (!theme) return;
     document.body.style.setProperty('--header-image', theme.headerImage, 'important');
-    document.body.style.setProperty('--main-color', theme.mainColor, 'important');
+    document.body.style.setProperty('--main-text-color', theme.mainColor, 'important');
     document.body.style.setProperty('--secondary-color', theme.secondaryColor, 'important');
   }, []);
 
