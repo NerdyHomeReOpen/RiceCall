@@ -136,6 +136,7 @@
   "create-server": "ساختن سرور",
   "create-sub-channel": "ساخت زیر چنل",
   "current-channel": "چنل کنونی",
+  "current-speaking-mode": "سبک گفتاری فعلی",
   "customer-service": "خدمات مشتریان",
   "day": "روز",
   "default-microphone": "میکروفون پیشفرض",
@@ -177,6 +178,7 @@
   "enable": "فعال کردن",
   "enter-channel-sound-label": "ورود به کانال صوتی",
   "entertainment": "سرگرمی",
+  "entertainment-groups": "娛樂語音群",
   "entertainment-mode": "حالت سرگرمی",
   "entertainment-mode-description": "صدای اصلی و استریو (مناسب برای چنل های صف، کارائوکه و سایر)",
   "error": "خطا",
@@ -223,6 +225,7 @@
   "guest-text-gap-time-label": "فاصله زمانی بین ارسال پیام‌های متنی مهمانان",
   "guest-text-max-length-label": "حداکثر طول پیام متنی مهمانان",
   "guest-text-wait-time-label": "زمان انتظار برای اجازه ارسال پیام متنی به مهمانان",
+  "has-new-message": "{{0}} 則新訊息",
   "help-center": "مرکز راهنما",
   "hide-online-to-friend": "وضعیت آنلاین خود را از دوستان پنهان کنید",
   "home": "خانه",
@@ -555,7 +558,5 @@
   "week": "هفته",
   "xp": "اعتبار",
   "year": "سال",
-  "yesterday": "دیروز",
-  "current-speaking-mode": "سبک گفتاری فعلی",
-  "entertainment-groups": "娛樂語音群"
+  "yesterday": "دیروز"
 }
