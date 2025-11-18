@@ -136,6 +136,7 @@
   "create-server": "グループを作成",
   "create-sub-channel": "サブチャンネルを追加",
   "current-channel": "現在のチャンネル",
+  "current-speaking-mode": "現在の話し方",
   "customer-service": "公式お知らせ",
   "day": "日",
   "default-microphone": "デフォルトのマイク",
@@ -177,6 +178,7 @@
   "enable": "開始",
   "enter-channel-sound-label": "チャンネルに入る",
   "entertainment": "エンターテイメント",
+  "entertainment-groups": "娛樂語音群",
   "entertainment-mode": "娯楽モード",
   "entertainment-mode-description": "オリジナル品質、ステレオ効果（キューされたチャンネル、カラオケなど）",
   "error": "受信者が必要です",
@@ -223,6 +225,7 @@
   "guest-text-gap-time-label": "ゲストメッセージの間隔",
   "guest-text-max-length-label": "ゲストのテキストメッセージの最大長",
   "guest-text-wait-time-label": "ゲストメッセージの間隔",
+  "has-new-message": "{{0}} 則新訊息",
   "help-center": "ヘルプ",
   "hide-online-to-friend": "オンラインアカウントを公開しない",
   "home": "ご注文の詳細はここをクリック",
@@ -555,7 +558,5 @@
   "week": "週",
   "xp": "クレジット",
   "year": "年",
-  "yesterday": "昨日",
-  "current-speaking-mode": "現在の話し方",
-  "entertainment-groups": "娛樂語音群"
+  "yesterday": "昨日"
 }
