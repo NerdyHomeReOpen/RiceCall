@@ -136,6 +136,7 @@
   "create-server": "Bir Ses Grubu Oluşturun",
   "create-sub-channel": "İkincil bir kanal ekleyin",
   "current-channel": "Güncel Kanal",
+  "current-speaking-mode": "Güncel konuşma tarzı",
   "customer-service": "Yardım Ekibi Üyesi",
   "day": "gün",
   "default-microphone": "Sistem varsayılan mikrofonu",
@@ -177,6 +178,7 @@
   "enable": "Olanak vermek",
   "enter-channel-sound-label": "Ses kanalına girin",
   "entertainment": "eğlence",
+  "entertainment-groups": "娛樂語音群",
   "entertainment-mode": "Eğlence modu",
   "entertainment-mode-description": "Orijinal, stereo ses efekti (mikrofon düzenleme modundaki kanallar, karaoke ve diğer aktiviteler için uygundur)",
   "error": "Hata ",
@@ -223,6 +225,7 @@
   "guest-text-gap-time-label": "Ziyaretçinin gönderdiği her kısa mesaj arasındaki zaman aralığı",
   "guest-text-max-length-label": "Ziyaretçiler tarafından gönderilen kısa mesajların maksimum uzunluğu",
   "guest-text-wait-time-label": "Ziyaretçilerin kısa mesaj göndermesine izin verilen bekleme süresi",
+  "has-new-message": "{{0}} 則新訊息",
   "help-center": "Yardım Merkezi",
   "hide-online-to-friend": "Çevrimiçi durumunuzu arkadaşlarınızdan gizleyin",
   "home": "ön sayfa",
@@ -555,7 +558,5 @@
   "week": "Hafta",
   "xp": "integral",
   "year": "yıllar",
-  "yesterday": "dün",
-  "current-speaking-mode": "Güncel konuşma tarzı",
-  "entertainment-groups": "娛樂語音群"
+  "yesterday": "dün"
 }
