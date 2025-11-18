@@ -136,6 +136,7 @@
   "create-server": "Создать группу",
   "create-sub-channel": "Создать подканал",
   "current-channel": "Текущий канал",
+  "current-speaking-mode": "Текущий режим разговора",
   "customer-service": "Поддержка пользователей",
   "day": "день",
   "default-microphone": "Микрофон по умолчанию",
@@ -177,6 +178,7 @@
   "enable": "Включить",
   "enter-channel-sound-label": "Вход в канал",
   "entertainment": "Развлечения",
+  "entertainment-groups": "娛樂語音群",
   "entertainment-mode": "Высокое",
   "entertainment-mode-description": "Для караоке, прослушивания музыки и других активностей",
   "error": "Ошибка",
@@ -223,6 +225,7 @@
   "guest-text-gap-time-label": "Время между отправкой сообщений для гостей:",
   "guest-text-max-length-label": "Максимальная длинна сообщения гостей:",
   "guest-text-wait-time-label": "Время ожидания гостей для возможности отправить сообщений:",
+  "has-new-message": "{{0}} 則新訊息",
   "help-center": "Центр поддержки",
   "hide-online-to-friend": "Не показывать, когда я online",
   "home": "Главная",
@@ -555,7 +558,5 @@
   "week": "Недели",
   "xp": "Опыт",
   "year": "год",
-  "yesterday": "Вчера",
-  "current-speaking-mode": "Текущий режим разговора",
-  "entertainment-groups": "娛樂語音群"
+  "yesterday": "Вчера"
 }
