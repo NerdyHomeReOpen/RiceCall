@@ -6,6 +6,9 @@ import styles from '@/styles/message.module.css';
 // Types
 import type { User, ChannelMessage, PromptMessage, Channel, Server } from '@/types';
 
+// Providers
+import { useTranslation } from 'react-i18next';
+
 // Components
 import ChannelMessageTab from '@/components/ChannelMessage';
 import PromptMessageTab from '@/components/PromptMessage';
@@ -20,6 +23,9 @@ interface ChannelMessageContentProps {
 }
 
 const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server }) => {
+  // Hooks
+  const { t } = useTranslation();
+
   // Refs
   const messageViewerRef = useRef<HTMLDivElement>(null);
 
@@ -104,7 +110,7 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
       </div>
       {!isAtBottom && unreadCount > 0 && (
         <div className={styles['new-message-alert']} onClick={() => handleScrollToBottom()}>
-          {unreadCount} 則新訊息
+          {t('has-new-message', { 0: unreadCount })}
         </div>
       )}
     </>
