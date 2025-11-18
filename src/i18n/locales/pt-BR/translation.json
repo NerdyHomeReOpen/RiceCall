@@ -136,6 +136,7 @@
   "create-server": "Criar grupo",
   "create-sub-channel": "Criar subcanal",
   "current-channel": "Canal atual",
+  "current-speaking-mode": "Estilo de fala atual",
   "customer-service": "Suporte ao cliente",
   "day": "dia",
   "default-microphone": "Entrada padrão",
@@ -177,6 +178,7 @@
   "enable": "Habilitar",
   "enter-channel-sound-label": "Entrar no canal",
   "entertainment": "Entretenimento",
+  "entertainment-groups": "娛樂語音群",
   "entertainment-mode": "Modo de entretenimento",
   "entertainment-mode-description": "Som estéreo autêntico (adequado para canais com modo fila, karaokê e outros eventos de voz)",
   "error": "Erro",
@@ -223,6 +225,7 @@
   "guest-text-gap-time-label": "Intervalo entre mensagens de visitantes",
   "guest-text-max-length-label": "Tamanho máximo de mensagens de visitantes",
   "guest-text-wait-time-label": "Tempo de espera para visitantes mandarem mensagens",
+  "has-new-message": "{{0}} 則新訊息",
   "help-center": "Central de Ajuda",
   "hide-online-to-friend": "Esconder status de conectado",
   "home": "Início",
@@ -555,7 +558,5 @@
   "week": "Semana",
   "xp": "Experiência",
   "year": "ano",
-  "yesterday": "Ontem",
-  "current-speaking-mode": "Estilo de fala atual",
-  "entertainment-groups": "娛樂語音群"
+  "yesterday": "Ontem"
 }
