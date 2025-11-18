@@ -38,7 +38,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const toggleSpeakerKeyRef = useRef<string>('Alt+m');
   const toggleMicrophoneKeyRef = useRef<string>('Alt+v');
   const lastActiveRef = useRef<number>(Date.now());
-  const speakingActiveRef = useRef(false);
+  const isSpeakingRef = useRef(false);
 
   // States
   const [isKeepAlive, setIsKeepAlive] = useState<boolean>(true);
@@ -61,15 +61,15 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   };
 
   const startSpeak = useCallback(() => {
-    if (speakingActiveRef.current) return;
-    speakingActiveRef.current = true;
-    webRTC.setSpeakKeyPressed(true);
+    if (isSpeakingRef.current) return;
+    isSpeakingRef.current = true;
+    webRTC.pressSpeakKey();
   }, [webRTC]);
 
   const stopSpeak = useCallback(() => {
-    if (!speakingActiveRef.current) return;
-    speakingActiveRef.current = false;
-    webRTC.setSpeakKeyPressed(false);
+    if (!isSpeakingRef.current) return;
+    isSpeakingRef.current = false;
+    webRTC.releaseSpeakKey();
   }, [webRTC]);
 
   const toggleMainWindows = useCallback(() => {

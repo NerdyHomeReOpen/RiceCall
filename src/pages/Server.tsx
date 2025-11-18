@@ -341,8 +341,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [channelBitrate]);
 
     useEffect(() => {
-      webRTCRef.current.setMicTaken(isMicTaken && !isControlled, channelId);
-      webRTCRef.current.setMixMode(false);
+      if (isMicTaken && !isControlled) webRTCRef.current.takeMic(channelId);
+      else webRTCRef.current.releaseMic();
+      webRTCRef.current.stopMixing();
     }, [isMicTaken, isControlled, channelId]);
 
     useEffect(() => {
