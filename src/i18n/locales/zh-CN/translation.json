@@ -136,6 +136,7 @@
   "create-server": "创建语音群",
   "create-sub-channel": "新增次级频道",
   "current-channel": "当前频道",
+  "current-speaking-mode": "当前说话方式",
   "customer-service": "客服",
   "day": "天",
   "default-microphone": "系统默认麦克风",
@@ -177,6 +178,7 @@
   "enable": "启用",
   "enter-channel-sound-label": "进入语音频道",
   "entertainment": "娱乐",
+  "entertainment-groups": "娛樂語音群",
   "entertainment-mode": "娱乐模式",
   "entertainment-mode-description": "原汁原味，立体声效（适用于排麦模式下的频道、K歌等型活动语音）",
   "error": "错误",
@@ -223,6 +225,7 @@
   "guest-text-gap-time-label": "游客每次发送文字讯息的相隔时间",
   "guest-text-max-length-label": "游客发送文字讯息的最大长度",
   "guest-text-wait-time-label": "游客允许发送文字讯息的等待时间",
+  "has-new-message": "{{0}} 則新訊息",
   "help-center": "帮助中心",
   "hide-online-to-friend": "对好友隐藏上线",
   "home": "首页",
@@ -555,7 +558,5 @@
   "week": "周",
   "xp": "积分",
   "year": "年",
-  "yesterday": "昨天",
-  "current-speaking-mode": "当前说话方式",
-  "entertainment-groups": "娛樂語音群"
+  "yesterday": "昨天"
 }
