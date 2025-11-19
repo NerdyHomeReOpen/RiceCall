@@ -339,6 +339,8 @@
   "non-friend-message": "If the user is not added as a friend, some features will be unavailable!",
   "non-friend-warning-message": "You are not yet friends with this user, so this feature is not available!",
   "non-online-message": "The user is currently offline and cannot respond immediately.",
+  "official-title": "本人是",
+  "is-official": "RC語音官方人員",
   "none": "None",
   "not-available-page": "The page is not open yet",
   "not-public": "This is a private channel",
