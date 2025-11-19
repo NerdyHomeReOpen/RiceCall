@@ -87,6 +87,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     currentServerId: targetCurrentServerId,
     badges: targetBadges,
     shareCurrentServer: targetShareCurrentServer,
+    isVerified: targetIsVerified,
   } = target;
   const { name: targetCurrentServerName } = targetCurrentServer || {};
 
@@ -96,7 +97,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const isFriend = useMemo(() => friendState?.relationStatus === 2, [friendState]);
   const isBlocked = useMemo(() => friendState?.isBlocked, [friendState]);
   const isOnline = useMemo(() => targetStatus !== 'offline', [targetStatus]);
-  const isVerifiedUser = useMemo(() => false, []); // TODO: Remove this after implementing
 
   // Handlers
   const syncStyles = useCallback(() => {
@@ -318,10 +318,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               {!isFriend && <div className={styles['action-title']}>{t('non-friend-message')}</div>}
               {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
             </div>
-          ) : isVerifiedUser ? ( // TODO: Official badge
+          ) : targetIsVerified ? (
             <div className={styles['action-area']}>
-              <div className={styles['action-icon']} />
-              <div className={styles['action-title']}>{t('official-badge')}</div>
+              <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
+              <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
+                <span className={styles['is-official-title']}>{t('official-title')}</span>
+                <span className={styles['is-official-text']}>{t('is-official')}</span>
+              </div>
             </div>
           ) : null}
           <div onScroll={handleMessageAreaScroll} className={styles['message-area']}>

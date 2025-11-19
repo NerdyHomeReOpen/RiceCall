@@ -176,7 +176,7 @@ export type table_servers = {
   level: number;
   wealth: number;
   receiveApply: boolean;
-  isVerified: boolean;
+  isVerified: number;
   type: 'game' | 'entertainment' | 'other';
   visibility: 'public' | 'private' | 'invisible' | 'blocked';
   lobbyId: string;
@@ -249,7 +249,7 @@ export type table_users = {
   birthYear: number;
   birthMonth: number;
   birthDay: number;
-  isVerified: boolean;
+  isVerified: number;
   status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
   gender: 'Male' | 'Female';
   currentChannelId: string | null;
