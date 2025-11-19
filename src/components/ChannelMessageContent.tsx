@@ -108,7 +108,7 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
           </div>
         ))}
       </div>
-      {!isAtBottom && unreadCount > 0 && (
+      {unreadCount > 0 && (
         <div className={styles['new-message-alert']} onClick={() => handleScrollToBottom()}>
           {t('has-new-message', { 0: unreadCount })}
         </div>
