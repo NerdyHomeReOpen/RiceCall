@@ -39,7 +39,7 @@
 .search-input-box {
   display: flex;
   flex-direction: row;
-  box-shadow: inset 1px 1px 3px #0000001a;
+  box-shadow: var(--box-shadow);
   border: 1px solid var(--border);
   background-color: var(--background);
   align-items: center;

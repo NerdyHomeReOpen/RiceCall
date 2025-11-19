@@ -59,7 +59,7 @@
   border-top: 1px solid #b4dbec;
   border-bottom: 1px solid #b4dbec;
   border-right: 1px solid #fff0;
-  background-color: var(--background);
+  background-color: var(--popup-background);
 }
 
 .header-bar {
