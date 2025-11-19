@@ -339,6 +339,8 @@
   "non-friend-message": "Karşı taraf arkadaş listenizde olmadığı için bazı fonksiyonlar kullanılamayacak!",
   "non-friend-warning-message": "Henüz karşı tarafın arkadaşı değilsiniz, bu fonksiyon kullanılamaz!",
   "non-online-message": "Diğer taraf şu anda çevrimdışı ve size hemen yanıt veremiyor",
+  "official-title": "本人是",
+  "is-official": "RC語音官方人員",
   "none": "hiçbiri",
   "not-available-page": "Bu sayfa henüz açık değil",
   "not-public": "Diğer taraf bunu kamuoyuna açıklamadı",
