@@ -339,6 +339,8 @@
   "non-friend-message": "Este usuario no está en tu lista de contactos, ¡algunas funciones no estarán disponibles!",
   "non-friend-warning-message": "¡Aún no eres contacto de esta persona, esta función no está disponible!",
   "non-online-message": "El usuario está desconectado y no puede responderte de forma inmediata",
+  "official-title": "本人是",
+  "is-official": "RC語音官方人員",
   "none": "Ninguno",
   "not-available-page": "Esta página aún no está disponible",
   "not-public": "No está publicado públicamente por el usuario",
