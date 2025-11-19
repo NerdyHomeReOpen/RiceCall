@@ -339,6 +339,8 @@
   "non-friend-message": "ユーザーが友達として追加されていない場合、一部の機能は利用できなくなります!",
   "non-friend-warning-message": "このユーザーとはまだ友達ではないので、この機能は利用できません!",
   "non-online-message": "ユーザーは現在オフラインのため、すぐに応答できません",
+  "official-title": "本人是",
+  "is-official": "RC語音官方人員",
   "none": "カテゴリ名を設定してください",
   "not-available-page": "ページはまだ開いていません",
   "not-public": "これはプライベートチャンネルです",
