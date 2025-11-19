@@ -716,7 +716,6 @@ app.on('ready', async () => {
         if (res?.success) {
           token = res.token;
           isLogin = true;
-          mainWindow?.loadURL(`${BASE_URI}`);
           mainWindow?.showInactive();
           authWindow?.hide();
           connectSocket(token);
@@ -733,7 +732,7 @@ app.on('ready', async () => {
   ipcMain.handle('auth-logout', async () => {
     token = '';
     isLogin = false;
-    mainWindow?.loadURL(`about:blank`);
+    mainWindow?.reload();
     mainWindow?.hide();
     authWindow?.showInactive();
     disconnectSocket();
@@ -754,7 +753,6 @@ app.on('ready', async () => {
         if (res?.success) {
           token = res.token;
           isLogin = true;
-          mainWindow?.loadURL(`${BASE_URI}`);
           mainWindow?.showInactive();
           authWindow?.hide();
           connectSocket(token);

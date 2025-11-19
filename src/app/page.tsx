@@ -118,6 +118,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   const handleLogout = () => {
     ipc.auth.logout();
     localStorage.removeItem('token');
+    localStorage.removeItem('userId');
   };
 
   const handleExit = () => {
@@ -566,6 +567,7 @@ const RootPageComponent: React.FC = React.memo(() => {
         if (p.id === 'logout') {
           ipc.auth.logout();
           localStorage.removeItem('token');
+          localStorage.removeItem('userId');
         }
       });
     });
