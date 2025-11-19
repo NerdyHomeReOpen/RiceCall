@@ -1,6 +1,6 @@
 :root {
   --main-color: #0073c6;
-  --main-text-color:#3790ce;
+  --main-color: #3790ce;
   --secondary-color: #fff;
   --header-image: none;
   --background: #fbfbfb;
@@ -20,7 +20,6 @@
   --text-color-senary: #a8a8a8;
   --text-color-septenary: #ccc;
   --text-color-octonary: #eee;
-  --text-color-quaternary-plus: #777;
   --text-warning: #ff0000;
   --text-link: #0059a1;
   --text-link-hover: #0059a1;
@@ -213,9 +212,11 @@ button {
 *[datatype='read-only'] {
   pointer-events: none;
   user-select: none;
+
   &:hover {
     cursor: default;
   }
+
   &:focus {
     outline: none;
   }
@@ -226,6 +227,7 @@ button {
 .has-hover-text {
   position: relative;
   cursor: pointer;
+
   &:hover {
     .hover-text {
       opacity: 1;

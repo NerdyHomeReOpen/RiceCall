@@ -15,8 +15,6 @@
 .header.popup {
   flex-direction: column;
   justify-content: center;
-  border: 1px solid #466378;
-  border-bottom: unset;
 }
 
 .header.big {
@@ -242,7 +240,7 @@
   overflow: hidden;
   white-space: nowrap;
   padding: 0 13px;
-  font-size: 15px;
+  font-size: 1.06rem;
 }
 
 .main-tabs .tab::before {
@@ -328,7 +326,7 @@
 }
 
 .main-tabs .tab.selected .tab-lable {
-  color: var(--main-text-color);
+  color: var(--main-color);
 }
 
 .main-tabs .tab.selected .tab-close {

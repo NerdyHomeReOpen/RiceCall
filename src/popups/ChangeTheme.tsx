@@ -39,7 +39,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     const clickedElement = event.currentTarget;
     const computedStyle = window.getComputedStyle(clickedElement as Element);
     const headerImage = computedStyle.getPropertyValue('--header-image');
-    const mainColor = computedStyle.getPropertyValue('--main-text-color');
+    const mainColor = computedStyle.getPropertyValue('--main-color');
     const secondaryColor = computedStyle.getPropertyValue('--secondary-color');
 
     ipc.customThemes.current.set({ headerImage, mainColor, secondaryColor });
@@ -182,7 +182,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                             {
                               'backgroundColor': customTheme.mainColor,
                               'backgroundImage': customTheme.headerImage,
-                              '--main-text-color': customTheme.mainColor,
+                              '--main-color': customTheme.mainColor,
                               '--secondary-color': customTheme.secondaryColor,
                               '--header-image': customTheme.headerImage,
                             } as React.CSSProperties
