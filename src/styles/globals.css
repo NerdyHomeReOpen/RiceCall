@@ -1,6 +1,5 @@
 :root {
   --main-color: #0073c6;
-  --main-color: #3790ce;
   --secondary-color: #fff;
   --header-image: none;
   --background: #fbfbfb;
@@ -35,8 +34,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    /* --background: #1f1f1f;
+  /* :root {
+    --background: #1f1f1f;
     --foreground: #292929;
     --sidebar: #242424;
     --border: #333;
@@ -63,8 +62,8 @@
     --text-nickname: #6e849b;
     --notify-toaster-border: #855800;
     --notify-toaster-background: #3b3b00;
-    --button-background: linear-gradient(#242424, #1f1f1f); */
-  }
+    --button-background: linear-gradient(#242424, #1f1f1f);
+  } */
 }
 
 * {
