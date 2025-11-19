@@ -32,7 +32,7 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
   blockMember: async ({ userId, serverId }: { userId: string; serverId: string }) => {
     const [member] = await Promise.all([data.member({ userId, serverId })]);
 
-    return { userId, serverId, member };
+    return { serverId, member };
   },
 
   channelSetting: async ({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) => {
@@ -114,6 +114,19 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
     const [target, memberInvitation] = await Promise.all([data.member({ userId, serverId }), data.memberInvitation({ serverId, receiverId: userId })]);
 
     return { userId, serverId, target, memberInvitation };
+  },
+
+  kickMemberFromServer: async ({ userId, serverId }: { userId: string; serverId: string }) => {
+    const [member] = await Promise.all([data.member({ userId, serverId })]);
+
+    return { serverId, member };
+  },
+
+  kickMemberFromChannel: async ({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) => {
+    const [member] = await Promise.all([data.member({ userId, serverId, channelId })]);
+    const [channel] = await Promise.all([data.channel({ userId, serverId, channelId })]);
+
+    return { serverId, channel, member };
   },
 
   memberApplicationSetting: async ({ userId, serverId }: { userId: string; serverId: string }) => {

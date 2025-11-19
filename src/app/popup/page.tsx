@@ -32,6 +32,8 @@ import EditNickname from '@/popups/EditNickname';
 import EditFriendNote from '@/popups/EditFriendNote';
 import EditFriendGroupName from '@/popups/EditFriendGroupName';
 import FriendVerification from '@/popups/FriendVerification';
+import KickMemberFromChannel from '@/popups/KickMemberFromChannel';
+import KickMemberFromServer from '@/popups/KickMemberFromServer';
 import MemberApplicationSetting from '@/popups/MemberApplicationSetting';
 import MemberInvitation from '@/popups/MemberInvitation';
 import ImageCropper from '@/popups/ImageCropper';
@@ -225,6 +227,16 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
     buttons: ['close'],
     hideHeader: false,
   },
+  kickMemberFromChannel: {
+    type: 'kickMemberFromChannel',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  kickMemberFromServer: {
+    type: 'kickMemberFromServer',
+    buttons: ['close'],
+    hideHeader: false,
+  },
   memberApplicationSetting: {
     type: 'memberApplicationSetting',
     buttons: ['close'],
@@ -321,6 +333,8 @@ const Popup = React.memo(() => {
       friendVerification: t('friend-verification'),
       imageCropper: t('image-cropper'),
       inviteMember: t('invite-member'),
+      kickMemberFromChannel: t('kick-channel'),
+      kickMemberFromServer: t('kick-server'),
       memberApplicationSetting: t('member-application-setting'),
       memberInvitation: t('member-invitation'),
       searchUser: t('search-user'),
@@ -359,6 +373,8 @@ const Popup = React.memo(() => {
       friendVerification: () => <FriendVerification {...initialData} />,
       imageCropper: () => <ImageCropper {...initialData} />,
       inviteMember: () => <InviteMember {...initialData} />,
+      kickMemberFromChannel: () => <KickMemberFromChannel {...initialData} />,
+      kickMemberFromServer: () => <KickMemberFromServer {...initialData} />,
       memberApplicationSetting: () => <MemberApplicationSetting {...initialData} />,
       memberInvitation: () => <MemberInvitation {...initialData} />,
       searchUser: () => <SearchUser {...initialData} />,

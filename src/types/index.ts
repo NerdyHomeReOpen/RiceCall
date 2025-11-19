@@ -246,6 +246,8 @@ export type PopupType =
   | 'friendVerification'
   | 'imageCropper'
   | 'inviteMember'
+  | 'kickMemberFromChannel'
+  | 'kickMemberFromServer'
   | 'memberApplicationSetting'
   | 'memberInvitation'
   | 'searchUser'
