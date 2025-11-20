@@ -227,7 +227,16 @@
 .message-item {
   flex: 1;
   height: auto;
-  width: 100%;
+  width: 95%;
+  padding: 6px 10px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.15s;
+}
+
+.message-item:hover {
+  background: #eaf3ff;
 }
 
 .pagination-wrapper {
@@ -319,4 +328,35 @@
 
 .radio-wrapper.selected {
   background: #006ad1;
+}
+
+.body-right-message-box {
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.message-row-top {
+  justify-content: space-between;
+  color: #555;
+  font-size: 14px;
+}
+
+.username {
+  margin-right: 0.5rem;
+}
+
+.send-time,
+.message-text {
+  font-size: 13px;
+  cursor: text;
+  user-select: text;
+}
+
+.message-text {
+  color: #006ad1;
+  margin-top: 10px;
 }
