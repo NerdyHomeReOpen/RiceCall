@@ -98,6 +98,8 @@ type PopupType =
   | 'friendVerification'
   | 'imageCropper'
   | 'inviteMember'
+  | 'kickMemberFromChannel'
+  | 'kickMemberFromServer'
   | 'memberApplicationSetting'
   | 'memberInvitation'
   | 'searchUser'
@@ -191,6 +193,8 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   friendVerification: { height: 550, width: 500 },
   imageCropper: { height: 520, width: 610 },
   inviteMember: { height: 300, width: 490 },
+  kickMemberFromChannel: { height: 250, width: 400 },
+  kickMemberFromServer: { height: 250, width: 400 },
   memberApplicationSetting: { height: 220, width: 380 },
   memberInvitation: { height: 550, width: 500 },
   searchUser: { height: 200, width: 380 },
