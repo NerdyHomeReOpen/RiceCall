@@ -342,6 +342,8 @@
 
 .username {
   margin-right: 0.5rem;
+  cursor: text;
+  user-select: text;
 }
 
 .send-time,
