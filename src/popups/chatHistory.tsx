@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 // CSS
 import popup from '@/styles/popup.module.css';
 import chatHistory from '@/styles/chatHistory.module.css';
-import friednList from "@/styles/friend.module.css";
+import friendList from "@/styles/friend.module.css";
 
 // Types
 import type { FriendApplication, FriendGroup, User } from '@/types';
@@ -26,49 +26,72 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ totalPag
   const goLast = () => setCurrentPage(totalPages);
   const goPage = (page: number) => setCurrentPage(page);
 
+  const messages = [
+    { id: 1, name: "使用者名稱", time: "00:00", message_text: "訊息內容" },
+    { id: 2, name: "使用者名稱", time: "00:01", message_text: "訊息內容" },
+    { id: 3, name: "使用者名稱", time: "00:02", message_text: "訊息內容" },
+    { id: 4, name: "使用者名稱", time: "00:03", message_text: "訊息內容" },
+    { id: 5, name: "使用者名稱", time: "00:04", message_text: "訊息內容" },
+    { id: 6, name: "使用者名稱", time: "00:05", message_text: "訊息內容" },
+    { id: 7, name: "使用者名稱", time: "00:06", message_text: "訊息內容" },
+    { id: 8, name: "使用者名稱", time: "00:07", message_text: "訊息內容" },
+  ];
+
+  const [selectedMsg, setSelectedMsg] = useState<number | null>(null);
+
   return (
     <div className={popup['popup-wrapper']}>
+
+      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={`${chatHistory['content']} ${popup['content']} ${popup['col']}`}>
+
+          {/* header 區 */}
           <div className={`${chatHistory['header-box']} ${popup['row']}`}>
             <div className={chatHistory['select-wrapper']}>
-              <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
+              <div className={popup['select-box']} style={{ maxWidth: '100px' }}>
                 <select className={popup['select']}>
-                  <option value="當前聯繫人">當前聯繫人 </option>
-                  <option value="語音群訊息">語音群訊息 </option>
+                  <option value="當前聯繫人">當前聯繫人</option>
+                  <option value="語音群訊息">語音群訊息</option>
                 </select>
               </div>
-              <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
+
+              <div className={popup['select-box']} style={{ maxWidth: '100px' }}>
                 <select className={popup['select']}>
-                  <option value="最近一週">最近一週 </option>
-                  <option value="最近一個月">最近一個月 </option>
-                  <option value="最近三個月">最近三個月 </option>
+                  <option value="最近一週">最近一週</option>
+                  <option value="最近一個月">最近一個月</option>
+                  <option value="最近三個月">最近三個月</option>
                 </select>
               </div>
             </div>
+
             <div className={chatHistory['search-wrapper']}>
               <span className={chatHistory['search-title']}>關鍵字</span>
               <div className={`${chatHistory['search-input-box']} ${popup['input-box']} ${popup['col']}`}>
                 <input type="text" />
-                <div className={chatHistory['search-icon']}></div>
+                <div className={chatHistory['search-icon']} />
               </div>
             </div>
           </div>
 
+          {/* body 區 */}
           <div className={chatHistory['body-box']}>
-            <div className={`${chatHistory['body-left']} ${friednList['friend-group-list']}`}>
+
+            {/* 左側好友群組 */}
+            <div className={`${chatHistory['body-left']} ${friendList['friend-group-list']}`}>
               <div className={chatHistory['friend-group-box']}>
-                <div className={`${friednList['friend-group-tab']}`}>
-                  <div className={`${friednList['toggle-icon']} ${friednList['expanded']}`}></div>
-                  <div>我的好友</div>
+                <div className={`${friendList['friend-group-tab']}`}>
+                  <div className={`${friendList['toggle-icon']} ${friendList['expanded']}`} />
+                  <div>黑名單</div>
                   <div>(0)</div>
                 </div>
+
                 {/* friend list */}
                 <div className={chatHistory['friend-group-list']}>
                   <div className={chatHistory['friend-info-box']}>
                     <div className={chatHistory['avatar-box']}>
-                      <div className={chatHistory['avatar-border']}></div>
-                      <div className={chatHistory['avatar']}></div>
+                      <div className={chatHistory['avatar-border']} />
+                      <div className={chatHistory['avatar']} />
                     </div>
                     <div className={chatHistory['name']}>123</div>
                   </div>
@@ -76,71 +99,40 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ totalPag
               </div>
             </div>
 
+            {/* 右側訊息區 */}
             <div className={chatHistory['body-right']}>
+
+              {/* header */}
               <div className={chatHistory['main']}>
                 <div className={chatHistory['main-title']}>與 %d 的聊天訊息紀錄</div>
                 <div className={chatHistory['main-delete-button-box']}>
-                  <div className={chatHistory['delete-button-icon']}></div>
+                  <div className={chatHistory['delete-button-icon']} />
                   <div className={chatHistory['delete-button-text']}>刪除紀錄</div>
                 </div>
               </div>
 
+              {/* 日期 */}
               <div className={chatHistory['body-right-bottom']}>
-                <div className={chatHistory['message-date']}>日期：%d/%d/%d</div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
-                </div>
-                <div className={chatHistory['message-item']}>
-                  <div className={chatHistory['user-name']}>123</div>
-                  <div className={chatHistory['send-time']}>23:42</div>
-                  <div className={chatHistory['message-text']}>123</div>
+                <div className={chatHistory['message-date']}>日期：2025/11/20</div>
+                {/* 訊息內容 */}
+                <div className={chatHistory['body-right-message-box']}>
+
+                  {messages.map(msg => (
+                    <div
+                      key={msg.id}
+                      className={`${chatHistory['message-item']} ${selectedMsg === msg.id ? chatHistory['selected'] : ''}`}
+                      onClick={() => setSelectedMsg(msg.id)}
+                    >
+                      <div className={chatHistory['message-row-top']}>
+                        <span className={chatHistory['username']}>{msg.name}</span>
+                        <span className={chatHistory['send-time']}>{msg.time}</span>
+                      </div>
+                      <div className={chatHistory['message-text']}>
+                        {msg.message_text}
+                      </div>
+                    </div>
+                  ))}
+
                 </div>
               </div>
 
@@ -191,9 +183,12 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ totalPag
                 <div className={chatHistory['spacer']} />
               </div>
             </div>
+
           </div>
+
         </div>
       </div>
+
     </div>
   );
 });
