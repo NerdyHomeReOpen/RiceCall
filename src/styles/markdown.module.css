@@ -36,6 +36,7 @@
   word-break: break-word;
   cursor: pointer;
   color: var(--text-link);
+
   &:hover {
     text-decoration: underline;
     color: var(--text-link-hover);
@@ -170,8 +171,10 @@
 }
 
 .markdown-content img:not(.emoji) {
-  max-width: 1024px;
-  max-height: 1024px;
+  margin: 5px;
+  width: 90%;
+  max-width: 256px;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
 }
 
 .container {
@@ -235,6 +238,7 @@
   color: var(--text-username);
   cursor: pointer;
   white-space: pre-wrap;
+
   &:hover {
     text-decoration: underline;
   }

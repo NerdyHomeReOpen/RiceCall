@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
@@ -20,17 +20,15 @@ interface ChannelMessageContentProps {
   user: User;
   channel: Channel;
   server: Server;
+  handleScrollToBottom?: () => void;
+  isAtBottom?: boolean;
 }
 
-const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server }) => {
+const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server, handleScrollToBottom, isAtBottom }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Refs
-  const messageViewerRef = useRef<HTMLDivElement>(null);
-
   // States
-  const [isAtBottom, setIsAtBottom] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Memos
@@ -53,51 +51,32 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
     }, []);
   }, [messages]);
 
-  // Heandles
-  const handleScroll = () => {
-    const el = messageViewerRef.current;
-    if (!el) return;
-    const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
-    setIsAtBottom(isBottom);
-  };
-
-  const handleScrollToBottom = () => {
-    const el = messageViewerRef.current;
-    if (!el) return;
-
-    setIsAtBottom(true);
-    el.scrollTo({
-      top: el.scrollHeight,
-      behavior: 'smooth',
-    });
-  };
-
   // Effects
   useEffect(() => {
+    const el = document.querySelector('[data-message-area]');
+    if (!el) return;
+
     if (messageGroups.length === 0) return;
 
     const lastMessage = messageGroups[messageGroups.length - 1];
-    const el = messageViewerRef.current;
-    const isBottom = el ? el.scrollHeight - el.scrollTop - el.clientHeight <= 100 : true;
+    const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
 
     if (lastMessage.type !== 'general' || lastMessage.userId === user.userId) {
-      setTimeout(() => handleScrollToBottom(), 50);
+      setTimeout(() => handleScrollToBottom?.(), 50);
     } else if (isBottom) {
-      setTimeout(() => handleScrollToBottom(), 50);
+      setTimeout(() => handleScrollToBottom?.(), 50);
     } else {
       setUnreadCount((prev) => prev + 1);
     }
-  }, [messageGroups, user.userId]);
+  }, [messageGroups, user.userId, handleScrollToBottom]);
 
   useEffect(() => {
-    if (isAtBottom) {
-      setUnreadCount(0);
-    }
+    if (isAtBottom) setUnreadCount(0);
   }, [isAtBottom]);
 
   return (
     <>
-      <div ref={messageViewerRef} className={styles['message-viewer-wrapper']} onScroll={() => handleScroll()}>
+      <div className={styles['message-viewer-wrapper']}>
         {messageGroups.map((messageGroup, index) => (
           <div key={index} className={styles['message-wrapper']}>
             {messageGroup.type === 'general' ? (
@@ -109,7 +88,7 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
         ))}
       </div>
       {unreadCount > 0 && (
-        <div className={styles['new-message-alert']} onClick={() => handleScrollToBottom()}>
+        <div className={styles['new-message-alert']} onClick={() => handleScrollToBottom?.()}>
           {t('has-new-message', { 0: unreadCount })}
         </div>
       )}

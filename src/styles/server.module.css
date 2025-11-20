@@ -519,16 +519,17 @@
 
 .message-area {
   display: flex;
-  overflow-y: hidden;
-  padding: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden;
   height: 100%;
+  padding: 10px 10px 0 10px;
 }
 
 .broadcast-area {
   position: absolute;
-  left: 0;
+  left: 10px;
   bottom: calc(100% + 10px);
-  width: 100%;
+  width: calc(100% - 20px);
   min-height: 25px;
   display: flex;
   align-items: center;
@@ -542,9 +543,9 @@
 .input-area {
   position: relative;
   display: flex;
-  min-height: 60px;
+  min-height: 70px;
   max-height: 50%;
-  margin: 10px;
+  padding: 0 10px 10px 10px;
 }
 
 .button-area {

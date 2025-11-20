@@ -34,8 +34,9 @@
 }
 
 .message-input-length-text {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
   color: var(--text-color-senary);
   font-size: 0.9em;
-  align-self: flex-end;
-  margin-left: 2px;
 }

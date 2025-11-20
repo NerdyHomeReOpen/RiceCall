@@ -70,6 +70,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
 
   // Memos
   const textLength = editor?.getText().length || 0;
+  const isCloseToMaxLength = useMemo(() => textLength >= maxLength - 100, [textLength, maxLength]);
   const isWarning = useMemo(() => textLength > maxLength, [textLength, maxLength]);
 
   // Handlers
@@ -182,9 +183,11 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
         onCompositionEnd={() => (isComposingRef.current = false)}
         maxLength={maxLength}
       />
-      <div className={messageInputBox['message-input-length-text']}>
-        {editor?.getText().length}/{maxLength}
-      </div>
+      {isCloseToMaxLength && (
+        <div className={messageInputBox['message-input-length-text']}>
+          {editor?.getText().length}/{maxLength}
+        </div>
+      )}
     </div>
   );
 });
