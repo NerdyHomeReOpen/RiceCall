@@ -96,7 +96,7 @@
   "permission-denied": "Sem permissão suficiente.",
   "receive-shake-window": "Você recebeu uma vibração de janela",
   "register-failed": "Erro ao registrar-se. Tente novamente mais tarde.",
-  "register-success": "帳號註冊成功，請至 {{0}} 驗證你的電子郵件以啟用帳號，帳號未啟用前將無法登入。若未收到驗證信件，請至[官方網站](https://ricecall.com.tw)重新發送驗證信件。",
+  "register-success": "Cadastro de conta concluído com sucesso. Acesse {{0}} para verificar seu endereço de e-mail e ativar sua conta. Você não poderá fazer login até que sua conta seja ativada. Caso não tenha recebido o e-mail de verificação, acesse o [site oficial](https://ricecall.com.tw) para solicitar o reenvio do e-mail de verificação.",
   "reject-friend-application-failed": "Erro ao rejeitar um pedido de amizade. Tente novamente mais tarde.",
   "reject-member-application-failed": "Erro ao rejeitar pedido de Membro. Tente novamente mais tarde.",
   "reject-member-invitation-failed": "Erro ao rejeitar pedido de Membro. Tente novamente mais tarde.",

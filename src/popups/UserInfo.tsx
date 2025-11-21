@@ -13,7 +13,6 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
 import ipc from '@/services/ipc.service';
-import api from '@/services/api.service';
 
 // CSS
 import styles from '@/styles/userSetting.module.css';
@@ -224,7 +223,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                     formData.append('_type', 'user');
                     formData.append('_fileName', userId);
                     formData.append('_file', data.imageDataUrl as string);
-                    const response = await api.post('/upload', formData);
+                    const response = await ipc.data.upload(formData);
                     if (response) {
                       setTarget((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
                       handleEditUser({ avatar: response.avatar, avatarUrl: response.avatarUrl });

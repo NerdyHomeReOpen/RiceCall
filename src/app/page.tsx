@@ -55,8 +55,6 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
 import ipc from '@/services/ipc.service';
-import auth from '@/services/auth.service';
-import data from '@/services/data.service';
 
 interface HeaderProps {
   user: User;
@@ -118,9 +116,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   };
 
   const handleLogout = () => {
-    auth.logout().then((success) => {
-      if (success) ipc.auth.logout();
-    });
+    ipc.auth.logout();
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
   };
 
   const handleExit = () => {
@@ -566,10 +564,11 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.popup.open(p.type, p.id, p.initialData, p.force);
       popupOffSubmitRef.current?.();
       popupOffSubmitRef.current = ipc.popup.onSubmit(p.id, () => {
-        if (p.id === 'logout')
-          auth.logout().then((success) => {
-            if (success) ipc.auth.logout();
-          });
+        if (p.id === 'logout') {
+          ipc.auth.logout();
+          localStorage.removeItem('token');
+          localStorage.removeItem('userId');
+        }
       });
     });
   };
@@ -588,9 +587,11 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     if (user.userId) return;
+
     const userId = localStorage.getItem('userId');
     if (!userId) return;
-    data.user({ userId }).then((user) => {
+
+    ipc.data.userHotReload(userId).then((user) => {
       if (user) setUser(user);
     });
   }, [user]);
@@ -677,25 +678,25 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      data.servers({ userId: userId }).then((servers) => {
+      ipc.data.servers(userId).then((servers) => {
         if (servers) setServers(servers);
       });
-      data.friends({ userId: userId }).then((friends) => {
+      ipc.data.friends(userId).then((friends) => {
         if (friends) setFriends(friends);
       });
-      data.friendActivities({ userId: userId }).then((friendActivities) => {
+      ipc.data.friendActivities(userId).then((friendActivities) => {
         if (friendActivities) setFriendActivities(friendActivities);
       });
-      data.friendGroups({ userId: userId }).then((friendGroups) => {
+      ipc.data.friendGroups(userId).then((friendGroups) => {
         if (friendGroups) setFriendGroups(friendGroups);
       });
-      data.friendApplications({ receiverId: userId }).then((friendApplications) => {
+      ipc.data.friendApplications(userId).then((friendApplications) => {
         if (friendApplications) setFriendApplications(friendApplications);
       });
-      data.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
+      ipc.data.memberInvitations(userId).then((memberInvitations) => {
         if (memberInvitations) setMemberInvitations(memberInvitations);
       });
-      data.recommendServers().then((recommendServerList) => {
+      ipc.data.recommendServers().then((recommendServerList) => {
         if (recommendServerList) setRecommendServers(recommendServerList);
       });
       setSystemNotify([]); // TODO: Implement system notify
@@ -706,10 +707,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      data.announcements({ region: i18n.language }).then((announcements) => {
+      ipc.data.announcements(i18n.language).then((announcements) => {
         if (announcements) setAnnouncements(announcements);
       });
-      data.notifies({ region: i18n.language }).then((notifies) => {
+      ipc.data.notifies(i18n.language).then((notifies) => {
         if (notifies) setNotifies(notifies);
       });
     };
@@ -720,13 +721,13 @@ const RootPageComponent: React.FC = React.memo(() => {
     if (!userId || !server.serverId) return;
     setServerMemberApplications([]);
     const refresh = async () => {
-      data.channels({ userId: userId, serverId: server.serverId }).then((channels) => {
+      ipc.data.channels(userId, server.serverId).then((channels) => {
         if (channels) setChannels(channels);
       });
-      data.serverOnlineMembers({ serverId: server.serverId }).then((serverOnlineMembers) => {
+      ipc.data.serverOnlineMembers(server.serverId).then((serverOnlineMembers) => {
         if (serverOnlineMembers) setServerOnlineMembers(serverOnlineMembers);
       });
-      // data.memberApplications({ serverId: server.serverId }).then((serverMemberApplications) => {
+      // ipc.data.memberApplications(server.serverId).then((serverMemberApplications) => {
       //   if (serverMemberApplications) setServerMemberApplications(serverMemberApplications);
       // });
     };

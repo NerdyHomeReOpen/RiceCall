@@ -23,8 +23,6 @@ import LevelIcon from '@/components/LevelIcon';
 
 // Services
 import ipc from '@/services/ipc.service';
-import data from '@/services/data.service';
-import api from '@/services/api.service';
 
 // CSS
 import styles from '@/styles/directMessage.module.css';
@@ -89,6 +87,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     currentServerId: targetCurrentServerId,
     badges: targetBadges,
     shareCurrentServer: targetShareCurrentServer,
+    isVerified: targetIsVerified,
   } = target;
   const { name: targetCurrentServerName } = targetCurrentServer || {};
 
@@ -98,7 +97,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const isFriend = useMemo(() => friendState?.relationStatus === 2, [friendState]);
   const isBlocked = useMemo(() => friendState?.isBlocked, [friendState]);
   const isOnline = useMemo(() => targetStatus !== 'offline', [targetStatus]);
-  const isVerifiedUser = useMemo(() => false, []); // TODO: Remove this after implementing
 
   // Handlers
   const syncStyles = useCallback(() => {
@@ -114,10 +112,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       return;
     }
     const formData = new FormData();
-    formData.append('_type', 'announcement');
+    formData.append('_type', 'message');
     formData.append('_fileName', `fileName-${Date.now()}`);
     formData.append('_file', imageData);
-    const response = await api.post('/upload', formData);
+    const response = await ipc.data.upload(formData);
     if (response) {
       editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
       syncStyles();
@@ -251,7 +249,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       setTargetCurrentServer(null);
       return;
     }
-    data.server({ userId: targetId, serverId: targetCurrentServerId }).then((server) => {
+    ipc.data.server(targetId, targetCurrentServerId).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
   }, [targetId, targetCurrentServerId, isBlocked, isFriend, targetShareCurrentServer]);
@@ -320,10 +318,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               {!isFriend && <div className={styles['action-title']}>{t('non-friend-message')}</div>}
               {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
             </div>
-          ) : isVerifiedUser ? ( // TODO: Official badge
+          ) : targetIsVerified ? (
             <div className={styles['action-area']}>
-              <div className={styles['action-icon']} />
-              <div className={styles['action-title']}>{t('official-badge')}</div>
+              <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
+              <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
+                <span className={styles['is-official-title']}>{t('official-title')}</span>
+                <span className={styles['is-official-text']}>{t('is-official')}</span>
+              </div>
             </div>
           ) : null}
           <div onScroll={handleMessageAreaScroll} className={styles['message-area']}>

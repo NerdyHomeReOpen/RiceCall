@@ -50,6 +50,14 @@ export const handleOpenBlockMember = (userId: User['userId'], serverId: Server['
   ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
 };
 
+export const handleOpenKickMemberFromServer = (userId: User['userId'], serverId: Server['serverId']) => {
+  ipc.popup.open('kickMemberFromServer', `kickMemberFromServer`, { userId, serverId });
+};
+
+export const handleOpenKickMemberFromChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+  ipc.popup.open('kickMemberFromChannel', `kickMemberFromChannel`, { userId, serverId, channelId });
+};
+
 export const handleOpenInviteMember = (userId: User['userId'], serverId: Server['serverId']) => {
   ipc.popup.open('inviteMember', `inviteMember`, { userId, serverId });
 };
@@ -124,6 +132,6 @@ export const handleOpenApplyMember = (userId: User['userId'], serverId: Server['
 };
 
 export const handleOpenImageCropper = (imageData: string, onSubmit: (data: { imageDataUrl: string }) => void) => {
-  ipc.popup.open('imageCropper', 'imageCropper', { imageData: imageData });
+  ipc.popup.open('imageCropper', 'imageCropper', { imageData: imageData, submitTo: 'imageCropper' });
   ipc.popup.onSubmit('imageCropper', onSubmit);
 };

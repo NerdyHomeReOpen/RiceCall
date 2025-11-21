@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
 // CSS
 import styles from '@/styles/server.module.css';
@@ -160,8 +160,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
-    const [isScrollToBottom, setIsScrollToBottom] = useState<boolean>(true);
     const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
+    const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
 
     // Variables
     const { userId, permissionLevel: globalPermissionLevel } = user;
@@ -336,10 +336,21 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       }
     };
 
-    const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
-      const isScrollToBottom = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
-      setIsScrollToBottom(isScrollToBottom);
+    const handleScroll = () => {
+      const el = document.querySelector('[data-message-area]');
+      if (!el) return;
+
+      const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
+      setIsAtBottom(isBottom);
     };
+
+    const handleScrollToBottom = useCallback(() => {
+      const el = document.querySelector('[data-message-area]');
+      if (!el) return;
+
+      setIsAtBottom(true);
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    }, []);
 
     // Effects
     useEffect(() => {
@@ -347,8 +358,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [channelBitrate]);
 
     useEffect(() => {
-      webRTCRef.current.setMicTaken(isMicTaken && !isControlled, channelId);
-      webRTCRef.current.setMixMode(false);
+      if (isMicTaken && !isControlled) webRTCRef.current.takeMic(channelId);
+      else webRTCRef.current.releaseMic();
+      webRTCRef.current.stopMixing();
     }, [isMicTaken, isControlled, channelId]);
 
     useEffect(() => {
@@ -486,7 +498,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 {/* Message Area */}
                 <div
                   className={styles['message-area']}
-                  onScroll={handleMessageAreaScroll}
+                  onScroll={handleScroll}
+                  data-message-area
                   onContextMenu={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -508,7 +521,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     ]);
                   }}
                 >
-                  <ChannelMessageContent messages={channelMessages} user={user} channel={currentChannel} server={server} isScrollToBottom={isScrollToBottom} />
+                  <ChannelMessageContent messages={channelMessages} user={user} channel={currentChannel} server={server} handleScrollToBottom={handleScrollToBottom} isAtBottom={isAtBottom} />
                 </div>
 
                 {/* Broadcast Area */}

@@ -297,6 +297,7 @@
 }
 
 @keyframes shake {
+
   0%,
   100% {
     transform: translate(0, 0);
@@ -320,4 +321,28 @@
 
 .shake {
   animation: shake 0.4s ease-in-out;
+}
+
+.official-title-box {
+  display: flex;
+  align-items: center;
+}
+
+.is-official-title {
+  color:#636363;
+}
+
+.is-official-text {
+  margin-left: 1rem;
+  color: #0084e3;
+}
+
+.is-official-icon {
+  background-image: url(https://api.ricecall.com/images/badgeIcons/official.webp);
+  width: 17px;
+  height: 16px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: auto;
 }

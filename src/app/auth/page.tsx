@@ -11,7 +11,6 @@ import RegisterPage from '@/pages/Register';
 
 // Services
 import ipc from '@/services/ipc.service';
-import auth from '@/services/auth.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -74,10 +73,8 @@ const Auth: React.FC = React.memo(() => {
   useEffect(() => {
     const autoLogin = async () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const res = await auth.autoLogin();
-      if (res.success) {
-        ipc.auth.login(res.token);
-      }
+      const token = localStorage.getItem('token') || '';
+      ipc.auth.autoLogin(token);
     };
     autoLogin();
   }, []);

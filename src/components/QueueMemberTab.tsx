@@ -81,8 +81,12 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
   }, [isSpeaking, memberIsTextMuted, isMuted, memberIsVoiceMuted, isControlled]);
 
   // Handlers
-  const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
-    webRTC.setUserMuted(userId, muted);
+  const handleMuteUser = (userId: User['userId']) => {
+    webRTC.muteUser(userId);
+  };
+
+  const handleUnmuteUser = (userId: User['userId']) => {
+    webRTC.unmuteUser(userId);
   };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
@@ -213,7 +217,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
             id: 'set-mute',
             label: isMuted ? t('unmute') : t('mute'),
             show: !isUser,
-            onClick: () => handleSetIsUserMuted(memberUserId, !isMuted),
+            onClick: () => (isMuted ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
           },
           {
             id: 'edit-nickname',

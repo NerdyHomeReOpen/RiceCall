@@ -32,7 +32,7 @@ class RecorderProcessor extends AudioWorkletProcessor {
     const input = inputs[0];
     if (!input || !input[0]) return true;
     const left = input[0];
-    const right = input[1] || input[0]; // 單聲道時複製
+    const right = input[1] || input[0];
     this.port.postMessage({ left, right });
     return true;
   }
@@ -42,15 +42,21 @@ registerProcessor('recorder-processor', RecorderProcessor);
 `;
 
 interface WebRTCContextType {
-  setUserMuted: (userId: string, muted: boolean) => void;
-  setMicTaken: (taken: boolean, channelId: string) => void;
-  setMixMode: (active: boolean) => void;
-  setSpeakKeyPressed: (pressed: boolean) => void;
+  startMixing: () => void;
+  stopMixing: () => void;
+  startRecording: () => void;
+  stopRecording: () => void;
+  muteUser: (userId: string) => void;
+  unmuteUser: (userId: string) => void;
+  pressSpeakKey: () => void;
+  releaseSpeakKey: () => void;
+  takeMic: (channelId: string) => void;
+  releaseMic: () => void;
   toggleMixMode: () => void;
   toggleRecording: () => void;
   toggleSpeakerMuted: () => void;
   toggleMicMuted: () => void;
-  changeBitrate: (newBitrate: number) => void;
+  changeBitrate: (bitrate: number) => void;
   changeMicVolume: (volume: number) => void;
   changeMixVolume: (volume: number) => void;
   changeSpeakerVolume: (volume: number) => void;
@@ -85,7 +91,7 @@ interface WebRTCProviderProps {
 }
 
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
-  // Providers
+  // Hooks
   const soundPlayer = useSoundPlayer();
 
   // Refs
@@ -413,11 +419,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
   }, []);
 
-  const initMixMode = useCallback(
+  const initMixAudio = useCallback(
     async (systemStream: MediaStream) => {
       if (!audioContextRef.current || !inputDesRef.current || !inputAnalyserRef.current) {
         initAudioContext();
-        return initMixMode(systemStream);
+        return initMixAudio(systemStream);
       }
 
       removeMixAudio();
@@ -443,74 +449,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     },
     [initAudioContext, removeMixAudio, detectSpeaking],
   );
-
-  const startMixMode = useCallback(async () => {
-    ipc.loopbackAudio.enable();
-    navigator.mediaDevices
-      .getDisplayMedia({
-        video: true,
-        audio: {
-          channelCount: 2,
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false,
-        },
-      })
-      .then((stream) => {
-        // TODO: Add video support
-        for (const track of stream.getVideoTracks()) {
-          track.stop();
-          stream.removeTrack(track);
-        }
-        ipc.loopbackAudio.disable();
-        initMixMode(stream);
-      })
-      .catch((err) => {
-        console.error('[WebRTC] Error capturing audio from system', err);
-      });
-  }, [initMixMode]);
-
-  const startRecording = useCallback(async () => {
-    if (!audioContextRef.current || !recorderDesRef.current) {
-      initAudioContext();
-      return startRecording();
-    }
-
-    setRecordTime(0);
-    recorderGainRef.current = audioContextRef.current.createGain();
-    recorderGainRef.current.connect(recorderDesRef.current);
-
-    micNodesRef.current.gain?.connect(recorderGainRef.current);
-    mixNodesRef.current.gain?.connect(recorderGainRef.current);
-    masterGainNodeRef.current?.connect(recorderGainRef.current);
-
-    const recorderNode = new AudioWorkletNode(audioContextRef.current, 'recorder-processor');
-    recorderGainRef.current.connect(recorderNode);
-
-    recorderNode.port.onmessage = (e) => {
-      const { left, right } = e.data;
-      buffersRef.current.push({ left: left.slice(), right: right.slice() });
-    };
-  }, [initAudioContext]);
-
-  const stopRecording = useCallback(() => {
-    if (!audioContextRef.current) {
-      initAudioContext();
-      return stopRecording();
-    }
-
-    recorderGainRef.current!.disconnect();
-    if (timerRef.current) clearInterval(timerRef.current);
-
-    const blob = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate, recordFormatRef.current);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ricecall-record-${new Date().toISOString()}.${recordFormatRef.current}`;
-    a.click();
-
-    buffersRef.current = [];
-  }, [initAudioContext]);
 
   const consumeOne = useCallback(
     async (producerId: string, channelId: string) => {
@@ -734,59 +672,153 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     window.localStorage.setItem('voice-threshold', voiceThreshold.toString());
   }, []);
 
-  const setUserMuted = useCallback((userId: string, muted: boolean) => {
+  const startMixing = useCallback(async () => {
+    ipc.loopbackAudio.enable();
+    navigator.mediaDevices
+      .getDisplayMedia({
+        video: true,
+        audio: {
+          channelCount: 2,
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
+      })
+      .then((stream) => {
+        // TODO: Add video support
+        for (const track of stream.getVideoTracks()) {
+          track.stop();
+          stream.removeTrack(track);
+        }
+        ipc.loopbackAudio.disable();
+        initMixAudio(stream);
+      })
+      .catch((err) => {
+        console.error('[WebRTC] Error capturing audio from system', err);
+      });
+
+    setIsMixModeActive(true);
+    isMixModeActiveRef.current = true;
+  }, [initMixAudio]);
+
+  const stopMixing = useCallback(() => {
+    ipc.loopbackAudio.disable();
+    removeMixAudio();
+    setIsMixModeActive(false);
+    isMixModeActiveRef.current = false;
+  }, [removeMixAudio]);
+
+  const startRecording = useCallback(async () => {
+    if (!audioContextRef.current || !recorderDesRef.current) {
+      initAudioContext();
+      return startRecording();
+    }
+
+    setRecordTime(0);
+    recorderGainRef.current = audioContextRef.current.createGain();
+    recorderGainRef.current.connect(recorderDesRef.current);
+
+    micNodesRef.current.gain?.connect(recorderGainRef.current);
+    mixNodesRef.current.gain?.connect(recorderGainRef.current);
+    masterGainNodeRef.current?.connect(recorderGainRef.current);
+
+    const recorderNode = new AudioWorkletNode(audioContextRef.current, 'recorder-processor');
+    recorderGainRef.current.connect(recorderNode);
+
+    recorderNode.port.onmessage = (e) => {
+      const { left, right } = e.data;
+      buffersRef.current.push({ left: left.slice(), right: right.slice() });
+    };
+
+    setIsRecording(true);
+    isRecordingRef.current = true;
+  }, [initAudioContext]);
+
+  const stopRecording = useCallback(() => {
+    if (!audioContextRef.current) {
+      initAudioContext();
+      return stopRecording();
+    }
+
+    recorderGainRef.current!.disconnect();
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    const blob = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate, recordFormatRef.current);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ricecall-record-${new Date().toISOString()}.${recordFormatRef.current}`;
+    a.click();
+
+    buffersRef.current = [];
+
+    setIsRecording(false);
+    isRecordingRef.current = false;
+  }, [initAudioContext]);
+
+  const muteUser = useCallback((userId: string) => {
     Object.values(consumersRef.current).forEach((consumer) => {
-      if (consumer.appData.userId === userId && muted) consumer.pause();
-      else consumer.resume();
+      if (consumer.appData.userId === userId) consumer.pause();
     });
-    setMutedIds((prev) => (muted ? [...prev, userId] : prev.filter((id) => id !== userId)));
-    mutedIdsRef.current = muted ? [...mutedIdsRef.current, userId] : mutedIdsRef.current.filter((id) => id !== userId);
+    setMutedIds((prev) => [...prev, userId]);
+    mutedIdsRef.current = [...mutedIdsRef.current, userId];
     window.localStorage.setItem('muted-ids', mutedIdsRef.current.join(','));
   }, []);
 
-  const setSpeakKeyPressed = useCallback((enable: boolean) => {
-    if (speakingModeRef.current !== 'key' || !isMicTakenRef.current) return;
-    soundPlayerRef.current.playSound(enable ? 'startSpeaking' : 'stopSpeaking');
-    micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
-      track.enabled = enable;
+  const unmuteUser = useCallback((userId: string) => {
+    Object.values(consumersRef.current).forEach((consumer) => {
+      if (consumer.appData.userId === userId) consumer.resume();
     });
-    setIsSpeakKeyPressed(enable);
-    isSpeakKeyPressedRef.current = enable;
+    setMutedIds((prev) => prev.filter((id) => id !== userId));
+    mutedIdsRef.current = [...mutedIdsRef.current.filter((id) => id !== userId)];
+    window.localStorage.setItem('muted-ids', mutedIdsRef.current.join(','));
   }, []);
 
-  const setMicTaken = useCallback(
-    async (taken: boolean, channelId: string) => {
-      if (taken) await setupSend(channelId);
-      else closeSend();
-      setIsMicTaken(taken);
-      isMicTakenRef.current = taken;
+  const pressSpeakKey = useCallback(() => {
+    if (speakingModeRef.current !== 'key' || !isMicTakenRef.current) return;
+    soundPlayerRef.current.playSound('startSpeaking');
+    micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
+      track.enabled = true;
+    });
+    setIsSpeakKeyPressed(true);
+    isSpeakKeyPressedRef.current = true;
+  }, []);
+
+  const releaseSpeakKey = useCallback(() => {
+    if (speakingModeRef.current !== 'key' || !isMicTakenRef.current) return;
+    soundPlayerRef.current.playSound('stopSpeaking');
+    micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
+      track.enabled = false;
+    });
+    setIsSpeakKeyPressed(false);
+    isSpeakKeyPressedRef.current = false;
+  }, []);
+
+  const takeMic = useCallback(
+    async (channelId: string) => {
+      if (isMicTakenRef.current) return;
+      await setupSend(channelId);
+      setIsMicTaken(true);
+      isMicTakenRef.current = true;
     },
-    [setupSend, closeSend],
+    [setupSend],
   );
 
-  const setMixMode = useCallback(
-    (active: boolean) => {
-      if (active) startMixMode();
-      else removeMixAudio();
-      setIsMixModeActive(active);
-      isMixModeActiveRef.current = active;
-    },
-    [startMixMode, removeMixAudio],
-  );
+  const releaseMic = useCallback(() => {
+    if (!isMicTakenRef.current) return;
+    closeSend();
+    setIsMicTaken(false);
+    isMicTakenRef.current = false;
+  }, [closeSend]);
 
   const toggleMixMode = useCallback(() => {
-    if (!isMicTakenRef.current) return;
-    if (isMixModeActiveRef.current) removeMixAudio();
-    else startMixMode();
-    setIsMixModeActive(!isMixModeActiveRef.current);
-    isMixModeActiveRef.current = !isMixModeActiveRef.current;
-  }, [startMixMode, removeMixAudio]);
+    if (isMixModeActiveRef.current) stopMixing();
+    else startMixing();
+  }, [startMixing, stopMixing]);
 
   const toggleRecording = useCallback(() => {
     if (isRecordingRef.current) stopRecording();
     else startRecording();
-    setIsRecording(!isRecordingRef.current);
-    isRecordingRef.current = !isRecordingRef.current;
   }, [startRecording, stopRecording]);
 
   const toggleMicMuted = useCallback(() => {
@@ -819,14 +851,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const getVolumePercent = useCallback((targetId: string | 'user') => volumePercent[targetId] ?? 0, [volumePercent]);
 
   const handleSFUJoined = useCallback(
-    async ({ channelId }: { channelId: string }) => {
-      await setupRecv(channelId);
-      if (isMicTakenRef.current) setupSend(channelId);
+    ({ channelId }: { channelId: string }) => {
+      setupRecv(channelId);
     },
-    [setupRecv, setupSend],
+    [setupRecv],
   );
 
-  const handleSFULeft = useCallback(async () => {
+  const handleSFULeft = useCallback(() => {
     closeRecv();
   }, [closeRecv]);
 
@@ -881,17 +912,17 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     [initMicAudio],
   );
 
-  const handleEditSpeakingMode = (mode: SpeakingMode) => {
+  const handleEditSpeakingMode = useCallback((mode: SpeakingMode) => {
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
       track.enabled = mode === 'key' ? isSpeakKeyPressedRef.current : true;
     });
     setSpeakingMode(mode);
     speakingModeRef.current = mode;
-  };
+  }, []);
 
-  const handleEditRecordFormat = (format: 'wav' | 'mp3') => {
+  const handleEditRecordFormat = useCallback((format: 'wav' | 'mp3') => {
     recordFormatRef.current = format;
-  };
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -924,15 +955,21 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       ipc.socket.on('SFUProducerClosed', handleProducerClosed),
     ];
     return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleEditInputDevice, handleEditOutputDevice, handleSFUJoined, handleSFULeft, handleNewProducer, handleProducerClosed]);
+  }, [handleEditInputDevice, handleEditOutputDevice, handleEditSpeakingMode, handleEditRecordFormat, handleSFUJoined, handleSFULeft, handleNewProducer, handleProducerClosed]);
 
   return (
     <WebRTCContext.Provider
       value={{
-        setUserMuted,
-        setMicTaken,
-        setMixMode,
-        setSpeakKeyPressed,
+        startMixing,
+        stopMixing,
+        startRecording,
+        stopRecording,
+        muteUser,
+        unmuteUser,
+        pressSpeakKey,
+        releaseSpeakKey,
+        takeMic,
+        releaseMic,
         toggleMixMode,
         toggleRecording,
         toggleSpeakerMuted,

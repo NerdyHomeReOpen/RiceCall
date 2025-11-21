@@ -10,16 +10,16 @@
   --box-shadow: 0 0 4px 0.5px #00000080;
   --hover: #00000010;
   --selected: #00000020;
-  --footer-background: #edeff1;
+  --footer-background: #eeeff1;
   --text-color: #000;
-  --text-color-secondary: #222;
+  --text-color-secondary: #333;
   --text-color-tertiary: #444;
   --text-color-quaternary: #666;
-  --text-color-quinary: #888;
-  --text-color-senary: #aaa;
+  --text-color-quinary: #999;
+  --text-color-senary: #a8a8a8;
   --text-color-septenary: #ccc;
   --text-color-octonary: #eee;
-  --text-warning: #ff3030;
+  --text-warning: #ff0000;
   --text-link: #0059a1;
   --text-link-hover: #0059a1;
   --text-username: #2f94db;
@@ -30,11 +30,12 @@
   --notify-toaster-border: #f9c55d;
   --notify-toaster-background: #fefee4;
   --button-background: #fdfdfd;
+  --popup-background: #f7f7f7;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    /* --background: #1f1f1f;
+  /* :root {
+    --background: #1f1f1f;
     --foreground: #292929;
     --sidebar: #242424;
     --border: #333;
@@ -61,8 +62,8 @@
     --text-nickname: #6e849b;
     --notify-toaster-border: #855800;
     --notify-toaster-background: #3b3b00;
-    --button-background: linear-gradient(#242424, #1f1f1f); */
-  }
+    --button-background: linear-gradient(#242424, #1f1f1f);
+  } */
 }
 
 * {
@@ -210,9 +211,11 @@ button {
 *[datatype='read-only'] {
   pointer-events: none;
   user-select: none;
+
   &:hover {
     cursor: default;
   }
+
   &:focus {
     outline: none;
   }
@@ -223,6 +226,7 @@ button {
 .has-hover-text {
   position: relative;
   cursor: pointer;
+
   &:hover {
     .hover-text {
       opacity: 1;

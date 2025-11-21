@@ -1,9 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DiscordPresence, PopupType, SpeakingMode, MixMode, ServerToClientEvents, ClientToServerEvents, ChannelUIMode, ACK, Theme, SystemSettings } from '@/types';
+import {
+  DiscordPresence,
+  PopupType,
+  SpeakingMode,
+  MixMode,
+  ServerToClientEvents,
+  ClientToServerEvents,
+  ChannelUIMode,
+  ACK,
+  Theme,
+  SystemSettings,
+  User,
+  Friend,
+  FriendActivity,
+  FriendGroup,
+  FriendApplication,
+  Server,
+  Member,
+  OnlineMember,
+  Channel,
+  MemberApplication,
+  MemberInvitation,
+  Notify,
+  Announcement,
+  RecommendServer,
+} from '@/types';
 import { LanguageKey } from '@/i18n';
-
-// Services
-import data from '@/services/data.service';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
@@ -45,6 +67,155 @@ const ipcService = {
           else reject(new Error(ack?.error || 'unknown error'));
         });
       });
+    },
+  },
+
+  auth: {
+    login: async (account: string, password: string): Promise<{ success: true; token: string } | { success: false }> => {
+      if (!isElectron) return { success: false };
+      return await ipcRenderer.invoke('auth-login', account, password);
+    },
+
+    logout: async (): Promise<void> => {
+      if (!isElectron) return;
+      return await ipcRenderer.invoke('auth-logout');
+    },
+
+    register: async (account: string, password: string, username: string): Promise<{ success: true; message: string } | { success: false }> => {
+      if (!isElectron) return { success: false };
+      return await ipcRenderer.invoke('auth-register', account, password, username);
+    },
+
+    autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {
+      if (!isElectron) return { success: false };
+      return await ipcRenderer.invoke('auth-auto-login', token);
+    },
+  },
+
+  data: {
+    user: async (userId: User['userId']): Promise<User | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-user', userId);
+    },
+
+    userHotReload: async (userId: User['userId']): Promise<User | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-user-hot-reload', userId);
+    },
+
+    friend: async (userId: User['userId'], targetId: User['userId']): Promise<Friend | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-friend', userId, targetId);
+    },
+
+    friends: async (userId: User['userId']): Promise<Friend[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-friends', userId);
+    },
+
+    friendActivities: async (userId: User['userId']): Promise<FriendActivity[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-friendActivities', userId);
+    },
+
+    friendGroup: async (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']): Promise<FriendGroup | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-friendGroup', userId, friendGroupId);
+    },
+
+    friendGroups: async (userId: User['userId']): Promise<FriendGroup[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-friendGroups', userId);
+    },
+
+    friendApplication: async (receiverId: User['userId'], senderId: User['userId']): Promise<FriendApplication | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-friendApplication', receiverId, senderId);
+    },
+
+    friendApplications: async (receiverId: User['userId']): Promise<FriendApplication[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-friendApplications', receiverId);
+    },
+
+    server: async (userId: User['userId'], serverId: Server['serverId']): Promise<Server | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-server', userId, serverId);
+    },
+
+    servers: async (userId: User['userId']): Promise<Server[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-servers', userId);
+    },
+
+    serverMembers: async (serverId: Server['serverId']): Promise<Member[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-serverMembers', serverId);
+    },
+
+    serverOnlineMembers: async (serverId: Server['serverId']): Promise<OnlineMember[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-serverOnlineMembers', serverId);
+    },
+
+    channel: async (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']): Promise<Channel | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-channel', userId, serverId, channelId);
+    },
+
+    channels: async (userId: User['userId'], serverId: Server['serverId']): Promise<Channel[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-channels', userId, serverId);
+    },
+
+    channelMembers: async (serverId: Server['serverId'], channelId: Channel['channelId']): Promise<Member[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-channelMembers', serverId, channelId);
+    },
+
+    member: async (userId: User['userId'], serverId: Server['serverId'], channelId?: Channel['channelId']): Promise<Member | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-member', userId, serverId, channelId);
+    },
+
+    memberApplication: async (userId: User['userId'], serverId: Server['serverId']): Promise<MemberApplication | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-memberApplication', userId, serverId);
+    },
+
+    memberApplications: async (serverId: Server['serverId']): Promise<MemberApplication[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-memberApplications', serverId);
+    },
+
+    memberInvitation: async (receiverId: User['userId'], serverId: Server['serverId']): Promise<MemberInvitation | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-memberInvitation', receiverId, serverId);
+    },
+
+    memberInvitations: async (receiverId: User['userId']): Promise<MemberInvitation[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-memberInvitations', receiverId);
+    },
+
+    notifies: async (region: Notify['region']): Promise<Notify[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-notifies', region);
+    },
+
+    announcements: async (region: Announcement['region']): Promise<Announcement[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-announcements', region);
+    },
+
+    recommendServers: async (): Promise<RecommendServer[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-recommendServers');
+    },
+
+    upload: async (formData: FormData): Promise<any | null> => {
+      if (!isElectron) return null;
+      return await ipcRenderer.invoke('data-upload', formData.get('_type'), formData.get('_fileName'), formData.get('_file'));
     },
   },
 
@@ -108,158 +279,7 @@ const ipcService = {
   popup: {
     open: (type: PopupType, id: string, initialData: any, force?: boolean) => {
       if (!isElectron) return;
-      if (type === 'applyMember') {
-        const { userId, serverId } = initialData;
-        Promise.all([data.server({ userId, serverId }), data.memberApplication({ userId, serverId })]).then(([server, memberApplication]) => {
-          if (!server) return;
-          ipcRenderer.send('open-popup', type, id, { server, memberApplication }, force);
-        });
-      } else if (type === 'applyFriend') {
-        const { userId, targetId } = initialData;
-        Promise.all([
-          data.user({ userId: targetId }),
-          data.friendGroups({ userId }),
-          data.friendApplication({ senderId: userId, receiverId: targetId }),
-          data.friendApplication({ senderId: targetId, receiverId: userId }),
-        ]).then(([target, friendGroups, friendApplication, receivedFriendApplication]) => {
-          if (!target || !friendGroups) return;
-          if (!receivedFriendApplication) {
-            ipcRenderer.send('open-popup', 'applyFriend', 'applyFriend', { userId, targetId, target, friendGroups, friendApplication }, force);
-          } else {
-            ipcRenderer.send('open-popup', 'approveFriend', 'approveFriend', { targetId, friendGroups }, force);
-          }
-        });
-      } else if (type === 'approveFriend') {
-        const { userId, targetId } = initialData;
-        Promise.all([data.friendGroups({ userId })]).then(([friendGroups]) => {
-          if (!friendGroups) return;
-          ipcRenderer.send('open-popup', type, id, { targetId, friendGroups }, force);
-        });
-      } else if (type === 'blockMember') {
-        const { userId, serverId } = initialData;
-        Promise.all([data.member({ userId, serverId })]).then(([member]) => {
-          if (!member) return;
-          ipcRenderer.send('open-popup', type, id, { userId, serverId, member }, force);
-        });
-      } else if (type === 'channelSetting') {
-        const { userId, serverId, channelId } = initialData;
-        Promise.all([data.user({ userId }), data.server({ userId, serverId }), data.channel({ userId, serverId, channelId }), data.channelMembers({ serverId, channelId })]).then(
-          ([user, server, channel, channelMembers]) => {
-            if (!user || !server || !channel || !channelMembers) return;
-            const title = channel.name ?? '';
-            ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, user, server, channel, channelMembers }, force, title);
-          },
-        );
-      } else if (type === 'createServer') {
-        const { userId } = initialData;
-        Promise.all([data.user({ userId }), data.servers({ userId })]).then(([user, servers]) => {
-          if (!user || !servers) return;
-          ipcRenderer.send('open-popup', type, id, { userId, user, servers }, force);
-        });
-      } else if (type === 'createChannel') {
-        const { userId, serverId, channelId } = initialData;
-        if (!channelId) {
-          ipcRenderer.send('open-popup', type, id, { userId, serverId }, force);
-        } else {
-          Promise.all([data.channel({ userId, serverId, channelId })]).then(([parent]) => {
-            if (!parent) return;
-            ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, parent }, force);
-          });
-        }
-      } else if (type === 'chatHistory') {
-        const { userId, targetId } = initialData;
-        Promise.all([data.user({ userId }), data.friend({ userId, targetId }), data.user({ userId: targetId })]).then(([user, friend, target]) => {
-          if (!user || !target) return;
-          const title = target.name ?? '';
-          ipcRenderer.send('open-popup', type, id, { userId, targetId, user, friend, target }, force, title);
-        });
-      } else if (type === 'directMessage') {
-        const { userId, targetId, event, message } = initialData;
-        Promise.all([data.user({ userId }), data.friend({ userId, targetId }), data.user({ userId: targetId })]).then(([user, friend, target]) => {
-          if (!user || !target) return;
-          const title = target.name ?? '';
-          ipcRenderer.send('open-popup', type, id, { userId, targetId, user, friend, target, event, message }, force, title);
-        });
-      } else if (type === 'editChannelOrder') {
-        const { userId, serverId } = initialData;
-        Promise.all([data.channels({ userId, serverId })]).then(([serverChannels]) => {
-          if (!serverChannels) return;
-          ipcRenderer.send('open-popup', type, id, { userId, serverId, serverChannels }, force);
-        });
-      } else if (type === 'editChannelName') {
-        const { userId, serverId, channelId } = initialData;
-        Promise.all([data.channel({ userId, serverId, channelId })]).then(([channel]) => {
-          if (!channel) return;
-          ipcRenderer.send('open-popup', type, id, { userId, serverId, channelId, channel }, force);
-        });
-      } else if (type === 'editFriendNote') {
-        const { userId, targetId } = initialData;
-        Promise.all([data.friend({ userId, targetId }), data.friendGroups({ userId })]).then(([friend, friendGroups]) => {
-          if (!friend || !friendGroups) return;
-          ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, friendGroups }, force);
-        });
-      } else if (type === 'editFriendGroupName') {
-        const { userId, friendGroupId } = initialData;
-        Promise.all([data.friendGroup({ userId, friendGroupId })]).then(([friendGroup]) => {
-          if (!friendGroup) return;
-          ipcRenderer.send('open-popup', type, id, { userId, friendGroupId, friendGroup }, force);
-        });
-      } else if (type === 'editNickname') {
-        const { userId, serverId } = initialData;
-        Promise.all([data.member({ userId, serverId })]).then(([member]) => {
-          if (!member) return;
-          ipcRenderer.send('open-popup', type, id, { userId, serverId, member }, force);
-        });
-      } else if (type === 'friendVerification') {
-        const { userId } = initialData;
-        Promise.all([data.friendApplications({ receiverId: userId })]).then(([friendApplications]) => {
-          if (!friendApplications) return;
-          ipcRenderer.send('open-popup', type, id, { userId, friendApplications }, force);
-        });
-      } else if (type === 'inviteMember') {
-        const { userId, serverId } = initialData;
-        Promise.all([data.member({ userId, serverId }), data.memberInvitation({ serverId, receiverId: userId })]).then(([target, memberInvitation]) => {
-          if (!target) return;
-          ipcRenderer.send('open-popup', type, id, { userId, serverId, target, memberInvitation }, force);
-        });
-      } else if (type === 'memberApplicationSetting') {
-        const { userId, serverId } = initialData;
-        Promise.all([data.server({ userId, serverId })]).then(([server]) => {
-          if (!server) return;
-          ipcRenderer.send('open-popup', type, id, { userId, serverId, server }, force);
-        });
-      } else if (type === 'memberInvitation') {
-        const { userId } = initialData;
-        Promise.all([data.memberInvitations({ receiverId: userId })]).then(([memberInvitations]) => {
-          if (!memberInvitations) return;
-          ipcRenderer.send('open-popup', type, id, { userId, memberInvitations }, force);
-        });
-      } else if (type === 'serverSetting') {
-        const { userId, serverId } = initialData;
-        Promise.all([data.user({ userId }), data.server({ userId, serverId }), data.serverMembers({ serverId }), data.memberApplications({ serverId })]).then(
-          ([user, server, serverMembers, memberApplications]) => {
-            if (!user || !server || !serverMembers || !memberApplications) return;
-            const title = server.name ?? '';
-            ipcRenderer.send('open-popup', type, id, { userId, serverId, user, server, serverMembers, memberApplications }, force, title);
-          },
-        );
-      } else if (type === 'systemSetting') {
-        const { userId } = initialData;
-        const systemSettings = ipcService.systemSettings.get();
-        Promise.all([data.user({ userId })]).then(([user]) => {
-          if (!user) return;
-          ipcRenderer.send('open-popup', type, id, { userId, user, systemSettings }, force);
-        });
-      } else if (type === 'userInfo') {
-        const { userId, targetId } = initialData;
-        Promise.all([data.friend({ userId, targetId }), data.user({ userId: targetId }), data.servers({ userId: targetId })]).then(([friend, target, targetServers]) => {
-          if (!target || !targetServers) return;
-          const title = target.name ?? '';
-          ipcRenderer.send('open-popup', type, id, { userId, targetId, friend, target, targetServers }, force, title);
-        });
-      } else {
-        ipcRenderer.send('open-popup', type, id, initialData, force);
-      }
+      ipcRenderer.send('open-popup', type, id, initialData, force);
     },
 
     close: (id: string) => {
@@ -335,17 +355,17 @@ const ipcService = {
     },
   },
 
-  auth: {
-    login: (token: string) => {
-      if (!isElectron) return;
-      ipcRenderer.send('login', token);
-    },
+  // auth: {
+  //   login: (token: string) => {
+  //     if (!isElectron) return;
+  //     ipcRenderer.send('login', token);
+  //   },
 
-    logout: () => {
-      if (!isElectron) return;
-      ipcRenderer.send('logout');
-    },
-  },
+  //   logout: () => {
+  //     if (!isElectron) return;
+  //     ipcRenderer.send('logout');
+  //   },
+  // },
 
   customThemes: {
     get: (): Theme[] => {

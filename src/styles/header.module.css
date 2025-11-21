@@ -240,6 +240,7 @@
   overflow: hidden;
   white-space: nowrap;
   padding: 0 13px;
+  font-size: 1.06rem;
 }
 
 .main-tabs .tab::before {

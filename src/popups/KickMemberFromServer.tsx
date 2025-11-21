@@ -12,33 +12,25 @@ import popup from '@/styles/popup.module.css';
 // Services
 import ipc from '@/services/ipc.service';
 
-interface BlockMemberPopupProps {
+interface KickMemberFromServerPopupProps {
   serverId: Server['serverId'];
   member: Member;
 }
 
-const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId, member }) => {
+const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = React.memo(({ serverId, member }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [blockType, setBlockType] = useState<'block-temporary' | 'block-permanent' | 'block-ip'>('block-permanent');
   const [formatType, setFormatType] = useState<string>('hours');
   const [selectTime, setSelectTime] = useState<number>(1);
+  const [selectReason, setSelectReason] = useState<string>('');
+  const [otherReason, setOtherReason] = useState<string>('');
 
   // Destructuring
   const { userId, name: memberName, nickname: memberNickname } = member;
 
   // Memos
-  const BLOCK_TYPE_OPTIONS = useMemo(
-    () => [
-      // { key: 'block-temporary', label: t('block-temporary'), disabled: false },
-      { key: 'block-permanent', label: t('block-permanent'), disabled: false },
-      { key: 'block-ip', label: t('block-ip'), disabled: true },
-    ],
-    [t],
-  );
-
   const FORMAT_TYPE_OPTIONS = useMemo(
     () => [
       { key: 'seconds', label: t('second') },
@@ -47,6 +39,17 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
       { key: 'days', label: t('day') },
       { key: 'month', label: t('month') },
       { key: 'years', label: t('year') },
+    ],
+    [t],
+  );
+
+  const KCIK_REASON = useMemo(
+    () => [
+      { key: 'spam', label: t('reason-spam') },
+      { key: 'abuse', label: t('reason-abuse') },
+      { key: 'harassment', label: t('reason-harassment') },
+      { key: 'inappropriate-content', label: t('reason-inappropriate-content') },
+      { key: 'other', label: t('reason-other') },
     ],
     [t],
   );
@@ -90,12 +93,10 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
   }, [formatType, selectTime]);
 
   // Variables
-  const isBlock = blockType === 'block-temporary';
 
   // Handlers
   const handleBlockUserFromServer = (userId: User['userId'], serverId: Server['serverId'], blockUntil: number) => {
     ipc.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
-    ipc.socket.send('terminateMember', { userId, serverId });
     ipc.window.close();
   };
 
@@ -110,39 +111,48 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup['alert']}`} />
           <div className={popup['col']}>
-            <div className={popup['label']}>{t('confirm-block-user', { '0': memberNickname || memberName })}</div>
+            <div className={popup['label']}>{t('confirm-kick-user-from-server', { '0': memberNickname || memberName })}</div>
             <div className={popup['col']}>
-              <div className={`${popup['input-box']} ${popup['row']}`}>
-                <div className={popup['label']}>{t('block-type')}</div>
-                <div className={popup['select-box']}>
-                  <select value={blockType} onChange={(e) => setBlockType(e.target.value as 'block-temporary' | 'block-permanent' | 'block-ip')}>
-                    {BLOCK_TYPE_OPTIONS.map((option) => (
-                      <option key={option.key} value={option.key} disabled={option.disabled}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('kick-time')}</div>
+                <div className={`${popup['row']}`}>
+                  <div className={popup['select-box']}>
+                    <select value={selectTime} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
+                      {LENGTH_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={popup['select-box']}>
+                    <select value={formatType} onChange={(e) => setFormatType(e.target.value)}>
+                      {FORMAT_TYPE_OPTIONS.map((option) => (
+                        <option key={option.key} value={option.key}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div className={`${popup['input-box']} ${popup['row']}`} style={{ display: 'none' }}>
-                <div className={popup['label']}>{t('block-time')}</div>
-                <div className={popup['select-box']}>
-                  <select value={selectTime} disabled={!isBlock} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
-                    {LENGTH_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className={popup['select-box']}>
-                  <select value={formatType} disabled={!isBlock} onChange={(e) => setFormatType(e.target.value)}>
-                    {FORMAT_TYPE_OPTIONS.map((option) => (
-                      <option key={option.key} value={option.key}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('kick-reason')}</div>
+                <div className={`${popup['row']}`}>
+                  <div className={popup['select-box']}>
+                    <select value={selectReason} onChange={(e) => setSelectReason(e.target.value)}>
+                      {KCIK_REASON.map((option) => (
+                        <option key={option.key} value={option.key}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {selectReason === 'other' && (
+                    <div className={popup['input-box']}>
+                      <input type="text" value={otherReason} placeholder={`${t('reason')}(${t('limit-text', { 0: '20' })})`} maxLength={20} onChange={(e) => setOtherReason(e.target.value)} />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -152,7 +162,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div className={popup['button']} onClick={() => handleBlockUserFromServer(userId, serverId, blockType === 'block-temporary' ? Date.now() + BLOCK_TIME : -1)}>
+        <div className={popup['button']} onClick={() => handleBlockUserFromServer(userId, serverId, Date.now() + BLOCK_TIME)}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>
@@ -163,6 +173,6 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
   );
 });
 
-BlockMemberPopup.displayName = 'BlockMemberPopup';
+KickMemberFromServerPopup.displayName = 'KickMemberFromServerPopup';
 
-export default BlockMemberPopup;
+export default KickMemberFromServerPopup;

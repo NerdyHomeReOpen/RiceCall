@@ -14,7 +14,6 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
 import ipc from '@/services/ipc.service';
-import api from '@/services/api.service';
 
 // Utils
 import {
@@ -333,9 +332,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                           }
                           const formData = new FormData();
                           formData.append('_type', 'server');
-                          formData.append('_fileName', serverAvatar);
+                          formData.append('_fileName', serverId);
                           formData.append('_file', data.imageDataUrl as string);
-                          const response = await api.post('/upload', formData);
+                          const response = await ipc.data.upload(formData);
                           if (response) {
                             setServer((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
                           }

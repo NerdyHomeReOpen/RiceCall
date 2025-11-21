@@ -1,15 +1,13 @@
 // Services
-import api from '@/services/api.service';
+import api from './api.service.js';
 
 // Package
-import packageJson from '../../package.json';
+import packageJson from './package.json' with { type: 'json' };
 const version = packageJson.version;
 
 interface LoginFormData {
   account: string;
   password: string;
-  rememberAccount: boolean;
-  autoLogin: boolean;
 }
 
 interface RegisterFormData {
@@ -36,16 +34,7 @@ export const authService = {
     return { success: true, token: res.token };
   },
 
-  logout: async (): Promise<boolean> => {
-    localStorage.removeItem('token');
-
-    return true;
-  },
-
-  autoLogin: async (): Promise<{ success: true; token: string } | { success: false }> => {
-    const token = localStorage.getItem('token');
-    if (!token) return { success: false };
-
+  autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {
     const res = await api.post('/token/verify', {
       token,
       version,

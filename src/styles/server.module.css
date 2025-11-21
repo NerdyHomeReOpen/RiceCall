@@ -114,7 +114,7 @@
   justify-content: flex-start;
   align-items: center;
   min-width: 75px;
-  color: var(--text-color-quinary);
+  color: var(--text-color-quaternary);
   text-shadow: 0 1px 0 #ffffff;
 }
 
@@ -123,7 +123,7 @@
   justify-content: flex-start;
   align-items: center;
   min-width: 55px;
-  color: var(--text-color-quinary);
+  color: var(--text-color-quaternary);
   text-shadow: 0 1px 0 #ffffff;
 }
 
@@ -135,7 +135,7 @@
   background-image: url('/channel/ID.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-  margin-right: 5px;
+  margin-right: 2px;
 }
 
 .member-text::before {
@@ -146,7 +146,7 @@
   background-image: url('/channel/member.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-  margin-right: 5px;
+  margin-right: 2px;
 }
 
 .options {
@@ -223,6 +223,7 @@
 .section-title-text {
   color: var(--text-color-senary);
   padding: 5px 10px;
+  text-shadow: 0 1px #fff;
 }
 
 .current-channel-box {
@@ -288,6 +289,7 @@
   height: 25px;
   padding: 2px 20px 2px 8px;
   gap: 2px;
+  margin-right: 5px;
 }
 
 .channel-tab:hover {
@@ -360,7 +362,7 @@
 }
 
 .channel-tab .channel-user-count-text {
-  color: var(--text-color-quaternary);
+  color: #808080;
 }
 
 .user-list {
@@ -375,9 +377,14 @@
   display: flex;
   align-items: center;
   height: 25px;
-  padding: 2px 20px 0px 8px;
+  padding: 2px 20px 0px 23px;
   gap: 2px;
   text-shadow: 0 1px #fff;
+  margin-right: 5px;
+}
+
+.queue-list .user-tab {
+  padding: 2px 20px 0px 10px;
 }
 
 .user-tab:not(.selected):hover {
@@ -400,7 +407,7 @@
 }
 
 .channel-list .channel-list .user-list .user-tab {
-  padding-left: 25px;
+  padding-left: 40px;
 }
 
 .user-tab.selected,
@@ -513,15 +520,16 @@
 .message-area {
   display: flex;
   overflow-y: scroll;
-  padding: 10px;
+  overflow-x: hidden;
   height: 100%;
+  padding: 10px 10px 0 10px;
 }
 
 .broadcast-area {
   position: absolute;
-  left: 0;
+  left: 10px;
   bottom: calc(100% + 10px);
-  width: 100%;
+  width: calc(100% - 20px);
   min-height: 25px;
   display: flex;
   align-items: center;
@@ -535,9 +543,9 @@
 .input-area {
   position: relative;
   display: flex;
-  min-height: 60px;
+  min-height: 70px;
   max-height: 50%;
-  margin: 10px;
+  padding: 0 10px 10px 10px;
 }
 
 .button-area {
@@ -707,6 +715,7 @@
   color: var(--text-color-quaternary);
   text-align: center;
   position: relative;
+
   &::after {
     display: block;
     content: '';
@@ -718,9 +727,11 @@
     background-repeat: no-repeat;
     background-position: 0 0;
   }
+
   &:hover::after {
     background-position: -9px 0;
   }
+
   &:active::after {
     background-position: -18px 0;
   }
@@ -730,7 +741,8 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: var(--text-color-quaternary);
+  color: var(--text-color-secondary);
+
   &::before {
     content: '';
     min-height: 18px;
@@ -739,6 +751,7 @@
     background-repeat: no-repeat;
     background-position: 0 0;
   }
+
   &.active::before {
     background-position: -18px 0;
     animation: bkg-blink 1s steps(2, jump-none) infinite;
@@ -749,84 +762,111 @@
   0% {
     background-position: -18px 0;
   }
+
   3.8% {
     background-position: -36px 0;
   }
+
   7.6% {
     background-position: -54px 0;
   }
+
   11.4% {
     background-position: -72px 0;
   }
+
   15.2% {
     background-position: -90px 0;
   }
+
   19% {
     background-position: -108px 0;
   }
+
   22.8% {
     background-position: -126px 0;
   }
+
   26.6% {
     background-position: -144px 0;
   }
+
   30.4% {
     background-position: -162px 0;
   }
+
   34.2% {
     background-position: -180px 0;
   }
+
   38% {
     background-position: -198px 0;
   }
+
   41.8% {
     background-position: -216px 0;
   }
+
   45.6% {
     background-position: -234px 0;
   }
+
   49.4% {
     background-position: -252px 0;
   }
+
   53.2% {
     background-position: -234px 0;
   }
+
   57% {
     background-position: -216px 0;
   }
+
   60.8% {
     background-position: -198px 0;
   }
+
   64.6% {
     background-position: -180px 0;
   }
+
   68.4% {
     background-position: -162px 0;
   }
+
   72.2% {
     background-position: -144px 0;
   }
+
   76% {
     background-position: -126px 0;
   }
+
   79.8% {
     background-position: -108px 0;
   }
+
   83.6% {
     background-position: -90px 0;
   }
+
   87.4% {
     background-position: -72px 0;
   }
+
   91.2% {
     background-position: -54px 0;
   }
+
   95% {
     background-position: -36px 0;
   }
+
   98.8% {
     background-position: -18px 0;
   }
+
   100% {
     background-position: -18px 0;
   }
@@ -842,6 +882,7 @@
   background-image: url('/channel/Mic.png');
   background-repeat: no-repeat;
   background-position: 0 0;
+
   &::after {
     content: '';
     position: absolute;
@@ -852,6 +893,7 @@
     background-repeat: no-repeat;
     background-position: -16px 0;
   }
+
   &.muted::after {
     opacity: 1;
   }
@@ -864,6 +906,7 @@
   min-width: 8px;
   width: 8px;
   cursor: pointer;
+
   &::after {
     content: '';
     position: absolute;
@@ -874,9 +917,11 @@
     background-position: 0 0;
     transform: rotate(180deg);
   }
+
   &:hover::after {
     background-position: -9px 0;
   }
+
   &:active::after {
     background-position: -18px 0;
   }
@@ -916,6 +961,7 @@
   outline: none;
   border: 1px solid var(--border);
   cursor: pointer;
+
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -925,6 +971,7 @@
     background-image: url('/channel/Thresholdslider.png');
     cursor: pointer;
   }
+
   &::before {
     content: '';
     position: absolute;
@@ -944,6 +991,7 @@
   background-size: auto;
   background-repeat: no-repeat;
   background-position: -24px 0;
+
   &.active {
     opacity: 1;
   }
@@ -959,6 +1007,7 @@
   background-image: url('/channel/speaker.png');
   background-repeat: no-repeat;
   background-position: 0 0;
+
   &::after {
     position: absolute;
     content: '';
@@ -969,6 +1018,7 @@
     background-repeat: no-repeat;
     background-position: -18px 0;
   }
+
   &.muted::after {
     opacity: 1;
   }
@@ -984,6 +1034,7 @@
   align-items: center;
   margin-left: 5px;
   color: var(--text-color-quaternary);
+
   &.active {
     display: flex;
   }
@@ -997,9 +1048,11 @@
   background-image: url('/channel/recorder.png');
   background-repeat: no-repeat;
   background-position: 0 0;
+
   &.active {
     background-position: -18px 0;
   }
+
   &.active::after {
     z-index: -1;
     content: '';
@@ -1018,6 +1071,7 @@
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0.6;
   }

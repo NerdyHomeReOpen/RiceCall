@@ -5,12 +5,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from '@/styles/login.module.css';
 
 // Services
-import auth from '@/services/auth.service';
 import ipc from '@/services/ipc.service';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { handleOpenErrorDialog } from '@/utils/popup';
 
 interface FormDatas {
   account: string;
@@ -86,10 +84,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
 
     setIsLoading(true);
 
-    const res = await auth.login(formData).catch((error) => {
-      handleOpenErrorDialog(t(error.message), () => {});
-      return { success: false } as { success: false };
-    });
+    const res = await ipc.auth.login(formData.account, formData.password);
     if (res.success) {
       if (formData.rememberAccount) {
         ipc.accounts.add(formData.account, formData);
@@ -98,7 +93,6 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
         localStorage.setItem('token', res.token);
       }
       localStorage.setItem('login-account', formData.account);
-      ipc.auth.login(res.token);
       setSection('login');
     }
 

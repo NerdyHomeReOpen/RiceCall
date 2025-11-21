@@ -22,7 +22,17 @@ import LevelIcon from '@/components/LevelIcon';
 import ipc from '@/services/ipc.service';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenEditNickname, handleOpenApplyFriend, handleOpenBlockMember, handleOpenInviteMember } from '@/utils/popup';
+import {
+  handleOpenAlertDialog,
+  handleOpenDirectMessage,
+  handleOpenUserInfo,
+  handleOpenEditNickname,
+  handleOpenApplyFriend,
+  handleOpenBlockMember,
+  handleOpenKickMemberFromServer,
+  handleOpenKickMemberFromChannel,
+  handleOpenInviteMember,
+} from '@/utils/popup';
 import { isMember, isServerAdmin, isServerOwner, isChannelMod, isChannelAdmin } from '@/utils/permission';
 
 interface UserTabProps {
@@ -91,8 +101,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
   }, [isSpeaking, memberIsTextMuted, isMuted, memberIsVoiceMuted]);
 
   // Handlers
-  const handleSetIsUserMuted = (userId: User['userId'], muted: boolean) => {
-    webRTC.setUserMuted(userId, muted);
+  const handleMuteUser = (userId: User['userId']) => {
+    webRTC.muteUser(userId);
+  };
+
+  const handleUnmuteUser = (userId: User['userId']) => {
+    webRTC.unmuteUser(userId);
   };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
@@ -117,14 +131,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
 
   const handleForbidUserVoiceInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isVoiceMuted: boolean) => {
     ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted } });
-  };
-
-  const handleBlockUserFromServer = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipc.socket.send('blockUserFromServer', { userId, serverId }));
-  };
-
-  const handleBlockUserFromChannel = (userId: User['userId'], channelId: Channel['channelId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipc.socket.send('blockUserFromChannel', { userId, serverId, channelId }));
   };
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
@@ -209,7 +215,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
             id: 'set-mute',
             label: isMuted ? t('unmute') : t('mute'),
             show: !isUser,
-            onClick: () => handleSetIsUserMuted(memberUserId, !isMuted),
+            onClick: () => (isMuted ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)),
           },
           {
             id: 'edit-nickname',
@@ -247,13 +253,13 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
             id: 'kick-channel',
             label: t('kick-channel'),
             show: !isUser && isChannelMod(permissionLevel) && isSuperior && memberCurrentChannelId !== serverLobbyId,
-            onClick: () => handleBlockUserFromChannel(memberUserId, channelId, serverId, memberNickname || memberName),
+            onClick: () => handleOpenKickMemberFromChannel(memberUserId, serverId, channelId),
           },
           {
             id: 'kick-server',
             label: t('kick-server'),
             show: !isUser && isServerAdmin(permissionLevel) && isSuperior && memberCurrentServerId === serverId,
-            onClick: () => handleBlockUserFromServer(memberUserId, serverId, memberNickname || memberName),
+            onClick: () => handleOpenKickMemberFromServer(memberUserId, serverId),
           },
           {
             id: 'block',
