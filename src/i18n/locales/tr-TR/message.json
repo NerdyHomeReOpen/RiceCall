@@ -96,7 +96,7 @@
   "permission-denied": "Yetersiz izinler",
   "receive-shake-window": "Diğer taraf size bir pencere titreşimi gönderdi",
   "register-failed": "Kayıt başarısız oldu, lütfen daha sonra tekrar deneyin",
-  "register-success": "帳號註冊成功，請至 {{0}} 驗證你的電子郵件以啟用帳號，帳號未啟用前將無法登入。若未收到驗證信件，請至[官方網站](https://ricecall.com.tw)重新發送驗證信件。",
+  "register-success": "Hesap kaydı başarılı. Hesabınızı etkinleştirmek için lütfen e-posta adresinizi doğrulamak üzere {{0}} adresine gidin. Hesabınız etkinleştirilene kadar oturum açamazsınız. Doğrulama e-postası almadıysanız, lütfen doğrulama e-postasını yeniden göndermek için [resmi web sitesi](https://ricecall.com.tw) adresine gidin.",
   "reject-friend-application-failed": "Arkadaşlık isteği reddedildi. Lütfen daha sonra tekrar deneyin.",
   "reject-member-application-failed": "Üyelik başvurusu reddedildi. Lütfen daha sonra tekrar deneyin.",
   "reject-member-invitation-failed": "Üyelik davetini reddetme işlemi başarısız oldu. Lütfen daha sonra tekrar deneyin.",
