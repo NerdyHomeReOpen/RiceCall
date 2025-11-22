@@ -211,6 +211,7 @@
   background-image: url('/channel/chn_tree_split.png');
   background-repeat: no-repeat;
   background-position: 50% 0;
+  cursor: ns-resize;
 }
 
 .saperator-3 {

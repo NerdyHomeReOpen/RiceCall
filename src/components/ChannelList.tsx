@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/server.module.css';
@@ -40,6 +40,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
   const findMe = useFindMeContext();
+
+  // Refs
+  const queueListRef = useRef<HTMLDivElement>(null);
+  const isResizingQueueListRef = useRef<boolean>(false);
 
   // States
   const [viewType, setViewType] = useState<'all' | 'current'>('all');
@@ -100,6 +104,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
   };
 
+  const handleQueueListHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    isResizingQueueListRef.current = true;
+  };
+
+  const handleQueueListHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isResizingQueueListRef.current || !queueListRef.current) return;
+    queueListRef.current.style.maxHeight = `${e.clientY - queueListRef.current.offsetTop}px`;
+  };
+
   // Effects
   useEffect(() => {
     for (const channel of channels) {
@@ -112,6 +126,14 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
       setLatency(ipc.latency.get());
     }, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const resetResizing = () => {
+      isResizingQueueListRef.current = false;
+    };
+    document.addEventListener('pointerup', resetResizing);
+    return () => document.removeEventListener('pointerup', resetResizing);
   }, []);
 
   return (
@@ -215,7 +237,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
       {currentChannelVoiceMode === 'queue' && (
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
-          <div className={styles['scroll-view']} style={{ maxHeight: '120px' }}>
+          <div ref={queueListRef} className={styles['scroll-view']} style={{ minHeight: '120px', maxHeight: '120px' }}>
             <div className={styles['queue-list']}>
               {filteredQueueMembers.map((queueMember) => (
                 <QueueMemberTab
@@ -231,7 +253,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
               ))}
             </div>
           </div>
-          <div className={styles['saperator-2']} />
+          <div className={styles['saperator-2']} onPointerDown={handleQueueListHandleDown} onPointerMove={handleQueueListHandleMove} />
         </>
       )}
 

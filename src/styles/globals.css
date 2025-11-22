@@ -119,7 +119,7 @@ body {
   min-width: 2px;
   height: 100%;
   background-color: var(--border);
-  cursor: col-resize;
+  cursor: ew-resize;
   transition: background-color 0.1s ease-in-out;
 }
 
@@ -132,13 +132,13 @@ body {
   width: 100%;
   min-height: 2px;
   background-color: var(--border);
-  cursor: row-resize;
+  cursor: ns-resize;
   transition: background-color 0.1s ease-in-out;
 }
 
 .resize-handle-vertical:active,
 .resize-handle-vertical:hover {
-  background-color: var(--border);
+  background-color: var(--border-secondary);
 }
 
 /* Radio & Checkbox */
