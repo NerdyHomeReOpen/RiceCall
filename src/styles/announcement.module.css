@@ -27,6 +27,7 @@
   color: var(--text-color-quaternary);
   font-weight: bold;
   transition: color 0.1s ease;
+
   &::after {
     content: '';
     position: absolute;
@@ -37,10 +38,12 @@
     border-bottom: 2px solid #e72525;
     transition: all 0.1s ease;
   }
+
   &.active::after {
     left: 0;
     width: 100%;
   }
+
   &.active {
     color: #e72525;
   }
@@ -68,6 +71,7 @@
   color: var(--text-color-quaternary);
   border-bottom: 1px solid var(--border);
   cursor: pointer;
+
   &:hover {
     background-color: var(--hover);
   }
@@ -82,6 +86,7 @@
   min-width: 50px;
   width: fit-content;
   text-align: center;
+
   &[data-category='general'] {
     border-color: #005cbf;
     background-color: #e7f3ff;
@@ -128,6 +133,7 @@
   justify-content: center;
   align-items: center;
   background-color: #00000080;
+  animation: visibility 0.2s ease-in-out;
 }
 
 .announcement-detail-container {
@@ -141,6 +147,29 @@
   background-color: var(--background);
   box-shadow: 0 1px 1px #00000080;
   overflow-y: auto;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes visibility {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .announcement-detail-header {
