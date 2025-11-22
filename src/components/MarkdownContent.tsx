@@ -17,7 +17,7 @@ import markdown from '@/styles/markdown.module.css';
 import { useTranslation } from 'react-i18next';
 
 // Utils
-import { fromPreserveHtml, toPreserveHtml } from '@/utils/tagConverter';
+import { fromTags } from '@/utils/tagConverter';
 
 // Providers
 import { useImageViewer } from '@/providers/ImageViewer';
@@ -154,15 +154,17 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     },
   };
 
+  // Parse <@username-level-gender> to <tag data-tag='username-level-gender'></tag>
+  const parsed = markdownText.replace(/<@([^>]+)-([^>]+)-([^>]+)>/g, '<tag data-tag="$1-$2-$3"></tag>');
+
   // Memos
-  const preserved = useMemo(() => toPreserveHtml(markdownText), [markdownText]);
-  const sanitized = useMemo(() => DOMPurify.sanitize(preserved, { ALLOWED_TAGS, ALLOWED_ATTR }), [preserved]);
-  const restored = useMemo(() => fromPreserveHtml(sanitized), [sanitized]);
+  const sanitized = useMemo(() => DOMPurify.sanitize(parsed, { ALLOWED_TAGS, ALLOWED_ATTR }), [parsed]);
+  const converted = useMemo(() => fromTags(sanitized), [sanitized]);
 
   return (
     <div className={`${markdown['markdown-content']}`} style={{ userSelect: selectable ? 'text' : 'none' }}>
       <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components} skipHtml={false} unwrapDisallowed={false}>
-        {restored}
+        {converted}
       </ReactMarkdown>
     </div>
   );
