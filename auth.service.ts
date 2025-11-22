@@ -13,6 +13,7 @@ interface LoginFormData {
 interface RegisterFormData {
   account: string;
   password: string;
+  email: string;
   username: string;
 }
 
