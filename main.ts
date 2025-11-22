@@ -743,8 +743,8 @@ app.on('ready', async () => {
     setTrayDetail(isLogin);
   });
 
-  ipcMain.handle('auth-register', async (_, account: string, password: string, username: string) => {
-    return await authService.register({ account, password, username }).catch((error) => {
+  ipcMain.handle('auth-register', async (_, account: string, password: string, email: string, username: string) => {
+    return await authService.register({ account, password, email, username }).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
       return { success: false };
     });

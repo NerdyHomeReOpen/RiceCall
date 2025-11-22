@@ -196,7 +196,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     setIsLoading(true);
 
-    const res = await ipc.auth.register(formData.account, formData.password, formData.username);
+    const res = await ipc.auth.register(formData.account, formData.password, formData.email, formData.username);
     if (res.success) {
       handleOpenAlertDialog(t(res.message, { '0': formData.email }), () => {
         setSection('login');
