@@ -122,9 +122,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   }, [channels]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setLatency(ipc.latency.get());
-    }, 1000);
+    const interval = setInterval(() => setLatency(ipc.latency.get()), 1000);
     return () => clearInterval(interval);
   }, []);
 

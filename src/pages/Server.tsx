@@ -57,8 +57,8 @@ const MessageInputBoxGuard = React.memo(
 
     // Effects
     useEffect(() => {
-      const id = setInterval(() => setNow(Date.now()), 1000);
-      return () => clearInterval(id);
+      const interval = setInterval(() => setNow(Date.now()), 1000);
+      return () => clearInterval(interval);
     }, []);
 
     const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;

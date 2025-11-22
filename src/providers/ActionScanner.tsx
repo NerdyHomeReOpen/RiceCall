@@ -97,13 +97,13 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   // Effects
   useEffect(() => {
     if (!idleCheck.current) return;
-    const id = setInterval(() => {
+    const interval = setInterval(() => {
       const now = Date.now();
       if (isKeepAlive && now - lastActiveRef.current >= idleMinutes.current * 60_000) {
         setIsKeepAlive(false);
       }
     }, 1000);
-    return () => clearInterval(id);
+    return () => clearInterval(interval);
   }, [isKeepAlive]);
 
   useEffect(() => {

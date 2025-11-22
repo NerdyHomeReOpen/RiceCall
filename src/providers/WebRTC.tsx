@@ -927,10 +927,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // Effects
   useEffect(() => {
     if (!isRecording) return;
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setRecordTime((prev) => prev + 1);
-    }, 1000);
+    timerRef.current = setInterval(() => setRecordTime((prev) => prev + 1), 1000);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = null;
+    };
   }, [isRecording]);
 
   useEffect(() => {

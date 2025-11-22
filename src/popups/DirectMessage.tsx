@@ -235,13 +235,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, [event, message, handleDirectMessage, handleShakeWindow]);
 
   useEffect(() => {
-    const id = setInterval(() => {
+    const interval = setInterval(() => {
       if (cooldownRef.current === 0) return;
       const remaining = Math.max(0, cooldownRef.current - 1);
       setCooldown(remaining);
       cooldownRef.current = remaining;
     }, 1000);
-    return () => clearInterval(id);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
