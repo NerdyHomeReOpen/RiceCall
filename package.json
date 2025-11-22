@@ -58,7 +58,6 @@
     "electron-updater": "^6.6.2",
     "emoji.json": "^15.1.0",
     "font-list": "^1.5.1",
-    "highlight.js": "^11.11.1",
     "i18next": "^25.2.1",
     "mediasoup-client": "^3.12.5",
     "net": "^1.0.2",
@@ -70,8 +69,9 @@
     "react-i18next": "^15.5.3",
     "react-icons": "^5.5.0",
     "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
     "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.1",
+    "remark-breaks": "^4.0.0",
     "socket.io-client": "^4.8.1",
     "twemoji": "^14.0.2",
     "zod": "^4.1.5"

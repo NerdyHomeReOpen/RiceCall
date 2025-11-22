@@ -259,6 +259,8 @@
   width: 100%;
   aspect-ratio: 16/9;
   border: 0;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
 }
 
 .emoji {
