@@ -582,6 +582,8 @@ function configureAutoUpdater() {
   }
 
   autoUpdater.on('update-available', (info: UpdateInfo) => {
+    if (DEV) return;
+    console.info(`${new Date().toLocaleString()} | Update available: ${info.version}`);
     dialog
       .showMessageBox({
         type: 'info',
@@ -591,6 +593,7 @@ function configureAutoUpdater() {
       .catch((error) => {
         console.error(`${new Date().toLocaleString()} | Cannot show update dialog:`, error.message);
       });
+    isUpdateNotified = true;
   });
 
   autoUpdater.on('update-not-available', () => {
@@ -608,6 +611,7 @@ function configureAutoUpdater() {
 
   autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
     if (DEV) return;
+    console.info(`${new Date().toLocaleString()} | Update downloaded: ${info.version}`);
     dialog
       .showMessageBox({
         type: 'info',
@@ -618,26 +622,20 @@ function configureAutoUpdater() {
       .then((buttonIndex) => {
         if (buttonIndex.response === 0) {
           autoUpdater.quitAndInstall(false, true);
-          isUpdateNotified = false;
         }
       })
       .catch((error) => {
         console.error(`${new Date().toLocaleString()} | Cannot show update dialog:`, error.message);
       });
+    isUpdateNotified = false;
   });
 
   function checkUpdate() {
-    if (DEV) return;
-    if (isUpdateNotified) return;
+    if (DEV || isUpdateNotified) return;
     console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, env.UPDATE_CHANNEL);
-    autoUpdater
-      .checkForUpdates()
-      .then(() => {
-        isUpdateNotified = true;
-      })
-      .catch((error) => {
-        console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
-      });
+    autoUpdater.checkForUpdates().catch((error) => {
+      console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
+    });
   }
 
   // Check update every hour
