@@ -172,8 +172,7 @@
 
 .markdown-content img:not(.emoji) {
   margin: 5px;
-  width: 90%;
-  max-width: 256px;
+  max-width: calc(min(90%, 1024px));
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
 }
 
