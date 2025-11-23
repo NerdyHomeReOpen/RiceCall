@@ -92,8 +92,8 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
       setAccounts(accounts);
     };
     changeAccounts(ipc.accounts.get());
-    const unsubs = [ipc.accounts.onUpdate(changeAccounts)];
-    return () => unsubs.forEach((unsub) => unsub());
+    const unsub = ipc.accounts.onUpdate(changeAccounts);
+    return () => unsub();
   }, []);
 
   useEffect(() => {

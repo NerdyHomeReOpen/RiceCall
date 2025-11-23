@@ -75,8 +75,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
 
   // Effects
   useEffect(() => {
-    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
-    return () => unsubs.forEach((unsub) => unsub());
+    const unsub = ipc.window.onUnmaximize(() => setIsFullscreen(false));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.window.onMaximize(() => setIsFullscreen(true));
+    return () => unsub();
   }, []);
 
   return (

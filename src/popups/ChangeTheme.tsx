@@ -107,11 +107,9 @@ const ChangeThemePopup: React.FC = React.memo(() => {
       console.info('[Custom Themes] custom themes updated: ', customThemes);
       setCustomThemes(customThemes);
     };
-
     changeCustomTheme(ipc.customThemes.get());
-
-    const unsubs = [ipc.customThemes.onUpdate(changeCustomTheme)];
-    return () => unsubs.forEach((unsub) => unsub());
+    const unsub = ipc.customThemes.onUpdate(changeCustomTheme);
+    return () => unsub();
   }, []);
 
   useEffect(() => {

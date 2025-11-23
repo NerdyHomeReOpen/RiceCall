@@ -215,14 +215,22 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   // }, [actionScanner.isKeepAlive, user.status]);
 
   useEffect(() => {
-    isCloseToTray.current = ipc.systemSettings.closeToTray.get();
+    const changeCloseToTray = (enable: boolean) => {
+      isCloseToTray.current = enable;
+    };
+    changeCloseToTray(isCloseToTray.current);
+    const unsub = ipc.systemSettings.closeToTray.onUpdate(changeCloseToTray);
+    return () => unsub();
+  }, []);
 
-    const unsubs = [
-      ipc.systemSettings.closeToTray.onUpdate((enable) => (isCloseToTray.current = enable)),
-      ipc.window.onUnmaximize(() => setIsFullscreen(false)),
-      ipc.window.onMaximize(() => setIsFullscreen(true)),
-    ];
-    return () => unsubs.forEach((unsub) => unsub());
+  useEffect(() => {
+    const unsub = ipc.window.onMaximize(() => setIsFullscreen(true));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.window.onUnmaximize(() => setIsFullscreen(false));
+    return () => unsub();
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import i18n, { LanguageKey } from '@/i18n';
 
 // Providers
@@ -22,49 +22,53 @@ interface ProvidersProps {
 }
 
 const Providers = ({ children }: ProvidersProps) => {
-  // Handlers
-  const handleFontChange = useCallback((font: string | null) => {
-    console.info('[Font] font updated: ', font);
-    if (!font) return;
-    document.body.style.setProperty('font-family', font, 'important');
-    document.body.style.setProperty('--font-family', font, 'important');
-  }, []);
-
-  const handleFontSizeChange = useCallback((fontSize: number | null) => {
-    console.info('[Font] font size updated: ', fontSize);
-    if (!fontSize) return;
-    document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
-  }, []);
-
-  const handleThemeChange = useCallback((theme: Theme | null) => {
-    console.info('[Theme] theme updated: ', theme);
-    if (!theme) return;
-    document.body.style.setProperty('--header-image', theme.headerImage, 'important');
-    document.body.style.setProperty('--main-color', theme.mainColor, 'important');
-    document.body.style.setProperty('--secondary-color', theme.secondaryColor, 'important');
-  }, []);
-
-  const handleLanguageChange = useCallback((language: LanguageKey) => {
-    console.info('[Language] language updated: ', language);
-    if (!language) return;
-    i18n.changeLanguage(language);
-  }, []);
-
   // Effects
   useEffect(() => {
-    handleFontChange(ipc.systemSettings.font.get());
-    handleFontSizeChange(ipc.systemSettings.fontSize.get());
-    handleThemeChange(ipc.customThemes.current.get());
-    handleLanguageChange(ipc.language.get());
+    const changeFont = (font: string | null) => {
+      console.info('[Font] font updated: ', font);
+      if (!font) return;
+      document.body.style.setProperty('font-family', font, 'important');
+      document.body.style.setProperty('--font-family', font, 'important');
+    };
+    changeFont(ipc.systemSettings.font.get());
+    const unsub = ipc.systemSettings.font.onUpdate(changeFont);
+    return () => unsub();
+  }, []);
 
-    const unsubs = [
-      ipc.systemSettings.font.onUpdate(handleFontChange),
-      ipc.systemSettings.fontSize.onUpdate(handleFontSizeChange),
-      ipc.customThemes.current.onUpdate(handleThemeChange),
-      ipc.language.onUpdate(handleLanguageChange),
-    ];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, [handleFontChange, handleFontSizeChange, handleThemeChange, handleLanguageChange]);
+  useEffect(() => {
+    const changeFontSize = (fontSize: number | null) => {
+      console.info('[Font] font size updated: ', fontSize);
+      if (!fontSize) return;
+      document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
+    };
+    changeFontSize(ipc.systemSettings.fontSize.get());
+    const unsub = ipc.systemSettings.fontSize.onUpdate(changeFontSize);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const changeTheme = (theme: Theme | null) => {
+      console.info('[Theme] theme updated: ', theme);
+      if (!theme) return;
+      document.body.style.setProperty('--header-image', theme.headerImage, 'important');
+      document.body.style.setProperty('--main-color', theme.mainColor, 'important');
+      document.body.style.setProperty('--secondary-color', theme.secondaryColor, 'important');
+    };
+    changeTheme(ipc.customThemes.current.get());
+    const unsub = ipc.customThemes.current.onUpdate(changeTheme);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const changeLanguage = (language: LanguageKey) => {
+      console.info('[Language] language updated: ', language);
+      if (!language) return;
+      i18n.changeLanguage(language);
+    };
+    changeLanguage(ipc.language.get());
+    const unsub = ipc.language.onUpdate(changeLanguage);
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     const setupLanguage = async () => {
