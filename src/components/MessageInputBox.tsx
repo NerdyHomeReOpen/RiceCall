@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -71,10 +71,10 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   // States
   const [messageInput, setMessageInput] = useState<string>('');
 
-  // Memos
+  // Variables
   const textLength = editor?.getText().length || 0;
-  const isCloseToMaxLength = useMemo(() => textLength >= maxLength - 100, [textLength, maxLength]);
-  const isWarning = useMemo(() => textLength > maxLength, [textLength, maxLength]);
+  const isCloseToMaxLength = textLength >= maxLength - 100;
+  const isWarning = textLength > maxLength;
 
   // Handlers
   const syncStyles = useCallback(() => {

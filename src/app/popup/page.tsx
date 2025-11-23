@@ -303,7 +303,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
   const [type, setType] = useState<PopupType | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
 
-  // Memos
+  // Variables
   const { title, buttons, node, hideHeader } = useMemo<Popup>(() => {
     if (!id || !type || !initialData) return { id: '', type: 'dialogAlert', title: '', buttons: ['close'], node: () => null, hideHeader: true };
 
