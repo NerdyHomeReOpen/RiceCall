@@ -363,9 +363,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const setSelectedTabIdRef = useRef(mainTab.setSelectedTabId);
   const selectedTabIdRef = useRef(mainTab.selectedTabId);
   const loadingBoxRef = useRef(loadingBox);
-  const soundPlayerRef = useRef(soundPlayer);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
-  const serverIdRef = useRef<Server['serverId'] | null>(null);
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // States
@@ -570,19 +568,18 @@ const RootPageComponent: React.FC = React.memo(() => {
     const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<User> }[]) => {
       // Remove action messages and channel messages while switching server
       const currentServerId = args[0].update.currentServerId;
-      if (currentServerId !== undefined && currentServerId !== serverIdRef.current) {
+      if (currentServerId !== undefined && currentServerId !== serverId) {
         setActionMessages([]);
         setChannelMessages([]);
         setQueueUsers([]);
         setChannels([]);
         setServerOnlineMembers([]);
-        serverIdRef.current = currentServerId;
       }
       setUser((prev) => ({ ...prev, ...args[0].update }));
       if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
     });
     return () => unsub();
-  }, []);
+  }, [serverId]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendAdd', (...args: { data: Friend }[]) => {
@@ -791,10 +788,10 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('playSound', (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
-      args.forEach((s) => soundPlayerRef.current.playSound(s));
+      args.forEach((s) => soundPlayer.playSound(s));
     });
     return () => unsub();
-  }, []);
+  }, [soundPlayer]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('openPopup', (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => {
