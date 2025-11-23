@@ -37,36 +37,36 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
     ipc.socket.send('rejectMemberInvitation', { serverId });
   };
 
-  const handleRejectAllFriendApplication = () => {
+  const handleRejectAllMemberInvitation = () => {
     if (memberInvitations.length === 0) return;
     handleOpenAlertDialog(t('confirm-reject-all-member-invitation'), () => {
       ipc.socket.send('rejectMemberInvitation', ...memberInvitations.map((item) => ({ serverId: item.serverId })));
     });
   };
 
-  const handleMemberInvitationAdd = (...args: { data: MemberInvitation }[]) => {
-    const add = new Set(args.map((i) => `${i.data.serverId}`));
-    setMemberInvitations((prev) => prev.filter((mi) => !add.has(`${mi.serverId}`)).concat(args.map((i) => i.data)));
-  };
-
-  const handleMemberInvitationUpdate = (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => {
-    const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
-    setMemberInvitations((prev) => prev.map((mi) => (update.has(`${mi.serverId}`) ? { ...mi, ...update.get(`${mi.serverId}`) } : mi)));
-  };
-
-  const handleMemberInvitationRemove = (...args: { serverId: string }[]) => {
-    const remove = new Set(args.map((i) => i.serverId));
-    setMemberInvitations((prev) => prev.filter((mi) => !remove.has(mi.serverId)));
-  };
-
   // Effects
   useEffect(() => {
-    const unsubs = [
-      ipc.socket.on('memberInvitationAdd', handleMemberInvitationAdd),
-      ipc.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
-      ipc.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
-    ];
-    return () => unsubs.forEach((unsub) => unsub());
+    const unsub = ipc.socket.on('memberInvitationAdd', (...args: { data: MemberInvitation }[]) => {
+      const add = new Set(args.map((i) => `${i.data.serverId}`));
+      setMemberInvitations((prev) => prev.filter((mi) => !add.has(`${mi.serverId}`)).concat(args.map((i) => i.data)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('memberInvitationUpdate', (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => {
+      const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
+      setMemberInvitations((prev) => prev.map((mi) => (update.has(`${mi.serverId}`) ? { ...mi, ...update.get(`${mi.serverId}`) } : mi)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('memberInvitationRemove', (...args: { serverId: string }[]) => {
+      const remove = new Set(args.map((i) => i.serverId));
+      setMemberInvitations((prev) => prev.filter((mi) => !remove.has(mi.serverId)));
+    });
+    return () => unsub();
   }, []);
 
   return (
@@ -78,7 +78,7 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
             {t('unprocessed')}
             <span className={styles['processing-status-count']}>({memberInvitations.length})</span>
           </div>
-          <div className={styles['all-cancel-text']} onClick={handleRejectAllFriendApplication}>
+          <div className={styles['all-cancel-text']} onClick={handleRejectAllMemberInvitation}>
             {t('reject-all')}
           </div>
         </div>

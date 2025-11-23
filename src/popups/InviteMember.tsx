@@ -26,7 +26,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
   const [section, setSection] = useState<number>(memberInvitation ? 1 : 0); // 0: send, 1: sent, 2: edit
   const [invitationDesc, setInvitationDesc] = useState<string>(memberInvitation?.description || '');
 
-  // Destructuring
+  // Variables
   const { userId: targetId, name: targetName, avatarUrl: targetAvatarUrl, displayId: targetDisplayId, contribution: targetContribution } = target;
 
   // Handlers

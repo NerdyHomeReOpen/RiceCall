@@ -99,10 +99,9 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     pre: ({ ...props }: any) => <pre {...props} />,
   };
 
+  // Variables
   // Parse <@username-level-gender> to <tag data-tag='username-level-gender'></tag> and <t:timestamp:format> to <time data-timestamp='timestamp'></time>
   const parsed = markdownText.replace(/<@([^>]+)-([^>]+)-([^>]+)>/g, '<tag data-tag="$1-$2-$3"></tag>').replace(/<t:(\d+):(.*?)>/g, '<time data-timestamp="$1"></time>');
-
-  // Memos
   const sanitized = useMemo(() => DOMPurify.sanitize(parsed, { ALLOWED_TAGS, ALLOWED_ATTR }), [parsed]);
   const converted = useMemo(() => fromTags(sanitized), [sanitized]);
 

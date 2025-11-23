@@ -29,7 +29,7 @@ export function cleanMenu(items: ContextMenuItem[]): ContextMenuItem[] {
   return result;
 }
 
-interface ContextMenuProps {
+interface MicContextMenuProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -37,7 +37,7 @@ interface ContextMenuProps {
   onClose: () => void;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
+const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
   // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -104,7 +104,7 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
                 const { left, right, bottom, top } = e.currentTarget.getBoundingClientRect();
                 const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
                 const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
-                setSubMenu(<ContextMenu items={item.submenuItems} onClose={onClose} x={x} y={y} direction={direction} />);
+                setSubMenu(<MicContextMenu items={item.submenuItems} onClose={onClose} x={x} y={y} direction={direction} />);
               }}
               onMouseLeave={() => {
                 if (item.hasSubmenu) setSubMenu(null);
@@ -119,6 +119,6 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
   );
 });
 
-ContextMenu.displayName = 'ContextMenu';
+MicContextMenu.displayName = 'MicContextMenu';
 
-export default ContextMenu;
+export default MicContextMenu;

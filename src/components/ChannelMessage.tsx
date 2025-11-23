@@ -20,6 +20,9 @@ import { isServerAdmin } from '@/utils/permission';
 import { handleOpenDirectMessage, handleOpenUserInfo, handleOpenBlockMember } from '@/utils/popup';
 import { getFormatTimestamp } from '@/utils/language';
 
+// Constants
+import { ALLOWED_MESSAGE_KEYS } from '@/constant';
+
 interface ChannelMessageProps {
   messageGroup: ChannelMessage & { contents: string[] };
   user: User;
@@ -32,7 +35,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   const contextMenu = useContextMenu();
   const { t } = useTranslation();
 
-  // Destructuring
+  // Variables
   const {
     userId: senderUserId,
     name: senderName,
@@ -43,20 +46,13 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     contents: messageContents,
     timestamp: messageTimestamp,
   } = messageGroup;
-
   const { userId, permissionLevel: globalPermission } = user;
-
   const { permissionLevel: channelPermissionLevel } = channel;
   const { serverId, permissionLevel: serverPermissionLevel } = server;
-
-  // Variables
   const permissionLevel = Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel);
-  const isUser = useMemo(() => senderUserId === userId, [senderUserId, userId]);
+  const isUser = senderUserId === userId;
   const isSuperior = permissionLevel > senderPermissionLevel;
-
-  // Memos
-  const ALLOWED_MESSAGE_KEYS = useMemo(() => ['guest-send-an-external-link'], []);
-  const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
+  const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
   const formattedMessageContents = useMemo(
     () =>
       messageContents.map((content) =>
@@ -65,7 +61,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
           .map((c) => (ALLOWED_MESSAGE_KEYS.includes(c) ? t(c) : c))
           .join(' '),
       ),
-    [messageContents, t, ALLOWED_MESSAGE_KEYS],
+    [messageContents, t],
   );
 
   return (

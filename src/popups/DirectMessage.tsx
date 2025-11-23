@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
@@ -34,8 +34,8 @@ import vip from '@/styles/vip.module.css';
 import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenChatHistory, handleOpenUserInfo } from '@/utils/popup';
 import { toTags } from '@/utils/tagConverter';
 
-const SHAKE_COOLDOWN = 3;
-const MAX_LENGTH = 1000;
+// Constants
+import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN } from '@/constant';
 
 interface DirectMessagePopupProps {
   userId: User['userId'];
@@ -73,7 +73,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const [directMessages, setDirectMessages] = useState<(DirectMessage | PromptMessage)[]>([]);
   const [cooldown, setCooldown] = useState<number>(0);
 
-  // Destructuring
+  // Variables
   const { avatarUrl: userAvatarUrl } = user;
   const {
     userId: targetUserId,
@@ -90,13 +90,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     isVerified: targetIsVerified,
   } = target;
   const { name: targetCurrentServerName } = targetCurrentServer || {};
-
-  // Memos
   const textLength = editor?.getText().length || 0;
-  const isWarning = useMemo(() => textLength > MAX_LENGTH, [textLength]);
-  const isFriend = useMemo(() => friendState?.relationStatus === 2, [friendState]);
-  const isBlocked = useMemo(() => friendState?.isBlocked, [friendState]);
-  const isOnline = useMemo(() => targetStatus !== 'offline', [targetStatus]);
+  const isWarning = textLength > MAX_INPUT_LENGTH;
+  const isFriend = friendState?.relationStatus === 2;
+  const isBlocked = friendState?.isBlocked;
+  const isOnline = targetStatus !== 'offline';
 
   // Handlers
   const syncStyles = useCallback(() => {
@@ -106,7 +104,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   const handlePaste = async (imageData: string, fileName: string) => {
     isUploadingRef.current = true;
-    if (imageData.length > 5 * 1024 * 1024) {
+    if (imageData.length > MAX_FILE_SIZE) {
       handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
@@ -162,16 +160,49 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
   };
 
-  const handleFriendUpdate = useCallback(
-    (...args: { targetId: User['userId']; update: Partial<Friend> }[]) => {
+  const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    isScrollToBottomRef.current = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
+  };
+
+  // Effects
+  useEffect(() => {
+    editor?.on('selectionUpdate', syncStyles);
+  }, [editor, syncStyles]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (cooldownRef.current === 0) return;
+      const remaining = Math.max(0, cooldownRef.current - 1);
+      setCooldown(remaining);
+      cooldownRef.current = remaining;
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (!targetId || !targetCurrentServerId || isBlocked || !isFriend || !targetShareCurrentServer) {
+      setTargetCurrentServer(null);
+      return;
+    }
+    ipc.data.server(targetId, targetCurrentServerId).then((server) => {
+      if (server) setTargetCurrentServer(server);
+    });
+  }, [targetId, targetCurrentServerId, isBlocked, isFriend, targetShareCurrentServer]);
+
+  useEffect(() => {
+    if (!friendState) ipc.socket.send('stranger', { targetId });
+  }, [friendState, targetId]);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: User['userId']; update: Partial<Friend> }[]) => {
       if (targetId !== targetUserId) return;
       setFriendState((prev) => ({ ...prev, ...args[0].update }) as Friend);
-    },
-    [targetId, targetUserId],
-  );
+    });
+    return () => unsub();
+  }, [targetId, targetUserId]);
 
-  const handleDirectMessage = useCallback(
-    (...args: DirectMessage[]) => {
+  useEffect(() => {
+    const onDirectMessage = (...args: DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
@@ -181,12 +212,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
         if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
       });
-    },
-    [userId, targetId],
-  );
+    };
+    if (event === 'directMessage') onDirectMessage(message);
+    const unsub = ipc.socket.on('directMessage', onDirectMessage);
+    return () => unsub();
+  }, [event, message, userId, targetId]);
 
-  const handleShakeWindow = useCallback(
-    (...args: DirectMessage[]) => {
+  useEffect(() => {
+    const onShakeWindow = (...args: DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
@@ -212,54 +245,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
           requestAnimationFrame(shake);
         }
       });
-    },
-    [userId, targetId],
-  );
-
-  const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    isScrollToBottomRef.current = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
-  };
-
-  // Effects
-  useEffect(() => {
-    editor?.on('selectionUpdate', syncStyles);
-  }, [editor, syncStyles]);
-
-  useEffect(() => {
-    if (event === 'shakeWindow') handleShakeWindow(message);
-    if (event === 'directMessage') handleDirectMessage(message);
-  }, [event, message, handleDirectMessage, handleShakeWindow]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (cooldownRef.current === 0) return;
-      const remaining = Math.max(0, cooldownRef.current - 1);
-      setCooldown(remaining);
-      cooldownRef.current = remaining;
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (!targetId || !targetCurrentServerId || isBlocked || !isFriend || !targetShareCurrentServer) {
-      setTargetCurrentServer(null);
-      return;
-    }
-    ipc.data.server(targetId, targetCurrentServerId).then((server) => {
-      if (server) setTargetCurrentServer(server);
-    });
-  }, [targetId, targetCurrentServerId, isBlocked, isFriend, targetShareCurrentServer]);
-
-  useEffect(() => {
-    if (!friendState) {
-      ipc.socket.send('stranger', { targetId });
-    }
-  }, [friendState, targetId]);
-
-  useEffect(() => {
-    const unsubs = [ipc.socket.on('friendUpdate', handleFriendUpdate), ipc.socket.on('directMessage', handleDirectMessage), ipc.socket.on('shakeWindow', handleShakeWindow)];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, [handleFriendUpdate, handleDirectMessage, handleShakeWindow]);
+    };
+    if (event === 'shakeWindow') onShakeWindow(message);
+    const unsub = ipc.socket.on('shakeWindow', onShakeWindow);
+    return () => unsub();
+  }, [event, message, userId, targetId]);
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -392,7 +382,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               }}
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={() => (isComposingRef.current = false)}
-              maxLength={MAX_LENGTH}
+              maxLength={MAX_INPUT_LENGTH}
             />
           </div>
         </div>

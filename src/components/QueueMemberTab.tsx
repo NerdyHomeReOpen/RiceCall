@@ -42,7 +42,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
   // Refs
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Destructuring
+  // Variables
   const {
     userId: memberUserId,
     name: memberName,
@@ -62,25 +62,23 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
   const { userId, permissionLevel: globalPermission } = user;
   const { serverId, lobbyId: serverLobbyId, permissionLevel: serverPermission } = server;
   const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermission } = channel;
-
-  // Variables
   const permissionLevel = Math.max(globalPermission, serverPermission, channelPermission);
   const isUser = memberUserId === userId;
   const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
   const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
   const isControlled = memberPosition === 0 && memberIsQueueControlled && !isChannelMod(memberPermission);
-  const isFriend = friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2);
+  const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = permissionLevel > memberPermission;
   const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
 
-  const statusIcon = useMemo(() => {
+  // Handlers
+  const getStatusIcon = () => {
     if (isMuted || memberIsVoiceMuted || isControlled) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
     return '';
-  }, [isSpeaking, memberIsTextMuted, isMuted, memberIsVoiceMuted, isControlled]);
+  };
 
-  // Handlers
   const handleMuteUser = (userId: User['userId']) => {
     webRTC.muteUser(userId);
   };
@@ -320,7 +318,7 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
         ]);
       }}
     >
-      <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} />
+      <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       <div className={`${styles['user-queue-position']}`}>{memberPosition + 1}.</div>
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}

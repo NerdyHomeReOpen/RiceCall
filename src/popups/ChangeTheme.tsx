@@ -219,13 +219,12 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       if (!file) return;
                       const reader = new FileReader();
                       reader.onloadend = () =>
-                        handleOpenImageCropper(reader.result as string, async (data) => {
-                          const base64String = data.imageDataUrl as string;
-                          const dominantColor = await getDominantColor(base64String);
+                        handleOpenImageCropper(reader.result as string, async (imageDataUrl: string) => {
+                          const dominantColor = await getDominantColor(imageDataUrl);
                           const visibleColor = getVisibleColor(dominantColor);
                           const contrastColor = getContrastColor(dominantColor);
                           const newTheme: Theme = {
-                            headerImage: `url(${base64String})`,
+                            headerImage: `url(${imageDataUrl})`,
                             mainColor: toRGBString(visibleColor),
                             secondaryColor: toRGBString(contrastColor),
                           };

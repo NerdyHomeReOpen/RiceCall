@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 // Types
 import type { Channel, Server } from '@/types';
@@ -27,12 +27,10 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
   // States
   const [channel, setChannel] = useState<Channel>(Default.channel());
 
-  // Destructuring
+  // Variables
   const { name: channelName } = channel;
   const { channelId: parentChannelId, name: parentChannelName } = parentData || {};
-
-  // Memos
-  const canSubmit = useMemo(() => channelName.trim(), [channelName]);
+  const canSubmit = channelName.trim();
 
   // Handlers
   const handleCreateChannel = (serverId: Server['serverId'], preset: Partial<Channel>) => {

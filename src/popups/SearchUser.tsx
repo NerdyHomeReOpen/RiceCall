@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Types
 import type { User } from '@/types';
@@ -27,8 +27,8 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  // Memos
-  const canSubmit = useMemo(() => searchQuery.trim(), [searchQuery]);
+  // Variables
+  const canSubmit = searchQuery.trim();
 
   // Handlers
   const handleSearchUser = (query: string) => {
@@ -39,8 +39,13 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
     ipc.window.close();
   };
 
-  const handleUserSearch = useCallback(
-    (...args: User[]) => {
+  // Effects
+  useEffect(() => {
+    setError(null);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('userSearch', (...args: User[]) => {
       // TODO: Need to handle while already friend
       if (!args.length) {
         setError(t('user-not-found'));
@@ -53,19 +58,9 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         else handleOpenApplyFriend(userId, targetId);
         ipc.window.close();
       });
-    },
-    [userId, t],
-  );
-
-  // Effects
-  useEffect(() => {
-    setError(null);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    const unsubs = [ipc.socket.on('userSearch', handleUserSearch)];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, [handleUserSearch]);
+    });
+    return () => unsub();
+  }, [userId, t]);
 
   return (
     <div className={popup['popup-wrapper']}>

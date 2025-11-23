@@ -42,34 +42,26 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const contextMenu = useContextMenu();
     const findMe = useFindMeContext();
 
-    // Destructuring
+    // Variables
     const { userId, permissionLevel: globalPermissionLevel, currentChannelId: userCurrentChannelId } = user;
     const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, permissionLevel: channelPermissionLevel, categoryId: channelCategoryId } = channel;
     const { permissionLevel: currentChannelPermissionLevel } = currentChannel;
     const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
-
-    // Memos
-    const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel), [globalPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
-    const currentPermissionLevel = useMemo(
-      () => Math.max(globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel),
-      [globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel],
-    );
+    const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
+    const currentPermissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel);
     const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
     const channelMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === channelId), [serverOnlineMembers, channelId]);
     const channelUserIds = useMemo(() => channelMembers.map((m) => m.userId), [channelMembers]);
     const movableUserIds = useMemo(() => channelMembers.filter((m) => m.permissionLevel <= currentPermissionLevel).map((m) => m.userId), [channelMembers, currentPermissionLevel]);
-    const isInChannel = useMemo(() => userCurrentChannelId === channelId, [userCurrentChannelId, channelId]);
-    const isLobby = useMemo(() => serverLobbyId === channelId, [serverLobbyId, channelId]);
-    const isReceptionLobby = useMemo(() => serverReceptionLobbyId === channelId, [serverReceptionLobbyId, channelId]);
-    const isMemberChannel = useMemo(() => channelVisibility === 'member', [channelVisibility]);
-    const isPrivateChannel = useMemo(() => channelVisibility === 'private', [channelVisibility]);
-    const isReadonlyChannel = useMemo(() => channelVisibility === 'readonly', [channelVisibility]);
-    const isFull = useMemo(() => channelUserLimit && channelUserLimit <= channelMembers.length, [channelUserLimit, channelMembers]);
-    const isSelected = useMemo(() => selectedItemId === `channel-${channelId}`, [selectedItemId, channelId]);
-    const canJoin = useMemo(
-      () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
-      [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
-    );
+    const isInChannel = userCurrentChannelId === channelId;
+    const isLobby = serverLobbyId === channelId;
+    const isReceptionLobby = serverReceptionLobbyId === channelId;
+    const isMemberChannel = channelVisibility === 'member';
+    const isPrivateChannel = channelVisibility === 'private';
+    const isReadonlyChannel = channelVisibility === 'readonly';
+    const isFull = channelUserLimit && channelUserLimit <= channelMembers.length;
+    const isSelected = selectedItemId === `channel-${channelId}`;
+    const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel));
     const filteredChannelMembers = useMemo(
       () => channelMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
       [channelMembers],

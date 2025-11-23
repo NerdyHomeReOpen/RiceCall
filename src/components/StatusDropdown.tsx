@@ -1,38 +1,15 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
 
 // Types
-import type { ContextMenuItem, User } from '@/types';
+import type { User } from '@/types';
 
-// Hooks
-import { useTranslation } from 'react-i18next';
+// Constants
+import { STATUS_OPTIONS } from '@/constant';
 
-/**
- * Clean the menu items by removing duplicate separators and ensuring that separators are not placed at the beginning or end of the menu.
- * @param items - The menu items to clean.
- * @returns The cleaned menu items.
- */
-export function cleanMenu(items: ContextMenuItem[]): ContextMenuItem[] {
-  const preFiltered = items.filter((item) => item.id === 'separator' || item.show !== false);
-  const result: ContextMenuItem[] = [];
-
-  for (let i = 0; i < preFiltered.length; i++) {
-    const cur = preFiltered[i];
-    if (cur.id === 'separator') {
-      if (result.length === 0) continue;
-      const hasVisibleAfter = preFiltered.slice(i + 1).some((it) => it.id !== 'separator');
-      if (!hasVisibleAfter) continue;
-      if (result[result.length - 1].id === 'separator') continue;
-    }
-    result.push(cur);
-  }
-
-  return result;
-}
-
-interface ContextMenuProps {
+interface StatusDropdownProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -40,10 +17,7 @@ interface ContextMenuProps {
   onStatusSelect: (status: User['status']) => void;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, onClose, onStatusSelect }) => {
-  // Hooks
-  const { t } = useTranslation();
-
+const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direction, onClose, onStatusSelect }) => {
   // Refs
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -51,16 +25,6 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, o
   const [display, setDisplay] = useState(false);
   const [dropdownX, setDropdownX] = useState(x);
   const [dropdownY, setDropdownY] = useState(y);
-
-  // Memos
-  const statusOptions = useMemo<{ status: User['status']; label: string }[]>(() => {
-    return [
-      { status: 'online', label: t('online') },
-      { status: 'dnd', label: t('dnd') },
-      { status: 'idle', label: t('idle') },
-      { status: 'gn', label: t('gn') },
-    ];
-  }, [t]);
 
   // Effects
   useEffect(() => {
@@ -98,13 +62,13 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, o
 
   return (
     <div ref={dropdownRef} className={`context-menu-container ${header['status-dropdown']}`} style={display ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}>
-      {statusOptions.map((option) => (
+      {STATUS_OPTIONS.map((status) => (
         <div
-          key={option.status}
+          key={status}
           className={header['option']}
-          datatype={option.status}
+          datatype={status}
           onClick={() => {
-            onStatusSelect(option.status as User['status']);
+            onStatusSelect(status);
             onClose();
           }}
         />
@@ -113,6 +77,6 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, o
   );
 });
 
-ContextMenu.displayName = 'ContextMenu';
+StatusDropdown.displayName = 'StatusDropdown';
 
-export default ContextMenu;
+export default StatusDropdown;

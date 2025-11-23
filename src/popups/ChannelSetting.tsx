@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -47,7 +47,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [searchText, setSearchText] = useState('');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
 
-  // Destructuring
+  // Variables
   const { permissionLevel: userPermissionLevel } = user;
   const { serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId, permissionLevel: serverPermissionLevel } = server;
   const {
@@ -72,32 +72,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     permissionLevel: channelPermissionLevel,
     categoryId: channelCategoryId,
   } = channel;
-
-  // Memos
-  const permissionLevel = useMemo(() => Math.max(userPermissionLevel, serverPermissionLevel, channelPermissionLevel), [userPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
-  const isLobby = useMemo(() => serverLobbyId === channelId, [serverLobbyId, channelId]);
-  const isReceptionLobby = useMemo(() => serverReceptionLobbyId === channelId, [serverReceptionLobbyId, channelId]);
+  const permissionLevel = Math.max(userPermissionLevel, serverPermissionLevel, channelPermissionLevel);
+  const isLobby = serverLobbyId === channelId;
+  const isReceptionLobby = serverReceptionLobbyId === channelId;
   const totalModerators = useMemo(() => channelMembers.filter((m) => isChannelMod(m.permissionLevel) && !isServerAdmin(m.permissionLevel)).length, [channelMembers]);
-  const canSubmit = useMemo(() => channelName.trim(), [channelName]);
-
-  const settingPages = useMemo(
-    () =>
-      isChannelMod(permissionLevel)
-        ? [t('channel-info'), t('channel-announcement'), t('access-permission'), t('speaking-permission'), t('text-permission'), t('channel-management')]
-        : [t('channel-info'), t('channel-announcement')],
-    [t, permissionLevel],
-  );
-
-  const memberTableFields = useMemo(
-    () => [
-      { name: t('name'), field: 'name' },
-      { name: t('permission'), field: 'permissionLevel' },
-      { name: t('contribution'), field: 'contribution' },
-      { name: t('join-date'), field: 'createdAt' },
-    ],
-    [t],
-  );
-
+  const canSubmit = channelName.trim();
   const filteredModerators = useMemo(
     () =>
       channelMembers
@@ -110,6 +89,15 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         .sort(Sorter(sortField as keyof Member, sortDirection)),
     [channelMembers, searchText, sortField, sortDirection],
   );
+  const settingPages = isChannelMod(permissionLevel)
+    ? [t('channel-info'), t('channel-announcement'), t('access-permission'), t('speaking-permission'), t('text-permission'), t('channel-management')]
+    : [t('channel-info'), t('channel-announcement')];
+  const memberTableFields = [
+    { name: t('name'), field: 'name' },
+    { name: t('permission'), field: 'permissionLevel' },
+    { name: t('contribution'), field: 'contribution' },
+    { name: t('join-date'), field: 'createdAt' },
+  ];
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
@@ -142,39 +130,37 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     handleSort(field);
   };
 
-  const handleChannelUpdate = (...args: { channelId: string; update: Partial<Channel> }[]) => {
-    const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
-    setChannel((prev) => (update.has(`${prev.channelId}`) ? { ...prev, ...update.get(`${prev.channelId}`) } : prev));
-  };
+  useEffect(() => {
+    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Channel> }[]) => {
+      const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
+      setChannel((prev) => (update.has(`${prev.channelId}`) ? { ...prev, ...update.get(`${prev.channelId}`) } : prev));
+    });
+    return () => unsub();
+  }, []);
 
-  const handleServerMemberAdd = (...args: { data: Member }[]) => {
-    const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-    setChannelMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
-  };
+  useEffect(() => {
+    const unsub = ipc.socket.on('serverMemberAdd', (...args: { data: Member }[]) => {
+      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+      setChannelMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
+    });
+    return () => unsub();
+  }, []);
 
-  const handleChannelMemberUpdate = useCallback(
-    (...args: { userId: string; serverId: string; channelId: string; update: Partial<Member> }[]) => {
+  useEffect(() => {
+    const unsub = ipc.socket.on('channelMemberUpdate', (...args: { userId: string; serverId: string; channelId: string; update: Partial<Member> }[]) => {
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}#${i.channelId}`, i.update] as const));
       setChannelMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}#${channelId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}#${channelId}`) } : m)));
-    },
-    [channelId],
-  );
+    });
+    return () => unsub();
+  }, [channelId]);
 
-  const handleServerMemberRemove = (...args: { userId: string; serverId: string }[]) => {
-    const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
-    setChannelMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
-  };
-
-  // Effects
   useEffect(() => {
-    const unsubs = [
-      ipc.socket.on('channelUpdate', handleChannelUpdate),
-      ipc.socket.on('serverMemberAdd', handleServerMemberAdd),
-      ipc.socket.on('channelMemberUpdate', handleChannelMemberUpdate),
-      ipc.socket.on('serverMemberRemove', handleServerMemberRemove),
-    ];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, [handleChannelMemberUpdate]);
+    const unsub = ipc.socket.on('serverMemberRemove', (...args: { userId: string; serverId: string }[]) => {
+      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
+      setChannelMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
+    });
+    return () => unsub();
+  }, []);
 
   return (
     <div className={popup['popup-wrapper']}>

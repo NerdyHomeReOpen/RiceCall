@@ -31,7 +31,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   const mainTab = useMainTab();
   const { t } = useTranslation();
 
-  // Destructuring
+  // Variables
   const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, slogan: serverSlogan, favorite: serverFavorite, permissionLevel: serverPermissionLevel } = server;
   const { userId, currentServerId: userCurrentServerId } = user;
 

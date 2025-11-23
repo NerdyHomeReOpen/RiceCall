@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 
 // Package
@@ -35,6 +35,9 @@ const AboutPopup: React.FC = React.memo(() => {
   const [dontShowNextTime, setDontShowNextTime] = useState(false);
   const [staffs, setStaffs] = useState<Staff[]>([]);
 
+  // Variables
+  const currentYear = new Date().getFullYear();
+
   // Handlers
   const handleDontShowNextTime = () => {
     ipc.systemSettings.disclaimer.dontShowNextTime();
@@ -51,9 +54,6 @@ const AboutPopup: React.FC = React.memo(() => {
     if (['developer', 'machine-network', 'technical-support'].some((t) => title.includes(t))) return styles['color-3'];
     return styles['color-5'];
   };
-
-  // Memos
-  const CURRENT_YEAR = useMemo(() => new Date().getFullYear(), []);
 
   // Effects
   useEffect(() => {
@@ -74,7 +74,7 @@ const AboutPopup: React.FC = React.memo(() => {
 
           <div className={styles['app-info']}>
             <div className={styles['app-version-text']}>RiceCall v{version}</div>
-            <div className={styles['copyright-text']}>COPYRIGHT @ {CURRENT_YEAR} RiceCall.com ,ALL RIGHTS RESERVED.</div>
+            <div className={styles['copyright-text']}>COPYRIGHT @ {currentYear} RiceCall.com ,ALL RIGHTS RESERVED.</div>
             <div className={popup['row']} style={{ alignSelf: 'center' }}>
               <div className={popup['link-text']} onClick={() => window.open('https://discord.com/invite/adCWzv6wwS', '_blank')}>
                 {t('get-help')}

@@ -410,7 +410,10 @@ const RootPageComponent: React.FC = React.memo(() => {
     if (!userId) return;
 
     ipc.data.userHotReload(userId).then((user) => {
-      if (user) setUser(user);
+      if (user) {
+        setUser(user);
+        setIsSocketConnected(true);
+      }
     });
   }, [user]);
 
@@ -467,21 +470,18 @@ const RootPageComponent: React.FC = React.memo(() => {
     const onStorage = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
-      if (loadingBoxRef.current.isLoading || !serverDisplayId || !serverId) return;
-
-      if (serverId === server.serverId) {
-        setSelectedTabIdRef.current('server');
+      if (loadingBox.isLoading) return;
+      if (serverId === user.currentServerId) {
+        mainTab.setSelectedTabId('server');
         return;
       }
-
-      loadingBoxRef.current.setIsLoading(true);
-      loadingBoxRef.current.setLoadingServerId(serverDisplayId);
+      loadingBox.setIsLoading(true);
+      loadingBox.setLoadingServerId(serverDisplayId);
       ipc.socket.send('connectServer', { serverId });
     };
-
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [server.serverId, user.currentServerId]);
+  }, [user.currentServerId, mainTab, loadingBox]);
 
   useEffect(() => {
     if (!userId) return;

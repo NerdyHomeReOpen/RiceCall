@@ -28,6 +28,9 @@ import ipc from '@/services/ipc.service';
 import { handleOpenAlertDialog } from '@/utils/popup';
 import { toTags } from '@/utils/tagConverter';
 
+// Constants
+import { MAX_FILE_SIZE } from '@/constant';
+
 interface MessageInputBoxProps {
   onSend?: (message: string) => void;
   disabled?: boolean;
@@ -81,7 +84,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
 
   const handlePaste = async (imageData: string, fileName: string) => {
     isUploadingRef.current = true;
-    if (imageData.length > 5 * 1024 * 1024) {
+    if (imageData.length > MAX_FILE_SIZE) {
       handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;

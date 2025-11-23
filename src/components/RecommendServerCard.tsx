@@ -30,7 +30,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
   const mainTab = useMainTab();
   const { t } = useTranslation();
 
-  // Destructuring
+  // Variables
   const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, slogan: serverSlogan, online: serverOnline } = recommendServer;
   const { userId, currentServerId: userCurrentServerId } = user;
 

@@ -43,29 +43,29 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
     });
   };
 
-  const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
-    const add = new Set(args.map((i) => `${i.data.senderId}`));
-    setFriendApplications((prev) => prev.filter((a) => !add.has(`${a.senderId}`)).concat(args.map((i) => i.data)));
-  };
-
-  const handleFriendApplicationUpdate = (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
-    const update = new Map(args.map((i) => [`${i.senderId}`, i.update] as const));
-    setFriendApplications((prev) => prev.map((a) => (update.has(`${a.senderId}`) ? { ...a, ...update.get(`${a.senderId}`) } : a)));
-  };
-
-  const handleFriendApplicationRemove = (...args: { senderId: string }[]) => {
-    const remove = new Set(args.map((i) => `${i.senderId}`));
-    setFriendApplications((prev) => prev.filter((a) => !remove.has(`${a.senderId}`)));
-  };
-
   // Effects
   useEffect(() => {
-    const unsubs = [
-      ipc.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
-      ipc.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
-      ipc.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
-    ];
-    return () => unsubs.forEach((unsub) => unsub());
+    const unsub = ipc.socket.on('friendApplicationAdd', (...args: { data: FriendApplication }[]) => {
+      const add = new Set(args.map((i) => `${i.data.senderId}`));
+      setFriendApplications((prev) => prev.filter((a) => !add.has(`${a.senderId}`)).concat(args.map((i) => i.data)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('friendApplicationUpdate', (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
+      const update = new Map(args.map((i) => [`${i.senderId}`, i.update] as const));
+      setFriendApplications((prev) => prev.map((a) => (update.has(`${a.senderId}`) ? { ...a, ...update.get(`${a.senderId}`) } : a)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('friendApplicationRemove', (...args: { senderId: string }[]) => {
+      const remove = new Set(args.map((i) => `${i.senderId}`));
+      setFriendApplications((prev) => prev.filter((a) => !remove.has(`${a.senderId}`)));
+    });
+    return () => unsub();
   }, []);
 
   return (

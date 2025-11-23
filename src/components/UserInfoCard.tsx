@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef, useMemo } from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/userInfoCard.module.css';
@@ -37,7 +37,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
-  // Destructuring
+  // Variables
   const {
     name: memberName,
     avatarUrl: memberAvatarUrl,
@@ -51,9 +51,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
     nickname: memberNickname,
     vip: memberVip,
   } = member;
-
-  // Memos
-  const vipBoost = useMemo(() => Math.min(2, 1 + memberVip * 0.2), [memberVip]);
+  const vipBoost = Math.min(2, 1 + memberVip * 0.2);
 
   // Effects
   useLayoutEffect(() => {

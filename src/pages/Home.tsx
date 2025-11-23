@@ -60,8 +60,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const loadingBox = useLoading();
 
   // Refs
-  const setSelectedTabIdRef = useRef(mainTab.setSelectedTabId);
-  const loadingBoxRef = useRef(loadingBox);
   const canSearchRef = useRef<boolean>(true);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -130,20 +128,17 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   const handleConnectServer = useCallback(
     (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-      if (loadingBoxRef.current.isLoading || !serverDisplayId || !serverId) return;
-
+      if (loadingBox.isLoading) return;
       if (serverId === currentServerId) {
-        setSelectedTabIdRef.current('server');
+        mainTab.setSelectedTabId('server');
         return;
       }
-
-      loadingBoxRef.current.setIsLoading(true);
-      loadingBoxRef.current.setLoadingServerId(serverDisplayId);
+      loadingBox.setIsLoading(true);
+      loadingBox.setLoadingServerId(serverDisplayId);
       ipc.socket.send('connectServer', { serverId });
-
       handleClearSearchState();
     },
-    [currentServerId],
+    [currentServerId, mainTab, loadingBox],
   );
 
   // Effects

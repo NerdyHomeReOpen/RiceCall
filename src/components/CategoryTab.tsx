@@ -44,35 +44,27 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const contextMenu = useContextMenu();
     const findMe = useFindMeContext();
 
-    // Destructuring
+    // Variables
     const { userId, permissionLevel: globalPermissionLevel, currentChannelId: userCurrentChannelId } = user;
     const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, userLimit: categoryUserLimit, permissionLevel: categoryPermissionLevel } = category;
     const { permissionLevel: currentChannelPermissionLevel } = currentChannel;
     const { serverId, permissionLevel: serverPermissionLevel, receptionLobbyId: serverReceptionLobbyId } = server;
-
-    // Memos
-    const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel), [globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel]);
-    const currentPermissionLevel = useMemo(
-      () => Math.max(globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel),
-      [globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel],
-    );
+    const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, categoryPermissionLevel);
+    const currentPermissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel);
     const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
     const categoryChannels = useMemo(() => channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [channels, categoryId]);
     const categoryMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === categoryId), [serverOnlineMembers, categoryId]);
     const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);
     const movableUserIds = useMemo(() => categoryMembers.filter((m) => m.permissionLevel <= currentPermissionLevel).map((m) => m.userId), [categoryMembers, currentPermissionLevel]);
-    const isInChannel = useMemo(() => userCurrentChannelId === categoryId, [userCurrentChannelId, categoryId]);
+    const isInChannel = userCurrentChannelId === categoryId;
     const isInCategory = useMemo(() => categoryMembers.some((m) => m.currentChannelId === userCurrentChannelId), [categoryMembers, userCurrentChannelId]);
-    const isReceptionLobby = useMemo(() => serverReceptionLobbyId === categoryId, [serverReceptionLobbyId, categoryId]);
-    const isMemberChannel = useMemo(() => categoryVisibility === 'member', [categoryVisibility]);
-    const isPrivateChannel = useMemo(() => categoryVisibility === 'private', [categoryVisibility]);
-    const isReadonlyChannel = useMemo(() => categoryVisibility === 'readonly', [categoryVisibility]);
-    const isFull = useMemo(() => categoryUserLimit && categoryUserLimit <= categoryMembers.length, [categoryUserLimit, categoryMembers]);
-    const isSelected = useMemo(() => selectedItemId === `category-${categoryId}`, [selectedItemId, categoryId]);
-    const canJoin = useMemo(
-      () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel)),
-      [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
-    );
+    const isReceptionLobby = serverReceptionLobbyId === categoryId;
+    const isMemberChannel = categoryVisibility === 'member';
+    const isPrivateChannel = categoryVisibility === 'private';
+    const isReadonlyChannel = categoryVisibility === 'readonly';
+    const isFull = categoryUserLimit && categoryUserLimit <= categoryMembers.length;
+    const isSelected = selectedItemId === `category-${categoryId}`;
+    const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel));
     const filteredCategoryChannels = useMemo(() => categoryChannels.filter(Boolean).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [categoryChannels]);
     const filteredCategoryMembers = useMemo(
       () => categoryMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),

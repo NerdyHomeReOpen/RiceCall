@@ -36,11 +36,9 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
   // States
   const [expanded, setExpanded] = useState<boolean>(true);
 
-  // Destructuring
+  // Variables
   const { userId } = user;
   const { friendGroupId, name: friendGroupName } = friendGroup;
-
-  // Memos
   const friendGroupFriends = useMemo(() => {
     switch (friendGroupId) {
       case '':

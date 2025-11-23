@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 // Types
 import type { Server, Channel, PromptMessage } from '@/types';
@@ -11,6 +11,9 @@ import popup from '@/styles/popup.module.css';
 
 // Services
 import ipc from '@/services/ipc.service';
+
+// Constants
+import { MAX_BROADCAST_LENGTH } from '@/constant';
 
 interface ServerBroadcastPopupProps {
   serverId: Server['serverId'];
@@ -26,9 +29,8 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   const [broadcastType, setBroadcastType] = useState<'channel' | 'server'>('channel');
   const [broadcastContent, setBroadcastContent] = useState<string>('');
 
-  // Memos
-  const MAX_LENGTH = useMemo(() => 300, []);
-  const canSend = useMemo(() => broadcastContent.trim() && broadcastContent.length <= MAX_LENGTH, [broadcastContent, MAX_LENGTH]);
+  // Variables
+  const canSend = broadcastContent.trim() && broadcastContent.length <= MAX_BROADCAST_LENGTH;
 
   // Handlers
   const handleBroadcastChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<PromptMessage>) => {
@@ -74,9 +76,9 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`}>
             <div className={popup['label']}>{t('broadcast-content')}</div>
-            <textarea name="content" maxLength={MAX_LENGTH} style={{ minHeight: '90px' }} onChange={(e) => setBroadcastContent(e.target.value)} />
+            <textarea name="content" maxLength={MAX_BROADCAST_LENGTH} style={{ minHeight: '90px' }} onChange={(e) => setBroadcastContent(e.target.value)} />
             <div className={popup['hint-text']}>
-              {broadcastContent.length}/{MAX_LENGTH}
+              {broadcastContent.length}/{MAX_BROADCAST_LENGTH}
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // CSS
 import styles from '@/styles/friend.module.css';
@@ -41,7 +41,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
   // States
   const [friendCurrentServer, setFriendCurrentServer] = useState<Server | null>(null);
 
-  // Destructuring
+  // Variables
   const { userId, currentServerId: userCurrentServerId } = user;
   const {
     targetId,
@@ -60,13 +60,11 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     currentServerId: friendCurrentServerId,
     shareCurrentServer: friendShareCurrentServer,
   } = friend;
-
-  // Memos
-  const isUser = useMemo(() => targetId === userId, [targetId, userId]);
-  const isOnline = useMemo(() => friendStatus !== 'offline', [friendStatus]);
-  const isStranger = useMemo(() => friendRelationStatus === 0, [friendRelationStatus]);
-  const isPending = useMemo(() => friendRelationStatus === 1, [friendRelationStatus]);
-  const isFriend = useMemo(() => friendRelationStatus === 2, [friendRelationStatus]);
+  const isUser = targetId === userId;
+  const isOnline = friendStatus !== 'offline';
+  const isStranger = friendRelationStatus === 0;
+  const isPending = friendRelationStatus === 1;
+  const isFriend = friendRelationStatus === 2;
 
   // Handlers
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {

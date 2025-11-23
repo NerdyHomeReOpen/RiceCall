@@ -15,6 +15,9 @@ import MarkdownContent from '@/components/MarkdownContent';
 // Utils
 import { getFormatTimestamp } from '@/utils/language';
 
+// Constants
+import { ALLOWED_MESSAGE_KEYS } from '@/constant';
+
 interface DirectMessageProps {
   messageGroup: DirectMessage & {
     contents: string[];
@@ -25,12 +28,9 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   // Hooks
   const { t } = useTranslation();
 
-  // Destructuring
+  // Variables
   const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
-
-  // Memos
-  const ALLOWED_MESSAGE_KEYS = useMemo(() => ['message:send-shake-window', 'message:receive-shake-window'], []);
-  const formattedTimestamp = useMemo(() => getFormatTimestamp(t, messageTimestamp), [t, messageTimestamp]);
+  const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
   const formattedMessageContents = useMemo(
     () =>
       messageContents.map((content) =>
@@ -39,7 +39,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
           .map((c) => (ALLOWED_MESSAGE_KEYS.includes(c) ? t(c) : c))
           .join(' '),
       ),
-    [messageContents, t, ALLOWED_MESSAGE_KEYS],
+    [messageContents, t],
   );
 
   return (

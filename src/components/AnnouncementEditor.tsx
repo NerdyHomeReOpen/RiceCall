@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
@@ -27,6 +27,9 @@ import ipc from '@/services/ipc.service';
 import { handleOpenAlertDialog } from '@/utils/popup';
 import { fromTags, toTags } from '@/utils/tagConverter';
 
+// Constants
+import { FONT_LIST, MAX_FILE_SIZE } from '@/constant';
+
 interface AnnouncementEditorProps {
   announcement: string;
   showPreview?: boolean;
@@ -46,22 +49,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   // Refs
   const isUploadingRef = useRef(false);
-
-  // Memos
-  const FONT_LIST = useMemo(
-    () => [
-      { label: 'Arial', value: 'Arial, sans-serif' },
-      { label: 'Times New Roman', value: '"Times New Roman", serif' },
-      { label: 'Georgia', value: 'Georgia, serif' },
-      { label: 'Verdana', value: 'Verdana, sans-serif' },
-      { label: 'Courier New', value: '"Courier New", monospace' },
-      { label: '微軟正黑體', value: '"Microsoft JhengHei", sans-serif' },
-      { label: '微軟雅黑', value: '"Microsoft YaHei", sans-serif' },
-      { label: 'PingFang TC', value: '"PingFang TC", sans-serif' },
-      { label: 'Noto Sans TC', value: '"Noto Sans TC", sans-serif' },
-    ],
-    [],
-  );
 
   // States
   const [isBold, setIsBold] = useState(false);
@@ -89,7 +76,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handlePaste = async (imageData: string, fileName: string) => {
     isUploadingRef.current = true;
-    if (imageData.length > 5 * 1024 * 1024) {
+    if (imageData.length > MAX_FILE_SIZE) {
       handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;

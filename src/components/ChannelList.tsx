@@ -51,7 +51,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  // Destructuring
+  // Variables
   const { userId, permissionLevel: globalPermissionLevel } = user;
   const {
     serverId,
@@ -64,10 +64,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
     isVerified: isVerifiedServer,
   } = server;
   const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = currentChannel;
-
-  // Memos
-  const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel), [globalPermissionLevel, serverPermissionLevel]);
-  const connectStatus = useMemo(() => 4 - Math.floor(Number(latency) / 50), [latency]);
+  const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel);
+  const connectStatus = 4 - Math.floor(Number(latency) / 50);
   const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((c) => !!c && !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);

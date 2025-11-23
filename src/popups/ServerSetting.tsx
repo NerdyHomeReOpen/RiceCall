@@ -32,6 +32,9 @@ import { isMember, isServerAdmin, isServerOwner, isStaff } from '@/utils/permiss
 // Components
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
+// Constants
+import { MAX_FILE_SIZE } from '@/constant';
+
 interface ServerSettingPopupProps {
   userId: User['userId'];
   user: User;
@@ -75,14 +78,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       visibility: serverVisibility,
       permissionLevel: serverPermission,
     } = server;
-
-    // Memos
-    const permissionLevel = useMemo(() => Math.max(globalPermission, serverPermission), [globalPermission, serverPermission]);
+    const permissionLevel = Math.max(globalPermission, serverPermission);
     const totalMembers = useMemo(() => serverMembers.filter((m) => isMember(m.permissionLevel) && !isStaff(m.permissionLevel)).length, [serverMembers]);
-    const totalApplications = useMemo(() => memberApplications.length, [memberApplications]);
+    const totalApplications = memberApplications.length;
     const totalBlockMembers = useMemo(() => serverMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now()).length, [serverMembers]);
-    const canSubmit = useMemo(() => serverName.trim(), [serverName]);
-
+    const canSubmit = serverName.trim();
     const filteredMembers = useMemo(
       () =>
         serverMembers
@@ -93,7 +93,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           .sort(Sorter(sortField as keyof Member, sortDirection)),
       [serverMembers, searchText, sortField, sortDirection],
     );
-
     const filteredBlockMembers = useMemo(
       () =>
         serverMembers
@@ -103,7 +102,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           .sort(Sorter(sortField as keyof Member, sortDirection)),
       [serverMembers, searchText, sortField, sortDirection],
     );
-
     const filteredApplications = useMemo(
       () =>
         memberApplications
@@ -111,50 +109,33 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           .sort(Sorter(sortField as keyof MemberApplication, sortDirection)),
       [memberApplications, searchText, sortField, sortDirection],
     );
-
-    const memberTableFields = useMemo(
-      () => [
-        { name: t('name'), field: 'name' },
-        { name: t('permission'), field: 'permissionLevel' },
-        { name: t('contribution'), field: 'contribution' },
-        { name: t('join-date'), field: 'createdAt' },
-      ],
-      [t],
-    );
-
-    const applicationTableFields = useMemo(
-      () => [
-        { name: t('name'), field: 'name' },
-        { name: t('description'), field: 'description' },
-        { name: t('create-at'), field: 'createdAt' },
-      ],
-      [t],
-    );
-
-    const blockMemberTableFields = useMemo(
-      () => [
-        { name: t('name'), field: 'name' },
-        { name: t('unblock-date'), field: 'isBlocked' },
-      ],
-      [t],
-    );
-
-    const settingPages = useMemo(
-      () =>
-        isServerAdmin(permissionLevel)
-          ? [
-              t('server-info'),
-              t('server-announcement'),
-              t('member-management'),
-              t('access-permission'),
-              `${t('member-application-management')} (${totalApplications})`,
-              `${t('blacklist-management')} (${totalBlockMembers})`,
-            ]
-          : isMember(permissionLevel)
-            ? [t('server-info'), t('server-announcement'), t('member-management')]
-            : [t('server-info'), t('server-announcement')],
-      [t, totalApplications, totalBlockMembers, permissionLevel],
-    );
+    const memberTableFields = [
+      { name: t('name'), field: 'name' },
+      { name: t('permission'), field: 'permissionLevel' },
+      { name: t('contribution'), field: 'contribution' },
+      { name: t('join-date'), field: 'createdAt' },
+    ];
+    const applicationTableFields = [
+      { name: t('name'), field: 'name' },
+      { name: t('description'), field: 'description' },
+      { name: t('create-at'), field: 'createdAt' },
+    ];
+    const blockMemberTableFields = [
+      { name: t('name'), field: 'name' },
+      { name: t('unblock-date'), field: 'isBlocked' },
+    ];
+    const settingPages = isServerAdmin(permissionLevel)
+      ? [
+          t('server-info'),
+          t('server-announcement'),
+          t('member-management'),
+          t('access-permission'),
+          `${t('member-application-management')} (${totalApplications})`,
+          `${t('blacklist-management')} (${totalBlockMembers})`,
+        ]
+      : isMember(permissionLevel)
+        ? [t('server-info'), t('server-announcement'), t('member-management')]
+        : [t('server-info'), t('server-announcement')];
 
     // Handlers
     const handleApproveMemberApplication = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -199,53 +180,61 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       handleSort(field);
     };
 
-    const handleServerUpdate = (...args: { serverId: string; update: Partial<Server> }[]) => {
-      const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
-      setServer((prev) => (update.has(`${prev.serverId}`) ? { ...prev, ...update.get(`${prev.serverId}`) } : prev));
-    };
-
-    const handleServerMemberAdd = (...args: { data: Member }[]) => {
-      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-      setServerMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
-    };
-
-    const handleServerMemberUpdate = (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
-      const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
-      setServerMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
-    };
-
-    const handleServerMemberRemove = (...args: { userId: string; serverId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
-      setServerMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
-    };
-
-    const handleServerMemberApplicationAdd = (...args: { data: MemberApplication }[]) => {
-      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-      setMemberApplications((prev) => prev.filter((a) => !add.has(`${a.userId}#${a.serverId}`)).concat(args.map((i) => i.data)));
-    };
-
-    const handleServerMemberApplicationUpdate = (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => {
-      const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
-      setMemberApplications((prev) => prev.map((a) => (update.has(`${a.userId}#${a.serverId}`) ? { ...a, ...update.get(`${a.userId}#${a.serverId}`) } : a)));
-    };
-
-    const handleServerMemberApplicationRemove = (...args: { userId: string; serverId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
-      setMemberApplications((prev) => prev.filter((a) => !remove.has(`${a.userId}#${a.serverId}`)));
-    };
-
     // Effects
     useEffect(() => {
-      const unsubs = [
-        ipc.socket.on('serverUpdate', handleServerUpdate),
-        ipc.socket.on('serverMemberAdd', handleServerMemberAdd),
-        ipc.socket.on('serverMemberUpdate', handleServerMemberUpdate),
-        ipc.socket.on('serverMemberRemove', handleServerMemberRemove),
-        ipc.socket.on('serverMemberApplicationAdd', handleServerMemberApplicationAdd),
-        ipc.socket.on('serverMemberApplicationUpdate', handleServerMemberApplicationUpdate),
-        ipc.socket.on('serverMemberApplicationRemove', handleServerMemberApplicationRemove),
-      ];
-      return () => unsubs.forEach((unsub) => unsub());
+      const unsub = ipc.socket.on('serverUpdate', (...args: { serverId: string; update: Partial<Server> }[]) => {
+        const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
+        setServer((prev) => (update.has(`${prev.serverId}`) ? { ...prev, ...update.get(`${prev.serverId}`) } : prev));
+      });
+      return () => unsub();
+    }, []);
+
+    useEffect(() => {
+      const unsub = ipc.socket.on('serverMemberAdd', (...args: { data: Member }[]) => {
+        const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+        setServerMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
+      });
+      return () => unsub();
+    }, []);
+
+    useEffect(() => {
+      const unsub = ipc.socket.on('serverMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => {
+        const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
+        setServerMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
+      });
+      return () => unsub();
+    }, []);
+
+    useEffect(() => {
+      const unsub = ipc.socket.on('serverMemberRemove', (...args: { userId: string; serverId: string }[]) => {
+        const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
+        setServerMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
+      });
+      return () => unsub();
+    }, []);
+
+    useEffect(() => {
+      const unsub = ipc.socket.on('serverMemberApplicationAdd', (...args: { data: MemberApplication }[]) => {
+        const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+        setMemberApplications((prev) => prev.filter((a) => !add.has(`${a.userId}#${a.serverId}`)).concat(args.map((i) => i.data)));
+      });
+      return () => unsub();
+    }, []);
+
+    useEffect(() => {
+      const unsub = ipc.socket.on('serverMemberApplicationUpdate', (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => {
+        const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
+        setMemberApplications((prev) => prev.map((a) => (update.has(`${a.userId}#${a.serverId}`) ? { ...a, ...update.get(`${a.userId}#${a.serverId}`) } : a)));
+      });
+      return () => unsub();
+    }, []);
+
+    useEffect(() => {
+      const unsub = ipc.socket.on('serverMemberApplicationRemove', (...args: { userId: string; serverId: string }[]) => {
+        const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
+        setMemberApplications((prev) => prev.filter((a) => !remove.has(`${a.userId}#${a.serverId}`)));
+      });
+      return () => unsub();
     }, []);
 
     return (
@@ -326,7 +315,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       const reader = new FileReader();
                       reader.onloadend = async () =>
                         handleOpenImageCropper(reader.result as string, async (imageDataUrl) => {
-                          if (imageDataUrl.length > 5 * 1024 * 1024) {
+                          if (imageDataUrl.length > MAX_FILE_SIZE) {
                             handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
                             return;
                           }

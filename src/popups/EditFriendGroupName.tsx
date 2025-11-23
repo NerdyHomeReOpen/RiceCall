@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 // Types
 import type { FriendGroup } from '@/types';
@@ -24,8 +24,8 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
   // States
   const [friendGroupName, setFriendGroupName] = useState<string>(friendGroup.name);
 
-  // Memos
-  const canSubmit = useMemo(() => friendGroupName.trim(), [friendGroupName]);
+  // Variables
+  const canSubmit = friendGroupName.trim();
 
   // Handlers
   const handleEditFriendGroup = (friendGroupId: FriendGroup['friendGroupId'], update: Partial<FriendGroup>) => {

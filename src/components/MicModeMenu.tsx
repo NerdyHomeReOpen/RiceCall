@@ -38,7 +38,7 @@ const MicModeMenu: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const webRTC = useWebRTC();
 
-  // Memos
+  // Variables
   const volumePercent = webRTC.getVolumePercent('user');
   const volumeThreshold = webRTC.voiceThreshold;
   const isActive = volumePercent > volumeThreshold;

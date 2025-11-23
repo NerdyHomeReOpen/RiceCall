@@ -22,7 +22,7 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
   // Refs
   const messagesViewerRef = useRef<HTMLDivElement>(null);
 
-  // Memos
+  // Variables
   const messageGroups = useMemo(() => {
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
     return sortedMessages.reduce<MessageGroup[]>((acc, message) => {

@@ -27,11 +27,9 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   // Hooks
   const { t } = useTranslation();
 
-  // Destructuring
+  // Variables
   const { contents: messageContents, parameter: messageParameter } = messageGroup;
-
-  // Memos
-  const escapedMessageParameter = useMemo(() => Object.fromEntries(Object.entries(messageParameter).map(([key, value]) => [key, escapeHtml(value)])), [messageParameter]);
+  const escapedMessageParameter = Object.fromEntries(Object.entries(messageParameter).map(([key, value]) => [key, escapeHtml(value)]));
   const formattedMessagesContents = useMemo(
     () =>
       messageContents.map((content) =>

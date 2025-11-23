@@ -59,7 +59,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
   const userTabRef = useRef<HTMLDivElement>(null);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Destructuring
+  // Variables
   const { userId, permissionLevel: globalPermission, currentChannelId: userCurrentChannelId } = user;
   const {
     userId: memberUserId,
@@ -80,27 +80,25 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
   const { channelId, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel, voiceMode: channelVoiceMode } = channel;
   const { permissionLevel: currentChannelPermissionLevel } = currentChannel;
   const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId } = server;
-
-  // Variables
   const permissionLevel = Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel);
   const currentPermissionLevel = Math.max(globalPermission, serverPermissionLevel, currentChannelPermissionLevel);
   const isUser = memberUserId === userId;
-  const isUserInQueue = queueUsers.some((qu) => qu.userId === memberUserId);
+  const isUserInQueue = useMemo(() => queueUsers.some((qu) => qu.userId === memberUserId), [queueUsers, memberUserId]);
   const isSameChannel = memberCurrentChannelId === userCurrentChannelId;
   const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
   const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
-  const isFriend = friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2);
+  const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = permissionLevel > memberPermission;
   const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
 
-  const statusIcon = useMemo(() => {
+  // Handlers
+  const getStatusIcon = () => {
     if (isMuted || memberIsVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
     if (memberIsTextMuted) return 'no-text';
     return '';
-  }, [isSpeaking, memberIsTextMuted, isMuted, memberIsVoiceMuted]);
+  };
 
-  // Handlers
   const handleMuteUser = (userId: User['userId']) => {
     webRTC.muteUser(userId);
   };
@@ -328,7 +326,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
         ]);
       }}
     >
-      <div className={`${styles['user-audio-state']} ${styles[statusIcon]}`} />
+      <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>

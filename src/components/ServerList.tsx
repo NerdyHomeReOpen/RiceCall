@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 
 // CSS
 import homePage from '@/styles/home.module.css';
@@ -25,9 +25,9 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, user, servers
   // States
   const [expanded, setExpanded] = useState(false);
 
-  // Memos
-  const displayedServers = useMemo(() => (expanded ? servers : servers.slice(0, 6)), [expanded, servers]);
-  const canExpand = useMemo(() => servers.length > 6, [servers]);
+  // Variables
+  const displayedServers = expanded ? servers : servers.slice(0, 6);
+  const canExpand = servers.length > 6;
 
   return (
     <div>
