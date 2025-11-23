@@ -71,9 +71,9 @@ const ipcService = {
   },
 
   auth: {
-    login: async (account: string, password: string): Promise<{ success: true; token: string } | { success: false }> => {
+    login: async (formData: { account: string; password: string }): Promise<{ success: true; token: string } | { success: false }> => {
       if (!isElectron) return { success: false };
-      return await ipcRenderer.invoke('auth-login', account, password);
+      return await ipcRenderer.invoke('auth-login', formData);
     },
 
     logout: async (): Promise<void> => {
@@ -81,9 +81,9 @@ const ipcService = {
       return await ipcRenderer.invoke('auth-logout');
     },
 
-    register: async (account: string, password: string, email: string, username: string): Promise<{ success: true; message: string } | { success: false }> => {
+    register: async (formData: { account: string; password: string; email: string; username: string }): Promise<{ success: true; message: string } | { success: false }> => {
       if (!isElectron) return { success: false };
-      return await ipcRenderer.invoke('auth-register', account, password, email, username);
+      return await ipcRenderer.invoke('auth-register', formData);
     },
 
     autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {

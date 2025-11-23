@@ -84,17 +84,14 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
 
     setIsLoading(true);
 
-    const res = await ipc.auth.login(formData.account, formData.password);
-    if (res.success) {
-      if (formData.rememberAccount) {
-        ipc.accounts.add(formData.account, formData);
+    await ipc.auth.login({ account: formData.account, password: formData.password }).then((res) => {
+      if (res.success) {
+        if (formData.rememberAccount) ipc.accounts.add(formData.account, formData);
+        if (formData.autoLogin) localStorage.setItem('token', res.token);
+        localStorage.setItem('login-account', formData.account);
+        setSection('login');
       }
-      if (formData.autoLogin) {
-        localStorage.setItem('token', res.token);
-      }
-      localStorage.setItem('login-account', formData.account);
-      setSection('login');
-    }
+    });
 
     setIsLoading(false);
   };

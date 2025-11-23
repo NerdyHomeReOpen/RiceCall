@@ -711,9 +711,9 @@ app.on('ready', async () => {
   });
 
   // API handlers
-  ipcMain.handle('auth-login', async (_, account: string, password: string) => {
+  ipcMain.handle('auth-login', async (_, formData: { account: string; password: string }) => {
     return await authService
-      .login({ account, password })
+      .login(formData)
       .then((res) => {
         if (res?.success) {
           token = res.token;
@@ -741,8 +741,8 @@ app.on('ready', async () => {
     setTrayDetail(isLogin);
   });
 
-  ipcMain.handle('auth-register', async (_, account: string, password: string, email: string, username: string) => {
-    return await authService.register({ account, password, email, username }).catch((error) => {
+  ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string }) => {
+    return await authService.register(formData).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
       return { success: false };
     });
