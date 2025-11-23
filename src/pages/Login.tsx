@@ -39,6 +39,8 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
       setAccount(value);
       setRememberAccount(match?.rememberAccount ?? false);
       setAutoLogin(match?.autoLogin ?? false);
+    } else if (name === 'password') {
+      setPassword(value);
     } else if (name === 'autoLogin') {
       setAutoLogin(checked);
       setRememberAccount(checked ? true : rememberAccount);
