@@ -84,6 +84,88 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   );
 
   // Handlers
+  const getContextMenuItems1 = () => [
+    {
+      id: 'apply-member',
+      label: t('apply-member'),
+      show: !isMember(permissionLevel),
+      icon: 'applyMember',
+      onClick: () => handleApplyMember(userId, serverId),
+    },
+    {
+      id: 'member-management',
+      label: t('member-management'),
+      show: isServerAdmin(permissionLevel),
+      icon: 'memberManagement',
+      onClick: () => handleOpenServerSetting(userId, serverId),
+    },
+    {
+      id: 'separator',
+      label: '',
+    },
+    {
+      id: 'edit-nickname',
+      label: t('edit-nickname'),
+      icon: 'editGroupcard',
+      show: isMember(permissionLevel),
+      onClick: () => handleOpenEditNickname(userId, serverId),
+    },
+    {
+      id: 'locate-me',
+      label: t('locate-me'),
+      icon: 'locateme',
+      onClick: () => handleLocateUser(),
+    },
+    {
+      id: 'separator',
+      label: '',
+    },
+    {
+      id: 'report',
+      label: t('report'),
+      icon: 'report',
+      disabled: true,
+      onClick: () => {
+        /* TODO: handleOpenReport */
+      },
+    },
+    {
+      id: 'favorite',
+      label: isFavorite ? t('unfavorite') : t('favorite'),
+      icon: isFavorite ? 'collect' : 'uncollect',
+      onClick: () => handleFavoriteServer(serverId),
+    },
+  ];
+
+  const getContextMenuItems2 = () => [
+    {
+      id: 'create-channel',
+      label: t('create-channel'),
+      show: isServerAdmin(permissionLevel),
+      onClick: () => handleOpenCreateChannel(userId, serverId, ''),
+    },
+    {
+      id: 'separator',
+      label: '',
+    },
+    {
+      id: 'kick-all-users-from-server',
+      label: t('kick-all-users-from-server'),
+      show: isStaff(permissionLevel) && serverUserIds.length > 0,
+      onClick: () => handleKickUsersFromServer(serverUserIds, serverId),
+    },
+    {
+      id: 'separator',
+      label: '',
+    },
+    {
+      id: 'edit-channel-order',
+      label: t('edit-channel-order'),
+      show: isServerAdmin(permissionLevel),
+      onClick: () => handleOpenEditChannelOrder(userId, serverId),
+    },
+  ];
+
   const handleFavoriteServer = (serverId: Server['serverId']) => {
     ipc.socket.send('favoriteServer', { serverId });
   };
@@ -155,58 +237,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
                 onClick={(e) => {
                   const x = e.currentTarget.getBoundingClientRect().left;
                   const y = e.currentTarget.getBoundingClientRect().bottom;
-                  contextMenu.showContextMenu(x, y, 'right-bottom', [
-                    {
-                      id: 'apply-member',
-                      label: t('apply-member'),
-                      show: !isMember(permissionLevel),
-                      icon: 'applyMember',
-                      onClick: () => handleApplyMember(userId, serverId),
-                    },
-                    {
-                      id: 'member-management',
-                      label: t('member-management'),
-                      show: isServerAdmin(permissionLevel),
-                      icon: 'memberManagement',
-                      onClick: () => handleOpenServerSetting(userId, serverId),
-                    },
-                    {
-                      id: 'separator',
-                      label: '',
-                    },
-                    {
-                      id: 'edit-nickname',
-                      label: t('edit-nickname'),
-                      icon: 'editGroupcard',
-                      show: isMember(permissionLevel),
-                      onClick: () => handleOpenEditNickname(userId, serverId),
-                    },
-                    {
-                      id: 'locate-me',
-                      label: t('locate-me'),
-                      icon: 'locateme',
-                      onClick: () => handleLocateUser(),
-                    },
-                    {
-                      id: 'separator',
-                      label: '',
-                    },
-                    {
-                      id: 'report',
-                      label: t('report'),
-                      icon: 'report',
-                      disabled: true,
-                      onClick: () => {
-                        /* TODO: handleOpenReport */
-                      },
-                    },
-                    {
-                      id: 'favorite',
-                      label: isFavorite ? t('unfavorite') : t('favorite'),
-                      icon: isFavorite ? 'collect' : 'uncollect',
-                      onClick: () => handleFavoriteServer(serverId),
-                    },
-                  ]);
+                  contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
                 }}
               >
                 <div className={`${header['overlay']} ${isServerAdmin(permissionLevel) && serverMemberApplications.length > 0 ? header['new'] : ''}`} />
@@ -257,34 +288,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
         onContextMenu={(e) => {
           e.preventDefault();
           const { clientX: x, clientY: y } = e;
-          contextMenu.showContextMenu(x, y, 'right-bottom', [
-            {
-              id: 'create-channel',
-              label: t('create-channel'),
-              show: isServerAdmin(permissionLevel),
-              onClick: () => handleOpenCreateChannel(userId, serverId, ''),
-            },
-            {
-              id: 'separator',
-              label: '',
-            },
-            {
-              id: 'kick-all-users-from-server',
-              label: t('kick-all-users-from-server'),
-              show: isStaff(permissionLevel) && serverUserIds.length > 0,
-              onClick: () => handleKickUsersFromServer(serverUserIds, serverId),
-            },
-            {
-              id: 'separator',
-              label: '',
-            },
-            {
-              id: 'edit-channel-order',
-              label: t('edit-channel-order'),
-              show: isServerAdmin(permissionLevel),
-              onClick: () => handleOpenEditChannelOrder(userId, serverId),
-            },
-          ]);
+          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
         }}
       >
         <div className={styles['channel-list']}>

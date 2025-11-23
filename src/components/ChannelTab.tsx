@@ -68,6 +68,94 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     );
 
     // Handlers
+    const getContextMenuItems = () => [
+      {
+        id: 'join-channel',
+        label: t('join-channel'),
+        disabled: !canJoin,
+        show: !isInChannel,
+        onClick: () => handleConnectChannel(serverId, channelId),
+      },
+      {
+        id: 'view-or-edit',
+        label: t('view-or-edit'),
+        onClick: () => handleOpenChannelSetting(userId, serverId, channelId),
+      },
+      {
+        id: 'separator',
+        label: '',
+      },
+      {
+        id: 'create-channel',
+        label: t('create-channel'),
+        show: isServerAdmin(permissionLevel) && channelCategoryId === null,
+        onClick: () => handleOpenCreateChannel(userId, serverId, ''),
+      },
+      {
+        id: 'create-sub-channel',
+        label: t('create-sub-channel'),
+        show: !isLobby && isChannelAdmin(permissionLevel),
+        onClick: () => handleOpenCreateChannel(userId, serverId, channelCategoryId ? channelCategoryId : channelId),
+      },
+      {
+        id: 'delete-channel',
+        label: t('delete-channel'),
+        show: !isLobby && isChannelAdmin(permissionLevel),
+        onClick: () => handleDeleteChannel(serverId, channelId),
+      },
+      {
+        id: 'separator',
+        label: '',
+      },
+      {
+        id: 'broadcast',
+        label: t('broadcast'),
+        show: isChannelAdmin(permissionLevel),
+        onClick: () => handleOpenServerBroadcast(serverId, channelId),
+      },
+      {
+        id: 'move-all-user-to-channel',
+        label: t('move-all-user-to-channel'),
+        show: !isInChannel && isChannelMod(permissionLevel) && movableUserIds.length > 0,
+        onClick: () => handleMoveAllUsersToChannel(movableUserIds, serverId, userCurrentChannelId || ''),
+      },
+      {
+        id: 'edit-channel-order',
+        label: t('edit-channel-order'),
+        show: isServerAdmin(permissionLevel),
+        onClick: () => handleOpenEditChannelOrder(userId, serverId),
+      },
+      {
+        id: 'separator',
+        label: '',
+      },
+      {
+        id: 'kick-channel-users-from-server',
+        label: t('kick-channel-users-from-server'),
+        disabled: channelMembers.length === 0,
+        show: isStaff(permissionLevel),
+        onClick: () => handleKickUsersFromServer(channelUserIds, serverId),
+      },
+      {
+        id: 'kick-all-users-from-server',
+        label: t('kick-all-users-from-server'),
+        disabled: serverOnlineMembers.length === 0,
+        show: isStaff(permissionLevel),
+        onClick: () => handleKickUsersFromServer(serverUserIds, serverId),
+      },
+      {
+        id: 'separator',
+        label: '',
+      },
+      {
+        id: 'set-reception-lobby',
+        label: t('set-reception-lobby'),
+        disabled: isPrivateChannel || isReadonlyChannel,
+        show: isServerAdmin(permissionLevel) && !isReceptionLobby,
+        onClick: () => handleEditServer(serverId, { receptionLobbyId: channelId }),
+      },
+    ];
+
     const handleEditServer = (serverId: Server['serverId'], update: Partial<Server>) => {
       ipc.socket.send('editServer', { serverId, update });
     };
@@ -155,93 +243,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             e.preventDefault();
             e.stopPropagation();
             const { clientX: x, clientY: y } = e;
-            contextMenu.showContextMenu(x, y, 'right-bottom', [
-              {
-                id: 'join-channel',
-                label: t('join-channel'),
-                disabled: !canJoin,
-                show: !isInChannel,
-                onClick: () => handleConnectChannel(serverId, channelId),
-              },
-              {
-                id: 'view-or-edit',
-                label: t('view-or-edit'),
-                onClick: () => handleOpenChannelSetting(userId, serverId, channelId),
-              },
-              {
-                id: 'separator',
-                label: '',
-              },
-              {
-                id: 'create-channel',
-                label: t('create-channel'),
-                show: isServerAdmin(permissionLevel) && channelCategoryId === null,
-                onClick: () => handleOpenCreateChannel(userId, serverId, ''),
-              },
-              {
-                id: 'create-sub-channel',
-                label: t('create-sub-channel'),
-                show: !isLobby && isChannelAdmin(permissionLevel),
-                onClick: () => handleOpenCreateChannel(userId, serverId, channelCategoryId ? channelCategoryId : channelId),
-              },
-              {
-                id: 'delete-channel',
-                label: t('delete-channel'),
-                show: !isLobby && isChannelAdmin(permissionLevel),
-                onClick: () => handleDeleteChannel(serverId, channelId),
-              },
-              {
-                id: 'separator',
-                label: '',
-              },
-              {
-                id: 'broadcast',
-                label: t('broadcast'),
-                show: isChannelAdmin(permissionLevel),
-                onClick: () => handleOpenServerBroadcast(serverId, channelId),
-              },
-              {
-                id: 'move-all-user-to-channel',
-                label: t('move-all-user-to-channel'),
-                show: !isInChannel && isChannelMod(permissionLevel) && movableUserIds.length > 0,
-                onClick: () => handleMoveAllUsersToChannel(movableUserIds, serverId, userCurrentChannelId || ''),
-              },
-              {
-                id: 'edit-channel-order',
-                label: t('edit-channel-order'),
-                show: isServerAdmin(permissionLevel),
-                onClick: () => handleOpenEditChannelOrder(userId, serverId),
-              },
-              {
-                id: 'separator',
-                label: '',
-              },
-              {
-                id: 'kick-channel-users-from-server',
-                label: t('kick-channel-users-from-server'),
-                disabled: channelMembers.length === 0,
-                show: isStaff(permissionLevel),
-                onClick: () => handleKickUsersFromServer(channelUserIds, serverId),
-              },
-              {
-                id: 'kick-all-users-from-server',
-                label: t('kick-all-users-from-server'),
-                disabled: serverOnlineMembers.length === 0,
-                show: isStaff(permissionLevel),
-                onClick: () => handleKickUsersFromServer(serverUserIds, serverId),
-              },
-              {
-                id: 'separator',
-                label: '',
-              },
-              {
-                id: 'set-reception-lobby',
-                label: t('set-reception-lobby'),
-                disabled: isPrivateChannel || isReadonlyChannel,
-                show: isServerAdmin(permissionLevel) && !isReceptionLobby,
-                onClick: () => handleEditServer(serverId, { receptionLobbyId: channelId }),
-              },
-            ]);
+            contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
           }}
         >
           <div

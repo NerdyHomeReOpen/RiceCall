@@ -501,6 +501,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 </thead>
                 <tbody className={setting['table-container']}>
                   {filteredModerators.map((moderator) => {
+                    // Variables
                     const {
                       userId: memberUserId,
                       name: memberName,
@@ -513,6 +514,83 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     const isUser = memberUserId === userId;
                     const isSuperior = permissionLevel > memberPermission;
                     const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
+
+                    // Handlers
+                    const getContextMenuItems = () => [
+                      {
+                        id: 'direct-message',
+                        label: t('direct-message'),
+                        show: !isUser,
+                        onClick: () => handleOpenDirectMessage(userId, memberUserId),
+                      },
+                      {
+                        id: 'view-profile',
+                        label: t('view-profile'),
+                        onClick: () => handleOpenUserInfo(userId, memberUserId),
+                      },
+                      {
+                        id: 'edit-nickname',
+                        label: t('edit-nickname'),
+                        show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
+                        onClick: () => handleOpenEditNickname(memberUserId, serverId),
+                      },
+                      {
+                        id: 'separator',
+                        label: '',
+                      },
+                      {
+                        id: 'block',
+                        label: t('block'),
+                        show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+                        onClick: () => handleOpenBlockMember(memberUserId, serverId),
+                      },
+                      {
+                        id: 'separator',
+                        label: '',
+                      },
+                      {
+                        id: 'member-management',
+                        label: t('member-management'),
+                        show: !isUser && isMember(memberPermission) && isSuperior,
+                        icon: 'submenu',
+                        hasSubmenu: true,
+                        submenuItems: [
+                          {
+                            id: 'terminate-member',
+                            label: t('terminate-member'),
+                            show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission) && !isServerOwner(memberPermission),
+                            onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
+                          },
+                          {
+                            id: 'set-channel-mod',
+                            label: isChannelMod(memberPermission) ? t('unset-channel-mod') : t('set-channel-mod'),
+                            show: canUpdatePermission && isChannelAdmin(permissionLevel) && !isChannelAdmin(memberPermission) && channelCategoryId !== null,
+                            onClick: () =>
+                              isChannelMod(memberPermission)
+                                ? handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 2 })
+                                : handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 3 }),
+                          },
+                          {
+                            id: 'set-channel-admin',
+                            label: isChannelAdmin(memberPermission) ? t('unset-channel-admin') : t('set-channel-admin'),
+                            show: canUpdatePermission && isServerAdmin(permissionLevel) && !isServerAdmin(memberPermission),
+                            onClick: () =>
+                              isChannelAdmin(memberPermission)
+                                ? handleEditChannelPermission(memberUserId, serverId, channelCategoryId || channelId, { permissionLevel: 2 })
+                                : handleEditChannelPermission(memberUserId, serverId, channelCategoryId || channelId, { permissionLevel: 4 }),
+                          },
+                          {
+                            id: 'set-server-admin',
+                            label: isServerAdmin(memberPermission) ? t('unset-server-admin') : t('set-server-admin'),
+                            show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerOwner(memberPermission),
+                            onClick: () =>
+                              isServerAdmin(memberPermission)
+                                ? handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 })
+                                : handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
+                          },
+                        ],
+                      },
+                    ];
                     return (
                       <tr
                         key={memberUserId}
@@ -525,81 +603,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                           e.preventDefault();
                           const x = e.clientX;
                           const y = e.clientY;
-                          contextMenu.showContextMenu(x, y, 'right-bottom', [
-                            {
-                              id: 'direct-message',
-                              label: t('direct-message'),
-                              show: !isUser,
-                              onClick: () => handleOpenDirectMessage(userId, memberUserId),
-                            },
-                            {
-                              id: 'view-profile',
-                              label: t('view-profile'),
-                              onClick: () => handleOpenUserInfo(userId, memberUserId),
-                            },
-                            {
-                              id: 'edit-nickname',
-                              label: t('edit-nickname'),
-                              show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
-                              onClick: () => handleOpenEditNickname(memberUserId, serverId),
-                            },
-                            {
-                              id: 'separator',
-                              label: '',
-                            },
-                            {
-                              id: 'block',
-                              label: t('block'),
-                              show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-                              onClick: () => handleOpenBlockMember(memberUserId, serverId),
-                            },
-                            {
-                              id: 'separator',
-                              label: '',
-                            },
-                            {
-                              id: 'member-management',
-                              label: t('member-management'),
-                              show: !isUser && isMember(memberPermission) && isSuperior,
-                              icon: 'submenu',
-                              hasSubmenu: true,
-                              submenuItems: [
-                                {
-                                  id: 'terminate-member',
-                                  label: t('terminate-member'),
-                                  show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission) && !isServerOwner(memberPermission),
-                                  onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
-                                },
-                                {
-                                  id: 'set-channel-mod',
-                                  label: isChannelMod(memberPermission) ? t('unset-channel-mod') : t('set-channel-mod'),
-                                  show: canUpdatePermission && isChannelAdmin(permissionLevel) && !isChannelAdmin(memberPermission) && channelCategoryId !== null,
-                                  onClick: () =>
-                                    isChannelMod(memberPermission)
-                                      ? handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 2 })
-                                      : handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 3 }),
-                                },
-                                {
-                                  id: 'set-channel-admin',
-                                  label: isChannelAdmin(memberPermission) ? t('unset-channel-admin') : t('set-channel-admin'),
-                                  show: canUpdatePermission && isServerAdmin(permissionLevel) && !isServerAdmin(memberPermission),
-                                  onClick: () =>
-                                    isChannelAdmin(memberPermission)
-                                      ? handleEditChannelPermission(memberUserId, serverId, channelCategoryId || channelId, { permissionLevel: 2 })
-                                      : handleEditChannelPermission(memberUserId, serverId, channelCategoryId || channelId, { permissionLevel: 4 }),
-                                },
-                                {
-                                  id: 'set-server-admin',
-                                  label: isServerAdmin(memberPermission) ? t('unset-server-admin') : t('set-server-admin'),
-                                  show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerOwner(memberPermission),
-                                  onClick: () =>
-                                    isServerAdmin(memberPermission)
-                                      ? handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 })
-                                      : handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
-                                },
-                              ],
-                            },
-                          ]);
+                          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                         }}
                       >
                         <td>

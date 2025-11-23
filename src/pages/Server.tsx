@@ -239,6 +239,66 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       return className;
     };
 
+    const getContextMenuItems1 = () => [
+      {
+        id: 'close-announcement',
+        label: t('close-announcement'),
+        onClick: () => setIsAnnouncementVisible(false),
+      },
+    ];
+
+    const getContextMenuItems2 = () => [
+      {
+        id: 'clean-up-message',
+        label: t('clean-up-message'),
+        onClick: onClearMessages,
+      },
+      {
+        id: 'open-announcement',
+        label: t('open-announcement'),
+        show: !isAnnouncementVisible,
+        onClick: () => setIsAnnouncementVisible(true),
+      },
+    ];
+
+    const getContextMenuItems3 = () => [
+      {
+        id: 'free-speech',
+        label: t('free-speech'),
+        icon: channelVoiceMode === 'free' ? 'checked' : '',
+        onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'free' }),
+      },
+      {
+        id: 'admin-speech',
+        label: t('admin-speech'),
+        icon: channelVoiceMode === 'admin' ? 'checked' : '',
+        onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'admin' }),
+      },
+      {
+        id: 'queue-speech',
+        label: t('queue-speech'),
+        icon: channelVoiceMode === 'queue' ? 'submenu' : '',
+        hasSubmenu: channelVoiceMode === 'queue',
+        onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'queue' }),
+        submenuItems: [
+          {
+            id: 'forbid-guest-queue',
+            label: t('forbid-queue'),
+            icon: channelForbidQueue ? 'checked' : '',
+            disabled: channelVoiceMode !== 'queue',
+            onClick: () => handleEditChannel(serverId, channelId, { forbidQueue: !channelForbidQueue }),
+          },
+          {
+            id: 'control-queue',
+            label: t('control-queue'),
+            icon: isChannelQueueControlled ? 'checked' : '',
+            disabled: channelVoiceMode !== 'queue',
+            onClick: () => handleControlQueue(serverId, channelId),
+          },
+        ],
+      },
+    ];
+
     const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
       ipc.socket.send('channelMessage', { serverId, channelId, preset });
       setLastMessageTime(Date.now());
@@ -485,13 +545,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     e.preventDefault();
                     e.stopPropagation();
                     const { clientX: x, clientY: y } = e;
-                    contextMenu.showContextMenu(x, y, 'right-bottom', [
-                      {
-                        id: 'close-announcement',
-                        label: t('close-announcement'),
-                        onClick: () => setIsAnnouncementVisible(false),
-                      },
-                    ]);
+                    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
                   }}
                 >
                   <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} />
@@ -525,19 +579,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     const target = e.target as HTMLElement;
                     if (target.closest(`.${styles['username-text']}`)) return;
                     const { clientX: x, clientY: y } = e;
-                    contextMenu.showContextMenu(x, y, 'right-bottom', [
-                      {
-                        id: 'clean-up-message',
-                        label: t('clean-up-message'),
-                        onClick: onClearMessages,
-                      },
-                      {
-                        id: 'open-announcement',
-                        label: t('open-announcement'),
-                        show: !isAnnouncementVisible,
-                        onClick: () => setIsAnnouncementVisible(true),
-                      },
-                    ]);
+                    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
                   }}
                 >
                   <ChannelMessageContent messages={channelMessages} user={user} channel={currentChannel} server={server} handleScrollToBottom={handleScrollToBottom} isAtBottom={isAtBottom} />
@@ -573,43 +615,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   onClick={(e) => {
                     const x = e.currentTarget.getBoundingClientRect().left;
                     const y = e.currentTarget.getBoundingClientRect().top;
-                    contextMenu.showContextMenu(x, y, 'right-top', [
-                      {
-                        id: 'free-speech',
-                        label: t('free-speech'),
-                        icon: channelVoiceMode === 'free' ? 'checked' : '',
-                        onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'free' }),
-                      },
-                      {
-                        id: 'admin-speech',
-                        label: t('admin-speech'),
-                        icon: channelVoiceMode === 'admin' ? 'checked' : '',
-                        onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'admin' }),
-                      },
-                      {
-                        id: 'queue-speech',
-                        label: t('queue-speech'),
-                        icon: channelVoiceMode === 'queue' ? 'submenu' : '',
-                        hasSubmenu: channelVoiceMode === 'queue',
-                        onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'queue' }),
-                        submenuItems: [
-                          {
-                            id: 'forbid-guest-queue',
-                            label: t('forbid-queue'),
-                            icon: channelForbidQueue ? 'checked' : '',
-                            disabled: channelVoiceMode !== 'queue',
-                            onClick: () => handleEditChannel(serverId, channelId, { forbidQueue: !channelForbidQueue }),
-                          },
-                          {
-                            id: 'control-queue',
-                            label: t('control-queue'),
-                            icon: isChannelQueueControlled ? 'checked' : '',
-                            disabled: channelVoiceMode !== 'queue',
-                            onClick: () => handleControlQueue(serverId, channelId),
-                          },
-                        ],
-                      },
-                    ]);
+                    contextMenu.showContextMenu(x, y, 'right-top', getContextMenuItems3());
                   }}
                 >
                   {channelVoiceMode === 'queue' ? t('queue-speech') : channelVoiceMode === 'free' ? t('free-speech') : channelVoiceMode === 'admin' ? t('admin-speech') : ''}

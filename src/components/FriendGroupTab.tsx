@@ -54,6 +54,21 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
   const friendsOnlineCount = useMemo(() => friendGroupFriends.filter((f) => f.status !== 'offline').length, [friendGroupFriends]);
 
   // Handlers
+  const getContextMenuItems = () => [
+    {
+      id: 'edit-friend-group-name',
+      label: t('edit-friend-group-name'),
+      show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
+      onClick: () => handleOpenEditFriendGroupName(userId, friendGroupId),
+    },
+    {
+      id: 'delete-friend-group',
+      label: t('delete-friend-group'),
+      show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
+      onClick: () => handleDeleteFriendGroup(friendGroupId),
+    },
+  ];
+
   const handleDeleteFriendGroup = (friendGroupId: FriendGroup['friendGroupId']) => {
     handleOpenAlertDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipc.socket.send('deleteFriendGroup', { friendGroupId }));
   };
@@ -68,20 +83,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
           e.preventDefault();
           const x = e.clientX;
           const y = e.clientY;
-          contextMenu.showContextMenu(x, y, 'right-bottom', [
-            {
-              id: 'edit-friend-group-name',
-              label: t('edit-friend-group-name'),
-              show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
-              onClick: () => handleOpenEditFriendGroupName(userId, friendGroupId),
-            },
-            {
-              id: 'delete-friend-group',
-              label: t('delete-friend-group'),
-              show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
-              onClick: () => handleDeleteFriendGroup(friendGroupId),
-            },
-          ]);
+          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
         }}
       >
         <div className={`${styles['toggle-icon']} ${expanded ? styles['expanded'] : ''}`} />

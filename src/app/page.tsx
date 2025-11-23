@@ -84,16 +84,90 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   const hasFriendApplication = friendApplications.length !== 0;
   const hasMemberInvitation = memberInvitations.length !== 0;
   const hasSystemNotify = systemNotify.length !== 0;
-  const mainTabs = useMemo<{ id: 'home' | 'friends' | 'server'; label: string }[]>(
-    () => [
-      { id: 'home', label: t('home') },
-      { id: 'friends', label: t('friends') },
-      { id: 'server', label: serverName },
-    ],
-    [t, serverName],
-  );
+  const mainTabs: { id: 'home' | 'friends' | 'server'; label: string }[] = [
+    { id: 'home', label: t('home') },
+    { id: 'friends', label: t('friends') },
+    { id: 'server', label: serverName },
+  ];
 
   // Handlers
+  const getContextMenuItems = () => [
+    {
+      id: 'system-setting',
+      label: t('system-setting'),
+      icon: 'setting',
+      onClick: () => handleOpenSystemSetting(userId),
+    },
+    {
+      id: 'change-theme',
+      label: t('change-theme'),
+      icon: 'skin',
+      onClick: handleOpenChangeTheme,
+    },
+    {
+      id: 'feedback',
+      label: t('feedback'),
+      icon: 'feedback',
+      onClick: () => window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank'),
+    },
+    {
+      id: 'language-select',
+      label: t('language-select'),
+      icon: 'submenu-left',
+      hasSubmenu: true,
+      submenuItems: LANGUAGES.map((language) => ({
+        id: `language-select-${language.code}`,
+        label: language.label,
+        onClick: () => handleLanguageChange(language.code),
+      })),
+    },
+    {
+      id: 'help-center',
+      label: t('help-center'),
+      icon: 'submenu-left',
+      hasSubmenu: true,
+      submenuItems: [
+        {
+          id: 'faq',
+          label: t('faq'),
+          onClick: () => window.open('https://ricecall.com.tw/#faq', '_blank'),
+        },
+        {
+          id: 'agreement',
+          label: t('agreement'),
+          onClick: () => window.open('https://ricecall.com.tw/terms', '_blank'),
+        },
+        // {
+        //   id: 'specification',
+        //   label: t('specification'),
+        //   onClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
+        // },
+        {
+          id: 'contact-us',
+          label: t('contact-us'),
+          onClick: () => window.open('https://ricecall.com.tw/contact', '_blank'),
+        },
+        {
+          id: 'about-us',
+          label: t('about-ricecall'),
+          onClick: handleOpenAboutUs,
+        },
+      ],
+    },
+    {
+      id: 'logout',
+      label: t('logout'),
+      icon: 'logout',
+      onClick: handleLogout,
+    },
+    {
+      id: 'exit',
+      label: t('exit'),
+      icon: 'exit',
+      onClick: handleExit,
+    },
+  ];
+
   const handleLeaveServer = (serverId: Server['serverId']) => {
     ipc.socket.send('disconnectServer', { serverId });
   };
@@ -264,82 +338,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
           onClick={(e) => {
             const x = e.currentTarget.getBoundingClientRect().right + 50;
             const y = e.currentTarget.getBoundingClientRect().bottom;
-            contextMenu.showContextMenu(x, y, 'left-bottom', [
-              {
-                id: 'system-setting',
-                label: t('system-setting'),
-                icon: 'setting',
-                onClick: () => handleOpenSystemSetting(userId),
-              },
-              {
-                id: 'change-theme',
-                label: t('change-theme'),
-                icon: 'skin',
-                onClick: handleOpenChangeTheme,
-              },
-              {
-                id: 'feedback',
-                label: t('feedback'),
-                icon: 'feedback',
-                onClick: () => window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank'),
-              },
-              {
-                id: 'language-select',
-                label: t('language-select'),
-                icon: 'submenu-left',
-                hasSubmenu: true,
-                submenuItems: LANGUAGES.map((language) => ({
-                  id: `language-select-${language.code}`,
-                  label: language.label,
-                  onClick: () => handleLanguageChange(language.code),
-                })),
-              },
-              {
-                id: 'help-center',
-                label: t('help-center'),
-                icon: 'submenu-left',
-                hasSubmenu: true,
-                submenuItems: [
-                  {
-                    id: 'faq',
-                    label: t('faq'),
-                    onClick: () => window.open('https://ricecall.com.tw/#faq', '_blank'),
-                  },
-                  {
-                    id: 'agreement',
-                    label: t('agreement'),
-                    onClick: () => window.open('https://ricecall.com.tw/terms', '_blank'),
-                  },
-                  // {
-                  //   id: 'specification',
-                  //   label: t('specification'),
-                  //   onClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
-                  // },
-                  {
-                    id: 'contact-us',
-                    label: t('contact-us'),
-                    onClick: () => window.open('https://ricecall.com.tw/contact', '_blank'),
-                  },
-                  {
-                    id: 'about-us',
-                    label: t('about-ricecall'),
-                    onClick: handleOpenAboutUs,
-                  },
-                ],
-              },
-              {
-                id: 'logout',
-                label: t('logout'),
-                icon: 'logout',
-                onClick: handleLogout,
-              },
-              {
-                id: 'exit',
-                label: t('exit'),
-                icon: 'exit',
-                onClick: handleExit,
-              },
-            ]);
+            contextMenu.showContextMenu(x, y, 'left-bottom', getContextMenuItems());
           }}
         />
         <div className={header['minimize']} onClick={handleMinimize} />

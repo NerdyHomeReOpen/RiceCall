@@ -64,6 +64,32 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     [messageContents, t],
   );
 
+  // Handlers
+  const getContextMenuItems = () => [
+    {
+      id: 'direct-message',
+      label: t('direct-message'),
+      show: !isUser,
+      onClick: () => handleOpenDirectMessage(userId, senderUserId),
+    },
+    {
+      id: 'view-profile',
+      label: t('view-profile'),
+      onClick: () => handleOpenUserInfo(userId, senderUserId),
+    },
+    {
+      id: 'separator',
+      label: '',
+      show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+    },
+    {
+      id: 'block',
+      label: t('block'),
+      show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+      onClick: () => handleOpenBlockMember(senderUserId, serverId),
+    },
+  ];
+
   return (
     <div className={styles['message-box']}>
       <div
@@ -72,30 +98,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
           e.preventDefault();
           e.stopPropagation();
           const { clientX: x, clientY: y } = e;
-          contextMenu.showContextMenu(x, y, 'right-bottom', [
-            {
-              id: 'direct-message',
-              label: t('direct-message'),
-              show: !isUser,
-              onClick: () => handleOpenDirectMessage(userId, senderUserId),
-            },
-            {
-              id: 'view-profile',
-              label: t('view-profile'),
-              onClick: () => handleOpenUserInfo(userId, senderUserId),
-            },
-            {
-              id: 'separator',
-              label: '',
-              show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-            },
-            {
-              id: 'block',
-              label: t('block'),
-              show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-              onClick: () => handleOpenBlockMember(senderUserId, serverId),
-            },
-          ]);
+          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
         }}
       >
         <div className={`${senderPermissionLevel > 2 && permission[senderGender]} ${senderPermissionLevel > 2 && permission[`lv-${senderPermissionLevel}`]}`} />

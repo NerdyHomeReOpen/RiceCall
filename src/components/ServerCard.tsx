@@ -36,6 +36,30 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   const { userId, currentServerId: userCurrentServerId } = user;
 
   // Handles
+  const getContextMenuItems = () => [
+    {
+      id: 'join-server',
+      label: t('join-server'),
+      onClick: () => handleServerSelect(serverId, serverDisplayId),
+    },
+    {
+      id: 'view-server-info',
+      label: t('view-server-info'),
+      onClick: () => handleOpenServerSetting(userId, serverId),
+    },
+    {
+      id: 'set-favorite',
+      label: !serverFavorite ? t('favorite') : t('unfavorite'),
+      onClick: () => handleFavoriteServer(serverId),
+    },
+    {
+      id: 'terminate-self-membership',
+      label: t('terminate-self-membership'),
+      show: isMember(serverPermissionLevel) && !isServerOwner(serverPermissionLevel),
+      onClick: () => handleTerminateMember(userId, serverId, t('self')),
+    },
+  ];
+
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
     if (loadingBox.isLoading) return;
     if (serverId === userCurrentServerId) {
@@ -63,29 +87,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
         e.preventDefault();
         const x = e.clientX;
         const y = e.clientY;
-        contextMenu.showContextMenu(x, y, 'right-bottom', [
-          {
-            id: 'join-server',
-            label: t('join-server'),
-            onClick: () => handleServerSelect(serverId, serverDisplayId),
-          },
-          {
-            id: 'view-server-info',
-            label: t('view-server-info'),
-            onClick: () => handleOpenServerSetting(userId, serverId),
-          },
-          {
-            id: 'set-favorite',
-            label: !serverFavorite ? t('favorite') : t('unfavorite'),
-            onClick: () => handleFavoriteServer(serverId),
-          },
-          {
-            id: 'terminate-self-membership',
-            label: t('terminate-self-membership'),
-            show: isMember(serverPermissionLevel) && !isServerOwner(serverPermissionLevel),
-            onClick: () => handleTerminateMember(userId, serverId, t('self')),
-          },
-        ]);
+        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
       }}
     >
       <div className={homePage['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>

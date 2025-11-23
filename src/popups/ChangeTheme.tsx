@@ -172,8 +172,16 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                   <div className={styles['color-selector']} onClick={() => setShowColorPicker((prev) => !prev)} />
 
                   {/* Custom Colors */}
-                  {customThemes.slice(0, 7).map((_, i) => {
-                    const customTheme = customThemes[i];
+                  {customThemes.slice(0, 7).map((customTheme, i) => {
+                    // Handlers
+                    const getContextMenuItems = () => [
+                      {
+                        id: 'delete',
+                        label: t('delete'),
+                        onClick: () => handleRemoveCustom(i),
+                      },
+                    ];
+
                     if (customTheme) {
                       return (
                         <div
@@ -192,13 +200,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                             e.preventDefault();
                             const x = e.clientX;
                             const y = e.clientY;
-                            contextMenu.showContextMenu(x, y, 'right-bottom', [
-                              {
-                                id: 'delete',
-                                label: t('delete'),
-                                onClick: () => handleRemoveCustom(i),
-                              },
-                            ]);
+                            contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         />
                       );

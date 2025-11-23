@@ -409,6 +409,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   </thead>
                   <tbody className={setting['table-container']}>
                     {filteredMembers.map((member) => {
+                      // Variables
                       const {
                         userId: memberUserId,
                         name: memberName,
@@ -421,6 +422,66 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       const isUser = memberUserId === userId;
                       const isSuperior = permissionLevel > memberPermission;
                       const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
+
+                      // Handlers
+                      const getContextMenuItems = () => [
+                        {
+                          id: 'direct-message',
+                          label: t('direct-message'),
+                          show: !isUser,
+                          onClick: () => handleOpenDirectMessage(userId, memberUserId),
+                        },
+                        {
+                          id: 'view-profile',
+                          label: t('view-profile'),
+                          onClick: () => handleOpenUserInfo(userId, memberUserId),
+                        },
+                        {
+                          id: 'edit-nickname',
+                          label: t('edit-nickname'),
+                          show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
+                          onClick: () => handleOpenEditNickname(memberUserId, serverId),
+                        },
+                        {
+                          id: 'separator',
+                          label: '',
+                        },
+                        {
+                          id: 'block',
+                          label: t('block'),
+                          show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+                          onClick: () => handleOpenBlockMember(memberUserId, serverId),
+                        },
+                        {
+                          id: 'separator',
+                          label: '',
+                        },
+                        {
+                          id: 'member-management',
+                          label: t('member-management'),
+                          show: !isUser && isMember(memberPermission) && isSuperior,
+                          icon: 'submenu',
+                          hasSubmenu: true,
+                          submenuItems: [
+                            {
+                              id: 'terminate-member',
+                              label: t('terminate-member'),
+                              show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission) && !isServerOwner(memberPermission),
+                              onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
+                            },
+                            {
+                              id: 'set-server-admin',
+                              label: isServerAdmin(memberPermission) ? t('unset-server-admin') : t('set-server-admin'),
+                              show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerOwner(memberPermission),
+                              onClick: () =>
+                                isServerAdmin(memberPermission)
+                                  ? handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 })
+                                  : handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
+                            },
+                          ],
+                        },
+                      ];
+
                       return (
                         <tr
                           key={memberUserId}
@@ -433,63 +494,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             e.preventDefault();
                             const x = e.clientX;
                             const y = e.clientY;
-                            contextMenu.showContextMenu(x, y, 'right-bottom', [
-                              {
-                                id: 'direct-message',
-                                label: t('direct-message'),
-                                show: !isUser,
-                                onClick: () => handleOpenDirectMessage(userId, memberUserId),
-                              },
-                              {
-                                id: 'view-profile',
-                                label: t('view-profile'),
-                                onClick: () => handleOpenUserInfo(userId, memberUserId),
-                              },
-                              {
-                                id: 'edit-nickname',
-                                label: t('edit-nickname'),
-                                show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
-                                onClick: () => handleOpenEditNickname(memberUserId, serverId),
-                              },
-                              {
-                                id: 'separator',
-                                label: '',
-                              },
-                              {
-                                id: 'block',
-                                label: t('block'),
-                                show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-                                onClick: () => handleOpenBlockMember(memberUserId, serverId),
-                              },
-                              {
-                                id: 'separator',
-                                label: '',
-                              },
-                              {
-                                id: 'member-management',
-                                label: t('member-management'),
-                                show: !isUser && isMember(memberPermission) && isSuperior,
-                                icon: 'submenu',
-                                hasSubmenu: true,
-                                submenuItems: [
-                                  {
-                                    id: 'terminate-member',
-                                    label: t('terminate-member'),
-                                    show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission) && !isServerOwner(memberPermission),
-                                    onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
-                                  },
-                                  {
-                                    id: 'set-server-admin',
-                                    label: isServerAdmin(memberPermission) ? t('unset-server-admin') : t('set-server-admin'),
-                                    show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerOwner(memberPermission),
-                                    onClick: () =>
-                                      isServerAdmin(memberPermission)
-                                        ? handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 })
-                                        : handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
-                                  },
-                                ],
-                              },
-                            ]);
+                            contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
                           <td title={memberNickname || memberName}>
@@ -594,8 +599,36 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   </thead>
                   <tbody className={setting['table-container']}>
                     {filteredApplications.map((application) => {
+                      // Variables
                       const { userId: applicationUserId, name: applicationName, description: applicationDescription, createdAt: applicationCreatedAt } = application;
                       const isUser = applicationUserId === userId;
+
+                      // Handlers
+                      const getContextMenuItems = () => [
+                        {
+                          id: 'view-profile',
+                          label: t('view-profile'),
+                          show: !isUser,
+                          onClick: () => handleOpenUserInfo(userId, applicationUserId),
+                        },
+                        {
+                          id: 'accept-application',
+                          label: t('accept-application'),
+                          show: !isUser && isServerAdmin(permissionLevel),
+                          onClick: () => {
+                            handleApproveMemberApplication(applicationUserId, serverId);
+                          },
+                        },
+                        {
+                          id: 'deny-application',
+                          label: t('deny-application'),
+                          show: !isUser && isServerAdmin(permissionLevel),
+                          onClick: () => {
+                            handleRejectMemberApplication(applicationUserId, serverId);
+                          },
+                        },
+                      ];
+
                       return (
                         <tr
                           key={applicationUserId}
@@ -608,30 +641,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             e.preventDefault();
                             const x = e.clientX;
                             const y = e.clientY;
-                            contextMenu.showContextMenu(x, y, 'right-bottom', [
-                              {
-                                id: 'view-profile',
-                                label: t('view-profile'),
-                                show: !isUser,
-                                onClick: () => handleOpenUserInfo(userId, applicationUserId),
-                              },
-                              {
-                                id: 'accept-application',
-                                label: t('accept-application'),
-                                show: !isUser && isServerAdmin(permissionLevel),
-                                onClick: () => {
-                                  handleApproveMemberApplication(applicationUserId, serverId);
-                                },
-                              },
-                              {
-                                id: 'deny-application',
-                                label: t('deny-application'),
-                                show: !isUser && isServerAdmin(permissionLevel),
-                                onClick: () => {
-                                  handleRejectMemberApplication(applicationUserId, serverId);
-                                },
-                              },
-                            ]);
+                            contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
                           <td>{applicationName}</td>
@@ -670,8 +680,26 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   </thead>
                   <tbody className={setting['table-container']}>
                     {filteredBlockMembers.map((member) => {
+                      // Variables
                       const { userId: memberUserId, nickname: memberNickname, name: memberName, blockedUntil: memberBlockedUntil } = member;
                       const isUser = memberUserId === userId;
+
+                      // Handlers
+                      const getContextMenuItems = () => [
+                        {
+                          id: 'view-profile',
+                          label: t('view-profile'),
+                          show: !isUser,
+                          onClick: () => handleOpenUserInfo(userId, memberUserId),
+                        },
+                        {
+                          id: 'unblock',
+                          label: t('unblock'),
+                          show: true,
+                          onClick: () => handleUnblockUserFromServer(memberUserId, memberName, serverId),
+                        },
+                      ];
+
                       return (
                         <tr
                           key={memberUserId}
@@ -684,20 +712,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             e.preventDefault();
                             const x = e.clientX;
                             const y = e.clientY;
-                            contextMenu.showContextMenu(x, y, 'right-bottom', [
-                              {
-                                id: 'view-profile',
-                                label: t('view-profile'),
-                                show: !isUser,
-                                onClick: () => handleOpenUserInfo(userId, memberUserId),
-                              },
-                              {
-                                id: 'unblock',
-                                label: t('unblock'),
-                                show: true,
-                                onClick: () => handleUnblockUserFromServer(memberUserId, memberName, serverId),
-                              },
-                            ]);
+                            contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
                           <td>{memberNickname || memberName}</td>

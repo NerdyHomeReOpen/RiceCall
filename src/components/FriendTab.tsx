@@ -67,6 +67,99 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
   const isFriend = friendRelationStatus === 2;
 
   // Handlers
+  const getContextMenuItems = () => [
+    {
+      id: 'direct-message',
+      label: t('direct-message'),
+      show: !isUser,
+      onClick: () => handleOpenDirectMessage(userId, targetId),
+    },
+    {
+      id: 'separator',
+      label: '',
+      show: !isUser,
+    },
+    {
+      id: 'view-profile',
+      label: t('view-profile'),
+      show: !isUser,
+      onClick: () => handleOpenUserInfo(userId, targetId),
+    },
+    {
+      id: 'add-friend',
+      label: t('add-friend'),
+      show: !isUser && !isFriend,
+      onClick: () => handleOpenApplyFriend(userId, targetId),
+    },
+    {
+      id: 'edit-note',
+      label: t('edit-note'),
+      show: !isUser && isFriend,
+      onClick: () => handleOpenEditFriendNote(userId, targetId),
+    },
+    {
+      id: 'separator',
+      label: '',
+    },
+    {
+      id: 'permission-setting',
+      label: t('permission-setting'),
+      show: !isUser && isFriend,
+      icon: 'submenu',
+      disabled: true,
+      hasSubmenu: true,
+      submenuItems: [
+        {
+          id: 'set-hide-or-show-online-to-friend',
+          label: t('hide-online-to-friend'),
+          disabled: true,
+          onClick: () => {
+            /* TODO: handlePrivateFriend() */
+          },
+        },
+        {
+          id: 'set-notify-friend-online',
+          label: t('notify-friend-online'),
+          disabled: true,
+          onClick: () => {
+            /* TODO: handleNotifyFriendOnline() */
+          },
+        },
+      ],
+    },
+    {
+      id: 'edit-friend-friend-group',
+      label: t('edit-friend-friend-group'),
+      show: !isUser && !isStranger && !friendIsBlocked,
+      icon: 'submenu',
+      hasSubmenu: true,
+      submenuItems: friendGroups.map((group, key) => ({
+        id: `friend-group-${key}`,
+        label: group.name,
+        show: !((group.friendGroupId || null) === friend.friendGroupId),
+        onClick: () => handleEditFriend(targetId, { friendGroupId: group.friendGroupId || null }),
+      })),
+    },
+    {
+      id: 'block',
+      label: friendIsBlocked ? t('unblock') : t('block'),
+      show: !isUser,
+      onClick: () => (friendIsBlocked ? handleUnblockUser(targetId) : handleBlockUser(targetId)),
+    },
+    {
+      id: 'delete-friend',
+      label: t('delete-friend'),
+      show: !isUser && isFriend,
+      onClick: () => handleDeleteFriend(targetId),
+    },
+    {
+      id: 'delete-friend-application',
+      label: t('delete-friend-application'),
+      show: !isUser && isPending,
+      onClick: () => handleDeleteFriendApplication(targetId),
+    },
+  ];
+
   const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
     if (loadingBox.isLoading) return;
     if (serverId === userCurrentServerId) {
@@ -122,98 +215,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
         e.preventDefault();
         const x = e.clientX;
         const y = e.clientY;
-        contextMenu.showContextMenu(x, y, 'right-bottom', [
-          {
-            id: 'direct-message',
-            label: t('direct-message'),
-            show: !isUser,
-            onClick: () => handleOpenDirectMessage(userId, targetId),
-          },
-          {
-            id: 'separator',
-            label: '',
-            show: !isUser,
-          },
-          {
-            id: 'view-profile',
-            label: t('view-profile'),
-            show: !isUser,
-            onClick: () => handleOpenUserInfo(userId, targetId),
-          },
-          {
-            id: 'add-friend',
-            label: t('add-friend'),
-            show: !isUser && !isFriend,
-            onClick: () => handleOpenApplyFriend(userId, targetId),
-          },
-          {
-            id: 'edit-note',
-            label: t('edit-note'),
-            show: !isUser && isFriend,
-            onClick: () => handleOpenEditFriendNote(userId, targetId),
-          },
-          {
-            id: 'separator',
-            label: '',
-          },
-          {
-            id: 'permission-setting',
-            label: t('permission-setting'),
-            show: !isUser && isFriend,
-            icon: 'submenu',
-            disabled: true,
-            hasSubmenu: true,
-            submenuItems: [
-              {
-                id: 'set-hide-or-show-online-to-friend',
-                label: t('hide-online-to-friend'),
-                disabled: true,
-                onClick: () => {
-                  /* TODO: handlePrivateFriend() */
-                },
-              },
-              {
-                id: 'set-notify-friend-online',
-                label: t('notify-friend-online'),
-                disabled: true,
-                onClick: () => {
-                  /* TODO: handleNotifyFriendOnline() */
-                },
-              },
-            ],
-          },
-          {
-            id: 'edit-friend-friend-group',
-            label: t('edit-friend-friend-group'),
-            show: !isUser && !isStranger && !friendIsBlocked,
-            icon: 'submenu',
-            hasSubmenu: true,
-            submenuItems: friendGroups.map((group, key) => ({
-              id: `friend-group-${key}`,
-              label: group.name,
-              show: !((group.friendGroupId || null) === friend.friendGroupId),
-              onClick: () => handleEditFriend(targetId, { friendGroupId: group.friendGroupId || null }),
-            })),
-          },
-          {
-            id: 'block',
-            label: friendIsBlocked ? t('unblock') : t('block'),
-            show: !isUser,
-            onClick: () => (friendIsBlocked ? handleUnblockUser(targetId) : handleBlockUser(targetId)),
-          },
-          {
-            id: 'delete-friend',
-            label: t('delete-friend'),
-            show: !isUser && isFriend,
-            onClick: () => handleDeleteFriend(targetId),
-          },
-          {
-            id: 'delete-friend-application',
-            label: t('delete-friend-application'),
-            show: !isUser && isPending,
-            onClick: () => handleDeleteFriendApplication(targetId),
-          },
-        ]);
+        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
       }}
     >
       <div
