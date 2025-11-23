@@ -813,9 +813,6 @@ const RootPageComponent: React.FC = React.memo(() => {
 
 RootPageComponent.displayName = 'RootPageComponent';
 
-// use dynamic import to disable SSR
-const RootPage = dynamic(() => Promise.resolve(RootPageComponent), {
-  ssr: false,
-});
+const RootPage = dynamic(() => Promise.resolve(RootPageComponent), { ssr: false });
 
 export default RootPage;

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useMemo } from 'react';
 
 // CSS
@@ -293,7 +294,7 @@ type Popup = {
   hideHeader: boolean;
 };
 
-const Popup = React.memo(() => {
+const PopupPageComponent: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
 
@@ -430,6 +431,8 @@ const Popup = React.memo(() => {
   );
 });
 
-Popup.displayName = 'Popup';
+PopupPageComponent.displayName = 'PopupPageComponent';
 
-export default Popup;
+const PopupPage = dynamic(() => Promise.resolve(PopupPageComponent), { ssr: false });
+
+export default PopupPage;
