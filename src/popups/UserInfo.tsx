@@ -214,16 +214,12 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onloadend = async () =>
-                  handleOpenImageCropper(reader.result as string, async (data) => {
-                    if (data.imageDataUrl.length > 5 * 1024 * 1024) {
+                  handleOpenImageCropper(reader.result as string, async (imageDataUrl) => {
+                    if (imageDataUrl.length > 5 * 1024 * 1024) {
                       handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
                       return;
                     }
-                    const formData = new FormData();
-                    formData.append('_type', 'user');
-                    formData.append('_fileName', userId);
-                    formData.append('_file', data.imageDataUrl as string);
-                    const response = await ipc.data.upload(formData);
+                    const response = await ipc.data.upload('user', userId, imageDataUrl);
                     if (response) {
                       setTarget((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
                       handleEditUser({ avatar: response.avatar, avatarUrl: response.avatarUrl });

@@ -213,9 +213,9 @@ const ipcService = {
       return await ipcRenderer.invoke('data-recommendServers');
     },
 
-    upload: async (formData: FormData): Promise<any | null> => {
+    upload: async (type: string, fileName: string, file: string): Promise<any | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-upload', formData.get('_type'), formData.get('_fileName'), formData.get('_file'));
+      return await ipcRenderer.invoke('data-upload', type, fileName, file);
     },
   },
 

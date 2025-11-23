@@ -111,11 +111,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       isUploadingRef.current = false;
       return;
     }
-    const formData = new FormData();
-    formData.append('_type', 'message');
-    formData.append('_fileName', `fileName-${Date.now()}`);
-    formData.append('_file', imageData);
-    const response = await ipc.data.upload(formData);
+    const response = await ipc.data.upload('message', `fileName-${Date.now()}`, imageData);
     if (response) {
       editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
       syncStyles();

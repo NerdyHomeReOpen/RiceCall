@@ -94,11 +94,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
       isUploadingRef.current = false;
       return;
     }
-    const formData = new FormData();
-    formData.append('_type', 'announcement');
-    formData.append('_fileName', `fileName-${Date.now()}`);
-    formData.append('_file', imageData);
-    const response = await ipc.data.upload(formData);
+    const response = await ipc.data.upload('announcement', `fileName-${Date.now()}`, imageData);
     if (response) {
       editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
       syncStyles();

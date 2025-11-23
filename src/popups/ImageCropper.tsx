@@ -72,9 +72,9 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ imageD
 
   const handleCrop = async () => {
     const canvas = previewRef.current;
-    const dataUrl = canvas?.toDataURL('image/png');
-    if (!dataUrl) return;
-    ipc.popup.submit(submitTo, { imageDataUrl: dataUrl });
+    const imageDataUrl = canvas?.toDataURL('image/png');
+    if (!imageDataUrl) return;
+    ipc.popup.submit(submitTo, imageDataUrl);
     handleClose();
   };
 

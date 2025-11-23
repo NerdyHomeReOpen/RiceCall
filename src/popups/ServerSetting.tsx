@@ -325,16 +325,12 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       if (!file) return;
                       const reader = new FileReader();
                       reader.onloadend = async () =>
-                        handleOpenImageCropper(reader.result as string, async (data) => {
-                          if (data.imageDataUrl.length > 5 * 1024 * 1024) {
+                        handleOpenImageCropper(reader.result as string, async (imageDataUrl) => {
+                          if (imageDataUrl.length > 5 * 1024 * 1024) {
                             handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
                             return;
                           }
-                          const formData = new FormData();
-                          formData.append('_type', 'server');
-                          formData.append('_fileName', serverId);
-                          formData.append('_file', data.imageDataUrl as string);
-                          const response = await ipc.data.upload(formData);
+                          const response = await ipc.data.upload('server', serverId, imageDataUrl);
                           if (response) {
                             setServer((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
                           }
