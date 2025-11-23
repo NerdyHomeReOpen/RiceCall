@@ -172,8 +172,8 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, [serverChannels]);
 
   useEffect(() => {
-    const unsubscribe = [ipc.socket.on('channelAdd', handleChannelAdd), ipc.socket.on('channelUpdate', handleChannelUpdate), ipc.socket.on('channelRemove', handleChannelRemove)];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    const unsubs = [ipc.socket.on('channelAdd', handleChannelAdd), ipc.socket.on('channelUpdate', handleChannelUpdate), ipc.socket.on('channelRemove', handleChannelRemove)];
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   const categoryTab = (category: Category) => {

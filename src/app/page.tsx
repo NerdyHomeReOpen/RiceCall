@@ -143,12 +143,12 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   useEffect(() => {
     isCloseToTray.current = ipc.systemSettings.closeToTray.get();
 
-    const unsubscribe = [
+    const unsubs = [
       ipc.systemSettings.closeToTray.onUpdate((enable) => (isCloseToTray.current = enable)),
       ipc.window.onUnmaximize(() => setIsFullscreen(false)),
       ipc.window.onMaximize(() => setIsFullscreen(true)),
     ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return (
@@ -392,6 +392,11 @@ const RootPageComponent: React.FC = React.memo(() => {
   const channel = useMemo(() => channels.find((item) => item.channelId === user.currentChannelId) || Default.channel(), [channels, user.currentChannelId]);
   const { userId } = user;
   const { serverId } = server;
+
+  // Handlers
+  const handleClearMessages = () => {
+    setChannelMessages([]);
+  };
 
   // Effects
   useEffect(() => {
@@ -845,7 +850,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 currentChannel={channel}
                 channels={channels}
                 channelMessages={channelMessages}
-                clearMessages={() => setChannelMessages([])}
+                onClearMessages={handleClearMessages}
                 actionMessages={actionMessages}
                 queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}

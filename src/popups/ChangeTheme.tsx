@@ -110,8 +110,8 @@ const ChangeThemePopup: React.FC = React.memo(() => {
 
     changeCustomTheme(ipc.customThemes.get());
 
-    const unsubscribe = [ipc.customThemes.onUpdate(changeCustomTheme)];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    const unsubs = [ipc.customThemes.onUpdate(changeCustomTheme)];
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   useEffect(() => {

@@ -122,11 +122,11 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
   }, [channels]);
 
   useEffect(() => {
-    const resetResizing = () => {
+    const onPointerup = () => {
       isResizingQueueListRef.current = false;
     };
-    document.addEventListener('pointerup', resetResizing);
-    return () => document.removeEventListener('pointerup', resetResizing);
+    document.addEventListener('pointerup', onPointerup);
+    return () => document.removeEventListener('pointerup', onPointerup);
   }, []);
 
   return (

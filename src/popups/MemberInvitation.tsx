@@ -61,12 +61,12 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
 
   // Effects
   useEffect(() => {
-    const unsubscribe = [
+    const unsubs = [
       ipc.socket.on('memberInvitationAdd', handleMemberInvitationAdd),
       ipc.socket.on('memberInvitationUpdate', handleMemberInvitationUpdate),
       ipc.socket.on('memberInvitationRemove', handleMemberInvitationRemove),
     ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return (

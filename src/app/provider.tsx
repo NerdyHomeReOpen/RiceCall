@@ -57,13 +57,13 @@ const Providers = ({ children }: ProvidersProps) => {
     handleThemeChange(ipc.customThemes.current.get());
     handleLanguageChange(ipc.language.get());
 
-    const unsubscribe = [
+    const unsubs = [
       ipc.systemSettings.font.onUpdate(handleFontChange),
       ipc.systemSettings.fontSize.onUpdate(handleFontSizeChange),
       ipc.customThemes.current.onUpdate(handleThemeChange),
       ipc.language.onUpdate(handleLanguageChange),
     ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    return () => unsubs.forEach((unsub) => unsub());
   }, [handleFontChange, handleFontSizeChange, handleThemeChange, handleLanguageChange]);
 
   useEffect(() => {

@@ -131,7 +131,7 @@ interface ServerPageProps {
   currentChannel: Channel;
   channels: Channel[];
   channelMessages: (ChannelMessage | PromptMessage)[];
-  clearMessages: () => void;
+  onClearMessages: () => void;
   actionMessages: PromptMessage[];
   queueUsers: QueueUser[];
   display: boolean;
@@ -139,7 +139,7 @@ interface ServerPageProps {
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
-  ({ user, friends, server, serverOnlineMembers, serverMemberApplications, currentChannel, channels, channelMessages, clearMessages, actionMessages, queueUsers, display, latency }) => {
+  ({ user, friends, server, serverOnlineMembers, serverMemberApplications, currentChannel, channels, channelMessages, onClearMessages, actionMessages, queueUsers, display, latency }) => {
     // Hooks
     const { t } = useTranslation();
     const webRTC = useWebRTC();
@@ -405,12 +405,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [channelId]);
 
     useEffect(() => {
-      const resetResizing = () => {
+      const onPointerup = () => {
         isResizingSidebarRef.current = false;
         isResizingAnnAreaRef.current = false;
       };
-      document.addEventListener('pointerup', resetResizing);
-      return () => document.removeEventListener('pointerup', resetResizing);
+      document.addEventListener('pointerup', onPointerup);
+      return () => document.removeEventListener('pointerup', onPointerup);
     }, []);
 
     useEffect(() => {
@@ -529,7 +529,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       {
                         id: 'clean-up-message',
                         label: t('clean-up-message'),
-                        onClick: () => clearMessages(),
+                        onClick: onClearMessages,
                       },
                       {
                         id: 'open-announcement',

@@ -945,7 +945,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     handleEditSpeakingMode(ipc.systemSettings.speakingMode.get());
     handleEditRecordFormat(ipc.systemSettings.recordFormat.get());
 
-    const unsubscribe = [
+    const unsubs = [
       ipc.systemSettings.inputAudioDevice.onUpdate(handleEditInputDevice),
       ipc.systemSettings.outputAudioDevice.onUpdate(handleEditOutputDevice),
       ipc.systemSettings.speakingMode.onUpdate(handleEditSpeakingMode),
@@ -955,7 +955,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       ipc.socket.on('SFUNewProducer', handleNewProducer),
       ipc.socket.on('SFUProducerClosed', handleProducerClosed),
     ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    return () => unsubs.forEach((unsub) => unsub());
   }, [handleEditInputDevice, handleEditOutputDevice, handleEditSpeakingMode, handleEditRecordFormat, handleSFUJoined, handleSFULeft, handleNewProducer, handleProducerClosed]);
 
   return (

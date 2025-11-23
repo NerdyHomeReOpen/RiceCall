@@ -167,13 +167,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   // Effects
   useEffect(() => {
-    const unsubscribe = [
+    const unsubs = [
       ipc.socket.on('channelUpdate', handleChannelUpdate),
       ipc.socket.on('serverMemberAdd', handleServerMemberAdd),
       ipc.socket.on('channelMemberUpdate', handleChannelMemberUpdate),
       ipc.socket.on('serverMemberRemove', handleServerMemberRemove),
     ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    return () => unsubs.forEach((unsub) => unsub());
   }, [handleChannelMemberUpdate]);
 
   return (

@@ -56,12 +56,8 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
 
   // Effects
   useEffect(() => {
-    const unsubscribe = [
-      ipc.socket.on('friendGroupAdd', handleFriendGroupAdd),
-      ipc.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
-      ipc.socket.on('friendGroupRemove', handleFriendGroupRemove),
-    ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    const unsubs = [ipc.socket.on('friendGroupAdd', handleFriendGroupAdd), ipc.socket.on('friendGroupUpdate', handleFriendGroupUpdate), ipc.socket.on('friendGroupRemove', handleFriendGroupRemove)];
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return (

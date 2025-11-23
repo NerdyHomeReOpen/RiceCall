@@ -231,7 +231,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
     changeHotKeyToggleSpeaker(ipc.systemSettings.hotKeyToggleSpeaker.get());
     changeHotKeyToggleMicrophone(ipc.systemSettings.hotKeyToggleMicrophone.get());
 
-    const unsubscribe = [
+    const unsubs = [
       ipc.systemSettings.statusAutoIdle.onUpdate(changeStatusAutoIdle),
       ipc.systemSettings.statusAutoIdleMinutes.onUpdate(changeStatusAutoIdleMinutes),
       ipc.systemSettings.defaultSpeakingKey.onUpdate(changeDefaultSpeakingKey),
@@ -241,7 +241,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
       ipc.systemSettings.hotKeyToggleSpeaker.onUpdate(changeHotKeyToggleSpeaker),
       ipc.systemSettings.hotKeyToggleMicrophone.onUpdate(changeHotKeyToggleMicrophone),
     ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return <ActionScannerContext.Provider value={{ isKeepAlive }}>{children}</ActionScannerContext.Provider>;

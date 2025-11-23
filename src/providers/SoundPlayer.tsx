@@ -128,7 +128,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
     changeReceiveDirectMessageSound(ipc.systemSettings.receiveDirectMessageSound.get());
     changeReceiveChannelMessageSound(ipc.systemSettings.receiveChannelMessageSound.get());
 
-    const unsubscribe = [
+    const unsubs = [
       ipc.systemSettings.outputAudioDevice.onUpdate(changeOutputAudioDevice),
       ipc.systemSettings.disableAllSoundEffect.onUpdate(changeDisableAllSoundEffect),
       ipc.systemSettings.enterVoiceChannelSound.onUpdate(changeEnterVoiceChannelSound),
@@ -138,7 +138,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
       ipc.systemSettings.receiveDirectMessageSound.onUpdate(changeReceiveDirectMessageSound),
       ipc.systemSettings.receiveChannelMessageSound.onUpdate(changeReceiveChannelMessageSound),
     ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return <SoundPlayerContext.Provider value={{ playSound }}>{children}</SoundPlayerContext.Provider>;

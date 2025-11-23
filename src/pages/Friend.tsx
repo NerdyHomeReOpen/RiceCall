@@ -69,11 +69,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   }, [userSignature]);
 
   useEffect(() => {
-    const resetResizing = () => {
+    const onPointerup = () => {
       isResizingSidebarRef.current = false;
     };
-    document.addEventListener('pointerup', resetResizing);
-    return () => document.removeEventListener('pointerup', resetResizing);
+    document.addEventListener('pointerup', onPointerup);
+    return () => document.removeEventListener('pointerup', onPointerup);
   }, []);
 
   return (

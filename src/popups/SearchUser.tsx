@@ -63,8 +63,8 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   }, [searchQuery]);
 
   useEffect(() => {
-    const unsubscribe = [ipc.socket.on('userSearch', handleUserSearch)];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    const unsubs = [ipc.socket.on('userSearch', handleUserSearch)];
+    return () => unsubs.forEach((unsub) => unsub());
   }, [handleUserSearch]);
 
   return (
