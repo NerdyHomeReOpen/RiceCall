@@ -33,9 +33,10 @@ interface ChannelListProps {
   currentChannel: Channel;
   channels: (Channel | Category)[];
   queueUsers: QueueUser[];
+  latency: number;
 }
 
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, serverMemberApplications, currentChannel, channels, queueUsers }) => {
+const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, server, serverOnlineMembers, serverMemberApplications, currentChannel, channels, queueUsers, latency }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -47,7 +48,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
 
   // States
   const [viewType, setViewType] = useState<'all' | 'current'>('all');
-  const [latency, setLatency] = useState<number>(0);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
@@ -120,11 +120,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, friends, ser
       setExpanded((prev) => ({ ...prev, [channel.channelId]: prev[channel.channelId] != undefined ? prev[channel.channelId] : true }));
     }
   }, [channels]);
-
-  useEffect(() => {
-    const interval = setInterval(() => setLatency(ipc.latency.get()), 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const resetResizing = () => {

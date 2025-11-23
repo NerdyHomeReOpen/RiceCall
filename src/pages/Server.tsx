@@ -135,10 +135,11 @@ interface ServerPageProps {
   actionMessages: PromptMessage[];
   queueUsers: QueueUser[];
   display: boolean;
+  latency: number;
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
-  ({ user, friends, server, serverOnlineMembers, serverMemberApplications, currentChannel, channels, channelMessages, clearMessages, actionMessages, queueUsers, display }) => {
+  ({ user, friends, server, serverOnlineMembers, serverMemberApplications, currentChannel, channels, channelMessages, clearMessages, actionMessages, queueUsers, display, latency }) => {
     // Hooks
     const { t } = useTranslation();
     const webRTC = useWebRTC();
@@ -446,6 +447,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               channels={channels}
               currentChannel={currentChannel}
               queueUsers={queueUsers}
+              latency={latency}
             />
           </aside>
 

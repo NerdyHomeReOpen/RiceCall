@@ -1188,13 +1188,6 @@ const ipcService = {
       ipcRenderer.invoke('disable-loopback-audio');
     },
   },
-
-  latency: {
-    get: (): number => {
-      if (!isElectron) return 0;
-      return ipcRenderer.sendSync('get-latency');
-    },
-  },
 };
 
 export default ipcService;

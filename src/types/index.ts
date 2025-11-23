@@ -345,6 +345,7 @@ export type ServerToClientEvents = {
   reconnect_error: (error: any) => void;
   reconnect_failed: () => void;
   disconnect: () => void;
+  heartbeat: (...args: { seq: number; latency: number }[]) => void;
   // Notification
   notification: (...args: { message: string }[]) => void; // not used yet
   // User

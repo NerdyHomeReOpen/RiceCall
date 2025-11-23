@@ -366,6 +366,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const soundPlayerRef = useRef(soundPlayer);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
   const serverIdRef = useRef<Server['serverId'] | null>(null);
+  const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -385,6 +386,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [notifies, setNotifies] = useState<Notify[]>([]);
   const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
+  const [latency, setLatency] = useState<number>(0);
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   // Variables
   const server = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
@@ -537,12 +540,29 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [userId, serverId]);
 
   useEffect(() => {
-    const onConnect = () => {
+    const unsub = ipc.socket.on('connect', () => {
       console.info('[Socket] connected');
       ipc.popup.close('errorDialog');
-    };
+      if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
+      setIsSocketConnected(true);
+    });
+    return () => unsub();
+  }, []);
 
-    const unsub = ipc.socket.on('connect', onConnect);
+  useEffect(() => {
+    const unsub = ipc.socket.on('disconnect', () => {
+      console.info('[Socket] disconnected');
+      if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
+      disconnectTimerRef.current = setTimeout(() => setIsSocketConnected(false), 30000);
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('heartbeat', (...args: { seq: number; latency: number }[]) => {
+      console.log(`[Socket] heartbeat`, args);
+      setLatency(args[0].latency);
+    });
     return () => unsub();
   }, []);
 
@@ -813,7 +833,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       <ActionScannerProvider>
         <ExpandedProvider>
           <Header user={user} server={server} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
-          {!userId ? (
+          {!userId || !isSocketConnected ? (
             <LoadingSpinner />
           ) : (
             <>
@@ -832,6 +852,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 actionMessages={actionMessages}
                 queueUsers={queueUsers}
                 display={mainTab.selectedTabId === 'server'}
+                latency={latency}
               />
               <NotifyToaster notifies={notifies} />
             </>

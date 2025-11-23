@@ -12,7 +12,7 @@ import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
 import { initMainI18n, t } from './i18n.js';
-import { connectSocket, disconnectSocket, latency } from './socket.js';
+import { connectSocket, disconnectSocket } from './socket.js';
 import { env, loadEnv } from './env.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
 import authService from './auth.service.js';
@@ -1100,16 +1100,6 @@ app.on('ready', async () => {
   // Env
   ipcMain.on('get-env', (event) => {
     event.returnValue = env;
-  });
-
-  // Token
-  ipcMain.on('get-token', (event) => {
-    event.returnValue = token;
-  });
-
-  // Latency
-  ipcMain.on('get-latency', (event) => {
-    event.returnValue = latency;
   });
 
   // System settings handlers
