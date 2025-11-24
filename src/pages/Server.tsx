@@ -485,7 +485,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     useEffect(() => {
       const changeSpeakingMode = (speakingMode: SpeakingMode) => {
-        console.info('[ServerPage] speaking mode updated: ', speakingMode);
         setSpeakingMode(speakingMode);
       };
       changeSpeakingMode(ipc.systemSettings.speakingMode.get());
@@ -495,7 +494,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     useEffect(() => {
       const changeDefaultSpeakingKey = (key: string) => {
-        console.info('[ServerPage] default speaking key updated: ', key);
         setSpeakingKey(key);
       };
       changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
@@ -505,7 +503,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     useEffect(() => {
       const changeChannelUIMode = (channelUIMode: ChannelUIMode) => {
-        console.info('[ServerPage] channel UI mode updated: ', channelUIMode);
         setChannelUIMode(channelUIMode);
       };
       changeChannelUIMode(ipc.systemSettings.channelUIMode.get());
