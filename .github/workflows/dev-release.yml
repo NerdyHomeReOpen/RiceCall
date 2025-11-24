@@ -3,7 +3,7 @@ name: Release Dev Latest
 on:
   push:
     tags:
-      - '[0-9]+.[0-9]+.[0-9]+-dev.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-dev.*'
 
 permissions:
   contents: write
