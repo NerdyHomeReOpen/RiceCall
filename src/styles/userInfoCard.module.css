@@ -1,5 +1,5 @@
 .user-info-card {
-  z-index: 500;
+  z-index: 10000;
   position: absolute;
   background-color: var(--background);
   height: 190px;

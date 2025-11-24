@@ -1,4 +1,4 @@
 .color-picker {
+  z-index: 10000;
   position: absolute;
-  z-index: 1000;
 }

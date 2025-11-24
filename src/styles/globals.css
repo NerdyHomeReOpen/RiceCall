@@ -235,7 +235,7 @@ button {
 }
 
 .hover-text {
-  z-index: 999;
+  z-index: 1;
   position: absolute;
   left: 0;
   bottom: 100%;

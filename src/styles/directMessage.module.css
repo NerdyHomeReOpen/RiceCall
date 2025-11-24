@@ -123,7 +123,7 @@
 }
 
 .avatar-picture::before {
-  z-index: 2;
+  z-index: 1;
   content: '';
   position: absolute;
   top: -10px;
@@ -329,7 +329,7 @@
 }
 
 .is-official-title {
-  color:#636363;
+  color: #636363;
 }
 
 .is-official-text {

@@ -1,5 +1,5 @@
 .notify-menu:not(:empty) {
-  z-index: 1000;
+  z-index: 10000;
   position: fixed;
   display: flex;
   flex-direction: column;
