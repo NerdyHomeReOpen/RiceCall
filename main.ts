@@ -714,7 +714,7 @@ app.on('ready', async () => {
     return await authService
       .login(formData)
       .then((res) => {
-        if (res?.success) {
+        if (res.success) {
           token = res.token;
           isLogin = true;
           mainWindow?.showInactive();
@@ -751,7 +751,7 @@ app.on('ready', async () => {
     return await authService
       .autoLogin(t)
       .then((res) => {
-        if (res?.success) {
+        if (res.success) {
           token = res.token;
           isLogin = true;
           mainWindow?.showInactive();
