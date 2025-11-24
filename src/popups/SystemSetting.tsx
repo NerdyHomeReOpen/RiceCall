@@ -74,6 +74,9 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
     stopSpeakingSound,
     receiveDirectMessageSound,
     receiveChannelMessageSound,
+    autoCheckForUpdates,
+    updateCheckInterval,
+    updateChannel,
   } = systemSettings;
   const { forbidFriendApplications, forbidShakeMessages, forbidMemberInvitations, forbidStrangerMessages, shareCurrentServer, shareRecentServers, shareJoinedServers, shareFavoriteServers } =
     userSettings;
@@ -82,6 +85,10 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
   const handleEditUserSetting = (update: Partial<UserSetting>) => {
     ipc.socket.send('editUserSetting', { update });
     ipc.window.close();
+  };
+
+  const handleCheckForUpdates = () => {
+    ipc.checkForUpdates();
   };
 
   const handleClose = () => {
@@ -189,7 +196,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
         {/* Sidebar */}
         <div className={setting['left']}>
           <div className={setting['tabs']}>
-            {[t('basic-setting'), t('audio-setting'), t('voice-setting'), t('privacy-setting'), t('hot-key-setting'), t('sound-effect-setting')].map((title, index) => (
+            {[t('basic-setting'), t('audio-setting'), t('voice-setting'), t('privacy-setting'), t('hot-key-setting'), t('sound-effect-setting'), t('update-setting')].map((title, index) => (
               <div className={`${setting['tab']} ${activeTabIndex === index ? setting['active'] : ''}`} onClick={() => setActiveTabIndex(index)} key={index}>
                 {title}
               </div>
@@ -729,6 +736,54 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Update Settings */}
+        <div className={setting['right']} style={activeTabIndex === 6 ? {} : { display: 'none' }}>
+          <div className={popup['col']}>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('update-setting')}</div>
+            </div>
+            <div className={popup['row']}>
+              <div className={`${popup['input-box']} ${popup['row']}`}>
+                <input
+                  name="auto-check-for-updates"
+                  type="checkbox"
+                  checked={autoCheckForUpdates}
+                  onChange={(e) => setSystemSettings((prev) => ({ ...prev, autoCheckForUpdates: e.target.checked }))}
+                />
+                <div className={popup['label']}>{t('auto-check-for-updates-label')}</div>
+              </div>
+              <div className={popup['button']} onClick={() => handleCheckForUpdates()}>
+                {t('check-for-updates')}
+              </div>
+            </div>
+            <div className={popup['row']}>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('update-channel-label')}</div>
+                <div className={popup['select-box']} style={{ width: '100%' }}>
+                  <select value={updateChannel} onChange={(e) => setSystemSettings((prev) => ({ ...prev, updateChannel: e.target.value }))}>
+                    <option value="latest">{t('update-channel-latest-label')}</option>
+                    <option value="dev">{t('update-channel-dev-label')}</option>
+                  </select>
+                </div>
+              </div>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('update-check-interval-label')}</div>
+                <div className={`${popup['input-box']} ${popup['row']}`}>
+                  <input
+                    name="update-check-interval"
+                    type="number"
+                    min={1}
+                    max={600}
+                    value={updateCheckInterval / 60 / 1000}
+                    onChange={(e) => setSystemSettings((prev) => ({ ...prev, updateCheckInterval: Math.max(1, Math.min(600, Number(e.target.value))) * 60 * 1000 }))}
+                  />
+                  <div className={popup['label']}>{t('minute')}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

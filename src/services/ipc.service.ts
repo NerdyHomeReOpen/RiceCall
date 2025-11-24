@@ -355,18 +355,6 @@ const ipcService = {
     },
   },
 
-  // auth: {
-  //   login: (token: string) => {
-  //     if (!isElectron) return;
-  //     ipcRenderer.send('login', token);
-  //   },
-
-  //   logout: () => {
-  //     if (!isElectron) return;
-  //     ipcRenderer.send('logout');
-  //   },
-  // },
-
   customThemes: {
     get: (): Theme[] => {
       if (!isElectron) return [];
@@ -466,6 +454,9 @@ const ipcService = {
       if (settings.stopSpeakingSound !== undefined) ipcRenderer.send('set-stop-speaking-sound', settings.stopSpeakingSound);
       if (settings.receiveDirectMessageSound !== undefined) ipcRenderer.send('set-receive-direct-message-sound', settings.receiveDirectMessageSound);
       if (settings.receiveChannelMessageSound !== undefined) ipcRenderer.send('set-receive-channel-message-sound', settings.receiveChannelMessageSound);
+      if (settings.autoCheckForUpdates !== undefined) ipcRenderer.send('set-auto-check-for-updates', settings.autoCheckForUpdates);
+      if (settings.updateCheckInterval !== undefined) ipcRenderer.send('set-update-check-interval', settings.updateCheckInterval);
+      if (settings.updateChannel !== undefined) ipcRenderer.send('set-update-channel', settings.updateChannel);
     },
 
     get: (): SystemSettings | null => {
@@ -1163,6 +1154,63 @@ const ipcService = {
         return () => ipcRenderer.removeListener('receive-channel-message-sound', listener);
       },
     },
+
+    autoCheckForUpdates: {
+      set: (enabled: boolean) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-auto-check-for-updates', enabled);
+      },
+
+      get: (): boolean => {
+        if (!isElectron) return false;
+        return ipcRenderer.sendSync('get-auto-check-for-updates');
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, enabled: boolean) => callback(enabled);
+        ipcRenderer.on('auto-check-for-updates', listener);
+        return () => ipcRenderer.removeListener('auto-check-for-updates', listener);
+      },
+    },
+
+    updateCheckInterval: {
+      set: (interval: number) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-update-check-interval', interval);
+      },
+
+      get: (): number => {
+        if (!isElectron) return 0;
+        return ipcRenderer.sendSync('get-update-check-interval');
+      },
+
+      onUpdate: (callback: (interval: number) => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, interval: number) => callback(interval);
+        ipcRenderer.on('update-check-interval', listener);
+        return () => ipcRenderer.removeListener('update-check-interval', listener);
+      },
+    },
+
+    updateChannel: {
+      set: (channel: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-update-channel', channel);
+      },
+
+      get: (): string => {
+        if (!isElectron) return '';
+        return ipcRenderer.sendSync('get-update-channel');
+      },
+
+      onUpdate: (callback: (channel: string) => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, channel: string) => callback(channel);
+        ipcRenderer.on('update-channel', listener);
+        return () => ipcRenderer.removeListener('update-channel', listener);
+      },
+    },
   },
 
   toolbar: {
@@ -1171,50 +1219,6 @@ const ipcService = {
         if (!isElectron) return;
         ipcRenderer.send('set-toolbar-title', title);
       },
-    },
-  },
-
-  detectKey: {
-    onDefaultSpeakingKeyToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-default-speaking-key', listener);
-      return () => ipcRenderer.removeListener('toggle-default-speaking-key', listener);
-    },
-
-    onHotKeyOpenMainWindowToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-open-main-window', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-open-main-window', listener);
-    },
-
-    onHotKeyIncreaseVolumeToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-increase-volume', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-increase-volume', listener);
-    },
-
-    onHotKeyDecreaseVolumeToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-decrease-volume', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-decrease-volume', listener);
-    },
-
-    onHotKeyToggleSpeakerToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-toggle-speaker', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-toggle-speaker', listener);
-    },
-
-    onHotKeyToggleMicrophoneToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-toggle-microphone', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-toggle-microphone', listener);
     },
   },
 
@@ -1228,6 +1232,11 @@ const ipcService = {
       if (!isElectron) return;
       ipcRenderer.invoke('disable-loopback-audio');
     },
+  },
+
+  checkForUpdates: () => {
+    if (!isElectron) return;
+    ipcRenderer.send('check-for-updates');
   },
 };
 

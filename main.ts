@@ -67,6 +67,9 @@ type StoreType = {
   stopSpeakingSound: boolean;
   receiveDirectMessageSound: boolean;
   receiveChannelMessageSound: boolean;
+  autoCheckForUpdates: boolean;
+  updateCheckInterval: number;
+  updateChannel: string;
 };
 
 // Popup
@@ -162,6 +165,10 @@ const store = new Store<StoreType>({
     stopSpeakingSound: true,
     receiveDirectMessageSound: true,
     receiveChannelMessageSound: true,
+    // Update settings
+    autoCheckForUpdates: true,
+    updateCheckInterval: 1 * 60 * 1000, // 1 minute
+    updateChannel: 'latest',
   },
 });
 
@@ -222,6 +229,7 @@ export const APP_TRAY_ICON = {
 export let token: string = '';
 export let isLogin: boolean = false;
 export let isUpdateNotified: boolean = false;
+export let checkForUpdatesInterval: NodeJS.Timeout | null = null;
 
 const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
@@ -314,6 +322,9 @@ export function getSettings() {
     stopSpeakingSound: store.get('stopSpeakingSound'),
     receiveDirectMessageSound: store.get('receiveDirectMessageSound'),
     receiveChannelMessageSound: store.get('receiveChannelMessageSound'),
+    autoCheckForUpdates: store.get('autoCheckForUpdates'),
+    updateCheckInterval: store.get('updateCheckInterval'),
+    updateChannel: store.get('updateChannel'),
   };
 }
 
@@ -557,37 +568,66 @@ export function closePopups() {
 }
 
 // Auto Updater
-function configureAutoUpdater() {
-  const channel = env.UPDATE_CHANNEL;
-  if (channel) {
-    autoUpdater.channel = channel;
-    autoUpdater.allowPrerelease = true;
-    autoUpdater.setFeedURL({
-      provider: 'github',
-      owner: 'NerdyHomeReOpen',
-      repo: 'RiceCall',
-      channel: channel,
-    });
-  } else {
-    autoUpdater.allowPrerelease = false;
-  }
-  autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = true;
-  autoUpdater.allowDowngrade = false;
+async function checkForUpdates(force = false) {
+  if (isUpdateNotified && !force) return;
 
   if (DEV) {
     autoUpdater.forceDevUpdateConfig = true;
     autoUpdater.updateConfigPath = path.join(app.getAppPath(), 'dev-app-update.yml');
   }
 
+  const channel = store.get('updateChannel');
+  console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, channel);
+
+  if (channel === 'dev') {
+    autoUpdater.allowPrerelease = true;
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'NerdyHomeReOpen',
+      repo: 'RiceCall',
+      channel: 'dev',
+    });
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = false;
+    autoUpdater.allowDowngrade = true;
+    const result = await autoUpdater.checkForUpdates().catch((error) => {
+      console.log(`${new Date().toLocaleString()} | Cannot check for updates in dev channel:`, error.message);
+    });
+    if (result?.isUpdateAvailable) return result;
+  }
+
+  autoUpdater.allowPrerelease = false;
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'NerdyHomeReOpen',
+    repo: 'RiceCall',
+    channel: 'latest',
+  });
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.allowDowngrade = false;
+  const result = await autoUpdater.checkForUpdates().catch((error) => {
+    console.error(`${new Date().toLocaleString()} | Cannot check for updates in latest channel:`, error.message);
+  });
+  if (result?.isUpdateAvailable) return result;
+}
+
+async function configureAutoUpdater() {
   autoUpdater.on('update-available', (info: UpdateInfo) => {
-    if (DEV) return;
     console.info(`${new Date().toLocaleString()} | Update available: ${info.version}`);
+
     dialog
       .showMessageBox({
         type: 'info',
         title: t('update-available'),
         message: t('update-available-message', { version: info.version, releaseDate: new Date(info.releaseDate).toLocaleDateString() }),
+        buttons: [t('download-update'), t('cancel')],
+        cancelId: 1,
+      })
+      .then((buttonIndex) => {
+        if (buttonIndex.response === 0) {
+          autoUpdater.downloadUpdate();
+        }
       })
       .catch((error) => {
         console.error(`${new Date().toLocaleString()} | Cannot show update dialog:`, error.message);
@@ -596,12 +636,10 @@ function configureAutoUpdater() {
   });
 
   autoUpdater.on('update-not-available', () => {
-    if (DEV) return;
     console.info(`${new Date().toLocaleString()} | Is latest version`);
   });
 
   autoUpdater.on('download-progress', (progressInfo: ProgressInfo) => {
-    if (DEV) return;
     let message = `${progressInfo.bytesPerSecond}`;
     message = `${message} - ${progressInfo.percent}%`;
     message = `${message} (${progressInfo.transferred}/${progressInfo.total})`;
@@ -609,18 +647,21 @@ function configureAutoUpdater() {
   });
 
   autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
-    if (DEV) return;
     console.info(`${new Date().toLocaleString()} | Update downloaded: ${info.version}`);
+
     dialog
       .showMessageBox({
         type: 'info',
         title: t('update-downloaded'),
         message: t('update-downloaded-message', { version: info.version }),
-        buttons: [t('install-update')],
+        buttons: [t('install-update'), t('install-after-quit'), t('cancel')],
+        cancelId: 2,
       })
       .then((buttonIndex) => {
         if (buttonIndex.response === 0) {
           autoUpdater.quitAndInstall(false, true);
+        } else if (buttonIndex.response === 1) {
+          autoUpdater.autoInstallOnAppQuit = true;
         }
       })
       .catch((error) => {
@@ -629,17 +670,18 @@ function configureAutoUpdater() {
     isUpdateNotified = false;
   });
 
-  function checkUpdate() {
-    if (DEV || isUpdateNotified) return;
-    console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, env.UPDATE_CHANNEL);
-    autoUpdater.checkForUpdates().catch((error) => {
-      console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
-    });
-  }
+  if (store.get('autoCheckForUpdates')) startCheckForUpdates();
+}
 
-  // Check update every hour
-  setInterval(checkUpdate, 60 * 60 * 1000);
-  checkUpdate();
+export function startCheckForUpdates() {
+  if (checkForUpdatesInterval) clearInterval(checkForUpdatesInterval);
+  checkForUpdatesInterval = setInterval(checkForUpdates, store.get('updateCheckInterval'));
+  checkForUpdates();
+}
+
+export function stopCheckForUpdates() {
+  if (checkForUpdatesInterval) clearInterval(checkForUpdatesInterval);
+  checkForUpdatesInterval = null;
 }
 
 // Tray Icon
@@ -1031,6 +1073,14 @@ app.on('ready', async () => {
     });
   });
 
+  // Update settings handlers
+  ipcMain.on('check-for-updates', async () => {
+    const result = await checkForUpdates(true);
+    if (!result || !result.isUpdateAvailable) {
+      createPopup('dialogInfo', 'dialogInfo', { message: t('is-latest-version'), timestamp: Date.now(), submitTo: 'dialogInfo' }, true);
+    }
+  });
+
   // Popup handlers
   ipcMain.on('open-popup', async (_, type, id, initialData?, force = true) => {
     console.log(`${new Date().toLocaleString()} | open popup`, type, id);
@@ -1249,6 +1299,18 @@ app.on('ready', async () => {
 
   ipcMain.on('get-receive-channel-message-sound', (event) => {
     event.returnValue = store.get('receiveChannelMessageSound');
+  });
+
+  ipcMain.on('get-auto-check-for-updates', (event) => {
+    event.returnValue = store.get('autoCheckForUpdates');
+  });
+
+  ipcMain.on('get-update-check-interval', (event) => {
+    event.returnValue = store.get('updateCheckInterval');
+  });
+
+  ipcMain.on('get-update-channel', (event) => {
+    event.returnValue = store.get('updateChannel');
   });
 
   ipcMain.on('set-auto-login', (_, enable) => {
@@ -1501,6 +1563,29 @@ app.on('ready', async () => {
     store.set('receiveChannelMessageSound', enable ?? false);
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('receive-channel-message-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-auto-check-for-updates', (_, enable) => {
+    store.set('autoCheckForUpdates', enable ?? false);
+    if (enable) startCheckForUpdates();
+    else stopCheckForUpdates();
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('auto-check-for-updates', enable);
+    });
+  });
+
+  ipcMain.on('set-update-check-interval', (_, interval) => {
+    store.set('updateCheckInterval', interval ?? 1 * 60 * 1000);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('update-check-interval', interval);
+    });
+  });
+
+  ipcMain.on('set-update-channel', (_, channel) => {
+    store.set('updateChannel', channel ?? 'latest');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('update-channel', channel);
     });
   });
 

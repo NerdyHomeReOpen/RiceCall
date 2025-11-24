@@ -158,6 +158,10 @@ export type SystemSettings = {
   stopSpeakingSound: boolean;
   receiveDirectMessageSound: boolean;
   receiveChannelMessageSound: boolean;
+
+  autoCheckForUpdates: boolean;
+  updateCheckInterval: number;
+  updateChannel: string;
 };
 
 export type ContextMenuItem = {
