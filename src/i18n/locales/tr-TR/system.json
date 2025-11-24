@@ -1,10 +1,14 @@
 {
-  "update-available": "Yeni bir sürüm mevcut",
-  "update-available-message": "Yeni sürüm {{version}} {{releaseDate}} tarihinde yayımlandı, indirme işlemi başlıyor...",
-  "update-downloaded": "Güncellemeyi Yükleme",
-  "update-downloaded-message": "{{version}} sürümü indirildi. Lütfen yüklemek için Şimdi Yükle düğmesine tıklayın.",
+  "cancel": "İptal etmek",
+  "download-update": "下載更新",
+  "exit": "Çıkış",
   "install-update": "Şimdi Yükle",
-  "open-main-window": "Ana pencereyi aç",
+  "install-after-quit": "關閉時安裝",
+  "is-latest-version": "已經是最新版本",
   "logout": "oturumu Kapat",
-  "exit": "Çıkış"
+  "open-main-window": "Ana pencereyi aç",
+  "update-available": "Yeni bir sürüm mevcut",
+  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，點擊「下載更新」按鈕開始下載",
+  "update-downloaded": "Güncellemeyi Yükleme",
+  "update-downloaded-message": "版本 {{version}} 已下載完成，請選擇「立即安裝」或「關閉時安裝」"
 }
