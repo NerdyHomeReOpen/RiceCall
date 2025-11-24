@@ -75,7 +75,6 @@ const QueueMemberTab: React.FC<QueueMemberTabProps> = React.memo(({ user, friend
   const getStatusIcon = () => {
     if (isMuted || memberIsVoiceMuted || isControlled) return 'muted';
     if (isSpeaking) return 'play';
-    if (memberIsTextMuted) return 'no-text';
     return '';
   };
 

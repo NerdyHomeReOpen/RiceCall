@@ -288,7 +288,7 @@
   display: flex;
   align-items: center;
   height: 25px;
-  padding: 2px 20px 2px 8px;
+  padding: 2px 20px 2px 10px;
   gap: 2px;
   margin-right: 5px;
 }
@@ -378,14 +378,10 @@
   display: flex;
   align-items: center;
   height: 25px;
-  padding: 2px 20px 0px 23px;
+  padding: 2px 20px 2px 10px;
   gap: 2px;
   text-shadow: 0 1px #fff;
   margin-right: 5px;
-}
-
-.queue-list .user-tab {
-  padding: 2px 20px 0px 10px;
 }
 
 .user-tab:not(.selected):hover {
@@ -408,7 +404,7 @@
 }
 
 .channel-list .channel-list .user-list .user-tab {
-  padding-left: 40px;
+  padding-left: 25px;
 }
 
 .user-tab.selected,
@@ -426,6 +422,15 @@
   left: 0;
 }
 
+.user-text-state {
+  min-height: 12px;
+  min-width: 12px;
+  background-image: url('/channel/audioState.png');
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: -36px 0;
+}
+
 .user-audio-state.loading {
   background-image: url('/loading.gif');
   background-size: cover;
@@ -440,7 +445,7 @@
   background-position: -12px 0;
 }
 
-.user-audio-state.no-text {
+.user-text-state.muted {
   background-position: 0 0;
 }
 

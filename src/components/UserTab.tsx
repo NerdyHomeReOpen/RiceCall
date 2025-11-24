@@ -95,7 +95,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
   const getStatusIcon = () => {
     if (isMuted || memberIsVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
-    if (memberIsTextMuted) return 'no-text';
     return '';
   };
 
@@ -326,6 +325,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, friends, channel, cu
         contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
       }}
     >
+      <div className={`${styles['user-text-state']} ${memberIsTextMuted ? styles['muted'] : ''}`} />
       <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
