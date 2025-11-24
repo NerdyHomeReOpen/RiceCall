@@ -10,7 +10,7 @@ import type { Server, MemberInvitation, Member } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import ipcService from '@/services/ipc.service';
+import ipc from '@/services/ipc.service';
 
 interface InviteMemberPopupProps {
   serverId: Server['serverId'];
@@ -31,17 +31,17 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
 
   // Handlers
   const handleSendMemberInvitation = (receiverId: Member['userId'], serverId: Server['serverId'], preset: Partial<MemberInvitation>) => {
-    ipcService.socket.send('sendMemberInvitation', { receiverId, serverId, preset });
-    ipcService.window.close();
+    ipc.socket.send('sendMemberInvitation', { receiverId, serverId, preset });
+    ipc.window.close();
   };
 
   const handleEditMemberInvitation = (receiverId: Member['userId'], serverId: Server['serverId'], update: Partial<MemberInvitation>) => {
-    ipcService.socket.send('editMemberInvitation', { receiverId, serverId, update });
-    ipcService.window.close();
+    ipc.socket.send('editMemberInvitation', { receiverId, serverId, update });
+    ipc.window.close();
   };
 
   const handleClose = () => {
-    ipcService.window.close();
+    ipc.window.close();
   };
 
   return (
