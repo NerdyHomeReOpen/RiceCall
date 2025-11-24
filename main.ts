@@ -17,7 +17,6 @@ import { env, loadEnv } from './env.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
 import authService from './auth.service.js';
 import dataService from './data.service.js';
-import apiService from './api.service.js';
 import popupLoaders from './popupLoader.js';
 
 if (process.platform === 'linux') {
@@ -937,12 +936,8 @@ app.on('ready', async () => {
     });
   });
 
-  ipcMain.handle('data-upload', async (_, _type: string, _fileName: string, _file: string) => {
-    const formData = new FormData();
-    formData.append('_type', _type);
-    formData.append('_fileName', _fileName);
-    formData.append('_file', _file);
-    return await apiService.post('/upload', formData).catch((error) => {
+  ipcMain.handle('data-upload', async (_, type: string, fileName: string, file: string) => {
+    return await dataService.upload(type, fileName, file).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
       return null;
     });

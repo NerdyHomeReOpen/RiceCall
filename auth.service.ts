@@ -17,7 +17,7 @@ interface LoginFormData {
   password: string;
 }
 
-export const authService = {
+const authService = {
   register: async (formData: RegisterFormData): Promise<{ success: true; message: string } | { success: false }> => {
     const res = await api.post('/register', formData);
     if (!res) return { success: false };
