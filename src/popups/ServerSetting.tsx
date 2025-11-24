@@ -63,7 +63,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const [selectedItemId, setSelectedItemId] = useState<string>('');
 
     // Variables
-    const { permissionLevel: globalPermission } = user;
     const {
       name: serverName,
       avatarUrl: serverAvatarUrl,
@@ -76,9 +75,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       wealth: serverWealth,
       createdAt: serverCreatedAt,
       visibility: serverVisibility,
-      permissionLevel: serverPermission,
     } = server;
-    const permissionLevel = Math.max(globalPermission, serverPermission);
+    const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel);
     const totalMembers = useMemo(() => serverMembers.filter((m) => isMember(m.permissionLevel) && !isStaff(m.permissionLevel)).length, [serverMembers]);
     const totalApplications = memberApplications.length;
     const totalBlockMembers = useMemo(() => serverMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now()).length, [serverMembers]);

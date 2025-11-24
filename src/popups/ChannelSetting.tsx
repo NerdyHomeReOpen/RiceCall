@@ -49,8 +49,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [selectedItemId, setSelectedItemId] = useState<string>('');
 
   // Variables
-  const { permissionLevel: userPermissionLevel } = user;
-  const { serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId, permissionLevel: serverPermissionLevel } = server;
+  const { serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
   const {
     channelId,
     name: channelName,
@@ -69,10 +68,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     guestTextWaitTime: channelGuestTextWaitTime,
     guestTextGapTime: channelGuestTextGapTime,
     bitrate: channelBitrate,
-    permissionLevel: channelPermissionLevel,
     categoryId: channelCategoryId,
   } = channel;
-  const permissionLevel = Math.max(userPermissionLevel, serverPermissionLevel, channelPermissionLevel);
+  const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel, channel.permissionLevel);
   const isLobby = serverLobbyId === channelId;
   const isReceptionLobby = serverReceptionLobbyId === channelId;
   const totalModerators = useMemo(() => channelMembers.filter((m) => isChannelMod(m.permissionLevel) && !isServerAdmin(m.permissionLevel)).length, [channelMembers]);
