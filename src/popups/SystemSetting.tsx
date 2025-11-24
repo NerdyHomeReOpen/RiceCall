@@ -14,6 +14,9 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 // Services
 import ipc from '@/services/ipc.service';
 
+// Utils
+import { objDiff } from '@/utils/objDiff';
+
 interface SystemSettingPopupProps {
   userId: User['userId'];
   user: User;
@@ -730,57 +733,8 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
         <div
           className={popup['button']}
           onClick={() => {
-            ipc.systemSettings.autoLogin.set(autoLogin);
-            ipc.systemSettings.autoLaunch.set(autoLaunch);
-            ipc.systemSettings.alwaysOnTop.set(alwaysOnTop);
-            ipc.systemSettings.statusAutoIdle.set(statusAutoIdle);
-            ipc.systemSettings.statusAutoIdleMinutes.set(statusAutoIdleMinutes);
-            ipc.systemSettings.statusAutoDnd.set(statusAutoDnd);
-            ipc.systemSettings.channelUIMode.set(channelUIMode);
-            ipc.systemSettings.closeToTray.set(closeToTray);
-            ipc.systemSettings.font.set(font);
-            ipc.systemSettings.fontSize.set(fontSize);
-
-            ipc.systemSettings.inputAudioDevice.set(inputAudioDevice);
-            ipc.systemSettings.outputAudioDevice.set(outputAudioDevice);
-            ipc.systemSettings.recordFormat.set(recordFormat);
-            // ipc.systemSettings.mixEffect.set(mixEffect);
-            // ipc.systemSettings.mixEffectType.set(mixEffectType);
-            // ipc.systemSettings.autoMixSetting.set(autoMixSetting);
-            // ipc.systemSettings.echoCancellation.set(echoCancellation);
-            // ipc.systemSettings.noiseCancellation.set(noiseCancellation);
-            // ipc.systemSettings.microphoneAmplification.set(microphoneAmplification);
-            // ipc.systemSettings.manualMixMode.set(manualMixMode);
-            // ipc.systemSettings.mixMode.set(mixMode);
-
-            ipc.systemSettings.speakingMode.set(speakingMode);
-            ipc.systemSettings.defaultSpeakingKey.set(defaultSpeakingKey);
-
-            ipc.systemSettings.hotKeyOpenMainWindow.set(hotKeyOpenMainWindow);
-            ipc.systemSettings.hotKeyIncreaseVolume.set(hotKeyIncreaseVolume);
-            ipc.systemSettings.hotKeyDecreaseVolume.set(hotKeyDecreaseVolume);
-            ipc.systemSettings.hotKeyToggleSpeaker.set(hotKeyToggleSpeaker);
-            ipc.systemSettings.hotKeyToggleMicrophone.set(hotKeyToggleMicrophone);
-
-            ipc.systemSettings.disableAllSoundEffect.set(disableAllSoundEffect);
-            ipc.systemSettings.enterVoiceChannelSound.set(enterVoiceChannelSound);
-            ipc.systemSettings.leaveVoiceChannelSound.set(leaveVoiceChannelSound);
-            ipc.systemSettings.startSpeakingSound.set(startSpeakingSound);
-            ipc.systemSettings.stopSpeakingSound.set(stopSpeakingSound);
-            ipc.systemSettings.receiveDirectMessageSound.set(receiveDirectMessageSound);
-            ipc.systemSettings.receiveChannelMessageSound.set(receiveChannelMessageSound);
-
-            handleEditUserSetting({
-              forbidFriendApplications: !!forbidFriendApplications,
-              forbidShakeMessages: !!forbidShakeMessages,
-              forbidMemberInvitations: !!forbidMemberInvitations,
-              forbidStrangerMessages: !!forbidStrangerMessages,
-              shareCurrentServer: !!shareCurrentServer,
-              shareRecentServers: !!shareRecentServers,
-              shareJoinedServers: !!shareJoinedServers,
-              shareFavoriteServers: !!shareFavoriteServers,
-              notSaveMessageHistory: true,
-            });
+            ipc.systemSettings.set(objDiff(systemSettings, systemSettingsData));
+            handleEditUserSetting(objDiff(userSettings, userData));
           }}
         >
           {t('confirm')}

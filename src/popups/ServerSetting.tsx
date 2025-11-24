@@ -28,6 +28,7 @@ import {
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isServerOwner, isStaff } from '@/utils/permission';
+import { objDiff } from '@/utils/objDiff';
 
 // Components
 import AnnouncementEditor from '@/components/AnnouncementEditor';
@@ -65,7 +66,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const { permissionLevel: globalPermission } = user;
     const {
       name: serverName,
-      avatar: serverAvatar,
       avatarUrl: serverAvatarUrl,
       announcement: serverAnnouncement,
       description: serverDescription,
@@ -730,21 +730,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
         {/* Footer */}
         <div className={popup['popup-footer']} style={isServerAdmin(permissionLevel) ? {} : { display: 'none' }}>
-          <div
-            className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-            onClick={() =>
-              handleEditServer(serverId, {
-                name: serverName,
-                avatar: serverAvatar,
-                avatarUrl: serverAvatarUrl,
-                announcement: serverAnnouncement,
-                description: serverDescription,
-                type: serverType,
-                slogan: serverSlogan,
-                visibility: serverVisibility,
-              })
-            }
-          >
+          <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => handleEditServer(serverId, objDiff(server, serverData))}>
             {t('save')}
           </div>
           <div className={popup['button']} onClick={() => handleClose()}>

@@ -24,6 +24,7 @@ import emoji from '@/styles/emoji.module.css';
 // Utils
 import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenApplyFriend, handleOpenImageCropper } from '@/utils/popup';
 import { isMember, isStaff } from '@/utils/permission';
+import { objDiff } from '@/utils/objDiff';
 
 // Constants
 import { MAX_FILE_SIZE } from '@/constant';
@@ -269,16 +270,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                     return;
                   }
 
-                  handleEditUser({
-                    name: targetName,
-                    gender: targetGender,
-                    country: targetCountry,
-                    birthYear: targetBirthYear,
-                    birthMonth: targetBirthMonth,
-                    birthDay: targetBirthDay,
-                    signature: targetSignature,
-                    about: targetAbout,
-                  });
+                  handleEditUser(objDiff(target, targetData));
                   setSelectedTabId('about');
                 }}
               >

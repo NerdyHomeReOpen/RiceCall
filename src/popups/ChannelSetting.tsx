@@ -23,6 +23,7 @@ import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, han
 import Sorter from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isChannelMod, isServerOwner, isChannelAdmin } from '@/utils/permission';
+import { objDiff } from '@/utils/objDiff';
 
 interface ChannelSettingPopupProps {
   userId: User['userId'];
@@ -58,7 +59,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     password: channelPassword,
     userLimit: channelUserLimit,
     voiceMode: channelVoiceMode,
-    order: channelOrder,
     queueTime: channelQueueTime,
     forbidText: channelForbidText,
     forbidGuestText: channelForbidGuestText,
@@ -626,30 +626,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
       {/* Footer */}
       <div className={popup['popup-footer']} style={isChannelMod(permissionLevel) ? {} : { display: 'none' }}>
-        <div
-          className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() =>
-            handleEditChannel(serverId, channelId, {
-              name: channelName,
-              announcement: channelAnnouncement,
-              password: channelPassword,
-              order: channelOrder,
-              userLimit: channelUserLimit,
-              queueTime: channelQueueTime,
-              guestTextMaxLength: channelGuestTextMaxLength,
-              guestTextWaitTime: channelGuestTextWaitTime,
-              guestTextGapTime: channelGuestTextGapTime,
-              bitrate: channelBitrate,
-              forbidText: !!channelForbidText,
-              forbidGuestText: !!channelForbidGuestText,
-              forbidGuestVoice: !!channelForbidGuestVoice,
-              forbidGuestQueue: !!channelForbidGuestQueue,
-              forbidGuestUrl: !!channelForbidGuestUrl,
-              visibility: channelVisibility,
-              voiceMode: channelVoiceMode,
-            })
-          }
-        >
+        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => handleEditChannel(serverId, channelId, objDiff(channel, channelData))}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>
