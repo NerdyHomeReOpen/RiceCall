@@ -57,6 +57,9 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
     inputAudioDevice,
     outputAudioDevice,
     recordFormat,
+    echoCancellation,
+    noiseCancellation,
+    microphoneAmplification,
     speakingMode,
     defaultSpeakingKey,
     hotKeyOpenMainWindow,
@@ -351,10 +354,10 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
             </div>
 
             {/* Mix Setting */}
-            {/* <div className={popup['header']}>
-              <div className={popup['label']}>{t('mix-setting') + ' ' + t('soon')}</div>
+            <div className={popup['header']}>
+              <div className={popup['label']}>{t('mix-setting')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} disabled`}>
+            {/* <div className={`${popup['input-box']} ${popup['row']} disabled`}>
               <input name="mix-effect" type="checkbox" checked={mixEffect} onChange={(e) => setSystemSettings((prev) => ({ ...prev, mixEffect: e.target.checked }))} />
               <div className={popup['label']}>{t('mix-effect-label')}</div>
               <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
@@ -374,21 +377,24 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
             <div className={`${popup['input-box']} ${popup['row']} disabled`}>
               <input name="mix-setting-manual" type="radio" checked={!autoMixSetting} onChange={() => setSystemSettings((prev) => ({ ...prev, autoMixSetting: false }))} />
               <div className={popup['label']}>{t('mix-setting-manual-label')}</div>
-            </div>
-            <div className={popup['col']} style={{ marginLeft: '10px' }}>
-              <div className={`${popup['input-box']} ${popup['row']} ${autoMixSetting && 'disabled'} disabled`}>
-                <input name="echo-cancellation" type="checkbox" checked={echoCancellation} disabled={autoMixSetting} onChange={(e) => setSystemSettings((prev) => ({ ...prev, echoCancellation: e.target.checked }))} />
-                <div className={popup['label']}>{t('echo-cancellation-label')}</div>
-              </div>
-              <div className={`${popup['input-box']} ${popup['row']} ${autoMixSetting && 'disabled'} disabled`}>
-                <input name="noise-cancellation" type="checkbox" checked={noiseCancellation} disabled={autoMixSetting} onChange={(e) => setSystemSettings((prev) => ({ ...prev, noiseCancellation: e.target.checked }))} />
-                <div className={popup['label']}>{t('noise-cancellation-label')}</div>
-              </div>
-              <div className={`${popup['input-box']} ${popup['row']} ${autoMixSetting && 'disabled'} disabled`}>
-                <input name="microphone-amplification" type="checkbox" checked={microphoneAmplification} disabled={autoMixSetting} onChange={(e) => setSystemSettings((prev) => ({ ...prev, microphoneAmplification: e.target.checked }))} />
-                <div className={popup['label']}>{t('microphone-amplification-label')}</div>
-              </div>
             </div> */}
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="echo-cancellation" type="checkbox" checked={echoCancellation} onChange={(e) => setSystemSettings((prev) => ({ ...prev, echoCancellation: e.target.checked }))} />
+              <div className={popup['label']}>{t('echo-cancellation-label')}</div>
+            </div>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input name="noise-cancellation" type="checkbox" checked={noiseCancellation} onChange={(e) => setSystemSettings((prev) => ({ ...prev, noiseCancellation: e.target.checked }))} />
+              <div className={popup['label']}>{t('noise-cancellation-label')}</div>
+            </div>
+            <div className={`${popup['input-box']} ${popup['row']}`}>
+              <input
+                name="microphone-amplification"
+                type="checkbox"
+                checked={microphoneAmplification}
+                onChange={(e) => setSystemSettings((prev) => ({ ...prev, microphoneAmplification: e.target.checked }))}
+              />
+              <div className={popup['label']}>{t('microphone-amplification-label')}</div>
+            </div>
 
             {/* Mix mode setting */}
             {/* <div className={popup['header']}>

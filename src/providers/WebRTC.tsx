@@ -135,10 +135,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const isSpeakKeyPressedRef = useRef<boolean>(false);
   const isMicMutedRef = useRef<boolean>(false);
   const micVolumeRef = useRef<number>(100);
+  const microphoneAmplificationRef = useRef<boolean>(false);
   const [micVolume, setMicVolume] = useState<number>(100);
   const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
   const [isSpeakKeyPressed, setIsSpeakKeyPressed] = useState<boolean>(false);
   const [isMicMuted, setIsMicMuted] = useState<boolean>(false);
+  const [inputAudioDevice, setInputAudioDevice] = useState<string | null>(null);
+  const [echoCancellation, setEchoCancellation] = useState<boolean>(false);
+  const [noiseCancellation, setNoiseCancellation] = useState<boolean>(false);
 
   // Mix
   const mixVolumeRef = useRef<number>(100);
@@ -381,7 +385,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       // Create nodes
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
       const gainNode = audioContextRef.current.createGain();
-      gainNode.gain.value = micVolumeRef.current / 20;
+      gainNode.gain.value = micVolumeRef.current / (microphoneAmplificationRef.current ? 20 : 100);
 
       micNodesRef.current = { stream, source: sourceNode, gain: gainNode };
 
@@ -638,7 +642,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const changeMicVolume = useCallback((volume: number) => {
-    micNodesRef.current.gain!.gain.value = volume / 20;
+    if (!micNodesRef.current.gain) return;
+    micNodesRef.current.gain.gain.value = volume / (microphoneAmplificationRef.current ? 20 : 100);
     setMicVolume(volume);
     micVolumeRef.current = volume;
     window.localStorage.setItem('mic-volume', volume.toString());
@@ -649,14 +654,16 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const changeMixVolume = useCallback((volume: number) => {
-    mixNodesRef.current.gain!.gain.value = volume / 100;
+    if (!mixNodesRef.current.gain) return;
+    mixNodesRef.current.gain.gain.value = volume / 100;
     setMixVolume(volume);
     mixVolumeRef.current = volume;
     window.localStorage.setItem('mix-volume', volume.toString());
   }, []);
 
   const changeSpeakerVolume = useCallback((volume: number) => {
-    masterGainNodeRef.current!.gain.value = volume / 100;
+    if (!masterGainNodeRef.current) return;
+    masterGainNodeRef.current.gain.value = volume / 100;
     setSpeakerVolume(volume);
     speakerVolumeRef.current = volume;
     window.localStorage.setItem('speaker-volume', volume.toString());
@@ -740,7 +747,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       return stopRecording();
     }
 
-    recorderGainRef.current!.disconnect();
+    recorderGainRef.current?.disconnect();
     if (timerRef.current) clearInterval(timerRef.current);
 
     const blob = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate, recordFormatRef.current);
@@ -866,24 +873,28 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [initAudioContext, initLocalStorage]);
 
   useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: {
+          channelCount: 2,
+          echoCancellation: echoCancellation,
+          noiseSuppression: noiseCancellation,
+          autoGainControl: false,
+          ...(inputAudioDevice ? { deviceId: { exact: inputAudioDevice } } : {}),
+        },
+      })
+      .then(async (stream) => {
+        initMicAudio(stream);
+      })
+      .catch((err) => {
+        console.error('[WebRTC] access input device failed: ', err);
+      });
+  }, [inputAudioDevice, echoCancellation, noiseCancellation, initMicAudio]);
+
+  useEffect(() => {
     const changeInputAudioDevice = (inputAudioDevice: string) => {
       console.info('[WebRTC] input audio device updated: ', inputAudioDevice);
-      navigator.mediaDevices
-        .getUserMedia({
-          audio: {
-            channelCount: 2,
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false,
-            ...(inputAudioDevice ? { deviceId: { exact: inputAudioDevice } } : {}),
-          },
-        })
-        .then(async (stream) => {
-          initMicAudio(stream);
-        })
-        .catch((err) => {
-          console.error('[WebRTC] access input device failed: ', err);
-        });
+      setInputAudioDevice(inputAudioDevice);
     };
     changeInputAudioDevice(ipc.systemSettings.inputAudioDevice.get());
     const unsub = ipc.systemSettings.inputAudioDevice.onUpdate(changeInputAudioDevice);
@@ -904,6 +915,37 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     const unsub = ipc.systemSettings.outputAudioDevice.onUpdate(changeOutputAudioDevice);
     return () => unsub();
   }, []);
+
+  useEffect(() => {
+    const changeEchoCancellation = (echoCancellation: boolean) => {
+      console.info('[WebRTC] echo cancellation updated: ', echoCancellation);
+      setEchoCancellation(echoCancellation);
+    };
+    changeEchoCancellation(ipc.systemSettings.echoCancellation.get());
+    const unsub = ipc.systemSettings.echoCancellation.onUpdate(changeEchoCancellation);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const changeNoiseCancellation = (noiseCancellation: boolean) => {
+      console.info('[WebRTC] noise cancellation updated: ', noiseCancellation);
+      setNoiseCancellation(noiseCancellation);
+    };
+    changeNoiseCancellation(ipc.systemSettings.noiseCancellation.get());
+    const unsub = ipc.systemSettings.noiseCancellation.onUpdate(changeNoiseCancellation);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const changeMicrophoneAmplification = (microphoneAmplification: boolean) => {
+      console.info('[WebRTC] microphone amplification updated: ', microphoneAmplification);
+      microphoneAmplificationRef.current = microphoneAmplification;
+      changeMicVolume(micVolumeRef.current);
+    };
+    changeMicrophoneAmplification(ipc.systemSettings.microphoneAmplification.get());
+    const unsub = ipc.systemSettings.microphoneAmplification.onUpdate(changeMicrophoneAmplification);
+    return () => unsub();
+  }, [changeMicVolume]);
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: SpeakingMode) => {
