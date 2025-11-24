@@ -642,8 +642,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const changeMicVolume = useCallback((volume: number) => {
-    if (!micNodesRef.current.gain) return;
-    micNodesRef.current.gain.gain.value = volume / (microphoneAmplificationRef.current ? 20 : 100);
+    if (micNodesRef.current.gain) micNodesRef.current.gain.gain.value = volume / (microphoneAmplificationRef.current ? 20 : 100);
     setMicVolume(volume);
     micVolumeRef.current = volume;
     window.localStorage.setItem('mic-volume', volume.toString());
@@ -654,16 +653,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const changeMixVolume = useCallback((volume: number) => {
-    if (!mixNodesRef.current.gain) return;
-    mixNodesRef.current.gain.gain.value = volume / 100;
+    if (mixNodesRef.current.gain) mixNodesRef.current.gain.gain.value = volume / 100;
     setMixVolume(volume);
     mixVolumeRef.current = volume;
     window.localStorage.setItem('mix-volume', volume.toString());
   }, []);
 
   const changeSpeakerVolume = useCallback((volume: number) => {
-    if (!masterGainNodeRef.current) return;
-    masterGainNodeRef.current.gain.value = volume / 100;
+    if (masterGainNodeRef.current) masterGainNodeRef.current.gain.value = volume / 100;
     setSpeakerVolume(volume);
     speakerVolumeRef.current = volume;
     window.localStorage.setItem('speaker-volume', volume.toString());
