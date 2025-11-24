@@ -85,40 +85,37 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
 
         {/* Content Body */}
         <div className={styles['content']}>
-          {memberInvitations.map((memberInvitation) => {
-            const { serverId, avatarUrl: serverAvatarUrl, name: serverName, createdAt: memberInvitationCreatedAt, description: memberInvitationDescription } = memberInvitation;
-            return (
-              <div key={serverId} className={styles['application']}>
-                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
-                <div style={{ flex: 1 }}>
-                  <div className={styles['user-info-box']}>
-                    <div className={styles['user-name-text']}>{serverName}</div>
-                    <div className={styles['time-text']} title={getFormatTimestamp(t, memberInvitationCreatedAt)}>
-                      {getFormatTimeDiff(t, memberInvitationCreatedAt)}
+          {memberInvitations.map((memberInvitation) => (
+            <div key={memberInvitation.serverId} className={styles['application']}>
+              <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${memberInvitation.avatarUrl})` }} />
+              <div style={{ flex: 1 }}>
+                <div className={styles['user-info-box']}>
+                  <div className={styles['user-name-text']}>{memberInvitation.name}</div>
+                  <div className={styles['time-text']} title={getFormatTimestamp(t, memberInvitation.createdAt)}>
+                    {getFormatTimeDiff(t, memberInvitation.createdAt)}
+                  </div>
+                </div>
+                <div className={styles['application-content-box']}>
+                  <div className={popup['col']}>
+                    <div className={styles['content-text']}>{t('invite-you-to-be-member')}</div>
+                    <div className={styles['content-text']}>
+                      {t('note')}: {memberInvitation.description}
                     </div>
                   </div>
-                  <div className={styles['application-content-box']}>
-                    <div className={popup['col']}>
-                      <div className={styles['content-text']}>{t('invite-you-to-be-member')}</div>
-                      <div className={styles['content-text']}>
-                        {t('note')}: {memberInvitationDescription}
+                  <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
+                    <div className={styles['action-buttons']}>
+                      <div className={styles['button']} onClick={() => handleAcceptMemberInvitation(memberInvitation.serverId)}>
+                        {t('accept')}
                       </div>
-                    </div>
-                    <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
-                      <div className={styles['action-buttons']}>
-                        <div className={styles['button']} onClick={() => handleAcceptMemberInvitation(serverId)}>
-                          {t('accept')}
-                        </div>
-                        <div className={styles['button']} onClick={() => handleRejectMemberInvitation(serverId)}>
-                          {t('reject')}
-                        </div>
+                      <div className={styles['button']} onClick={() => handleRejectMemberInvitation(memberInvitation.serverId)}>
+                        {t('reject')}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </div>

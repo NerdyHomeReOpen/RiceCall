@@ -91,30 +91,26 @@ const AboutPopup: React.FC = React.memo(() => {
 
           <div className={styles['team-members']}>
             <p>{t('team-members')}:</p>
-            {staffs.map((staff, index) => {
-              const githubInfo = staff.github;
-              const discordInfo = staff.discord;
-              return (
-                <div key={index} className={styles['team-member-card']}>
-                  <div className={styles['name-wrapper']}>
-                    <span className={`${styles['staff-title']} ${getTitleColorClass(staff.title)}`}>{t(staff.title)}</span>
-                    <span>{staff.contact}</span>
-                  </div>
-                  <div className={styles['icon-wrapper']}>
-                    {githubInfo && (
-                      <div className={styles['github-icon-link']} title="GitHub" onClick={() => window.open(`https://github.com/${githubInfo}`, '_blank')}>
-                        <FaGithub size={20} />
-                      </div>
-                    )}
-                    {discordInfo && (
-                      <div className={styles['discord-icon-link']} title="Discord" onClick={() => window.open(`http://discordapp.com/users/${discordInfo}`, '_blank')}>
-                        <FaDiscord size={20} />
-                      </div>
-                    )}
-                  </div>
+            {staffs.map((staff, index) => (
+              <div key={index} className={styles['team-member-card']}>
+                <div className={styles['name-wrapper']}>
+                  <span className={`${styles['staff-title']} ${getTitleColorClass(staff.title)}`}>{t(staff.title)}</span>
+                  <span>{staff.contact}</span>
                 </div>
-              );
-            })}
+                <div className={styles['icon-wrapper']}>
+                  {staff.github && (
+                    <div className={styles['github-icon-link']} title="GitHub" onClick={() => window.open(`https://github.com/${staff.github}`, '_blank')}>
+                      <FaGithub size={20} />
+                    </div>
+                  )}
+                  {staff.discord && (
+                    <div className={styles['discord-icon-link']} title="Discord" onClick={() => window.open(`http://discordapp.com/users/${staff.discord}`, '_blank')}>
+                      <FaDiscord size={20} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

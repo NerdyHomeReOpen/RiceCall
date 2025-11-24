@@ -257,16 +257,17 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
 
       {/* Main Tabs */}
       <div className={header['main-tabs']}>
-        {mainTabs.map((tab) => {
-          const tabId = tab.id;
-          const tabLable = tab.label;
-          const tabClose = tabId === 'server';
-          if (tabId === 'server' && !serverId) return null;
-          return (
-            <div key={`tabs-${tabId}`} data-tab-id={tabId} className={`${header['tab']} ${tabId === mainTab.selectedTabId ? header['selected'] : ''}`} onClick={() => mainTab.setSelectedTabId(tabId)}>
-              <div className={header['tab-lable']}>{tabLable}</div>
+        {mainTabs.map((tab) =>
+          tab.id === 'server' && !serverId ? null : (
+            <div
+              key={`tabs-${tab.id}`}
+              data-tab-id={tab.id}
+              className={`${header['tab']} ${tab.id === mainTab.selectedTabId ? header['selected'] : ''}`}
+              onClick={() => mainTab.setSelectedTabId(tab.id)}
+            >
+              <div className={header['tab-lable']}>{tab.label}</div>
               <div className={header['tab-bg']} />
-              {tabClose && (
+              {tab.id === 'server' && (
                 <svg
                   className={`${header['tab-close']} themeTabClose`}
                   onClick={(e) => {
@@ -283,8 +284,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                 </svg>
               )}
             </div>
-          );
-        })}
+          ),
+        )}
       </div>
 
       {/* Buttons */}

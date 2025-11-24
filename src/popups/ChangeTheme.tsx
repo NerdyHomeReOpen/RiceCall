@@ -180,31 +180,29 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       },
                     ];
 
-                    if (customTheme) {
-                      return (
-                        <div
-                          key={`custom-${i}`}
-                          style={
-                            {
-                              'backgroundColor': customTheme.mainColor,
-                              'backgroundImage': customTheme.headerImage,
-                              '--main-color': customTheme.mainColor,
-                              '--secondary-color': customTheme.secondaryColor,
-                              '--header-image': customTheme.headerImage,
-                            } as React.CSSProperties
-                          }
-                          onClick={handleSelectTheme}
-                          onContextMenu={(e) => {
-                            e.preventDefault();
-                            const x = e.clientX;
-                            const y = e.clientY;
-                            contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-                          }}
-                        />
-                      );
-                    } else {
-                      return <div key={`color-box-empty-${i}`} />;
-                    }
+                    return customTheme ? (
+                      <div
+                        key={`custom-${i}`}
+                        style={
+                          {
+                            'backgroundColor': customTheme.mainColor,
+                            'backgroundImage': customTheme.headerImage,
+                            '--main-color': customTheme.mainColor,
+                            '--secondary-color': customTheme.secondaryColor,
+                            '--header-image': customTheme.headerImage,
+                          } as React.CSSProperties
+                        }
+                        onClick={handleSelectTheme}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          const x = e.clientX;
+                          const y = e.clientY;
+                          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+                        }}
+                      />
+                    ) : (
+                      <div key={`color-box-empty-${i}`} />
+                    );
                   })}
 
                   {/* Image Selector */}

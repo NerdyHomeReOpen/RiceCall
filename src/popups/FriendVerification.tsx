@@ -84,43 +84,40 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
 
         {/* Content Body */}
         <div className={styles['content']}>
-          {friendApplications.map((friendApplication) => {
-            const { senderId, name: senderName, avatarUrl: senderAvatarUrl, createdAt: applicationCreatedAt, description: applicationDescription } = friendApplication;
-            return (
-              <div key={senderId} className={styles['application']}>
-                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${senderAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, senderId)} />
-                <div style={{ flex: 1 }}>
-                  <div className={styles['user-info-box']}>
-                    <div className={styles['user-name-text']}>{senderName}</div>
-                    <div className={styles['time-text']} title={getFormatTimestamp(t, applicationCreatedAt)}>
-                      {getFormatTimeDiff(t, applicationCreatedAt)}
+          {friendApplications.map((friendApplication) => (
+            <div key={friendApplication.senderId} className={styles['application']}>
+              <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friendApplication.avatarUrl})` }} onClick={() => handleOpenUserInfo(userId, friendApplication.senderId)} />
+              <div style={{ flex: 1 }}>
+                <div className={styles['user-info-box']}>
+                  <div className={styles['user-name-text']}>{friendApplication.name}</div>
+                  <div className={styles['time-text']} title={getFormatTimestamp(t, friendApplication.createdAt)}>
+                    {getFormatTimeDiff(t, friendApplication.createdAt)}
+                  </div>
+                </div>
+                <div className={styles['application-content-box']}>
+                  <div className={popup['col']}>
+                    <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
+                    <div className={styles['content-text']}>
+                      {t('note')}: {friendApplication.description}
                     </div>
                   </div>
-                  <div className={styles['application-content-box']}>
-                    <div className={popup['col']}>
-                      <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
-                      <div className={styles['content-text']}>
-                        {t('note')}: {applicationDescription}
+                  <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
+                    <div className={styles['action-buttons']}>
+                      <div className={styles['button']} onClick={() => handleOpenApproveFriend(userId, friendApplication.senderId)}>
+                        {t('accept')}
+                      </div>
+                      <div className={styles['button']} onClick={() => handleRejectFriendApplication(friendApplication.senderId, friendApplication.name)}>
+                        {t('reject')}
                       </div>
                     </div>
-                    <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
-                      <div className={styles['action-buttons']}>
-                        <div className={styles['button']} onClick={() => handleOpenApproveFriend(userId, senderId)}>
-                          {t('accept')}
-                        </div>
-                        <div className={styles['button']} onClick={() => handleRejectFriendApplication(senderId, senderName)}>
-                          {t('reject')}
-                        </div>
-                      </div>
-                      <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(userId, senderId)}>
-                        <div className={styles['direct-message-icon']} />
-                      </div>
+                    <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(userId, friendApplication.senderId)}>
+                      <div className={styles['direct-message-icon']} />
                     </div>
                   </div>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </div>

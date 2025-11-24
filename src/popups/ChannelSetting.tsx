@@ -502,18 +502,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <tbody className={setting['table-container']}>
                   {filteredModerators.map((moderator) => {
                     // Variables
-                    const {
-                      userId: memberUserId,
-                      name: memberName,
-                      nickname: memberNickname,
-                      gender: memberGender,
-                      permissionLevel: memberPermission,
-                      contribution: memberContribution,
-                      createdAt: memberJoinDate,
-                    } = moderator;
-                    const isUser = memberUserId === userId;
-                    const isSuperior = permissionLevel > memberPermission;
-                    const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
+                    const isUser = moderator.userId === userId;
+                    const isSuperior = permissionLevel > moderator.permissionLevel;
+                    const canUpdatePermission = !isUser && isSuperior && isMember(moderator.permissionLevel);
 
                     // Handlers
                     const getContextMenuItems = () => [
@@ -521,18 +512,18 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                         id: 'direct-message',
                         label: t('direct-message'),
                         show: !isUser,
-                        onClick: () => handleOpenDirectMessage(userId, memberUserId),
+                        onClick: () => handleOpenDirectMessage(userId, moderator.userId),
                       },
                       {
                         id: 'view-profile',
                         label: t('view-profile'),
-                        onClick: () => handleOpenUserInfo(userId, memberUserId),
+                        onClick: () => handleOpenUserInfo(userId, moderator.userId),
                       },
                       {
                         id: 'edit-nickname',
                         label: t('edit-nickname'),
-                        show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
-                        onClick: () => handleOpenEditNickname(memberUserId, serverId),
+                        show: isMember(moderator.permissionLevel) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
+                        onClick: () => handleOpenEditNickname(moderator.userId, serverId),
                       },
                       {
                         id: 'separator',
@@ -542,7 +533,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                         id: 'block',
                         label: t('block'),
                         show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-                        onClick: () => handleOpenBlockMember(memberUserId, serverId),
+                        onClick: () => handleOpenBlockMember(moderator.userId, serverId),
                       },
                       {
                         id: 'separator',
@@ -551,53 +542,54 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                       {
                         id: 'member-management',
                         label: t('member-management'),
-                        show: !isUser && isMember(memberPermission) && isSuperior,
+                        show: !isUser && isMember(moderator.permissionLevel) && isSuperior,
                         icon: 'submenu',
                         hasSubmenu: true,
                         submenuItems: [
                           {
                             id: 'terminate-member',
                             label: t('terminate-member'),
-                            show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission) && !isServerOwner(memberPermission),
-                            onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
+                            show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(moderator.permissionLevel) && !isServerOwner(moderator.permissionLevel),
+                            onClick: () => handleTerminateMember(moderator.userId, serverId, moderator.name),
                           },
                           {
                             id: 'set-channel-mod',
-                            label: isChannelMod(memberPermission) ? t('unset-channel-mod') : t('set-channel-mod'),
-                            show: canUpdatePermission && isChannelAdmin(permissionLevel) && !isChannelAdmin(memberPermission) && channelCategoryId !== null,
+                            label: isChannelMod(moderator.permissionLevel) ? t('unset-channel-mod') : t('set-channel-mod'),
+                            show: canUpdatePermission && isChannelAdmin(permissionLevel) && !isChannelAdmin(moderator.permissionLevel) && channelCategoryId !== null,
                             onClick: () =>
-                              isChannelMod(memberPermission)
-                                ? handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 2 })
-                                : handleEditChannelPermission(memberUserId, serverId, channelId, { permissionLevel: 3 }),
+                              isChannelMod(moderator.permissionLevel)
+                                ? handleEditChannelPermission(moderator.userId, serverId, channelId, { permissionLevel: 2 })
+                                : handleEditChannelPermission(moderator.userId, serverId, channelId, { permissionLevel: 3 }),
                           },
                           {
                             id: 'set-channel-admin',
-                            label: isChannelAdmin(memberPermission) ? t('unset-channel-admin') : t('set-channel-admin'),
-                            show: canUpdatePermission && isServerAdmin(permissionLevel) && !isServerAdmin(memberPermission),
+                            label: isChannelAdmin(moderator.permissionLevel) ? t('unset-channel-admin') : t('set-channel-admin'),
+                            show: canUpdatePermission && isServerAdmin(permissionLevel) && !isServerAdmin(moderator.permissionLevel),
                             onClick: () =>
-                              isChannelAdmin(memberPermission)
-                                ? handleEditChannelPermission(memberUserId, serverId, channelCategoryId || channelId, { permissionLevel: 2 })
-                                : handleEditChannelPermission(memberUserId, serverId, channelCategoryId || channelId, { permissionLevel: 4 }),
+                              isChannelAdmin(moderator.permissionLevel)
+                                ? handleEditChannelPermission(moderator.userId, serverId, channelCategoryId || channelId, { permissionLevel: 2 })
+                                : handleEditChannelPermission(moderator.userId, serverId, channelCategoryId || channelId, { permissionLevel: 4 }),
                           },
                           {
                             id: 'set-server-admin',
-                            label: isServerAdmin(memberPermission) ? t('unset-server-admin') : t('set-server-admin'),
-                            show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerOwner(memberPermission),
+                            label: isServerAdmin(moderator.permissionLevel) ? t('unset-server-admin') : t('set-server-admin'),
+                            show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerOwner(moderator.permissionLevel),
                             onClick: () =>
-                              isServerAdmin(memberPermission)
-                                ? handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 })
-                                : handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
+                              isServerAdmin(moderator.permissionLevel)
+                                ? handleEditServerPermission(moderator.userId, serverId, { permissionLevel: 2 })
+                                : handleEditServerPermission(moderator.userId, serverId, { permissionLevel: 5 }),
                           },
                         ],
                       },
                     ];
+
                     return (
                       <tr
-                        key={memberUserId}
-                        className={`${selectedItemId === `member-${memberUserId}` ? popup['selected'] : ''}`}
+                        key={moderator.userId}
+                        className={`${selectedItemId === `member-${moderator.userId}` ? popup['selected'] : ''}`}
                         onClick={() => {
-                          if (selectedItemId === `member-${memberUserId}`) setSelectedItemId('');
-                          else setSelectedItemId(`member-${memberUserId}`);
+                          if (selectedItemId === `member-${moderator.userId}`) setSelectedItemId('');
+                          else setSelectedItemId(`member-${moderator.userId}`);
                         }}
                         onContextMenu={(e) => {
                           e.preventDefault();
@@ -607,12 +599,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                         }}
                       >
                         <td>
-                          <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
-                          <div className={`${popup['name']} ${memberNickname ? popup['highlight'] : ''}`}>{memberNickname || memberName}</div>
+                          <div className={`${permission[moderator.gender]} ${permission[`lv-${moderator.permissionLevel}`]}`} />
+                          <div className={`${popup['name']} ${moderator.nickname ? popup['highlight'] : ''}`}>{moderator.nickname || moderator.name}</div>
                         </td>
-                        <td>{getPermissionText(t, memberPermission)}</td>
-                        <td>{memberContribution}</td>
-                        <td>{new Date(memberJoinDate).toLocaleString()}</td>
+                        <td>{getPermissionText(t, moderator.permissionLevel)}</td>
+                        <td>{moderator.contribution}</td>
+                        <td>{new Date(moderator.createdAt).toLocaleString()}</td>
                       </tr>
                     );
                   })}
