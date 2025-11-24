@@ -76,6 +76,8 @@ export type QueueUser = {
   isQueueControlled: boolean;
 };
 
+export type QueueMember = QueueUser & OnlineMember;
+
 export type Member = table_members & table_users & table_server_blocked_users & table_server_permissions;
 
 export type MemberApplication = table_member_applications & table_users;

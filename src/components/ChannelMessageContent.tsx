@@ -16,15 +16,15 @@ import PromptMessageTab from '@/components/PromptMessage';
 type MessageGroup = (ChannelMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
 
 interface ChannelMessageContentProps {
-  messages: (ChannelMessage | PromptMessage)[];
   user: User;
-  channel: Channel;
-  server: Server;
-  handleScrollToBottom?: () => void;
+  currentServer: Server;
+  currentChannel: Channel;
+  messages: (ChannelMessage | PromptMessage)[];
   isAtBottom?: boolean;
+  onScrollToBottom?: () => void;
 }
 
-const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server, handleScrollToBottom, isAtBottom }) => {
+const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ user, currentServer, currentChannel, messages, isAtBottom, onScrollToBottom }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -62,13 +62,13 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
     const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
 
     if (lastMessage.type !== 'general' || lastMessage.userId === user.userId) {
-      setTimeout(() => handleScrollToBottom?.(), 50);
+      setTimeout(() => onScrollToBottom?.(), 50);
     } else if (isBottom) {
-      setTimeout(() => handleScrollToBottom?.(), 50);
+      setTimeout(() => onScrollToBottom?.(), 50);
     } else {
       setUnreadCount((prev) => prev + 1);
     }
-  }, [messageGroups, user.userId, handleScrollToBottom]);
+  }, [messageGroups, user.userId, onScrollToBottom]);
 
   useEffect(() => {
     if (isAtBottom) setUnreadCount(0);
@@ -80,15 +80,15 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
         {messageGroups.map((messageGroup, index) => (
           <div key={index} className={styles['message-wrapper']}>
             {messageGroup.type === 'general' ? (
-              <ChannelMessageTab messageGroup={messageGroup} user={user} channel={channel} server={server} />
+              <ChannelMessageTab user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
             ) : (
-              <PromptMessageTab messageGroup={messageGroup} messageType={messageGroup.type} />
+              <PromptMessageTab messageType={messageGroup.type} messageGroup={messageGroup} />
             )}
           </div>
         ))}
       </div>
       {unreadCount > 0 && (
-        <div className={styles['new-message-alert']} onClick={() => handleScrollToBottom?.()}>
+        <div className={styles['new-message-alert']} onClick={() => onScrollToBottom?.()}>
           {t('has-new-message', { 0: unreadCount })}
         </div>
       )}

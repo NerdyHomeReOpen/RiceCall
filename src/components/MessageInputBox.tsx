@@ -32,12 +32,12 @@ import { toTags } from '@/utils/tagConverter';
 import { MAX_FILE_SIZE } from '@/constant';
 
 interface MessageInputBoxProps {
-  onSend?: (message: string) => void;
+  onSendMessage?: (message: string) => void;
   disabled?: boolean;
   maxLength?: number;
 }
 
-const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, disabled = false, maxLength = 2000 }) => {
+const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMessage, disabled = false, maxLength = 2000 }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -173,7 +173,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
           if (e.key === 'Enter') {
             e.preventDefault();
             if (messageInput.trim().length === 0) return;
-            onSend?.(messageInput);
+            onSendMessage?.(messageInput);
             editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
             syncStyles();
           }

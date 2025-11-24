@@ -24,18 +24,20 @@ import { getFormatTimestamp } from '@/utils/language';
 import { ALLOWED_MESSAGE_KEYS } from '@/constant';
 
 interface ChannelMessageProps {
-  messageGroup: ChannelMessage & { contents: string[] };
   user: User;
-  channel: Channel;
-  server: Server;
+  currentChannel: Channel;
+  currentServer: Server;
+  messageGroup: ChannelMessage & { contents: string[] };
 }
 
-const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup, user, channel, server }) => {
+const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, currentChannel, currentServer, messageGroup }) => {
   // Hooks
   const contextMenu = useContextMenu();
   const { t } = useTranslation();
 
   // Variables
+  const { userId } = user;
+  const { serverId: currentServerId } = currentServer;
   const {
     userId: senderUserId,
     name: senderName,
@@ -46,10 +48,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     contents: messageContents,
     timestamp: messageTimestamp,
   } = messageGroup;
-  const { userId, permissionLevel: globalPermission } = user;
-  const { permissionLevel: channelPermissionLevel } = channel;
-  const { serverId, permissionLevel: serverPermissionLevel } = server;
-  const permissionLevel = Math.max(globalPermission, serverPermissionLevel, channelPermissionLevel);
+  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isUser = senderUserId === userId;
   const isSuperior = permissionLevel > senderPermissionLevel;
   const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
@@ -86,7 +85,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       id: 'block',
       label: t('block'),
       show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-      onClick: () => handleOpenBlockMember(senderUserId, serverId),
+      onClick: () => handleOpenBlockMember(senderUserId, currentServerId),
     },
   ];
 

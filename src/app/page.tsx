@@ -58,13 +58,13 @@ import ipc from '@/services/ipc.service';
 
 interface HeaderProps {
   user: User;
-  server: Server;
+  currentServer: Server;
   friendApplications: FriendApplication[];
   memberInvitations: MemberInvitation[];
   systemNotify: string[];
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplications, memberInvitations, systemNotify }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, memberInvitations, systemNotify }) => {
   // Hooks
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
 
   // Variables
   const { userId, name: userName, status: userStatus } = user;
-  const { serverId, name: serverName } = server;
+  const { serverId: currentServerId, name: currentServerName } = currentServer;
   const hasNotify = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotify.length !== 0;
   const hasFriendApplication = friendApplications.length !== 0;
   const hasMemberInvitation = memberInvitations.length !== 0;
@@ -87,7 +87,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
   const mainTabs: { id: 'home' | 'friends' | 'server'; label: string }[] = [
     { id: 'home', label: t('home') },
     { id: 'friends', label: t('friends') },
-    { id: 'server', label: serverName },
+    { id: 'server', label: currentServerName },
   ];
 
   // Handlers
@@ -258,7 +258,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
       {/* Main Tabs */}
       <div className={header['main-tabs']}>
         {mainTabs.map((tab) =>
-          tab.id === 'server' && !serverId ? null : (
+          tab.id === 'server' && !currentServerId ? null : (
             <div
               key={`tabs-${tab.id}`}
               data-tab-id={tab.id}
@@ -272,7 +272,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, server, friendApplicat
                   className={`${header['tab-close']} themeTabClose`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleLeaveServer(serverId);
+                    handleLeaveServer(currentServerId);
                   }}
                   xmlns="http://www.w3.org/2000/svg"
                   width="12"
@@ -396,10 +396,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   // Variables
-  const server = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
-  const channel = useMemo(() => channels.find((item) => item.channelId === user.currentChannelId) || Default.channel(), [channels, user.currentChannelId]);
-  const { userId } = user;
-  const { serverId } = server;
+  const currentServer = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
+  const currentChannel = useMemo(() => channels.find((item) => item.channelId === user.currentChannelId) || Default.channel(), [channels, user.currentChannelId]);
+  const { userId, name: userName } = user;
+  const { serverId: currentServerId, name: currentServerName } = currentServer;
 
   // Handlers
   const handleClearMessages = () => {
@@ -430,7 +430,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       case 'home':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-home-page'),
-          state: `${t('rpc:user', { '0': user.name })}`,
+          state: `${t('rpc:user', { '0': userName })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
           smallImageKey: 'home_icon',
@@ -441,7 +441,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       case 'friends':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-friend-page'),
-          state: `${t('rpc:user', { '0': user.name })}`,
+          state: `${t('rpc:user', { '0': userName })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
           smallImageKey: 'home_icon',
@@ -451,7 +451,7 @@ const RootPageComponent: React.FC = React.memo(() => {
         });
       case 'server':
         ipc.discord.updatePresence({
-          details: `${t('in')} ${server.name}`,
+          details: `${t('in')} ${currentServerName}`,
           state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
@@ -461,7 +461,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
         });
     }
-  }, [mainTab.selectedTabId, user.name, server.name, serverOnlineMembers.length, t]);
+  }, [mainTab.selectedTabId, userName, currentServerName, serverOnlineMembers.length, t]);
 
   useEffect(() => {
     selectedTabIdRef.current = mainTab.selectedTabId;
@@ -534,12 +534,12 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [i18n.language, userId]);
 
   useEffect(() => {
-    if (!userId || !serverId) return;
+    if (!userId || !currentServerId) return;
     const refresh = async () => {
-      ipc.data.channels(userId, serverId).then((channels) => {
+      ipc.data.channels(userId, currentServerId).then((channels) => {
         if (channels) setChannels(channels);
       });
-      ipc.data.serverOnlineMembers(serverId).then((serverOnlineMembers) => {
+      ipc.data.serverOnlineMembers(currentServerId).then((serverOnlineMembers) => {
         if (serverOnlineMembers) setServerOnlineMembers(serverOnlineMembers);
       });
       setServerMemberApplications([]);
@@ -548,7 +548,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       // });
     };
     refresh();
-  }, [userId, serverId]);
+  }, [userId, currentServerId]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('connect', () => {
@@ -580,8 +580,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<User> }[]) => {
       // Remove action messages and channel messages while switching server
-      const currentServerId = args[0].update.currentServerId;
-      if (currentServerId !== undefined && currentServerId !== serverId) {
+      const newCurrentServerId = args[0].update.currentServerId;
+      if (newCurrentServerId !== undefined && newCurrentServerId !== currentServerId) {
         setActionMessages([]);
         setChannelMessages([]);
         setQueueUsers([]);
@@ -592,7 +592,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
     });
     return () => unsub();
-  }, [serverId]);
+  }, [currentServerId]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendAdd', (...args: { data: Friend }[]) => {
@@ -842,7 +842,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     <WebRTCProvider>
       <ActionScannerProvider>
         <ExpandedProvider>
-          <Header user={user} server={server} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
+          <Header user={user} currentServer={currentServer} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
           {!userId || !isSocketConnected ? (
             <LoadingSpinner />
           ) : (
@@ -851,16 +851,16 @@ const RootPageComponent: React.FC = React.memo(() => {
               <FriendPage user={user} friends={friends} friendActivities={friendActivities} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}
+                currentServer={currentServer}
+                currentChannel={currentChannel}
                 friends={friends}
-                server={server}
+                queueUsers={queueUsers}
                 serverOnlineMembers={serverOnlineMembers}
                 serverMemberApplications={serverMemberApplications}
-                currentChannel={channel}
                 channels={channels}
                 channelMessages={channelMessages}
-                onClearMessages={handleClearMessages}
                 actionMessages={actionMessages}
-                queueUsers={queueUsers}
+                onClearMessages={handleClearMessages}
                 display={mainTab.selectedTabId === 'server'}
                 latency={latency}
               />

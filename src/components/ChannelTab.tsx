@@ -23,12 +23,12 @@ import { isMember, isServerAdmin, isChannelMod, isChannelAdmin, isStaff } from '
 
 interface ChannelTabProps {
   user: User;
+  currentServer: Server;
+  currentChannel: Channel;
   friends: Friend[];
-  server: Server;
+  queueUsers: QueueUser[];
   serverOnlineMembers: OnlineMember[];
   channel: Channel;
-  currentChannel: Channel;
-  queueUsers: QueueUser[];
   expanded: Record<string, boolean>;
   selectedItemId: string | null;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
@@ -36,26 +36,25 @@ interface ChannelTabProps {
 }
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(
-  ({ user, friends, server, serverOnlineMembers, channel, currentChannel, queueUsers, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+  ({ user, currentServer, currentChannel, friends, queueUsers, serverOnlineMembers, channel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
     // Hooks
     const { t } = useTranslation();
     const contextMenu = useContextMenu();
     const findMe = useFindMeContext();
 
     // Variables
-    const { userId, permissionLevel: globalPermissionLevel, currentChannelId: userCurrentChannelId } = user;
-    const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, permissionLevel: channelPermissionLevel, categoryId: channelCategoryId } = channel;
-    const { permissionLevel: currentChannelPermissionLevel } = currentChannel;
-    const { serverId, permissionLevel: serverPermissionLevel, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
-    const permissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel);
-    const currentPermissionLevel = Math.max(globalPermissionLevel, serverPermissionLevel, currentChannelPermissionLevel);
+    const { userId, currentChannelId: userCurrentChannelId } = user;
+    const { serverId: currentServerId, lobbyId: currentServerLobbyId, receptionLobbyId: currentServerReceptionLobbyId } = currentServer;
+    const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId } = channel;
+    const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
+    const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
     const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
     const channelMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === channelId), [serverOnlineMembers, channelId]);
     const channelUserIds = useMemo(() => channelMembers.map((m) => m.userId), [channelMembers]);
     const movableUserIds = useMemo(() => channelMembers.filter((m) => m.permissionLevel <= currentPermissionLevel).map((m) => m.userId), [channelMembers, currentPermissionLevel]);
     const isInChannel = userCurrentChannelId === channelId;
-    const isLobby = serverLobbyId === channelId;
-    const isReceptionLobby = serverReceptionLobbyId === channelId;
+    const isLobby = currentServerLobbyId === channelId;
+    const isReceptionLobby = currentServerReceptionLobbyId === channelId;
     const isMemberChannel = channelVisibility === 'member';
     const isPrivateChannel = channelVisibility === 'private';
     const isReadonlyChannel = channelVisibility === 'readonly';
@@ -74,12 +73,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         label: t('join-channel'),
         disabled: !canJoin,
         show: !isInChannel,
-        onClick: () => handleConnectChannel(serverId, channelId),
+        onClick: () => handleConnectChannel(currentServerId, channelId),
       },
       {
         id: 'view-or-edit',
         label: t('view-or-edit'),
-        onClick: () => handleOpenChannelSetting(userId, serverId, channelId),
+        onClick: () => handleOpenChannelSetting(userId, currentServerId, channelId),
       },
       {
         id: 'separator',
@@ -89,19 +88,19 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         id: 'create-channel',
         label: t('create-channel'),
         show: isServerAdmin(permissionLevel) && channelCategoryId === null,
-        onClick: () => handleOpenCreateChannel(userId, serverId, ''),
+        onClick: () => handleOpenCreateChannel(userId, currentServerId, ''),
       },
       {
         id: 'create-sub-channel',
         label: t('create-sub-channel'),
         show: !isLobby && isChannelAdmin(permissionLevel),
-        onClick: () => handleOpenCreateChannel(userId, serverId, channelCategoryId ? channelCategoryId : channelId),
+        onClick: () => handleOpenCreateChannel(userId, currentServerId, channelCategoryId ? channelCategoryId : channelId),
       },
       {
         id: 'delete-channel',
         label: t('delete-channel'),
         show: !isLobby && isChannelAdmin(permissionLevel),
-        onClick: () => handleDeleteChannel(serverId, channelId),
+        onClick: () => handleDeleteChannel(currentServerId, channelId),
       },
       {
         id: 'separator',
@@ -111,19 +110,19 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         id: 'broadcast',
         label: t('broadcast'),
         show: isChannelAdmin(permissionLevel),
-        onClick: () => handleOpenServerBroadcast(serverId, channelId),
+        onClick: () => handleOpenServerBroadcast(currentServerId, channelId),
       },
       {
         id: 'move-all-user-to-channel',
         label: t('move-all-user-to-channel'),
         show: !isInChannel && isChannelMod(permissionLevel) && movableUserIds.length > 0,
-        onClick: () => handleMoveAllUsersToChannel(movableUserIds, serverId, userCurrentChannelId || ''),
+        onClick: () => handleMoveAllUsersToChannel(movableUserIds, currentServerId, userCurrentChannelId || ''),
       },
       {
         id: 'edit-channel-order',
         label: t('edit-channel-order'),
         show: isServerAdmin(permissionLevel),
-        onClick: () => handleOpenEditChannelOrder(userId, serverId),
+        onClick: () => handleOpenEditChannelOrder(userId, currentServerId),
       },
       {
         id: 'separator',
@@ -134,14 +133,14 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         label: t('kick-channel-users-from-server'),
         disabled: channelMembers.length === 0,
         show: isStaff(permissionLevel),
-        onClick: () => handleKickUsersFromServer(channelUserIds, serverId),
+        onClick: () => handleKickUsersFromServer(channelUserIds, currentServerId),
       },
       {
         id: 'kick-all-users-from-server',
         label: t('kick-all-users-from-server'),
         disabled: serverOnlineMembers.length === 0,
         show: isStaff(permissionLevel),
-        onClick: () => handleKickUsersFromServer(serverUserIds, serverId),
+        onClick: () => handleKickUsersFromServer(serverUserIds, currentServerId),
       },
       {
         id: 'separator',
@@ -152,7 +151,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         label: t('set-reception-lobby'),
         disabled: isPrivateChannel || isReadonlyChannel,
         show: isServerAdmin(permissionLevel) && !isReceptionLobby,
-        onClick: () => handleEditServer(serverId, { receptionLobbyId: channelId }),
+        onClick: () => handleEditServer(currentServerId, { receptionLobbyId: channelId }),
       },
     ];
 
@@ -225,7 +224,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             if (isSelected) setSelectedItemId(null);
             else setSelectedItemId(`channel-${channelId}`);
           }}
-          onDoubleClick={() => handleConnectChannel(serverId, channelId)}
+          onDoubleClick={() => handleConnectChannel(currentServerId, channelId)}
           draggable={isChannelMod(permissionLevel) && movableUserIds.length > 0}
           onDragStart={(e) => handleDragStart(e, movableUserIds, channelId)}
           onDragOver={(e) => {
@@ -237,7 +236,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           }}
           onDrop={(e) => {
             if (isReadonlyChannel) return;
-            handleDrop(e, serverId, channelId);
+            handleDrop(e, currentServerId, channelId);
           }}
           onContextMenu={(e) => {
             e.preventDefault();
@@ -261,12 +260,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             <UserTab
               key={member.userId}
               user={user}
-              friends={friends}
-              channel={channel}
+              currentServer={currentServer}
               currentChannel={currentChannel}
-              server={server}
-              member={member}
+              friends={friends}
               queueUsers={queueUsers}
+              channel={channel}
+              member={member}
               selectedItemId={selectedItemId}
               setSelectedItemId={setSelectedItemId}
               handleConnectChannel={handleConnectChannel}
