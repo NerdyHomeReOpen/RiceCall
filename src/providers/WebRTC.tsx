@@ -873,6 +873,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [initAudioContext, initLocalStorage]);
 
   useEffect(() => {
+    if (!isMicTaken) {
+      removeMicAudio();
+      return;
+    }
+
     navigator.mediaDevices
       .getUserMedia({
         audio: {
@@ -883,13 +888,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           ...(inputAudioDevice ? { deviceId: { exact: inputAudioDevice } } : {}),
         },
       })
-      .then(async (stream) => {
+      .then((stream) => {
         initMicAudio(stream);
       })
       .catch((err) => {
         console.error('[WebRTC] access input device failed: ', err);
       });
-  }, [inputAudioDevice, echoCancellation, noiseCancellation, initMicAudio]);
+  }, [inputAudioDevice, echoCancellation, noiseCancellation, isMicTaken, initMicAudio, removeMicAudio]);
 
   useEffect(() => {
     const changeInputAudioDevice = (inputAudioDevice: string) => {
