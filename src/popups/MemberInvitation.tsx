@@ -86,19 +86,13 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
         {/* Content Body */}
         <div className={styles['content']}>
           {memberInvitations.map((memberInvitation) => {
-            const {
-              serverId: memberInvitationServerId,
-              avatarUrl: memberInvitationAvatarUrl,
-              displayId: memberInvitationDisplayId,
-              createdAt: memberInvitationCreatedAt,
-              description: memberInvitationDescription,
-            } = memberInvitation;
+            const { serverId, avatarUrl: serverAvatarUrl, name: serverName, createdAt: memberInvitationCreatedAt, description: memberInvitationDescription } = memberInvitation;
             return (
-              <div key={memberInvitationServerId} className={styles['application']}>
-                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${memberInvitationAvatarUrl})` }} />
+              <div key={serverId} className={styles['application']}>
+                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
                 <div style={{ flex: 1 }}>
                   <div className={styles['user-info-box']}>
-                    <div className={styles['user-name-text']}>{memberInvitationDisplayId}</div>
+                    <div className={styles['user-name-text']}>{serverName}</div>
                     <div className={styles['time-text']} title={getFormatTimestamp(t, memberInvitationCreatedAt)}>
                       {getFormatTimeDiff(t, memberInvitationCreatedAt)}
                     </div>
@@ -112,10 +106,10 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
                     </div>
                     <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
                       <div className={styles['action-buttons']}>
-                        <div className={styles['button']} onClick={() => handleAcceptMemberInvitation(memberInvitationServerId)}>
+                        <div className={styles['button']} onClick={() => handleAcceptMemberInvitation(serverId)}>
                           {t('accept')}
                         </div>
-                        <div className={styles['button']} onClick={() => handleRejectMemberInvitation(memberInvitationServerId)}>
+                        <div className={styles['button']} onClick={() => handleRejectMemberInvitation(serverId)}>
                           {t('reject')}
                         </div>
                       </div>

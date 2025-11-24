@@ -85,13 +85,13 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
         {/* Content Body */}
         <div className={styles['content']}>
           {friendApplications.map((friendApplication) => {
-            const { senderId: applicationSenderId, name: applicationName, avatarUrl: applicationAvatarUrl, createdAt: applicationCreatedAt, description: applicationDescription } = friendApplication;
+            const { senderId, name: senderName, avatarUrl: senderAvatarUrl, createdAt: applicationCreatedAt, description: applicationDescription } = friendApplication;
             return (
-              <div key={applicationSenderId} className={styles['application']}>
-                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${applicationAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, applicationSenderId)} />
+              <div key={senderId} className={styles['application']}>
+                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${senderAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, senderId)} />
                 <div style={{ flex: 1 }}>
                   <div className={styles['user-info-box']}>
-                    <div className={styles['user-name-text']}>{applicationName}</div>
+                    <div className={styles['user-name-text']}>{senderName}</div>
                     <div className={styles['time-text']} title={getFormatTimestamp(t, applicationCreatedAt)}>
                       {getFormatTimeDiff(t, applicationCreatedAt)}
                     </div>
@@ -105,14 +105,14 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
                     </div>
                     <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
                       <div className={styles['action-buttons']}>
-                        <div className={styles['button']} onClick={() => handleOpenApproveFriend(userId, applicationSenderId)}>
+                        <div className={styles['button']} onClick={() => handleOpenApproveFriend(userId, senderId)}>
                           {t('accept')}
                         </div>
-                        <div className={styles['button']} onClick={() => handleRejectFriendApplication(applicationSenderId, applicationName)}>
+                        <div className={styles['button']} onClick={() => handleRejectFriendApplication(senderId, senderName)}>
                           {t('reject')}
                         </div>
                       </div>
-                      <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(userId, applicationSenderId)}>
+                      <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(userId, senderId)}>
                         <div className={styles['direct-message-icon']} />
                       </div>
                     </div>
