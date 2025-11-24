@@ -1,10 +1,14 @@
 {
-  "update-available": "Доступна новая версия",
-  "update-available-message": "Новая версия {{version}} была выпущена {{ReleaseDate}} и начинает загружаться...",
-  "update-downloaded": "Установите обновление",
-  "update-downloaded-message": "Версия {{version}} загружена, пожалуйста, нажмите кнопку \"Установить\"",
+  "cancel": "Отменить",
+  "download-update": "下載更新",
+  "exit": "Выйти",
   "install-update": "Установить",
-  "open-main-window": "Показать/скрыть главное меню",
+  "install-after-quit": "關閉時安裝",
+  "is-latest-version": "已經是最新版本",
   "logout": "Отключиться",
-  "exit": "Выйти"
+  "open-main-window": "Показать/скрыть главное меню",
+  "update-available": "Доступна новая версия",
+  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，點擊「下載更新」按鈕開始下載",
+  "update-downloaded": "Установите обновление",
+  "update-downloaded-message": "版本 {{version}} 已下載完成，請選擇「立即安裝」或「關閉時安裝」"
 }
