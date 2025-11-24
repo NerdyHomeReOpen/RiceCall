@@ -1,10 +1,14 @@
 {
-  "update-available": "Nueva versión disponible",
-  "update-available-message": "Nueva versión {{version}} lanzada el {{releaseDate}}, iniciando descarga...",
-  "update-downloaded": "Instalación de la actualización",
-  "update-downloaded-message": "Se ha descargado la versión {{version}}. Haga clic en el botón \"Instalar ahora\" para instalarla.",
+  "cancel": "Cancelar",
+  "download-update": "下載更新",
+  "exit": "Salir",
   "install-update": "Instalar ahora",
-  "open-main-window": "Abrir ventana principal",
+  "install-after-quit": "關閉時安裝",
+  "is-latest-version": "已經是最新版本",
   "logout": "Cerrar sesión",
-  "exit": "Salir"
+  "open-main-window": "Abrir ventana principal",
+  "update-available": "Nueva versión disponible",
+  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，點擊「下載更新」按鈕開始下載",
+  "update-downloaded": "Instalación de la actualización",
+  "update-downloaded-message": "版本 {{version}} 已下載完成，請選擇「立即安裝」或「關閉時安裝」"
 }
