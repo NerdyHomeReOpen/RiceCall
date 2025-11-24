@@ -55,8 +55,10 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
       ipc.data.friend(userId, targetId).then((friend) => {
         if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
         else if (targetId === userId) setError(t('cannot-add-yourself'));
-        else handleOpenApplyFriend(userId, targetId);
-        ipc.window.close();
+        else {
+          handleOpenApplyFriend(userId, targetId);
+          ipc.window.close();
+        }
       });
     });
     return () => unsub();
