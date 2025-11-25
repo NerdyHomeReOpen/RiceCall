@@ -1,14 +1,14 @@
 {
   "cancel": "انصراف",
-  "download-update": "下載更新",
+  "download-update": "دانلود به‌روزرسانی",
   "exit": "خروج",
   "install-update": "همین حالا نصب کن",
-  "install-after-quit": "關閉時安裝",
-  "is-latest-version": "已經是最新版本",
+  "install-after-quit": "هنگام بسته بودن نصب کنید",
+  "is-latest-version": "این در حال حاضر آخرین نسخه است.",
   "logout": "خروج",
   "open-main-window": "نشان دان یا مخفی کردن منوی اصلی",
   "update-available": "نسخه جدید در دسترس است",
-  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，點擊「下載更新」按鈕開始下載",
+  "update-available-message": "نسخه جدید {{version}} در تاریخ {{releaseDate}} منتشر شد. برای شروع دانلود، روی دکمه \"دانلود به‌روزرسانی\" کلیک کنید.",
   "update-downloaded": "نصب به‌روزرسانی",
-  "update-downloaded-message": "版本 {{version}} 已下載完成，請選擇「立即安裝」或「關閉時安裝」"
+  "update-downloaded-message": "نسخه {{version}} دانلود شده است. لطفاً «نصب اکنون» یا «نصب هنگام بستن» را انتخاب کنید."
 }
