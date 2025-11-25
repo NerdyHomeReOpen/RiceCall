@@ -1,14 +1,14 @@
 {
   "cancel": "Cancelar",
-  "download-update": "下載更新",
+  "download-update": "Baixar atualização",
   "exit": "Sair",
   "install-update": "Instalar Agora",
-  "install-after-quit": "關閉時安裝",
-  "is-latest-version": "已經是最新版本",
+  "install-after-quit": "Instalar quando fechado",
+  "is-latest-version": "Já é a versão mais recente.",
   "logout": "Desconectar",
   "open-main-window": "Mostrar/esconder menu principal",
   "update-available": "Uma nova versão está disponível",
-  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，點擊「下載更新」按鈕開始下載",
+  "update-available-message": "A nova versão {{version}} foi lançada em {{releaseDate}}. Clique no botão \"Baixar atualização\" para iniciar o download.",
   "update-downloaded": "Instalar atualizações",
-  "update-downloaded-message": "版本 {{version}} 已下載完成，請選擇「立即安裝」或「關閉時安裝」"
+  "update-downloaded-message": "A versão {{version}} foi baixada. Selecione \"Instalar agora\" ou \"Instalar ao fechar\"."
 }
