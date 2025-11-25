@@ -74,6 +74,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const isLobby = serverLobbyId === channelId;
   const isReceptionLobby = serverReceptionLobbyId === channelId;
   const totalModerators = useMemo(() => channelMembers.filter((m) => isChannelMod(m.permissionLevel) && !isServerAdmin(m.permissionLevel)).length, [channelMembers]);
+  const totalBlockMembers = useMemo(() => channelMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now()).length, [channelMembers]);
   const canSubmit = channelName.trim();
   const filteredModerators = useMemo(
     () =>
@@ -87,14 +88,39 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         .sort(Sorter(sortField as keyof Member, sortDirection)),
     [channelMembers, searchText, sortField, sortDirection],
   );
+
+  const filteredBlockMembers = useMemo(
+    () =>
+      channelMembers
+        .filter(
+          (m) => (m.blockedUntil === -1 || m.blockedUntil > Date.now()) && (m.nickname?.toLowerCase().includes(searchText.toLowerCase()) || m.name.toLowerCase().includes(searchText.toLowerCase())),
+        )
+        .sort(Sorter(sortField as keyof Member, sortDirection)),
+    [channelMembers, searchText, sortField, sortDirection],
+  );
+
   const settingPages = isChannelMod(permissionLevel)
-    ? [t('channel-info'), t('channel-announcement'), t('access-permission'), t('speaking-permission'), t('text-permission'), t('channel-management')]
+    ? [
+        t('channel-info'),
+        t('channel-announcement'),
+        t('access-permission'),
+        t('speaking-permission'),
+        t('text-permission'),
+        `${t('channel-management')} (${totalModerators})`,
+        `${t('blacklist-management')} (${totalBlockMembers})`,
+      ]
     : [t('channel-info'), t('channel-announcement')];
+
   const memberTableFields = [
     { name: t('name'), field: 'name' },
     { name: t('permission'), field: 'permissionLevel' },
     { name: t('contribution'), field: 'contribution' },
     { name: t('join-date'), field: 'createdAt' },
+  ];
+
+  const blockMemberTableFields = [
+    { name: t('name'), field: 'name' },
+    { name: t('unblock-date'), field: 'isBlocked' },
   ];
 
   // Handlers
@@ -109,6 +135,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   const handleEditChannelPermission = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
     ipc.socket.send('editChannelPermission', { userId, serverId, channelId, update });
+  };
+
+  const handleUnblockUserFromChannel = (userId: User['userId'], userName: User['name'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+    handleOpenAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipc.socket.send('unblockUserFromChannel', { userId, serverId, channelId }));
   };
 
   const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
@@ -603,6 +633,75 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                         <td>{getPermissionText(t, moderator.permissionLevel)}</td>
                         <td>{moderator.contribution}</td>
                         <td>{new Date(moderator.createdAt).toLocaleString()}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <div className={setting['note-text']}>{t('right-click-to-process')}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Blacklist Management */}
+        <div className={setting['right']} style={activeTabIndex === 6 ? {} : { display: 'none' }}>
+          <div className={popup['col']}>
+            <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
+              <div className={popup['label']}>{`${t('blacklist')} (${filteredBlockMembers.length})`}</div>
+              <div className={setting['search-box']}>
+                <div className={setting['search-icon']}></div>
+                <input name="search-query" type="text" className={setting['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+              </div>
+            </div>
+            <div className={`${popup['input-box']} ${popup['col']}`}>
+              <table style={{ height: '330px' }}>
+                <thead>
+                  <tr>
+                    {blockMemberTableFields.map((field) => (
+                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
+                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className={setting['table-container']}>
+                  {filteredBlockMembers.map((member) => {
+                    // Variables
+                    const isUser = member.userId === userId;
+
+                    // Handlers
+                    const getContextMenuItems = () => [
+                      {
+                        id: 'view-profile',
+                        label: t('view-profile'),
+                        show: !isUser,
+                        onClick: () => handleOpenUserInfo(userId, member.userId),
+                      },
+                      {
+                        id: 'unblock',
+                        label: t('unblock'),
+                        show: true,
+                        onClick: () => handleUnblockUserFromChannel(member.userId, member.name, serverId, channelId),
+                      },
+                    ];
+
+                    return (
+                      <tr
+                        key={member.userId}
+                        className={`${selectedItemId === `blocked-${member.userId}` ? popup['selected'] : ''}`}
+                        onClick={() => {
+                          if (selectedItemId === `blocked-${member.userId}`) setSelectedItemId('');
+                          else setSelectedItemId(`blocked-${member.userId}`);
+                        }}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          const x = e.clientX;
+                          const y = e.clientY;
+                          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+                        }}
+                      >
+                        <td>{member.nickname || member.name}</td>
+                        <td>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
                       </tr>
                     );
                   })}
