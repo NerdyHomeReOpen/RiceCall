@@ -703,7 +703,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                           }}
                         >
                           <td>{member.nickname || member.name}</td>
-                          <td>{member.blockedUntil === -1 ? t('permanent') : new Date(member.blockedUntil).toLocaleString()}</td>
+                          <td>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
                         </tr>
                       );
                     })}
