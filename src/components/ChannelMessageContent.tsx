@@ -71,6 +71,14 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
   }, [messageGroups, user.userId, onScrollToBottom]);
 
   useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onScrollToBottom?.();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onScrollToBottom]);
+
+  useEffect(() => {
     if (isAtBottom) setUnreadCount(0);
   }, [isAtBottom]);
 
@@ -82,7 +90,7 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
             {messageGroup.type === 'general' ? (
               <ChannelMessageTab user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
             ) : (
-              <PromptMessageTab messageType={messageGroup.type} messageGroup={messageGroup} />
+              <PromptMessageTab user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
             )}
           </div>
         ))}

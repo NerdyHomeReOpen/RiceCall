@@ -26,7 +26,9 @@
   line-height: 24px;
   color: #ffffff;
   font-size: 0.9em;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 
   &:hover {
     cursor: pointer;
@@ -101,6 +103,13 @@
 }
 
 .header {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+}
+
+.header .details {
   display: flex;
   align-items: center;
   gap: 3px;
