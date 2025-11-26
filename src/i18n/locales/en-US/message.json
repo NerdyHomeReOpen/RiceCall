@@ -90,6 +90,7 @@
   "login-success": "Login successful.",
   "move-channel-failed": "Failed to log in to the user's channel, please try again later",
   "move-queue-position-failed": "Failed to move the item, try again later",
+  "move-user-to-channel": "您被管理員【{{operator}}】移動到【{{channel}}】",
   "mute-member-in-channel-failed": "The channel failed to mute members. Please try again later.",
   "not-receive-application": "It is not possible to apply for member. This group does not accept applications",
   "others-device-login": "Another device is connected, please log in again.",
