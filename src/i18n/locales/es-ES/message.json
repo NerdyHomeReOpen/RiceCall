@@ -90,6 +90,7 @@
   "login-success": "Inicio de sesión correcto.",
   "move-channel-failed": "Error al mover al usuario de canal, inténtalo más tarde",
   "move-queue-position-failed": "Error al cambiar la posición en la cola, inténtalo más tarde",
+  "move-user-to-channel": "您被管理員【{{operator}}】移動到【{{channel}}】",
   "mute-member-in-channel-failed": "No se pudo silenciar a los miembros del canal. Inténtalo de nuevo más tarde.",
   "not-receive-application": "No se puede unirse al grupo, este grupo de voz no acepta solicitudes de membresía.",
   "others-device-login": "Otro dispositivo ha iniciado sesión, por favor vuelve a iniciar sesión",
