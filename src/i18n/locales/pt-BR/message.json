@@ -90,6 +90,7 @@
   "login-success": "Login efetuado com sucesso.",
   "move-channel-failed": "Erro ao se conectar no canal do usuário. Tente novamente mais tarde.",
   "move-queue-position-failed": "Erro ao mover o item. Tente novamente mais tarde.",
+  "move-user-to-channel": "您被管理員【{{operator}}】移動到【{{channel}}】",
   "mute-member-in-channel-failed": "A tentativa de silenciar os membros do canal falhou. Tente novamente mais tarde.",
   "not-receive-application": "Este grupo não aceita pedidos para se tornar membro.",
   "others-device-login": "Outro dispositivo está conectado, por favor conecte-se novamente",
