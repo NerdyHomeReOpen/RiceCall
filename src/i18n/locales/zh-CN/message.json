@@ -90,6 +90,7 @@
   "login-success": "登入成功。",
   "move-channel-failed": "移动使用者频道失败，请稍后再试。",
   "move-queue-position-failed": "移动麦序位置失败，请稍后再试。",
+  "move-user-to-channel": "您被管理員【{{operator}}】移動到【{{channel}}】",
   "mute-member-in-channel-failed": "在频道静音成员失败，请稍后再试。",
   "not-receive-application": "无法加入群，此语音群不开放会员申请。",
   "others-device-login": "另一个设备已登入，请重新登入。",
