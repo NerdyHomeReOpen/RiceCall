@@ -231,6 +231,7 @@ export type PopupType =
   | 'applyMember'
   | 'approveFriend'
   | 'blockMember'
+  | 'channelEvent'
   | 'changeTheme'
   | 'channelPassword'
   | 'channelSetting'

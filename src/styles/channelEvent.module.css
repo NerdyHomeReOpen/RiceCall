@@ -1,0 +1,69 @@
+.options-viewer {
+  display: flex;
+  width: 100%;
+  max-height: 50px;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.options-viewer .option-tab {
+  padding: 8px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--text-color-quinary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: transform 0.2s ease;
+}
+
+.options-viewer .option-tab.active {
+  color: var(--text-color-quaternary);
+  transform: translateY(-1px);
+}
+
+.options-viewer .option-tab.active::before {
+  background-position: 0 -18px;
+}
+
+.options-viewer .option-tab.active::after {
+  content: '';
+  position: absolute;
+  min-height: 20px;
+  min-width: 70px;
+  top: 20px;
+  transition: left 0.2s ease;
+  background-image: url('/channel/switch_arrow.png');
+  background-repeat: no-repeat;
+  background-size: auto;
+  background-position: 0 0;
+}
+
+.event-list {
+  display: flex;
+  overflow-y: scroll;
+}
+
+.current-channel {
+  padding: 5px;
+  display: flex;
+  height: auto;
+  flex: 1;
+  margin: 0 auto;
+  justify-content: flex-start;
+}
+
+.current-channel::before {
+  content: '';
+  display: inline-block;
+  height: 15px;
+  width: 15px;
+  min-height: 15px;
+  min-width: 15px;
+  background-image: url('/mylocation.png');
+  background-repeat: no-repeat;
+  background-size: auto;
+  margin-right: 4px;
+}

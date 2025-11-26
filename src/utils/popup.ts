@@ -30,6 +30,10 @@ export const handleOpenServerSetting = (userId: User['userId'], serverId: Server
   ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
 };
 
+export const handleOpenChannelEvent = (userId: User['userId'], serverId: Server['serverId']) => {
+  ipc.popup.open('channelEvent', 'channelEvent', { userId, serverId });
+};
+
 export const handleOpenChannelSetting = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
   ipc.popup.open('channelSetting', 'channelSetting', { userId, serverId, channelId });
 };

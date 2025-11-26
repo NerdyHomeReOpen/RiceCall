@@ -25,6 +25,7 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
+import { handleOpenChannelEvent } from '@/utils/popup';
 import MicModeMenu from '@/components/MicModeMenu';
 
 const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
@@ -259,6 +260,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         id: 'clean-up-message',
         label: t('clean-up-message'),
         onClick: onClearMessages,
+      },
+      {
+        id: 'open-channel-event',
+        label: t('channel-event'),
+        onClick: () => handleOpenChannelEvent(userId, currentServer.serverId),
       },
       {
         id: 'open-announcement',

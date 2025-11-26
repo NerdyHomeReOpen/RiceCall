@@ -79,6 +79,7 @@ type PopupType =
   | 'applyMember'
   | 'blockMember'
   | 'changeTheme'
+  | 'channelEvent'
   | 'channelPassword'
   | 'channelSetting'
   | 'createChannel'
@@ -180,6 +181,7 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   approveFriend: { height: 250, width: 400 },
   applyMember: { height: 300, width: 490 },
   blockMember: { height: 250, width: 400 },
+  channelEvent: { height: 400, width: 500 },
   channelSetting: { height: 520, width: 600 },
   channelPassword: { height: 200, width: 380 },
   changeTheme: { height: 335, width: 480 },
