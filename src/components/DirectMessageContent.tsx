@@ -13,12 +13,12 @@ import PromptMessageTab from '@/components/PromptMessage';
 type MessageGroup = (DirectMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
 
 interface DirectMessageContentProps {
-  messages: (DirectMessage | PromptMessage)[];
   user: User;
+  messages: (DirectMessage | PromptMessage)[];
   isScrollToBottom?: boolean;
 }
 
-const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ messages, isScrollToBottom = true }) => {
+const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ user, messages, isScrollToBottom = true }) => {
   // Refs
   const messagesViewerRef = useRef<HTMLDivElement>(null);
 
@@ -56,7 +56,7 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
     <div ref={messagesViewerRef} className={styles['message-viewer-wrapper']}>
       {messageGroups.map((messageGroup, index) => (
         <div key={index} className={styles['message-wrapper']}>
-          {messageGroup.type === 'dm' ? <DirectMessageTab messageGroup={messageGroup} /> : <PromptMessageTab messageGroup={messageGroup} messageType={messageGroup.type} />}
+          {messageGroup.type === 'dm' ? <DirectMessageTab messageGroup={messageGroup} /> : <PromptMessageTab user={user} messageGroup={messageGroup} messageType={messageGroup.type} />}
         </div>
       ))}
     </div>
