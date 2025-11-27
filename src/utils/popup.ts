@@ -5,7 +5,7 @@ import type { User, Server, Channel, FriendGroup } from '@/types';
 import ipc from '@/services/ipc.service';
 
 export const handleOpenAlertDialog = (message: string, callback: () => void) => {
-  ipc.popup.open('dialogAlert', 'dialogAlert', { message, timestamp: Date.now(), submitTo: 'dialogAlert' });
+  ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
   ipc.popup.onSubmit('dialogAlert', callback);
 };
 
