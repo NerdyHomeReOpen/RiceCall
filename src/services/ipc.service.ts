@@ -1238,6 +1238,11 @@ const ipcService = {
     if (!isElectron) return;
     ipcRenderer.send('check-for-updates');
   },
+
+  changeServer: (server: 'prod' | 'dev') => {
+    if (!isElectron) return;
+    ipcRenderer.send('change-server', server);
+  },
 };
 
 export default ipcService;

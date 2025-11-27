@@ -12,6 +12,10 @@
     {
       "from": ".env",
       "to": "app.env"
+    },
+    {
+      "from": ".env.dev",
+      "to": "app.env.dev"
     }
   ],
   "nsis": {

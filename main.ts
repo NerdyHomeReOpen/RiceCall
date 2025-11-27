@@ -2,8 +2,6 @@
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
-import dotenv from 'dotenv';
-dotenv.config();
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import { initMain } from 'electron-audio-loopback-josh';
@@ -70,6 +68,7 @@ type StoreType = {
   autoCheckForUpdates: boolean;
   updateCheckInterval: number;
   updateChannel: string;
+  server: 'prod' | 'dev';
 };
 
 // Popup
@@ -169,6 +168,8 @@ const store = new Store<StoreType>({
     autoCheckForUpdates: true,
     updateCheckInterval: 1 * 60 * 1000, // 1 minute
     updateChannel: 'latest',
+    // Server settings
+    server: 'prod',
   },
 });
 
@@ -736,7 +737,7 @@ export function configureTray() {
 
 app.on('ready', async () => {
   // Load env
-  loadEnv();
+  loadEnv(store.get('server'));
 
   // Configure
   configureAutoUpdater();
@@ -807,6 +808,15 @@ app.on('ready', async () => {
         createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
         return { success: false };
       });
+  });
+
+  // env handlers
+  ipcMain.on('change-server', (_, server: 'prod' | 'dev') => {
+    store.set('server', server);
+    loadEnv(server);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('server', server);
+    });
   });
 
   // Data handlers

@@ -9,6 +9,7 @@ import header from '@/styles/header.module.css';
 // Pages
 import LoginPage from '@/pages/Login';
 import RegisterPage from '@/pages/Register';
+import ChangeServerPage from '@/pages/ChangeServer';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -68,7 +69,7 @@ Header.displayName = 'Header';
 
 const AuthPageComponent: React.FC = React.memo(() => {
   // States
-  const [section, setSection] = useState<'register' | 'login'>('login');
+  const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
 
   // Effects
   useEffect(() => {
@@ -94,6 +95,7 @@ const AuthPageComponent: React.FC = React.memo(() => {
       <Header />
       <LoginPage display={section === 'login'} setSection={setSection} />
       <RegisterPage display={section === 'register'} setSection={setSection} />
+      <ChangeServerPage display={section === 'change-server'} setSection={setSection} />
     </>
   );
 });

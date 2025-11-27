@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 interface LoginPageProps {
   display: boolean;
-  setSection: (section: 'login' | 'register') => void;
+  setSection: (section: 'login' | 'register' | 'change-server') => void;
 }
 
 const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setSection }) => {
@@ -186,8 +186,16 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
 
       {/* Footer */}
       <div className={styles['login-footer']}>
-        <div className={styles['create-account']} onClick={() => setSection('register')}>
-          {t('register-account')}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <div className={styles['create-account']} onClick={() => setSection('register')}>
+            {t('register-account')}
+          </div>
+          <div className={styles['change-server']} onClick={() => setSection('change-server')}>
+            {'/'}
+          </div>
+          <div className={styles['change-server']} onClick={() => setSection('change-server')}>
+            {t('change-server')}
+          </div>
         </div>
         <div className={styles['forget-password']} onClick={() => handleForgotPassword()}>
           {t('forgot-password')}
