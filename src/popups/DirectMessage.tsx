@@ -105,7 +105,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const handlePaste = async (imageData: string, fileName: string) => {
     isUploadingRef.current = true;
     if (imageData.length > MAX_FILE_SIZE) {
-      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
       isUploadingRef.current = false;
       return;
     }
@@ -294,6 +294,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
         {/* Main Content */}
         <div className={styles['main-content']}>
+          {targetIsVerified && (
+            <div className={`${styles['action-area']} ${styles['no-border']}`}>
+              <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
+              <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
+                <span className={styles['is-official-title']}>{t('official-title')}</span>
+                <span className={styles['is-official-text']}>{t('is-official')}</span>
+              </div>
+            </div>
+          )}
           {isFriend && isOnline && targetCurrentServer ? (
             <div className={styles['action-area']} style={{ cursor: 'pointer' }} onClick={() => handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId)}>
               <div className={`${styles['action-icon']} ${styles['in-server']}`} />
@@ -303,14 +312,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div className={styles['action-area']}>
               {!isFriend && <div className={styles['action-title']}>{t('non-friend-message')}</div>}
               {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
-            </div>
-          ) : targetIsVerified ? (
-            <div className={styles['action-area']}>
-              <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
-              <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
-                <span className={styles['is-official-title']}>{t('official-title')}</span>
-                <span className={styles['is-official-text']}>{t('is-official')}</span>
-              </div>
             </div>
           ) : null}
           <div onScroll={handleMessageAreaScroll} className={styles['message-area']}>
