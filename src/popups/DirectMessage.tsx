@@ -295,7 +295,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         {/* Main Content */}
         <div className={styles['main-content']}>
           {targetIsVerified && (
-            <div className={`${styles['action-area']} ${styles['no-border']}`}>
+            <div className={`${styles['action-area']} ${isFriend && isOnline && targetCurrentServer && styles['no-border']}`}>
               <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
               <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
                 <span className={styles['is-official-title']}>{t('official-title')}</span>
