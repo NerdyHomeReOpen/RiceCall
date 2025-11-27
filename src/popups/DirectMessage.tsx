@@ -294,7 +294,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
         {/* Main Content */}
         <div className={styles['main-content']}>
-          {targetIsVerified && (
+          {targetIsVerified ? (
             <div className={`${styles['action-area']} ${isFriend && isOnline && targetCurrentServer && styles['no-border']}`}>
               <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
               <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
@@ -302,7 +302,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 <span className={styles['is-official-text']}>{t('is-official')}</span>
               </div>
             </div>
-          )}
+          ) : null}
           {isFriend && isOnline && targetCurrentServer ? (
             <div className={styles['action-area']} style={{ cursor: 'pointer' }} onClick={() => handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId)}>
               <div className={`${styles['action-icon']} ${styles['in-server']}`} />
