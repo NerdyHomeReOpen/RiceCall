@@ -169,7 +169,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
       id: 'broadcast',
       label: t('broadcast'),
       show: isServerAdmin(permissionLevel),
-      onClick: () => handleOpenServerBroadcast(currentServerId),
+      onClick: () => handleOpenServerBroadcast(currentServerId, currentChannelId),
     },
     {
       id: 'edit-channel-order',

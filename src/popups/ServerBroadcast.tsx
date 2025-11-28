@@ -17,7 +17,7 @@ import { MAX_BROADCAST_LENGTH } from '@/constant';
 
 interface ServerBroadcastPopupProps {
   serverId: Server['serverId'];
-  channelId?: Channel['channelId'];
+  channelId: Channel['channelId'];
 }
 
 const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ serverId, channelId }) => {
@@ -26,7 +26,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
 
   // States
   const [sendType, setSendType] = useState<'text' | 'voice'>('text');
-  const [broadcastType, setBroadcastType] = useState<'channel' | 'server'>(channelId ? 'channel' : 'server');
+  const [broadcastType, setBroadcastType] = useState<'channel' | 'server'>('channel');
   const [broadcastContent, setBroadcastContent] = useState<string>('');
 
   // Variables
@@ -54,7 +54,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
         <div className={`${popup['content']} ${popup['col']}`}>
           <div className={popup['row']}>
             <div className={popup['label']}>{t('receive-channel')}</div>
-            <div className={`${popup['input-box']} ${popup['row']} ${!channelId ? 'disabled' : ''}`} style={{ width: 'fit-content' }}>
+            <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
               <input name="channelType" type="radio" checked={broadcastType === 'channel'} onChange={() => setBroadcastType('channel')} />
               <div className={popup['label']}>{t('current-channel')}</div>
             </div>
@@ -91,7 +91,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
           onClick={() =>
             canSend
               ? broadcastType === 'channel'
-                ? handleBroadcastChannel(serverId, channelId!, { type: 'alert', content: broadcastContent })
+                ? handleBroadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent })
                 : handleBroadcastServer(serverId, { type: 'alert', content: broadcastContent })
               : null
           }
