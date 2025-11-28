@@ -70,7 +70,7 @@ export const handleOpenEditChannelOrder = (userId: User['userId'], serverId: Ser
   ipc.popup.open('editChannelOrder', 'editChannelOrder', { serverId, userId });
 };
 
-export const handleOpenServerBroadcast = (serverId: Server['serverId'], channelId?: Channel['channelId']) => {
+export const handleOpenServerBroadcast = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
   ipc.popup.open('serverBroadcast', 'serverBroadcast', { serverId, channelId });
 };
 
