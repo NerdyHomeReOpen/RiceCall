@@ -1,4 +1,4 @@
-name: Release Main
+name: Release
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
             build_name: linux-x64
             args: '--linux --x64 --publish never -c electron-builder.json'
 
-    environment: main
+    environment: prod
 
     steps:
       - name: Checkout
