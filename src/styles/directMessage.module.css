@@ -181,10 +181,6 @@
   background-position: 0 0;
 }
 
-.no-border:after {
-  background-image: unset;
-}
-
 .action-icon {
   min-height: 12px;
   min-width: 12px;
