@@ -57,9 +57,9 @@ jobs:
       - name: Make .env file
         run: |
           echo "API_URL=${{ secrets.API_URL }}" > .env
-          echo "API_DEV_URL=${{ secrets.API_DEV_URL }}" > .env.dev
+          echo "API_URL=${{ secrets.API_DEV_URL }}" > .env.dev
           echo "WS_URL=${{ secrets.WS_URL }}" > .env
-          echo "WS_DEV_URL=${{ secrets.WS_DEV_URL }}" > .env.dev
+          echo "WS_URL=${{ secrets.WS_DEV_URL }}" > .env.dev
           echo "CROWDIN_DISTRIBUTION_HASH=${{ secrets.CROWDIN_DISTRIBUTION_HASH }}" > .env
 
       - name: Build electron
