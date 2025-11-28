@@ -708,8 +708,14 @@ export function setTrayDetail(isLogin: boolean) {
       type: 'normal',
       enabled: isLogin,
       click: () => {
+        token = '';
+        isLogin = false;
+        mainWindow?.reload();
+        mainWindow?.hide();
+        authWindow?.showInactive();
         closePopups();
-        ipcMain.emit('logout');
+        disconnectSocket();
+        setTrayDetail(isLogin);
       },
     },
     {
@@ -779,6 +785,7 @@ app.on('ready', async () => {
     mainWindow?.reload();
     mainWindow?.hide();
     authWindow?.showInactive();
+    closePopups();
     disconnectSocket();
     setTrayDetail(isLogin);
   });
