@@ -745,6 +745,9 @@ app.on('ready', async () => {
   // Load env
   loadEnv(store.get('server', 'prod'));
 
+  // Initialize i18n
+  initMainI18n(store.get('language'));
+
   // Configure
   configureAutoUpdater();
   configureDiscordRPC();
