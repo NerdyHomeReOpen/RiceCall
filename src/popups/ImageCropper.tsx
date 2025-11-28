@@ -10,14 +10,14 @@ import { useTranslation } from 'react-i18next';
 import ipc from '@/services/ipc.service';
 
 interface ImageCropperPopupProps {
+  id: string;
   imageData: string;
-  submitTo: string;
 }
 
 const INITIAL_CROP_SIZE = 200;
 const MIN_CROP_SIZE = 100;
 
-const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ imageData, submitTo }) => {
+const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, imageData }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -74,7 +74,7 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ imageD
     const canvas = previewRef.current;
     const imageDataUrl = canvas?.toDataURL('image/png');
     if (!imageDataUrl) return;
-    ipc.popup.submit(submitTo, imageDataUrl);
+    ipc.popup.submit(id, imageDataUrl);
     handleClose();
   };
 

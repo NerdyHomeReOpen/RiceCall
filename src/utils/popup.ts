@@ -5,12 +5,12 @@ import type { User, Server, Channel, FriendGroup } from '@/types';
 import ipc from '@/services/ipc.service';
 
 export const handleOpenAlertDialog = (message: string, callback: () => void) => {
-  ipc.popup.open('dialogAlert', 'dialogAlert', { message, submitTo: 'dialogAlert' });
+  ipc.popup.open('dialogAlert', 'dialogAlert', { message });
   ipc.popup.onSubmit('dialogAlert', callback);
 };
 
 export const handleOpenErrorDialog = (message: string, callback: () => void) => {
-  ipc.popup.open('dialogError', 'dialogError', { message, timestamp: Date.now(), submitTo: 'dialogError' });
+  ipc.popup.open('dialogError', 'dialogError', { message, timestamp: Date.now() });
   ipc.popup.onSubmit('dialogError', callback);
 };
 
@@ -75,7 +75,7 @@ export const handleOpenServerBroadcast = (serverId: Server['serverId'], channelI
 };
 
 export const handleOpenChannelPassword = (onSubmit: (password: string) => void) => {
-  ipc.popup.open('channelPassword', 'channelPassword', { submitTo: 'channelPassword' });
+  ipc.popup.open('channelPassword', 'channelPassword', {});
   ipc.popup.onSubmit('channelPassword', onSubmit);
 };
 
@@ -132,6 +132,6 @@ export const handleOpenApplyMember = (userId: User['userId'], serverId: Server['
 };
 
 export const handleOpenImageCropper = (imageData: string, onSubmit: (imageDataUrl: string) => void) => {
-  ipc.popup.open('imageCropper', 'imageCropper', { imageData, submitTo: 'imageCropper' });
+  ipc.popup.open('imageCropper', 'imageCropper', { imageData });
   ipc.popup.onSubmit('imageCropper', onSubmit);
 };

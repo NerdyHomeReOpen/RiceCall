@@ -25,14 +25,14 @@ enum DIALOG_ICON {
 }
 
 interface DialogPopupProps {
+  id: string;
   iconType: keyof typeof DIALOG_ICON;
   message: string;
   parameter?: Record<string, string>;
-  submitTo: string;
   timestamp?: number;
 }
 
-const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter, submitTo, timestamp }) => {
+const DialogPopup: React.FC<DialogPopupProps> = ({ id, iconType, message, parameter, timestamp }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -41,7 +41,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ iconType, message, parameter,
 
   // Handlers
   const handleSubmit = () => {
-    ipc.popup.submit(submitTo);
+    ipc.popup.submit(id);
     ipc.window.close();
   };
 

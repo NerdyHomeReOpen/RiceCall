@@ -297,12 +297,11 @@ const ipcService = {
       ipcRenderer.send('popup-submit', to, data);
     },
 
-    onSubmit: (host: string, callback: (data: any) => void) => {
+    onSubmit: <T>(host: string, callback: (data: T) => void) => {
       if (!isElectron) return () => {};
       ipcRenderer.removeAllListeners('popup-submit');
-      const listener = (_: any, from: string, data?: any) => {
-        if (from != host) return;
-        callback(data);
+      const listener = (_: any, from: string, data: T) => {
+        if (from === host) callback(data);
         ipcRenderer.removeAllListeners('popup-submit');
       };
       ipcRenderer.on('popup-submit', listener);

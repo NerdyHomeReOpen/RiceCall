@@ -773,7 +773,7 @@ app.on('ready', async () => {
         return res;
       })
       .catch((error) => {
-        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
         return { success: false };
       });
   });
@@ -791,7 +791,7 @@ app.on('ready', async () => {
 
   ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string; locale: string }) => {
     return await authService.register(formData).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return { success: false };
     });
   });
@@ -811,7 +811,7 @@ app.on('ready', async () => {
         return res;
       })
       .catch((error) => {
-        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
         return { success: false };
       });
   });
@@ -828,7 +828,7 @@ app.on('ready', async () => {
   // Data handlers
   ipcMain.handle('data-user', async (_, userId: string) => {
     return await dataService.user({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
@@ -842,161 +842,161 @@ app.on('ready', async () => {
 
   ipcMain.handle('data-friend', async (_, userId: string, targetId: string) => {
     return await dataService.friend({ userId, targetId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friends', async (_, userId: string) => {
     return await dataService.friends({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendActivities', async (_, userId: string) => {
     return await dataService.friendActivities({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendGroup', async (_, userId: string, friendGroupId: string) => {
     return await dataService.friendGroup({ userId, friendGroupId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendGroups', async (_, userId: string) => {
     return await dataService.friendGroups({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendApplication', async (_, receiverId: string, senderId: string) => {
     return await dataService.friendApplication({ receiverId, senderId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendApplications', async (_, receiverId: string) => {
     return await dataService.friendApplications({ receiverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-server', async (_, userId: string, serverId: string) => {
     return await dataService.server({ userId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-servers', async (_, userId: string) => {
     return await dataService.servers({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-serverMembers', async (_, serverId: string) => {
     return await dataService.serverMembers({ serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-serverOnlineMembers', async (_, serverId: string) => {
     return await dataService.serverOnlineMembers({ serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-channel', async (_, userId: string, serverId: string, channelId: string) => {
     return await dataService.channel({ userId, serverId, channelId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-channels', async (_, userId: string, serverId: string) => {
     return await dataService.channels({ userId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-channelMembers', async (_, serverId: string, channelId: string) => {
     return await dataService.channelMembers({ serverId, channelId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-member', async (_, userId: string, serverId: string, channelId?: string) => {
     return await dataService.member({ userId, serverId, channelId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-memberApplication', async (_, userId: string, serverId: string) => {
     return await dataService.memberApplication({ userId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-memberApplications', async (_, serverId: string) => {
     return await dataService.memberApplications({ serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-memberInvitation', async (_, receiverId: string, serverId: string) => {
     return await dataService.memberInvitation({ receiverId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-memberInvitations', async (_, receiverId: string) => {
     return await dataService.memberInvitations({ receiverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-notifies', async (_, region: string) => {
     return await dataService.notifies({ region }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-announcements', async (_, region: string) => {
     return await dataService.announcements({ region }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-recommendServers', async () => {
     return await dataService.recommendServers().catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-upload', async (_, type: string, fileName: string, file: string) => {
     return await dataService.upload(type, fileName, file).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
@@ -1093,7 +1093,7 @@ app.on('ready', async () => {
   ipcMain.on('check-for-updates', async () => {
     const result = await checkForUpdates(true);
     if (!result || !result.isUpdateAvailable) {
-      createPopup('dialogInfo', 'dialogInfo', { message: t('is-latest-version'), timestamp: Date.now(), submitTo: 'dialogInfo' }, true);
+      createPopup('dialogInfo', 'dialogInfo', { message: t('is-latest-version'), timestamp: Date.now() }, true);
     }
   });
 

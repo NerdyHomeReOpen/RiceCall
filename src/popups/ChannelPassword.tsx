@@ -10,10 +10,10 @@ import popup from '@/styles/popup.module.css';
 import ipc from '@/services/ipc.service';
 
 interface ChannelPasswordPopupProps {
-  submitTo: string;
+  id: string;
 }
 
-const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ submitTo }) => {
+const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ id }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -22,7 +22,7 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
 
   // Handlers
   const handleSubmit = () => {
-    ipc.popup.submit(submitTo, password);
+    ipc.popup.submit(id, password);
     ipc.window.close();
   };
 
