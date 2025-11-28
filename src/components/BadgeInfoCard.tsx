@@ -29,7 +29,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
   const [cardY, setCardY] = useState(y);
 
   // Variables
-  const { name: badgeName, description: badgeDescription, iconUrl: badgeIconUrl, showTo: badgeShowTo } = badge;
+  const { name: badgeName, description: badgeDescription, iconUrl: badgeIconUrl, showTo: badgeShowTo, displayNickname: badgeDisplayNickname } = badge;
 
   // Effects
   useEffect(() => {
@@ -74,7 +74,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
         </div>
         <div className={styles['badge-description-box']}>
           <div className={styles['badge-name']}>{t(`${badgeName}`)}</div>
-          <div className={styles['badge-description']}>{t(`${badgeDescription}`)}</div>
+          <div className={styles['badge-description']}>{t(`${badgeDescription}`, { nickname: badgeDisplayNickname })}</div>
         </div>
       </div>
       <div className={styles['badge-show-time']}>{`${t('show-to')}: ${badgeShowTo <= 0 ? t('permanent') : new Date(badgeShowTo).toLocaleDateString()}`}</div>
