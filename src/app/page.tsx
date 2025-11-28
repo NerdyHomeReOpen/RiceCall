@@ -408,7 +408,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Effects
   useEffect(() => {
-    ipc.toolbar.title.set(user.name);
+    ipc.tray.title.set(user.name);
   }, [user.name]);
 
   useEffect(() => {

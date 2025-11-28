@@ -40,7 +40,7 @@ const AboutPopup: React.FC = React.memo(() => {
 
   // Handlers
   const handleDontShowNextTime = () => {
-    ipc.systemSettings.disclaimer.dontShowNextTime();
+    ipc.dontShowDisclaimerNextTime();
     ipc.window.close();
   };
 

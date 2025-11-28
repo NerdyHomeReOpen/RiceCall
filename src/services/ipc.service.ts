@@ -236,22 +236,22 @@ const ipcService = {
 
     minimize: () => {
       if (!isElectron) return;
-      ipcRenderer.send('window-control', 'minimize');
+      ipcRenderer.send('window-control-minimize');
     },
 
     maximize: () => {
       if (!isElectron) return;
-      ipcRenderer.send('window-control', 'maximize');
+      ipcRenderer.send('window-control-maximize');
     },
 
     unmaximize: () => {
       if (!isElectron) return;
-      ipcRenderer.send('window-control', 'unmaximize');
+      ipcRenderer.send('window-control-unmaximize');
     },
 
     close: () => {
       if (!isElectron) return;
-      ipcRenderer.send('window-control', 'close');
+      ipcRenderer.send('window-control-close');
     },
 
     onMaximize: (callback: () => void) => {
@@ -441,7 +441,6 @@ const ipcService = {
       if (settings.defaultSpeakingKey !== undefined) ipcRenderer.send('set-default-speaking-key', settings.defaultSpeakingKey);
       if (settings.notSaveMessageHistory !== undefined) ipcRenderer.send('set-not-save-message-history', settings.notSaveMessageHistory);
       if (settings.hotKeyOpenMainWindow !== undefined) ipcRenderer.send('set-hot-key-open-main-window', settings.hotKeyOpenMainWindow);
-      if (settings.hotKeyScreenshot !== undefined) ipcRenderer.send('set-hot-key-screenshot', settings.hotKeyScreenshot);
       if (settings.hotKeyIncreaseVolume !== undefined) ipcRenderer.send('set-hot-key-increase-volume', settings.hotKeyIncreaseVolume);
       if (settings.hotKeyDecreaseVolume !== undefined) ipcRenderer.send('set-hot-key-decrease-volume', settings.hotKeyDecreaseVolume);
       if (settings.hotKeyToggleSpeaker !== undefined) ipcRenderer.send('set-hot-key-toggle-speaker', settings.hotKeyToggleSpeaker);
@@ -612,13 +611,6 @@ const ipcService = {
         const listener = (_: any, enabled: boolean) => callback(enabled);
         ipcRenderer.on('close-to-tray', listener);
         return () => ipcRenderer.removeListener('close-to-tray', listener);
-      },
-    },
-
-    disclaimer: {
-      dontShowNextTime: () => {
-        if (!isElectron) return;
-        ipcRenderer.send('dont-show-disclaimer-next-time');
       },
     },
 
@@ -1212,13 +1204,18 @@ const ipcService = {
     },
   },
 
-  toolbar: {
+  tray: {
     title: {
       set: (title: string) => {
         if (!isElectron) return;
-        ipcRenderer.send('set-toolbar-title', title);
+        ipcRenderer.send('set-tray-title', title);
       },
     },
+  },
+
+  dontShowDisclaimerNextTime: () => {
+    if (!isElectron) return;
+    ipcRenderer.send('dont-show-disclaimer-next-time');
   },
 
   loopbackAudio: {

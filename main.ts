@@ -26,7 +26,7 @@ type StoreType = {
   accounts: Record<string, any>;
   language: LanguageKey;
   customThemes: Record<string, any>[];
-  currentTheme: string;
+  currentTheme: string | null;
   autoLogin: boolean;
   autoLaunch: boolean;
   alwaysOnTop: boolean;
@@ -35,7 +35,6 @@ type StoreType = {
   statusAutoIdleMinutes: number;
   statusAutoDnd: boolean;
   channelUIMode: string;
-  dontShowDisclaimer: boolean;
   font: string;
   fontSize: number;
   inputAudioDevice: string;
@@ -65,6 +64,7 @@ type StoreType = {
   stopSpeakingSound: boolean;
   receiveDirectMessageSound: boolean;
   receiveChannelMessageSound: boolean;
+  dontShowDisclaimer: boolean;
   autoCheckForUpdates: boolean;
   updateCheckInterval: number;
   updateChannel: string;
@@ -119,7 +119,7 @@ const store = new Store<StoreType>({
     language: getLanguage(),
     // Custom Themes
     customThemes: [],
-    currentTheme: '',
+    currentTheme: null,
     // Basic settings
     autoLogin: false,
     autoLaunch: false,
@@ -129,7 +129,6 @@ const store = new Store<StoreType>({
     statusAutoIdleMinutes: 10,
     statusAutoDnd: false,
     channelUIMode: 'classic',
-    dontShowDisclaimer: false,
     font: '',
     fontSize: 13,
     // Mix settings
@@ -164,6 +163,8 @@ const store = new Store<StoreType>({
     stopSpeakingSound: true,
     receiveDirectMessageSound: true,
     receiveChannelMessageSound: true,
+    // Disclaimer settings
+    dontShowDisclaimer: false,
     // Update settings
     autoCheckForUpdates: true,
     updateCheckInterval: 1 * 60 * 1000, // 1 minute
@@ -757,7 +758,7 @@ app.on('ready', async () => {
     app.exit();
   });
 
-  // API handlers
+  // Auth handlers
   ipcMain.handle('auth-login', async (_, formData: { account: string; password: string }) => {
     return await authService
       .login(formData)
@@ -814,15 +815,6 @@ app.on('ready', async () => {
         createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
         return { success: false };
       });
-  });
-
-  // env handlers
-  ipcMain.on('change-server', (_, server: 'prod' | 'dev') => {
-    store.set('server', server);
-    loadEnv(server);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('server', server);
-    });
   });
 
   // Data handlers
@@ -1024,8 +1016,8 @@ app.on('ready', async () => {
     });
   });
 
-  // toolbar handlers
-  ipcMain.on('set-toolbar-title', (_, title: string) => {
+  // Toolbar handlers
+  ipcMain.on('set-tray-title', (_, title: string) => {
     if (!tray) return;
     const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
     tray.setToolTip(fullTitle);
@@ -1089,7 +1081,7 @@ app.on('ready', async () => {
     });
   });
 
-  // Update settings handlers
+  // Update check handlers
   ipcMain.on('check-for-updates', async () => {
     const result = await checkForUpdates(true);
     if (!result || !result.isUpdateAvailable) {
@@ -1124,32 +1116,36 @@ app.on('ready', async () => {
   });
 
   // Window control event handlers
-  ipcMain.on('window-control', (event, command) => {
+  ipcMain.on('window-control-minimize', (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     if (!window) return;
-    window.webContents.send(command);
-    switch (command) {
-      case 'minimize':
-        window.minimize();
-        break;
-      case 'maximize':
-        if (process.platform === 'darwin') {
-          window.setFullScreen(true);
-        } else {
-          window.maximize();
-        }
-        break;
-      case 'unmaximize':
-        if (process.platform === 'darwin') {
-          window.setFullScreen(false);
-        } else {
-          window.unmaximize();
-        }
-        break;
-      case 'close':
-        window.close();
-        break;
+    window.minimize();
+  });
+
+  ipcMain.on('window-control-maximize', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return;
+    if (process.platform === 'darwin') {
+      window.setFullScreen(true);
+    } else {
+      window.maximize();
     }
+  });
+
+  ipcMain.on('window-control-unmaximize', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return;
+    if (process.platform === 'darwin') {
+      window.setFullScreen(false);
+    } else {
+      window.unmaximize();
+    }
+  });
+
+  ipcMain.on('window-control-close', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return;
+    window.close();
   });
 
   // Discord RPC handlers
@@ -1158,9 +1154,17 @@ app.on('ready', async () => {
     updateDiscordPresence(updatePresence);
   });
 
-  // Env
+  // Env handlers
   ipcMain.on('get-env', (event) => {
     event.returnValue = env;
+  });
+
+  ipcMain.on('change-server', (_, server: 'prod' | 'dev') => {
+    store.set('server', server);
+    loadEnv(server);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('server', server);
+    });
   });
 
   // System settings handlers
@@ -1605,13 +1609,9 @@ app.on('ready', async () => {
     });
   });
 
+  // Disclaimer handlers
   ipcMain.on('dont-show-disclaimer-next-time', () => {
     store.set('dontShowDisclaimer', true);
-  });
-
-  // Open external url handlers
-  ipcMain.on('open-external', (_, url) => {
-    shell.openExternal(url);
   });
 });
 
