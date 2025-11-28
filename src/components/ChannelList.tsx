@@ -21,7 +21,15 @@ import QueueUserTab from '@/components/QueueUserTab';
 import ipc from '@/services/ipc.service';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenServerSetting, handleOpenEditNickname, handleOpenCreateChannel, handleOpenEditChannelOrder, handleOpenApplyMember } from '@/utils/popup';
+import {
+  handleOpenAlertDialog,
+  handleOpenServerSetting,
+  handleOpenEditNickname,
+  handleOpenCreateChannel,
+  handleOpenEditChannelOrder,
+  handleOpenApplyMember,
+  handleOpenServerBroadcast,
+} from '@/utils/popup';
 import { isMember, isServerAdmin, isStaff } from '@/utils/permission';
 
 interface ChannelListProps {
@@ -156,6 +164,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     {
       id: 'separator',
       label: '',
+    },
+    {
+      id: 'broadcast',
+      label: t('broadcast'),
+      show: isServerAdmin(permissionLevel),
+      onClick: () => handleOpenServerBroadcast(currentServerId, currentChannelId),
     },
     {
       id: 'edit-channel-order',
