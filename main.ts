@@ -9,7 +9,7 @@ initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
-import { initMainI18n, t } from './i18n.js';
+import { initMainI18n, LanguageKey, getLanguage, t } from './i18n.js';
 import { connectSocket, disconnectSocket } from './socket.js';
 import { env, loadEnv } from './env.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
@@ -24,7 +24,7 @@ if (process.platform === 'linux') {
 // Store
 type StoreType = {
   accounts: Record<string, any>;
-  language: string;
+  language: LanguageKey;
   customThemes: Record<string, any>[];
   currentTheme: string;
   autoLogin: boolean;
@@ -116,7 +116,7 @@ const store = new Store<StoreType>({
     // Accounts
     accounts: {},
     // Language
-    language: 'zh-TW',
+    language: getLanguage(),
     // Custom Themes
     customThemes: [],
     currentTheme: '',
@@ -789,7 +789,7 @@ app.on('ready', async () => {
     setTrayDetail();
   });
 
-  ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string }) => {
+  ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string; locale: string }) => {
     return await authService.register(formData).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
       return { success: false };
@@ -1038,8 +1038,8 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-language', (_, language) => {
-    store.set('language', language ?? 'zh-TW');
-    initMainI18n(language ?? 'zh-TW');
+    store.set('language', language ?? getLanguage());
+    initMainI18n(language ?? getLanguage());
     setTrayDetail();
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);

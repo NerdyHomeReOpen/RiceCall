@@ -81,7 +81,7 @@ const ipcService = {
       return await ipcRenderer.invoke('auth-logout');
     },
 
-    register: async (formData: { account: string; password: string; email: string; username: string }): Promise<{ success: true; message: string } | { success: false }> => {
+    register: async (formData: { account: string; password: string; email: string; username: string; locale: string }): Promise<{ success: true; message: string } | { success: false }> => {
       if (!isElectron) return { success: false };
       return await ipcRenderer.invoke('auth-register', formData);
     },

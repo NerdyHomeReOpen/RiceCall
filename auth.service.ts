@@ -10,6 +10,7 @@ interface RegisterFormData {
   password: string;
   email: string;
   username: string;
+  locale: string;
 }
 
 interface LoginFormData {
@@ -19,14 +20,14 @@ interface LoginFormData {
 
 const authService = {
   register: async (formData: RegisterFormData): Promise<{ success: true; message: string } | { success: false }> => {
-    const res = await api.post('/register', formData);
+    const res = await api.post('/account/register', formData);
     if (!res) return { success: false };
 
     return { success: true, message: res.message };
   },
 
   login: async (formData: LoginFormData): Promise<{ success: true; token: string } | { success: false }> => {
-    const res = await api.post('/login', { ...formData, version });
+    const res = await api.post('/account/login', { ...formData, version });
     if (!res?.token) return { success: false };
 
     return { success: true, token: res.token };

@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
+import i18n from '@/i18n';
 
 // CSS
 import styles from '@/styles/register.module.css';
@@ -128,7 +129,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     setIsLoading(true);
 
-    await ipc.auth.register({ account, password, email, username }).then((res) => {
+    await ipc.auth.register({ account, password, email, username, locale: i18n.language ?? 'zh-TW' }).then((res) => {
       if (res.success) {
         handleOpenAlertDialog(t(res.message, { '0': email }), () => setSection('login'));
       }

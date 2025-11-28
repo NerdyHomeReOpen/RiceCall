@@ -10,11 +10,10 @@ import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
 
-// services
+// Services
 import ipc from '@/services/ipc.service';
 
-// utilities
-import { getLangByIp } from '@/utils/language';
+// Types
 import { Theme } from '@/types';
 
 interface ProvidersProps {
@@ -68,14 +67,6 @@ const Providers = ({ children }: ProvidersProps) => {
     changeLanguage(ipc.language.get());
     const unsub = ipc.language.onUpdate(changeLanguage);
     return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const setupLanguage = async () => {
-      const language = (ipc.language.get() || (await getLangByIp())) as LanguageKey;
-      ipc.language.set(language);
-    };
-    setupLanguage();
   }, []);
 
   return (

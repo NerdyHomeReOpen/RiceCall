@@ -66,3 +66,12 @@ export async function initMainI18n(language: string) {
 export function t(key: string, params?: Record<string, string>) {
   return i18next.t(key, params);
 }
+
+export function getLanguage(): LanguageKey {
+  const language = Intl.DateTimeFormat().resolvedOptions().locale;
+
+  const match = LANGUAGES.find(({ code }) => code.includes(language));
+  if (!match) return 'en-US';
+
+  return match.code;
+}
