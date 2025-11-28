@@ -688,7 +688,7 @@ export function stopCheckForUpdates() {
 // Tray Icon
 let tray: Tray | null = null;
 
-export function setTrayDetail(isLogin: boolean) {
+export function setTrayDetail() {
   if (!tray) return;
   const trayIconPath = isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
   const contextMenu = Menu.buildFromTemplate([
@@ -715,7 +715,6 @@ export function setTrayDetail(isLogin: boolean) {
         authWindow?.showInactive();
         closePopups();
         disconnectSocket();
-        setTrayDetail(isLogin);
       },
     },
     {
@@ -738,12 +737,12 @@ export function configureTray() {
     if (isLogin) mainWindow?.showInactive();
     else authWindow?.showInactive();
   });
-  setTrayDetail(isLogin);
+  setTrayDetail();
 }
 
 app.on('ready', async () => {
   // Load env
-  loadEnv(store.get('server'));
+  loadEnv(store.get('server', 'prod'));
 
   // Configure
   configureAutoUpdater();
@@ -769,7 +768,7 @@ app.on('ready', async () => {
           mainWindow?.showInactive();
           authWindow?.hide();
           connectSocket(token);
-          setTrayDetail(isLogin);
+          setTrayDetail();
         }
         return res;
       })
@@ -787,7 +786,7 @@ app.on('ready', async () => {
     authWindow?.showInactive();
     closePopups();
     disconnectSocket();
-    setTrayDetail(isLogin);
+    setTrayDetail();
   });
 
   ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string }) => {
@@ -807,7 +806,7 @@ app.on('ready', async () => {
           mainWindow?.showInactive();
           authWindow?.hide();
           connectSocket(token);
-          setTrayDetail(isLogin);
+          setTrayDetail();
         }
         return res;
       })
@@ -1041,7 +1040,7 @@ app.on('ready', async () => {
   ipcMain.on('set-language', (_, language) => {
     store.set('language', language ?? 'zh-TW');
     initMainI18n(language ?? 'zh-TW');
-    setTrayDetail(isLogin);
+    setTrayDetail();
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);
     });
