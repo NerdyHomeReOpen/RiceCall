@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
@@ -15,10 +15,9 @@ type MessageGroup = (DirectMessage & { contents: string[] }) | (PromptMessage & 
 interface DirectMessageContentProps {
   user: User;
   messages: (DirectMessage | PromptMessage)[];
-  isScrollToBottom?: boolean;
 }
 
-const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ user, messages, isScrollToBottom = true }) => {
+const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ user, messages }) => {
   // Refs
   const messagesViewerRef = useRef<HTMLDivElement>(null);
 
@@ -41,16 +40,6 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
       return acc;
     }, []);
   }, [messages]);
-
-  // Effects
-  useLayoutEffect(() => {
-    if (isScrollToBottom && messagesViewerRef.current?.lastElementChild) {
-      (messagesViewerRef.current.lastElementChild as HTMLElement).scrollIntoView({
-        behavior: 'auto',
-        block: 'end',
-      });
-    }
-  }, [messageGroups, isScrollToBottom]);
 
   return (
     <div ref={messagesViewerRef} className={styles['message-viewer-wrapper']}>

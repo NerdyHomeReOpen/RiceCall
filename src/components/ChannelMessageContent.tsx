@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
 
 // Types
 import type { User, ChannelMessage, PromptMessage, Channel, Server } from '@/types';
-
-// Providers
-import { useTranslation } from 'react-i18next';
 
 // Components
 import ChannelMessageTab from '@/components/ChannelMessage';
@@ -20,17 +17,9 @@ interface ChannelMessageContentProps {
   currentServer: Server;
   currentChannel: Channel;
   messages: (ChannelMessage | PromptMessage)[];
-  isAtBottom?: boolean;
-  onScrollToBottom?: () => void;
 }
 
-const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ user, currentServer, currentChannel, messages, isAtBottom, onScrollToBottom }) => {
-  // Hooks
-  const { t } = useTranslation();
-
-  // States
-  const [unreadCount, setUnreadCount] = useState(0);
-
+const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ user, currentServer, currentChannel, messages }) => {
   // Variables
   const messageGroups = useMemo(() => {
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
@@ -51,56 +40,18 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
     }, []);
   }, [messages]);
 
-  // Effects
-  useEffect(() => {
-    const el = document.querySelector('[data-message-area]');
-    if (!el) return;
-
-    if (messageGroups.length === 0) return;
-
-    const lastMessage = messageGroups[messageGroups.length - 1];
-    const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
-
-    if (lastMessage.type !== 'general' || lastMessage.userId === user.userId) {
-      setTimeout(() => onScrollToBottom?.(), 50);
-    } else if (isBottom) {
-      setTimeout(() => onScrollToBottom?.(), 50);
-    } else {
-      setUnreadCount((prev) => prev + 1);
-    }
-  }, [messageGroups, user.userId, onScrollToBottom]);
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onScrollToBottom?.();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onScrollToBottom]);
-
-  useEffect(() => {
-    if (isAtBottom) setUnreadCount(0);
-  }, [isAtBottom]);
-
   return (
-    <>
-      <div className={styles['message-viewer-wrapper']}>
-        {messageGroups.map((messageGroup, index) => (
-          <div key={index} className={styles['message-wrapper']}>
-            {messageGroup.type === 'general' ? (
-              <ChannelMessageTab user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
-            ) : (
-              <PromptMessageTab user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
-            )}
-          </div>
-        ))}
-      </div>
-      {unreadCount > 0 && (
-        <div className={styles['new-message-alert']} onClick={() => onScrollToBottom?.()}>
-          {t('has-new-message', { 0: unreadCount })}
+    <div className={styles['message-viewer-wrapper']}>
+      {messageGroups.map((messageGroup, index) => (
+        <div key={index} className={styles['message-wrapper']}>
+          {messageGroup.type === 'general' ? (
+            <ChannelMessageTab user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
+          ) : (
+            <PromptMessageTab user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
+          )}
         </div>
-      )}
-    </>
+      ))}
+    </div>
   );
 });
 

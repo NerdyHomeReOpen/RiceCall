@@ -29,6 +29,7 @@ import styles from '@/styles/directMessage.module.css';
 import markdown from '@/styles/markdown.module.css';
 import popup from '@/styles/popup.module.css';
 import vip from '@/styles/vip.module.css';
+import messageStyles from '@/styles/message.module.css';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenChatHistory, handleOpenUserInfo } from '@/utils/popup';
@@ -64,7 +65,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const fontSizeRef = useRef<string>('13px');
   const textColorRef = useRef<string>('#000000');
   const cooldownRef = useRef<number>(0);
-  const isScrollToBottomRef = useRef<boolean>(true);
+  const messageAreaRef = useRef<HTMLDivElement>(null);
 
   // States
   const [messageInput, setMessageInput] = useState<string>('');
@@ -72,6 +73,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const [friendState, setFriendState] = useState<Friend | null>(friend);
   const [directMessages, setDirectMessages] = useState<(DirectMessage | PromptMessage)[]>([]);
   const [cooldown, setCooldown] = useState<number>(0);
+  const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+  const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
 
   // Variables
   const { avatarUrl: userAvatarUrl } = user;
@@ -160,9 +163,17 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
   };
 
-  const handleMessageAreaScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    isScrollToBottomRef.current = Math.abs(e.currentTarget.scrollTop + e.currentTarget.clientHeight - e.currentTarget.scrollHeight) < 1;
+  const handleScroll = () => {
+    if (!messageAreaRef.current) return;
+    const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
+    setIsAtBottom(isBottom);
   };
+
+  const handleScrollToBottom = useCallback(() => {
+    if (!messageAreaRef.current) return;
+    messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'smooth' });
+    setIsAtBottom(true);
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -192,6 +203,33 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   useEffect(() => {
     if (!friendState) ipc.socket.send('stranger', { targetId });
   }, [friendState, targetId]);
+
+  useEffect(() => {
+    if (!messageAreaRef.current || directMessages.length === 0) return;
+
+    const lastMessage = directMessages[directMessages.length - 1];
+    const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
+
+    if (lastMessage.type !== 'dm' || lastMessage.userId === userId) {
+      setTimeout(() => handleScrollToBottom(), 50);
+    } else if (isBottom) {
+      setTimeout(() => handleScrollToBottom(), 50);
+    } else {
+      setUnreadMessageCount((prev) => prev + 1);
+    }
+  }, [directMessages, userId, handleScrollToBottom]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleScrollToBottom();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [handleScrollToBottom]);
+
+  useEffect(() => {
+    if (isAtBottom) setUnreadMessageCount(0);
+  }, [isAtBottom]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: User['userId']; update: Partial<Friend> }[]) => {
@@ -313,8 +351,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
             </div>
           ) : null}
-          <div onScroll={handleMessageAreaScroll} className={styles['message-area']}>
-            <DirectMessageContent messages={directMessages} user={user} isScrollToBottom={isScrollToBottomRef.current} />
+          <div ref={messageAreaRef} onScroll={handleScroll} className={styles['message-area']}>
+            <DirectMessageContent messages={directMessages} user={user} />
+            {unreadMessageCount > 0 && (
+              <div className={messageStyles['new-message-alert']} onClick={handleScrollToBottom}>
+                {t('has-new-message', { 0: unreadMessageCount })}
+              </div>
+            )}
           </div>
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>

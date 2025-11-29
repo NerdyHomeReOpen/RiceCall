@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 
 // CSS
 import styles from '@/styles/server.module.css';
+import messageStyles from '@/styles/message.module.css';
 
 // Components
 import MarkdownContent from '@/components/MarkdownContent';
@@ -152,6 +153,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
+    const messageAreaRef = useRef<HTMLDivElement>(null);
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
@@ -163,6 +165,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
     const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+    const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
 
     // Variables
     const { userId } = user;
@@ -416,19 +419,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     };
 
     const handleScroll = () => {
-      const el = document.querySelector('[data-message-area]');
-      if (!el) return;
-
-      const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
+      if (!messageAreaRef.current) return;
+      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
       setIsAtBottom(isBottom);
     };
 
     const handleScrollToBottom = useCallback(() => {
-      const el = document.querySelector('[data-message-area]');
-      if (!el) return;
-
+      if (!messageAreaRef.current) return;
+      messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'smooth' });
       setIsAtBottom(true);
-      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }, []);
 
     // Effects
@@ -483,6 +482,37 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       document.addEventListener('pointerdown', onPointerDown);
       return () => document.removeEventListener('pointerdown', onPointerDown);
     }, []);
+
+    useEffect(() => {
+      if (!messageAreaRef.current || channelMessages.length === 0) return;
+
+      const lastMessage = channelMessages[channelMessages.length - 1];
+      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
+
+      if (lastMessage.type !== 'general' || lastMessage.userId === userId) {
+        setTimeout(() => handleScrollToBottom(), 50);
+      } else if (isBottom) {
+        setTimeout(() => handleScrollToBottom(), 50);
+      } else {
+        setUnreadMessageCount((prev) => prev + 1);
+      }
+    }, [channelMessages, userId, handleScrollToBottom]);
+
+    useEffect(() => {
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') handleScrollToBottom();
+      };
+      window.addEventListener('keydown', onKeyDown);
+      return () => window.removeEventListener('keydown', onKeyDown);
+    }, [handleScrollToBottom]);
+
+    useEffect(() => {
+      if (isAtBottom) setUnreadMessageCount(0);
+    }, [isAtBottom]);
+
+    useEffect(() => {
+      setUnreadMessageCount(0);
+    }, [currentServerId]);
 
     useEffect(() => {
       const changeSpeakingMode = (speakingMode: SpeakingMode) => {
@@ -572,9 +602,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               <div className={styles['bottom-area']}>
                 {/* Message Area */}
                 <div
+                  ref={messageAreaRef}
                   className={styles['message-area']}
                   onScroll={handleScroll}
-                  data-message-area
                   onContextMenu={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -584,14 +614,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
                   }}
                 >
-                  <ChannelMessageContent
-                    user={user}
-                    currentServer={currentServer}
-                    currentChannel={currentChannel}
-                    messages={channelMessages}
-                    isAtBottom={isAtBottom}
-                    onScrollToBottom={handleScrollToBottom}
-                  />
+                  <ChannelMessageContent user={user} currentServer={currentServer} currentChannel={currentChannel} messages={channelMessages} />
+                  {unreadMessageCount > 0 && (
+                    <div className={messageStyles['new-message-alert']} onClick={handleScrollToBottom}>
+                      {t('has-new-message', { 0: unreadMessageCount })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Broadcast Area */}
