@@ -3,7 +3,6 @@
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Components } from 'react-markdown';
-import remarkBreaks from 'remark-breaks';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import DOMPurify from 'dompurify';
@@ -107,7 +106,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
 
   return (
     <div className={`${markdown['markdown-content']}`} style={{ userSelect: selectable ? 'text' : 'none' }}>
-      <ReactMarkdown remarkPlugins={[remarkBreaks]} rehypePlugins={[rehypeRaw, rehypeHighlight]} components={components} skipHtml={false} unwrapDisallowed={false}>
+      <ReactMarkdown remarkPlugins={[]} rehypePlugins={[rehypeRaw, rehypeHighlight]} components={components} skipHtml={false} unwrapDisallowed={false}>
         {converted}
       </ReactMarkdown>
     </div>
