@@ -181,6 +181,10 @@
   background-position: 0 0;
 }
 
+.action-area.official-content::after {
+  background-image: none;
+}
+
 .action-icon {
   min-height: 12px;
   min-width: 12px;
@@ -339,7 +343,7 @@
 }
 
 .is-official-text {
-  margin-left: 0.8rem;
+  margin-left: 10px;
   color: #0084e3;
 }
 
