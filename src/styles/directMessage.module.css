@@ -199,6 +199,13 @@
   width: 100%;
 }
 
+.action-area.clickable {
+  cursor: pointer;
+  &:hover .action-title {
+    text-decoration: underline;
+  }
+}
+
 .message-area {
   display: flex;
   flex: 5;
