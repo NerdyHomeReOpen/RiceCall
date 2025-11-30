@@ -332,15 +332,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
         {/* Main Content */}
         <div className={styles['main-content']}>
-          {targetIsVerified ? (
-            <div className={styles['action-area']}>
-              <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
-              <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
-                <span className={styles['is-official-title']}>{t('official-title')}</span>
-                <span className={styles['is-official-text']}>{t('is-official')}</span>
-              </div>
-            </div>
-          ) : isFriend && isOnline && targetCurrentServer ? (
+          {isFriend && isOnline && targetCurrentServer ? (
             <div className={styles['action-area']} style={{ cursor: 'pointer' }} onClick={() => handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId)}>
               <div className={`${styles['action-icon']} ${styles['in-server']}`} />
               <div className={styles['action-title']}>{targetCurrentServerName}</div>
@@ -349,6 +341,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div className={styles['action-area']}>
               {!isFriend && <div className={styles['action-title']}>{t('non-friend-message')}</div>}
               {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
+            </div>
+          ) : null}
+          {targetIsVerified ? (
+            <div className={styles['action-area']}>
+              <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
+              <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
+                <span className={styles['is-official-title']}>{t('official-title')}</span>
+                <span className={styles['is-official-text']}>{t('is-official')}</span>
+              </div>
             </div>
           ) : null}
           <div ref={messageAreaRef} onScroll={handleScroll} className={styles['message-area']}>

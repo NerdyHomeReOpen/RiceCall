@@ -297,7 +297,6 @@
 }
 
 @keyframes shake {
-
   0%,
   100% {
     transform: translate(0, 0);
@@ -333,7 +332,7 @@
 }
 
 .is-official-text {
-  margin-left: 1rem;
+  margin-left: 0.8rem;
   color: #0084e3;
 }
 
@@ -345,4 +344,5 @@
   background-position: center;
   background-repeat: no-repeat;
   image-rendering: auto;
+  margin: 5px;
 }
