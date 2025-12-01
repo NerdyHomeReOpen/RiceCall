@@ -47,6 +47,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [sortField, setSortField] = useState<string>('contribution');
   const [searchText, setSearchText] = useState('');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
+  const [memberColumnWidths, setMemberColumnWidths] = useState<number[]>([150, 90, 80, 90]);
+  const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>([150, 150]);
 
   // Variables
   const { serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
@@ -101,14 +103,14 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   const settingPages = isChannelMod(permissionLevel)
     ? [
-        t('channel-info'),
-        t('channel-announcement'),
-        t('access-permission'),
-        t('speaking-permission'),
-        t('text-permission'),
-        `${t('channel-management')} (${totalModerators})`,
-        `${t('blacklist-management')} (${totalBlockMembers})`,
-      ]
+      t('channel-info'),
+      t('channel-announcement'),
+      t('access-permission'),
+      t('speaking-permission'),
+      t('text-permission'),
+      `${t('channel-management')} (${totalModerators})`,
+      `${t('blacklist-management')} (${totalBlockMembers})`,
+    ]
     : [t('channel-info'), t('channel-announcement')];
 
   const memberTableFields = [
@@ -122,6 +124,44 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     { name: t('name'), field: 'name' },
     { name: t('unblock-date'), field: 'isBlocked' },
   ];
+
+  const formatDate = (value: number | string) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleColumnResize =
+    (index: number, columnWidths: number[], setColumnWidths: React.Dispatch<React.SetStateAction<number[]>>, defaultWidths: number[]) =>
+      (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const startX = e.clientX;
+        const startWidths = [...columnWidths];
+        const minWidth = defaultWidths[index] ?? 60;
+
+        const onMouseMove = (moveEvent: MouseEvent) => {
+          const deltaX = moveEvent.clientX - startX;
+          setColumnWidths((prev) => {
+            const next = [...prev];
+            const base = startWidths[index] ?? prev[index] ?? minWidth;
+            const maxWidth = minWidth * 2.5;
+            next[index] = Math.max(minWidth, Math.min(maxWidth, base + deltaX));
+            return next;
+          });
+        };
+
+        const onMouseUp = () => {
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      };
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
@@ -520,9 +560,21 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
-                    {memberTableFields.map((field) => (
-                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                    {memberTableFields.map((field, index) => (
+                      <th
+                        key={field.field}
+                        style={{ flex: `0 0 ${memberColumnWidths[index] ?? [150, 90, 80, 90][index]}px` }}
+                      >
+                        <div
+                          className={setting['th-content']}
+                          onClick={() => handleMemberSort(field.field as keyof Member)}
+                        >
+                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                        </div>
+                        <div
+                          className={setting['col-resizer']}
+                          onMouseDown={handleColumnResize(index, memberColumnWidths, setMemberColumnWidths, [150, 90, 80, 90])}
+                        />
                       </th>
                     ))}
                   </tr>
@@ -626,13 +678,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                           contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                         }}
                       >
-                        <td>
+                        <td style={{ flex: `0 0 ${memberColumnWidths[0] ?? 150}px` }}>
                           <div className={`${permission[moderator.gender]} ${permission[`lv-${moderator.permissionLevel}`]}`} />
                           <div className={`${popup['name']} ${moderator.nickname ? popup['highlight'] : ''}`}>{moderator.nickname || moderator.name}</div>
                         </td>
-                        <td>{getPermissionText(t, moderator.permissionLevel)}</td>
-                        <td>{moderator.contribution}</td>
-                        <td>{new Date(moderator.createdAt).toLocaleString()}</td>
+                        <td style={{ flex: `0 0 ${memberColumnWidths[1] ?? 90}px` }}>{getPermissionText(t, moderator.permissionLevel)}</td>
+                        <td style={{ flex: `0 0 ${memberColumnWidths[2] ?? 80}px` }}>{moderator.contribution}</td>
+                        <td style={{ flex: `0 0 ${memberColumnWidths[3] ?? 90}px` }}>{formatDate(moderator.createdAt)}</td>
                       </tr>
                     );
                   })}
@@ -657,9 +709,21 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
-                    {blockMemberTableFields.map((field) => (
-                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                    {blockMemberTableFields.map((field, index) => (
+                      <th
+                        key={field.field}
+                        style={{ flex: `0 0 ${blockMemberColumnWidths[index] ?? [150, 150][index]}px` }}
+                      >
+                        <div
+                          className={setting['th-content']}
+                          onClick={() => handleMemberSort(field.field as keyof Member)}
+                        >
+                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                        </div>
+                        <div
+                          className={setting['col-resizer']}
+                          onMouseDown={handleColumnResize(index, blockMemberColumnWidths, setBlockMemberColumnWidths, [150, 150])}
+                        />
                       </th>
                     ))}
                   </tr>
@@ -700,8 +764,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                           contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                         }}
                       >
-                        <td>{member.nickname || member.name}</td>
-                        <td>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
+                        <td style={{ flex: `0 0 ${blockMemberColumnWidths[0] ?? 150}px` }}>{member.nickname || member.name}</td>
+                        <td style={{ flex: `0 0 ${blockMemberColumnWidths[1] ?? 150}px` }}>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
                       </tr>
                     );
                   })}

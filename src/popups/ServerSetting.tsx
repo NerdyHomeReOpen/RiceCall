@@ -61,6 +61,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const [searchText, setSearchText] = useState('');
     const [showPreview, setShowPreview] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState<string>('');
+    const [memberColumnWidths, setMemberColumnWidths] = useState<number[]>([150, 90, 80, 90]);
+    const [applicationColumnWidths, setApplicationColumnWidths] = useState<number[]>([120, 200, 90]);
+    const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>([150, 150]);
 
     // Variables
     const {
@@ -124,16 +127,54 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     ];
     const settingPages = isServerAdmin(permissionLevel)
       ? [
-          t('server-info'),
-          t('server-announcement'),
-          t('member-management'),
-          t('access-permission'),
-          `${t('member-application-management')} (${totalApplications})`,
-          `${t('blacklist-management')} (${totalBlockMembers})`,
-        ]
+        t('server-info'),
+        t('server-announcement'),
+        t('member-management'),
+        t('access-permission'),
+        `${t('member-application-management')} (${totalApplications})`,
+        `${t('blacklist-management')} (${totalBlockMembers})`,
+      ]
       : isMember(permissionLevel)
         ? [t('server-info'), t('server-announcement'), t('member-management')]
         : [t('server-info'), t('server-announcement')];
+
+    const formatDate = (value: number | string) => {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      const year = date.getFullYear();
+      const month = `${date.getMonth() + 1}`.padStart(2, '0');
+      const day = `${date.getDate()}`.padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const handleColumnResize =
+      (index: number, columnWidths: number[], setColumnWidths: React.Dispatch<React.SetStateAction<number[]>>, defaultWidths: number[]) =>
+        (e: React.MouseEvent<HTMLDivElement>) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const startX = e.clientX;
+          const startWidths = [...columnWidths];
+          const minWidth = defaultWidths[index] ?? 60;
+
+          const onMouseMove = (moveEvent: MouseEvent) => {
+            const deltaX = moveEvent.clientX - startX;
+            setColumnWidths((prev) => {
+              const next = [...prev];
+              const base = startWidths[index] ?? prev[index] ?? minWidth;
+              const maxWidth = minWidth * 2.5;
+              next[index] = Math.max(minWidth, Math.min(maxWidth, base + deltaX));
+              return next;
+            });
+          };
+
+          const onMouseUp = () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+          };
+
+          window.addEventListener('mousemove', onMouseMove);
+          window.addEventListener('mouseup', onMouseUp);
+        };
 
     // Handlers
     const handleApproveMemberApplication = (userId: User['userId'], serverId: Server['serverId']) => {
@@ -314,7 +355,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                       reader.onloadend = async () =>
                         handleOpenImageCropper(reader.result as string, async (imageDataUrl) => {
                           if (imageDataUrl.length > MAX_FILE_SIZE) {
-                            handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+                            handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
                             return;
                           }
                           const response = await ipc.data.upload('server', serverId, imageDataUrl);
@@ -398,9 +439,18 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 <table style={{ height: '330px' }}>
                   <thead>
                     <tr>
-                      {memberTableFields.map((field) => (
-                        <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                      {memberTableFields.map((field, index) => (
+                        <th
+                          key={field.field}
+                          style={{ flex: `0 0 ${memberColumnWidths[index] ?? [150, 90, 80, 90][index]}px` }}
+                        >
+                          <div
+                            className={setting['th-content']}
+                            onClick={() => handleMemberSort(field.field as keyof Member)}
+                          >
+                            {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                          </div>
+                          <div className={setting['col-resizer']} onMouseDown={handleColumnResize(index, memberColumnWidths, setMemberColumnWidths, [150, 90, 80, 90])} />
                         </th>
                       ))}
                     </tr>
@@ -486,13 +536,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td title={member.nickname || member.name}>
+                          <td title={member.nickname || member.name} style={{ flex: `0 0 ${memberColumnWidths[0] ?? 150}px` }}>
                             <div className={`${permission[member.gender]} ${permission[`lv-${member.permissionLevel}`]}`} />
                             <div className={`${popup['name']} ${member.nickname ? popup['highlight'] : ''}`}>{member.nickname || member.name}</div>
                           </td>
-                          <td>{getPermissionText(t, member.permissionLevel)}</td>
-                          <td>{member.contribution}</td>
-                          <td>{new Date(member.createdAt).toLocaleString()}</td>
+                          <td style={{ flex: `0 0 ${memberColumnWidths[1] ?? 90}px` }}>{getPermissionText(t, member.permissionLevel)}</td>
+                          <td style={{ flex: `0 0 ${memberColumnWidths[2] ?? 80}px` }}>{member.contribution}</td>
+                          <td style={{ flex: `0 0 ${memberColumnWidths[3] ?? 90}px` }}>{formatDate(member.createdAt)}</td>
                         </tr>
                       );
                     })}
@@ -579,9 +629,21 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 <table style={{ height: '330px' }}>
                   <thead>
                     <tr>
-                      {applicationTableFields.map((field) => (
-                        <th key={field.field} onClick={() => handleApplicationSort(field.field as keyof MemberApplication)}>
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                      {applicationTableFields.map((field, index) => (
+                        <th
+                          key={field.field}
+                          style={{ flex: `0 0 ${applicationColumnWidths[index] ?? [120, 200, 90][index]}px` }}
+                        >
+                          <div
+                            className={setting['th-content']}
+                            onClick={() => handleApplicationSort(field.field as keyof MemberApplication)}
+                          >
+                            {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                          </div>
+                          <div
+                            className={setting['col-resizer']}
+                            onMouseDown={handleColumnResize(index, applicationColumnWidths, setApplicationColumnWidths, [120, 200, 90])}
+                          />
                         </th>
                       ))}
                     </tr>
@@ -632,9 +694,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td>{application.name}</td>
-                          <td>{application.description}</td>
-                          <td>{new Date(application.createdAt).toLocaleString()}</td>
+                          <td style={{ flex: `0 0 ${applicationColumnWidths[0] ?? 120}px` }}>{application.name}</td>
+                          <td style={{ flex: `0 0 ${applicationColumnWidths[1] ?? 200}px` }}>{application.description}</td>
+                          <td style={{ flex: `0 0 ${applicationColumnWidths[2] ?? 90}px` }}>{formatDate(application.createdAt)}</td>
                         </tr>
                       );
                     })}
@@ -659,9 +721,21 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 <table style={{ height: '330px' }}>
                   <thead>
                     <tr>
-                      {blockMemberTableFields.map((field) => (
-                        <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                      {blockMemberTableFields.map((field, index) => (
+                        <th
+                          key={field.field}
+                          style={{ flex: `0 0 ${blockMemberColumnWidths[index] ?? [150, 150][index]}px` }}
+                        >
+                          <div
+                            className={setting['th-content']}
+                            onClick={() => handleMemberSort(field.field as keyof Member)}
+                          >
+                            {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                          </div>
+                          <div
+                            className={setting['col-resizer']}
+                            onMouseDown={handleColumnResize(index, blockMemberColumnWidths, setBlockMemberColumnWidths, [150, 150])}
+                          />
                         </th>
                       ))}
                     </tr>
@@ -702,8 +776,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td>{member.nickname || member.name}</td>
-                          <td>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
+                          <td style={{ flex: `0 0 ${blockMemberColumnWidths[0] ?? 150}px` }}>{member.nickname || member.name}</td>
+                          <td style={{ flex: `0 0 ${blockMemberColumnWidths[1] ?? 150}px` }}>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
                         </tr>
                       );
                     })}
