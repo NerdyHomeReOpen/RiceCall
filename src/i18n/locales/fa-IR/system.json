@@ -1,10 +1,14 @@
 {
-  "update-available": "نسخه جدید در دسترس است",
-  "update-available-message": "نسخه جدید {{version}} در تاریخ {{releaseDate}} منتشر شد، در حال دانلود...",
-  "update-downloaded": "نصب به‌روزرسانی",
-  "update-downloaded-message": "نسخه {{version}} با موفقیت دانلود شد، لطفاً برای نصب روی دکمه «همین حالا نصب کن» کلیک کنید",
+  "cancel": "انصراف",
+  "download-update": "دانلود به‌روزرسانی",
+  "exit": "خروج",
   "install-update": "همین حالا نصب کن",
-  "open-main-window": "نشان دان یا مخفی کردن منوی اصلی",
+  "install-after-quit": "هنگام بسته بودن نصب کنید",
+  "is-latest-version": "این در حال حاضر آخرین نسخه است.",
   "logout": "خروج",
-  "exit": "خروج"
+  "open-main-window": "نشان دان یا مخفی کردن منوی اصلی",
+  "update-available": "نسخه جدید در دسترس است",
+  "update-available-message": "نسخه جدید {{version}} در تاریخ {{releaseDate}} منتشر شد. برای شروع دانلود، روی دکمه \"دانلود به‌روزرسانی\" کلیک کنید.",
+  "update-downloaded": "نصب به‌روزرسانی",
+  "update-downloaded-message": "نسخه {{version}} دانلود شده است. لطفاً «نصب اکنون» یا «نصب هنگام بستن» را انتخاب کنید."
 }
