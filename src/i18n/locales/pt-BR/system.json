@@ -1,10 +1,14 @@
 {
-  "update-available": "Uma nova versão está disponível",
-  "update-available-message": "Nova versão {{version}} lançada em {{releaseDate}}, iniciando o download...",
-  "update-downloaded": "Instalar atualizações",
-  "update-downloaded-message": "A versão {{version}} foi baixada. Por favor, clique no botão \"Instalar Agora\" para prosseguir com a instalação.",
+  "cancel": "Cancelar",
+  "download-update": "Baixar atualização",
+  "exit": "Sair",
   "install-update": "Instalar Agora",
-  "open-main-window": "Mostrar/esconder menu principal",
+  "install-after-quit": "Instalar quando fechado",
+  "is-latest-version": "Já é a versão mais recente.",
   "logout": "Desconectar",
-  "exit": "Sair"
+  "open-main-window": "Mostrar/esconder menu principal",
+  "update-available": "Uma nova versão está disponível",
+  "update-available-message": "A nova versão {{version}} foi lançada em {{releaseDate}}. Clique no botão \"Baixar atualização\" para iniciar o download.",
+  "update-downloaded": "Instalar atualizações",
+  "update-downloaded-message": "A versão {{version}} foi baixada. Selecione \"Instalar agora\" ou \"Instalar ao fechar\"."
 }
