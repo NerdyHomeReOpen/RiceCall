@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 
 // CSS
 import styles from '@/styles/server.module.css';
@@ -16,6 +16,7 @@ import { useFindMeContext } from '@/providers/FindMe';
 import ChannelTab from '@/components/ChannelTab';
 import CategoryTab from '@/components/CategoryTab';
 import QueueUserTab from '@/components/QueueUserTab';
+import LazyRender from '@/components/common/LazyRender';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -53,6 +54,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   // Refs
   const queueListRef = useRef<HTMLDivElement>(null);
   const isResizingQueueListRef = useRef<boolean>(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // States
   const [viewType, setViewType] = useState<'all' | 'current'>('all');
@@ -76,6 +78,24 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((c) => !!c && !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
+  const channelMemberMap = useMemo(() => {
+    const map = new Map<string, OnlineMember[]>();
+    for (const member of serverOnlineMembers) {
+      const key = member.currentChannelId;
+      if (!key) continue;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(member);
+    }
+    return map;
+  }, [serverOnlineMembers]);
+  const targetChannelMeta = useMemo(() => channels.find((item) => item.channelId === currentChannelId), [channels, currentChannelId]);
+  const targetCategoryId = useMemo(() => {
+    if (!targetChannelMeta) return null;
+    if ((targetChannelMeta as Channel).type === 'channel') {
+      return (targetChannelMeta as Channel).categoryId ?? null;
+    }
+    return targetChannelMeta.channelId;
+  }, [targetChannelMeta]);
   const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
     () =>
       queueUsers
@@ -222,6 +242,51 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     return () => document.removeEventListener('pointerup', onPointerup);
   }, []);
 
+  useEffect(() => {
+    if (viewType !== 'all') return;
+    if (!targetCategoryId) return;
+    setExpanded((prev) => {
+      if (prev[targetCategoryId]) return prev;
+      return { ...prev, [targetCategoryId]: true };
+    });
+  }, [targetCategoryId, viewType]);
+
+  const scrollToChannel = useCallback(
+    (channelId: string) => {
+      const container = scrollContainerRef.current;
+      if (!container || !channelId) return false;
+      const targetNode = container.querySelector<HTMLElement>(`[data-channel-scroll-id="channel-${channelId}"]`);
+      if (!targetNode) return false;
+      targetNode.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth',
+      });
+      return true;
+    },
+    [scrollContainerRef],
+  );
+
+  useEffect(() => {
+    if (viewType !== 'all') return;
+    if (!currentChannelId) return;
+    if (targetCategoryId && !expanded[targetCategoryId]) return;
+    let attempts = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const tryScroll = () => {
+      const success = scrollToChannel(currentChannelId);
+      if (success || attempts >= 8) {
+        if (timer) clearTimeout(timer);
+        return;
+      }
+      attempts += 1;
+      timer = setTimeout(tryScroll, 120);
+    };
+    timer = setTimeout(tryScroll, 100);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [viewType, currentChannelId, scrollToChannel, expanded, targetCategoryId]);
+
   return (
     <>
       {/* Header */}
@@ -297,6 +362,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
 
       {/* Channel List */}
       <div
+        ref={scrollContainerRef}
         className={styles['scroll-view']}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -319,40 +385,47 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
               selectedItemId={selectedItemId}
               setExpanded={() => {}}
               setSelectedItemId={setSelectedItemId}
+              channelMemberMap={channelMemberMap}
             />
           ) : (
             filteredChannels.map((item) =>
               item.type === 'category' ? (
-                <CategoryTab
-                  key={item.channelId}
-                  user={user}
-                  currentServer={currentServer}
-                  currentChannel={currentChannel}
-                  friends={friends}
-                  queueUsers={queueUsers}
-                  serverOnlineMembers={serverOnlineMembers}
-                  channels={channels}
-                  category={item as Category}
-                  expanded={expanded}
-                  selectedItemId={selectedItemId}
-                  setExpanded={setExpanded}
-                  setSelectedItemId={setSelectedItemId}
-                />
+                <LazyRender key={`category-${item.channelId}`} root={scrollContainerRef} placeholderHeight={56} forceVisible={viewType === 'all' && targetCategoryId === item.channelId}>
+                  <CategoryTab
+                    key={item.channelId}
+                    user={user}
+                    currentServer={currentServer}
+                    currentChannel={currentChannel}
+                    friends={friends}
+                    queueUsers={queueUsers}
+                    serverOnlineMembers={serverOnlineMembers}
+                    channels={channels}
+                    category={item as Category}
+                    expanded={expanded}
+                    selectedItemId={selectedItemId}
+                    setExpanded={setExpanded}
+                    setSelectedItemId={setSelectedItemId}
+                    channelMemberMap={channelMemberMap}
+                  />
+                </LazyRender>
               ) : (
-                <ChannelTab
-                  key={item.channelId}
-                  user={user}
-                  currentServer={currentServer}
-                  currentChannel={currentChannel}
-                  friends={friends}
-                  queueUsers={queueUsers}
-                  serverOnlineMembers={serverOnlineMembers}
-                  channel={item as Channel}
-                  expanded={expanded}
-                  selectedItemId={selectedItemId}
-                  setExpanded={setExpanded}
-                  setSelectedItemId={setSelectedItemId}
-                />
+                <LazyRender key={`channel-${item.channelId}`} root={scrollContainerRef} placeholderHeight={48}>
+                  <ChannelTab
+                    key={item.channelId}
+                    user={user}
+                    currentServer={currentServer}
+                    currentChannel={currentChannel}
+                    friends={friends}
+                    queueUsers={queueUsers}
+                    serverOnlineMembers={serverOnlineMembers}
+                    channel={item as Channel}
+                    expanded={expanded}
+                    selectedItemId={selectedItemId}
+                    setExpanded={setExpanded}
+                    setSelectedItemId={setSelectedItemId}
+                    channelMemberMap={channelMemberMap}
+                  />
+                </LazyRender>
               ),
             )
           )}
