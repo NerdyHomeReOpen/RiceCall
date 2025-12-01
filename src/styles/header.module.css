@@ -451,6 +451,7 @@
 }
 
 .status-dropdown {
+  z-index: 10000;
   position: absolute;
   display: flex;
   flex-flow: column wrap;
@@ -462,7 +463,6 @@
   background-color: var(--background);
   border-radius: 3px;
   box-shadow: var(--box-shadow);
-  z-index: 1000;
 }
 
 .status-dropdown.hidden {

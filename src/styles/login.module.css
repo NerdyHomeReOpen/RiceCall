@@ -257,7 +257,8 @@
 }
 
 .create-account,
-.forget-password {
+.forget-password,
+.change-server {
   text-decoration: none;
   font-size: 0.9em;
   color: var(--text-color-quaternary);
@@ -267,7 +268,8 @@
 }
 
 .create-account:hover,
-.forget-password:hover {
+.forget-password:hover,
+.change-server:hover {
   color: #0073c6;
 }
 

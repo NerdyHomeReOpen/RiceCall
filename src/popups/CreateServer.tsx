@@ -18,6 +18,9 @@ import ipc from '@/services/ipc.service';
 import { handleOpenAlertDialog, handleOpenImageCropper } from '@/utils/popup';
 import Default from '@/utils/default';
 
+// Constants
+import { MAX_FILE_SIZE } from '@/constant';
+
 interface CreateServerPopupProps {
   user: User;
   servers: Server[];
@@ -35,23 +38,18 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   const [serverAvatar, setServerAvatar] = useState<Server['avatar']>(Default.server().avatar);
   const [serverAvatarUrl, setServerAvatarUrl] = useState<Server['avatarUrl']>(Default.server().avatarUrl);
 
-  // Destructuring
+  // Variables
   const { level: userLevel } = user;
-
-  // Memos
-  const serverTypes = useMemo(
-    () => [
-      { value: 'game', name: t('game') },
-      { value: 'entertainment', name: t('entertainment') },
-      { value: 'other', name: t('other') },
-    ],
-    [t],
-  );
   const remainingServers = useMemo(() => {
     const maxGroups = userLevel >= 16 ? 5 : userLevel >= 6 && userLevel < 16 ? 4 : 3;
     return maxGroups - servers.filter((s) => s.owned).length;
   }, [userLevel, servers]);
-  const canSubmit = useMemo(() => remainingServers > 0 && serverName.trim(), [remainingServers, serverName]);
+  const canSubmit = remainingServers > 0 && serverName.trim();
+  const serverTypes = [
+    { value: 'game', name: t('game') },
+    { value: 'entertainment', name: t('entertainment') },
+    { value: 'other', name: t('other') },
+  ];
 
   // Handlers
   const handleCreateServer = (preset: Partial<Server>) => {
@@ -125,16 +123,12 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                   if (!file) return;
                   const reader = new FileReader();
                   reader.onloadend = () =>
-                    handleOpenImageCropper(reader.result as string, async (data) => {
-                      if (data.imageDataUrl.length > 5 * 1024 * 1024) {
+                    handleOpenImageCropper(reader.result as string, async (imageDataUrl) => {
+                      if (imageDataUrl.length > MAX_FILE_SIZE) {
                         handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
                         return;
                       }
-                      const formData = new FormData();
-                      formData.append('_type', 'server');
-                      formData.append('_fileName', serverAvatar);
-                      formData.append('_file', data.imageDataUrl as string);
-                      const response = await ipc.data.upload(formData);
+                      const response = await ipc.data.upload('server', serverAvatar, imageDataUrl);
                       if (response) {
                         setServerAvatar(response.avatar);
                         setServerAvatarUrl(response.avatarUrl);

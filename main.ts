@@ -2,8 +2,6 @@
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
-import dotenv from 'dotenv';
-dotenv.config();
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import { initMain } from 'electron-audio-loopback-josh';
@@ -11,13 +9,12 @@ initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
-import { initMainI18n, t } from './i18n.js';
-import { connectSocket, disconnectSocket, latency } from './socket.js';
+import { initMainI18n, LanguageKey, getLanguage, t } from './i18n.js';
+import { connectSocket, disconnectSocket } from './socket.js';
 import { env, loadEnv } from './env.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
 import authService from './auth.service.js';
 import dataService from './data.service.js';
-import apiService from './api.service.js';
 import popupLoaders from './popupLoader.js';
 
 if (process.platform === 'linux') {
@@ -27,9 +24,9 @@ if (process.platform === 'linux') {
 // Store
 type StoreType = {
   accounts: Record<string, any>;
-  language: string;
+  language: LanguageKey;
   customThemes: Record<string, any>[];
-  currentTheme: string;
+  currentTheme: string | null;
   autoLogin: boolean;
   autoLaunch: boolean;
   alwaysOnTop: boolean;
@@ -38,7 +35,6 @@ type StoreType = {
   statusAutoIdleMinutes: number;
   statusAutoDnd: boolean;
   channelUIMode: string;
-  dontShowDisclaimer: boolean;
   font: string;
   fontSize: number;
   inputAudioDevice: string;
@@ -68,6 +64,11 @@ type StoreType = {
   stopSpeakingSound: boolean;
   receiveDirectMessageSound: boolean;
   receiveChannelMessageSound: boolean;
+  dontShowDisclaimer: boolean;
+  autoCheckForUpdates: boolean;
+  updateCheckInterval: number;
+  updateChannel: string;
+  server: 'prod' | 'dev';
 };
 
 // Popup
@@ -115,10 +116,10 @@ const store = new Store<StoreType>({
     // Accounts
     accounts: {},
     // Language
-    language: 'zh-TW',
+    language: getLanguage(),
     // Custom Themes
     customThemes: [],
-    currentTheme: '',
+    currentTheme: null,
     // Basic settings
     autoLogin: false,
     autoLaunch: false,
@@ -128,7 +129,6 @@ const store = new Store<StoreType>({
     statusAutoIdleMinutes: 10,
     statusAutoDnd: false,
     channelUIMode: 'classic',
-    dontShowDisclaimer: false,
     font: '',
     fontSize: 13,
     // Mix settings
@@ -163,6 +163,14 @@ const store = new Store<StoreType>({
     stopSpeakingSound: true,
     receiveDirectMessageSound: true,
     receiveChannelMessageSound: true,
+    // Disclaimer settings
+    dontShowDisclaimer: false,
+    // Update settings
+    autoCheckForUpdates: true,
+    updateCheckInterval: 1 * 60 * 1000, // 1 minute
+    updateChannel: 'latest',
+    // Server settings
+    server: 'prod',
   },
 });
 
@@ -223,6 +231,7 @@ export const APP_TRAY_ICON = {
 export let token: string = '';
 export let isLogin: boolean = false;
 export let isUpdateNotified: boolean = false;
+export let checkForUpdatesInterval: NodeJS.Timeout | null = null;
 
 const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
@@ -315,6 +324,9 @@ export function getSettings() {
     stopSpeakingSound: store.get('stopSpeakingSound'),
     receiveDirectMessageSound: store.get('receiveDirectMessageSound'),
     receiveChannelMessageSound: store.get('receiveChannelMessageSound'),
+    autoCheckForUpdates: store.get('autoCheckForUpdates'),
+    updateCheckInterval: store.get('updateCheckInterval'),
+    updateChannel: store.get('updateChannel'),
   };
 }
 
@@ -558,37 +570,66 @@ export function closePopups() {
 }
 
 // Auto Updater
-function configureAutoUpdater() {
-  const channel = env.UPDATE_CHANNEL;
-  if (channel) {
-    autoUpdater.channel = channel;
-    autoUpdater.allowPrerelease = true;
-    autoUpdater.setFeedURL({
-      provider: 'github',
-      owner: 'NerdyHomeReOpen',
-      repo: 'RiceCall',
-      channel: channel,
-    });
-  } else {
-    autoUpdater.allowPrerelease = false;
-  }
-  autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = true;
-  autoUpdater.allowDowngrade = false;
+async function checkForUpdates(force = false) {
+  if (isUpdateNotified && !force) return;
 
   if (DEV) {
     autoUpdater.forceDevUpdateConfig = true;
     autoUpdater.updateConfigPath = path.join(app.getAppPath(), 'dev-app-update.yml');
   }
 
+  const channel = store.get('updateChannel');
+  console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, channel);
+
+  if (channel === 'dev') {
+    autoUpdater.allowPrerelease = true;
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'NerdyHomeReOpen',
+      repo: 'RiceCall',
+      channel: 'dev',
+    });
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = false;
+    autoUpdater.allowDowngrade = true;
+    const result = await autoUpdater.checkForUpdates().catch((error) => {
+      console.log(`${new Date().toLocaleString()} | Cannot check for updates in dev channel:`, error.message);
+    });
+    if (result?.isUpdateAvailable) return result;
+  }
+
+  autoUpdater.allowPrerelease = false;
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'NerdyHomeReOpen',
+    repo: 'RiceCall',
+    channel: 'latest',
+  });
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.allowDowngrade = false;
+  const result = await autoUpdater.checkForUpdates().catch((error) => {
+    console.error(`${new Date().toLocaleString()} | Cannot check for updates in latest channel:`, error.message);
+  });
+  if (result?.isUpdateAvailable) return result;
+}
+
+async function configureAutoUpdater() {
   autoUpdater.on('update-available', (info: UpdateInfo) => {
-    if (DEV) return;
     console.info(`${new Date().toLocaleString()} | Update available: ${info.version}`);
+
     dialog
       .showMessageBox({
         type: 'info',
         title: t('update-available'),
         message: t('update-available-message', { version: info.version, releaseDate: new Date(info.releaseDate).toLocaleDateString() }),
+        buttons: [t('download-update'), t('cancel')],
+        cancelId: 1,
+      })
+      .then((buttonIndex) => {
+        if (buttonIndex.response === 0) {
+          autoUpdater.downloadUpdate();
+        }
       })
       .catch((error) => {
         console.error(`${new Date().toLocaleString()} | Cannot show update dialog:`, error.message);
@@ -597,12 +638,10 @@ function configureAutoUpdater() {
   });
 
   autoUpdater.on('update-not-available', () => {
-    if (DEV) return;
     console.info(`${new Date().toLocaleString()} | Is latest version`);
   });
 
   autoUpdater.on('download-progress', (progressInfo: ProgressInfo) => {
-    if (DEV) return;
     let message = `${progressInfo.bytesPerSecond}`;
     message = `${message} - ${progressInfo.percent}%`;
     message = `${message} (${progressInfo.transferred}/${progressInfo.total})`;
@@ -610,18 +649,21 @@ function configureAutoUpdater() {
   });
 
   autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
-    if (DEV) return;
     console.info(`${new Date().toLocaleString()} | Update downloaded: ${info.version}`);
+
     dialog
       .showMessageBox({
         type: 'info',
         title: t('update-downloaded'),
         message: t('update-downloaded-message', { version: info.version }),
-        buttons: [t('install-update')],
+        buttons: [t('install-update'), t('install-after-quit'), t('cancel')],
+        cancelId: 2,
       })
       .then((buttonIndex) => {
         if (buttonIndex.response === 0) {
           autoUpdater.quitAndInstall(false, true);
+        } else if (buttonIndex.response === 1) {
+          autoUpdater.autoInstallOnAppQuit = true;
         }
       })
       .catch((error) => {
@@ -630,23 +672,24 @@ function configureAutoUpdater() {
     isUpdateNotified = false;
   });
 
-  function checkUpdate() {
-    if (DEV || isUpdateNotified) return;
-    console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, env.UPDATE_CHANNEL);
-    autoUpdater.checkForUpdates().catch((error) => {
-      console.error(`${new Date().toLocaleString()} | Cannot check for updates:`, error.message);
-    });
-  }
+  if (store.get('autoCheckForUpdates')) startCheckForUpdates();
+}
 
-  // Check update every hour
-  setInterval(checkUpdate, 60 * 60 * 1000);
-  checkUpdate();
+export function startCheckForUpdates() {
+  if (checkForUpdatesInterval) clearInterval(checkForUpdatesInterval);
+  checkForUpdatesInterval = setInterval(checkForUpdates, store.get('updateCheckInterval'));
+  checkForUpdates();
+}
+
+export function stopCheckForUpdates() {
+  if (checkForUpdatesInterval) clearInterval(checkForUpdatesInterval);
+  checkForUpdatesInterval = null;
 }
 
 // Tray Icon
 let tray: Tray | null = null;
 
-export function setTrayDetail(isLogin: boolean) {
+export function setTrayDetail() {
   if (!tray) return;
   const trayIconPath = isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
   const contextMenu = Menu.buildFromTemplate([
@@ -666,8 +709,13 @@ export function setTrayDetail(isLogin: boolean) {
       type: 'normal',
       enabled: isLogin,
       click: () => {
+        token = '';
+        isLogin = false;
+        mainWindow?.reload();
+        mainWindow?.hide();
+        authWindow?.showInactive();
         closePopups();
-        ipcMain.emit('logout');
+        disconnectSocket();
       },
     },
     {
@@ -690,12 +738,15 @@ export function configureTray() {
     if (isLogin) mainWindow?.showInactive();
     else authWindow?.showInactive();
   });
-  setTrayDetail(isLogin);
+  setTrayDetail();
 }
 
 app.on('ready', async () => {
   // Load env
-  loadEnv();
+  loadEnv(store.get('server', 'prod'));
+
+  // Initialize i18n
+  initMainI18n(store.get('language'));
 
   // Configure
   configureAutoUpdater();
@@ -710,23 +761,23 @@ app.on('ready', async () => {
     app.exit();
   });
 
-  // API handlers
-  ipcMain.handle('auth-login', async (_, account: string, password: string) => {
+  // Auth handlers
+  ipcMain.handle('auth-login', async (_, formData: { account: string; password: string }) => {
     return await authService
-      .login({ account, password })
+      .login(formData)
       .then((res) => {
-        if (res?.success) {
+        if (res.success) {
           token = res.token;
           isLogin = true;
           mainWindow?.showInactive();
           authWindow?.hide();
           connectSocket(token);
-          setTrayDetail(isLogin);
+          setTrayDetail();
         }
         return res;
       })
       .catch((error) => {
-        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
         return { success: false };
       });
   });
@@ -737,13 +788,14 @@ app.on('ready', async () => {
     mainWindow?.reload();
     mainWindow?.hide();
     authWindow?.showInactive();
+    closePopups();
     disconnectSocket();
-    setTrayDetail(isLogin);
+    setTrayDetail();
   });
 
-  ipcMain.handle('auth-register', async (_, account: string, password: string, email: string, username: string) => {
-    return await authService.register({ account, password, email, username }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+  ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string; locale: string }) => {
+    return await authService.register(formData).catch((error) => {
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return { success: false };
     });
   });
@@ -752,18 +804,18 @@ app.on('ready', async () => {
     return await authService
       .autoLogin(t)
       .then((res) => {
-        if (res?.success) {
+        if (res.success) {
           token = res.token;
           isLogin = true;
           mainWindow?.showInactive();
           authWindow?.hide();
           connectSocket(token);
-          setTrayDetail(isLogin);
+          setTrayDetail();
         }
         return res;
       })
       .catch((error) => {
-        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
         return { success: false };
       });
   });
@@ -771,7 +823,7 @@ app.on('ready', async () => {
   // Data handlers
   ipcMain.handle('data-user', async (_, userId: string) => {
     return await dataService.user({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
@@ -785,165 +837,161 @@ app.on('ready', async () => {
 
   ipcMain.handle('data-friend', async (_, userId: string, targetId: string) => {
     return await dataService.friend({ userId, targetId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friends', async (_, userId: string) => {
     return await dataService.friends({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendActivities', async (_, userId: string) => {
     return await dataService.friendActivities({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendGroup', async (_, userId: string, friendGroupId: string) => {
     return await dataService.friendGroup({ userId, friendGroupId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendGroups', async (_, userId: string) => {
     return await dataService.friendGroups({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendApplication', async (_, receiverId: string, senderId: string) => {
     return await dataService.friendApplication({ receiverId, senderId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-friendApplications', async (_, receiverId: string) => {
     return await dataService.friendApplications({ receiverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-server', async (_, userId: string, serverId: string) => {
     return await dataService.server({ userId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-servers', async (_, userId: string) => {
     return await dataService.servers({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-serverMembers', async (_, serverId: string) => {
     return await dataService.serverMembers({ serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-serverOnlineMembers', async (_, serverId: string) => {
     return await dataService.serverOnlineMembers({ serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-channel', async (_, userId: string, serverId: string, channelId: string) => {
     return await dataService.channel({ userId, serverId, channelId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-channels', async (_, userId: string, serverId: string) => {
     return await dataService.channels({ userId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-channelMembers', async (_, serverId: string, channelId: string) => {
     return await dataService.channelMembers({ serverId, channelId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-member', async (_, userId: string, serverId: string, channelId?: string) => {
     return await dataService.member({ userId, serverId, channelId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-memberApplication', async (_, userId: string, serverId: string) => {
     return await dataService.memberApplication({ userId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-memberApplications', async (_, serverId: string) => {
     return await dataService.memberApplications({ serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-memberInvitation', async (_, receiverId: string, serverId: string) => {
     return await dataService.memberInvitation({ receiverId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-memberInvitations', async (_, receiverId: string) => {
     return await dataService.memberInvitations({ receiverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-notifies', async (_, region: string) => {
     return await dataService.notifies({ region }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-announcements', async (_, region: string) => {
     return await dataService.announcements({ region }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
   ipcMain.handle('data-recommendServers', async () => {
     return await dataService.recommendServers().catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
 
-  ipcMain.handle('data-upload', async (_, _type: string, _fileName: string, _file: string) => {
-    const formData = new FormData();
-    formData.append('_type', _type);
-    formData.append('_fileName', _fileName);
-    formData.append('_file', _file);
-    return await apiService.post('/upload', formData).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now(), submitTo: 'dialogError' }, true);
+  ipcMain.handle('data-upload', async (_, type: string, fileName: string, file: string) => {
+    return await dataService.upload(type, fileName, file).catch((error) => {
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
   });
@@ -971,8 +1019,8 @@ app.on('ready', async () => {
     });
   });
 
-  // toolbar handlers
-  ipcMain.on('set-toolbar-title', (_, title: string) => {
+  // Toolbar handlers
+  ipcMain.on('set-tray-title', (_, title: string) => {
     if (!tray) return;
     const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
     tray.setToolTip(fullTitle);
@@ -985,9 +1033,9 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-language', (_, language) => {
-    store.set('language', language ?? 'zh-TW');
-    initMainI18n(language ?? 'zh-TW');
-    setTrayDetail(isLogin);
+    store.set('language', language ?? getLanguage());
+    initMainI18n(language ?? getLanguage());
+    setTrayDetail();
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);
     });
@@ -1036,6 +1084,14 @@ app.on('ready', async () => {
     });
   });
 
+  // Update check handlers
+  ipcMain.on('check-for-updates', async () => {
+    const result = await checkForUpdates(true);
+    if (!result || !result.isUpdateAvailable) {
+      createPopup('dialogInfo', 'dialogInfo', { message: t('is-latest-version'), timestamp: Date.now() }, true);
+    }
+  });
+
   // Popup handlers
   ipcMain.on('open-popup', async (_, type, id, initialData?, force = true) => {
     console.log(`${new Date().toLocaleString()} | open popup`, type, id);
@@ -1063,32 +1119,36 @@ app.on('ready', async () => {
   });
 
   // Window control event handlers
-  ipcMain.on('window-control', (event, command) => {
+  ipcMain.on('window-control-minimize', (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     if (!window) return;
-    window.webContents.send(command);
-    switch (command) {
-      case 'minimize':
-        window.minimize();
-        break;
-      case 'maximize':
-        if (process.platform === 'darwin') {
-          window.setFullScreen(true);
-        } else {
-          window.maximize();
-        }
-        break;
-      case 'unmaximize':
-        if (process.platform === 'darwin') {
-          window.setFullScreen(false);
-        } else {
-          window.unmaximize();
-        }
-        break;
-      case 'close':
-        window.close();
-        break;
+    window.minimize();
+  });
+
+  ipcMain.on('window-control-maximize', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return;
+    if (process.platform === 'darwin') {
+      window.setFullScreen(true);
+    } else {
+      window.maximize();
     }
+  });
+
+  ipcMain.on('window-control-unmaximize', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return;
+    if (process.platform === 'darwin') {
+      window.setFullScreen(false);
+    } else {
+      window.unmaximize();
+    }
+  });
+
+  ipcMain.on('window-control-close', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return;
+    window.close();
   });
 
   // Discord RPC handlers
@@ -1097,19 +1157,17 @@ app.on('ready', async () => {
     updateDiscordPresence(updatePresence);
   });
 
-  // Env
+  // Env handlers
   ipcMain.on('get-env', (event) => {
     event.returnValue = env;
   });
 
-  // Token
-  ipcMain.on('get-token', (event) => {
-    event.returnValue = token;
-  });
-
-  // Latency
-  ipcMain.on('get-latency', (event) => {
-    event.returnValue = latency;
+  ipcMain.on('change-server', (_, server: 'prod' | 'dev') => {
+    store.set('server', server);
+    loadEnv(server);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('server', server);
+    });
   });
 
   // System settings handlers
@@ -1264,6 +1322,18 @@ app.on('ready', async () => {
 
   ipcMain.on('get-receive-channel-message-sound', (event) => {
     event.returnValue = store.get('receiveChannelMessageSound');
+  });
+
+  ipcMain.on('get-auto-check-for-updates', (event) => {
+    event.returnValue = store.get('autoCheckForUpdates');
+  });
+
+  ipcMain.on('get-update-check-interval', (event) => {
+    event.returnValue = store.get('updateCheckInterval');
+  });
+
+  ipcMain.on('get-update-channel', (event) => {
+    event.returnValue = store.get('updateChannel');
   });
 
   ipcMain.on('set-auto-login', (_, enable) => {
@@ -1519,13 +1589,32 @@ app.on('ready', async () => {
     });
   });
 
-  ipcMain.on('dont-show-disclaimer-next-time', () => {
-    store.set('dontShowDisclaimer', true);
+  ipcMain.on('set-auto-check-for-updates', (_, enable) => {
+    store.set('autoCheckForUpdates', enable ?? false);
+    if (enable) startCheckForUpdates();
+    else stopCheckForUpdates();
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('auto-check-for-updates', enable);
+    });
   });
 
-  // Open external url handlers
-  ipcMain.on('open-external', (_, url) => {
-    shell.openExternal(url);
+  ipcMain.on('set-update-check-interval', (_, interval) => {
+    store.set('updateCheckInterval', interval ?? 1 * 60 * 1000);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('update-check-interval', interval);
+    });
+  });
+
+  ipcMain.on('set-update-channel', (_, channel) => {
+    store.set('updateChannel', channel ?? 'latest');
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('update-channel', channel);
+    });
+  });
+
+  // Disclaimer handlers
+  ipcMain.on('dont-show-disclaimer-next-time', () => {
+    store.set('dontShowDisclaimer', true);
   });
 });
 

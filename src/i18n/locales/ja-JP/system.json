@@ -1,10 +1,14 @@
 {
-  "update-available": "新しいバージョンを利用できます",
-  "update-available-message": "バージョン {{version}} は {{releaseDate}} にリリースされました。ダウンロード中です...",
-  "update-downloaded": "更新をインストール",
-  "update-downloaded-message": "バージョン {{version}} がダウンロードされました。インストールを続行するには、「インストール」ボタンをクリックしてください",
+  "cancel": "キャンセル",
+  "download-update": "アップデートをダウンロード",
+  "exit": "終了",
   "install-update": "今すぐインストールする",
-  "open-main-window": "メインメニューの表示/非表示",
+  "install-after-quit": "閉じた状態でインストール",
+  "is-latest-version": "すでに最新バージョンです。",
   "logout": "ログアウト",
-  "exit": "終了"
+  "open-main-window": "メインメニューの表示/非表示",
+  "update-available": "新しいバージョンを利用できます",
+  "update-available-message": "新しいバージョン {{version}} は {{releaseDate}} にリリースされました。「アップデートをダウンロード」ボタンをクリックしてダウンロードを開始してください。",
+  "update-downloaded": "更新をインストール",
+  "update-downloaded-message": "バージョン {{version}} がダウンロードされました。「今すぐインストール」または「閉じるときにインストール」を選択してください。"
 }

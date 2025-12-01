@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 
 // CSS
@@ -11,114 +12,9 @@ import RecommendServerCard from '@/components/RecommendServerCard';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import Image from 'next/image';
 
-type Category = {
-  id: string;
-  label: string[];
-  tags: string[];
-  emoji?: string;
-  subCategories?: Category[];
-};
-
-const CATEGORIES: Category[] = [
-  {
-    id: 'official-groups',
-    label: ['official-groups'],
-    tags: ['official'],
-    emoji: '2705',
-  },
-  {
-    id: 'taiwan-groups',
-    label: ['taiwan-groups'],
-    tags: ['taiwan'],
-    emoji: '1f1f9-1f1fc',
-    subCategories: [
-      {
-        id: 'taiwan-official-groups',
-        label: ['taiwan-groups', 'official-groups'],
-        tags: ['taiwan', 'official'],
-      },
-      {
-        id: 'taiwan-entertainment-groups',
-        label: ['taiwan-groups', 'entertainment-groups'],
-        tags: ['taiwan', 'entertainment'],
-      },
-    ],
-  },
-  {
-    id: 'russia-groups',
-    label: ['russia-groups'],
-    tags: ['russia'],
-    emoji: '1f1f7-1f1fa',
-    subCategories: [
-      {
-        id: 'russia-official-groups',
-        label: ['russia-groups', 'official-groups'],
-        tags: ['russia', 'official'],
-      },
-      {
-        id: 'russia-entertainment-groups',
-        label: ['russia-groups', 'entertainment-groups'],
-        tags: ['russia', 'entertainment'],
-      },
-    ],
-  },
-  {
-    id: 'brazil-groups',
-    label: ['brazil-groups'],
-    tags: ['brazil'],
-    emoji: '1f1e7-1f1f7',
-    subCategories: [
-      {
-        id: 'brazil-official-groups',
-        label: ['brazil-groups', 'official-groups'],
-        tags: ['brazil', 'official'],
-      },
-      {
-        id: 'brazil-entertainment-groups',
-        label: ['brazil-groups', 'entertainment-groups'],
-        tags: ['brazil', 'entertainment'],
-      },
-    ],
-  },
-  {
-    id: 'turkey-groups',
-    label: ['turkey-groups'],
-    tags: ['turkey'],
-    emoji: '1f1f9-1f1f7',
-    subCategories: [
-      {
-        id: 'turkey-official-groups',
-        label: ['turkey-groups', 'official-groups'],
-        tags: ['turkey', 'official'],
-      },
-      {
-        id: 'turkey-entertainment-groups',
-        label: ['turkey-groups', 'entertainment-groups'],
-        tags: ['turkey', 'entertainment'],
-      },
-    ],
-  },
-  {
-    id: 'iran-groups',
-    label: ['iran-groups'],
-    tags: ['iran'],
-    emoji: '1f1ee-1f1f7',
-    subCategories: [
-      {
-        id: 'iran-official-groups',
-        label: ['iran-groups', 'official-groups'],
-        tags: ['iran', 'official'],
-      },
-      {
-        id: 'iran-entertainment-groups',
-        label: ['iran-groups', 'entertainment-groups'],
-        tags: ['iran', 'entertainment'],
-      },
-    ],
-  },
-];
+// Constants
+import { CATEGORIES } from '@/constant';
 
 interface RecommendServerListProps {
   user: User;
@@ -130,10 +26,10 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
   const { t } = useTranslation();
 
   // States
-  const [activeCategory, setActiveCategory] = useState<Category>(CATEGORIES[0]);
+  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
   const [selectedFilter, setSelectedFilter] = useState<string[]>(['official']);
 
-  // Memos
+  // Variables
   const filteredRecommendServers = useMemo(() => recommendServers.filter((server) => selectedFilter.every((filter) => server.tags.includes(filter))), [recommendServers, selectedFilter]);
 
   return (

@@ -1,0 +1,130 @@
+.change-server {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: var(--background-secondary);
+}
+
+.loading-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 256px;
+  height: 12px;
+  background-image: url('/icon_loading.gif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.change-server-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 226px;
+  height: 100%;
+  gap: 10px;
+}
+
+.app-logo {
+  display: block;
+  min-width: 226px;
+  min-height: 54px;
+  background-image: url('/login_logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.form-wrapper {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+  justify-items: center;
+}
+
+.server-option {
+  width: 200px;
+  height: 42px;
+  margin-top: 10px;
+  background-color: #1680ce;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.server-option:hover {
+  background-color: #419ddd;
+}
+
+.server-option:active {
+  background-color: #1680ce;
+}
+
+.server-option:disabled {
+  background-color: #1680ce;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.label {
+  font-size: 0.9em;
+  color: var(--text-color-secondary);
+  display: inline-block;
+  width: 80px;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.warn-text {
+  margin-left: 80px;
+  color: var(--text-warning);
+}
+
+.hint-text {
+  margin-left: 80px;
+  color: var(--text-color-quaternary);
+}
+
+/* Footer */
+
+.change-server-footer {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: var(--footer-background);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.back-to-login {
+  text-decoration: none;
+  font-size: 0.9em;
+  color: var(--text-color-quaternary);
+  display: flex;
+  align-items: flex-end;
+  cursor: pointer;
+}
+
+.back-to-login:hover {
+  color: #0073c6;
+}
+
+.back-to-login::before {
+  content: '';
+  min-width: 14px;
+  min-height: 14px;
+  margin-right: 5px;
+  vertical-align: middle;
+  /* background-image: url('/icon_back.png'); */
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}

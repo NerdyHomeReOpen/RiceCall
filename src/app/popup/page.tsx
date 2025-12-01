@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useMemo } from 'react';
 
 // CSS
@@ -74,8 +75,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
 
   // Effects
   useEffect(() => {
-    const unsubscribe = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    const unsub = ipc.window.onUnmaximize(() => setIsFullscreen(false));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.window.onMaximize(() => setIsFullscreen(true));
+    return () => unsub();
   }, []);
 
   return (
@@ -293,7 +299,7 @@ type Popup = {
   hideHeader: boolean;
 };
 
-const Popup = React.memo(() => {
+const PopupPageComponent: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
 
@@ -302,7 +308,7 @@ const Popup = React.memo(() => {
   const [type, setType] = useState<PopupType | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
 
-  // Memos
+  // Variables
   const { title, buttons, node, hideHeader } = useMemo<Popup>(() => {
     if (!id || !type || !initialData) return { id: '', type: 'dialogAlert', title: '', buttons: ['close'], node: () => null, hideHeader: true };
 
@@ -347,43 +353,43 @@ const Popup = React.memo(() => {
     };
 
     const node = {
-      aboutus: () => <About {...initialData} />,
-      applyFriend: () => <ApplyFriend {...initialData} />,
-      applyMember: () => <ApplyMember {...initialData} />,
-      approveFriend: () => <ApproveFriend {...initialData} />,
-      blockMember: () => <BlockMember {...initialData} />,
-      changeTheme: () => <ChangeTheme {...initialData} />,
-      channelPassword: () => <ChannelPassword {...initialData} />,
-      channelSetting: () => <ChannelSetting {...initialData} />,
-      createChannel: () => <CreateChannel {...initialData} />,
-      createFriendGroup: () => <CreateFriendGroup {...initialData} />,
-      createServer: () => <CreateServer {...initialData} />,
-      dialogAlert: () => <Dialog {...{ ...initialData, iconType: 'ALERT' }} />,
-      dialogAlert2: () => <Dialog {...{ ...initialData, iconType: 'ALERT' }} />,
-      dialogError: () => <Dialog {...{ ...initialData, iconType: 'ERROR' }} />,
-      dialogInfo: () => <Dialog {...{ ...initialData, iconType: 'INFO' }} />,
-      dialogSuccess: () => <Dialog {...{ ...initialData, iconType: 'SUCCESS' }} />,
-      dialogWarning: () => <Dialog {...{ ...initialData, iconType: 'WARNING' }} />,
-      directMessage: () => <DirectMessage {...initialData} />,
-      editChannelOrder: () => <EditChannelOrder {...initialData} />,
-      editChannelName: () => <EditChannelName {...initialData} />,
-      editFriendNote: () => <EditFriendNote {...initialData} />,
-      editFriendGroupName: () => <EditFriendGroupName {...initialData} />,
-      editNickname: () => <EditNickname {...initialData} />,
-      friendVerification: () => <FriendVerification {...initialData} />,
-      imageCropper: () => <ImageCropper {...initialData} />,
-      inviteMember: () => <InviteMember {...initialData} />,
-      kickMemberFromChannel: () => <KickMemberFromChannel {...initialData} />,
-      kickMemberFromServer: () => <KickMemberFromServer {...initialData} />,
-      memberApplicationSetting: () => <MemberApplicationSetting {...initialData} />,
-      memberInvitation: () => <MemberInvitation {...initialData} />,
-      searchUser: () => <SearchUser {...initialData} />,
-      serverBroadcast: () => <ServerBroadcast {...initialData} />,
-      serverSetting: () => <ServerSetting {...initialData} />,
-      systemSetting: () => <SystemSetting {...initialData} />,
-      userInfo: () => <UserInfo {...initialData} />,
-      userSetting: () => <UserInfo {...initialData} />,
-      chatHistory: () => <ChatHistory {...initialData} />,
+      aboutus: () => <About id={id} {...initialData} />,
+      applyFriend: () => <ApplyFriend id={id} {...initialData} />,
+      applyMember: () => <ApplyMember id={id} {...initialData} />,
+      approveFriend: () => <ApproveFriend id={id} {...initialData} />,
+      blockMember: () => <BlockMember id={id} {...initialData} />,
+      changeTheme: () => <ChangeTheme id={id} {...initialData} />,
+      channelPassword: () => <ChannelPassword id={id} {...initialData} />,
+      channelSetting: () => <ChannelSetting id={id} {...initialData} />,
+      createChannel: () => <CreateChannel id={id} {...initialData} />,
+      createFriendGroup: () => <CreateFriendGroup id={id} {...initialData} />,
+      createServer: () => <CreateServer id={id} {...initialData} />,
+      dialogAlert: () => <Dialog id={id} iconType="ALERT" {...initialData} />,
+      dialogAlert2: () => <Dialog id={id} iconType="ALERT" {...initialData} />,
+      dialogError: () => <Dialog id={id} iconType="ERROR" {...initialData} />,
+      dialogInfo: () => <Dialog id={id} iconType="INFO" {...initialData} />,
+      dialogSuccess: () => <Dialog id={id} iconType="SUCCESS" {...initialData} />,
+      dialogWarning: () => <Dialog id={id} iconType="WARNING" {...initialData} />,
+      directMessage: () => <DirectMessage id={id} {...initialData} />,
+      editChannelOrder: () => <EditChannelOrder id={id} {...initialData} />,
+      editChannelName: () => <EditChannelName id={id} {...initialData} />,
+      editFriendNote: () => <EditFriendNote id={id} {...initialData} />,
+      editFriendGroupName: () => <EditFriendGroupName id={id} {...initialData} />,
+      editNickname: () => <EditNickname id={id} {...initialData} />,
+      friendVerification: () => <FriendVerification id={id} {...initialData} />,
+      imageCropper: () => <ImageCropper id={id} {...initialData} />,
+      inviteMember: () => <InviteMember id={id} {...initialData} />,
+      kickMemberFromChannel: () => <KickMemberFromChannel id={id} {...initialData} />,
+      kickMemberFromServer: () => <KickMemberFromServer id={id} {...initialData} />,
+      memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
+      memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
+      searchUser: () => <SearchUser id={id} {...initialData} />,
+      serverBroadcast: () => <ServerBroadcast id={id} {...initialData} />,
+      serverSetting: () => <ServerSetting id={id} {...initialData} />,
+      systemSetting: () => <SystemSetting id={id} {...initialData} />,
+      userInfo: () => <UserInfo id={id} {...initialData} />,
+      userSetting: () => <UserInfo id={id} {...initialData} />,
+      chatHistory: () => <ChatHistory id={id} {...initialData} />,
     };
 
     return {
@@ -430,6 +436,8 @@ const Popup = React.memo(() => {
   );
 });
 
-Popup.displayName = 'Popup';
+PopupPageComponent.displayName = 'PopupPageComponent';
 
-export default Popup;
+const PopupPage = dynamic(() => Promise.resolve(PopupPageComponent), { ssr: false });
+
+export default PopupPage;

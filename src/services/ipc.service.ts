@@ -71,9 +71,9 @@ const ipcService = {
   },
 
   auth: {
-    login: async (account: string, password: string): Promise<{ success: true; token: string } | { success: false }> => {
+    login: async (formData: { account: string; password: string }): Promise<{ success: true; token: string } | { success: false }> => {
       if (!isElectron) return { success: false };
-      return await ipcRenderer.invoke('auth-login', account, password);
+      return await ipcRenderer.invoke('auth-login', formData);
     },
 
     logout: async (): Promise<void> => {
@@ -81,9 +81,9 @@ const ipcService = {
       return await ipcRenderer.invoke('auth-logout');
     },
 
-    register: async (account: string, password: string, email: string, username: string): Promise<{ success: true; message: string } | { success: false }> => {
+    register: async (formData: { account: string; password: string; email: string; username: string; locale: string }): Promise<{ success: true; message: string } | { success: false }> => {
       if (!isElectron) return { success: false };
-      return await ipcRenderer.invoke('auth-register', account, password, email, username);
+      return await ipcRenderer.invoke('auth-register', formData);
     },
 
     autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {
@@ -213,9 +213,9 @@ const ipcService = {
       return await ipcRenderer.invoke('data-recommendServers');
     },
 
-    upload: async (formData: FormData): Promise<any | null> => {
+    upload: async (type: string, fileName: string, file: string): Promise<any | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-upload', formData.get('_type'), formData.get('_fileName'), formData.get('_file'));
+      return await ipcRenderer.invoke('data-upload', type, fileName, file);
     },
   },
 
@@ -236,22 +236,22 @@ const ipcService = {
 
     minimize: () => {
       if (!isElectron) return;
-      ipcRenderer.send('window-control', 'minimize');
+      ipcRenderer.send('window-control-minimize');
     },
 
     maximize: () => {
       if (!isElectron) return;
-      ipcRenderer.send('window-control', 'maximize');
+      ipcRenderer.send('window-control-maximize');
     },
 
     unmaximize: () => {
       if (!isElectron) return;
-      ipcRenderer.send('window-control', 'unmaximize');
+      ipcRenderer.send('window-control-unmaximize');
     },
 
     close: () => {
       if (!isElectron) return;
-      ipcRenderer.send('window-control', 'close');
+      ipcRenderer.send('window-control-close');
     },
 
     onMaximize: (callback: () => void) => {
@@ -297,12 +297,11 @@ const ipcService = {
       ipcRenderer.send('popup-submit', to, data);
     },
 
-    onSubmit: (host: string, callback: (data: any) => void) => {
+    onSubmit: <T>(host: string, callback: (data: T) => void) => {
       if (!isElectron) return () => {};
       ipcRenderer.removeAllListeners('popup-submit');
-      const listener = (_: any, from: string, data?: any) => {
-        if (from != host) return;
-        callback(data);
+      const listener = (_: any, from: string, data: T) => {
+        if (from === host) callback(data);
         ipcRenderer.removeAllListeners('popup-submit');
       };
       ipcRenderer.on('popup-submit', listener);
@@ -354,18 +353,6 @@ const ipcService = {
       return () => ipcRenderer.removeListener('language', listener);
     },
   },
-
-  // auth: {
-  //   login: (token: string) => {
-  //     if (!isElectron) return;
-  //     ipcRenderer.send('login', token);
-  //   },
-
-  //   logout: () => {
-  //     if (!isElectron) return;
-  //     ipcRenderer.send('logout');
-  //   },
-  // },
 
   customThemes: {
     get: (): Theme[] => {
@@ -427,6 +414,49 @@ const ipcService = {
   },
 
   systemSettings: {
+    set: (settings: Partial<SystemSettings>) => {
+      if (!isElectron) return;
+      if (settings.autoLogin !== undefined) ipcRenderer.send('set-auto-login', settings.autoLogin);
+      if (settings.autoLaunch !== undefined) ipcRenderer.send('set-auto-launch', settings.autoLaunch);
+      if (settings.alwaysOnTop !== undefined) ipcRenderer.send('set-always-on-top', settings.alwaysOnTop);
+      if (settings.statusAutoIdle !== undefined) ipcRenderer.send('set-status-auto-idle', settings.statusAutoIdle);
+      if (settings.statusAutoIdleMinutes !== undefined) ipcRenderer.send('set-status-auto-idle-minutes', settings.statusAutoIdleMinutes);
+      if (settings.statusAutoDnd !== undefined) ipcRenderer.send('set-status-auto-dnd', settings.statusAutoDnd);
+      if (settings.channelUIMode !== undefined) ipcRenderer.send('set-channel-ui-mode', settings.channelUIMode);
+      if (settings.closeToTray !== undefined) ipcRenderer.send('set-close-to-tray', settings.closeToTray);
+      if (settings.font !== undefined) ipcRenderer.send('set-font', settings.font);
+      if (settings.fontSize !== undefined) ipcRenderer.send('set-font-size', settings.fontSize);
+      if (settings.inputAudioDevice !== undefined) ipcRenderer.send('set-input-audio-device', settings.inputAudioDevice);
+      if (settings.outputAudioDevice !== undefined) ipcRenderer.send('set-output-audio-device', settings.outputAudioDevice);
+      if (settings.recordFormat !== undefined) ipcRenderer.send('set-record-format', settings.recordFormat);
+      if (settings.mixEffect !== undefined) ipcRenderer.send('set-mix-effect', settings.mixEffect);
+      if (settings.mixEffectType !== undefined) ipcRenderer.send('set-mix-effect-type', settings.mixEffectType);
+      if (settings.autoMixSetting !== undefined) ipcRenderer.send('set-auto-mix-setting', settings.autoMixSetting);
+      if (settings.echoCancellation !== undefined) ipcRenderer.send('set-echo-cancellation', settings.echoCancellation);
+      if (settings.noiseCancellation !== undefined) ipcRenderer.send('set-noise-cancellation', settings.noiseCancellation);
+      if (settings.microphoneAmplification !== undefined) ipcRenderer.send('set-microphone-amplification', settings.microphoneAmplification);
+      if (settings.manualMixMode !== undefined) ipcRenderer.send('set-manual-mix-mode', settings.manualMixMode);
+      if (settings.mixMode !== undefined) ipcRenderer.send('set-mix-mode', settings.mixMode);
+      if (settings.speakingMode !== undefined) ipcRenderer.send('set-speaking-mode', settings.speakingMode);
+      if (settings.defaultSpeakingKey !== undefined) ipcRenderer.send('set-default-speaking-key', settings.defaultSpeakingKey);
+      if (settings.notSaveMessageHistory !== undefined) ipcRenderer.send('set-not-save-message-history', settings.notSaveMessageHistory);
+      if (settings.hotKeyOpenMainWindow !== undefined) ipcRenderer.send('set-hot-key-open-main-window', settings.hotKeyOpenMainWindow);
+      if (settings.hotKeyIncreaseVolume !== undefined) ipcRenderer.send('set-hot-key-increase-volume', settings.hotKeyIncreaseVolume);
+      if (settings.hotKeyDecreaseVolume !== undefined) ipcRenderer.send('set-hot-key-decrease-volume', settings.hotKeyDecreaseVolume);
+      if (settings.hotKeyToggleSpeaker !== undefined) ipcRenderer.send('set-hot-key-toggle-speaker', settings.hotKeyToggleSpeaker);
+      if (settings.hotKeyToggleMicrophone !== undefined) ipcRenderer.send('set-hot-key-toggle-microphone', settings.hotKeyToggleMicrophone);
+      if (settings.disableAllSoundEffect !== undefined) ipcRenderer.send('set-disable-all-sound-effect', settings.disableAllSoundEffect);
+      if (settings.enterVoiceChannelSound !== undefined) ipcRenderer.send('set-enter-voice-channel-sound', settings.enterVoiceChannelSound);
+      if (settings.leaveVoiceChannelSound !== undefined) ipcRenderer.send('set-leave-voice-channel-sound', settings.leaveVoiceChannelSound);
+      if (settings.startSpeakingSound !== undefined) ipcRenderer.send('set-start-speaking-sound', settings.startSpeakingSound);
+      if (settings.stopSpeakingSound !== undefined) ipcRenderer.send('set-stop-speaking-sound', settings.stopSpeakingSound);
+      if (settings.receiveDirectMessageSound !== undefined) ipcRenderer.send('set-receive-direct-message-sound', settings.receiveDirectMessageSound);
+      if (settings.receiveChannelMessageSound !== undefined) ipcRenderer.send('set-receive-channel-message-sound', settings.receiveChannelMessageSound);
+      if (settings.autoCheckForUpdates !== undefined) ipcRenderer.send('set-auto-check-for-updates', settings.autoCheckForUpdates);
+      if (settings.updateCheckInterval !== undefined) ipcRenderer.send('set-update-check-interval', settings.updateCheckInterval);
+      if (settings.updateChannel !== undefined) ipcRenderer.send('set-update-channel', settings.updateChannel);
+    },
+
     get: (): SystemSettings | null => {
       if (!isElectron) return null;
       return ipcRenderer.sendSync('get-system-settings');
@@ -581,13 +611,6 @@ const ipcService = {
         const listener = (_: any, enabled: boolean) => callback(enabled);
         ipcRenderer.on('close-to-tray', listener);
         return () => ipcRenderer.removeListener('close-to-tray', listener);
-      },
-    },
-
-    disclaimer: {
-      dontShowNextTime: () => {
-        if (!isElectron) return;
-        ipcRenderer.send('dont-show-disclaimer-next-time');
       },
     },
 
@@ -1122,59 +1145,77 @@ const ipcService = {
         return () => ipcRenderer.removeListener('receive-channel-message-sound', listener);
       },
     },
-  },
 
-  toolbar: {
-    title: {
-      set: (title: string) => {
+    autoCheckForUpdates: {
+      set: (enabled: boolean) => {
         if (!isElectron) return;
-        ipcRenderer.send('set-toolbar-title', title);
+        ipcRenderer.send('set-auto-check-for-updates', enabled);
+      },
+
+      get: (): boolean => {
+        if (!isElectron) return false;
+        return ipcRenderer.sendSync('get-auto-check-for-updates');
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, enabled: boolean) => callback(enabled);
+        ipcRenderer.on('auto-check-for-updates', listener);
+        return () => ipcRenderer.removeListener('auto-check-for-updates', listener);
+      },
+    },
+
+    updateCheckInterval: {
+      set: (interval: number) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-update-check-interval', interval);
+      },
+
+      get: (): number => {
+        if (!isElectron) return 0;
+        return ipcRenderer.sendSync('get-update-check-interval');
+      },
+
+      onUpdate: (callback: (interval: number) => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, interval: number) => callback(interval);
+        ipcRenderer.on('update-check-interval', listener);
+        return () => ipcRenderer.removeListener('update-check-interval', listener);
+      },
+    },
+
+    updateChannel: {
+      set: (channel: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-update-channel', channel);
+      },
+
+      get: (): string => {
+        if (!isElectron) return '';
+        return ipcRenderer.sendSync('get-update-channel');
+      },
+
+      onUpdate: (callback: (channel: string) => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, channel: string) => callback(channel);
+        ipcRenderer.on('update-channel', listener);
+        return () => ipcRenderer.removeListener('update-channel', listener);
       },
     },
   },
 
-  detectKey: {
-    onDefaultSpeakingKeyToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-default-speaking-key', listener);
-      return () => ipcRenderer.removeListener('toggle-default-speaking-key', listener);
+  tray: {
+    title: {
+      set: (title: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-tray-title', title);
+      },
     },
+  },
 
-    onHotKeyOpenMainWindowToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-open-main-window', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-open-main-window', listener);
-    },
-
-    onHotKeyIncreaseVolumeToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-increase-volume', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-increase-volume', listener);
-    },
-
-    onHotKeyDecreaseVolumeToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-decrease-volume', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-decrease-volume', listener);
-    },
-
-    onHotKeyToggleSpeakerToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-toggle-speaker', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-toggle-speaker', listener);
-    },
-
-    onHotKeyToggleMicrophoneToggled: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('toggle-hot-key-toggle-microphone', listener);
-      return () => ipcRenderer.removeListener('toggle-hot-key-toggle-microphone', listener);
-    },
+  dontShowDisclaimerNextTime: () => {
+    if (!isElectron) return;
+    ipcRenderer.send('dont-show-disclaimer-next-time');
   },
 
   loopbackAudio: {
@@ -1189,11 +1230,14 @@ const ipcService = {
     },
   },
 
-  latency: {
-    get: (): number => {
-      if (!isElectron) return 0;
-      return ipcRenderer.sendSync('get-latency');
-    },
+  checkForUpdates: () => {
+    if (!isElectron) return;
+    ipcRenderer.send('check-for-updates');
+  },
+
+  changeServer: (server: 'prod' | 'dev') => {
+    if (!isElectron) return;
+    ipcRenderer.send('change-server', server);
   },
 };
 

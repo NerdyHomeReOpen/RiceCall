@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -28,13 +28,16 @@ import ipc from '@/services/ipc.service';
 import { handleOpenAlertDialog } from '@/utils/popup';
 import { toTags } from '@/utils/tagConverter';
 
+// Constants
+import { MAX_FILE_SIZE } from '@/constant';
+
 interface MessageInputBoxProps {
-  onSend?: (message: string) => void;
+  onSendMessage?: (message: string) => void;
   disabled?: boolean;
   maxLength?: number;
 }
 
-const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, disabled = false, maxLength = 2000 }) => {
+const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMessage, disabled = false, maxLength = 2000 }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -68,10 +71,10 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
   // States
   const [messageInput, setMessageInput] = useState<string>('');
 
-  // Memos
+  // Variables
   const textLength = editor?.getText().length || 0;
-  const isCloseToMaxLength = useMemo(() => textLength >= maxLength - 100, [textLength, maxLength]);
-  const isWarning = useMemo(() => textLength > maxLength, [textLength, maxLength]);
+  const isCloseToMaxLength = textLength >= maxLength - 100;
+  const isWarning = textLength > maxLength;
 
   // Handlers
   const syncStyles = useCallback(() => {
@@ -81,16 +84,12 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
 
   const handlePaste = async (imageData: string, fileName: string) => {
     isUploadingRef.current = true;
-    if (imageData.length > 5 * 1024 * 1024) {
+    if (imageData.length > MAX_FILE_SIZE) {
       handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
-    const formData = new FormData();
-    formData.append('_type', 'message');
-    formData.append('_fileName', `fileName-${Date.now()}`);
-    formData.append('_file', imageData);
-    const response = await ipc.data.upload(formData);
+    const response = await ipc.data.upload('message', `fileName-${Date.now()}`, imageData);
     if (response) {
       editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
       syncStyles();
@@ -174,7 +173,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSend, di
           if (e.key === 'Enter') {
             e.preventDefault();
             if (messageInput.trim().length === 0) return;
-            onSend?.(messageInput);
+            onSendMessage?.(messageInput);
             editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
             syncStyles();
           }

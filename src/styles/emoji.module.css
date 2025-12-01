@@ -67,8 +67,8 @@
 }
 
 .emoji-panel {
+  z-index: 10000;
   position: absolute;
-  z-index: 1000;
   box-sizing: border-box;
   padding: 0 1px 1px 0;
   background-color: var(--background);
@@ -122,6 +122,7 @@
 }
 
 .color-select-box .color-panel {
+  z-index: 10001;
   position: absolute;
   top: calc(100%);
   left: 0;
@@ -133,7 +134,6 @@
   height: auto;
   border: 1px solid var(--border);
   box-shadow: 0 8px 16px var(--shadow);
-  z-index: 1001;
 }
 
 .color-select-box::before {
@@ -180,6 +180,7 @@
 }
 
 .color-panel {
+  z-index: 10001;
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
@@ -189,10 +190,7 @@
   padding: 8px;
   background-color: var(--background);
   border: 1px solid var(--border);
-  box-shadow:
-    0 8px 16px rgba(0, 0, 0, 0.15),
-    inset 0 1px 5px rgb(0 0 0 / 10%);
-  z-index: 1001;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), inset 0 1px 5px rgb(0 0 0 / 10%);
 }
 
 .color-option {
@@ -264,7 +262,7 @@
   cursor: pointer;
 }
 
-.emoji-tab-btn + .emoji-tab-btn {
+.emoji-tab-btn+.emoji-tab-btn {
   margin-left: 0;
 }
 
@@ -279,6 +277,7 @@
   height: 32px;
   opacity: 0.7;
 }
+
 .emoji-tab-btn[aria-pressed='true'] .img {
   opacity: 1;
 }
@@ -306,9 +305,11 @@
 .tab-def::before {
   background-image: url('/im/deftab.png');
 }
+
 .tab-other::before {
   background-image: url('/im/vipEm_Sign.png');
 }
+
 .tab-vip::before {
   background-image: url('/im/viptab.png');
 }

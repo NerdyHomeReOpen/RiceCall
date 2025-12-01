@@ -172,9 +172,13 @@
 
 .markdown-content img:not(.emoji) {
   margin: 5px;
-  width: 90%;
-  max-width: 256px;
-  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+  max-width: calc(min(90%, 1024px));
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.01);
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+  }
 }
 
 .container {
@@ -252,9 +256,19 @@
 }
 
 .embed-video {
-  width: 100%;
+  margin: 5px;
+  width: 90%;
+  max-width: calc(min(90%, 1024px));
   aspect-ratio: 16/9;
   border: 0;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.01);
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+  }
 }
 
 .emoji {

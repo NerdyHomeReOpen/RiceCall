@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
 
 // Types
 import type { User, ChannelMessage, PromptMessage, Channel, Server } from '@/types';
-
-// Providers
-import { useTranslation } from 'react-i18next';
 
 // Components
 import ChannelMessageTab from '@/components/ChannelMessage';
@@ -16,22 +13,14 @@ import PromptMessageTab from '@/components/PromptMessage';
 type MessageGroup = (ChannelMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
 
 interface ChannelMessageContentProps {
-  messages: (ChannelMessage | PromptMessage)[];
   user: User;
-  channel: Channel;
-  server: Server;
-  handleScrollToBottom?: () => void;
-  isAtBottom?: boolean;
+  currentServer: Server;
+  currentChannel: Channel;
+  messages: (ChannelMessage | PromptMessage)[];
 }
 
-const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages, user, channel, server, handleScrollToBottom, isAtBottom }) => {
-  // Hooks
-  const { t } = useTranslation();
-
-  // States
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  // Memos
+const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ user, currentServer, currentChannel, messages }) => {
+  // Variables
   const messageGroups = useMemo(() => {
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
     return sortedMessages.reduce<MessageGroup[]>((acc, message) => {
@@ -51,48 +40,18 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
     }, []);
   }, [messages]);
 
-  // Effects
-  useEffect(() => {
-    const el = document.querySelector('[data-message-area]');
-    if (!el) return;
-
-    if (messageGroups.length === 0) return;
-
-    const lastMessage = messageGroups[messageGroups.length - 1];
-    const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
-
-    if (lastMessage.type !== 'general' || lastMessage.userId === user.userId) {
-      setTimeout(() => handleScrollToBottom?.(), 50);
-    } else if (isBottom) {
-      setTimeout(() => handleScrollToBottom?.(), 50);
-    } else {
-      setUnreadCount((prev) => prev + 1);
-    }
-  }, [messageGroups, user.userId, handleScrollToBottom]);
-
-  useEffect(() => {
-    if (isAtBottom) setUnreadCount(0);
-  }, [isAtBottom]);
-
   return (
-    <>
-      <div className={styles['message-viewer-wrapper']}>
-        {messageGroups.map((messageGroup, index) => (
-          <div key={index} className={styles['message-wrapper']}>
-            {messageGroup.type === 'general' ? (
-              <ChannelMessageTab messageGroup={messageGroup} user={user} channel={channel} server={server} />
-            ) : (
-              <PromptMessageTab messageGroup={messageGroup} messageType={messageGroup.type} />
-            )}
-          </div>
-        ))}
-      </div>
-      {unreadCount > 0 && (
-        <div className={styles['new-message-alert']} onClick={() => handleScrollToBottom?.()}>
-          {t('has-new-message', { 0: unreadCount })}
+    <div className={styles['message-viewer-wrapper']}>
+      {messageGroups.map((messageGroup, index) => (
+        <div key={index} className={styles['message-wrapper']}>
+          {messageGroup.type === 'general' ? (
+            <ChannelMessageTab user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
+          ) : (
+            <PromptMessageTab user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
+          )}
         </div>
-      )}
-    </>
+      ))}
+    </div>
   );
 });
 

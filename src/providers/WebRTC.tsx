@@ -135,10 +135,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const isSpeakKeyPressedRef = useRef<boolean>(false);
   const isMicMutedRef = useRef<boolean>(false);
   const micVolumeRef = useRef<number>(100);
+  const microphoneAmplificationRef = useRef<boolean>(false);
   const [micVolume, setMicVolume] = useState<number>(100);
   const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
   const [isSpeakKeyPressed, setIsSpeakKeyPressed] = useState<boolean>(false);
   const [isMicMuted, setIsMicMuted] = useState<boolean>(false);
+  const [inputAudioDevice, setInputAudioDevice] = useState<string | null>(null);
+  const [echoCancellation, setEchoCancellation] = useState<boolean>(false);
+  const [noiseCancellation, setNoiseCancellation] = useState<boolean>(false);
 
   // Mix
   const mixVolumeRef = useRef<number>(100);
@@ -381,7 +385,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       // Create nodes
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
       const gainNode = audioContextRef.current.createGain();
-      gainNode.gain.value = micVolumeRef.current / 20;
+      gainNode.gain.value = micVolumeRef.current / (microphoneAmplificationRef.current ? 20 : 100);
 
       micNodesRef.current = { stream, source: sourceNode, gain: gainNode };
 
@@ -638,7 +642,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const changeMicVolume = useCallback((volume: number) => {
-    micNodesRef.current.gain!.gain.value = volume / 20;
+    if (micNodesRef.current.gain) micNodesRef.current.gain.gain.value = volume / (microphoneAmplificationRef.current ? 20 : 100);
     setMicVolume(volume);
     micVolumeRef.current = volume;
     window.localStorage.setItem('mic-volume', volume.toString());
@@ -649,14 +653,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const changeMixVolume = useCallback((volume: number) => {
-    mixNodesRef.current.gain!.gain.value = volume / 100;
+    if (mixNodesRef.current.gain) mixNodesRef.current.gain.gain.value = volume / 100;
     setMixVolume(volume);
     mixVolumeRef.current = volume;
     window.localStorage.setItem('mix-volume', volume.toString());
   }, []);
 
   const changeSpeakerVolume = useCallback((volume: number) => {
-    masterGainNodeRef.current!.gain.value = volume / 100;
+    if (masterGainNodeRef.current) masterGainNodeRef.current.gain.value = volume / 100;
     setSpeakerVolume(volume);
     speakerVolumeRef.current = volume;
     window.localStorage.setItem('speaker-volume', volume.toString());
@@ -740,7 +744,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       return stopRecording();
     }
 
-    recorderGainRef.current!.disconnect();
+    recorderGainRef.current?.disconnect();
     if (timerRef.current) clearInterval(timerRef.current);
 
     const blob = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate, recordFormatRef.current);
@@ -850,87 +854,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const getVolumePercent = useCallback((targetId: string | 'user') => volumePercent[targetId] ?? 0, [volumePercent]);
 
-  const handleSFUJoined = useCallback(
-    ({ channelId }: { channelId: string }) => {
-      setupRecv(channelId);
-    },
-    [setupRecv],
-  );
-
-  const handleSFULeft = useCallback(() => {
-    closeRecv();
-  }, [closeRecv]);
-
-  const handleNewProducer = useCallback(
-    async ({ userId, producerId, channelId }: { userId: string; producerId: string; channelId: string }) => {
-      console.info('[WebRTC] New producer: ', userId);
-      consumeOne(producerId, channelId).catch((e) => {
-        console.error('[WebRTC] Error consuming producer: ', e);
-      });
-    },
-    [consumeOne],
-  );
-
-  const handleProducerClosed = useCallback(
-    async ({ userId, producerId }: { userId: string; producerId: string }) => {
-      console.info('[WebRTC] Producer closed: ', userId);
-      unconsumeOne(producerId).catch((e) => {
-        console.error('[WebRTC] Error unconsuming producer: ', e);
-      });
-    },
-    [unconsumeOne],
-  );
-
-  const handleEditOutputDevice = useCallback((deviceId: string) => {
-    const el = speakerRef.current;
-    if (el && typeof el.setSinkId === 'function') {
-      el.setSinkId(deviceId).catch((err) => {
-        console.warn('[WebRTC] set output device failed: ', err);
-      });
-    }
-  }, []);
-
-  const handleEditInputDevice = useCallback(
-    (deviceId: string) => {
-      navigator.mediaDevices
-        .getUserMedia({
-          audio: {
-            channelCount: 2,
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false,
-            ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
-          },
-        })
-        .then(async (stream) => {
-          initMicAudio(stream);
-        })
-        .catch((err) => {
-          console.error('[WebRTC] access input device failed: ', err);
-        });
-    },
-    [initMicAudio],
-  );
-
-  const handleEditSpeakingMode = useCallback((mode: SpeakingMode) => {
-    micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
-      track.enabled = mode === 'key' ? isSpeakKeyPressedRef.current : true;
-    });
-    setSpeakingMode(mode);
-    speakingModeRef.current = mode;
-  }, []);
-
-  const handleEditRecordFormat = useCallback((format: 'wav' | 'mp3') => {
-    recordFormatRef.current = format;
-  }, []);
-
   // Effects
   useEffect(() => {
     if (!isRecording) return;
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setRecordTime((prev) => prev + 1);
-    }, 1000);
+    timerRef.current = setInterval(() => setRecordTime((prev) => prev + 1), 1000);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = null;
+    };
   }, [isRecording]);
 
   useEffect(() => {
@@ -939,23 +870,142 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [initAudioContext, initLocalStorage]);
 
   useEffect(() => {
-    handleEditInputDevice(ipc.systemSettings.inputAudioDevice.get());
-    handleEditOutputDevice(ipc.systemSettings.outputAudioDevice.get());
-    handleEditSpeakingMode(ipc.systemSettings.speakingMode.get());
-    handleEditRecordFormat(ipc.systemSettings.recordFormat.get());
+    if (!isMicTaken) {
+      removeMicAudio();
+      return;
+    }
 
-    const unsubscribe = [
-      ipc.systemSettings.inputAudioDevice.onUpdate(handleEditInputDevice),
-      ipc.systemSettings.outputAudioDevice.onUpdate(handleEditOutputDevice),
-      ipc.systemSettings.speakingMode.onUpdate(handleEditSpeakingMode),
-      ipc.systemSettings.recordFormat.onUpdate(handleEditRecordFormat),
-      ipc.socket.on('SFUJoined', handleSFUJoined),
-      ipc.socket.on('SFULeft', handleSFULeft),
-      ipc.socket.on('SFUNewProducer', handleNewProducer),
-      ipc.socket.on('SFUProducerClosed', handleProducerClosed),
-    ];
-    return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleEditInputDevice, handleEditOutputDevice, handleEditSpeakingMode, handleEditRecordFormat, handleSFUJoined, handleSFULeft, handleNewProducer, handleProducerClosed]);
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: {
+          channelCount: 2,
+          echoCancellation: echoCancellation,
+          noiseSuppression: noiseCancellation,
+          autoGainControl: false,
+          ...(inputAudioDevice ? { deviceId: { exact: inputAudioDevice } } : {}),
+        },
+      })
+      .then((stream) => {
+        initMicAudio(stream);
+      })
+      .catch((err) => {
+        console.error('[WebRTC] access input device failed: ', err);
+      });
+  }, [inputAudioDevice, echoCancellation, noiseCancellation, isMicTaken, initMicAudio, removeMicAudio]);
+
+  useEffect(() => {
+    const changeInputAudioDevice = (inputAudioDevice: string) => {
+      console.info('[WebRTC] input audio device updated: ', inputAudioDevice);
+      setInputAudioDevice(inputAudioDevice);
+    };
+    changeInputAudioDevice(ipc.systemSettings.inputAudioDevice.get());
+    const unsub = ipc.systemSettings.inputAudioDevice.onUpdate(changeInputAudioDevice);
+    return () => unsub();
+  }, [initMicAudio]);
+
+  useEffect(() => {
+    const changeOutputAudioDevice = (outputAudioDevice: string) => {
+      console.info('[WebRTC] output audio device updated: ', outputAudioDevice);
+      const el = speakerRef.current;
+      if (el && typeof el.setSinkId === 'function') {
+        el.setSinkId(outputAudioDevice).catch((err) => {
+          console.warn('[WebRTC] set output device failed: ', err);
+        });
+      }
+    };
+    changeOutputAudioDevice(ipc.systemSettings.outputAudioDevice.get());
+    const unsub = ipc.systemSettings.outputAudioDevice.onUpdate(changeOutputAudioDevice);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const changeEchoCancellation = (echoCancellation: boolean) => {
+      console.info('[WebRTC] echo cancellation updated: ', echoCancellation);
+      setEchoCancellation(echoCancellation);
+    };
+    changeEchoCancellation(ipc.systemSettings.echoCancellation.get());
+    const unsub = ipc.systemSettings.echoCancellation.onUpdate(changeEchoCancellation);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const changeNoiseCancellation = (noiseCancellation: boolean) => {
+      console.info('[WebRTC] noise cancellation updated: ', noiseCancellation);
+      setNoiseCancellation(noiseCancellation);
+    };
+    changeNoiseCancellation(ipc.systemSettings.noiseCancellation.get());
+    const unsub = ipc.systemSettings.noiseCancellation.onUpdate(changeNoiseCancellation);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const changeMicrophoneAmplification = (microphoneAmplification: boolean) => {
+      console.info('[WebRTC] microphone amplification updated: ', microphoneAmplification);
+      microphoneAmplificationRef.current = microphoneAmplification;
+      changeMicVolume(micVolumeRef.current);
+    };
+    changeMicrophoneAmplification(ipc.systemSettings.microphoneAmplification.get());
+    const unsub = ipc.systemSettings.microphoneAmplification.onUpdate(changeMicrophoneAmplification);
+    return () => unsub();
+  }, [changeMicVolume]);
+
+  useEffect(() => {
+    const changeSpeakingMode = (speakingMode: SpeakingMode) => {
+      console.info('[WebRTC] speaking mode updated: ', speakingMode);
+      micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
+        track.enabled = speakingMode === 'key' ? isSpeakKeyPressedRef.current : true;
+      });
+      setSpeakingMode(speakingMode);
+      speakingModeRef.current = speakingMode;
+    };
+    changeSpeakingMode(ipc.systemSettings.speakingMode.get());
+    const unsub = ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const changeRecordFormat = (recordFormat: 'wav' | 'mp3') => {
+      console.info('[WebRTC] record format updated: ', recordFormat);
+      recordFormatRef.current = recordFormat;
+    };
+    changeRecordFormat(ipc.systemSettings.recordFormat.get());
+    const unsub = ipc.systemSettings.recordFormat.onUpdate(changeRecordFormat);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('SFUJoined', ({ channelId }: { channelId: string }) => {
+      setupRecv(channelId);
+    });
+    return () => unsub();
+  }, [setupRecv]);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('SFULeft', () => {
+      closeRecv();
+    });
+    return () => unsub();
+  }, [closeRecv]);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('SFUNewProducer', ({ userId, producerId, channelId }: { userId: string; producerId: string; channelId: string }) => {
+      console.info('[WebRTC] New producer: ', userId);
+      consumeOne(producerId, channelId).catch((e) => {
+        console.error('[WebRTC] Error consuming producer: ', e);
+      });
+    });
+    return () => unsub();
+  }, [consumeOne]);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('SFUProducerClosed', ({ userId, producerId }: { userId: string; producerId: string }) => {
+      console.info('[WebRTC] Producer closed: ', userId);
+      unconsumeOne(producerId).catch((e) => {
+        console.error('[WebRTC] Error unconsuming producer: ', e);
+      });
+    });
+    return () => unsub();
+  }, [unconsumeOne]);
 
   return (
     <WebRTCContext.Provider

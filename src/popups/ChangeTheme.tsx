@@ -107,11 +107,9 @@ const ChangeThemePopup: React.FC = React.memo(() => {
       console.info('[Custom Themes] custom themes updated: ', customThemes);
       setCustomThemes(customThemes);
     };
-
     changeCustomTheme(ipc.customThemes.get());
-
-    const unsubscribe = [ipc.customThemes.onUpdate(changeCustomTheme)];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    const unsub = ipc.customThemes.onUpdate(changeCustomTheme);
+    return () => unsub();
   }, []);
 
   useEffect(() => {
@@ -172,39 +170,39 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                   <div className={styles['color-selector']} onClick={() => setShowColorPicker((prev) => !prev)} />
 
                   {/* Custom Colors */}
-                  {customThemes.slice(0, 7).map((_, i) => {
-                    const customTheme = customThemes[i];
-                    if (customTheme) {
-                      return (
-                        <div
-                          key={`custom-${i}`}
-                          style={
-                            {
-                              'backgroundColor': customTheme.mainColor,
-                              'backgroundImage': customTheme.headerImage,
-                              '--main-color': customTheme.mainColor,
-                              '--secondary-color': customTheme.secondaryColor,
-                              '--header-image': customTheme.headerImage,
-                            } as React.CSSProperties
-                          }
-                          onClick={handleSelectTheme}
-                          onContextMenu={(e) => {
-                            e.preventDefault();
-                            const x = e.clientX;
-                            const y = e.clientY;
-                            contextMenu.showContextMenu(x, y, 'right-bottom', [
-                              {
-                                id: 'delete',
-                                label: t('delete'),
-                                onClick: () => handleRemoveCustom(i),
-                              },
-                            ]);
-                          }}
-                        />
-                      );
-                    } else {
-                      return <div key={`color-box-empty-${i}`} />;
-                    }
+                  {customThemes.slice(0, 7).map((customTheme, i) => {
+                    // Handlers
+                    const getContextMenuItems = () => [
+                      {
+                        id: 'delete',
+                        label: t('delete'),
+                        onClick: () => handleRemoveCustom(i),
+                      },
+                    ];
+
+                    return customTheme ? (
+                      <div
+                        key={`custom-${i}`}
+                        style={
+                          {
+                            'backgroundColor': customTheme.mainColor,
+                            'backgroundImage': customTheme.headerImage,
+                            '--main-color': customTheme.mainColor,
+                            '--secondary-color': customTheme.secondaryColor,
+                            '--header-image': customTheme.headerImage,
+                          } as React.CSSProperties
+                        }
+                        onClick={handleSelectTheme}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          const x = e.clientX;
+                          const y = e.clientY;
+                          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+                        }}
+                      />
+                    ) : (
+                      <div key={`color-box-empty-${i}`} />
+                    );
                   })}
 
                   {/* Image Selector */}
@@ -219,13 +217,12 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       if (!file) return;
                       const reader = new FileReader();
                       reader.onloadend = () =>
-                        handleOpenImageCropper(reader.result as string, async (data) => {
-                          const base64String = data.imageDataUrl as string;
-                          const dominantColor = await getDominantColor(base64String);
+                        handleOpenImageCropper(reader.result as string, async (imageDataUrl: string) => {
+                          const dominantColor = await getDominantColor(imageDataUrl);
                           const visibleColor = getVisibleColor(dominantColor);
                           const contrastColor = getContrastColor(dominantColor);
                           const newTheme: Theme = {
-                            headerImage: `url(${base64String})`,
+                            headerImage: `url(${imageDataUrl})`,
                             mainColor: toRGBString(visibleColor),
                             secondaryColor: toRGBString(contrastColor),
                           };

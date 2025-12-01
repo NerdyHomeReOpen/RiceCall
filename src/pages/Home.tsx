@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
 // CSS
 import homePage from '@/styles/home.module.css';
-import announcementStyle from '@/styles/announcement.module.css';
+import annStyle from '@/styles/announcement.module.css';
 
 // Components
 import ServerList from '@/components/ServerList';
@@ -71,8 +71,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [personalResults, setPersonalResults] = useState<Server[]>([]);
   const [relatedResults, setRelatedResults] = useState<Server[]>([]);
   const [section, setSection] = useState<number>(0);
-  const [selectedAnnouncementCategory, setSelectedAnnouncementCategory] = useState<Announcement['category']>('all');
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
+  const [selectedAnnCategory, setSelectedAnnCategory] = useState<Announcement['category']>('all');
+  const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
 
   // Variables
   const { userId, currentServerId } = user;
@@ -80,26 +80,27 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
-
   const filteredAnnouncements = useMemo(
-    () => announcements.filter((a) => a.category === selectedAnnouncementCategory || selectedAnnouncementCategory === 'all').sort((a, b) => b.timestamp - a.timestamp),
-    [announcements, selectedAnnouncementCategory],
+    () => announcements.filter((a) => a.category === selectedAnnCategory || selectedAnnCategory === 'all').sort((a, b) => b.timestamp - a.timestamp),
+    [announcements, selectedAnnCategory],
   );
-
-  const categoryTabs = [
-    { key: 'all', label: t('all') },
-    { key: 'general', label: t('general') },
-    { key: 'event', label: t('event') },
-    { key: 'update', label: t('update') },
-    { key: 'system', label: t('system') },
-  ];
+  const categoryTabs = useMemo(
+    () => [
+      { key: 'all', label: t('all') },
+      { key: 'general', label: t('general') },
+      { key: 'event', label: t('event') },
+      { key: 'update', label: t('update') },
+      { key: 'system', label: t('system') },
+    ],
+    [t],
+  );
 
   // Handlers
   const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
 
     if (!query) {
-      handleClearSearchState();
+      handleClearSearchState(true);
       return;
     }
 
@@ -118,8 +119,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     }, 500);
   };
 
-  const handleClearSearchState = () => {
-    if (searchInputRef.current) searchInputRef.current.value = '';
+  const handleClearSearchState = (clearSearchQuery: boolean = false) => {
+    if (clearSearchQuery && searchInputRef.current) searchInputRef.current.value = '';
     setExactMatch(null);
     setPersonalResults([]);
     setRelatedResults([]);
@@ -128,28 +129,38 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const handleConnectServer = useCallback(
     (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
       if (loadingBox.isLoading) return;
-      if (currentServerId == serverId) {
+      if (serverId === currentServerId) {
         mainTab.setSelectedTabId('server');
         return;
       }
       loadingBox.setIsLoading(true);
       loadingBox.setLoadingServerId(serverDisplayId);
       ipc.socket.send('connectServer', { serverId });
-
-      setExactMatch(null);
-      setPersonalResults([]);
-      setRelatedResults([]);
+      handleClearSearchState();
     },
     [currentServerId, mainTab, loadingBox],
   );
 
-  const handleServerSearch = useCallback(
-    (...args: Server[]) => {
+  // Effects
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        handleClearSearchState(true);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, []);
+
+  useEffect(() => {
+    if (announcements.length > 0) setSelectedAnn(announcements[announcements.length - 1]);
+  }, [announcements]);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('serverSearch', (...args: Server[]) => {
       const q = searchQueryRef.current;
 
-      setExactMatch(null);
-      setPersonalResults([]);
-      setRelatedResults([]);
+      handleClearSearchState();
 
       if (!args.length) return;
 
@@ -172,12 +183,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       setExactMatch(exact);
       setPersonalResults(personal);
       setRelatedResults(related);
-    },
-    [servers],
-  );
+    });
+    return () => unsub();
+  }, [servers]);
 
-  const handleDeepLink = useCallback(
-    async (serverId: string) => {
+  useEffect(() => {
+    const unsub = ipc.deepLink.onDeepLink(async (serverId: string) => {
       if (!userId || !serverId) return;
       ipc.socket.send('searchServer', { query: serverId });
       const servers: Server[] = await new Promise((resolve) => {
@@ -191,42 +202,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         return;
       }
       handleConnectServer(target.serverId, target.displayId);
-    },
-    [userId, handleConnectServer],
-  );
-
-  // Effects
-  useEffect(() => {
-    const onPointerDown = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setExactMatch(null);
-        setPersonalResults([]);
-        setRelatedResults([]);
-      }
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (searchTimerRef.current) {
-        clearTimeout(searchTimerRef.current);
-        searchTimerRef.current = null;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (announcements.length > 0) {
-      setSelectedAnnouncement(announcements[announcements.length - 1]);
-    }
-  }, [announcements]);
-
-  useEffect(() => {
-    const unsubscribe = [ipc.socket.on('serverSearch', handleServerSearch), ipc.deepLink.onDeepLink(handleDeepLink)];
-    return () => unsubscribe.forEach((unsub) => unsub());
-  }, [handleServerSearch, handleDeepLink]);
+    });
+    return () => unsub();
+  }, [userId, handleConnectServer]);
 
   return (
     <main className={homePage['home']} style={display ? {} : { display: 'none' }}>
@@ -247,7 +225,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 handleConnectServer(exactMatch.serverId, exactMatch.displayId);
               }}
             />
-            <div className={homePage['search-input-clear-btn']} onClick={handleClearSearchState} style={searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
+            <div className={homePage['search-input-clear-btn']} onClick={() => handleClearSearchState(true)} style={searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
             <div className={homePage['search-input-icon']} style={!searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
             <div className={homePage['search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
               {exactMatch && (
@@ -288,12 +266,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={`${homePage['navegate-tab']} ${section === 1 ? homePage['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
             {t('recommend')}
           </div>
-          {/* <div className={`${homePage['navegate-tab']} ${section === 2 ? homePage['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
-            {t('game')}
-          </div>
-          <div className={`${homePage['navegate-tab']} ${section === 3 ? homePage['active'] : ''}`} data-key="30375" onClick={() => setSection(3)}>
-            {t('live')}
-          </div> */}
         </div>
 
         <div className={homePage['right']}>
@@ -308,40 +280,40 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
       {/* Announcement */}
       <main className={homePage['home-body']} style={section === 0 ? {} : { display: 'none' }}>
-        <div className={announcementStyle['announcement-wrapper']}>
-          <div className={announcementStyle['announcement-header']}>
+        <div className={annStyle['announcement-wrapper']}>
+          <div className={annStyle['announcement-header']}>
             {categoryTabs.map((categoryTab) => (
               <div
                 key={categoryTab.key}
-                className={`${announcementStyle['announcement-tab']} ${selectedAnnouncementCategory === categoryTab.key ? announcementStyle['active'] : ''}`}
-                onClick={() => setSelectedAnnouncementCategory(categoryTab.key)}
+                className={`${annStyle['announcement-tab']} ${selectedAnnCategory === categoryTab.key ? annStyle['active'] : ''}`}
+                onClick={() => setSelectedAnnCategory(categoryTab.key)}
               >
                 {t(categoryTab.label)}
               </div>
             ))}
           </div>
-          <div className={announcementStyle['announcement-list']}>
+          <div className={annStyle['announcement-list']}>
             {filteredAnnouncements.map((announcement) => (
-              <div key={announcement.announcementId} className={announcementStyle['announcement-item']} onClick={() => setSelectedAnnouncement(announcement)}>
-                <div className={announcementStyle['announcement-type']} data-category={announcement.category}>
+              <div key={announcement.announcementId} className={annStyle['announcement-item']} onClick={() => setSelectedAnn(announcement)}>
+                <div className={annStyle['announcement-type']} data-category={announcement.category}>
                   {t(`${announcement.category}`)}
                 </div>
-                <div className={announcementStyle['announcement-title']}>{announcement.title}</div>
-                <div className={announcementStyle['announcement-date']}>{getFormatDate(announcement.timestamp)}</div>
+                <div className={annStyle['announcement-title']}>{announcement.title}</div>
+                <div className={annStyle['announcement-date']}>{getFormatDate(announcement.timestamp)}</div>
               </div>
             ))}
           </div>
-          <div className={announcementStyle['announcement-detail-wrapper']} style={selectedAnnouncement ? {} : { display: 'none' }} onClick={() => setSelectedAnnouncement(null)}>
-            <div className={announcementStyle['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
-              <div className={announcementStyle['announcement-detail-header']}>
-                <div className={announcementStyle['announcement-type']} data-category={selectedAnnouncement?.category}>
-                  {t(`${selectedAnnouncement?.category}`)}
+          <div className={annStyle['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
+            <div className={annStyle['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
+              <div className={annStyle['announcement-detail-header']}>
+                <div className={annStyle['announcement-type']} data-category={selectedAnn?.category}>
+                  {t(`${selectedAnn?.category}`)}
                 </div>
-                <div className={announcementStyle['announcement-detail-title']}>{selectedAnnouncement?.title}</div>
-                <div className={announcementStyle['announcement-datail-date']}>{selectedAnnouncement && getFormatDate(selectedAnnouncement.timestamp)}</div>
+                <div className={annStyle['announcement-detail-title']}>{selectedAnn?.title}</div>
+                <div className={annStyle['announcement-datail-date']}>{selectedAnn && getFormatDate(selectedAnn.timestamp)}</div>
               </div>
-              <div className={announcementStyle['announcement-detail-content']}>
-                <MarkdownContent markdownText={selectedAnnouncement?.content ?? ''} />
+              <div className={annStyle['announcement-detail-content']}>
+                <MarkdownContent markdownText={selectedAnn?.content ?? ''} />
               </div>
             </div>
           </div>

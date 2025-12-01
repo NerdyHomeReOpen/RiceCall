@@ -31,14 +31,12 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   const [selectedTabId, setSelectedTabId] = useState<number>(0);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
-  // Destructuring
+  // Variables
   const { userId } = user;
-
-  // Memos
   const filteredFriends = useMemo(() => friends.filter((f) => f.name.includes(searchQuery)), [friends, searchQuery]);
-  const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: 0, userId }), [t, userId]);
-  const strangerFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000, userId }), [t, userId]);
-  const blacklistFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001, userId }), [t, userId]);
+  const defaultFriendGroup = Default.friendGroup({ name: t('my-friends'), order: 0, userId });
+  const strangerFriendGroup = Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000, userId });
+  const blacklistFriendGroup = Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001, userId });
   const filteredFriendGroups = useMemo(
     () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
     [defaultFriendGroup, friendGroups, strangerFriendGroup, blacklistFriendGroup],

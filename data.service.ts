@@ -1,7 +1,7 @@
 // Services
 import api from './api.service.js';
 
-export const getDataService = {
+const dataService = {
   user: async (params: { userId: string }) => {
     return await api.get(`/user?${new URLSearchParams(params).toString()}`);
   },
@@ -93,6 +93,14 @@ export const getDataService = {
   recommendServers: async () => {
     return await api.get(`/recommendServers`);
   },
+
+  upload: async (type: string, fileName: string, file: string): Promise<{ avatar: string; avatarUrl: string }> => {
+    const formData = new FormData();
+    formData.append('_type', type);
+    formData.append('_fileName', fileName);
+    formData.append('_file', file);
+    return await api.post('/upload', formData);
+  },
 };
 
-export default getDataService;
+export default dataService;

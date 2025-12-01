@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 // CSS
 import styles from '@/styles/message.module.css';
@@ -13,16 +13,15 @@ import PromptMessageTab from '@/components/PromptMessage';
 type MessageGroup = (DirectMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
 
 interface DirectMessageContentProps {
-  messages: (DirectMessage | PromptMessage)[];
   user: User;
-  isScrollToBottom?: boolean;
+  messages: (DirectMessage | PromptMessage)[];
 }
 
-const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ messages, isScrollToBottom = true }) => {
+const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ user, messages }) => {
   // Refs
   const messagesViewerRef = useRef<HTMLDivElement>(null);
 
-  // Memos
+  // Variables
   const messageGroups = useMemo(() => {
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
     return sortedMessages.reduce<MessageGroup[]>((acc, message) => {
@@ -42,25 +41,13 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
     }, []);
   }, [messages]);
 
-  // Effects
-  useLayoutEffect(() => {
-    if (isScrollToBottom && messagesViewerRef.current?.lastElementChild) {
-      (messagesViewerRef.current.lastElementChild as HTMLElement).scrollIntoView({
-        behavior: 'auto',
-        block: 'end',
-      });
-    }
-  }, [messageGroups, isScrollToBottom]);
-
   return (
     <div ref={messagesViewerRef} className={styles['message-viewer-wrapper']}>
-      {messageGroups.map((messageGroup, index) => {
-        return (
-          <div key={index} className={styles['message-wrapper']}>
-            {messageGroup.type === 'dm' ? <DirectMessageTab messageGroup={messageGroup} /> : <PromptMessageTab messageGroup={messageGroup} messageType={messageGroup.type} />}
-          </div>
-        );
-      })}
+      {messageGroups.map((messageGroup, index) => (
+        <div key={index} className={styles['message-wrapper']}>
+          {messageGroup.type === 'dm' ? <DirectMessageTab messageGroup={messageGroup} /> : <PromptMessageTab user={user} messageGroup={messageGroup} messageType={messageGroup.type} />}
+        </div>
+      ))}
     </div>
   );
 });

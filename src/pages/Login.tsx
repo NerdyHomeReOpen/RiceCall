@@ -10,16 +10,9 @@ import ipc from '@/services/ipc.service';
 // Providers
 import { useTranslation } from 'react-i18next';
 
-interface FormDatas {
-  account: string;
-  password: string;
-  rememberAccount: boolean;
-  autoLogin: boolean;
-}
-
 interface LoginPageProps {
   display: boolean;
-  setSection: (section: 'login' | 'register') => void;
+  setSection: (section: 'login' | 'register' | 'change-server') => void;
 }
 
 const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setSection }) => {
@@ -30,71 +23,49 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
   const comboRef = useRef<HTMLDivElement>(null);
 
   // States
-  const [formData, setFormData] = useState<FormDatas>({
-    account: '',
-    password: '',
-    rememberAccount: false,
-    autoLogin: false,
-  });
+  const [account, setAccount] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [rememberAccount, setRememberAccount] = useState<boolean>(false);
+  const [autoLogin, setAutoLogin] = useState<boolean>(false);
   const [accounts, setAccounts] = useState<Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showAccountselectBox, setShowAccountselectBox] = useState<boolean>(false);
 
   // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, checked } = e.target;
     if (name === 'account') {
       const match = accounts[value];
-      setFormData((prev) => ({
-        ...prev,
-        account: value,
-        rememberAccount: match?.rememberAccount ?? false,
-        autoLogin: match?.autoLogin ?? false,
-      }));
+      setAccount(value);
+      setRememberAccount(match?.rememberAccount ?? false);
+      setAutoLogin(match?.autoLogin ?? false);
+    } else if (name === 'password') {
+      setPassword(value);
     } else if (name === 'autoLogin') {
-      setFormData((prev) => ({
-        ...prev,
-        autoLogin: checked,
-        rememberAccount: checked ? true : prev.rememberAccount,
-      }));
+      setAutoLogin(checked);
+      setRememberAccount(checked ? true : rememberAccount);
     } else if (name === 'rememberAccount') {
-      setFormData((prev) => {
-        if (prev.autoLogin && !checked) {
-          return {
-            ...prev,
-            autoLogin: false,
-            rememberAccount: false,
-          };
-        }
-        return {
-          ...prev,
-          rememberAccount: checked,
-        };
-      });
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value,
-      }));
+      if (autoLogin && !checked) {
+        setAutoLogin(false);
+        setRememberAccount(false);
+      }
+      setRememberAccount(checked);
     }
   };
 
   const handleSubmit = async () => {
-    if (!formData.account || !formData.password) return;
+    if (!account || !password) return;
 
     setIsLoading(true);
 
-    const res = await ipc.auth.login(formData.account, formData.password);
-    if (res.success) {
-      if (formData.rememberAccount) {
-        ipc.accounts.add(formData.account, formData);
+    await ipc.auth.login({ account, password }).then((res) => {
+      if (res.success) {
+        if (rememberAccount) ipc.accounts.add(account, { autoLogin, rememberAccount, password });
+        if (autoLogin) localStorage.setItem('token', res.token);
+        localStorage.setItem('login-account', account);
+        setSection('login');
       }
-      if (formData.autoLogin) {
-        localStorage.setItem('token', res.token);
-      }
-      localStorage.setItem('login-account', formData.account);
-      setSection('login');
-    }
+    });
 
     setIsLoading(false);
   };
@@ -110,13 +81,10 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
   // Effects
   useEffect(() => {
     const loginAccount = localStorage.getItem('login-account') || '';
-    setFormData((prev) => ({
-      ...prev,
-      account: accounts[loginAccount] ? loginAccount : '',
-      password: accounts[loginAccount]?.password ?? '',
-      rememberAccount: !!accounts[loginAccount]?.rememberAccount,
-      autoLogin: !!accounts[loginAccount]?.autoLogin,
-    }));
+    setAccount(accounts[loginAccount] ? loginAccount : '');
+    setPassword(accounts[loginAccount]?.password ?? '');
+    setRememberAccount(!!accounts[loginAccount]?.rememberAccount);
+    setAutoLogin(!!accounts[loginAccount]?.autoLogin);
   }, [accounts]);
 
   useEffect(() => {
@@ -124,8 +92,8 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
       setAccounts(accounts);
     };
     changeAccounts(ipc.accounts.get());
-    const unsubscribe = [ipc.accounts.onUpdate(changeAccounts)];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    const unsub = ipc.accounts.onUpdate(changeAccounts);
+    return () => unsub();
   }, []);
 
   useEffect(() => {
@@ -148,18 +116,17 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
             handleSubmit();
           }}
         >
-          {isLoading && (
+          {isLoading ? (
             <>
               <div className={styles['loading-indicator']}>{`${t('logining')}...`}</div>
               <div className={styles['loading-bar']} />
             </>
-          )}
-          {!isLoading && (
+          ) : (
             <>
               <div className={styles['input-wrapper']}>
                 <div className={styles['label']}>{t('account')}</div>
                 <div className={styles['input-box']} ref={comboRef}>
-                  <input type="text" name="account" value={formData.account} onChange={handleInputChange} placeholder={t('please-input-account')} className={styles['input']} />
+                  <input type="text" name="account" value={account} onChange={handleInputChange} placeholder={t('please-input-account')} className={styles['input']} />
                   <div
                     className={styles['combo-arrow']}
                     onClick={(e) => {
@@ -173,13 +140,10 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
                         key={account}
                         className={styles['account-select-option-box']}
                         onClick={() => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            account: account,
-                            rememberAccount: rememberAccount,
-                            autoLogin: autoLogin,
-                            password: password,
-                          }));
+                          setAccount(account);
+                          setRememberAccount(rememberAccount);
+                          setAutoLogin(autoLogin);
+                          setPassword(password);
                           setShowAccountselectBox(false);
                         }}
                       >
@@ -199,20 +163,20 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
               <div className={styles['input-wrapper']}>
                 <div className={styles['label']}>{t('password')}</div>
                 <div className={styles['input-box']}>
-                  <input type="password" name="password" value={formData.password} onChange={handleInputChange} placeholder={t('please-input-password')} className={styles['input']} />
+                  <input type="password" name="password" value={password} onChange={handleInputChange} placeholder={t('please-input-password')} className={styles['input']} />
                 </div>
               </div>
               <div className={styles['check-wrapper']}>
                 <div className={styles['check-box']}>
-                  <input type="checkbox" name="rememberAccount" checked={formData.rememberAccount} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
+                  <input type="checkbox" name="rememberAccount" checked={rememberAccount} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
                   {t('remember-account')}
                 </div>
                 <div className={styles['check-box']}>
-                  <input type="checkbox" name="autoLogin" checked={formData.autoLogin} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
+                  <input type="checkbox" name="autoLogin" checked={autoLogin} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
                   {t('auto-login')}
                 </div>
               </div>
-              <button className={styles['submit-button']} onClick={handleSubmit} tabIndex={-1} disabled={!formData.account || !formData.password}>
+              <button className={styles['submit-button']} onClick={handleSubmit} tabIndex={-1} disabled={!account || !password}>
                 {t('login')}
               </button>
             </>
@@ -222,8 +186,16 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
 
       {/* Footer */}
       <div className={styles['login-footer']}>
-        <div className={styles['create-account']} onClick={() => setSection('register')}>
-          {t('register-account')}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <div className={styles['create-account']} onClick={() => setSection('register')}>
+            {t('register-account')}
+          </div>
+          <div className={styles['change-server']} onClick={() => setSection('change-server')}>
+            {'/'}
+          </div>
+          <div className={styles['change-server']} onClick={() => setSection('change-server')}>
+            {t('change-server')}
+          </div>
         </div>
         <div className={styles['forget-password']} onClick={() => handleForgotPassword()}>
           {t('forgot-password')}

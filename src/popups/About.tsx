@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 
 // Package
@@ -35,9 +35,12 @@ const AboutPopup: React.FC = React.memo(() => {
   const [dontShowNextTime, setDontShowNextTime] = useState(false);
   const [staffs, setStaffs] = useState<Staff[]>([]);
 
+  // Variables
+  const currentYear = new Date().getFullYear();
+
   // Handlers
   const handleDontShowNextTime = () => {
-    ipc.systemSettings.disclaimer.dontShowNextTime();
+    ipc.dontShowDisclaimerNextTime();
     ipc.window.close();
   };
 
@@ -51,9 +54,6 @@ const AboutPopup: React.FC = React.memo(() => {
     if (['developer', 'machine-network', 'technical-support'].some((t) => title.includes(t))) return styles['color-3'];
     return styles['color-5'];
   };
-
-  // Memos
-  const CURRENT_YEAR = useMemo(() => new Date().getFullYear(), []);
 
   // Effects
   useEffect(() => {
@@ -74,7 +74,7 @@ const AboutPopup: React.FC = React.memo(() => {
 
           <div className={styles['app-info']}>
             <div className={styles['app-version-text']}>RiceCall v{version}</div>
-            <div className={styles['copyright-text']}>COPYRIGHT @ {CURRENT_YEAR} RiceCall.com ,ALL RIGHTS RESERVED.</div>
+            <div className={styles['copyright-text']}>COPYRIGHT @ {currentYear} RiceCall.com ,ALL RIGHTS RESERVED.</div>
             <div className={popup['row']} style={{ alignSelf: 'center' }}>
               <div className={popup['link-text']} onClick={() => window.open('https://discord.com/invite/adCWzv6wwS', '_blank')}>
                 {t('get-help')}
@@ -91,30 +91,26 @@ const AboutPopup: React.FC = React.memo(() => {
 
           <div className={styles['team-members']}>
             <p>{t('team-members')}:</p>
-            {staffs.map((staff, index) => {
-              const githubInfo = staff.github;
-              const discordInfo = staff.discord;
-              return (
-                <div key={index} className={styles['team-member-card']}>
-                  <div className={styles['name-wrapper']}>
-                    <span className={`${styles['staff-title']} ${getTitleColorClass(staff.title)}`}>{t(staff.title)}</span>
-                    <span>{staff.contact}</span>
-                  </div>
-                  <div className={styles['icon-wrapper']}>
-                    {githubInfo && (
-                      <div className={styles['github-icon-link']} title="GitHub" onClick={() => window.open(`https://github.com/${githubInfo}`, '_blank')}>
-                        <FaGithub size={20} />
-                      </div>
-                    )}
-                    {discordInfo && (
-                      <div className={styles['discord-icon-link']} title="Discord" onClick={() => window.open(`http://discordapp.com/users/${discordInfo}`, '_blank')}>
-                        <FaDiscord size={20} />
-                      </div>
-                    )}
-                  </div>
+            {staffs.map((staff, index) => (
+              <div key={index} className={styles['team-member-card']}>
+                <div className={styles['name-wrapper']}>
+                  <span className={`${styles['staff-title']} ${getTitleColorClass(staff.title)}`}>{t(staff.title)}</span>
+                  <span>{staff.contact}</span>
                 </div>
-              );
-            })}
+                <div className={styles['icon-wrapper']}>
+                  {staff.github && (
+                    <div className={styles['github-icon-link']} title="GitHub" onClick={() => window.open(`https://github.com/${staff.github}`, '_blank')}>
+                      <FaGithub size={20} />
+                    </div>
+                  )}
+                  {staff.discord && (
+                    <div className={styles['discord-icon-link']} title="Discord" onClick={() => window.open(`http://discordapp.com/users/${staff.discord}`, '_blank')}>
+                      <FaDiscord size={20} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

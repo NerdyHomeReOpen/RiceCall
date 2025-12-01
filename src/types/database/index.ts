@@ -201,6 +201,7 @@ export type table_user_activities = {
 export type table_user_badges = {
   userId: string;
   badgeId: string;
+  displayNickname: string | null;
   order: number;
   showTo: number;
   obtainedAt: number;

@@ -39,7 +39,7 @@
   position: absolute;
   top: -1px;
   left: -1px;
-  z-index: 99;
+  z-index: 1;
   min-width: 42px;
   min-height: 42px;
   background-image: url('/win_border.png');

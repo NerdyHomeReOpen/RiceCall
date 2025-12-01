@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 
 // CSS
 import styles from '@/styles/server.module.css';
+import messageStyles from '@/styles/message.module.css';
 
 // Components
 import MarkdownContent from '@/components/MarkdownContent';
@@ -35,8 +36,8 @@ interface MessageInputBoxGuardProps {
   channelGuestTextGapTime: number;
   channelGuestTextWaitTime: number;
   channelGuestTextMaxLength: number;
-  channelIsTextMuted: boolean;
-  onSend: (msg: string) => void;
+  isChannelTextMuted: boolean;
+  onSendMessage: (msg: string) => void;
 }
 
 const MessageInputBoxGuard = React.memo(
@@ -49,22 +50,22 @@ const MessageInputBoxGuard = React.memo(
     channelGuestTextGapTime,
     channelGuestTextWaitTime,
     channelGuestTextMaxLength,
-    channelIsTextMuted,
-    onSend,
+    isChannelTextMuted,
+    onSendMessage,
   }: MessageInputBoxGuardProps) => {
     // States
     const [now, setNow] = useState(Date.now());
 
     // Effects
     useEffect(() => {
-      const id = setInterval(() => setNow(Date.now()), 1000);
-      return () => clearInterval(id);
+      const interval = setInterval(() => setNow(Date.now()), 1000);
+      return () => clearInterval(interval);
     }, []);
 
     const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;
     const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
 
-    const isForbidByMutedText = channelIsTextMuted;
+    const isForbidByMutedText = isChannelTextMuted;
     const isForbidByForbidText = !isChannelMod(permissionLevel) && channelForbidText;
     const isForbidByForbidGuestText = !isMember(permissionLevel) && channelForbidGuestText;
     const isForbidByForbidGuestTextGap = !isMember(permissionLevel) && leftGapTime > 0;
@@ -72,7 +73,7 @@ const MessageInputBoxGuard = React.memo(
     const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
     const maxLength = !isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
 
-    return <MessageInputBox disabled={disabled} maxLength={maxLength} onSend={onSend} />;
+    return <MessageInputBox disabled={disabled} maxLength={maxLength} onSendMessage={onSendMessage} />;
   },
 );
 
@@ -124,21 +125,22 @@ VolumeSlider.displayName = 'VolumeSlider';
 
 interface ServerPageProps {
   user: User;
+  currentServer: Server;
+  currentChannel: Channel;
   friends: Friend[];
-  server: Server;
+  queueUsers: QueueUser[];
   serverOnlineMembers: OnlineMember[];
   serverMemberApplications: MemberApplication[];
-  currentChannel: Channel;
   channels: Channel[];
   channelMessages: (ChannelMessage | PromptMessage)[];
-  clearMessages: () => void;
   actionMessages: PromptMessage[];
-  queueUsers: QueueUser[];
+  onClearMessages: () => void;
   display: boolean;
+  latency: number;
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
-  ({ user, friends, server, serverOnlineMembers, serverMemberApplications, currentChannel, channels, channelMessages, clearMessages, actionMessages, queueUsers, display }) => {
+  ({ user, currentServer, currentChannel, friends, queueUsers, serverOnlineMembers, serverMemberApplications, channels, channelMessages, actionMessages, onClearMessages, display, latency }) => {
     // Hooks
     const { t } = useTranslation();
     const webRTC = useWebRTC();
@@ -151,6 +153,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
+    const messageAreaRef = useRef<HTMLDivElement>(null);
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
@@ -162,46 +165,66 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
     const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+    const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
 
     // Variables
-    const { userId, permissionLevel: globalPermissionLevel } = user;
-    const { serverId, announcement: serverAnnouncement, permissionLevel: serverPermissionLevel } = server;
+    const { userId } = user;
+    const { serverId: currentServerId, announcement: currentServerAnnouncement } = currentServer;
     const {
-      channelId,
-      announcement: channelAnnouncement,
-      bitrate: channelBitrate,
-      voiceMode: channelVoiceMode,
-      forbidText: channelForbidText,
-      forbidQueue: channelForbidQueue,
-      forbidGuestText: channelForbidGuestText,
-      guestTextGapTime: channelGuestTextGapTime,
-      guestTextWaitTime: channelGuestTextWaitTime,
-      guestTextMaxLength: channelGuestTextMaxLength,
-      permissionLevel: channelPermissionLevel,
-      isTextMuted: channelIsTextMuted,
-      isVoiceMuted: channelIsVoiceMuted,
+      channelId: currentChannelId,
+      announcement: currentChannelAnnouncement,
+      bitrate: currentChannelBitrate,
+      voiceMode: currentChannelVoiceMode,
+      forbidText: currentChannelForbidText,
+      forbidQueue: currentChannelForbidQueue,
+      forbidGuestText: currentChannelForbidGuestText,
+      guestTextGapTime: currentChannelGuestTextGapTime,
+      guestTextWaitTime: currentChannelGuestTextWaitTime,
+      guestTextMaxLength: currentChannelGuestTextMaxLength,
+      isTextMuted: isCurrentChannelTextMuted,
+      isVoiceMuted: isCurrentChannelVoiceMuted,
     } = currentChannel;
-    const permissionLevel = useMemo(() => Math.max(globalPermissionLevel, serverPermissionLevel, channelPermissionLevel), [globalPermissionLevel, serverPermissionLevel, channelPermissionLevel]);
-    const queueUser = useMemo(() => queueUsers.find((m) => m.userId === userId), [queueUsers, userId]);
-    const queuePosition = useMemo(() => (queueUser?.position ?? 0) + 1, [queueUser]);
-    const channelIsQueueMode = useMemo(() => channelVoiceMode === 'queue', [channelVoiceMode]);
-    const channelIsQueueControlled = useMemo(() => queueUsers.some((m) => m.isQueueControlled), [queueUsers]);
-    const volumeLevel = useMemo(() => (webRTC.isSpeaking('user') ? Math.ceil(webRTC.getVolumePercent('user') / 10) - 1 : 0), [webRTC]);
-    const isMicTaken = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position <= 0), [queueUsers, userId]);
-    const isQueuing = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position > 0), [queueUsers, userId]);
-    const isIdling = useMemo(() => !isMicTaken && !isQueuing, [isMicTaken, isQueuing]);
-    const isControlled = useMemo(() => queueUsers.some((m) => m.userId === userId && m.position === 0 && !isChannelMod(permissionLevel) && m.isQueueControlled), [queueUsers, userId, permissionLevel]);
+    const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
+    const queuePosition = useMemo(() => (queueUsers.find((m) => m.userId === userId)?.position ?? 0) + 1, [queueUsers, userId]);
+    const isCurrentChannelFreeMode = currentChannelVoiceMode === 'free';
+    const isCurrentChannelAdminMode = currentChannelVoiceMode === 'admin';
+    const isCurrentChannelQueueMode = currentChannelVoiceMode === 'queue';
+    const volumeLevel = webRTC.isSpeaking('user') ? Math.ceil(webRTC.getVolumePercent('user') / 10) - 1 : 0;
+    const { isMicTaken, isQueuing, isIdling, isControlled, isCurrentChannelQueueControlled } = useMemo(() => {
+      let isMicTaken = false;
+      let isQueuing = false;
+      let isControlled = false;
+      let isCurrentChannelQueueControlled = false;
 
-    const micText = useMemo(() => {
+      for (const m of queueUsers) {
+        if (m.isQueueControlled) isCurrentChannelQueueControlled = true;
+        if (m.userId !== userId) continue;
+        if (m.position <= 0) {
+          isMicTaken = true;
+          if (!isChannelMod(permissionLevel) && m.isQueueControlled) {
+            isControlled = true;
+          }
+        } else if (m.position > 0) {
+          isQueuing = true;
+        }
+      }
+
+      const isIdling = !isMicTaken && !isQueuing;
+
+      return { isMicTaken, isQueuing, isIdling, isControlled, isCurrentChannelQueueControlled };
+    }, [queueUsers, userId, permissionLevel]);
+
+    // Handlers
+    const getMicText = () => {
       if (isMicTaken) return t('mic-taken');
       if (isQueuing) return t('mic-queued');
       return t('take-mic');
-    }, [isMicTaken, isQueuing, t]);
+    };
 
-    const micSubText = useMemo(() => {
+    const getMicSubText = () => {
       if (isIdling) return '';
       if (isQueuing) return t('in-queue-position', { '0': queuePosition });
-      if (channelIsVoiceMuted) return t('mic-forbidden');
+      if (isCurrentChannelVoiceMuted) return t('mic-forbidden');
       if (isControlled) return t('mic-controlled');
       if (speakingMode === 'key' && !webRTC.isSpeakKeyPressed) {
         return t('press-key-to-speak', { '0': speakingKey });
@@ -209,18 +232,77 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       if (webRTC.isMixModeActive) return t('speaking-with-mix');
       if (webRTC.micVolume === 0) return t('mic-muted');
       return t('speaking');
-    }, [speakingMode, speakingKey, webRTC.isSpeakKeyPressed, webRTC.micVolume, isQueuing, isIdling, channelIsVoiceMuted, isControlled, queuePosition, t, webRTC.isMixModeActive]);
+    };
 
-    const micBtnClass = useMemo(() => {
+    const getMicBtnClass = () => {
       let className = styles['mic-button'];
       if (isMicTaken) className += ` ${styles['speaking']}`;
       if (isQueuing) className += ` ${styles['queuing']}`;
-      if (channelIsVoiceMuted || isControlled) className += ` ${styles['muted']}`;
-      if (!channelIsQueueMode || (!isChannelMod(permissionLevel) && isIdling)) className += ` ${styles['no-selection']}`;
+      if (isCurrentChannelVoiceMuted || isControlled) className += ` ${styles['muted']}`;
+      if (!isCurrentChannelQueueMode || (!isChannelMod(permissionLevel) && isIdling)) className += ` ${styles['no-selection']}`;
       return className;
-    }, [isMicTaken, isQueuing, channelIsVoiceMuted, isControlled, channelIsQueueMode, permissionLevel, isIdling]);
+    };
 
-    // Handlers
+    const getContextMenuItems1 = () => [
+      {
+        id: 'close-announcement',
+        label: t('close-announcement'),
+        onClick: () => setIsAnnouncementVisible(false),
+      },
+    ];
+
+    const getContextMenuItems2 = () => [
+      {
+        id: 'clean-up-message',
+        label: t('clean-up-message'),
+        onClick: onClearMessages,
+      },
+      {
+        id: 'open-announcement',
+        label: t('open-announcement'),
+        show: !isAnnouncementVisible,
+        onClick: () => setIsAnnouncementVisible(true),
+      },
+    ];
+
+    const getContextMenuItems3 = () => [
+      {
+        id: 'free-speech',
+        label: t('free-speech'),
+        icon: isCurrentChannelFreeMode ? 'checked' : '',
+        onClick: () => handleEditChannel(currentServerId, currentChannelId, { voiceMode: 'free' }),
+      },
+      {
+        id: 'admin-speech',
+        label: t('admin-speech'),
+        icon: isCurrentChannelAdminMode ? 'checked' : '',
+        onClick: () => handleEditChannel(currentServerId, currentChannelId, { voiceMode: 'admin' }),
+      },
+      {
+        id: 'queue-speech',
+        label: t('queue-speech'),
+        icon: isCurrentChannelQueueMode ? 'submenu' : '',
+        hasSubmenu: isCurrentChannelQueueMode,
+        onClick: () => handleEditChannel(currentServerId, currentChannelId, { voiceMode: 'queue' }),
+        submenuItems: [
+          {
+            id: 'forbid-guest-queue',
+            label: t('forbid-queue'),
+            icon: currentChannelForbidQueue ? 'checked' : '',
+            disabled: !isCurrentChannelQueueMode,
+            onClick: () => handleEditChannel(currentServerId, currentChannelId, { forbidQueue: !currentChannelForbidQueue }),
+          },
+          {
+            id: 'control-queue',
+            label: t('control-queue'),
+            icon: isCurrentChannelQueueControlled ? 'checked' : '',
+            disabled: !isCurrentChannelQueueMode,
+            onClick: () => handleControlQueue(currentServerId, currentChannelId),
+          },
+        ],
+      },
+    ];
+
     const handleSendMessage = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<ChannelMessage>): void => {
       ipc.socket.send('channelMessage', { serverId, channelId, preset });
       setLastMessageTime(Date.now());
@@ -267,7 +349,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     };
 
     const handleClickMicButton = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (channelIsQueueMode) {
+      if (isCurrentChannelQueueMode) {
         if (!isIdling) {
           const x = e.currentTarget.getBoundingClientRect().left;
           const y = e.currentTarget.getBoundingClientRect().top;
@@ -275,8 +357,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             {
               id: 'untake-mic',
               label: t('untake-mic'),
-              show: channelIsQueueMode,
-              onClick: () => handleLeaveQueue(serverId, channelId),
+              show: isCurrentChannelQueueMode,
+              onClick: () => handleLeaveQueue(currentServerId, currentChannelId),
             },
           ]);
         } else if (isChannelMod(permissionLevel)) {
@@ -286,8 +368,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             {
               id: 'take-mic-in-queue',
               label: t('take-mic-in-queue'),
-              show: channelIsQueueMode,
-              onClick: () => handleJoinQueue(serverId, channelId),
+              show: isCurrentChannelQueueMode,
+              onClick: () => handleJoinQueue(currentServerId, currentChannelId),
             },
             {
               id: 'separator',
@@ -296,18 +378,18 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
             {
               id: 'take-mic-directly',
               label: t('take-mic-directly'),
-              show: channelIsQueueMode,
-              onClick: () => handleJoinQueue(serverId, channelId, -2),
+              show: isCurrentChannelQueueMode,
+              onClick: () => handleJoinQueue(currentServerId, currentChannelId, -2),
             },
           ]);
         } else {
-          handleJoinQueue(serverId, channelId);
+          handleJoinQueue(currentServerId, currentChannelId);
         }
       } else {
         if (isMicTaken) {
-          handleLeaveQueue(serverId, channelId);
+          handleLeaveQueue(currentServerId, currentChannelId);
         } else {
-          handleJoinQueue(serverId, channelId);
+          handleJoinQueue(currentServerId, currentChannelId);
         }
       }
     };
@@ -337,31 +419,27 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     };
 
     const handleScroll = () => {
-      const el = document.querySelector('[data-message-area]');
-      if (!el) return;
-
-      const isBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
+      if (!messageAreaRef.current) return;
+      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
       setIsAtBottom(isBottom);
     };
 
     const handleScrollToBottom = useCallback(() => {
-      const el = document.querySelector('[data-message-area]');
-      if (!el) return;
-
+      if (!messageAreaRef.current) return;
+      messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'smooth' });
       setIsAtBottom(true);
-      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }, []);
 
     // Effects
     useEffect(() => {
-      webRTCRef.current.changeBitrate(channelBitrate);
-    }, [channelBitrate]);
+      webRTCRef.current.changeBitrate(currentChannelBitrate);
+    }, [currentChannelBitrate]);
 
     useEffect(() => {
-      if (isMicTaken && !isControlled) webRTCRef.current.takeMic(channelId);
+      if (isMicTaken && !isControlled) webRTCRef.current.takeMic(currentChannelId);
       else webRTCRef.current.releaseMic();
       webRTCRef.current.stopMixing();
-    }, [isMicTaken, isControlled, channelId]);
+    }, [isMicTaken, isControlled, currentChannelId]);
 
     useEffect(() => {
       if (actionMessages.length === 0) {
@@ -380,19 +458,19 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [actionMessages]);
 
     useEffect(() => {
-      if (channelId) {
+      if (currentChannelId) {
         setLastJoinChannelTime(Date.now());
         setLastMessageTime(0);
       }
-    }, [channelId]);
+    }, [currentChannelId]);
 
     useEffect(() => {
-      const resetResizing = () => {
+      const onPointerup = () => {
         isResizingSidebarRef.current = false;
         isResizingAnnAreaRef.current = false;
       };
-      document.addEventListener('pointerup', resetResizing);
-      return () => document.removeEventListener('pointerup', resetResizing);
+      document.addEventListener('pointerup', onPointerup);
+      return () => document.removeEventListener('pointerup', onPointerup);
     }, []);
 
     useEffect(() => {
@@ -406,29 +484,61 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, []);
 
     useEffect(() => {
+      if (!messageAreaRef.current || channelMessages.length === 0) return;
+
+      const lastMessage = channelMessages[channelMessages.length - 1];
+      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
+
+      if (lastMessage.type !== 'general' || lastMessage.userId === userId) {
+        setTimeout(() => handleScrollToBottom(), 50);
+      } else if (isBottom) {
+        setTimeout(() => handleScrollToBottom(), 50);
+      } else {
+        setUnreadMessageCount((prev) => prev + 1);
+      }
+    }, [channelMessages, userId, handleScrollToBottom]);
+
+    useEffect(() => {
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') handleScrollToBottom();
+      };
+      window.addEventListener('keydown', onKeyDown);
+      return () => window.removeEventListener('keydown', onKeyDown);
+    }, [handleScrollToBottom]);
+
+    useEffect(() => {
+      if (isAtBottom) setUnreadMessageCount(0);
+    }, [isAtBottom]);
+
+    useEffect(() => {
+      setUnreadMessageCount(0);
+    }, [currentServerId]);
+
+    useEffect(() => {
       const changeSpeakingMode = (speakingMode: SpeakingMode) => {
-        console.info('[ServerPage] speaking mode updated: ', speakingMode);
         setSpeakingMode(speakingMode);
       };
-      const changeSpeakingKey = (key: string) => {
-        console.info('[ServerPage] speaking key updated: ', key);
+      changeSpeakingMode(ipc.systemSettings.speakingMode.get());
+      const unsub = ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode);
+      return () => unsub();
+    }, []);
+
+    useEffect(() => {
+      const changeDefaultSpeakingKey = (key: string) => {
         setSpeakingKey(key);
       };
+      changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
+      const unsub = ipc.systemSettings.defaultSpeakingKey.onUpdate(changeDefaultSpeakingKey);
+      return () => unsub();
+    }, []);
+
+    useEffect(() => {
       const changeChannelUIMode = (channelUIMode: ChannelUIMode) => {
-        console.info('[ServerPage] channel UI mode updated: ', channelUIMode);
         setChannelUIMode(channelUIMode);
       };
-
-      changeSpeakingMode(ipc.systemSettings.speakingMode.get());
-      changeSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
       changeChannelUIMode(ipc.systemSettings.channelUIMode.get());
-
-      const unsubscribe = [
-        ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode),
-        ipc.systemSettings.defaultSpeakingKey.onUpdate(changeSpeakingKey),
-        ipc.systemSettings.channelUIMode.onUpdate(changeChannelUIMode),
-      ];
-      return () => unsubscribe.forEach((unsub) => unsub());
+      const unsub = ipc.systemSettings.channelUIMode.onUpdate(changeChannelUIMode);
+      return () => unsub();
     }, []);
 
     return (
@@ -439,13 +549,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           <aside ref={sidebarRef} className={styles['sidebar']}>
             <ChannelList
               user={user}
+              currentServer={currentServer}
+              currentChannel={currentChannel}
               friends={friends}
-              server={server}
+              queueUsers={queueUsers}
               serverOnlineMembers={serverOnlineMembers}
               serverMemberApplications={serverMemberApplications}
               channels={channels}
-              currentChannel={currentChannel}
-              queueUsers={queueUsers}
+              latency={latency}
             />
           </aside>
 
@@ -466,16 +577,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     e.preventDefault();
                     e.stopPropagation();
                     const { clientX: x, clientY: y } = e;
-                    contextMenu.showContextMenu(x, y, 'right-bottom', [
-                      {
-                        id: 'close-announcement',
-                        label: t('close-announcement'),
-                        onClick: () => setIsAnnouncementVisible(false),
-                      },
-                    ]);
+                    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
                   }}
                 >
-                  <MarkdownContent markdownText={channelAnnouncement || serverAnnouncement} />
+                  <MarkdownContent markdownText={currentChannelAnnouncement || currentServerAnnouncement} />
                 </div>
               )}
 
@@ -497,49 +602,47 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               <div className={styles['bottom-area']}>
                 {/* Message Area */}
                 <div
+                  ref={messageAreaRef}
                   className={styles['message-area']}
                   onScroll={handleScroll}
-                  data-message-area
                   onContextMenu={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     const target = e.target as HTMLElement;
                     if (target.closest(`.${styles['username-text']}`)) return;
                     const { clientX: x, clientY: y } = e;
-                    contextMenu.showContextMenu(x, y, 'right-bottom', [
-                      {
-                        id: 'clean-up-message',
-                        label: t('clean-up-message'),
-                        onClick: () => clearMessages(),
-                      },
-                      {
-                        id: 'open-announcement',
-                        label: t('open-announcement'),
-                        show: !isAnnouncementVisible,
-                        onClick: () => setIsAnnouncementVisible(true),
-                      },
-                    ]);
+                    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
                   }}
                 >
-                  <ChannelMessageContent messages={channelMessages} user={user} channel={currentChannel} server={server} handleScrollToBottom={handleScrollToBottom} isAtBottom={isAtBottom} />
+                  <ChannelMessageContent user={user} currentServer={currentServer} currentChannel={currentChannel} messages={channelMessages} />
+                  {unreadMessageCount > 0 && (
+                    <div className={messageStyles['new-message-alert']} onClick={handleScrollToBottom}>
+                      {t('has-new-message', { 0: unreadMessageCount })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Broadcast Area */}
                 <div className={styles['input-area']}>
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
-                    <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} user={user} channel={currentChannel} server={server} />
+                    <ChannelMessageContent
+                      user={user}
+                      currentServer={currentServer}
+                      currentChannel={currentChannel}
+                      messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []}
+                    />
                   </div>
                   <MessageInputBoxGuard
                     lastJoinChannelTime={lastJoinChannelTime}
                     lastMessageTime={lastMessageTime}
                     permissionLevel={permissionLevel}
-                    channelForbidText={channelForbidText}
-                    channelForbidGuestText={channelForbidGuestText}
-                    channelGuestTextGapTime={channelGuestTextGapTime}
-                    channelGuestTextWaitTime={channelGuestTextWaitTime}
-                    channelGuestTextMaxLength={channelGuestTextMaxLength}
-                    channelIsTextMuted={channelIsTextMuted}
-                    onSend={(message) => handleSendMessage(serverId, channelId, { type: 'general', content: message })}
+                    channelForbidText={currentChannelForbidText}
+                    channelForbidGuestText={currentChannelForbidGuestText}
+                    channelGuestTextGapTime={currentChannelGuestTextGapTime}
+                    channelGuestTextWaitTime={currentChannelGuestTextWaitTime}
+                    channelGuestTextMaxLength={currentChannelGuestTextMaxLength}
+                    isChannelTextMuted={isCurrentChannelTextMuted}
+                    onSendMessage={(message) => handleSendMessage(currentServerId, currentChannelId, { type: 'general', content: message })}
                   />
                 </div>
               </div>
@@ -554,55 +657,19 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   onClick={(e) => {
                     const x = e.currentTarget.getBoundingClientRect().left;
                     const y = e.currentTarget.getBoundingClientRect().top;
-                    contextMenu.showContextMenu(x, y, 'right-top', [
-                      {
-                        id: 'free-speech',
-                        label: t('free-speech'),
-                        icon: channelVoiceMode === 'free' ? 'checked' : '',
-                        onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'free' }),
-                      },
-                      {
-                        id: 'admin-speech',
-                        label: t('admin-speech'),
-                        icon: channelVoiceMode === 'admin' ? 'checked' : '',
-                        onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'admin' }),
-                      },
-                      {
-                        id: 'queue-speech',
-                        label: t('queue-speech'),
-                        icon: channelVoiceMode === 'queue' ? 'submenu' : '',
-                        hasSubmenu: channelVoiceMode === 'queue',
-                        onClick: () => handleEditChannel(serverId, channelId, { voiceMode: 'queue' }),
-                        submenuItems: [
-                          {
-                            id: 'forbid-guest-queue',
-                            label: t('forbid-queue'),
-                            icon: channelForbidQueue ? 'checked' : '',
-                            disabled: channelVoiceMode !== 'queue',
-                            onClick: () => handleEditChannel(serverId, channelId, { forbidQueue: !channelForbidQueue }),
-                          },
-                          {
-                            id: 'control-queue',
-                            label: t('control-queue'),
-                            icon: channelIsQueueControlled ? 'checked' : '',
-                            disabled: channelVoiceMode !== 'queue',
-                            onClick: () => handleControlQueue(serverId, channelId),
-                          },
-                        ],
-                      },
-                    ]);
+                    contextMenu.showContextMenu(x, y, 'right-top', getContextMenuItems3());
                   }}
                 >
-                  {channelVoiceMode === 'queue' ? t('queue-speech') : channelVoiceMode === 'free' ? t('free-speech') : channelVoiceMode === 'admin' ? t('admin-speech') : ''}
+                  {currentChannelVoiceMode === 'queue' ? t('queue-speech') : currentChannelVoiceMode === 'free' ? t('free-speech') : currentChannelVoiceMode === 'admin' ? t('admin-speech') : ''}
                 </div>
               </div>
-              <div className={micBtnClass} onClick={handleClickMicButton}>
+              <div className={getMicBtnClass()} onClick={handleClickMicButton}>
                 <div className={`${styles['mic-icon']} ${isMicTaken ? styles[`level${volumeLevel}`] : ''}`} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <div className={styles['mic-text']} style={{ fontSize: isIdling ? '1.3rem' : '1.1rem' }}>
-                    {micText}
+                    {getMicText()}
                   </div>
-                  <div className={styles['mic-sub-text']}>{micSubText}</div>
+                  <div className={styles['mic-sub-text']}>{getMicSubText()}</div>
                 </div>
               </div>
               <div className={styles['buttons']}>

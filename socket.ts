@@ -123,7 +123,6 @@ const ServerToClientEventNames = [
 
 // Socket
 export let socket: Socket | null = null;
-export let latency: number = 0;
 export let seq: number = 0;
 export let interval: NodeJS.Timeout | null = null;
 
@@ -279,8 +278,13 @@ export function connectSocket(token: string) {
       if (err) {
         console.warn(`${new Date().toLocaleString()} | Heartbeat ${seq} timeout`);
       } else {
-        latency = Date.now() - start;
+        const latency = Date.now() - start;
+
         console.log(`${new Date().toLocaleString()} | ACK for #${ack.seq} in ${latency} ms`);
+
+        BrowserWindow.getAllWindows().forEach((window) => {
+          window.webContents.send('heartbeat', { seq: ack.seq, latency });
+        });
       }
     });
   }, 30000);

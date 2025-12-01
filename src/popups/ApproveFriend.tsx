@@ -39,29 +39,29 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
     ipc.window.close();
   };
 
-  const handleFriendGroupAdd = (...args: { data: FriendGroup }[]) => {
-    const add = new Set(args.map((i) => `${i.data.friendGroupId}`));
-    setFriendGroups((prev) => prev.filter((fg) => !add.has(`${fg.friendGroupId}`)).concat(args.map((i) => i.data)));
-  };
-
-  const handleFriendGroupUpdate = (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
-    const update = new Map(args.map((i) => [`${i.friendGroupId}`, i.update] as const));
-    setFriendGroups((prev) => prev.map((fg) => (update.has(`${fg.friendGroupId}`) ? { ...fg, ...update.get(`${fg.friendGroupId}`) } : fg)));
-  };
-
-  const handleFriendGroupRemove = (...args: { friendGroupId: string }[]) => {
-    const remove = new Set(args.map((i) => `${i.friendGroupId}`));
-    setFriendGroups((prev) => prev.filter((fg) => !remove.has(`${fg.friendGroupId}`)));
-  };
-
   // Effects
   useEffect(() => {
-    const unsubscribe = [
-      ipc.socket.on('friendGroupAdd', handleFriendGroupAdd),
-      ipc.socket.on('friendGroupUpdate', handleFriendGroupUpdate),
-      ipc.socket.on('friendGroupRemove', handleFriendGroupRemove),
-    ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    const unsub = ipc.socket.on('friendGroupAdd', (...args: { data: FriendGroup }[]) => {
+      const add = new Set(args.map((i) => `${i.data.friendGroupId}`));
+      setFriendGroups((prev) => prev.filter((fg) => !add.has(`${fg.friendGroupId}`)).concat(args.map((i) => i.data)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('friendGroupUpdate', (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
+      const update = new Map(args.map((i) => [`${i.friendGroupId}`, i.update] as const));
+      setFriendGroups((prev) => prev.map((fg) => (update.has(`${fg.friendGroupId}`) ? { ...fg, ...update.get(`${fg.friendGroupId}`) } : fg)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('friendGroupRemove', (...args: { friendGroupId: string }[]) => {
+      const remove = new Set(args.map((i) => `${i.friendGroupId}`));
+      setFriendGroups((prev) => prev.filter((fg) => !remove.has(`${fg.friendGroupId}`)));
+    });
+    return () => unsub();
   }, []);
 
   return (

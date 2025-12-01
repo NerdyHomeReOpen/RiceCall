@@ -43,29 +43,29 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
     });
   };
 
-  const handleFriendApplicationAdd = (...args: { data: FriendApplication }[]) => {
-    const add = new Set(args.map((i) => `${i.data.senderId}`));
-    setFriendApplications((prev) => prev.filter((a) => !add.has(`${a.senderId}`)).concat(args.map((i) => i.data)));
-  };
-
-  const handleFriendApplicationUpdate = (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
-    const update = new Map(args.map((i) => [`${i.senderId}`, i.update] as const));
-    setFriendApplications((prev) => prev.map((a) => (update.has(`${a.senderId}`) ? { ...a, ...update.get(`${a.senderId}`) } : a)));
-  };
-
-  const handleFriendApplicationRemove = (...args: { senderId: string }[]) => {
-    const remove = new Set(args.map((i) => `${i.senderId}`));
-    setFriendApplications((prev) => prev.filter((a) => !remove.has(`${a.senderId}`)));
-  };
-
   // Effects
   useEffect(() => {
-    const unsubscribe = [
-      ipc.socket.on('friendApplicationAdd', handleFriendApplicationAdd),
-      ipc.socket.on('friendApplicationUpdate', handleFriendApplicationUpdate),
-      ipc.socket.on('friendApplicationRemove', handleFriendApplicationRemove),
-    ];
-    return () => unsubscribe.forEach((unsub) => unsub());
+    const unsub = ipc.socket.on('friendApplicationAdd', (...args: { data: FriendApplication }[]) => {
+      const add = new Set(args.map((i) => `${i.data.senderId}`));
+      setFriendApplications((prev) => prev.filter((a) => !add.has(`${a.senderId}`)).concat(args.map((i) => i.data)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('friendApplicationUpdate', (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
+      const update = new Map(args.map((i) => [`${i.senderId}`, i.update] as const));
+      setFriendApplications((prev) => prev.map((a) => (update.has(`${a.senderId}`) ? { ...a, ...update.get(`${a.senderId}`) } : a)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('friendApplicationRemove', (...args: { senderId: string }[]) => {
+      const remove = new Set(args.map((i) => `${i.senderId}`));
+      setFriendApplications((prev) => prev.filter((a) => !remove.has(`${a.senderId}`)));
+    });
+    return () => unsub();
   }, []);
 
   return (
@@ -84,43 +84,40 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
 
         {/* Content Body */}
         <div className={styles['content']}>
-          {friendApplications.map((friendApplication) => {
-            const { senderId: applicationSenderId, name: applicationName, avatarUrl: applicationAvatarUrl, createdAt: applicationCreatedAt, description: applicationDescription } = friendApplication;
-            return (
-              <div key={applicationSenderId} className={styles['application']}>
-                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${applicationAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, applicationSenderId)} />
-                <div style={{ flex: 1 }}>
-                  <div className={styles['user-info-box']}>
-                    <div className={styles['user-name-text']}>{applicationName}</div>
-                    <div className={styles['time-text']} title={getFormatTimestamp(t, applicationCreatedAt)}>
-                      {getFormatTimeDiff(t, applicationCreatedAt)}
+          {friendApplications.map((friendApplication) => (
+            <div key={friendApplication.senderId} className={styles['application']}>
+              <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friendApplication.avatarUrl})` }} onClick={() => handleOpenUserInfo(userId, friendApplication.senderId)} />
+              <div style={{ flex: 1 }}>
+                <div className={styles['user-info-box']}>
+                  <div className={styles['user-name-text']}>{friendApplication.name}</div>
+                  <div className={styles['time-text']} title={getFormatTimestamp(t, friendApplication.createdAt)}>
+                    {getFormatTimeDiff(t, friendApplication.createdAt)}
+                  </div>
+                </div>
+                <div className={styles['application-content-box']}>
+                  <div className={popup['col']}>
+                    <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
+                    <div className={styles['content-text']}>
+                      {t('note')}: {friendApplication.description}
                     </div>
                   </div>
-                  <div className={styles['application-content-box']}>
-                    <div className={popup['col']}>
-                      <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
-                      <div className={styles['content-text']}>
-                        {t('note')}: {applicationDescription}
+                  <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
+                    <div className={styles['action-buttons']}>
+                      <div className={styles['button']} onClick={() => handleOpenApproveFriend(userId, friendApplication.senderId)}>
+                        {t('accept')}
+                      </div>
+                      <div className={styles['button']} onClick={() => handleRejectFriendApplication(friendApplication.senderId, friendApplication.name)}>
+                        {t('reject')}
                       </div>
                     </div>
-                    <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
-                      <div className={styles['action-buttons']}>
-                        <div className={styles['button']} onClick={() => handleOpenApproveFriend(userId, applicationSenderId)}>
-                          {t('accept')}
-                        </div>
-                        <div className={styles['button']} onClick={() => handleRejectFriendApplication(applicationSenderId, applicationName)}>
-                          {t('reject')}
-                        </div>
-                      </div>
-                      <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(userId, applicationSenderId)}>
-                        <div className={styles['direct-message-icon']} />
-                      </div>
+                    <div className={styles['direct-message-button']} onClick={() => handleOpenDirectMessage(userId, friendApplication.senderId)}>
+                      <div className={styles['direct-message-icon']} />
                     </div>
                   </div>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </div>

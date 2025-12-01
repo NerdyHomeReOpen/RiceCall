@@ -1,9 +1,9 @@
-name: Release Dev Latest
+name: Release (Dev)
 
 on:
   push:
     tags:
-      - '[0-9]+.[0-9]+.[0-9]+-dev.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-dev.*'
 
 permissions:
   contents: write
@@ -57,9 +57,10 @@ jobs:
       - name: Make .env file
         run: |
           echo "API_URL=${{ secrets.API_URL }}" > .env
+          echo "API_URL=${{ secrets.API_DEV_URL }}" >> .env.dev
           echo "WS_URL=${{ secrets.WS_URL }}" >> .env
+          echo "WS_URL=${{ secrets.WS_DEV_URL }}" >> .env.dev
           echo "CROWDIN_DISTRIBUTION_HASH=${{ secrets.CROWDIN_DISTRIBUTION_HASH }}" >> .env
-          echo "UPDATE_CHANNEL=dev" >> .env
 
       - name: Build electron
         uses: samuelmeuli/action-electron-builder@v1
@@ -73,7 +74,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.build_name }}
-          merge-multiple: true
           if-no-files-found: ignore
           path: |
             # Windows

@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
 // CSS
@@ -8,6 +9,7 @@ import header from '@/styles/header.module.css';
 // Pages
 import LoginPage from '@/pages/Login';
 import RegisterPage from '@/pages/Register';
+import ChangeServerPage from '@/pages/ChangeServer';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -65,16 +67,19 @@ const Header: React.FC = React.memo(() => {
 
 Header.displayName = 'Header';
 
-const Auth: React.FC = React.memo(() => {
+const AuthPageComponent: React.FC = React.memo(() => {
   // States
-  const [section, setSection] = useState<'register' | 'login'>('login');
+  const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
 
   // Effects
   useEffect(() => {
     const autoLogin = async () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const token = localStorage.getItem('token') || '';
-      ipc.auth.autoLogin(token);
+
+      const token = localStorage.getItem('token');
+      if (token) {
+        return await ipc.auth.autoLogin(token);
+      }
     };
     autoLogin();
   }, []);
@@ -90,10 +95,13 @@ const Auth: React.FC = React.memo(() => {
       <Header />
       <LoginPage display={section === 'login'} setSection={setSection} />
       <RegisterPage display={section === 'register'} setSection={setSection} />
+      <ChangeServerPage display={section === 'change-server'} setSection={setSection} />
     </>
   );
 });
 
-Auth.displayName = 'Auth';
+AuthPageComponent.displayName = 'AuthPageComponent';
 
-export default Auth;
+const AuthPage = dynamic(() => Promise.resolve(AuthPageComponent), { ssr: false });
+
+export default AuthPage;

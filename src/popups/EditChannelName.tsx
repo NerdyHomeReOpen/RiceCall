@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 // Types
 import type { Channel, Server } from '@/types';
@@ -25,8 +25,8 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
   // States
   const [channelName, setChannelName] = useState<string>(channel.name);
 
-  // Memos
-  const canSubmit = useMemo(() => channelName.trim(), [channelName]);
+  // Variables
+  const canSubmit = channelName.trim();
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {

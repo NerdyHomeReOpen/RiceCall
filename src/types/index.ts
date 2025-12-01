@@ -76,6 +76,8 @@ export type QueueUser = {
   isQueueControlled: boolean;
 };
 
+export type QueueMember = QueueUser & OnlineMember;
+
 export type Member = table_members & table_users & table_server_blocked_users & table_server_permissions;
 
 export type MemberApplication = table_member_applications & table_users;
@@ -156,6 +158,10 @@ export type SystemSettings = {
   stopSpeakingSound: boolean;
   receiveDirectMessageSound: boolean;
   receiveChannelMessageSound: boolean;
+
+  autoCheckForUpdates: boolean;
+  updateCheckInterval: number;
+  updateChannel: string;
 };
 
 export type ContextMenuItem = {
@@ -345,6 +351,7 @@ export type ServerToClientEvents = {
   reconnect_error: (error: any) => void;
   reconnect_failed: () => void;
   disconnect: () => void;
+  heartbeat: (...args: { seq: number; latency: number }[]) => void;
   // Notification
   notification: (...args: { message: string }[]) => void; // not used yet
   // User

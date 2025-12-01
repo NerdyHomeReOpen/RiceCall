@@ -1,10 +1,14 @@
 {
-  "update-available": "Yeni bir sürüm mevcut",
-  "update-available-message": "Yeni sürüm {{version}} {{releaseDate}} tarihinde yayımlandı, indirme işlemi başlıyor...",
-  "update-downloaded": "Güncellemeyi Yükleme",
-  "update-downloaded-message": "{{version}} sürümü indirildi. Lütfen yüklemek için Şimdi Yükle düğmesine tıklayın.",
+  "cancel": "İptal etmek",
+  "download-update": "Güncellemeyi indir",
+  "exit": "Çıkış",
   "install-update": "Şimdi Yükle",
-  "open-main-window": "Ana pencereyi aç",
+  "install-after-quit": "Kapalıyken kurun",
+  "is-latest-version": "Zaten son versiyon bu.",
   "logout": "oturumu Kapat",
-  "exit": "Çıkış"
+  "open-main-window": "Ana pencereyi aç",
+  "update-available": "Yeni bir sürüm mevcut",
+  "update-available-message": "Yeni sürüm {{version}} {{releaseDate}} tarihinde yayınlandı. İndirmeyi başlatmak için \"Güncellemeyi İndir\" düğmesine tıklayın.",
+  "update-downloaded": "Güncellemeyi Yükleme",
+  "update-downloaded-message": "{{version}} sürümü indirildi. Lütfen \"Şimdi Yükle\" veya \"Kapanışta Yükle\" seçeneğini seçin."
 }

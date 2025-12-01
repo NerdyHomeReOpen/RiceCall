@@ -79,15 +79,8 @@ const NotifyMenu: React.FC<NotifyMenuProps> = React.memo(({ x, y, direction, ite
               </div>
               {item.showContent && item.contents && (
                 <div className={styles['contents']}>
-                  {item.contents.slice(0, 3).map((content, index) => {
-                    switch (item.contentType) {
-                      case 'image':
-                        return <img key={index} src={content} alt={content} />;
-                      default:
-                        return content;
-                    }
-                  })}
-                  {item.contents.length > 3 && <span>..({item.contents.length - 3})</span>}
+                  {item.contents.slice(0, 3).map((content, index) => (item.contentType === 'image' ? <img key={index} src={content} alt={content} /> : content))}
+                  {item.contents.length > 3 && <span>...({item.contents.length - 3})</span>}
                 </div>
               )}
             </div>

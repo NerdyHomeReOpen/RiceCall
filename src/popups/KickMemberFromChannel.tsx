@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 
 // Types
 import type { Member, Server, Channel, User } from '@/types';
@@ -28,34 +28,26 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
   const [selectReason, setSelectReason] = useState<string>('');
   const [otherReason, setOtherReason] = useState<string>('');
 
-  // Destructuring
+  // Variables
   const { userId, name: memberName, nickname: memberNickname } = member;
+  const formatTypeOptions = [
+    { key: 'seconds', label: t('second') },
+    { key: 'minutes', label: t('minute') },
+    { key: 'hours', label: t('hour') },
+    { key: 'days', label: t('day') },
+    { key: 'month', label: t('month') },
+    { key: 'years', label: t('year') },
+  ];
+  const kickReasonOptions = [
+    { key: 'spam', label: t('reason-spam') },
+    { key: 'abuse', label: t('reason-abuse') },
+    { key: 'harassment', label: t('reason-harassment') },
+    { key: 'inappropriate-content', label: t('reason-inappropriate-content') },
+    { key: 'other', label: t('reason-other') },
+  ];
 
-  // Memos
-  const FORMAT_TYPE_OPTIONS = useMemo(
-    () => [
-      { key: 'seconds', label: t('second') },
-      { key: 'minutes', label: t('minute') },
-      { key: 'hours', label: t('hour') },
-      { key: 'days', label: t('day') },
-      { key: 'month', label: t('month') },
-      { key: 'years', label: t('year') },
-    ],
-    [t],
-  );
-
-  const KCIK_REASON = useMemo(
-    () => [
-      { key: 'spam', label: t('reason-spam') },
-      { key: 'abuse', label: t('reason-abuse') },
-      { key: 'harassment', label: t('reason-harassment') },
-      { key: 'inappropriate-content', label: t('reason-inappropriate-content') },
-      { key: 'other', label: t('reason-other') },
-    ],
-    [t],
-  );
-
-  const LENGTH_OPTIONS = useMemo(() => {
+  // Handlers
+  const getLengthOptions = () => {
     switch (formatType) {
       case 'seconds':
         return Array.from({ length: 60 }, (_, i) => i + 1);
@@ -72,9 +64,9 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
       default:
         return [];
     }
-  }, [formatType]);
+  };
 
-  const BLOCK_TIME = useMemo(() => {
+  const getBlockTime = () => {
     switch (formatType) {
       case 'seconds':
         return 1000 * selectTime;
@@ -91,11 +83,8 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
       default:
         return 1000;
     }
-  }, [formatType, selectTime]);
+  };
 
-  // Variables
-
-  // Handlers
   const handleBlockUserFromChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], blockUntil: number) => {
     ipc.socket.send('blockUserFromChannel', { userId, serverId, channelId, blockUntil });
     ipc.window.close();
@@ -121,7 +110,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
                 <div className={`${popup['row']}`}>
                   <div className={popup['select-box']}>
                     <select value={selectTime} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
-                      {LENGTH_OPTIONS.map((option) => (
+                      {getLengthOptions().map((option) => (
                         <option key={option} value={option}>
                           {option}
                         </option>
@@ -130,7 +119,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
                   </div>
                   <div className={popup['select-box']}>
                     <select value={formatType} onChange={(e) => setFormatType(e.target.value)}>
-                      {FORMAT_TYPE_OPTIONS.map((option) => (
+                      {formatTypeOptions.map((option) => (
                         <option key={option.key} value={option.key}>
                           {option.label}
                         </option>
@@ -144,7 +133,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
                 <div className={`${popup['row']}`}>
                   <div className={popup['select-box']}>
                     <select value={selectReason} onChange={(e) => setSelectReason(e.target.value)}>
-                      {KCIK_REASON.map((option) => (
+                      {kickReasonOptions.map((option) => (
                         <option key={option.key} value={option.key}>
                           {option.label}
                         </option>
@@ -165,7 +154,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
 
       {/* Footer */}
       <div className={popup['popup-footer']}>
-        <div className={popup['button']} onClick={() => handleBlockUserFromChannel(userId, serverId, channel.channelId, Date.now() + BLOCK_TIME)}>
+        <div className={popup['button']} onClick={() => handleBlockUserFromChannel(userId, serverId, channel.channelId, Date.now() + getBlockTime())}>
           {t('confirm')}
         </div>
         <div className={popup['button']} onClick={handleClose}>

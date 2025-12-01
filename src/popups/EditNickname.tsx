@@ -25,7 +25,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
   // States
   const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
 
-  // Destructuring
+  // Variables
   const { name: memberName } = member;
 
   // Handlers

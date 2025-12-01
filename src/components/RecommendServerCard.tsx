@@ -30,11 +30,25 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
   const mainTab = useMainTab();
   const { t } = useTranslation();
 
-  // Destructuring
+  // Variables
   const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, slogan: serverSlogan, online: serverOnline } = recommendServer;
   const { userId, currentServerId: userCurrentServerId } = user;
 
   // Handles
+  const getContextMenuItems = () => [
+    {
+      id: 'join-server',
+      label: t('join-server'),
+      onClick: () => handleServerSelect(serverId, serverDisplayId),
+    },
+    {
+      id: 'view-server-info',
+      label: t('view-server-info'),
+      disabled: true,
+      onClick: () => handleOpenServerSetting(userId, serverId),
+    },
+  ];
+
   const handleServerSelect = (serverId: RecommendServer['serverId'], serverDisplayId: RecommendServer['displayId']) => {
     if (loadingBox.isLoading) return;
     if (serverId === userCurrentServerId) {
@@ -54,19 +68,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
         e.preventDefault();
         const x = e.clientX;
         const y = e.clientY;
-        contextMenu.showContextMenu(x, y, 'right-bottom', [
-          {
-            id: 'join-server',
-            label: t('join-server'),
-            onClick: () => handleServerSelect(serverId, serverDisplayId),
-          },
-          {
-            id: 'view-server-info',
-            label: t('view-server-info'),
-            disabled: true,
-            onClick: () => handleOpenServerSetting(userId, serverId),
-          },
-        ]);
+        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
       }}
     >
       <div className={homePage['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>

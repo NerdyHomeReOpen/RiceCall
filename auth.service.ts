@@ -5,41 +5,36 @@ import api from './api.service.js';
 import packageJson from './package.json' with { type: 'json' };
 const version = packageJson.version;
 
-interface LoginFormData {
-  account: string;
-  password: string;
-}
-
 interface RegisterFormData {
   account: string;
   password: string;
   email: string;
   username: string;
+  locale: string;
 }
 
-export const authService = {
-  register: async (data: RegisterFormData): Promise<{ success: boolean; message: string }> => {
-    const res = await api.post('/register', data);
+interface LoginFormData {
+  account: string;
+  password: string;
+}
 
-    return { success: !!res, message: res.message };
+const authService = {
+  register: async (formData: RegisterFormData): Promise<{ success: true; message: string } | { success: false }> => {
+    const res = await api.post('/account/register', formData);
+    if (!res) return { success: false };
+
+    return { success: true, message: res.message };
   },
 
-  login: async (data: LoginFormData): Promise<{ success: true; token: string } | { success: false }> => {
-    const res = await api.post('/login', {
-      account: data.account,
-      password: data.password,
-      version,
-    });
+  login: async (formData: LoginFormData): Promise<{ success: true; token: string } | { success: false }> => {
+    const res = await api.post('/account/login', { ...formData, version });
     if (!res?.token) return { success: false };
 
     return { success: true, token: res.token };
   },
 
   autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {
-    const res = await api.post('/token/verify', {
-      token,
-      version,
-    });
+    const res = await api.post('/token/verify', { token, version });
     if (!res?.token) return { success: false };
 
     return { success: true, token: res.token };
