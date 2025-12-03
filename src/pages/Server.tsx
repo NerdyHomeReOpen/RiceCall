@@ -27,6 +27,9 @@ import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
 import MicModeMenu from '@/components/MicModeMenu';
 
+const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
+const MESSAGE_VIERER_DEVIATION = 100;
+
 interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
   lastMessageTime: number;
@@ -420,7 +423,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     const handleScroll = () => {
       if (!messageAreaRef.current) return;
-      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
+      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
       setIsAtBottom(isBottom);
     };
 
@@ -447,8 +450,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         return;
       }
       if (actionMessageTimer.current) clearTimeout(actionMessageTimer.current);
+      const seconeds = actionMessages[actionMessages.length - 1].displaySeconds ?? DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS;
       setShowActionMessage(true);
-      actionMessageTimer.current = setTimeout(() => setShowActionMessage(false), 8000);
+      actionMessageTimer.current = setTimeout(() => setShowActionMessage(false), seconeds * 1000);
       return () => {
         if (actionMessageTimer.current) {
           clearTimeout(actionMessageTimer.current);
@@ -487,11 +491,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       if (!messageAreaRef.current || channelMessages.length === 0) return;
 
       const lastMessage = channelMessages[channelMessages.length - 1];
-      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
+      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
 
-      if (lastMessage.type !== 'general' || lastMessage.userId === userId) {
-        setTimeout(() => handleScrollToBottom(), 50);
-      } else if (isBottom) {
+      if (isBottom || lastMessage.type !== 'general' || lastMessage.userId === userId) {
         setTimeout(() => handleScrollToBottom(), 50);
       } else {
         setUnreadMessageCount((prev) => prev + 1);

@@ -113,6 +113,7 @@ export type DirectMessage = Message &
 
 export type PromptMessage = Message & {
   type: 'alert' | 'info' | 'warn' | 'event';
+  displaySeconds?: number;
 };
 
 export type SystemSettings = {
