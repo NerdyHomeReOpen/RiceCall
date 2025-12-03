@@ -223,6 +223,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
           {[...currentChannelEvents].reverse().map((e, index) => {
             // Variables
             const isUser = e.userId === userId;
+            const isSuperior = permissionLevel > e.permissionLevel;
 
             // Handlers
             const getContextMenuItems = () => [
@@ -235,7 +236,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
               {
                 id: 'block',
                 label: t('block'),
-                show: !isUser && isServerAdmin(permissionLevel),
+                show: !isUser && isSuperior && isServerAdmin(permissionLevel),
                 onClick: () => handleOpenBlockMember(e.userId, serverId),
               },
             ];
@@ -267,6 +268,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
           {[...filterChannelEvent].reverse().map((e, index) => {
             // Variables
             const isUser = e.userId === userId;
+            const isSuperior = permissionLevel > e.permissionLevel;
 
             // Handlers
             const getContextMenuItems = () => [
@@ -279,7 +281,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
               {
                 id: 'block',
                 label: t('block'),
-                show: !isUser && isServerAdmin(permissionLevel),
+                show: !isUser && isSuperior && isServerAdmin(permissionLevel),
                 onClick: () => handleOpenBlockMember(e.userId, serverId),
               },
             ];
