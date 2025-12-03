@@ -368,7 +368,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
         {/* Recommend Server */}
         <div className={styles['home-wrapper']}>
-          <div className={styles['label']}>{t('recommend-server')}</div>
+          <div className={styles['server-list-title']}>{t('recommend-server')}</div>
           <div className={styles['recommend-server-tabs']}>
             {recommendServerCategoryTabs.map((tab) => (
               <div
@@ -433,10 +433,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           </div>
         </div>
       </main>
-      {/* Recommended servers */}
-      {/* <main className={styles['recommended-servers-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
-        <RecommendServerList recommendServers={recommendServers} user={user} />
-      </main> */}
 
       {/* Personal Exclusive */}
       <main className={styles['home-body']} style={section === 4 ? {} : { display: 'none' }}>
