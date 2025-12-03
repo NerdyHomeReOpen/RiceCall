@@ -109,7 +109,8 @@ type PopupType =
   | 'systemSetting'
   | 'userInfo'
   | 'userSetting'
-  | 'chatHistory';
+  | 'chatHistory'
+  | 'groupApplied'
 
 const store = new Store<StoreType>({
   defaults: {
@@ -212,6 +213,7 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   userInfo: { height: 630, width: 440 },
   userSetting: { height: 700, width: 500 },
   chatHistory: { height: 547, width: 714 },
+  groupApplied: { height: 150, width: 320 }
 };
 
 // Constants
