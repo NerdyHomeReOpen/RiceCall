@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import popup from '@/styles/popup.module.css';
 import styles from '@/styles/channelEvent.module.css';
 import permission from '@/styles/permission.module.css';
+import setting from '@/styles/setting.module.css';
 
 // Types
 import type { Channel, OnlineMember, User, ChannelEvent, Server } from '@/types';
@@ -43,6 +44,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
   const [onlineMembers, setOnlineMembers] = useState<OnlineMember[]>(serverMembers);
   const [serverChannelEvents, setServerChannelEvents] = useState<ChannelEvent[]>(channelEvents);
   const [selectMode, setSelectMode] = useState<'current' | 'all'>('current');
+  const [searchText, setSearchText] = useState<string>('');
 
   // Variables
   const { userId, currentChannelId: userCurrentChannelId, permissionLevel: userPermissionLevel } = currentUser;
@@ -50,7 +52,10 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
   const { channelId: currentChannelId, name: currentChannelName, permissionLevel: currentChannelPermissionLevel } = channels.filter((c) => c.channelId === userCurrentChannelId)[0];
   const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
 
-  const currentChannelEvents = serverChannelEvents.filter((e) => e.prevChannelId === currentChannelId || e.nextChannelId === currentChannelId);
+  const filterChannelEvent = serverChannelEvents.filter((e) => e.name.toLowerCase().includes(searchText.toLowerCase()) || e.nickname?.toLowerCase().includes(searchText.toLowerCase()));
+  const currentChannelEvents = serverChannelEvents
+    .filter((e) => e.prevChannelId === currentChannelId || e.nextChannelId === currentChannelId)
+    .filter((e) => e.name.toLowerCase().includes(searchText.toLowerCase()) || e.nickname?.toLowerCase().includes(searchText.toLowerCase()));
 
   // Effects
   useEffect(() => {
@@ -216,6 +221,9 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
         <div className={styles['event-list']} style={selectMode === 'current' ? {} : { display: 'none' }}>
           <div className={styles['current-channel']}>{currentChannelName}</div>
           {[...currentChannelEvents].reverse().map((e, index) => {
+            // Variables
+            const isUser = e.userId === userId;
+
             // Handlers
             const getContextMenuItems = () => [
               {
@@ -227,7 +235,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
               {
                 id: 'block',
                 label: t('block'),
-                show: isServerAdmin(permissionLevel),
+                show: !isUser && isServerAdmin(permissionLevel),
                 onClick: () => handleOpenBlockMember(e.userId, serverId),
               },
             ];
@@ -256,7 +264,10 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
           })}
         </div>
         <div className={styles['event-list']} style={selectMode === 'all' ? {} : { display: 'none' }}>
-          {[...serverChannelEvents].reverse().map((e, index) => {
+          {[...filterChannelEvent].reverse().map((e, index) => {
+            // Variables
+            const isUser = e.userId === userId;
+
             // Handlers
             const getContextMenuItems = () => [
               {
@@ -268,7 +279,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
               {
                 id: 'block',
                 label: t('block'),
-                show: isServerAdmin(permissionLevel),
+                show: !isUser && isServerAdmin(permissionLevel),
                 onClick: () => handleOpenBlockMember(e.userId, serverId),
               },
             ];
@@ -298,7 +309,12 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
         </div>
       </div>
       {/* Footer */}
-      <div className={popup['popup-footer']}></div>
+      <div className={popup['popup-footer']}>
+        <div className={setting['search-box']}>
+          <div className={setting['search-icon']}></div>
+          <input name="search-query" type="text" className={setting['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+        </div>
+      </div>
     </div>
   );
 });
