@@ -344,6 +344,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     };
 
     const handleToggleMixingMode = async () => {
+      if (!webRTC.isMicTaken) return;
       webRTC.toggleMixMode();
     };
 
