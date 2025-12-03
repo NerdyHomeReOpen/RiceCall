@@ -138,11 +138,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   );
 
   const handleNextAnn = () => {
-    scrollToIndex(selectedAnnIndex + 1);
+    scrollToIndex(selectedAnnIndex === filteredAnns.length - 1 ? 0 : selectedAnnIndex + 1);
   };
 
   const handlePrevAnn = () => {
-    scrollToIndex(selectedAnnIndex - 1);
+    scrollToIndex(selectedAnnIndex === 0 ? filteredAnns.length - 1 : selectedAnnIndex - 1);
   };
 
   const scrollToIndex = useCallback(
@@ -334,10 +334,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => scrollToIndex(index)}></nav>
               ))}
             </div>
-            <nav className={`${styles['nav']} ${styles['prev-btn']}`} style={selectedAnnIndex === 0 ? { display: 'none' } : {}} onClick={handlePrevAnn}>
+            <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnn}>
               {'◀'}
             </nav>
-            <nav className={`${styles['nav']} ${styles['next-btn']}`} style={selectedAnnIndex === filteredAnns.length - 1 ? { display: 'none' } : {}} onClick={handleNextAnn}>
+            <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={handleNextAnn}>
               {'▶'}
             </nav>
           </div>
