@@ -190,7 +190,9 @@
   padding: 8px;
   background-color: var(--background);
   border: 1px solid var(--border);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), inset 0 1px 5px rgb(0 0 0 / 10%);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 5px rgb(0 0 0 / 10%);
 }
 
 .color-option {
@@ -262,7 +264,7 @@
   cursor: pointer;
 }
 
-.emoji-tab-btn+.emoji-tab-btn {
+.emoji-tab-btn + .emoji-tab-btn {
   margin-left: 0;
 }
 

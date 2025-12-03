@@ -116,7 +116,6 @@
   background-color: var(--selected);
 }
 
-
 .friend-info-box:hover {
   background-color: var(--hover);
 }

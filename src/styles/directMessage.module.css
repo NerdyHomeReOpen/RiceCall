@@ -208,6 +208,7 @@
 
 .action-area.clickable {
   cursor: pointer;
+
   &:hover .action-title {
     text-decoration: underline;
   }
