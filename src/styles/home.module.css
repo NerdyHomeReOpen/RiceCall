@@ -620,6 +620,13 @@
   display: flex;
   overflow: hidden;
   aspect-ratio: 3 / 1;
+  border-radius: 5px;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.01);
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+  }
 }
 
 .banners {
