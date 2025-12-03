@@ -843,6 +843,7 @@
 }
 
 .announcement-detail-wrapper {
+  z-index: 10000;
   position: absolute;
   top: 0;
   left: 0;
