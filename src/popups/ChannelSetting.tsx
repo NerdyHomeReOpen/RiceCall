@@ -568,7 +568,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <thead>
                   <tr>
                     {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
-                      <th key={field.key} style={memberColumnWidths[index] ? { flex: `0 0 ${memberColumnWidths[index]}px` } : {}}>
+                      <th key={field.key} style={{ width: `${memberColumnWidths[index]}px` }}>
                         <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
                           {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                         </div>
@@ -676,13 +676,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                           contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                         }}
                       >
-                        <td style={{ flex: `0 0 ${memberColumnWidths[0] ?? 150}px` }}>
+                        <td style={{ width: `${memberColumnWidths[0]}px` }}>
                           <div className={`${permission[moderator.gender]} ${permission[`lv-${moderator.permissionLevel}`]}`} />
                           <div className={`${popup['name']} ${moderator.nickname ? popup['highlight'] : ''}`}>{moderator.nickname || moderator.name}</div>
                         </td>
-                        <td style={{ flex: `0 0 ${memberColumnWidths[1] ?? 90}px` }}>{getPermissionText(t, moderator.permissionLevel)}</td>
-                        <td style={{ flex: `0 0 ${memberColumnWidths[2] ?? 80}px` }}>{moderator.contribution}</td>
-                        <td style={{ flex: `0 0 ${memberColumnWidths[3] ?? 90}px` }}>{new Date(moderator.createdAt).toLocaleDateString()}</td>
+                        <td style={{ width: `${memberColumnWidths[1]}px` }}>{getPermissionText(t, moderator.permissionLevel)}</td>
+                        <td style={{ width: `${memberColumnWidths[2]}px` }}>{moderator.contribution}</td>
+                        <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(moderator.createdAt).toLocaleDateString()}</td>
                       </tr>
                     );
                   })}
@@ -708,7 +708,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                 <thead>
                   <tr>
                     {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
-                      <th key={field.key} style={blockMemberColumnWidths[index] ? { flex: `0 0 ${blockMemberColumnWidths[index]}px` } : {}}>
+                      <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }}>
                         <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
                           {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                         </div>
@@ -753,10 +753,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                           contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                         }}
                       >
-                        <td style={{ flex: `0 0 ${blockMemberColumnWidths[0] ?? 150}px` }}>{member.nickname || member.name}</td>
-                        <td style={{ flex: `0 0 ${blockMemberColumnWidths[1] ?? 150}px` }}>
-                          {member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}
-                        </td>
+                        <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{member.nickname || member.name}</td>
+                        <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
                       </tr>
                     );
                   })}

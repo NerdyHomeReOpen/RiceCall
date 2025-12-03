@@ -461,7 +461,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   <thead>
                     <tr>
                       {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
-                        <th key={field.key} style={memberColumnWidths[index] ? { flex: `0 0 ${memberColumnWidths[index]}px` } : {}}>
+                        <th key={field.key} style={{ width: `${memberColumnWidths[index]}px` }}>
                           <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
                             {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                           </div>
@@ -551,13 +551,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td title={member.nickname || member.name} style={memberColumnWidths[0] ? { flex: `0 0 ${memberColumnWidths[0]}px` } : {}}>
+                          <td title={member.nickname || member.name} style={{ width: `${memberColumnWidths[0]}px` }}>
                             <div className={`${permission[member.gender]} ${permission[`lv-${member.permissionLevel}`]}`} />
                             <div className={`${popup['name']} ${member.nickname ? popup['highlight'] : ''}`}>{member.nickname || member.name}</div>
                           </td>
-                          <td style={memberColumnWidths[1] ? { flex: `0 0 ${memberColumnWidths[1]}px` } : {}}>{getPermissionText(t, member.permissionLevel)}</td>
-                          <td style={memberColumnWidths[2] ? { flex: `0 0 ${memberColumnWidths[2]}px` } : {}}>{member.contribution}</td>
-                          <td style={memberColumnWidths[3] ? { flex: `0 0 ${memberColumnWidths[3]}px` } : {}}>{new Date(member.createdAt).toLocaleDateString()}</td>
+                          <td style={{ width: `${memberColumnWidths[1]}px` }}>{getPermissionText(t, member.permissionLevel)}</td>
+                          <td style={{ width: `${memberColumnWidths[2]}px` }}>{member.contribution}</td>
+                          <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(member.createdAt).toLocaleDateString()}</td>
                         </tr>
                       );
                     })}
@@ -645,7 +645,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   <thead>
                     <tr>
                       {MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
-                        <th key={field.key} style={applicationColumnWidths[index] ? { flex: `0 0 ${applicationColumnWidths[index]}px` } : {}}>
+                        <th key={field.key} style={{ width: `${applicationColumnWidths[index]}px` }}>
                           <div className={popup['label']} onClick={() => handleApplicationSort(field.key as keyof MemberApplication)}>
                             {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                           </div>
@@ -700,9 +700,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td style={applicationColumnWidths[0] ? { flex: `0 0 ${applicationColumnWidths[0]}px` } : {}}>{application.name}</td>
-                          <td style={applicationColumnWidths[1] ? { flex: `0 0 ${applicationColumnWidths[1]}px` } : {}}>{application.description}</td>
-                          <td style={applicationColumnWidths[2] ? { flex: `0 0 ${applicationColumnWidths[2]}px` } : {}}>{new Date(application.createdAt).toLocaleDateString()}</td>
+                          <td style={{ width: `${applicationColumnWidths[0]}px` }}>{application.name}</td>
+                          <td style={{ width: `${applicationColumnWidths[1]}px` }}>{application.description}</td>
+                          <td style={{ width: `${applicationColumnWidths[2]}px` }}>{new Date(application.createdAt).toLocaleDateString()}</td>
                         </tr>
                       );
                     })}
@@ -728,7 +728,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   <thead>
                     <tr>
                       {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
-                        <th key={field.key} style={blockMemberColumnWidths[index] ? { flex: `0 0 ${blockMemberColumnWidths[index]}px` } : {}}>
+                        <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }}>
                           <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
                             {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                           </div>
@@ -773,8 +773,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td style={blockMemberColumnWidths[0] ? { flex: `0 0 ${blockMemberColumnWidths[0]}px` } : {}}>{member.nickname || member.name}</td>
-                          <td style={blockMemberColumnWidths[1] ? { flex: `0 0 ${blockMemberColumnWidths[1]}px` } : {}}>
+                          <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{member.nickname || member.name}</td>
+                          <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>
                             {member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}
                           </td>
                         </tr>
