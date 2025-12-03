@@ -174,3 +174,11 @@ export const BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; 
     minWidth: 220,
   },
 ];
+export const RECOMMEND_SERVER_CATEGORY_TABS = [
+  { key: 'all', tKey: 'all' },
+  { key: 'official', tKey: 'official-server' },
+  { key: 'entertainment', tKey: 'entertainment-server' },
+  { key: 'game', tKey: 'game-server' },
+  { key: 'community', tKey: 'community-server' },
+  { key: 'education', tKey: 'education-server' },
+];
