@@ -132,12 +132,12 @@ export const MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWid
   {
     tKey: 'permission',
     key: 'permissionLevel',
-    minWidth: 100,
+    minWidth: 120,
   },
   {
     tKey: 'contribution',
     key: 'contribution',
-    minWidth: 100,
+    minWidth: 70,
   },
   {
     tKey: 'join-date',

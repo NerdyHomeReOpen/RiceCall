@@ -209,7 +209,8 @@
   position: sticky;
   top: 0;
   display: flex;
-  width: max-content;
+  width: 100%;
+  min-width: max-content;
 
   & tr {
     background-color: var(--background-secondary);
@@ -219,7 +220,8 @@
 .input-box table tbody {
   display: flex;
   flex-direction: column;
-  width: max-content;
+  width: 100%;
+  min-width: max-content;
 }
 
 .input-box table tr {
@@ -238,7 +240,7 @@
 }
 
 .input-box table tr th {
-  height: auto;
+  position: relative;
   width: 100%;
   background-color: var(--background-secondary);
   border-right: 1px solid var(--border);
@@ -246,13 +248,13 @@
   font-weight: unset;
   display: flex;
   align-items: center;
-
-  & .label {
-    padding: 5px;
-    flex: 1;
-  }
+  padding: 5px;
 
   & .resizer {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
     width: 5px;
     align-self: stretch;
     cursor: col-resize;
@@ -267,7 +269,6 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  height: auto;
   width: 100%;
   border-right: 1px solid var(--border);
   padding: 5px;

@@ -461,10 +461,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   <thead>
                     <tr>
                       {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
-                        <th key={field.key} style={{ width: `${memberColumnWidths[index]}px` }}>
-                          <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
-                            {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
-                          </div>
+                        <th key={field.key} style={{ width: `${memberColumnWidths[index]}px` }} onClick={() => handleMemberSort(field.key as keyof Member)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                           <div className={popup['resizer']} onPointerDown={(e) => handleMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleMemberColumnHandleMove(e, index)} />
                         </th>
                       ))}
@@ -645,10 +643,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   <thead>
                     <tr>
                       {MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
-                        <th key={field.key} style={{ width: `${applicationColumnWidths[index]}px` }}>
-                          <div className={popup['label']} onClick={() => handleApplicationSort(field.key as keyof MemberApplication)}>
-                            {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
-                          </div>
+                        <th key={field.key} style={{ width: `${applicationColumnWidths[index]}px` }} onClick={() => handleApplicationSort(field.key as keyof MemberApplication)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                           <div className={popup['resizer']} onPointerDown={(e) => handleApplicationColumnHandleDown(e, index)} onPointerMove={(e) => handleApplicationColumnHandleMove(e, index)} />
                         </th>
                       ))}
@@ -728,10 +724,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   <thead>
                     <tr>
                       {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
-                        <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }}>
-                          <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
-                            {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
-                          </div>
+                        <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }} onClick={() => handleMemberSort(field.key as keyof Member)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                           <div className={popup['resizer']} onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
                         </th>
                       ))}
