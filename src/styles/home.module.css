@@ -279,6 +279,15 @@
   background-position: 0 0;
 }
 
+.navegate-tab[data-key='60005']::before {
+  content: '';
+  min-width: 12px;
+  min-height: 12px;
+  margin-right: 5px;
+  background-image: url('/back.png');
+  background-position: 0 0;
+}
+
 /* Body */
 
 .home-body {

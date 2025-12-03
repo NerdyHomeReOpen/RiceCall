@@ -328,9 +328,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={styles['navegate-tab']} data-key="30014" onClick={() => handleOpenCreateServer(userId)}>
             {t('create-server')}
           </div>
-          <div className={styles['navegate-tab']} data-key="60004" onClick={() => setSection(4)}>
-            {t('personal-exclusive')}
-          </div>
+          {section !== 4 && (
+            <div className={styles['navegate-tab']} data-key="60004" onClick={() => setSection(4)}>
+              {t('personal-exclusive')}
+            </div>
+          )}
+          {section === 4 && (
+            <div className={styles['navegate-tab']} data-key="60005" onClick={() => setSection(0)}>
+              {t('back')}
+            </div>
+          )}
         </div>
       </header>
 
