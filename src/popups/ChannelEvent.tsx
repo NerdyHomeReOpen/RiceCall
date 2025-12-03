@@ -187,21 +187,21 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
 
   const getActionContent = (e: ChannelEvent) => {
     if (e.type === 'join') {
-      return <span className={styles['green']}>{t('join-current-server')}</span>;
+      return <span className={styles['green']} title={t('join-current-server')}>{t('join-current-server')}</span>;
     } else if (e.type === 'leave') {
-      return <span className={styles['red']}>{t('leave-current-server')}</span>;
+      return <span className={styles['red']} title={t('leave-current-server')}>{t('leave-current-server')}</span>;
     } else {
       const prevChannelName = e.prevChannelId ? channelsMap.get(e.prevChannelId) : '';
       const nextChannelName = e.nextChannelId ? channelsMap.get(e.nextChannelId) : '';
-      return <span className={styles['green']}>{t('move-to-new-channel', { 0: prevChannelName, 1: nextChannelName })}</span>;
+      return <span className={styles['green']} title={t('move-to-new-channel', { 0: prevChannelName, 1: nextChannelName })}>{t('move-to-new-channel', { 0: prevChannelName, 1: nextChannelName })}</span>;
     }
   };
 
   const getCurrentActionContent = (e: ChannelEvent) => {
     if (e.type === 'join' || (e.type === 'move' && e.nextChannelId === currentChannelId)) {
-      return <span className={styles['green']}>{t('join-current-channel')}</span>;
+      return <span className={styles['green']} title={t('join-current-channel')}>{t('join-current-channel')}</span>;
     } else if (e.type === 'leave' || (e.type === 'move' && e.prevChannelId === currentChannelId)) {
-      return <span className={styles['red']}>{t('leave-current-channel')}</span>;
+      return <span className={styles['red']} title={t('leave-current-channel')}>{t('leave-current-channel')}</span>;
     }
   };
 
@@ -212,6 +212,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
         <div className={`${styles['option-tab']} ${selectMode === 'current' ? styles['active'] : ''}`} onClick={() => setSelectMode('current')}>
           {t('current-channel')}
         </div>
+        <div className={styles['spliter']}></div>
         <div className={`${styles['option-tab']} ${selectMode === 'all' ? styles['active'] : ''}`} onClick={() => setSelectMode('all')}>
           {t('all-channel')}
         </div>
