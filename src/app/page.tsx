@@ -25,6 +25,7 @@ import type {
   Notify,
   RecommendServer,
   FriendActivity,
+  ChannelEvent,
 } from '@/types';
 
 // i18n
@@ -385,6 +386,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [serverOnlineMembers, setServerOnlineMembers] = useState<OnlineMember[]>([]);
   const [serverMemberApplications, setServerMemberApplications] = useState<MemberApplication[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [channelEvents, setChannelEvents] = useState<ChannelEvent[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
   const [systemNotify, setSystemNotify] = useState<string[]>([]);
@@ -394,6 +396,9 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
   const [latency, setLatency] = useState<number>(0);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
+
+  // Channel Event Refs
+  const serverMembersRef = useRef(serverOnlineMembers);
 
   // Variables
   const currentServer = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
@@ -466,6 +471,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     selectedTabIdRef.current = mainTab.selectedTabId;
   }, [mainTab.selectedTabId]);
+
+  useEffect(() => {
+    serverMembersRef.current = serverOnlineMembers;
+  }, [serverOnlineMembers]);
 
   useEffect(() => {
     if (user.currentServerId && selectedTabIdRef.current !== 'server') setSelectedTabIdRef.current('server');
@@ -587,6 +596,7 @@ const RootPageComponent: React.FC = React.memo(() => {
         setQueueUsers([]);
         setChannels([]);
         setServerOnlineMembers([]);
+        setChannelEvents([]);
       }
       setUser((prev) => ({ ...prev, ...args[0].update }));
       if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
@@ -693,6 +703,16 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: OnlineMember }[]) => {
       const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
+      setChannelEvents((prev) => [
+        ...prev,
+        ...args.map((m) => ({
+          ...m.data,
+          type: 'join' as ChannelEvent['type'],
+          prevChannelId: null,
+          nextChannelId: m.data.currentChannelId,
+          timestamp: Date.now(),
+        })),
+      ]);
       setServerOnlineMembers((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
     });
     return () => unsub();
@@ -701,6 +721,23 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
+      args.map((m) => {
+        const originMember = serverMembersRef.current.find((om) => om.userId === m.userId);
+        if (originMember) {
+          const originChannelId = originMember.currentChannelId;
+          const newMember = { ...originMember, ...m.update };
+          setChannelEvents((prev) => [
+            ...prev,
+            {
+              ...newMember,
+              type: 'move' as ChannelEvent['type'],
+              prevChannelId: originChannelId,
+              nextChannelId: newMember.currentChannelId,
+              timestamp: Date.now(),
+            },
+          ]);
+        }
+      });
       setServerOnlineMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
     });
     return () => unsub();
@@ -709,6 +746,21 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args: { userId: string; serverId: string }[]) => {
       const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
+      args.map((m) => {
+        const originMember = serverMembersRef.current.find((om) => om.userId === m.userId);
+        if (originMember) {
+          setChannelEvents((prev) => [
+            ...prev,
+            {
+              ...originMember,
+              type: 'leave' as ChannelEvent['type'],
+              prevChannelId: originMember.currentChannelId,
+              nextChannelId: null,
+              timestamp: Date.now(),
+            },
+          ]);
+        }
+      });
       setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
     });
     return () => unsub();
@@ -860,6 +912,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 channels={channels}
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
+                channelEvents={channelEvents}
                 onClearMessages={handleClearMessages}
                 display={mainTab.selectedTabId === 'server'}
                 latency={latency}

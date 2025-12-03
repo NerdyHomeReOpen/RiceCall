@@ -1,5 +1,5 @@
 // Types
-import type { User, Server, Channel, FriendGroup } from '@/types';
+import type { User, Server, Channel, FriendGroup, ChannelEvent } from '@/types';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -30,8 +30,8 @@ export const handleOpenServerSetting = (userId: User['userId'], serverId: Server
   ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
 };
 
-export const handleOpenChannelEvent = (userId: User['userId'], serverId: Server['serverId']) => {
-  ipc.popup.open('channelEvent', 'channelEvent', { userId, serverId });
+export const handleOpenChannelEvent = (userId: User['userId'], serverId: Server['serverId'], channelEvents: ChannelEvent[]) => {
+  ipc.popup.open('channelEvent', 'channelEvent', { userId, serverId, channelEvents });
 };
 
 export const handleOpenChannelSetting = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
